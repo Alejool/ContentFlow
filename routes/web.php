@@ -21,14 +21,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    // Route::get('/videos', [ProfileController::class, 'edit'])->name('profile.edit');
 
 });
     Route::get('/videos', [VideoController::class, 'edit'])->name('video.edit');
-Route::resource('posts', App\Http\Controllers\PostController::class)->only('index', 'store');
-Route::resource('posts', App\Http\Controllers\PostController::class)->only('index', 'store');
+    Route::resource('posts', App\Http\Controllers\PostController::class)->only('index', 'store');
+    Route::resource('posts', App\Http\Controllers\PostController::class)->only('index', 'store');
 
-// Route::resource('videos', VideoController::class)->only('index', 'store');
 
 require __DIR__.'/auth.php';
 
