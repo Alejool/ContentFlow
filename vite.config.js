@@ -16,11 +16,12 @@ export default defineConfig({
   },
    server: {
         proxy: {
-            '/videos': {
+            '*': {
                 target: 'http://127.0.0.1:8000', // URL del backend
                 changeOrigin: true,
-                secure: false,
+                secure: true,
             },
         },
+        // cors: true,
     },
 });

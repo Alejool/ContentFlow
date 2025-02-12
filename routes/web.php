@@ -1,9 +1,11 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PostController;
 use App\Http\Controllers\VideoController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
+
 use Inertia\Inertia;
 
 Route::get('/', function () {
@@ -24,8 +26,8 @@ Route::middleware('auth')->group(function () {
 
 });
     Route::get('/videos', [VideoController::class, 'edit'])->name('video.edit');
-    Route::resource('posts', App\Http\Controllers\PostController::class)->only('index', 'store');
-    Route::resource('posts', App\Http\Controllers\PostController::class)->only('index', 'store');
+    Route::resource('posts', PostController::class)->only('index', 'store');
+    Route::resource('posts', PostController::class)->only('index', 'store');
 
 
 require __DIR__.'/auth.php';
