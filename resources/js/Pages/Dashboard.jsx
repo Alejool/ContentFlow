@@ -19,7 +19,7 @@ export default function Dashboard() {
                                 </p>
                                 <Link
                                     href="/edit-photos"
-                                    className="mt-4 inline-block w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+                                    className=" px-4 mt-4 inline-block w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
                                 >
                                     Go to Photo Editor
                                 </Link>
@@ -35,7 +35,7 @@ export default function Dashboard() {
                                 </p>
                                 <Link
                                     href="/featured-collections"
-                                    className="mt-4 inline-block w-full py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition"
+                                    className=" px-4 mt-4 inline-block w-full py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition"
                                 >
                                     View Featured Collections
                                 </Link>
@@ -51,7 +51,7 @@ export default function Dashboard() {
                                 </p>
                                 <Link
                                     href="/manage-collections"
-                                    className="mt-4 inline-block w-full py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+                                    className=" px-4 mt-4 inline-block w-full py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
                                 >
                                     Manage Your Collections
                                 </Link>
@@ -67,7 +67,7 @@ export default function Dashboard() {
                                 </p>
                                 <Link
                                     href="/videos"
-                                    className="mt-4 inline-block w-full py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+                                    className=" px-4 mt-4 inline-block w-full py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
                                 >
                                     Start Creating Videos
                                 </Link>

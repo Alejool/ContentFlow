@@ -201,12 +201,13 @@ const Edit = () => {
             const data = await ffmpeg.readFile('output.mp4');
             const videoBlob = new Blob([data.buffer], { type: 'video/mp4' });
             const videoUrl = URL.createObjectURL(videoBlob);
-            setOutputVideo(videoUrl);
+            setOutputVideo(videoUrl);  // Actualizar el estado con la URL del video generado
             await ffmpeg.terminate();
         } catch (error) {
             console.error('Error al procesar los videos:', error);
         }
     };
+
 
     return (
         <AuthenticatedLayout
@@ -216,9 +217,9 @@ const Edit = () => {
                 </h2>
             }
         >
-            <Head title="Profile" />
-            <div className="min-h-screen bg-gray-100 flex flex-col justify-center items-center py-10 px-4">
-                <div className="w-full max-w-4xl bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+            <Head title="Video" />
+            <div className="min-h-screen  flex flex-col justify-center items-center py-10 px-4">
+                <div className="w-full max-w-4xl  dark:bg-gray-800 rounded-lg shadow-lg p-6">
                     <h1 className="text-2xl font-semibold text-center text-gray-900 dark:text-white mb-6">
                         Editar Videos
                     </h1>
@@ -293,6 +294,20 @@ const Edit = () => {
                             </button>
                         </div>
                     </div>
+                    <div className="mt-6">
+                            <h3 className="text-lg font-medium text-gray-700 dark:text-white mb-2">Video Finalizado</h3>
+                            {outputVideo ? (
+                                <div className="mb-4">
+                                    <video className="w-full h-auto" controls>
+                                        <source src={outputVideo} type="video/mp4" />
+                                        Tu navegador no soporta el elemento de video.
+                                    </video>
+                                </div>
+                            ) : (
+                                <p>No hay video generado aún.</p>
+                            )}
+                    </div>
+
 
                     {/* Save button */}
                     <div className="mt-6 flex justify-between items-center">
