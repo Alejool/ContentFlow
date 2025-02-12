@@ -28,7 +28,7 @@ export default {
             },
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
-                poppins: ['Poppins', ...defaultTheme.fontFamily.poppins],
+                poppins: ['Poppins', ...defaultTheme.fontFamily.sans],
             },
         },
     },
