@@ -18,7 +18,7 @@ export default function AuthenticatedLayout({ header, children }) {
          style={{ backgroundImage: `url(${Bg})`}}
          >
              
-            <nav className=" border-gray-100   ">
+            <nav className=" border-gray-100">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="flex h-24 justify-between">
                         <div className="flex">
