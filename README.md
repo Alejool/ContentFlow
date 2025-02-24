@@ -15,13 +15,13 @@ SmartContentHub es una plataforma diseñada para creadores de contenido y equipo
 
 ## 📌 Roadmap del Proyecto
 
-### **Fase 1: Diseño e Infraestructura (1-2 meses)**
+### **Fase 1: Diseño e Infraestructura **
 - [x] Definir estructura de la base de datos.
 - [x] Configurar Laravel como API REST y React como frontend.
 - [x] Implementar autenticación con Laravel Sanctum y opciones OAuth.
 - [x] Sistema de subida y almacenamiento de imágenes/videos.
 
-### **Fase 2: Gestión de Contenido (2-3 meses)**
+### **Fase 2: Gestión de Contenido **
 - [ ] Creación de módulos para organizar contenido (colecciones, etiquetas, filtros).
 - [ ] Implementación del dashboard para visualizar y gestionar archivos.
 - [ ] Integración con redes sociales (autenticación y permisos).
@@ -32,7 +32,7 @@ SmartContentHub es una plataforma diseñada para creadores de contenido y equipo
 - [ ] Autoajuste de imágenes y videos según cada red social.
 - [ ] Implementación de análisis de engagement.
 
-### **Fase 4: Expansión y Optimización (6+ meses)**
+### **Fase 4: Expansión y Optimización **
 - [ ] Implementación de planes gratuitos y premium.
 - [ ] Funcionalidad de colaboración para equipos.
 - [ ] Soporte para nuevas redes sociales y mejoras en UI/UX.
