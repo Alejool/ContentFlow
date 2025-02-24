@@ -8,68 +8,52 @@ export default function Dashboard() {
             <Head title="Dashboard" />
             <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    {/* Main Dashboard Grid */}
+                    {/* Main Dashboard Grid */}      
                     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                        {/* Card 1: Edit Photos */}
+                        {/* Card 1: Manage Orders */}
                         <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                             <div className="p-6">
-                                <h3 className="text-lg font-semibold text-gray-700">Edit Photos</h3>
+                                <h3 className="text-lg font-semibold text-gray-700">Manage Orders</h3>
                                 <p className="mt-2 text-sm text-gray-500">
-                                    Enhance and edit your photos with advanced tools.
+                                    View, update, and process service orders efficiently.
                                 </p>
                                 <Link
-                                    href="/edit-photos"
-                                    className=" px-4 mt-4 inline-block w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+                                    href="/orders"
+                                    className="px-4 mt-4 inline-block w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
                                 >
-                                    Go to Photo Editor
+                                    Go to Orders
                                 </Link>
                             </div>
                         </div>
 
-                        {/* Card 2: Featured Collections */}
+                        {/* Card 2: Customer Management */}
                         <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                             <div className="p-6">
-                                <h3 className="text-lg font-semibold text-gray-700">Featured Collections</h3>
+                                <h3 className="text-lg font-semibold text-gray-700">Customer Management</h3>
                                 <p className="mt-2 text-sm text-gray-500">
-                                    Explore our curated collections of high-quality images.
+                                    Access customer profiles and service history.
                                 </p>
                                 <Link
-                                    href="/featured-collections"
-                                    className=" px-4 mt-4 inline-block w-full py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition"
+                                    href="/customers"
+                                    className="px-4 mt-4 inline-block w-full py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition"
                                 >
-                                    View Featured Collections
+                                    Manage Customers
                                 </Link>
                             </div>
                         </div>
 
-                        {/* Card 3: Manage Collections */}
+                        {/* Card 3: Service Reports */}
                         <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                             <div className="p-6">
-                                <h3 className="text-lg font-semibold text-gray-700">Manage Collections</h3>
+                                <h3 className="text-lg font-semibold text-gray-700">Service Reports</h3>
                                 <p className="mt-2 text-sm text-gray-500">
-                                    Organize and manage your personal photo collections.
+                                    Generate and review performance reports.
                                 </p>
                                 <Link
-                                    href="/manage-collections"
-                                    className=" px-4 mt-4 inline-block w-full py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+                                    href="/reports"
+                                    className="px-4 mt-4 inline-block w-full py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
                                 >
-                                    Manage Your Collections
-                                </Link>
-                            </div>
-                        </div>
-
-                        {/* Card 4: Video Creating */}
-                        <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-                            <div className="p-6">
-                                <h3 className="text-lg font-semibold text-gray-700">Video Creating</h3>
-                                <p className="mt-2 text-sm text-gray-500">
-                                    Create stunning videos with professional-grade tools.
-                                </p>
-                                <Link
-                                    href="/videos"
-                                    className=" px-4 mt-4 inline-block w-full py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
-                                >
-                                    Start Creating Videos
+                                    View Reports
                                 </Link>
                             </div>
                         </div>
@@ -77,40 +61,39 @@ export default function Dashboard() {
 
                     {/* Graph Section */}
                     <div className="mt-8 bg-white p-6 shadow-sm sm:rounded-lg">
-                        <h3 className="text-lg font-semibold text-gray-700">Monthly Usage Overview</h3>
+                        <h3 className="text-lg font-semibold text-gray-700">Service Performance Overview</h3>
                         <div className="mt-4">
-                            {/* Placeholder for a graph */}
                             <div className="bg-gray-200 h-48 w-full flex justify-center items-center">
                                 <span className="text-gray-500">Graph Placeholder</span>
                             </div>
                         </div>
                     </div>
 
-                    {/* Actions or Additional Options */}
+                    {/* Additional Actions */}
                     <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                        {/* Action 1: Upload Media */}
+                        {/* Action 1: New Service Request */}
                         <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                             <div className="p-6">
                                 <button className="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-                                    Upload New Media
+                                    Create New Service Request
                                 </button>
                             </div>
                         </div>
 
-                        {/* Action 2: View Reports */}
+                        {/* Action 2: Assign Technicians */}
                         <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                             <div className="p-6">
                                 <button className="w-full py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition">
-                                    View Activity Reports
+                                    Assign Technicians
                                 </button>
                             </div>
                         </div>
 
-                        {/* Action 3: Settings */}
+                        {/* Action 3: System Settings */}
                         <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                             <div className="p-6">
                                 <button className="w-full py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition">
-                                    Platform Settings
+                                    System Settings
                                 </button>
                             </div>
                         </div>
