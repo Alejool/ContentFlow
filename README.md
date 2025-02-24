@@ -27,7 +27,7 @@ SmartContentHub es una plataforma diseñada para creadores de contenido y equipo
 - [ ] Integración con redes sociales (autenticación y permisos).
 - [ ] API para crear y programar publicaciones.
 
-### **Fase 3: IA y Automatización (3-4 meses)**
+### **Fase 3: IA y Automatización **
 - [ ] Algoritmo de recomendaciones de hashtags y horarios óptimos.
 - [ ] Autoajuste de imágenes y videos según cada red social.
 - [ ] Implementación de análisis de engagement.
