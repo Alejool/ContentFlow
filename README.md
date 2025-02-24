@@ -6,9 +6,9 @@ SmartContentHub es una plataforma diseñada para creadores de contenido y equipo
 
 ## 🚀 Tecnologías Utilizadas
 
-- **Backend:** Laravel (API RESTful)
+- **Backend:** Laravel
 - **Frontend:** React (con Vite y TailwindCSS)
-- **Base de Datos:** MySQL o PostgreSQL
+- **Base de Datos:** MySQL
 - **Almacenamiento de Archivos:** AWS S3 / Firebase Storage / DigitalOcean Spaces
 - **Autenticación:** Laravel Sanctum + OAuth para integración con redes sociales
 - **APIs de Redes Sociales:** Meta Graph API, TikTok API, Twitter API, YouTube API
