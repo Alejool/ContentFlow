@@ -7,19 +7,17 @@ SmartContentHub es una plataforma diseñada para creadores de contenido y equipo
 ## 🚀 Tecnologías Utilizadas
 
 - **Backend:** Laravel
-- **Frontend:** React (con Vite y TailwindCSS)
-- **Base de Datos:** MySQL
-- **Almacenamiento de Archivos:** AWS S3 / Firebase Storage / DigitalOcean Spaces
-- **Autenticación:** Laravel Sanctum + OAuth para integración con redes sociales
+- **Frontend:** React ( con TailwindCSS)
+- **Base de Datos:** MySQL (prontamente redis - mongo)
 - **APIs de Redes Sociales:** Meta Graph API, TikTok API, Twitter API, YouTube API
 
 ## 📌 Roadmap del Proyecto
 
 ### **Fase 1: Diseño e Infraestructura **
-- [x] Definir estructura de la base de datos.
-- [x] Configurar Laravel como API REST y React como frontend.
-- [x] Implementar autenticación con Laravel Sanctum y opciones OAuth.
-- [x] Sistema de subida y almacenamiento de imágenes/videos.
+- [] Definir estructura de la base de datos.
+- [] Configurar Laravel como API REST y React como frontend.
+- [] Implementar autenticación con Laravel Sanctum y opciones OAuth.
+- [] Sistema de subida y almacenamiento de imágenes/videos.
 
 ### **Fase 2: Gestión de Contenido **
 - [ ] Creación de módulos para organizar contenido (colecciones, etiquetas, filtros).
@@ -40,7 +38,7 @@ SmartContentHub es una plataforma diseñada para creadores de contenido y equipo
 ## 🎯 Cómo Usarlo
 
 1. **Registro e Inicio de Sesión**  
-   - Los usuarios crean una cuenta o inician sesión con OAuth.
+   - Los usuarios crean una cuenta o inician sesión (luego se incluira Auth0).
 
 2. **Carga de Contenido**  
    - Suben imágenes y videos, los organizan en colecciones y agregan etiquetas.
@@ -56,7 +54,6 @@ SmartContentHub es una plataforma diseñada para creadores de contenido y equipo
 5. **Monitoreo y Recomendaciones**  
    - Se analizan métricas de engagement y se sugieren mejoras.
 
-## 📢 Contacto
 
-Si estás interesado en colaborar o probar el proyecto, ¡contáctanos! 🚀
+
 
