@@ -41,14 +41,15 @@ const [fecha, setFecha] = useState(new Date());
 
     return (
         <>
-            <Head title="Welcome" />
+            <Head title="index" />
             <div 
-                className="block  text-black/50 dark:bg-gray-400  dark:text-white/50 bg-cover bg-center h-screen px-10 "  
+                className=" text-black/50 dark:bg-gray-400 
+                 dark:text-white/50 bg-cover bg-center bg-red-200  "  
                      style={{ backgroundImage: `url(${Bg})`}}>
 
-                <div className=" flex  flex-col items-center justify-center
+                <div className=" flex flex-col items-center justify-center
                             selection:bg-[#FF2D20] selection:text-white">    
-                    <div className=" w-full max-w-2xl px-6 lg:max-w-7xl">
+                    <div className="h-[100%]  border-gray-200 border-2 border-dashed rounded-lg w-full max-w-2xl px-6 lg:max-w-7xl">
                         <header className="grid grid-cols-2 items-center gap-2 py-10 lg:grid-cols-3">
                             <div className="flex lg:col-start-2 lg:justify-center">
 

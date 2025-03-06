@@ -6,6 +6,11 @@ import { Transition } from '@headlessui/react';
 import { useForm } from '@inertiajs/react';
 import { useRef } from 'react';
 
+// import IconSave from '/Icons/save.svg';
+
+
+
+
 export default function UpdatePasswordForm({ className = '' }) {
     const passwordInput = useRef();
     const currentPasswordInput = useRef();
@@ -122,7 +127,10 @@ export default function UpdatePasswordForm({ className = '' }) {
                 </div>
 
                 <div className="flex items-center gap-4">
-                    <PrimaryButton disabled={processing}>Save</PrimaryButton>
+                    <PrimaryButton 
+                        disabled={processing} 
+                        // icon={IconSave}
+                    >Save </PrimaryButton>
 
                     <Transition
                         show={recentlySuccessful}
