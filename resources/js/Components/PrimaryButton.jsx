@@ -1,5 +1,5 @@
 import React from 'react';
-import IconSave from '/public/Icons/profile.svg'; // Asegúrate de que la ruta sea correcta
+
 
 export default function PrimaryButton({
     className = '',

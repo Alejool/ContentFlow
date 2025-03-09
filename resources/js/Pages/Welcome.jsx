@@ -42,6 +42,7 @@ const [fecha, setFecha] = useState(new Date());
     return (
         <>
             <Head title="index" />
+            
             <div 
                 className=" text-black/50 dark:bg-gray-400 
                  dark:text-white/50 bg-cover bg-center bg-red-200  "  
