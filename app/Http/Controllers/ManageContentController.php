@@ -20,8 +20,6 @@ class ManageContentController extends Controller
 {
   public function index(Request $request): Response
   {
-    $posts = Post::all();
-
     return Inertia::render('Manage-content/Index', [
    
     ]);

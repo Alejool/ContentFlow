@@ -11,6 +11,8 @@ use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\AIChatController;
 use Inertia\Inertia;
 use App\Http\Controllers\ManageContentController;
+use App\Http\Controllers\PostsController;
+
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -48,7 +50,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('analytics', AnalyticsController::class)->only('index', 'store');
 
     // POST Controller
-    // Route::get('/post-controller', [PostControllerController::class, 'index'])->name('post-controller.index');
+    Route::get('/posts', [PostsController::class, 'index'])->name('posts.index');
 
     // ia
     Route::get('/ai-chat', [AIChatController::class, 'index'])->name('ai-chat.index');
