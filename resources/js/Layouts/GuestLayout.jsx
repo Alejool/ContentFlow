@@ -6,20 +6,20 @@ import Logo from '@/../assets/logo-v2.svg';
 
 export default function GuestLayout({ children }) {
     return (
-        <div className="flex min-h-screen flex-col items-center bg-gray-100 pt-6 
+        <div className=" min-h-screen flex-col items-center 
                 sm:justify-center sm:pt-0 bg-cover bg-center h-screen"
               style={{ backgroundImage: `url(${Bg})`}}
         >
             <div>
                 <Link href="/">
-                    <img src={Logo} alt="logo" className="h-40 w-auto fill-current text-gray-800" />
+                    {/* <img src={Logo} alt="logo" className="h-40 w-auto fill-current text-gray-800" /> */}
                     {/* <ApplicationLogo className="h-20 w-20 fill-current text-gray-500" /> */}
 
                     {/* <ApplicationLogo className="h-20 w-20 fill-current text-gray-500" /> */}
                 </Link>
             </div>
 
-            <div className="mt-6 w-full overflow-hidden bg-white px-6 py-4 shadow-md sm:max-w-md sm:rounded-lg">
+            <div className="bg-gray-50 bg-opacity-60 ">
                 {children}
             </div>
         </div>
