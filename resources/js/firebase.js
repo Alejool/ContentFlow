@@ -18,14 +18,7 @@ import { getFirestore } from 'firebase/firestore';
 
 
 const firebaseConfig = {
-  // Tu configuración de Firebase aquí
-    apiKey: "AIzaSyCC5sH1tSpCN272bskLzyhkj4BSZ9S65G4",
-  authDomain: "contentflow-75c0d.firebaseapp.com",
-  projectId: "contentflow-75c0d",
-  storageBucket: "contentflow-75c0d.firebasestorage.app",
-  messagingSenderId: "958940586207",
-  appId: "1:958940586207:web:59f6d6835f0fc6bdac496a",
-  measurementId: "G-8Q31MDQTRR"
+
 };
 
 // Inicializar Firebase
