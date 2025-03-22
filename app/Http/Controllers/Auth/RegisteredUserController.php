@@ -28,24 +28,35 @@ class RegisteredUserController extends Controller
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request)
     {
+        // Validar los datos del usuario
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'email' => 'required|string|email|max:255|unique:users',
+            'provider' => 'nullable|string', // Proveedor (google, etc.)
+            'provider_id' => 'nullable|string', // ID único del proveedor
+            'photo_url' => 'nullable|string', // URL de la foto de perfil
         ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
+        // Crear o actualizar el usuario
+        $user = User::updateOrCreate(
+            ['email' => $request->email], // Buscar por email
+            [
+                'name' => $request->name,
+                'email' => $request->email,
+                'provider' => $request->provider,
+                'provider_id' => $request->provider_id,
+                'photo_url' => $request->photo_url,
+                'password' => Hash::make(uniqid()), // Generar una contraseña aleatoria
+            ]
+        );
+
+        return response()->json([
+            'message' => 'Usuario guardado correctamente.',
+            'user' => $user,
         ]);
-
-        event(new Registered($user));
-
-        Auth::login($user);
-
-        return redirect(route('dashboard', absolute: false));
     }
 }
+
+

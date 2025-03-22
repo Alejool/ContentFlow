@@ -4,7 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Collection extends Model
 {
@@ -16,12 +17,28 @@ class Collection extends Model
      * @var array
      */
     protected $fillable = [
-        'title',
+        'user_id',
+        'name',
         'description',
     ];
 
-    public function images(): BelongsToMany
+    /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'id' => 'integer',
+        'user_id' => 'integer',
+    ];
+
+    public function user(): BelongsTo
     {
-        return $this->belongsToMany(Image::class);
+        return $this->belongsTo(User::class);
+    }
+
+    public function mediaFiles(): HasMany
+    {
+        return $this->hasMany(MediaFile::class);
     }
 }
