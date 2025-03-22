@@ -13,10 +13,11 @@ export default function AuthenticatedLayout({ header, children }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
     return (
-        <div className="min-h-screen bg-cover bg-center" style={{ backgroundImage: `url(${Bg})` }}>
+        <div className="min-h-screen bg-cover bg-center bg-" style={{ backgroundImage: `url(${Bg})` }}>
             {/* Sidebar para pantallas grandes */}
             <div
-                className={`hidden lg:block fixed inset-y-0 bg-gray-800 bg-opacity-90 text-red-500 pb-10 transition-all duration-300 ease-in-out ${
+                className={`hidden lg:block fixed inset-y-0 bg-gray-800 bg-opacity-90
+                     text-red-500 pb-10 transition-all duration-300 ease-in-out ${
                     isSidebarOpen ? 'w-64' : 'w-20'
                 }`}
             >
@@ -205,7 +206,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                             type="button"
                                             className="inline-flex items-center rounded-md border border-transparent bg-gray-700 px-3 py-2 text-sm font-medium leading-4 text-white hover:bg-red-600 focus:outline-none"
                                         >
-                                            {user.name}
+                                            {user.name ?? 'unknown'}
                                             <svg
                                                 className="-me-0.5 ms-2 h-4 w-4"
                                                 xmlns="http://www.w3.org/2000/svg"

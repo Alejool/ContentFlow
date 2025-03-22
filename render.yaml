@@ -1,0 +1,340 @@
+models:
+  User:
+    id: id
+    name: string
+    email: string unique
+    password: string
+    timestamps: true
+    relationships:
+      hasMany: SocialAccount, Collection, MediaFile, ScheduledPost
+
+  SocialAccount:
+    id: id
+    user_id: id foreign:users
+    platform: enum:facebook,instagram,tiktok,twitter,youtube
+    account_id: string
+    access_token: text
+    refresh_token: text nullable
+    token_expires_at: timestamp nullable
+    timestamps: true
+    relationships:
+      belongsTo: User
+      hasMany: ScheduledPost
+
+  Collection:models:
+  User:
+    id: id
+    name: string
+    email: string unique
+    password: string
+    timestamps: true
+    relationships:
+      hasMany: SocialAccount, Collection, MediaFile, ScheduledPost
+
+  SocialAccount:
+    id: id
+    user_id: id foreign:users
+    platform: enum:facebook,instagram,tiktok,twitter,youtube
+    account_id: string
+    access_token: text
+    refresh_token: text nullable
+    token_expires_at: timestamp nullable
+    timestamps: true
+    relationships:
+      belongsTo: User
+      hasMany: ScheduledPost
+
+  Collection:
+    id: id
+    user_id: id foreign:users
+    name: string
+    description: text nullable
+    timestamps: true
+    relationships:
+      belongsTo: User
+      hasMany: MediaFile
+
+  MediaFile:
+    id: id
+    user_id: id foreign:users
+    collection_id: id foreign:collections nullable
+    file_name: string
+    file_path: string
+    file_type: enum:image,video
+    mime_type: string nullable
+    size: integer
+    timestamps: true
+    relationships:
+      belongsTo: User, Collection
+      hasMany: ScheduledPost
+
+  ScheduledPost:
+    id: id
+    user_id: id foreign:users
+    social_account_id: id foreign:social_accounts
+    media_file_id: id foreign:media_files nullable
+    caption: text nullable
+    scheduled_at: datetime
+    status: enum:pending,posted,failed default:pending
+    timestamps: true
+    relationships:
+      belongsTo: User, SocialAccount, MediaFile
+      hasMany: PostLog
+
+  PostLog:
+    id: id
+    scheduled_post_id: id foreign:scheduled_posts
+    response_message: text nullable
+    posted_at: timestamp
+    created_at: timestamp
+    relationships:
+      belongsTo: ScheduledPost
+models:
+  User:
+    id: id
+    name: string
+    email: string unique
+    password: string
+    timestamps: true
+    relationships:
+      hasMany: SocialAccount, Collection, MediaFile, ScheduledPost
+
+  SocialAccount:
+    id: id
+    user_id: id foreign:users
+    platform: enum:facebook,instagram,tiktok,twitter,youtube
+    account_id: string
+    access_token: text
+    refresh_token: text nullable
+    token_expires_at: timestamp nullable
+    timestamps: true
+    relationships:
+      belongsTo: User
+      hasMany: ScheduledPost
+
+  Collection:
+    id: id
+    user_id: id foreign:users
+    name: string
+    description: text nullable
+    timestamps: true
+    relationships:
+      belongsTo: User
+      hasMany: MediaFile
+
+  MediaFile:
+    id: id
+    user_id: id foreign:users
+    collection_id: id foreign:collections nullable
+    file_name: string
+    file_path: string
+    file_type: enum:image,video
+    mime_type: string nullable
+    size: integer
+    timestamps: true
+    relationships:
+      belongsTo: User, Collection
+      hasMany: ScheduledPost
+
+  ScheduledPost:
+    id: id
+    user_id: id foreign:users
+    social_account_id: id foreign:social_accounts
+    media_file_id: id foreign:media_files nullable
+    caption: text nullable
+    scheduled_at: datetime
+    status: enum:pending,posted,failed default:pending
+    timestamps: true
+    relationships:
+      belongsTo: User, SocialAccount, MediaFile
+      hasMany: PostLog
+
+  PostLog:
+    id: id
+    scheduled_post_id: id foreign:scheduled_posts
+    response_message: text nullable
+    posted_at: timestamp
+    created_at: timestamp
+    relationships:
+      belongsTo: ScheduledPost
+models:
+  User:
+    id: id
+    name: string
+    email: string unique
+    password: string
+    timestamps: true
+    relationships:
+      hasMany: SocialAccount, Collection, MediaFile, ScheduledPost
+
+  SocialAccount:
+    id: id
+    user_id: id foreign:users
+    platform: enum:facebook,instagram,tiktok,twitter,youtube
+    account_id: string
+    access_token: text
+    refresh_token: text nullable
+    token_expires_at: timestamp nullable
+    timestamps: true
+    relationships:
+      belongsTo: User
+      hasMany: ScheduledPost
+
+  Collection:
+    id: id
+    user_id: id foreign:users
+    name: string
+    description: text nullable
+    timestamps: true
+    relationships:
+      belongsTo: User
+      hasMany: MediaFile
+
+  MediaFile:
+    id: id
+    user_id: id foreign:users
+    collection_id: id foreign:collections nullable
+    file_name: string
+    file_path: string
+    file_type: enum:image,video
+    mime_type: string nullable
+    size: integer
+    timestamps: true
+    relationships:
+      belongsTo: User, Collection
+      hasMany: ScheduledPost
+
+  ScheduledPost:
+    id: id
+    user_id: id foreign:users
+    social_account_id: id foreign:social_accounts
+    media_file_id: id foreign:media_files nullable
+    caption: text nullable
+    scheduled_at: datetime
+    status: enum:pending,posted,failed default:pending
+    timestamps: true
+    relationships:
+      belongsTo: User, SocialAccount, MediaFile
+      hasMany: PostLog
+
+  PostLog:
+    id: id
+    scheduled_post_id: id foreign:scheduled_posts
+    response_message: text nullable
+    posted_at: timestamp
+    created_at: timestamp
+    relationships:
+      belongsTo: ScheduledPost
+models:  
+  User:
+    id: id
+    name: string
+    email: string unique
+    password: string
+    timestamps: true
+    relationships:
+      hasMany: SocialAccount, Collection, MediaFile, ScheduledPost
+
+  SocialAccount:
+    id: id
+    user_id: id foreign:users
+    platform: enum:facebook,instagram,tiktok,twitter,youtube
+    account_id: string
+    access_token: text
+    refresh_token: text nullable
+    token_expires_at: timestamp nullable
+    timestamps: true
+    relationships:
+      belongsTo: User
+      hasMany: ScheduledPost
+
+  Collection:
+    id: id
+    user_id: id foreign:users
+    name: string
+    description: text nullable
+    timestamps: true
+    relationships:
+      belongsTo: User
+      hasMany: MediaFile
+
+  MediaFile:
+    id: id
+    user_id: id foreign:users
+    collection_id: id foreign:collections nullable
+    file_name: string
+    file_path: string
+    file_type: enum:image,video
+    mime_type: string nullable
+    size: integer
+    timestamps: true
+    relationships:
+      belongsTo: User, Collection
+      hasMany: ScheduledPost
+
+  ScheduledPost:
+    id: id
+    user_id: id foreign:users
+    social_account_id: id foreign:social_accounts
+    media_file_id: id foreign:media_files nullable
+    caption: text nullable
+    scheduled_at: datetime
+    status: enum:pending,posted,failed default:pending
+    timestamps: true
+    relationships:
+      belongsTo: User, SocialAccount, MediaFile
+      hasMany: PostLog
+
+  PostLog:
+    id: id
+    scheduled_post_id: id foreign:scheduled_posts
+    response_message: text nullable
+    posted_at: timestamp
+    created_at: timestamp
+    relationships:
+      belongsTo: ScheduledPost
+
+    id: id
+    user_id: id foreign:users
+    name: string
+    description: text nullable
+    timestamps: true
+    relationships:
+      belongsTo: User
+      hasMany: MediaFile
+
+  MediaFile:
+    id: id
+    user_id: id foreign:users
+    collection_id: id foreign:collections nullable
+    file_name: string
+    file_path: string
+    file_type: enum:image,video
+    mime_type: string nullable
+    size: integer
+    timestamps: true
+    relationships:
+      belongsTo: User, Collection
+      hasMany: ScheduledPost
+
+  ScheduledPost:
+    id: id
+    user_id: id foreign:users
+    social_account_id: id foreign:social_accounts
+    media_file_id: id foreign:media_files nullable
+    caption: text nullable
+    scheduled_at: datetime
+    status: enum:pending,posted,failed default:pending
+    timestamps: true
+    relationships:
+      belongsTo: User, SocialAccount, MediaFile
+      hasMany: PostLog
+
+  PostLog:
+    id: id
+    scheduled_post_id: id foreign:scheduled_posts
+    response_message: text nullable
+    posted_at: timestamp
+    created_at: timestamp
+    relationships:
+      belongsTo: ScheduledPost
