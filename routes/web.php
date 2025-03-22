@@ -31,9 +31,18 @@ Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->name('dashboard');
 
-// user verification
+
+
+/*
+ verificaciond e rutas como api 
+ */
+
 Route::post('/check-user', [LoginController::class, 'checkUser']);
 Route::post('/save-user', [RegisteredUserController::class, 'store']);
+
+/* 
+    fin rutas "api" 
+*/
 
 
 Route::middleware('auth')->group(function () {
