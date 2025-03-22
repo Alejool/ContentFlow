@@ -5,6 +5,7 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 use App\Models\Collection;
+use App\Models\User;
 
 class CollectionFactory extends Factory
 {
@@ -21,7 +22,8 @@ class CollectionFactory extends Factory
     public function definition(): array
     {
         return [
-            'title' => fake()->sentence(4),
+            'user_id' => User::factory(),
+            'name' => fake()->name(),
             'description' => fake()->text(),
         ];
     }

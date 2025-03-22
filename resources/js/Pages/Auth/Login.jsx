@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
-import { auth, signInWithGoogle, signInWithFacebook, getAuthResult } from '@/firebase';
+import { auth, signInWithGoogle, signInWithFacebook, getAuthResult, loginAnonymously} from '@/firebase';
 import Logo from '@/../assets/logo-v2.svg';
 import GuestLayout from '@/Layouts/GuestLayout';
 
@@ -12,6 +12,7 @@ import GuestLayout from '@/Layouts/GuestLayout';
 export default function Login() {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+     const [successMessage, setSuccessMessage] = useState('');
     
     const { data, setData, post, processing } = useForm({
         email: '',
@@ -27,7 +28,8 @@ export default function Login() {
                 const result = await getAuthResult();
                 if (result && result.user) {
                     // Usuario ha iniciado sesión correctamente mediante redirección
-                    // window.location.href = route('dashboard');
+                    setSuccessMessage('Login exitoso. Redirecting...');
+                    window.location.href = route('dashboard');
                    
                 }
             } catch (err) {
@@ -60,14 +62,38 @@ export default function Login() {
         e.preventDefault();
         setLoading(true);
         setError('');
-        
-        try {
-            await signInWithEmailAndPassword(auth, data.email, data.password);
-            // Redirigir al dashboard después del login se hará automáticamente
-            // gracias al onAuthStateChanged
+        setSuccessMessage('');
 
+        try {
+            // 1. Verificar en la base de datos si el usuario existe y cómo se registró
+            const response = await axios.post('/check-user', {
+                email: data.email,
+            });
+            console.log('userData: ', response);
+
+            const userData = response.data;
+
+            if (userData.provider) {
+                // El usuario se registró con un proveedor externo
+                setError(`Este usuario se registró con ${userData.provider}. Por favor, inicia sesión con ${userData.provider}.`);
+                setLoading(false);
+                return; // Detener el flujo aquí
+            }
+
+            // 2. Si el usuario se registró con correo y contraseña, autenticar con Firebase
+            await signInWithEmailAndPassword(auth, data.email, data.password);
+            setSuccessMessage('Login exitoso. Redirecting...');
         } catch (err) {
-            setError('Credenciales incorrectas. Por favor, inténtalo de nuevo.');
+            if (err.response && err.response.data.error) {
+                // Error desde el backend (por ejemplo, usuario no encontrado)
+                setError(err.response.data.error);
+            } else if (err.code) {
+                // Error de Firebase (por ejemplo, credenciales incorrectas)
+                setError('Credenciales incorrectas. Por favor, inténtalo de nuevo.');
+            } else {
+                // Error genérico
+                setError('Ocurrió un error inesperado. Por favor, inténtalo de nuevo.');
+            }
             setLoading(false);
         }
     };
@@ -77,7 +103,13 @@ export default function Login() {
         setError('');
         
         try {
-            await signInWithGoogle();
+            const result = await signInWithGoogle();
+            const user = result.user;
+            console.log('result: ', result);
+            console.log('user: ', user);
+            //  await saveUserDataToFirestore(user);
+
+            // setSuccessMessage(result.user.email + result.user.displayName + result.user.photoURL + result.user.uid);
             // No redirigimos aquí, la redirección se maneja automáticamente
         } catch (err) {
             setError('Error al iniciar sesión con Google. Por favor, inténtalo de nuevo.');
@@ -88,12 +120,25 @@ export default function Login() {
     const handleFacebookLogin = async () => {
         setLoading(true);
         setError('');
-        
+             
         try {
             await signInWithFacebook();
             // No redirigimos aquí, la redirección se maneja automáticamente
         } catch (err) {
             setError('Error al iniciar sesión con Facebook. Por favor, inténtalo de nuevo.');
+            setLoading(false);
+        }
+    };
+    const handleAnonymousLogin = async () => {
+        setLoading(true);       
+        setError('');
+        
+        try {
+            await loginAnonymously();
+            // No redirigimos aquí, la redirección se maneja automáticamente
+            setSuccessMessage('Login exitoso. Redirecting...');
+        } catch (err) {
+            setError('Error al iniciar sesión anónimamente. Por favor, inténtalo de nuevo.');
             setLoading(false);
         }
     };
@@ -130,12 +175,12 @@ export default function Login() {
                                                         {error}
                                                     </div>
                                                 )}
-                        {/*                         
+                                                
                         {successMessage && (
                             <div className="rounded-md bg-green-50 p-4 text-sm text-green-600">
                                 {successMessage}
                             </div>
-                        )} */}
+                        )}
                     
                         <div className="mb-4">
                             <label className="mb-1 block text-sm font-medium  ">
@@ -213,7 +258,8 @@ export default function Login() {
                                     type="button"
                                     onClick={handleGoogleLogin}
                                     disabled={loading}
-                                    className="flex items-center justify-center w-full rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+                                    className="flex items-center justify-center w-full rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm 
+                                     dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700 hover:bg-gray-50"
                                 >
                                     <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24">
                                         <path
@@ -250,6 +296,19 @@ export default function Login() {
                                 </svg>
                                 Facebook
                             </button> */}
+                           <button
+                            type="button"
+                            onClick={handleAnonymousLogin}
+                            disabled={loading}
+                            className="flex items-center justify-center rounded-md border 
+                                    border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50
+                                    dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+                        >
+                            <svg className="mr-2 h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 4a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM6 12a6 6 0 0 0-6 6v1a1 1 0 0 0 1 1h22a1 1 0 0 0 1-1v-1a6 6 0 0 0-6-6H6z" />
+                            </svg>
+                            Anónimo
+                        </button>
 
                         </div>
                     </div>

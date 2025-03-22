@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use App\Models\User; // Asegúrate de importar el modelo User
 
 class LoginRequest extends FormRequest
 {
@@ -41,6 +42,19 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
+        // Buscar al usuario por su correo electrónico
+        $user = User::where('email', $this->input('email'))->first();
+
+        // Verificar si el usuario se registró con un proveedor externo (Google, etc.)
+        if ($user && $user->provider) {
+            RateLimiter::hit($this->throttleKey());
+
+            throw ValidationException::withMessages([
+                'email' => 'Este usuario se registró con ' . $user->provider . '. Por favor, inicia sesión con ' . $user->provider . ' o establece una contraseña.',
+            ]);
+        }
+
+        // Intentar autenticar al usuario con correo electrónico y contraseña
         if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
@@ -80,6 +94,6 @@ class LoginRequest extends FormRequest
      */
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('email')).'|'.$this->ip());
+        return Str::transliterate(Str::lower($this->string('email')) . '|' . $this->ip());
     }
 }

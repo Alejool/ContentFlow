@@ -25,63 +25,89 @@ export default function Register() {
         setData(name, value);
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        setError('');
-        setSuccessMessage('');
+   const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    setSuccessMessage('');
 
-        if (data.password !== data.password_confirmation) {
-            setError('Passwords do not match.');
-            setLoading(false);
-            return;
-        }
+    if (data.password !== data.password_confirmation) {
+        setError('Passwords do not match.');
+        setLoading(false);
+        return;
+    }
 
-        try {
-            // Register with Firebase
-            const userCredential = await registerWithEmailAndPassword(data.email, data.password);
-            
-            // Update user profile with name
-            await updateUserProfile(userCredential.user, {
-                displayName: data.name
-            });
-            
-            setSuccessMessage('Account created successfully! Redirecting...');
-            reset('password', 'password_confirmation');
-            
-            // Redirect to dashboard after short delay
-            setTimeout(() => {
-                window.location.href = route('dashboard');
-            }, 1500);
-            
-        } catch (err) {
-            console.error(err);
-            setError(getFirebaseErrorMessage(err.code) || 'Error creating account. Please try again.');
-            setLoading(false);
-        }
-    };
+    try {
+        // Registrar con Firebase
+        const userCredential = await registerWithEmailAndPassword(data.email, data.password);
 
-    const handleGoogleRegister = async () => {
-        setLoading(true);
-        setError('');
-        setSuccessMessage('');
+        // Actualizar el perfil del usuario con el nombre
+        await updateUserProfile(userCredential.user, {
+            displayName: data.name,
+        });
 
-        try {
-            await signInWithGoogle();
-            setSuccessMessage('Signed in with Google successfully! Redirecting...');
-            
-            // Redirect will be handled by auth state listener or here
-            setTimeout(() => {
-                window.location.href = route('dashboard');
-            }, 1500);
-            
-        } catch (err) {
-            console.error(err);
-            setError(getFirebaseErrorMessage(err.code) || 'Error signing in with Google. Please try again.');
-            setLoading(false);
-        }
-    };
-    
+        // Enviar los datos del usuario al backend
+        const response = await axios.post('/api/save-user', {
+            name: data.name,
+            email: data.email,
+            provider: null, // No es un proveedor externo
+            provider_id: null, // No es un proveedor externo
+            photo_url: null, // No hay foto de perfil
+        });
+
+        console.log('Respuesta del backend:', response.data);
+
+        setSuccessMessage('Account created successfully! Redirecting...');
+        reset('password', 'password_confirmation');
+
+        // Redirigir al dashboard después de un breve retraso
+        setTimeout(() => {
+            window.location.href = route('dashboard');
+        }, 1500);
+
+    } catch (err) {
+        console.error(err);
+        setError(getFirebaseErrorMessage(err.code) || 'Error creating account. Please try again.');
+        setLoading(false);
+    }
+};
+
+const handleGoogleRegister = async () => {
+    setLoading(true);
+    setError('');
+    setSuccessMessage('');
+
+    try {
+        // Iniciar sesión con Google
+        const result = await signInWithGoogle();
+        const user = result.user;
+
+        console.log('Usuario de Google:', user);
+
+        // Enviar los datos del usuario al backend
+        const response = await axios.post('/save-user', {
+            name: user.displayName,
+            email: user.email,
+            provider: 'google', // Proveedor
+            provider_id: user.uid, // ID único de Google
+            photo_url: user.photoURL, // URL de la foto de perfil
+        });
+
+        console.log('Respuesta del backend:', response.data);
+
+        setSuccessMessage('Signed in with Google successfully! Redirecting...');
+
+        // Redirigir al dashboard después de un breve retraso
+        setTimeout(() => {
+            window.location.href = route('dashboard');
+        }, 1500);
+
+    } catch (err) {
+        console.error(err);
+        setError(getFirebaseErrorMessage(err.code) || 'Error signing in with Google. Please try again.');
+        setLoading(false);
+    }
+};
     // Helper function to get user-friendly Firebase error messages
     const getFirebaseErrorMessage = (errorCode) => {
         switch (errorCode) {

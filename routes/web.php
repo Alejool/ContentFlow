@@ -12,6 +12,8 @@ use App\Http\Controllers\AIChatController;
 use Inertia\Inertia;
 use App\Http\Controllers\ManageContentController;
 use App\Http\Controllers\PostsController;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\RegisteredUserController;
 
 
 Route::get('/', function () {
@@ -28,6 +30,11 @@ Route::get('/', function () {
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->name('dashboard');
+
+// user verification
+Route::post('/check-user', [LoginController::class, 'checkUser']);
+Route::post('/save-user', [RegisteredUserController::class, 'store']);
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
