@@ -9,15 +9,15 @@ export default function Dashboard() {
             <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     {/* Welcome Header */}
-                    <div className="mb-8">
-                        <h1 className="text-3xl font-bold text-gray-900">Welcome to ContentFlow</h1>
-                        <p className="mt-2 text-lg text-gray-600">Manage your multimedia content efficiently with AI-powered tools.</p>
+                    <div className="mb-8 text-center">
+                        <h1 className="text-4xl font-bold text-gray-900">Welcome to ContentFlow</h1>
+                        <p className="mt-2 text-xl text-gray-600">Manage your multimedia content efficiently with AI-powered tools.</p>
                     </div>
 
                     {/* Main Dashboard Grid */}
                     <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
                         {/* Card 1: Content Management */}
-                        <div className="overflow-hidden bg-white shadow-md rounded-lg transform transition-all hover:scale-105 hover:shadow-lg">
+                        <div className="overflow-hidden bg-white shadow-xl rounded-lg transform transition-all hover:scale-105 hover:shadow-2xl">
                             <div className="p-6">
                                 <div className="flex items-center justify-center w-12 h-12 mb-4 bg-red-100 rounded-full">
                                     <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -30,7 +30,7 @@ export default function Dashboard() {
                                 </p>
                                 <Link
                                     href="/manage-content"
-                                    className="mt-4 inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-300"
+                                    className="mt-4 block w-full text-center px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-300"
                                 >
                                     Manage Content
                                 </Link>
@@ -38,7 +38,7 @@ export default function Dashboard() {
                         </div>
 
                         {/* Card 2: Schedule Posts */}
-                        <div className="overflow-hidden bg-white shadow-md rounded-lg transform transition-all hover:scale-105 hover:shadow-lg">
+                        <div className="overflow-hidden bg-white shadow-xl rounded-lg transform transition-all hover:scale-105 hover:shadow-2xl">
                             <div className="p-6">
                                 <div className="flex items-center justify-center w-12 h-12 mb-4 bg-red-100 rounded-full">
                                     <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -51,7 +51,7 @@ export default function Dashboard() {
                                 </p>
                                 <Link
                                     href="/schedule"
-                                    className="mt-4 inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-300"
+                                    className="mt-4 block w-full text-center px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-300"
                                 >
                                     Schedule Now
                                 </Link>
@@ -59,7 +59,7 @@ export default function Dashboard() {
                         </div>
 
                         {/* Card 3: Analytics */}
-                        <div className="overflow-hidden bg-white shadow-md rounded-lg transform transition-all hover:scale-105 hover:shadow-lg">
+                        <div className="overflow-hidden bg-white shadow-xl rounded-lg transform transition-all hover:scale-105 hover:shadow-2xl">
                             <div className="p-6">
                                 <div className="flex items-center justify-center w-12 h-12 mb-4 bg-red-100 rounded-full">
                                     <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -72,7 +72,7 @@ export default function Dashboard() {
                                 </p>
                                 <Link
                                     href="/analytics"
-                                    className="mt-4 inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-300"
+                                    className="mt-4 block w-full text-center px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-300"
                                 >
                                     View Analytics
                                 </Link>
@@ -80,7 +80,7 @@ export default function Dashboard() {
                         </div>
 
                         {/* Card 4: AI Chat */}
-                        <div className="overflow-hidden bg-white shadow-md rounded-lg transform transition-all hover:scale-105 hover:shadow-lg">
+                        <div className="overflow-hidden bg-white shadow-xl rounded-lg transform transition-all hover:scale-105 hover:shadow-2xl">
                             <div className="p-6">
                                 <div className="flex items-center justify-center w-12 h-12 mb-4 bg-red-100 rounded-full">
                                     <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -93,7 +93,7 @@ export default function Dashboard() {
                                 </p>
                                 <Link
                                     href="/ai-chat"
-                                    className="mt-4 inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-300"
+                                    className="mt-4 block w-full text-center px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-300"
                                 >
                                     Chat Now
                                 </Link>
@@ -102,48 +102,48 @@ export default function Dashboard() {
                     </div>
 
                     {/* Graph Section */}
-                    <div className="mt-8 bg-white p-6 shadow-md rounded-lg transform transition-all hover:scale-105 hover:shadow-lg">
+                    {/* <div className="mt-8 bg-white p-6 shadow-md rounded-lg transform transition-all hover:scale-105 hover:shadow-lg">
                         <h3 className="text-xl font-semibold text-gray-800">Performance Overview</h3>
                         <div className="mt-4">
                             <div className="bg-gray-100 h-64 w-full flex justify-center items-center rounded-lg">
                                 <span className="text-gray-500">Interactive Graph Placeholder</span>
                             </div>
                         </div>
-                    </div>
+                    </div> */}
 
                     {/* Quick Actions Section */}
                     <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
                         {/* Quick Action 1: Upload Content */}
-                        <div className="overflow-hidden bg-white shadow-md rounded-lg transform transition-all hover:scale-105 hover:shadow-lg">
+                        <div className="overflow-hidden bg-white shadow-xl rounded-lg transform transition-all hover:scale-105 hover:shadow-2xl">
                             <div className="p-6">
-                                <button className="w-full py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-300">
+                                <button className="w-full py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-300">
                                     Upload Content
                                 </button>
                             </div>
                         </div>
 
                         {/* Quick Action 2: Create Campaign */}
-                        <div className="overflow-hidden bg-white shadow-md rounded-lg transform transition-all hover:scale-105 hover:shadow-lg">
+                        <div className="overflow-hidden bg-white shadow-xl rounded-lg transform transition-all hover:scale-105 hover:shadow-2xl">
                             <div className="p-6">
-                                <button className="w-full py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-300">
+                                <button className="w-full py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-300">
                                     Create Campaign
                                 </button>
                             </div>
                         </div>
 
                         {/* Quick Action 3: Team Collaboration */}
-                        <div className="overflow-hidden bg-white shadow-md rounded-lg transform transition-all hover:scale-105 hover:shadow-lg">
+                        <div className="overflow-hidden bg-white shadow-xl rounded-lg transform transition-all hover:scale-105 hover:shadow-2xl">
                             <div className="p-6">
-                                <button className="w-full py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-300">
+                                <button className="w-full py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-300">
                                     Team Collaboration
                                 </button>
                             </div>
                         </div>
 
                         {/* Quick Action 4: Settings */}
-                        <div className="overflow-hidden bg-white shadow-md rounded-lg transform transition-all hover:scale-105 hover:shadow-lg">
+                        <div className="overflow-hidden bg-white shadow-xl rounded-lg transform transition-all hover:scale-105 hover:shadow-2xl">
                             <div className="p-6">
-                                <button className="w-full py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-300">
+                                <button className="w-full py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-300">
                                     Settings
                                 </button>
                             </div>
