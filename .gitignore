@@ -30,3 +30,4 @@ bun.lockb
 laravel
 package-lock.json
 .env.example
+.qodo
