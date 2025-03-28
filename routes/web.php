@@ -1,4 +1,4 @@
-<?php
+    <?php
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\VideoController;
@@ -37,8 +37,8 @@ Route::get('/dashboard', function () {
  verificaciond e rutas como api 
  */
 
-Route::post('/check-user', [LoginController::class, 'checkUser']);
-Route::post('/save-user', [RegisteredUserController::class, 'store']);
+Route::post('/api/check-user', [LoginController::class, 'checkUser']);
+Route::post('/api/save-user', [RegisteredUserController::class, 'store']);
 
 /* 
     fin rutas "api" 

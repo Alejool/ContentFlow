@@ -33,11 +33,12 @@ export default function Login() {
         };
 
         const unsubscribe = onAuthStateChanged(auth, () => {});
+
         checkRedirectResult();
         return () => unsubscribe();
     }, []);
 
-    const handleChange = (e) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value, type, checked } = e.target;
         setData(name, type === 'checkbox' ? checked : value);
     };
@@ -67,7 +68,7 @@ export default function Login() {
                    
                     <div className="w-full max-w-md space-y-6">
 
-                            <form onSubmit={handleEmailLogin}>
+                            <form onSubmit={handleSubmit}>
                                         
                                                 {error && (
                                                     <div className="rounded-md bg-red-50 p-4 text-sm text-red-600">

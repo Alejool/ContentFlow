@@ -7,133 +7,34 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import GuestLayout from '@/Layouts/GuestLayout';
 import Logo from '@/../assets/logo-v2.svg';
+import { useRegister } from '@/Hooks/useRegister';
 
 export default function Register() {
-    const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [successMessage, setSuccessMessage] = useState('');
+  
 
-    const { data, setData, errors, reset } = useForm({
-        name: '',
-        email: '',
-        password: '',
-        password_confirmation: '',
-    });
+    const {
+        data,
+        setData,
+        error,
+        loading,
+        successMessage,
+        errors,
+        handleEmailRegister,
+        handleGoogleRegister
+    } = useRegister();
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setData(name, value);
     };
 
-   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-    setSuccessMessage('');
-
-    if (data.password !== data.password_confirmation) {
-        setError('Passwords do not match.');
-        setLoading(false);
-        return;
-    }
-
-    try {
-        // Registrar con Firebase
-        const userCredential = await registerWithEmailAndPassword(data.email, data.password);
-
-        // Actualizar el perfil del usuario con el nombre
-        await updateUserProfile(userCredential.user, {
-            displayName: data.name,
-        });
-
-        // Enviar los datos del usuario al backend
-        const response = await axios.post('/api/save-user', {
-            name: data.name,
-            email: data.email,
-            provider: null, // No es un proveedor externo
-            provider_id: null, // No es un proveedor externo
-            photo_url: null, // No hay foto de perfil
-        });
-
-        console.log('Respuesta del backend:', response.data);
-
-        setSuccessMessage('Account created successfully! Redirecting...');
-        reset('password', 'password_confirmation');
-
-        // Redirigir al dashboard después de un breve retraso
-        setTimeout(() => {
-            window.location.href = route('dashboard');
-        }, 1500);
-
-    } catch (err) {
-        console.error(err);
-        setError(getFirebaseErrorMessage(err.code) || 'Error creating account. Please try again.');
-        setLoading(false);
-    }
-};
-
-const handleGoogleRegister = async () => {
-    setLoading(true);
-    setError('');
-    setSuccessMessage('');
-
-    try {
-        // Iniciar sesión con Google
-        const result = await signInWithGoogle();
-        const user = result.user;
-
-        console.log('Usuario de Google:', user);
-
-        // Enviar los datos del usuario al backend
-        const response = await axios.post('/save-user', {
-            name: user.displayName,
-            email: user.email,
-            provider: 'google', // Proveedor
-            provider_id: user.uid, // ID único de Google
-            photo_url: user.photoURL, // URL de la foto de perfil
-        });
-
-        console.log('Respuesta del backend:', response.data);
-
-        setSuccessMessage('Signed in with Google successfully! Redirecting...');
-
-        // Redirigir al dashboard después de un breve retraso
-        setTimeout(() => {
-            window.location.href = route('dashboard');
-        }, 1500);
-
-    } catch (err) {
-        console.error(err);
-        setError(getFirebaseErrorMessage(err.code) || 'Error signing in with Google. Please try again.');
-        setLoading(false);
-    }
-};
-    // Helper function to get user-friendly Firebase error messages
-    const getFirebaseErrorMessage = (errorCode) => {
-        switch (errorCode) {
-            case 'auth/email-already-in-use':
-                return 'Email address is already in use.';
-            case 'auth/invalid-email':
-                return 'Email address is invalid.';
-            case 'auth/weak-password':
-                return 'Password is too weak. Please use at least 6 characters.';
-            case 'auth/operation-not-allowed':
-                return 'Account creation is currently disabled.';
-            case 'auth/popup-closed-by-user':
-                return 'Google sign-in was canceled. Please try again.';
-            default:
-                return null;
-        }
-    };
-
     return (
         <GuestLayout>
             <Head title="Register" />
-
-                   <div className="min-h-screen flex flex-col lg:flex-row">
-                {/* Left side: Red background, logo and welcome text */}
-                     <div className="w-full lg:w-1/2 bg-red-600 bg-opacity-90 flex flex-col items-center justify-center p-8">
-                        <div className="text-white text-center">
+            <div className="min-h-screen flex flex-col lg:flex-row">
+                {/* Left side remains the same */}
+                <div className="w-full lg:w-1/2 bg-red-600 bg-opacity-90 flex flex-col items-center justify-center p-8">
+                    <div className="text-white text-center">
                            
                             <h1 className="text-4xl font-bold mb-4">Welcome</h1>
                             <p className="text-lg">
@@ -165,7 +66,7 @@ const handleGoogleRegister = async () => {
                             </div>
                         )}
 
-                        <form onSubmit={handleSubmit} className="space-y-6">
+                        <form onSubmit={handleEmailRegister} className="space-y-6">
                             <div>
                                 <InputLabel htmlFor="name" value="Name" />
                                 <TextInput
@@ -232,10 +133,11 @@ const handleGoogleRegister = async () => {
                                     className="text-sm text-indigo-600 hover:text-indigo-500"
                                 >
                                     Already registered?
-                                </Link>
-
-                                <PrimaryButton className="ms-4" disabled={loading}  
-                                    class=" 
+                                </Link>     
+        
+                                <PrimaryButton  disabled={loading}  
+                                    className="
+                                    ms-4 
                                     rounded-md bg-[#FF2D20] px-4 py-2 font-medium
                                      text-white
                                     transition hover:bg-[#FF2D20]/90 
@@ -292,7 +194,4 @@ const handleGoogleRegister = async () => {
             </div>
         </GuestLayout>
     );
-
-
-
 }
