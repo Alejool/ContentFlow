@@ -124,7 +124,7 @@ export default function Login() {
                             />
                             <label htmlFor="remember" className="ml-2 block text-sm text-gray-700
                             ">
-                                Recordarme
+                                Remember me
                             </label>
                         </div>
                         
@@ -146,7 +146,7 @@ export default function Login() {
                                 </div> */}
                                 <div className="relative flex  justify-center text-sm">
                                     <span className=" px-2 text-gray-500 ">
-                                        O continúa con
+                                        Or continue with
                                     </span>
                                 </div>
                             </div>
@@ -206,19 +206,19 @@ export default function Login() {
                             <svg className="mr-2 h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M12 4a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM6 12a6 6 0 0 0-6 6v1a1 1 0 0 0 1 1h22a1 1 0 0 0 1-1v-1a6 6 0 0 0-6-6H6z" />
                             </svg>
-                            Anónimo
+                            Anonimus
                         </button>
 
                         </div>
                     </div>
 
                     <div className="mt-6 text-center text-sm">
-                        <span className="text-gray-600 dark:text-gray-400">¿No tienes una cuenta?</span>
+                        <span className="text-gray-600 dark:text-gray-400"> have you not an account?</span>
                         <Link
                             href={route('register')}
                             className="ml-1 font-medium text-[#FF2D20] hover:text-[#FF2D20]/80"
                         >
-                            Regístrate
+                            Register
                         </Link>
                     </div>
                     </form>
