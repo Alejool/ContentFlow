@@ -44,7 +44,7 @@ export default function Login() {
 
     return (
         <GuestLayout>
-            <Head title="Iniciar sesión" />
+            <Head title="start sesion" />
             <div className="min-h-screen flex flex-col lg:flex-row">
                 <div className="w-full lg:w-1/2 bg-red-600 bg-opacity-90 flex flex-col items-center justify-center p-8">
                     <div className="text-white text-center">
@@ -83,7 +83,7 @@ export default function Login() {
                     
                         <div className="mb-4">
                             <label className="mb-1 block text-sm font-medium  ">
-                                Correo electrónico
+                                Email
                             </label>
                             <input
                                 type="email"
@@ -98,7 +98,7 @@ export default function Login() {
                         
                         <div className="mb-4">
                             <label className="mb-1 block text-sm font-medium text-gray-700 ">
-                                Contraseña
+                                Password
                             </label>
                             <input
                                 type="password"
@@ -132,9 +132,10 @@ export default function Login() {
                             type="submit"
                             disabled={processing || loading}
                             className="w-full rounded-md bg-[#FF2D20] px-4 py-2 font-medium text-white
-                             transition hover:bg-[#FF2D20]/90 focus:outline-none focus:ring-2 focus:ring-[#FF2D20] focus:ring-offset-2 disabled:opacity-75"
+                             transition hover:bg-[#FF2D20]/90 focus:outline-none 
+                             focus:ring-2 focus:ring-[#FF2D20] focus:ring-offset-2 disabled:opacity-75"
                         >
-                            {loading ? 'Iniciando sesión...' : 'Iniciar sesión'}
+                            {loading ? 'Starting session...' : 'Start sesion'}
                         </button>
                     
                     
