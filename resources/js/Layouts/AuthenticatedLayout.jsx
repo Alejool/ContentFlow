@@ -8,7 +8,7 @@ import Bg from '@/../assets/background.svg';
 import Logo from '@/../assets/logo-v2.svg';
 
 export default function AuthenticatedLayout({ header, children }) {
-    const user = usePage().props.auth.user;
+    const user = usePage().props.auth.user || {};
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
@@ -206,7 +206,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                             type="button"
                                             className="inline-flex items-center rounded-md border border-transparent bg-gray-700 px-3 py-2 text-sm font-medium leading-4 text-white hover:bg-red-600 focus:outline-none"
                                         >
-                                            {user.name ?? 'unknown'}
+                                            {user.name || 'Unknown'}
                                             <svg
                                                 className="-me-0.5 ms-2 h-4 w-4"
                                                 xmlns="http://www.w3.org/2000/svg"

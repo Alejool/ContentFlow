@@ -30,6 +30,7 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request)
     {
+     
         // Validar los datos del usuario
         $request->validate([
             'name' => 'required|string|max:255',
@@ -53,7 +54,7 @@ class RegisteredUserController extends Controller
         );
 
         return response()->json([
-            'message' => 'Usuario guardado correctamente.',
+            'message' => 'user saved successfully.',
             'user' => $user,
         ]);
     }

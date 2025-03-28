@@ -10,6 +10,7 @@ import {
     getRedirectResult,
     updateProfile,
     onAuthStateChanged,
+    signInAnonymously, 
     signOut as firebaseSignOut
 } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
@@ -147,6 +148,19 @@ const updateUserProfile = async (user, profileData) => {
 };
 
 
+ const loginAnonymously = async () => {
+  try {
+    const result = await signInAnonymously(auth);
+    const user = result.user;
+    return { user };
+  } catch (error) {
+    console.error("Error durante la autenticación anónima:", error);
+    throw error;
+  }
+};
+
+
+
 
 export {
   app,
@@ -158,8 +172,9 @@ export {
   updateUserProfile,
   auth,
   googleProvider,
-  facebookProvider,
-  signInWithGoogle,
+  facebookProvider,           
+  signInWithGoogle,           
   signInWithFacebook,
-  getAuthResult
+  getAuthResult,
+  loginAnonymously
 };
