@@ -59,11 +59,11 @@ export const useAuth = () => {
         try {
             const result = await signInWithGoogle();
             if (result?.user) {
-                setSuccessMessage('Login exitoso con Google. Redirecting...');
+                setSuccessMessage('Login sucessfully. Redirecting...');
                 window.location.href = route('dashboard');
             }
         } catch (err) {
-            setError('Error al iniciar sesión con Google. Por favor, inténtalo de nuevo.');
+            setError('Error to start sesion with Google. Please, try again.');
         } finally {
             setLoading(false);
         }
@@ -76,11 +76,11 @@ export const useAuth = () => {
         try {
             const result = await signInWithFacebook();
             if (result?.user) {
-                setSuccessMessage('Login exitoso con Facebook. Redirecting...');
+                setSuccessMessage('Login sucessfully with Facebook. Redirecting...');
                 window.location.href = route('dashboard');
             }
         } catch (err) {
-            setError('Error al iniciar sesión con Facebook. Por favor, inténtalo de nuevo.');
+            setError('Error to start sesión with Facebook. Please, try again.');
         } finally {
             setLoading(false);
         }
@@ -94,11 +94,11 @@ export const useAuth = () => {
             const result = await loginAnonymously();
             console.log(result);
             if (result?.user) {
-                setSuccessMessage('Login exitoso como anónimo. Redirecting...');
+                setSuccessMessage('Login sucessfully with anonymous. Redirecting...');
                 window.location.href = route('dashboard');
             }
         } catch (err) {
-            setError('Error al iniciar sesión anónimamente. Por favor, inténtalo de nuevo.');
+            setError('Error to start sesión with anonymous. Please, try again.');
         } finally {
             setLoading(false);
         }

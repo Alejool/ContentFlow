@@ -46,7 +46,17 @@ export default function Login() {
         <GuestLayout>
             <Head title="start sesion" />
             <div className="min-h-screen flex flex-col lg:flex-row">
-                <div className="w-full lg:w-1/2 bg-red-600 bg-opacity-90 flex flex-col items-center justify-center p-8">
+                <div 
+                    className="
+                        w-full 
+                        lg:w-1/2 
+                        bg-red-600 
+                        bg-opacity-90 
+                        flex 
+                        flex-col 
+                        items-center 
+                        justify-center 
+                        p-8">
                     <div className="text-white text-center">
                        
                         <h1 className="text-4xl font-bold mb-4">Welcome</h1>
@@ -56,7 +66,7 @@ export default function Login() {
                     </div>
                     <Link href="/">
                         <img
-                            src={Logo} // Ruta de tu imagen
+                            src={Logo} 
                             alt="Register Image"
                             className="w-64 object-cover h-40"
                         />
