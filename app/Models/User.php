@@ -17,6 +17,7 @@ class User extends Model implements Authenticatable
         'provider',
         'provider_id',
         'photo_url',
+        'remember_token', 
     ];
 
     protected $hidden = [
