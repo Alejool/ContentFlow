@@ -32,37 +32,35 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request)
     {
-     
-        // Validar los datos del usuario
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' =>'required|string|min:6|max:255',
-            'provider' => 'nullable|string', // Proveedor (google, etc.)
-            'provider_id' => 'nullable|string', // ID único del proveedor
-            'photo_url' => 'nullable|string', // URL de la foto de perfil
+            'provider' => 'nullable|string',
+            'provider_id' => 'nullable|string',
+            'photo_url' => 'nullable|string',
         ]);
 
-        // Crear o actualizar el usuario
-        $user = User::create(
-            [
-                'name' => $request->name,
-                'email' => $request->email,
-                'provider' => $request->provider,
-                'provider_id' => $request->provider_id,
-                'password' => Hash::make($request->password),
-            ]
-        );
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'provider' => $request->provider,
+            'provider_id' => $request->provider_id,
+            'password' => Hash::make($request->password),
+        ]);
+
         event(new Registered($user));
+        
+        // Iniciar sesión y regenerar
         Auth::login($user);
-        $request = request();    
         $request->session()->regenerate();
-            
+
         return response()->json([
             'success' => true,
-            'message' => 'user saved successfully.',
-            'user' => $user,
+            'message' => 'User registered successfully',
+            'user' => Auth::user(),
             'redirect' => route('dashboard'),
+            'status' => 200
         ]);
     }
 }
