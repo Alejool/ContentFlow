@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useForm } from '@inertiajs/react';
 import { signInWithGoogle, registerWithEmailAndPassword, updateUserProfile } from '@/firebase';
 import axios from 'axios';
+import { toast } from 'react-toastify';
+
 
 export const useRegister = () => {
     const [error, setError] = useState('');
@@ -23,6 +25,7 @@ export const useRegister = () => {
 
         if (data.password !== data.password_confirmation) {
             setError('Passwords do not match.');
+            toast.error('Passwords do not match.');
             setLoading(false);
             return;
         }
@@ -46,9 +49,10 @@ export const useRegister = () => {
                 
                 if (response.data.success) {
                     setSuccessMessage(response.data.message);
+                    toast.success(response.data.message);
+
                     if(response.data.redirect){
                         window.location.href = response.data.redirect;
-                        // window.location.href = response.data.redirect;
                     }
                     reset('name', 'email', 'password', 'password_confirmation');
                     reset('password', 'password_confirmation');
@@ -63,21 +67,25 @@ export const useRegister = () => {
                         .flat()
                         .join(' ');
                     setError(prevError => `${prevError ? prevError + '. ' : ''}${errorMessage}`);
+                    toast.error(errorMessage);
                 }
                 
                 // Handle general backend error message
                 if (backendError.response?.data?.message) {
                     setError(prevError => `${prevError ? prevError + '. ' : ''}${backendError.response.data.message}`);
+                    toast.error(backendError.response.data.message);
                 }
                 
                 if (!backendError.response?.data) {
                     setError(prevError => `${prevError ? prevError + '. ' : ''}An error occurred while saving user data.`);
+                    toast.error('An error occurred while saving user data.');
                 }
             }
 
         } catch (err) {
             console.error('Registration error:', err);
             const firebaseError = getFirebaseErrorMessage(err.code) || 'Error creating account. Please try again.';
+            toast.error(firebaseError);
             setError(prevError => `${prevError ? prevError + '. ' : ''}${firebaseError}`);
         } finally {
             setLoading(false);

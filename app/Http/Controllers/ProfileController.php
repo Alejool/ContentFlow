@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
 use Inertia\Response;
 
+use function Laravel\Prompts\warning;
+
 class ProfileController extends Controller
 {
     /**
@@ -27,17 +29,45 @@ class ProfileController extends Controller
     /**
      * Update the user's profile information.
      */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function update(ProfileUpdateRequest $request)
     {
-        $request->user()->fill($request->validated());
+        try {
+            $user = $request->user();
+            $validated = $request->validated();
+            
+            $changes = array_filter($validated, function($value, $key) use ($user) {
+                return $user->$key !== $value;
+            }, ARRAY_FILTER_USE_BOTH);
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+            if (!empty($changes)) {
+                $user->fill($changes);
+                
+                if (isset($changes['email'])) {
+                    $user->email_verified_at = null;
+                }
+                
+                $user->save();
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Profile updated successfully',
+                    'user' => $user
+                ]);
+            }
+
+            return response()->json([
+                'success' => false,
+                'warning' => true,
+                'message' => 'No changes detected'
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error updating profile',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        $request->user()->save();
-
-        return Redirect::route('profile.edit');
     }
 
     /**
