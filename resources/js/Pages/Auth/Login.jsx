@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, getAuthResult } from '@/firebase';
-import Logo from '@/../assets/logo-v2.svg';
+import Logo from '@/../assets/logo.png';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { useAuth } from '@/Hooks/useAuth';
      
@@ -52,8 +52,10 @@ export default function Login() {
                     className="  
                         w-full 
                         lg:w-1/2 
-                        bg-red-600 
+                        bg-red-400 
                         bg-opacity-90 
+                          bg-gradient-to-b md:bg-gradient-to-r
+                        from-red-600 to-purple-500
                         flex 
                         flex-col    
                         items-center 
@@ -69,7 +71,7 @@ export default function Login() {
                         <img
                             src={Logo} 
                             alt="Register Image"
-                            className="w-64 object-cover h-40"
+                            className=" object-cover h-40 fill-current"
                         />
                     </Link>
                 </div>
@@ -144,6 +146,8 @@ export default function Login() {
                             disabled={processing || loading}
                             className="w-full rounded-md bg-[#FF2D20] px-4 py-2 font-medium text-white
                              transition hover:bg-[#FF2D20]/90 focus:outline-none 
+                             md:bg-gradient-to-r
+                                     from-red-600 to-purple-500
                              focus:ring-2 focus:ring-[#FF2D20] focus:ring-offset-2 disabled:opacity-75"
                         >
                             {loading ? 'Starting session...' : 'Start sesion'}
@@ -170,7 +174,7 @@ export default function Login() {
                                     onClick={handleGoogleLogin}
                                     disabled={loading}
                                     className="flex items-center justify-center w-full rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm 
-                                     dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700 hover:bg-gray-50"
+                                     "
                                 >
                                     <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24">
                                         <path
@@ -212,8 +216,8 @@ export default function Login() {
                             onClick={handleAnonymousLogin}
                             disabled={loading}
                             className="flex items-center justify-center rounded-md border 
-                                    border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50
-                                    dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+                                    border-gray-300 bg-white px-4 py-2 text-sm font-medium 
+                                    "
                         >
                             <svg className="mr-2 h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M12 4a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM6 12a6 6 0 0 0-6 6v1a1 1 0 0 0 1 1h22a1 1 0 0 0 1-1v-1a6 6 0 0 0-6-6H6z" />
@@ -228,10 +232,17 @@ export default function Login() {
                         <span className="text-gray-600 dark:text-gray-400"> have you not an account?</span>
                         <Link
                             href={route('register')}
-                            className="ml-1 font-medium text-[#FF2D20] hover:text-[#FF2D20]/80"
+                            className="
+                                ml-1  
+                                md:bg-gradient-to-r
+                                font-bold
+                                text-transparent bg-clip-text
+                                from-red-600 to-purple-500
+                                     "
                         >
                             Register
                         </Link>
+
                     </div>
                     </form>
 

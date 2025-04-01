@@ -5,7 +5,7 @@ import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import Bg from '@/../assets/background.svg';
-import Logo from '@/../assets/logo-v2.svg';
+import Logo from '@/../assets/logo.png';
 
 export default function AuthenticatedLayout({ header, children }) {
     const user = usePage().props.auth.user || {};

@@ -4,7 +4,7 @@ import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import GuestLayout from '@/Layouts/GuestLayout';
-import Logo from '@/../assets/logo-v2.svg';
+import Logo from '@/../assets/logo.png';
 import { useRegister } from '@/Hooks/useRegister';
 
 export default function Register() {
@@ -28,7 +28,10 @@ export default function Register() {
         <GuestLayout>
             <Head title="Register" />
             <div className="min-h-screen flex flex-col lg:flex-row">
-                <div className="w-full lg:w-1/2 bg-red-600 bg-opacity-90 flex flex-col items-center justify-center p-8">
+                <div className="w-full lg:w-1/2
+                    bg-gradient-to-b md:bg-gradient-to-r
+                  from-red-600 to-purple-500
+                flex flex-col items-center justify-center p-8">
                     <div className="text-white text-center">
                             <h1 className="text-4xl font-bold mb-4">Welcome</h1>
                             <p className="text-lg">
@@ -39,12 +42,16 @@ export default function Register() {
                             <img
                                 src={Logo} // Ruta de tu imagen
                                 alt="Register Image"
-                                className="w-64 object-cover h-40"
+                                className=" object-cover h-40 fill-current"
                             />
                         </Link>
                     </div>
                 
-                <div className="w-full lg:w-1/2 flex items-center justify-center bg-gray-50 bg-opacity-70 p-8">
+                <div className="w-full lg:w-1/2 flex items-center 
+                justify-center
+                 p-8">
+
+                    
                     <div className="w-full max-w-md space-y-6">
                         {error && (
                             <div className="rounded-md bg-red-50 p-4 text-sm text-red-600">
@@ -132,8 +139,11 @@ export default function Register() {
                                     ms-4 
                                     rounded-md bg-[#FF2D20] px-4 py-2 font-medium
                                      text-white
+                                      md:bg-gradient-to-r
+                                     from-red-600 to-purple-500
                                     transition hover:bg-[#FF2D20]/90 
-                                    focus:outline-none focus:ring-2 focus:ring-[#FF2D20] focus:ring-offset-2 disabled:opacity-75"
+                                    focus:outline-none focus:ring-2 focus:ring-[#FF2D20] 
+                                    focus:ring-offset-2 disabled:opacity-75"
                         >
                                     {loading ? 'Registering...' : 'Register'}
                                 </PrimaryButton>

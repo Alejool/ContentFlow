@@ -3,7 +3,7 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, useForm } from '@inertiajs/react';
-import Logo from '@/../assets/logo-v2.svg';
+import Logo from '@/../assets/logo.png';
 import { Link } from '@inertiajs/react';
 
 
