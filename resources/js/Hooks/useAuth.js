@@ -3,6 +3,7 @@ import { useForm } from '@inertiajs/react';
 import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 import { auth, signInWithGoogle, signInWithFacebook, getAuthResult, loginAnonymously } from '@/firebase';
 import axios from 'axios';
+import firebase from 'firebase/compat/app';
 
 export const useAuth = () => {
     const [error, setError] = useState('');
@@ -22,30 +23,48 @@ export const useAuth = () => {
         setSuccessMessage('');
 
         try {
-            const response = await axios.post('/api/check-user', {
-                email: data.email,
-            });
-
-            const userData = response.data;
-
-            if (userData.provider) {
-                setError(`This user was registered with ${userData.provider}. Please login with ${userData.provider}.`);
-                setLoading(false);
-                return;
-            }
-
+            // Primero autenticar con Firebase
             const result = await signInWithEmailAndPassword(auth, data.email, data.password);
-            if (result.user) {
-                setSuccessMessage('login successful. Redirecting...');
-                window.location.href = route('dashboard');
+            // console.log(result);
+            if (true) {
+            // if (result.true) {
+                const idToken = await result.user.accessToken;
+                const loginResponse = await axios.post('/login', {
+                    email: data.email,
+                    password: data.password,
+                    remember: data.remember ?? false,
+                    firebase_user: {
+                        uid: result.user.uid,
+                        email: result.user.email,
+                        displayName: result.user.displayName,
+                        photoURL: result.user.photoURL
+                    },
+                }, {
+                    headers: {   
+                        'Authorization': `Bearer ${idToken}`,
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                // console.log(loginResponse);
+                if (loginResponse.data.success) {
+                    setSuccessMessage('Login successful. Redirecting...');
+                    if (loginResponse.data.redirect) {
+                        window.location.href = loginResponse.data.redirect;
+                    }
+                }
+                if (loginResponse.data.error) {
+                    setError(loginResponse.data.error);
+                }
             }
         } catch (err) {
+            console.error('Login error:', err);
             if (err.response?.data?.error) {
                 setError(err.response.data.error);
-            } else if (err.code) {
-                setError('Credentials incorrect. Please try again.');
+            } else if (err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found') {
+                setError('Invalid credentials. Please try again.');
             } else {
-                setError('An unexpected error occurred. Please try again.');
+                setError('User not found in the system. Please try again.');
             }
         } finally {
             setLoading(false);

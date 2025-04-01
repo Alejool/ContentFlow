@@ -34,18 +34,27 @@ export const useRegister = () => {
             });
 
             try {
-                const response = await axios.post('/api/save-user', {
+                const response = await axios.post('/register', {
                     name: data.name,
                     email: data.email,
+                    password: data.password,
                     provider: null,
                     provider_id: null,
                     photo_url: null,    
                 });
+                console.log(response);
                 
-                if (response.data.message) {
+                if (response.data.success) {
                     setSuccessMessage(response.data.message);
+                    if(response.data.redirect){
+                        window.location.href = response.data.redirect;
+                        // window.location.href = response.data.redirect;
+                    }
+                    reset('name', 'email', 'password', 'password_confirmation');
                     reset('password', 'password_confirmation');
                 }
+
+
                 
             } catch (backendError) {
                 // Handle Laravel validation errors
@@ -85,7 +94,7 @@ export const useRegister = () => {
             const user = result.user;
 
             try {
-                await axios.post('/api/save-user', {
+                await axios.post('/register', {
                     name: user.displayName,
                     email: user.email,
                     provider: 'google',
@@ -94,7 +103,7 @@ export const useRegister = () => {
                 });
             } catch (backendError) {
                 console.error('Backend save failed but Google sign-in succeeded:', backendError);
-                // Continue with success flow since Google sign-in worked
+                
             }
 
             setSuccessMessage('Signed in with Google successfully! Redirecting...');

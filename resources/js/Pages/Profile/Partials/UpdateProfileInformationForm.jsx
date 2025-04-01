@@ -14,6 +14,7 @@ export default function UpdateProfileInformation({
     className = '',
 }) {
     const user = usePage().props.auth.user;
+    console.log(user);
 
     const {
         register,
@@ -55,6 +56,7 @@ export default function UpdateProfileInformation({
                     <TextInput
                         id="name"
                         {...register('name')}
+                        value={user.name}
                         className="mt-1 block w-full"
                         autoComplete="name"
                     />
@@ -67,6 +69,7 @@ export default function UpdateProfileInformation({
                         id="email"
                         {...register('email')}
                         type="email"
+                        value={user.email}
                         className="mt-1 block w-full"
                         autoComplete="username"
                     />

@@ -38,32 +38,53 @@ class LoginRequest extends FormRequest
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function authenticate(): void
+    public function authenticate(): array
     {
         $this->ensureIsNotRateLimited();
 
-        // Buscar al usuario por su correo electrónico
-        $user = User::where('email', $this->input('email'))->first();
-
-        // Verificar si el usuario se registró con un proveedor externo (Google, etc.)
-        if ($user && $user->provider) {
-            RateLimiter::hit($this->throttleKey());
-
+        if (!$this->has('firebase_user') || !isset($this->firebase_user['email'])) {
             throw ValidationException::withMessages([
-                'email' => 'Este usuario se registró con ' . $user->provider . '. Por favor, inicia sesión con ' . $user->provider . ' o establece una contraseña.',
+                'email' => 'Invalid firebase user data'
             ]);
         }
 
-        // Intentar autenticar al usuario con correo electrónico y contraseña
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
-            RateLimiter::hit($this->throttleKey());
+        $firebaseUser = $this->input('firebase_user');
+        $user = User::where('email', $firebaseUser['email'])->first();
 
+        if (!$user) {
             throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
+                'email' => 'User not found in the system'
             ]);
         }
 
-        RateLimiter::clear($this->throttleKey());
+        // Debug credentials
+        $credentials = [
+            'email' => $firebaseUser['email'],
+            'password' => $this->input('password')
+        ];
+
+        \Log::info('Auth attempt credentials:', [
+            'email' => $credentials['email'],
+            'hasPassword' => !empty($credentials['password'])
+        ]);
+
+        if (!Auth::attempt($credentials)) {
+            // RateLimiter::hit($this->throttleKey());
+            throw ValidationException::withMessages([
+                'email' => 'These credentials do not match our records'
+            ]);
+        }
+
+        // RateLimiter::clear($this->throttleKey());
+        // $request = request();
+        // $request->session()->regenerate();
+        
+        return [
+            'success' => true,
+            'user' => Auth::user(),
+            'redirect' => route('dashboard'),
+            'status' => 200
+        ];
     }
 
     /**

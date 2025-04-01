@@ -1,6 +1,4 @@
-import { useState, useEffect } from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { signInWithGoogle, registerWithEmailAndPassword, updateUserProfile } from '@/firebase';
 import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
@@ -10,11 +8,9 @@ import Logo from '@/../assets/logo-v2.svg';
 import { useRegister } from '@/Hooks/useRegister';
 
 export default function Register() {
-  
-
-    const {
+    const {   
         data,
-        setData,
+        setData, 
         error,
         loading,
         successMessage,
@@ -32,10 +28,8 @@ export default function Register() {
         <GuestLayout>
             <Head title="Register" />
             <div className="min-h-screen flex flex-col lg:flex-row">
-                {/* Left side remains the same */}
                 <div className="w-full lg:w-1/2 bg-red-600 bg-opacity-90 flex flex-col items-center justify-center p-8">
                     <div className="text-white text-center">
-                           
                             <h1 className="text-4xl font-bold mb-4">Welcome</h1>
                             <p className="text-lg">
                                 Start session with your email and password
@@ -50,8 +44,6 @@ export default function Register() {
                         </Link>
                     </div>
                 
-
-                {/* Right side: Registration form */}
                 <div className="w-full lg:w-1/2 flex items-center justify-center bg-gray-50 bg-opacity-70 p-8">
                     <div className="w-full max-w-md space-y-6">
                         {error && (
