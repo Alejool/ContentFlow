@@ -1,7 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
 
 import Bg from '@/../assets/background.svg';
-import Logo from '@/../assets/logo-v2.svg';
+import Logo from '@/../assets/logo.png';
 import { useEffect,useState } from 'react';
 
 export default function Welcome({ auth }) {
