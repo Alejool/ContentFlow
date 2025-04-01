@@ -1,90 +1,80 @@
-# ContentFlow - Plataforma Inteligente de Gestión de Contenido Multimedia
+# ContentFlow - Intelligent Multimedia Content Management Platform
 
-![ContentFlow Logo](https://via.placeholder.com/150) <!-- Reemplaza con el logo del proyecto -->
+![ContentFlow Logo](https://via.placeholder.com/150)
 
-ContentFlow es una plataforma diseñada para creadores de contenido y equipos de marketing que necesitan gestionar, optimizar y programar publicaciones en redes sociales de manera eficiente. Con un sistema avanzado de organización y automatización, los usuarios pueden administrar archivos multimedia, programar publicaciones y recibir recomendaciones basadas en inteligencia artificial.
+ContentFlow is a sophisticated platform designed for content creators and marketing teams who need to efficiently manage, optimize, and schedule social media content. Leveraging advanced organization systems and AI-driven automation, users can manage multimedia files, schedule posts, and receive AI-powered recommendations.
 
----
-
-## 🚀 Tecnologías Utilizadas
+## 🚀 Tech Stack
 
 - **Backend**: Laravel
-- **Frontend**: React (con TailwindCSS)
-- **Base de Datos**: MySQL (próximamente Redis y MongoDB)
-- **APIs de Redes Sociales**: Meta Graph API, TikTok API, Twitter API, YouTube API
+- **Frontend**: React with TailwindCSS
+- **Database**: MySQL
+- **Authentication**: Laravel Sanctum & OAuth
+- **Social APIs**: Meta Graph API, TikTok API, Twitter API, YouTube API
 
----
+## 🎯 Core Features
 
-## 📌 Roadmap del Proyecto
+- **Smart Content Management**
+  - Multimedia file organization
+  - Collections and tagging system
+  - Advanced filtering and search
 
-### **Fase 1: Diseño e Infraestructura**
-- [ ] Definir la estructura de la base de datos.
-- [ ] Configurar Laravel como API REST y React como frontend.
-- [ ] Implementar autenticación con Laravel Sanctum y opciones OAuth.
-- [ ] Sistema de subida y almacenamiento de imágenes/videos.
+- **Social Media Integration**
+  - Multi-platform posting
+  - Scheduled publications
+  - Content optimization per platform
 
-### **Fase 2: Gestión de Contenido**
-- [ ] Creación de módulos para organizar contenido (colecciones, etiquetas, filtros).
-- [ ] Implementación del dashboard para visualizar y gestionar archivos.
-- [ ] Integración con redes sociales (autenticación y permisos).
-- [ ] API para crear y programar publicaciones.
+- **AI-Powered Tools**
+  - Hashtag recommendations
+  - Optimal posting time suggestions
+  - Engagement analysis
+  - Automatic image/video optimization
 
-### **Fase 3: IA y Automatización**
-- [ ] Algoritmo de recomendaciones de hashtags y horarios óptimos.
-- [ ] Autoajuste de imágenes y videos según cada red social.
-- [ ] Implementación de análisis de engagement.
+- **Team Collaboration**
+  - Role-based access control
+  - Shared workspaces
+  - Activity tracking
 
-### **Fase 4: Expansión y Optimización**
-- [ ] Implementación de planes gratuitos y premium.
-- [ ] Funcionalidad de colaboración para equipos.
-- [ ] Soporte para nuevas redes sociales y mejoras en UI/UX.
+## 📌 Project Roadmap
 
----
+### Phase 1: Foundation
+- [x] Database architecture
+- [x] REST API setup
+- [x] Authentication system
+- [ ] File storage implementation
 
-## 🎯 Cómo Usarlo
+### Phase 2: Core Features
+- [ ] Content management modules
+- [ ] Social media integration
+- [ ] Scheduling system
+- [ ] Analytics dashboard
 
-### 1. **Registro e Inicio de Sesión**
-   - Los usuarios pueden crear una cuenta o iniciar sesión (próximamente se incluirá Auth0).
+### Phase 3: AI Integration
+- [ ] Content optimization
+- [ ] Recommendation engine
+- [ ] Automated tagging
+- [ ] Performance analytics
 
-### 2. **Carga de Contenido**
-   - Sube imágenes y videos, organízalos en colecciones y agrega etiquetas.
+## 💻 Installation
 
-### 3. **Programación de Publicaciones**
-   - Selecciona contenido y prográmalo para redes sociales.
-   - La IA sugiere hashtags, títulos y horarios óptimos.
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/contentflow.git
 
-### 4. **Optimización y Publicación**
-   - El sistema ajusta automáticamente formatos y tamaños.
-   - Publica en las plataformas configuradas.
+# Install PHP dependencies
+composer install
 
-### 5. **Monitoreo y Recomendaciones**
-   - Analiza métricas de engagement y recibe sugerencias de mejora.
+# Install Node dependencies
+npm install
 
----
+# Set up environment
+cp .env.example .env
+php artisan key:generate
 
-## 📄 Licencia
+# Run migrations
+php artisan migrate
 
-Este proyecto está bajo la licencia [MIT](https://opensource.org/licenses/MIT). <!-- Cambia la licencia si es necesario -->
-
----
-
-## 🤝 Contribuciones
-
-¡Las contribuciones son bienvenidas! Si deseas contribuir, por favor sigue estos pasos:
-1. Haz un fork del proyecto.
-2. Crea una rama con tu nueva funcionalidad (`git checkout -b feature/nueva-funcionalidad`).
-3. Realiza tus cambios y haz commit (`git commit -m 'Añade nueva funcionalidad'`).
-4. Haz push a la rama (`git push origin feature/nueva-funcionalidad`).
-5. Abre un Pull Request.
-
----
-
-## 📧 Contacto
-
-Si tienes alguna pregunta o sugerencia, no dudes en contactarnos:
-- **Email**: soporte@contentflow.com <!-- Reemplaza con el correo oficial -->
-- **Sitio Web**: [www.contentflow.com](https://www.contentflow.com) <!-- Reemplaza con el sitio oficial -->
-
----
-
-© 2025 ContentFlow. Todos los derechos reservados.
+# Start development servers
+php artisan serve
+npm run dev
+```
