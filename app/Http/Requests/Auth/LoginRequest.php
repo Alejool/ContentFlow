@@ -69,15 +69,15 @@ class LoginRequest extends FormRequest
         ]);
 
         if (!Auth::attempt($credentials)) {
-            // RateLimiter::hit($this->throttleKey());
+            RateLimiter::hit($this->throttleKey());
             throw ValidationException::withMessages([
                 'email' => 'These credentials do not match our records'
             ]);
         }
 
-        // RateLimiter::clear($this->throttleKey());
-        // $request = request();
-        // $request->session()->regenerate();
+        RateLimiter::clear($this->throttleKey());
+        $request = request();
+        $request->session()->regenerate();
         
         return [
             'success' => true,

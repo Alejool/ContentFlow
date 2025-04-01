@@ -5,11 +5,11 @@ import { auth, getAuthResult } from '@/firebase';
 import Logo from '@/../assets/logo-v2.svg';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { useAuth } from '@/Hooks/useAuth';
-
+     
     
 export default function Login() {
     const { errors } = usePage().props;  // Obtenemos los errores de los props
-    const {
+    const {     
         data,
         setData,
         error,

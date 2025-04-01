@@ -7,6 +7,7 @@ import { Link, usePage } from '@inertiajs/react';
 import { useForm as useHookForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { profileSchema } from '@/schemas/schemas';
+import { toast } from 'react-toastify';
 
 export default function UpdateProfileInformation({
     mustVerifyEmail,
@@ -14,29 +15,49 @@ export default function UpdateProfileInformation({
     className = '',
 }) {
     const user = usePage().props.auth.user;
-    console.log(user);
 
     const {
         register,
         handleSubmit,
         setError,
+        watch,
         formState: { errors, isSubmitting },
     } = useHookForm({
         resolver: zodResolver(profileSchema),
         defaultValues: {
-            name: user.name,
-            email: user.email,
+            name: user?.name || '',
+            email: user?.email || '',
         },
+        // values: {
+        //     name: user?.name,
+        //     email: user?.email,
+        // }
     });
+     const watchedName = watch('name');
+    const watchedEmail = watch('email');
 
     const submit = async (data) => {
         try {
-            await axios.patch(route('profile.update'), data);
+            const response = await axios.patch(route('profile.update'), data);
+            
+            if (response.data.success) {
+                toast.success(response.data.message || 'Profile updated successfully');
+            } else if(response.data.warning) {
+                toast.warning(response.data.message || 'No changes were made');
+            }
+            else
+            {
+                toast.error(response.data.message || 'An error occurred while updating profile');
+            }
+            
         } catch (error) {
             if (error.response?.data?.errors) {
                 Object.entries(error.response.data.errors).forEach(([key, value]) => {
                     setError(key, { message: value[0] });
+                    toast.error(value[0]);
                 });
+            } else {
+                toast.error(error.response?.data?.message || 'An error occurred while updating profile');
             }
         }
     };
@@ -55,24 +76,25 @@ export default function UpdateProfileInformation({
                     <InputLabel htmlFor="name" value="Name" />
                     <TextInput
                         id="name"
-                        {...register('name')}
-                        value={user.name}
+                        value={watchedName}
+                        onChange={(e) => register('name').onChange(e)}
                         className="mt-1 block w-full"
                         autoComplete="name"
                     />
                     <InputError message={errors.name?.message} className="mt-2" />
                 </div>
-
+     
                 <div>
                     <InputLabel htmlFor="email" value="Email" />
-                    <TextInput
-                        id="email"
-                        {...register('email')}
-                        type="email"
-                        value={user.email}
-                        className="mt-1 block w-full"
-                        autoComplete="username"
-                    />
+                       <TextInput
+                    id="email"
+                    value={watchedEmail}
+                    onChange={(e) => register('email').onChange(e)}
+                    type="email"
+                    disabled={true}
+                    className="mt-1 block w-full"
+                    autoComplete="email"
+                />
                     <InputError message={errors.email?.message} className="mt-2" />
                 </div>
 
