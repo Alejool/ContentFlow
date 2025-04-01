@@ -1,12 +1,14 @@
 import { useEffect } from 'react';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, getAuthResult } from '@/firebase';
 import Logo from '@/../assets/logo-v2.svg';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { useAuth } from '@/Hooks/useAuth';
 
+    
 export default function Login() {
+    const { errors } = usePage().props;  // Obtenemos los errores de los props
     const {
         data,
         setData,
@@ -47,18 +49,17 @@ export default function Login() {
             <Head title="start sesion" />
             <div className="min-h-screen flex flex-col lg:flex-row">
                 <div 
-                    className="
+                    className="  
                         w-full 
                         lg:w-1/2 
                         bg-red-600 
                         bg-opacity-90 
                         flex 
-                        flex-col 
+                        flex-col    
                         items-center 
                         justify-center 
                         p-8">
                     <div className="text-white text-center">
-                       
                         <h1 className="text-4xl font-bold mb-4">Welcome</h1>
                         <p className="text-lg">
                             Start session with your email and password
@@ -122,7 +123,7 @@ export default function Login() {
                             />
                         </div>
                         
-                        <div className="mb-6 flex items-center">
+                        {/* <div className="mb-6 flex items-center">
                             <input
                                 type="checkbox"
                                 name="remember"
@@ -136,7 +137,7 @@ export default function Login() {
                             ">
                                 Remember me
                             </label>
-                        </div>
+                        </div> */} 
                         
                         <button
                             type="submit"
