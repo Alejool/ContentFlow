@@ -1,6 +1,6 @@
 # ContentFlow - Intelligent Multimedia Content Management Platform
 
-![ContentFlow Logo](/resources\assets/logo.png)
+![ContentFlow Logo](/resources/assets/logo.png)
 
 ContentFlow is a sophisticated platform designed for content creators and marketing teams who need to efficiently manage, optimize, and schedule social media content. Leveraging advanced organization systems and AI-driven automation, users can manage multimedia files, schedule posts, and receive AI-powered recommendations.
 
