@@ -1,12 +1,16 @@
 export default function ContentCard({ content, onEdit, onDelete }) {
     return (
         <div className="overflow-hidden bg-gray-50 rounded-lg hover:bg-gray-100 transition duration-300">
-            <img src={content.image} alt="Content Thumbnail" className="w-full h-40 object-cover" />
+            {content.image ? (
+                <img src={content.image} alt="Content Thumbnail" className="w-full h-40 object-cover" />
+            ): (
+                <div className="w-full h-40 bg-gray-300"></div>
+            )}
             <div className="p-4">
-                <h3 className="text-lg font-semibold text-gray-800">{content.title}</h3>
-                <p className="mt-2 text-sm text-gray-600">{content.description}</p>
+                <h3 className="text-lg font-semibold overflow-y-auto text-gray-800 h-16">{content.title}</h3>
+               <p className="mt-2 text-sm h-40 overflow-y-auto p-1 text-gray-600">{content.description}</p>
                 {/* Hashtags Section */}
-                <div className="mt-2">
+                <div className="mt-2 ">
                     <p className="text-sm text-blue-600">{content.hashtags}</p>
                 </div>
                 <div className="mt-4 flex items-center justify-between">
