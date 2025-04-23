@@ -8,6 +8,7 @@ use App\Http\Controllers\AIChatController;
 use Inertia\Inertia;
 use App\Http\Controllers\ManageContentController;
 use App\Http\Controllers\PostsController;
+use App\Http\Controllers\Campaigns\CampaignController;
  
   
 Route::get('/', function () {
@@ -28,17 +29,6 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Video routes
-    // Route::get('/videos', [VideoController::class, 'edit'])->name('video.edit');
-    // Route::get('/manage-collection', [VideoController::class, 'index'])->name('video.edit');
-    // Route::resource('videos', VideoController::class)->only('index', 'store');
-    // Post routes
-
-    // Image routes
-    Route::resource('images', ImageController::class)->only('index', 'store');
-    // Collection routes
-    Route::get('collections/attach-image', [CollectionController::class, 'attachImage']);
-    Route::resource('collections', CollectionController::class)->only('index', 'store');
 
     // ManageContent
     Route::get('/manage-content', [ManageContentController::class, 'index'])->name('manage-content.index');
@@ -54,6 +44,17 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/ai-chat', [AIChatController::class, 'index'])->name('ai-chat.index');
 });
 
+
+
+// routes for campaigns
+Route::middleware(['auth'])->group(function () {
+    Route::prefix('campaigns')->group(function () {
+        Route::get('/', [CampaignController::class, 'index'])->name('campaigns.index');
+        Route::post('/', [CampaignController::class, 'store'])->name('campaigns.store');
+        Route::put('/{campaign}', [CampaignController::class, 'update'])->name('campaigns.update');
+        Route::delete('/{campaign}', [CampaignController::class, 'destroy'])->name('campaigns.destroy');
+    });
+});
 
 
 require __DIR__ . '/auth.php';
