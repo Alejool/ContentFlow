@@ -1,12 +1,12 @@
 # ContentFlow - Intelligent Multimedia Content Management Platform
 
-![ContentFlow Logo](https://via.placeholder.com/150)
+![ContentFlow Logo](/resources/assets/logo.png)
 
 ContentFlow is a sophisticated platform designed for content creators and marketing teams who need to efficiently manage, optimize, and schedule social media content. Leveraging advanced organization systems and AI-driven automation, users can manage multimedia files, schedule posts, and receive AI-powered recommendations.
 
 ## 🚀 Tech Stack
 
-- **Backend**: Laravel
+- **Backend**: Laravel (Inertia)
 - **Frontend**: React with TailwindCSS
 - **Database**: MySQL
 - **Authentication**: Laravel Sanctum & OAuth
@@ -59,7 +59,7 @@ ContentFlow is a sophisticated platform designed for content creators and market
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/contentflow.git
+git clone [https://github.com/Alejool/contentflow.git](https://github.com/Alejool/ContentFlow.git)
 
 # Install PHP dependencies
 composer install
