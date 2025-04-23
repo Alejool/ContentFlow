@@ -10,7 +10,7 @@ export default function ContentCard({ content, onEdit, onDelete }) {
                     <p className="text-sm text-blue-600">{content.hashtags}</p>
                 </div>
                 <div className="mt-4 flex items-center justify-between">
-                    <span className="text-sm text-gray-500">Published: {content.date}</span>
+                    <span className="text-sm text-gray-500">Published: {content.publish_date}</span>
                     <div className="flex gap-2">
                         <button
                             onClick={onEdit}
