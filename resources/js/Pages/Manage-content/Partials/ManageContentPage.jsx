@@ -34,11 +34,23 @@ export default function ManageContentPage() {
         setSelectedCampaign(campaign);
         setIsEditModalOpen(true);
     };
+    
+    const handleUpdateCampaign = async (data) => {
+        const success = await updateCampaign(selectedCampaign.id, data);
+        if (success) {
+            setIsEditModalOpen(false);
+            setSelectedCampaign(null);
+            await fetchCampaigns();
+        }
+    };
 
-    // if (isLoading) {
-        
-        
-    // }
+    const handleAddCampaign = async (data) => {
+        const success = await addCampaign(data);
+        if (success) {
+            setIsModalOpen(false);
+            await fetchCampaigns();
+        }
+    };
 
     return (
         <AuthenticatedLayout>
@@ -66,15 +78,16 @@ export default function ManageContentPage() {
             <AddCampaignModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                onSubmit={addCampaign}
+                onSubmit={handleAddCampaign}
             />
 
             <EditCampaignModal
                 isOpen={isEditModalOpen}
                 onClose={() => setIsEditModalOpen(false)}
-                onSubmit={(data) => updateCampaign(selectedCampaign.id, data)}
+                onSubmit={handleUpdateCampaign}
                 campaign={selectedCampaign}
             />
         </AuthenticatedLayout>
     );
 }
+

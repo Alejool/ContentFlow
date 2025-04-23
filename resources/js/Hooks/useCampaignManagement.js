@@ -39,10 +39,13 @@ export function useCampaignManagement() {
     const updateCampaign = async (id, data) => {
         try {
             const response = await axios.put(`/campaigns/${id}`, data);
-            setCampaigns(campaigns.map(campaign => 
-                campaign.id === id ? response.data : campaign
-            ));
+            setCampaigns(prevCampaigns => 
+                prevCampaigns.map(campaign => 
+                    campaign.id === id ? response.data : campaign
+                )
+            );
             toast.success('Campaign updated successfully!');
+            await fetchCampaigns(); // Recargar los datos después de actualizar
             return true;
         } catch (error) {
             toast.error('Failed to update campaign');
@@ -64,7 +67,10 @@ export function useCampaignManagement() {
         if (result.isConfirmed) {
             try {
                 await axios.delete(`/campaigns/${id}`);
-                setCampaigns(campaigns.filter(campaign => campaign.id !== id));
+                setCampaigns(prevCampaigns => 
+                    prevCampaigns.filter(campaign => campaign.id !== id)
+                );
+                await fetchCampaigns(); // Recargar los datos después de eliminar
                 toast.success('Campaign deleted successfully!');
             } catch (error) {
                 toast.error('Failed to delete campaign');
