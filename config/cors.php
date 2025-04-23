@@ -29,6 +29,6 @@ return [
 
     'max_age' => 0,  // El tiempo que el navegador puede almacenar en caché las respuestas CORS, en segundos.
 
-    'supports_credentials' => false,  // Cambia a true si deseas enviar credenciales (cookies, etc.)
+    'supports_credentials' => true,  // Cambia a true si deseas enviar credenciales (cookies, etc.)
 
 ];

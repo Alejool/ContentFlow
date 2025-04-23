@@ -9,6 +9,7 @@ use Inertia\Inertia;
 use App\Http\Controllers\ManageContentController;
 use App\Http\Controllers\PostsController;
 use App\Http\Controllers\Campaigns\CampaignController;
+use App\Http\Controllers\SocialAccountController;
  
   
 Route::get('/', function () {
@@ -56,5 +57,5 @@ Route::middleware(['auth'])->group(function () {
     });
 });
 
-
+   
 require __DIR__ . '/auth.php';
