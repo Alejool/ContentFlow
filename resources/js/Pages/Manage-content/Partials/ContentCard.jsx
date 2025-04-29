@@ -1,36 +1,95 @@
+import { 
+    Card, 
+    Image, 
+    Box, 
+    Heading, 
+    Text, 
+    Flex, 
+    Button, 
+    Stack,
+    Badge
+} from "@chakra-ui/react";
+
 export default function ContentCard({ content, onEdit, onDelete }) {
     return (
-        <div className="overflow-hidden bg-gray-50 rounded-lg hover:bg-gray-100 transition duration-300">
+        <Card.Root 
+            overflow="hidden" 
+            bg="gray.50" 
+            rounded="lg" 
+            _hover={{ bg: "gray.100" }} 
+            transition="all 0.3s"
+        >
             {content.image ? (
-                <img src={content.image} alt="Content Thumbnail" className="w-full h-40 object-cover" />
-            ): (
-                <div className="w-full h-40 bg-gray-300"></div>
+                <Image 
+                    src={content.image} 
+                    alt="Content Thumbnail" 
+                    w="full" 
+                    h="40" 
+                    objectFit="cover" 
+                />
+            ) : (
+                <Box w="full" h="40" bg="gray.300" />
             )}
-            <div className="p-4">
-                <h3 className="text-lg font-semibold overflow-y-auto text-gray-800 h-16">{content.title}</h3>
-               <p className="mt-2 text-sm h-40 overflow-y-auto p-1 text-gray-600">{content.description}</p>
+            
+            <Card.Header 
+                className="text-center font-bold text-xl py-3"
+            >
+                {content.title}
+            </Card.Header>
+            
+            {/* Description Section */}
+            <Card.Body p="4">
+                <Text 
+                    mt="2" 
+                    overflowY="auto" 
+                    p="1" 
+                    color="gray.600"
+                    h="40" 
+                >
+                    {content.description}
+                </Text>
+            
                 {/* Hashtags Section */}
-                <div className="mt-2 ">
-                    <p className="text-sm text-blue-600">{content.hashtags}</p>
-                </div>
-                <div className="mt-4 flex items-center justify-between">
-                    <span className="text-sm text-gray-500">Published: {content.publish_date}</span>
-                    <div className="flex gap-2">
-                        <button
+                <Box mt="2">
+                    <Text color="blue.600">
+                        {content.hashtags}
+                    </Text>
+                </Box>
+                
+                <Flex mt="4" align="center" justify="space-between">
+                    <Text color="gray.500">
+                        Published: {content.publish_date}
+                    </Text>
+                    
+                    <Stack direction="row" spacing="2">
+                        <Button
                             onClick={onEdit}
-                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300"
+                            px="4"
+                            py="2"
+                            bg="blue.600"
+                            color="white"
+                            rounded="lg"
+                            _hover={{ bg: "blue.700" }}
+                            transition="background 0.3s"
                         >
                             Edit
-                        </button>
-                        <button
+                        </Button>
+                        
+                        <Button
                             onClick={onDelete}
-                            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-300"
+                            px="4"
+                            py="2"
+                            bg="red.600"
+                            color="white"
+                            rounded="lg"
+                            _hover={{ bg: "red.700" }}
+                            transition="background 0.3s"
                         >
                             Delete
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+                        </Button>
+                    </Stack>
+                </Flex>
+            </Card.Body>
+        </Card.Root>
     );
 }

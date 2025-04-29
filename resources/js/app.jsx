@@ -3,8 +3,14 @@ import './bootstrap';
 import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot, hydrateRoot } from 'react-dom/client';
-import { ToastContainer } from 'react-toastify'; // Importa ToastContainer
-import 'react-toastify/dist/ReactToastify.css'; // Importa los estilos de Toastify
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+// Remove Chakra UI import
+// import { Provider } from "@/components/ui/provider"
+// import { ColorModeProvider } from "@/components/ui/color-mode"
+import { ChakraProvider, defaultSystem } from "@chakra-ui/react"
+
+
 
 const appName = import.meta.env.VITE_APP_NAME || 'life-image';
 
@@ -20,8 +26,10 @@ createInertiaApp({
 
         root.render(
             <>
-                <App {...props} />
-                <ToastContainer /> {/* Agrega el ToastContainer aquí */}
+                <ChakraProvider value={defaultSystem}>
+                    <App {...props} />
+                </ChakraProvider >
+                <ToastContainer />
             </>,
         );
     },

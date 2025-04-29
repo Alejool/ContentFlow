@@ -57,5 +57,12 @@ Route::middleware(['auth'])->group(function () {
     });
 });
 
+// Rutas para callbacks de OAuth
+Route::middleware(['web'])->group(function () {
+    Route::get('/auth/facebook/callback', [SocialAccountController::class, 'handleFacebookCallback']);
+    Route::get('/auth/instagram/callback', [SocialAccountController::class, 'handleInstagramCallback']);
+    Route::get('/auth/twitter/callback', [SocialAccountController::class, 'handleTwitterCallback']);
+    Route::get('/auth/youtube/callback', [SocialAccountController::class, 'handleYoutubeCallback']);
+});
    
 require __DIR__ . '/auth.php';
