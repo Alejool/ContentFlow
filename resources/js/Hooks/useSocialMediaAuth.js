@@ -1,17 +1,84 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
-export function useSocialMediaAuth() {
+export const useSocialMediaAuth = () => {
     const [isAuthenticating, setIsAuthenticating] = useState(false);
     const [accounts, setAccounts] = useState([]);
+    
+    useEffect(() => {
+        // Escuchar mensajes de la ventana emergente
+        const handleMessage = async (event) => {
+            console.log('Mensaje recibido:', event.data);
+            
+            if (event.data && event.data.type === 'social_auth_callback') {
+                setIsAuthenticating(false);
+                
+                if (event.data.success) {
+                    // La autenticación fue exitosa
+                    console.log('Autenticación exitosa:', event.data.data);
+                    
+                    try {
+                        // Parsear los datos recibidos del callback
+                        const responseData = JSON.parse(event.data.data);
+                        console.log('Datos parseados:', responseData);
+                        
+                        // Guardar los datos en el backend
+                        await axios.post('/api/social-accounts', {
+                            platform: responseData.platform,
+                            account_id: responseData.account_id,
+                            access_token: responseData.access_token,
+                            refresh_token: responseData.refresh_token || null,
+                            token_expires_at: responseData.token_expires_at || null
+                        }, {
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json',
+                            },
+                            withCredentials: true
+                        });
+                        
+                        toast.success(`Cuenta de ${responseData.platform} conectada exitosamente`);
+                        
+                        // Recargar las cuentas conectadas
+                        await loadConnectedAccounts();
+                    } catch (error) {
+                        console.error('Error al guardar datos de la cuenta:', error);
+                        toast.error('Error al guardar los datos de la cuenta: ' + (error.response?.data?.message || error.message));
+                    }
+                } else {
+                    // La autenticación falló
+                    console.error('Error en la autenticación:', event.data.message);
+                    toast.error('Error en la autenticación: ' + (event.data.message || 'Error desconocido'));
+                }
+            }
+        };
+        
+        window.addEventListener('message', handleMessage);
+        
+        return () => {
+            window.removeEventListener('message', handleMessage);
+        };
+    }, []);
     
     // Cargar cuentas conectadas del usuario
     const loadConnectedAccounts = async () => {
         try {
-            const response = await axios.get('/api/social-accounts');
-            setAccounts(response.data.accounts);
-            return response.data.accounts;
+            const response = await axios.get('/api/social-accounts', {
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
+                    'Accept': 'application/json',
+                },
+                withCredentials: true
+            });
+            
+            if (response.data && response.data.accounts) {
+                setAccounts(response.data.accounts);
+                return response.data.accounts;
+            }
+            
+            return [];
         } catch (error) {
             console.error('Error al cargar cuentas sociales:', error);
             toast.error('No se pudieron cargar las cuentas conectadas');
@@ -19,82 +86,85 @@ export function useSocialMediaAuth() {
         }
     };
     
-    // Iniciar proceso de autenticación
     const connectSocialMedia = async (platform) => {
-        setIsAuthenticating(true);
-        
         try {
-            // Obtener URL de autorización del backend
-            const response = await axios.get(`/api/social-accounts/auth-url/${platform}`);
+            setIsAuthenticating(true);
             
-            // Abrir ventana de autenticación
-            const authWindow = window.open(
-                response.data.url,
-                `Conectar con ${platform}`,
-                'width=600,height=700'
-            );
+            // Obtener URL de autenticación
+            const response = await axios.get(`/api/social-accounts/auth-url/${platform}`, {
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
+                    'Accept': 'application/json',
+                },
+                withCredentials: true
+            });
             
-            // Manejar el resultado de la autenticación
-            const authResult = await new Promise((resolve, reject) => {
-                // Escuchar mensajes de la ventana de autenticación
-                window.addEventListener('message', (event) => {
-                    if (event.data.type === 'social_auth_callback') {
-                        if (authWindow) authWindow.close();
-                        
-                        if (event.data.success) {
-                            resolve(event.data);
-                        } else {
-                            reject(new Error(event.data.error || 'Error de autenticación'));
-                        }
-                    }
-                }, { once: true });
+            if (response.data.success && response.data.url) {
+                // Abrir ventana emergente para autenticación
+                const authWindow = window.open(
+                    response.data.url,
+                    `${platform}Auth`,
+                    'width=600,height=700,left=200,top=100'
+                );
                 
-                // Manejar cierre manual de la ventana
-                const checkClosed = setInterval(() => {
-                    if (authWindow && authWindow.closed) {
-                        clearInterval(checkClosed);
-                        reject(new Error('Ventana cerrada por el usuario'));
+                if (!authWindow) {
+                    setIsAuthenticating(false);
+                    toast.error('El navegador bloqueó la ventana emergente. Por favor, permita ventanas emergentes para este sitio.');
+                    return false;
+                }
+                
+                // Verificar si la ventana se cerró manualmente
+                const checkWindowClosed = setInterval(() => {
+                    if (authWindow.closed) {
+                        clearInterval(checkWindowClosed);
+                        setIsAuthenticating(false);
                     }
-                }, 500);
-            });
-            
-            // Guardar los datos de la cuenta en el backend
-            await axios.post('/api/social-accounts', {
-                platform: platform,
-                account_id: authResult.account_id,
-                access_token: authResult.access_token,
-                refresh_token: authResult.refresh_token,
-                token_expires_at: authResult.expires_at
-            });
-            
-            // Recargar cuentas conectadas
-            await loadConnectedAccounts();
-            
-            toast.success(`Cuenta de ${platform} conectada exitosamente`);
-            return true;
+                }, 1000);
+                
+                return true;
+            } else {
+                setIsAuthenticating(false);
+                toast.error('No se pudo obtener la URL de autenticación');
+                throw new Error('No se pudo obtener la URL de autenticación');
+            }
         } catch (error) {
-            console.error(`Error al conectar con ${platform}:`, error);
-            toast.error(`Error al conectar con ${platform}: ${error.message}`);
-            return false;
-        } finally {
             setIsAuthenticating(false);
+            console.error('Error al conectar con la red social:', error);
+            toast.error('Error al conectar con la red social: ' + (error.response?.data?.message || error.message));
+            throw error;
         }
     };
     
-    // Desconectar cuenta
     const disconnectSocialMedia = async (platform, accountId) => {
         try {
-            await axios.delete(`/api/social-accounts/${accountId}`);
+            setIsAuthenticating(true);
             
-            // Actualizar estado local
-            setAccounts(accounts.filter(account => account.id !== accountId));
+            const response = await axios.delete(`/api/social-accounts/${accountId}`, {
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
+                    'Accept': 'application/json',
+                },
+                withCredentials: true
+            });
             
-            toast.success(`Cuenta de ${platform} desconectada exitosamente`);
-            return true;
+            setIsAuthenticating(false);
+            
+            if (response.data.success) {
+                toast.success(`Cuenta de ${platform} desconectada exitosamente`);
+                
+                // Recargar las cuentas conectadas después de desconectar
+                await loadConnectedAccounts();
+                
+                return true;
+            } else {
+                toast.error('Error al desconectar la cuenta: ' + (response.data.message || 'Error desconocido'));
+                return false;
+            }
         } catch (error) {
-            console.error(`Error al desconectar ${platform}:`, error);
-            toast.error(`Error al desconectar ${platform}: ${error.message}`);
-            return false;
+            setIsAuthenticating(false);
+            console.error('Error al desconectar la red social:', error);
+            toast.error('Error al desconectar la red social: ' + (error.response?.data?.message || error.message));
+            throw error;
         }
     };
     
@@ -105,4 +175,4 @@ export function useSocialMediaAuth() {
         connectSocialMedia,
         disconnectSocialMedia
     };
-}
+};

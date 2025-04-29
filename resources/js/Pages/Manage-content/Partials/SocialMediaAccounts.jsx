@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import IconFacebook from '@/../assets/Icons/facebook.svg';
 import IconInstagram from '@/../assets/Icons/instagram.svg';
 import IconTiktok from '@/../assets/Icons/tiktok.svg';
@@ -18,10 +18,45 @@ export default function SocialMediaAccounts() {
         { id: 5, platform: 'youtube', name: 'YouTube', logo: IconYoutube, isConnected: false, accountId: null },
     ]);
     const [loading, setLoading] = useState(true);
+    const [authInProgress, setAuthInProgress] = useState(false);
+    const authWindowRef = useRef(null);
+    const authCheckIntervalRef = useRef(null);
 
     // Cargar las cuentas conectadas al iniciar el componente
     useEffect(() => {
         fetchConnectedAccounts();
+        
+        // Configurar el listener de mensajes para la autenticación
+        const handleAuthMessage = (event) => {
+            console.log('Mensaje recibido en SocialMediaAccounts:', event.data);
+            
+            if (event.data && event.data.type === 'social_auth_callback') {
+                setAuthInProgress(false);
+                
+                if (event.data.success) {
+                    toast.success(`Cuenta conectada exitosamente`);
+                    fetchConnectedAccounts(); // Recargar las cuentas después de una autenticación exitosa
+                } else {
+                    toast.error(`Error en la autenticación: ${event.data.message || 'Error desconocido'}`);
+                }
+                
+                // Limpiar el intervalo de verificación si existe
+                if (authCheckIntervalRef.current) {
+                    clearInterval(authCheckIntervalRef.current);
+                    authCheckIntervalRef.current = null;
+                }
+            }
+        };
+        
+        window.addEventListener('message', handleAuthMessage);
+        
+        return () => {
+            window.removeEventListener('message', handleAuthMessage);
+            // Limpiar el intervalo de verificación al desmontar
+            if (authCheckIntervalRef.current) {
+                clearInterval(authCheckIntervalRef.current);
+            }
+        };
     }, []);
 
     // Función para obtener las cuentas conectadas desde el backend
@@ -107,23 +142,70 @@ export default function SocialMediaAccounts() {
                 toast.error(`Error al desconectar ${account.name}: ${error.message}`);
             }
         } else {
-            // Conectar cuenta
+            // Conectar cuenta - Implementación mejorada
             try {
-                const result = await connectSocialMedia(account.platform.toLowerCase());
-                if (result) {
-                    // Recargar las cuentas para obtener la información actualizada
-                    await fetchConnectedAccounts();
-                    toast.success(`Cuenta de ${account.name} conectada exitosamente`);
+                setAuthInProgress(true);
+                
+                // Obtener URL de autenticación
+                const response = await axios.get(`/api/social-accounts/auth-url/${account.platform}`, {
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
+                        'Accept': 'application/json',
+                    },
+                    withCredentials: true
+                });
+                
+                if (response.data.success && response.data.url) {
+                    // Cerrar cualquier ventana de autenticación anterior que pudiera estar abierta
+                    if (authWindowRef.current && !authWindowRef.current.closed) {
+                        authWindowRef.current.close();
+                    }
+                    
+                    // Abrir ventana emergente para autenticación
+                    authWindowRef.current = window.open(
+                        response.data.url,
+                        `${account.platform}Auth`,
+                        'width=600,height=700,left=200,top=100'
+                    );
+                    
+                    if (!authWindowRef.current) {
+                        setAuthInProgress(false);
+                        toast.error('El navegador bloqueó la ventana emergente. Por favor, permita ventanas emergentes para este sitio.');
+                        return;
+                    }
+                    
+                    // Verificar si la ventana se cerró manualmente
+                    authCheckIntervalRef.current = setInterval(() => {
+                        if (authWindowRef.current.closed) {
+                            clearInterval(authCheckIntervalRef.current);
+                            authCheckIntervalRef.current = null;
+                            setAuthInProgress(false);
+                            
+                            // Verificar si la cuenta se conectó correctamente después de un breve retraso
+                            setTimeout(() => {
+                                fetchConnectedAccounts();
+                            }, 1000);
+                        }
+                    }, 500);
+                } else {
+                    setAuthInProgress(false);
+                    toast.error('No se pudo obtener la URL de autenticación');
                 }
             } catch (error) {
-                toast.error(`Error al conectar con ${account.name}: ${error.message}`);
+                setAuthInProgress(false);
+                console.error('Error al conectar con la red social:', error);
+                toast.error(`Error al conectar con ${account.name}: ${error.response?.data?.message || error.message}`);
             }
         }
     };
 
     return (
         <div className="bg-white shadow-md rounded-lg p-6 mb-10">
-            <h2 className="text-xl font-semibold text-gray-800 mb-6">Cuentas de Redes Sociales Conectadas</h2>
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">Conecta tus Redes Sociales</h2>
+            <p className="text-gray-600 mb-6">
+                Conecta tus cuentas de redes sociales para permitir la publicación automática de contenido.
+                Tu información se mantendrá segura y solo se utilizará para las funciones que autorices.
+            </p>
             
             {loading ? (
                 <div className="text-center py-4">
@@ -154,20 +236,33 @@ export default function SocialMediaAccounts() {
                             </div>
                             <button
                                 onClick={() => handleConnectionToggle(account.id)}
-                                disabled={isAuthenticating}
+                                disabled={isAuthenticating || authInProgress}
                                 className={`px-4 py-2 rounded-lg text-sm font-semibold ${
-                                    isAuthenticating ? 'bg-gray-200 text-gray-500' :
+                                    isAuthenticating || authInProgress ? 'bg-gray-200 text-gray-500' :
                                     account.isConnected
                                         ? 'bg-red-100 text-red-600 hover:bg-red-200'
                                         : 'bg-blue-100 text-blue-600 hover:bg-blue-200'
                                 } transition duration-300`}
                             >
-                                {isAuthenticating ? 'Procesando...' : account.isConnected ? 'Desconectar' : 'Conectar'}
+                                {isAuthenticating || authInProgress ? 'Procesando...' : account.isConnected ? 'Desconectar' : 'Conectar'}
                             </button>
                         </div>
                     ))}
                 </div>
             )}
+            
+            <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+                <h3 className="text-lg font-semibold text-blue-800 mb-2">¿Por qué conectar tus redes sociales?</h3>
+                <ul className="list-disc pl-5 text-blue-700">
+                    <li className="mb-1">Publica contenido automáticamente en tus redes sociales</li>
+                    <li className="mb-1">Gestiona todas tus cuentas desde un solo lugar</li>
+                    <li className="mb-1">Programa publicaciones para momentos óptimos</li>
+                    <li className="mb-1">Mantén el control total de tus cuentas en todo momento</li>
+                </ul>
+                <p className="text-sm text-blue-600 mt-2">
+                    Puedes desconectar tus cuentas en cualquier momento. No publicaremos nada sin tu permiso.
+                </p>
+            </div>
         </div>
     );
 }

@@ -286,7 +286,7 @@ export default function AuthenticatedLayout({ header, children }) {
             {/* Contenido principal */}
             <main className={`transition-all duration-300 ease-in-out ${isSidebarOpen ? 'lg:ml-64' : 'lg:ml-20'}`}>
                 {header && (
-                    <header className="bg-white shadow">
+                    <header className="">
                         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
                             {header}
                         </div>

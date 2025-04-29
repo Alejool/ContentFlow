@@ -1,20 +1,59 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 import DeleteUserForm from './Partials/DeleteUserForm';
 import UpdatePasswordForm from './Partials/UpdatePasswordForm';
 import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm';
 import IconsProfile from '@/../assets/Icons/profile.svg';
+import { Avatar, Circle, Float,Highlight } from "@chakra-ui/react"
+
+
 
 export default function Edit({ mustVerifyEmail, status }) {
+        const user = usePage().props.auth.user;
+
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex items-center gap-4 text-gray-900">
-                    <img src={IconsProfile} alt="Profile" className="h-12 w-auto" />
-                    <h2 className="text-4xl font-extrabold text-gray-800 drop-shadow-lg">
-                        Profile
-                    </h2>
+                <div className="flex flex-col items-center justify-center mt-10">
+                    <Avatar.Root 
+                        colorPalette="green" 
+                        size="2xl" 
+                        variant="subtle"
+                        className="mx-auto relative" // Añadido relative para posicionamiento
+                    >
+                        <Avatar.Fallback name={user.name} />
+                        
+                        {/* Círculo de estado en la parte inferior del avatar */}
+                        <div className="absolute bottom-0 right-0">
+                            <Circle
+                                bg="green.500"
+                                size="8px"
+                                color="white"
+                                outline="0.2em solid"
+                                outlineColor="bg"
+                            />
+                        </div>
+                    </Avatar.Root>
+                    
+                    {/* Nombre del usuario debajo del avatar */}
+                    <div className="mt-2 text-center">
+                        <Highlight
+                            query="spotlight"
+                            styles={{ 
+                                px: "3", 
+                                py: "1",
+                                bg: "orange.subtle", 
+                                color: "orange.fg",
+                                borderRadius: "md"
+                            }}
+                            className="font-medium"
+                        >
+                            {user.name}
+                        </Highlight>
+                    </div>
                 </div>
+
+                
             }
         >
             <Head title="Profile" />
@@ -64,3 +103,4 @@ export default function Edit({ mustVerifyEmail, status }) {
         </AuthenticatedLayout>
     );
 }
+
