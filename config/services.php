@@ -58,4 +58,17 @@ return [
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),
         'redirect' => env('GOOGLE_REDIRECT_URI'),
     ],
+    
+    'openai' => [
+        'enabled' => env('OPENAI_ENABLED', false),
+        'api_key' => env('OPENAI_API_KEY'),
+        'model' => env('OPENAI_MODEL', 'gpt-3.5-turbo'),
+        'temperature' => env('OPENAI_TEMPERATURE', 0.7),
+    ],
+    
+    'gemini' => [
+        'enabled' => env('GEMINI_ENABLED', true),
+        'api_key' => env('GEMINI_API_KEY'),
+        'model' => env('GEMINI_MODEL', 'gemini-pro'),
+    ],
 ];
