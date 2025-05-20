@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-// import { createAI, createStreamableUI } from 'ai/rsc';
 import { toast } from 'react-toastify';
 
 export default function useAIChat() {
@@ -56,7 +55,7 @@ export default function useAIChat() {
                 hashtags: campaign.hashtags
             }));
             
-            const response = await axios.post(route('ai-chat.message'), {
+            const response = await axios.post('/api/ai-chat/message', {
                 message: inputMessage,
                 context: {
                     campaigns: campaignContext,
@@ -93,20 +92,16 @@ export default function useAIChat() {
         }
     };
     
-    // Manejar sugerencias de la IA (nuevas campañas o mejoras)
     const handleSuggestion = (suggestion) => {
         if (suggestion.type === 'new_campaign') {
-            // Lógica para crear nueva campaña
             console.log('Nueva campaña sugerida:', suggestion.data);
             toast.info('La IA ha sugerido una nueva campaña');
         } else if (suggestion.type === 'improvement') {
-            // Lógica para aplicar mejoras a campaña existente
             console.log('Mejora sugerida para campaña:', suggestion.data);
             toast.info('La IA ha sugerido mejoras para una campaña existente');
         }
     };
     
-    // Manejar envío con Enter
     const handleKeyPress = (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
@@ -114,7 +109,6 @@ export default function useAIChat() {
         }
     };
 
-    // Función para actualizar el mensaje de entrada
     const handleInputChange = (e) => {
         setInputMessage(e.target.value);
     };

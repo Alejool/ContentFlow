@@ -43,13 +43,14 @@ Route::middleware(['auth'])->group(function () {
 
     // ia
     Route::get('/ai-chat', [AIChatController::class, 'index'])->name('ai-chat.index');
+   
 });
 
 
 
-// routes for campaigns
+// routes for campaigns      
 Route::middleware(['auth'])->group(function () {
-    Route::prefix('campaigns')->group(function () {
+    Route::prefix('campaigns')->group(function () { 
         Route::get('/', [CampaignController::class, 'index'])->name('campaigns.index');
         Route::post('/', [CampaignController::class, 'store'])->name('campaigns.store');
         Route::put('/{campaign}', [CampaignController::class, 'update'])->name('campaigns.update');

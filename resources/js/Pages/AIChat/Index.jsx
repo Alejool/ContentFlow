@@ -15,7 +15,7 @@ export default function Index() {
         sendMessage,
     } = useAIChat();
 
-    // Estado para las tendencias e ideas de campañas
+   
     const [trends, setTrends] = useState([
         {
             id: 1,

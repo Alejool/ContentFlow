@@ -32,7 +32,6 @@ class AIChatController extends Controller
         ]);
 
         try {
-            // Obtener campañas del usuario si no se proporcionaron en el contexto
             $campaigns = $request->input('context.campaigns', []);
             if (empty($campaigns)) {
                 $campaigns = Campaign::where('user_id', Auth::id())
@@ -49,8 +48,7 @@ class AIChatController extends Controller
                 'message' => $request->input('message'),
             ];
 
-            // Aquí implementarías la llamada a tu servicio de IA
-            // Este es un ejemplo simplificado
+     
             $aiResponse = $this->getAIResponse($context);
 
             return response()->json([
@@ -88,10 +86,106 @@ class AIChatController extends Controller
      */
     private function getAIResponse($context)
     {
-        // Ejemplo simplificado - en producción conectarías con OpenAI, Azure, etc.
-        $userMessage = strtolower($context['message']);
+        // Determine which AI service to use based on configuration
+            // Check environment variables and log their values
+            $geminiEnabled = config('services.gemini.enabled');
+            $openaiEnabled = config('services.openai.enabled');
+            
+            // Log the configuration status
+            Log::debug('AI Services Status', [
+                'gemini' => $geminiEnabled ? 'enabled' : 'disabled',
+                'openai' => $openaiEnabled ? 'enabled' : 'disabled',
+                'env' => app()->environment()
+            ]);
+
+            if ($geminiEnabled) {
+                return $this->getGeminiResponse($context);
+            } elseif ($openaiEnabled) {
+            return $this->getOpenAIResponse($context);
+        }
+        // Si ningún servicio está habilitado, usar respuesta por defecto
+        return $this->getDefaultResponse($context['message']);
+    }
+    
+    private function getOpenAIResponse($context)
+    {
+        try {
+            $apiKey = config('services.openai.api_key');
+            
+            if (!$apiKey) {
+                throw new \Exception('OpenAI API key not configured');
+            }
+    
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $apiKey,
+                'Content-Type' => 'application/json',
+            ])->post('https://api.openai.com/v1/chat/completions', [
+                'model' => config('services.openai.model', 'gpt-3.5-turbo'),
+                'messages' => [
+                    [
+                        'role' => 'system',
+                        'content' => 'You are a social media campaign assistant.'
+                    ],
+                    [
+                        'role' => 'user',
+                        'content' => json_encode($context)
+                    ]
+                ],
+                'temperature' => config('services.openai.temperature', 0.7),
+            ]);
+    
+            return [
+                'message' => $response['choices'][0]['message']['content'] ?? 'No response from AI',
+                'suggestion' => null
+            ];
+        } catch (\Exception $e) {
+            Log::error('OpenAI API Error: ' . $e->getMessage());
+            return $this->getDefaultResponse($context['message']);
+        }
+    }
+    
+    private function getGeminiResponse($context)
+    {
+        try {
+            $apiKey = config('services.gemini.api_key');
+            
+            if (!$apiKey) {
+                throw new \Exception('Gemini API key not configured');
+            }
+    
+            $response = Http::withoutVerifying() 
+                ->withHeaders([
+                    'Content-Type' => 'application/json',
+                ])->post('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' . $apiKey, [
+                    'contents' => [
+                        [
+                            'parts' => [
+                                ['text' => json_encode($context)]
+                            ]
+                        ]
+                    ],
+                    'generationConfig' => [
+                        'maxOutputTokens' => 50, // Approximately 10 words
+                        'temperature' => 0.1, // Lower temperature for more focused responses
+                        'topP' => 0.5, // More deterministic output
+                        'topK' => 20 // Reduced for more concise responses
+                    ]
+                ]);
+    
+            return [
+                'message' => $response['candidates'][0]['content']['parts'][0]['text'] ?? 'No response from AI',
+                'suggestion' => null
+            ];
+        } catch (\Exception $e) {
+            Log::error('Gemini API Error: ' . $e->getMessage());
+            return $this->getDefaultResponse($context['message']);
+        }
+    }
+
+    private function getDefaultResponse($userMessage)
+    {
+        $userMessage = strtolower($userMessage);
         
-        // Simulación de respuestas basadas en palabras clave
         if (strpos($userMessage, 'nueva campaña') !== false) {
             return [
                 'message' => 'Basado en tus campañas anteriores, te recomendaría crear una campaña enfocada en engagement para Instagram con publicaciones semanales. ¿Te gustaría que te ayude a estructurarla?',
@@ -111,7 +205,7 @@ class AIChatController extends Controller
                 'suggestion' => [
                     'type' => 'improvement',
                     'data' => [
-                        'campaign_id' => 1, // En producción, identificarías la campaña relevante
+                        'campaign_id' => 1,
                         'improvements' => [
                             'hashtags' => ['#ContentStrategy', '#SocialGrowth', '#DigitalMarketing'],
                             'posting_frequency' => 'Aumentar a 3 veces por semana',
