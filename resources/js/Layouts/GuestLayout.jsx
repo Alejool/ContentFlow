@@ -1,4 +1,4 @@
-import ApplicationLogo from '@/Components/ApplicationLogo';
+import ApplicationLogo from '@/Components/ApplicationLogo.tsx';
 import { Link } from '@inertiajs/react';
 
 import Bg from '@/../assets/background.svg';
