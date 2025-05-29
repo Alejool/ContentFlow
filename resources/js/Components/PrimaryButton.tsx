@@ -1,13 +1,19 @@
-import React from 'react';
+import React, { ButtonHTMLAttributes, ReactNode, ElementType } from 'react';
 
+interface PrimaryButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+    className?: string;
+    disabled?: boolean;
+    children?: ReactNode; // children can also be optional if the button might only have an icon
+    icon?: ElementType; // For passing an SVG component or similar
+}
 
 export default function PrimaryButton({
     className = '',
     disabled,
     children,
-    icon: Icon, 
+    icon: Icon, // Destructure icon prop and alias it to Icon for use as a component
     ...props
-}) {
+}: PrimaryButtonProps) {
     return (
         <button
             {...props}
@@ -18,7 +24,7 @@ export default function PrimaryButton({
             }
             disabled={disabled}
         >
-            {Icon && <Icon className="w-4 h-4" />} {/* Usamos el componente SVG aquí */}
+            {Icon && <Icon className="w-4 h-4" />}
             {children}
         </button>
     );

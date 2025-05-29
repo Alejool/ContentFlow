@@ -1,7 +1,7 @@
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
+import InputError from '@/Components/InputError.tsx';
+import InputLabel from '@/Components/InputLabel.tsx';
+import PrimaryButton from '@/Components/PrimaryButton.tsx';
+import TextInput from '@/Components/TextInput.tsx';
 import { Transition } from '@headlessui/react';
 import { Link, usePage } from '@inertiajs/react';
 import { useForm as useHookForm } from 'react-hook-form';
