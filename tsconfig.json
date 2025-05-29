@@ -14,9 +14,10 @@
         "resolveJsonModule": true,
         "baseUrl": ".",
         "paths": {
-            "@/*": ["resources/js/*"]
+            "@/*": ["resources/js/*"],
+            "ziggy-js": ["./vendor/tightenco/ziggy"]
         }
     },
-    "include": ["resources/js/**/*.ts", "resources/js/**/*.tsx"],
+    "include": ["resources/js/**/*.ts", "resources/js/**/*.tsx", "./vendor/tightenco/ziggy/**/*.js"],
     "exclude": ["node_modules"]
 }

@@ -8,6 +8,7 @@ interface LoginFormData {
     email: string;
     password: string;
     remember: boolean;
+    [key: string]: any; // Add this line
 }
 
 export const useAuth = () => {

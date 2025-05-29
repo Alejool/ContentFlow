@@ -1,3 +1,4 @@
+import React, { ReactNode } from 'react';
 import {
     Dialog,
     DialogPanel,
@@ -5,26 +6,38 @@ import {
     TransitionChild,
 } from '@headlessui/react';
 
+type MaxWidth = 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+
+interface ModalProps {
+    children: ReactNode;
+    show?: boolean;
+    maxWidth?: MaxWidth;
+    closeable?: boolean;
+    onClose?: () => void; // Made onClose optional as well, matching original default
+}
+
 export default function Modal({
     children,
     show = false,
     maxWidth = '2xl',
     closeable = true,
     onClose = () => {},
-}) {
+}: ModalProps) {
     const close = () => {
         if (closeable) {
             onClose();
         }
     };
 
-    const maxWidthClass = {
+    const maxWidthMap: Record<MaxWidth, string> = { // Added explicit Record type
         sm: 'sm:max-w-sm',
         md: 'sm:max-w-md',
         lg: 'sm:max-w-lg',
         xl: 'sm:max-w-xl',
         '2xl': 'sm:max-w-2xl',
-    }[maxWidth];
+    };
+    const maxWidthClass = maxWidthMap[maxWidth];
+
 
     return (
         <Transition show={show} leave="duration-200">
@@ -35,6 +48,7 @@ export default function Modal({
                 onClose={close}
             >
                 <TransitionChild
+                    as={React.Fragment} // Added as={React.Fragment} for proper rendering
                     enter="ease-out duration-300"
                     enterFrom="opacity-0"
                     enterTo="opacity-100"
@@ -46,6 +60,7 @@ export default function Modal({
                 </TransitionChild>
 
                 <TransitionChild
+                    as={React.Fragment} // Added as={React.Fragment} for proper rendering
                     enter="ease-out duration-300"
                     enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                     enterTo="opacity-100 translate-y-0 sm:scale-100"

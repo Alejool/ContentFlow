@@ -1,9 +1,9 @@
-import DangerButton from '@/Components/DangerButton';
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import Modal from '@/Components/Modal';
-import SecondaryButton from '@/Components/SecondaryButton';
-import TextInput from '@/Components/TextInput';
+import DangerButton from '@/Components/DangerButton.tsx';
+import InputError from '@/Components/InputError.tsx';
+import InputLabel from '@/Components/InputLabel.tsx';
+import Modal from '@/Components/Modal.tsx';
+import SecondaryButton from '@/Components/SecondaryButton.tsx';
+import TextInput from '@/Components/TextInput.tsx';
 import { useRef, useState } from 'react';
 import { useForm as useHookForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
