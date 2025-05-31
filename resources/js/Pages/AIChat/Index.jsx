@@ -1,223 +1,463 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head } from '@inertiajs/react';
-import useAIChat from '@/Hooks/useAIChat';
-import { useState, useEffect } from 'react';
-import { Box, Circle, Float } from '@chakra-ui/react';
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
+import { Head } from "@inertiajs/react";
+import useAIChat from "@/Hooks/useAIChat";
+import { useState } from "react";
+import { usePage } from "@inertiajs/react";
+import {
+  Box,
+  Container,
+  Heading,
+  Text,
+  Grid,
+  Card,
+  Badge,
+  Button,
+  Textarea,
+  Stack,
+  Flex,
+  Avatar,
+  Spinner,
+  Drawer,
+  IconButton,
+  useDisclosure,
+  Stat,
+  Separator,
+} from "@chakra-ui/react";
+
+// Iconos SVG minimalistas
+const Icon = ({ type, size = 20, className = "" }) => {
+  const icons = {
+    ai: (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
+        <circle cx="12" cy="12" r="3" />
+        <path d="M12 1v6m0 6v6" />
+        <path d="m21 12-6-6-6 6-6-6" />
+      </svg>
+    ),
+    send: (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
+        <path d="m22 2-7 20-4-9-9-4Z" />
+      </svg>
+    ),
+    lightbulb: (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
+        <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5" />
+        <path d="M9 18h6" />
+        <path d="M10 22h4" />
+      </svg>
+    ),
+    trending: (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
+        <polyline points="22,6 13.5,15.5 8.5,10.5 1,18" />
+        <polyline points="22,6 18,6 18,10" />
+      </svg>
+    ),
+    stats: (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
+        <line x1="12" y1="20" x2="12" y2="10" />
+        <line x1="18" y1="20" x2="18" y2="4" />
+        <line x1="6" y1="20" x2="6" y2="16" />
+      </svg>
+    ),
+  };
+
+  return <Box as="span" display="inline-flex" alignItems="center">{icons[type]}</Box>;
+};
+
+// Mensaje del chat minimalista
+const ChatMessage = ({ message, user }) => {
+  const isAI = message.sender === "AI";
+  
+  return (
+    <Flex 
+      gap={4}
+      p={2}
+      direction={isAI ? "row" : "row-reverse"}
+          className="text-white  "
+      >
+      <Avatar.Root 
+        // size="2xl" 
+        flexShrink={0}
+        >
+        <Avatar.Fallback 
+          bg={isAI ? "orange.600" : "purple.500"} 
+          color="white"
+          fontSize="sm"
+          h={10}
+          p={2}
+          w={10}
+          borderRadius="full"
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          className="mx-auto"
+        >
+          {isAI ? "AI" :  user.name?.charAt(0)?.toUpperCase()+1 || 'U'}
+        </Avatar.Fallback>
+      </Avatar.Root>
+      
+      <Box 
+        bg={isAI ? "white" : "red.50"}
+        px={4} 
+        py={3} 
+        rounded="2xl"
+        maxW="80%"
+        shadow="sm"
+        border="1px"
+        borderColor={isAI ? "gray.100" : "red.100"}
+      >
+        <Text fontSize="sm" color="gray.700" lineHeight="1.5">
+          {message.message}
+        </Text>
+        <Text fontSize="xs" color="gray.400" mt={1}>
+          {message.timestamp}
+        </Text>
+      </Box>
+    </Flex>
+  );
+};
+
+// Estadísticas compactas
+const CompactStats = ({ campaigns }) => {
+  const active = campaigns.filter(c => c.status === "active").length;
+  const total = campaigns.length;
+
+  return (
+    <Flex gap={6}>
+      <Box textAlign="center">
+        <Text fontSize="lg" fontWeight="bold" color="red.600">{active}</Text>
+        <Text fontSize="xs" color="gray.500">Activas</Text>
+      </Box>
+      <Box textAlign="center">
+        <Text fontSize="lg" fontWeight="bold" color="blue.600">{total}</Text>
+        <Text fontSize="xs" color="gray.500">Total</Text>
+      </Box>
+    </Flex>
+  );
+};
+
+// Tarjeta de idea minimalista
+const IdeaCard = ({ idea, onUse }) => (
+  <Button
+    variant="ghost"
+    h="auto"
+    p={4}
+    justifyContent="start"
+    textAlign="left"
+    onClick={() => onUse(idea)}
+    _hover={{ bg: "red.50", transform: "translateY(-1px)" }}
+    transition="all 0.2s"
+  >
+    <Flex align="start" gap={3} w="full" flex={1}>
+      <Text fontSize="lg">{idea.icon}</Text>
+      <Box flex={1}>
+        <Text fontSize="sm" fontWeight="600" color="gray.800" mb={1}>
+          {idea.title}
+        </Text>
+        <Text fontSize="xs" color="gray.600" lineHeight="1.4" textWrap="wrap">
+          {idea.description}
+        </Text>
+      </Box>
+    </Flex>
+  </Button>
+);
+
+// Panel de ideas
+const IdeasPanel = ({ ideas, onUse }) => (
+  <Card.Root bg="white" shadow="sm" border="1px" borderColor="gray.100">
+    <Card.Body p={5}>
+      <Flex align="center" gap={3} mb={5}>
+        <Box p={2} bg="red.100" rounded="lg" color="red.600">
+          <Icon type="lightbulb" size={18} />
+        </Box>
+        <Heading size="md" color="gray.800">Ideas</Heading>
+      </Flex>
+      
+      <Stack gap={2}>
+        {ideas.map(idea => (
+          <IdeaCard key={idea.id} idea={idea} onUse={onUse} />
+        ))}
+      </Stack>
+    </Card.Body>
+  </Card.Root>
+);
+
+// Drawer móvil
+const MobileIdeasDrawer = ({ isOpen, onClose, ideas, onUse }) => (
+  <Drawer.Root open={isOpen} onOpenChange={onClose} placement="bottom">
+    <Drawer.Backdrop />
+    <Drawer.Positioner>
+      <Drawer.Content>
+        <Drawer.Header borderBottom="1px" borderColor="gray.100">
+          <Drawer.Title>💡 Ideas para Campañas</Drawer.Title>
+          <Drawer.CloseTrigger />
+        </Drawer.Header>
+        <Drawer.Body p={4}>
+          <Stack gap={2}>
+            {ideas.map(idea => (
+              <IdeaCard 
+                key={idea.id} 
+                idea={idea} 
+                onUse={(idea) => { onUse(idea); onClose(); }} 
+              />
+            ))}
+          </Stack>
+        </Drawer.Body>
+      </Drawer.Content>
+    </Drawer.Positioner>
+  </Drawer.Root>
+);
 
 export default function Index() {
-    const {
-        messages,
-        inputMessage,
-        campaigns,
-        loading,
-        handleInputChange,
-        handleKeyPress,
-        sendMessage,
-    } = useAIChat();
+  const {
+    messages,
+    inputMessage,
+    campaigns,
+    loading,
+    handleInputChange,
+    handleKeyPress,
+    sendMessage,
+  } = useAIChat();
 
-   
-    const [trends, setTrends] = useState([
-        {
-            id: 1,
-            title: 'Marketing de Contenido Visual',
-            description: 'Las imágenes y videos cortos generan 40% más engagement',
-            icon: '📸'
-        },
-        {
-            id: 2,
-            title: 'Campañas de Sostenibilidad',
-            description: 'Las marcas eco-friendly tienen 25% más retención de clientes',
-            icon: '🌱'
-        },
-        {
-            id: 3,
-            title: 'Colaboraciones con Micro-Influencers',
-            description: 'Mayor tasa de conversión que con celebridades tradicionales',
-            icon: '👥'
-        },
-        {
-            id: 4,
-            title: 'Marketing Conversacional',
-            description: 'Los chatbots personalizados aumentan la satisfacción del cliente',
-            icon: '💬'
-        },
-        {
-            id: 5,
-            title: 'Contenido Generado por Usuarios',
-            description: 'Aumenta la autenticidad de marca y reduce costos de producción',
-            icon: '👤'
-        }
-    ]);
+  const { open, onOpen, onClose } = useDisclosure();
 
-    // Función para usar una tendencia como prompt para la IA
-    const useTrendAsPrompt = (trend) => {
-        const prompt = `Dame ideas para crear una campaña de ${trend.title}`;
-        handleInputChange({ target: { value: prompt } });
-    };
-     
-    return (
-        <AuthenticatedLayout>
-            <Head title="AI Chat" />
-          
-            <div className="py-12">
-              
+  const [ideas] = useState([
+    {
+      id: 1,
+      title: "Marketing Visual",
+      description: "Contenido visual genera 40% más engagement",
+      icon: "📸",
+    },
+    {
+      id: 2,
+      title: "Sostenibilidad",
+      description: "Marcas eco-friendly retienen 25% más clientes",
+      icon: "🌱",
+    },
+    {
+      id: 3,
+      title: "Micro-Influencers",
+      description: "Mayor conversión que celebridades",
+      icon: "👥",
+    },
+    {
+      id: 4,
+      title: "Contenido UGC",
+      description: "Aumenta autenticidad y reduce costos",
+      icon: "👤",
+    },
+  ]);
+  const user = usePage().props.auth.user || {};
 
-                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    {/* Encabezado de la página */}
-                    <div className="mb-8">
-                        <h1 className="text-3xl font-bold text-gray-900">Asistente IA para Campañas</h1>
-                        <p className="mt-2 text-lg text-gray-600">
-                            Obtén recomendaciones personalizadas para tus campañas de redes sociales.
-                        </p>
-                    </div>
+  const useIdeaAsPrompt = (idea) => {
+    const prompt = `Dame ideas para una campaña de ${idea.title}`;
+    handleInputChange({ target: { value: prompt } });
+  };
 
-                    {/* Contenedor principal con grid */}
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        {/* Sección de Chat (2/3 del ancho) */}
-                        <div className="lg:col-span-2">
-                            <div className="bg-white shadow-md rounded-lg p-6 h-full">
-                                <div className="flex justify-between items-center mb-6">
-                                    <h2 className="text-xl font-semibold text-gray-800">Chat con IA</h2>
-                                    {campaigns.length > 0 && (
-                                        <span className="text-sm text-green-600">
-                                            {campaigns.length} campañas cargadas
-                                        </span>
-                                    )}
-                                </div>
-                                
-                                {/* Mensajes del chat */}
-                                <div className="space-y-4 max-h-96 overflow-y-auto mb-6 p-2">
-                                    {messages.map((msg) => (
-                                        <div
-                                            key={msg.id}
-                                            className={`p-4 rounded-lg ${
-                                                msg.sender === 'AI' ? 'bg-blue-50' : 'bg-gray-50'
-                                            }`}
-                                        >
-                                            <div className="flex items-center justify-between">
-                                                <p className="text-sm font-semibold text-gray-800">{msg.sender}</p>
-                                                <p className="text-sm text-gray-500">{msg.timestamp}</p>
-                                            </div>
-                                            <p className="mt-2 text-sm text-gray-600">{msg.message}</p>
-                                        </div>
-                                    ))}
-                                    
-                                    {loading && (
-                                        <div className="p-4 rounded-lg bg-blue-50">
-                                            <div className="flex items-center space-x-2">
-                                                <div className="animate-pulse text-blue-600">
-                                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"></path>
-                                                    </svg>
-                                                </div>
-                                                <p className="text-sm text-gray-600">La IA está pensando...</p>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
+  return (
+    <AuthenticatedLayout>
+      <Head title="AI Chat" />
 
-                                {/* Entrada de chat */}
-                                <div className="mt-6">
-                                    <div className="flex">
-                                        <textarea
-                                            value={inputMessage}
-                                            onChange={handleInputChange}
-                                            onKeyPress={handleKeyPress}
-                                            placeholder="Escribe tu mensaje... (Puedes preguntar sobre campañas, solicitar ideas o mejoras)"
-                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                                            rows="3"
-                                        />
-                                    </div>
-                                    <div className="flex justify-between mt-2">
-                                        <p className="text-xs text-gray-500">
-                                            Presiona Enter para enviar o Shift+Enter para nueva línea
-                                        </p>
-                                        <button 
-                                            onClick={sendMessage}
-                                            disabled={loading || !inputMessage.trim()}
-                                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300 disabled:opacity-50"
-                                        >
-                                            Enviar
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+      <Box minH="100vh" py={6}>
+        <Container maxW="6xl">
+          {/* Header minimalista */}
+          <Stack gap={6} mb={8}>
+            <Flex 
+              direction={{ base: "column", md: "row" }} 
+              justify="space-between" 
+              align={{ base: "start", md: "center" }}
+              gap={4}
+            >
+              <Box>
+                <Heading 
+                  fontSize={{ base: "3xl", md: "5xl" }}
+                  fontWeight="800" 
+                  size={{ base: "4xl"}}
+                  textAlign={{ base: "center"}}
+                  bgGradient="to-r" 
+                  gradientFrom="red.500" 
+                  gradientTo="orange.700" 
+                  // className="mt-10"
+                  bgClip="text"
+                >
+                  Asistente IA
+                </Heading>
+                <Text color="gray.600" mt={6} fontSize="lg">
+                  Recomendaciones inteligentes para tus campañas
+                </Text>
+              </Box>
 
-                        {/* Panel de Tendencias e Ideas (1/3 del ancho) */}
-                        <div className="lg:col-span-1">
-                            <div className="bg-white shadow-md rounded-lg p-6 h-full">
-                                <h2 className="text-xl font-semibold text-gray-800 mb-6">Tendencias & Ideas</h2>
-                                
-                                {/* Lista de tendencias */}
-                                <div className="space-y-4">
-                                    {trends.map((trend) => (
-                                        <div 
-                                            key={trend.id} 
-                                            className="p-4 border border-gray-100 rounded-lg hover:bg-blue-50 transition-colors cursor-pointer"
-                                            onClick={() => useTrendAsPrompt(trend)}
-                                        >
-                                            <div className="flex items-start">
-                                                <span className="text-2xl mr-3">{trend.icon}</span>
-                                                <div>
-                                                    <h3 className="font-medium text-gray-800">{trend.title}</h3>
-                                                    <p className="text-sm text-gray-600 mt-1">{trend.description}</p>
-                                                </div>
-                                            </div>
-                                            <div className="mt-2 text-right">
-                                                <button 
-                                                    className="text-xs text-blue-600 hover:text-blue-800"
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        useTrendAsPrompt(trend);
-                                                    }}
-                                                >
-                                                    Usar como idea →
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
+              <Flex align="center" gap={4}>
+                {campaigns.length > 0 && (
+                  <Box bg="white" px={4} py={3} rounded="xl" shadow="sm" border="1px" borderColor="gray.100">
+                    <CompactStats campaigns={campaigns} />
+                  </Box>
+                )}
+                
+                <IconButton
+                  onClick={onOpen}
+                  colorScheme="red"
+                  variant="outline"
+                  size="md"
+                  rounded="xl"
+                  display={{ base: "flex", lg: "none" }}
+                >
+                  <Icon type="lightbulb" size={20} />
+                </IconButton>
+              </Flex>
+            </Flex>
 
-                                {/* Estadísticas de campañas */}
-                                <div className="mt-8 pt-6 border-t border-gray-200">
-                                    <h3 className="text-lg font-medium text-gray-800 mb-4">Estadísticas de Campañas</h3>
-                                    <div className="grid grid-cols-2 gap-4">
-                                           <Box position="relative"  bg="bg.emphasized">
-                                                <Float offsetX="1">
-                                                <Circle size="5" bg="green" color="white">
-                                                    {campaigns.filter(c => c.status === 'active').length || 0}
-                                                </Circle>
-                                                </Float>
-                                                <div className="bg-green-50 p-3 rounded-lg">
-                                                    <p className="text-sm text-gray-600">Campañas Activas</p>
-                                                    <p className="text-2xl font-bold text-green-600">
-                                                        {campaigns.filter(c => c.status === 'active').length || 0}
-                                                    </p>
-                                                </div>
-                                            </Box>
-                                           <Box position="relative"  bg="bg.emphasized">
-                                                <Float offsetX="1">
-                                                <Circle size="5" bg="blue" color="white">
-                                                   {campaigns.length || 0}
-                                                </Circle>
-                                                </Float>
-                                                <div className="bg-blue-50 p-3 rounded-lg">
-                                                    <p className="text-sm text-gray-600">Total Campañas</p>
-                                                    <p className="text-2xl font-bold text-blue-600">
-                                                        {campaigns.length || 0}
-                                                    </p>
-                                                </div>
-                                            </Box>
-                                        
-                                        
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </AuthenticatedLayout>
-    );
+            {campaigns.length > 0 && (
+              <Badge 
+                colorScheme="red" 
+                variant="subtle" 
+                px={3} 
+                py={1} 
+                rounded="full" 
+                alignSelf="start"
+              >
+                {campaigns.length} campañas disponibles
+              </Badge>
+            )}
+          </Stack>
+
+          {/* Layout principal */}
+          <Grid 
+            templateColumns={{ base: "1fr", lg: "1fr 300px" }} 
+            gap={6}
+          >
+            {/* Chat */}
+            <Card.Root bg="gray.50" shadow="sm" border="1px" borderColor="gray.100">
+              <Card.Body p={6}>
+                {/* Header del chat */}
+                <Flex justify="space-between" align="center" mb={6}>
+                  <Flex align="center" gap={3}>
+                    <Box p={2} bg="red.100" rounded="lg" color="red.600">
+                      <Icon type="ai" size={20} />
+                    </Box>
+                    <Heading size="xl" 
+                      color="gray.900"
+                      fontWeight="600"
+                    >
+                      Chat ContentFlow
+                    </Heading>
+                  </Flex>
+                  <Badge colorScheme="green" variant="subtle" rounded="full">
+                    ⭐En línea
+                  </Badge>
+                </Flex>
+
+                {/* Mensajes */}
+                <Box 
+                  h="400px" 
+                  px={2}
+                  overflowY="auto" 
+                  mb={6}
+                  css={{
+                    scrollbarWidth: "thin",
+                    scrollbarColor: "#c2530a transparent",
+                    "&::-webkit-scrollbar": { 
+                      width: "3px" 
+                    },
+                    "&::-webkit-scrollbar-track": {
+                      background: "transparent"
+                    },
+                    "&::-webkit-scrollbar-thumb": { 
+                      background: "#c2530a",
+                      borderRadius: "2px"
+                    },
+                    "&::-ms-scrollbar": {
+                      width: "3px"
+                    },
+                    "&::-ms-scrollbar-thumb": {
+                      background: "#c2530a"
+                    }
+                  }}
+                >
+                  <Stack gap={4} py={1}>
+                    {messages.length === 0 && (
+                      <Box textAlign="center" py={8}>
+                        <Text color="gray.500" fontSize="sm">
+                          ¡Hola! Soy tu asistente IA. ¿En qué puedo ayudarte hoy?
+                        </Text>
+                      </Box>
+                    )}
+                    
+                    {messages.map(msg => (
+                      <ChatMessage key={msg.id} message={msg} user={user} />
+                    ))}
+
+                    {loading && (
+                      <Flex gap={3} align="center">
+                        <Avatar.Root size="sm">
+                          <Avatar.Fallback bg="red.500" color="white" 
+                            fontSize="xl">
+                            AI
+                          </Avatar.Fallback>
+                        </Avatar.Root>
+                        <Box bg="white" px={4} py={3} rounded="2xl" shadow="sm" border="1px" borderColor="gray.100">
+                          <Flex align="center" gap={2}>
+                            <Spinner size="sm" color="red.500" />
+                            <Text fontSize="sm" color="gray.600">Pensando...</Text>
+                          </Flex>
+                        </Box>
+                      </Flex>
+                    )}
+                  </Stack>
+                </Box>
+
+                <Separator mb={6} />
+
+                {/* Input */}
+                <Stack gap={3}>
+                  <Textarea
+                    value={inputMessage}
+                    onChange={handleInputChange}
+                    // onKeyPress={handleKeyPress}
+                    placeholder="Escribe tu mensaje..."
+                    resize="none"
+                    p={4}
+                    border="1px solid"
+                    borderColor="gray.200"
+                    rows={3}
+                    focusBorderColor="red.500"
+                    rounded="xl"
+                  />
+                  <Flex justify="space-between" align="center">
+                    <Text fontSize="xs" color="gray.500">
+                      Enter para enviar
+                    </Text>
+                    <Button
+                      onClick={sendMessage}
+                      disabled={loading || !inputMessage.trim()}
+                      colorScheme="red"
+                      size="md"
+                      rounded="xl"
+                      minW="100px"
+                    >
+                      <Icon type="send" size={16} />
+                      Enviar
+                    </Button>
+                  </Flex>
+                </Stack>
+              </Card.Body>
+            </Card.Root>
+
+            {/* Panel de ideas (desktop) */}
+            <Box display={{ base: "none", lg: "block" }}>
+              <IdeasPanel ideas={ideas} onUse={useIdeaAsPrompt} />
+            </Box>
+          </Grid>
+
+          {/* Drawer móvil */}
+          <MobileIdeasDrawer
+            isOpen={open}
+            onClose={onClose}
+            ideas={ideas}
+            onUse={useIdeaAsPrompt}
+          />
+        </Container>
+      </Box>
+    </AuthenticatedLayout>
+  );
 }
