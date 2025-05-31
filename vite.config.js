@@ -18,10 +18,10 @@ export default defineConfig({
         react(),
         tsconfigPaths(),
     ],
-      optimizeDeps: {
-    include: ['@ffmpeg/ffmpeg'], // Asegúrate de incluir la biblioteca
-  },
-   server: {
+    optimizeDeps: {
+        include: ['@ffmpeg/ffmpeg'], // Asegúrate de incluir la biblioteca
+    },
+    server: {
         proxy: {
             '*': {
                 target: 'http://127.0.0.1:8000', // URL del backend
@@ -29,6 +29,7 @@ export default defineConfig({
                 secure: true,
             },
         },
+        allowedHosts: ['eebd-2a09-bac5-26fc-aa-00-11-181.ngrok-free.app'],
         // cors: true,
     },
 });
