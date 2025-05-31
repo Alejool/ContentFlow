@@ -55,7 +55,7 @@ export default function MobileNavbar({ user, showingNavigationDropdown, setShowi
                             </div>
                             <div>
                                 <h1 className="text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-                                    MI Platform
+                                    ContentFlow
                                 </h1>
                             </div>
                         </div>
@@ -67,12 +67,19 @@ export default function MobileNavbar({ user, showingNavigationDropdown, setShowi
                                     <span className="inline-flex rounded-2xl">
                                         <button
                                             type="button"
-                                            className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 rounded-2xl text-sm font-medium text-gray-700 transition-all duration-300 shadow-sm hover:shadow-md"
+                                            className="inline-flex items-center 
+                                            px-4 py-2 bg-gradient-to-r
+                                            from-gray-50 to-gray-100
+                                            hover:from-gray-100 
+                                            hover:to-gray-200 rounded-2xl 
+                                            ml-[55px]
+                                            text-sm font-medium text-gray-700 transition-all duration-300 shadow-sm hover:shadow-md"
                                         >
-                                            <div className="w-8 h-8 bg-gradient-to-r
+                                            <div className="w-8 h-8 mr-3 bg-gradient-to-r
                                                  from-red-500 to-orange-700 
-                                                 rounded-full flex items-center justify-center mr-3">
-                                                <span className="text-white text-sm font-bold">
+                                                 rounded-full flex items-center justify-center ">
+                                                <span className="text-white 
+                                                    text-sm font-bold">
                                                     {user.name?.charAt(0)?.toUpperCase() || 'U'}
                                                 </span>
                                             </div>
