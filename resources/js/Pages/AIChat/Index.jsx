@@ -1,223 +1,597 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head } from '@inertiajs/react';
-import useAIChat from '@/Hooks/useAIChat';
-import { useState, useEffect } from 'react';
-import { Box, Circle, Float } from '@chakra-ui/react';
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
+import { Head } from "@inertiajs/react";
+import useAIChat from "@/Hooks/useAIChat";
+import { useState } from "react";
+import {
+  Box,
+  Container,
+  Heading,
+  Text,
+  Grid,
+  Card,
+  Badge,
+  Button,
+  Textarea,
+  Stack,
+  Icon,
+  Circle,
+  Float,
+  Separator,
+  Flex,
+  Avatar,
+  Spinner,
+  Drawer,
+  IconButton,
+  useDisclosure,
+  Stat,
+} from "@chakra-ui/react";
 
-export default function Index() {
-    const {
-        messages,
-        inputMessage,
-        campaigns,
-        loading,
-        handleInputChange,
-        handleKeyPress,
-        sendMessage,
-    } = useAIChat();
+// Componente para iconos SVG personalizados
+const CustomIcon = ({ type, size = "20", color = "currentColor" }) => {
+  const icons = {
+    ai: (
+      <svg
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke={color}
+        strokeWidth="2"
+      >
+        <circle cx="12" cy="12" r="10" />
+        <path d="M8 14s1.5 2 4 2 4-2 4-2" />
+        <line x1="9" y1="9" x2="9.01" y2="9" />
+        <line x1="15" y1="9" x2="15.01" y2="9" />
+      </svg>
+    ),
+    trending: (
+      <svg
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke={color}
+        strokeWidth="2"
+      >
+        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+        <polyline points="17 6 23 6 23 12" />
+      </svg>
+    ),
+    lightbulb: (
+      <svg
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke={color}
+        strokeWidth="2"
+      >
+        <path d="M9 21h6" />
+        <path d="M12 17h.01" />
+        <path d="M12 3a6 6 0 0 1 6 6c0 3-2 5.5-2 8H8c0-2.5-2-5-2-8a6 6 0 0 1 6-6z" />
+      </svg>
+    ),
+    send: (
+      <svg
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke={color}
+        strokeWidth="2"
+      >
+        <line x1="22" y1="2" x2="11" y2="13" />
+        <polygon points="22,2 15,22 11,13 2,9" />
+      </svg>
+    ),
+    menu: (
+      <svg
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke={color}
+        strokeWidth="2"
+      >
+        <line x1="3" y1="6" x2="21" y2="6" />
+        <line x1="3" y1="12" x2="21" y2="12" />
+        <line x1="3" y1="18" x2="21" y2="18" />
+      </svg>
+    ),
+    stats: (
+      <svg
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke={color}
+        strokeWidth="2"
+      >
+        <line x1="18" y1="20" x2="18" y2="10" />
+        <line x1="12" y1="20" x2="12" y2="4" />
+        <line x1="6" y1="20" x2="6" y2="14" />
+      </svg>
+    ),
+  };
 
-   
-    const [trends, setTrends] = useState([
-        {
-            id: 1,
-            title: 'Marketing de Contenido Visual',
-            description: 'Las imágenes y videos cortos generan 40% más engagement',
-            icon: '📸'
-        },
-        {
-            id: 2,
-            title: 'Campañas de Sostenibilidad',
-            description: 'Las marcas eco-friendly tienen 25% más retención de clientes',
-            icon: '🌱'
-        },
-        {
-            id: 3,
-            title: 'Colaboraciones con Micro-Influencers',
-            description: 'Mayor tasa de conversión que con celebridades tradicionales',
-            icon: '👥'
-        },
-        {
-            id: 4,
-            title: 'Marketing Conversacional',
-            description: 'Los chatbots personalizados aumentan la satisfacción del cliente',
-            icon: '💬'
-        },
-        {
-            id: 5,
-            title: 'Contenido Generado por Usuarios',
-            description: 'Aumenta la autenticidad de marca y reduce costos de producción',
-            icon: '👤'
-        }
-    ]);
+  return (
+    <Box display="inline-flex" alignItems="center">
+      {icons[type]}
+    </Box>
+  );
+};
 
-    // Función para usar una tendencia como prompt para la IA
-    const useTrendAsPrompt = (trend) => {
-        const prompt = `Dame ideas para crear una campaña de ${trend.title}`;
-        handleInputChange({ target: { value: prompt } });
-    };
-     
+// Componente para mensajes del chat
+const ChatMessage = ({ message }) => {
+  const isAI = message.sender === "AI";
+  const bgColor = isAI ? "red.50" : "gray.50";
+  const borderColor = isAI ? "red.200" : "gray.200";
+
+  return (
+    <Card.Root
+      bg={bgColor}
+      borderWidth="1px"
+      borderColor={borderColor}
+      shadow="sm"
+      transition="all 0.3s"
+      _hover={{ shadow: "md", transform: "translateY(-1px)" }}
+    >
+      <Card.Body p={4}>
+        <Stack direction="row" justify="space-between" mb={2}>
+          <Stack direction="row" align="center" gap={2}>
+            <Avatar.Root size="sm">
+              <Avatar.Fallback bg={isAI ? "red.500" : "gray.500"} color="white">
+                {message.sender.charAt(0)}
+              </Avatar.Fallback>
+            </Avatar.Root>
+            <Text
+              fontSize="sm"
+              fontWeight="600"
+              color={isAI ? "red.600" : "gray.600"}
+            >
+              {message.sender}
+            </Text>
+          </Stack>
+          <Text fontSize="xs" color="gray.500">
+            {message.timestamp}
+          </Text>
+        </Stack>
+        <Text fontSize="sm" color="gray.700" lineHeight="1.6">
+          {message.message}
+        </Text>
+      </Card.Body>
+    </Card.Root>
+  );
+};
+
+// Componente compacto para estadísticas en el header
+const CompactStats = ({ campaigns }) => {
+  const activeCampaigns =
+    campaigns.filter((c) => c.status === "active").length || 0;
+  const totalCampaigns = campaigns.length || 0;
+
+  return (
+    <Stack direction="row" gap={4}>
+      <Stat.Root size="sm">
+        <Stat.Label color="gray.600">Activas</Stat.Label>
+        <Stat.ValueText color="red.600" fontWeight="bold">
+          {activeCampaigns}
+        </Stat.ValueText>
+      </Stat.Root>
+      <Stat.Root size="sm">
+        <Stat.Label color="gray.600">Total</Stat.Label>
+        <Stat.ValueText color="blue.600" fontWeight="bold">
+          {totalCampaigns}
+        </Stat.ValueText>
+      </Stat.Root>
+    </Stack>
+  );
+};
+
+// Componente para tarjetas de tendencias
+const TrendCard = ({ trend, onUse, compact = false }) => {
+  if (compact) {
     return (
-        <AuthenticatedLayout>
-            <Head title="AI Chat" />
-          
-            <div className="py-12">
-              
-
-                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    {/* Encabezado de la página */}
-                    <div className="mb-8">
-                        <h1 className="text-3xl font-bold text-gray-900">Asistente IA para Campañas</h1>
-                        <p className="mt-2 text-lg text-gray-600">
-                            Obtén recomendaciones personalizadas para tus campañas de redes sociales.
-                        </p>
-                    </div>
-
-                    {/* Contenedor principal con grid */}
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        {/* Sección de Chat (2/3 del ancho) */}
-                        <div className="lg:col-span-2">
-                            <div className="bg-white shadow-md rounded-lg p-6 h-full">
-                                <div className="flex justify-between items-center mb-6">
-                                    <h2 className="text-xl font-semibold text-gray-800">Chat con IA</h2>
-                                    {campaigns.length > 0 && (
-                                        <span className="text-sm text-green-600">
-                                            {campaigns.length} campañas cargadas
-                                        </span>
-                                    )}
-                                </div>
-                                
-                                {/* Mensajes del chat */}
-                                <div className="space-y-4 max-h-96 overflow-y-auto mb-6 p-2">
-                                    {messages.map((msg) => (
-                                        <div
-                                            key={msg.id}
-                                            className={`p-4 rounded-lg ${
-                                                msg.sender === 'AI' ? 'bg-blue-50' : 'bg-gray-50'
-                                            }`}
-                                        >
-                                            <div className="flex items-center justify-between">
-                                                <p className="text-sm font-semibold text-gray-800">{msg.sender}</p>
-                                                <p className="text-sm text-gray-500">{msg.timestamp}</p>
-                                            </div>
-                                            <p className="mt-2 text-sm text-gray-600">{msg.message}</p>
-                                        </div>
-                                    ))}
-                                    
-                                    {loading && (
-                                        <div className="p-4 rounded-lg bg-blue-50">
-                                            <div className="flex items-center space-x-2">
-                                                <div className="animate-pulse text-blue-600">
-                                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"></path>
-                                                    </svg>
-                                                </div>
-                                                <p className="text-sm text-gray-600">La IA está pensando...</p>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* Entrada de chat */}
-                                <div className="mt-6">
-                                    <div className="flex">
-                                        <textarea
-                                            value={inputMessage}
-                                            onChange={handleInputChange}
-                                            onKeyPress={handleKeyPress}
-                                            placeholder="Escribe tu mensaje... (Puedes preguntar sobre campañas, solicitar ideas o mejoras)"
-                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                                            rows="3"
-                                        />
-                                    </div>
-                                    <div className="flex justify-between mt-2">
-                                        <p className="text-xs text-gray-500">
-                                            Presiona Enter para enviar o Shift+Enter para nueva línea
-                                        </p>
-                                        <button 
-                                            onClick={sendMessage}
-                                            disabled={loading || !inputMessage.trim()}
-                                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300 disabled:opacity-50"
-                                        >
-                                            Enviar
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Panel de Tendencias e Ideas (1/3 del ancho) */}
-                        <div className="lg:col-span-1">
-                            <div className="bg-white shadow-md rounded-lg p-6 h-full">
-                                <h2 className="text-xl font-semibold text-gray-800 mb-6">Tendencias & Ideas</h2>
-                                
-                                {/* Lista de tendencias */}
-                                <div className="space-y-4">
-                                    {trends.map((trend) => (
-                                        <div 
-                                            key={trend.id} 
-                                            className="p-4 border border-gray-100 rounded-lg hover:bg-blue-50 transition-colors cursor-pointer"
-                                            onClick={() => useTrendAsPrompt(trend)}
-                                        >
-                                            <div className="flex items-start">
-                                                <span className="text-2xl mr-3">{trend.icon}</span>
-                                                <div>
-                                                    <h3 className="font-medium text-gray-800">{trend.title}</h3>
-                                                    <p className="text-sm text-gray-600 mt-1">{trend.description}</p>
-                                                </div>
-                                            </div>
-                                            <div className="mt-2 text-right">
-                                                <button 
-                                                    className="text-xs text-blue-600 hover:text-blue-800"
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        useTrendAsPrompt(trend);
-                                                    }}
-                                                >
-                                                    Usar como idea →
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-
-                                {/* Estadísticas de campañas */}
-                                <div className="mt-8 pt-6 border-t border-gray-200">
-                                    <h3 className="text-lg font-medium text-gray-800 mb-4">Estadísticas de Campañas</h3>
-                                    <div className="grid grid-cols-2 gap-4">
-                                           <Box position="relative"  bg="bg.emphasized">
-                                                <Float offsetX="1">
-                                                <Circle size="5" bg="green" color="white">
-                                                    {campaigns.filter(c => c.status === 'active').length || 0}
-                                                </Circle>
-                                                </Float>
-                                                <div className="bg-green-50 p-3 rounded-lg">
-                                                    <p className="text-sm text-gray-600">Campañas Activas</p>
-                                                    <p className="text-2xl font-bold text-green-600">
-                                                        {campaigns.filter(c => c.status === 'active').length || 0}
-                                                    </p>
-                                                </div>
-                                            </Box>
-                                           <Box position="relative"  bg="bg.emphasized">
-                                                <Float offsetX="1">
-                                                <Circle size="5" bg="blue" color="white">
-                                                   {campaigns.length || 0}
-                                                </Circle>
-                                                </Float>
-                                                <div className="bg-blue-50 p-3 rounded-lg">
-                                                    <p className="text-sm text-gray-600">Total Campañas</p>
-                                                    <p className="text-2xl font-bold text-blue-600">
-                                                        {campaigns.length || 0}
-                                                    </p>
-                                                </div>
-                                            </Box>
-                                        
-                                        
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </AuthenticatedLayout>
+      <Button
+        variant="ghost"
+        size="sm"
+        justifyContent="start"
+        p={3}
+        h="auto"
+        whiteSpace="normal"
+        textAlign="left"
+        onClick={() => onUse(trend)}
+        _hover={{ bg: "red.50" }}
+      >
+        <Stack gap={1} align="start" w="full">
+          <Stack direction="row" align="center" gap={2}>
+            <Text fontSize="md">{trend.icon}</Text>
+            <Text fontSize="sm" fontWeight="600" color="gray.800">
+              {trend.title}
+            </Text>
+          </Stack>
+          <Text fontSize="xs" color="gray.600" lineHeight="1.3">
+            {trend.description}
+          </Text>
+        </Stack>
+      </Button>
     );
+  }
+
+  return (
+    <Card.Root
+      bg="white"
+      shadow="sm"
+      borderWidth="1px"
+      borderColor="gray.200"
+      transition="all 0.3s"
+      cursor="pointer"
+      onClick={() => onUse(trend)}
+      _hover={{
+        bg: "red.50",
+        shadow: "md",
+        transform: "translateY(-2px)",
+        borderColor: "red.300",
+      }}
+    >
+      <Card.Body p={4}>
+        <Stack gap={3} align="start">
+          <Box p={2} rounded="lg" bg="red.100" color="red.600" fontSize="xl">
+            {trend.icon}
+          </Box>
+          <Stack align="start" gap={1} flex={1}>
+            <Text fontWeight="600" fontSize="sm" color="gray.800">
+              {trend.title}
+            </Text>
+            <Text fontSize="xs" color="gray.600" lineHeight="1.4">
+              {trend.description}
+            </Text>
+          </Stack>
+        </Stack>
+        <Flex justify="end" mt={3}>
+          <Button
+            size="xs"
+            variant="ghost"
+            colorScheme="red"
+            onClick={(e) => {
+              e.stopPropagation();
+              onUse(trend);
+            }}
+          >
+            Usar idea
+            <CustomIcon type="send" size="12" />
+          </Button>
+        </Flex>
+      </Card.Body>
+    </Card.Root>
+  );
+};
+
+// Panel lateral para ideas (escritorio)
+const IdeasPanel = ({ trends, onUse }) => (
+  <Card.Root bg="white" shadow="lg" borderWidth="1px" borderColor="gray.200">
+    <Card.Body p={6}>
+      <Stack gap={4} mb={6}>
+        <Stack direction="row" align="center" gap={2}>
+          <Box p={2} rounded="lg" bg="red.100" color="red.600">
+            <CustomIcon type="lightbulb" size="20" />
+          </Box>
+          <Heading size="md" color="gray.800">
+            Ideas Rápidas
+          </Heading>
+        </Stack>
+      </Stack>
+
+      <Stack gap={3} align="stretch">
+        {trends.map((trend) => (
+          <TrendCard
+            key={trend.id}
+            trend={trend}
+            onUse={onUse}
+            compact={true}
+          />
+        ))}
+      </Stack>
+    </Card.Body>
+  </Card.Root>
+);
+
+// Drawer para móvil
+const MobileIdeasDrawer = ({ isOpen, onClose, trends, onUse }) => (
+  <Drawer.Root
+    open={isOpen}
+    onOpenChange={onClose}
+    placement="bottom"
+    size="lg"
+  >
+    <Drawer.Backdrop />
+    <Drawer.Positioner>
+      <Drawer.Content>
+        <Drawer.Header>
+          <Drawer.Title>💡 Ideas para Campañas</Drawer.Title>
+          <Drawer.CloseTrigger />
+        </Drawer.Header>
+        <Drawer.Body>
+          <Stack gap={2}>
+            {trends.map((trend) => (
+              <TrendCard
+                key={trend.id}
+                trend={trend}
+                onUse={(trend) => {
+                  onUse(trend);
+                  onClose();
+                }}
+                compact={true}
+              />
+            ))}
+          </Stack>
+        </Drawer.Body>
+      </Drawer.Content>
+    </Drawer.Positioner>
+  </Drawer.Root>
+);
+
+// Componente principal
+export default function Index() {
+  const {
+    messages,
+    inputMessage,
+    campaigns,
+    loading,
+    handleInputChange,
+    handleKeyPress,
+    sendMessage,
+  } = useAIChat();
+
+  const { open, onOpen, onClose } = useDisclosure();
+  const bgColor = "gray.50";
+  const cardBg = "white";
+
+  const [trends] = useState([
+    {
+      id: 1,
+      title: "Marketing Visual",
+      description: "Imágenes y videos cortos generan 40% más engagement",
+      icon: "📸",
+    },
+    {
+      id: 2,
+      title: "Sostenibilidad",
+      description: "Marcas eco-friendly tienen 25% más retención",
+      icon: "🌱",
+    },
+    {
+      id: 3,
+      title: "Micro-Influencers",
+      description: "Mayor conversión que celebridades tradicionales",
+      icon: "👥",
+    },
+    {
+      id: 4,
+      title: "Marketing Conversacional",
+      description: "Chatbots personalizados mejoran satisfacción",
+      icon: "💬",
+    },
+    {
+      id: 5,
+      title: "Contenido UGC",
+      description: "Aumenta autenticidad y reduce costos",
+      icon: "👤",
+    },
+  ]);
+
+  const useTrendAsPrompt = (trend) => {
+    const prompt = `Dame ideas para crear una campaña de ${trend.title}`;
+    handleInputChange({ target: { value: prompt } });
+  };
+
+  return (
+    <AuthenticatedLayout>
+      <Head title="AI Chat" />
+
+      <Box bg={bgColor} minH="100vh" py={8}>
+        <Container maxW="7xl">
+          {/* Header mejorado */}
+          <Stack gap={4} mb={8}>
+            <Stack
+              direction={{ base: "column", md: "row" }}
+              justify="space-between"
+              align={{ base: "start", md: "center" }}
+              gap={4}
+            >
+              <Stack gap={2}>
+                <Heading
+                  size={{ base: "xl", md: "2xl" }}
+                  fontWeight="700"
+                  bgGradient="to-r"
+                  gradientFrom="red.600"
+                  gradientTo="pink.600"
+                  bgClip="text"
+                >
+                  Asistente IA para Campañas
+                </Heading>
+                <Text
+                  fontSize={{ base: "md", md: "lg" }}
+                  color="gray.600"
+                  maxW="2xl"
+                >
+                  Obtén recomendaciones personalizadas con IA avanzada
+                </Text>
+              </Stack>
+
+              {/* Stats compactas y botón de ideas para móvil */}
+              <Stack direction="row" align="center" gap={4}>
+                {campaigns.length > 0 && (
+                  <Card.Root
+                    bg="white"
+                    shadow="sm"
+                    borderWidth="1px"
+                    borderColor="gray.200"
+                  >
+                    <Card.Body p={3}>
+                      <CompactStats campaigns={campaigns} />
+                    </Card.Body>
+                  </Card.Root>
+                )}
+
+                {/* Botón de ideas para móvil */}
+                <Box display={{ base: "block", lg: "none" }}>
+                  <IconButton
+                    onClick={onOpen}
+                    colorScheme="red"
+                    variant="outline"
+                    size="md"
+                  >
+                    <CustomIcon type="lightbulb" size="20" />
+                  </IconButton>
+                </Box>
+              </Stack>
+            </Stack>
+
+            {/* Badge de campañas cargadas */}
+            {campaigns.length > 0 && (
+              <Badge
+                colorScheme="red"
+                variant="subtle"
+                px={3}
+                py={1}
+                rounded="full"
+                alignSelf="start"
+              >
+                {campaigns.length} campañas cargadas
+              </Badge>
+            )}
+          </Stack>
+
+          {/* Layout responsivo */}
+          <Grid
+            columns={{ base: 1, lg: 4 }}
+            gap={6}
+            templateColumns={{ base: "1fr", lg: "1fr 300px" }}
+          >
+            {/* Chat principal */}
+            <Box>
+              <Card.Root
+                bg={cardBg}
+                shadow="lg"
+                borderWidth="1px"
+                borderColor="gray.200"
+              >
+                <Card.Body p={6}>
+                  <Stack
+                    direction="row"
+                    justify="space-between"
+                    align="center"
+                    mb={6}
+                  >
+                    <Stack direction="row" align="center" gap={3}>
+                      <Box p={2} rounded="lg" bg="red.100" color="red.600">
+                        <CustomIcon type="ai" size="24" />
+                      </Box>
+                      <Heading size="lg" color="gray.800">
+                        Chat con IA
+                      </Heading>
+                    </Stack>
+                    <Badge colorScheme="green" variant="subtle">
+                      En línea
+                    </Badge>
+                  </Stack>
+
+                  {/* Mensajes del chat */}
+                  <Box
+                    maxH="500px"
+                    overflowY="auto"
+                    mb={6}
+                    css={{
+                      "&::-webkit-scrollbar": {
+                        width: "4px",
+                      },
+                      "&::-webkit-scrollbar-track": {
+                        width: "6px",
+                      },
+                      "&::-webkit-scrollbar-thumb": {
+                        background: "#E53E3E",
+                        borderRadius: "24px",
+                      },
+                    }}
+                  >
+                    <Stack gap={4} align="stretch">
+                      {messages.map((msg) => (
+                        <ChatMessage key={msg.id} message={msg} />
+                      ))}
+
+                      {loading && (
+                        <Card.Root
+                          bg="red.50"
+                          borderWidth="1px"
+                          borderColor="red.200"
+                        >
+                          <Card.Body p={4}>
+                            <Stack direction="row" align="center" gap={3}>
+                              <Spinner size="sm" color="red.500" />
+                              <Text fontSize="sm" color="gray.600">
+                                La IA está pensando...
+                              </Text>
+                            </Stack>
+                          </Card.Body>
+                        </Card.Root>
+                      )}
+                    </Stack>
+                  </Box>
+
+                  <Separator mb={6} />
+
+                  {/* Entrada de chat */}
+                  <Stack gap={4}>
+                    <Textarea
+                      value={inputMessage}
+                      onChange={handleInputChange}
+                      onKeyPress={handleKeyPress}
+                      placeholder="Escribe tu mensaje... (Puedes preguntar sobre campañas, solicitar ideas o mejoras)"
+                      resize="none"
+                      rows={3}
+                      focusBorderColor="red.500"
+                      borderColor="gray.300"
+                    />
+                    <Stack
+                      direction={{ base: "column", sm: "row" }}
+                      justify="space-between"
+                      gap={2}
+                    >
+                      <Text fontSize="xs" color="gray.500">
+                        Enter para enviar • Shift+Enter para nueva línea
+                      </Text>
+                      <Button
+                        onClick={sendMessage}
+                        disabled={loading || !inputMessage.trim()}
+                        colorScheme="red"
+                        size="md"
+                        minW="120px"
+                      >
+                        Enviar
+                        <CustomIcon type="send" size="16" />
+                      </Button>
+                    </Stack>
+                  </Stack>
+                </Card.Body>
+              </Card.Root>
+            </Box>
+
+            {/* Panel lateral de ideas (solo escritorio) */}
+            <Box display={{ base: "none", lg: "block" }}>
+              <IdeasPanel trends={trends} onUse={useTrendAsPrompt} />
+            </Box>
+          </Grid>
+
+          {/* Drawer de ideas para móvil */}
+          <MobileIdeasDrawer
+            isOpen={open}
+            onClose={onClose}
+            trends={trends}
+            onUse={useTrendAsPrompt}
+          />
+        </Container>
+      </Box>
+    </AuthenticatedLayout>
+  );
 }
