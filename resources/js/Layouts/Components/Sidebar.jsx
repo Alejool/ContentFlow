@@ -57,132 +57,181 @@ const navigationItems = [
 
 export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }) {
     return (
-        <div className={`hidden lg:block fixed inset-y-0 z-50 transition-all duration-500 ease-in-out ${
-            isSidebarOpen ? 'w-80' : 'w-20'
-        }`}>
-            {/* Backdrop */}
-            <div className="absolute inset-0 bg-white/95 backdrop-blur-xl border-r border-gray-200/50 shadow-2xl" />
-            
-            {/* Content */}
-            <div className="relative h-full flex flex-col">
-                {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b border-gray-200/50">
-                    <Link href="/" className={`flex items-center transition-all duration-300 ${
-                        !isSidebarOpen && 'justify-center'
-                    }`}>
-                        <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center flex-shrink-0">
-                            <img
-                                src={Logo}
-                                alt="logo"
-                                className="w-8 h-8 object-contain filter brightness-0 invert"
-                            />
-                        </div>
-                        {isSidebarOpen && (
-                            <div className="ml-4 opacity-100 transition-opacity duration-300">
-                                <h1 className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-                                    MI Platform
-                                </h1>
-                                <p className="text-xs text-gray-500">Social Media Manager</p>
-                            </div>
-                        )}
-                    </Link>
-                    
-                    <button
-                        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                        className="p-2 rounded-xl hover:bg-gray-100 transition-colors duration-200 group"
+      <div
+        className={`hidden lg:block fixed inset-y-0 z-50 transition-all duration-500 ease-in-out ${
+          isSidebarOpen ? "w-80" : "w-20"
+        }`}
+      >
+        {/* Backdrop */}
+        <div className="absolute inset-0 bg-white/95 backdrop-blur-xl border-r border-gray-200/50 shadow-2xl" />
+
+        {/* Content */}
+        <div className="relative h-full flex flex-col">
+          {/* Header */}
+          <div className="flex items-center justify-between p-6 border-b border-gray-200/50">
+            <Link
+              href="/"
+              className={`flex items-center transition-all duration-300 ${
+                !isSidebarOpen && "justify-center"
+              }`}
+            >
+              <div className="w-12 h-12 bg-gradient-to-r
+                 from-red-500 to-orange-700 
+                rounded-2xl flex items-center justify-center flex-shrink-0">
+                <img
+                  src={Logo}
+                  alt="logo"
+                  className="w-8 h-8 object-contain filter brightness-0 invert"
+                />
+              </div>
+              {isSidebarOpen && (
+                <div className="ml-4 opacity-100 transition-opacity duration-300">
+                  <h1
+                    className="text-xl font-bold bg-gradient-to-r
+                                 from-gray-900 to-gray-600 bg-clip-text text-transparent"
+                  >
+                    MI Platform
+                  </h1>
+                  <p className="text-xs text-gray-500">Social Media Manager</p>
+                </div>
+              )}
+            </Link>
+
+            <button
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+              className="p-2 rounded-xl hover:bg-gray-100 transition-colors duration-200 group"
+            >
+              <div className="relative">
+                {isSidebarOpen ? (
+                  <svg
+                    className="h-5 w-5 text-gray-600 group-hover:text-blue-600 transition-colors"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M15 19l-7-7 7-7"
+                    />
+                  </svg>
+                ) : (
+                  <svg
+                    className="h-5 w-5 text-gray-600 group-hover:text-blue-600 transition-colors"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                )}
+              </div>
+            </button>
+          </div>
+
+          {/* Navigation */}
+          <nav className="flex-1 px-4 py-6 space-y-2">
+            {navigationItems.map((item) => (
+              <NavLink
+                key={item.href}
+                href={route(item.href)}
+                active={route().current(item.href)}
+                className={`group flex items-center px-4 py-3 text-sm 
+                    font-medium rounded-2xl transition-all duration-300 
+                    hover:bg-gradient-to-r text-gray-700 hover:text-red-600
+                    hover:shadow-lg hover:scale-105 ${
+                      route().current(item.href)
+                        ? "bg-gradient-to-r from-red-600 to-orange-600  hover:text-white text-white shadow-lg"
+                        : "text-gray-700 hover:text-red-600"
+                    }`}
+              >
+                <div
+                  className={`flex items-center justify-center w-10 h-10 rounded-xl transition-all duration-300 ${
+                    route().current(item.href)
+                      ? "bg-gradient-to-r from-red-600 to-orange-600 text-white shadow-lg"
+                      : "text-gray-700 hover:text-red-600"
+                  }`}
+                >
+                  {isSidebarOpen ? (
+                    <span className="text-lg">{item.emoji}</span>
+                  ) : (
+                    <div
+                      className={`transition-colors ${
+                        route().current(item.href)
+                          ? "bg-gradient-to-r from-red-600 to-orange-600 text-white shadow-lg"
+                          : "text-gray-700 hover:text-red-600"
+                      }`}
                     >
-                        <div className="relative">
-                            {isSidebarOpen ? (
-                                <svg className="h-5 w-5 text-gray-600 group-hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
-                                </svg>
-                            ) : (
-                                <svg className="h-5 w-5 text-gray-600 group-hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                                </svg>
-                            )}
-                        </div>
-                    </button>
+                      {item.icon}
+                    </div>
+                  )}
                 </div>
 
-                {/* Navigation */}
-                <nav className="flex-1 px-4 py-6 space-y-2">
-                    {navigationItems.map((item) => (
-                        <NavLink
-                            key={item.href}
-                            href={route(item.href)}
-                            active={route().current(item.href)}
-                            className={`group flex items-center px-4 py-3 text-sm font-medium rounded-2xl transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 hover:shadow-lg hover:scale-105 ${
-                                route().current(item.href)
-                                    ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg'
-                                    : 'text-gray-700 hover:text-blue-600'
-                            }`}
-                        >
-                            <div className={`flex items-center justify-center w-10 h-10 rounded-xl transition-all duration-300 ${
-                                route().current(item.href)
-                                    ? 'bg-white/20'
-                                    : 'bg-gray-100 group-hover:bg-white group-hover:shadow-md'
-                            }`}>
-                                {isSidebarOpen ? (
-                                    <span className="text-lg">{item.emoji}</span>
-                                ) : (
-                                    <div className={`transition-colors ${
-                                        route().current(item.href) ? 'text-white' : 'text-gray-600 group-hover:text-blue-600'
-                                    }`}>
-                                        {item.icon}
-                                    </div>
-                                )}
-                            </div>
-                            
-                            {isSidebarOpen && (
-                                <span className="ml-4 transition-all duration-300">
-                                    {item.name}
-                                </span>
-                            )}
-                            
-                            {!isSidebarOpen && (
-                                <div className="absolute left-full ml-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
-                                    {item.name}
-                                    <div className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-1 w-2 h-2 bg-gray-900 rotate-45"></div>
-                                </div>
-                            )}
-                        </NavLink>
-                    ))}
-                </nav>
+                {isSidebarOpen && (
+                  <span className="ml-4 transition-all duration-300">
+                    {item.name}
+                  </span>
+                )}
 
-                {/* Logout Button */}
-                <div className="p-4 border-t border-gray-200/50">
-                    <NavLink
-                        href={route('logout')}
-                        method="post"
-                        as="button"
-                        className="group w-full flex items-center px-4 py-3 text-sm font-medium rounded-2xl transition-all duration-300 text-red-600 hover:bg-red-50 hover:shadow-lg hover:scale-105"
-                    >
-                        <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-red-100 group-hover:bg-red-200 transition-all duration-300">
-                            {isSidebarOpen ? (
-                                <span className="text-lg">🚪</span>
-                            ) : (
-                                <svg className="h-5 w-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                                </svg>
-                            )}
-                        </div>
-                        
-                        {isSidebarOpen && (
-                            <span className="ml-4 transition-all duration-300">
-                                Cerrar Sesión
-                            </span>
-                        )}
-                        
-                        {!isSidebarOpen && (
-                            <div className="absolute left-full ml-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
-                                Cerrar Sesión
-                                <div className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-1 w-2 h-2 bg-gray-900 rotate-45"></div>
-                            </div>
-                        )}
-                    </NavLink>
+                {!isSidebarOpen && (
+                  <div className="absolute left-full ml-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
+                    {item.name}
+                    <div className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-1 w-2 h-2 bg-gray-900 rotate-45"></div>
+                  </div>
+                )}
+              </NavLink>
+            ))}
+          </nav>
+
+          {/* Logout Button */}
+          <div className="p-4 border-t border-gray-200/50">
+            <NavLink
+              href={route("logout")}
+              method="post"
+              as="button"
+              className="group w-full flex items-center px-4 py-3 text-sm font-medium rounded-2xl transition-all duration-300 text-red-600 hover:bg-red-50 hover:shadow-lg hover:scale-105"
+            >
+              <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-red-100 group-hover:bg-red-200 transition-all duration-300">
+                {isSidebarOpen ? (
+                  <span className="text-lg">🚪</span>
+                ) : (
+                  <svg
+                    className="h-5 w-5 text-red-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                    />
+                  </svg>
+                )}
+              </div>
+
+              {isSidebarOpen && (
+                <span className="ml-4 transition-all duration-300">
+                  Cerrar Sesión
+                </span>
+              )}
+
+              {!isSidebarOpen && (
+                <div className="absolute left-full ml-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
+                  Cerrar Sesión
+                  <div className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-1 w-2 h-2 bg-gray-900 rotate-45"></div>
                 </div>
-            </div>
+              )}
+            </NavLink>
+          </div>
         </div>
+      </div>
     );
 }

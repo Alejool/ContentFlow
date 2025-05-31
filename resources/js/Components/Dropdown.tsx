@@ -57,7 +57,7 @@ interface ContentProps {
 const Content = ({
     align = 'right',
     width = '48',
-    contentClasses = 'py-1 bg-red-50 font-bold block text-center',
+    contentClasses = 'py-1 bg-gray-50 font-bold block text-center',
     children,
 }: ContentProps) => {
     const context = useContext(DropDownContext);

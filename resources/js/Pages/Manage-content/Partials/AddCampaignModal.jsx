@@ -135,11 +135,11 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
   if (!isOpen) return null;
 
   return (
-    <div 
+    <div
       className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50 backdrop-blur-sm"
       onClick={handleClose}
     >
-      <div 
+      <div
         className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto transform transition-all duration-300 scale-100"
         onClick={(e) => e.stopPropagation()}
       >
@@ -158,22 +158,38 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
             className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200"
             disabled={isSubmitting}
           >
-            <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <svg
+              className="w-6 h-6 text-gray-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
 
-        <form onSubmit={handleSubmit(handleFormSubmit)} className="p-6 space-y-6">
+        <form
+          onSubmit={handleSubmit(handleFormSubmit)}
+          className="p-6 space-y-6"
+        >
           {/* Progress Bar */}
           <div className="w-full bg-gray-200 rounded-full h-2">
-            <div 
-              className="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-500"
-              style={{ 
+            <div
+              className="bg-gradient-to-r 
+              from-red-500 to-purple-600
+               h-2 rounded-full transition-all duration-500"
+              style={{
                 width: `${Math.min(
-                  (Object.values(watchedFields).filter(Boolean).length / 5) * 100, 
+                  (Object.values(watchedFields).filter(Boolean).length / 5) *
+                    100,
                   100
-                )}%` 
+                )}%`,
               }}
             ></div>
           </div>
@@ -187,9 +203,9 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
             <input
               {...register("title")}
               className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 transition-all duration-300 ${
-                errors.title 
-                  ? 'border-red-300 focus:ring-red-200 bg-red-50' 
-                  : 'border-gray-300 focus:ring-blue-200 focus:border-blue-500'
+                errors.title
+                  ? "border-red-300 focus:ring-red-200 bg-red-50"
+                  : "border-gray-300 focus:ring-blue-200 focus:border-blue-500"
               }`}
               placeholder="Ej: Campaña de Verano 2024"
             />
@@ -199,7 +215,13 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
                   ⚠️ {errors.title.message}
                 </p>
               )}
-              <p className={`ml-auto ${(watchedFields.title?.length || 0) > 80 ? 'text-orange-600' : 'text-gray-400'}`}>
+              <p
+                className={`ml-auto ${
+                  (watchedFields.title?.length || 0) > 80
+                    ? "text-orange-600"
+                    : "text-gray-400"
+                }`}
+              >
                 {watchedFields.title?.length || 0}/100
               </p>
             </div>
@@ -214,9 +236,9 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
             <textarea
               {...register("description")}
               className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 transition-all duration-300 resize-none ${
-                errors.description 
-                  ? 'border-red-300 focus:ring-red-200 bg-red-50' 
-                  : 'border-gray-300 focus:ring-blue-200 focus:border-blue-500'
+                errors.description
+                  ? "border-red-300 focus:ring-red-200 bg-red-50"
+                  : "border-gray-300 focus:ring-blue-200 focus:border-blue-500"
               }`}
               rows="4"
               placeholder="Describe tu campaña de manera detallada y atractiva..."
@@ -227,7 +249,13 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
                   ⚠️ {errors.description.message}
                 </p>
               )}
-              <p className={`ml-auto ${(watchedFields.description?.length || 0) > 400 ? 'text-orange-600' : 'text-gray-400'}`}>
+              <p
+                className={`ml-auto ${
+                  (watchedFields.description?.length || 0) > 400
+                    ? "text-orange-600"
+                    : "text-gray-400"
+                }`}
+              >
                 {watchedFields.description?.length || 0}/500
               </p>
             </div>
@@ -239,15 +267,15 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
               🖼️ Imagen de la Campaña
               <span className="text-red-500 ml-1">*</span>
             </label>
-            
+
             {!imagePreview ? (
               <div
                 className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all duration-300 ${
-                  isDragOver 
-                    ? 'border-blue-400 bg-blue-50' 
-                    : errors.image 
-                      ? 'border-red-300 bg-red-50' 
-                      : 'border-gray-300 hover:border-blue-400 hover:bg-blue-50'
+                  isDragOver
+                    ? "border-blue-400 bg-blue-50"
+                    : errors.image
+                    ? "border-red-300 bg-red-50"
+                    : "border-gray-300 hover:border-blue-400 hover:bg-blue-50"
                 }`}
                 onDrop={handleDrop}
                 onDragOver={handleDragOver}
@@ -276,9 +304,9 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
               </div>
             ) : (
               <div className="relative rounded-xl overflow-hidden bg-gray-100">
-                <img 
-                  src={imagePreview} 
-                  alt="Preview" 
+                <img
+                  src={imagePreview}
+                  alt="Preview"
                   className="w-full h-48 object-cover"
                 />
                 <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
@@ -287,8 +315,18 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
                     onClick={removeImage}
                     className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors duration-200 flex items-center space-x-2"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                      />
                     </svg>
                     <span>Eliminar</span>
                   </button>
@@ -303,7 +341,7 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
                 />
               </div>
             )}
-            
+
             {errors.image && (
               <p className="text-red-600 text-xs flex items-center">
                 ⚠️ {errors.image.message}
@@ -320,9 +358,9 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
             <input
               {...register("objective")}
               className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 transition-all duration-300 ${
-                errors.objective 
-                  ? 'border-red-300 focus:ring-red-200 bg-red-50' 
-                  : 'border-gray-300 focus:ring-blue-200 focus:border-blue-500'
+                errors.objective
+                  ? "border-red-300 focus:ring-red-200 bg-red-50"
+                  : "border-gray-300 focus:ring-blue-200 focus:border-blue-500"
               }`}
               placeholder="Ej: Aumentar engagement en redes sociales"
             />
@@ -332,7 +370,13 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
                   ⚠️ {errors.objective.message}
                 </p>
               )}
-              <p className={`ml-auto ${(watchedFields.objective?.length || 0) > 160 ? 'text-orange-600' : 'text-gray-400'}`}>
+              <p
+                className={`ml-auto ${
+                  (watchedFields.objective?.length || 0) > 160
+                    ? "text-orange-600"
+                    : "text-gray-400"
+                }`}
+              >
                 {watchedFields.objective?.length || 0}/200
               </p>
             </div>
@@ -347,9 +391,9 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
             <input
               {...register("hashtags")}
               className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 transition-all duration-300 ${
-                errors.hashtags 
-                  ? 'border-red-300 focus:ring-red-200 bg-red-50' 
-                  : 'border-gray-300 focus:ring-blue-200 focus:border-blue-500'
+                errors.hashtags
+                  ? "border-red-300 focus:ring-red-200 bg-red-50"
+                  : "border-gray-300 focus:ring-blue-200 focus:border-blue-500"
               }`}
               placeholder="#marketing #campaña #verano2024"
               onChange={handleHashtagChange}
@@ -361,7 +405,12 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
                 </p>
               )}
               <p className="text-gray-400 ml-auto">
-                {watchedFields.hashtags ? watchedFields.hashtags.split(' ').filter(tag => tag.startsWith('#')).length : 0}/10 hashtags
+                {watchedFields.hashtags
+                  ? watchedFields.hashtags
+                      .split(" ")
+                      .filter((tag) => tag.startsWith("#")).length
+                  : 0}
+                /10 hashtags
               </p>
             </div>
           </div>
@@ -378,14 +427,33 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
             </button>
             <button
               type="submit"
-              className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center space-x-2"
+              className="flex-1 px-6 py-3 bg-gradient-to-r 
+               from-red-500 to-orange-700 
+              hover:from-red-700 hover:to-orange-900 
+               text-white rounded-xl 
+               transition-all duration-300 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center space-x-2"
               disabled={isSubmitting}
             >
               {isSubmitting ? (
                 <>
-                  <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  <svg
+                    className="animate-spin h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
                   </svg>
                   <span>Creando...</span>
                 </>

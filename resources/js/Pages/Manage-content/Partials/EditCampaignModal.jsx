@@ -245,7 +245,9 @@ export default function EditCampaignModal({
           {/* Progress Bar */}
           <div className="w-full bg-gray-200 rounded-full h-2">
             <div
-              className="bg-gradient-to-r from-green-500 to-blue-600 h-2 rounded-full transition-all duration-500"
+              className="bg-gradient-to-r 
+              from-red-500 to-blue-600 
+              h-2 rounded-full transition-all duration-500"
               style={{ width: `${getFormCompletion()}%` }}
             ></div>
           </div>
@@ -472,7 +474,11 @@ export default function EditCampaignModal({
             </button>
             <button
               type="submit"
-              className="flex-1 px-6 py-3 bg-gradient-to-r from-green-600 to-blue-600 text-white rounded-xl hover:from-green-700 hover:to-blue-700 transition-all duration-300 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center space-x-2"
+              className="flex-1 px-6 py-3 bg-gradient-to-r 
+               text-white rounded-xl 
+              from-red-500 to-orange-700 
+              hover:from-red-700 hover:to-orange-900 
+              transition-all duration-300 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center space-x-2"
               disabled={isSubmitting}
             >
               {isSubmitting ? (
