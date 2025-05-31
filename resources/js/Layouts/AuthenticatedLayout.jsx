@@ -16,10 +16,14 @@ export default function AuthenticatedLayout({ header, children }) {
 
     return (
       <div
-        className="min-h-screen 
-             to-indigo-50 relative overflow-hidden
-             "
-            style={{ backgroundImage: `url(${Bg})` }}
+        className="min-h-screen relative overflow-hidden"
+            style={{
+               backgroundImage: `url(${Bg})`,
+               backgroundSize: 'cover',
+               backgroundPosition: 'center',
+               backgroundRepeat: 'no-repeat'
+               }
+            }
       >
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-5 bg-cover bg-center" />
