@@ -1,9 +1,23 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import React from 'react'; // Imported React
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.tsx';
 import { Head } from '@inertiajs/react';
 
-export default function Index() {
-    // Mock data for analytics
-    const analyticsData = [
+// Interface for individual analytics metric objects
+interface AnalyticsMetric {
+    id: number;
+    metric: string;
+    value: string;
+    change: string;
+}
+
+// Props for the Index page component (usually passed by Inertia)
+interface AnalyticsIndexPageProps {
+    // Define any props passed from the controller, if any
+}
+
+export default function Index(props: AnalyticsIndexPageProps) { // Added props typing
+    // Mock data for analytics - typed with AnalyticsMetric[]
+    const analyticsData: AnalyticsMetric[] = [
         {
             id: 1,      
             metric: 'Engagement Rate',
@@ -47,7 +61,7 @@ export default function Index() {
                     <div className="bg-white shadow-md rounded-lg p-6">
                         <h2 className="text-xl font-semibold text-gray-800 mb-6">Performance Overview</h2>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                            {analyticsData.map((data) => (
+                            {analyticsData.map((data) => ( // data is now typed as AnalyticsMetric
                                 <div
                                     key={data.id}                         
                                     className="p-6 bg-gray-50 rounded-lg hover:bg-gray-100 transition duration-300"

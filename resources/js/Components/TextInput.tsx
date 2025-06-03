@@ -41,12 +41,12 @@ const TextInput = forwardRef<TextInputRef, TextInputProps>(function TextInput(
         <input
             {...props}
             type={type}
-            value={value} 
+            value={value}
             className={
                 `block w-full rounded-md border-gray-300 shadow-sm transition duration-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50 ` +
                 className
             }
-            onChange={handleChange} 
+            onChange={handleChange}
             ref={localRef}
         />
     );

@@ -1,4 +1,4 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.tsx';
 import { Head } from '@inertiajs/react';
 import { Link } from '@inertiajs/react';
 import { 
@@ -31,12 +31,12 @@ export default function Dashboard() {
                             <Card.Body p="6">
                                 <Flex align="center" justify="center" w="12" h="12" mb="4" bg="red.100" rounded="full">
                                     <Icon viewBox="0 0 24 24" w="6" h="6" color="red.600">
-                                        <path 
-                                            fill="none" 
-                                            stroke="currentColor" 
-                                            strokeLinecap="round" 
-                                            strokeLinejoin="round" 
-                                            strokeWidth="2" 
+                                        <path
+                                            fill="none"
+                                            stroke="currentColor"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth="2"
                                             d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
                                         />
                                     </Icon>
@@ -45,17 +45,17 @@ export default function Dashboard() {
                                 <Text mt="2" fontSize="sm" color="gray.600">
                                     Organize, edit, and schedule your multimedia content.
                                 </Text>
-                                <Box as={Link} 
+                                <Box as={Link}
                                     href="/manage-content"
-                                    mt="4" 
-                                    display="block" 
-                                    w="full" 
-                                    textAlign="center" 
-                                    px="6" 
-                                    py="3" 
-                                    bg="red.600" 
-                                    color="white" 
-                                    rounded="lg" 
+                                    mt="4"
+                                    display="block"
+                                    w="full"
+                                    textAlign="center"
+                                    px="6"
+                                    py="3"
+                                    bg="red.600"
+                                    color="white"
+                                    rounded="lg"
                                     _hover={{ bg: "red.700" }}
                                     transition="background 0.3s"
                                 >
@@ -69,12 +69,12 @@ export default function Dashboard() {
                             <Card.Body p="6">
                                 <Flex align="center" justify="center" w="12" h="12" mb="4" bg="red.100" rounded="full">
                                     <Icon viewBox="0 0 24 24" w="6" h="6" color="red.600">
-                                        <path 
-                                            fill="none" 
-                                            stroke="currentColor" 
-                                            strokeLinecap="round" 
-                                            strokeLinejoin="round" 
-                                            strokeWidth="2" 
+                                        <path
+                                            fill="none"
+                                            stroke="currentColor"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth="2"
                                             d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                                         />
                                     </Icon>
@@ -83,17 +83,17 @@ export default function Dashboard() {
                                 <Text mt="2" fontSize="sm" color="gray.600">
                                     Plan and schedule your social media posts with ease.
                                 </Text>
-                                <Box as={Link} 
+                                <Box as={Link}
                                     href="/schedule"
-                                    mt="4" 
-                                    display="block" 
-                                    w="full" 
-                                    textAlign="center" 
-                                    px="6" 
-                                    py="3" 
-                                    bg="red.600" 
-                                    color="white" 
-                                    rounded="lg" 
+                                    mt="4"
+                                    display="block"
+                                    w="full"
+                                    textAlign="center"
+                                    px="6"
+                                    py="3"
+                                    bg="red.600"
+                                    color="white"
+                                    rounded="lg"
                                     _hover={{ bg: "red.700" }}
                                     transition="background 0.3s"
                                 >
@@ -107,12 +107,12 @@ export default function Dashboard() {
                             <Card.Body p="6">
                                 <Flex align="center" justify="center" w="12" h="12" mb="4" bg="red.100" rounded="full">
                                     <Icon viewBox="0 0 24 24" w="6" h="6" color="red.600">
-                                        <path 
-                                            fill="none" 
-                                            stroke="currentColor" 
-                                            strokeLinecap="round" 
-                                            strokeLinejoin="round" 
-                                            strokeWidth="2" 
+                                        <path
+                                            fill="none"
+                                            stroke="currentColor"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth="2"
                                             d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
                                         />
                                     </Icon>
@@ -121,17 +121,17 @@ export default function Dashboard() {
                                 <Text mt="2" fontSize="sm" color="gray.600">
                                     Track engagement and performance metrics.
                                 </Text>
-                                <Box as={Link} 
+                                <Box as={Link}
                                     href="/analytics"
-                                    mt="4" 
-                                    display="block" 
-                                    w="full" 
-                                    textAlign="center" 
-                                    px="6" 
-                                    py="3" 
-                                    bg="red.600" 
-                                    color="white" 
-                                    rounded="lg" 
+                                    mt="4"
+                                    display="block"
+                                    w="full"
+                                    textAlign="center"
+                                    px="6"
+                                    py="3"
+                                    bg="red.600"
+                                    color="white"
+                                    rounded="lg"
                                     _hover={{ bg: "red.700" }}
                                     transition="background 0.3s"
                                 >
@@ -145,12 +145,12 @@ export default function Dashboard() {
                             <Card.Body p="6">
                                 <Flex align="center" justify="center" w="12" h="12" mb="4" bg="red.100" rounded="full">
                                     <Icon viewBox="0 0 24 24" w="6" h="6" color="red.600">
-                                        <path 
-                                            fill="none" 
-                                            stroke="currentColor" 
-                                            strokeLinecap="round" 
-                                            strokeLinejoin="round" 
-                                            strokeWidth="2" 
+                                        <path
+                                            fill="none"
+                                            stroke="currentColor"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth="2"
                                             d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
                                         />
                                     </Icon>
@@ -159,17 +159,17 @@ export default function Dashboard() {
                                 <Text mt="2" fontSize="sm" color="gray.600">
                                     Get real-time recommendations and support from our AI.
                                 </Text>
-                                <Box as={Link} 
+                                <Box as={Link}
                                     href="/ai-chat"
-                                    mt="4" 
-                                    display="block" 
-                                    w="full" 
-                                    textAlign="center" 
-                                    px="6" 
-                                    py="3" 
-                                    bg="red.600" 
-                                    color="white" 
-                                    rounded="lg" 
+                                    mt="4"
+                                    display="block"
+                                    w="full"
+                                    textAlign="center"
+                                    px="6"
+                                    py="3"
+                                    bg="red.600"
+                                    color="white"
+                                    rounded="lg"
                                     _hover={{ bg: "red.700" }}
                                     transition="background 0.3s"
                                 >

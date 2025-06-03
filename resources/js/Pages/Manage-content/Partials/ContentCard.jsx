@@ -1,54 +1,54 @@
-import { 
-    Card, 
-    Image, 
-    Box, 
-    Heading, 
-    Text, 
-    Flex, 
-    Button, 
+import {
+    Card,
+    Image,
+    Box,
+    Heading,
+    Text,
+    Flex,
+    Button,
     Stack,
     Badge
 } from "@chakra-ui/react";
 
 export default function ContentCard({ content, onEdit, onDelete }) {
     return (
-        <Card.Root 
-            overflow="hidden" 
-            bg="gray.50" 
-            rounded="lg" 
-            _hover={{ bg: "gray.100" }} 
+        <Card.Root
+            overflow="hidden"
+            bg="gray.50"
+            rounded="lg"
+            _hover={{ bg: "gray.100" }}
             transition="all 0.3s"
         >
             {content.image ? (
-                <Image 
-                    src={content.image} 
-                    alt="Content Thumbnail" 
-                    w="full" 
-                    h="40" 
-                    objectFit="cover" 
+                <Image
+                    src={content.image}
+                    alt="Content Thumbnail"
+                    w="full"
+                    h="40"
+                    objectFit="cover"
                 />
             ) : (
                 <Box w="full" h="40" bg="gray.300" />
             )}
-            
-            <Card.Header 
+
+            <Card.Header
                 className="text-center font-bold text-xl py-3"
             >
                 {content.title}
             </Card.Header>
-            
+
             {/* Description Section */}
             <Card.Body p="4">
-                <Text 
-                    mt="2" 
-                    overflowY="auto" 
-                    p="1" 
+                <Text
+                    mt="2"
+                    overflowY="auto"
+                    p="1"
                     color="gray.600"
-                    h="40" 
+                    h="40"
                 >
                     {content.description}
                 </Text>
-            
+
                 {/* Hashtags Section */}
                 <Box mt="2">
                     <Text color="blue.600">
@@ -74,7 +74,7 @@ export default function ContentCard({ content, onEdit, onDelete }) {
                         >
                             Edit
                         </Button>
-                        
+
                         <Button
                             onClick={onDelete}
                             px="4"

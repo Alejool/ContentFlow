@@ -1,22 +1,51 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import React, { useState, useEffect, useRef, ChangeEvent, KeyboardEvent, ReactNode } from 'react';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.tsx';
 import { Head } from '@inertiajs/react';
-import useAIChat from '@/Hooks/useAIChat';
-import { useState, useEffect } from 'react';
+import useAIChat from '@/Hooks/useAIChat'; // Assuming useAIChat will be typed or handled
 import { Box, Circle, Float } from '@chakra-ui/react';
 
-export default function Index() {
-    const {
-        messages,
-        inputMessage,
-        campaigns,
-        loading,
-        handleInputChange,
-        handleKeyPress,
-        sendMessage,
-    } = useAIChat();
+// Interface for individual trend objects
+interface Trend {
+    id: number;
+    title: string;
+    description: string;
+    icon: string;
+}
 
-   
-    const [trends, setTrends] = useState([
+// Interface for chat messages (assuming structure from useAIChat)
+interface ChatMessage {
+    id: string; // Or number, depending on what useAIChat provides
+    sender: 'AI' | 'User'; // Or string
+    message: string;
+    timestamp: string; // Or Date
+}
+
+// Interface for campaign data (assuming structure from useAIChat)
+interface Campaign {
+    id: string; // Or number
+    name: string;
+    status: 'active' | 'inactive' | string; // Example statuses
+    // Add other campaign properties
+}
+
+// Props for the Index page component (usually passed by Inertia)
+interface AIChatIndexPageProps {
+    // Define any props passed from the controller, if any
+    // For example: initialTrends?: Trend[];
+}
+
+export default function Index(props: AIChatIndexPageProps) { // Added props typing
+    const {
+        messages,       // Should be ChatMessage[] from useAIChat
+        inputMessage,   // Should be string
+        campaigns,      // Should be Campaign[]
+        loading,        // Should be boolean
+        handleInputChange, // Should be (e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => void
+        handleKeyPress,    // Should be (e: KeyboardEvent<HTMLTextAreaElement>) => void
+        sendMessage,       // Should be () => void or similar
+    } = useAIChat(); // Ideally, useAIChat would be a typed hook
+
+    const [trends, setTrends] = useState<Trend[]>([
         {
             id: 1,
             title: 'Marketing de Contenido Visual',
@@ -49,21 +78,19 @@ export default function Index() {
         }
     ]);
 
-    // Función para usar una tendencia como prompt para la IA
-    const useTrendAsPrompt = (trend) => {
+    // Type for the trend parameter
+    const useTrendAsPrompt = (trend: Trend) => {
         const prompt = `Dame ideas para crear una campaña de ${trend.title}`;
-        handleInputChange({ target: { value: prompt } });
+        // Assuming handleInputChange expects an event-like object or simply the value
+        handleInputChange({ target: { value: prompt } } as ChangeEvent<HTMLInputElement>);
     };
-     
+
     return (
         <AuthenticatedLayout>
             <Head title="AI Chat" />
-          
-            <div className="py-12">
-              
 
+            <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    {/* Encabezado de la página */}
                     <div className="mb-8">
                         <h1 className="text-3xl font-bold text-gray-900">Asistente IA para Campañas</h1>
                         <p className="mt-2 text-lg text-gray-600">
@@ -71,23 +98,20 @@ export default function Index() {
                         </p>
                     </div>
 
-                    {/* Contenedor principal con grid */}
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        {/* Sección de Chat (2/3 del ancho) */}
                         <div className="lg:col-span-2">
                             <div className="bg-white shadow-md rounded-lg p-6 h-full">
                                 <div className="flex justify-between items-center mb-6">
                                     <h2 className="text-xl font-semibold text-gray-800">Chat con IA</h2>
                                     {campaigns.length > 0 && (
                                         <span className="text-sm text-green-600">
-                                            {campaigns.length} campañas cargadas
+                                            {(campaigns as Campaign[]).length} campañas cargadas
                                         </span>
                                     )}
                                 </div>
-                                
-                                {/* Mensajes del chat */}
+
                                 <div className="space-y-4 max-h-96 overflow-y-auto mb-6 p-2">
-                                    {messages.map((msg) => (
+                                    {(messages as ChatMessage[]).map((msg) => ( // Cast messages for now
                                         <div
                                             key={msg.id}
                                             className={`p-4 rounded-lg ${
@@ -101,7 +125,7 @@ export default function Index() {
                                             <p className="mt-2 text-sm text-gray-600">{msg.message}</p>
                                         </div>
                                     ))}
-                                    
+
                                     {loading && (
                                         <div className="p-4 rounded-lg bg-blue-50">
                                             <div className="flex items-center space-x-2">
@@ -116,25 +140,24 @@ export default function Index() {
                                     )}
                                 </div>
 
-                                {/* Entrada de chat */}
                                 <div className="mt-6">
                                     <div className="flex">
                                         <textarea
-                                            value={inputMessage}
-                                            onChange={handleInputChange}
-                                            onKeyPress={handleKeyPress}
+                                            value={inputMessage as string} // Cast for now
+                                            onChange={handleInputChange as (e: ChangeEvent<HTMLTextAreaElement>) => void} // Cast for now
+                                            onKeyPress={handleKeyPress as (e: KeyboardEvent<HTMLTextAreaElement>) => void} // Cast for now
                                             placeholder="Escribe tu mensaje... (Puedes preguntar sobre campañas, solicitar ideas o mejoras)"
                                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                                            rows="3"
+                                            rows={3} // rows should be number
                                         />
                                     </div>
                                     <div className="flex justify-between mt-2">
                                         <p className="text-xs text-gray-500">
                                             Presiona Enter para enviar o Shift+Enter para nueva línea
                                         </p>
-                                        <button 
-                                            onClick={sendMessage}
-                                            disabled={loading || !inputMessage.trim()}
+                                        <button
+                                            onClick={sendMessage as () => void} // Cast for now
+                                            disabled={loading || !(inputMessage as string).trim()}
                                             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300 disabled:opacity-50"
                                         >
                                             Enviar
@@ -144,16 +167,13 @@ export default function Index() {
                             </div>
                         </div>
 
-                        {/* Panel de Tendencias e Ideas (1/3 del ancho) */}
                         <div className="lg:col-span-1">
                             <div className="bg-white shadow-md rounded-lg p-6 h-full">
                                 <h2 className="text-xl font-semibold text-gray-800 mb-6">Tendencias & Ideas</h2>
-                                
-                                {/* Lista de tendencias */}
                                 <div className="space-y-4">
                                     {trends.map((trend) => (
-                                        <div 
-                                            key={trend.id} 
+                                        <div
+                                            key={trend.id}
                                             className="p-4 border border-gray-100 rounded-lg hover:bg-blue-50 transition-colors cursor-pointer"
                                             onClick={() => useTrendAsPrompt(trend)}
                                         >
@@ -165,9 +185,9 @@ export default function Index() {
                                                 </div>
                                             </div>
                                             <div className="mt-2 text-right">
-                                                <button 
+                                                <button
                                                     className="text-xs text-blue-600 hover:text-blue-800"
-                                                    onClick={(e) => {
+                                                    onClick={(e: React.MouseEvent<HTMLButtonElement>) => { // Typed event
                                                         e.stopPropagation();
                                                         useTrendAsPrompt(trend);
                                                     }}
@@ -179,38 +199,35 @@ export default function Index() {
                                     ))}
                                 </div>
 
-                                {/* Estadísticas de campañas */}
                                 <div className="mt-8 pt-6 border-t border-gray-200">
                                     <h3 className="text-lg font-medium text-gray-800 mb-4">Estadísticas de Campañas</h3>
                                     <div className="grid grid-cols-2 gap-4">
-                                           <Box position="relative"  bg="bg.emphasized">
-                                                <Float offsetX="1">
+                                           <Box position="relative" bg="bg.emphasized"> {/* Ensure Chakra Box props are valid */}
+                                                <Float offsetX={1}> {/* Chakra Float props */}
                                                 <Circle size="5" bg="green" color="white">
-                                                    {campaigns.filter(c => c.status === 'active').length || 0}
+                                                    {(campaigns as Campaign[]).filter(c => c.status === 'active').length || 0}
                                                 </Circle>
                                                 </Float>
                                                 <div className="bg-green-50 p-3 rounded-lg">
                                                     <p className="text-sm text-gray-600">Campañas Activas</p>
                                                     <p className="text-2xl font-bold text-green-600">
-                                                        {campaigns.filter(c => c.status === 'active').length || 0}
+                                                        {(campaigns as Campaign[]).filter(c => c.status === 'active').length || 0}
                                                     </p>
                                                 </div>
                                             </Box>
-                                           <Box position="relative"  bg="bg.emphasized">
-                                                <Float offsetX="1">
+                                           <Box position="relative" bg="bg.emphasized">
+                                                <Float offsetX={1}>
                                                 <Circle size="5" bg="blue" color="white">
-                                                   {campaigns.length || 0}
+                                                   {(campaigns as Campaign[]).length || 0}
                                                 </Circle>
                                                 </Float>
                                                 <div className="bg-blue-50 p-3 rounded-lg">
                                                     <p className="text-sm text-gray-600">Total Campañas</p>
                                                     <p className="text-2xl font-bold text-blue-600">
-                                                        {campaigns.length || 0}
+                                                        {(campaigns as Campaign[]).length || 0}
                                                     </p>
                                                 </div>
                                             </Box>
-                                        
-                                        
                                     </div>
                                 </div>
                             </div>
