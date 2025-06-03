@@ -1,10 +1,16 @@
+import React, { ReactNode } from 'react'; // Imported ReactNode
 import ApplicationLogo from '@/Components/ApplicationLogo.tsx';
 import { Link } from '@inertiajs/react';
 
 import Bg from '@/../assets/background.svg';
-import Logo from '@/../assets/logo.png';
+// Logo is imported but not used in the original code, will keep it commented
+// import Logo from '@/../assets/logo.png';
 
-export default function GuestLayout({ children }) {
+interface GuestLayoutProps {
+    children: ReactNode;
+}
+
+export default function GuestLayout({ children }: GuestLayoutProps) { // Added type for children
     return (
         <div className=" min-h-screen flex-col items-center 
                 sm:justify-center sm:pt-0 bg-cover bg-center h-screen"
@@ -12,9 +18,7 @@ export default function GuestLayout({ children }) {
         >
             <div>
                 <Link href="/">
-                    {/* <img src={Logo} alt="logo" className="h-40 w-auto fill-current text-gray-800" /> */}
-                    {/* <ApplicationLogo className="h-20 w-20 fill-current text-gray-500" /> */}
-
+                    {/* The ApplicationLogo was commented out in the original, keeping it that way. */}
                     {/* <ApplicationLogo className="h-20 w-20 fill-current text-gray-500" /> */}
                 </Link>
             </div>
