@@ -42,7 +42,7 @@ const Trigger = ({ children }: TriggerProps) => {
     return (
         <>
             <div onClick={toggleOpen}>{children}</div>
-            {open && <div className="fixed inset-0 z-20" onClick={() => setOpen(false)}></div>}
+            {open && <div className="fixed inset-0 z-40" onClick={() => setOpen(false)}></div>}
         </>
     );
 };
@@ -56,8 +56,8 @@ interface ContentProps {
 
 const Content = ({
     align = 'right',
-    width = '86',
-    contentClasses = 'py-4 mt-3 bg-gray-50 font-bold block text-center',
+    width = '48',
+    contentClasses = 'py-1 bg-red-50 font-bold block text-center',
     children,
 }: ContentProps) => {
     const context = useContext(DropDownContext);
@@ -91,11 +91,10 @@ const Content = ({
             leaveTo="opacity-0 scale-95"
         >
             <div
-                className={`absolute rounded-md shadow-xl ${alignmentClasses} ${widthClasses}`}
+                className={`absolute z-50 mt-2 rounded-md shadow-lg ${alignmentClasses} ${widthClasses}`}
                 onClick={() => setOpen(false)}
             >
-                <div className={`rounded-md ring-1 ring-black ring-opacity-5 
-                        ${contentClasses}`}>
+                <div className={`rounded-md ring-1 ring-black ring-opacity-5 ${contentClasses}`}>
                     {children}
                 </div>
             </div>
