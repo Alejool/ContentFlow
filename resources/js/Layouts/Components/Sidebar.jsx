@@ -59,7 +59,7 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }) {
     return (
       <div
         className={`hidden lg:block fixed inset-y-0 z-50 transition-all duration-500 ease-in-out ${
-          isSidebarOpen ? "w-80" : "w-20"
+          isSidebarOpen ? "w-80" : "w-32"
         }`}
       >
         {/* Backdrop */}
@@ -144,29 +144,43 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }) {
                 key={item.href}
                 href={route(item.href)}
                 active={route().current(item.href)}
-                className={`group flex items-center px-4 py-3 text-sm 
+                className={`group w-full flex items-center 
+                    d-flex 
+                    align-center
+                    px-4 py-3 text-sm 
+                    ${isSidebarOpen ? "" : "justify-center"}
                     font-medium rounded-2xl transition-all duration-300 
-                    hover:bg-gradient-to-r text-gray-700 hover:text-red-600
-                    hover:shadow-lg hover:scale-105 ${
+                    hover:bg-gradient-to-r 
+                    text-gray-700
+                    hover:text-red-600
+                    hover:bg-orange-50
+                    hover:shadow-lg 
+                    hover:scale-105 
+                    ${
                       route().current(item.href)
                         ? "bg-gradient-to-r from-red-600 to-orange-600  hover:text-white text-white shadow-lg"
                         : "text-gray-700 hover:text-red-600"
                     }`}
               >
                 <div
-                  className={`flex items-center justify-center w-10 h-10 rounded-xl transition-all duration-300 ${
+                  className={`flex items-center justify-center rounded-full 
+                  h-10  transition-all duration-300 ${
                     route().current(item.href)
-                      ? "bg-gradient-to-r from-red-600 to-orange-600 text-white shadow-lg"
+                      ? "bg-gradient-to-r  text-white shadow-lg"
                       : "text-gray-700 hover:text-red-600"
                   }`}
                 >
                   {isSidebarOpen ? (
-                    <span className="text-lg">{item.emoji}</span>
+                    <span 
+                      className="text-lg "
+                    >
+                      {item.emoji}
+                      </span>
                   ) : (
                     <div
-                      className={`transition-colors ${
+                      className={`transition-colors  ${
                         route().current(item.href)
-                          ? "bg-gradient-to-r from-red-600 to-orange-600 text-white shadow-lg"
+                          ? "bg-gradient-to-r from-red-600 to-orange-600 w-90 text-white shadow-lg"
                           : "text-gray-700 hover:text-red-600"
                       }`}
                     >
@@ -182,9 +196,19 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }) {
                 )}
 
                 {!isSidebarOpen && (
-                  <div className="absolute left-full ml-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
+                  <div
+                    className="absolute left-full ml-2 px-3 py-2 
+                    bg-gray-900 text-white text-sm rounded-lg 
+                    opacity-0 group-hover:opacity-100 transition-opacity 
+                    duration-200 pointer-events-none whitespace-nowrap 
+                    z-50"
+                  >
                     {item.name}
-                    <div className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-1 w-2 h-2 bg-gray-900 rotate-45"></div>
+                    <div
+                      className="absolute left-0 top-1/2 transform 
+                    -translate-y-1/2 -translate-x-1 w-2 h-2
+                     bg-gray-900 rotate-45"
+                    ></div>
                   </div>
                 )}
               </NavLink>
@@ -226,7 +250,10 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }) {
               )}
 
               {!isSidebarOpen && (
-                <div className="absolute left-full ml-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
+                <div
+                  className="absolute left-full ml-2 px-3 py-2 bg-gray-900 text-white 
+                text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50"
+                >
                   Cerrar Sesión
                   <div className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-1 w-2 h-2 bg-gray-900 rotate-45"></div>
                 </div>

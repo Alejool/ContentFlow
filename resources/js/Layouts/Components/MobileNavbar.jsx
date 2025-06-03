@@ -128,10 +128,13 @@ export default function MobileNavbar({ user, showingNavigationDropdown, setShowi
                                 key={item.href}
                                 href={route(item.href)}
                                 active={route().current(item.href)}
-                                className={`flex items-center space-x-3 px-4 py-3 rounded-2xl transition-all duration-300 ${
+                                className={`flex items-center 
+                                    space-x-3 px-4 py-3 rounded-2xl 
+                                    transition-all duration-300
+                                     ${
                                     route().current(item.href)
                                         ? 'bg-gradient-to-r from-red-600 to-orange-700 text-white shadow-lg'
-                                        : 'text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 hover:text-orange-600'
+                                        : 'text-gray-700 hover:bg-gradient-to-r hover:from-orange-50 hover:to-purple-50 hover:text-orange-600'
                                 }`}
                             >
                                 <span className="text-lg">{item.emoji}</span>

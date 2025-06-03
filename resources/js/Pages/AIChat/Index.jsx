@@ -262,22 +262,22 @@ export default function Index() {
         <Container maxW="6xl">
           {/* Header minimalista */}
           <Stack gap={6} mb={8}>
-            <Flex 
-              direction={{ base: "column", md: "row" }} 
-              justify="space-between" 
+            <Flex
+              direction={{ base: "column", md: "row" }}
+              justify="space-between"
               align={{ base: "start", md: "center" }}
-              gap={4}
+              gap={6}
             >
               <Box>
-                <Heading 
+                <Heading
                   fontSize={{ base: "3xl", md: "5xl" }}
-                  fontWeight="800" 
-                  size={{ base: "4xl"}}
-                  textAlign={{ base: "center"}}
-                  bgGradient="to-r" 
-                  gradientFrom="red.500" 
-                  gradientTo="orange.700" 
-                  // className="mt-10"
+                  fontWeight="800"
+                  size={{ base: "4xl" }}
+                  textAlign={{ base: "center" }}
+                  bgGradient="to-r"
+                  gradientFrom="red.500"
+                  gradientTo="orange.700"
+                  height="60px"
                   bgClip="text"
                 >
                   Asistente IA
@@ -289,11 +289,19 @@ export default function Index() {
 
               <Flex align="center" gap={4}>
                 {campaigns.length > 0 && (
-                  <Box bg="white" px={4} py={3} rounded="xl" shadow="sm" border="1px" borderColor="gray.100">
+                  <Box
+                    bg="white"
+                    px={4}
+                    py={3}
+                    rounded="xl"
+                    shadow="sm"
+                    border="1px"
+                    borderColor="gray.100"
+                  >
                     <CompactStats campaigns={campaigns} />
                   </Box>
                 )}
-                
+
                 <IconButton
                   onClick={onOpen}
                   colorScheme="red"
@@ -308,12 +316,12 @@ export default function Index() {
             </Flex>
 
             {campaigns.length > 0 && (
-              <Badge 
-                colorScheme="red" 
-                variant="subtle" 
-                px={3} 
-                py={1} 
-                rounded="full" 
+              <Badge
+                colorScheme="red"
+                variant="subtle"
+                px={3}
+                py={1}
+                rounded="full"
                 alignSelf="start"
               >
                 {campaigns.length} campañas disponibles
@@ -322,12 +330,14 @@ export default function Index() {
           </Stack>
 
           {/* Layout principal */}
-          <Grid 
-            templateColumns={{ base: "1fr", lg: "1fr 300px" }} 
-            gap={6}
-          >
+          <Grid templateColumns={{ base: "1fr", lg: "1fr 300px" }} gap={6}>
             {/* Chat */}
-            <Card.Root bg="gray.50" shadow="sm" border="1px" borderColor="gray.100">
+            <Card.Root
+              bg="gray.50"
+              shadow="sm"
+              border="1px"
+              borderColor="gray.100"
+            >
               <Card.Body p={6}>
                 {/* Header del chat */}
                 <Flex justify="space-between" align="center" mb={6}>
@@ -335,10 +345,7 @@ export default function Index() {
                     <Box p={2} bg="red.100" rounded="lg" color="red.600">
                       <Icon type="ai" size={20} />
                     </Box>
-                    <Heading size="xl" 
-                      color="gray.900"
-                      fontWeight="600"
-                    >
+                    <Heading size="xl" color="gray.900" fontWeight="600">
                       Chat ContentFlow
                     </Heading>
                   </Flex>
@@ -348,57 +355,80 @@ export default function Index() {
                 </Flex>
 
                 {/* Mensajes */}
-                <Box 
-                  h="400px" 
+                <Box
+                  h="400px"
                   px={2}
-                  overflowY="auto" 
+                  overflowY="auto"
                   mb={6}
                   css={{
                     scrollbarWidth: "thin",
                     scrollbarColor: "#c2530a transparent",
-                    "&::-webkit-scrollbar": { 
-                      width: "3px" 
+                    "&::-webkit-scrollbar": {
+                      width: "3px",
                     },
                     "&::-webkit-scrollbar-track": {
-                      background: "transparent"
+                      background: "transparent",
                     },
-                    "&::-webkit-scrollbar-thumb": { 
+                    "&::-webkit-scrollbar-thumb": {
                       background: "#c2530a",
-                      borderRadius: "2px"
+                      borderRadius: "2px",
                     },
                     "&::-ms-scrollbar": {
-                      width: "3px"
+                      width: "3px",
                     },
                     "&::-ms-scrollbar-thumb": {
-                      background: "#c2530a"
-                    }
+                      background: "#c2530a",
+                    },
                   }}
                 >
                   <Stack gap={4} py={1}>
                     {messages.length === 0 && (
                       <Box textAlign="center" py={8}>
                         <Text color="gray.500" fontSize="sm">
-                          ¡Hola! Soy tu asistente IA. ¿En qué puedo ayudarte hoy?
+                          ¡Hola! Soy tu asistente IA. ¿En qué puedo ayudarte
+                          hoy?
                         </Text>
                       </Box>
                     )}
-                    
-                    {messages.map(msg => (
+
+                    {messages.map((msg) => (
                       <ChatMessage key={msg.id} message={msg} user={user} />
                     ))}
 
                     {loading && (
                       <Flex gap={3} align="center">
-                        <Avatar.Root size="sm">
-                          <Avatar.Fallback bg="red.500" color="white" 
-                            fontSize="xl">
+                         <Avatar.Root size="sm"> 
+                          <Avatar.Fallback 
+                              bg="orange.600"  
+                              color="white"
+                              fontSize="sm"
+                              h={10}
+                              p={2}
+                              w={10}
+                              borderRadius="full"
+                              display="flex"
+                              alignItems="center"
+                              justifyContent="center"
+                              className="mx-auto"
+                            >
                             AI
-                          </Avatar.Fallback>
+                            </Avatar.Fallback>
                         </Avatar.Root>
-                        <Box bg="white" px={4} py={3} rounded="2xl" shadow="sm" border="1px" borderColor="gray.100">
+
+                        <Box
+                          bg="white"
+                          px={4}
+                          py={3}
+                          rounded="2xl"
+                          shadow="sm"
+                          border="1px"
+                          borderColor="gray.100"
+                        >
                           <Flex align="center" gap={2}>
                             <Spinner size="sm" color="red.500" />
-                            <Text fontSize="sm" color="gray.600">Pensando...</Text>
+                            <Text fontSize="sm" color="gray.600">
+                              Pensando...
+                            </Text>
                           </Flex>
                         </Box>
                       </Flex>
