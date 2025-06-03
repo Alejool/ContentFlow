@@ -1,4 +1,4 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.tsx';
 import { Head } from '@inertiajs/react';
 import { Line } from '@ant-design/plots';
 

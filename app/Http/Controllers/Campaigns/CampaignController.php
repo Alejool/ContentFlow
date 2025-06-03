@@ -16,7 +16,7 @@ class CampaignController extends Controller
         // $campaigns = Campaign::all();
         // limit(10);
         $campaigns = Campaign::orderBy('id', 'desc')->get();
-        $campaigns = Campaign::orderBy('id', 'desc')->take(10)->get();
+        $campaigns = Campaign::orderBy('id', 'desc')->take(5)->get();
         // $campaigns = Campaign::orderBy('id', 'asc')->skip(5)->take(5)->get();
         
         // $campaigns = Campaign::paginate(10);
