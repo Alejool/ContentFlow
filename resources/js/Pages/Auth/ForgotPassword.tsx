@@ -1,21 +1,29 @@
+import React, { FormEvent, ChangeEvent } from 'react'; // Added React, FormEvent, ChangeEvent
 import InputError from '@/Components/InputError.tsx';
 import PrimaryButton from '@/Components/PrimaryButton.tsx';
 import TextInput from '@/Components/TextInput.tsx';
-import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, useForm } from '@inertiajs/react';
+import GuestLayout from '@/Layouts/GuestLayout.tsx';
+import { Head, useForm, Link } from '@inertiajs/react'; // Added Link
 import Logo from '@/../assets/logo.png';
-import { Link } from '@inertiajs/react';
 
+// Define props for the page
+interface ForgotPasswordPageProps {
+    status?: string;
+}
 
-export default function ForgotPassword({ status }) {
-    const { data, setData, post, processing, errors } = useForm({
+// Define the shape of the form data
+interface ForgotPasswordFormData {
+    email: string;
+}
+
+export default function ForgotPassword({ status }: ForgotPasswordPageProps) { // Typed props
+    const { data, setData, post, processing, errors } = useForm<ForgotPasswordFormData>({
         email: '',
     });
 
-    const submit = (e) => {
+    const submit = (e: FormEvent) => { // Typed event
         e.preventDefault();
-
-        post(route('password.email'));
+        post((window as any).route('password.email')); // Used (window as any).route for now
     };
 
     return (
@@ -33,7 +41,7 @@ export default function ForgotPassword({ status }) {
                     </div>
                     <Link href="/">
                         <img
-                            src={Logo} // Ruta de tu imagen
+                            src={Logo}
                             alt="Register Image"
                             className="w-64 object-cover h-40"
                         />
@@ -63,7 +71,7 @@ export default function ForgotPassword({ status }) {
                                 value={data.email}
                                 className="mt-1 block w-full"
                                 isFocused={true}
-                                onChange={(e) => setData('email', e.target.value)}
+                                onChange={(e: ChangeEvent<HTMLInputElement>) => setData('email', e.target.value)} // Typed event
                             />
                             <InputError message={errors.email} className="mt-2" />
                         </div>

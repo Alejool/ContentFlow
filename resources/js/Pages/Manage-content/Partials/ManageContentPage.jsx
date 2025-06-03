@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.tsx';
 import { Head } from '@inertiajs/react';
 import SocialMediaAccounts from './SocialMediaAccounts';
 import ContentMetrics from './ContentMetrics';

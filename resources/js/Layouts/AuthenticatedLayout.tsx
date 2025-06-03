@@ -1,16 +1,40 @@
+import React, { useState, ReactNode } from 'react';
 import ApplicationLogo from '@/Components/ApplicationLogo.tsx';
 import Dropdown from '@/Components/Dropdown.tsx';
 import NavLink from '@/Components/NavLink.tsx';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.tsx';
-import { Link, usePage } from '@inertiajs/react';
-import { useState } from 'react';
+import { Link, usePage } from '@inertiajs/react'; // Assuming PageProps and User are available globally or via a type definition file
 import Bg from '@/../assets/background.svg';
 import Logo from '@/../assets/logo.png';
 
-export default function AuthenticatedLayout({ header, children }) {
-    const user = usePage().props.auth.user || {};
-    const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+// Define a basic User interface
+interface User {
+    name: string;
+    // Add other user properties if known, e.g., email, id, etc.
+}
+
+// Define props for AuthenticatedLayout
+interface AuthenticatedLayoutProps {
+    header?: ReactNode; // header is optional
+    children: ReactNode;
+}
+
+// It's good practice to type the props from usePage more specifically if possible.
+// For now, we'll use a general approach for `auth.user`.
+interface PagePropsAuth {
+    auth: {
+        user: User | null; // User can be null if not authenticated
+    };
+    // Add other page props if known
+}
+
+export default function AuthenticatedLayout({ header, children }: AuthenticatedLayoutProps) {
+    // Type the user from usePage().props
+    const { props: pageProps } = usePage<PagePropsAuth>();
+    const user = pageProps.auth.user || { name: 'Unknown' }; // Provide a fallback for user.name
+
+    const [showingNavigationDropdown, setShowingNavigationDropdown] = useState<boolean>(false);
+    const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(true);
 
     return (
         <div className="min-h-screen bg-cover bg-center bg-" style={{ backgroundImage: `url(${Bg})` }}>
@@ -50,8 +74,8 @@ export default function AuthenticatedLayout({ header, children }) {
                     <div className="flex flex-col mt-10">
                         {/* Dashboard */}
                         <NavLink
-                            href={route('dashboard')}
-                            active={route().current('dashboard')}
+                            href={(window as any).route('dashboard')} // Using window.route for now
+                            active={(window as any).route().current('dashboard')}
                             className="flex items-center text-white px-6 py-3 text-sm hover:bg-gray-700 hover:text-red-500"
                         >
                             <div className="w-8 flex-shrink-0">
@@ -69,8 +93,8 @@ export default function AuthenticatedLayout({ header, children }) {
 
                         {/* Profile */}
                         <NavLink
-                            href={route('profile.edit')}
-                            active={route().current('profile.edit')}
+                            href={(window as any).route('profile.edit')}
+                            active={(window as any).route().current('profile.edit')}
                             className="flex items-center text-white px-6 py-3 text-sm hover:bg-gray-700 hover:text-red-500"
                         >
                             <div className="w-8 flex-shrink-0">
@@ -88,8 +112,8 @@ export default function AuthenticatedLayout({ header, children }) {
 
                         {/* Manage Content */}
                         <NavLink
-                            href={route('manage-content.index')}
-                            active={route().current('manage-content.index')}
+                            href={(window as any).route('manage-content.index')}
+                            active={(window as any).route().current('manage-content.index')}
                             className="flex items-center text-white px-6 py-3 text-sm hover:bg-gray-700 hover:text-red-500"
                         >
                             <div className="w-8 flex-shrink-0">
@@ -107,8 +131,8 @@ export default function AuthenticatedLayout({ header, children }) {
 
                         {/* Analytics */}
                         <NavLink
-                            href={route('analytics.index')}
-                            active={route().current('analytics.index')}
+                            href={(window as any).route('analytics.index')}
+                            active={(window as any).route().current('analytics.index')}
                             className="flex items-center text-white px-6 py-3 text-sm hover:bg-gray-700 hover:text-red-500"
                         >
                             <div className="w-8 flex-shrink-0">
@@ -126,8 +150,8 @@ export default function AuthenticatedLayout({ header, children }) {
 
                         {/* AI Chat */}
                         <NavLink
-                            href={route('ai-chat.index')}
-                            active={route().current('ai-chat.index')}
+                            href={(window as any).route('ai-chat.index')}
+                            active={(window as any).route().current('ai-chat.index')}
                             className="flex items-center text-white px-6 py-3 text-sm hover:bg-gray-700 hover:text-red-500"
                         >
                             <div className="w-8 flex-shrink-0">
@@ -146,7 +170,7 @@ export default function AuthenticatedLayout({ header, children }) {
 
                     {/* Log Out */}
                     <NavLink
-                        href={route('logout')}
+                        href={(window as any).route('logout')}
                         method="post"
                         as="button"
                         className="flex items-center text-white px-6 py-3 text-sm hover:bg-gray-700 hover:text-red-500"
@@ -206,7 +230,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                             type="button"
                                             className="inline-flex items-center rounded-md border border-transparent bg-gray-700 px-3 py-2 text-sm font-medium leading-4 text-white hover:bg-red-600 focus:outline-none"
                                         >
-                                            {user.name || 'Unknown'}
+                                            {user.name} {/* Use user.name directly */}
                                             <svg
                                                 className="-me-0.5 ms-2 h-4 w-4"
                                                 xmlns="http://www.w3.org/2000/svg"
@@ -223,8 +247,8 @@ export default function AuthenticatedLayout({ header, children }) {
                                     </span>
                                 </Dropdown.Trigger>
                                 <Dropdown.Content>
-                                    <Dropdown.Link href={route('profile.edit')}>Profile</Dropdown.Link>
-                                    <Dropdown.Link href={route('logout')} method="post" as="button">
+                                    <Dropdown.Link href={(window as any).route('profile.edit')}>Profile</Dropdown.Link>
+                                    <Dropdown.Link href={(window as any).route('logout')} method="post" as="button">
                                         Log Out
                                     </Dropdown.Link>
                                 </Dropdown.Content>
@@ -237,42 +261,42 @@ export default function AuthenticatedLayout({ header, children }) {
                 <div className={`${showingNavigationDropdown ? 'block' : 'hidden'} lg:hidden`}>
                     <div className="space-y-1 pb-3 pt-2">
                         <ResponsiveNavLink
-                            href={route('dashboard')}
-                            active={route().current('dashboard')}
+                            href={(window as any).route('dashboard')}
+                            active={(window as any).route().current('dashboard')}
                             className="text-gray-300 hover:bg-gray-700 hover:text-red-500"
                         >
                             Dashboard
                         </ResponsiveNavLink>
                         <ResponsiveNavLink
-                            href={route('profile.edit')}
-                            active={route().current('profile.edit')}
+                            href={(window as any).route('profile.edit')}
+                            active={(window as any).route().current('profile.edit')}
                             className="text-gray-300 hover:bg-gray-700 hover:text-red-500"
                         >
                             Profile
                         </ResponsiveNavLink>
                         <ResponsiveNavLink
-                            href={route('manage-content.index')}
-                            active={route().current('manage-content.index')}
+                            href={(window as any).route('manage-content.index')}
+                            active={(window as any).route().current('manage-content.index')}
                             className="text-gray-300 hover:bg-gray-700 hover:text-red-500"
                         >
                             Manage Content
                         </ResponsiveNavLink>
                         <ResponsiveNavLink
-                            href={route('analytics.index')}
-                            active={route().current('analytics.index')}
+                            href={(window as any).route('analytics.index')}
+                            active={(window as any).route().current('analytics.index')}
                             className="text-gray-300 hover:bg-gray-700 hover:text-red-500"
                         >
                             Analytics
                         </ResponsiveNavLink>
                         <ResponsiveNavLink
-                            href={route('ai-chat.index')}
-                            active={route().current('ai-chat.index')}
+                            href={(window as any).route('ai-chat.index')}
+                            active={(window as any).route().current('ai-chat.index')}
                             className="text-gray-300 hover:bg-gray-700 hover:text-red-500"
                         >
                             AI Chat
                         </ResponsiveNavLink>
                         <ResponsiveNavLink
-                            href={route('logout')}
+                            href={(window as any).route('logout')}
                             method="post"
                             as="button"
                             className="text-gray-300 hover:bg-gray-700 hover:text-red-500"

@@ -2,7 +2,7 @@ import InputError from '@/Components/InputError.tsx';
 import InputLabel from '@/Components/InputLabel.tsx';
 import PrimaryButton from '@/Components/PrimaryButton.tsx';
 import TextInput from '@/Components/TextInput.tsx';
-import GuestLayout from '@/Layouts/GuestLayout';
+import GuestLayout from '@/Layouts/GuestLayout.tsx';
 import { Head, useForm } from '@inertiajs/react';
 
 export default function ResetPassword({ token, email }) {
