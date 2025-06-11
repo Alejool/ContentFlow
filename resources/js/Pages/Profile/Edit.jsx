@@ -1,6 +1,6 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, usePage } from '@inertiajs/react';
-import DeleteUserForm from './Partials/DeleteUserForm';
+// import DeleteUserForm from './Partials/DeleteUserForm';
 import UpdatePasswordForm from './Partials/UpdatePasswordForm';
 import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm';
 import IconsProfile from '@/../assets/Icons/profile.svg';
@@ -94,7 +94,7 @@ export default function Edit({ mustVerifyEmail, status }) {
                             ⚠️ Warning: This action is irreversible. Proceed with caution.
                         </p>
                         <div className="mt-2 flex flex-col rounded-2xl bg-white p-6 shadow-lg border border-red-400 transition hover:shadow-2xl">
-                            <DeleteUserForm className="w-full" />
+                            {/* <DeleteUserForm className="w-full" /> */}
                         </div>
                     </div>
 
