@@ -51,7 +51,7 @@ class RegisteredUserController extends Controller
 
         event(new Registered($user));
         
-        // Iniciar sesión y regenerar
+        // Log in and regenerate session
         Auth::login($user);
         $request->session()->regenerate();
 

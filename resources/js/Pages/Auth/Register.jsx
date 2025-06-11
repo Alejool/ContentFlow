@@ -35,7 +35,7 @@ export default function Register() {
                     <div className="text-white text-center">
                             <h1 className="text-4xl font-bold mb-4">Welcome</h1>
                             <p className="text-lg">
-                                Start session with your email and password
+                                Register with your email and password
                             </p>
                         </div>
                         <Link href="/">

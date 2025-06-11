@@ -22,25 +22,25 @@ export default function SocialMediaAccounts() {
     const authWindowRef = useRef(null);
     const authCheckIntervalRef = useRef(null);
 
-    // Cargar las cuentas conectadas al iniciar el componente
+    // Load connected accounts when the component starts
     useEffect(() => {
         fetchConnectedAccounts();
         
-        // Configurar el listener de mensajes para la autenticación
+        // Configure message listener for authentication
         const handleAuthMessage = (event) => {
-            console.log('Mensaje recibido en SocialMediaAccounts:', event.data);
+            console.log('Message received in SocialMediaAccounts:', event.data);
             
             if (event.data && event.data.type === 'social_auth_callback') {
                 setAuthInProgress(false);
                 
                 if (event.data.success) {
-                    toast.success(`Cuenta conectada exitosamente`);
-                    fetchConnectedAccounts(); // Recargar las cuentas después de una autenticación exitosa
+                    toast.success(`Account connected successfully`);
+                    fetchConnectedAccounts(); // Reload accounts after successful authentication
                 } else {
-                    toast.error(`Error en la autenticación: ${event.data.message || 'Error desconocido'}`);
+                    toast.error(`Authentication error: ${event.data.message || 'Unknown error'}`);
                 }
                 
-                // Limpiar el intervalo de verificación si existe
+                // Clear verification interval if it exists
                 if (authCheckIntervalRef.current) {
                     clearInterval(authCheckIntervalRef.current);
                     authCheckIntervalRef.current = null;
@@ -52,46 +52,46 @@ export default function SocialMediaAccounts() {
         
         return () => {
             window.removeEventListener('message', handleAuthMessage);
-            // Limpiar el intervalo de verificación al desmontar
+            // Clear verification interval on unmount
             if (authCheckIntervalRef.current) {
                 clearInterval(authCheckIntervalRef.current);
             }
         };
     }, []);
 
-    // Función para obtener las cuentas conectadas desde el backend
+    // Function to get connected accounts from the backend
     const fetchConnectedAccounts = async () => {
         try {
             setLoading(true);
-            // Aseguramos que la solicitud incluya las credenciales y el token CSRF
+            // Ensure the request includes credentials and CSRF token
             const response = await axios.get('/api/social-accounts', {
                 headers: {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                 },
-                withCredentials: true // Importante para Sanctum
+                withCredentials: true // Important for Sanctum
             });
             
             if (response.data && response.data.accounts) {
-                // Actualizar el estado de las cuentas con la información del servidor
+                // Update account status with server information
                 updateAccountsStatus(response.data.accounts);
             }
         } catch (error) {
-            console.error('Error al cargar cuentas sociales:', error);
+            console.error('Error loading social accounts:', error);
             if (error.response?.status === 401) {
-                toast.error('No autorizado. Por favor inicie sesión nuevamente.');
+                toast.error('Unauthorized. Please log in again.');
             } else {
-                toast.error('No se pudieron cargar las cuentas conectadas');
+                toast.error('Could not load connected accounts');
             }
         } finally {
             setLoading(false);
         }
     };
 
-    // Actualizar el estado de las cuentas con la información del servidor
+    // Update account status with server information
     const updateAccountsStatus = (connectedAccounts) => {
-        // Si no hay cuentas conectadas o el array está vacío, mantener todos los valores predeterminados
+        // If there are no connected accounts or the array is empty, keep all default values
         if (!connectedAccounts || connectedAccounts.length === 0) {
             setAccounts(prevAccounts => 
                 prevAccounts.map(account => ({
@@ -104,7 +104,7 @@ export default function SocialMediaAccounts() {
             return;
         }
         
-        // Si hay cuentas conectadas, actualizar solo las que coincidan por platform
+        // If there are connected accounts, update only those that match by platform
         setAccounts(prevAccounts => 
             prevAccounts.map(account => {
                 const connectedAccount = connectedAccounts.find(
@@ -127,7 +127,7 @@ export default function SocialMediaAccounts() {
         if (!account) return;
         
         if (account.isConnected) {
-            // Desconectar cuenta
+            // Disconnect account
             try {
                 const success = await disconnectSocialMedia(account.platform, account.accountId);
                 if (success) {
@@ -136,17 +136,17 @@ export default function SocialMediaAccounts() {
                             acc.id === accountId ? { ...acc, isConnected: false, accountId: null, accountDetails: null } : acc
                         )
                     );
-                    toast.success(`Cuenta de ${account.name} desconectada exitosamente`);
+                    toast.success(`${account.name} account disconnected successfully`);
                 }
             } catch (error) {
-                toast.error(`Error al desconectar ${account.name}: ${error.message}`);
+                toast.error(`Error disconnecting ${account.name}: ${error.message}`);
             }
         } else {
-            // Conectar cuenta - Implementación mejorada
+            // Connect account - Improved implementation
             try {
                 setAuthInProgress(true);
                 
-                // Obtener URL de autenticación
+                // Get authentication URL
                 const response = await axios.get(`/api/social-accounts/auth-url/${account.platform}`, {
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
@@ -156,12 +156,12 @@ export default function SocialMediaAccounts() {
                 });
                 
                 if (response.data.success && response.data.url) {
-                    // Cerrar cualquier ventana de autenticación anterior que pudiera estar abierta
+                    // Close any previous authentication window that might be open
                     if (authWindowRef.current && !authWindowRef.current.closed) {
                         authWindowRef.current.close();
                     }
                     
-                    // Abrir ventana emergente para autenticación
+                    // Open popup window for authentication
                     authWindowRef.current = window.open(
                         response.data.url,
                         `${account.platform}Auth`,
@@ -170,18 +170,18 @@ export default function SocialMediaAccounts() {
                     
                     if (!authWindowRef.current) {
                         setAuthInProgress(false);
-                        toast.error('El navegador bloqueó la ventana emergente. Por favor, permita ventanas emergentes para este sitio.');
+                        toast.error('The browser blocked the pop-up window. Please allow pop-ups for this site.');
                         return;
                     }
                     
-                    // Verificar si la ventana se cerró manualmente
+                    // Check if the window was closed manually
                     authCheckIntervalRef.current = setInterval(() => {
                         if (authWindowRef.current.closed) {
                             clearInterval(authCheckIntervalRef.current);
                             authCheckIntervalRef.current = null;
                             setAuthInProgress(false);
                             
-                            // Verificar si la cuenta se conectó correctamente después de un breve retraso
+                            // Check if the account connected correctly after a short delay
                             setTimeout(() => {
                                 fetchConnectedAccounts();
                             }, 1000);
@@ -189,27 +189,27 @@ export default function SocialMediaAccounts() {
                     }, 500);
                 } else {
                     setAuthInProgress(false);
-                    toast.error('No se pudo obtener la URL de autenticación');
+                    toast.error('Could not get authentication URL');
                 }
             } catch (error) {
                 setAuthInProgress(false);
-                console.error('Error al conectar con la red social:', error);
-                toast.error(`Error al conectar con ${account.name}: ${error.response?.data?.message || error.message}`);
+                console.error('Error connecting to social network:', error);
+                toast.error(`Error connecting with ${account.name}: ${error.response?.data?.message || error.message}`);
             }
         }
     };
 
     return (
         <div className="bg-white shadow-md rounded-lg p-6 mb-10">
-            <h2 className="text-xl font-semibold text-gray-800 mb-2">Conecta tus Redes Sociales</h2>
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">Connect Your Social Networks</h2>
             <p className="text-gray-600 mb-6">
-                Conecta tus cuentas de redes sociales para permitir la publicación automática de contenido.
-                Tu información se mantendrá segura y solo se utilizará para las funciones que autorices.
+                Connect your social media accounts to allow automatic content publishing.
+                Your information will be kept secure and will only be used for the functions you authorize.
             </p>
             
             {loading ? (
                 <div className="text-center py-4">
-                    <p className="text-gray-600">Cargando cuentas...</p>
+                    <p className="text-gray-600">Loading accounts...</p>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -223,9 +223,9 @@ export default function SocialMediaAccounts() {
                                 <h3 className="text-lg font-semibold text-gray-800">{account.name}</h3>
                                 <p className="text-sm text-gray-600">
                                     {account.isConnected ? (
-                                        <span className="text-green-600">Conectado</span>
+                                        <span className="text-green-600">Connected</span>
                                     ) : (
-                                        <span className="text-red-600">No Conectado</span>
+                                        <span className="text-red-600">Not Connected</span>
                                     )}
                                 </p>
                                 {account.isConnected && account.accountDetails && (
@@ -244,7 +244,7 @@ export default function SocialMediaAccounts() {
                                         : 'bg-blue-100 text-blue-600 hover:bg-blue-200'
                                 } transition duration-300`}
                             >
-                                {isAuthenticating || authInProgress ? 'Procesando...' : account.isConnected ? 'Desconectar' : 'Conectar'}
+                                {isAuthenticating || authInProgress ? 'Processing...' : account.isConnected ? 'Disconnect' : 'Connect'}
                             </button>
                         </div>
                     ))}
@@ -252,15 +252,15 @@ export default function SocialMediaAccounts() {
             )}
             
             <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-                <h3 className="text-lg font-semibold text-blue-800 mb-2">¿Por qué conectar tus redes sociales?</h3>
+                <h3 className="text-lg font-semibold text-blue-800 mb-2">Why connect your social networks?</h3>
                 <ul className="list-disc pl-5 text-blue-700">
-                    <li className="mb-1">Publica contenido automáticamente en tus redes sociales</li>
-                    <li className="mb-1">Gestiona todas tus cuentas desde un solo lugar</li>
-                    <li className="mb-1">Programa publicaciones para momentos óptimos</li>
-                    <li className="mb-1">Mantén el control total de tus cuentas en todo momento</li>
+                    <li className="mb-1">Automatically publish content to your social networks</li>
+                    <li className="mb-1">Manage all your accounts from one place</li>
+                    <li className="mb-1">Schedule posts for optimal times</li>
+                    <li className="mb-1">Maintain full control of your accounts at all times</li>
                 </ul>
                 <p className="text-sm text-blue-600 mt-2">
-                    Puedes desconectar tus cuentas en cualquier momento. No publicaremos nada sin tu permiso.
+                    You can disconnect your accounts at any time. We will not publish anything without your permission.
                 </p>
             </div>
         </div>

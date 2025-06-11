@@ -245,7 +245,7 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }) {
 
               {isSidebarOpen && (
                 <span className="ml-4 transition-all duration-300">
-                  Cerrar Sesión
+                  Log Out
                 </span>
               )}
 
@@ -254,7 +254,7 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }) {
                   className="absolute left-full ml-2 px-3 py-2 bg-gray-900 text-white 
                 text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50"
                 >
-                  Cerrar Sesión
+                  Log Out
                   <div className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-1 w-2 h-2 bg-gray-900 rotate-45"></div>
                 </div>
               )}

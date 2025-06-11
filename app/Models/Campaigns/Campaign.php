@@ -33,15 +33,15 @@ class Campaign extends Model
         // }
         public function getStartDateAttribute($value)
         {
-            return date('d-m-Y',strtotime($value));
+            return date('Y-m-d',strtotime($value));
         }
         public function getEndDateAttribute($value)
         {
-            return date('d-m-Y',strtotime($value));
+            return date('Y-m-d',strtotime($value));
         }
         public function getPublishDateAttribute($value)
         {
-            return date('d-m-Y',strtotime($value));
+            return date('Y-m-d',strtotime($value));
         }
 
 }

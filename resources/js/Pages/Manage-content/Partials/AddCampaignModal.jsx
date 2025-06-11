@@ -5,37 +5,37 @@ import { useState, useRef } from "react";
 
 const schema = z.object({
   title: z.string()
-    .min(1, "El título es requerido")
-    .max(100, "El título no puede exceder 100 caracteres"),
+    .min(1, "Title is required")
+    .max(100, "Title cannot exceed 100 characters"),
   description: z.string()
-    .min(10, "La descripción debe tener al menos 10 caracteres")
-    .max(500, "La descripción no puede exceder 500 caracteres"),
+    .min(10, "Description must be at least 10 characters")
+    .max(500, "Description cannot exceed 500 characters"),
   image: z
     .instanceof(FileList)
-    .refine((files) => files.length > 0, "La imagen es requerida")
+    .refine((files) => files.length > 0, "Image is required")
     .refine((files) => {
       if (files.length === 0) return true;
       const file = files[0];
       return file.size <= 5 * 1024 * 1024; // 5MB
-    }, "La imagen debe ser menor a 5MB")
+    }, "Image must be smaller than 5MB")
     .refine((files) => {
       if (files.length === 0) return true;
       const file = files[0];
       return ['image/jpeg', 'image/png', 'image/webp'].includes(file.type);
-    }, "Solo se permiten archivos JPG, PNG o WebP"),
+    }, "Only JPG, PNG, or WebP files are allowed"),
   objective: z.string()
-    .min(5, "El objetivo debe tener al menos 5 caracteres")
-    .max(200, "El objetivo no puede exceder 200 caracteres"),
+    .min(5, "Objective must be at least 5 characters")
+    .max(200, "Objective cannot exceed 200 characters"),
   hashtags: z.string()
-    .min(1, "Los hashtags son requeridos")
+    .min(1, "Hashtags are required")
     .refine((val) => {
       const hashtags = val.split(' ').filter(tag => tag.startsWith('#'));
       return hashtags.length > 0;
-    }, "Debe incluir al menos un hashtag válido (#ejemplo)")
+    }, "Must include at least one valid hashtag (#example)")
     .refine((val) => {
       const hashtags = val.split(' ').filter(tag => tag.startsWith('#'));
       return hashtags.length <= 10;
-    }, "Máximo 10 hashtags permitidos"),
+    }, "Maximum 10 hashtags allowed"),
 });
 
 export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
@@ -147,10 +147,10 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
         <div className="flex items-center justify-between p-6 border-b border-gray-100">
           <div>
             <h2 className="text-2xl font-bold text-gray-900">
-              ✨ Nueva Campaña
+              ✨ New Campaign
             </h2>
             <p className="text-sm text-gray-500 mt-1">
-              Crea una campaña impactante y atractiva
+              Create an impactful and attractive campaign
             </p>
           </div>
           <button
@@ -197,7 +197,7 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
           {/* Title */}
           <div className="space-y-2">
             <label className="flex items-center text-sm font-semibold text-gray-700">
-              📝 Título de la Campaña
+              📝 Campaign Title
               <span className="text-red-500 ml-1">*</span>
             </label>
             <input
@@ -207,7 +207,7 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
                   ? "border-red-300 focus:ring-red-200 bg-red-50"
                   : "border-gray-300 focus:ring-blue-200 focus:border-blue-500"
               }`}
-              placeholder="Ej: Campaña de Verano 2024"
+              placeholder="Eg: Summer Campaign 2024"
             />
             <div className="flex justify-between text-xs">
               {errors.title && (
@@ -230,7 +230,7 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
           {/* Description */}
           <div className="space-y-2">
             <label className="flex items-center text-sm font-semibold text-gray-700">
-              📄 Descripción
+              📄 Description
               <span className="text-red-500 ml-1">*</span>
             </label>
             <textarea
@@ -241,7 +241,7 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
                   : "border-gray-300 focus:ring-blue-200 focus:border-blue-500"
               }`}
               rows="4"
-              placeholder="Describe tu campaña de manera detallada y atractiva..."
+              placeholder="Describe your campaign in a detailed and attractive way..."
             />
             <div className="flex justify-between text-xs">
               {errors.description && (
@@ -264,7 +264,7 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
           {/* Image Upload */}
           <div className="space-y-2">
             <label className="flex items-center text-sm font-semibold text-gray-700">
-              🖼️ Imagen de la Campaña
+              🖼️ Campaign Image
               <span className="text-red-500 ml-1">*</span>
             </label>
 
@@ -286,10 +286,10 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
                   <div className="text-4xl">📸</div>
                   <div>
                     <p className="text-gray-600 font-medium">
-                      Arrastra tu imagen aquí o haz clic para seleccionar
+                      Drag your image here or click to select
                     </p>
                     <p className="text-xs text-gray-400 mt-1">
-                      JPG, PNG o WebP • Máximo 5MB
+                      JPG, PNG, or WebP • Maximum 5MB
                     </p>
                   </div>
                 </div>
@@ -328,7 +328,7 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
                         d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
                       />
                     </svg>
-                    <span>Eliminar</span>
+                    <span>Remove</span>
                   </button>
                 </div>
                 <input
@@ -352,7 +352,7 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
           {/* Objective */}
           <div className="space-y-2">
             <label className="flex items-center text-sm font-semibold text-gray-700">
-              🎯 Objetivo de la Campaña
+              🎯 Campaign Objective
               <span className="text-red-500 ml-1">*</span>
             </label>
             <input
@@ -362,7 +362,7 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
                   ? "border-red-300 focus:ring-red-200 bg-red-50"
                   : "border-gray-300 focus:ring-blue-200 focus:border-blue-500"
               }`}
-              placeholder="Ej: Aumentar engagement en redes sociales"
+              placeholder="Eg: Increase social media engagement"
             />
             <div className="flex justify-between text-xs">
               {errors.objective && (
@@ -395,7 +395,7 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
                   ? "border-red-300 focus:ring-red-200 bg-red-50"
                   : "border-gray-300 focus:ring-blue-200 focus:border-blue-500"
               }`}
-              placeholder="#marketing #campaña #verano2024"
+              placeholder="#marketing #campaign #summer2024"
               onChange={handleHashtagChange}
             />
             <div className="flex justify-between text-xs">
@@ -423,7 +423,7 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
               className="flex-1 px-6 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-all duration-300 font-medium disabled:opacity-50"
               disabled={isSubmitting}
             >
-              Cancelar
+              Cancel
             </button>
             <button
               type="submit"
@@ -455,12 +455,12 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     ></path>
                   </svg>
-                  <span>Creando...</span>
+                  <span>Creating...</span>
                 </>
               ) : (
                 <>
                   <span>🚀</span>
-                  <span>Crear Campaña</span>
+                  <span>Create Campaign</span>
                 </>
               )}
             </button>

@@ -8,7 +8,7 @@ use Inertia\Inertia;
 class LoginController extends Controller
 {
 /**
-* Verifica si el usuario existe y cómo se registró.
+* Checks if the user exists and how they registered.
 */
 public function checkUser(Request $request)
 {
@@ -16,28 +16,28 @@ public function checkUser(Request $request)
   'email' => 'required|email',
   ]);
 
-  // COMENTARIO DE PRUEBA DE QUE SI LLEGA EL EMAIL
+  // TEST COMMENT TO CHECK IF EMAIL ARRIVES
   // return response()->json([
-  // 'error' => 'Usuario no encontrado.',
+  // 'error' => 'User not found.',
   // ], 404);
 
-  // Buscar al usuario por su correo electrónico
+  // Find the user by their email
   $user = User::where('email', $request->email)->first();
 
   if (!$user) {
   return response()->json([
-  'error' => 'Usuario no encontrado.',
+  'error' => 'User not found.',
   ], 404);
   }
 
-  // Verificar si el usuario se registró con un proveedor externo
+  // Check if the user registered with an external provider
   if ($user->provider) {
   return response()->json([
   'provider' => $user->provider,
   ]);
   }
 
-  // Si el usuario se registró con correo y contraseña
+  // If the user registered with email and password
   return response()->json([
   'provider' => null,
   ]);
@@ -47,7 +47,7 @@ public function checkUser(Request $request)
 // public function checkUser(Request $request)
 // {
 //   echo "checkUser";
-//   // Verificar si el usuario existe
+//   // Check if the user exists
 //   echo $request->email;
 
 //     $request->validate([
@@ -58,21 +58,21 @@ public function checkUser(Request $request)
                                         
 //     if (!$user) {
 //         return Inertia::render('Auth/Login', [
-//             'error' => 'Usuario no encontrado.',
+//             'error' => 'User not found.',
 //         ]);
 //     }
 
 //     if ($user->provider) {
 //       return Inertia::render('Auth/Login', [
-//         'error' => "Este usuario se registró con {$user->provider}. Por favor, inicia sesión con {$user->provider}.",
+//         'error' => "This user registered with {$user->provider}. Please log in with {$user->provider}.",
 //       ]);
 //     }
 
-//     // Continuar con el flujo de inicio de sesión
+//     // Continue with the login flow
 // }
 
 
 
-    // Continuar con el flujo de inicio de sesión
+    // Continue with the login flow
 }
 

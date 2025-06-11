@@ -11,7 +11,7 @@ export default function Dashboard({ auth, campaigns }: DashboardProps) {
     return (
         <AuthenticatedLayout>
             <Head title="Dashboard" />
-            {/* Tu componente aquí */}
+            {/* Your component here */}
         </AuthenticatedLayout>
     );
 }

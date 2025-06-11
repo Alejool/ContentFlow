@@ -41,7 +41,7 @@ Route::middleware(['auth'])->group(function () {
     // POST Controller
     Route::get('/posts', [PostsController::class, 'index'])->name('posts.index');
 
-    // ia
+    // AI Chat
     Route::get('/ai-chat', [AIChatController::class, 'index'])->name('ai-chat.index');
    
 });
@@ -58,7 +58,7 @@ Route::middleware(['auth'])->group(function () {
     });
 });
 
-// Rutas para callbacks de OAuth
+// Routes for OAuth callbacks
 Route::middleware(['web'])->group(function () {
     Route::get('/auth/facebook/callback', [SocialAccountController::class, 'handleFacebookCallback']);
     Route::get('/auth/instagram/callback', [SocialAccountController::class, 'handleInstagramCallback']);

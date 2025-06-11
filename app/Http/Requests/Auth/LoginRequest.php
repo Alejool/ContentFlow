@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
-use App\Models\User; // Asegúrate de importar el modelo User
+use App\Models\User; // Ensure the User model is imported
 
 class LoginRequest extends FormRequest
 {

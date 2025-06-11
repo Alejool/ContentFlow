@@ -12,7 +12,7 @@ const mobileNavigationItems = [
 export default function MobileNavbar({ user, showingNavigationDropdown, setShowingNavigationDropdown }) {
     return (
         <>
-            {/* Navbar para dispositivos móviles */}
+            {/* Navbar for mobile devices */}
             <nav className="lg:hidden bg-white/95 backdrop-blur-xl border-b border-gray-200/50 shadow-lg sticky top-0 z-50">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6">
                     <div className="flex h-16 justify-between items-center">
@@ -85,7 +85,7 @@ export default function MobileNavbar({ user, showingNavigationDropdown, setShowi
                                             </div>
                                             <span 
                                                 className="hidden sm:block">
-                                                    {user.name || 'Usuario'}
+                                                    {user.name || 'User'}
                                             </span>
                                             <svg
                                                 className="ml-2 h-4 w-4 text-gray-500"
@@ -107,12 +107,12 @@ export default function MobileNavbar({ user, showingNavigationDropdown, setShowi
                                     <Dropdown.Link href={route('profile.edit')} 
                                         className="flex items-center space-x-2">
                                         <span>👤</span>
-                                        <span>Perfil</span>
+                                        <span>Profile</span>
                                     </Dropdown.Link>
                                     <Dropdown.Link href={route('logout')} method="post" 
                                         as="button" className="flex items-center space-x-2 text-red-500">
                                         <span>🚪</span>
-                                        <span>Cerrar Sesión</span>
+                                        <span>Log Out</span>
                                     </Dropdown.Link>
                                 </Dropdown.Content>
                             </Dropdown>
@@ -120,7 +120,7 @@ export default function MobileNavbar({ user, showingNavigationDropdown, setShowi
                     </div>
                 </div>
 
-                {/* Menú desplegable para móviles */}
+                {/* Dropdown menu for mobile */}
                 <div className={`${showingNavigationDropdown ? 'block' : 'hidden'} border-t border-gray-200/50 bg-white/95 backdrop-blur-xl`}>
                     <div className="px-4 py-6 space-y-2">
                         {mobileNavigationItems.map((item) => (
@@ -151,7 +151,7 @@ export default function MobileNavbar({ user, showingNavigationDropdown, setShowi
                                  text-red-600 hover:bg-red-50 transition-all duration-300 w-full"
                             >
                                 <span className="text-lg">🚪</span>
-                                <span className="font-medium">Cerrar Sesión</span>
+                                <span className="font-medium">Log Out</span>
                             </ResponsiveNavLink>
                         </div>
                     </div>

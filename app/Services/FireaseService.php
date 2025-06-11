@@ -9,7 +9,7 @@ class FirebaseService
 
   public function __construct()
   {
-    // Inicializar Firebase con las credenciales
+    // Initialize Firebase with credentials
     $factory = (new Factory)->withServiceAccount(storage_path('app/firebase-credentials.json'));
     $this->auth = $factory->createAuth();
   }
@@ -17,11 +17,11 @@ class FirebaseService
   public function verifyToken($token)
   {
     try {
-      // Verificar el token
+      // Verify the token
       $verifiedIdToken = $this->auth->verifyIdToken($token);
-      return $verifiedIdToken->claims()->get('sub'); // Retorna el UID del usuario
+      return $verifiedIdToken->claims()->get('sub'); // Returns the user's UID
     } catch (FailedToVerifyToken $e) {
-      // El token no es válido
+      // The token is not valid
       return null;
     }
   }

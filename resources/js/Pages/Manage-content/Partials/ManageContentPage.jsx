@@ -65,11 +65,11 @@ export default function ManageContentPage() {
                             </svg>
                         </div>
                         <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent mb-4">
-                            ✨ Gestión de Contenido
+                            ✨ Content Management
                         </h1>
                         
                         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                            Organiza y gestiona tu contenido multimedia de manera elegante y eficiente
+                            Organize and manage your multimedia content elegantly and efficiently
                         </p>
                     </div>
 

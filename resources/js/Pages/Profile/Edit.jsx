@@ -19,11 +19,11 @@ export default function Edit({ mustVerifyEmail, status }) {
                         colorPalette="green" 
                         size="2xl" 
                         variant="subtle"
-                        className="mx-auto relative" // Añadido relative para posicionamiento
+                        className="mx-auto relative" // Added relative for positioning
                     >
                         <Avatar.Fallback name={user.name} />
                         
-                        {/* Círculo de estado en la parte inferior del avatar */}
+                        {/* Status circle at the bottom of the avatar */}
                         <div className="absolute bottom-0 right-0">
                             <Circle
                                 bg="green.500"
@@ -35,7 +35,7 @@ export default function Edit({ mustVerifyEmail, status }) {
                         </div>
                     </Avatar.Root>
                     
-                    {/* Nombre del usuario debajo del avatar */}
+                    {/* Username below the avatar */}
                     <div className="mt-2 text-center">
                         <Highlight
                             query="spotlight"
