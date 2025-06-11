@@ -186,7 +186,7 @@ const UpdatePasswordForm= ({
       className={`bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden ${className}`}
     >
       {/* Header */}
-      <div className="px-8 py-6 bg-gradient-to-r from-blue-600 to-purple-600">
+      <div className="px-8 py-6 bg-gradient-to-r from-red-600 to-orange-700">
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
             <LockIcon className="w-6 h-6 text-white" />
@@ -249,7 +249,7 @@ const UpdatePasswordForm= ({
                                 ${
                                   isSubmitting
                                     ? "bg-gray-400 cursor-not-allowed"
-                                    : "bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transform hover:scale-[1.02] shadow-lg hover:shadow-xl"
+                                    : "bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 transform hover:scale-[1.02] shadow-lg hover:shadow-xl"
                                 }
                             `}
             >
@@ -287,11 +287,11 @@ const UpdatePasswordForm= ({
         </form>
 
         {/* Security Tips */}
-        <div className="mt-8 p-4 bg-blue-50 rounded-xl border border-blue-100">
-          <h4 className="text-sm font-semibold text-blue-900 mb-2">
+        <div className="mt-8 p-4 bg-orange-50 rounded-xl border border-blue-100">
+          <h4 className="text-sm font-semibold text-orange-900 mb-2">
             Password Security Tips:
           </h4>
-          <ul className="text-xs text-blue-700 space-y-1">
+          <ul className="text-xs text-dark-700 space-y-2">
             <li>
               • Use at least 8 characters with a mix of letters, numbers, and
               symbols

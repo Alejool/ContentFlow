@@ -50,47 +50,55 @@ export default function DeleteUserForm({ className = '' }) {
     };
 
     return (
-        <section className={`space-y-6 ${className}`}>
-            <header>
-                <h2 className="text-lg font-medium text-gray-900">Delete Account</h2>
-                <p className="mt-1 text-sm text-gray-600">
-                    Once your account is deleted, all of its resources and data will be permanently deleted.
-                </p>
-            </header>
+      <section className={`space-y-6 ${className}`}>
+        <header>
+          <h2 className="text-lg font-medium text-gray-900">Delete Account</h2>
+          <p className="mt-1 text-sm text-gray-600">
+            Once your account is deleted, all of its resources and data will be
+            permanently deleted.
+          </p>
+        </header>
 
-            <DangerButton onClick={confirmUserDeletion}>Delete Account</DangerButton>
+        <DangerButton onClick={confirmUserDeletion}>
+          Delete Account
+        </DangerButton>
 
-            <Modal show={confirmingUserDeletion} onClose={closeModal}>
-                <form onSubmit={handleSubmit(deleteUser)} className="p-6">
-                    <h2 className="text-lg font-medium text-gray-900">
-                        Are you sure you want to delete your account?
-                    </h2>
+        <Modal show={confirmingUserDeletion} onClose={closeModal}>
+          <form onSubmit={handleSubmit(deleteUser)} className="p-6 w-full">
+            <h2 className="text-lg font-medium text-gray-900">
+              Are you sure you want to delete your account?
+            </h2>
 
-                    <p className="mt-1 text-sm text-gray-600">
-                        Please enter your password to confirm you would like to permanently delete your account.
-                    </p>
+            <p className="mt-1 text-sm text-gray-600">
+              Please enter your password to confirm you would like to
+              permanently delete your account.
+            </p>
 
-                    <div className="mt-6">
-                        <InputLabel htmlFor="password" value="Password" className="sr-only" />
-                        <TextInput
-                            id="password"
-                            type="password"
-                            {...register('password')}
-                            ref={passwordInput}
-                            className="mt-1 block w-3/4"
-                            placeholder="Password"
-                        />
-                        <InputError message={errors.password?.message} className="mt-2" />
-                    </div>
+            <div className="mt-6">
+              <InputLabel
+                htmlFor="password"
+                value="Password"
+                className="sr-only"
+              />
+              <TextInput
+                id="password"
+                type="password"
+                {...register("password")}
+                ref={passwordInput}
+                className="mt-1 block w-full"
+                placeholder="Password"
+              />
+              <InputError message={errors.password?.message} className="mt-2" />
+            </div>
 
-                    <div className="mt-6 flex justify-end">
-                        <SecondaryButton onClick={closeModal}>Cancel</SecondaryButton>
-                        <DangerButton className="ms-3" disabled={isSubmitting}>
-                            Delete Account
-                        </DangerButton>
-                    </div>
-                </form>
-            </Modal>
-        </section>
+            <div className="mt-6 flex justify-end">
+              <SecondaryButton onClick={closeModal}>Cancel</SecondaryButton>
+              <DangerButton className="ms-3" disabled={isSubmitting}>
+                Delete Account
+              </DangerButton>
+            </div>
+          </form>
+        </Modal>
+      </section>
     );
 }
