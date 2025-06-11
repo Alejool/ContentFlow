@@ -68,7 +68,7 @@ class LoginRequest extends FormRequest
             'hasPassword' => !empty($credentials['password'])
         ]);
 
-        if (!Auth::attempt($credentials)) {
+        if (!Auth::attempt($credentials, true)) {
             RateLimiter::hit($this->throttleKey());
             throw ValidationException::withMessages([
                 'email' => 'These credentials do not match our records'

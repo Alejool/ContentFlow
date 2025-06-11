@@ -374,10 +374,11 @@ export default function Welcome({ auth }) {
           </main>
 
           {/* Footer */}
-          <footer className="relative z-10 border-t border-gray-200/50 bg-white/50 backdrop-blur-sm dark:border-gray-700/50 dark:bg-gray-900/50">
+          <footer className="relative z-10 border-t border-gray-200/50 
+           backdrop-blur-sm">
             <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
               <div className="text-center">
-                <p className="text-sm text-gray-600 dark:text-gray-400 font-mono">
+                <p className="text-sm text-gray-900 dark:text-gray-400 font-mono">
                   {formattedDate}
                 </p>
               </div>

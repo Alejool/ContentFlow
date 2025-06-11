@@ -42,12 +42,18 @@ export const useUpdatePassword = (): UseUpdatePasswordReturn => {
         try {
             setIsSuccess(false);
             
-            await axios.put(route('password.update'), data, {
+            const response = await axios.put(route('profile.changePassword'), data, {
                 preserveScroll: true,
             });
-            
-            reset();
-            setIsSuccess(true);
+
+            if (response.data.success) {
+                reset();
+                setIsSuccess(true);
+            }
+            if(response.data.success === false){
+                setError('password', response.data);
+            }
+            // reset();
             
             // Hide success message after 3 seconds
             setTimeout(() => {
