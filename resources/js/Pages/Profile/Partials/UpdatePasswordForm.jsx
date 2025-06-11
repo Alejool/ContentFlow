@@ -202,6 +202,34 @@ const UpdatePasswordForm= ({
 
       {/* Form Content */}
       <div className="px-8 py-8">
+        {/* Error Summary Section */}
+        {Object.keys(errors).length > 0 && (
+          <div className="px-8 py-6 bg-red-50 border-b border-red-100">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                <svg
+                  className="w-5 h-5 text-red-600"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
+              <h3 className="font-semibold text-red-800">
+                Please correct the following errors:
+              </h3>
+            </div>
+            <ul className="space-y-1 text-sm text-red-700 ml-11">
+              {Object.entries(errors).map(([field, error]) => (
+                <li key={field}>• {error.message}</li>
+              ))}
+            </ul>
+          </div>
+        )}
         {/* Success Alert */}
         <div className="mb-6">
           <SuccessAlert show={isSuccess} />
@@ -224,7 +252,7 @@ const UpdatePasswordForm= ({
             type="password"
             placeholder="Enter your new password"
             register={register}
-            error={errors.password?.message}
+            // error={errors.password?.message}
             showPasswordToggle
           />
 
