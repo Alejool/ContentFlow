@@ -18,7 +18,7 @@ export default function EditCampaignModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = useRef(null);
 
-  // Precargar datos cuando cambia la campaña
+  // Preload data when campaign changes
   useEffect(() => {
     if (campaign && isOpen) {
       setFormData({
@@ -27,7 +27,7 @@ export default function EditCampaignModal({
         hashtags: campaign.hashtags || "",
       });
 
-      // Si hay una imagen existente, mostrar preview
+      // If there is an existing image, show preview
       if (campaign.image) {
         setImagePreview(campaign.image);
       }
@@ -42,43 +42,43 @@ export default function EditCampaignModal({
 
     // Title validation
     if (!formData.title.trim()) {
-      newErrors.title = "El título es requerido";
+      newErrors.title = "Title is required";
     } else if (formData.title.length > 100) {
-      newErrors.title = "El título no puede exceder 100 caracteres";
+      newErrors.title = "Title cannot exceed 100 characters";
     }
 
     // Description validation
     if (!formData.description.trim()) {
-      newErrors.description = "La descripción es requerida";
+      newErrors.description = "Description is required";
     } else if (formData.description.length < 10) {
       newErrors.description =
-        "La descripción debe tener al menos 10 caracteres";
+        "Description must be at least 10 characters";
     } else if (formData.description.length > 500) {
-      newErrors.description = "La descripción no puede exceder 500 caracteres";
+      newErrors.description = "Description cannot exceed 500 characters";
     }
 
-    // Image validation (opcional para edición)
+    // Image validation (optional for editing)
     if (imageFile) {
       if (imageFile.size > 5 * 1024 * 1024) {
-        newErrors.image = "La imagen debe ser menor a 5MB";
+        newErrors.image = "Image must be smaller than 5MB";
       }
       if (!["image/jpeg", "image/png", "image/webp"].includes(imageFile.type)) {
-        newErrors.image = "Solo se permiten archivos JPG, PNG o WebP";
+        newErrors.image = "Only JPG, PNG, or WebP files are allowed";
       }
     }
 
     // Hashtags validation
     if (!formData.hashtags.trim()) {
-      newErrors.hashtags = "Los hashtags son requeridos";
+      newErrors.hashtags = "Hashtags are required";
     } else {
       const hashtags = formData.hashtags
         .split(" ")
         .filter((tag) => tag.startsWith("#"));
       if (hashtags.length === 0) {
         newErrors.hashtags =
-          "Debe incluir al menos un hashtag válido (#ejemplo)";
+          "Must include at least one valid hashtag (#example)";
       } else if (hashtags.length > 10) {
-        newErrors.hashtags = "Máximo 10 hashtags permitidos";
+        newErrors.hashtags = "Maximum 10 hashtags allowed";
       }
     }
 
@@ -214,10 +214,10 @@ export default function EditCampaignModal({
         <div className="flex items-center justify-between p-6 border-b border-gray-100">
           <div>
             <h2 className="text-2xl font-bold text-gray-900">
-              ✏️ Editar Campaña
+              ✏️ Edit Campaign
             </h2>
             <p className="text-sm text-gray-500 mt-1">
-              Actualiza tu campaña con nueva información
+              Update your campaign with new information
             </p>
           </div>
           <button
@@ -255,7 +255,7 @@ export default function EditCampaignModal({
           {/* Title */}
           <div className="space-y-2">
             <label className="flex items-center text-sm font-semibold text-gray-700">
-              📝 Título de la Campaña
+              📝 Campaign Title
               <span className="text-red-500 ml-1">*</span>
             </label>
             <input
@@ -266,7 +266,7 @@ export default function EditCampaignModal({
                   ? "border-red-300 focus:ring-red-200 bg-red-50"
                   : "border-gray-300 focus:ring-blue-200 focus:border-blue-500"
               }`}
-              placeholder="Ej: Campaña de Verano 2024"
+              placeholder="Eg: Summer Campaign 2024"
             />
             <div className="flex justify-between text-xs">
               {errors.title && (
@@ -289,7 +289,7 @@ export default function EditCampaignModal({
           {/* Description */}
           <div className="space-y-2">
             <label className="flex items-center text-sm font-semibold text-gray-700">
-              📄 Descripción
+              📄 Description
               <span className="text-red-500 ml-1">*</span>
             </label>
             <textarea
@@ -301,7 +301,7 @@ export default function EditCampaignModal({
                   : "border-gray-300 focus:ring-blue-200 focus:border-blue-500"
               }`}
               rows="4"
-              placeholder="Describe tu campaña de manera detallada y atractiva..."
+              placeholder="Describe your campaign in a detailed and attractive way..."
             />
             <div className="flex justify-between text-xs">
               {errors.description && (
@@ -324,8 +324,8 @@ export default function EditCampaignModal({
           {/* Image Upload */}
           <div className="space-y-2">
             <label className="flex items-center text-sm font-semibold text-gray-700">
-              🖼️ Imagen de la Campaña
-              <span className="text-gray-400 ml-1 text-xs">(Opcional)</span>
+              🖼️ Campaign Image
+              <span className="text-gray-400 ml-1 text-xs">(Optional)</span>
             </label>
 
             {!imagePreview ? (
@@ -346,10 +346,10 @@ export default function EditCampaignModal({
                   <div className="text-4xl">📸</div>
                   <div>
                     <p className="text-gray-600 font-medium">
-                      Arrastra una nueva imagen o haz clic para seleccionar
+                      Drag a new image here or click to select
                     </p>
                     <p className="text-xs text-gray-400 mt-1">
-                      JPG, PNG o WebP • Máximo 5MB
+                      JPG, PNG, or WebP • Maximum 5MB
                     </p>
                   </div>
                 </div>
@@ -388,7 +388,7 @@ export default function EditCampaignModal({
                           d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
                         />
                       </svg>
-                      <span>Cambiar</span>
+                      <span>Change</span>
                     </button>
                     <button
                       type="button"
@@ -408,7 +408,7 @@ export default function EditCampaignModal({
                           d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
                         />
                       </svg>
-                      <span>Eliminar</span>
+                      <span>Remove</span>
                     </button>
                   </div>
                 </div>
@@ -443,7 +443,7 @@ export default function EditCampaignModal({
                   ? "border-red-300 focus:ring-red-200 bg-red-50"
                   : "border-gray-300 focus:ring-blue-200 focus:border-blue-500"
               }`}
-              placeholder="#marketing #campaña #verano2024"
+              placeholder="#marketing #campaign #summer2024"
             />
             <div className="flex justify-between text-xs">
               {errors.hashtags && (
@@ -470,7 +470,7 @@ export default function EditCampaignModal({
               className="flex-1 px-6 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-all duration-300 font-medium disabled:opacity-50"
               disabled={isSubmitting}
             >
-              Cancelar
+              Cancel
             </button>
             <button
               type="submit"
@@ -502,12 +502,12 @@ export default function EditCampaignModal({
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     ></path>
                   </svg>
-                  <span>Guardando...</span>
+                  <span>Saving...</span>
                 </>
               ) : (
                 <>
                   <span>💾</span>
-                  <span>Guardar Cambios</span>
+                  <span>Save Changes</span>
                 </>
               )}
             </button>

@@ -16,26 +16,26 @@ class AuthController extends Controller
 
     public function verifyFirebaseToken(Request $request)
     {
-        // Validar que el token esté presente en la solicitud
+        // Validate that the token is present in the request
         $request->validate([
             'token' => 'required|string',
         ]);
 
-        // Obtener el token de la solicitud
+        // Get the token from the request
         $token = $request->input('token');
 
-        // Verificar el token usando FirebaseService
+        // Verify the token using FirebaseService
         $uid = $this->firebaseService->verifyToken($token);
 
         if ($uid) {
-            // El token es válido
+            // The token is valid
             return response()->json([
                 'message' => 'Authenticated',
                 'uid' => $uid,
             ], 200);
         }
 
-        // El token no es válido
+        // The token is not valid
         return response()->json([
             'error' => 'Invalid token',
         ], 401);

@@ -26,7 +26,7 @@ import {
   Area,
 } from 'recharts';
 
-// Iconos SVG minimalistas
+// Minimalist SVG Icons
 const Icon = ({ type, size = 20, className = "" }) => {
   const icons = {
     trending: (
@@ -67,7 +67,7 @@ const Icon = ({ type, size = 20, className = "" }) => {
   return <Box as="span" display="inline-flex" alignItems="center">{icons[type]}</Box>;
 };
 
-// Componente de métrica minimalista
+// Minimalist Metric Card
 const MetricCard = ({ metric, value, change, icon, color = "red" }) => {
   const isPositive = change.startsWith('+');
   
@@ -108,7 +108,7 @@ const MetricCard = ({ metric, value, change, icon, color = "red" }) => {
   );
 };
 
-// Componente de gráfica personalizada
+// Custom Chart Component
 const EngagementChart = ({ data, timeRange }) => {
   return (
     <Card.Root bg="white" shadow="sm" border="1px" borderColor="gray.100">
@@ -123,12 +123,12 @@ const EngagementChart = ({ data, timeRange }) => {
           
           <Select.Root size="sm" width="150px" defaultValue={timeRange}>
             <Select.Trigger>
-              <Select.ValueText placeholder="Período" />
+              <Select.ValueText placeholder="Period" />
             </Select.Trigger>
             <Select.Content>
-              <Select.Item item="7d">Últimos 7 días</Select.Item>
-              <Select.Item item="30d">Últimos 30 días</Select.Item>
-              <Select.Item item="90d">Últimos 90 días</Select.Item>
+              <Select.Item item="7d">Last 7 days</Select.Item>
+              <Select.Item item="30d">Last 30 days</Select.Item>
+              <Select.Item item="90d">Last 90 days</Select.Item>
             </Select.Content>
           </Select.Root>
         </Flex>
@@ -181,7 +181,7 @@ const EngagementChart = ({ data, timeRange }) => {
 export default function Index() {
   const [timeRange, setTimeRange] = useState('30d');
   
-  // Datos de métricas
+  // Metric Data
   const analyticsData = [
     {
       id: 1,
@@ -217,21 +217,21 @@ export default function Index() {
     },
   ];
 
-  // Datos de ejemplo para la gráfica
+  // Example data for the chart
   const engagementData = [
-    { date: '1 Ene', engagement: 4.2 },
-    { date: '5 Ene', engagement: 5.1 },
-    { date: '10 Ene', engagement: 4.8 },
-    { date: '15 Ene', engagement: 6.3 },
-    { date: '20 Ene', engagement: 7.2 },
-    { date: '25 Ene', engagement: 8.1 },
-    { date: '30 Ene', engagement: 8.5 },
-    { date: '5 Feb', engagement: 9.2 },
-    { date: '10 Feb', engagement: 8.8 },
-    { date: '15 Feb', engagement: 9.5 },
-    { date: '20 Feb', engagement: 10.1 },
-    { date: '25 Feb', engagement: 9.8 },
-    { date: 'Hoy', engagement: 11.2 },
+    { date: 'Jan 1', engagement: 4.2 },
+    { date: 'Jan 5', engagement: 5.1 },
+    { date: 'Jan 10', engagement: 4.8 },
+    { date: 'Jan 15', engagement: 6.3 },
+    { date: 'Jan 20', engagement: 7.2 },
+    { date: 'Jan 25', engagement: 8.1 },
+    { date: 'Jan 30', engagement: 8.5 },
+    { date: 'Feb 5', engagement: 9.2 },
+    { date: 'Feb 10', engagement: 8.8 },
+    { date: 'Feb 15', engagement: 9.5 },
+    { date: 'Feb 20', engagement: 10.1 },
+    { date: 'Feb 25', engagement: 9.8 },
+    { date: 'Today', engagement: 11.2 },
   ];
 
   return (
@@ -240,7 +240,7 @@ export default function Index() {
 
       <Box minH="100vh" py={6}>
         <Container maxW="6xl">
-          {/* Header minimalista */}
+          {/* Minimalist Header */}
           <Stack gap={6} mb={8}>
             <Flex
               direction={{ base: "column", md: "row" }}
@@ -264,7 +264,7 @@ export default function Index() {
                   Analytics
                 </Heading>
                 <Text color="gray.600" mt={6} fontSize="lg">
-                  Métricas de rendimiento y engagement en tiempo real
+                  Real-time performance and engagement metrics
                 </Text>
               </Box>
 
@@ -275,12 +275,12 @@ export default function Index() {
                 py={1}
                 rounded="full"
               >
-                Datos actualizados
+                Data updated
               </Badge>
             </Flex>
           </Stack>
 
-          {/* Métricas principales */}
+          {/* Main Metrics */}
           <Grid
             templateColumns={{
               base: "1fr",
@@ -302,16 +302,16 @@ export default function Index() {
             ))}
           </Grid>
 
-          {/* Gráfica de engagement */}
+          {/* Engagement Chart */}
           <EngagementChart data={engagementData} timeRange={timeRange} />
 
-          {/* Métricas adicionales */}
+          {/* Additional Metrics */}
           <Grid
             templateColumns={{ base: "1fr", lg: "repeat(2, 1fr)" }}
             gap={6}
             mt={8}
           >
-            {/* Resumen de rendimiento */}
+            {/* Performance Summary */}
             <Card.Root
               bg="white"
               shadow="sm"
@@ -324,31 +324,31 @@ export default function Index() {
                     <Icon type="trending" size={20} />
                   </Box>
                   <Heading size="lg" color="gray.800">
-                    Resumen del Mes
+                    Monthly Summary
                   </Heading>
                 </Flex>
 
                 <Stack gap={4}>
                   <Flex justify="space-between" align="center">
-                    <Text color="gray.600">Mejor día</Text>
+                    <Text color="gray.600">Best day</Text>
                     <Text fontWeight="bold" color="gray.800">
-                      Viernes
+                      Friday
                     </Text>
                   </Flex>
                   <Flex justify="space-between" align="center">
-                    <Text color="gray.600">Hora pico</Text>
+                    <Text color="gray.600">Peak time</Text>
                     <Text fontWeight="bold" color="gray.800">
                       2:00 PM
                     </Text>
                   </Flex>
                   <Flex justify="space-between" align="center">
-                    <Text color="gray.600">Crecimiento</Text>
+                    <Text color="gray.600">Growth</Text>
                     <Badge colorScheme="green" variant="subtle">
                       +23%
                     </Badge>
                   </Flex>
                   <Flex justify="space-between" align="center">
-                    <Text color="gray.600">Alcance total</Text>
+                    <Text color="gray.600">Total reach</Text>
                     <Text fontWeight="bold" color="gray.800">
                       2.8M
                     </Text>
@@ -357,7 +357,7 @@ export default function Index() {
               </Card.Body>
             </Card.Root>
 
-            {/* Top contenido */}
+            {/* Top Content */}
             <Card.Root
               bg="white"
               shadow="sm"
@@ -370,16 +370,16 @@ export default function Index() {
                     <Icon type="stats" size={20} />
                   </Box>
                   <Heading size="lg" color="gray.800">
-                    Top Contenido
+                    Top Content
                   </Heading>
                 </Flex>
 
                 <Stack gap={4}>
                   {[
-                    { title: "Campaña de Verano", engagement: "12.3%" },
-                    { title: "Producto Nuevo", engagement: "9.8%" },
+                    { title: "Summer Campaign", engagement: "12.3%" },
+                    { title: "New Product", engagement: "9.8%" },
                     { title: "Behind the Scenes", engagement: "8.5%" },
-                    { title: "Tutorial Rápido", engagement: "7.2%" },
+                    { title: "Quick Tutorial", engagement: "7.2%" },
                   ].map((item, index) => (
                     <Flex key={index} justify="space-between" align="center">
                       <Text color="gray.700" fontSize="sm">

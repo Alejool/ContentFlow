@@ -22,7 +22,7 @@ class AIChatController extends Controller
     }
 
     /**
-     * Procesa un mensaje del chat y devuelve la respuesta de la IA
+     * Processes a chat message and returns the AI's response
      */
     public function processMessage(Request $request)
     {
@@ -40,7 +40,7 @@ class AIChatController extends Controller
                     ->toArray();
             }
 
-            // Preparar el contexto para la IA
+            // Prepare context for the AI
             $context = [
                 'user' => Auth::user()->name,
                 'project_type' => 'social_media_management',
@@ -57,16 +57,16 @@ class AIChatController extends Controller
                 'suggestion' => $aiResponse['suggestion'] ?? null,
             ]);
         } catch (\Exception $e) {
-            Log::error('Error en AI Chat: ' . $e->getMessage());
+            Log::error('Error in AI Chat: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Ocurrió un error al procesar tu mensaje.',
+                'message' => 'An error occurred while processing your message.',
             ], 500);
         }
     }
 
     /**
-     * Obtiene las campañas del usuario para el contexto
+     * Gets the user's campaigns for context
      */
     public function getCampaigns()
     {
@@ -81,8 +81,8 @@ class AIChatController extends Controller
     }
 
     /**
-     * Método para obtener respuesta de la IA (simulado)
-     * En producción, aquí implementarías la llamada a tu API de IA
+     * Method to get AI response (simulated)
+     * In production, you would implement the call to your AI API here
      */
     private function getAIResponse($context)
     {
@@ -103,7 +103,7 @@ class AIChatController extends Controller
             } elseif ($openaiEnabled) {
             return $this->getOpenAIResponse($context);
         }
-        // Si ningún servicio está habilitado, usar respuesta por defecto
+        // If no service is enabled, use default response
         return $this->getDefaultResponse($context['message']);
     }
     
@@ -186,37 +186,37 @@ class AIChatController extends Controller
     {
         $userMessage = strtolower($userMessage);
         
-        if (strpos($userMessage, 'nueva campaña') !== false) {
+        if (strpos($userMessage, 'new campaign') !== false) {
             return [
-                'message' => 'Basado en tus campañas anteriores, te recomendaría crear una campaña enfocada en engagement para Instagram con publicaciones semanales. ¿Te gustaría que te ayude a estructurarla?',
+                'message' => 'Based on your previous campaigns, I would recommend creating a campaign focused on Instagram engagement with weekly posts. Would you like me to help you structure it?',
                 'suggestion' => [
                     'type' => 'new_campaign',
                     'data' => [
-                        'name' => 'Campaña de Engagement Instagram',
+                        'name' => 'Instagram Engagement Campaign',
                         'platform' => 'Instagram',
                         'frequency' => 'weekly',
                         'goal' => 'increase_engagement'
                     ]
                 ]
             ];
-        } elseif (strpos($userMessage, 'mejorar') !== false) {
+        } elseif (strpos($userMessage, 'improve') !== false) {
             return [
-                'message' => 'He analizado tus campañas actuales y veo oportunidades de mejora en la frecuencia de publicación y el uso de hashtags. ¿Quieres que te proporcione recomendaciones específicas?',
+                'message' => 'I have analyzed your current campaigns and see opportunities for improvement in posting frequency and hashtag usage. Would you like me to provide specific recommendations?',
                 'suggestion' => [
                     'type' => 'improvement',
                     'data' => [
                         'campaign_id' => 1,
                         'improvements' => [
                             'hashtags' => ['#ContentStrategy', '#SocialGrowth', '#DigitalMarketing'],
-                            'posting_frequency' => 'Aumentar a 3 veces por semana',
-                            'best_times' => ['Lunes 10am', 'Miércoles 2pm', 'Viernes 6pm']
+                            'posting_frequency' => 'Increase to 3 times per week',
+                            'best_times' => ['Monday 10am', 'Wednesday 2pm', 'Friday 6pm']
                         ]
                     ]
                 ]
             ];
         } else {
             return [
-                'message' => 'Estoy aquí para ayudarte con tus campañas de redes sociales. Puedes preguntarme sobre cómo crear nuevas campañas, mejorar las existentes o analizar el rendimiento de tu contenido.'
+                'message' => 'I am here to help you with your social media campaigns. You can ask me about creating new campaigns, improving existing ones, or analyzing your content performance.'
             ];
         }
     }

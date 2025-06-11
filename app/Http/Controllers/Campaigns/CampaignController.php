@@ -37,16 +37,16 @@ class CampaignController extends Controller
     public function store(Request $request)
     {
 
-        // Verificar si la campaña ya existe
+        // Check if the campaign already exists
         if (Campaign::where('title', $request->title)->exists()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Campaña ya existe',
+                'message' => 'Campaign already exists',
                 'status' => 409
             ], 409);
         }
 
-        // Validar los datos de entrada
+        // Validate input data
         $validatedData = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
@@ -54,7 +54,7 @@ class CampaignController extends Controller
             'image' => 'nullable|string',
         ]);
 
-        // Crear la campaña
+        // Create the campaign
          Campaign::create([
             'title' => $validatedData['title'],
             'description' => $validatedData['description'],
@@ -65,7 +65,7 @@ class CampaignController extends Controller
             'user_id' => Auth::user()->id,
         ]);
 
-        // Devolver respuesta con la campaña creada
+        // Return response with the created campaign
         return response()->json([
             'message' => 'Campaign created successfully',
         ]);
@@ -90,7 +90,7 @@ class CampaignController extends Controller
 
     public function update(Request $request, $id)
     {
-        // Validar los datos de entrada
+        // Validate input data
         $validatedData = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
@@ -98,31 +98,31 @@ class CampaignController extends Controller
             // 'image' => 'nullable|string',
         ]);
 
-        // Buscar la campaña
+        // Find the campaign
         $campaign = Campaign::find($id);
         
-        // Verificar si la campaña existe
+        // Check if the campaign exists
         if (!$campaign) {
             return response()->json([
                 'success' => false,
-                'message' => 'Campaña no encontrada',
+                'message' => 'Campaign not found',
                 'status' => 404
             ], 404);
         }
 
-        // Actualizar los campos
+        // Update the fields
         $campaign->title = $validatedData['title'];
         $campaign->description = $validatedData['description'];
         $campaign->hashtags = $validatedData['hashtags'] ?? $campaign->hashtags;
         $campaign->image = $validatedData['image'] ?? $campaign->image;
         
-        // Guardar los cambios
+        // Save the changes
         $campaign->save();
         
-        // Devolver respuesta con la campaña actualizada
+        // Return response with the updated campaign
         return response()->json([
             'success' => true,
-            'message' => 'Campaña actualizada exitosamente',
+            'message' => 'Campaign updated successfully',
             'campaign' => $campaign,
             'status' => 200
         ]);

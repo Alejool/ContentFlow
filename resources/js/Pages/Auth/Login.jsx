@@ -7,7 +7,7 @@ import GuestLayout from "@/Layouts/GuestLayout";
 import { useAuth } from "@/Hooks/useAuth";
 
 export default function Login() {
-  const { errors } = usePage().props; // Obtenemos los errores de los props
+  const { errors } = usePage().props; // We get the errors from props
   const {
     data,
     setData,
@@ -29,7 +29,7 @@ export default function Login() {
           window.location.href = route("dashboard");
         }
       } catch (err) {
-        console.error("Error procesando redirección:", err);
+        console.error("Error processing redirection:", err);
       }
     };
 
@@ -45,7 +45,7 @@ export default function Login() {
 
   return (
     <GuestLayout>
-      <Head title="start sesion" />
+      <Head title="Login" />
       <div className="min-h-screen flex flex-col lg:flex-row">
         <div
           className="  
@@ -70,7 +70,7 @@ export default function Login() {
           <Link href="/">
             <img
               src={Logo}
-              alt="Register Image"
+              alt="Logo"
               className=" object-cover h-40 fill-current"
             />
           </Link>
@@ -165,7 +165,7 @@ export default function Login() {
                                      from-red-600 to-purple-500
                              focus:ring-2 focus:ring-[#FF2D20] focus:ring-offset-2 disabled:opacity-75"
               >
-                {loading ? "Starting session..." : "Start sesion"}
+                {loading ? "Logging in..." : "Login"}
                 <span
                   className="ml-2  icon-[ri--login-circle-line]"
                   role="img"
@@ -245,15 +245,14 @@ export default function Login() {
                     >
                       <path d="M12 4a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM6 12a6 6 0 0 0-6 6v1a1 1 0 0 0 1 1h22a1 1 0 0 0 1-1v-1a6 6 0 0 0-6-6H6z" />
                     </svg>
-                    Anonimus
+                    Anonymous
                   </button>
                 </div>
               </div>
 
               <div className="mt-6 text-center text-sm">
                 <span className="text-gray-600 dark:text-gray-400">
-                  {" "}
-                  have you not an account?
+                  Don't have an account?
                 </span>
                 <Link
                   href={route("register")}

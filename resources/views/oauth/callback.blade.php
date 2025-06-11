@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Autenticación completada</title>
+    <title>Authentication completed</title>
     <script>
         window.onload = function() {
             // Enviar mensaje a la ventana principal
@@ -23,12 +23,12 @@
 <body>
     <div style="text-align: center; margin-top: 50px;">
         @if($success)
-            <h2>Autenticación completada</h2>
-            <p>Esta ventana se cerrará automáticamente.</p>
+            <h2>Authentication completed</h2>
+            <p>This window will close automatically.</p>
         @else
-            <h2>Error en la autenticación</h2>
-            <p>{{ $message ?? 'Ocurrió un error durante el proceso de autenticación.' }}</p>
-            <p>Esta ventana se cerrará automáticamente.</p>
+            <h2>Authentication error</h2>
+            <p>{{ $message ?? 'An error occurred during the authentication process.' }}</p>
+            <p>This window will close automatically.</p>
         @endif
     </div>
 </body>

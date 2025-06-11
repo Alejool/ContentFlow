@@ -23,7 +23,7 @@ export default function ForgotPassword({ status }) {
             <Head title="Forgot Password" />
 
             <div className="min-h-screen flex flex-col lg:flex-row">
-                {/* Mitad izquierda: Fondo rojo, logo e imagen */}
+                {/* Left half: Red background, logo and image */}
                 <div className="w-full lg:w-1/2 bg-red-600 bg-opacity-90 flex flex-col items-center justify-center p-8">
                     <div className="text-white text-center">
                         <h1 className="text-4xl font-bold mb-4">Welcome</h1>
@@ -34,13 +34,13 @@ export default function ForgotPassword({ status }) {
                     <Link href="/">
                         <img
                             src={Logo} // Ruta de tu imagen
-                            alt="Register Image"
+                            alt="Logo"
                             className="w-64 object-cover h-40"
                         />
                     </Link>
                 </div>
 
-                {/* Mitad derecha: Formulario de recuperación de contraseña */}
+                {/* Right half: Password recovery form */}
                 <div className="w-full lg:w-1/2 flex items-center justify-center  p-8">
                     <form onSubmit={submit} className="w-full max-w-md space-y-6">
                         <div className="mb-4 text-sm text-gray-600">

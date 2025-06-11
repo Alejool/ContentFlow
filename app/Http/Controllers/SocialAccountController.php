@@ -10,7 +10,7 @@ use Illuminate\Support\Str;
 
 class SocialAccountController extends Controller
 {
-    // Obtener todas las cuentas conectadas del usuario
+    // Get all connected accounts for the user
     public function index()
     {
         $accounts = SocialAccount::where('user_id', Auth::id())->get();
@@ -21,10 +21,10 @@ class SocialAccountController extends Controller
         ]);
     }
     
-    // Método para obtener URL de autenticación
+    // Method to get authentication URL
     public function getAuthUrl(Request $request, $platform)
     {
-        // Generar estado aleatorio para prevenir CSRF
+        // Generate random state to prevent CSRF
         $state = Str::random(40);
         session(['social_auth_state' => $state]);
         
@@ -88,7 +88,7 @@ class SocialAccountController extends Controller
             default:
                 return response()->json([
                     'success' => false,
-                    'message' => 'Plataforma no soportada'
+                    'message' => 'Platform not supported'
                 ], 400);
         }
         
@@ -98,21 +98,21 @@ class SocialAccountController extends Controller
         ]);
     }
     
-    // Callback para Facebook
+    // Callback for Facebook
     public function handleFacebookCallback(Request $request)
     {
-        // Verificar estado para prevenir CSRF
+        // Verify state to prevent CSRF
         if ($request->state !== session('social_auth_state')) {
-            return $this->handleOAuthError('Estado inválido');
+            return $this->handleOAuthError('Invalid state');
         }
         
-        // Verificar si hay un código de autorización
+        // Check if there is an authorization code
         if (!$request->has('code')) {
-            return $this->handleOAuthError('No se recibió código de autorización');
+            return $this->handleOAuthError('Authorization code not received');
         }
         
         try {
-            // Intercambiar código por token de acceso
+            // Exchange code for access token
             $response = Http::post('https://graph.facebook.com/v18.0/oauth/access_token', [
                 'client_id' => config('services.facebook.client_id'),
                 'client_secret' => config('services.facebook.client_secret'),
@@ -123,20 +123,20 @@ class SocialAccountController extends Controller
             $data = $response->json();
             
             if (!isset($data['access_token'])) {
-                return $this->handleOAuthError('No se pudo obtener el token de acceso');
+                return $this->handleOAuthError('Could not obtain access token');
             }
             
-            // Obtener información del usuario/página
+            // Get user/page information
             $userResponse = Http::withToken($data['access_token'])
                 ->get('https://graph.facebook.com/me?fields=id,name');
             
             $userData = $userResponse->json();
             
             if (!isset($userData['id'])) {
-                return $this->handleOAuthError('No se pudo obtener información del usuario');
+                return $this->handleOAuthError('Could not obtain user information');
             }
             
-            // Guardar la cuenta en la base de datos
+            // Save the account to the database
             $account = $this->saveAccount([
                 'platform' => 'facebook',
                 'account_id' => $userData['id'],
@@ -147,7 +147,7 @@ class SocialAccountController extends Controller
                     : null,
             ]);
             
-            // Cerrar la ventana y enviar mensaje a la ventana principal
+            // Close the window and send message to the main window
             return $this->closeWindowWithMessage('success', [
                 'platform' => 'facebook',
                 'account_id' => $userData['id'],
@@ -159,25 +159,25 @@ class SocialAccountController extends Controller
             ]);
             
         } catch (\Exception $e) {
-            return $this->handleOAuthError('Error al procesar la autenticación: ' . $e->getMessage());
+            return $this->handleOAuthError('Error processing authentication: ' . $e->getMessage());
         }
     }
     
-    // Callback para Instagram
+    // Callback for Instagram
     public function handleInstagramCallback(Request $request)
     {
-        // Verificar estado para prevenir CSRF
+        // Verify state to prevent CSRF
         if ($request->state !== session('social_auth_state')) {
-            return $this->handleOAuthError('Estado inválido');
+            return $this->handleOAuthError('Invalid state');
         }
         
-        // Verificar si hay un código de autorización
+        // Check if there is an authorization code
         if (!$request->has('code')) {
-            return $this->handleOAuthError('No se recibió código de autorización');
+            return $this->handleOAuthError('Authorization code not received');
         }
         
         try {
-            // Intercambiar código por token de acceso
+            // Exchange code for access token
             $response = Http::post('https://api.instagram.com/oauth/access_token', [
                 'client_id' => config('services.instagram.client_id'),
                 'client_secret' => config('services.instagram.client_secret'),
@@ -189,10 +189,10 @@ class SocialAccountController extends Controller
             $data = $response->json();
             
             if (!isset($data['access_token']) || !isset($data['user_id'])) {
-                return $this->handleOAuthError('No se pudo obtener el token de acceso');
+                return $this->handleOAuthError('Could not obtain access token');
             }
             
-            // Guardar la cuenta en la base de datos
+            // Save the account to the database
             $account = $this->saveAccount([
                 'platform' => 'instagram',
                 'account_id' => $data['user_id'],
@@ -201,7 +201,7 @@ class SocialAccountController extends Controller
                 'token_expires_at' => null,
             ]);
             
-            // Cerrar la ventana y enviar mensaje a la ventana principal
+            // Close the window and send message to the main window
             return $this->closeWindowWithMessage('success', [
                 'platform' => 'instagram',
                 'account_id' => $data['user_id'],
@@ -211,25 +211,25 @@ class SocialAccountController extends Controller
             ]);
             
         } catch (\Exception $e) {
-            return $this->handleOAuthError('Error al procesar la autenticación: ' . $e->getMessage());
+            return $this->handleOAuthError('Error processing authentication: ' . $e->getMessage());
         }
     }
     
-    // Callback para Twitter
+    // Callback for Twitter
     public function handleTwitterCallback(Request $request)
     {
-        // Verificar estado para prevenir CSRF
+        // Verify state to prevent CSRF
         if ($request->state !== session('social_auth_state')) {
-            return $this->handleOAuthError('Estado inválido');
+            return $this->handleOAuthError('Invalid state');
         }
         
-        // Verificar si hay un código de autorización
+        // Check if there is an authorization code
         if (!$request->has('code')) {
-            return $this->handleOAuthError('No se recibió código de autorización');
+            return $this->handleOAuthError('Authorization code not received');
         }
         
         try {
-            // Intercambiar código por token de acceso
+            // Exchange code for access token
             $response = Http::asForm()->post('https://api.twitter.com/2/oauth2/token', [
                 'client_id' => config('services.twitter.client_id'),
                 'client_secret' => config('services.twitter.client_secret'),
@@ -242,20 +242,20 @@ class SocialAccountController extends Controller
             $data = $response->json();
             
             if (!isset($data['access_token'])) {
-                return $this->handleOAuthError('No se pudo obtener el token de acceso');
+                return $this->handleOAuthError('Could not obtain access token');
             }
             
-            // Obtener información del usuario
+            // Get user information
             $userResponse = Http::withToken($data['access_token'])
                 ->get('https://api.twitter.com/2/users/me');
             
             $userData = $userResponse->json();
             
             if (!isset($userData['data']['id'])) {
-                return $this->handleOAuthError('No se pudo obtener información del usuario');
+                return $this->handleOAuthError('Could not obtain user information');
             }
             
-            // Guardar la cuenta en la base de datos
+            // Save the account to the database
             $account = $this->saveAccount([
                 'platform' => 'twitter',
                 'account_id' => $userData['data']['id'],
@@ -266,7 +266,7 @@ class SocialAccountController extends Controller
                     : null,
             ]);
             
-            // Cerrar la ventana y enviar mensaje a la ventana principal
+            // Close the window and send message to the main window
             return $this->closeWindowWithMessage('success', [
                 'platform' => 'twitter',
                 'account_id' => $userData['data']['id'],
@@ -278,25 +278,25 @@ class SocialAccountController extends Controller
             ]);
             
         } catch (\Exception $e) {
-            return $this->handleOAuthError('Error al procesar la autenticación: ' . $e->getMessage());
+            return $this->handleOAuthError('Error processing authentication: ' . $e->getMessage());
         }
     }
     
-    // Callback para YouTube
+    // Callback for YouTube
     public function handleYoutubeCallback(Request $request)
     {
-        // Verificar estado para prevenir CSRF
+        // Verify state to prevent CSRF
         if ($request->state !== session('social_auth_state')) {
-            return $this->handleOAuthError('Estado inválido');
+            return $this->handleOAuthError('Invalid state');
         }
         
-        // Verificar si hay un código de autorización
+        // Check if there is an authorization code
         if (!$request->has('code')) {
-            return $this->handleOAuthError('No se recibió código de autorización');
+            return $this->handleOAuthError('Authorization code not received');
         }
         
         try {
-            // Intercambiar código por token de acceso
+            // Exchange code for access token
             $response = Http::post('https://oauth2.googleapis.com/token', [
                 'client_id' => config('services.google.client_id'),
                 'client_secret' => config('services.google.client_secret'),
@@ -308,20 +308,20 @@ class SocialAccountController extends Controller
             $data = $response->json();
             
             if (!isset($data['access_token'])) {
-                return $this->handleOAuthError('No se pudo obtener el token de acceso');
+                return $this->handleOAuthError('Could not obtain access token');
             }
             
-            // Obtener información del canal
+            // Get channel information
             $channelResponse = Http::withToken($data['access_token'])
                 ->get('https://www.googleapis.com/youtube/v3/channels?part=snippet&mine=true');
             
             $channelData = $channelResponse->json();
             
             if (!isset($channelData['items'][0]['id'])) {
-                return $this->handleOAuthError('No se pudo obtener información del canal');
+                return $this->handleOAuthError('Could not obtain channel information');
             }
             
-            // Guardar la cuenta en la base de datos
+            // Save the account to the database
             $account = $this->saveAccount([
                 'platform' => 'youtube',
                 'account_id' => $channelData['items'][0]['id'],
@@ -332,7 +332,7 @@ class SocialAccountController extends Controller
                     : null,
             ]);
             
-            // Cerrar la ventana y enviar mensaje a la ventana principal
+            // Close the window and send message to the main window
             return $this->closeWindowWithMessage('success', [
                 'platform' => 'youtube',
                 'account_id' => $channelData['items'][0]['id'],
@@ -344,25 +344,25 @@ class SocialAccountController extends Controller
             ]);
             
         } catch (\Exception $e) {
-            return $this->handleOAuthError('Error al procesar la autenticación: ' . $e->getMessage());
+            return $this->handleOAuthError('Error processing authentication: ' . $e->getMessage());
         }
     }
     
-    // Callback para TikTok
+    // Callback for TikTok
     public function handleTiktokCallback(Request $request)
     {
-        // Verificar estado para prevenir CSRF
+        // Verify state to prevent CSRF
         if ($request->state !== session('social_auth_state')) {
-            return $this->handleOAuthError('Estado inválido');
+            return $this->handleOAuthError('Invalid state');
         }
         
-        // Verificar si hay un código de autorización
+        // Check if there is an authorization code
         if (!$request->has('code')) {
-            return $this->handleOAuthError('No se recibió código de autorización');
+            return $this->handleOAuthError('Authorization code not received');
         }
         
         try {
-            // Intercambiar código por token de acceso
+            // Exchange code for access token
             $response = Http::post('https://open-api.tiktok.com/oauth/access_token/', [
                 'client_key' => config('services.tiktok.client_key'),
                 'client_secret' => config('services.tiktok.client_secret'),
@@ -374,10 +374,10 @@ class SocialAccountController extends Controller
             $data = $response->json();
             
             if (!isset($data['data']['access_token']) || !isset($data['data']['open_id'])) {
-                return $this->handleOAuthError('No se pudo obtener el token de acceso');
+                return $this->handleOAuthError('Could not obtain access token');
             }
             
-            // Guardar la cuenta en la base de datos
+            // Save the account to the database
             $account = $this->saveAccount([
                 'platform' => 'tiktok',
                 'account_id' => $data['data']['open_id'],
@@ -388,7 +388,7 @@ class SocialAccountController extends Controller
                     : null,
             ]);
             
-            // Cerrar la ventana y enviar mensaje a la ventana principal
+            // Close the window and send message to the main window
             return $this->closeWindowWithMessage('success', [
                 'platform' => 'tiktok',
                 'account_id' => $data['data']['open_id'],
@@ -400,20 +400,20 @@ class SocialAccountController extends Controller
             ]);
             
         } catch (\Exception $e) {
-            return $this->handleOAuthError('Error al procesar la autenticación: ' . $e->getMessage());
+            return $this->handleOAuthError('Error processing authentication: ' . $e->getMessage());
         }
     }
     
-    // Método auxiliar para guardar la cuenta
+    // Helper method to save the account
     private function saveAccount($data)
     {
-        // Verificar si ya existe una cuenta para esta plataforma
+        // Check if an account already exists for this platform
         $existingAccount = SocialAccount::where('user_id', Auth::id())
             ->where('platform', $data['platform'])
             ->first();
             
         if ($existingAccount) {
-            // Actualizar cuenta existente
+            // Update existing account
             $existingAccount->update([
                 'account_id' => $data['account_id'],
                 'access_token' => $data['access_token'],
@@ -422,7 +422,7 @@ class SocialAccountController extends Controller
             ]);
             return $existingAccount;
         } else {
-            // Crear nueva cuenta
+            // Create new account
             return SocialAccount::create([
                 'user_id' => Auth::id(),
                 'platform' => $data['platform'],
@@ -434,7 +434,7 @@ class SocialAccountController extends Controller
         }
     }
     
-    // Método para manejar errores de OAuth
+    // Method to handle OAuth errors
     private function handleOAuthError($message)
     {
         return view('oauth.callback', [
@@ -443,7 +443,7 @@ class SocialAccountController extends Controller
         ]);
     }
     
-    // Método para cerrar la ventana y enviar mensaje a la ventana principal
+    // Method to close the window and send message to the main window
     private function closeWindowWithMessage($status, $data = [])
     {
         return view('oauth.callback', [

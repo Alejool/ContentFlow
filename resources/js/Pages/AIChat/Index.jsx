@@ -24,7 +24,7 @@ import {
   Separator,
 } from "@chakra-ui/react";
 
-// Iconos SVG minimalistas
+// Minimalist SVG Icons
 const Icon = ({ type, size = 20, className = "" }) => {
   const icons = {
     ai: (
@@ -64,7 +64,7 @@ const Icon = ({ type, size = 20, className = "" }) => {
   return <Box as="span" display="inline-flex" alignItems="center">{icons[type]}</Box>;
 };
 
-// Mensaje del chat minimalista
+// Minimalist Chat Message
 const ChatMessage = ({ message, user }) => {
   const isAI = message.sender === "AI";
   
@@ -117,7 +117,7 @@ const ChatMessage = ({ message, user }) => {
   );
 };
 
-// Estadísticas compactas
+// Compact Statistics
 const CompactStats = ({ campaigns }) => {
   const active = campaigns.filter(c => c.status === "active").length;
   const total = campaigns.length;
@@ -126,7 +126,7 @@ const CompactStats = ({ campaigns }) => {
     <Flex gap={6}>
       <Box textAlign="center">
         <Text fontSize="lg" fontWeight="bold" color="red.600">{active}</Text>
-        <Text fontSize="xs" color="gray.500">Activas</Text>
+        <Text fontSize="xs" color="gray.500">Active</Text>
       </Box>
       <Box textAlign="center">
         <Text fontSize="lg" fontWeight="bold" color="blue.600">{total}</Text>
@@ -136,7 +136,7 @@ const CompactStats = ({ campaigns }) => {
   );
 };
 
-// Tarjeta de idea minimalista
+// Minimalist Idea Card
 const IdeaCard = ({ idea, onUse }) => (
   <Button
     variant="ghost"
@@ -162,7 +162,7 @@ const IdeaCard = ({ idea, onUse }) => (
   </Button>
 );
 
-// Panel de ideas
+// Ideas Panel
 const IdeasPanel = ({ ideas, onUse }) => (
   <Card.Root bg="white" shadow="sm" border="1px" borderColor="gray.100">
     <Card.Body p={5}>
@@ -182,14 +182,14 @@ const IdeasPanel = ({ ideas, onUse }) => (
   </Card.Root>
 );
 
-// Drawer móvil
+// Mobile Drawer
 const MobileIdeasDrawer = ({ isOpen, onClose, ideas, onUse }) => (
   <Drawer.Root open={isOpen} onOpenChange={onClose} placement="bottom">
     <Drawer.Backdrop />
     <Drawer.Positioner>
       <Drawer.Content>
         <Drawer.Header borderBottom="1px" borderColor="gray.100">
-          <Drawer.Title>💡 Ideas para Campañas</Drawer.Title>
+          <Drawer.Title>💡 Campaign Ideas</Drawer.Title>
           <Drawer.CloseTrigger />
         </Drawer.Header>
         <Drawer.Body p={4}>
@@ -224,33 +224,33 @@ export default function Index() {
   const [ideas] = useState([
     {
       id: 1,
-      title: "Marketing Visual",
-      description: "Contenido visual genera 40% más engagement",
+      title: "Visual Marketing",
+      description: "Visual content generates 40% more engagement",
       icon: "📸",
     },
     {
       id: 2,
-      title: "Sostenibilidad",
-      description: "Marcas eco-friendly retienen 25% más clientes",
+      title: "Sustainability",
+      description: "Eco-friendly brands retain 25% more customers",
       icon: "🌱",
     },
     {
       id: 3,
       title: "Micro-Influencers",
-      description: "Mayor conversión que celebridades",
+      description: "Higher conversion than celebrities",
       icon: "👥",
     },
     {
       id: 4,
-      title: "Contenido UGC",
-      description: "Aumenta autenticidad y reduce costos",
+      title: "UGC Content",
+      description: "Increases authenticity and reduces costs",
       icon: "👤",
     },
   ]);
   const user = usePage().props.auth.user || {};
 
   const useIdeaAsPrompt = (idea) => {
-    const prompt = `Dame ideas para una campaña de ${idea.title}`;
+    const prompt = `Give me ideas for a campaign about ${idea.title}`;
     handleInputChange({ target: { value: prompt } });
   };
 
@@ -260,7 +260,7 @@ export default function Index() {
 
       <Box minH="100vh" py={6}>
         <Container maxW="6xl">
-          {/* Header minimalista */}
+          {/* Minimalist Header */}
           <Stack gap={6} mb={8}>
             <Flex
               direction={{ base: "column", md: "row" }}
@@ -280,10 +280,10 @@ export default function Index() {
                   height="60px"
                   bgClip="text"
                 >
-                  Asistente IA
+                  AI Assistant
                 </Heading>
                 <Text color="gray.600" mt={6} fontSize="lg">
-                  Recomendaciones inteligentes para tus campañas
+                  Intelligent recommendations for your campaigns
                 </Text>
               </Box>
 
@@ -324,12 +324,12 @@ export default function Index() {
                 rounded="full"
                 alignSelf="start"
               >
-                {campaigns.length} campañas disponibles
+                {campaigns.length} campaigns available
               </Badge>
             )}
           </Stack>
 
-          {/* Layout principal */}
+          {/* Main Layout */}
           <Grid templateColumns={{ base: "1fr", lg: "1fr 300px" }} gap={6}>
             {/* Chat */}
             <Card.Root
@@ -339,7 +339,7 @@ export default function Index() {
               borderColor="gray.100"
             >
               <Card.Body p={6}>
-                {/* Header del chat */}
+                {/* Chat Header */}
                 <Flex justify="space-between" align="center" mb={6}>
                   <Flex align="center" gap={3}>
                     <Box p={2} bg="red.100" rounded="lg" color="red.600">
@@ -350,11 +350,11 @@ export default function Index() {
                     </Heading>
                   </Flex>
                   <Badge colorScheme="green" variant="subtle" rounded="full">
-                    ⭐En línea
+                    ⭐Online
                   </Badge>
                 </Flex>
 
-                {/* Mensajes */}
+                {/* Messages */}
                 <Box
                   h="400px"
                   px={2}
@@ -385,8 +385,7 @@ export default function Index() {
                     {messages.length === 0 && (
                       <Box textAlign="center" py={8}>
                         <Text color="gray.500" fontSize="sm">
-                          ¡Hola! Soy tu asistente IA. ¿En qué puedo ayudarte
-                          hoy?
+                          Hi! I'm your AI assistant. How can I help you today?
                         </Text>
                       </Box>
                     )}
@@ -427,7 +426,7 @@ export default function Index() {
                           <Flex align="center" gap={2}>
                             <Spinner size="sm" color="red.500" />
                             <Text fontSize="sm" color="gray.600">
-                              Pensando...
+                              Thinking...
                             </Text>
                           </Flex>
                         </Box>
@@ -444,7 +443,7 @@ export default function Index() {
                     value={inputMessage}
                     onChange={handleInputChange}
                     // onKeyPress={handleKeyPress}
-                    placeholder="Escribe tu mensaje..."
+                    placeholder="Write your message..."
                     resize="none"
                     p={4}
                     border="1px solid"
@@ -455,7 +454,7 @@ export default function Index() {
                   />
                   <Flex justify="space-between" align="center">
                     <Text fontSize="xs" color="gray.500">
-                      Enter para enviar
+                      Enter to send
                     </Text>
                     <Button
                       onClick={sendMessage}
@@ -466,20 +465,20 @@ export default function Index() {
                       minW="100px"
                     >
                       <Icon type="send" size={16} />
-                      Enviar
+                      Send
                     </Button>
                   </Flex>
                 </Stack>
               </Card.Body>
             </Card.Root>
 
-            {/* Panel de ideas (desktop) */}
+            {/* Ideas Panel (desktop) */}
             <Box display={{ base: "none", lg: "block" }}>
               <IdeasPanel ideas={ideas} onUse={useIdeaAsPrompt} />
             </Box>
           </Grid>
 
-          {/* Drawer móvil */}
+          {/* Mobile Drawer */}
           <MobileIdeasDrawer
             isOpen={open}
             onClose={onClose}

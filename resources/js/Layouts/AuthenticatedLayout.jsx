@@ -28,20 +28,20 @@ export default function AuthenticatedLayout({ header, children }) {
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-5 bg-cover bg-center" />
 
-        {/* Sidebar para pantallas grandes */}
+        {/* Sidebar for large screens */}
         <Sidebar
           isSidebarOpen={isSidebarOpen}
           setIsSidebarOpen={setIsSidebarOpen}
         />
 
-        {/* Navbar para dispositivos móviles */}
+        {/* Navbar for mobile devices */}
         <MobileNavbar
           user={user}
           showingNavigationDropdown={showingNavigationDropdown}
           setShowingNavigationDropdown={setShowingNavigationDropdown}
         />
 
-        {/* Contenido principal */}
+        {/* Main content */}
         <main
           className={`transition-all duration-500 ease-in-out relative z-10 ${
             isSidebarOpen ? "lg:ml-80" : "lg:ml-20"
