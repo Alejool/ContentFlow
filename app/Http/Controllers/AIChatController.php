@@ -165,10 +165,10 @@ class AIChatController extends Controller
                         ]
                     ],
                     'generationConfig' => [
-                        'maxOutputTokens' => 50, // Approximately 10 words
+                        'maxOutputTokens' => 100, // Approximately 10 words
                         'temperature' => 0.1, // Lower temperature for more focused responses
-                        'topP' => 0.5, // More deterministic output
-                        'topK' => 20 // Reduced for more concise responses
+                        'topP' => 0.2, // More deterministic output
+                        'topK' => 1 // Reduced for more concise responses
                     ]
                 ]);
     
