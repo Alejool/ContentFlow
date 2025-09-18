@@ -82,11 +82,9 @@ export const useAuth = () => {
         
         try {
             const result = await signInWithGoogle();
-            if (result?.user) {
-                setSuccessMessage('Login sucessfully. Redirecting...');
-                toast.success('Login sucessfully. Redirecting...');
-                window.location.href = route('dashboard');
-            }
+            setSuccessMessage('Login sucessfully. Redirecting...');
+            toast.success('Login sucessfully. Redirecting...');
+            window.location.href = route('dashboard');
         } catch (err) {
             setError('Error to start sesion with Google. Please, try again.');
             toast.error('Error to start sesion with Google. Please, try again.');
@@ -98,9 +96,9 @@ export const useAuth = () => {
     const handleFacebookLogin = async () => {
         setLoading(true);
         setError('');
-             
         try {
             const result = await signInWithFacebook();
+            console.log(result)
             if (result?.user) {
                 setSuccessMessage('Login sucessfully with Facebook. Redirecting...');
                 window.location.href = route('dashboard');
