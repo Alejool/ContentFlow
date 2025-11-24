@@ -1,0 +1,118 @@
+import React from "react";
+import { usePage } from "@inertiajs/react";
+import ModernCard from "@/Components/Modern/ModernCard";
+
+const ChartIcon = ({ className }) => (
+  <svg
+    className={className}
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+    />
+  </svg>
+);
+
+export default function AccountStatistics({ className = "" }) {
+  const user = usePage().props.auth.user;
+
+  // Format date
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
+  // Calculate days since joining
+  const getDaysSinceJoining = (dateString) => {
+    if (!dateString) return 0;
+    const joined = new Date(dateString);
+    const now = new Date();
+    const diffTime = Math.abs(now - joined);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  };
+
+  return (
+    <ModernCard
+      title="Account Statistics"
+      description="Overview of your account activity and status."
+      icon={ChartIcon}
+      headerColor="green"
+      className={className}
+    >
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
+          <p className="text-sm text-gray-500 font-medium">Member Since</p>
+          <p className="text-lg font-bold text-gray-800 mt-1">
+            {formatDate(user.created_at)}
+          </p>
+        </div>
+
+        <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
+          <p className="text-sm text-gray-500 font-medium">Days Active</p>
+          <p className="text-lg font-bold text-gray-800 mt-1">
+            {getDaysSinceJoining(user.created_at)} days
+          </p>
+        </div>
+
+        <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
+          <p className="text-sm text-gray-500 font-medium">Account Status</p>
+          <div className="flex items-center mt-1">
+            <span className="w-2 h-2 rounded-full bg-green-500 mr-2"></span>
+            <p className="text-lg font-bold text-gray-800">Active</p>
+          </div>
+        </div>
+
+        <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
+          <p className="text-sm text-gray-500 font-medium">Email Status</p>
+          <div className="flex items-center mt-1">
+            {user.email_verified_at ? (
+              <>
+                <svg
+                  className="w-5 h-5 text-green-500 mr-1"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+                <p className="text-lg font-bold text-gray-800">Verified</p>
+              </>
+            ) : (
+              <>
+                <svg
+                  className="w-5 h-5 text-yellow-500 mr-1"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                  />
+                </svg>
+                <p className="text-lg font-bold text-gray-800">Unverified</p>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    </ModernCard>
+  );
+}
