@@ -3,7 +3,6 @@ import { Head, usePage } from '@inertiajs/react';
 import DeleteUserForm from './Partials/DeleteUserForm';
 import UpdatePasswordForm from './Partials/UpdatePasswordForm';
 import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm';
-import IconsProfile from '@/../assets/Icons/profile.svg';
 import { Avatar, Circle, Float,Highlight } from "@chakra-ui/react"
 
 
@@ -19,11 +18,10 @@ export default function Edit({ mustVerifyEmail, status }) {
                         colorPalette="green" 
                         size="2xl" 
                         variant="subtle"
-                        className="mx-auto relative" // Added relative for positioning
+                        className="mx-auto relative" 
                     >
                         <Avatar.Fallback name={user.name} />
                         
-                        {/* Status circle at the bottom of the avatar */}
                         <div className="absolute bottom-0 right-0">
                             <Circle
                                 bg="green.500"
@@ -35,7 +33,6 @@ export default function Edit({ mustVerifyEmail, status }) {
                         </div>
                     </Avatar.Root>
                     
-                    {/* Username below the avatar */}
                     <div className="mt-2 text-center">
                         <Highlight
                             query="spotlight"
@@ -61,7 +58,6 @@ export default function Edit({ mustVerifyEmail, status }) {
             <div className="py-6">
                 <div className="mx-auto max-w-2xl space-y-10 sm:px-6 lg:px-8">
 
-                    {/* Update Profile Information */}
                     <div>
                         <h3 className="text-xl font-semibold text-gray-700 flex items-center gap-2">
                             <span className="w-2 h-6 bg-blue-500 rounded-full"></span> Update Profile Information
@@ -75,7 +71,6 @@ export default function Edit({ mustVerifyEmail, status }) {
                         </div>
                     </div>
 
-                    {/* Update Password */}
                     <div>
                         <h3 className="text-xl font-semibold text-gray-700 flex items-center gap-2">
                             <span className="w-2 h-6 bg-green-500 rounded-full"></span> Change Password
@@ -85,7 +80,6 @@ export default function Edit({ mustVerifyEmail, status }) {
                         </div>
                     </div>
 
-                    {/* Delete Account */}
                     <div>
                         <h3 className="text-xl font-semibold text-red-600 flex items-center gap-2">
                             <span className="w-2 h-6 bg-red-500 rounded-full"></span> Delete Account

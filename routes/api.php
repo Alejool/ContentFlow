@@ -21,6 +21,14 @@ Route::middleware(EnsureFrontendRequestsAreStateful::class)->group(function () {
         // Move AI chat route inside authentication middleware
         Route::post('/ai-chat/message', [AIChatController::class, 'processMessage']);
     });
+
+    Route::get('/test-curl', function() {
+    return [
+        'curl.cainfo' => ini_get('curl.cainfo'),
+        'openssl.cafile' => ini_get('openssl.cafile'),
+    ];
+});
+
 });
 
 // // Routes for social accounts

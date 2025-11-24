@@ -2,12 +2,24 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useState, useRef } from "react";
+import {
+  FileText,
+  FileImage,
+  Camera,
+  Target,
+  Hash,
+  Rocket,
+  AlertTriangle,
+  Sparkles,
+} from "lucide-react";
 
 const schema = z.object({
-  title: z.string()
+  title: z
+    .string()
     .min(1, "Title is required")
     .max(100, "Title cannot exceed 100 characters"),
-  description: z.string()
+  description: z
+    .string()
     .min(10, "Description must be at least 10 characters")
     .max(500, "Description cannot exceed 500 characters"),
   image: z
@@ -21,19 +33,21 @@ const schema = z.object({
     .refine((files) => {
       if (files.length === 0) return true;
       const file = files[0];
-      return ['image/jpeg', 'image/png', 'image/webp'].includes(file.type);
+      return ["image/jpeg", "image/png", "image/webp"].includes(file.type);
     }, "Only JPG, PNG, or WebP files are allowed"),
-  objective: z.string()
+  objective: z
+    .string()
     .min(5, "Objective must be at least 5 characters")
     .max(200, "Objective cannot exceed 200 characters"),
-  hashtags: z.string()
+  hashtags: z
+    .string()
     .min(1, "Hashtags are required")
     .refine((val) => {
-      const hashtags = val.split(' ').filter(tag => tag.startsWith('#'));
+      const hashtags = val.split(" ").filter((tag) => tag.startsWith("#"));
       return hashtags.length > 0;
     }, "Must include at least one valid hashtag (#example)")
     .refine((val) => {
-      const hashtags = val.split(' ').filter(tag => tag.startsWith('#'));
+      const hashtags = val.split(" ").filter((tag) => tag.startsWith("#"));
       return hashtags.length <= 10;
     }, "Maximum 10 hashtags allowed"),
 });
@@ -51,10 +65,10 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
     watch,
     setValue,
     reset,
-    trigger
+    trigger,
   } = useForm({
     resolver: zodResolver(schema),
-    mode: "onChange"
+    mode: "onChange",
   });
 
   const watchedFields = watch();
@@ -65,7 +79,7 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
       const reader = new FileReader();
       reader.onload = (e) => setImagePreview(e.target.result);
       reader.readAsDataURL(file);
-      
+
       // Crear un nuevo FileList para setValue
       const dt = new DataTransfer();
       dt.items.add(file);
@@ -95,15 +109,15 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
     setImagePreview(null);
     setValue("image", new DataTransfer().files);
     if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      fileInputRef.current.value = "";
     }
   };
 
   const formatHashtags = (value) => {
     return value
       .split(/\s+/)
-      .map(tag => tag.startsWith('#') ? tag : `#${tag}`)
-      .join(' ');
+      .map((tag) => (tag.startsWith("#") ? tag : `#${tag}`))
+      .join(" ");
   };
 
   const handleHashtagChange = (e) => {
@@ -119,7 +133,7 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
       setImagePreview(null);
       onClose();
     } catch (error) {
-      console.error('Error submitting form:', error);
+      console.error("Error submitting form:", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -146,8 +160,9 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-100">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">
-              ✨ New Campaign
+            <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+              <Sparkles className="h-6 w-6 text-yellow-500" />
+              New Campaign
             </h2>
             <p className="text-sm text-gray-500 mt-1">
               Create an impactful and attractive campaign
@@ -197,7 +212,8 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
           {/* Title */}
           <div className="space-y-2">
             <label className="flex items-center text-sm font-semibold text-gray-700">
-              📝 Campaign Title
+              <FileText className="inline h-4 w-4 mr-1" />
+              Campaign Title
               <span className="text-red-500 ml-1">*</span>
             </label>
             <input
@@ -212,7 +228,8 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
             <div className="flex justify-between text-xs">
               {errors.title && (
                 <p className="text-red-600 flex items-center">
-                  ⚠️ {errors.title.message}
+                  <AlertTriangle className="inline h-3 w-3 mr-1" />
+                  {errors.title.message}
                 </p>
               )}
               <p
@@ -230,7 +247,8 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
           {/* Description */}
           <div className="space-y-2">
             <label className="flex items-center text-sm font-semibold text-gray-700">
-              📄 Description
+              <FileText className="inline h-4 w-4 mr-1" />
+              Description
               <span className="text-red-500 ml-1">*</span>
             </label>
             <textarea
@@ -246,7 +264,8 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
             <div className="flex justify-between text-xs">
               {errors.description && (
                 <p className="text-red-600 flex items-center">
-                  ⚠️ {errors.description.message}
+                  <AlertTriangle className="inline h-3 w-3 mr-1" />
+                  {errors.description.message}
                 </p>
               )}
               <p
@@ -264,7 +283,8 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
           {/* Image Upload */}
           <div className="space-y-2">
             <label className="flex items-center text-sm font-semibold text-gray-700">
-              🖼️ Campaign Image
+              <FileImage className="inline h-4 w-4 mr-1" />
+              Campaign Image
               <span className="text-red-500 ml-1">*</span>
             </label>
 
@@ -283,7 +303,7 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
                 onClick={() => fileInputRef.current?.click()}
               >
                 <div className="space-y-3">
-                  <div className="text-4xl">📸</div>
+                  <Camera className="h-10 w-10 mx-auto text-gray-400" />
                   <div>
                     <p className="text-gray-600 font-medium">
                       Drag your image here or click to select
@@ -344,7 +364,8 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
 
             {errors.image && (
               <p className="text-red-600 text-xs flex items-center">
-                ⚠️ {errors.image.message}
+                <AlertTriangle className="inline h-3 w-3 mr-1" />
+                {errors.image.message}
               </p>
             )}
           </div>
@@ -352,7 +373,8 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
           {/* Objective */}
           <div className="space-y-2">
             <label className="flex items-center text-sm font-semibold text-gray-700">
-              🎯 Campaign Objective
+              <Target className="inline h-4 w-4 mr-1" />
+              Campaign Objective
               <span className="text-red-500 ml-1">*</span>
             </label>
             <input
@@ -367,7 +389,8 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
             <div className="flex justify-between text-xs">
               {errors.objective && (
                 <p className="text-red-600 flex items-center">
-                  ⚠️ {errors.objective.message}
+                  <AlertTriangle className="inline h-3 w-3 mr-1" />
+                  {errors.objective.message}
                 </p>
               )}
               <p
@@ -385,7 +408,8 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
           {/* Hashtags */}
           <div className="space-y-2">
             <label className="flex items-center text-sm font-semibold text-gray-700">
-              🏷️ Hashtags
+              <Hash className="inline h-4 w-4 mr-1" />
+              Hashtags
               <span className="text-red-500 ml-1">*</span>
             </label>
             <input
@@ -401,7 +425,8 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
             <div className="flex justify-between text-xs">
               {errors.hashtags && (
                 <p className="text-red-600 flex items-center">
-                  ⚠️ {errors.hashtags.message}
+                  <AlertTriangle className="inline h-3 w-3 mr-1" />
+                  {errors.hashtags.message}
                 </p>
               )}
               <p className="text-gray-400 ml-auto">
@@ -459,7 +484,7 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
                 </>
               ) : (
                 <>
-                  <span>🚀</span>
+                  <Rocket className="inline h-4 w-4" />
                   <span>Create Campaign</span>
                 </>
               )}

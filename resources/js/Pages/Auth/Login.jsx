@@ -5,9 +5,10 @@ import { auth, getAuthResult } from "@/firebase";
 import Logo from "@/../assets/logo.png";
 import GuestLayout from "@/Layouts/GuestLayout";
 import { useAuth } from "@/Hooks/useAuth";
+import theme from "@/theme";
 
 export default function Login() {
-  const { errors } = usePage().props; // We get the errors from props
+  const { errors } = usePage().props;
   const {
     data,
     setData,
@@ -102,7 +103,7 @@ export default function Login() {
                     value={data.email}
                     onChange={handleChange}
                     className="w-full rounded-md border border-gray-300 px-3 py-2 pl-10
-                                     focus:border-[#FF2D20] focus:outline-none focus:ring-[#FF2D20]"
+                                     focus:border-[theme.colors.primary.500] focus:outline-none focus:ring-[theme.colors.primary.500]"
                     required
                   />
                   <span
@@ -126,8 +127,8 @@ export default function Login() {
                     onChange={handleChange}
                     className="w-full rounded-md border
                                      border-gray-300 px-3 py-2 pl-10
-                                     focus:border-[#FF2D20] 
-                                     focus:outline-none focus:ring-[#FF2D20]
+                                     focus:border-[theme.colors.primary.500] 
+                                     focus:outline-none focus:ring-[theme.colors.primary.500]
                                       dark:border-gray-700"
                     required
                   />
@@ -147,8 +148,8 @@ export default function Login() {
                                 id="remember"
                                 checked={data.remember}
                                 onChange={handleChange}
-                                className="h-4 w-4 rounded border-gray-300 text-[#FF2D20]
-                                 focus:ring-[#FF2D20]"
+                                className="h-4 w-4 rounded border-gray-300 text-[theme.colors.primary.500]
+                                 focus:ring-[theme.colors.primary.500]"
                             />
                             <label htmlFor="remember" className="ml-2 block text-sm text-gray-700
                             ">
@@ -159,11 +160,11 @@ export default function Login() {
               <button
                 type="submit"
                 disabled={processing || loading}
-                className="w-full rounded-md bg-[#FF2D20] px-4 py-2 font-medium text-white
-                             transition hover:bg-[#FF2D20]/90 focus:outline-none 
+                className="w-full rounded-md bg-[theme.colors.primary.500] px-4 py-2 font-medium text-white
+                             transition hover:bg-[theme.colors.primary.500]/90 focus:outline-none 
                              md:bg-gradient-to-r
                                      from-red-600 to-purple-500
-                             focus:ring-2 focus:ring-[#FF2D20] focus:ring-offset-2 disabled:opacity-75"
+                             focus:ring-2 focus:ring-[theme.colors.primary.500] focus:ring-offset-2 disabled:opacity-75"
               >
                 {loading ? "Logging in..." : "Login"}
                 <span
