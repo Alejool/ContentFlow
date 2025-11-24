@@ -28,7 +28,7 @@ export default function ResetPassword({ token, email }) {
             <form onSubmit={submit}>
                 <div>
                     <InputLabel htmlFor="email" value="Email" />
-
+ 
                     <TextInput
                         id="email"
                         type="email"
@@ -76,6 +76,8 @@ export default function ResetPassword({ token, email }) {
                             setData('password_confirmation', e.target.value)
                         }
                     />
+
+                    
 
                     <InputError
                         message={errors.password_confirmation}

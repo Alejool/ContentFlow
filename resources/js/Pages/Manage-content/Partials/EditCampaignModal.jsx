@@ -1,4 +1,13 @@
 import { useState, useRef, useEffect } from "react";
+import {
+  FileText,
+  FileImage,
+  Camera,
+  Hash,
+  Save,
+  AlertTriangle,
+  Edit,
+} from "lucide-react";
 
 export default function EditCampaignModal({
   isOpen,
@@ -51,8 +60,7 @@ export default function EditCampaignModal({
     if (!formData.description.trim()) {
       newErrors.description = "Description is required";
     } else if (formData.description.length < 10) {
-      newErrors.description =
-        "Description must be at least 10 characters";
+      newErrors.description = "Description must be at least 10 characters";
     } else if (formData.description.length > 500) {
       newErrors.description = "Description cannot exceed 500 characters";
     }
@@ -214,7 +222,8 @@ export default function EditCampaignModal({
         <div className="flex items-center justify-between p-6 border-b border-gray-100">
           <div>
             <h2 className="text-2xl font-bold text-gray-900">
-              ✏️ Edit Campaign
+              <Edit className="inline h-6 w-6 mr-2 text-blue-600" />
+              Edit Campaign
             </h2>
             <p className="text-sm text-gray-500 mt-1">
               Update your campaign with new information
@@ -255,7 +264,8 @@ export default function EditCampaignModal({
           {/* Title */}
           <div className="space-y-2">
             <label className="flex items-center text-sm font-semibold text-gray-700">
-              📝 Campaign Title
+              <FileText className="inline h-4 w-4 mr-1" />
+              Campaign Title
               <span className="text-red-500 ml-1">*</span>
             </label>
             <input
@@ -271,7 +281,8 @@ export default function EditCampaignModal({
             <div className="flex justify-between text-xs">
               {errors.title && (
                 <p className="text-red-600 flex items-center">
-                  ⚠️ {errors.title}
+                  <AlertTriangle className="inline h-3 w-3 mr-1" />
+                  {errors.title}
                 </p>
               )}
               <p
@@ -289,7 +300,8 @@ export default function EditCampaignModal({
           {/* Description */}
           <div className="space-y-2">
             <label className="flex items-center text-sm font-semibold text-gray-700">
-              📄 Description
+              <FileText className="inline h-4 w-4 mr-1" />
+              Description
               <span className="text-red-500 ml-1">*</span>
             </label>
             <textarea
@@ -306,7 +318,8 @@ export default function EditCampaignModal({
             <div className="flex justify-between text-xs">
               {errors.description && (
                 <p className="text-red-600 flex items-center">
-                  ⚠️ {errors.description}
+                  <AlertTriangle className="inline h-3 w-3 mr-1" />
+                  {errors.description}
                 </p>
               )}
               <p
@@ -324,7 +337,8 @@ export default function EditCampaignModal({
           {/* Image Upload */}
           <div className="space-y-2">
             <label className="flex items-center text-sm font-semibold text-gray-700">
-              🖼️ Campaign Image
+              <FileImage className="inline h-4 w-4 mr-1" />
+              Campaign Image
               <span className="text-gray-400 ml-1 text-xs">(Optional)</span>
             </label>
 
@@ -343,7 +357,7 @@ export default function EditCampaignModal({
                 onClick={() => fileInputRef.current?.click()}
               >
                 <div className="space-y-3">
-                  <div className="text-4xl">📸</div>
+                  <Camera className="h-10 w-10 mx-auto text-gray-400" />
                   <div>
                     <p className="text-gray-600 font-medium">
                       Drag a new image here or click to select
@@ -424,7 +438,8 @@ export default function EditCampaignModal({
 
             {errors.image && (
               <p className="text-red-600 text-xs flex items-center">
-                ⚠️ {errors.image}
+                <AlertTriangle className="inline h-3 w-3 mr-1" />
+                {errors.image}
               </p>
             )}
           </div>
@@ -432,7 +447,8 @@ export default function EditCampaignModal({
           {/* Hashtags */}
           <div className="space-y-2">
             <label className="flex items-center text-sm font-semibold text-gray-700">
-              🏷️ Hashtags
+              <Hash className="inline h-4 w-4 mr-1" />
+              Hashtags
               <span className="text-red-500 ml-1">*</span>
             </label>
             <input
@@ -448,7 +464,8 @@ export default function EditCampaignModal({
             <div className="flex justify-between text-xs">
               {errors.hashtags && (
                 <p className="text-red-600 flex items-center">
-                  ⚠️ {errors.hashtags}
+                  <AlertTriangle className="inline h-3 w-3 mr-1" />
+                  {errors.hashtags}
                 </p>
               )}
               <p className="text-gray-400 ml-auto">
@@ -506,7 +523,7 @@ export default function EditCampaignModal({
                 </>
               ) : (
                 <>
-                  <span>💾</span>
+                  <Save className="inline h-4 w-4" />
                   <span>Save Changes</span>
                 </>
               )}

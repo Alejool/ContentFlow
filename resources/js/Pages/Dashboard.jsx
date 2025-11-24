@@ -1,186 +1,205 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import DashboardCard from './Components/DashboardCard';
-import { Head } from '@inertiajs/react';
-import { Link } from '@inertiajs/react';
-import { 
-    Box, 
-    Heading, 
-    Text,
-    SimpleGrid,
-    Flex,
-    Card,
-    Icon,
-    Button
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
+import DashboardCard from "./Components/DashboardCard";
+import { Head } from "@inertiajs/react";
+import { theme } from "@/theme";
+import {
+  Box,
+  Heading,
+  Text,
+  SimpleGrid,
+  Card,
+  Button,
+  Container,
+  VStack,
+  HStack,
+  Stat,
+  Icon,
 } from "@chakra-ui/react";
 
 export default function Dashboard() {
-    return (
-      <AuthenticatedLayout>
-        <Head title="Dashboard" />
-        <Box py="12" mt={5}>
-          <Box mx="auto" maxW="1300px" px={{ base: "6", lg: "8" }}>
-            {/* Welcome Header */}
-            <Box mb="8" textAlign="center">
+  return (
+    <AuthenticatedLayout>
+      <Head title="Dashboard" />
+      <Box bg={theme.colors.gray[50]} minH="100vh">
+        <Container maxW="7xl" py={8}>
+          <VStack spacing={8} align="stretch">
+            <Box textAlign="center" py={6}>
               <Heading
-                as="h1"
-                fontSize="5xl"
-                mb="10"
-                fontWeight="bold"
-                color="gray.900"
+                size="2xl"
+                mb={3}
+                color={theme.colors.gray[900]}
+                fontWeight="800"
               >
-                Welcome to ContentFlow
+                ContentFlow
               </Heading>
-              <Text mt="2" fontSize="2xl" color="gray.600">
-                Manage your multimedia content efficiently with AI-powered
-                tools.
+              <Text fontSize="lg" color={theme.colors.gray[600]}>
+                Manage your content with modern tools
               </Text>
             </Box>
 
-            {/* Main Dashboard Grid */}
-            <SimpleGrid columns={{ base: 1, md:2, '2xl':4 }} spacing="8" gap="6">
-              <DashboardCard
-                title="Content Management"
-                description="Organize, edit, and schedule your multimedia content."
-                href="/manage-content"
-                buttonText="Manage Content"
-                icon="icon-[mdi--rolodex]"
-              />
-              <DashboardCard
-                title="Schedule Posts"
-                description="Plan and schedule your social media posts with ease."
-                href="/schedule"
-                buttonText="Schedule Now"
-                icon="icon-[iconoir--post]"
-              />
-              <DashboardCard
-                title="Analytics"
-                description="Track engagement and performance metrics."
-                href="/analytics"
-                buttonText="View Analytics"
-                icon="icon-[pixel--analytics]"
-              />
-              <DashboardCard
-                title="AI Chat"
-                description="Get real-time recommendations and support from our AI."
-                href="/ai-chat"
-                buttonText="Chat Now"
-                icon="icon-[hugeicons--ai-beautify]"
-              />
+            {/* Stats Cards */}
+            <SimpleGrid columns={{ base: 1, md: 4 }} spacing={6}>
+              <Card.Root
+                bg={theme.colors.white}
+                shadow="sm"
+                border="1px"
+                borderColor={theme.colors.gray[200]}
+              >
+                <Card.Body p={6}>
+                  <Stat.Root>
+                    <Stat.Label color={theme.colors.gray[600]}>
+                      Total Posts
+                    </Stat.Label>
+                    <Stat.ValueText
+                      color={theme.colors.primary[600]}
+                      fontSize="2xl"
+                    >
+                      1,234
+                    </Stat.ValueText>
+                  </Stat.Root>
+                </Card.Body>
+              </Card.Root>
+              <Card.Root
+                bg={theme.colors.white}
+                shadow="sm"
+                border="1px"
+                borderColor={theme.colors.gray[200]}
+              >
+                <Card.Body p={6}>
+                  <Stat.Root>
+                    <Stat.Label color={theme.colors.gray[600]}>
+                      Campaigns
+                    </Stat.Label>
+                    <Stat.ValueText
+                      color={theme.colors.primary[600]}
+                      fontSize="2xl"
+                    >
+                      56
+                    </Stat.ValueText>
+                  </Stat.Root>
+                </Card.Body>
+              </Card.Root>
+              <Card.Root
+                bg={theme.colors.white}
+                shadow="sm"
+                border="1px"
+                borderColor={theme.colors.gray[200]}
+              >
+                <Card.Body p={6}>
+                  <Stat.Root>
+                    <Stat.Label color={theme.colors.gray[600]}>
+                      Engagement
+                    </Stat.Label>
+                    <Stat.ValueText
+                      color={theme.colors.primary[600]}
+                      fontSize="2xl"
+                    >
+                      89%
+                    </Stat.ValueText>
+                  </Stat.Root>
+                </Card.Body>
+              </Card.Root>
+              <Card.Root
+                bg={theme.colors.white}
+                shadow="sm"
+                border="1px"
+                borderColor={theme.colors.gray[200]}
+              >
+                <Card.Body p={6}>
+                  <Stat.Root>
+                    <Stat.Label color={theme.colors.gray[600]}>
+                      Revenue
+                    </Stat.Label>
+                    <Stat.ValueText
+                      color={theme.colors.primary[600]}
+                      fontSize="2xl"
+                    >
+                      $12.5K
+                    </Stat.ValueText>
+                  </Stat.Root>
+                </Card.Body>
+              </Card.Root>
             </SimpleGrid>
 
-            <Box mt={20}>
-              <Heading
-                as="h2"
-                fontSize="6xl"
-                fontWeight="bold"
-                color="gray.900"
-              >
-                Quick Actions
+            {/* Main Features */}
+            <Box>
+              <Heading size="lg" mb={6} color={theme.colors.gray[800]}>
+                Main Features
               </Heading>
-            </Box>
-
-            {/* Quick Actions Section */}
-            <Box mt={20}>
-              <SimpleGrid
-                columns={{ base: 1, sm: 2, lg: 4 }}
-                gap="6"
-                spacing="6"
-              >
-                {/* Quick Action 1: Upload Content */}
-                <Card.Root
-                  overflow="hidden"
-                  shadow="xl"
-                  rounded="lg"
-                  _hover={{ transform: "scale(1.05)", shadow: "2xl" }}
-                  transition="all 0.3s"
-                >
-                  <Card.Body p="6">
-                    <Button
-                      w="full"
-                      py="3"
-                      bg="red.600"
-                      color="white"
-                      rounded="lg"
-                      _hover={{ bg: "red.700" }}
-                      transition="background 0.3s"
-                    >
-                      Upload Content
-                    </Button>
-                  </Card.Body>
-                </Card.Root>
-
-                {/* Quick Action 2: Create Campaign */}
-                <Card.Root
-                  overflow="hidden"
-                  shadow="xl"
-                  rounded="lg"
-                  _hover={{ transform: "scale(1.05)", shadow: "2xl" }}
-                  transition="all 0.3s"
-                >
-                  <Card.Body p="6">
-                    <Button
-                      w="full"
-                      py="3"
-                      bg="red.600"
-                      color="white"
-                      rounded="lg"
-                      _hover={{ bg: "red.700" }}
-                      transition="background 0.3s"
-                    >
-                      Create Campaign
-                    </Button>
-                  </Card.Body>
-                </Card.Root>
-
-                {/* Quick Action 3: Team Collaboration */}
-                <Card.Root
-                  overflow="hidden"
-                  shadow="xl"
-                  rounded="lg"
-                  _hover={{ transform: "scale(1.05)", shadow: "2xl" }}
-                  transition="all 0.3s"
-                >
-                  <Card.Body p="6">
-                    <Button
-                      w="full"
-                      py="3"
-                      bg="red.600"
-                      color="white"
-                      rounded="lg"
-                      _hover={{ bg: "red.700" }}
-                      transition="background 0.3s"
-                    >
-                      Team Collaboration
-                    </Button>
-                  </Card.Body>
-                </Card.Root>
-
-                {/* Quick Action 4: Settings */}
-                <Card.Root
-                  overflow="hidden"
-                  shadow="xl"
-                  rounded="lg"
-                  _hover={{ transform: "scale(1.05)", shadow: "2xl" }}
-                  transition="all 0.3s"
-                >
-                  <Card.Body p="6">
-                    <Button
-                      w="full"
-                      py="3"
-                      bg="red.600"
-                      color="white"
-                      rounded="lg"
-                      _hover={{ bg: "red.700" }}
-                      transition="background 0.3s"
-                    >
-                      Settings
-                    </Button>
-                  </Card.Body>
-                </Card.Root>
+              <SimpleGrid columns={{ base: 1, md: 2, xl: 4 }} spacing={6}>
+                <DashboardCard
+                  title="Content Management"
+                  description="Organize and schedule your content"
+                  href="/manage-content"
+                  buttonText="Manage"
+                  icon="icon-[mdi--rolodex]"
+                />
+                <DashboardCard
+                  title="Schedule Posts"
+                  description="Plan your social media posts"
+                  href="/schedule"
+                  buttonText="Schedule"
+                  icon="icon-[iconoir--post]"
+                />
+                <DashboardCard
+                  title="Analytics"
+                  description="Track performance metrics"
+                  href="/analytics"
+                  buttonText="View Stats"
+                  icon="icon-[pixel--analytics]"
+                />
+                <DashboardCard
+                  title="AI Assistant"
+                  description="Get AI-powered recommendations"
+                  href="/ai-chat"
+                  buttonText="Chat"
+                  icon="icon-[hugeicons--ai-beautify]"
+                />
               </SimpleGrid>
             </Box>
-          </Box>
-        </Box>
-      </AuthenticatedLayout>
-    );
+
+            {/* Quick Actions */}
+            <Box>
+              <Heading size="lg" mb={6} color={theme.colors.gray[800]}>
+                Quick Actions
+              </Heading>
+              <HStack spacing={4} flexWrap="wrap">
+                <Button
+                  bg={theme.colors.primary[600]}
+                  color={theme.colors.white}
+                  _hover={{ bg: theme.colors.primary[700] }}
+                  size="lg"
+                  px={8}
+                >
+                  Upload Content
+                </Button>
+                <Button
+                  bg={theme.colors.white}
+                  color={theme.colors.gray[700]}
+                  border="1px"
+                  borderColor={theme.colors.gray[300]}
+                  _hover={{ bg: theme.colors.gray[50] }}
+                  size="lg"
+                  px={8}
+                >
+                  New Campaign
+                </Button>
+                <Button
+                  bg={theme.colors.white}
+                  color={theme.colors.gray[700]}
+                  border="1px"
+                  borderColor={theme.colors.gray[300]}
+                  _hover={{ bg: theme.colors.gray[50] }}
+                  size="lg"
+                  px={8}
+                >
+                  Team Settings
+                </Button>
+              </HStack>
+            </Box>
+          </VStack>
+        </Container>
+      </Box>
+    </AuthenticatedLayout>
+  );
 }

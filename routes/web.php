@@ -65,6 +65,7 @@ Route::middleware(['web'])->group(function () {
     Route::get('/auth/instagram/callback', [SocialAccountController::class, 'handleInstagramCallback']);
     Route::get('/auth/twitter/callback', [SocialAccountController::class, 'handleTwitterCallback']);
     Route::get('/auth/youtube/callback', [SocialAccountController::class, 'handleYoutubeCallback']);
+    Route::get('/auth/tiktok/callback', [SocialAccountController::class, 'handleTiktokCallback']);
 });
    
 require __DIR__ . '/auth.php';

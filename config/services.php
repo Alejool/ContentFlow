@@ -59,6 +59,12 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI'),
     ],
     
+    'tiktok' => [
+        'client_key' => env('TIKTOK_CLIENT_KEY'),
+        'client_secret' => env('TIKTOK_CLIENT_SECRET'),
+        'redirect' => env('TIKTOK_REDIRECT_URI'),
+    ],
+    
     'openai' => [
         'enabled' => env('OPENAI_ENABLED', false),
         'api_key' => env('OPENAI_API_KEY'),

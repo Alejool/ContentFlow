@@ -72,7 +72,13 @@
         "allow-plugins": {
             "pestphp/pest-plugin": true,
             "php-http/discovery": true
-        }
+        },
+    "audit": {
+        "ignore": [
+            "PKSA-365x-2zjk-pt47"
+        ]
+    
+    }
     },
     "minimum-stability": "stable",
     "prefer-stable": true

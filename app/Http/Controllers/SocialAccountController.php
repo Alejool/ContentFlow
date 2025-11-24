@@ -6,6 +6,7 @@ use App\Models\SocialAccount;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class SocialAccountController extends Controller
@@ -76,12 +77,21 @@ class SocialAccountController extends Controller
                 break;
                 
             case 'tiktok':
+                // Generate PKCE code verifier and challenge for TikTok
+                $codeVerifier = Str::random(128);
+                $codeChallenge = rtrim(strtr(base64_encode(hash('sha256', $codeVerifier, true)), '+/', '-_'), '=');
+                
+                // Store code verifier in session for later use in callback
+                session(['tiktok_code_verifier' => $codeVerifier]);
+                
                 $url = 'https://www.tiktok.com/v2/auth/authorize?' . http_build_query([
                     'client_key' => config('services.tiktok.client_key'),
                     'redirect_uri' => url('/auth/tiktok/callback'),
                     'response_type' => 'code',
                     'scope' => 'user.info.basic,video.publish',
-                    'state' => $state
+                    'state' => $state,
+                    'code_challenge' => $codeChallenge,
+                    'code_challenge_method' => 'S256'
                 ]);
                 break;
                 
@@ -177,8 +187,8 @@ class SocialAccountController extends Controller
         }
         
         try {
-            // Exchange code for access token
-            $response = Http::post('https://api.instagram.com/oauth/access_token', [
+            // Exchange code for access token (Instagram Basic Display API)
+            $response = Http::asForm()->post('https://api.instagram.com/oauth/access_token', [
                 'client_id' => config('services.instagram.client_id'),
                 'client_secret' => config('services.instagram.client_secret'),
                 'redirect_uri' => url('/auth/instagram/callback'),
@@ -189,28 +199,44 @@ class SocialAccountController extends Controller
             $data = $response->json();
             
             if (!isset($data['access_token']) || !isset($data['user_id'])) {
-                return $this->handleOAuthError('Could not obtain access token');
+                \Log::error('Instagram OAuth Error:', $data);
+                return $this->handleOAuthError('Could not obtain access token: ' . json_encode($data));
             }
+            
+            // Exchange for long-lived token (expires in 60 days)
+            $longLivedResponse = Http::get('https://graph.instagram.com/access_token', [
+                'grant_type' => 'ig_exchange_token',
+                'client_secret' => config('services.instagram.client_secret'),
+                'access_token' => $data['access_token']
+            ]);
+            
+            $longLivedData = $longLivedResponse->json();
+            $finalAccessToken = $longLivedData['access_token'] ?? $data['access_token'];
+            $expiresIn = $longLivedData['expires_in'] ?? null;
             
             // Save the account to the database
             $account = $this->saveAccount([
                 'platform' => 'instagram',
                 'account_id' => $data['user_id'],
-                'access_token' => $data['access_token'],
+                'access_token' => $finalAccessToken,
                 'refresh_token' => null,
-                'token_expires_at' => null,
+                'token_expires_at' => $expiresIn ? now()->addSeconds($expiresIn) : null,
             ]);
             
             // Close the window and send message to the main window
             return $this->closeWindowWithMessage('success', [
                 'platform' => 'instagram',
                 'account_id' => $data['user_id'],
-                'access_token' => $data['access_token'],
+                'access_token' => $finalAccessToken,
                 'refresh_token' => null,
-                'token_expires_at' => null
+                'token_expires_at' => $expiresIn ? now()->addSeconds($expiresIn)->toIso8601String() : null
             ]);
             
         } catch (\Exception $e) {
+            \Log::error('Instagram OAuth Exception:', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
             return $this->handleOAuthError('Error processing authentication: ' . $e->getMessage());
         }
     }
@@ -362,16 +388,27 @@ class SocialAccountController extends Controller
         }
         
         try {
-            // Exchange code for access token
-            $response = Http::post('https://open-api.tiktok.com/oauth/access_token/', [
+            // Get code verifier from session
+            $codeVerifier = session('tiktok_code_verifier');
+            
+            if (!$codeVerifier) {
+                return $this->handleOAuthError('Code verifier not found in session');
+            }
+            
+            // Exchange code for access token with code_verifier
+            $response = Http::asForm()->post('https://open.tiktokapis.com/v2/oauth/token/', [
                 'client_key' => config('services.tiktok.client_key'),
                 'client_secret' => config('services.tiktok.client_secret'),
                 'code' => $request->code,
                 'grant_type' => 'authorization_code',
                 'redirect_uri' => url('/auth/tiktok/callback'),
+                'code_verifier' => $codeVerifier,
             ]);
             
             $data = $response->json();
+            
+            // Clear code verifier from session
+            session()->forget('tiktok_code_verifier');
             
             if (!isset($data['data']['access_token']) || !isset($data['data']['open_id'])) {
                 return $this->handleOAuthError('Could not obtain access token');
@@ -450,5 +487,67 @@ class SocialAccountController extends Controller
             'success' => $status === 'success',
             'data' => json_encode($data)
         ]);
+    }
+    
+    // Store a new social account
+    public function store(Request $request)
+    {
+        $request->validate([
+            'platform' => 'required|string|in:facebook,instagram,twitter,youtube,tiktok',
+            'account_id' => 'required|string',
+            'access_token' => 'required|string',
+            'refresh_token' => 'nullable|string',
+            'token_expires_at' => 'nullable|date',
+        ]);
+        
+        try {
+            $account = $this->saveAccount([
+                'platform' => $request->platform,
+                'account_id' => $request->account_id,
+                'access_token' => $request->access_token,
+                'refresh_token' => $request->refresh_token,
+                'token_expires_at' => $request->token_expires_at,
+            ]);
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Account connected successfully',
+                'account' => $account
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error saving account: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    
+    // Delete/disconnect a social account
+    public function destroy($id)
+    {
+        try {
+            $account = SocialAccount::where('id', $id)
+                ->where('user_id', Auth::id())
+                ->first();
+                
+            if (!$account) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Account not found'
+                ], 404);
+            }
+            
+            $account->delete();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Account disconnected successfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error disconnecting account: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

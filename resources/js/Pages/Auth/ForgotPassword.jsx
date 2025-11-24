@@ -2,16 +2,15 @@ import InputError from '@/Components/InputError.tsx';
 import PrimaryButton from '@/Components/PrimaryButton.tsx';
 import TextInput from '@/Components/TextInput.tsx';
 import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, useForm, Link} from '@inertiajs/react';
 import Logo from '@/../assets/logo.png';
-import { Link } from '@inertiajs/react';
 
 
 export default function ForgotPassword({ status }) {
     const { data, setData, post, processing, errors } = useForm({
         email: '',
     });
-
+     
     const submit = (e) => {
         e.preventDefault();
 

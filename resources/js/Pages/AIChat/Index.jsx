@@ -23,37 +23,85 @@ import {
   Stat,
   Separator,
 } from "@chakra-ui/react";
+import {
+  Lightbulb,
+  Camera,
+  Leaf,
+  Users,
+  User as UserIcon,
+  Star,
+} from "lucide-react";
 
 // Minimalist SVG Icons
 const Icon = ({ type, size = 20, className = "" }) => {
   const icons = {
     ai: (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
+      <svg
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        className={className}
+      >
         <circle cx="12" cy="12" r="3" />
         <path d="M12 1v6m0 6v6" />
         <path d="m21 12-6-6-6 6-6-6" />
       </svg>
     ),
     send: (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
+      <svg
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        className={className}
+      >
         <path d="m22 2-7 20-4-9-9-4Z" />
       </svg>
     ),
     lightbulb: (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
+      <svg
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        className={className}
+      >
         <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5" />
         <path d="M9 18h6" />
         <path d="M10 22h4" />
       </svg>
     ),
     trending: (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
+      <svg
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        className={className}
+      >
         <polyline points="22,6 13.5,15.5 8.5,10.5 1,18" />
         <polyline points="22,6 18,6 18,10" />
       </svg>
     ),
     stats: (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
+      <svg
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        className={className}
+      >
         <line x1="12" y1="20" x2="12" y2="10" />
         <line x1="18" y1="20" x2="18" y2="4" />
         <line x1="6" y1="20" x2="6" y2="16" />
@@ -61,26 +109,30 @@ const Icon = ({ type, size = 20, className = "" }) => {
     ),
   };
 
-  return <Box as="span" display="inline-flex" alignItems="center">{icons[type]}</Box>;
+  return (
+    <Box as="span" display="inline-flex" alignItems="center">
+      {icons[type]}
+    </Box>
+  );
 };
 
 // Minimalist Chat Message
 const ChatMessage = ({ message, user }) => {
   const isAI = message.sender === "AI";
-  
+
   return (
-    <Flex 
+    <Flex
       gap={4}
       p={2}
       direction={isAI ? "row" : "row-reverse"}
-          className="text-white  "
-      >
-      <Avatar.Root 
-        // size="2xl" 
+      className="text-white  "
+    >
+      <Avatar.Root
+        // size="2xl"
         flexShrink={0}
-        >
-        <Avatar.Fallback 
-          bg={isAI ? "orange.600" : "purple.500"} 
+      >
+        <Avatar.Fallback
+          bg={isAI ? "orange.600" : "purple.500"}
           color="white"
           fontSize="sm"
           h={10}
@@ -92,14 +144,14 @@ const ChatMessage = ({ message, user }) => {
           justifyContent="center"
           className="mx-auto"
         >
-          {isAI ? "AI" :  user.name?.charAt(0)?.toUpperCase()+1 || 'U'}
+          {isAI ? "AI" : user.name?.charAt(0)?.toUpperCase() + 1 || "U"}
         </Avatar.Fallback>
       </Avatar.Root>
-      
-      <Box 
+
+      <Box
         bg={isAI ? "white" : "red.50"}
-        px={4} 
-        py={3} 
+        px={4}
+        py={3}
         rounded="2xl"
         maxW="80%"
         shadow="sm"
@@ -119,18 +171,26 @@ const ChatMessage = ({ message, user }) => {
 
 // Compact Statistics
 const CompactStats = ({ campaigns }) => {
-  const active = campaigns.filter(c => c.status === "active").length;
+  const active = campaigns.filter((c) => c.status === "active").length;
   const total = campaigns.length;
 
   return (
     <Flex gap={6}>
       <Box textAlign="center">
-        <Text fontSize="lg" fontWeight="bold" color="red.600">{active}</Text>
-        <Text fontSize="xs" color="gray.500">Active</Text>
+        <Text fontSize="lg" fontWeight="bold" color="red.600">
+          {active}
+        </Text>
+        <Text fontSize="xs" color="gray.500">
+          Active
+        </Text>
       </Box>
       <Box textAlign="center">
-        <Text fontSize="lg" fontWeight="bold" color="blue.600">{total}</Text>
-        <Text fontSize="xs" color="gray.500">Total</Text>
+        <Text fontSize="lg" fontWeight="bold" color="blue.600">
+          {total}
+        </Text>
+        <Text fontSize="xs" color="gray.500">
+          Total
+        </Text>
       </Box>
     </Flex>
   );
@@ -149,7 +209,7 @@ const IdeaCard = ({ idea, onUse }) => (
     transition="all 0.2s"
   >
     <Flex align="start" gap={3} w="full" flex={1}>
-      <Text fontSize="lg">{idea.icon}</Text>
+      <idea.icon className="h-5 w-5 text-red-600" />
       <Box flex={1}>
         <Text fontSize="sm" fontWeight="600" color="gray.800" mb={1}>
           {idea.title}
@@ -170,11 +230,13 @@ const IdeasPanel = ({ ideas, onUse }) => (
         <Box p={2} bg="red.100" rounded="lg" color="red.600">
           <Icon type="lightbulb" size={18} />
         </Box>
-        <Heading size="md" color="gray.800">Ideas</Heading>
+        <Heading size="md" color="gray.800">
+          Ideas
+        </Heading>
       </Flex>
-      
+
       <Stack gap={2}>
-        {ideas.map(idea => (
+        {ideas.map((idea) => (
           <IdeaCard key={idea.id} idea={idea} onUse={onUse} />
         ))}
       </Stack>
@@ -189,16 +251,22 @@ const MobileIdeasDrawer = ({ isOpen, onClose, ideas, onUse }) => (
     <Drawer.Positioner>
       <Drawer.Content>
         <Drawer.Header borderBottom="1px" borderColor="gray.100">
-          <Drawer.Title>💡 Campaign Ideas</Drawer.Title>
+          <Drawer.Title>
+            <Lightbulb className="inline h-4 w-4 mr-2" />
+            Campaign Ideas
+          </Drawer.Title>
           <Drawer.CloseTrigger />
         </Drawer.Header>
         <Drawer.Body p={4}>
           <Stack gap={2}>
-            {ideas.map(idea => (
-              <IdeaCard 
-                key={idea.id} 
-                idea={idea} 
-                onUse={(idea) => { onUse(idea); onClose(); }} 
+            {ideas.map((idea) => (
+              <IdeaCard
+                key={idea.id}
+                idea={idea}
+                onUse={(idea) => {
+                  onUse(idea);
+                  onClose();
+                }}
               />
             ))}
           </Stack>
@@ -226,25 +294,25 @@ export default function Index() {
       id: 1,
       title: "Visual Marketing",
       description: "Visual content generates 40% more engagement",
-      icon: "📸",
+      icon: Camera,
     },
     {
       id: 2,
       title: "Sustainability",
       description: "Eco-friendly brands retain 25% more customers",
-      icon: "🌱",
+      icon: Leaf,
     },
     {
       id: 3,
       title: "Micro-Influencers",
       description: "Higher conversion than celebrities",
-      icon: "👥",
+      icon: Users,
     },
     {
       id: 4,
       title: "UGC Content",
       description: "Increases authenticity and reduces costs",
-      icon: "👤",
+      icon: UserIcon,
     },
   ]);
   const user = usePage().props.auth.user || {};
@@ -350,7 +418,8 @@ export default function Index() {
                     </Heading>
                   </Flex>
                   <Badge colorScheme="green" variant="subtle" rounded="full">
-                    ⭐Online
+                    <Star className="inline h-3 w-3 mr-1" />
+                    Online
                   </Badge>
                 </Flex>
 
@@ -396,22 +465,22 @@ export default function Index() {
 
                     {loading && (
                       <Flex gap={3} align="center">
-                         <Avatar.Root size="sm"> 
-                          <Avatar.Fallback 
-                              bg="orange.600"  
-                              color="white"
-                              fontSize="sm"
-                              h={10}
-                              p={2}
-                              w={10}
-                              borderRadius="full"
-                              display="flex"
-                              alignItems="center"
-                              justifyContent="center"
-                              className="mx-auto"
-                            >
+                        <Avatar.Root size="sm">
+                          <Avatar.Fallback
+                            bg="orange.600"
+                            color="white"
+                            fontSize="sm"
+                            h={10}
+                            p={2}
+                            w={10}
+                            borderRadius="full"
+                            display="flex"
+                            alignItems="center"
+                            justifyContent="center"
+                            className="mx-auto"
+                          >
                             AI
-                            </Avatar.Fallback>
+                          </Avatar.Fallback>
                         </Avatar.Root>
 
                         <Box

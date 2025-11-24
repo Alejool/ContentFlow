@@ -1,9 +1,11 @@
+import { TrendingUp, Eye, MousePointerClick, Link2 } from 'lucide-react';
+
 export default function ContentMetrics() {
     const contentMetrics = [
-        { id: 1, title: 'Engagement Rate', value: '8.5%', change: '+2.3%', icon: '📈' },
-        { id: 2, title: 'Impressions', value: '1.2M', change: '+15%', icon: '👀' },
-        { id: 3, title: 'Clicks', value: '45K', change: '+10%', icon: '🖱️' },
-        { id: 4, title: 'Shares', value: '12K', change: '+5%', icon: '🔗' },
+        { id: 1, title: 'Engagement Rate', value: '8.5%', change: '+2.3%', icon: TrendingUp },
+        { id: 2, title: 'Impressions', value: '1.2M', change: '+15%', icon: Eye },
+        { id: 3, title: 'Clicks', value: '45K', change: '+10%', icon: MousePointerClick },
+        { id: 4, title: 'Shares', value: '12K', change: '+5%', icon: Link2 },
     ];
 
     return (
@@ -18,7 +20,7 @@ export default function ContentMetrics() {
                             <p className="text-sm text-gray-600">{metric.title}</p>
                             <p className="text-2xl font-bold text-gray-800">{metric.value}</p>
                         </div>
-                        <span className="text-2xl">{metric.icon}</span>
+                        <metric.icon className="h-8 w-8 text-red-600" />
                     </div>
                     <p className="mt-2 text-sm text-green-600">{metric.change}</p>
                 </div>
