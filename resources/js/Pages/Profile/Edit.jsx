@@ -3,7 +3,9 @@ import { Head, usePage } from "@inertiajs/react";
 import DeleteUserForm from "./Partials/DeleteUserForm";
 import UpdatePasswordForm from "./Partials/UpdatePasswordForm";
 import UpdateProfileInformationForm from "./Partials/UpdateProfileInformationForm";
-import { Avatar, Circle, Highlight } from "@chakra-ui/react";
+import ConnectedAccounts from "./Partials/ConnectedAccounts";
+import AccountStatistics from "./Partials/AccountStatistics";
+import { Avatar } from "@chakra-ui/react";
 
 export default function Edit({ mustVerifyEmail, status }) {
   const user = usePage().props.auth.user;
@@ -42,17 +44,21 @@ export default function Edit({ mustVerifyEmail, status }) {
       <div className="py-12 bg-gray-50 min-h-screen">
         <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Left Column: Profile Info */}
+            {/* Left Column: Profile Info & Stats */}
             <div className="space-y-8">
               <UpdateProfileInformationForm
                 mustVerifyEmail={mustVerifyEmail}
                 status={status}
-                className="h-full"
+                className="h-auto"
               />
+
+              <AccountStatistics />
             </div>
 
-            {/* Right Column: Security & Danger Zone */}
+            {/* Right Column: Connections, Security & Danger Zone */}
             <div className="space-y-8">
+              <ConnectedAccounts />
+
               <UpdatePasswordForm className="w-full" />
 
               <div className="pt-8 border-t border-gray-200">
