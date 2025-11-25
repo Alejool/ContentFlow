@@ -23,7 +23,13 @@ export function useCampaignManagement() {
         try {
             const formData = new FormData();
             Object.keys(data).forEach(key => {
-                formData.append(key, data[key]);
+                if (key === 'image' && data[key] instanceof FileList) {
+                    if (data[key].length > 0) {
+                        formData.append(key, data[key][0]);
+                    }
+                } else {
+                    formData.append(key, data[key]);
+                }
             });
             
             const response = await axios.post('/campaigns', formData);
@@ -38,16 +44,42 @@ export function useCampaignManagement() {
 
     const updateCampaign = async (id, data) => {
         try {
-            const response = await axios.put(`/campaigns/${id}`, data);
+            let response;
+            const hasFile = data.image instanceof File || data.image instanceof FileList;
+
+            if (hasFile) {
+                const formData = new FormData();
+                formData.append('_method', 'PUT');
+                
+                Object.keys(data).forEach(key => {
+                    if (key === 'image') {
+                        if (data[key] instanceof FileList && data[key].length > 0) {
+                            formData.append(key, data[key][0]);
+                        } else if (data[key] instanceof File) {
+                            formData.append(key, data[key]);
+                        }
+                    } else {
+                        formData.append(key, data[key] === null ? '' : data[key]);
+                    }
+                });
+
+                response = await axios.post(`/campaigns/${id}`, formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                });
+            } else {
+                response = await axios.put(`/campaigns/${id}`, data);
+            }
+
             setCampaigns(prevCampaigns => 
                 prevCampaigns.map(campaign => 
-                    campaign.id === id ? response.data : campaign
+                    campaign.id === id ? response.data.campaign : campaign
                 )
             );
             toast.success('Campaign updated successfully!');
             await fetchCampaigns(); 
             return true;
         } catch (error) {
+            console.error(error);
             toast.error('Failed to update campaign');
             return false;
         }
