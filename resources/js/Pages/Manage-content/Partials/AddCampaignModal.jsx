@@ -79,12 +79,6 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
       const reader = new FileReader();
       reader.onload = (e) => setImagePreview(e.target.result);
       reader.readAsDataURL(file);
-
-      // Crear un nuevo FileList para setValue
-      const dt = new DataTransfer();
-      dt.items.add(file);
-      setValue("image", dt.files);
-      trigger("image");
     }
   };
 
@@ -93,6 +87,7 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
     setIsDragOver(false);
     const files = e.dataTransfer.files;
     handleImageChange(files);
+    setValue("image", files, { shouldValidate: true });
   };
 
   const handleDragOver = (e) => {
@@ -314,12 +309,23 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
                   </div>
                 </div>
                 <input
-                  ref={fileInputRef}
                   type="file"
-                  {...register("image")}
                   className="hidden"
                   accept="image/*"
-                  onChange={(e) => handleImageChange(e.target.files)}
+                  {...(() => {
+                    const { ref, onChange, ...rest } = register("image");
+                    return {
+                      ...rest,
+                      ref: (e) => {
+                        ref(e);
+                        fileInputRef.current = e;
+                      },
+                      onChange: (e) => {
+                        handleImageChange(e.target.files);
+                        onChange(e);
+                      },
+                    };
+                  })()}
                 />
               </div>
             ) : (
@@ -352,12 +358,23 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
                   </button>
                 </div>
                 <input
-                  ref={fileInputRef}
                   type="file"
-                  {...register("image")}
                   className="hidden"
                   accept="image/*"
-                  onChange={(e) => handleImageChange(e.target.files)}
+                  {...(() => {
+                    const { ref, onChange, ...rest } = register("image");
+                    return {
+                      ...rest,
+                      ref: (e) => {
+                        ref(e);
+                        fileInputRef.current = e;
+                      },
+                      onChange: (e) => {
+                        handleImageChange(e.target.files);
+                        onChange(e);
+                      },
+                    };
+                  })()}
                 />
               </div>
             )}

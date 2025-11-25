@@ -16,8 +16,43 @@ class AnalyticsController extends Controller
      * Display a listing of the resource.
      */
     public function index(Request $request): Response {
-        return Inertia::render('Analytics/Index', []);
-    }       
+        $user = Auth::user();
+        
+        // Fetch user's campaigns to show as "Top Content"
+        // Assuming Campaign model is in App\Models\Campaigns\Campaign
+        $topContent = \App\Models\Campaigns\Campaign::where('user_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get()
+            ->map(function($campaign) {
+                return [
+                    'title' => $campaign->title,
+                    'engagement' => rand(5, 15) . '.' . rand(0, 9) . '%', // Mock engagement
+                ];
+            });
+
+        // Mock chart data
+        $engagementData = [
+            ['date' => 'Jan 1', 'engagement' => rand(30, 50) / 10],
+            ['date' => 'Jan 5', 'engagement' => rand(40, 60) / 10],
+            ['date' => 'Jan 10', 'engagement' => rand(35, 65) / 10],
+            ['date' => 'Jan 15', 'engagement' => rand(50, 70) / 10],
+            ['date' => 'Jan 20', 'engagement' => rand(60, 80) / 10],
+            ['date' => 'Jan 25', 'engagement' => rand(70, 90) / 10],
+            ['date' => 'Jan 30', 'engagement' => rand(75, 95) / 10],
+            ['date' => 'Feb 5', 'engagement' => rand(80, 100) / 10],
+            ['date' => 'Feb 10', 'engagement' => rand(75, 95) / 10],
+            ['date' => 'Feb 15', 'engagement' => rand(85, 105) / 10],
+            ['date' => 'Feb 20', 'engagement' => rand(90, 110) / 10],
+            ['date' => 'Feb 25', 'engagement' => rand(85, 105) / 10],
+            ['date' => 'Today', 'engagement' => rand(100, 120) / 10],
+        ];
+
+        return Inertia::render('Analytics/Index', [
+            'topContent' => $topContent,
+            'engagementData' => $engagementData
+        ]);
+    }
     
 
     /**  

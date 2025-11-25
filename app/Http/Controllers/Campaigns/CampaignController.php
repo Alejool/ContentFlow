@@ -15,9 +15,10 @@ class CampaignController extends Controller
     {
         // $campaigns = Campaign::all();
         // limit(10);
-        $campaigns = Campaign::orderBy('id', 'desc')->get();
-        $campaigns = Campaign::orderBy('id', 'desc')->take(10)->get();
-        // $campaigns = Campaign::orderBy('id', 'asc')->skip(5)->take(5)->get();
+        $campaigns = Campaign::where('user_id', Auth::id())
+            ->orderBy('id', 'desc')
+            ->take(10)
+            ->get();
         
         // $campaigns = Campaign::paginate(10);
 
@@ -34,7 +35,7 @@ class CampaignController extends Controller
     {
         return view('campaigns.create');
     }
-    public function store(Request $request)
+    public function store(Request $request, \App\Services\FileUploadService $fileUploadService)
     {
 
         // Check if the campaign already exists
@@ -51,15 +52,29 @@ class CampaignController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'hashtags' => 'nullable|string',
-            'image' => 'nullable|string',
+            'image' => 'nullable|file|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'objective' => 'nullable|string',
         ]);
+
+        $imageUrl = null;
+        try {
+            if ($request->hasFile('image')) {
+                $imageUrl = $fileUploadService->uploadToS3($request->file('image'), 'campaigns');
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Upload failed: ' . $e->getMessage(),
+                'status' => 500
+            ], 500);
+        }
 
         // Create the campaign
          Campaign::create([
             'title' => $validatedData['title'],
             'description' => $validatedData['description'],
             'hashtags' => $validatedData['hashtags'] ?? '',
-            'image' => $validatedData['image'] ?? '',
+            'image' => $imageUrl ?? '',
             'objective' => $validatedData['objective'] ?? '',
             'slug' => Str::slug($validatedData['title']),
             'user_id' => Auth::user()->id,
@@ -88,14 +103,14 @@ class CampaignController extends Controller
         ]);
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, $id, \App\Services\FileUploadService $fileUploadService)
     {
         // Validate input data
         $validatedData = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'hashtags' => 'nullable|string',
-            // 'image' => 'nullable|string',
+            'image' => 'nullable', // Can be file or string (if not changed)
         ]);
 
         // Find the campaign
@@ -114,7 +129,23 @@ class CampaignController extends Controller
         $campaign->title = $validatedData['title'];
         $campaign->description = $validatedData['description'];
         $campaign->hashtags = $validatedData['hashtags'] ?? $campaign->hashtags;
-        $campaign->image = $validatedData['image'] ?? $campaign->image;
+        
+        // Handle image update
+        try {
+            if ($request->hasFile('image')) {
+                $imageUrl = $fileUploadService->uploadToS3($request->file('image'), 'campaigns');
+                if ($imageUrl) {
+                    $campaign->image = $imageUrl;
+                }
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Upload failed: ' . $e->getMessage(),
+                'status' => 500
+            ], 500);
+        }
+        // If image is not a file, we assume it's the existing URL string, so we don't change it unless it was explicitly cleared (which we don't handle here yet)
         
         // Save the changes
         $campaign->save();
