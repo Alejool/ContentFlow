@@ -53,7 +53,7 @@ class CampaignController extends Controller
             'description' => 'required|string',
             'hashtags' => 'nullable|string',
             'image' => 'nullable|file|mimes:jpeg,png,jpg,gif,webp|max:5120',
-            'objective' => 'nullable|string',
+            'goal' => 'nullable|string',
         ]);
 
         $imageUrl = null;
@@ -75,7 +75,7 @@ class CampaignController extends Controller
             'description' => $validatedData['description'],
             'hashtags' => $validatedData['hashtags'] ?? '',
             'image' => $imageUrl ?? '',
-            'objective' => $validatedData['objective'] ?? '',
+            'goal' => $validatedData['goal'] ?? '',
             'slug' => Str::slug($validatedData['title']),
             'user_id' => Auth::user()->id,
         ]);
@@ -111,6 +111,7 @@ class CampaignController extends Controller
             'description' => 'required|string',
             'hashtags' => 'nullable|string',
             'image' => 'nullable', // Can be file or string (if not changed)
+            'goal' => 'nullable|string',
         ]);
 
         // Find the campaign
@@ -129,10 +130,13 @@ class CampaignController extends Controller
         $campaign->title = $validatedData['title'];
         $campaign->description = $validatedData['description'];
         $campaign->hashtags = $validatedData['hashtags'] ?? $campaign->hashtags;
+        $campaign->goal = $validatedData['goal'] ?? $campaign->goal;
         
         // Handle image update
         try {
-            if ($request->hasFile('image')) {
+            if ($request->has('image_removed') && $request->image_removed === 'true') {
+                $campaign->image = null;
+            } elseif ($request->hasFile('image')) {
                 $imageUrl = $fileUploadService->uploadToS3($request->file('image'), 'campaigns');
                 if ($imageUrl) {
                     $campaign->image = $imageUrl;
@@ -145,7 +149,7 @@ class CampaignController extends Controller
                 'status' => 500
             ], 500);
         }
-        // If image is not a file, we assume it's the existing URL string, so we don't change it unless it was explicitly cleared (which we don't handle here yet)
+        // If image is not a file, we assume it's the existing URL string, so we don't change it unless it was explicitly cleared
         
         // Save the changes
         $campaign->save();
