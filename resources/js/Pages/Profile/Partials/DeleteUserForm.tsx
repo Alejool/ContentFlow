@@ -7,6 +7,7 @@ import ModernInput from "@/Components/Modern/ModernInput";
 import ModernButton from "@/Components/Modern/ModernButton";
 import ModernCard from "@/Components/Modern/ModernCard";
 import axios from "axios";
+import { useTranslation } from "react-i18next";
 
 const TrashIcon = ({ className }) => (
   <svg
@@ -41,6 +42,7 @@ const WarningIcon = ({ className }) => (
 );
 
 export default function DeleteUserForm({ className = "" }) {
+  const { t } = useTranslation();
   const [confirmingUserDeletion, setConfirmingUserDeletion] = useState(false);
   const passwordInput = useRef();
 
@@ -84,8 +86,8 @@ export default function DeleteUserForm({ className = "" }) {
 
   return (
     <ModernCard
-      title="Delete Account"
-      description="Permanently remove your account and data"
+      title={t("profile.delete.title")}
+      description={t("profile.delete.description")}
       icon={TrashIcon}
       headerColor="red"
       className={className}
@@ -97,12 +99,10 @@ export default function DeleteUserForm({ className = "" }) {
           </div>
           <div>
             <h3 className="text-sm font-bold text-red-800">
-              Warning: Irreversible Action
+              {t("profile.delete.warningTitle")}
             </h3>
             <p className="mt-1 text-sm text-red-700">
-              Once your account is deleted, all of its resources and data will
-              be permanently deleted. Before deleting your account, please
-              download any data or information that you wish to retain.
+              {t("profile.delete.warningMessage")}
             </p>
           </div>
         </div>
@@ -112,7 +112,7 @@ export default function DeleteUserForm({ className = "" }) {
           onClick={confirmUserDeletion}
           icon={TrashIcon}
         >
-          Delete Account
+          {t("profile.delete.deleteButton")}
         </ModernButton>
       </div>
 
@@ -121,23 +121,22 @@ export default function DeleteUserForm({ className = "" }) {
           <div className="flex items-center gap-3 mb-4 text-red-600">
             <WarningIcon className="w-8 h-8" />
             <h2 className="text-xl font-bold text-gray-900">
-              Are you sure you want to delete your account?
+              {t("profile.delete.confirmTitle")}
             </h2>
           </div>
 
           <p className="mt-1 text-sm text-gray-600 mb-6">
-            Please enter your password to confirm you would like to permanently
-            delete your account.
+            {t("profile.delete.confirmMessage")}
           </p>
 
           <div className="mt-6">
             <ModernInput
               id="password"
               type="password"
-              label="Password"
+              label={t("profile.delete.passwordLabel")}
               register={register}
               error={errors.password?.message}
-              placeholder="Enter your password to confirm"
+              placeholder={t("profile.delete.passwordPlaceholder")}
               showPasswordToggle
               autoFocus
             />
@@ -150,7 +149,7 @@ export default function DeleteUserForm({ className = "" }) {
               onClick={closeModal}
               className="w-auto"
             >
-              Cancel
+              {t("profile.delete.cancel")}
             </ModernButton>
 
             <ModernButton
@@ -158,7 +157,7 @@ export default function DeleteUserForm({ className = "" }) {
               disabled={isSubmitting}
               className="w-auto"
             >
-              Delete Account
+              {t("profile.delete.deleteButton")}
             </ModernButton>
           </div>
         </form>

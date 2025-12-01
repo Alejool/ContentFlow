@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import ModernCard from "@/Components/Modern/ModernCard";
+import { useTranslation } from "react-i18next";
 import IconFacebook from "@/../assets/Icons/facebook.svg";
 import IconInstagram from "@/../assets/Icons/instagram.svg";
 import IconTiktok from "@/../assets/Icons/tiktok.svg";
@@ -24,6 +25,7 @@ const ShareIcon = ({ className }) => (
 );
 
 export default function ConnectedAccounts({ className = "" }) {
+  const { t } = useTranslation();
   const [accounts, setAccounts] = useState([
     {
       id: 1,
@@ -103,8 +105,8 @@ export default function ConnectedAccounts({ className = "" }) {
 
   return (
     <ModernCard
-      title="Connected Social Accounts"
-      description="Manage your connected social media profiles for content publishing."
+      title={t("profile.connectedAccounts.title")}
+      description={t("profile.connectedAccounts.description")}
       icon={ShareIcon}
       headerColor="purple"
       className={className}
@@ -138,7 +140,9 @@ export default function ConnectedAccounts({ className = "" }) {
                     account.isConnected ? "text-green-600" : "text-gray-500"
                   }`}
                 >
-                  {account.isConnected ? "Connected" : "Not Connected"}
+                  {account.isConnected
+                    ? t("profile.connectedAccounts.connected")
+                    : t("profile.connectedAccounts.notConnected")}
                 </p>
               </div>
               {account.isConnected && (
@@ -154,7 +158,7 @@ export default function ConnectedAccounts({ className = "" }) {
           href="/manage-content"
           className="text-sm text-purple-600 hover:text-purple-800 font-medium hover:underline"
         >
-          Manage connections in Content Manager &rarr;
+          {t("profile.connectedAccounts.manageLink")} &rarr;
         </a>
       </div>
     </ModernCard>

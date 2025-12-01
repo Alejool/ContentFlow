@@ -10,6 +10,7 @@ import ModernButton from "@/Components/Modern/ModernButton";
 import ModernCard from "@/Components/Modern/ModernCard";
 import axios from "axios";
 import LanguageSwitcher from "@/Components/LanguageSwitcher";
+import { useTranslation } from "react-i18next";
 
 const UserIcon = ({ className }) => (
   <svg
@@ -49,6 +50,7 @@ export default function UpdateProfileInformation({
   className = "",
 }) {
   const user = usePage().props.auth.user;
+  const { t } = useTranslation();
 
   const {
     register,
@@ -86,8 +88,7 @@ export default function UpdateProfileInformation({
         });
       } else {
         toast.error(
-          error.response?.data?.message ||
-            "An error occurred while updating profile"
+          error.response?.data?.message || t("profile.toast.errorUpdating")
         );
       }
     }
@@ -95,8 +96,8 @@ export default function UpdateProfileInformation({
 
   return (
     <ModernCard
-      title="Profile Information"
-      description="Update your account's profile information and email address."
+      title={t("profile.information.title")}
+      description={t("profile.information.description")}
       icon={UserIcon}
       headerColor="blue"
       className={className}
@@ -104,20 +105,20 @@ export default function UpdateProfileInformation({
       <form onSubmit={handleSubmit(submit)} className="space-y-6">
         <ModernInput
           id="name"
-          label="Name"
+          label={t("profile.information.nameLabel")}
           register={register}
           error={errors.name?.message}
-          placeholder="Your Name"
+          placeholder={t("profile.information.namePlaceholder")}
         />
 
         <div className="flex items-center justify-between">
           <ModernInput
             id="email"
-            label="Email"
+            label={t("profile.information.emailLabel")}
             type="email"
             register={register}
             error={errors.email?.message}
-            placeholder="your.email@example.com"
+            placeholder={t("profile.information.emailPlaceholder")}
             containerClassName="flex-1"
           />
         </div>
@@ -138,13 +139,15 @@ export default function UpdateProfileInformation({
                   d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
                 />
               </svg>
-              <span>Email Status: Unverified</span>
+              <span>
+                {t("profile.statistics.emailStatus")}:{" "}
+                {t("profile.statistics.unverified")}
+              </span>
             </div>
 
             <div className="flex items-center justify-between">
               <p className="text-sm text-yellow-700">
-                Your email address is not verified. Please verify it to access
-                all features.
+                {t("profile.information.emailUnverified")}
               </p>
               <Link
                 href={route("verification.send")}
@@ -152,7 +155,7 @@ export default function UpdateProfileInformation({
                 as="button"
                 className="px-4 py-2 bg-yellow-100 hover:bg-yellow-200 text-yellow-800 text-sm font-medium rounded-md transition-colors shadow-sm"
               >
-                Send Verification Email
+                {t("profile.information.sendVerification")}
               </Link>
             </div>
 
@@ -171,7 +174,7 @@ export default function UpdateProfileInformation({
                     d="M5 13l4 4L19 7"
                   />
                 </svg>
-                A new verification link has been sent to your email address.
+                {t("profile.information.verificationSent")}
               </div>
             )}
           </div>
@@ -179,11 +182,11 @@ export default function UpdateProfileInformation({
 
         <div className="border-t border-gray-100 pt-6">
           <h3 className="text-lg font-medium text-gray-900 mb-4">
-            Application Language
+            {t("profile.information.applicationLanguage")}
           </h3>
           <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
             <div className="text-sm text-gray-600">
-              Select your preferred language for the application interface.
+              {t("profile.information.languageDescription")}
             </div>
             <LanguageSwitcher />
           </div>

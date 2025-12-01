@@ -4,6 +4,7 @@ import ModernInput from "@/Components/Modern/ModernInput";
 import ModernButton from "@/Components/Modern/ModernButton";
 import ModernCard from "@/Components/Modern/ModernCard";
 import { Transition } from "@headlessui/react";
+import { useTranslation } from "react-i18next";
 
 const LockIcon = ({ className }) => (
   <svg
@@ -38,7 +39,7 @@ const CheckIcon = ({ className = "w-5 h-5" }) => (
 );
 
 // Success Alert Component
-const SuccessAlert = ({ show }) => (
+const SuccessAlert = ({ show, t }) => (
   <Transition
     show={show}
     enter="transform transition duration-300 ease-out"
@@ -54,10 +55,10 @@ const SuccessAlert = ({ show }) => (
       </div>
       <div>
         <p className="text-sm font-medium text-green-800">
-          Password updated successfully!
+          {t("profile.password.successTitle")}
         </p>
         <p className="text-xs text-green-600">
-          Your account security has been enhanced.
+          {t("profile.password.successMessage")}
         </p>
       </div>
     </div>
@@ -65,6 +66,7 @@ const SuccessAlert = ({ show }) => (
 );
 
 const UpdatePasswordForm = ({ className = "" }) => {
+  const { t } = useTranslation();
   const {
     register,
     handleSubmit,
@@ -76,8 +78,8 @@ const UpdatePasswordForm = ({ className = "" }) => {
 
   return (
     <ModernCard
-      title="Update Password"
-      description="Keep your account secure with a strong password"
+      title={t("profile.password.title")}
+      description={t("profile.password.description")}
       icon={LockIcon}
       headerColor="orange"
       className={className}
@@ -100,7 +102,7 @@ const UpdatePasswordForm = ({ className = "" }) => {
               </svg>
             </div>
             <h3 className="font-semibold text-red-800 text-sm">
-              Please correct the following errors:
+              {t("profile.password.errorTitle")}
             </h3>
           </div>
           <ul className="space-y-1 text-sm text-red-700 ml-9 list-disc">
@@ -111,14 +113,14 @@ const UpdatePasswordForm = ({ className = "" }) => {
         </div>
       )}
 
-      <SuccessAlert show={isSuccess} />
+      <SuccessAlert show={isSuccess} t={t} />
 
       <form onSubmit={handleSubmit(updatePassword)} className="space-y-6">
         <ModernInput
           id="current_password"
-          label="Current Password"
+          label={t("profile.password.currentPassword")}
           type="password"
-          placeholder="Enter your current password"
+          placeholder={t("profile.password.placeholders.current")}
           register={register}
           error={errors.current_password?.message}
           showPasswordToggle
@@ -126,9 +128,9 @@ const UpdatePasswordForm = ({ className = "" }) => {
 
         <ModernInput
           id="password"
-          label="New Password"
+          label={t("profile.password.newPassword")}
           type="password"
-          placeholder="Enter your new password"
+          placeholder={t("profile.password.placeholders.new")}
           register={register}
           error={errors.password?.message}
           showPasswordToggle
@@ -136,9 +138,9 @@ const UpdatePasswordForm = ({ className = "" }) => {
 
         <ModernInput
           id="password_confirmation"
-          label="Confirm New Password"
+          label={t("profile.password.confirmPassword")}
           type="password"
-          placeholder="Confirm your new password"
+          placeholder={t("profile.password.placeholders.confirm")}
           register={register}
           error={errors.password_confirmation?.message}
           showPasswordToggle
@@ -147,10 +149,10 @@ const UpdatePasswordForm = ({ className = "" }) => {
         <div className="pt-4">
           <ModernButton
             disabled={isSubmitting}
-            variant="danger" // Using danger/orange variant to match header
+            variant="danger"
             icon={LockIcon}
           >
-            Update Password
+            {t("profile.password.updateButton")}
           </ModernButton>
         </div>
       </form>
@@ -158,15 +160,12 @@ const UpdatePasswordForm = ({ className = "" }) => {
       {/* Security Tips */}
       <div className="mt-8 p-4 bg-orange-50 rounded-xl border border-orange-100">
         <h4 className="text-sm font-semibold text-orange-900 mb-2">
-          Password Security Tips:
+          {t("profile.password.securityTips")}
         </h4>
         <ul className="text-xs text-orange-800 space-y-2">
-          <li>
-            • Use at least 8 characters with a mix of letters, numbers, and
-            symbols
-          </li>
-          <li>• Avoid using personal information or common words</li>
-          <li>• Consider using a password manager for better security</li>
+          <li>• {t("profile.password.tip1")}</li>
+          <li>• {t("profile.password.tip2")}</li>
+          <li>• {t("profile.password.tip3")}</li>
         </ul>
       </div>
     </ModernCard>
