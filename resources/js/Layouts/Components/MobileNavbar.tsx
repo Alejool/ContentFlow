@@ -1,6 +1,7 @@
 import Dropdown from "@/Components/Dropdown";
 import ResponsiveNavLink from "@/Components/ResponsiveNavLink";
 import { Home, User, FileText, BarChart3, Bot, LogOut } from "lucide-react";
+import LanguageSwitcher from "@/Components/LanguageSwitcher";
 
 interface MobileNavbarProps {
   user: {
@@ -181,7 +182,11 @@ export default function MobileNavbar({
               </ResponsiveNavLink>
             ))}
 
-            <div className="pt-4 border-t border-gray-200/50">
+            <div className="pt-4 border-t border-gray-200/50 space-y-4">
+              <div className="px-4">
+                <LanguageSwitcher />
+              </div>
+
               <ResponsiveNavLink
                 href={route("logout")}
                 method="post"

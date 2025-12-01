@@ -9,6 +9,7 @@ import ModernInput from "@/Components/Modern/ModernInput";
 import ModernButton from "@/Components/Modern/ModernButton";
 import ModernCard from "@/Components/Modern/ModernCard";
 import axios from "axios";
+import LanguageSwitcher from "@/Components/LanguageSwitcher";
 
 const UserIcon = ({ className }) => (
   <svg
@@ -109,36 +110,84 @@ export default function UpdateProfileInformation({
           placeholder="Your Name"
         />
 
-        <ModernInput
-          id="email"
-          label="Email"
-          type="email"
-          register={register}
-          error={errors.email?.message}
-          placeholder="your.email@example.com"
-        />
+        <div className="flex items-center justify-between">
+          <ModernInput
+            id="email"
+            label="Email"
+            type="email"
+            register={register}
+            error={errors.email?.message}
+            placeholder="your.email@example.com"
+            containerClassName="flex-1"
+          />
+        </div>
 
         {mustVerifyEmail && user.email_verified_at === null && (
-          <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
-            <p className="text-sm text-yellow-800">
-              Your email address is unverified.
+          <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-200 space-y-3">
+            <div className="flex items-center gap-2 text-yellow-800 font-medium">
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                />
+              </svg>
+              <span>Email Status: Unverified</span>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-yellow-700">
+                Your email address is not verified. Please verify it to access
+                all features.
+              </p>
               <Link
                 href={route("verification.send")}
                 method="post"
                 as="button"
-                className="ml-1 underline font-medium hover:text-yellow-900 transition-colors"
+                className="px-4 py-2 bg-yellow-100 hover:bg-yellow-200 text-yellow-800 text-sm font-medium rounded-md transition-colors shadow-sm"
               >
-                Click here to re-send the verification email.
+                Send Verification Email
               </Link>
-            </p>
+            </div>
 
             {status === "verification-link-sent" && (
-              <div className="mt-2 text-sm font-medium text-green-600">
+              <div className="mt-2 text-sm font-medium text-green-600 flex items-center gap-2">
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
                 A new verification link has been sent to your email address.
               </div>
             )}
           </div>
         )}
+
+        <div className="border-t border-gray-100 pt-6">
+          <h3 className="text-lg font-medium text-gray-900 mb-4">
+            Application Language
+          </h3>
+          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
+            <div className="text-sm text-gray-600">
+              Select your preferred language for the application interface.
+            </div>
+            <LanguageSwitcher />
+          </div>
+        </div>
 
         <div className="flex items-center gap-4 pt-4">
           <ModernButton

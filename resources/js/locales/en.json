@@ -236,25 +236,27 @@
         "title": "New Campaign",
         "subtitle": "Create an impactful and attractive campaign",
         "createButton": "Create Campaign",
-        "creating": "Creating..."
+        "creating": "Creating...",
+        "save": "Create"
       },
       "edit": {
         "title": "Edit Campaign",
         "subtitle": "Update your campaign with new information",
         "saveButton": "Save Changes",
-        "saving": "Saving..."
+        "saving": "Saving...",
+        "save": "Update"
       },
       "fields": {
         "title": "Campaign Title",
         "description": "Description",
         "image": "Campaign Image",
-        "objective": "Campaign Objective",
+        "goal": "Campaign goal",
         "hashtags": "Hashtags",
         "optional": "(Optional)",
         "placeholders": {
           "title": "Eg: Summer Campaign 2024",
           "description": "Describe your campaign in a detailed and attractive way...",
-          "objective": "Eg: Increase social media engagement",
+          "goal": "Eg: Increase social media engagement",
           "hashtags": "#marketing #campaign #summer2024"
         },
         "dragDrop": {

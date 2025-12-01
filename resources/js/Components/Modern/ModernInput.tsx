@@ -7,7 +7,10 @@ interface ModernInputProps extends InputHTMLAttributes<HTMLInputElement> {
   error?: string;
   register?: UseFormRegister<any>;
   showPasswordToggle?: boolean;
+  containerClassName?: string;
 }
+
+// ... (EyeIcon and EyeOffIcon remain unchanged, so I will skip them in the replacement content if possible, but replace_file_content requires contiguous block. I'll just target the props interface and the component start)
 
 const EyeIcon = ({ className = "w-5 h-5" }) => (
   <svg
@@ -57,13 +60,14 @@ export default function ModernInput({
   showPasswordToggle = false,
   disabled = false,
   className = "",
+  containerClassName = "",
   ...props
 }: ModernInputProps) {
   const [showPassword, setShowPassword] = useState(false);
   const inputType = type === "password" && showPassword ? "text" : type;
 
   return (
-    <div className={`space-y-2 ${className}`}>
+    <div className={`space-y-2 ${containerClassName}`}>
       {label && (
         <label
           htmlFor={id}
@@ -114,7 +118,7 @@ export default function ModernInput({
               fillRule="evenodd"
               d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
               clipRule="evenodd"
-              />
+            />
           </svg>
           <span>{error}</span>
         </div>

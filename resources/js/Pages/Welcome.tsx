@@ -2,6 +2,8 @@ import { Head, Link } from "@inertiajs/react";
 import { useEffect, useState, ReactNode } from "react";
 import Bg from "@/../assets/background.svg";
 import Logo from "@/../assets/logo.png";
+import ContentFlowVisualization3D from "@/Components/tree/ContentFlowVisualization3D";
+import Bg3d from '@/Components/tree/Bg3d'
 
 interface AuthProps {
   user: {
@@ -45,7 +47,7 @@ const FeatureCard = ({
 }: FeatureCardProps) => (
   <a
     href={href}
-    className={`group relative overflow-hidden rounded-2xl bg-white/80 backdrop-blur-sm p-6 shadow-lg ring-1 ring-gray-200/50 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] hover:ring-red-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 dark:bg-gray-900/80 dark:ring-gray-700/50 dark:hover:ring-red-700 ${className}`}
+    className={`group relative overflow-hidden rounded-2xl  backdrop-blur-sm p-6 shadow-lg ring-1 ring-gray-200/50 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] hover:ring-red-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 dark:bg-gray-900/80 dark:ring-gray-700/50 dark:hover:ring-red-700 ${className}`}
   >
     {featured && (
       <div className="absolute top-4 right-4 z-10">
@@ -248,79 +250,30 @@ export default function Welcome({ auth }: WelcomeProps) {
       <Head title="Welcome" />
 
       <div
-        className="min-h-screen bg-gradient-to-br 
-                    from-gray-50 via-white to-red-50 dark:from-gray-900
-                     dark:via-gray-800 dark:to-red-900/20
-                     text-black"
-        style={{
-          backgroundImage: `url(${Bg})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundBlendMode: "overlay",
-        }}
+        className=""
+        // style={{
+        //   backgroundImage: `url(${Bg})`,
+        //   backgroundSize: "cover",
+        //   backgroundPosition: "center",
+        //   backgroundBlendMode: "overlay",
+        // }}
       >
-        <div className="relative ">
-          {/* Header */}
-          <header className="relative z-10 bg-gray-300">
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-              <div
-                className="flex items-center 
-                                px-4
-                                justify-between py-6 lg:py-8"
-              >
-                {/* Logo */}
-                <div className="flex items-center">
-                  <img
-                    src={Logo}
-                    alt="Logo"
-                    className="h-32 w-auto 
-                                        
-                                        transition-transform duration-300 hover:scale-105"
-                  />
-                </div>
-
-                {/* Navigation */}
-                <nav className="flex items-center  space-x-4">
-                  {auth.user ? (
-                    <Link
-                      href={route("dashboard")}
-                      className="inline-flex items-center rounded-full bg-red-600 px-6 py-2.5 text-sm font-medium text-white shadow-lg transition-all duration-200 hover:bg-red-700 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-                    >
-                      Enhance Social Media
-                    </Link>
-                  ) : (
-                    <div className="flex items-center space-x-3">
-                      <Link
-                        href={route("login")}
-                        className="rounded-lg px-4 py-2 text-sm font-medium text-black transition-colors hover:text-red-600 dark:text-black dark:hover:text-red-400"
-                      >
-                        Log in
-                      </Link>
-                      <Link
-                        href={route("register")}
-                        className="inline-flex items-center rounded-full bg-red-600 px-6 py-2.5 text-sm font-medium text-white shadow-lg transition-all duration-200 hover:bg-red-700 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-                      >
-                        Register
-                      </Link>
-                    </div>
-                  )}
-                </nav>
-              </div>
-            </div>
-          </header>
-
+        <div className="relative">
           {/* Main Content */}
-          <main className="relative z-10 pb-16">
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <main className="relative z-10 overflow-hidden">
+            <div className="mx-auto max-w-7xl  sm:px-6 lg:px-8">
               {/* Hero Section */}
-              <div className="text-center py-12 lg:py-20">
-                <h1 className="text-4xl font-bold tracking-tight text-gray-900 dark:gray-700 sm:text-5xl lg:text-6xl">
+              <div className="text-center mt-20 py-20">
+                <h1
+                  className="text-4xl font-bold tracking-tight 
+                text-white dark:gray-700 sm:text-5xl lg:text-6xl"
+                >
                   Manage your content
-                  <span className="block text-red-600">
+                  <span className="block text-red-600 mt-3">
                     with artificial intelligence
                   </span>
                 </h1>
-                <p className="mx-auto mt-6 max-w-2xl text-lg text-gray-800 dark:text-gray-800">
+                <p className="mx-auto mt-6 max-w-2xl text-lg text-white ">
                   Organize, optimize, and schedule your multimedia content with
                   AI-powered tools to maximize your social media presence.
                 </p>
@@ -330,9 +283,9 @@ export default function Welcome({ auth }: WelcomeProps) {
               <div className="grid gap-6 lg:grid-cols-2 lg:gap-8">
                 {/* Featured Card */}
                 <div className="lg:row-span-2">
-                  <div className="group relative overflow-hidden rounded-2xl bg-white/80 backdrop-blur-sm p-8 shadow-lg ring-1 ring-gray-200/50 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] hover:ring-red-200 dark:bg-gray-900/80 dark:ring-gray-700/50 dark:hover:ring-red-700">
+                  <div className="group relative overflow-hidden rounded-2xl  backdrop-blur-sm p-8 shadow-lg ring-1 ring-gray-200/50 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] hover:ring-red-200 dark:bg-gray-900/80 dark:ring-gray-700/50 dark:hover:ring-red-700">
                     <div className="absolute top-6 right-6 z-10">
-                      <span className="inline-flex items-center rounded-full bg-red-100 px-3 py-1 text-sm font-medium text-red-800 dark:bg-red-900 dark:text-red-200">
+                      <span className="inline-flex items-center rounded-full  px-3 py-1 text-sm font-medium text-red-800 dark:bg-red-900 dark:text-red-200">
                         Featured
                       </span>
                     </div>
@@ -393,18 +346,8 @@ export default function Welcome({ auth }: WelcomeProps) {
               </div>
             </div>
           </main>
-
-          {/* Footer */}
-          <footer className="relative z-10 border-t border-gray-200/50 
-           backdrop-blur-sm">
-            <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-              <div className="text-center">
-                <p className="text-sm text-gray-900 dark:text-gray-400 font-mono">
-                  {formattedDate}
-                </p>
-              </div>
-            </div>
-          </footer>
+          <ContentFlowVisualization3D />
+          {/* <Bg3d /> */}
         </div>
       </div>
     </>

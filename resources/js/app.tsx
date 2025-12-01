@@ -7,8 +7,9 @@ import { createRoot } from 'react-dom/client';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { ChakraProvider, defaultSystem } from "@chakra-ui/react"
+import ContentFlowVisualization3D from "@/Components/tree/ContentFlowVisualization3D";
 
-const appName = import.meta.env.VITE_APP_NAME || 'life-image';
+const appName = import.meta.env.VITE_APP_NAME || 'contentFlow';
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
@@ -26,6 +27,7 @@ createInertiaApp({
 
         root.render(
             <>
+                {/* <ContentFlowVisualization3D /> */}
                 <ChakraProvider value={defaultSystem}>
                     <App {...props} />
                 </ChakraProvider >
