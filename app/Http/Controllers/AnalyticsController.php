@@ -3,103 +3,255 @@
 namespace App\Http\Controllers;
 
 use App\Models\Analytics;
+use App\Services\StatisticsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
 use Inertia\Response;
-use Illuminate\Http\RedirectResponse;
+use Carbon\Carbon;
 
 class AnalyticsController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index(Request $request): Response {
-        $user = Auth::user();
-        
-        // Fetch user's campaigns to show as "Top Content"
-        // Assuming Campaign model is in App\Models\Campaigns\Campaign
-        $topContent = \App\Models\Campaigns\Campaign::where('user_id', $user->id)
-            ->orderBy('created_at', 'desc')
-            ->take(5)
-            ->get()
-            ->map(function($campaign) {
-                return [
-                    'title' => $campaign->title,
-                    'engagement' => rand(5, 15) . '.' . rand(0, 9) . '%', // Mock engagement
-                ];
-            });
+    protected $statisticsService;
 
-        // Mock chart data
-        $engagementData = [
-            ['date' => 'Jan 1', 'engagement' => rand(30, 50) / 10],
-            ['date' => 'Jan 5', 'engagement' => rand(40, 60) / 10],
-            ['date' => 'Jan 10', 'engagement' => rand(35, 65) / 10],
-            ['date' => 'Jan 15', 'engagement' => rand(50, 70) / 10],
-            ['date' => 'Jan 20', 'engagement' => rand(60, 80) / 10],
-            ['date' => 'Jan 25', 'engagement' => rand(70, 90) / 10],
-            ['date' => 'Jan 30', 'engagement' => rand(75, 95) / 10],
-            ['date' => 'Feb 5', 'engagement' => rand(80, 100) / 10],
-            ['date' => 'Feb 10', 'engagement' => rand(75, 95) / 10],
-            ['date' => 'Feb 15', 'engagement' => rand(85, 105) / 10],
-            ['date' => 'Feb 20', 'engagement' => rand(90, 110) / 10],
-            ['date' => 'Feb 25', 'engagement' => rand(85, 105) / 10],
-            ['date' => 'Today', 'engagement' => rand(100, 120) / 10],
+    public function __construct(StatisticsService $statisticsService)
+    {
+        $this->statisticsService = $statisticsService;
+    }
+
+    /**
+     * Display the dashboard with statistics
+     */
+    public function dashboard(): Response
+    {
+        $user = Auth::user();
+        $startDate = now()->subDays(30);
+        $endDate = now();
+
+        // Get overview stats
+        $overview = $this->statisticsService->getOverviewStats($user->id, $startDate, $endDate);
+        $campaigns = $this->statisticsService->getTopCampaigns($user->id, 10);
+        $socialMedia = $this->statisticsService->getSocialMediaOverview($user->id);
+        $engagementTrends = $this->statisticsService->getEngagementTrends($user->id, $startDate, $endDate);
+
+        // Format data for frontend
+        $stats = [
+            'totalViews' => $overview['total_views'] ?? 0,
+            'totalClicks' => $overview['total_clicks'] ?? 0,
+            'totalConversions' => $overview['total_conversions'] ?? 0,
+            'totalReach' => $overview['total_reach'] ?? 0,
+            'totalEngagement' => $overview['total_engagement'] ?? 0,
+            'avgEngagementRate' => $overview['avg_engagement_rate'] ?? 0,
+            'campaigns' => $campaigns->map(function($campaign) {
+                return [
+                    'id' => $campaign['id'],
+                    'title' => $campaign['title'],
+                    'views' => $campaign['total_views'],
+                    'clicks' => $campaign['total_clicks'],
+                    'engagement' => $campaign['total_engagement'],
+                ];
+            })->toArray(),
+            'engagementTrends' => $engagementTrends->map(function($trend) {
+                return [
+                    'date' => Carbon::parse($trend['date'])->format('M d'),
+                    'views' => $trend['views'],
+                    'clicks' => $trend['clicks'],
+                    'engagement' => $trend['total_engagement'],
+                ];
+            })->toArray(),
+            'platformData' => $socialMedia->map(function($platform) {
+                return [
+                    'name' => ucfirst($platform['platform']),
+                    'value' => $platform['followers'],
+                ];
+            })->toArray(),
         ];
 
-        return Inertia::render('Analytics/Index', [
-            'topContent' => $topContent,
-            'engagementData' => $engagementData
+        return Inertia::render('Dashboard', [
+            'stats' => $stats,
         ]);
-    }
-    
-
-    /**  
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
     }
 
     /**
-     * Store a newly created resource in storage.    
+     * Display the main analytics page
+     */
+    public function index(Request $request): Response
+    {
+        $user = Auth::user();
+        $days = $request->input('days', 30);
+        
+        $stats = $this->statisticsService->getDashboardStats($user->id, $days);
+
+        return Inertia::render('Analytics/Index', [
+            'stats' => $stats,
+            'period' => $days,
+        ]);
+    }
+
+    /**
+     * Get dashboard overview statistics
+     */
+    public function getDashboardStats(Request $request)
+    {
+        $user = Auth::user();
+        $days = $request->input('days', 7);
+
+        $startDate = now()->subDays($days);
+        $endDate = now();
+
+        $overview = $this->statisticsService->getOverviewStats($user->id, $startDate, $endDate);
+        $topCampaigns = $this->statisticsService->getTopCampaigns($user->id, 3);
+        $socialMedia = $this->statisticsService->getSocialMediaOverview($user->id);
+        $engagementTrends = $this->statisticsService->getEngagementTrends($user->id, $startDate, $endDate);
+
+        return response()->json([
+            'overview' => $overview,
+            'top_campaigns' => $topCampaigns,
+            'social_media' => $socialMedia,
+            'engagement_trends' => $engagementTrends,
+        ]);
+    }
+
+    /**
+     * Get campaign-specific analytics
+     */
+    public function getCampaignAnalytics(Request $request, int $campaignId)
+    {
+        $startDate = $request->input('start_date') ? Carbon::parse($request->input('start_date')) : null;
+        $endDate = $request->input('end_date') ? Carbon::parse($request->input('end_date')) : null;
+
+        $analytics = $this->statisticsService->getCampaignAnalytics($campaignId, $startDate, $endDate);
+
+        return response()->json($analytics);
+    }
+
+    /**
+     * Get social media platform metrics
+     */
+    public function getSocialMediaMetrics(Request $request)
+    {
+        $user = Auth::user();
+        $platform = $request->input('platform');
+        $days = $request->input('days', 30);
+
+        $startDate = now()->subDays($days);
+        $endDate = now();
+
+        $socialAccounts = \App\Models\SocialAccount::where('user_id', $user->id);
+        
+        if ($platform) {
+            $socialAccounts->where('platform', $platform);
+        }
+
+        $metrics = $socialAccounts->get()->map(function ($account) use ($startDate, $endDate) {
+            return [
+                'platform' => $account->platform,
+                'metrics' => $this->statisticsService->getSocialMediaMetrics($account->id, $startDate, $endDate),
+            ];
+        });
+
+        return response()->json($metrics);
+    }
+
+    /**
+     * Get engagement trends data
+     */
+    public function getEngagementData(Request $request)
+    {
+        $user = Auth::user();
+        $days = $request->input('days', 30);
+
+        $startDate = now()->subDays($days);
+        $endDate = now();
+
+        $trends = $this->statisticsService->getEngagementTrends($user->id, $startDate, $endDate);
+
+        return response()->json($trends);
+    }
+
+    /**
+     * Get platform comparison data
+     */
+    public function getPlatformComparison(Request $request)
+    {
+        $user = Auth::user();
+        
+        $comparison = $this->statisticsService->getPlatformComparison($user->id);
+
+        return response()->json($comparison);
+    }
+
+    /**
+     * Store analytics data (for API integrations)
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'metric_type' => 'required|string',
+            'metric_name' => 'required|string',
+            'metric_value' => 'required|numeric',
+            'metric_date' => 'required|date',
+            'platform' => 'nullable|string',
+            'reference_id' => 'nullable|integer',
+            'reference_type' => 'nullable|string',
+            'metadata' => 'nullable|array',
+        ]);
+
+        $analytics = Analytics::create([
+            'user_id' => Auth::id(),
+            ...$validated,
+        ]);
+
+        return response()->json($analytics, 201);
     }
 
     /**
-     * Display the specified resource.
+     * Export statistics data
      */
-    public function show(Analytics $analytics)
+    public function exportData(Request $request)
     {
-        //
+        $user = Auth::user();
+        $format = $request->input('format', 'json'); // json, csv
+        $days = $request->input('days', 30);
+
+        $stats = $this->statisticsService->getDashboardStats($user->id, $days);
+
+        if ($format === 'csv') {
+            // Implement CSV export
+            return $this->exportToCsv($stats);
+        }
+
+        return response()->json($stats);
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Helper method to export to CSV
      */
-    public function edit(Analytics $analytics)
+    private function exportToCsv($data)
     {
-        //
-    }
+        $filename = 'analytics_' . now()->format('Y-m-d') . '.csv';
+        
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"$filename\"",
+        ];
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Analytics $analytics)
-    {
-        //
-    }
+        $callback = function() use ($data) {
+            $file = fopen('php://output', 'w');
+            
+            // Add headers
+            fputcsv($file, ['Metric', 'Value']);
+            
+            // Add overview data
+            foreach ($data['overview'] as $key => $value) {
+                if (!is_array($value)) {
+                    fputcsv($file, [$key, $value]);
+                }
+            }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Analytics $analytics)
-    {
-        //
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 }

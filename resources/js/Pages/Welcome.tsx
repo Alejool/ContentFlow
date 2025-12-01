@@ -1,297 +1,412 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link } from "@inertiajs/react";
+import { useEffect, useState, ReactNode } from "react";
+import Bg from "@/../assets/background.svg";
+import Logo from "@/../assets/logo.png";
 
-import Bg from '@/../assets/background.svg';
-import Logo from '@/../assets/logo.png';
-import { useEffect,useState } from 'react';
+interface AuthProps {
+  user: {
+    name: string;
+    email: string;
+  } | null;
+}
 
-export default function Welcome({ auth }) {
-const [fecha, setFecha] = useState(new Date());
- 
-                useEffect(() => {
-            const interval = setInterval(() => {
-                setFecha(new Date());
-            }, 1000);
+interface WelcomeProps {
+  auth: AuthProps;
+}
 
-            return () => clearInterval(interval); // Limpiamos el intervalo cuando el componente se desmonte
-            }, []);
+// Component for SVG icons
+const CustomIcon = ({ children, className = "" }: { children: ReactNode; className?: string }) => (
+  <div
+    className={`flex items-center justify-center rounded-full bg-red-50 ${className}`}
+  >
+    {children}
+  </div>
+);
 
-            const formattedDate = fecha.toLocaleString('es-ES', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                hour: 'numeric',
-                minute: 'numeric',
-                second: 'numeric',
-                hour12: false,
-            });
+interface FeatureCardProps {
+  href: string;
+  icon: ReactNode;
+  title: string;
+  description: string;
+  tags?: string[];
+  featured?: boolean;
+  className?: string;
+}
 
+// Component for feature cards
+const FeatureCard = ({
+  href,
+  icon,
+  title,
+  description,
+  tags,
+  featured = false,
+  className = "",
+}: FeatureCardProps) => (
+  <a
+    href={href}
+    className={`group relative overflow-hidden rounded-2xl bg-white/80 backdrop-blur-sm p-6 shadow-lg ring-1 ring-gray-200/50 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] hover:ring-red-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 dark:bg-gray-900/80 dark:ring-gray-700/50 dark:hover:ring-red-700 ${className}`}
+  >
+    {featured && (
+      <div className="absolute top-4 right-4 z-10">
+        <span className="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800 dark:bg-red-900 dark:text-red-200">
+          Featured
+        </span>
+      </div>
+    )}
 
+    <div className="flex items-start gap-4">
+      <CustomIcon className="w-12 h-12 shrink-0 group-hover:scale-110 transition-transform duration-300">
+        {icon}
+      </CustomIcon>
 
-    const handleImageError = () => {
-        document
-            .getElementById('screenshot-container')
-            ?.classList.add('!hidden');
-        document.getElementById('docs-card')?.classList.add('!row-span-1');
-        document
-            .getElementById('docs-card-content')
-            ?.classList.add('!flex-row');
-        document.getElementById('background')?.classList.add('!hidden');
-    };
+      <div className="flex-1 min-w-0">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
+          {title}
+        </h3>
+        <p className="mt-2 text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+          {description}
+        </p>
 
-    return (
-        <>
-            <Head title="index" />
-                                                 
-            <div 
-                className=" text-black/50 dark:bg-gray-400 
-                 dark:text-white/50 bg-cover bg-center "  
-                     style={{ backgroundImage: `url(${Bg})`}}
-                     >
+        {tags && (
+          <div className="mt-3 flex flex-wrap gap-1.5">
+            {tags.map((tag, index) => (
+              <span
+                key={index}
+                className="inline-flex items-center rounded-full bg-red-50 px-2 py-1 text-xs font-medium text-red-700 dark:bg-red-900/30 dark:text-red-300"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
 
-                <div className=" flex flex-col items-center justify-center
-                            selection:bg-[#FF2D20] selection:text-white">    
-                    <div className="h-[100%]  -dashed rounded-lg w-full max-w-2xl px-6 lg:max-w-7xl">
-                        <header className="grid grid-cols-2 items-center gap-2 py-10 lg:grid-cols-3">
-                            <div className="flex lg:col-start-2 lg:justify-center">
+      <svg
+        className="w-5 h-5 text-red-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 shrink-0"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M9 5l7 7-7 7"
+        />
+      </svg>
+    </div>
+  </a>
+);
 
-                                <img src={Logo} alt="logo" className="h-40 w-auto fill-current" />                             
-                             
-                            </div>
-                            <nav className="-mx-3 flex flex-1 justify-end">
-                                {auth.user ? (
-                                    <Link
-                                        href={route('dashboard')}
-                                        className="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white"
-                                    >
-                                            Improve your social media
-                                    </Link>
-                                ) : (
-                                    <>
-                                        <Link
-                                            href={route('login')}
-                                            className="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white"
-                                        >
-                                            Log in
-                                        </Link>
-                                        <Link
-                                            href={route('register')}
-                                            className="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white"
-                                        >
-                                            Register
-                                        </Link>
-                                    </>
-                                )}
-                            </nav>
-                        </header>
+// Component for image gallery
+const ImageGallery = () => (
+  <div className="relative w-full overflow-hidden rounded-xl">
+    <div className="grid grid-cols-3 gap-2">
+      <div className="col-span-2 row-span-2">
+        <img
+          src="https://images.unsplash.com/photo-1604537529428-15bcbeecfe4d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
+          alt="Featured collection"
+          className="h-48 w-full rounded-lg object-cover transition-transform duration-300 hover:scale-105"
+        />
+      </div>
+      <div>
+        <img
+          src="https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80"
+          alt="Thumbnail 1"
+          className="h-[5.8rem] w-full rounded-lg object-cover transition-transform duration-300 hover:scale-105"
+        />
+      </div>
+      <div>
+        <img
+          src="https://images.unsplash.com/photo-1523800503107-5bc3ba2a6f81?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80"
+          alt="Thumbnail 2"
+          className="h-[5.8rem] w-full rounded-lg object-cover transition-transform duration-300 hover:scale-105"
+        />
+      </div>
+    </div>
+    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
+      <span className="text-sm font-medium text-white">
+        Featured Collection
+      </span>
+    </div>
+  </div>
+);
 
-                        <main className="mt-6">
-                           
-                            <div className="grid gap-6 lg:grid-cols-2 lg:gap-8">
-                                <a
-                                    href="#photo-collection"
-                                    className="flex flex-col items-start gap-6 overflow-hidden rounded-lg bg-white p-6 shadow-[0px_14px_34px_0px_rgba(0,0,0,0.08)] ring-1 ring-white/[0.05] transition duration-300 hover:text-black/70 hover:ring-black/20 focus:outline-none focus-visible:ring-[#FF2D20] md:row-span-3 lg:p-10 lg:pb-10 dark:bg-zinc-900 dark:ring-zinc-800 dark:hover:text-white/70 dark:hover:ring-zinc-700 dark:focus-visible:ring-[#FF2D20]"
-                                >
-                                    <div className="relative w-full overflow-hidden rounded-lg">
-                                       
-                                       <div className="relative w-full overflow-hidden rounded-lg">
-                                            <div className="grid grid-cols-3 gap-2">
-                                                <div className="col-span-2 row-span-2">
-                                                    <img
-                                                        src="https://images.unsplash.com/photo-1604537529428-15bcbeecfe4d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
-                                                        alt="Featured collection photo"
-                                                        className="h-48 w-full rounded-lg object-cover"
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <img
-                                                        src="https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80"
-                                                        alt="Collection thumbnail 1"
-                                                        className="h-[5.8rem] w-full rounded-lg object-cover"
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <img
-                                                        src="https://images.unsplash.com/photo-1523800503107-5bc3ba2a6f81?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80"
-                                                        alt="Collection thumbnail 2"
-                                                        className="h-[5.8rem] w-full rounded-lg object-cover"
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-white/80 to-transparent p-4 dark:from-zinc-900/80">
-                                            <span className="text-sm font-medium">Featured Collection</span>
-                                        </div>
-                                    </div>
+export default function Welcome({ auth }: WelcomeProps) {
+  const [date, setDate] = useState(new Date());
 
-                                    <div className="flex items-center gap-6 lg:items-end">
-                                        <div className="flex items-start gap-6 lg:flex-col">
-                                            <div className="flex size-12 shrink-0 items-center justify-center rounded-full bg-[#FF2D20]/10 sm:size-16">
-                                                <svg
-                                                    className="size-5 sm:size-6"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    fill="none"
-                                                    viewBox="0 0 24 24"
-                                                    stroke="currentColor"
-                                                >
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                                </svg>
-                                            </div>
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDate(new Date());
+    }, 1000);
 
-                                            <div className="pt-3 sm:pt-5 lg:pt-0">
-                                                <h2 className="text-xl font-semibold text-black dark:text-white">
-                                                    AI Content Organization
-                                                </h2>
+    return () => clearInterval(interval);
+  }, []);
 
-                                                <p className="mt-4 text-sm/relaxed">
-                                                    Easily categorize, tag, and search your multimedia files with AI-driven organization
-                                                </p>
+  const formattedDate = date.toLocaleString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    second: "numeric",
+    hour12: true,
+  });
 
-                                                <div className="mt-4 flex flex-wrap gap-2">
-                                                    <span className="rounded-full bg-[#FF2D20]/10 px-3 py-1 text-xs font-medium text-[#FF2D20]">
-                                                        Smart Albums
-                                                    </span>
-                                                    <span className="rounded-full bg-[#FF2D20]/10 px-3 py-1 text-xs font-medium text-[#FF2D20]">
-                                                        Auto-Organization
-                                                    </span>
-                                                    <span className="rounded-full bg-[#FF2D20]/10 px-3 py-1 text-xs font-medium text-[#FF2D20]">
-                                                        Custom Tags
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
+  const features = [
+    {
+      href: "ai-chat",
+      icon: (
+        <svg
+          className="w-6 h-6 text-red-600"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+          />
+        </svg>
+      ),
+      title: "AI Organization",
+      description:
+        "Easily categorize, tag, and search your multimedia files with AI-powered organization",
+      tags: ["Smart Albums", "Auto-Organization", "Custom Tags"],
+    },
+    {
+      href: "manage-content",
+      icon: (
+        <svg
+          className="w-6 h-6 text-red-600"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+          />
+        </svg>
+      ),
+      title: "Multi-Platform Publishing",
+      description:
+        "Optimize and seamlessly share content across multiple social media platforms",
+    },
+    {
+      href: "analytics",
+      icon: (
+        <svg
+          className="w-6 h-6 text-red-600"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+          />
+        </svg>
+      ),
+      title: "Performance Analytics",
+      description:
+        "Get insights into your content engagement and optimize your strategy accordingly",
+    },
+    {
+      href: "manage-content",
+      icon: (
+        <svg
+          className="w-6 h-6 text-red-600"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+      ),
+      title: "Smart Scheduling",
+      description:
+        "Automate and schedule your posts with AI recommendations for optimal performance",
+    },
+  ];
 
-                                        <svg
-                                            className="size-6 shrink-0 stroke-[#FF2D20]"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            strokeWidth="1.5"
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75"
-                                            />
-                                        </svg>
-                                    </div>
-                                </a>
+  return (
+    <>
+      <Head title="Welcome" />
 
-                                <a
-                                    href="#photo-editing"
-                                    className="flex items-start gap-4 rounded-lg bg-white p-6 shadow-[0px_14px_34px_0px_rgba(0,0,0,0.08)] ring-1 ring-white/[0.05] transition duration-300 hover:text-black/70 hover:ring-black/20 focus:outline-none focus-visible:ring-[#FF2D20] lg:pb-10 dark:bg-zinc-900 dark:ring-zinc-800 dark:hover:text-white/70 dark:hover:ring-zinc-700 dark:focus-visible:ring-[#FF2D20]"
-                                >
-                                    <div className="flex size-12 shrink-0 items-center justify-center rounded-full bg-[#FF2D20]/10 sm:size-16">
-                                        <svg
-                                            className="size-5 sm:size-6"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke="currentColor"
-                                        >
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                        </svg>
-                                    </div>
-
-                                    <div className="pt-3 sm:pt-5">
-                                        <h2 className="text-xl font-semibold text-black dark:text-white">
-                                            Cross-Platform Publishing
-                                        </h2>
-
-                                        <p className="mt-4 text-sm/relaxed">
-                                            Optimize and share content seamlessly across various social media platforms
-                                        </p>
-                                    </div>
-
-                                    <svg
-                                        className="size-6 shrink-0 self-center stroke-[#FF2D20]"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        strokeWidth="1.5"
-                                    >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75"
-                                        />
-                                    </svg>
-                                </a>
-
-                                <a
-                                    href="#video-creation"
-                                    className="flex items-start gap-4 rounded-lg bg-white p-6 shadow-[0px_14px_34px_0px_rgba(0,0,0,0.08)] ring-1 ring-white/[0.05] transition duration-300 hover:text-black/70 hover:ring-black/20 focus:outline-none focus-visible:ring-[#FF2D20] lg:pb-10 dark:bg-zinc-900 dark:ring-zinc-800 dark:hover:text-white/70 dark:hover:ring-zinc-700 dark:focus-visible:ring-[#FF2D20]"
-                                >
-                                    <div className="flex size-12 shrink-0 items-center justify-center rounded-full bg-[#FF2D20]/10 sm:size-16">
-                                        <svg
-                                            className="size-5 sm:size-6"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke="currentColor"
-                                        >
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                                        </svg>
-                                    </div>
-
-                                    <div className="pt-3 sm:pt-5">
-                                        <h2 className="text-xl font-semibold text-black dark:text-white">
-                                            Performance Analytics
-                                        </h2>
-
-                                        <p className="mt-4 text-sm/relaxed">
-                                           Gain insights into your content's engagement and optimize your strategy accordingly.
-                                        </p>
-                                    </div>
-
-                                    <svg
-                                        className="size-6 shrink-0 self-center stroke-[#FF2D20]"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        strokeWidth="1.5"
-                                    >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75"
-                                        />
-                                    </svg>
-                                </a>
-
-                                <div className="flex items-start gap-4 rounded-lg bg-white p-6 shadow-[0px_14px_34px_0px_rgba(0,0,0,0.08)] ring-1 ring-white/[0.05] lg:pb-10 dark:bg-zinc-900 dark:ring-zinc-800">
-                                    <div className="flex size-12 shrink-0 items-center justify-center rounded-full bg-[#FF2D20]/10 sm:size-16">
-                                        <svg
-                                            className="size-5 sm:size-6"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke="currentColor"
-                                        >
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                    </div>
-
-                                    <div className="pt-3 sm:pt-5">
-                                        <h2 className="text-xl font-semibold text-black dark:text-white">
-                                            Smart Scheduling
-                                        </h2>
-
-                                        <p className="mt-4 text-sm/relaxed">
-                                            Automate and schedule your posts with AI recommendations for peak performance
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                           
-                        </main>
-
-                        <footer className="py-16 text-center text-sm text-black dark:text-white/70">
-                            {formattedDate}
-                        </footer>
-                    </div>
+      <div
+        className="min-h-screen bg-gradient-to-br 
+                    from-gray-50 via-white to-red-50 dark:from-gray-900
+                     dark:via-gray-800 dark:to-red-900/20
+                     text-black"
+        style={{
+          backgroundImage: `url(${Bg})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundBlendMode: "overlay",
+        }}
+      >
+        <div className="relative ">
+          {/* Header */}
+          <header className="relative z-10 bg-gray-300">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+              <div
+                className="flex items-center 
+                                px-4
+                                justify-between py-6 lg:py-8"
+              >
+                {/* Logo */}
+                <div className="flex items-center">
+                  <img
+                    src={Logo}
+                    alt="Logo"
+                    className="h-32 w-auto 
+                                        
+                                        transition-transform duration-300 hover:scale-105"
+                  />
                 </div>
+
+                {/* Navigation */}
+                <nav className="flex items-center  space-x-4">
+                  {auth.user ? (
+                    <Link
+                      href={route("dashboard")}
+                      className="inline-flex items-center rounded-full bg-red-600 px-6 py-2.5 text-sm font-medium text-white shadow-lg transition-all duration-200 hover:bg-red-700 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                    >
+                      Enhance Social Media
+                    </Link>
+                  ) : (
+                    <div className="flex items-center space-x-3">
+                      <Link
+                        href={route("login")}
+                        className="rounded-lg px-4 py-2 text-sm font-medium text-black transition-colors hover:text-red-600 dark:text-black dark:hover:text-red-400"
+                      >
+                        Log in
+                      </Link>
+                      <Link
+                        href={route("register")}
+                        className="inline-flex items-center rounded-full bg-red-600 px-6 py-2.5 text-sm font-medium text-white shadow-lg transition-all duration-200 hover:bg-red-700 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                      >
+                        Register
+                      </Link>
+                    </div>
+                  )}
+                </nav>
+              </div>
             </div>
-        </>
-    );
+          </header>
+
+          {/* Main Content */}
+          <main className="relative z-10 pb-16">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+              {/* Hero Section */}
+              <div className="text-center py-12 lg:py-20">
+                <h1 className="text-4xl font-bold tracking-tight text-gray-900 dark:gray-700 sm:text-5xl lg:text-6xl">
+                  Manage your content
+                  <span className="block text-red-600">
+                    with artificial intelligence
+                  </span>
+                </h1>
+                <p className="mx-auto mt-6 max-w-2xl text-lg text-gray-800 dark:text-gray-800">
+                  Organize, optimize, and schedule your multimedia content with
+                  AI-powered tools to maximize your social media presence.
+                </p>
+              </div>
+
+              {/* Features Grid */}
+              <div className="grid gap-6 lg:grid-cols-2 lg:gap-8">
+                {/* Featured Card */}
+                <div className="lg:row-span-2">
+                  <div className="group relative overflow-hidden rounded-2xl bg-white/80 backdrop-blur-sm p-8 shadow-lg ring-1 ring-gray-200/50 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] hover:ring-red-200 dark:bg-gray-900/80 dark:ring-gray-700/50 dark:hover:ring-red-700">
+                    <div className="absolute top-6 right-6 z-10">
+                      <span className="inline-flex items-center rounded-full bg-red-100 px-3 py-1 text-sm font-medium text-red-800 dark:bg-red-900 dark:text-red-200">
+                        Featured
+                      </span>
+                    </div>
+
+                    <ImageGallery />
+
+                    <div className="mt-6">
+                      <div className="flex items-start gap-4">
+                        <CustomIcon className="w-14 h-14 shrink-0 group-hover:scale-110 transition-transform duration-300">
+                          <svg
+                            className="w-7 h-7 text-red-600"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                            />
+                          </svg>
+                        </CustomIcon>
+
+                        <div className="flex-1">
+                          <h3 className="text-xl font-semibold text-gray-900 dark:text-white group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
+                            AI Organization
+                          </h3>
+                          <p className="mt-3 text-gray-600 dark:text-gray-300 leading-relaxed">
+                            Easily categorize, tag, and search your multimedia
+                            files with AI-powered organization
+                          </p>
+
+                          <div className="mt-4 flex flex-wrap gap-2">
+                            {[
+                              "Smart Albums",
+                              "Auto-Organization",
+                              "Custom Tags",
+                            ].map((tag, index) => (
+                              <span
+                                key={index}
+                                className="inline-flex items-center rounded-full bg-red-50 px-3 py-1 text-sm font-medium text-red-700 dark:bg-red-900/30 dark:text-red-300"
+                              >
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Other Feature Cards */}
+                {features.slice(1).map((feature, index) => (
+                  <FeatureCard key={index} {...feature} />
+                ))}
+              </div>
+            </div>
+          </main>
+
+          {/* Footer */}
+          <footer className="relative z-10 border-t border-gray-200/50 
+           backdrop-blur-sm">
+            <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+              <div className="text-center">
+                <p className="text-sm text-gray-900 dark:text-gray-400 font-mono">
+                  {formattedDate}
+                </p>
+              </div>
+            </div>
+          </footer>
+        </div>
+      </div>
+    </>
+  );
 }
