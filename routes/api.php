@@ -31,10 +31,3 @@ Route::middleware(EnsureFrontendRequestsAreStateful::class)->group(function () {
 
 });
 
-// // Routes for social accounts
-// Route::middleware(['auth:web', 'sanctum'])->group(function () {
-//     Route::get('/social-accounts', [SocialAccountController::class, 'index']);
-//     Route::get('/social-accounts/auth-url/{platform}', [SocialAccountController::class, 'getAuthUrl']);
-//     Route::post('/social-accounts', [SocialAccountController::class, 'store']);
-//     Route::delete('/social-accounts/{id}', [SocialAccountController::class, 'destroy']);
-// });

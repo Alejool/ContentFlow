@@ -37,10 +37,6 @@ class AuthenticatedSessionController extends Controller
             $return = $request->authenticate();
             $request->session()->regenerate();
             return response()->json($return);
-
-        if($return['success'] or $return['redirect']){
-                return response()->json($return);
-            }
             // return redirect(route('/dashboard', absolute: true));
             
 
@@ -59,5 +55,24 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerateToken();
 
         return redirect('/');
+    }
+
+    public function checkUser(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+        ]);
+
+        $user = \App\Models\User::where('email', $request->email)->first();
+
+        if ($user && $user->provider) {
+            return response()->json([
+                'provider' => $user->provider,
+            ]);
+        }
+
+        return response()->json([
+            'provider' => null,
+        ]);
     }
 }

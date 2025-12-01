@@ -73,8 +73,16 @@ return [
     ],
     
     'gemini' => [
-        'enabled' => env('GEMINI_ENABLED', true),
+        'enabled' => env('GEMINI_ENABLED', false),
         'api_key' => env('GEMINI_API_KEY'),
         'model' => env('GEMINI_MODEL', 'gemini-pro'),
+    ],
+    'deepseek' => [
+        'enabled' => env('DEEPSEEK_ENABLED', true),
+        'api_key' => env('DEEPSEEK_API_KEY'),
+        'model' => env('DEEPSEEK_MODEL', 'deepseek-chat'),
+        'temperature' => 0.7,
+        'max_tokens' => 2000,
+        'base_url' => 'https://api.deepseek.com/v1',
     ],
 ];

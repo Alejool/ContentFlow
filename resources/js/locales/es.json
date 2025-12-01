@@ -236,25 +236,27 @@
         "title": "Nueva Campaña",
         "subtitle": "Crea una campaña impactante y atractiva",
         "createButton": "Crear Campaña",
-        "creating": "Creando..."
+        "creating": "Creando...",
+        "save": "Crear"
       },
       "edit": {
         "title": "Editar Campaña",
         "subtitle": "Actualiza tu campaña con nueva información",
         "saveButton": "Guardar Cambios",
-        "saving": "Guardando..."
+        "saving": "Guardando...",
+        "save": "Actualizar"
       },
       "fields": {
         "title": "Título de la Campaña",
         "description": "Descripción",
         "image": "Imagen de la Campaña",
-        "objective": "Objetivo de la Campaña",
+        "goal": "Objetivo de la Campaña",
         "hashtags": "Hashtags",
         "optional": "(Opcional)",
         "placeholders": {
           "title": "Ej: Campaña de Verano 2024",
           "description": "Describe tu campaña de manera detallada y atractiva...",
-          "objective": "Ej: Aumentar el engagement en redes sociales",
+          "goal": "Ej: Aumentar el engagement en redes sociales",
           "hashtags": "#marketing #campaña #verano2024"
         },
         "dragDrop": {

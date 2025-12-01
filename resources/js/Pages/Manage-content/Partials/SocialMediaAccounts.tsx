@@ -333,7 +333,7 @@ export default function SocialMediaAccounts() {
               {/* Logo & Name */}
               <div className="flex flex-col items-center text-center mb-6 pt-2">
                 <div className="relative mb-4">
-                  <div className="w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center p-3 transition-transform group-hover:scale-110 duration-300">
+                  <div className="w-16 h-16 rounded-2xl mt-3 flex items-center justify-center p-3 transition-transform group-hover:scale-110 duration-300">
                     <img
                       src={account.logo}
                       alt={`${account.name} Logo`}
