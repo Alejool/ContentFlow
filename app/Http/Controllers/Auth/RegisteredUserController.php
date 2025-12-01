@@ -13,6 +13,9 @@ use Illuminate\Validation\Rules;
 use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Password;
+use App\Mail\PasswordRecoveryMail;
 
 
 class RegisteredUserController extends Controller
@@ -54,6 +57,10 @@ class RegisteredUserController extends Controller
         // Log in and regenerate session
         Auth::login($user);
         $request->session()->regenerate();
+
+        // Generate password reset token and send email
+        $token = Password::broker()->createToken($user);
+        Mail::to($user->email)->send(new PasswordRecoveryMail($token, $user->email));
 
         return response()->json([
             'success' => true,

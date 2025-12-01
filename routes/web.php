@@ -19,9 +19,9 @@ Route::get('/', function () {
     ]);     
 })->middleware('guest')->name('welcome');
       
-Route::get('/dashboard', function () {    
-    return Inertia::render('Dashboard');   
-})->middleware(['auth', 'verified'])->name('dashboard') ;  
+      
+Route::get('/dashboard', [AnalyticsController::class, 'dashboard'])->middleware(['auth', 'verified'])->name('dashboard') ;  
+  
       
                    
 // Protected routes     
@@ -37,13 +37,20 @@ Route::middleware(['auth'])->group(function () {
 
     // Analytics
     Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics.index');
-    Route::resource('analytics', AnalyticsController::class)->only('index', 'store');
+    Route::get('/api/statistics/dashboard', [AnalyticsController::class, 'getDashboardStats'])->name('statistics.dashboard');
+    Route::get('/api/statistics/campaigns/{id}', [AnalyticsController::class, 'getCampaignAnalytics'])->name('statistics.campaign');
+    Route::get('/api/statistics/social-media', [AnalyticsController::class, 'getSocialMediaMetrics'])->name('statistics.social');
+    Route::get('/api/statistics/engagement', [AnalyticsController::class, 'getEngagementData'])->name('statistics.engagement');
+    Route::get('/api/statistics/platform-comparison', [AnalyticsController::class, 'getPlatformComparison'])->name('statistics.platforms');
+    Route::get('/api/statistics/export', [AnalyticsController::class, 'exportData'])->name('statistics.export');
+    Route::post('/analytics', [AnalyticsController::class, 'store'])->name('analytics.store');
 
     // POST Controller
     Route::get('/posts', [PostsController::class, 'index'])->name('posts.index');
 
     // AI Chat
     Route::get('/ai-chat', [AIChatController::class, 'index'])->name('ai-chat.index');
+    Route::post('/ai-chat/process', [AIChatController::class, 'processMessage'])->name('ai-chat.process');
    
 });
 

@@ -2,8 +2,11 @@
 
 namespace App\Models\Campaigns;
 use App\Models\User;
+use App\Models\CampaignAnalytics;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Campaign extends Model
 {
@@ -23,9 +26,36 @@ class Campaign extends Model
             'description',
             'user_id',
         ];  
-        public function user()
+        
+        public function user(): BelongsTo
         {
             return $this->belongsTo(User::class);
+        }
+
+        public function analytics(): HasMany
+        {
+            return $this->hasMany(CampaignAnalytics::class);
+        }
+
+        // Helper methods for analytics
+        public function getTotalViews()
+        {
+            return $this->analytics()->sum('views');
+        }
+
+        public function getTotalClicks()
+        {
+            return $this->analytics()->sum('clicks');
+        }
+
+        public function getTotalConversions()
+        {
+            return $this->analytics()->sum('conversions');
+        }
+
+        public function getAverageEngagementRate()
+        {
+            return $this->analytics()->avg('engagement_rate');
         }
         // public function getImageAttribute($value)
         // {

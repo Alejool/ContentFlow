@@ -45,4 +45,32 @@ class SocialAccount extends Model
     {
         return $this->hasMany(ScheduledPost::class);
     }
+
+    public function metrics(): HasMany
+    {
+        return $this->hasMany(SocialMediaMetrics::class);
+    }
+
+    public function getLatestMetrics()
+    {
+        return $this->metrics()->latest('date')->first();
+    }
+
+    public function getFollowerGrowth($days = 30)
+    {
+        $startDate = now()->subDays($days);
+        $metrics = $this->metrics()
+            ->where('date', '>=', $startDate)
+            ->orderBy('date')
+            ->get();
+
+        if ($metrics->count() < 2) {
+            return 0;
+        }
+
+        $firstFollowers = $metrics->first()->followers;
+        $lastFollowers = $metrics->last()->followers;
+
+        return $lastFollowers - $firstFollowers;
+    }
 }

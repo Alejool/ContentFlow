@@ -32,21 +32,34 @@ class AIChatController extends Controller
         ]);
 
         try {
-            $campaigns = $request->input('context.campaigns', []);
-            if (empty($campaigns)) {
-                $campaigns = Campaign::where('user_id', Auth::id())
-                    ->select('id', 'name', 'description', 'status', 'start_date', 'end_date')
-                    ->get()
-                    ->toArray();
+            // Determine if we should include campaign context
+            $source = $request->input('source', 'chat'); // 'chat' or 'assistant'
+            $includeContext = $source === 'assistant';
+
+            $campaigns = [];
+            if ($includeContext) {
+                $campaigns = $request->input('context.campaigns', []);
+                if (empty($campaigns)) {
+                    $campaigns = Campaign::where('user_id', Auth::id())
+                        ->select('id', 'name', 'description', 'status', 'start_date', 'end_date')
+                        ->get()
+                        ->toArray();
+                }
             }
 
             // Prepare context for the AI
             $context = [
                 'user' => Auth::user()->name,
                 'project_type' => 'social_media_management',
-                'campaigns' => $campaigns,
                 'message' => $request->input('message'),
             ];
+
+            if ($includeContext) {
+                $context['campaigns'] = $campaigns;
+                $context['instruction'] = 'You are a helpful assistant. Use the provided campaign data to answer questions. If the user asks about something unrelated to the campaigns, answer generally.';
+            } else {
+                $context['instruction'] = 'You are a helpful assistant. Answer the user\'s question clearly and concisely. Do not assume knowledge of their specific campaigns unless they provide it.';
+            }
 
      
             $aiResponse = $this->getAIResponse($context);
@@ -152,6 +165,23 @@ class AIChatController extends Controller
             if (!$apiKey) {
                 throw new \Exception('Gemini API key not configured');
             }
+
+            // Define the schema for structured output
+            $responseSchema = [
+                'type' => 'OBJECT',
+                'properties' => [
+                    'message' => ['type' => 'STRING'],
+                    'suggestion' => [
+                        'type' => 'OBJECT',
+                        'properties' => [
+                            'type' => ['type' => 'STRING'],
+                            'data' => ['type' => 'OBJECT']
+                        ],
+                        'nullable' => true
+                    ]
+                ],
+                'required' => ['message']
+            ];
     
             $response = Http::withoutVerifying() 
                 ->withHeaders([
@@ -159,23 +189,36 @@ class AIChatController extends Controller
                 ])->post('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' . $apiKey, [
                     'contents' => [
                         [
+                            'role' => 'user',
                             'parts' => [
                                 ['text' => json_encode($context)]
                             ]
                         ]
                     ],
                     'generationConfig' => [
-                        'maxOutputTokens' => 100, // Approximately 10 words
-                        'temperature' => 0.1, // Lower temperature for more focused responses
-                        'topP' => 0.2, // More deterministic output
-                        'topK' => 1 // Reduced for more concise responses
+                        'responseMimeType' => 'application/json',
+                        'responseSchema' => $responseSchema,
+                        'maxOutputTokens' => 700,
+                        'temperature' => 0.7,
+                        'topP' => 0.8,
+                        'topK' => 40
                     ]
                 ]);
     
-            return [
-                'message' => $response['candidates'][0]['content']['parts'][0]['text'] ?? 'No response from AI',
-                'suggestion' => null
-            ];
+            if ($response->successful()) {
+                $data = $response->json();
+                $text = $data['candidates'][0]['content']['parts'][0]['text'] ?? '{}';
+                $parsed = json_decode($text, true);
+                
+                return [
+                    'message' => $parsed['message'] ?? 'No response from AI',
+                    'suggestion' => $parsed['suggestion'] ?? null
+                ];
+            } else {
+                Log::error('Gemini API Error Response: ' . $response->body());
+                throw new \Exception('Gemini API request failed: ' . $response->status());
+            }
+
         } catch (\Exception $e) {
             Log::error('Gemini API Error: ' . $e->getMessage());
             return $this->getDefaultResponse($context['message']);
