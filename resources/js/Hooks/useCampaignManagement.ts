@@ -23,20 +23,24 @@ export function useCampaignManagement() {
 
   const addCampaign = async (data) => {
     try {
-      const formData = new FormData();
-      Object.keys(data).forEach((key) => {
-        if (key === "image" && data[key] instanceof FileList) {
-          if (data[key].length > 0) {
-            formData.append(key, data[key][0]);
+      let formData;
+      if (data instanceof FormData) {
+        formData = data;
+      } else {
+        formData = new FormData();
+        Object.keys(data).forEach((key) => {
+          if (key === "image" && data[key] instanceof FileList) {
+            if (data[key].length > 0) {
+              formData.append(key, data[key][0]);
+            }
+          } else {
+            formData.append(key, data[key]);
           }
-        } else {
-          formData.append(key, data[key]);
-        }
-      });
-
-      const response = await axios.post("/campaigns", formData);
-      setCampaigns([...campaigns, response.data]);
+        });
+      }
+      await axios.post("/campaigns", formData);
       toast.success(t("campaigns.messages.addSuccess"));
+      await fetchCampaigns();
       return true;
     } catch (error) {
       toast.error(t("campaigns.messages.addError"));
@@ -47,30 +51,36 @@ export function useCampaignManagement() {
   const updateCampaign = async (id, data) => {
     try {
       let response;
-      const hasFile =
-        data.image instanceof File || data.image instanceof FileList;
-
-      if (hasFile) {
-        const formData = new FormData();
-        formData.append("_method", "PUT");
-
-        Object.keys(data).forEach((key) => {
-          if (key === "image") {
-            if (data[key] instanceof FileList && data[key].length > 0) {
-              formData.append(key, data[key][0]);
-            } else if (data[key] instanceof File) {
-              formData.append(key, data[key]);
-            }
-          } else {
-            formData.append(key, data[key] === null ? "" : data[key]);
-          }
-        });
-
-        response = await axios.post(`/campaigns/${id}`, formData, {
+      if (data instanceof FormData) {
+        response = await axios.post(`/campaigns/${id}`, data, {
           headers: { "Content-Type": "multipart/form-data" },
         });
       } else {
-        response = await axios.put(`/campaigns/${id}`, data);
+        const hasFile =
+          data.image instanceof File || data.image instanceof FileList;
+
+        if (hasFile) {
+          const formData = new FormData();
+          formData.append("_method", "PUT");
+
+          Object.keys(data).forEach((key) => {
+            if (key === "image") {
+              if (data[key] instanceof FileList && data[key].length > 0) {
+                formData.append(key, data[key][0]);
+              } else if (data[key] instanceof File) {
+                formData.append(key, data[key]);
+              }
+            } else {
+              formData.append(key, data[key] === null ? "" : data[key]);
+            }
+          });
+
+          response = await axios.post(`/campaigns/${id}`, formData, {
+            headers: { "Content-Type": "multipart/form-data" },
+          });
+        } else {
+          response = await axios.put(`/campaigns/${id}`, data);
+        }
       }
 
       setCampaigns((prevCampaigns) =>
