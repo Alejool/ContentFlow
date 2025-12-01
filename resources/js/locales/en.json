@@ -104,7 +104,72 @@
     "newPassword": "New Password",
     "confirmPassword": "Confirm Password",
     "updateProfile": "Update Profile",
-    "deleteAccount": "Delete Account"
+    "deleteAccount": "Delete Account",
+    "information": {
+      "title": "Profile Information",
+      "description": "Update your account's profile information and email address.",
+      "saved": "Saved.",
+      "nameLabel": "Name",
+      "namePlaceholder": "Your Name",
+      "emailLabel": "Email",
+      "emailPlaceholder": "your.email@example.com",
+      "emailUnverified": "Your email address is not verified. Please verify it to access all features.",
+      "sendVerification": "Send Verification Email",
+      "verificationSent": "A new verification link has been sent to your email address.",
+      "applicationLanguage": "Application Language",
+      "languageDescription": "Select your preferred language for the application interface."
+    },
+    "statistics": {
+      "title": "Account Statistics",
+      "description": "Overview of your account activity and status.",
+      "memberSince": "Member Since",
+      "daysActive": "Days Active",
+      "days": "days",
+      "accountStatus": "Account Status",
+      "active": "Active",
+      "emailStatus": "Email Status",
+      "verified": "Verified",
+      "unverified": "Unverified"
+    },
+    "connectedAccounts": {
+      "title": "Connected Social Accounts",
+      "description": "Manage your connected social media profiles for content publishing.",
+      "connected": "Connected",
+      "notConnected": "Not Connected",
+      "manageLink": "Manage connections in Content Manager"
+    },
+    "password": {
+      "title": "Update Password",
+      "description": "Keep your account secure with a strong password",
+      "currentPassword": "Current Password",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm New Password",
+      "updateButton": "Update Password",
+      "successTitle": "Password updated successfully!",
+      "successMessage": "Your account security has been enhanced.",
+      "errorTitle": "Please correct the following errors:",
+      "securityTips": "Password Security Tips:",
+      "tip1": "Use at least 8 characters with a mix of letters, numbers, and symbols",
+      "tip2": "Avoid using personal information or common words",
+      "tip3": "Consider using a password manager for better security",
+      "placeholders": {
+        "current": "Enter your current password",
+        "new": "Enter your new password",
+        "confirm": "Confirm your new password"
+      }
+    },
+    "delete": {
+      "title": "Delete Account",
+      "description": "Permanently remove your account and data",
+      "warningTitle": "Warning: Irreversible Action",
+      "warningMessage": "Once your account is deleted, all of its resources and data will be permanently deleted. Before deleting your account, please download any data or information that you wish to retain.",
+      "deleteButton": "Delete Account",
+      "confirmTitle": "Are you sure you want to delete your account?",
+      "confirmMessage": "Please enter your password to confirm you would like to permanently delete your account.",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Enter your password to confirm",
+      "cancel": "Cancel"
+    }
   },
   "auth": {
     "login": "Login",
