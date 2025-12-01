@@ -1,0 +1,283 @@
+{
+  "common": {
+    "welcome": "Welcome",
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "search": "Search",
+    "filter": "Filter",
+    "export": "Export",
+    "viewAll": "View All",
+    "noData": "No Data",
+    "error": "Error",
+    "success": "Success"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "campaigns": "Campaigns",
+    "analytics": "Analytics",
+    "content": "Content",
+    "posts": "Posts",
+    "profile": "Profile",
+    "logout": "Logout"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcomeMessage": "Welcome, {{name}}!",
+    "systemStats": "System Statistics",
+    "totalViews": "Total Views",
+    "totalClicks": "Total Clicks",
+    "conversions": "Conversions",
+    "totalReach": "Total Reach",
+    "totalEngagement": "Total Engagement",
+    "avgEngagementRate": "Average Engagement Rate",
+    "engagementTrends": "Engagement Trends (Last 30 Days)",
+    "followersByPlatform": "Followers by Platform",
+    "campaignPerformance": "Campaign Performance",
+    "views": "Views",
+    "clicks": "Clicks",
+    "engagement": "Engagement",
+    "emptyState": {
+      "title": "No Data",
+      "message": "Run the command to generate test data:",
+      "command": "php artisan statistics:seed"
+    },
+    "quickActions": {
+      "campaigns": {
+        "title": "Campaigns",
+        "description": "Create and manage marketing campaigns"
+      },
+      "analytics": {
+        "title": "Analytics",
+        "description": "View detailed statistics"
+      },
+      "content": {
+        "title": "Content",
+        "description": "Manage media and publications"
+      }
+    }
+  },
+  "campaigns": {
+    "title": "Campaigns",
+    "addCampaign": "Add Campaign",
+    "editCampaign": "Edit Campaign",
+    "deleteCampaign": "Delete Campaign",
+    "campaignTitle": "Campaign Title",
+    "description": "Description",
+    "hashtags": "Hashtags",
+    "image": "Image",
+    "objective": "Objective",
+    "status": "Status",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "publishDate": "Publish Date",
+    "draft": "Draft",
+    "active": "Active",
+    "completed": "Completed",
+    "messages": {
+      "addSuccess": "Campaign added successfully!",
+      "addError": "Failed to add campaign",
+      "updateSuccess": "Campaign updated successfully!",
+      "updateError": "Failed to update campaign",
+      "deleteSuccess": "Campaign deleted successfully!",
+      "deleteError": "Failed to delete campaign",
+      "fetchError": "Failed to fetch campaigns",
+      "confirmDelete": {
+        "title": "Are you sure?",
+        "text": "You will not be able to recover this campaign!",
+        "confirmButton": "Yes, delete it!",
+        "cancelButton": "Cancel"
+      }
+    }
+  },
+
+  "profile": {
+    "title": "Profile",
+    "editProfile": "Edit Profile",
+    "changePassword": "Change Password",
+    "name": "Name",
+    "email": "Email",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmPassword": "Confirm Password",
+    "updateProfile": "Update Profile",
+    "deleteAccount": "Delete Account"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "forgotPassword": "Forgot Password?",
+    "resetPassword": "Reset Password",
+    "rememberMe": "Remember Me",
+    "alreadyRegistered": "Already registered?",
+    "notRegistered": "Not registered yet?"
+  },
+  "aiChat": {
+    "title": "AI Assistant",
+    "subtitle": "Intelligent recommendations for your campaigns",
+    "campaignsAvailable": "campaigns available",
+    "chatTitle": "Chat ContentFlow",
+    "online": "Online",
+    "thinking": "Thinking...",
+    "welcomeMessage": "Hi! I'm your AI assistant. How can I help you today?",
+    "inputPlaceholder": "Write your message...",
+    "enterToSend": "Enter to send",
+    "send": "Send",
+    "ideas": {
+      "title": "Ideas",
+      "panelTitle": "Campaign Ideas",
+      "visualMarketing": {
+        "title": "Visual Marketing",
+        "description": "Visual content generates 40% more engagement"
+      },
+      "sustainability": {
+        "title": "Sustainability",
+        "description": "Eco-friendly brands retain 25% more customers"
+      },
+      "microInfluencers": {
+        "title": "Micro-Influencers",
+        "description": "Higher conversion than celebrities"
+      },
+      "ugcContent": {
+        "title": "UGC Content",
+        "description": "Increases authenticity and reduces costs"
+      }
+    },
+    "stats": {
+      "active": "Active",
+      "total": "Total"
+    }
+  },
+  "analytics": {
+    "title": "Analytics & Statistics",
+    "subtitle": "Comprehensive overview of your campaigns and social media performance",
+    "days": "Days",
+    "stats": {
+      "totalViews": "Total Views",
+      "totalClicks": "Total Clicks",
+      "conversions": "Conversions",
+      "totalReach": "Total Reach",
+      "avgEngagementRate": "Avg Engagement Rate",
+      "avgCtr": "Avg CTR",
+      "avgConversionRate": "Avg Conversion Rate",
+      "totalEngagement": "Total Engagement"
+    },
+    "charts": {
+      "engagementTrends": "Engagement Trends",
+      "followersByPlatform": "Followers by Platform",
+      "noSocialMedia": "No social media accounts connected",
+      "topCampaignPerformance": "Top Campaign Performance",
+      "views": "Views",
+      "clicks": "Clicks",
+      "engagement": "Engagement"
+    },
+    "socialMedia": {
+      "title": "Social Media Overview",
+      "followers": "Followers",
+      "engagementRate": "Engagement Rate",
+      "reach": "Reach"
+    },
+    "emptyState": {
+      "title": "No Data Available",
+      "description": "Start creating campaigns and connecting social media accounts to see your analytics here."
+    }
+  },
+  "manageContent": {
+    "title": "Content Management",
+    "subtitle": "Organize and manage your multimedia content elegantly and efficiently",
+    "socialMedia": {
+      "title": "Connect Your Social Networks",
+      "description": "Connect your social media accounts to allow automatic content publishing. Your information will be kept secure and will only be used for the functions you authorize.",
+      "whyConnect": "Why connect your social networks?",
+      "benefits": {
+        "autoPublish": "Automatically publish content",
+        "manageAll": "Manage all accounts in one place",
+        "schedule": "Schedule posts for optimal times",
+        "control": "Maintain full control always"
+      },
+      "disclaimer": "You can disconnect your accounts at any time. We will not publish anything without your permission.",
+      "status": {
+        "connected": "Connected",
+        "notConnected": "Not Connected",
+        "connectToShare": "Connect to start sharing"
+      },
+      "actions": {
+        "connect": "Connect Account",
+        "disconnect": "Disconnect",
+        "processing": "Processing..."
+      },
+      "messages": {
+        "connectSuccess": "Account connected successfully",
+        "disconnectSuccess": "Account disconnected successfully",
+        "authError": "Authentication error",
+        "unauthorized": "Unauthorized. Please log in again.",
+        "loadError": "Could not load connected accounts",
+        "disconnectError": "Error disconnecting",
+        "popupBlocked": "The browser blocked the pop-up window. Please allow pop-ups for this site.",
+        "urlError": "Could not get authentication URL",
+        "connectError": "Error connecting with"
+      }
+    },
+    "campaigns": {
+      "yourContent": "Your Content",
+      "addNew": "Add New Content",
+      "edit": "Edit",
+      "delete": "Delete",
+      "active": "Active",
+      "remove": "Remove",
+      "change": "Change"
+    },
+    "modals": {
+      "add": {
+        "title": "New Campaign",
+        "subtitle": "Create an impactful and attractive campaign",
+        "createButton": "Create Campaign",
+        "creating": "Creating..."
+      },
+      "edit": {
+        "title": "Edit Campaign",
+        "subtitle": "Update your campaign with new information",
+        "saveButton": "Save Changes",
+        "saving": "Saving..."
+      },
+      "fields": {
+        "title": "Campaign Title",
+        "description": "Description",
+        "image": "Campaign Image",
+        "objective": "Campaign Objective",
+        "hashtags": "Hashtags",
+        "optional": "(Optional)",
+        "placeholders": {
+          "title": "Eg: Summer Campaign 2024",
+          "description": "Describe your campaign in a detailed and attractive way...",
+          "objective": "Eg: Increase social media engagement",
+          "hashtags": "#marketing #campaign #summer2024"
+        },
+        "dragDrop": {
+          "title": "Drag your image here or click to select",
+          "subtitle": "JPG, PNG, or WebP • Maximum 5MB"
+        }
+      },
+      "validation": {
+        "titleRequired": "Title is required",
+        "titleLength": "Title cannot exceed 100 characters",
+        "descRequired": "Description is required",
+        "descMin": "Description must be at least 10 characters",
+        "descMax": "Description cannot exceed 500 characters",
+        "imageRequired": "Image is required",
+        "imageSize": "Image must be smaller than 5MB",
+        "imageType": "Only JPG, PNG, or WebP files are allowed",
+        "objRequired": "Objective is required",
+        "objMin": "Objective must be at least 5 characters",
+        "objMax": "Objective cannot exceed 200 characters",
+        "hashtagsRequired": "Hashtags are required",
+        "hashtagValid": "Must include at least one valid hashtag (#example)",
+        "hashtagMax": "Maximum 10 hashtags allowed"
+      }
+    }
+  }
+}

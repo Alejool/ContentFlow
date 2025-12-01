@@ -1,0 +1,283 @@
+{
+  "common": {
+    "welcome": "Bienvenido",
+    "loading": "Cargando...",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "add": "Agregar",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "export": "Exportar",
+    "viewAll": "Ver Todas",
+    "noData": "Sin Datos",
+    "error": "Error",
+    "success": "Éxito"
+  },
+  "nav": {
+    "dashboard": "Panel",
+    "campaigns": "Campañas",
+    "analytics": "Analíticas",
+    "content": "Contenido",
+    "posts": "Publicaciones",
+    "profile": "Perfil",
+    "logout": "Cerrar Sesión"
+  },
+  "dashboard": {
+    "title": "Panel",
+    "welcomeMessage": "Bienvenido, {{name}}!",
+    "systemStats": "Estadísticas generales del sistema",
+    "totalViews": "Total Vistas",
+    "totalClicks": "Total Clicks",
+    "conversions": "Conversiones",
+    "totalReach": "Alcance Total",
+    "totalEngagement": "Engagement Total",
+    "avgEngagementRate": "Tasa de Engagement Promedio",
+    "engagementTrends": "Tendencia de Engagement (Últimos 30 días)",
+    "followersByPlatform": "Seguidores por Plataforma",
+    "campaignPerformance": "Rendimiento de Campañas",
+    "views": "Vistas",
+    "clicks": "Clicks",
+    "engagement": "Engagement",
+    "emptyState": {
+      "title": "Sin Datos",
+      "message": "Ejecuta el comando para generar datos de prueba:",
+      "command": "php artisan statistics:seed"
+    },
+    "quickActions": {
+      "campaigns": {
+        "title": "Campañas",
+        "description": "Crear y gestionar campañas de marketing"
+      },
+      "analytics": {
+        "title": "Analytics",
+        "description": "Ver estadísticas detalladas"
+      },
+      "content": {
+        "title": "Contenido",
+        "description": "Gestionar medios y publicaciones"
+      }
+    }
+  },
+  "campaigns": {
+    "title": "Campañas",
+    "addCampaign": "Agregar Campaña",
+    "editCampaign": "Editar Campaña",
+    "deleteCampaign": "Eliminar Campaña",
+    "campaignTitle": "Título de Campaña",
+    "description": "Descripción",
+    "hashtags": "Hashtags",
+    "image": "Imagen",
+    "objective": "Objetivo",
+    "status": "Estado",
+    "startDate": "Fecha de Inicio",
+    "endDate": "Fecha de Fin",
+    "publishDate": "Fecha de Publicación",
+    "draft": "Borrador",
+    "active": "Activa",
+    "completed": "Completada",
+    "messages": {
+      "addSuccess": "¡Campaña agregada exitosamente!",
+      "addError": "Error al agregar campaña",
+      "updateSuccess": "¡Campaña actualizada exitosamente!",
+      "updateError": "Error al actualizar campaña",
+      "deleteSuccess": "¡Campaña eliminada exitosamente!",
+      "deleteError": "Error al eliminar campaña",
+      "fetchError": "Error al cargar campañas",
+      "confirmDelete": {
+        "title": "¿Estás seguro?",
+        "text": "¡No podrás recuperar esta campaña!",
+        "confirmButton": "Sí, eliminarla!",
+        "cancelButton": "Cancelar"
+      }
+    }
+  },
+
+  "profile": {
+    "title": "Perfil",
+    "editProfile": "Editar Perfil",
+    "changePassword": "Cambiar Contraseña",
+    "name": "Nombre",
+    "email": "Correo Electrónico",
+    "currentPassword": "Contraseña Actual",
+    "newPassword": "Nueva Contraseña",
+    "confirmPassword": "Confirmar Contraseña",
+    "updateProfile": "Actualizar Perfil",
+    "deleteAccount": "Eliminar Cuenta"
+  },
+  "auth": {
+    "login": "Iniciar Sesión",
+    "register": "Registrarse",
+    "logout": "Cerrar Sesión",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "resetPassword": "Restablecer Contraseña",
+    "rememberMe": "Recuérdame",
+    "alreadyRegistered": "¿Ya estás registrado?",
+    "notRegistered": "¿No estás registrado aún?"
+  },
+  "aiChat": {
+    "title": "Asistente IA",
+    "subtitle": "Recomendaciones inteligentes para tus campañas",
+    "campaignsAvailable": "campañas disponibles",
+    "chatTitle": "Chat ContentFlow",
+    "online": "En línea",
+    "thinking": "Pensando...",
+    "welcomeMessage": "¡Hola! Soy tu asistente de IA. ¿Cómo puedo ayudarte hoy?",
+    "inputPlaceholder": "Escribe tu mensaje...",
+    "enterToSend": "Enter para enviar",
+    "send": "Enviar",
+    "ideas": {
+      "title": "Ideas",
+      "panelTitle": "Ideas de Campaña",
+      "visualMarketing": {
+        "title": "Marketing Visual",
+        "description": "El contenido visual genera un 40% más de engagement"
+      },
+      "sustainability": {
+        "title": "Sostenibilidad",
+        "description": "Las marcas ecológicas retienen un 25% más de clientes"
+      },
+      "microInfluencers": {
+        "title": "Micro-Influencers",
+        "description": "Mayor conversión que las celebridades"
+      },
+      "ugcContent": {
+        "title": "Contenido UGC",
+        "description": "Aumenta la autenticidad y reduce costos"
+      }
+    },
+    "stats": {
+      "active": "Activas",
+      "total": "Total"
+    }
+  },
+  "analytics": {
+    "title": "Analíticas y Estadísticas",
+    "subtitle": "Resumen completo de tus campañas y rendimiento en redes sociales",
+    "days": "Días",
+    "stats": {
+      "totalViews": "Vistas Totales",
+      "totalClicks": "Clics Totales",
+      "conversions": "Conversiones",
+      "totalReach": "Alcance Total",
+      "avgEngagementRate": "Tasa de Engagement Promedio",
+      "avgCtr": "CTR Promedio",
+      "avgConversionRate": "Tasa de Conversión Promedio",
+      "totalEngagement": "Engagement Total"
+    },
+    "charts": {
+      "engagementTrends": "Tendencias de Engagement",
+      "followersByPlatform": "Seguidores por Plataforma",
+      "noSocialMedia": "No hay cuentas de redes sociales conectadas",
+      "topCampaignPerformance": "Rendimiento de Mejores Campañas",
+      "views": "Vistas",
+      "clicks": "Clics",
+      "engagement": "Engagement"
+    },
+    "socialMedia": {
+      "title": "Resumen de Redes Sociales",
+      "followers": "Seguidores",
+      "engagementRate": "Tasa de Engagement",
+      "reach": "Alcance"
+    },
+    "emptyState": {
+      "title": "No hay datos disponibles",
+      "description": "Comienza a crear campañas y conecta tus cuentas de redes sociales para ver tus analíticas aquí."
+    }
+  },
+  "manageContent": {
+    "title": "Gestión de Contenido",
+    "subtitle": "Organiza y gestiona tu contenido multimedia de forma elegante y eficiente",
+    "socialMedia": {
+      "title": "Conecta tus Redes Sociales",
+      "description": "Conecta tus cuentas de redes sociales para permitir la publicación automática de contenido. Tu información se mantendrá segura y solo se utilizará para las funciones que autorices.",
+      "whyConnect": "¿Por qué conectar tus redes sociales?",
+      "benefits": {
+        "autoPublish": "Publicar contenido automáticamente",
+        "manageAll": "Gestionar todas las cuentas en un solo lugar",
+        "schedule": "Programar publicaciones para momentos óptimos",
+        "control": "Mantener el control total siempre"
+      },
+      "disclaimer": "Puedes desconectar tus cuentas en cualquier momento. No publicaremos nada sin tu permiso.",
+      "status": {
+        "connected": "Conectado",
+        "notConnected": "No Conectado",
+        "connectToShare": "Conecta para comenzar a compartir"
+      },
+      "actions": {
+        "connect": "Conectar Cuenta",
+        "disconnect": "Desconectar",
+        "processing": "Procesando..."
+      },
+      "messages": {
+        "connectSuccess": "Cuenta conectada exitosamente",
+        "disconnectSuccess": "Cuenta desconectada exitosamente",
+        "authError": "Error de autenticación",
+        "unauthorized": "No autorizado. Por favor inicia sesión nuevamente.",
+        "loadError": "No se pudieron cargar las cuentas conectadas",
+        "disconnectError": "Error al desconectar",
+        "popupBlocked": "El navegador bloqueó la ventana emergente. Por favor permite ventanas emergentes para este sitio.",
+        "urlError": "No se pudo obtener la URL de autenticación",
+        "connectError": "Error al conectar con"
+      }
+    },
+    "campaigns": {
+      "yourContent": "Tu Contenido",
+      "addNew": "Agregar Nuevo Contenido",
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "active": "Activo",
+      "remove": "Eliminar",
+      "change": "Cambiar"
+    },
+    "modals": {
+      "add": {
+        "title": "Nueva Campaña",
+        "subtitle": "Crea una campaña impactante y atractiva",
+        "createButton": "Crear Campaña",
+        "creating": "Creando..."
+      },
+      "edit": {
+        "title": "Editar Campaña",
+        "subtitle": "Actualiza tu campaña con nueva información",
+        "saveButton": "Guardar Cambios",
+        "saving": "Guardando..."
+      },
+      "fields": {
+        "title": "Título de la Campaña",
+        "description": "Descripción",
+        "image": "Imagen de la Campaña",
+        "objective": "Objetivo de la Campaña",
+        "hashtags": "Hashtags",
+        "optional": "(Opcional)",
+        "placeholders": {
+          "title": "Ej: Campaña de Verano 2024",
+          "description": "Describe tu campaña de manera detallada y atractiva...",
+          "objective": "Ej: Aumentar el engagement en redes sociales",
+          "hashtags": "#marketing #campaña #verano2024"
+        },
+        "dragDrop": {
+          "title": "Arrastra tu imagen aquí o haz clic para seleccionar",
+          "subtitle": "JPG, PNG o WebP • Máximo 5MB"
+        }
+      },
+      "validation": {
+        "titleRequired": "El título es obligatorio",
+        "titleLength": "El título no puede exceder los 100 caracteres",
+        "descRequired": "La descripción es obligatoria",
+        "descMin": "La descripción debe tener al menos 10 caracteres",
+        "descMax": "La descripción no puede exceder los 500 caracteres",
+        "imageRequired": "La imagen es obligatoria",
+        "imageSize": "La imagen debe ser menor a 5MB",
+        "imageType": "Solo se permiten archivos JPG, PNG o WebP",
+        "objRequired": "El objetivo es obligatorio",
+        "objMin": "El objetivo debe tener al menos 5 caracteres",
+        "objMax": "El objetivo no puede exceder los 200 caracteres",
+        "hashtagsRequired": "Los hashtags son obligatorios",
+        "hashtagValid": "Debe incluir al menos un hashtag válido (#ejemplo)",
+        "hashtagMax": "Máximo 10 hashtags permitidos"
+      }
+    }
+  }
+}

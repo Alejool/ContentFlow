@@ -3,6 +3,7 @@ import { Head } from "@inertiajs/react";
 import useAIChat from "@/Hooks/useAIChat";
 import { useState } from "react";
 import { usePage } from "@inertiajs/react";
+import { useTranslation } from "react-i18next";
 import {
   Box,
   Container,
@@ -189,6 +190,7 @@ interface Campaign {
 
 // Compact Statistics
 const CompactStats = ({ campaigns }: { campaigns: Campaign[] }) => {
+  const { t } = useTranslation();
   const active = campaigns.filter((c) => c.status === "active").length;
   const total = campaigns.length;
 
@@ -199,7 +201,7 @@ const CompactStats = ({ campaigns }: { campaigns: Campaign[] }) => {
           {active}
         </Text>
         <Text fontSize="xs" color="gray.500">
-          Active
+          {t('aiChat.stats.active')}
         </Text>
       </Box>
       <Box textAlign="center">
@@ -207,7 +209,7 @@ const CompactStats = ({ campaigns }: { campaigns: Campaign[] }) => {
           {total}
         </Text>
         <Text fontSize="xs" color="gray.500">
-          Total
+          {t('aiChat.stats.total')}
         </Text>
       </Box>
     </Flex>
@@ -216,92 +218,105 @@ const CompactStats = ({ campaigns }: { campaigns: Campaign[] }) => {
 
 interface Idea {
   id: number;
-  title: string;
-  description: string;
+  titleKey: string;
+  descriptionKey: string;
   icon: LucideIcon;
 }
 
 // Minimalist Idea Card
-const IdeaCard = ({ idea, onUse }: { idea: Idea; onUse: (idea: Idea) => void }) => (
-  <Button
-    variant="ghost"
-    h="auto"
-    p={4}
-    justifyContent="start"
-    textAlign="left"
-    onClick={() => onUse(idea)}
-    _hover={{ bg: "red.50", transform: "translateY(-1px)" }}
-    transition="all 0.2s"
-  >
-    <Flex align="start" gap={3} w="full" flex={1}>
-      <idea.icon className="h-5 w-5 text-red-600" />
-      <Box flex={1}>
-        <Text fontSize="sm" fontWeight="600" color="gray.800" mb={1}>
-          {idea.title}
-        </Text>
-        <Text fontSize="xs" color="gray.600" lineHeight="1.4" textWrap="wrap">
-          {idea.description}
-        </Text>
-      </Box>
-    </Flex>
-  </Button>
-);
+const IdeaCard = ({ idea, onUse }: { idea: Idea; onUse: (idea: Idea) => void }) => {
+  const { t } = useTranslation();
+  
+  return (
+    <Button
+      variant="ghost"
+      h="auto"
+      p={4}
+      justifyContent="start"
+      textAlign="left"
+      onClick={() => onUse(idea)}
+      _hover={{ bg: "red.50", transform: "translateY(-1px)" }}
+      transition="all 0.2s"
+    >
+      <Flex align="start" gap={3} w="full" flex={1}>
+        <idea.icon className="h-5 w-5 text-red-600" />
+        <Box flex={1}>
+          <Text fontSize="sm" fontWeight="600" color="gray.800" mb={1}>
+            {t(idea.titleKey)}
+          </Text>
+          <Text fontSize="xs" color="gray.600" lineHeight="1.4" textWrap="wrap">
+            {t(idea.descriptionKey)}
+          </Text>
+        </Box>
+      </Flex>
+    </Button>
+  );
+};
 
 // Ideas Panel
-const IdeasPanel = ({ ideas, onUse }: { ideas: Idea[]; onUse: (idea: Idea) => void }) => (
-  <Card.Root bg="white" shadow="sm" border="1px" borderColor="gray.100">
-    <Card.Body p={5}>
-      <Flex align="center" gap={3} mb={5}>
-        <Box p={2} bg="red.100" rounded="lg" color="red.600">
-          <Icon type="lightbulb" size={18} />
-        </Box>
-        <Heading size="md" color="gray.800">
-          Ideas
-        </Heading>
-      </Flex>
+const IdeasPanel = ({ ideas, onUse }: { ideas: Idea[]; onUse: (idea: Idea) => void }) => {
+  const { t } = useTranslation();
+  
+  return (
+    <Card.Root bg="white" shadow="sm" border="1px" borderColor="gray.100">
+      <Card.Body p={5}>
+        <Flex align="center" gap={3} mb={5}>
+          <Box p={2} bg="red.100" rounded="lg" color="red.600">
+            <Icon type="lightbulb" size={18} />
+          </Box>
+          <Heading size="md" color="gray.800">
+            {t('aiChat.ideas.title')}
+          </Heading>
+        </Flex>
 
-      <Stack gap={2}>
-        {ideas.map((idea) => (
-          <IdeaCard key={idea.id} idea={idea} onUse={onUse} />
-        ))}
-      </Stack>
-    </Card.Body>
-  </Card.Root>
-);
+        <Stack gap={2}>
+          {ideas.map((idea) => (
+            <IdeaCard key={idea.id} idea={idea} onUse={onUse} />
+          ))}
+        </Stack>
+      </Card.Body>
+    </Card.Root>
+  );
+};
 
 // Mobile Drawer
-const MobileIdeasDrawer = ({ isOpen, onClose, ideas, onUse }: { isOpen: boolean; onClose: () => void; ideas: Idea[]; onUse: (idea: Idea) => void }) => (
-  <Drawer.Root open={isOpen} onOpenChange={onClose} placement="bottom">
-    <Drawer.Backdrop />
-    <Drawer.Positioner>
-      <Drawer.Content>
-        <Drawer.Header borderBottom="1px" borderColor="gray.100">
-          <Drawer.Title>
-            <Lightbulb className="inline h-4 w-4 mr-2" />
-            Campaign Ideas
-          </Drawer.Title>
-          <Drawer.CloseTrigger />
-        </Drawer.Header>
-        <Drawer.Body p={4}>
-          <Stack gap={2}>
-            {ideas.map((idea) => (
-              <IdeaCard
-                key={idea.id}
-                idea={idea}
-                onUse={(idea) => {
-                  onUse(idea);
-                  onClose();
-                }}
-              />
-            ))}
-          </Stack>
-        </Drawer.Body>
-      </Drawer.Content>
-    </Drawer.Positioner>
-  </Drawer.Root>
-);
+const MobileIdeasDrawer = ({ isOpen, onClose, ideas, onUse }: { isOpen: boolean; onClose: () => void; ideas: Idea[]; onUse: (idea: Idea) => void }) => {
+  const { t } = useTranslation();
+  
+  return (
+    <Drawer.Root open={isOpen} onOpenChange={onClose} placement="bottom">
+      <Drawer.Backdrop />
+      <Drawer.Positioner>
+        <Drawer.Content>
+          <Drawer.Header borderBottom="1px" borderColor="gray.100">
+            <Drawer.Title>
+              <Lightbulb className="inline h-4 w-4 mr-2" />
+              {t('aiChat.ideas.panelTitle')}
+            </Drawer.Title>
+            <Drawer.CloseTrigger />
+          </Drawer.Header>
+          <Drawer.Body p={4}>
+            <Stack gap={2}>
+              {ideas.map((idea) => (
+                <IdeaCard
+                  key={idea.id}
+                  idea={idea}
+                  onUse={(idea) => {
+                    onUse(idea);
+                    onClose();
+                  }}
+                />
+              ))}
+            </Stack>
+          </Drawer.Body>
+        </Drawer.Content>
+      </Drawer.Positioner>
+    </Drawer.Root>
+  );
+};
 
 export default function Index() {
+  const { t } = useTranslation();
   const {
     messages,
     inputMessage,
@@ -317,39 +332,39 @@ export default function Index() {
   const [ideas] = useState<Idea[]>([
     {
       id: 1,
-      title: "Visual Marketing",
-      description: "Visual content generates 40% more engagement",
+      titleKey: "aiChat.ideas.visualMarketing.title",
+      descriptionKey: "aiChat.ideas.visualMarketing.description",
       icon: Camera,
     },
     {
       id: 2,
-      title: "Sustainability",
-      description: "Eco-friendly brands retain 25% more customers",
+      titleKey: "aiChat.ideas.sustainability.title",
+      descriptionKey: "aiChat.ideas.sustainability.description",
       icon: Leaf,
     },
     {
       id: 3,
-      title: "Micro-Influencers",
-      description: "Higher conversion than celebrities",
+      titleKey: "aiChat.ideas.microInfluencers.title",
+      descriptionKey: "aiChat.ideas.microInfluencers.description",
       icon: Users,
     },
     {
       id: 4,
-      title: "UGC Content",
-      description: "Increases authenticity and reduces costs",
+      titleKey: "aiChat.ideas.ugcContent.title",
+      descriptionKey: "aiChat.ideas.ugcContent.description",
       icon: UserIcon,
     },
   ]);
   const user = usePage().props.auth.user || {};
 
   const useIdeaAsPrompt = (idea: Idea) => {
-    const prompt = `Give me ideas for a campaign about ${idea.title}`;
+    const prompt = `Give me ideas for a campaign about ${t(idea.titleKey)}`;
     handleInputChange({ target: { value: prompt } } as any);
   };
 
   return (
     <AuthenticatedLayout>
-      <Head title="AI Chat" />
+      <Head title={t('aiChat.title')} />
 
       <Box minH="100vh" py={6}>
         <Container maxW="6xl">
@@ -373,10 +388,10 @@ export default function Index() {
                   height="60px"
                   bgClip="text"
                 >
-                  AI Assistant
+                  {t('aiChat.title')}
                 </Heading>
                 <Text color="gray.600" mt={6} fontSize="lg">
-                  Intelligent recommendations for your campaigns
+                  {t('aiChat.subtitle')}
                 </Text>
               </Box>
 
@@ -417,7 +432,7 @@ export default function Index() {
                 rounded="full"
                 alignSelf="start"
               >
-                {campaigns.length} campaigns available
+                {campaigns.length} {t('aiChat.campaignsAvailable')}
               </Badge>
             )}
           </Stack>
@@ -439,12 +454,12 @@ export default function Index() {
                       <Icon type="ai" size={20} />
                     </Box>
                     <Heading size="xl" color="gray.900" fontWeight="600">
-                      Chat ContentFlow
+                      {t('aiChat.chatTitle')}
                     </Heading>
                   </Flex>
                   <Badge colorScheme="green" variant="subtle" rounded="full">
                     <Star className="inline h-3 w-3 mr-1" />
-                    Online
+                    {t('aiChat.online')}
                   </Badge>
                 </Flex>
 
@@ -479,7 +494,7 @@ export default function Index() {
                     {messages.length === 0 && (
                       <Box textAlign="center" py={8}>
                         <Text color="gray.500" fontSize="sm">
-                          Hi! I'm your AI assistant. How can I help you today?
+                          {t('aiChat.welcomeMessage')}
                         </Text>
                       </Box>
                     )}
@@ -520,7 +535,7 @@ export default function Index() {
                           <Flex align="center" gap={2}>
                             <Spinner size="sm" color="red.500" />
                             <Text fontSize="sm" color="gray.600">
-                              Thinking...
+                              {t('aiChat.thinking')}
                             </Text>
                           </Flex>
                         </Box>
@@ -537,7 +552,7 @@ export default function Index() {
                     value={inputMessage}
                     onChange={handleInputChange}
                     // onKeyPress={handleKeyPress}
-                    placeholder="Write your message..."
+                    placeholder={t('aiChat.inputPlaceholder')}
                     resize="none"
                     p={4}
                     border="1px solid"
@@ -548,7 +563,7 @@ export default function Index() {
                   />
                   <Flex justify="space-between" align="center">
                     <Text fontSize="xs" color="gray.500">
-                      Enter to send
+                      {t('aiChat.enterToSend')}
                     </Text>
                     <Button
                       onClick={sendMessage}
@@ -559,7 +574,7 @@ export default function Index() {
                       minW="100px"
                     >
                       <Icon type="send" size={16} />
-                      Send
+                      {t('aiChat.send')}
                     </Button>
                   </Flex>
                 </Stack>

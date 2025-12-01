@@ -2,6 +2,7 @@ import { Link } from "@inertiajs/react";
 import NavLink from "@/Components/NavLink";
 import Logo from "@/../assets/logo.png";
 import { Home, User, FileText, BarChart3, Bot, LogOut } from "lucide-react";
+import LanguageSwitcher from "@/Components/LanguageSwitcher";
 
 interface SidebarProps {
   isSidebarOpen: boolean;
@@ -205,7 +206,7 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
                     align-center
                     px-4 py-3 text-sm 
                     ${isSidebarOpen ? "" : "justify-center"}
-                    font-medium rounded-2xl transition-all duration-300 
+                    font-medium rounded-lg transition-all duration-300 
                     hover:bg-gradient-to-r 
                     text-gray-700
                     hover:text-red-600
@@ -222,8 +223,7 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
                 className={`flex items-center justify-center rounded-full 
                   h-10  transition-all duration-300 ${
                     route().current(item.href)
-                      ? "bg-gradient-to-r  text-white shadow-lg"
-                      : "text-gray-700 hover:text-red-600"
+                     
                   }`}
               >
                 {isSidebarOpen ? (
@@ -266,6 +266,11 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
             </NavLink>
           ))}
         </nav>
+
+        {/* Language Switcher */}
+        <div className={`px-4 pb-2 ${!isSidebarOpen && 'flex justify-center'}`}>
+          <LanguageSwitcher />
+        </div>
 
         {/* Logout Button */}
         <div className="p-4 border-t border-gray-200/50">
