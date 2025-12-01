@@ -1,10 +1,13 @@
 import React from 'react';
 import ContentCard from './ContentCard';
+import { useTranslation } from 'react-i18next';
 
 export default function CampaignList({ campaigns, onEdit, onDelete, onAdd }) {
+    const { t } = useTranslation();
+
     return (
         <div className="mt-8 bg-white shadow-md rounded-lg p-6">
-            <h2 className="text-xl font-semibold text-gray-800 mb-6">Your Content</h2>
+            <h2 className="text-xl font-semibold text-gray-800 mb-6">{t('manageContent.campaigns.yourContent')}</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {campaigns.map((campaign) => (
                     <ContentCard
@@ -33,7 +36,7 @@ export default function CampaignList({ campaigns, onEdit, onDelete, onAdd }) {
                                 d="M12 6v6m0 0v6m0-6h6m-6 0H6"
                             ></path>
                         </svg>
-                        <span className="text-sm font-semibold">Add New Content</span>
+                        <span className="text-sm font-semibold">{t('manageContent.campaigns.addNew')}</span>
                     </button>
                 </div>
             </div>

@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import {
   FileText,
   FileImage,
@@ -11,52 +11,59 @@ import {
   Rocket,
   AlertTriangle,
   Sparkles,
+  X,
+  Upload,
+  CheckCircle2,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
-const schema = z.object({
+const createSchema = (t) => z.object({
   title: z
     .string()
-    .min(1, "Title is required")
-    .max(100, "Title cannot exceed 100 characters"),
+    .min(1, t('manageContent.modals.validation.titleRequired'))
+    .max(100, t('manageContent.modals.validation.titleLength')),
   description: z
     .string()
-    .min(10, "Description must be at least 10 characters")
-    .max(500, "Description cannot exceed 500 characters"),
+    .min(10, t('manageContent.modals.validation.descRequired'))
+    .max(500, t('manageContent.modals.validation.descMax')),
   image: z
     .instanceof(FileList)
-    .refine((files) => files.length > 0, "Image is required")
+    .refine((files) => files.length > 0, t('manageContent.modals.validation.imageRequired'))
     .refine((files) => {
       if (files.length === 0) return true;
       const file = files[0];
       return file.size <= 5 * 1024 * 1024; // 5MB
-    }, "Image must be smaller than 5MB")
+    }, t('manageContent.modals.validation.imageSize'))
     .refine((files) => {
       if (files.length === 0) return true;
       const file = files[0];
       return ["image/jpeg", "image/png", "image/webp"].includes(file.type);
-    }, "Only JPG, PNG, or WebP files are allowed"),
+    }, t('manageContent.modals.validation.imageType')),
   objective: z
     .string()
-    .min(5, "Objective must be at least 5 characters")
-    .max(200, "Objective cannot exceed 200 characters"),
+    .min(5, t('manageContent.modals.validation.objRequired'))
+    .max(200, t('manageContent.modals.validation.objMax')),
   hashtags: z
     .string()
-    .min(1, "Hashtags are required")
+    .min(1, t('manageContent.modals.validation.hashtagsRequired'))
     .refine((val) => {
       const hashtags = val.split(" ").filter((tag) => tag.startsWith("#"));
       return hashtags.length > 0;
-    }, "Must include at least one valid hashtag (#example)")
+    }, t('manageContent.modals.validation.hashtagValid'))
     .refine((val) => {
       const hashtags = val.split(" ").filter((tag) => tag.startsWith("#"));
       return hashtags.length <= 10;
-    }, "Maximum 10 hashtags allowed"),
+    }, t('manageContent.modals.validation.hashtagMax')),
 });
 
 export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
+  const { t } = useTranslation();
   const [imagePreview, setImagePreview] = useState(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = useRef(null);
+
+  const schema = useMemo(() => createSchema(t), [t]);
 
   const {
     register,
@@ -120,7 +127,7 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
     setValue("hashtags", formatted);
   };
 
-  const handleFormSubmit = async (data) => {
+  const onFormSubmit = async (data) => {
     setIsSubmitting(true);
     try {
       await onSubmit(data);
@@ -144,273 +151,246 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
   if (!isOpen) return null;
 
   return (
-    <div
-      className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50 backdrop-blur-sm"
-      onClick={handleClose}
-    >
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
       <div
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto transform transition-all duration-300 scale-100"
-        onClick={(e) => e.stopPropagation()}
-      >
+        className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity"
+        onClick={onClose}
+      ></div>
+
+      <div className="relative w-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-100">
+        <div className="px-8 py-6 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white flex items-center justify-between sticky top-0 z-10">
           <div>
             <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-              <Sparkles className="h-6 w-6 text-yellow-500" />
-              New Campaign
+              <Sparkles className="w-6 h-6 text-indigo-600" />
+              {t('manageContent.modals.add.title')}
             </h2>
-            <p className="text-sm text-gray-500 mt-1">
-              Create an impactful and attractive campaign
+            <p className="text-gray-500 mt-1">
+              {t('manageContent.modals.add.subtitle')}
             </p>
           </div>
           <button
-            onClick={handleClose}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200"
-            disabled={isSubmitting}
+            onClick={onClose}
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-400 hover:text-gray-600"
           >
-            <svg
-              className="w-6 h-6 text-gray-500"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
+            <X className="w-6 h-6" />
           </button>
         </div>
 
-        <form
-          onSubmit={handleSubmit(handleFormSubmit)}
-          className="p-6 space-y-6"
-        >
-          {/* Progress Bar */}
-          <div className="w-full bg-gray-200 rounded-full h-2">
-            <div
-              className="bg-gradient-to-r 
-              from-red-500 to-purple-600
-               h-2 rounded-full transition-all duration-500"
-              style={{
-                width: `${Math.min(
-                  (Object.values(watchedFields).filter(Boolean).length / 5) *
-                    100,
-                  100
-                )}%`,
-              }}
-            ></div>
-          </div>
-
-          {/* Title */}
-          <div className="space-y-2">
-            <label className="flex items-center text-sm font-semibold text-gray-700">
-              <FileText className="inline h-4 w-4 mr-1" />
-              Campaign Title
-              <span className="text-red-500 ml-1">*</span>
-            </label>
-            <input
-              {...register("title")}
-              className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 transition-all duration-300 ${
-                errors.title
-                  ? "border-red-300 focus:ring-red-200 bg-red-50"
-                  : "border-gray-300 focus:ring-blue-200 focus:border-blue-500"
-              }`}
-              placeholder="Eg: Summer Campaign 2024"
-            />
-            <div className="flex justify-between text-xs">
-              {errors.title && (
-                <p className="text-red-600 flex items-center">
-                  <AlertTriangle className="inline h-3 w-3 mr-1" />
-                  {errors.title.message}
-                </p>
-              )}
-              <p
-                className={`ml-auto ${
-                  (watchedFields.title?.length || 0) > 80
-                    ? "text-orange-600"
-                    : "text-gray-400"
-                }`}
-              >
-                {watchedFields.title?.length || 0}/100
-              </p>
-            </div>
-          </div>
-
-          {/* Description */}
-          <div className="space-y-2">
-            <label className="flex items-center text-sm font-semibold text-gray-700">
-              <FileText className="inline h-4 w-4 mr-1" />
-              Description
-              <span className="text-red-500 ml-1">*</span>
-            </label>
-            <textarea
-              {...register("description")}
-              className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 transition-all duration-300 resize-none ${
-                errors.description
-                  ? "border-red-300 focus:ring-red-200 bg-red-50"
-                  : "border-gray-300 focus:ring-blue-200 focus:border-blue-500"
-              }`}
-              rows="4"
-              placeholder="Describe your campaign in a detailed and attractive way..."
-            />
-            <div className="flex justify-between text-xs">
-              {errors.description && (
-                <p className="text-red-600 flex items-center">
-                  <AlertTriangle className="inline h-3 w-3 mr-1" />
-                  {errors.description.message}
-                </p>
-              )}
-              <p
-                className={`ml-auto ${
-                  (watchedFields.description?.length || 0) > 400
-                    ? "text-orange-600"
-                    : "text-gray-400"
-                }`}
-              >
-                {watchedFields.description?.length || 0}/500
-              </p>
-            </div>
-          </div>
-
-          {/* Image Upload */}
-          <div className="space-y-2">
-            <label className="flex items-center text-sm font-semibold text-gray-700">
-              <FileImage className="inline h-4 w-4 mr-1" />
-              Campaign Image
-              <span className="text-red-500 ml-1">*</span>
-            </label>
-
-            {!imagePreview ? (
-              <div
-                className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all duration-300 ${
-                  isDragOver
-                    ? "border-blue-400 bg-blue-50"
-                    : errors.image
-                    ? "border-red-300 bg-red-50"
-                    : "border-gray-300 hover:border-blue-400 hover:bg-blue-50"
-                }`}
-                onDrop={handleDrop}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onClick={() => fileInputRef.current?.click()}
-              >
-                <div className="space-y-3">
-                  <Camera className="h-10 w-10 mx-auto text-gray-400" />
-                  <div>
-                    <p className="text-gray-600 font-medium">
-                      Drag your image here or click to select
+        {/* Form Content */}
+        <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
+          <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Left Column - Image Upload */}
+              <div className="space-y-6">
+                <div className="form-group">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                    <FileImage className="w-4 h-4 text-indigo-600" />
+                    {t('manageContent.modals.fields.image')}
+                  </label>
+                  <div
+                    className={`relative group cursor-pointer transition-all duration-300 ${
+                      isDragOver
+                        ? "scale-[1.02] ring-2 ring-indigo-500 ring-offset-2"
+                        : ""
+                    }`}
+                    onDrop={handleDrop}
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <div
+                      className={`aspect-[4/3] rounded-2xl border-2 border-dashed flex flex-col items-center justify-center p-6 text-center transition-colors overflow-hidden bg-gray-50 ${
+                        errors.image
+                          ? "border-red-300 bg-red-50"
+                          : isDragOver
+                          ? "border-indigo-500 bg-indigo-50"
+                          : "border-gray-200 hover:border-indigo-300 hover:bg-gray-100"
+                      }`}
+                    >
+                      {imagePreview ? (
+                        <div className="relative w-full h-full group-hover:opacity-90 transition-opacity">
+                          <img
+                            src={imagePreview}
+                            alt="Preview"
+                            className="w-full h-full object-cover rounded-xl shadow-sm"
+                          />
+                          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 rounded-xl">
+                            <p className="text-white font-medium flex items-center gap-2">
+                              <Camera className="w-5 h-5" />
+                              {t('manageContent.campaigns.change')}
+                            </p>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          <div className="w-16 h-16 rounded-full bg-indigo-100 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300">
+                            <Upload className="w-8 h-8 text-indigo-600" />
+                          </div>
+                          <div>
+                            <p className="text-gray-900 font-medium text-lg">
+                              {t('manageContent.modals.fields.dragDrop.title')}
+                            </p>
+                            <p className="text-gray-500 text-sm mt-1">
+                              {t('manageContent.modals.fields.dragDrop.subtitle')}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      className="hidden"
+                      accept="image/jpeg,image/png,image/webp"
+                      onChange={(e) => {
+                        handleImageChange(e.target.files);
+                        register("image").onChange(e);
+                      }}
+                    />
+                  </div>
+                  {errors.image && (
+                    <p className="mt-2 text-sm text-red-500 flex items-center gap-1 animate-in slide-in-from-left-1">
+                      <AlertTriangle className="w-4 h-4" />
+                      {errors.image.message}
                     </p>
-                    <p className="text-xs text-gray-400 mt-1">
-                      JPG, PNG, or WebP • Maximum 5MB
+                  )}
+                </div>
+
+                {/* Hashtags Field */}
+                <div className="form-group">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                    <Hash className="w-4 h-4 text-indigo-600" />
+                    {t('manageContent.modals.fields.hashtags')}
+                  </label>
+                  <div className="relative">
+                    <input
+                      {...register("hashtags")}
+                      className={`w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-offset-0 transition-all ${
+                        errors.hashtags
+                          ? "border-red-300 focus:border-red-500 focus:ring-red-200"
+                          : "border-gray-200 focus:border-indigo-500 focus:ring-indigo-200"
+                      }`}
+                      placeholder={t('manageContent.modals.fields.placeholders.hashtags')}
+                      onChange={handleHashtagChange}
+                    />
+                  </div>
+                  {errors.hashtags && (
+                    <p className="mt-2 text-sm text-red-500 flex items-center gap-1">
+                      <AlertTriangle className="w-4 h-4" />
+                      {errors.hashtags.message}
                     </p>
+                  )}
+                </div>
+              </div>
+
+              {/* Right Column - Details */}
+              <div className="space-y-6">
+                {/* Title Field */}
+                <div className="form-group">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-indigo-600" />
+                    {t('manageContent.modals.fields.title')}
+                  </label>
+                  <input
+                    {...register("title")}
+                    className={`w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-offset-0 transition-all ${
+                      errors.title
+                        ? "border-red-300 focus:border-red-500 focus:ring-red-200"
+                        : "border-gray-200 focus:border-indigo-500 focus:ring-indigo-200"
+                    }`}
+                    placeholder={t('manageContent.modals.fields.placeholders.title')}
+                  />
+                  {errors.title && (
+                    <p className="mt-2 text-sm text-red-500 flex items-center gap-1">
+                      <AlertTriangle className="w-4 h-4" />
+                      {errors.title.message}
+                    </p>
+                  )}
+                </div>
+
+                {/* Description Field */}
+                <div className="form-group">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-indigo-600" />
+                    {t('manageContent.modals.fields.description')}
+                  </label>
+                  <textarea
+                    {...register("description")}
+                    rows={4}
+                    className={`w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-offset-0 transition-all resize-none ${
+                      errors.description
+                        ? "border-red-300 focus:border-red-500 focus:ring-red-200"
+                        : "border-gray-200 focus:border-indigo-500 focus:ring-indigo-200"
+                    }`}
+                    placeholder={t('manageContent.modals.fields.placeholders.description')}
+                  />
+                  {errors.description && (
+                    <p className="mt-2 text-sm text-red-500 flex items-center gap-1">
+                      <AlertTriangle className="w-4 h-4" />
+                      {errors.description.message}
+                    </p>
+                  )}
+                  <div className="mt-1 flex justify-end">
+                    <span
+                      className={`text-xs ${
+                        (watchedFields.description?.length || 0) > 500
+                          ? "text-red-500"
+                          : "text-gray-400"
+                      }`}
+                    >
+                      {watchedFields.description?.length || 0}/500
+                    </span>
                   </div>
                 </div>
-                <input
-                  type="file"
-                  className="hidden"
-                  accept="image/*"
-                  {...(() => {
-                    const { ref, onChange, ...rest } = register("image");
-                    return {
-                      ...rest,
-                      ref: (e) => {
-                        ref(e);
-                        fileInputRef.current = e;
-                      },
-                      onChange: (e) => {
-                        handleImageChange(e.target.files);
-                        onChange(e);
-                      },
-                    };
-                  })()}
-                />
-              </div>
-            ) : (
-              <div className="relative rounded-xl overflow-hidden bg-gray-100">
-                <img
-                  src={imagePreview}
-                  alt="Preview"
-                  className="w-full h-48 object-cover"
-                />
-                <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
-                  <button
-                    type="button"
-                    onClick={removeImage}
-                    className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors duration-200 flex items-center space-x-2"
-                  >
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                      />
-                    </svg>
-                    <span>Remove</span>
-                  </button>
+
+                {/* Objective Field */}
+                <div className="form-group">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                    <Target className="w-4 h-4 text-indigo-600" />
+                    {t('manageContent.modals.fields.objective')}
+                  </label>
+                  <input
+                    {...register("objective")}
+                    className={`w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-offset-0 transition-all ${
+                      errors.objective
+                        ? "border-red-300 focus:border-red-500 focus:ring-red-200"
+                        : "border-gray-200 focus:border-indigo-500 focus:ring-indigo-200"
+                    }`}
+                    placeholder={t('manageContent.modals.fields.placeholders.objective')}
+                  />
+                  {errors.objective && (
+                    <p className="mt-2 text-sm text-red-500 flex items-center gap-1">
+                      <AlertTriangle className="w-4 h-4" />
+                      {errors.objective.message}
+                    </p>
+                  )}
                 </div>
-                <input
-                  type="file"
-                  className="hidden"
-                  accept="image/*"
-                  {...(() => {
-                    const { ref, onChange, ...rest } = register("image");
-                    return {
-                      ...rest,
-                      ref: (e) => {
-                        ref(e);
-                        fileInputRef.current = e;
-                      },
-                      onChange: (e) => {
-                        handleImageChange(e.target.files);
-                        onChange(e);
-                      },
-                    };
-                  })()}
-                />
               </div>
-            )}
+            </div>
+          </form>
+        </div>
 
-            {errors.image && (
-              <p className="text-red-600 text-xs flex items-center">
-                <AlertTriangle className="inline h-3 w-3 mr-1" />
-                {errors.image.message}
-              </p>
-            )}
-          </div>
-
-          {/* Objective */}
-          <div className="space-y-2">
-            <label className="flex items-center text-sm font-semibold text-gray-700">
-              <Target className="inline h-4 w-4 mr-1" />
-              Campaign Objective
-              <span className="text-red-500 ml-1">*</span>
-            </label>
-            <input
-              {...register("objective")}
-              className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 transition-all duration-300 ${
-                errors.objective
-                  ? "border-red-300 focus:ring-red-200 bg-red-50"
-                  : "border-gray-300 focus:ring-blue-200 focus:border-blue-500"
-              }`}
-              placeholder="Eg: Increase social media engagement"
-            />
-            <div className="flex justify-between text-xs">
-              {errors.objective && (
-                <p className="text-red-600 flex items-center">
-                  <AlertTriangle className="inline h-3 w-3 mr-1" />
-                  {errors.objective.message}
-                </p>
-              )}
-              <p
+        {/* Footer */}
+        <div className="px-8 py-6 border-t border-gray-100 bg-gray-50 flex items-center justify-end gap-4 sticky bottom-0 z-10">
+          <button
+            type="button"
+            onClick={handleClose}
+            className="px-6 py-2.5 rounded-xl text-gray-700 font-medium hover:bg-gray-200 transition-colors"
+          >
+            {t('common.cancel')}
+          </button>
+          <button
+            onClick={handleSubmit(onFormSubmit)}
+            disabled={isSubmitting}
+            className="px-8 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-medium hover:shadow-lg hover:shadow-indigo-200 transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2"
+          >
+            {isSubmitting ? (
+              <>
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                {t('manageContent.modals.add.creating')}
+              </>
+            ) : (
                 className={`ml-auto ${
                   (watchedFields.objective?.length || 0) > 160
                     ? "text-orange-600"

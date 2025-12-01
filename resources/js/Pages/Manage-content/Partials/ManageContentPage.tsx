@@ -8,8 +8,10 @@ import AddCampaignModal from './AddCampaignModal';
 import EditCampaignModal from './EditCampaignModal';
 import { useCampaignManagement } from '@/Hooks/useCampaignManagement';
 import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
 
 export default function ManageContentPage() {
+    const { t } = useTranslation();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedCampaign, setSelectedCampaign] = useState(null);
@@ -51,10 +53,8 @@ export default function ManageContentPage() {
 
     return (
         <AuthenticatedLayout>
-            <Head title="Manage Content" />
-            <div className="min-h-screen bg-gradient-to-br
-                
-                  ">
+            <Head title={t('manageContent.title')} />
+            <div className="min-h-screen bg-gradient-to-br">
                 <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8 py-8">
                     {/* Header Section */}
                     <div className="mb-12 text-center">
@@ -64,11 +64,11 @@ export default function ManageContentPage() {
                             </svg>
                         </div>
                         <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent mb-4">
-                            ✨ Content Management
+                            ✨ {t('manageContent.title')}
                         </h1>
                         
                         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                            Organize and manage your multimedia content elegantly and efficiently
+                            {t('manageContent.subtitle')}
                         </p>
                     </div>
 

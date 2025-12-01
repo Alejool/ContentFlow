@@ -1,132 +1,125 @@
-import { useState } from 'react';
-import axios from 'axios';
-import { toast } from 'react-toastify';
-import Swal from 'sweetalert2';
+import { useState } from "react";
+import axios from "axios";
+import { toast } from "react-toastify";
+import Swal from "sweetalert2";
+import { useTranslation } from "react-i18next";
 
 export function useCampaignManagement() {
-    const [campaigns, setCampaigns] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
+  const { t } = useTranslation();
+  const [campaigns, setCampaigns] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-    const fetchCampaigns = async () => {
-        try {
-            const response = await axios.get('/campaigns');
-            console.log(response.data.campaigns);
-            setCampaigns(response.data.campaigns);
-        } catch (error) {
-            toast.error('Failed to fetch campaigns');
-        } finally {
-            setIsLoading(false);
+  const fetchCampaigns = async () => {
+    try {
+      const response = await axios.get("/campaigns");
+      console.log(response.data.campaigns);
+      setCampaigns(response.data.campaigns);
+    } catch (error) {
+      toast.error(t("campaigns.messages.fetchError"));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const addCampaign = async (data) => {
+    try {
+      const formData = new FormData();
+      Object.keys(data).forEach((key) => {
+        if (key === "image" && data[key] instanceof FileList) {
+          if (data[key].length > 0) {
+            formData.append(key, data[key][0]);
+          }
+        } else {
+          formData.append(key, data[key]);
         }
-    };
+      });
 
-    const addCampaign = async (data) => {
-        try {
-            const formData = new FormData();
-            Object.keys(data).forEach(key => {
-                if (key === 'image' && data[key] instanceof FileList) {
-                    if (data[key].length > 0) {
-                        formData.append(key, data[key][0]);
-                    }
-                } else {
-                    formData.append(key, data[key]);
-                }
-            });
-            
-            const response = await axios.post('/campaigns', formData);
-            setCampaigns([...campaigns, response.data]);
-            toast.success('Campaign added successfully!');
-            return true;
-        } catch (error) {
-            toast.error('Failed to add campaign');
-            return false;
-        }
-    };
+      const response = await axios.post("/campaigns", formData);
+      setCampaigns([...campaigns, response.data]);
+      toast.success(t("campaigns.messages.addSuccess"));
+      return true;
+    } catch (error) {
+      toast.error(t("campaigns.messages.addError"));
+      return false;
+    }
+  };
 
-    const updateCampaign = async (id, data) => {
-        try {
-            let response;
-            const hasFile = data.image instanceof File || data.image instanceof FileList;
+  const updateCampaign = async (id, data) => {
+    try {
+      let response;
+      const hasFile =
+        data.image instanceof File || data.image instanceof FileList;
 
-            if (hasFile) {
-                const formData = new FormData();
-                formData.append('_method', 'PUT');
-                
-                Object.keys(data).forEach(key => {
-                    if (key === 'image') {
-                        if (data[key] instanceof FileList && data[key].length > 0) {
-                            formData.append(key, data[key][0]);
-                        } else if (data[key] instanceof File) {
-                            formData.append(key, data[key]);
-                        }
-                    } else {
-                        formData.append(key, data[key] === null ? '' : data[key]);
-                    }
-                });
+      if (hasFile) {
+        const formData = new FormData();
+        formData.append("_method", "PUT");
 
-                response = await axios.post(`/campaigns/${id}`, formData, {
-                    headers: { 'Content-Type': 'multipart/form-data' }
-                });
-            } else {
-                response = await axios.put(`/campaigns/${id}`, data);
+        Object.keys(data).forEach((key) => {
+          if (key === "image") {
+            if (data[key] instanceof FileList && data[key].length > 0) {
+              formData.append(key, data[key][0]);
+            } else if (data[key] instanceof File) {
+              formData.append(key, data[key]);
             }
-
-            setCampaigns(prevCampaigns => 
-                prevCampaigns.map(campaign => 
-                    campaign.id === id ? response.data.campaign : campaign
-                )
-            );
-            toast.success('Campaign updated successfully!');
-            await fetchCampaigns(); 
-            return true;
-        } catch (error) {
-            console.error(error);
-            toast.error('Failed to update campaign');
-            return false;
-        }
-    };
-
-    const deleteCampaign = async (id) => {
-        const result = await Swal.fire({
-            title: 'Are you sure?',
-            text: 'You will not be able to recover this campaign!',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, delete it!'
+          } else {
+            formData.append(key, data[key] === null ? "" : data[key]);
+          }
         });
 
-        if (result.isConfirmed) {
-            try {
-                await axios.delete(`/campaigns/${id}`);
-                setCampaigns(prevCampaigns => 
-                    prevCampaigns.filter(campaign => campaign.id !== id)
-                );
-                await fetchCampaigns(); 
-                toast.success('Campaign deleted successfully!');
-            } catch (error) {
-                toast.error('Failed to delete campaign');
-            }
-        }
-    };
+        response = await axios.post(`/campaigns/${id}`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+      } else {
+        response = await axios.put(`/campaigns/${id}`, data);
+      }
 
-    return {
-        campaigns,
-        isLoading,
-        fetchCampaigns,
-        addCampaign,
-        updateCampaign,
-        deleteCampaign
-    };
-}
-const fetchCampaigns = async () => {
-    try {
-        const response = await axios.get('/campaigns');
-        console.log(response.data.campaigns);
-        setCampaigns(response.data.campaigns);
+      setCampaigns((prevCampaigns) =>
+        prevCampaigns.map((campaign) =>
+          campaign.id === id ? response.data.campaign : campaign
+        )
+      );
+      toast.success(t("campaigns.messages.updateSuccess"));
+      await fetchCampaigns();
+      return true;
     } catch (error) {
-        toast.error('Failed to fetch campaigns');
-    } finally {
-        setIsLoading(false);
+      console.error(error);
+      toast.error(t("campaigns.messages.updateError"));
+      return false;
     }
-};
+  };
+
+  const deleteCampaign = async (id) => {
+    const result = await Swal.fire({
+      title: t("campaigns.messages.confirmDelete.title"),
+      text: t("campaigns.messages.confirmDelete.text"),
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: t("campaigns.messages.confirmDelete.confirmButton"),
+      cancelButtonText: t("campaigns.messages.confirmDelete.cancelButton"),
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await axios.delete(`/campaigns/${id}`);
+        setCampaigns((prevCampaigns) =>
+          prevCampaigns.filter((campaign) => campaign.id !== id)
+        );
+        await fetchCampaigns();
+        toast.success(t("campaigns.messages.deleteSuccess"));
+      } catch (error) {
+        toast.error(t("campaigns.messages.deleteError"));
+      }
+    }
+  };
+
+  return {
+    campaigns,
+    isLoading,
+    fetchCampaigns,
+    addCampaign,
+    updateCampaign,
+    deleteCampaign,
+  };
+}
