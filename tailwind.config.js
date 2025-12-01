@@ -1,6 +1,7 @@
 import defaultTheme from 'tailwindcss/defaultTheme';
 import forms from '@tailwindcss/forms';
 import { addDynamicIconSelectors } from "@iconify/tailwind";
+import { theme } from './resources/js/theme.ts';
 
 
 
@@ -17,16 +18,35 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: {
-          100: "#f0f4ff",
-          200: "#d9e1ff",
-          300: "#a6c1ff",
-          400: "#598bff",
-          500: "#3366ff",
-          600: "#274bdb",
-          700: "#1a34b8",
-          800: "#102694",
-          900: "#091c7a",
+        // Primary brand colors
+        primary: theme.colors.primary,
+        secondary: theme.colors.secondary,
+        
+        // Semantic colors
+        success: theme.colors.success,
+        error: theme.colors.error,
+        warning: theme.colors.warning,
+        info: theme.colors.info,
+        
+        // Map Tailwind default color names to theme colors
+        red: theme.colors.primary,
+        orange: theme.colors.secondary,
+        blue: theme.colors.accent.blue,
+        purple: theme.colors.accent.purple,
+        green: theme.colors.accent.green,
+        yellow: theme.colors.accent.yellow,
+        pink: theme.colors.accent.pink,
+        indigo: theme.colors.accent.indigo,
+        gray: theme.colors.gray,
+        
+        // Accent colors (also accessible via accent.blue, etc.)
+        accent: {
+          blue: theme.colors.accent.blue,
+          purple: theme.colors.accent.purple,
+          green: theme.colors.accent.green,
+          yellow: theme.colors.accent.yellow,
+          pink: theme.colors.accent.pink,
+          indigo: theme.colors.accent.indigo,
         },
       },
       fontFamily: {
