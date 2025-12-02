@@ -3,8 +3,8 @@ import { z } from 'zod';
 // Esquema para actualizar la contraseña
 export const passwordSchema = z
     .object({
-        current_password: z.string().min(8, 'Current password must be at least 8 characters'),
-        password: z.string().min(8, 'New password must be at least 8 characters'),
+        current_password: z.string().min(6, 'Current password must be at least 6 characters'),
+        password: z.string().min(6, 'New password must be at least 6 characters'),
         password_confirmation: z.string(),
     })
     .refine((data) => data.password === data.password_confirmation, {

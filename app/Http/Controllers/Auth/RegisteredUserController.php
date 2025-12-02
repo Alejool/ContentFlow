@@ -9,6 +9,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rules;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -42,6 +43,7 @@ class RegisteredUserController extends Controller
             'provider' => 'nullable|string',
             'provider_id' => 'nullable|string',
             'photo_url' => 'nullable|string',
+            'locale' => 'nullable|string|in:en,es',
         ]);
 
         $user = User::create([
@@ -50,6 +52,7 @@ class RegisteredUserController extends Controller
             'provider' => $request->provider,
             'provider_id' => $request->provider_id,
             'password' => Hash::make($request->password),
+            'locale' => $request->locale ?? 'es', // Default to Spanish
         ]);
 
         event(new Registered($user));
@@ -58,9 +61,13 @@ class RegisteredUserController extends Controller
         Auth::login($user);
         $request->session()->regenerate();
 
-        // Generate password reset token and send email
-        $token = Password::broker()->createToken($user);
-        Mail::to($user->email)->send(new PasswordRecoveryMail($token, $user->email));
+        // Send email verification notification
+        try {
+            $user->sendEmailVerificationNotification();
+            Log::info('Email verification sent to: ' . $user->email);
+        } catch (\Exception $e) {
+            Log::error('Failed to send verification email: ' . $e->getMessage());
+        }
 
         return response()->json([
             'success' => true,

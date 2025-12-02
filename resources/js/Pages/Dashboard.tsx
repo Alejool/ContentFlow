@@ -1,5 +1,5 @@
 // Pages/Dashboard.tsx
-import { Head, Link } from "@inertiajs/react";
+import { Head, Link, router } from "@inertiajs/react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import StatCard from "@/Components/Statistics/StatCard";
 import LineChart from "@/Components/Statistics/LineChart";
@@ -13,16 +13,21 @@ import {
   Users,
   Heart,
   ArrowRight,
+  Mail,
+  X,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useState } from "react";
 
 interface DashboardProps {
   auth: {
     user: {
       name: string;
       email: string;
+      email_verified_at: string | null;
     };
   };
+  status?: string;
   stats: {
     totalViews: number;
     totalClicks: number;
@@ -50,8 +55,30 @@ interface DashboardProps {
   };
 }
 
-export default function Dashboard({ auth, stats }: DashboardProps) {
+export default function Dashboard({ auth, stats, status }: DashboardProps) {
   const { t } = useTranslation();
+  const [showBanner, setShowBanner] = useState(true);
+  const [sending, setSending] = useState(false);
+  const [successMessage, setSuccessMessage] = useState(
+    status === "verification-link-sent"
+  );
+
+  const handleResendVerification = () => {
+    setSending(true);
+    router.post(
+      route("verification.send"),
+      {},
+      {
+        onSuccess: () => {
+          setSuccessMessage(true);
+          setSending(false);
+        },
+        onError: () => {
+          setSending(false);
+        },
+      }
+    );
+  };
 
   // Prepare chart data
   const campaignChartData = stats.campaigns.map((c) => ({
@@ -66,6 +93,51 @@ export default function Dashboard({ auth, stats }: DashboardProps) {
       <Head title={t("dashboard.title")} />
 
       <div className="py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        {/* Email Verification Banner */}
+        {!auth.user.email_verified_at && showBanner && (
+          <div className="mb-6 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-2xl p-6 shadow-sm">
+            <div className="flex items-start justify-between">
+              <div className="flex items-start gap-4 flex-1">
+                <div className="flex-shrink-0">
+                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                    <Mail className="w-6 h-6 text-blue-600" />
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                    {t("verification.banner.title")}
+                  </h3>
+                  <p className="text-gray-600 text-sm mb-4">
+                    {t("verification.banner.message")}
+                  </p>
+                  {successMessage && (
+                    <div className="mb-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                      <p className="text-sm text-green-800 font-medium">
+                        ✓ {t("verification.banner.successMessage")}
+                      </p>
+                    </div>
+                  )}
+                  <button
+                    onClick={handleResendVerification}
+                    disabled={sending}
+                    className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  >
+                    {sending
+                      ? t("verification.banner.sending")
+                      : t("verification.banner.resendButton")}
+                  </button>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowBanner(false)}
+                className="flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">

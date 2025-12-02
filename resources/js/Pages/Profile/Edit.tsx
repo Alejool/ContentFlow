@@ -57,7 +57,7 @@ export default function Edit({ mustVerifyEmail, status }: EditProps) {
                 className="h-auto"
               />
 
-              <AccountStatistics />
+              <AccountStatistics status={status} />
             </div>
 
             {/* Right Column: Connections, Security & Danger Zone */}
