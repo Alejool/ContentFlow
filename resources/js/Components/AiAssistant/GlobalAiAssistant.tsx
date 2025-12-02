@@ -9,7 +9,7 @@ import {
   Maximize2,
 } from "lucide-react";
 import axios from "axios";
-import { toast } from "react-toastify";
+import { toast } from "react-hot-toast";
 
 interface Message {
   id: number;

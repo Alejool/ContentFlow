@@ -1,6 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
-import { toast } from "react-toastify";
+import { toast } from "react-hot-toast";
 import Swal from "sweetalert2";
 import { useTranslation } from "react-i18next";
 

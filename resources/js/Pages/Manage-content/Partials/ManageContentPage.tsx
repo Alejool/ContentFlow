@@ -7,7 +7,7 @@ import CampaignList from "./CampaignList";
 import AddCampaignModal from "./AddCampaignModal";
 import EditCampaignModal from "./EditCampaignModal";
 import { useCampaignManagement } from "@/Hooks/useCampaignManagement";
-import { toast } from "react-toastify";
+import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
 export default function ManageContentPage() {
