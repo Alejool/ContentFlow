@@ -21,10 +21,10 @@ export default function Edit({ mustVerifyEmail, status }: EditProps) {
         <div className="flex flex-col items-center justify-center py-8">
           <div className="relative">
             <Avatar.Root
-              colorPalette="blue"
+              colorPalette="orange"
               size="2xl"
               variant="subtle"
-              className="w-24 h-24 ring-4 ring-white shadow-lg"
+              className="w-24 h-24 ring-4 ring-green-200 shadow-lg"
             >
               <Avatar.Fallback
                 name={user.name}
@@ -46,7 +46,7 @@ export default function Edit({ mustVerifyEmail, status }: EditProps) {
     >
       <Head title="Profile" />
 
-      <div className="py-12 bg-gray-50 min-h-screen">
+      <div className="py-12  min-h-screen">
         <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Left Column: Profile Info & Stats */}
@@ -66,13 +66,13 @@ export default function Edit({ mustVerifyEmail, status }: EditProps) {
 
               <UpdatePasswordForm className="w-full" />
 
-              <div className="pt-8 border-t border-gray-200">
-                <h3 className="text-lg font-medium text-gray-900 mb-4 px-2">
+            </div>
+              {/* <div className="pt-8 border-t border-gray-200">
+                <h3 className="text-xl text-primary-800 font-bold mb-4 px-2">
                   Danger Zone
                 </h3>
                 <DeleteUserForm className="w-full" />
-              </div>
-            </div>
+              </div> */}
           </div>
         </div>
       </div>

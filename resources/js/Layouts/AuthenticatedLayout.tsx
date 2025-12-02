@@ -58,9 +58,9 @@ export default function AuthenticatedLayout({ header, children }: AuthenticatedL
                 }`}
             >
                 {header && (
-                    <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200/50 shadow-sm">
-                        <div className="mx-auto max-w-7xl px-6 py-8">
-                            <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
+                    <header className="backdrop-blur-3xl border-b border-gray-200/50 shadow-sm">
+                        <div className="mx-auto max-w-7xl ">
+                            <div className="">
                                 {header}
                             </div>
                         </div>
