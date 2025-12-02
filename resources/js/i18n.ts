@@ -13,14 +13,16 @@ i18n
       en: { translation: en },
       es: { translation: es },
     },
-    fallbackLng: "en",
+    fallbackLng: "es", // Default to Spanish if language not supported
+    supportedLngs: ["en", "es"],
     debug: false,
     interpolation: {
       escapeValue: false,
     },
     detection: {
-      order: ["localStorage", "navigator"],
-      caches: ["localStorage"],
+      order: ["localStorage", "navigator"], // Check localStorage first, then browser language
+      caches: ["localStorage"], // Save language preference to localStorage
+      lookupLocalStorage: "i18nextLng",
     },
   });
 
