@@ -6,7 +6,7 @@ import IconTwitter from "@/../assets/Icons/x.svg";
 import IconYoutube from "@/../assets/Icons/youtube.svg";
 import { useSocialMediaAuth } from "@/Hooks/useSocialMediaAuth";
 import axios from "axios";
-import { toast } from "react-toastify";
+import { toast } from "react-hot-toast";
 import {
   Check,
   X,
@@ -85,11 +85,13 @@ export default function SocialMediaAccounts() {
         setAuthInProgress(false);
 
         if (event.data.success) {
-          toast.success(t('manageContent.socialMedia.messages.connectSuccess'));
+          toast.success(t("manageContent.socialMedia.messages.connectSuccess"));
           fetchConnectedAccounts(); // Reload accounts after successful authentication
         } else {
           toast.error(
-            `${t('manageContent.socialMedia.messages.authError')}: ${event.data.message || "Unknown error"}`
+            `${t("manageContent.socialMedia.messages.authError")}: ${
+              event.data.message || "Unknown error"
+            }`
           );
         }
 
@@ -135,9 +137,9 @@ export default function SocialMediaAccounts() {
     } catch (error) {
       console.error("Error loading social accounts:", error);
       if (error.response?.status === 401) {
-        toast.error(t('manageContent.socialMedia.messages.unauthorized'));
+        toast.error(t("manageContent.socialMedia.messages.unauthorized"));
       } else {
-        toast.error(t('manageContent.socialMedia.messages.loadError'));
+        toast.error(t("manageContent.socialMedia.messages.loadError"));
       }
     } finally {
       setLoading(false);
@@ -201,10 +203,18 @@ export default function SocialMediaAccounts() {
                 : acc
             )
           );
-          toast.success(`${account.name} ${t('manageContent.socialMedia.messages.disconnectSuccess')}`);
+          toast.success(
+            `${account.name} ${t(
+              "manageContent.socialMedia.messages.disconnectSuccess"
+            )}`
+          );
         }
       } catch (error) {
-        toast.error(`${t('manageContent.socialMedia.messages.disconnectError')} ${account.name}: ${error.message}`);
+        toast.error(
+          `${t("manageContent.socialMedia.messages.disconnectError")} ${
+            account.name
+          }: ${error.message}`
+        );
       }
     } else {
       // Connect account - Improved implementation
@@ -240,9 +250,7 @@ export default function SocialMediaAccounts() {
 
           if (!authWindowRef.current) {
             setAuthInProgress(false);
-            toast.error(
-              t('manageContent.socialMedia.messages.popupBlocked')
-            );
+            toast.error(t("manageContent.socialMedia.messages.popupBlocked"));
             return;
           }
 
@@ -261,15 +269,15 @@ export default function SocialMediaAccounts() {
           }, 500);
         } else {
           setAuthInProgress(false);
-          toast.error(t('manageContent.socialMedia.messages.urlError'));
+          toast.error(t("manageContent.socialMedia.messages.urlError"));
         }
       } catch (error) {
         setAuthInProgress(false);
         console.error("Error connecting to social network:", error);
         toast.error(
-          `${t('manageContent.socialMedia.messages.connectError')} ${account.name}: ${
-            error.response?.data?.message || error.message
-          }`
+          `${t("manageContent.socialMedia.messages.connectError")} ${
+            account.name
+          }: ${error.response?.data?.message || error.message}`
         );
       }
     }
@@ -282,10 +290,10 @@ export default function SocialMediaAccounts() {
         <div className="max-w-3xl">
           <h2 className="text-2xl font-bold text-gray-900 mb-3 flex items-center gap-2">
             <Link2 className="w-6 h-6 text-indigo-600" />
-            {t('manageContent.socialMedia.title')}
+            {t("manageContent.socialMedia.title")}
           </h2>
           <p className="text-gray-600 text-lg leading-relaxed">
-            {t('manageContent.socialMedia.description')}
+            {t("manageContent.socialMedia.description")}
           </p>
         </div>
       </div>
@@ -294,7 +302,7 @@ export default function SocialMediaAccounts() {
       {loading ? (
         <div className="flex flex-col items-center justify-center py-12 bg-white rounded-2xl border border-gray-100">
           <Loader2 className="w-10 h-10 text-indigo-600 animate-spin mb-4" />
-          <p className="text-gray-500 font-medium">{t('common.loading')}</p>
+          <p className="text-gray-500 font-medium">{t("common.loading")}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -319,12 +327,12 @@ export default function SocialMediaAccounts() {
                   {account.isConnected ? (
                     <>
                       <Check className="w-3 h-3" />
-                      {t('manageContent.socialMedia.status.connected')}
+                      {t("manageContent.socialMedia.status.connected")}
                     </>
                   ) : (
                     <>
                       <div className="w-1.5 h-1.5 rounded-full bg-gray-400" />
-                      {t('manageContent.socialMedia.status.notConnected')}
+                      {t("manageContent.socialMedia.status.notConnected")}
                     </>
                   )}
                 </div>
@@ -355,7 +363,7 @@ export default function SocialMediaAccounts() {
                   </p>
                 ) : (
                   <p className="text-sm text-gray-500">
-                    {t('manageContent.socialMedia.status.connectToShare')}
+                    {t("manageContent.socialMedia.status.connectToShare")}
                   </p>
                 )}
               </div>
@@ -375,17 +383,17 @@ export default function SocialMediaAccounts() {
                 {isAuthenticating || authInProgress ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    {t('manageContent.socialMedia.actions.processing')}
+                    {t("manageContent.socialMedia.actions.processing")}
                   </>
                 ) : account.isConnected ? (
                   <>
                     <X className="w-4 h-4" />
-                    {t('manageContent.socialMedia.actions.disconnect')}
+                    {t("manageContent.socialMedia.actions.disconnect")}
                   </>
                 ) : (
                   <>
                     <ExternalLink className="w-4 h-4" />
-                    {t('manageContent.socialMedia.actions.connect')}
+                    {t("manageContent.socialMedia.actions.connect")}
                   </>
                 )}
               </button>
@@ -402,13 +410,13 @@ export default function SocialMediaAccounts() {
           </div>
           <div>
             <h3 className="text-lg font-bold text-indigo-900 mb-3">
-              {t('manageContent.socialMedia.whyConnect')}
+              {t("manageContent.socialMedia.whyConnect")}
             </h3>
             <div className="grid sm:grid-cols-2 gap-x-8 gap-y-2 mb-4">
               <ul className="space-y-2">
                 {[
-                  t('manageContent.socialMedia.benefits.autoPublish'),
-                  t('manageContent.socialMedia.benefits.manageAll'),
+                  t("manageContent.socialMedia.benefits.autoPublish"),
+                  t("manageContent.socialMedia.benefits.manageAll"),
                 ].map((item, i) => (
                   <li
                     key={i}
@@ -421,8 +429,8 @@ export default function SocialMediaAccounts() {
               </ul>
               <ul className="space-y-2">
                 {[
-                  t('manageContent.socialMedia.benefits.schedule'),
-                  t('manageContent.socialMedia.benefits.control'),
+                  t("manageContent.socialMedia.benefits.schedule"),
+                  t("manageContent.socialMedia.benefits.control"),
                 ].map((item, i) => (
                   <li
                     key={i}
@@ -435,7 +443,7 @@ export default function SocialMediaAccounts() {
               </ul>
             </div>
             <p className="text-sm text-indigo-600/80 bg-white/50 p-3 rounded-lg inline-block">
-              {t('manageContent.socialMedia.disclaimer')}
+              {t("manageContent.socialMedia.disclaimer")}
             </p>
           </div>
         </div>

@@ -3,7 +3,7 @@ import { Link, usePage } from "@inertiajs/react";
 import { useForm as useHookForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { profileSchema } from "@/schemas/schemas";
-import { toast } from "react-toastify";
+import { toast } from "react-hot-toast";
 
 import ModernInput from "@/Components/Modern/ModernInput";
 import ModernButton from "@/Components/Modern/ModernButton";
@@ -74,7 +74,7 @@ export default function UpdateProfileInformation({
         // Optionally reload to reflect changes if needed, though Inertia usually handles this via props
         // window.location.reload();
       } else if (response.data.warning) {
-        toast.warning(response.data.message || "No changes were made");
+        toast(response.data.message || "No changes were made", { icon: "⚠️" });
       } else {
         toast.error(
           response.data.message || "An error occurred while updating profile"
