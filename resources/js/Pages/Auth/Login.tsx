@@ -1,12 +1,26 @@
-import { useEffect, ChangeEvent, FormEvent } from "react";
+import { useEffect, ChangeEvent } from "react";
 import { Head, Link, usePage } from "@inertiajs/react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, getAuthResult } from "@/firebase";
-import Logo from "@/../assets/logo.png";
 import GuestLayout from "@/Layouts/GuestLayout";
 import { useAuth } from "@/Hooks/useAuth";
+import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "@/Components/LanguageSwitcher";
+import {
+  Mail,
+  Lock,
+  LogIn,
+  UserPlus,
+  AlertCircle,
+  CheckCircle2,
+  Shield,
+  Smartphone,
+  Globe,
+} from "lucide-react";
+import { motion } from "framer-motion";
 
 export default function Login() {
+  const { t } = useTranslation();
   const { errors } = usePage().props;
   const {
     data,
@@ -45,181 +59,277 @@ export default function Login() {
 
   return (
     <GuestLayout>
-      <Head title="Login" />
-      <div className="min-h-screen flex flex-col lg:flex-row">
-        <div
-          className="  
-                        w-full 
-                        lg:w-1/2 
-                        bg-red-400 
-                        bg-opacity-90 
-                          bg-gradient-to-b md:bg-gradient-to-r
-                        from-red-600 to-purple-500
-                        flex 
-                        flex-col    
-                        items-center 
-                        justify-center 
-                        p-8"
-        >
-          <div className="text-white text-center">
-            <h1 className="text-4xl font-bold mb-4">Welcome</h1>
-            <p className="text-lg">
-              Start session with your email and password
-            </p>
+      <Head title={t("auth.login.title")} />
+
+      {/* Language Switcher - Fixed Position */}
+      <div className="fixed top-6 right-6 z-50">
+        <LanguageSwitcher />
+      </div>
+
+      <div className="min-h-screen flex flex-col lg:flex-row bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+        {/* Left Side - Brand/Info Section */}
+        <div className="w-full lg:w-1/2 bg-gradient-primary relative overflow-hidden">
+          <div className="absolute inset-0 bg-black/10" />
+
+          <div className="relative h-full flex flex-col items-center justify-center p-8 text-white">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="text-center max-w-xl"
+            >
+              <div className="mb-8">
+                <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-white/20 backdrop-blur-sm mb-6">
+                  <Shield className="w-10 h-10" />
+                </div>
+                <h1 className="text-4xl font-bold font-poppins mb-4">
+                  {t("auth.login.welcome")}
+                </h1>
+                <p className="text-lg opacity-90 mb-8">
+                  {t("auth.login.subtitle")}
+                </p>
+              </div>
+
+              {/* Features List */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
+                <div className="flex items-center gap-3 p-3 rounded-lg bg-white/10 backdrop-blur-sm">
+                  <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                    <Shield className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="font-semibold">Secure Access</p>
+                    <p className="text-sm opacity-80">End-to-end encryption</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 p-3 rounded-lg bg-white/10 backdrop-blur-sm">
+                  <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                    <Globe className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="font-semibold">Global Platform</p>
+                    <p className="text-sm opacity-80">Access anywhere</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 p-3 rounded-lg bg-white/10 backdrop-blur-sm">
+                  <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                    <Smartphone className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="font-semibold">Mobile Friendly</p>
+                    <p className="text-sm opacity-80">Responsive design</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 p-3 rounded-lg bg-white/10 backdrop-blur-sm">
+                  <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                    <CheckCircle2 className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="font-semibold">Verified</p>
+                    <p className="text-sm opacity-80">Trusted by thousands</p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
           </div>
-          <Link href="/">
-            <img
-              src={Logo}
-              alt="Logo"
-              className=" object-cover h-40 fill-current"
-            />
-          </Link>
         </div>
 
-        <div className="w-full lg:w-1/2 flex items-center justify-center  p-8">
-          <div className="w-full max-w-md space-y-6">
-            <form onSubmit={handleEmailLogin}>
+        {/* Right Side - Login Form */}
+        <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-8">
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="w-full max-w-md"
+          >
+            <div className="mb-8 text-center">
+              <h2 className="text-3xl font-bold text-gray-900 dark:text-white font-poppins">
+                {t("auth.login.title")}
+              </h2>
+              <p className="text-gray-600 dark:text-gray-400 mt-2">
+                Sign in to your account to continue
+              </p>
+            </div>
+
+            <form onSubmit={handleEmailLogin} className="space-y-6">
+              {/* Error/Success Messages */}
               {error && (
-                <div className="rounded-md bg-red-50 p-4 text-sm text-red-600">
-                  {error}
+                <div className="rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-4">
+                  <div className="flex items-center gap-3 text-red-700 dark:text-red-400">
+                    <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                    <p className="text-sm font-medium">{error}</p>
+                  </div>
                 </div>
               )}
 
               {successMessage && (
-                <div className="rounded-md bg-green-50 p-4 text-sm text-green-600">
-                  {successMessage}
+                <div className="rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 p-4">
+                  <div className="flex items-center gap-3 text-green-700 dark:text-green-400">
+                    <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
+                    <p className="text-sm font-medium">{successMessage}</p>
+                  </div>
                 </div>
               )}
 
-              <div className="mb-4">
-                <label className="mb-1 block text-sm font-medium  ">
-                  Email
+              {/* Email Input */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  {t("auth.login.email")}
                 </label>
                 <div className="relative">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2">
+                    <Mail className="w-5 h-5 text-gray-400" />
+                  </div>
                   <input
                     type="email"
                     name="email"
                     value={data.email}
                     onChange={handleChange}
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 pl-10
-                                     focus:border-[theme.colors.primary.500] focus:outline-none focus:ring-[theme.colors.primary.500]"
+                    className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 
+                             bg-white dark:bg-gray-800 text-gray-900 dark:text-white
+                             focus:ring-2 focus:ring-primary-500 focus:border-transparent
+                             transition-all duration-200"
+                    placeholder="your@email.com"
                     required
                   />
-                  <span
-                    className="icon-[clarity--email-outline-badged]
-                    absolute left-3 top-1/2 -translate-y-1/2"
-                    role="img"
-                    aria-hidden="true"
-                  />{" "}
                 </div>
               </div>
 
-              <div className="mb-4">
-                <label className="mb-1 block text-sm font-medium text-gray-700 ">
-                  Password
+              {/* Password Input */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  {t("auth.login.password")}
                 </label>
                 <div className="relative">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2">
+                    <Lock className="w-5 h-5 text-gray-400" />
+                  </div>
                   <input
                     type="password"
                     name="password"
                     value={data.password}
                     onChange={handleChange}
-                    className="w-full rounded-md border
-                                     border-gray-300 px-3 py-2 pl-10
-                                     focus:border-[theme.colors.primary.500] 
-                                     focus:outline-none focus:ring-[theme.colors.primary.500]
-                                      dark:border-gray-700"
+                    className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 
+                             bg-white dark:bg-gray-800 text-gray-900 dark:text-white
+                             focus:ring-2 focus:ring-primary-500 focus:border-transparent
+                             transition-all duration-200"
+                    placeholder="••••••••"
                     required
-                  />
-                  <span
-                    className="icon-[solar--password-minimalistic-bold-duotone]
-                    absolute left-3 top-1/2 -translate-y-1/2"
-                    role="img"
-                    aria-hidden="true"
                   />
                 </div>
               </div>
 
+              {/* Remember Me & Forgot Password */}
+              <div className="flex items-center justify-between">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    name="remember"
+                    checked={data.remember}
+                    onChange={handleChange}
+                    className="w-4 h-4 rounded border-gray-300 text-primary-600 
+                             focus:ring-primary-500 focus:ring-offset-0"
+                  />
+                  <span className="text-sm text-gray-700 dark:text-gray-300">
+                    Remember me
+                  </span>
+                </label>
+
+                <Link
+                  href={route("password.request")}
+                  className="text-sm font-medium text-primary-600 hover:text-primary-500 
+                           dark:text-primary-400 dark:hover:text-primary-300 transition-colors"
+                >
+                  Forgot password?
+                </Link>
+              </div>
+
+              {/* Login Button */}
               <button
                 type="submit"
                 disabled={processing || loading}
-                className="w-full rounded-md bg-[theme.colors.primary.500] px-4 py-2 font-medium text-white
-                             transition hover:bg-[theme.colors.primary.500]/90 focus:outline-none 
-                             md:bg-gradient-to-r
-                                     from-red-600 to-purple-500
-                             focus:ring-2 focus:ring-[theme.colors.primary.500] focus:ring-offset-2 disabled:opacity-75"
+                className="w-full bg-gradient-primary text-white py-3 px-4 rounded-xl font-semibold
+                         hover:opacity-90 active:scale-[0.98] transition-all duration-200
+                         disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
-                {loading ? "Logging in..." : "Login"}
-                <span
-                  className="ml-2  icon-[ri--login-circle-line]"
-                  role="img"
-                  aria-hidden="true"
-                />
+                {loading ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    {t("auth.login.loggingIn")}
+                  </>
+                ) : (
+                  <>
+                    <LogIn className="w-5 h-5" />
+                    {t("auth.login.loginButton")}
+                  </>
+                )}
               </button>
 
-              <div className="mt-8">
-                <div className="relative">
-                  <div className="relative flex  justify-center text-sm">
-                    <span className=" px-2 text-gray-500 ">
-                      Or continue with
-                    </span>
-                  </div>
+              {/* Divider */}
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300 dark:border-gray-700"></div>
                 </div>
-
-                <div className="mt-3 grid gap-3">
-                  <div className="">
-                    <button
-                      type="button"
-                      onClick={handleGoogleLogin}
-                      disabled={loading}
-                      className="flex items-center justify-center w-full rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm 
-                                     "
-                    >
-                      <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24">
-                        <path
-                          d="M12.0003 4.75C13.7703 4.75 15.3553 5.36002 16.6053 6.54998L20.0303 3.125C17.9502 1.19 15.2353 0 12.0003 0C7.31028 0 3.25527 2.69 1.28027 6.60998L5.27028 9.70498C6.21525 6.86002 8.87028 4.75 12.0003 4.75Z"
-                          fill="#EA4335"
-                        />
-                        <path
-                          d="M23.49 12.275C23.49 11.49 23.415 10.73 23.3 10H12V14.51H18.47C18.18 15.99 17.34 17.25 16.08 18.1L19.945 21.1C22.2 19.01 23.49 15.92 23.49 12.275Z"
-                          fill="#4285F4"
-                        />
-                        <path
-                          d="M5.26498 14.2949C5.02498 13.5699 4.88501 12.7999 4.88501 11.9999C4.88501 11.1999 5.01998 10.4299 5.26498 9.7049L1.275 6.60986C0.46 8.22986 0 10.0599 0 11.9999C0 13.9399 0.46 15.7699 1.28 17.3899L5.26498 14.2949Z"
-                          fill="#FBBC05"
-                        />
-                        <path
-                          d="M12.0004 24.0001C15.2404 24.0001 17.9654 22.935 19.9454 21.095L16.0804 18.095C15.0054 18.82 13.6204 19.245 12.0004 19.245C8.8704 19.245 6.21537 17.135 5.2654 14.29L1.27539 17.385C3.25539 21.31 7.3104 24.0001 12.0004 24.0001Z"
-                          fill="#34A853"
-                        />
-                      </svg>
-                      Google
-                    </button>
-                  </div>
-
-                  
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-4 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">
+                    {t("auth.login.orContinueWith")}
+                  </span>
                 </div>
               </div>
 
-              <div className="mt-6 text-center text-sm">
-                <span className="text-gray-600 dark:text-gray-400">
-                  Don't have an account?
-                </span>
-                <Link
-                  href={route("register")}
-                  className="
-                                ml-1  
-                                md:bg-gradient-to-r
-                                font-bold
-                                text-transparent bg-clip-text
-                                from-red-600 to-purple-500
-                                     "
+              {/* Social Login Buttons */}
+              <div className="grid grid-cols-1 gap-3">
+                <button
+                  type="button"
+                  onClick={handleGoogleLogin}
+                  disabled={loading}
+                  className="w-full flex items-center justify-center gap-3 px-4 py-3 
+                           rounded-xl border border-gray-300 dark:border-gray-700 
+                           bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300
+                           hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors
+                           disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Register
-                </Link>
+                  <svg className="w-5 h-5" viewBox="0 0 24 24">
+                    <path
+                      fill="#4285F4"
+                      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                    />
+                    <path
+                      fill="#34A853"
+                      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                    />
+                    <path
+                      fill="#FBBC05"
+                      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                    />
+                    <path
+                      fill="#EA4335"
+                      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                    />
+                  </svg>
+                  <span className="font-medium">{t("auth.login.google")}</span>
+                </button>
+              </div>
+
+              {/* Register Link */}
+              <div className="text-center pt-6">
+                <p className="text-gray-600 dark:text-gray-400 text-sm">
+                  {t("auth.login.noAccount")}{" "}
+                  <Link
+                    href={route("register")}
+                    className="inline-flex items-center gap-1 font-semibold text-primary-600 
+                             hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300
+                             transition-colors"
+                  >
+                    <UserPlus className="w-4 h-4" />
+                    {t("auth.login.registerLink")}
+                  </Link>
+                </p>
               </div>
             </form>
-          </div>
+          </motion.div>
         </div>
       </div>
     </GuestLayout>

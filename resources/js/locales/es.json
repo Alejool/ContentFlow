@@ -194,14 +194,37 @@
     }
   },
   "auth": {
-    "login": "Iniciar Sesión",
-    "register": "Registrarse",
-    "logout": "Cerrar Sesión",
+    "login": {
+      "title": "Iniciar Sesión",
+      "welcome": "Bienvenido",
+      "subtitle": "Inicia sesión con tu correo y contraseña",
+      "email": "Correo Electrónico",
+      "password": "Contraseña",
+      "loginButton": "Iniciar Sesión",
+      "loggingIn": "Iniciando sesión...",
+      "orContinueWith": "O continúa con",
+      "google": "Google",
+      "noAccount": "¿No tienes una cuenta?",
+      "registerLink": "Registrarse"
+    },
+    "register": {
+      "title": "Registrarse",
+      "welcome": "Bienvenido",
+      "subtitle": "Regístrate con tu correo y contraseña",
+      "name": "Nombre",
+      "email": "Correo Electrónico",
+      "password": "Contraseña",
+      "confirmPassword": "Confirmar Contraseña",
+      "registerButton": "Registrarse",
+      "registering": "Registrando...",
+      "orContinueWith": "O continúa con",
+      "google": "Google",
+      "alreadyRegistered": "¿Ya estás registrado?",
+      "loginLink": "Iniciar Sesión"
+    },
     "forgotPassword": "¿Olvidaste tu contraseña?",
     "resetPassword": "Restablecer Contraseña",
-    "rememberMe": "Recuérdame",
-    "alreadyRegistered": "¿Ya estás registrado?",
-    "notRegistered": "¿No estás registrado aún?"
+    "rememberMe": "Recuérdame"
   },
   "verification": {
     "banner": {
