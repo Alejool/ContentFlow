@@ -28,7 +28,7 @@ export default function ModernCard({
 
   return (
     <div
-      className={`bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden transition-all duration-300 hover:shadow-xl ${className}`}
+      className={`rounded-lg shadow-lg  bg-white/90 border border-gray-100 overflow-hidden transition-all duration-300 hover:shadow-xl ${className}`}
     >
       {/* Header */}
       <div

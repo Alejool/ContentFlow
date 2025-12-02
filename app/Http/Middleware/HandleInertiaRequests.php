@@ -38,7 +38,8 @@ class HandleInertiaRequests extends Middleware
                     'email' => $request->user()->email,
                     'email_verified_at' => $request->user()->email_verified_at,
                     'locale' => $request->user()->locale ?? 'es',
-                    // Agrega otros campos del usuario que necesites
+                    'created_at' => $request->user()->created_at,
+  
                 ] : null,
             ],
             'flash' => [
