@@ -1,9 +1,11 @@
 import { Head, Link } from "@inertiajs/react";
 import { useEffect, useState, ReactNode } from "react";
-import Bg from "@/../assets/background.svg";
+import Bg from "@/../assets/logo.png";
 import Logo from "@/../assets/logo.png";
 import ContentFlowVisualization3D from "@/Components/tree/ContentFlowVisualization3D";
-import Bg3d from '@/Components/tree/Bg3d'
+import Bg3d from "@/Components/tree/Bg3d";
+import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "@/Components/LanguageSwitcher";
 
 interface AuthProps {
   user: {
@@ -17,7 +19,13 @@ interface WelcomeProps {
 }
 
 // Component for SVG icons
-const CustomIcon = ({ children, className = "" }: { children: ReactNode; className?: string }) => (
+const CustomIcon = ({
+  children,
+  className = "",
+}: {
+  children: ReactNode;
+  className?: string;
+}) => (
   <div
     className={`flex items-center justify-center rounded-full bg-red-50 ${className}`}
   >
@@ -52,7 +60,7 @@ const FeatureCard = ({
     {featured && (
       <div className="absolute top-4 right-4 z-10">
         <span className="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800 dark:bg-red-900 dark:text-red-200">
-          Featured
+          {title}
         </span>
       </div>
     )}
@@ -102,7 +110,7 @@ const FeatureCard = ({
 );
 
 // Component for image gallery
-const ImageGallery = () => (
+const ImageGallery = ({ t }: { t: any }) => (
   <div className="relative w-full overflow-hidden rounded-xl">
     <div className="grid grid-cols-3 gap-2">
       <div className="col-span-2 row-span-2">
@@ -129,14 +137,31 @@ const ImageGallery = () => (
     </div>
     <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
       <span className="text-sm font-medium text-white">
-        Featured Collection
+        {t("welcome.featuredCollection")}
       </span>
     </div>
   </div>
 );
 
 export default function Welcome({ auth }: WelcomeProps) {
+  const { t, i18n } = useTranslation();
   const [date, setDate] = useState(new Date());
+
+  // Detect browser language and set default
+  useEffect(() => {
+    const browserLang = navigator.language.split("-")[0]; // Get 'en' from 'en-US'
+    const supportedLanguages = ["en", "es"];
+
+    // If browser language is supported, use it; otherwise default to Spanish
+    const defaultLang = supportedLanguages.includes(browserLang)
+      ? browserLang
+      : "es";
+
+    // Only change if current language is different
+    if (i18n.language !== defaultLang) {
+      i18n.changeLanguage(defaultLang);
+    }
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -146,16 +171,19 @@ export default function Welcome({ auth }: WelcomeProps) {
     return () => clearInterval(interval);
   }, []);
 
-  const formattedDate = date.toLocaleString("en-US", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "numeric",
-    minute: "numeric",
-    second: "numeric",
-    hour12: true,
-  });
+  const formattedDate = date.toLocaleString(
+    i18n.language === "es" ? "es-ES" : "en-US",
+    {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "numeric",
+      minute: "numeric",
+      second: "numeric",
+      hour12: i18n.language === "en",
+    }
+  );
 
   const features = [
     {
@@ -175,10 +203,13 @@ export default function Welcome({ auth }: WelcomeProps) {
           />
         </svg>
       ),
-      title: "AI Organization",
-      description:
-        "Easily categorize, tag, and search your multimedia files with AI-powered organization",
-      tags: ["Smart Albums", "Auto-Organization", "Custom Tags"],
+      title: t("welcome.aiOrganization.title"),
+      description: t("welcome.aiOrganization.description"),
+      tags: [
+        t("welcome.aiOrganization.tags.smartAlbums"),
+        t("welcome.aiOrganization.tags.autoOrganization"),
+        t("welcome.aiOrganization.tags.customTags"),
+      ],
     },
     {
       href: "manage-content",
@@ -197,9 +228,8 @@ export default function Welcome({ auth }: WelcomeProps) {
           />
         </svg>
       ),
-      title: "Multi-Platform Publishing",
-      description:
-        "Optimize and seamlessly share content across multiple social media platforms",
+      title: t("welcome.multiPlatform.title"),
+      description: t("welcome.multiPlatform.description"),
     },
     {
       href: "analytics",
@@ -218,9 +248,8 @@ export default function Welcome({ auth }: WelcomeProps) {
           />
         </svg>
       ),
-      title: "Performance Analytics",
-      description:
-        "Get insights into your content engagement and optimize your strategy accordingly",
+      title: t("welcome.analytics.title"),
+      description: t("welcome.analytics.description"),
     },
     {
       href: "manage-content",
@@ -239,9 +268,8 @@ export default function Welcome({ auth }: WelcomeProps) {
           />
         </svg>
       ),
-      title: "Smart Scheduling",
-      description:
-        "Automate and schedule your posts with AI recommendations for optimal performance",
+      title: t("welcome.scheduling.title"),
+      description: t("welcome.scheduling.description"),
     },
   ];
 
@@ -249,16 +277,13 @@ export default function Welcome({ auth }: WelcomeProps) {
     <>
       <Head title="Welcome" />
 
-      <div
-        className=""
-        // style={{
-        //   backgroundImage: `url(${Bg})`,
-        //   backgroundSize: "cover",
-        //   backgroundPosition: "center",
-        //   backgroundBlendMode: "overlay",
-        // }}
-      >
+      <div className="">
         <div className="relative">
+          {/* Language Switcher - Fixed Position */}
+          <div className="fixed top-6 right-6 z-50">
+            <LanguageSwitcher />
+          </div>
+
           {/* Main Content */}
           <main className="relative z-10 overflow-hidden">
             <div className="mx-auto max-w-7xl  sm:px-6 lg:px-8">
@@ -268,14 +293,13 @@ export default function Welcome({ auth }: WelcomeProps) {
                   className="text-4xl font-bold tracking-tight 
                 text-white dark:gray-700 sm:text-5xl lg:text-6xl"
                 >
-                  Manage your content
+                  {t("welcome.title")}
                   <span className="block text-red-600 mt-3">
-                    with artificial intelligence
+                    {t("welcome.titleHighlight")}
                   </span>
                 </h1>
                 <p className="mx-auto mt-6 max-w-2xl text-lg text-white ">
-                  Organize, optimize, and schedule your multimedia content with
-                  AI-powered tools to maximize your social media presence.
+                  {t("welcome.subtitle")}
                 </p>
               </div>
 
@@ -286,11 +310,11 @@ export default function Welcome({ auth }: WelcomeProps) {
                   <div className="group relative overflow-hidden rounded-2xl  backdrop-blur-sm p-8 shadow-lg ring-1 ring-gray-200/50 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] hover:ring-red-200 dark:bg-gray-900/80 dark:ring-gray-700/50 dark:hover:ring-red-700">
                     <div className="absolute top-6 right-6 z-10">
                       <span className="inline-flex items-center rounded-full  px-3 py-1 text-sm font-medium text-red-800 dark:bg-red-900 dark:text-red-200">
-                        Featured
+                        {t("welcome.featured")}
                       </span>
                     </div>
 
-                    <ImageGallery />
+                    <ImageGallery t={t} />
 
                     <div className="mt-6">
                       <div className="flex items-start gap-4">
@@ -312,18 +336,17 @@ export default function Welcome({ auth }: WelcomeProps) {
 
                         <div className="flex-1">
                           <h3 className="text-xl font-semibold text-gray-900 dark:text-white group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
-                            AI Organization
+                            {t("welcome.aiOrganization.title")}
                           </h3>
                           <p className="mt-3 text-gray-600 dark:text-gray-300 leading-relaxed">
-                            Easily categorize, tag, and search your multimedia
-                            files with AI-powered organization
+                            {t("welcome.aiOrganization.description")}
                           </p>
 
                           <div className="mt-4 flex flex-wrap gap-2">
                             {[
-                              "Smart Albums",
-                              "Auto-Organization",
-                              "Custom Tags",
+                              t("welcome.aiOrganization.tags.smartAlbums"),
+                              t("welcome.aiOrganization.tags.autoOrganization"),
+                              t("welcome.aiOrganization.tags.customTags"),
                             ].map((tag, index) => (
                               <span
                                 key={index}
