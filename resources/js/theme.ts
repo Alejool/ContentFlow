@@ -107,7 +107,7 @@ export const theme = {
     },
 
     // Neutral colors
-    white: "#ffffff",
+    white: "#F5E7C6",
     black: "#000000",
 
     gray: {
