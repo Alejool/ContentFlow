@@ -3,6 +3,7 @@ import NavLink from "@/Components/NavLink";
 import Logo from "@/../assets/logo.png";
 import { Home, User, FileText, BarChart3, Bot, LogOut } from "lucide-react";
 import LanguageSwitcher from "@/Components/LanguageSwitcher";
+import { useTranslation } from "react-i18next";
 
 interface SidebarProps {
   isSidebarOpen: boolean;
@@ -11,7 +12,7 @@ interface SidebarProps {
 
 const navigationItems = [
   {
-    name: "Dashboard",
+    nameKey: "nav.dashboard",
     href: "dashboard",
     icon: (
       <svg
@@ -31,7 +32,7 @@ const navigationItems = [
     lucideIcon: Home,
   },
   {
-    name: "Profile",
+    nameKey: "nav.profile",
     href: "profile.edit",
     icon: (
       <svg
@@ -51,7 +52,7 @@ const navigationItems = [
     lucideIcon: User,
   },
   {
-    name: "Manage Content",
+    nameKey: "nav.manageContent",
     href: "manage-content.index",
     icon: (
       <svg
@@ -71,7 +72,7 @@ const navigationItems = [
     lucideIcon: FileText,
   },
   {
-    name: "Analytics",
+    nameKey: "nav.analytics",
     href: "analytics.index",
     icon: (
       <svg
@@ -91,7 +92,7 @@ const navigationItems = [
     lucideIcon: BarChart3,
   },
   {
-    name: "AI Chat",
+    nameKey: "nav.aiChat",
     href: "ai-chat.index",
     icon: (
       <svg
@@ -116,6 +117,7 @@ export default function Sidebar({
   isSidebarOpen,
   setIsSidebarOpen,
 }: SidebarProps) {
+  const { t } = useTranslation();
   return (
     <div
       className={`hidden lg:block fixed inset-y-0 z-50 transition-all duration-500 ease-in-out ${
@@ -245,7 +247,7 @@ export default function Sidebar({
 
               {isSidebarOpen && (
                 <span className="ml-4 transition-all duration-300">
-                  {item.name}
+                  {t(item.nameKey)}
                 </span>
               )}
 
@@ -257,7 +259,7 @@ export default function Sidebar({
                     duration-200 pointer-events-none whitespace-nowrap 
                     z-50"
                 >
-                  {item.name}
+                  {t(item.nameKey)}
                   <div
                     className="absolute left-0 top-1/2 transform 
                     -translate-y-1/2 -translate-x-1 w-2 h-2
@@ -297,14 +299,14 @@ export default function Sidebar({
                 <div className="relative group">
                   <LogOut className="h-5 w-5" />
                   <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-                    Log Out
+                    {t("nav.logout")}
                   </div>
                 </div>
               )}
             </div>
             {isSidebarOpen && (
               <div className="flex-1 ">
-                <span className="font-medium">Log Out</span>
+                <span className="font-medium">{t("nav.logout")}</span>
               </div>
             )}
           </NavLink>

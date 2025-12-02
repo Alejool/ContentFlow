@@ -17,12 +17,11 @@
   },
   "nav": {
     "dashboard": "Dashboard",
-    "campaigns": "Campaigns",
-    "analytics": "Analytics",
-    "content": "Content",
-    "posts": "Posts",
     "profile": "Profile",
-    "logout": "Logout"
+    "manageContent": "Manage Content",
+    "analytics": "Analytics",
+    "aiChat": "AI Chat",
+    "logout": "Log Out"
   },
   "dashboard": {
     "title": "Dashboard",

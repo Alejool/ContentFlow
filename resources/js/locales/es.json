@@ -17,11 +17,10 @@
   },
   "nav": {
     "dashboard": "Panel",
-    "campaigns": "Campañas",
-    "analytics": "Analíticas",
-    "content": "Contenido",
-    "posts": "Publicaciones",
     "profile": "Perfil",
+    "manageContent": "Gestionar Contenido",
+    "analytics": "Analíticas",
+    "aiChat": "Chat IA",
     "logout": "Cerrar Sesión"
   },
   "dashboard": {
