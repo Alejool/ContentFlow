@@ -30,6 +30,7 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::put('/profile', [ProfileController::class, 'changePassword'])->name('profile.changePassword');
+    Route::patch('/locale', [App\Http\Controllers\LocaleController::class, 'update'])->name('locale.update');
 
                 
     // ManageContent

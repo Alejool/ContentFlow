@@ -24,6 +24,14 @@ createInertiaApp({
   setup({ el, App, props }) {
     const root = createRoot(el);
 
+    // Set initial language from user preference if available
+    if (props.initialPage.props.auth?.user?.locale) {
+      // @ts-ignore
+      import("./i18n").then(({ default: i18n }) => {
+        i18n.changeLanguage(props.initialPage.props.auth.user.locale);
+      });
+    }
+
     root.render(
       <>
         {/* <ContentFlowVisualization3D /> */}
