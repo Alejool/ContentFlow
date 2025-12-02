@@ -6,14 +6,9 @@
     "cancel": "Cancel",
     "delete": "Delete",
     "edit": "Edit",
-    "add": "Add",
-    "search": "Search",
-    "filter": "Filter",
-    "export": "Export",
-    "viewAll": "View All",
-    "noData": "No Data",
-    "error": "Error",
-    "success": "Success"
+    "analytics": "Analytics",
+    "aiChat": "AI Chat",
+    "logout": "Log Out"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -22,6 +17,34 @@
     "analytics": "Analytics",
     "aiChat": "AI Chat",
     "logout": "Log Out"
+  },
+  "welcome": {
+    "title": "Manage your content",
+    "titleHighlight": "with artificial intelligence",
+    "subtitle": "Organize, optimize, and schedule your multimedia content with AI-powered tools to maximize your social media presence.",
+    "featured": "Featured",
+    "featuredCollection": "Featured Collection",
+    "aiOrganization": {
+      "title": "AI Organization",
+      "description": "Easily categorize, tag, and search your multimedia files with AI-powered organization",
+      "tags": {
+        "smartAlbums": "Smart Albums",
+        "autoOrganization": "Auto-Organization",
+        "customTags": "Custom Tags"
+      }
+    },
+    "multiPlatform": {
+      "title": "Multi-Platform Publishing",
+      "description": "Optimize and seamlessly share content across multiple social media platforms"
+    },
+    "analytics": {
+      "title": "Performance Analytics",
+      "description": "Get insights into your content engagement and optimize your strategy accordingly"
+    },
+    "scheduling": {
+      "title": "Smart Scheduling",
+      "description": "Automate and schedule your posts with AI recommendations for optimal performance"
+    }
   },
   "dashboard": {
     "title": "Dashboard",

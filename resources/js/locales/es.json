@@ -6,14 +6,9 @@
     "cancel": "Cancelar",
     "delete": "Eliminar",
     "edit": "Editar",
-    "add": "Agregar",
-    "search": "Buscar",
-    "filter": "Filtrar",
-    "export": "Exportar",
-    "viewAll": "Ver Todas",
-    "noData": "Sin Datos",
-    "error": "Error",
-    "success": "Éxito"
+    "analytics": "Analíticas",
+    "aiChat": "Chat IA",
+    "logout": "Cerrar Sesión"
   },
   "nav": {
     "dashboard": "Panel",
@@ -22,6 +17,34 @@
     "analytics": "Analíticas",
     "aiChat": "Chat IA",
     "logout": "Cerrar Sesión"
+  },
+  "welcome": {
+    "title": "Gestiona tu contenido",
+    "titleHighlight": "con inteligencia artificial",
+    "subtitle": "Organiza, optimiza y programa tu contenido multimedia con herramientas impulsadas por IA para maximizar tu presencia en redes sociales.",
+    "featured": "Destacado",
+    "featuredCollection": "Colección Destacada",
+    "aiOrganization": {
+      "title": "Organización con IA",
+      "description": "Categoriza, etiqueta y busca fácilmente tus archivos multimedia con organización impulsada por IA",
+      "tags": {
+        "smartAlbums": "Álbumes Inteligentes",
+        "autoOrganization": "Auto-Organización",
+        "customTags": "Etiquetas Personalizadas"
+      }
+    },
+    "multiPlatform": {
+      "title": "Publicación Multiplataforma",
+      "description": "Optimiza y comparte contenido sin problemas en múltiples plataformas de redes sociales"
+    },
+    "analytics": {
+      "title": "Analíticas de Rendimiento",
+      "description": "Obtén información sobre el engagement de tu contenido y optimiza tu estrategia en consecuencia"
+    },
+    "scheduling": {
+      "title": "Programación Inteligente",
+      "description": "Automatiza y programa tus publicaciones con recomendaciones de IA para un rendimiento óptimo"
+    }
   },
   "dashboard": {
     "title": "Panel",
