@@ -20,7 +20,7 @@ Route::get('/', function () {
 })->middleware('guest')->name('welcome');
       
       
-Route::get('/dashboard', [AnalyticsController::class, 'dashboard'])->middleware(['auth', 'verified'])->name('dashboard') ;  
+Route::get('/dashboard', [AnalyticsController::class, 'dashboard'])->middleware(['auth'])->name('dashboard');  
   
       
                    
@@ -74,5 +74,27 @@ Route::middleware(['web'])->group(function () {
     Route::get('/auth/youtube/callback', [SocialAccountController::class, 'handleYoutubeCallback']);
     Route::get('/auth/tiktok/callback', [SocialAccountController::class, 'handleTiktokCallback']);
 });
+
+// TEMPORARY: Test route to send verification email
+Route::get('/test-verification-email', function () {
+    $user = auth()->user();
+    
+    if (!$user) {
+        return response()->json(['error' => 'Not authenticated'], 401);
+    }
+    
+    // Send the verification email
+    $user->sendEmailVerificationNotification();
+    
+    return response()->json([
+        'success' => true,
+        'message' => 'Verification email sent to: ' . $user->email,
+        'user' => [
+            'name' => $user->name,
+            'email' => $user->email,
+            'email_verified_at' => $user->email_verified_at,
+        ]
+    ]);
+})->middleware('auth');
    
 require __DIR__ . '/auth.php';

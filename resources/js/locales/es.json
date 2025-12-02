@@ -181,6 +181,15 @@
     "alreadyRegistered": "¿Ya estás registrado?",
     "notRegistered": "¿No estás registrado aún?"
   },
+  "verification": {
+    "banner": {
+      "title": "Verifica Tu Correo Electrónico",
+      "message": "¡Gracias por registrarte! Antes de comenzar, ¿podrías verificar tu dirección de correo electrónico haciendo clic en el enlace que te acabamos de enviar?",
+      "resendButton": "Reenviar Correo de Verificación",
+      "sending": "Enviando...",
+      "successMessage": "¡Se ha enviado un nuevo enlace de verificación a tu dirección de correo electrónico!"
+    }
+  },
   "aiChat": {
     "title": "Asistente IA",
     "subtitle": "Recomendaciones inteligentes para tus campañas",
