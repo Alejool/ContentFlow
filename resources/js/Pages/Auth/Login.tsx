@@ -197,23 +197,7 @@ export default function Login() {
                     </button>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={handleAnonymousLogin}
-                    disabled={loading}
-                    className="flex items-center justify-center rounded-md border 
-                                    border-gray-300 bg-white px-4 py-2 text-sm font-medium 
-                                    "
-                  >
-                    <svg
-                      className="mr-2 h-5 w-5"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M12 4a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM6 12a6 6 0 0 0-6 6v1a1 1 0 0 0 1 1h22a1 1 0 0 0 1-1v-1a6 6 0 0 0-6-6H6z" />
-                    </svg>
-                    Anonymous
-                  </button>
+                  
                 </div>
               </div>
 
