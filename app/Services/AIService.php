@@ -60,7 +60,7 @@ class AIService
      */
     protected function callProvider(string $provider, array $context): array
     {
-        $method = "call{$provider}";
+        $method = "call" . ucfirst($provider);
         
         if (!method_exists($this, $method)) {
             throw new \Exception("Provider method {$method} not found");
@@ -143,14 +143,44 @@ class AIService
      */
     protected function getSystemPrompt(array $context): string
     {
-        $systemMessage = "You are an expert Social Media Management Assistant. Your role is to help users strategize, create content, and manage their social media presence effectively.\n\n";
+        $systemMessage = "You are an expert Social Media Management Assistant. Your role is to help users strategize, create content, and manage their social media presence effectively using this application.\n\n";
+
+        $systemMessage .= "APPLICATION KNOWLEDGE BASE:\n";
+        $systemMessage .= "1. **Campaign Management**: Users can create, edit, and track marketing campaigns. Campaigns have statuses (draft, active, completed) and date ranges.\n";
+        $systemMessage .= "2. **Social Media Analytics**: The app provides performance metrics for connected accounts (followers, engagement, etc.).\n";
+        $systemMessage .= "3. **Post Scheduling**: Users can schedule posts for future publication across connected platforms.\n";
+        $systemMessage .= "4. **Image Management**: Users can upload, edit (remove background), and organize images in collections.\n\n";
 
         $systemMessage .= "CRITICAL INSTRUCTIONS FOR RESPONSE FORMAT:\n";
-        $systemMessage .= "1.  **CLEAN FORMATTING**: Do NOT use asterisks (*) for bolding, lists, or emphasis. The output must be clean text. If you need to list items, use numbered lists (1., 2.) or simple dashes (-) ONLY if absolutely necessary, but prefer clean paragraphs.\n";
-        $systemMessage .= "2.  **PROFESSIONAL TONE**: Maintain a professional, helpful, and concise tone. Avoid robotic or overly enthusiastic greetings.\n";
-        $systemMessage .= "3.  **DIRECTNESS**: Do NOT repeat the user's context back to them (e.g., do not say 'I see you are looking for...'). Go straight to providing value, answers, or questions.\n";
-        $systemMessage .= "4.  **REALISM**: Act as a real human expert would. Be practical and realistic.\n";
-        $systemMessage .= "5.  **LANGUAGE**: Always respond in English unless the user specifically asks for another language.\n\n";
+        $systemMessage .= "1.  **CLEAN FORMATTING**: Do NOT use asterisks (*) for bolding, lists, or emphasis. The output must be clean text.\n";
+        $systemMessage .= "2.  **LISTS & SPACING**: When providing ideas or lists, ALWAYS use numbered lists (1., 2., 3.). **MANDATORY**: Put a blank line between each item in the list to ensure readability. Do not produce large blocks of text without breaks.\n";
+        $systemMessage .= "3.  **PROFESSIONAL TONE**: Maintain a professional, helpful, and concise tone. Avoid robotic or overly enthusiastic greetings.\n";
+        $systemMessage .= "4.  **DIRECTNESS**: Do NOT repeat the user's context back to them. Go straight to providing value.\n";
+        $systemMessage .= "5.  **REALISM**: Act as a real human expert would. Be practical and realistic.\n";
+        
+        // Add language instruction based on user locale
+        $userLocale = $context['user_locale'] ?? 'en';
+        $languageMap = [
+            'en' => 'English',
+            'es' => 'Spanish',
+            'fr' => 'French',
+            'de' => 'German',
+            'pt' => 'Portuguese',
+        ];
+        $language = $languageMap[$userLocale] ?? 'English';
+        $systemMessage .= "6.  **LANGUAGE**: ALWAYS respond in {$language}. This is critical - the user's interface language is {$userLocale}, so all your responses must be in {$language}.\n";
+        
+        $systemMessage .= "7.  **APPLICATION AWARENESS**: If the user asks how to do something in the app, refer to the 'APPLICATION KNOWLEDGE BASE'.\n";
+        $systemMessage .= "8.  **CLIENT DATA PRIORITY**: Use the provided client data (connected accounts, campaigns) to tailor your advice. For example, if they only have Instagram connected, focus on Instagram strategies.\n\n";
+
+        // Add client data - Connected Accounts
+        if (isset($context['social_accounts']) && !empty($context['social_accounts'])) {
+            $systemMessage .= "CLIENT DATA - CONNECTED ACCOUNTS:\n";
+            foreach ($context['social_accounts'] as $account) {
+                $systemMessage .= "- Platform: {$account['platform']} (Account ID: {$account['account_id']})\n";
+            }
+            $systemMessage .= "\n";
+        }
 
         // Add specific context based on what's provided
         if (isset($context['campaigns']) && !empty($context['campaigns'])) {
@@ -176,7 +206,7 @@ class AIService
         // Add response format instructions
         $systemMessage .= "\nIMPORTANT: Always respond in valid JSON format with this structure:\n" .
                         "{\n" .
-                        "  \"message\": \"Your detailed response message here (NO asterisks)\",\n" .
+                        "  \"message\": \"Your detailed response message here (NO asterisks, use newlines for spacing)\",\n" .
                         "  \"suggestion\": {\n" .
                         "    \"type\": \"suggestion_type\",\n" .
                         "    \"data\": {}\n" .
@@ -214,7 +244,7 @@ class AIService
                     ]
                 ],
                 'generationConfig' => [
-                    'temperature' => 0.4,
+                    'temperature' => 0.7,
                     'topP' => 0.8,
                     'topK' => 40,
                     'maxOutputTokens' => 400,

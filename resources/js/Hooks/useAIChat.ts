@@ -2,12 +2,15 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 
+import { useTranslation } from "react-i18next";
+
 export default function useAIChat() {
+  const { t } = useTranslation();
   const [messages, setMessages] = useState([
     {
       id: 1,
       sender: "AI",
-      message: "Hola! ¿Cómo puedo ayudarte con tus campañas hoy?",
+      message: t("aiChat.welcomeMessage"),
       timestamp: new Date().toLocaleString(),
     },
   ]);
@@ -15,6 +18,18 @@ export default function useAIChat() {
   const [inputMessage, setInputMessage] = useState("");
   const [campaigns, setCampaigns] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  // Update welcome message when language changes
+  useEffect(() => {
+    setMessages([
+      {
+        id: 1,
+        sender: "AI",
+        message: t("aiChat.welcomeMessage"),
+        timestamp: new Date().toLocaleString(),
+      },
+    ]);
+  }, [t]);
 
   useEffect(() => {
     fetchCampaigns();

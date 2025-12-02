@@ -51,6 +51,8 @@ class AIChatController extends Controller
             $includeContext = $source === 'assistant';
 
             $campaigns = [];
+            $socialAccounts = [];
+            
             if ($includeContext) {
                 $campaigns = $request->input('context.campaigns', []);
                 if (empty($campaigns)) {
@@ -59,12 +61,19 @@ class AIChatController extends Controller
                         ->get()
                         ->toArray();
                 }
+
+                // Fetch connected social accounts
+                $socialAccounts = $user->socialAccounts()
+                    ->select('platform', 'account_id', 'created_at')
+                    ->get()
+                    ->toArray();
             }
 
             // Prepare context for the AI
             $context = [
                 'user' => $user->name,
                 'user_email' => $user->email,
+                'user_locale' => $user->locale ?? 'en',
                 'project_type' => 'social_media_management',
                 'message' => $request->input('message'),
                 'timestamp' => now()->toISOString()
@@ -72,6 +81,7 @@ class AIChatController extends Controller
 
             if ($includeContext) {
                 $context['campaigns'] = $campaigns;
+                $context['social_accounts'] = $socialAccounts;
                 $context['context_type'] = 'campaign_management';
             } else {
                 $context['context_type'] = 'general_assistance';

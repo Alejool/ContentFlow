@@ -226,6 +226,15 @@
       "total": "Total"
     }
   },
+  "aiAssistant": {
+    "welcomeMessage": "Hi! I'm your AI assistant. I can help you with campaign ideas, content improvement, or analyzing your performance. How can I help you today?",
+    "error": "I apologize, but I encountered an error processing your request. Please try again later.",
+    "suggestion": "Suggestion",
+    "thinking": "Thinking...",
+    "askPlaceholder": "Ask about your campaigns...",
+    "buttonLabel": "Ask AI Assistant",
+    "headerTitle": "AI Assistant"
+  },
   "analytics": {
     "title": "Analytics & Statistics",
     "subtitle": "Comprehensive overview of your campaigns and social media performance",
