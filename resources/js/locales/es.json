@@ -226,6 +226,15 @@
       "total": "Total"
     }
   },
+  "aiAssistant": {
+    "welcomeMessage": "¡Hola! Soy tu asistente de IA. Puedo ayudarte con ideas de campañas, mejora de contenido o análisis de tu rendimiento. ¿Cómo puedo ayudarte hoy?",
+    "error": "Lo siento, pero encontré un error al procesar tu solicitud. Por favor intenta de nuevo más tarde.",
+    "suggestion": "Sugerencia",
+    "thinking": "Pensando...",
+    "askPlaceholder": "Pregunta sobre tus campañas...",
+    "buttonLabel": "Preguntar a la IA",
+    "headerTitle": "Asistente IA"
+  },
   "analytics": {
     "title": "Analíticas y Estadísticas",
     "subtitle": "Resumen completo de tus campañas y rendimiento en redes sociales",

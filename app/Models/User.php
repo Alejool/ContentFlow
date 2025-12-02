@@ -49,4 +49,9 @@ class User extends Model implements Authenticatable, MustVerifyEmail, CanResetPa
     {
         $this->notify(new VerifyEmailNotification);
     }
+
+    public function socialAccounts()
+    {
+        return $this->hasMany(SocialAccount::class);
+    }
 }
