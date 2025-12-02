@@ -8,7 +8,6 @@ import Sidebar from "./Components/Sidebar";
 import MobileNavbar from "./Components/MobileNavbar";
 import Bg from "@/../assets/background.svg";
 import GlobalAiAssistant from "@/Components/AiAssistant/GlobalAiAssistant";
-import ContentFlowVisualization3D from "@/Components/tree/ContentFlowVisualization3D";
 
 interface AuthenticatedLayoutProps {
     header?: ReactNode;

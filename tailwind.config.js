@@ -48,6 +48,10 @@ export default {
           pink: theme.colors.accent.pink,
           indigo: theme.colors.accent.indigo,
         },
+        gradient: {
+          primary: theme.gradients.primary,
+          secondary: theme.gradients.secondary,
+        },
       },
       fontFamily: {
         sans: ["Figtree", ...defaultTheme.fontFamily.sans],

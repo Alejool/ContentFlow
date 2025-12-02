@@ -112,7 +112,10 @@ const navigationItems = [
   },
 ];
 
-export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProps) {
+export default function Sidebar({
+  isSidebarOpen,
+  setIsSidebarOpen,
+}: SidebarProps) {
   return (
     <div
       className={`hidden lg:block fixed inset-y-0 z-50 transition-all duration-500 ease-in-out ${
@@ -120,7 +123,7 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
       }`}
     >
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-white/95 backdrop-blur-xl border-r border-gray-200/50 shadow-2xl" />
+      <div className="absolute inset-0  backdrop-blur-3xl border-r border-gray-200/50 shadow-2xl opacity-80" />
 
       {/* Content */}
       <div className="relative h-full flex flex-col">
@@ -177,7 +180,8 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
                 </svg>
               ) : (
                 <svg
-                  className="h-5 w-5 text-gray-600 group-hover:text-blue-600 transition-colors"
+                  className="h-5 w-5 text-gray-600 
+                  group-hover:text-blue-600 transition-colors"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -212,7 +216,6 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
                     hover:text-red-600
                     hover:bg-orange-50
                     hover:shadow-lg 
-                    hover:scale-105 
                     ${
                       route().current(item.href)
                         ? "bg-gradient-to-r from-red-600 to-orange-600  hover:text-white text-white shadow-lg"
@@ -221,10 +224,9 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
             >
               <div
                 className={`flex items-center justify-center rounded-full 
-                  h-10  transition-all duration-300 ${
-                    route().current(item.href)
-                     
-                  }`}
+                  h-10  transition-all duration-300 ${route().current(
+                    item.href
+                  )}`}
               >
                 {isSidebarOpen ? (
                   <item.lucideIcon className="h-5 w-5" />
@@ -267,53 +269,50 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: SidebarProp
           ))}
         </nav>
 
-        {/* Language Switcher */}
-        <div className={`px-4 pb-2 ${!isSidebarOpen && 'flex justify-center'}`}>
-          <LanguageSwitcher />
-        </div>
-
-        {/* Logout Button */}
-        <div className="p-4 border-t border-gray-200/50">
+        {/* Logout Button and Language Switcher */}
+        <div
+          className={`p-4 border-t border-gray-200/50 ${
+            isSidebarOpen ? "flex items-center gap-2" : "flex flex-col gap-2"
+          }`}
+        >
           <NavLink
             href={route("logout")}
             method="post"
             as="button"
-            className="group w-full flex items-center px-4 py-3 text-sm font-medium rounded-2xl transition-all duration-300 text-red-600 hover:bg-red-50 hover:shadow-lg hover:scale-105"
+            className={`group relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 
+              
+              ${
+                isSidebarOpen
+                  ? "hover:bg-red-50 text-gray-700 hover:text-red-600 flex-1"
+                  : "hover:bg-red-50 text-gray-700 hover:text-red-600 justify-center w-full"
+              }`}
           >
-            <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-red-100 group-hover:bg-red-200 transition-all duration-300">
+            <div
+              className={`flex items-center justify-center rounded-full 
+                h-10 transition-all duration-300`}
+            >
               {isSidebarOpen ? (
-                <LogOut className="h-5 w-5 text-red-600" />
+                <LogOut className="h-5 w-5" />
               ) : (
-                <svg
-                  className="h-5 w-5 text-red-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                  />
-                </svg>
+                <div className="relative group">
+                  <LogOut className="h-5 w-5" />
+                  <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                    Log Out
+                  </div>
+                </div>
               )}
             </div>
-
             {isSidebarOpen && (
-              <span className="ml-4 transition-all duration-300">Log Out</span>
-            )}
-
-            {!isSidebarOpen && (
-              <div
-                className="absolute left-full ml-2 px-3 py-2 bg-gray-900 text-white 
-                text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50"
-              >
-                Log Out
-                <div className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-1 w-2 h-2 bg-gray-900 rotate-45"></div>
+              <div className="flex-1 ">
+                <span className="font-medium">Log Out</span>
               </div>
             )}
           </NavLink>
+
+          {/* Language Switcher */}
+          <div className={isSidebarOpen ? "" : "w-full flex justify-center"}>
+            <LanguageSwitcher />
+          </div>
         </div>
       </div>
     </div>

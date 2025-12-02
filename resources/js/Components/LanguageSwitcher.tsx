@@ -1,100 +1,78 @@
-import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Globe } from "lucide-react";
 import axios from "axios";
 import { usePage } from "@inertiajs/react";
+import { useState } from "react";
 
 export default function LanguageSwitcher() {
   const { i18n } = useTranslation();
-  const [isOpen, setIsOpen] = useState(false);
-  const [currentLang, setCurrentLang] = useState(i18n.language);
   const { auth } = usePage().props as any;
-
-  useEffect(() => {
-    setCurrentLang(i18n.language);
-  }, [i18n.language]);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   const languages = [
-    { code: "en", name: "English", flag: "🇺🇸" },
-    { code: "es", name: "Español", flag: "🇪🇸" },
+    { code: "en", flag: "🇺🇸" },
+    { code: "es", flag: "🇪🇸" },
   ];
 
-  const changeLanguage = async (langCode: string) => {
-    i18n.changeLanguage(langCode);
-    setCurrentLang(langCode);
-    setIsOpen(false);
+  const currentLanguage =
+    languages.find((lang) => lang.code === i18n.language) || languages[0];
 
-    // Save locale preference to database if user is authenticated
+  const nextLanguage =
+    languages.find((lang) => lang.code !== i18n.language) || languages[1];
+
+  const toggleLanguage = async () => {
+    if (isAnimating) return;
+
+    setIsAnimating(true);
+    const newLang = nextLanguage.code;
+
+    // Pequeña pausa para la animación
+    setTimeout(() => {
+      i18n.changeLanguage(newLang);
+      setIsAnimating(false);
+    }, 200);
+
     if (auth?.user) {
       try {
-        await axios.patch(route("profile.update"), {
-          name: auth.user.name,
-          email: auth.user.email,
-          locale: langCode,
-        });
-        console.log("Locale preference saved to database");
+        await axios.patch(route("profile.update"), { locale: newLang });
       } catch (error) {
         console.error("Failed to save locale preference:", error);
       }
     }
   };
 
-  const currentLanguage =
-    languages.find((lang) => lang.code === currentLang) || languages[0];
-
   return (
-    <div className="relative">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-        aria-label="Change language"
-      >
-        <Globe className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-          {currentLanguage.flag} {currentLanguage.code.toUpperCase()}
-        </span>
-      </button>
+    <button
+      onClick={toggleLanguage}
+      className="relative p-2  rounded-lg hover:bg-gradient-to-br text-gray-600 hover:text-white
+       hover:from-gray-600 hover:to-indigo-800 transition-all duration-500 group overflow-hidden"
+      aria-label="Toggle language"
+      title={`Switch to ${nextLanguage.code.toUpperCase()}`}
+    >
+      {/* Background gradient animation */}
+      <div className="absolute inset-0  transition-all duration-700" />
 
-      {isOpen && (
-        <>
-          {/* Backdrop */}
+      <div className="relative flex items-center gap-2 ">
+        {/* Globe inside circle */}
+        <div
+          className="relative w-10 h-10  
+          flex items-center justify-center  transition-all duration-500"
+        >
+          <Globe className="w-7 h-7   transition-transform duration-500 group-hover:rotate-180" />
+
+          {/* Floating flag */}
           <div
-            className="fixed inset-0 z-10"
-            onClick={() => setIsOpen(false)}
-          />
-
-          {/* Dropdown */}
-          <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-20 overflow-hidden">
-            {languages.map((lang) => (
-              <button
-                key={lang.code}
-                onClick={() => changeLanguage(lang.code)}
-                className={`w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${
-                  currentLang === lang.code
-                    ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
-                    : "text-gray-700 dark:text-gray-300"
-                }`}
-              >
-                <span className="text-2xl">{lang.flag}</span>
-                <span className="font-medium">{lang.name}</span>
-                {currentLang === lang.code && (
-                  <svg
-                    className="ml-auto w-5 h-5"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                )}
-              </button>
-            ))}
+            className={`absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center text-sm rounded-full  
+              border border-gray-200 bg-secondary-20 shadow-sm transition-all duration-300 ${
+                isAnimating ? "scale-0 rotate-90" : "scale-100"
+              }`}
+          >
+            {nextLanguage.flag}
           </div>
-        </>
-      )}
-    </div>
+        </div>
+
+       
+      </div>
+    </button>
   );
 }
