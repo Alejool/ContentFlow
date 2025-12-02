@@ -55,7 +55,7 @@ class AIChatController extends Controller
                 $campaigns = $request->input('context.campaigns', []);
                 if (empty($campaigns)) {
                     $campaigns = Campaign::where('user_id', $user->id)
-                        ->select('id', 'name', 'description', 'status', 'start_date', 'end_date')
+                        ->select('id', 'title', 'description', 'status', 'start_date', 'end_date')
                         ->get()
                         ->toArray();
                 }
@@ -122,7 +122,7 @@ class AIChatController extends Controller
     {
         try {
             $campaigns = Campaign::where('user_id', Auth::id())
-                ->select('id', 'name', 'description', 'status', 'start_date', 'end_date')
+                ->select('id', 'title', 'description', 'status', 'start_date', 'end_date')
                 ->orderBy('created_at', 'desc')
                 ->get();
 

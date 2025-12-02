@@ -118,19 +118,7 @@ class AIService
 
         $content = $responseData['choices'][0]['message']['content'];
         
-        // Parse the JSON response
-        $parsedResponse = json_decode($content, true) ?? [
-            'message' => $content,
-            'suggestion' => null
-        ];
-
-        return [
-            'message' => $parsedResponse['message'] ?? $content,
-            'suggestion' => $parsedResponse['suggestion'] ?? null,
-            'provider' => 'deepseek',
-            'model' => config('services.deepseek.model'),
-            'usage' => $responseData['usage'] ?? null
-        ];
+        return $this->parseAIResponse($content, 'deepseek', config('services.deepseek.model'));
     }
 
     /**
@@ -138,22 +126,41 @@ class AIService
      */
     protected function prepareDeepSeekMessages(array $context): array
     {
-        $systemMessage = "You are a social media management assistant specializing in campaign strategy and content creation. " .
-                        "You help users with their social media campaigns, provide strategic advice, and suggest improvements. " .
-                        "Always respond in English unless the user specifically asks for another language.\n\n";
+        return [
+            [
+                'role' => 'system',
+                'content' => $this->getSystemPrompt($context)
+            ],
+            [
+                'role' => 'user',
+                'content' => $context['message']
+            ]
+        ];
+    }
+
+    /**
+     * Generate the unified system prompt
+     */
+    protected function getSystemPrompt(array $context): string
+    {
+        $systemMessage = "You are an expert Social Media Management Assistant. Your role is to help users strategize, create content, and manage their social media presence effectively.\n\n";
+
+        $systemMessage .= "CRITICAL INSTRUCTIONS FOR RESPONSE FORMAT:\n";
+        $systemMessage .= "1.  **CLEAN FORMATTING**: Do NOT use asterisks (*) for bolding, lists, or emphasis. The output must be clean text. If you need to list items, use numbered lists (1., 2.) or simple dashes (-) ONLY if absolutely necessary, but prefer clean paragraphs.\n";
+        $systemMessage .= "2.  **PROFESSIONAL TONE**: Maintain a professional, helpful, and concise tone. Avoid robotic or overly enthusiastic greetings.\n";
+        $systemMessage .= "3.  **DIRECTNESS**: Do NOT repeat the user's context back to them (e.g., do not say 'I see you are looking for...'). Go straight to providing value, answers, or questions.\n";
+        $systemMessage .= "4.  **REALISM**: Act as a real human expert would. Be practical and realistic.\n";
+        $systemMessage .= "5.  **LANGUAGE**: Always respond in English unless the user specifically asks for another language.\n\n";
 
         // Add specific context based on what's provided
         if (isset($context['campaigns']) && !empty($context['campaigns'])) {
-            $systemMessage .= "User Campaigns Data:\n";
+            $systemMessage .= "CONTEXT - ACTIVE CAMPAIGNS:\n";
             foreach ($context['campaigns'] as $campaign) {
-                $systemMessage .= "- Campaign: {$campaign['name']}\n";
+                $systemMessage .= "- Campaign: {$campaign['title']} (Status: {$campaign['status']})\n";
                 $systemMessage .= "  Description: {$campaign['description']}\n";
-                $systemMessage .= "  Status: {$campaign['status']}\n";
-                $systemMessage .= "  Period: {$campaign['start_date']} to {$campaign['end_date']}\n\n";
+                $systemMessage .= "  Period: {$campaign['start_date']} to {$campaign['end_date']}\n";
             }
-            
-            $systemMessage .= "Use this campaign data to provide specific, actionable advice. " .
-                            "If the user asks about something unrelated to campaigns, answer generally but maintain your assistant role.\n";
+            $systemMessage .= "\nUse this campaign data to provide specific, actionable advice.\n";
         }
 
         // Add project context
@@ -169,7 +176,7 @@ class AIService
         // Add response format instructions
         $systemMessage .= "\nIMPORTANT: Always respond in valid JSON format with this structure:\n" .
                         "{\n" .
-                        "  \"message\": \"Your detailed response message here\",\n" .
+                        "  \"message\": \"Your detailed response message here (NO asterisks)\",\n" .
                         "  \"suggestion\": {\n" .
                         "    \"type\": \"suggestion_type\",\n" .
                         "    \"data\": {}\n" .
@@ -178,16 +185,7 @@ class AIService
                         "The 'suggestion' field can be null if no specific suggestion is needed.\n" .
                         "Available suggestion types: new_campaign, improvement, content_idea, analytics_insight, scheduling";
 
-        return [
-            [
-                'role' => 'system',
-                'content' => $systemMessage
-            ],
-            [
-                'role' => 'user',
-                'content' => $context['message']
-            ]
-        ];
+        return $systemMessage;
     }
 
     /**
@@ -211,15 +209,15 @@ class AIService
                     [
                         'role' => 'user',
                         'parts' => [
-                            ['text' => json_encode($context)]
+                            ['text' => $this->getSystemPrompt($context) . "\n\nUser Message: " . $context['message']]
                         ]
                     ]
                 ],
                 'generationConfig' => [
-                    'temperature' => 0.7,
+                    'temperature' => 0.4,
                     'topP' => 0.8,
                     'topK' => 40,
-                    'maxOutputTokens' => 1000,
+                    'maxOutputTokens' => 400,
                 ]
             ]);
 
@@ -230,16 +228,7 @@ class AIService
         $data = $response->json();
         $text = $data['candidates'][0]['content']['parts'][0]['text'] ?? '{}';
         
-        $parsed = json_decode($text, true) ?? [
-            'message' => $text,
-            'suggestion' => null
-        ];
-
-        return [
-            'message' => $parsed['message'] ?? $text,
-            'suggestion' => $parsed['suggestion'] ?? null,
-            'provider' => 'gemini'
-        ];
+        return $this->parseAIResponse($text, 'gemini');
     }
 
     /**
@@ -263,11 +252,11 @@ class AIService
             'messages' => [
                 [
                     'role' => 'system',
-                    'content' => 'You are a social media campaign assistant. Always respond in English.'
+                    'content' => $this->getSystemPrompt($context)
                 ],
                 [
                     'role' => 'user',
-                    'content' => json_encode($context)
+                    'content' => $context['message']
                 ]
             ],
             'temperature' => 0.7,
@@ -281,15 +270,46 @@ class AIService
         $data = $response->json();
         $content = $data['choices'][0]['message']['content'] ?? '{}';
         
-        $parsed = json_decode($content, true) ?? [
-            'message' => $content,
-            'suggestion' => null
-        ];
+        return $this->parseAIResponse($content, 'openai', config('services.openai.model'));
+    }
 
+    /**
+     * Parse and clean AI response
+     */
+    protected function parseAIResponse(string $content, string $provider, string $model = 'default'): array
+    {
+        // Remove markdown code blocks if present
+        $cleanContent = preg_replace('/^```json\s*|\s*```$/', '', trim($content));
+        $cleanContent = preg_replace('/^```\s*|\s*```$/', '', $cleanContent);
+        
+        $parsed = json_decode($cleanContent, true);
+        
+        // If JSON decode failed, try to find JSON object in text
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            if (preg_match('/\{.*\}/s', $content, $matches)) {
+                $parsed = json_decode($matches[0], true);
+            }
+        }
+
+        // Fallback if still not parsed
+        if (!$parsed) {
+            $parsed = [
+                'message' => $content,
+                'suggestion' => null
+            ];
+        }
+
+        // Clean message content (remove asterisks and extra whitespace)
+        $message = $parsed['message'] ?? '';
+        $message = str_replace(['**', '*'], '', $message); // Remove asterisks
+        $message = preg_replace('/\n{3,}/', "\n\n", $message); // Normalize newlines
+        
         return [
-            'message' => $parsed['message'] ?? $content,
+            'message' => trim($message),
             'suggestion' => $parsed['suggestion'] ?? null,
-            'provider' => 'openai'
+            'provider' => $provider,
+            'model' => $model,
+            'usage' => null // Usage tracking can be added if needed
         ];
     }
 
