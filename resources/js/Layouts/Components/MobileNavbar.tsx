@@ -2,6 +2,7 @@ import Dropdown from "@/Components/Dropdown";
 import ResponsiveNavLink from "@/Components/ResponsiveNavLink";
 import { Home, User, FileText, BarChart3, Bot, LogOut } from "lucide-react";
 import LanguageSwitcher from "@/Components/LanguageSwitcher";
+import { useTranslation } from "react-i18next";
 
 interface MobileNavbarProps {
   user: {
@@ -13,15 +14,15 @@ interface MobileNavbarProps {
 }
 
 const mobileNavigationItems = [
-  { name: "Dashboard", href: "dashboard", lucideIcon: Home },
-  { name: "Profile", href: "profile.edit", lucideIcon: User },
+  { nameKey: "nav.dashboard", href: "dashboard", lucideIcon: Home },
+  { nameKey: "nav.profile", href: "profile.edit", lucideIcon: User },
   {
-    name: "Manage Content",
+    nameKey: "nav.manageContent",
     href: "manage-content.index",
     lucideIcon: FileText,
   },
-  { name: "Analytics", href: "analytics.index", lucideIcon: BarChart3 },
-  { name: "AI Chat", href: "ai-chat.index", lucideIcon: Bot },
+  { nameKey: "nav.analytics", href: "analytics.index", lucideIcon: BarChart3 },
+  { nameKey: "nav.aiChat", href: "ai-chat.index", lucideIcon: Bot },
 ];
 
 export default function MobileNavbar({
@@ -29,6 +30,7 @@ export default function MobileNavbar({
   showingNavigationDropdown,
   setShowingNavigationDropdown,
 }: MobileNavbarProps) {
+  const { t } = useTranslation();
   return (
     <>
       {/* Navbar for mobile devices */}
@@ -135,7 +137,7 @@ export default function MobileNavbar({
                     className="flex items-center space-x-2"
                   >
                     <User className="h-4 w-4" />
-                    <span>Profile</span>
+                    <span>{t("nav.profile")}</span>
                   </Dropdown.Link>
                   <Dropdown.Link
                     href={route("logout")}
@@ -144,7 +146,7 @@ export default function MobileNavbar({
                     className="flex items-center space-x-2 text-prim-500"
                   >
                     <LogOut className="h-4 w-4" />
-                    <span>Log Out</span>
+                    <span>{t("nav.logout")}</span>
                   </Dropdown.Link>
                 </Dropdown.Content>
               </Dropdown>
@@ -170,7 +172,7 @@ export default function MobileNavbar({
                             }`}
               >
                 <item.lucideIcon className="h-5 w-5" />
-                <span className="font-medium">{item.name}</span>
+                <span className="font-medium">{t(item.nameKey)}</span>
               </ResponsiveNavLink>
             ))}
 
@@ -186,7 +188,7 @@ export default function MobileNavbar({
                            text-secondary-600 bg-primary-50 transition-all duration-300"
                 >
                   <LogOut className="h-5 w-5 " />
-                  <span className="font-medium">Log Out</span>
+                  <span className="font-medium">{t("nav.logout")}</span>
                 </ResponsiveNavLink>
 
                 <div className="flex items-center justify-center ">
