@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useCampaignManagement } from "@/Hooks/useCampaignManagement";
+import { useTheme } from "@/Hooks/useTheme"; // Importar useTheme
 
 const createSchema = (t) =>
   z.object({
@@ -44,7 +45,6 @@ const createSchema = (t) =>
       }, t("manageContent.modals.validation.hashtagMax")),
   });
 
-// Validación separada para la imagen
 const validateImage = (file, t) => {
   if (!file) {
     return t("manageContent.modals.validation.imageRequired");
@@ -63,7 +63,8 @@ const validateImage = (file, t) => {
 
 export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
   const { t } = useTranslation();
-  const { addCampaign } = useCampaignManagement(); // Mover dentro del componente
+  const { theme } = useTheme(); 
+  const { addCampaign } = useCampaignManagement();
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [imageError, setImageError] = useState(null);
@@ -88,6 +89,52 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
 
   const watchedFields = watch();
 
+
+  const modalBg = theme === "dark" ? "bg-neutral-800" : "bg-white";
+  const modalHeaderBg =
+    theme === "dark"
+      ? "bg-gradient-to-r from-neutral-900 to-neutral-800"
+      : "bg-gradient-to-r from-gray-50 to-white";
+  const modalHeaderBorder =
+    theme === "dark" ? "border-neutral-700" : "border-gray-100";
+  const modalFooterBg =
+    theme === "dark"
+      ? "bg-neutral-900/50 border-neutral-700"
+      : "bg-gray-50 border-gray-100";
+  const textPrimary = theme === "dark" ? "text-gray-100" : "text-gray-900";
+  const textSecondary = theme === "dark" ? "text-gray-400" : "text-gray-500";
+  const textTertiary = theme === "dark" ? "text-gray-500" : "text-gray-400";
+  const borderColor =
+    theme === "dark" ? "border-neutral-600" : "border-gray-200";
+  const focusBorder =
+    theme === "dark"
+      ? "focus:border-orange-500 focus:ring-orange-500/20"
+      : "focus:border-orange-500 focus:ring-orange-200";
+  const errorBorder =
+    theme === "dark"
+      ? "border-red-500 focus:border-red-500 focus:ring-red-500/20"
+      : "border-red-300 focus:border-red-500 focus:ring-red-200";
+  const inputBg = theme === "dark" ? "bg-neutral-700" : "bg-white";
+  const labelText = theme === "dark" ? "text-gray-300" : "text-gray-700";
+  const iconColor = theme === "dark" ? "text-orange-400" : "text-orange-600";
+  const uploadBg = theme === "dark" ? "bg-neutral-700" : "bg-gray-50";
+  const uploadBorder =
+    theme === "dark"
+      ? "border-neutral-600 hover:border-orange-400"
+      : "border-gray-200 hover:border-orange-300";
+  const dragOverBg =
+    theme === "dark"
+      ? "bg-orange-900/20 border-orange-400"
+      : "bg-orange-50 border-orange-500";
+  const cancelButton =
+    theme === "dark"
+      ? "text-gray-300 hover:bg-neutral-700"
+      : "text-gray-700 hover:bg-gray-200";
+  const submitButton =
+    theme === "dark"
+      ? "bg-gradient-to-r from-orange-600 to-orange-800 hover:shadow-orange-500/20"
+      : "bg-gradient-to-r from-orange-600 to-orange-700 hover:shadow-orange-200";
+
   const handleImageChange = (files) => {
     if (files && files.length > 0) {
       const file = files[0];
@@ -107,7 +154,6 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
       reader.onload = (e) => setImagePreview(e.target.result);
       reader.readAsDataURL(file);
 
-      // Validar otros campos cuando se cambia la imagen
       trigger(["title", "description", "goal", "hashtags"]);
     }
   };
@@ -155,7 +201,6 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
   };
 
   const onFormSubmit = async (data) => {
-    // Validar imagen
     if (!imageFile) {
       setImageError(t("manageContent.modals.validation.imageRequired"));
       return;
@@ -169,7 +214,6 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
 
     setIsSubmitting(true);
     try {
-      // Crear FormData para enviar la imagen
       const formData = new FormData();
       formData.append("title", data.title);
       formData.append("description", data.description);
@@ -179,7 +223,6 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
 
       const success = await addCampaign(formData);
       if (success) {
-
         if (onSubmit) {
           onSubmit();
         }
@@ -206,25 +249,37 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
       <div
-        className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity"
+        className={`absolute inset-0 ${
+          theme === "dark" ? "bg-black/70" : "bg-gray-900/60"
+        } backdrop-blur-sm transition-opacity`}
         onClick={handleClose}
       ></div>
 
-      <div className="relative w-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300">
+      <div
+        className={`relative w-full max-w-4xl ${modalBg} rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300`}
+      >
         {/* Header */}
-        <div className="px-8 py-6 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white flex items-center justify-between sticky top-0 z-10">
+        <div
+          className={`px-8 py-6 border-b ${modalHeaderBorder} ${modalHeaderBg} flex items-center justify-between sticky top-0 z-10`}
+        >
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-              <Sparkles className="w-6 h-6 text-indigo-600" />
+            <h2
+              className={`text-2xl font-bold ${textPrimary} flex items-center gap-2`}
+            >
+              <Sparkles className={`w-6 h-6 ${iconColor}`} />
               {t("manageContent.modals.add.title")}
             </h2>
-            <p className="text-gray-500 mt-1">
+            <p className={`${textSecondary} mt-1`}>
               {t("manageContent.modals.add.subtitle")}
             </p>
           </div>
           <button
             onClick={handleClose}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-400 hover:text-gray-600"
+            className={`p-2 hover:${
+              theme === "dark" ? "bg-neutral-700" : "bg-gray-100"
+            } rounded-full transition-colors ${textTertiary} hover:${
+              theme === "dark" ? "text-gray-200" : "text-gray-600"
+            }`}
           >
             <X className="w-6 h-6" />
           </button>
@@ -237,15 +292,21 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
               {/* Left Column - Image Upload */}
               <div className="space-y-6">
                 <div className="form-group">
-                  <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                    <FileImage className="w-4 h-4 text-indigo-600" />
+                  <label
+                    className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
+                  >
+                    <FileImage className={`w-4 h-4 ${iconColor}`} />
                     {t("manageContent.modals.fields.image")}
                     <span className="text-red-500 ml-1">*</span>
                   </label>
                   <div
                     className={`relative group cursor-pointer transition-all duration-300 ${
                       isDragOver
-                        ? "scale-[1.02] ring-2 ring-indigo-500 ring-offset-2"
+                        ? `scale-[1.02] ring-2 ${
+                            theme === "dark"
+                              ? "ring-orange-400"
+                              : "ring-orange-500"
+                          } ring-offset-2`
                         : ""
                     }`}
                     onDrop={handleDrop}
@@ -254,12 +315,20 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
                     onClick={() => fileInputRef.current?.click()}
                   >
                     <div
-                      className={`aspect-[4/3] rounded-2xl border-2 border-dashed flex flex-col items-center justify-center p-6 text-center transition-colors overflow-hidden bg-gray-50 ${
+                      className={`aspect-[4/3] rounded-2xl border-2 border-dashed flex flex-col items-center justify-center p-6 text-center transition-colors overflow-hidden ${
                         imageError
-                          ? "border-red-300 bg-red-50"
+                          ? `${
+                              theme === "dark"
+                                ? "border-red-500 bg-red-900/20"
+                                : "border-red-300 bg-red-50"
+                            }`
                           : isDragOver
-                          ? "border-indigo-500 bg-indigo-50"
-                          : "border-gray-200 hover:border-indigo-300 hover:bg-gray-100"
+                          ? `${dragOverBg}`
+                          : `${uploadBorder} hover:${
+                              theme === "dark"
+                                ? "bg-neutral-600"
+                                : "bg-gray-100"
+                            } ${uploadBg}`
                       }`}
                     >
                       {imagePreview ? (
@@ -269,7 +338,11 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
                             alt="Preview"
                             className="w-full h-full object-cover rounded-xl shadow-sm"
                           />
-                          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 rounded-xl">
+                          <div
+                            className={`absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity ${
+                              theme === "dark" ? "bg-black/60" : "bg-black/40"
+                            } rounded-xl`}
+                          >
                             <p className="text-white font-medium flex items-center gap-2">
                               <Camera className="w-5 h-5" />
                               {t("manageContent.campaigns.change")}
@@ -288,14 +361,20 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
                         </div>
                       ) : (
                         <div className="space-y-4">
-                          <div className="w-16 h-16 rounded-full bg-indigo-100 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300">
-                            <Upload className="w-8 h-8 text-indigo-600" />
+                          <div
+                            className={`w-16 h-16 rounded-full ${
+                              theme === "dark"
+                                ? "bg-orange-900/30"
+                                : "bg-orange-100"
+                            } flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300`}
+                          >
+                            <Upload className={`w-8 h-8 ${iconColor}`} />
                           </div>
                           <div>
-                            <p className="text-gray-900 font-medium text-lg">
+                            <p className={`${textPrimary} font-medium text-lg`}>
                               {t("manageContent.modals.fields.dragDrop.title")}
                             </p>
-                            <p className="text-gray-500 text-sm mt-1">
+                            <p className={`${textSecondary} text-sm mt-1`}>
                               {t(
                                 "manageContent.modals.fields.dragDrop.subtitle"
                               )}
@@ -322,18 +401,20 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
 
                 {/* Hashtags Field */}
                 <div className="form-group">
-                  <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                    <Hash className="w-4 h-4 text-indigo-600" />
+                  <label
+                    className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
+                  >
+                    <Hash className={`w-4 h-4 ${iconColor}`} />
                     {t("manageContent.modals.fields.hashtags")}
                     <span className="text-red-500 ml-1">*</span>
                   </label>
                   <div className="relative">
                     <input
                       {...register("hashtags")}
-                      className={`w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-offset-0 transition-all ${
+                      className={`w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-offset-0 transition-all ${inputBg} ${
                         errors.hashtags
-                          ? "border-red-300 focus:border-red-500 focus:ring-red-200"
-                          : "border-gray-200 focus:border-indigo-500 focus:ring-indigo-200"
+                          ? errorBorder
+                          : `${borderColor} ${focusBorder}`
                       }`}
                       placeholder={t(
                         "manageContent.modals.fields.placeholders.hashtags"
@@ -348,7 +429,7 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
                     </p>
                   )}
                   <div className="mt-1 flex justify-between text-xs">
-                    <span className="text-gray-400">
+                    <span className={textTertiary}>
                       {watchedFields.hashtags
                         ? watchedFields.hashtags
                             .split(" ")
@@ -356,7 +437,7 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
                         : 0}
                       /10 hashtags
                     </span>
-                    <span className="text-gray-400">
+                    <span className={textTertiary}>
                       {watchedFields.hashtags?.length || 0} caracteres
                     </span>
                   </div>
@@ -367,17 +448,19 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
               <div className="space-y-6">
                 {/* Title Field */}
                 <div className="form-group">
-                  <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                    <FileText className="w-4 h-4 text-indigo-600" />
+                  <label
+                    className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
+                  >
+                    <FileText className={`w-4 h-4 ${iconColor}`} />
                     {t("manageContent.modals.fields.title")}
                     <span className="text-red-500 ml-1">*</span>
                   </label>
                   <input
                     {...register("title")}
-                    className={`w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-offset-0 transition-all ${
+                    className={`w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-offset-0 transition-all ${inputBg} ${
                       errors.title
-                        ? "border-red-300 focus:border-red-500 focus:ring-red-200"
-                        : "border-gray-200 focus:border-indigo-500 focus:ring-indigo-200"
+                        ? errorBorder
+                        : `${borderColor} ${focusBorder}`
                     }`}
                     placeholder={t(
                       "manageContent.modals.fields.placeholders.title"
@@ -390,7 +473,7 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
                     </p>
                   )}
                   <div className="mt-1 flex justify-end text-xs">
-                    <span className="text-gray-400">
+                    <span className={textTertiary}>
                       {watchedFields.title?.length || 0}/100 caracteres
                     </span>
                   </div>
@@ -398,19 +481,20 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
 
                 {/* Description Field */}
                 <div className="form-group">
-                  <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                    <FileText className="w-4 h-4 text-indigo-600" />
+                  <label
+                    className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
+                  >
+                    <FileText className={`w-4 h-4 ${iconColor}`} />
                     {t("manageContent.modals.fields.description")}
                     <span className="text-red-500 ml-1">*</span>
                   </label>
                   <textarea
                     {...register("description")}
-                    name="description"
                     rows={4}
-                    className={`w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-offset-0 transition-all resize-none ${
+                    className={`w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-offset-0 transition-all resize-none ${inputBg} ${
                       errors.description
-                        ? "border-red-300 focus:border-red-500 focus:ring-red-200"
-                        : "border-gray-200 focus:border-indigo-500 focus:ring-indigo-200"
+                        ? errorBorder
+                        : `${borderColor} ${focusBorder}`
                     }`}
                     placeholder={t(
                       "manageContent.modals.fields.placeholders.description"
@@ -427,7 +511,7 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
                       className={`text-xs ${
                         (watchedFields.description?.length || 0) > 500
                           ? "text-red-500"
-                          : "text-gray-400"
+                          : textTertiary
                       }`}
                     >
                       {watchedFields.description?.length || 0}/500 caracteres
@@ -435,19 +519,21 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
                   </div>
                 </div>
 
-                {/* goal Field */}
+                {/* Goal Field */}
                 <div className="form-group">
-                  <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                    <Target className="w-4 h-4 text-indigo-600" />
+                  <label
+                    className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
+                  >
+                    <Target className={`w-4 h-4 ${iconColor}`} />
                     {t("manageContent.modals.fields.goal")}
                     <span className="text-red-500 ml-1">*</span>
                   </label>
                   <input
                     {...register("goal")}
-                    className={`w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-offset-0 transition-all ${
+                    className={`w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-offset-0 transition-all ${inputBg} ${
                       errors.goal
-                        ? "border-red-300 focus:border-red-500 focus:ring-red-200"
-                        : "border-gray-200 focus:border-indigo-500 focus:ring-indigo-200"
+                        ? errorBorder
+                        : `${borderColor} ${focusBorder}`
                     }`}
                     placeholder={t(
                       "manageContent.modals.fields.placeholders.goal"
@@ -464,7 +550,7 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
                       className={`text-xs ${
                         (watchedFields.goal?.length || 0) > 200
                           ? "text-red-500"
-                          : "text-gray-400"
+                          : textTertiary
                       }`}
                     >
                       {watchedFields.goal?.length || 0}/200 caracteres
@@ -477,18 +563,20 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }) {
         </div>
 
         {/* Footer */}
-        <div className="px-8 py-6 border-t border-gray-100 bg-gray-50 flex items-center justify-end gap-4 sticky bottom-0 z-10">
+        <div
+          className={`px-8 py-6 border-t ${modalFooterBg} flex items-center justify-end gap-4 sticky bottom-0 z-10`}
+        >
           <button
             type="button"
             onClick={handleClose}
-            className="px-6 py-2.5 rounded-xl text-gray-700 font-medium hover:bg-gray-200 transition-colors"
+            className={`px-6 py-2.5 rounded-xl font-medium transition-colors ${cancelButton}`}
           >
             {t("common.cancel")}
           </button>
           <button
             onClick={handleSubmit(onFormSubmit)}
             disabled={isSubmitting}
-            className="px-8 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-medium hover:shadow-lg hover:shadow-indigo-200 transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2"
+            className={`px-8 py-2.5 rounded-xl text-white font-medium hover:shadow-lg transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2 ${submitButton}`}
           >
             {isSubmitting ? (
               <>

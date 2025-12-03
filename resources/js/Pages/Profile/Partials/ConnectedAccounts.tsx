@@ -122,7 +122,7 @@ export default function ConnectedAccounts({ className = "" }) {
               key={account.id}
               className={`flex items-center p-3 rounded-xl border transition-all duration-200 ${
                 account.isConnected
-                  ? "bg-purple-50 border-purple-200 shadow-sm"
+                  ? "bg-purple-50 dark: border-purple-200 shadow-sm"
                   : "bg-gray-50 border-gray-100 opacity-60 grayscale hover:grayscale-0 hover:opacity-100"
               }`}
             >
