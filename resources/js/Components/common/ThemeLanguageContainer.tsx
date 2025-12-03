@@ -62,7 +62,6 @@ export default function ThemeLanguageContainer({
       {/* Mobile con menú hamburguesa */}
       <div className="md:hidden">
         <div className="flex items-center space-x-2">
-          {/* Botón de menú móvil */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"

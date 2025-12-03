@@ -8,10 +8,7 @@ export default function ThemeSwitcher() {
 
   const handleToggle = () => {
     if (isAnimating) return;
-
     setIsAnimating(true);
-
-    // Small pause for animation
     setTimeout(() => {
       toggleTheme();
       setIsAnimating(false);
@@ -30,11 +27,9 @@ export default function ThemeSwitcher() {
       aria-label="Toggle theme"
       title={`Switch to ${nextTheme} mode`}
     >
-      {/* Background gradient animation */}
       <div className="absolute inset-0 transition-all duration-700" />
 
       <div className="relative flex items-center gap-2">
-        {/* Icon inside circle */}
         <div className="relative w-10 h-10 flex items-center justify-center transition-all duration-500">
           <Icon
             className={`w-7 h-7 transition-all duration-500 ${
@@ -44,7 +39,6 @@ export default function ThemeSwitcher() {
             }`}
           />
 
-          {/* Floating indicator */}
           <div
             className={`absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center text-xs rounded-full 
               border border-gray-600 dar bg-gradient-to-br shadow-sm transition-all duration-300 ${

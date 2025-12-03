@@ -43,7 +43,7 @@ export default function LanguageSwitcher() {
   return (
     <button
       onClick={toggleLanguage}
-      className="relative p-2  rounded-lg hover:bg-gradient-to-br text-gray-400 hover:text-white
+      className="relative p-2  rounded-lg hover:bg-gradient-to-br text-gray-500
         hover:to-indigo-800 transition-all duration-500 group overflow-hidden"
       aria-label="Toggle language"
       title={`Switch to ${nextLanguage.code.toUpperCase()}`}
