@@ -1,8 +1,8 @@
-import { useTranslation } from "react-i18next";
-import { Globe } from "lucide-react";
-import axios from "axios";
 import { usePage } from "@inertiajs/react";
+import axios from "axios";
+import { Globe } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export default function LanguageSwitcher() {
   const { i18n } = useTranslation();

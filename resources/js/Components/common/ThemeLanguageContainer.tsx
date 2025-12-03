@@ -1,8 +1,8 @@
-import { useState } from "react";
 import LanguageSwitcher from "@/Components/LanguageSwitcher";
 import ThemeSwitcher from "@/Components/ThemeSwitcher";
-import { useTranslation } from "react-i18next";
 import { Link } from "@inertiajs/react";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 interface ThemeLanguageContainerProps {
   isWelcome?: boolean;
