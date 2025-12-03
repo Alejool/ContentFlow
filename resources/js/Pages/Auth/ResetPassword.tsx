@@ -1,5 +1,5 @@
 import Logo from "@/../assets/logo.png";
-import ThemeSwitcher from "@/Components/ThemeSwitcher";
+import ThemeLanguageContainer from "@/Components/common/ThemeLanguageContainer";
 import GuestLayout from "@/Layouts/GuestLayout";
 import { Head, useForm } from "@inertiajs/react";
 import { motion } from "framer-motion";
@@ -44,9 +44,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
     <GuestLayout>
       <Head title="Reset Password" />
 
-      <div className="fixed top-6 right-6 z-50">
-        <ThemeSwitcher />
-      </div>
+      <ThemeLanguageContainer />
 
       <div className="min-h-screen flex flex-col lg:flex-row bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
         <div className="w-full lg:w-1/2 bg-gradient-primary relative overflow-hidden">
