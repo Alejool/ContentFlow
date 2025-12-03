@@ -298,7 +298,11 @@
       "orContinueWith": "Or continue with",
       "google": "Google",
       "alreadyRegistered": "Already registered?",
-      "loginLink": "Login"
+      "loginLink": "Login",
+       "tags": {
+        "freeForever": "Gratis por siempre",
+        "noCreditCard":"No requiere tarjeta de crédito" 
+      }
     },
     "forgotPassword": "Forgot Password?",
     "resetPassword": "Reset Password",
