@@ -57,7 +57,7 @@ export default function Register() {
               <div className="mb-8">
                 <img src={Logo} alt="logo" className="w-36 h-36 mx-auto" />
 
-                <h1 className="text-4xl font-bold font-poppins mb-4">
+                <h1 className="text-4xl font-bold  mb-4">
                   {t("auth.register.welcome")}
                 </h1>
                 <p className="text-lg opacity-90 mb-8">
@@ -112,7 +112,7 @@ export default function Register() {
             className="w-full max-w-md"
           >
             <div className="mb-8 text-center">
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-white font-poppins">
+              <h2 className="text-3xl font-bold text-gray-900 dark:text-white ">
                 {t("auth.register.title")}
               </h2>
               <p className="text-gray-600 dark:text-gray-400 mt-2">

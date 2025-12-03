@@ -299,7 +299,11 @@
       "orContinueWith": "O continúa con",
       "google": "Google",
       "alreadyRegistered": "¿Ya estás registrado?",
-      "loginLink": "Iniciar Sesión"
+      "loginLink": "Iniciar Sesión",
+      "tags": {
+        "freeForever": "Gratis por siempre",
+        "noCreditCard":"No requiere tarjeta de crédito" 
+      }
     },
     "forgotPassword": "¿Olvidaste tu contraseña?",
     "resetPassword": "Restablecer Contraseña",

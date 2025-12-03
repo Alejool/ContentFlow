@@ -18,12 +18,9 @@ export default {
     extend: {
       colors: {
         primary: theme.colors.primary,
-        
         secondary: theme.colors.secondary,
-        
         black: theme.colors.black,
         neutral: theme.colors.neutral,
-        
         success: theme.colors.success,
         error: theme.colors.error,
         warning: theme.colors.warning,
@@ -67,8 +64,12 @@ export default {
       },
       
       fontFamily: {
-        sans: ["Figtree", ...defaultTheme.fontFamily.sans],
+        heading: ["Poppins", ...defaultTheme.fontFamily.sans],
+        sans: ["Inter", ...defaultTheme.fontFamily.sans],
         poppins: ["Poppins", ...defaultTheme.fontFamily.sans],
+        inter: ["Inter", ...defaultTheme.fontFamily.sans],
+        display: ["Poppins", ...defaultTheme.fontFamily.sans],
+        mono: ["JetBrains Mono", ...defaultTheme.fontFamily.mono],
       },
       
       spacing: theme.spacing,

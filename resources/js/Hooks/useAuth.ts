@@ -81,6 +81,7 @@ export const useAuth = () => {
 
     try {
       await signInWithGoogle();
+      
     } catch (err) {
       setError(
         "Error al iniciar sesión con Google. Por favor, inténtalo de nuevo."

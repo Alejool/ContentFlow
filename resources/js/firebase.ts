@@ -86,6 +86,9 @@ const getCurrentUser = (): User | null => {
 
 // Sign in with Google
 const signInWithGoogle = async (): Promise<UserCredential | true | null> => {
+  console.log('isLocalHost'+ isLocalHost);
+  console.log( googleProvider);
+  console.log( auth);
   try {
     if (isLocalHost) {
       const result = await signInWithPopup(auth, googleProvider);

@@ -59,9 +59,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
             >
               <div className="mb-8">
                 <img src={Logo} alt="logo" className="w-36 h-36 mx-auto" />
-                <h1 className="text-4xl font-bold font-poppins mb-4">
-                  Set New Password
-                </h1>
+                <h1 className="text-4xl font-bold  mb-4">Set New Password</h1>
                 <p className="text-lg opacity-90 mb-8">
                   Create a strong and secure new password
                 </p>
@@ -125,7 +123,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
             className="w-full max-w-md"
           >
             <div className="mb-8 text-center">
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-white font-poppins">
+              <h2 className="text-3xl font-bold text-gray-900 dark:text-white ">
                 Reset Password
               </h2>
               <p className="text-gray-600 dark:text-gray-400 mt-2">
