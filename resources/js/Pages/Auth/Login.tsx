@@ -1,23 +1,25 @@
-import { useEffect, ChangeEvent } from "react";
+import Logo from "@/../assets/logo.png";
+import LanguageSwitcher from "@/Components/LanguageSwitcher";
+import ThemeSwitcher from "@/Components/ThemeSwitcher";
+import { useAuth } from "@/Hooks/useAuth";
+import GuestLayout from "@/Layouts/GuestLayout";
+import { auth, getAuthResult } from "@/firebase";
 import { Head, Link, usePage } from "@inertiajs/react";
 import { onAuthStateChanged } from "firebase/auth";
-import { auth, getAuthResult } from "@/firebase";
-import GuestLayout from "@/Layouts/GuestLayout";
-import { useAuth } from "@/Hooks/useAuth";
-import { useTranslation } from "react-i18next";
-import LanguageSwitcher from "@/Components/LanguageSwitcher";
+import { motion } from "framer-motion";
 import {
-  Mail,
-  Lock,
-  LogIn,
-  UserPlus,
   AlertCircle,
   CheckCircle2,
+  Globe,
+  Lock,
+  LogIn,
+  Mail,
   Shield,
   Smartphone,
-  Globe,
+  UserPlus,
 } from "lucide-react";
-import { motion } from "framer-motion";
+import { ChangeEvent, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
 export default function Login() {
   const { t } = useTranslation();
@@ -61,13 +63,12 @@ export default function Login() {
     <GuestLayout>
       <Head title={t("auth.login.title")} />
 
-      {/* Language Switcher - Fixed Position */}
-      <div className="fixed top-6 right-6 z-50">
+      <div className="fixed top-6 right-6 z-50 flex items-center gap-2">
+        <ThemeSwitcher />
         <LanguageSwitcher />
       </div>
 
       <div className="min-h-screen flex flex-col lg:flex-row bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
-        {/* Left Side - Brand/Info Section */}
         <div className="w-full lg:w-1/2 bg-gradient-primary relative overflow-hidden">
           <div className="absolute inset-0 bg-black/10" />
 
@@ -79,9 +80,7 @@ export default function Login() {
               className="text-center max-w-xl"
             >
               <div className="mb-8">
-                <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-white/20 backdrop-blur-sm mb-6">
-                  <Shield className="w-10 h-10" />
-                </div>
+                <img src={Logo} alt="logo" className="w-36 h-36 mx-auto" />
                 <h1 className="text-4xl font-bold font-poppins mb-4">
                   {t("auth.login.welcome")}
                 </h1>
@@ -90,7 +89,6 @@ export default function Login() {
                 </p>
               </div>
 
-              {/* Features List */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
                 <div className="flex items-center gap-3 p-3 rounded-lg bg-white/10 backdrop-blur-sm">
                   <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
@@ -136,7 +134,6 @@ export default function Login() {
           </div>
         </div>
 
-        {/* Right Side - Login Form */}
         <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-8">
           <motion.div
             initial={{ opacity: 0, x: 20 }}
@@ -154,7 +151,6 @@ export default function Login() {
             </div>
 
             <form onSubmit={handleEmailLogin} className="space-y-6">
-              {/* Error/Success Messages */}
               {error && (
                 <div className="rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-4">
                   <div className="flex items-center gap-3 text-red-700 dark:text-red-400">
@@ -173,7 +169,6 @@ export default function Login() {
                 </div>
               )}
 
-              {/* Email Input */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   {t("auth.login.email")}
@@ -197,7 +192,6 @@ export default function Login() {
                 </div>
               </div>
 
-              {/* Password Input */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   {t("auth.login.password")}
@@ -221,7 +215,6 @@ export default function Login() {
                 </div>
               </div>
 
-              {/* Remember Me & Forgot Password */}
               <div className="flex items-center justify-between">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
@@ -246,7 +239,6 @@ export default function Login() {
                 </Link>
               </div>
 
-              {/* Login Button */}
               <button
                 type="submit"
                 disabled={processing || loading}
@@ -267,7 +259,6 @@ export default function Login() {
                 )}
               </button>
 
-              {/* Divider */}
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-gray-300 dark:border-gray-700"></div>
@@ -279,7 +270,6 @@ export default function Login() {
                 </div>
               </div>
 
-              {/* Social Login Buttons */}
               <div className="grid grid-cols-1 gap-3">
                 <button
                   type="button"
@@ -313,7 +303,6 @@ export default function Login() {
                 </button>
               </div>
 
-              {/* Register Link */}
               <div className="text-center pt-6">
                 <p className="text-gray-600 dark:text-gray-400 text-sm">
                   {t("auth.login.noAccount")}{" "}
