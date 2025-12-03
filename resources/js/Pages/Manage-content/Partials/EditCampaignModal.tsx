@@ -76,7 +76,7 @@ interface EditCampaignModalProps {
 export default function EditCampaignModal({
   isOpen,
   onClose,
-  campaign,
+  campaign ,
 }: EditCampaignModalProps) {
   const { t } = useTranslation();
   const { theme } = useTheme();

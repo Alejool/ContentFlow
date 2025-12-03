@@ -14,14 +14,30 @@ import {
   AlertCircle,
   Loader2,
   Link2,
+  Globe,
+  Shield,
+  Zap,
+  BarChart3,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useTheme } from "@/Hooks/useTheme";
+
+interface Account {
+  id: number;
+  platform: string;
+  name: string;
+  logo: any;
+  isConnected: boolean;
+  accountId: number | null;
+  color: string;
+  gradient: string;
+}
 
 export default function SocialMediaAccounts() {
   const { t } = useTranslation();
-  const { isAuthenticating, connectSocialMedia, disconnectSocialMedia } =
-    useSocialMediaAuth();
-  const [accounts, setAccounts] = useState([
+  const { theme } = useTheme();
+  const { isAuthenticating, connectSocialMedia, disconnectSocialMedia } = useSocialMediaAuth();
+  const [accounts, setAccounts] = useState<Account[]>([
     {
       id: 1,
       platform: "facebook",
@@ -29,7 +45,8 @@ export default function SocialMediaAccounts() {
       logo: IconFacebook,
       isConnected: false,
       accountId: null,
-      color: "bg-blue-600",
+      color: theme === "dark" ? "bg-blue-700" : "bg-blue-600",
+      gradient: "from-blue-500 to-blue-700",
     },
     {
       id: 2,
@@ -38,7 +55,8 @@ export default function SocialMediaAccounts() {
       logo: IconInstagram,
       isConnected: false,
       accountId: null,
-      color: "bg-pink-600",
+      color: theme === "dark" ? "bg-pink-700" : "bg-pink-600",
+      gradient: "from-pink-500 to-purple-700",
     },
     {
       id: 3,
@@ -47,7 +65,8 @@ export default function SocialMediaAccounts() {
       logo: IconTiktok,
       isConnected: false,
       accountId: null,
-      color: "bg-black",
+      color: theme === "dark" ? "bg-neutral-900" : "bg-black",
+      gradient: "from-neutral-900 via-neutral-800 to-rose-900",
     },
     {
       id: 4,
@@ -56,7 +75,8 @@ export default function SocialMediaAccounts() {
       logo: IconTwitter,
       isConnected: false,
       accountId: null,
-      color: "bg-gray-900",
+      color: theme === "dark" ? "bg-neutral-800" : "bg-gray-900",
+      gradient: "from-neutral-800 to-neutral-900",
     },
     {
       id: 5,
@@ -65,7 +85,8 @@ export default function SocialMediaAccounts() {
       logo: IconYoutube,
       isConnected: false,
       accountId: null,
-      color: "bg-red-600",
+      color: theme === "dark" ? "bg-red-700" : "bg-red-600",
+      gradient: "from-red-600 to-red-800",
     },
   ]);
   const [loading, setLoading] = useState(true);
@@ -73,12 +94,10 @@ export default function SocialMediaAccounts() {
   const authWindowRef = useRef(null);
   const authCheckIntervalRef = useRef(null);
 
-  // Load connected accounts when the component starts
   useEffect(() => {
     fetchConnectedAccounts();
 
-    // Configure message listener for authentication
-    const handleAuthMessage = (event) => {
+    const handleAuthMessage = (event: MessageEvent) => {
       console.log("Message received in SocialMediaAccounts:", event.data);
 
       if (event.data && event.data.type === "social_auth_callback") {
@@ -86,7 +105,7 @@ export default function SocialMediaAccounts() {
 
         if (event.data.success) {
           toast.success(t("manageContent.socialMedia.messages.connectSuccess"));
-          fetchConnectedAccounts(); // Reload accounts after successful authentication
+          fetchConnectedAccounts();
         } else {
           toast.error(
             `${t("manageContent.socialMedia.messages.authError")}: ${
@@ -95,7 +114,6 @@ export default function SocialMediaAccounts() {
           );
         }
 
-        // Clear verification interval if it exists
         if (authCheckIntervalRef.current) {
           clearInterval(authCheckIntervalRef.current);
           authCheckIntervalRef.current = null;
@@ -107,18 +125,39 @@ export default function SocialMediaAccounts() {
 
     return () => {
       window.removeEventListener("message", handleAuthMessage);
-      // Clear verification interval on unmount
       if (authCheckIntervalRef.current) {
         clearInterval(authCheckIntervalRef.current);
       }
     };
   }, []);
 
-  // Function to get connected accounts from the backend
+  useEffect(() => {
+    setAccounts((prev) =>
+      prev.map((account) => ({
+        ...account,
+        color:
+          theme === "dark"
+            ? {
+                facebook: "bg-blue-700",
+                instagram: "bg-pink-700",
+                tiktok: "bg-neutral-900",
+                twitter: "bg-neutral-800",
+                youtube: "bg-red-700",
+              }[account.platform]
+            : {
+                facebook: "bg-blue-600",
+                instagram: "bg-pink-600",
+                tiktok: "bg-black",
+                twitter: "bg-gray-900",
+                youtube: "bg-red-600",
+              }[account.platform],
+      }))
+    );
+  }, [theme]);
+
   const fetchConnectedAccounts = async () => {
     try {
       setLoading(true);
-      // Ensure the request includes credentials and CSRF token
       const response = await axios.get("/api/social-accounts", {
         headers: {
           "X-CSRF-TOKEN": document
@@ -127,14 +166,13 @@ export default function SocialMediaAccounts() {
           Accept: "application/json",
           "Content-Type": "application/json",
         },
-        withCredentials: true, // Important for Sanctum
+        withCredentials: true,
       });
 
       if (response.data && response.data.accounts) {
-        // Update account status with server information
         updateAccountsStatus(response.data.accounts);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error loading social accounts:", error);
       if (error.response?.status === 401) {
         toast.error(t("manageContent.socialMedia.messages.unauthorized"));
@@ -146,9 +184,7 @@ export default function SocialMediaAccounts() {
     }
   };
 
-  // Update account status with server information
-  const updateAccountsStatus = (connectedAccounts) => {
-    // If there are no connected accounts or the array is empty, keep all default values
+  const updateAccountsStatus = (connectedAccounts: any[]) => {
     if (!connectedAccounts || connectedAccounts.length === 0) {
       setAccounts((prevAccounts) =>
         prevAccounts.map((account) => ({
@@ -161,7 +197,6 @@ export default function SocialMediaAccounts() {
       return;
     }
 
-    // If there are connected accounts, update only those that match by platform
     setAccounts((prevAccounts) =>
       prevAccounts.map((account) => {
         const connectedAccount = connectedAccounts.find(
@@ -178,13 +213,12 @@ export default function SocialMediaAccounts() {
     );
   };
 
-  const handleConnectionToggle = async (accountId) => {
+  const handleConnectionToggle = async (accountId: number) => {
     const account = accounts.find((acc) => acc.id === accountId);
 
     if (!account) return;
 
     if (account.isConnected) {
-      // Disconnect account
       try {
         const success = await disconnectSocialMedia(
           account.platform,
@@ -209,7 +243,7 @@ export default function SocialMediaAccounts() {
             )}`
           );
         }
-      } catch (error) {
+      } catch (error: any) {
         toast.error(
           `${t("manageContent.socialMedia.messages.disconnectError")} ${
             account.name
@@ -217,11 +251,9 @@ export default function SocialMediaAccounts() {
         );
       }
     } else {
-      // Connect account - Improved implementation
       try {
         setAuthInProgress(true);
 
-        // Get authentication URL
         const response = await axios.get(
           `/api/social-accounts/auth-url/${account.platform}`,
           {
@@ -236,12 +268,10 @@ export default function SocialMediaAccounts() {
         );
 
         if (response.data.success && response.data.url) {
-          // Close any previous authentication window that might be open
           if (authWindowRef.current && !authWindowRef.current.closed) {
             authWindowRef.current.close();
           }
 
-          // Open popup window for authentication
           authWindowRef.current = window.open(
             response.data.url,
             `${account.platform}Auth`,
@@ -254,14 +284,12 @@ export default function SocialMediaAccounts() {
             return;
           }
 
-          // Check if the window was closed manually
           authCheckIntervalRef.current = setInterval(() => {
             if (authWindowRef.current.closed) {
               clearInterval(authCheckIntervalRef.current);
               authCheckIntervalRef.current = null;
               setAuthInProgress(false);
 
-              // Check if the account connected correctly after a short delay
               setTimeout(() => {
                 fetchConnectedAccounts();
               }, 1000);
@@ -285,48 +313,104 @@ export default function SocialMediaAccounts() {
 
   return (
     <div className="space-y-8">
-      {/* Header Section */}
-      <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+      <div
+        className={`rounded-2xl p-8 shadow-sm border transition-colors duration-300
+        ${
+          theme === "dark"
+            ? "bg-neutral-800/50 backdrop-blur-sm border-neutral-700/50"
+            : "bg-white border-gray-100"
+        }`}
+      >
         <div className="max-w-3xl">
-          <h2 className="text-2xl font-bold text-gray-900 mb-3 flex items-center gap-2">
-            <Link2 className="w-6 h-6 text-indigo-600" />
+          <h2
+            className={`text-2xl font-bold mb-3 flex items-center gap-2
+            ${theme === "dark" ? "text-gray-100" : "text-gray-900"}`}
+          >
+            <div
+              className={`p-2 rounded-lg ${
+                theme === "dark"
+                  ? "bg-gradient-to-r from-orange-600/20 to-orange-800/20"
+                  : "bg-gradient-to-r from-orange-100 to-orange-50"
+              }`}
+            >
+              <Link2
+                className={`w-6 h-6 ${
+                  theme === "dark" ? "text-orange-400" : "text-orange-600"
+                }`}
+              />
+            </div>
             {t("manageContent.socialMedia.title")}
           </h2>
-          <p className="text-gray-600 text-lg leading-relaxed">
+          <p
+            className={`text-lg leading-relaxed ${
+              theme === "dark" ? "text-gray-400" : "text-gray-600"
+            }`}
+          >
             {t("manageContent.socialMedia.description")}
           </p>
         </div>
       </div>
 
-      {/* Accounts Grid */}
       {loading ? (
-        <div className="flex flex-col items-center justify-center py-12 bg-white rounded-2xl border border-gray-100">
-          <Loader2 className="w-10 h-10 text-indigo-600 animate-spin mb-4" />
-          <p className="text-gray-500 font-medium">{t("common.loading")}</p>
+        <div
+          className={`flex flex-col items-center justify-center py-12 rounded-2xl border transition-colors duration-300
+          ${
+            theme === "dark"
+              ? "bg-neutral-800/30 border-neutral-700/50"
+              : "bg-white border-gray-100"
+          }`}
+        >
+          <Loader2
+            className={`w-10 h-10 animate-spin mb-4 ${
+              theme === "dark" ? "text-orange-400" : "text-orange-600"
+            }`}
+          />
+          <p
+            className={`font-medium ${
+              theme === "dark" ? "text-gray-400" : "text-gray-500"
+            }`}
+          >
+            {t("common.loading")}
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {accounts.map((account) => (
             <div
               key={account.id}
-              className={`group relative bg-white rounded-2xl p-6 border transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${
-                account.isConnected
-                  ? "border-green-100 ring-1 ring-green-50"
-                  : "border-gray-100 hover:border-indigo-100"
-              }`}
+              className={`group relative rounded-lg p-6 border transition-all duration-300 
+                hover:shadow-xl hover:-translate-y-1
+                ${
+                  theme === "dark"
+                    ? "bg-neutral-800/30 backdrop-blur-sm border-neutral-700/50 hover:border-neutral-600"
+                    : "bg-white border-gray-100 hover:border-gray-200"
+                }
+                ${
+                  account.isConnected
+                    ? `ring-1 ${
+                        theme === "dark"
+                          ? "ring-green-500/20"
+                          : "ring-green-100"
+                      }`
+                    : ""
+                }`}
             >
-              {/* Status Badge */}
-              <div className="absolute top-4 right-4">
+              <div className="absolute top-4 right-4 z-10">
                 <div
-                  className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-colors ${
-                    account.isConnected
-                      ? "bg-green-50 text-green-700 border border-green-100"
-                      : "bg-gray-50 text-gray-500 border border-gray-100"
-                  }`}
+                  className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-colors border
+                    ${
+                      account.isConnected
+                        ? theme === "dark"
+                          ? "bg-green-900/30 text-green-300 border-green-700/50"
+                          : "bg-green-50 text-green-700 border-green-100"
+                        : theme === "dark"
+                        ? "bg-neutral-800 text-gray-400 border-neutral-700"
+                        : "bg-gray-50 text-gray-500 border-gray-100"
+                    }`}
                 >
                   {account.isConnected ? (
                     <>
-                      <Check className="w-3 h-3" />
+                      <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
                       {t("manageContent.socialMedia.status.connected")}
                     </>
                   ) : (
@@ -338,113 +422,197 @@ export default function SocialMediaAccounts() {
                 </div>
               </div>
 
-              {/* Logo & Name */}
               <div className="flex flex-col items-center text-center mb-6 pt-2">
                 <div className="relative mb-4">
-                  <div className="w-16 h-16 rounded-2xl mt-3 flex items-center justify-center p-3 transition-transform group-hover:scale-110 duration-300">
-                    <img
-                      src={account.logo}
-                      alt={`${account.name} Logo`}
-                      className="w-full h-full object-contain"
-                    />
+                  <div
+                    className={`w-20 h-12 rounded-lg flex items-center justify-center pt-6 
+                    
+                   `}
+                  >
+                    <div
+                      className={`w-12 h-12 p-2 rounded-xl
+                      ${
+                        theme === "dark" && !account.isConnected
+                          ? "bg-neutral-800"
+                          : "bg-white/90"
+                      }`}
+                    >
+                      <img
+                        src={account.logo}
+                        alt={`${account.name} Logo`}
+                        className={`w-full h-full object-contain transition-all duration-300
+                         `}
+                      />
+                    </div>
                   </div>
+
                   {account.isConnected && (
-                    <div className="absolute -bottom-1 -right-1 bg-green-500 text-white p-1 rounded-full border-2 border-white">
-                      <Check className="w-3 h-3" />
+                    <div
+                      className={`absolute -bottom-2 -right-2 p-1 rounded-full border-2 shadow-lg
+                      ${
+                        theme === "dark"
+                          ? "bg-gradient-to-r from-green-600 to-green-800 border-neutral-800"
+                          : "bg-gradient-to-r from-green-500 to-green-600 border-white"
+                      }`}
+                    >
+                      <Check className="w-3 h-3 text-white" />
                     </div>
                   )}
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-1">
+                <h3
+                  className={`text-xl font-bold mb-1
+                  ${theme === "dark" ? "text-gray-100" : "text-gray-900"}`}
+                >
                   {account.name}
                 </h3>
                 {account.isConnected && account.accountDetails ? (
-                  <p className="text-xs text-gray-500 font-mono bg-gray-50 px-2 py-1 rounded">
+                  <p
+                    className={`text-xs font-mono px-2 py-1 rounded
+                    ${
+                      theme === "dark"
+                        ? "bg-neutral-800 text-gray-400"
+                        : "bg-gray-50 text-gray-500"
+                    }`}
+                  >
                     ID: {account.accountDetails.account_id}
                   </p>
                 ) : (
-                  <p className="text-sm text-gray-500">
+                  <p
+                    className={`text-sm ${
+                      theme === "dark" ? "text-gray-400" : "text-gray-500"
+                    }`}
+                  >
                     {t("manageContent.socialMedia.status.connectToShare")}
                   </p>
                 )}
               </div>
 
-              {/* Action Button */}
               <button
                 onClick={() => handleConnectionToggle(account.id)}
                 disabled={isAuthenticating || authInProgress}
-                className={`w-full py-3 px-4 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all duration-200 ${
-                  isAuthenticating || authInProgress
-                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                    : account.isConnected
-                    ? "bg-white border border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300"
-                    : "bg-gray-900 text-white hover:bg-gray-800 shadow-lg shadow-gray-200 hover:shadow-gray-300"
-                }`}
+                className={`w-full py-3 px-4 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 
+                  transition-all duration-200 relative overflow-hidden group/btn
+                  ${
+                    isAuthenticating || authInProgress
+                      ? theme === "dark"
+                        ? "bg-neutral-700/50 text-gray-400 cursor-not-allowed"
+                        : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                      : account.isConnected
+                      ? theme === "dark"
+                        ? "bg-gradient-to-r from-red-900/30 to-red-800/30 text-red-300 border border-red-700/30 hover:from-red-800/40 hover:to-red-700/40"
+                        : "bg-gradient-to-r from-red-50 to-red-100 text-red-600 border border-red-200 hover:from-red-100 hover:to-red-50"
+                      : `bg-gradient-to-r ${account.gradient} text-white shadow-lg hover:shadow-xl hover:scale-[1.02]`
+                  }`}
               >
-                {isAuthenticating || authInProgress ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    {t("manageContent.socialMedia.actions.processing")}
-                  </>
-                ) : account.isConnected ? (
-                  <>
-                    <X className="w-4 h-4" />
-                    {t("manageContent.socialMedia.actions.disconnect")}
-                  </>
-                ) : (
-                  <>
-                    <ExternalLink className="w-4 h-4" />
-                    {t("manageContent.socialMedia.actions.connect")}
-                  </>
-                )}
+                <span className="relative z-10 flex items-center gap-2">
+                  {isAuthenticating || authInProgress ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      {t("manageContent.socialMedia.actions.processing")}
+                    </>
+                  ) : account.isConnected ? (
+                    <>
+                      <X className="w-4 h-4" />
+                      {t("manageContent.socialMedia.actions.disconnect")}
+                    </>
+                  ) : (
+                    <>
+                      <ExternalLink className="w-4 h-4" />
+                      {t("manageContent.socialMedia.actions.connect")}
+                    </>
+                  )}
+                </span>
+
+                <div
+                  className={`absolute inset-0 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700
+                  ${
+                    theme === "dark"
+                      ? "bg-gradient-to-r from-transparent via-white/10 to-transparent"
+                      : "bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                  }`}
+                ></div>
               </button>
             </div>
           ))}
         </div>
       )}
 
-      {/* Info Section */}
-      <div className="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-2xl p-8 border border-indigo-100">
+      <div
+        className={`rounded-2xl p-8 border transition-colors duration-300
+        ${
+          theme === "dark"
+            ? "bg-gradient-to-br from-neutral-900/50 to-neutral-800/50 border-neutral-700/50"
+            : "bg-gradient-to-br from-orange-50/50 to-pink-50/50 border-orange-100"
+        }`}
+      >
         <div className="flex items-start gap-4">
-          <div className="p-3 bg-white rounded-xl shadow-sm text-indigo-600 hidden sm:block">
-            <AlertCircle className="w-6 h-6" />
-          </div>
           <div>
-            <h3 className="text-lg font-bold text-indigo-900 mb-3">
+            <h3
+              className={`text-lg font-bold mb-3
+              ${theme === "dark" ? "text-gray-100" : "text-orange-900"}`}
+            >
               {t("manageContent.socialMedia.whyConnect")}
             </h3>
-            <div className="grid sm:grid-cols-2 gap-x-8 gap-y-2 mb-4">
-              <ul className="space-y-2">
-                {[
-                  t("manageContent.socialMedia.benefits.autoPublish"),
-                  t("manageContent.socialMedia.benefits.manageAll"),
-                ].map((item, i) => (
-                  <li
-                    key={i}
-                    className="flex items-center gap-2 text-indigo-800 text-sm"
+
+            <div className="grid sm:grid-cols-3 gap-6 mb-6">
+              {[
+                {
+                  icon: Zap,
+                  title: t("manageContent.socialMedia.benefits.autoPublish"),
+                  color: "text-orange-500",
+                },
+                {
+                  icon: BarChart3,
+                  title: t("manageContent.socialMedia.benefits.manageAll"),
+                  color: "text-blue-500",
+                },
+                {
+                  icon: Shield,
+                  title: t("manageContent.socialMedia.benefits.control"),
+                  color: "text-green-500",
+                },
+              ].map((item, i) => (
+                <div
+                  key={i}
+                  className={`flex flex-col lg:flex-row items-center gap-3 p-4 rounded-xl
+                  ${
+                    theme === "dark"
+                      ? "bg-neutral-800/30 border border-neutral-700/30"
+                      : "bg-white/60 border border-orange-100"
+                  }`}
+                >
+                  <div
+                    className={`p-2 rounded-lg ${
+                      theme === "dark" ? "bg-neutral-800" : "bg-white"
+                    }`}
                   >
-                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-              <ul className="space-y-2">
-                {[
-                  t("manageContent.socialMedia.benefits.schedule"),
-                  t("manageContent.socialMedia.benefits.control"),
-                ].map((item, i) => (
-                  <li
-                    key={i}
-                    className="flex items-center gap-2 text-indigo-800 text-sm"
+                    <item.icon className={`w-5 h-5 ${item.color}`} />
+                  </div>
+                  <p
+                    className={`text-sm font-medium ${
+                      theme === "dark" ? "text-gray-300" : "text-gray-700"
+                    }`}
                   >
-                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
+                    {item.title}
+                  </p>
+                </div>
+              ))}
             </div>
-            <p className="text-sm text-indigo-600/80 bg-white/50 p-3 rounded-lg inline-block">
+
+            <div
+              className={`text-sm p-4 rounded-xl inline-block
+              ${
+                theme === "dark"
+                  ? "bg-neutral-800/40 text-gray-400 border border-neutral-700/40"
+                  : "bg-white/60 text-orange-600/80 border border-orange-100"
+              }`}
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <AlertCircle className="w-4 h-4" />
+                <span className="font-semibold">{t("common.note")}:</span>
+              </div>
               {t("manageContent.socialMedia.disclaimer")}
-            </p>
+            </div>
           </div>
         </div>
       </div>

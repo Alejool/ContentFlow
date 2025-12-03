@@ -5,41 +5,38 @@ import ModernButton from "@/Components/Modern/ModernButton";
 import ModernCard from "@/Components/Modern/ModernCard";
 import { Transition } from "@headlessui/react";
 import { useTranslation } from "react-i18next";
+import { useTheme } from "@/Hooks/useTheme";
+import {
+  Lock,
+  Check,
+  AlertTriangle,
+  Shield,
+  Key,
+  Eye,
+  EyeOff,
+} from "lucide-react";
 
-const LockIcon = ({ className }) => (
-  <svg
-    className={className}
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-    />
-  </svg>
+interface UpdatePasswordFormProps {
+  className?: string;
+}
+
+interface IconProps {
+  className?: string;
+}
+
+const LockIcon = ({ className }: IconProps) => <Lock className={className} />;
+
+const CheckIcon = ({ className = "w-5 h-5" }: IconProps) => (
+  <Check className={className} />
 );
 
-const CheckIcon = ({ className = "w-5 h-5" }) => (
-  <svg
-    className={className}
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M5 13l4 4L19 7"
-    />
-  </svg>
-);
+interface SuccessAlertProps {
+  show: boolean;
+  t: (key: string) => string;
+  theme: "dark" | "light";
+}
 
-// Success Alert Component
-const SuccessAlert = ({ show, t }) => (
+const SuccessAlert = ({ show, t, theme }: SuccessAlertProps) => (
   <Transition
     show={show}
     enter="transform transition duration-300 ease-out"
@@ -49,15 +46,37 @@ const SuccessAlert = ({ show, t }) => (
     leaveFrom="translate-y-0 opacity-100"
     leaveTo="translate-y-2 opacity-0"
   >
-    <div className="flex items-center gap-3 p-4 bg-green-50 border border-green-200 rounded-xl mb-6">
-      <div className="flex-shrink-0 w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-        <CheckIcon className="w-5 h-5 text-green-600" />
+    <div
+      className={`flex items-center gap-3 p-4 rounded-xl mb-6 ${
+        theme === "dark"
+          ? "bg-green-900/20 border border-green-800/30"
+          : "bg-green-50 border border-green-200"
+      }`}
+    >
+      <div
+        className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
+          theme === "dark" ? "bg-green-800/40" : "bg-green-100"
+        }`}
+      >
+        <CheckIcon
+          className={`w-5 h-5 ${
+            theme === "dark" ? "text-green-400" : "text-green-600"
+          }`}
+        />
       </div>
       <div>
-        <p className="text-sm font-medium text-green-800">
+        <p
+          className={`text-sm font-medium ${
+            theme === "dark" ? "text-green-300" : "text-green-800"
+          }`}
+        >
           {t("profile.password.successTitle")}
         </p>
-        <p className="text-xs text-green-600">
+        <p
+          className={`text-xs ${
+            theme === "dark" ? "text-green-400/80" : "text-green-600"
+          }`}
+        >
           {t("profile.password.successMessage")}
         </p>
       </div>
@@ -65,8 +84,10 @@ const SuccessAlert = ({ show, t }) => (
   </Transition>
 );
 
-const UpdatePasswordForm = ({ className = "" }) => {
+const UpdatePasswordForm = ({ className = "" }: UpdatePasswordFormProps) => {
   const { t } = useTranslation();
+  const { theme } = useTheme();
+
   const {
     register,
     handleSubmit,
@@ -84,36 +105,47 @@ const UpdatePasswordForm = ({ className = "" }) => {
       headerColor="orange"
       className={className}
     >
-      {/* Error Summary Section */}
       {Object.keys(errors).length > 0 && (
-        <div className="p-4 mb-6 bg-red-50 border border-red-100 rounded-xl">
+        <div
+          className={`p-4 mb-6 rounded-xl ${
+            theme === "dark"
+              ? "bg-red-900/20 border border-red-800/30"
+              : "bg-red-50 border border-red-100"
+          }`}
+        >
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center">
-              <svg
-                className="w-4 h-4 text-red-600"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                  clipRule="evenodd"
-                />
-              </svg>
+            <div
+              className={`w-6 h-6 rounded-full flex items-center justify-center ${
+                theme === "dark" ? "bg-red-800/40" : "bg-red-100"
+              }`}
+            >
+              <AlertTriangle
+                className={`w-4 h-4 ${
+                  theme === "dark" ? "text-red-400" : "text-red-600"
+                }`}
+              />
             </div>
-            <h3 className="font-semibold text-red-800 text-sm">
+            <h3
+              className={`font-semibold text-sm ${
+                theme === "dark" ? "text-red-300" : "text-red-800"
+              }`}
+            >
               {t("profile.password.errorTitle")}
             </h3>
           </div>
-          <ul className="space-y-1 text-sm text-red-700 ml-9 list-disc">
-            {Object.entries(errors).map(([field, error]) => (
+          <ul
+            className={`space-y-1 text-sm ml-9 list-disc ${
+              theme === "dark" ? "text-red-400" : "text-red-700"
+            }`}
+          >
+            {Object.entries(errors).map(([field, error]: [string, any]) => (
               <li key={field}>{error.message}</li>
             ))}
           </ul>
         </div>
       )}
 
-      <SuccessAlert show={isSuccess} t={t} />
+      <SuccessAlert show={isSuccess} t={t} theme={theme} />
 
       <form onSubmit={handleSubmit(updatePassword)} className="space-y-6">
         <ModernInput
@@ -124,6 +156,8 @@ const UpdatePasswordForm = ({ className = "" }) => {
           register={register}
           error={errors.current_password?.message}
           showPasswordToggle
+          theme={theme}
+          icon={Key}
         />
 
         <ModernInput
@@ -134,6 +168,8 @@ const UpdatePasswordForm = ({ className = "" }) => {
           register={register}
           error={errors.password?.message}
           showPasswordToggle
+          theme={theme}
+          icon={Lock}
         />
 
         <ModernInput
@@ -144,6 +180,8 @@ const UpdatePasswordForm = ({ className = "" }) => {
           register={register}
           error={errors.password_confirmation?.message}
           showPasswordToggle
+          theme={theme}
+          icon={Lock}
         />
 
         <div className="pt-4">
@@ -151,21 +189,79 @@ const UpdatePasswordForm = ({ className = "" }) => {
             disabled={isSubmitting}
             variant="danger"
             icon={LockIcon}
+            theme={theme}
+            loading={isSubmitting}
+            className="min-w-[140px]"
           >
-            {t("profile.password.updateButton")}
+            {isSubmitting
+              ? t("common.updating")
+              : t("profile.password.updateButton")}
           </ModernButton>
+
+          {isSubmitting && (
+            <div
+              className={`mt-2 text-sm flex items-center gap-2 ${
+                theme === "dark" ? "text-gray-400" : "text-gray-500"
+              }`}
+            >
+              <div
+                className={`w-3 h-3 border-2 rounded-full animate-spin ${
+                  theme === "dark"
+                    ? "border-gray-400 border-t-transparent"
+                    : "border-gray-500 border-t-transparent"
+                }`}
+              ></div>
+              {t("common.processing")}
+            </div>
+          )}
         </div>
       </form>
 
-      {/* Security Tips */}
-      <div className="mt-8 p-4 bg-orange-50 rounded-xl border border-orange-100">
-        <h4 className="text-sm font-semibold text-orange-900 mb-2">
-          {t("profile.password.securityTips")}
-        </h4>
-        <ul className="text-xs text-orange-800 space-y-2">
-          <li>• {t("profile.password.tip1")}</li>
-          <li>• {t("profile.password.tip2")}</li>
-          <li>• {t("profile.password.tip3")}</li>
+      <div
+        className={`mt-8 p-4 rounded-xl border ${
+          theme === "dark"
+            ? "bg-orange-900/10 border-orange-800/30"
+            : "bg-orange-50 border-orange-100"
+        }`}
+      >
+        <div className="flex items-center gap-2 mb-3">
+          <Shield
+            className={`w-5 h-5 ${
+              theme === "dark" ? "text-orange-400" : "text-orange-700"
+            }`}
+          />
+          <h4
+            className={`text-sm font-semibold ${
+              theme === "dark" ? "text-orange-300" : "text-orange-900"
+            }`}
+          >
+            {t("profile.password.securityTips")}
+          </h4>
+        </div>
+        <ul
+          className={`text-xs space-y-2 ${
+            theme === "dark" ? "text-orange-400/80" : "text-orange-800"
+          }`}
+        >
+          <li className="flex items-start gap-2">
+            <span className="mt-0.5">•</span>
+            <span>{t("profile.password.tip1")}</span>
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="mt-0.5">•</span>
+            <span>{t("profile.password.tip2")}</span>
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="mt-0.5">•</span>
+            <span>{t("profile.password.tip3")}</span>
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="mt-0.5">•</span>
+            <span>
+              {t("profile.password.tip4") ||
+                "Evita usar información personal como fechas de nacimiento o nombres"}
+            </span>
+          </li>
         </ul>
       </div>
     </ModernCard>
