@@ -1,8 +1,10 @@
-import { Link } from "@inertiajs/react";
-import NavLink from "@/Components/NavLink";
 import Logo from "@/../assets/logo.png";
-import { Home, User, FileText, BarChart3, Bot, LogOut } from "lucide-react";
 import LanguageSwitcher from "@/Components/LanguageSwitcher";
+import NavLink from "@/Components/NavLink";
+import ThemeSwitcher from "@/Components/ThemeSwitcher";
+import { useTheme } from "@/Hooks/useTheme";
+import { Link } from "@inertiajs/react";
+import { BarChart3, Bot, FileText, Home, LogOut, User } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 interface SidebarProps {
@@ -118,19 +120,65 @@ export default function Sidebar({
   setIsSidebarOpen,
 }: SidebarProps) {
   const { t } = useTranslation();
+  const { theme } = useTheme(); 
+
+  const sidebarBg = theme === "dark" ? "bg-neutral-900/90" : "bg-beige-200/90";
+
+  const borderColor =
+    theme === "dark" ? "border-neutral-700/50" : "border-beige-300/50";
+
+  const textColor = theme === "dark" ? "text-gray-300" : "text-gray-700";
+
+  const hoverBg =
+    theme === "dark" ? "hover:bg-neutral-800" : "hover:bg-beige-300";
+
+  const hoverText =
+    theme === "dark" ? "hover:text-orange-400" : "hover:text-orange-600";
+
+  const activeGradient =
+    theme === "dark"
+      ? "bg-gradient-to-r from-orange-600 to-orange-800"
+      : "bg-gradient-to-r from-orange-600 to-orange-700";
+
+  const buttonHoverBg =
+    theme === "dark" ? "hover:bg-neutral-800" : "hover:bg-beige-300";
+
+  const logoGradient =
+    theme === "dark"
+      ? "from-orange-500 to-orange-700"
+      : "from-orange-600 to-orange-800";
+
+  const titleGradient =
+    theme === "dark"
+      ? "from-gray-200 to-gray-400"
+      : "from-gray-800 to-gray-600";
+
+  const subtitleColor = theme === "dark" ? "text-gray-400" : "text-gray-500";
+
+  const logoutHoverBg =
+    theme === "dark"
+      ? "hover:bg-red-900/30 hover:text-red-300"
+      : "hover:bg-red-50 hover:text-red-600";
+
+  const tooltipBg =
+    theme === "dark"
+      ? "bg-neutral-800 text-gray-100"
+      : "bg-gray-900 text-white";
+
   return (
     <div
       className={`hidden lg:block fixed inset-y-0 z-50 transition-all duration-500 ease-in-out ${
         isSidebarOpen ? "w-80" : "w-32"
       }`}
     >
-      {/* Backdrop */}
-      <div className="absolute inset-0  backdrop-blur-3xl border-r border-gray-200/50 shadow-2xl opacity-80" />
+      <div
+        className={`absolute inset-0 backdrop-blur-3xl border-r ${borderColor} shadow-2xl opacity-90 ${sidebarBg}`}
+      />
 
-      {/* Content */}
       <div className="relative h-full flex flex-col">
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200/50">
+        <div
+          className={`flex items-center justify-between p-6 border-b ${borderColor}`}
+        >
           <Link
             href="/"
             className={`flex items-center transition-all duration-300 ${
@@ -138,9 +186,8 @@ export default function Sidebar({
             }`}
           >
             <div
-              className="w-12 h-12 bg-gradient-to-r
-                 from-red-500 to-orange-700 
-                rounded-2xl flex items-center justify-center flex-shrink-0"
+              className={`w-12 h-12 bg-gradient-to-r ${logoGradient} 
+                rounded-2xl flex items-center justify-center flex-shrink-0`}
             >
               <img
                 src={Logo}
@@ -151,24 +198,29 @@ export default function Sidebar({
             {isSidebarOpen && (
               <div className="ml-4 opacity-100 transition-opacity duration-300">
                 <h1
-                  className="text-xl font-bold bg-gradient-to-r
-                                 from-gray-900 to-gray-600 bg-clip-text text-transparent"
+                  className={`text-xl font-bold bg-gradient-to-r ${titleGradient} bg-clip-text text-transparent`}
                 >
                   ContentFlow
                 </h1>
-                <p className="text-xs text-gray-500">Social Media Manager</p>
+                <p className={`text-xs ${subtitleColor}`}>
+                  Social Media Manager
+                </p>
               </div>
             )}
           </Link>
 
           <button
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="p-2 rounded-xl hover:bg-gray-100 transition-colors duration-200 group"
+            className={`p-2 rounded-xl transition-colors duration-200 ${buttonHoverBg} ${textColor}`}
           >
             <div className="relative">
               {isSidebarOpen ? (
                 <svg
-                  className="h-5 w-5 text-gray-600 group-hover:text-blue-600 transition-colors"
+                  className={`h-5 w-5 transition-colors ${
+                    theme === "dark"
+                      ? "text-gray-400 hover:text-orange-400"
+                      : "text-gray-600 hover:text-orange-600"
+                  }`}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -182,8 +234,11 @@ export default function Sidebar({
                 </svg>
               ) : (
                 <svg
-                  className="h-5 w-5 text-gray-600 
-                  group-hover:text-blue-600 transition-colors"
+                  className={`h-5 w-5 transition-colors ${
+                    theme === "dark"
+                      ? "text-gray-400 hover:text-orange-400"
+                      : "text-gray-600 hover:text-orange-600"
+                  }`}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -200,7 +255,6 @@ export default function Sidebar({
           </button>
         </div>
 
-        {/* Navigation */}
         <nav className="flex-1 px-4 py-6 space-y-2">
           {navigationItems.map((item) => (
             <NavLink
@@ -213,31 +267,28 @@ export default function Sidebar({
                     px-4 py-3 text-sm 
                     ${isSidebarOpen ? "" : "justify-center"}
                     font-medium rounded-lg transition-all duration-300 
-                    hover:bg-gradient-to-r 
-                    text-gray-700
-                    hover:text-red-600
-                    hover:bg-orange-50
+                    ${hoverBg}
+                    ${textColor}
+                    ${hoverText}
                     hover:shadow-lg 
                     ${
                       route().current(item.href)
-                        ? "bg-gradient-to-r from-red-600 to-orange-600  hover:text-white text-white shadow-lg"
-                        : "text-gray-700 hover:text-red-600"
+                        ? `${activeGradient} text-white shadow-lg hover:text-white`
+                        : `${textColor} ${hoverText}`
                     }`}
             >
               <div
                 className={`flex items-center justify-center rounded-full 
-                  h-10  transition-all duration-300 ${route().current(
-                    item.href
-                  )}`}
+                  h-10 transition-all duration-300`}
               >
                 {isSidebarOpen ? (
                   <item.lucideIcon className="h-5 w-5" />
                 ) : (
                   <div
-                    className={`transition-colors  ${
+                    className={`transition-colors ${
                       route().current(item.href)
-                        ? "bg-gradient-to-r from-red-600 to-orange-600 w-90 text-white shadow-lg"
-                        : "text-gray-700 hover:text-red-600"
+                        ? ` text-white shadow-lg`
+                        : `${textColor} ${hoverText}`
                     }`}
                   >
                     {item.icon}
@@ -253,17 +304,19 @@ export default function Sidebar({
 
               {!isSidebarOpen && (
                 <div
-                  className="absolute left-full ml-2 px-3 py-2 
-                    bg-gray-900 text-white text-sm rounded-lg 
+                  className={`absolute left-full ml-2 px-3 py-2 
+                    ${tooltipBg} text-sm rounded-lg 
                     opacity-0 group-hover:opacity-100 transition-opacity 
                     duration-200 pointer-events-none whitespace-nowrap 
-                    z-50"
+                    z-50`}
                 >
                   {t(item.nameKey)}
                   <div
-                    className="absolute left-0 top-1/2 transform 
+                    className={`absolute left-0 top-1/2 transform 
                     -translate-y-1/2 -translate-x-1 w-2 h-2
-                     bg-gray-900 rotate-45"
+                    ${
+                      theme === "dark" ? "bg-neutral-800" : "bg-gray-900"
+                    } rotate-45`}
                   ></div>
                 </div>
               )}
@@ -271,9 +324,8 @@ export default function Sidebar({
           ))}
         </nav>
 
-        {/* Logout Button and Language Switcher */}
         <div
-          className={`p-4 border-t border-gray-200/50 ${
+          className={`p-4 border-t ${borderColor} ${
             isSidebarOpen ? "flex items-center gap-2" : "flex flex-col gap-2"
           }`}
         >
@@ -282,12 +334,9 @@ export default function Sidebar({
             method="post"
             as="button"
             className={`group relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 
-              
-              ${
-                isSidebarOpen
-                  ? "hover:bg-red-50 text-gray-700 hover:text-red-600 flex-1"
-                  : "hover:bg-red-50 text-gray-700 hover:text-red-600 justify-center w-full"
-              }`}
+              ${textColor}
+              ${logoutHoverBg}
+              ${isSidebarOpen ? "flex-1" : "justify-center w-full"}`}
           >
             <div
               className={`flex items-center justify-center rounded-full 
@@ -298,21 +347,29 @@ export default function Sidebar({
               ) : (
                 <div className="relative group">
                   <LogOut className="h-5 w-5" />
-                  <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                  <div
+                    className={`absolute left-full ml-2 px-2 py-1 ${tooltipBg} text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none`}
+                  >
                     {t("nav.logout")}
                   </div>
                 </div>
               )}
             </div>
             {isSidebarOpen && (
-              <div className="flex-1 ">
+              <div className="flex-1">
                 <span className="font-medium">{t("nav.logout")}</span>
               </div>
             )}
           </NavLink>
 
-          {/* Language Switcher */}
-          <div className={isSidebarOpen ? "" : "w-full flex justify-center"}>
+          <div
+            className={
+              isSidebarOpen
+                ? "flex items-center gap-2"
+                : "w-full flex flex-col gap-2 items-center"
+            }
+          >
+            <ThemeSwitcher />
             <LanguageSwitcher />
           </div>
         </div>
