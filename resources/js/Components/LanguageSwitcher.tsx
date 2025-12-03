@@ -26,7 +26,6 @@ export default function LanguageSwitcher() {
     setIsAnimating(true);
     const newLang = nextLanguage.code;
 
-    // Pequeña pausa para la animación
     setTimeout(() => {
       i18n.changeLanguage(newLang);
       setIsAnimating(false);
@@ -44,23 +43,19 @@ export default function LanguageSwitcher() {
   return (
     <button
       onClick={toggleLanguage}
-      className="relative p-2  rounded-lg hover:bg-gradient-to-br text-gray-600 hover:text-white
-       hover:from-gray-600 hover:to-indigo-800 transition-all duration-500 group overflow-hidden"
+      className="relative p-2  rounded-lg hover:bg-gradient-to-br text-gray-400 hover:text-white
+        hover:to-indigo-800 transition-all duration-500 group overflow-hidden"
       aria-label="Toggle language"
       title={`Switch to ${nextLanguage.code.toUpperCase()}`}
     >
-      {/* Background gradient animation */}
       <div className="absolute inset-0  transition-all duration-700" />
 
       <div className="relative flex items-center gap-2 ">
-        {/* Globe inside circle */}
         <div
           className="relative w-10 h-10  
           flex items-center justify-center  transition-all duration-500"
         >
           <Globe className="w-7 h-7   transition-transform duration-500 group-hover:rotate-180" />
-
-          {/* Floating flag */}
           <div
             className={`absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center text-sm rounded-full  
               border border-gray-200 bg-secondary-20 shadow-sm transition-all duration-300 ${
