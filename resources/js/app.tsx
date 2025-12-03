@@ -1,17 +1,16 @@
-import "../css/app.css";
-import "./bootstrap";
-import "./i18n"; // Initialize i18n
+import { ThemeProvider } from "@/Contexts/ThemeContext";
+import { PageProps } from "@/types";
+import { ChakraProvider, defaultSystem } from "@chakra-ui/react";
 import { createInertiaApp } from "@inertiajs/react";
 import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
 import { createRoot } from "react-dom/client";
 import { Toaster } from "react-hot-toast";
-import { ChakraProvider, defaultSystem } from "@chakra-ui/react";
-import ContentFlowVisualization3D from "@/Components/tree/ContentFlowVisualization3D";
-import { ThemeProvider } from "@/Contexts/ThemeContext";
-
+import "../css/app.css";
+import "./bootstrap";
+import "./i18n";
 const appName = import.meta.env.VITE_APP_NAME || "contentFlow";
 
-createInertiaApp({
+createInertiaApp<PageProps>({
   title: (title) => `${title} - ${appName}`,
   resolve: (name) => {
     const pages = import.meta.glob("./Pages/**/*.tsx");
@@ -25,17 +24,15 @@ createInertiaApp({
   setup({ el, App, props }) {
     const root = createRoot(el);
 
-    // Set initial language from user preference if available
-    if (props.initialPage.props.auth?.user?.locale) {
-      // @ts-ignore
+    const userLocale = props.initialPage.props.auth?.user?.locale;
+    if (userLocale) {
       import("./i18n").then(({ default: i18n }) => {
-        i18n.changeLanguage(props.initialPage.props.auth.user.locale);
+        i18n.changeLanguage(userLocale);
       });
     }
 
     root.render(
       <>
-        {/* <ContentFlowVisualization3D /> */}
         <ThemeProvider>
           <ChakraProvider value={defaultSystem}>
             <App {...props} />
