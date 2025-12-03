@@ -8,7 +8,20 @@
     "edit": "Editar",
     "analytics": "Analíticas",
     "aiChat": "Chat IA",
-    "logout": "Cerrar Sesión"
+    "logout": "Cerrar Sesión",
+    "note" : "Nota",
+    "warning" : "Advertencia",
+    "success" : "Exito",
+    "error" : "Error",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "showing": "Mostrando",
+    "of": "de",
+    "results": "resultados",
+    "perPage": "por página",
+    "noResults": "No se encontraron resultados",
+    "search": "Buscar por nombre",
+    "processing": "Procesando..."
   },
   "nav": {
     "dashboard": "Panel",
@@ -127,6 +140,12 @@
     "confirmPassword": "Confirmar Contraseña",
     "updateProfile": "Actualizar Perfil",
     "deleteAccount": "Eliminar Cuenta",
+    "actions":{
+      "saveChanges": "Guardar Cambios"
+    },
+    "messages":{
+      "unsavedChanges": "Tienes cambios no guardados. ¿Deseas continuar?"
+    },
     "information": {
       "title": "Información del Perfil",
       "description": "Actualiza la información de tu cuenta y dirección de correo electrónico.",
@@ -139,7 +158,8 @@
       "sendVerification": "Enviar Correo de Verificación",
       "verificationSent": "Se ha enviado un nuevo enlace de verificación a tu dirección de correo electrónico.",
       "applicationLanguage": "Idioma de la Aplicación",
-      "languageDescription": "Selecciona tu idioma preferido para la interfaz de la aplicación."
+      "languageDescription": "Selecciona tu idioma preferido para la interfaz de la aplicación.",
+      "currentLanguage": "Idioma Actual"
     },
     "statistics": {
       "title": "Estadísticas de la Cuenta",
@@ -191,6 +211,9 @@
       "passwordLabel": "Contraseña",
       "passwordPlaceholder": "Ingresa tu contraseña para confirmar",
       "cancel": "Cancelar"
+    },
+    "toast": {
+      "languageChanged": "Idioma cambiado exitosamente."
     }
   },
   "auth": {
@@ -278,7 +301,9 @@
     "thinking": "Pensando...",
     "askPlaceholder": "Pregunta sobre tus campañas...",
     "buttonLabel": "Preguntar a la IA",
-    "headerTitle": "Asistente IA"
+    "headerTitle": "Asistente IA",
+    "tips": "Tips",
+    "subtitle": "Ask your AI assistant anything."
   },
   "analytics": {
     "title": "Analíticas y Estadísticas",

@@ -2,13 +2,28 @@
   "common": {
     "welcome": "Welcome",
     "loading": "Loading...",
+    "processing": "Processing...",
     "save": "Save",
     "cancel": "Cancel",
     "delete": "Delete",
     "edit": "Edit",
     "analytics": "Analytics",
     "aiChat": "AI Chat",
-    "logout": "Log Out"
+    "logout": "Log Out",
+    "note": "Note",
+    "warning": "Warning",
+    "error": "Error",
+    "success": "Success",
+    "info": "Info",
+    "next": "Next",
+    "previous": "Previous",
+    "showing": "Showing",
+    "of": "of",
+    "results": "Results",
+    "perPage": "per page",
+    "noResults": "No results",
+    "search": "Search per name",
+    "processing": "Processing"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -127,6 +142,12 @@
     "confirmPassword": "Confirm Password",
     "updateProfile": "Update Profile",
     "deleteAccount": "Delete Account",
+    "actions":{
+      "saveChanges": "Save changes"
+    },
+    "messages":{
+      "unsavedChanges": "You have unsaved changes. Do you want to continue?"
+    },
     "information": {
       "title": "Profile Information",
       "description": "Update your account's profile information and email address.",
@@ -139,7 +160,8 @@
       "sendVerification": "Send Verification Email",
       "verificationSent": "A new verification link has been sent to your email address.",
       "applicationLanguage": "Application Language",
-      "languageDescription": "Select your preferred language for the application interface."
+      "languageDescription": "Select your preferred language for the application interface.",
+      "currentLanguage": "Current Language"
     },
     "statistics": {
       "title": "Account Statistics",
@@ -191,6 +213,9 @@
       "passwordLabel": "Password",
       "passwordPlaceholder": "Enter your password to confirm",
       "cancel": "Cancel"
+    },
+    "toast":{
+      "languageChanged": "Language changed successfully."
     }
   },
   "auth": {
@@ -278,7 +303,10 @@
     "thinking": "Thinking...",
     "askPlaceholder": "Ask about your campaigns...",
     "buttonLabel": "Ask AI Assistant",
-    "headerTitle": "AI Assistant"
+    "headerTitle": "AI Assistant",
+    "subtitle": "Pregunta a la IA cualquier cosa. ",
+    "tips": "consejo"
+    
   },
   "analytics": {
     "title": "Analytics & Statistics",
