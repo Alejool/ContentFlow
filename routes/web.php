@@ -10,6 +10,7 @@ use App\Http\Controllers\ManageContentController;
 use App\Http\Controllers\PostsController;
 use App\Http\Controllers\Campaigns\CampaignController;
 use App\Http\Controllers\SocialAccountController;
+use App\Http\Controllers\ThemeController;
  
   
 Route::get('/', function () {
@@ -31,6 +32,7 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::put('/profile', [ProfileController::class, 'changePassword'])->name('profile.changePassword');
     Route::patch('/locale', [App\Http\Controllers\LocaleController::class, 'update'])->name('locale.update');
+    Route::patch('/theme', [ThemeController::class, 'update'])->name('theme.update');
 
                 
     // ManageContent
