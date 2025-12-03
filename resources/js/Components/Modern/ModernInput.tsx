@@ -1,126 +1,340 @@
-import React, { useState, InputHTMLAttributes } from "react";
-import { UseFormRegister } from "react-hook-form";
+import { useTheme } from "@/Hooks/useTheme";
+import {
+  AlertCircle,
+  CheckCircle,
+  Eye,
+  EyeOff,
+  LucideIcon,
+} from "lucide-react";
+import { InputHTMLAttributes, ReactNode, useState } from "react";
+import { FieldValues, Path, UseFormRegister } from "react-hook-form";
 
-interface ModernInputProps extends InputHTMLAttributes<HTMLInputElement> {
+interface ModernInputProps<T extends FieldValues = FieldValues>
+  extends Omit<InputHTMLAttributes<HTMLInputElement>, "name" | "prefix"> {
   id: string;
   label?: string;
   error?: string;
-  register?: UseFormRegister<any>;
+  success?: string;
+  register?: UseFormRegister<T>;
+  name?: Path<T>;
   showPasswordToggle?: boolean;
   containerClassName?: string;
+  icon?: LucideIcon;
+  theme?: "dark" | "light";
+  hint?: string;
+  prefix?: ReactNode;
+  suffix?: ReactNode;
+  variant?: "default" | "outlined" | "filled";
 }
 
-// ... (EyeIcon and EyeOffIcon remain unchanged, so I will skip them in the replacement content if possible, but replace_file_content requires contiguous block. I'll just target the props interface and the component start)
-
-const EyeIcon = ({ className = "w-5 h-5" }) => (
-  <svg
-    className={className}
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-    />
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-    />
-  </svg>
-);
-
-const EyeOffIcon = ({ className = "w-5 h-5" }) => (
-  <svg
-    className={className}
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L12 12m6.121-3.879a9.973 9.973 0 011.563 3.029m-1.563-3.029L21 21"
-    />
-  </svg>
-);
-
-export default function ModernInput({
+export default function ModernInput<T extends FieldValues>({
   id,
   label,
   type = "text",
   error,
+  success,
   register,
+  name,
   placeholder,
   showPasswordToggle = false,
   disabled = false,
   className = "",
   containerClassName = "",
+  icon: Icon,
+  theme: propTheme,
+  hint,
+  prefix,
+  suffix,
+  variant = "default",
   ...props
-}: ModernInputProps) {
+}: ModernInputProps<T>) {
+  const { theme: themeFromHook } = useTheme();
+  const theme = propTheme || themeFromHook;
   const [showPassword, setShowPassword] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
+
   const inputType = type === "password" && showPassword ? "text" : type;
+
+  const fieldName = name || (id as Path<T>);
+
+  const getContainerStyles = () => {
+    const baseStyles = "relative transition-all duration-200";
+
+    if (disabled) {
+      return `${baseStyles} opacity-60 cursor-not-allowed`;
+    }
+
+    if (error) {
+      return `${baseStyles} animate-pulse`;
+    }
+
+    return baseStyles;
+  };
+
+  const getInputStyles = () => {
+    const baseStyles = ` pl-10
+      block w-full text-sm placeholder:text-sm
+      rounded-xl transition-all duration-200
+      focus:outline-none focus:ring-0 focus:ring-offset-0
+      ${disabled ? "cursor-not-allowed" : ""}
+      ${prefix ? "pl-12" : "pl-4"}
+      ${suffix || showPasswordToggle ? "pr-12" : "pr-4"}
+      ${Icon ? "pl-[40px]" : ""}
+    `;
+
+    if (theme === "dark") {
+      switch (variant) {
+        case "filled":
+          return `
+            ${baseStyles}
+            py-3.5
+            bg-neutral-800/50 text-white placeholder:text-gray-400
+            border border-neutral-700/50
+            ${
+              error
+                ? "border-red-500/50 bg-red-900/10 focus:border-red-500"
+                : success
+                ? "border-green-500/50 bg-green-900/10 focus:border-green-500"
+                : isFocused
+                ? "border-purple-500/50 bg-neutral-800/70"
+                : "hover:border-neutral-600/70 hover:bg-neutral-800/60"
+            }
+          `;
+
+        case "outlined":
+          return `
+            ${baseStyles}
+            py-3
+            bg-transparent text-white placeholder:text-gray-500
+            border-2
+            ${
+              error
+                ? "border-red-500/50 focus:border-red-500"
+                : success
+                ? "border-green-500/50 focus:border-green-500"
+                : isFocused
+                ? "border-purple-500"
+                : "border-neutral-700 hover:border-neutral-600"
+            }
+          `;
+
+        default:
+          return `
+            ${baseStyles}
+            py-3
+            bg-neutral-900/30 text-white placeholder:text-gray-400
+            border border-neutral-700/50
+            shadow-sm
+            ${
+              error
+                ? "border-red-500/50 bg-red-900/10 focus:border-red-500"
+                : success
+                ? "border-green-500/50 bg-green-900/10 focus:border-green-500"
+                : isFocused
+                ? "border-purple-500 bg-neutral-800/50 shadow-md"
+                : "hover:border-neutral-600 hover:bg-neutral-800/40 hover:shadow"
+            }
+          `;
+      }
+    } else {
+      switch (variant) {
+        case "filled":
+          return `
+            ${baseStyles}
+            py-3.5
+            bg-gray-50 text-gray-900 placeholder:text-gray-500
+            border border-gray-200
+            ${
+              error
+                ? "border-red-300 bg-red-50 focus:border-red-500"
+                : success
+                ? "border-green-300 bg-green-50 focus:border-green-500"
+                : isFocused
+                ? "border-purple-500 bg-white"
+                : "hover:border-gray-300 hover:bg-white"
+            }
+          `;
+
+        case "outlined":
+          return `
+            ${baseStyles}
+            py-3
+            bg-transparent text-gray-900 placeholder:text-gray-500
+            border-2
+            ${
+              error
+                ? "border-red-300 focus:border-red-500"
+                : success
+                ? "border-green-300 focus:border-green-500"
+                : isFocused
+                ? "border-purple-500"
+                : "border-gray-300 hover:border-gray-400"
+            }
+          `;
+
+        default:
+          return `
+            ${baseStyles}
+            py-3
+            bg-white text-gray-900 placeholder:text-gray-400
+            border-2 border-gray-200
+            shadow-sm
+            ${
+              error
+                ? "border-red-300 bg-red-50 focus:border-red-500"
+                : success
+                ? "border-green-300 bg-green-50 focus:border-green-500"
+                : isFocused
+                ? "border-purple-500 bg-gray-50 shadow-md"
+                : "hover:border-gray-300 hover:shadow"
+            }
+          `;
+      }
+    }
+  };
+
+  const getLabelStyles = () => {
+    if (theme === "dark") {
+      return `block text-sm font-medium mb-2 ${
+        error ? "text-red-400" : success ? "text-green-400" : "text-gray-300"
+      }`;
+    }
+    return `block text-sm font-medium mb-2 ${
+      error ? "text-red-600" : success ? "text-green-600" : "text-gray-700"
+    }`;
+  };
+
+  const getErrorStyles = () => {
+    if (theme === "dark") {
+      return "text-red-400 bg-red-900/20 border border-red-800/30";
+    }
+    return "text-red-600 bg-red-50 border border-red-100";
+  };
+
+  const getSuccessStyles = () => {
+    if (theme === "dark") {
+      return "text-green-400 bg-green-900/20 border border-green-800/30";
+    }
+    return "text-green-600 bg-green-50 border border-green-100";
+  };
+
+  const getHintStyles = () => {
+    if (theme === "dark") {
+      return "text-gray-400";
+    }
+    return "text-gray-500";
+  };
 
   return (
     <div className={`space-y-2 ${containerClassName}`}>
       {label && (
-        <label
-          htmlFor={id}
-          className="block text-sm font-semibold text-gray-700"
-        >
-          {label}
-        </label>
+        <div className="flex items-center justify-between">
+          <label htmlFor={id} className={getLabelStyles()}>
+            {label}
+          </label>
+          {hint && <span className={`text-xs ${getHintStyles()}`}>{hint}</span>}
+        </div>
       )}
-      <div className="relative">
+
+      <div className={getContainerStyles()}>
+        {Icon && (
+          <div
+            className={`
+            absolute left-4 top-1/2 -translate-y-1/2
+            ${
+              theme === "dark"
+                ? error
+                  ? "text-red-400"
+                  : success
+                  ? "text-green-400"
+                  : "text-gray-400"
+                : error
+                ? "text-red-500"
+                : success
+                ? "text-green-500"
+                : "text-gray-400"
+            }
+          `}
+          >
+            <Icon className="w-5 h-5" />
+          </div>
+        )}
+
+        {prefix && (
+          <div className="absolute left-4 top-1/2 -translate-y-1/2">
+            {prefix}
+          </div>
+        )}
+
         <input
           id={id}
           type={inputType}
           disabled={disabled}
-          {...(register ? register(id) : {})}
+          {...(register ? register(fieldName) : {})}
           placeholder={placeholder}
-          className={`
-            block w-full px-4 py-3 text-gray-900 placeholder-gray-400 
-            bg-white border-2 rounded-xl shadow-sm transition-all duration-200
-            focus:outline-none focus:ring-0 hover:shadow-md
-            ${
-              error
-                ? "border-red-300 focus:border-red-500 bg-red-50"
-                : "border-gray-200 focus:border-blue-500 focus:bg-gray-50"
-            }
-            ${disabled ? "bg-gray-100 cursor-not-allowed opacity-75" : ""}
-            ${showPasswordToggle ? "pr-12" : ""}
-          `}
+          className={`${getInputStyles()} ${className}`}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
           {...props}
         />
+
+        {(error || success) && !suffix && !showPasswordToggle && (
+          <div className="absolute right-4 top-1/2 -translate-y-1/2">
+            {error ? (
+              <AlertCircle className="w-5 h-5 text-red-500" />
+            ) : success ? (
+              <CheckCircle className="w-5 h-5 text-green-500" />
+            ) : null}
+          </div>
+        )}
+
+        {suffix && !showPasswordToggle && (
+          <div className="absolute right-4 top-1/2 -translate-y-1/2">
+            {suffix}
+          </div>
+        )}
+
         {showPasswordToggle && !disabled && (
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400 hover:text-gray-600 transition-colors"
+            className={`
+              absolute right-4 top-1/2 -translate-y-1/2
+              transition-colors rounded-lg p-1
+              ${
+                theme === "dark"
+                  ? "text-gray-400 hover:text-gray-300 hover:bg-neutral-700/50"
+                  : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+              }
+            `}
+            aria-label={
+              showPassword ? "Ocultar contraseña" : "Mostrar contraseña"
+            }
           >
-            {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+            {showPassword ? (
+              <EyeOff className="w-5 h-5" />
+            ) : (
+              <Eye className="w-5 h-5" />
+            )}
           </button>
         )}
       </div>
+
       {error && (
-        <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg animate-pulse">
-          <svg
-            className="w-4 h-4 flex-shrink-0"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-          >
-            <path
-              fillRule="evenodd"
-              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-              clipRule="evenodd"
-            />
-          </svg>
+        <div
+          className={`flex items-start gap-2 text-sm px-3 py-2 rounded-lg ${getErrorStyles()}`}
+        >
+          <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
           <span>{error}</span>
+        </div>
+      )}
+
+      {success && !error && (
+        <div
+          className={`flex items-start gap-2 text-sm px-3 py-2 rounded-lg ${getSuccessStyles()}`}
+        >
+          <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+          <span>{success}</span>
         </div>
       )}
     </div>
