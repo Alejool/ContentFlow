@@ -7,12 +7,12 @@ import { useState } from "react";
 import { useForm as useHookForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
-
 import LanguageSwitcher from "@/Components/LanguageSwitcher";
 import ModernButton from "@/Components/Modern/ModernButton";
 import ModernCard from "@/Components/Modern/ModernCard";
 import ModernInput from "@/Components/Modern/ModernInput";
 import {
+  AlertTriangle,
   CheckCircle,
   Globe,
   Mail,
@@ -22,11 +22,16 @@ import {
   User,
 } from "lucide-react";
 
+interface UpdateProfileInformationProps {
+  mustVerifyEmail: boolean;
+  status: string;
+  className?: string;
+}
 export default function UpdateProfileInformation({
   mustVerifyEmail,
   status,
   className = "",
-}) {
+}: UpdateProfileInformationProps) {
   const user = usePage().props.auth.user;
   const { t, i18n } = useTranslation();
   const { theme } = useTheme();
@@ -78,7 +83,7 @@ export default function UpdateProfileInformation({
     }
   };
 
-  const handleLanguageChange = async (lang: string) => {
+  const handleLanguageChange = async (lang) => {
     try {
       setIsChangingLanguage(true);
       await i18n.changeLanguage(lang);
@@ -285,6 +290,18 @@ export default function UpdateProfileInformation({
             >
               <div className="w-3 h-3 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
               {t("common.processing")}
+            </div>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          {isDirty && !isSubmitting && (
+            <div
+              className={`flex items-center gap-2 text-sm
+                ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}
+            >
+              <AlertTriangle className="w-4 h-4" />
+              {t("profile.messages.unsavedChanges")}
             </div>
           )}
         </div>
