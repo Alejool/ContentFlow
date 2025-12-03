@@ -1,25 +1,24 @@
-import { Head, Link } from "@inertiajs/react";
-import GuestLayout from "@/Layouts/GuestLayout";
+import Logo from "@/../assets/logo.png";
+import LanguageSwitcher from "@/Components/LanguageSwitcher";
+import ThemeSwitcher from "@/Components/ThemeSwitcher";
 import { useRegister } from "@/Hooks/useRegister";
+import GuestLayout from "@/Layouts/GuestLayout";
+import { Head, Link } from "@inertiajs/react";
+import { motion } from "framer-motion";
+import {
+  AlertCircle,
+  Check,
+  CheckCircle2,
+  Key,
+  Lock,
+  LogIn,
+  Mail,
+  Smartphone,
+  User,
+  UserPlus,
+} from "lucide-react";
 import { ChangeEvent } from "react";
 import { useTranslation } from "react-i18next";
-import LanguageSwitcher from "@/Components/LanguageSwitcher";
-import {
-  User,
-  Mail,
-  Lock,
-  UserPlus,
-  LogIn,
-  AlertCircle,
-  CheckCircle2,
-  Shield,
-  Smartphone,
-  Globe,
-  Check,
-  Key,
-  Sparkles,
-} from "lucide-react";
-import { motion } from "framer-motion";
 
 export default function Register() {
   const { t } = useTranslation();
@@ -43,13 +42,12 @@ export default function Register() {
     <GuestLayout>
       <Head title={t("auth.register.title")} />
 
-      {/* Language Switcher - Fixed Position */}
-      <div className="fixed top-6 right-6 z-50">
+      <div className="fixed top-6 right-6 z-50 flex items-center gap-2">
+        <ThemeSwitcher />
         <LanguageSwitcher />
       </div>
 
       <div className="min-h-screen flex flex-col lg:flex-row bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
-        {/* Left Side - Brand/Info Section */}
         <div className="w-full lg:w-1/2 bg-gradient-primary relative overflow-hidden">
           <div className="absolute inset-0 bg-black/10" />
 
@@ -61,9 +59,8 @@ export default function Register() {
               className="text-center max-w-xl"
             >
               <div className="mb-8">
-                <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-white/20 backdrop-blur-sm mb-6">
-                  <Sparkles className="w-10 h-10" />
-                </div>
+                <img src={Logo} alt="logo" className="w-36 h-36 mx-auto" />
+
                 <h1 className="text-4xl font-bold font-poppins mb-4">
                   {t("auth.register.welcome")}
                 </h1>
@@ -72,7 +69,6 @@ export default function Register() {
                 </p>
               </div>
 
-              {/* Benefits List */}
               <div className="space-y-4 text-left">
                 <div className="flex items-center gap-3 p-3 rounded-lg bg-white/10 backdrop-blur-sm">
                   <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
@@ -112,7 +108,6 @@ export default function Register() {
           </div>
         </div>
 
-        {/* Right Side - Registration Form */}
         <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-8">
           <motion.div
             initial={{ opacity: 0, x: 20 }}
@@ -130,7 +125,6 @@ export default function Register() {
             </div>
 
             <form onSubmit={handleEmailRegister} className="space-y-6">
-              {/* Error/Success Messages */}
               {error && (
                 <div className="rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-4">
                   <div className="flex items-center gap-3 text-red-700 dark:text-red-400">
@@ -149,7 +143,6 @@ export default function Register() {
                 </div>
               )}
 
-              {/* Name Input */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   {t("auth.register.name")}
@@ -180,7 +173,6 @@ export default function Register() {
                 )}
               </div>
 
-              {/* Email Input */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   {t("auth.register.email")}
@@ -211,7 +203,6 @@ export default function Register() {
                 )}
               </div>
 
-              {/* Password Input */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   {t("auth.register.password")}
@@ -242,7 +233,6 @@ export default function Register() {
                 )}
               </div>
 
-              {/* Confirm Password Input */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   {t("auth.register.confirmPassword")}
@@ -273,7 +263,6 @@ export default function Register() {
                 )}
               </div>
 
-              {/* Terms & Privacy */}
               <div className="flex items-start gap-2">
                 <input
                   type="checkbox"
@@ -303,7 +292,6 @@ export default function Register() {
                 </label>
               </div>
 
-              {/* Register Button */}
               <button
                 type="submit"
                 disabled={loading}
@@ -324,7 +312,6 @@ export default function Register() {
                 )}
               </button>
 
-              {/* Login Link */}
               <div className="text-center">
                 <p className="text-gray-600 dark:text-gray-400 text-sm">
                   {t("auth.register.alreadyRegistered")}{" "}
@@ -340,7 +327,6 @@ export default function Register() {
                 </p>
               </div>
 
-              {/* Divider */}
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-gray-300 dark:border-gray-700"></div>
@@ -352,7 +338,6 @@ export default function Register() {
                 </div>
               </div>
 
-              {/* Google Register Button */}
               <div className="grid grid-cols-1 gap-3">
                 <button
                   type="button"
