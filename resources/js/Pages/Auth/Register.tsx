@@ -4,6 +4,8 @@ import { useRegister } from "@/Hooks/useRegister";
 import { ChangeEvent } from "react";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "@/Components/LanguageSwitcher";
+import ThemeSwitcher from "@/Components/ThemeSwitcher";
+import Logo from "@/../assets/logo.png";
 import {
   User,
   Mail,
@@ -12,9 +14,7 @@ import {
   LogIn,
   AlertCircle,
   CheckCircle2,
-  Shield,
   Smartphone,
-  Globe,
   Check,
   Key,
   Sparkles,
@@ -43,8 +43,9 @@ export default function Register() {
     <GuestLayout>
       <Head title={t("auth.register.title")} />
 
-      {/* Language Switcher - Fixed Position */}
-      <div className="fixed top-6 right-6 z-50">
+      {/* Language & Theme Switchers - Fixed Position */}
+      <div className="fixed top-6 right-6 z-50 flex items-center gap-2">
+        <ThemeSwitcher />
         <LanguageSwitcher />
       </div>
 
@@ -61,9 +62,8 @@ export default function Register() {
               className="text-center max-w-xl"
             >
               <div className="mb-8">
-                <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-white/20 backdrop-blur-sm mb-6">
-                  <Sparkles className="w-10 h-10" />
-                </div>
+                <img src={Logo} alt="logo" className="w-36 h-36 mx-auto" />
+
                 <h1 className="text-4xl font-bold font-poppins mb-4">
                   {t("auth.register.welcome")}
                 </h1>

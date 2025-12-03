@@ -1,6 +1,9 @@
 import GuestLayout from "@/Layouts/GuestLayout";
 import { Head, useForm, Link } from "@inertiajs/react";
 import { FormEventHandler } from "react";
+import ThemeSwitcher from "@/Components/ThemeSwitcher";
+import LanguageSwitcher from "@/Components/LanguageSwitcher";
+import Logo from "@/../assets/logo.png";
 import {
   KeyRound,
   Mail,
@@ -30,6 +33,12 @@ export default function ForgotPassword({ status }: ForgotPasswordProps) {
     <GuestLayout>
       <Head title="Forgot Password" />
 
+      {/* Theme Switcher - Fixed Position */}
+      <div className="fixed top-6 right-6 z-50">
+        <ThemeSwitcher />
+        <LanguageSwitcher />
+      </div>
+
       {/* Back Button */}
       <div className="fixed top-6 left-6 z-50">
         <Link
@@ -57,9 +66,7 @@ export default function ForgotPassword({ status }: ForgotPasswordProps) {
               className="text-center max-w-xl"
             >
               <div className="mb-8">
-                <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-white/20 backdrop-blur-sm mb-6">
-                  <KeyRound className="w-10 h-10" />
-                </div>
+                <img src={Logo} alt="logo" className="w-36 h-36 mx-auto" />
                 <h1 className="text-4xl font-bold font-poppins mb-4">
                   Password Recovery
                 </h1>

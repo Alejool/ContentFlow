@@ -1,48 +1,27 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, usePage } from "@inertiajs/react";
 import { useForm as useHookForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { profileSchema } from "@/schemas/schemas";
 import { toast } from "react-hot-toast";
+import axios from "axios";
+import { useTranslation } from "react-i18next";
+import { useTheme } from "@/Hooks/useTheme";
 
 import ModernInput from "@/Components/Modern/ModernInput";
 import ModernButton from "@/Components/Modern/ModernButton";
 import ModernCard from "@/Components/Modern/ModernCard";
-import axios from "axios";
 import LanguageSwitcher from "@/Components/LanguageSwitcher";
-import { useTranslation } from "react-i18next";
-
-const UserIcon = ({ className }) => (
-  <svg
-    className={className}
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-    />
-  </svg>
-);
-
-const SaveIcon = ({ className }) => (
-  <svg
-    className={className}
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
-    />
-  </svg>
-);
+import {
+  User,
+  Mail,
+  Save,
+  AlertTriangle,
+  CheckCircle,
+  Globe,
+  MailWarning,
+  Send,
+} from "lucide-react";
 
 export default function UpdateProfileInformation({
   mustVerifyEmail,
@@ -50,7 +29,9 @@ export default function UpdateProfileInformation({
   className = "",
 }) {
   const user = usePage().props.auth.user;
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const { theme } = useTheme();
+  const [isChangingLanguage, setIsChangingLanguage] = useState(false);
 
   const {
     register,
@@ -70,15 +51,19 @@ export default function UpdateProfileInformation({
       const response = await axios.patch(route("profile.update"), data);
 
       if (response.data.success) {
-        toast.success(response.data.message || "Profile updated successfully");
-        // Optionally reload to reflect changes if needed, though Inertia usually handles this via props
-        // window.location.reload();
-      } else if (response.data.warning) {
-        toast(response.data.message || "No changes were made", { icon: "⚠️" });
-      } else {
-        toast.error(
-          response.data.message || "An error occurred while updating profile"
+        toast.success(
+          response.data.message || t("profile.toast.updateSuccess")
         );
+      } else if (response.data.warning) {
+        toast(response.data.message || t("profile.toast.noChanges"), {
+          icon: "⚠️",
+          style: {
+            background: theme === "dark" ? "#374151" : "#f3f4f6",
+            color: theme === "dark" ? "#f9fafb" : "#374151",
+          },
+        });
+      } else {
+        toast.error(response.data.message || t("profile.toast.errorUpdating"));
       }
     } catch (error) {
       if (error.response?.data?.errors) {
@@ -94,13 +79,27 @@ export default function UpdateProfileInformation({
     }
   };
 
+  const handleLanguageChange = async (lang: string) => {
+    try {
+      setIsChangingLanguage(true);
+      await i18n.changeLanguage(lang);
+      localStorage.setItem("i18nextLng", lang);
+      toast.success(t("profile.toast.languageChanged"));
+    } catch (error) {
+      toast.error(t("profile.toast.languageChangeError"));
+    } finally {
+      setIsChangingLanguage(false);
+    }
+  };
+
   return (
     <ModernCard
       title={t("profile.information.title")}
       description={t("profile.information.description")}
-      icon={UserIcon}
-      headerColor="blue"
+      icon={User}
+      headerColor="green"
       className={className}
+      variant="elevated"
     >
       <form onSubmit={handleSubmit(submit)} className="space-y-6">
         <ModernInput
@@ -109,9 +108,11 @@ export default function UpdateProfileInformation({
           register={register}
           error={errors.name?.message}
           placeholder={t("profile.information.namePlaceholder")}
+          theme={theme}
+          icon={User}
         />
 
-        <div className="flex items-center justify-between">
+        <div className="relative">
           <ModernInput
             id="email"
             label={t("profile.information.emailLabel")}
@@ -120,89 +121,186 @@ export default function UpdateProfileInformation({
             error={errors.email?.message}
             placeholder={t("profile.information.emailPlaceholder")}
             containerClassName="flex-1"
+            theme={theme}
+            icon={Mail}
           />
+
+          {user.email_verified_at && (
+            <div
+              className={`absolute right-0 top-6 flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium
+                ${
+                  theme === "dark"
+                    ? "bg-green-900/30 text-green-300 border border-green-800/50"
+                    : "bg-green-100 text-green-800 border border-green-200"
+                }`}
+            >
+              <CheckCircle className="w-3 h-3" />
+              {t("profile.statistics.verified")}
+            </div>
+          )}
         </div>
 
         {mustVerifyEmail && user.email_verified_at === null && (
-          <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-200 space-y-3">
-            <div className="flex items-center gap-2 text-yellow-800 font-medium">
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                />
-              </svg>
+          <div
+            className={`rounded-xl p-4 space-y-3 transition-colors duration-300
+              ${
+                theme === "dark"
+                  ? "bg-yellow-900/20 border border-yellow-800/30"
+                  : "bg-yellow-50 border border-yellow-200"
+              }`}
+          >
+            <div
+              className={`flex items-center gap-2 font-medium
+                ${theme === "dark" ? "text-yellow-300" : "text-yellow-800"}`}
+            >
+              <MailWarning className="w-5 h-5" />
               <span>
                 {t("profile.statistics.emailStatus")}:{" "}
                 {t("profile.statistics.unverified")}
               </span>
             </div>
 
-            <div className="flex items-center justify-between">
-              <p className="text-sm text-yellow-700">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <p
+                className={`text-sm flex-1
+                  ${
+                    theme === "dark" ? "text-yellow-400/80" : "text-yellow-700"
+                  }`}
+              >
                 {t("profile.information.emailUnverified")}
               </p>
               <Link
                 href={route("verification.send")}
                 method="post"
                 as="button"
-                className="px-4 py-2 bg-yellow-100 hover:bg-yellow-200 text-yellow-800 text-sm font-medium rounded-md transition-colors shadow-sm"
+                className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-300 flex items-center justify-center gap-2 shadow-sm
+                  ${
+                    theme === "dark"
+                      ? "bg-gradient-to-r from-yellow-700/30 to-yellow-800/30 text-yellow-300 border border-yellow-700/30 hover:from-yellow-700/40 hover:to-yellow-800/40 hover:border-yellow-600/50"
+                      : "bg-gradient-to-r from-yellow-100 to-yellow-200 text-yellow-800 border border-yellow-300 hover:from-yellow-200 hover:to-yellow-300"
+                  }`}
               >
+                <Send className="w-4 h-4" />
                 {t("profile.information.sendVerification")}
               </Link>
             </div>
 
             {status === "verification-link-sent" && (
-              <div className="mt-2 text-sm font-medium text-green-600 flex items-center gap-2">
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
+              <div
+                className={`mt-2 text-sm font-medium flex items-center gap-2 p-3 rounded-lg
+                  ${
+                    theme === "dark"
+                      ? "bg-green-900/20 text-green-300 border border-green-800/30"
+                      : "bg-green-50 text-green-700 border border-green-200"
+                  }`}
+              >
+                <CheckCircle className="w-4 h-4" />
                 {t("profile.information.verificationSent")}
               </div>
             )}
           </div>
         )}
 
-        <div className="border-t border-gray-100 pt-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">
-            {t("profile.information.applicationLanguage")}
-          </h3>
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
-            <div className="text-sm text-gray-600">
-              {t("profile.information.languageDescription")}
+        <div
+          className={`border-t pt-6 transition-colors duration-300
+            ${theme === "dark" ? "border-neutral-700/50" : "border-gray-200"}`}
+        >
+          <div className="flex items-center gap-2 mb-4">
+            <Globe
+              className={`w-5 h-5 ${
+                theme === "dark" ? "text-gray-300" : "text-gray-700"
+              }`}
+            />
+            <h3
+              className={`text-lg font-medium ${
+                theme === "dark" ? "text-gray-200" : "text-gray-900"
+              }`}
+            >
+              {t("profile.information.applicationLanguage")}
+            </h3>
+          </div>
+
+          <div
+            className={`p-4 rounded-xl border transition-colors duration-300
+              ${
+                theme === "dark"
+                  ? "bg-neutral-800/30 border-neutral-700/50"
+                  : "bg-gray-50 border-gray-200"
+              }`}
+          >
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div
+                className={`text-sm ${
+                  theme === "dark" ? "text-gray-400" : "text-gray-600"
+                }`}
+              >
+                {t("profile.information.languageDescription")}
+              </div>
+
+              <div className="flex-shrink-0">
+                <div className="flex items-center gap-2">
+                  {isChangingLanguage ? (
+                    <div className="flex items-center gap-2 text-sm text-gray-500">
+                      <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+                      {t("common.changing")}
+                    </div>
+                  ) : (
+                    <LanguageSwitcher />
+                  )}
+                </div>
+              </div>
             </div>
-            <LanguageSwitcher />
+
+            <div
+              className={`mt-3 text-xs ${
+                theme === "dark" ? "text-gray-500" : "text-gray-400"
+              }`}
+            >
+              {t("profile.information.currentLanguage")}:{" "}
+              {i18n.language === "en" ? "English" : "Español"}
+            </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-4 pt-4">
+        <div
+          className={`flex items-center gap-4 pt-4 border-t transition-colors duration-300
+            ${theme === "dark" ? "border-neutral-700/50" : "border-gray-200"}`}
+        >
           <ModernButton
             disabled={isSubmitting || !isDirty}
             variant="primary"
-            icon={SaveIcon}
+            icon={Save}
+            theme={theme}
+            loading={isSubmitting}
+            className="min-w-[140px]"
           >
-            Save Changes
+            {isSubmitting
+              ? t("common.saving")
+              : t("profile.actions.saveChanges")}
           </ModernButton>
 
-          {/* Saved message removed in favor of Toast notifications */}
+          {isSubmitting && (
+            <div
+              className={`text-sm flex items-center gap-2
+                ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}
+            >
+              <div className="w-3 h-3 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+              {t("common.processing")}
+            </div>
+          )}
         </div>
+
+        {/* <div className="space-y-2">
+          {isDirty && !isSubmitting && (
+            <div
+              className={`flex items-center gap-2 text-sm
+                ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}
+            >
+              <AlertTriangle className="w-4 h-4" />
+              {t("profile.messages.unsavedChanges")}
+            </div>
+          )}
+        </div> */}
       </form>
     </ModernCard>
   );

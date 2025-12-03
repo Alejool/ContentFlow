@@ -2,7 +2,9 @@ import Dropdown from "@/Components/Dropdown";
 import ResponsiveNavLink from "@/Components/ResponsiveNavLink";
 import { Home, User, FileText, BarChart3, Bot, LogOut } from "lucide-react";
 import LanguageSwitcher from "@/Components/LanguageSwitcher";
+import ThemeSwitcher from "@/Components/ThemeSwitcher";
 import { useTranslation } from "react-i18next";
+import { useTheme } from "@/Hooks/useTheme"; // Importar useTheme
 
 interface MobileNavbarProps {
   user: {
@@ -31,10 +33,14 @@ export default function MobileNavbar({
   setShowingNavigationDropdown,
 }: MobileNavbarProps) {
   const { t } = useTranslation();
+  const { theme } = useTheme();
+
   return (
     <>
-      {/* Navbar for mobile devices */}
-      <nav className="lg:hidden shadow-lg sticky top-0 z-50 backdrop-blur-2xl">
+      <nav
+        className={` w-full  lg:hidden shadow-lg sticky top-0 z-50 backdrop-blur-2xl
+        ${theme === "dark" ? "bg-neutral-900/95" : "bg-beige-200/95"}`}
+      >
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="flex h-16 justify-between items-center">
             {/* Menu Button */}
@@ -42,12 +48,15 @@ export default function MobileNavbar({
               onClick={() =>
                 setShowingNavigationDropdown(!showingNavigationDropdown)
               }
-              className="inline-flex items-center justify-center p-3 rounded-2xl group"
+              className={`inline-flex items-center justify-center p-3 rounded-2xl
+                ${
+                  theme === "dark"
+                    ? "text-gray-400 hover:text-orange-400"
+                    : "text-gray-700 hover:text-orange-600"
+                }`}
             >
               <svg
-                className="h-6 w-6 text-gray-700 
-                                group-hover:text-primary-600
-                                 transition-colors"
+                className="h-6 w-6"
                 stroke="currentColor"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -76,14 +85,24 @@ export default function MobileNavbar({
             {/* Logo */}
             <div className="flex items-center space-x-3">
               <div
-                className="w-10 h-10 bg-gradient-to-r 
-                                from-primary-500 
-                                to-primary-700 rounded-full flex items-center justify-center"
+                className={`w-10 h-10 bg-gradient-to-r rounded-full flex items-center justify-center
+                ${
+                  theme === "dark"
+                    ? "from-orange-500 to-orange-700"
+                    : "from-orange-600 to-orange-800"
+                }`}
               >
-                <span className="text-white font-bold text-lg">MI</span>
+                <span className="text-white font-bold text-lg">CF</span>
               </div>
               <div>
-                <h1 className="text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+                <h1
+                  className={`text-lg font-bold bg-gradient-to-r bg-clip-text text-transparent
+                  ${
+                    theme === "dark"
+                      ? "from-gray-200 to-gray-400"
+                      : "from-gray-800 to-gray-600"
+                  }`}
+                >
                   ContentFlow
                 </h1>
               </div>
@@ -93,22 +112,25 @@ export default function MobileNavbar({
             <div className="flex items-center">
               <Dropdown>
                 <Dropdown.Trigger>
-                  <span className="inline-flex ">
+                  <span className="inline-flex">
                     <button
                       type="button"
-                      className="inline-flex items-center 
-                                            px-4 py-2  rounded-lg 
-                                            text-sm font-medium text-gray-700 transition-all duration-300 shadow-sm hover:shadow-md"
+                      className={`inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 shadow-sm hover:shadow-md
+                        ${
+                          theme === "dark"
+                            ? "text-gray-200 hover:bg-neutral-800"
+                            : "text-gray-700 hover:bg-beige-300"
+                        }`}
                     >
                       <div
-                        className="w-8 h-8 mr-3 bg-gradient-to-r
-                                                 from-red-500 to-orange-700 
-                                                 rounded-full flex items-center justify-center "
+                        className={`w-8 h-8 mr-3 bg-gradient-to-r rounded-full flex items-center justify-center
+                        ${
+                          theme === "dark"
+                            ? "from-orange-500 to-orange-700"
+                            : "from-orange-600 to-orange-800"
+                        }`}
                       >
-                        <span
-                          className="text-white 
-                                                    text-sm font-bold"
-                        >
+                        <span className="text-white text-sm font-bold">
                           {user.name?.charAt(0)?.toUpperCase() || "U"}
                         </span>
                       </div>
@@ -116,7 +138,9 @@ export default function MobileNavbar({
                         {user.name || "User"}
                       </span>
                       <svg
-                        className="ml-2 h-4 w-4 text-gray-500"
+                        className={`ml-2 h-4 w-4 ${
+                          theme === "dark" ? "text-gray-400" : "text-gray-500"
+                        }`}
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 20 20"
                         fill="currentColor"
@@ -131,10 +155,22 @@ export default function MobileNavbar({
                   </span>
                 </Dropdown.Trigger>
 
-                <Dropdown.Content>
+                <Dropdown.Content
+                  className={`shadow-xl
+                  ${
+                    theme === "dark"
+                      ? "bg-neutral-800 text-gray-200"
+                      : "bg-white text-gray-700"
+                  }`}
+                >
                   <Dropdown.Link
                     href={route("profile.edit")}
-                    className="flex items-center space-x-2"
+                    className={`flex items-center space-x-2
+                      ${
+                        theme === "dark"
+                          ? "hover:bg-neutral-700"
+                          : "hover:bg-gray-100"
+                      }`}
                   >
                     <User className="h-4 w-4" />
                     <span>{t("nav.profile")}</span>
@@ -143,7 +179,12 @@ export default function MobileNavbar({
                     href={route("logout")}
                     method="post"
                     as="button"
-                    className="flex items-center space-x-2 text-prim-500"
+                    className={`flex items-center space-x-2
+                      ${
+                        theme === "dark"
+                          ? "hover:bg-neutral-700"
+                          : "hover:bg-gray-100"
+                      }`}
                   >
                     <LogOut className="h-4 w-4" />
                     <span>{t("nav.logout")}</span>
@@ -154,44 +195,62 @@ export default function MobileNavbar({
           </div>
         </div>
 
-        {/* Dropdown menu for mobile */}
-        <div className={`${showingNavigationDropdown ? "block" : "hidden"} `}>
+        {/* Dropdown menu */}
+        <div
+          className={`${showingNavigationDropdown ? "block" : "hidden"}
+          ${theme === "dark" ? "bg-neutral-900/95" : "bg-beige-200/95"}`}
+        >
           <div className="px-4 py-6 space-y-2">
             {mobileNavigationItems.map((item) => (
               <ResponsiveNavLink
                 key={item.href}
                 href={route(item.href)}
                 active={route().current(item.href)}
-                className={`flex items-center 
-                            space-x-3 px-4 py-3 rounded-lg 
-                            transition-all duration-300
-                            ${
-                              route().current(item.href)
-                                ? "bg-gradient-to-r from-primary-600 to-orange-700 text-white shadow-lg"
-                                : "text-gray-700 hover:bg-gradient-to-r hover:from-orange-50 hover:to-purple-50 hover:text-orange-600"
-                            }`}
+                className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-300
+                  ${
+                    route().current(item.href)
+                      ? `bg-gradient-to-r ${
+                          theme === "dark"
+                            ? "from-orange-600 to-orange-800"
+                            : "from-orange-600 to-orange-700"
+                        } text-white shadow-lg`
+                      : `${
+                          theme === "dark"
+                            ? "text-gray-200 hover:bg-neutral-800 hover:text-orange-400"
+                            : "text-gray-700 hover:bg-beige-300 hover:text-orange-600"
+                        }`
+                  }`}
               >
                 <item.lucideIcon className="h-5 w-5" />
                 <span className="font-medium">{t(item.nameKey)}</span>
               </ResponsiveNavLink>
             ))}
 
-            <div className="pt-4 border-t border-gray-200/50">
-              <div className="flex items-center gap-2 ">
+            <div
+              className={`pt-4 border-t ${
+                theme === "dark"
+                  ? "border-neutral-700/50"
+                  : "border-beige-300/50"
+              }`}
+            >
+              <div className="flex items-center gap-2">
                 <ResponsiveNavLink
                   href={route("logout")}
                   method="post"
                   as="button"
-                  className="flex-1 flex items-center justify-center space-x-3 px-4 py-3 rounded-lg 
-                            border
-                            border-primary-200/50
-                           text-secondary-600 bg-primary-50 transition-all duration-300"
+                  className={`flex-1 flex items-center justify-center space-x-3 px-4 py-3 rounded-lg border transition-all duration-300
+                    ${
+                      theme === "dark"
+                        ? "bg-neutral-800 border-neutral-700 text-gray-200 hover:bg-red-900/30 hover:text-red-300"
+                        : "bg-beige-300 border-beige-400 text-gray-700 hover:bg-red-50 hover:text-red-600"
+                    }`}
                 >
-                  <LogOut className="h-5 w-5 " />
+                  <LogOut className="h-5 w-5" />
                   <span className="font-medium">{t("nav.logout")}</span>
                 </ResponsiveNavLink>
 
-                <div className="flex items-center justify-center ">
+                <div className="flex items-center justify-center gap-2">
+                  <ThemeSwitcher />
                   <LanguageSwitcher />
                 </div>
               </div>
