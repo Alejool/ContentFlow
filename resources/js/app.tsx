@@ -7,6 +7,7 @@ import { createRoot } from "react-dom/client";
 import { Toaster } from "react-hot-toast";
 import { ChakraProvider, defaultSystem } from "@chakra-ui/react";
 import ContentFlowVisualization3D from "@/Components/tree/ContentFlowVisualization3D";
+import { ThemeProvider } from "@/Contexts/ThemeContext";
 
 const appName = import.meta.env.VITE_APP_NAME || "contentFlow";
 
@@ -35,10 +36,12 @@ createInertiaApp({
     root.render(
       <>
         {/* <ContentFlowVisualization3D /> */}
-        <ChakraProvider value={defaultSystem}>
-          <App {...props} />
-        </ChakraProvider>
-        <Toaster />
+        <ThemeProvider>
+          <ChakraProvider value={defaultSystem}>
+            <App {...props} />
+          </ChakraProvider>
+          <Toaster />
+        </ThemeProvider>
       </>
     );
   },
