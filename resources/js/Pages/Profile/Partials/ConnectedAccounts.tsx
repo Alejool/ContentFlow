@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import ModernCard from "@/Components/Modern/ModernCard";
-import { useTranslation } from "react-i18next";
 import IconFacebook from "@/../assets/Icons/facebook.svg";
 import IconInstagram from "@/../assets/Icons/instagram.svg";
 import IconTiktok from "@/../assets/Icons/tiktok.svg";
 import IconTwitter from "@/../assets/Icons/x.svg";
 import IconYoutube from "@/../assets/Icons/youtube.svg";
+import ModernCard from "@/Components/Modern/ModernCard";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
-const ShareIcon = ({ className }) => (
+const ShareIcon = ({ className }: { className: string }) => (
   <svg
     className={className}
     fill="none"
@@ -122,7 +122,7 @@ export default function ConnectedAccounts({ className = "" }) {
               key={account.id}
               className={`flex items-center p-3 rounded-xl border transition-all duration-200 ${
                 account.isConnected
-                  ? "bg-purple-50 border-purple-200 shadow-sm"
+                  ? "bg-purple-50 dark: border-purple-200 shadow-sm"
                   : "bg-gray-50 border-gray-100 opacity-60 grayscale hover:grayscale-0 hover:opacity-100"
               }`}
             >
