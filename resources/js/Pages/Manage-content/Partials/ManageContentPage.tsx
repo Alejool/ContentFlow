@@ -1,20 +1,24 @@
+import { useCampaignManagement } from "@/Hooks/useCampaignManagement";
+import { useTheme } from "@/Hooks/useTheme";
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
+import AddCampaignModal from "@/Pages/Manage-content/Partials/AddCampaignModal";
+import CampaignList from "@/Pages/Manage-content/Partials/CampaignList";
+import EditCampaignModal from "@/Pages/Manage-content/Partials/EditCampaignModal";
+import SocialMediaAccounts from "@/Pages/Manage-content/Partials/SocialMediaAccounts";
+import { Campaign } from "@/types/Campaign";
+import { Head } from "@inertiajs/react";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head } from "@inertiajs/react";
-import SocialMediaAccounts from "./SocialMediaAccounts";
-import CampaignList from "./CampaignList";
-import AddCampaignModal from "./AddCampaignModal";
-import EditCampaignModal from "./EditCampaignModal";
-import { useCampaignManagement } from "@/Hooks/useCampaignManagement";
-import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
 export default function ManageContentPage() {
   const { t } = useTranslation();
+  const { theme } = useTheme();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedCampaign, setSelectedCampaign] = useState(null);
+  const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(
+    null
+  );
 
   const { campaigns, isLoading, fetchCampaigns, addCampaign, deleteCampaign } =
     useCampaignManagement();
@@ -23,12 +27,12 @@ export default function ManageContentPage() {
     fetchCampaigns();
   }, []);
 
-  const openEditModal = (campaign) => {
+  const openEditModal = (campaign: Campaign) => {
     setSelectedCampaign(campaign);
     setIsEditModalOpen(true);
   };
 
-  const handleAddCampaign = async (data) => {
+  const handleAddCampaign = async (data: Campaign) => {
     const success = await addCampaign(data);
     if (success) {
       setIsModalOpen(false);
@@ -36,14 +40,32 @@ export default function ManageContentPage() {
     }
   };
 
+  const bgGradient =
+    theme === "dark"
+      ? "bg-gradient-to-br from-neutral-900 to-neutral-800"
+      : "bg-gradient-to-br from-beige-50 to-white";
+
+  const iconGradient =
+    theme === "dark"
+      ? "from-orange-500 to-orange-700"
+      : "from-orange-600 to-orange-800";
+
+  const titleGradient =
+    theme === "dark"
+      ? "from-gray-200 to-gray-400"
+      : "from-gray-800 to-gray-600";
+
+  const subtitleColor = theme === "dark" ? "text-gray-400" : "text-gray-600";
+
   return (
     <AuthenticatedLayout>
       <Head title={t("manageContent.title")} />
-      <div className="min-h-screen bg-gradient-to-br">
+      <div className={`min-h-screen transition-colors duration-300`}>
         <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8 py-8">
-          {/* Header Section */}
           <div className="mb-12 text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-red-600 to-orange-700 rounded-2xl mb-6">
+            <div
+              className={`inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r ${iconGradient} rounded-2xl mb-6`}
+            >
               <svg
                 className="w-8 h-8 text-white"
                 fill="none"
@@ -58,16 +80,17 @@ export default function ManageContentPage() {
                 />
               </svg>
             </div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent mb-4">
+            <h1
+              className={`text-4xl font-bold bg-gradient-to-r ${titleGradient} bg-clip-text text-transparent mb-4`}
+            >
               ✨ {t("manageContent.title")}
             </h1>
 
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className={`text-lg ${subtitleColor} max-w-2xl mx-auto`}>
               {t("manageContent.subtitle")}
             </p>
           </div>
 
-          {/* Content Sections */}
           <div className="space-y-8">
             <SocialMediaAccounts />
             <CampaignList
