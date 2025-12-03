@@ -1,16 +1,11 @@
+import Logo from "@/../assets/logo.png";
+import LanguageSwitcher from "@/Components/LanguageSwitcher";
+import ThemeSwitcher from "@/Components/ThemeSwitcher";
 import GuestLayout from "@/Layouts/GuestLayout";
-import { Head, useForm, Link } from "@inertiajs/react";
-import { FormEventHandler } from "react";
-import {
-  KeyRound,
-  Mail,
-  ArrowLeft,
-  Shield,
-  Smartphone,
-  CheckCircle2,
-  Send,
-} from "lucide-react";
+import { Head, Link, useForm } from "@inertiajs/react";
 import { motion } from "framer-motion";
+import { ArrowLeft, CheckCircle2, Mail, Send, Shield } from "lucide-react";
+import { FormEventHandler } from "react";
 
 interface ForgotPasswordProps {
   status?: string;
@@ -30,7 +25,11 @@ export default function ForgotPassword({ status }: ForgotPasswordProps) {
     <GuestLayout>
       <Head title="Forgot Password" />
 
-      {/* Back Button */}
+      <div className="fixed top-6 right-6 z-50">
+        <ThemeSwitcher />
+        <LanguageSwitcher />
+      </div>
+
       <div className="fixed top-6 left-6 z-50">
         <Link
           href={route("login")}
@@ -45,7 +44,6 @@ export default function ForgotPassword({ status }: ForgotPasswordProps) {
       </div>
 
       <div className="min-h-screen flex flex-col lg:flex-row bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
-        {/* Left Side - Brand/Info Section */}
         <div className="w-full lg:w-1/2 bg-gradient-primary relative overflow-hidden">
           <div className="absolute inset-0 bg-black/10" />
 
@@ -57,9 +55,7 @@ export default function ForgotPassword({ status }: ForgotPasswordProps) {
               className="text-center max-w-xl"
             >
               <div className="mb-8">
-                <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-white/20 backdrop-blur-sm mb-6">
-                  <KeyRound className="w-10 h-10" />
-                </div>
+                <img src={Logo} alt="logo" className="w-36 h-36 mx-auto" />
                 <h1 className="text-4xl font-bold font-poppins mb-4">
                   Password Recovery
                 </h1>
@@ -68,7 +64,6 @@ export default function ForgotPassword({ status }: ForgotPasswordProps) {
                 </p>
               </div>
 
-              {/* Recovery Process Steps */}
               <div className="space-y-4 text-left">
                 <div className="flex items-start gap-3 p-3 rounded-lg bg-white/10 backdrop-blur-sm">
                   <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
@@ -107,7 +102,6 @@ export default function ForgotPassword({ status }: ForgotPasswordProps) {
                 </div>
               </div>
 
-              {/* Security Info */}
               <div className="mt-8 p-4 rounded-lg bg-white/10 backdrop-blur-sm">
                 <div className="flex items-center gap-2 mb-2">
                   <Shield className="w-4 h-4" />
@@ -122,7 +116,6 @@ export default function ForgotPassword({ status }: ForgotPasswordProps) {
           </div>
         </div>
 
-        {/* Right Side - Recovery Form */}
         <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-8">
           <motion.div
             initial={{ opacity: 0, x: 20 }}
@@ -140,7 +133,6 @@ export default function ForgotPassword({ status }: ForgotPasswordProps) {
             </div>
 
             <form onSubmit={submit} className="space-y-6">
-              {/* Status Message */}
               {status && (
                 <div className="rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 p-4">
                   <div className="flex items-center gap-3 text-green-700 dark:text-green-400">
@@ -150,7 +142,6 @@ export default function ForgotPassword({ status }: ForgotPasswordProps) {
                 </div>
               )}
 
-              {/* Instructions */}
               <div className="rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 p-4">
                 <p className="text-sm text-gray-700 dark:text-gray-300">
                   Forgot your password? No problem. Just enter your email
@@ -159,7 +150,6 @@ export default function ForgotPassword({ status }: ForgotPasswordProps) {
                 </p>
               </div>
 
-              {/* Email Input */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Email Address
@@ -191,7 +181,6 @@ export default function ForgotPassword({ status }: ForgotPasswordProps) {
                 )}
               </div>
 
-              {/* Submit Button */}
               <button
                 type="submit"
                 disabled={processing}
@@ -212,7 +201,6 @@ export default function ForgotPassword({ status }: ForgotPasswordProps) {
                 )}
               </button>
 
-              {/* Additional Help */}
               <div className="text-center pt-4">
                 <div className="rounded-lg bg-gray-50 dark:bg-gray-800/50 p-4">
                   <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
@@ -232,7 +220,6 @@ export default function ForgotPassword({ status }: ForgotPasswordProps) {
                 </div>
               </div>
 
-              {/* Back to Login Link */}
               <div className="text-center">
                 <Link
                   href={route("login")}
