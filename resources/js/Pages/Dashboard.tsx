@@ -1,23 +1,27 @@
-// Pages/Dashboard.tsx
-import { Head, Link, router } from "@inertiajs/react";
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import StatCard from "@/Components/Statistics/StatCard";
-import LineChart from "@/Components/Statistics/LineChart";
 import BarChart from "@/Components/Statistics/BarChart";
+import LineChart from "@/Components/Statistics/LineChart";
 import PieChart from "@/Components/Statistics/PieChart";
-import ContentFlowVisualization3D from "@/Components/tree/ContentFlowVisualization3D";
+import StatCard from "@/Components/Statistics/StatCard";
+import { useTheme } from "@/Hooks/useTheme";
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
+import { Head, Link, router } from "@inertiajs/react";
 import {
+  ArrowRight,
+  BarChart3,
+  Calendar,
   Eye,
+  FileText,
+  Heart,
+  Mail,
   MousePointerClick,
+  Sparkles,
+  Target,
   TrendingUp,
   Users,
-  Heart,
-  ArrowRight,
-  Mail,
   X,
 } from "lucide-react";
-import { useTranslation } from "react-i18next";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 interface DashboardProps {
   auth: {
@@ -57,6 +61,7 @@ interface DashboardProps {
 
 export default function Dashboard({ auth, stats, status }: DashboardProps) {
   const { t } = useTranslation();
+  const { theme } = useTheme();
   const [showBanner, setShowBanner] = useState(true);
   const [sending, setSending] = useState(false);
   const [successMessage, setSuccessMessage] = useState(
@@ -80,7 +85,6 @@ export default function Dashboard({ auth, stats, status }: DashboardProps) {
     );
   };
 
-  // Prepare chart data
   const campaignChartData = stats.campaigns.map((c) => ({
     name: c.title.length > 15 ? c.title.substring(0, 15) + "..." : c.title,
     views: c.views,
@@ -88,31 +92,145 @@ export default function Dashboard({ auth, stats, status }: DashboardProps) {
     engagement: c.engagement,
   }));
 
+  const getContainerBg = () => {
+    return theme === "dark" ? "bg-neutral-900" : "bg-gray-50";
+  };
+
+  const getCardBg = () => {
+    return theme === "dark"
+      ? "bg-neutral-800/50 backdrop-blur-sm border border-neutral-700/50"
+      : "bg-white/60 backdrop-blur-lg border border-gray-100";
+  };
+
+  const getTextColor = (
+    type: "primary" | "secondary" | "title" = "primary"
+  ) => {
+    if (theme === "dark") {
+      switch (type) {
+        case "title":
+          return "text-white";
+        case "primary":
+          return "text-gray-100";
+        case "secondary":
+          return "text-gray-400";
+        default:
+          return "text-gray-100";
+      }
+    } else {
+      switch (type) {
+        case "title":
+          return "text-gray-900";
+        case "primary":
+          return "text-gray-700";
+        case "secondary":
+          return "text-gray-600";
+        default:
+          return "text-gray-900";
+      }
+    }
+  };
+
+  const getGradientButton = (from: string, to: string) => {
+    const baseStyles =
+      "group relative overflow-hidden transition-all duration-300 font-semibold rounded-lg";
+    const darkStyles = `bg-gradient-to-r ${from} ${to} text-white hover:shadow-xl transform hover:-translate-y-0.5`;
+    const lightStyles = `bg-gradient-to-r ${from} ${to} text-white hover:shadow-xl transform hover:-translate-y-0.5`;
+    return `${baseStyles} ${theme === "dark" ? darkStyles : lightStyles}`;
+  };
+
   return (
     <AuthenticatedLayout>
       <Head title={t("dashboard.title")} />
 
-      <div className="py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        {/* Email Verification Banner */}
+      <div
+        className={`py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto 
+          min-h-screen transition-colors duration-300 `}
+      >
+        <div
+          className={`rounded-2xl p-8 mb-8 shadow-sm transition-colors duration-300 ${
+            theme === "dark"
+              ? "bg-gradient-to-r from-neutral-800/50 to-purple-900/20 border border-neutral-700/50"
+              : "bg-gradient-to-r from-orange-50/50 to-purple-50/50 border border-orange-100"
+          }`}
+        >
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div>
+              <h1
+                className={`text-3xl font-bold mb-2 ${getTextColor("title")}`}
+              >
+                {t("dashboard.welcomeMessage", { name: auth.user.name })}
+              </h1>
+              <p className={`text-lg ${getTextColor("secondary")}`}>
+                {t("dashboard.systemStats")}
+              </p>
+            </div>
+            <div
+              className={`flex items-center gap-4 p-4 rounded-xl ${
+                theme === "dark" ? "bg-neutral-800/30" : "bg-white/60"
+              }`}
+            >
+              <div
+                className={`p-3 rounded-lg ${
+                  theme === "dark" ? "bg-purple-900/20" : "bg-purple-100"
+                }`}
+              >
+                <Sparkles
+                  className={`w-6 h-6 ${
+                    theme === "dark" ? "text-purple-400" : "text-purple-600"
+                  }`}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
         {!auth.user.email_verified_at && showBanner && (
-          <div className="mb-6 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-2xl p-6 shadow-sm">
+          <div
+            className={`mb-8 rounded-2xl p-6 shadow-sm transition-colors duration-300 ${
+              theme === "dark"
+                ? "bg-gradient-to-r from-blue-900/20 to-purple-900/20 border border-blue-800/30"
+                : "bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200"
+            }`}
+          >
             <div className="flex items-start justify-between">
               <div className="flex items-start gap-4 flex-1">
                 <div className="flex-shrink-0">
-                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                    <Mail className="w-6 h-6 text-blue-600" />
+                  <div
+                    className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                      theme === "dark" ? "bg-blue-900/30" : "bg-blue-100"
+                    }`}
+                  >
+                    <Mail
+                      className={`w-6 h-6 ${
+                        theme === "dark" ? "text-blue-400" : "text-blue-600"
+                      }`}
+                    />
                   </div>
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                  <h3
+                    className={`text-lg font-semibold mb-1 ${getTextColor(
+                      "title"
+                    )}`}
+                  >
                     {t("verification.banner.title")}
                   </h3>
-                  <p className="text-gray-600 text-sm mb-4">
+                  <p className={`text-sm mb-4 ${getTextColor("secondary")}`}>
                     {t("verification.banner.message")}
                   </p>
                   {successMessage && (
-                    <div className="mb-3 p-3 bg-green-50 border border-green-200 rounded-lg">
-                      <p className="text-sm text-green-800 font-medium">
+                    <div
+                      className={`mb-3 p-3 rounded-lg ${
+                        theme === "dark"
+                          ? "bg-green-900/20 border border-green-800/30"
+                          : "bg-green-50 border border-green-200"
+                      }`}
+                    >
+                      <p
+                        className={`text-sm font-medium ${
+                          theme === "dark" ? "text-green-300" : "text-green-800"
+                        }`}
+                      >
                         ✓ {t("verification.banner.successMessage")}
                       </p>
                     </div>
@@ -120,7 +238,10 @@ export default function Dashboard({ auth, stats, status }: DashboardProps) {
                   <button
                     onClick={handleResendVerification}
                     disabled={sending}
-                    className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                    className={
+                      getGradientButton("from-blue-600", "to-purple-600") +
+                      " disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                    }
                   >
                     {sending
                       ? t("verification.banner.sending")
@@ -130,7 +251,11 @@ export default function Dashboard({ auth, stats, status }: DashboardProps) {
               </div>
               <button
                 onClick={() => setShowBanner(false)}
-                className="flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors"
+                className={`flex-shrink-0 transition-colors ${
+                  theme === "dark"
+                    ? "text-gray-400 hover:text-gray-300"
+                    : "text-gray-400 hover:text-gray-600"
+                }`}
               >
                 <X className="w-5 h-5" />
               </button>
@@ -138,49 +263,44 @@ export default function Dashboard({ auth, stats, status }: DashboardProps) {
           </div>
         )}
 
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">
-            {t("dashboard.welcomeMessage", { name: auth.user.name })}
-          </h1>
-          <p className="mt-2 text-gray-600">{t("dashboard.systemStats")}</p>
-        </div>
-
-        {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatCard
             title={t("dashboard.totalViews")}
             value={stats.totalViews}
             icon={<Eye className="w-6 h-6" />}
             color="blue"
+            theme={theme}
           />
           <StatCard
             title={t("dashboard.totalClicks")}
             value={stats.totalClicks}
             icon={<MousePointerClick className="w-6 h-6" />}
             color="green"
+            theme={theme}
           />
           <StatCard
             title={t("dashboard.conversions")}
             value={stats.totalConversions}
             icon={<TrendingUp className="w-6 h-6" />}
             color="purple"
+            theme={theme}
           />
           <StatCard
             title={t("dashboard.totalReach")}
             value={stats.totalReach}
             icon={<Users className="w-6 h-6" />}
             color="orange"
+            theme={theme}
           />
         </div>
 
-        {/* Engagement Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <StatCard
             title={t("dashboard.totalEngagement")}
             value={stats.totalEngagement}
             icon={<Heart className="w-6 h-6" />}
             color="red"
+            theme={theme}
           />
           <StatCard
             title={t("dashboard.avgEngagementRate")}
@@ -188,15 +308,31 @@ export default function Dashboard({ auth, stats, status }: DashboardProps) {
             icon={<TrendingUp className="w-6 h-6" />}
             color="purple"
             format="percentage"
+            theme={theme}
           />
         </div>
 
-        {/* Charts Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          {/* Engagement Trends */}
           {stats.engagementTrends.length > 0 && (
-            <div className="bg-white rounded-2xl shadow-lg p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">
+            <div
+              className={`rounded-2xl p-6 shadow-sm transition-colors duration-300 ${getCardBg()}`}
+            >
+              <h2
+                className={`text-xl font-bold mb-4 flex items-center gap-2 ${getTextColor(
+                  "title"
+                )}`}
+              >
+                <div
+                  className={`p-2 rounded-lg ${
+                    theme === "dark" ? "bg-purple-900/20" : "bg-purple-100"
+                  }`}
+                >
+                  <TrendingUp
+                    className={`w-5 h-5 ${
+                      theme === "dark" ? "text-purple-400" : "text-purple-600"
+                    }`}
+                  />
+                </div>
                 {t("dashboard.engagementTrends")}
               </h2>
               <LineChart
@@ -205,17 +341,17 @@ export default function Dashboard({ auth, stats, status }: DashboardProps) {
                   {
                     dataKey: "views",
                     name: t("dashboard.views"),
-                    color: "#3b82f6",
+                    color: theme === "dark" ? "#60a5fa" : "#3b82f6",
                   },
                   {
                     dataKey: "clicks",
                     name: t("dashboard.clicks"),
-                    color: "#10b981",
+                    color: theme === "dark" ? "#34d399" : "#10b981",
                   },
                   {
                     dataKey: "engagement",
                     name: t("dashboard.engagement"),
-                    color: "#8b5cf6",
+                    color: theme === "dark" ? "#a78bfa" : "#8b5cf6",
                   },
                 ]}
                 xAxisKey="date"
@@ -224,31 +360,68 @@ export default function Dashboard({ auth, stats, status }: DashboardProps) {
             </div>
           )}
 
-          {/* Platform Distribution */}
           {stats.platformData.length > 0 && (
-            <div className="bg-white rounded-2xl shadow-lg p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">
+            <div
+              className={`rounded-2xl p-6 shadow-sm transition-colors duration-300 ${getCardBg()}`}
+            >
+              <h2
+                className={`text-xl font-bold mb-4 flex items-center gap-2 ${getTextColor(
+                  "title"
+                )}`}
+              >
+                <div
+                  className={`p-2 rounded-lg ${
+                    theme === "dark" ? "bg-orange-900/20" : "bg-orange-100"
+                  }`}
+                >
+                  <Target
+                    className={`w-5 h-5 ${
+                      theme === "dark" ? "text-orange-400" : "text-orange-600"
+                    }`}
+                  />
+                </div>
                 {t("dashboard.followersByPlatform")}
               </h2>
               <PieChart
                 data={stats.platformData}
                 innerRadius={60}
                 height={300}
+                theme={theme}
               />
             </div>
           )}
         </div>
 
-        {/* Campaign Performance */}
         {campaignChartData.length > 0 && (
-          <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
+          <div
+            className={`rounded-2xl p-6 shadow-sm transition-colors duration-300 mb-8 ${getCardBg()}`}
+          >
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-gray-900">
+              <h2
+                className={`text-xl font-bold ${getTextColor(
+                  "title"
+                )} flex items-center gap-2`}
+              >
+                <div
+                  className={`p-2 rounded-lg ${
+                    theme === "dark" ? "bg-blue-900/20" : "bg-blue-100"
+                  }`}
+                >
+                  <BarChart3
+                    className={`w-5 h-5 ${
+                      theme === "dark" ? "text-blue-400" : "text-blue-600"
+                    }`}
+                  />
+                </div>
                 {t("dashboard.campaignPerformance")}
               </h2>
               <Link
                 href="/campaigns"
-                className="text-blue-600 hover:text-blue-700 font-medium text-sm flex items-center gap-1"
+                className={`text-sm font-medium flex items-center gap-1 transition-colors ${
+                  theme === "dark"
+                    ? "text-blue-400 hover:text-blue-300"
+                    : "text-blue-600 hover:text-blue-700"
+                }`}
               >
                 {t("common.viewAll")}
                 <ArrowRight className="w-4 h-4" />
@@ -260,76 +433,187 @@ export default function Dashboard({ auth, stats, status }: DashboardProps) {
                 {
                   dataKey: "views",
                   name: t("dashboard.views"),
-                  color: "#3b82f6",
+                  color: theme === "dark" ? "#60a5fa" : "#3b82f6",
                 },
                 {
                   dataKey: "clicks",
                   name: t("dashboard.clicks"),
-                  color: "#10b981",
+                  color: theme === "dark" ? "#34d399" : "#10b981",
                 },
                 {
                   dataKey: "engagement",
                   name: t("dashboard.engagement"),
-                  color: "#8b5cf6",
+                  color: theme === "dark" ? "#a78bfa" : "#8b5cf6",
                 },
               ]}
               xAxisKey="name"
               height={350}
+              theme={theme}
             />
           </div>
         )}
 
-        {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Link
             href="/campaigns"
-            className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl p-6 text-white hover:shadow-xl transition-shadow"
+            className={`group relative overflow-hidden rounded-2xl p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${
+              theme === "dark"
+                ? "bg-gradient-to-r from-blue-900/40 to-blue-800/40 border border-blue-800/30"
+                : "bg-gradient-to-r from-blue-500 to-blue-600"
+            }`}
           >
-            <h3 className="text-lg font-semibold mb-2">
+            <div
+              className={`p-3 rounded-xl inline-block mb-4 ${
+                theme === "dark" ? "bg-blue-900/30" : "bg-white/20"
+              }`}
+            >
+              <Calendar
+                className={`w-6 h-6 ${
+                  theme === "dark" ? "text-blue-400" : "text-white"
+                }`}
+              />
+            </div>
+            <h3
+              className={`text-lg font-semibold mb-2 ${
+                theme === "dark" ? "text-white" : "text-white"
+              }`}
+            >
               {t("dashboard.quickActions.campaigns.title")}
             </h3>
-            <p className="text-blue-100 text-sm">
+            <p
+              className={`text-sm ${
+                theme === "dark" ? "text-blue-300/80" : "text-blue-100"
+              }`}
+            >
               {t("dashboard.quickActions.campaigns.description")}
             </p>
+            <div
+              className={`absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ${
+                theme === "dark"
+                  ? "bg-gradient-to-r from-transparent via-white/5 to-transparent"
+                  : "bg-gradient-to-r from-transparent via-white/10 to-transparent"
+              }`}
+            ></div>
           </Link>
+
           <Link
             href="/analytics"
-            className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-2xl p-6 text-white hover:shadow-xl transition-shadow"
+            className={`group relative overflow-hidden rounded-2xl p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${
+              theme === "dark"
+                ? "bg-gradient-to-r from-purple-900/40 to-purple-800/40 border border-purple-800/30"
+                : "bg-gradient-to-r from-purple-500 to-purple-600"
+            }`}
           >
-            <h3 className="text-lg font-semibold mb-2">
+            <div
+              className={`p-3 rounded-xl inline-block mb-4 ${
+                theme === "dark" ? "bg-purple-900/30" : "bg-white/20"
+              }`}
+            >
+              <BarChart3
+                className={`w-6 h-6 ${
+                  theme === "dark" ? "text-purple-400" : "text-white"
+                }`}
+              />
+            </div>
+            <h3
+              className={`text-lg font-semibold mb-2 ${
+                theme === "dark" ? "text-white" : "text-white"
+              }`}
+            >
               {t("dashboard.quickActions.analytics.title")}
             </h3>
-            <p className="text-purple-100 text-sm">
+            <p
+              className={`text-sm ${
+                theme === "dark" ? "text-purple-300/80" : "text-purple-100"
+              }`}
+            >
               {t("dashboard.quickActions.analytics.description")}
             </p>
+            <div
+              className={`absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ${
+                theme === "dark"
+                  ? "bg-gradient-to-r from-transparent via-white/5 to-transparent"
+                  : "bg-gradient-to-r from-transparent via-white/10 to-transparent"
+              }`}
+            ></div>
           </Link>
+
           <Link
             href="/manage-content"
-            className="bg-gradient-to-r from-green-500 to-green-600 rounded-2xl p-6 text-white hover:shadow-xl transition-shadow"
+            className={`group relative overflow-hidden rounded-2xl p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${
+              theme === "dark"
+                ? "bg-gradient-to-r from-green-900/40 to-green-800/40 border border-green-800/30"
+                : "bg-gradient-to-r from-green-500 to-green-600"
+            }`}
           >
-            <h3 className="text-lg font-semibold mb-2">
+            <div
+              className={`p-3 rounded-xl inline-block mb-4 ${
+                theme === "dark" ? "bg-green-900/30" : "bg-white/20"
+              }`}
+            >
+              <FileText
+                className={`w-6 h-6 ${
+                  theme === "dark" ? "text-green-400" : "text-white"
+                }`}
+              />
+            </div>
+            <h3
+              className={`text-lg font-semibold mb-2 ${
+                theme === "dark" ? "text-white" : "text-white"
+              }`}
+            >
               {t("dashboard.quickActions.content.title")}
             </h3>
-            <p className="text-green-100 text-sm">
+            <p
+              className={`text-sm ${
+                theme === "dark" ? "text-green-300/80" : "text-green-100"
+              }`}
+            >
               {t("dashboard.quickActions.content.description")}
             </p>
+            <div
+              className={`absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ${
+                theme === "dark"
+                  ? "bg-gradient-to-r from-transparent via-white/5 to-transparent"
+                  : "bg-gradient-to-r from-transparent via-white/10 to-transparent"
+              }`}
+            ></div>
           </Link>
         </div>
 
-        {/* Empty State */}
         {stats.campaigns.length === 0 && (
-          <div className="bg-white rounded-2xl shadow-lg p-12 text-center mt-8">
+          <div
+            className={`rounded-2xl p-12 text-center transition-colors duration-300 ${getCardBg()}`}
+          >
             <div className="max-w-md mx-auto">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <TrendingUp className="w-8 h-8 text-blue-600" />
+              <div
+                className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${
+                  theme === "dark" ? "bg-blue-900/30" : "bg-blue-100"
+                }`}
+              >
+                <TrendingUp
+                  className={`w-8 h-8 ${
+                    theme === "dark" ? "text-blue-400" : "text-blue-600"
+                  }`}
+                />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              <h3
+                className={`text-xl font-semibold mb-2 ${getTextColor(
+                  "title"
+                )}`}
+              >
                 {t("dashboard.emptyState.title")}
               </h3>
-              <p className="text-gray-600 mb-6">
+              <p className={`mb-6 ${getTextColor("secondary")}`}>
                 {t("dashboard.emptyState.message")}
               </p>
-              <code className="bg-gray-100 px-4 py-2 rounded text-sm">
+              <code
+                className={`px-4 py-2 rounded text-sm font-mono ${
+                  theme === "dark"
+                    ? "bg-neutral-800 text-gray-300"
+                    : "bg-gray-100 text-gray-700"
+                }`}
+              >
                 {t("dashboard.emptyState.command")}
               </code>
             </div>
