@@ -1,11 +1,9 @@
-import { Head, Link } from "@inertiajs/react";
-import { useEffect, useState, ReactNode } from "react";
-import Bg from "@/../assets/logo.png";
-import Logo from "@/../assets/logo.png";
-import ContentFlowVisualization3D from "@/Components/tree/ContentFlowVisualization3D";
-import Bg3d from "@/Components/tree/Bg3d";
-import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "@/Components/LanguageSwitcher";
+import ThemeSwitcher from "@/Components/ThemeSwitcher";
+import { useTheme } from "@/Hooks/useTheme";
+import { Head } from "@inertiajs/react";
+import { ReactNode, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 interface AuthProps {
   user: {
@@ -18,7 +16,6 @@ interface WelcomeProps {
   auth: AuthProps;
 }
 
-// Component for SVG icons
 const CustomIcon = ({
   children,
   className = "",
@@ -43,7 +40,6 @@ interface FeatureCardProps {
   className?: string;
 }
 
-// Component for feature cards
 const FeatureCard = ({
   href,
   icon,
@@ -109,7 +105,6 @@ const FeatureCard = ({
   </a>
 );
 
-// Component for image gallery
 const ImageGallery = ({ t }: { t: any }) => (
   <div className="relative w-full overflow-hidden rounded-xl">
     <div className="grid grid-cols-3 gap-2">
@@ -146,18 +141,16 @@ const ImageGallery = ({ t }: { t: any }) => (
 export default function Welcome({ auth }: WelcomeProps) {
   const { t, i18n } = useTranslation();
   const [date, setDate] = useState(new Date());
+  const { theme } = useTheme();
 
-  // Detect browser language and set default
   useEffect(() => {
-    const browserLang = navigator.language.split("-")[0]; // Get 'en' from 'en-US'
+    const browserLang = navigator.language.split("-")[0];
     const supportedLanguages = ["en", "es"];
 
-    // If browser language is supported, use it; otherwise default to Spanish
     const defaultLang = supportedLanguages.includes(browserLang)
       ? browserLang
       : "es";
 
-    // Only change if current language is different
     if (i18n.language !== defaultLang) {
       i18n.changeLanguage(defaultLang);
     }
@@ -279,35 +272,41 @@ export default function Welcome({ auth }: WelcomeProps) {
 
       <div className="">
         <div className="relative">
-          {/* Language Switcher - Fixed Position */}
           <div className="fixed top-6 right-6 z-50">
+            <ThemeSwitcher />
             <LanguageSwitcher />
           </div>
 
-          {/* Main Content */}
           <main className="relative z-10 overflow-hidden">
             <div className="mx-auto max-w-7xl  sm:px-6 lg:px-8">
-              {/* Hero Section */}
               <div className="text-center mt-20 py-20">
                 <h1
-                  className="text-4xl font-bold tracking-tight 
-                text-white dark:gray-700 sm:text-5xl lg:text-6xl"
+                  className={`text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl
+  ${theme === "dark" ? "text-white" : "text-gray-900"}`}
                 >
                   {t("welcome.title")}
                   <span className="block text-red-600 mt-3">
                     {t("welcome.titleHighlight")}
                   </span>
                 </h1>
-                <p className="mx-auto mt-6 max-w-2xl text-lg text-white ">
+                <p
+                  className={`mx-auto mt-6 max-w-2xl text-lg
+  ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
+                >
                   {t("welcome.subtitle")}
                 </p>
               </div>
 
-              {/* Features Grid */}
               <div className="grid gap-6 lg:grid-cols-2 lg:gap-8">
-                {/* Featured Card */}
                 <div className="lg:row-span-2">
-                  <div className="group relative overflow-hidden rounded-2xl  backdrop-blur-sm p-8 shadow-lg ring-1 ring-gray-200/50 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] hover:ring-red-200 dark:bg-gray-900/80 dark:ring-gray-700/50 dark:hover:ring-red-700">
+                  <div
+                    className={`group relative overflow-hidden rounded-2xl backdrop-blur-sm p-8 shadow-lg ring-1 transition-all
+  ${
+    theme === "dark"
+      ? "bg-gray-900/80 ring-gray-700/50 hover:ring-red-700"
+      : "bg-white/80 ring-gray-200/50 hover:ring-red-200"
+  }`}
+                  >
                     <div className="absolute top-6 right-6 z-10">
                       <span className="inline-flex items-center rounded-full  px-3 py-1 text-sm font-medium text-red-800 dark:bg-red-900 dark:text-red-200">
                         {t("welcome.featured")}
@@ -335,7 +334,10 @@ export default function Welcome({ auth }: WelcomeProps) {
                         </CustomIcon>
 
                         <div className="flex-1">
-                          <h3 className="text-xl font-semibold text-gray-900 dark:text-white group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
+                          <h3
+                            className={`text-xl font-semibold transition-colors
+  ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+                          >
                             {t("welcome.aiOrganization.title")}
                           </h3>
                           <p className="mt-3 text-gray-600 dark:text-gray-300 leading-relaxed">
@@ -362,15 +364,12 @@ export default function Welcome({ auth }: WelcomeProps) {
                   </div>
                 </div>
 
-                {/* Other Feature Cards */}
                 {features.slice(1).map((feature, index) => (
                   <FeatureCard key={index} {...feature} />
                 ))}
               </div>
             </div>
           </main>
-          <ContentFlowVisualization3D />
-          {/* <Bg3d /> */}
         </div>
       </div>
     </>
