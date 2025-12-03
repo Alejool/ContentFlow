@@ -1,6 +1,5 @@
 import Logo from "@/../assets/logo.png";
-import LanguageSwitcher from "@/Components/LanguageSwitcher";
-import ThemeSwitcher from "@/Components/ThemeSwitcher";
+import ThemeLanguageContainer from "@/Components/common/ThemeLanguageContainer";
 import { useAuth } from "@/Hooks/useAuth";
 import GuestLayout from "@/Layouts/GuestLayout";
 import { auth, getAuthResult } from "@/firebase";
@@ -63,10 +62,7 @@ export default function Login() {
     <GuestLayout>
       <Head title={t("auth.login.title")} />
 
-      <div className="fixed top-6 right-6 z-50 flex items-center gap-2">
-        <ThemeSwitcher />
-        <LanguageSwitcher />
-      </div>
+      <ThemeLanguageContainer />
 
       <div className="min-h-screen flex flex-col lg:flex-row bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
         <div className="w-full lg:w-1/2 bg-gradient-primary relative overflow-hidden">

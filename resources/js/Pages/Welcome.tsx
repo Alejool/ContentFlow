@@ -1,8 +1,22 @@
-import LanguageSwitcher from "@/Components/LanguageSwitcher";
-import ThemeSwitcher from "@/Components/ThemeSwitcher";
+import Logo from "@/../assets/logo.png";
+import FeatureCard from "@/Components/common/FeatureCard";
+import ThemeLanguageContainer from "@/Components/common/ThemeLanguageContainer";
 import { useTheme } from "@/Hooks/useTheme";
-import { Head } from "@inertiajs/react";
-import { ReactNode, useEffect, useState } from "react";
+import { Head, Link } from "@inertiajs/react";
+import {
+  ArrowRight,
+  Brain,
+  Calendar,
+  Globe,
+  Mail,
+  Rocket,
+  Share2,
+  Shield,
+  Sparkles,
+  Upload,
+  Zap,
+} from "lucide-react";
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
 interface AuthProps {
@@ -14,133 +28,12 @@ interface AuthProps {
 
 interface WelcomeProps {
   auth: AuthProps;
+  canLogin: boolean;
+  canRegister: boolean;
 }
 
-const CustomIcon = ({
-  children,
-  className = "",
-}: {
-  children: ReactNode;
-  className?: string;
-}) => (
-  <div
-    className={`flex items-center justify-center rounded-full bg-red-50 ${className}`}
-  >
-    {children}
-  </div>
-);
-
-interface FeatureCardProps {
-  href: string;
-  icon: ReactNode;
-  title: string;
-  description: string;
-  tags?: string[];
-  featured?: boolean;
-  className?: string;
-}
-
-const FeatureCard = ({
-  href,
-  icon,
-  title,
-  description,
-  tags,
-  featured = false,
-  className = "",
-}: FeatureCardProps) => (
-  <a
-    href={href}
-    className={`group relative overflow-hidden rounded-2xl  backdrop-blur-sm p-6 shadow-lg ring-1 ring-gray-200/50 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] hover:ring-red-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 dark:bg-gray-900/80 dark:ring-gray-700/50 dark:hover:ring-red-700 ${className}`}
-  >
-    {featured && (
-      <div className="absolute top-4 right-4 z-10">
-        <span className="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800 dark:bg-red-900 dark:text-red-200">
-          {title}
-        </span>
-      </div>
-    )}
-
-    <div className="flex items-start gap-4">
-      <CustomIcon className="w-12 h-12 shrink-0 group-hover:scale-110 transition-transform duration-300">
-        {icon}
-      </CustomIcon>
-
-      <div className="flex-1 min-w-0">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
-          {title}
-        </h3>
-        <p className="mt-2 text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
-          {description}
-        </p>
-
-        {tags && (
-          <div className="mt-3 flex flex-wrap gap-1.5">
-            {tags.map((tag, index) => (
-              <span
-                key={index}
-                className="inline-flex items-center rounded-full bg-red-50 px-2 py-1 text-xs font-medium text-red-700 dark:bg-red-900/30 dark:text-red-300"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-        )}
-      </div>
-
-      <svg
-        className="w-5 h-5 text-red-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 shrink-0"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M9 5l7 7-7 7"
-        />
-      </svg>
-    </div>
-  </a>
-);
-
-const ImageGallery = ({ t }: { t: any }) => (
-  <div className="relative w-full overflow-hidden rounded-xl">
-    <div className="grid grid-cols-3 gap-2">
-      <div className="col-span-2 row-span-2">
-        <img
-          src="https://images.unsplash.com/photo-1604537529428-15bcbeecfe4d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
-          alt="Featured collection"
-          className="h-48 w-full rounded-lg object-cover transition-transform duration-300 hover:scale-105"
-        />
-      </div>
-      <div>
-        <img
-          src="https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80"
-          alt="Thumbnail 1"
-          className="h-[5.8rem] w-full rounded-lg object-cover transition-transform duration-300 hover:scale-105"
-        />
-      </div>
-      <div>
-        <img
-          src="https://images.unsplash.com/photo-1523800503107-5bc3ba2a6f81?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80"
-          alt="Thumbnail 2"
-          className="h-[5.8rem] w-full rounded-lg object-cover transition-transform duration-300 hover:scale-105"
-        />
-      </div>
-    </div>
-    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
-      <span className="text-sm font-medium text-white">
-        {t("welcome.featuredCollection")}
-      </span>
-    </div>
-  </div>
-);
-
-export default function Welcome({ auth }: WelcomeProps) {
+export default function Welcome({ auth, canLogin, canRegister }: WelcomeProps) {
   const { t, i18n } = useTranslation();
-  const [date, setDate] = useState(new Date());
   const { theme } = useTheme();
 
   useEffect(() => {
@@ -156,220 +49,249 @@ export default function Welcome({ auth }: WelcomeProps) {
     }
   }, []);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setDate(new Date());
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  const formattedDate = date.toLocaleString(
-    i18n.language === "es" ? "es-ES" : "en-US",
-    {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "numeric",
-      minute: "numeric",
-      second: "numeric",
-      hour12: i18n.language === "en",
-    }
-  );
-
   const features = [
     {
-      href: "ai-chat",
-      icon: (
-        <svg
-          className="w-6 h-6 text-red-600"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-          />
-        </svg>
-      ),
-      title: t("welcome.aiOrganization.title"),
-      description: t("welcome.aiOrganization.description"),
-      tags: [
-        t("welcome.aiOrganization.tags.smartAlbums"),
-        t("welcome.aiOrganization.tags.autoOrganization"),
-        t("welcome.aiOrganization.tags.customTags"),
-      ],
+      href: canLogin ? "/dashboard" : "/register",
+      icon: <Upload className="w-6 h-6 text-primary-600" />,
+      title:
+        t("welcome.contentManagement.title") ||
+        "Gestión de Contenido Inteligente",
+      description:
+        t("welcome.contentManagement.description") ||
+        "Organiza y gestiona archivos multimedia con sistemas avanzados de filtrado y etiquetas.",
+      tags: [t("welcome.tags.collections"), t("welcome.tags.tags"), t("welcome.tags.search"), t("welcome.tags.filters")],
     },
     {
-      href: "manage-content",
-      icon: (
-        <svg
-          className="w-6 h-6 text-red-600"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-          />
-        </svg>
-      ),
-      title: t("welcome.multiPlatform.title"),
-      description: t("welcome.multiPlatform.description"),
+      href: canLogin ? "/dashboard" : "/register",
+      icon: <Share2 className="w-6 h-6 text-primary-600" />,
+      title:
+        t("welcome.socialIntegration.title") || "Integración Multiplataforma",
+      description:
+        t("welcome.socialIntegration.description") ||
+        "Conecta y gestiona contenido en Facebook, Instagram, TikTok, YouTube y más.",
+      tags: [t("welcome.tags.facebook"), t("welcome.tags.instagram"), t("welcome.tags.tiktok"), t("welcome.tags.youtube"), t("welcome.tags.twitter")],
     },
     {
-      href: "analytics",
-      icon: (
-        <svg
-          className="w-6 h-6 text-red-600"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-          />
-        </svg>
-      ),
-      title: t("welcome.analytics.title"),
-      description: t("welcome.analytics.description"),
+      href: canLogin ? "/dashboard" : "/register",
+      icon: <Calendar className="w-6 h-6 text-primary-600" />,
+      title: t("welcome.scheduling.title") || "Programación Inteligente",
+      description:
+        t("welcome.scheduling.description") ||
+        "Programa publicaciones en horarios óptimos con recomendaciones impulsadas por IA.",
+      tags: [t("welcome.tags.calendar"), t("welcome.tags.queue"), t("welcome.tags.auto_post"), t("welcome.tags.time_zones")],
     },
     {
-      href: "manage-content",
-      icon: (
-        <svg
-          className="w-6 h-6 text-red-600"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
-      ),
-      title: t("welcome.scheduling.title"),
-      description: t("welcome.scheduling.description"),
+      href: canLogin ? "/dashboard" : "/register",
+      icon: <Brain className="w-6 h-6 text-primary-600" />,
+      title: t("welcome.aiTools.title") || "Optimización con IA",
+      description:
+        t("welcome.aiTools.description") ||
+        "Obtén recomendaciones de hashtags, horarios óptimos y sugerencias de contenido.",
+      tags: [t("welcome.tags.hashtags"), t("welcome.tags.optimization"), t("welcome.tags.recommendations"), t("welcome.tags.ai")],
     },
   ];
 
   return (
     <>
-      <Head title="Welcome" />
+      <Head title="ContentFlow - Plataforma de Gestión de Contenido" />
 
-      <div className="">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-950">
         <div className="relative">
-          <div className="fixed top-6 right-6 z-50">
-            <ThemeSwitcher />
-            <LanguageSwitcher />
-          </div>
-
-          <main className="relative z-10 overflow-hidden">
-            <div className="mx-auto max-w-7xl  sm:px-6 lg:px-8">
-              <div className="text-center mt-20 py-20">
-                <h1
-                  className={`text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl
-  ${theme === "dark" ? "text-white" : "text-gray-900"}`}
-                >
-                  {t("welcome.title")}
-                  <span className="block text-red-600 mt-3">
-                    {t("welcome.titleHighlight")}
-                  </span>
-                </h1>
-                <p
-                  className={`mx-auto mt-6 max-w-2xl text-lg
-  ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
-                >
-                  {t("welcome.subtitle")}
-                </p>
-              </div>
-
-              <div className="grid gap-6 lg:grid-cols-2 lg:gap-8">
-                <div className="lg:row-span-2">
-                  <div
-                    className={`group relative overflow-hidden rounded-2xl backdrop-blur-sm p-8 shadow-lg ring-1 transition-all
-  ${
-    theme === "dark"
-      ? "bg-gray-900/80 ring-gray-700/50 hover:ring-red-700"
-      : "bg-white/80 ring-gray-200/50 hover:ring-red-200"
-  }`}
-                  >
-                    <div className="absolute top-6 right-6 z-10">
-                      <span className="inline-flex items-center rounded-full  px-3 py-1 text-sm font-medium text-red-800 dark:bg-red-900 dark:text-red-200">
-                        {t("welcome.featured")}
-                      </span>
+          <header className="absolute top-0 left-0 right-0 z-50">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-3 md:mt-5">
+              <div className="flex items-center justify-between h-16 md:h-20">
+                <div className="flex items-center flex-shrink-0">
+                  <Link href="/" className="flex items-center">
+                    <div className="w-20 md:w-28">
+                      <img
+                        src={Logo}
+                        alt="ContentFlow Logo"
+                        className="w-full h-auto object-contain"
+                      />
                     </div>
-
-                    <ImageGallery t={t} />
-
-                    <div className="mt-6">
-                      <div className="flex items-start gap-4">
-                        <CustomIcon className="w-14 h-14 shrink-0 group-hover:scale-110 transition-transform duration-300">
-                          <svg
-                            className="w-7 h-7 text-red-600"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                            />
-                          </svg>
-                        </CustomIcon>
-
-                        <div className="flex-1">
-                          <h3
-                            className={`text-xl font-semibold transition-colors
-  ${theme === "dark" ? "text-white" : "text-gray-900"}`}
-                          >
-                            {t("welcome.aiOrganization.title")}
-                          </h3>
-                          <p className="mt-3 text-gray-600 dark:text-gray-300 leading-relaxed">
-                            {t("welcome.aiOrganization.description")}
-                          </p>
-
-                          <div className="mt-4 flex flex-wrap gap-2">
-                            {[
-                              t("welcome.aiOrganization.tags.smartAlbums"),
-                              t("welcome.aiOrganization.tags.autoOrganization"),
-                              t("welcome.aiOrganization.tags.customTags"),
-                            ].map((tag, index) => (
-                              <span
-                                key={index}
-                                className="inline-flex items-center rounded-full bg-red-50 px-3 py-1 text-sm font-medium text-red-700 dark:bg-red-900/30 dark:text-red-300"
-                              >
-                                {tag}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                  </Link>
                 </div>
 
-                {features.slice(1).map((feature, index) => (
-                  <FeatureCard key={index} {...feature} />
-                ))}
+                <div className="flex items-center flex-shrink-0">
+                  <ThemeLanguageContainer
+                    isWelcome={true}
+                    canLogin={canLogin}
+                    canRegister={canRegister}
+                    loginText={t("welcome.login")}
+                    registerText={t("welcome.getStarted")}
+                  />
+                </div>
+              </div>
+            </div>
+          </header>
+
+          <main className="pt-32 pb-20">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+              <div className="text-center">
+                <div className="inline-flex items-center justify-center px-4 py-2 rounded-full bg-red-50 dark:bg-red-900/20 mb-6">
+                  <span className="text-sm font-medium text-primary-600 dark:text-primary-400 flex items-center gap-1">
+                    <Sparkles className="w-4 h-4" />
+                    {t("welcome.beta") || "Beta Activa"} v.1.0
+                  </span>
+                </div>
+
+                <h1
+                  className={`text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl
+                  ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+                >
+                  {t("welcome.title") || "Transforma tu contenido"}
+                  <span className="block text-primary-600 mt-3 flex items-center justify-center gap-2">
+                    <Zap className="w-8 h-8" />
+                    {t("welcome.titleHighlight") || "en resultados reales"}
+                    <Rocket className="w-8 h-8" />
+                  </span>
+                </h1>
+
+                <p
+                  className={`mx-auto mt-6 max-w-2xl text-lg
+                  ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
+                >
+                  {t("welcome.subtitle") ||
+                    "La plataforma todo en uno para crear, programar y optimizar contenido en redes sociales. Impulsado por IA."}
+                </p>
+
+                <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
+                  {canRegister ? (
+                    <>
+                      <Link
+                        href="/register"
+                        className="inline-flex items-center justify-center px-8 py-3 text-base font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors shadow-lg hover:shadow-xl"
+                      >
+                        {t("welcome.startFree") || "Comenzar Gratis"}
+                        <ArrowRight className="w-5 h-5 ml-2" />
+                      </Link>
+
+                      <Link
+                        href="/login"
+                        className="inline-flex items-center justify-center px-8 py-3 text-base font-medium text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                      >
+                        {t("welcome.demo") || "Ver Demo"}
+                      </Link>
+                    </>
+                  ) : canLogin ? (
+                    <Link
+                      href="/dashboard"
+                      className="inline-flex items-center justify-center px-8 py-3 text-base font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors shadow-lg hover:shadow-xl"
+                    >
+                      {t("welcome.goToDashboard") || "Ir al Dashboard"}
+                      <ArrowRight className="w-5 h-5 ml-2" />
+                    </Link>
+                  ) : null}
+                </div>
+              </div>
+
+              <div className="mt-20">
+                <h2
+                  className={`text-3xl font-bold text-center ${
+                    theme === "dark" ? "text-white" : "text-gray-900"
+                  }`}
+                >
+                  {t("welcome.featuresTitle") ||
+                    "Todo lo que necesitas en una plataforma"}
+                </h2>
+                <p
+                  className={`mt-4 text-center ${
+                    theme === "dark" ? "text-gray-300" : "text-gray-600"
+                  }`}
+                >
+                  {t("welcome.featuresSubtitle") ||
+                    "Gestiona todo tu contenido social desde un solo lugar"}
+                </p>
+
+                <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                  {features.map((feature, index) => (
+                    <FeatureCard key={index} {...feature} />
+                  ))}
+                </div>
+              </div>
+
+              <div className="mt-20 relative overflow-hidden rounded-2xl bg-gradient-to-r from-red-50 to-pink-50 dark:from-red-900/20 dark:to-pink-900/20 backdrop-blur-sm p-8">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-red-200/20 dark:bg-red-500/10 rounded-full -translate-y-32 translate-x-32"></div>
+                <div className="relative text-center">
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                    {t("welcome.readyToStart") ||
+                      "¿Listo para transformar tu contenido?"}
+                  </h2>
+                  <p className="mt-2 text-gray-600 dark:text-gray-300">
+                    {t("welcome.joinNow") ||
+                      "Únete a miles de creadores que ya usan ContentFlow"}
+                  </p>
+
+                  <div className="mt-8">
+                    {canRegister ? (
+                      <Link
+                        href="/register"
+                        className="inline-flex items-center justify-center px-8 py-3 text-lg font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors shadow-lg hover:shadow-xl"
+                      >
+                        {t("welcome.createAccount") || "Crear Cuenta Gratis"}
+                        <Rocket className="w-6 h-6 ml-2" />
+                      </Link>
+                    ) : canLogin ? (
+                      <Link
+                        href="/dashboard"
+                        className="inline-flex items-center justify-center px-8 py-3 text-lg font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors shadow-lg hover:shadow-xl"
+                      >
+                        {t("welcome.continue") || "Continuar al Dashboard"}
+                        <ArrowRight className="w-6 h-6 ml-2" />
+                      </Link>
+                    ) : null}
+                  </div>
+
+                  <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">
+                    {t("welcome.noCreditCard") ||
+                      "Sin tarjeta de crédito • Prueba de 14 días"}
+                  </p>
+                </div>
               </div>
             </div>
           </main>
+
+          <footer className="border-t border-gray-200 dark:border-gray-800 py-8">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+              <div className="flex flex-col md:flex-row justify-between items-center">
+                <div className="flex items-center mb-4 md:mb-0">
+                  <Link href="/" className="flex items-center">
+                    <div className="w-20 md:w-28">
+                      <img
+                        src={Logo}
+                        alt="ContentFlow Logo"
+                        className="w-full h-auto object-contain"
+                      />
+                    </div>
+                  </Link>
+                </div>
+
+                <div className="flex items-center space-x-6">
+                  <Link
+                    href="/privacy"
+                    className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors flex items-center gap-1"
+                  >
+                    <Shield className="w-4 h-4" />
+                    {t("welcome.privacy") || "Privacidad"}
+                  </Link>
+                  <Link
+                    href="/terms"
+                    className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors flex items-center gap-1"
+                  >
+                    <Globe className="w-4 h-4" />
+                    {t("welcome.terms") || "Términos"}
+                  </Link>
+                  <Link
+                    href="/contact"
+                    className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors flex items-center gap-1"
+                  >
+                    <Mail className="w-4 h-4" />
+                    {t("welcome.contact") || "Contacto"}
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </footer>
         </div>
       </div>
     </>

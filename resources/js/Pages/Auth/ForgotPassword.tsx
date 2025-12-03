@@ -1,6 +1,5 @@
 import Logo from "@/../assets/logo.png";
-import LanguageSwitcher from "@/Components/LanguageSwitcher";
-import ThemeSwitcher from "@/Components/ThemeSwitcher";
+import ThemeLanguageContainer from "@/Components/common/ThemeLanguageContainer";
 import GuestLayout from "@/Layouts/GuestLayout";
 import { Head, Link, useForm } from "@inertiajs/react";
 import { motion } from "framer-motion";
@@ -25,10 +24,7 @@ export default function ForgotPassword({ status }: ForgotPasswordProps) {
     <GuestLayout>
       <Head title="Forgot Password" />
 
-      <div className="fixed top-6 right-6 z-50">
-        <ThemeSwitcher />
-        <LanguageSwitcher />
-      </div>
+      <ThemeLanguageContainer />
 
       <div className="fixed top-6 left-6 z-50">
         <Link
