@@ -11,29 +11,21 @@ class ScheduledPost extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
     protected $fillable = [
         'user_id',
         'social_account_id',
+        'campaign_id',
         'media_file_id',
         'caption',
         'scheduled_at',
         'status',
     ];
 
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
     protected $casts = [
         'id' => 'integer',
         'user_id' => 'integer',
         'social_account_id' => 'integer',
+        'campaign_id' => 'integer',
         'media_file_id' => 'integer',
         'scheduled_at' => 'datetime',
     ];
@@ -51,6 +43,11 @@ class ScheduledPost extends Model
     public function mediaFile(): BelongsTo
     {
         return $this->belongsTo(MediaFile::class);
+    }
+
+    public function campaign(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Campaigns\Campaign::class);
     }
 
     public function postLogs(): HasMany

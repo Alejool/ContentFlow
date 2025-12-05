@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Image;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ImageCollection extends Model
+class Image extends Model
 {
   use HasFactory;
 
