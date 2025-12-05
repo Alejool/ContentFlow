@@ -1,22 +1,15 @@
-import React, { useRef, useState, useEffect } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import * as THREE from "three";
 import {
+  Environment,
+  Float,
+  Html,
+  MeshTransmissionMaterial,
   OrbitControls,
   Text,
-  Html,
-  Float,
-  MeshTransmissionMaterial,
-  Environment,
 } from "@react-three/drei";
-import {
-  Share2,
-  TrendingUp,
-  Zap,
-  RefreshCw,
-  Sparkles,
-  Activity,
-} from "lucide-react";
+import { Canvas, useFrame } from "@react-three/fiber";
+import { Share2, Sparkles, TrendingUp } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import * as THREE from "three";
 
 // Modern particle system with trails
 const ContentParticle = ({
@@ -228,7 +221,7 @@ const PlatformNode = ({
 
         {hovered && (
           <Html position={[0, 2.5, 0]} center distanceFactor={8}>
-            <div className="bg-black/70 backdrop-blur-xl p-4 rounded-2xl border border-white/20 shadow-2xl min-w-[200px] animate-in fade-in slide-in-from-bottom-3 duration-300">
+            <div className="bg-black/70 backdrop-blur-xl p-4 rounded-lg border border-white/20 shadow-2xl min-w-[200px] animate-in fade-in slide-in-from-bottom-3 duration-300">
               <div className="flex items-center gap-2 mb-3">
                 <div
                   className="w-3 h-3 rounded-full animate-pulse"
@@ -487,21 +480,25 @@ const ContentFlowVisualization3D = () => {
       </Canvas>
 
       {/* Modern gradient overlays */}
-      <div className="absolute inset-0 bg-gradient-to-b from-purple-100/5 via-transparent
-       to-blue-100/5 pointer-events-none" />
+      <div
+        className="absolute inset-0 bg-gradient-to-b from-purple-100/5 via-transparent
+       to-blue-100/5 pointer-events-none"
+      />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-purple-900/20 via-transparent to-transparent pointer-events-none" />
 
       {/* Modern stats bar */}
-      <div className="absolute 
+      <div
+        className="absolute 
       top-3
       left-1/2 transform 
       -translate-x-1/2 
-      bg-black/40 backdrop-blur-xl rounded-2xl px-6 py-4 
+      bg-black/40 backdrop-blur-xl rounded-lg px-6 py-4 
       border 
-      border-white/10 shadow-2xl">
+      border-white/10 shadow-2xl"
+      >
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-purple-500/20 rounded-xl">
+            <div className="p-2 bg-purple-500/20 rounded-lg">
               <Share2 className="w-5 h-5 text-purple-400" />
             </div>
             <div>

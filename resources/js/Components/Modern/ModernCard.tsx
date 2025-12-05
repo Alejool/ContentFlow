@@ -1,6 +1,6 @@
-import React, { ReactNode } from "react";
-import { LucideIcon } from "lucide-react";
 import { useTheme } from "@/Hooks/useTheme";
+import { LucideIcon } from "lucide-react";
+import { ReactNode } from "react";
 
 interface ModernCardProps {
   title: string;
@@ -8,7 +8,7 @@ interface ModernCardProps {
   icon?: LucideIcon;
   children: ReactNode;
   headerColor?: "blue" | "red" | "green" | "orange" | "purple" | "custom";
-  customGradient?: string; 
+  customGradient?: string;
   className?: string;
   compact?: boolean;
   noBorder?: boolean;
@@ -60,7 +60,7 @@ export default function ModernCard({
 
   return (
     <div
-      className={`rounded-xl overflow-hidden transition-all duration-300
+      className={`rounded-lg overflow-hidden transition-all duration-300
         ${theme === "dark" ? "bg-neutral-800/50" : "bg-white"}
         ${
           !noBorder &&

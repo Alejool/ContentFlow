@@ -1,107 +1,407 @@
-"use client"
+"use client";
 
-import type { IconButtonProps, SpanProps } from "@chakra-ui/react"
-import { ClientOnly, IconButton, Skeleton, Span } from "@chakra-ui/react"
-import { ThemeProvider, useTheme } from "next-themes"
-import type { ThemeProviderProps } from "next-themes"
-import * as React from "react"
-import { LuMoon, LuSun } from "react-icons/lu"
+import * as React from "react";
+import { Moon, Sun } from "lucide-react";
 
-export interface ColorModeProviderProps extends ThemeProviderProps {}
-
-export function ColorModeProvider(props: ColorModeProviderProps) {
-  return (
-    <ThemeProvider attribute="class" disableTransitionOnChange {...props} />
-  )
+export interface ColorModeProviderProps {
+  children: React.ReactNode;
+  attribute?: string;
+  defaultTheme?: string;
+  enableSystem?: boolean;
+  disableTransitionOnChange?: boolean;
+  storageKey?: string;
+  themes?: string[];
 }
 
-export type ColorMode = "light" | "dark"
+// Context para el tema
+const ThemeContext = React.createContext<{
+  theme: "light" | "dark" | "system";
+  setTheme: (theme: "light" | "dark" | "system") => void;
+}>({
+  theme: "light",
+  setTheme: () => {},
+});
+
+// Hook para usar el contexto del tema
+export function useTheme() {
+  const context = React.useContext(ThemeContext);
+  if (!context) {
+    throw new Error("useTheme must be used within a ThemeProvider");
+  }
+  return context;
+}
+
+// Provider simplificado
+export function ColorModeProvider({
+  children,
+  attribute = "class",
+  defaultTheme = "system",
+  disableTransitionOnChange = false,
+  storageKey = "theme",
+}: ColorModeProviderProps) {
+  const [theme, setThemeState] = React.useState<"light" | "dark" | "system">(
+    () => {
+      if (typeof window === "undefined")
+        return defaultTheme as "light" | "dark" | "system";
+
+      const stored = localStorage.getItem(storageKey);
+      if (stored === "light" || stored === "dark" || stored === "system") {
+        return stored;
+      }
+
+      // Detectar preferencia del sistema
+      if (defaultTheme === "system") {
+        return window.matchMedia("(prefers-color-scheme: dark)").matches
+          ? "dark"
+          : "light";
+      }
+
+      return defaultTheme as "light" | "dark" | "system";
+    }
+  );
+
+  const setTheme = React.useCallback(
+    (newTheme: "light" | "dark" | "system") => {
+      setThemeState(newTheme);
+
+      if (typeof window !== "undefined") {
+        localStorage.setItem(storageKey, newTheme);
+
+        const root = document.documentElement;
+        const actualTheme =
+          newTheme === "system"
+            ? window.matchMedia("(prefers-color-scheme: dark)").matches
+              ? "dark"
+              : "light"
+            : newTheme;
+
+        if (disableTransitionOnChange) {
+          const css = document.createElement("style");
+          css.appendChild(
+            document.createTextNode(
+              `*{-webkit-transition:none!important;-moz-transition:none!important;-o-transition:none!important;-ms-transition:none!important;transition:none!important}`
+            )
+          );
+          document.head.appendChild(css);
+
+          root.classList.remove("light", "dark");
+          root.classList.add(actualTheme);
+
+          const _ = window.getComputedStyle(css).opacity;
+          document.head.removeChild(css);
+        } else {
+          root.classList.remove("light", "dark");
+          root.classList.add(actualTheme);
+        }
+      }
+    },
+    [disableTransitionOnChange, storageKey]
+  );
+
+  // Efecto para aplicar el tema al montar
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      const root = document.documentElement;
+      const actualTheme =
+        theme === "system"
+          ? window.matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light"
+          : theme;
+
+      root.classList.remove("light", "dark");
+      root.classList.add(actualTheme);
+      root.setAttribute(attribute, actualTheme);
+    }
+  }, [theme, attribute]);
+
+  // Escuchar cambios en la preferencia del sistema
+  React.useEffect(() => {
+    if (theme === "system" && typeof window !== "undefined") {
+      const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+
+      const handleChange = () => {
+        const root = document.documentElement;
+        const actualTheme = mediaQuery.matches ? "dark" : "light";
+
+        root.classList.remove("light", "dark");
+        root.classList.add(actualTheme);
+      };
+
+      mediaQuery.addEventListener("change", handleChange);
+      return () => mediaQuery.removeEventListener("change", handleChange);
+    }
+  }, [theme]);
+
+  const value = React.useMemo(
+    () => ({
+      theme,
+      setTheme,
+    }),
+    [theme, setTheme]
+  );
+
+  return (
+    <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
+  );
+}
+
+export type ColorMode = "light" | "dark";
 
 export interface UseColorModeReturn {
-  colorMode: ColorMode
-  setColorMode: (colorMode: ColorMode) => void
-  toggleColorMode: () => void
+  colorMode: ColorMode;
+  setColorMode: (colorMode: ColorMode) => void;
+  toggleColorMode: () => void;
 }
 
+// Hook principal para el modo de color
 export function useColorMode(): UseColorModeReturn {
-  const { resolvedTheme, setTheme } = useTheme()
-  const toggleColorMode = () => {
-    setTheme(resolvedTheme === "dark" ? "light" : "dark")
-  }
+  const { theme, setTheme } = useTheme();
+
+  const toggleColorMode = React.useCallback(() => {
+    const newTheme = theme === "dark" ? "light" : "dark";
+    setTheme(newTheme);
+  }, [theme, setTheme]);
+
+  const resolvedTheme = React.useMemo(() => {
+    if (theme === "system" && typeof window !== "undefined") {
+      return window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light";
+    }
+    return theme as ColorMode;
+  }, [theme]);
+
   return {
-    colorMode: resolvedTheme as ColorMode,
-    setColorMode: setTheme,
+    colorMode: resolvedTheme,
+    setColorMode: (colorMode: ColorMode) => setTheme(colorMode),
     toggleColorMode,
-  }
+  };
 }
 
+// Hook para valores dependientes del tema
 export function useColorModeValue<T>(light: T, dark: T) {
-  const { colorMode } = useColorMode()
-  return colorMode === "dark" ? dark : light
+  const { colorMode } = useColorMode();
+  return colorMode === "dark" ? dark : light;
 }
 
+// Icono que cambia según el tema
 export function ColorModeIcon() {
-  const { colorMode } = useColorMode()
-  return colorMode === "dark" ? <LuMoon /> : <LuSun />
+  const { colorMode } = useColorMode();
+  return colorMode === "dark" ? (
+    <Moon className="w-5 h-5" />
+  ) : (
+    <Sun className="w-5 h-5" />
+  );
 }
 
-interface ColorModeButtonProps extends Omit<IconButtonProps, "aria-label"> {}
+// Props para el botón de modo de color
+interface ColorModeButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: "ghost" | "solid" | "outline";
+  size?: "sm" | "md" | "lg";
+  isLoading?: boolean;
+  iconSize?: "sm" | "md" | "lg";
+}
 
+// Botón de cambio de tema
 export const ColorModeButton = React.forwardRef<
   HTMLButtonElement,
   ColorModeButtonProps
->(function ColorModeButton(props, ref) {
-  const { toggleColorMode } = useColorMode()
+>(function ColorModeButton(
+  {
+    variant = "ghost",
+    size = "sm",
+    isLoading = false,
+    iconSize,
+    className = "",
+    ...props
+  },
+  ref
+) {
+  const { toggleColorMode, colorMode } = useColorMode();
+
+  const sizeClasses = {
+    sm: "w-8 h-8 text-sm",
+    md: "w-10 h-10 text-base",
+    lg: "w-12 h-12 text-lg",
+  };
+
+  const iconSizeMap = {
+    sm: "w-4 h-4",
+    md: "w-5 h-5",
+    lg: "w-6 h-6",
+  };
+
+  const iconSizeClass = iconSize
+    ? iconSizeMap[iconSize]
+    : size === "sm"
+    ? "w-4 h-4"
+    : size === "md"
+    ? "w-5 h-5"
+    : "w-6 h-6";
+
+  const variantClasses = {
+    ghost:
+      "bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300",
+    solid:
+      colorMode === "dark"
+        ? "bg-gray-800 text-amber-400 hover:bg-gray-700"
+        : "bg-gray-100 text-amber-600 hover:bg-gray-200",
+    outline:
+      "border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300",
+  };
+
   return (
-    <ClientOnly fallback={<Skeleton boxSize="8" />}>
-      <IconButton
-        onClick={toggleColorMode}
-        variant="ghost"
-        aria-label="Toggle color mode"
-        size="sm"
-        ref={ref}
-        {...props}
-        css={{
-          _icon: {
-            width: "5",
-            height: "5",
-          },
-        }}
+    <button
+      ref={ref}
+      onClick={toggleColorMode}
+      aria-label={`Switch to ${colorMode === "dark" ? "light" : "dark"} mode`}
+      disabled={isLoading}
+      className={`
+        inline-flex items-center justify-center rounded-lg transition-all duration-200
+        ${sizeClasses[size]}
+        ${variantClasses[variant]}
+        ${isLoading ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
+        focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500
+        dark:focus:ring-offset-gray-900
+        ${className}
+      `}
+      {...props}
+    >
+      {isLoading ? (
+        <div
+          className={`${iconSizeClass} border-2 border-gray-300 dark:border-gray-600 border-t-transparent rounded-full animate-spin`}
+        />
+      ) : colorMode === "dark" ? (
+        <Sun
+          className={`${iconSizeClass} transition-transform duration-300 hover:rotate-12`}
+        />
+      ) : (
+        <Moon
+          className={`${iconSizeClass} transition-transform duration-300 hover:rotate-12`}
+        />
+      )}
+    </button>
+  );
+});
+
+// Versión con skeleton para SSR
+export const ColorModeButtonWithSkeleton = React.forwardRef<
+  HTMLButtonElement,
+  ColorModeButtonProps
+>(function ColorModeButtonWithSkeleton(props, ref) {
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <div
+        className={`w-8 h-8 rounded-lg bg-gray-200 dark:bg-gray-700 animate-pulse ${
+          props.className || ""
+        }`}
+        aria-hidden="true"
+      />
+    );
+  }
+
+  return <ColorModeButton ref={ref} {...props} />;
+});
+
+// Componentes para contenido específico del tema
+interface ThemeContentProps extends React.HTMLAttributes<HTMLSpanElement> {
+  children?: React.ReactNode;
+}
+
+export const LightMode = React.forwardRef<HTMLSpanElement, ThemeContentProps>(
+  function LightMode({ children, className = "", ...props }, ref) {
+    const { colorMode } = useColorMode();
+
+    if (colorMode !== "light") return null;
+
+    return (
+      <span ref={ref} className={`theme-light ${className}`} {...props}>
+        {children}
+      </span>
+    );
+  }
+);
+
+export const DarkMode = React.forwardRef<HTMLSpanElement, ThemeContentProps>(
+  function DarkMode({ children, className = "", ...props }, ref) {
+    const { colorMode } = useColorMode();
+
+    if (colorMode !== "dark") return null;
+
+    return (
+      <span ref={ref} className={`theme-dark ${className}`} {...props}>
+        {children}
+      </span>
+    );
+  }
+);
+
+// Hook para detectar si estamos en el cliente
+export function useIsClient() {
+  const [isClient, setIsClient] = React.useState(false);
+  React.useEffect(() => {
+    setIsClient(true);
+  }, []);
+  return isClient;
+}
+
+// Componente ClientOnly wrapper
+export function ClientOnly({
+  children,
+  fallback = null,
+}: {
+  children: React.ReactNode;
+  fallback?: React.ReactNode;
+}) {
+  const isClient = useIsClient();
+  return isClient ? <>{children}</> : <>{fallback}</>;
+}
+
+// Versión simplificada del ThemeProvider con soporte SSR
+export function SimpleThemeProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Previene el flash de contenido
+  if (!mounted) {
+    return (
+      <div
+        className="min-h-screen bg-white dark:bg-gray-900"
+        style={{ visibility: "hidden" }}
+        suppressHydrationWarning
       >
-        <ColorModeIcon />
-      </IconButton>
-    </ClientOnly>
-  )
-})
+        {children}
+      </div>
+    );
+  }
 
-export const LightMode = React.forwardRef<HTMLSpanElement, SpanProps>(
-  function LightMode(props, ref) {
-    return (
-      <Span
-        color="fg"
-        display="contents"
-        className="chakra-theme light"
-        colorPalette="gray"
-        colorScheme="light"
-        ref={ref}
-        {...props}
-      />
-    )
-  },
-)
+  return <>{children}</>;
+}
 
-export const DarkMode = React.forwardRef<HTMLSpanElement, SpanProps>(
-  function DarkMode(props, ref) {
-    return (
-      <Span
-        color="fg"
-        display="contents"
-        className="chakra-theme dark"
-        colorPalette="gray"
-        colorScheme="dark"
-        ref={ref}
-        {...props}
-      />
-    )
-  },
-)
+// Hook para obtener el color mode actual de manera segura
+export function useSafeColorMode() {
+  const isClient = useIsClient();
+  const { colorMode, setColorMode, toggleColorMode } = useColorMode();
+
+  return {
+    colorMode: isClient ? colorMode : ("light" as ColorMode),
+    setColorMode: isClient ? setColorMode : () => {},
+    toggleColorMode: isClient ? toggleColorMode : () => {},
+    isClient,
+  };
+}

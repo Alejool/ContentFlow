@@ -20,7 +20,7 @@ export default function ThemeLanguageContainer({
 
   if (!isWelcome) {
     return (
-      <div className="fixed top-6 right-6 z-50 backdrop-blur-sm rounded-xl flex items-center space-x-2">
+      <div className="fixed top-6 right-6 z-50 backdrop-blur-sm rounded-lg flex items-center space-x-2">
         <ThemeSwitcher />
         <LanguageSwitcher />
       </div>

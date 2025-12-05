@@ -74,7 +74,7 @@ export default function ModernInput<T extends FieldValues>({
   const getInputStyles = () => {
     const baseStyles = ` pl-10
       block w-full text-sm placeholder:text-sm
-      rounded-xl transition-all duration-200
+      rounded-lg transition-all duration-200
       focus:outline-none focus:ring-0 focus:ring-offset-0
       ${disabled ? "cursor-not-allowed" : ""}
       ${prefix ? "pl-12" : "pl-4"}

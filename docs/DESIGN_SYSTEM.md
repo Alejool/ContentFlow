@@ -142,7 +142,7 @@ const color = getColor('primary.600');
 <button 
   className="bg-gradient-to-r from-red-600 to-orange-600 
              hover:from-red-700 hover:to-orange-700 
-             text-white px-6 py-3 rounded-2xl 
+             text-white px-6 py-3 rounded-lg 
              shadow-lg hover:shadow-xl 
              transition-all duration-200"
 >
@@ -154,7 +154,7 @@ const color = getColor('primary.600');
 
 ```jsx
 <div 
-  className="bg-white rounded-2xl shadow-md 
+  className="bg-white rounded-lg shadow-md 
              hover:shadow-lg transition-shadow 
              p-6 border border-gray-200"
 >
@@ -166,7 +166,7 @@ const color = getColor('primary.600');
 
 ```jsx
 <input
-  className={`w-full px-4 py-3 rounded-xl 
+  className={`w-full px-4 py-3 rounded-lg 
               border transition-all duration-300
               ${error 
                 ? 'border-red-300 bg-red-50 focus:ring-red-200' 

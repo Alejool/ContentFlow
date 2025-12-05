@@ -1,5 +1,5 @@
-import React, { ButtonHTMLAttributes, ReactNode } from "react";
 import { LucideIcon } from "lucide-react";
+import { ButtonHTMLAttributes, ReactNode } from "react";
 
 interface ModernButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
@@ -18,7 +18,7 @@ export default function ModernButton({
   ...props
 }: ModernButtonProps) {
   const baseStyles =
-    "w-full px-6 py-4 font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-3 transform hover:scale-[1.02] shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none";
+    "w-full px-6 py-4 font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-3 transform hover:scale-[1.02] shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none";
 
   const variants = {
     primary:
