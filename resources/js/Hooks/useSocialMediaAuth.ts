@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
 import axios from "axios";
+import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 
 export const useSocialMediaAuth = () => {
@@ -25,7 +25,7 @@ export const useSocialMediaAuth = () => {
 
             // Guardar los datos en el backend
             await axios.post(
-              "/api/social-accounts",
+              "/social-accounts",
               {
                 platform: responseData.platform,
                 account_id: responseData.account_id,
