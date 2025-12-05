@@ -1,14 +1,99 @@
+import Logo from "@/../assets/logo-with-name.png";
 import Dropdown from "@/Components/Dropdown";
-import ResponsiveNavLink from "@/Components/ResponsiveNavLink";
-import { Home, User, FileText, BarChart3, Bot, LogOut } from "lucide-react";
 import LanguageSwitcher from "@/Components/LanguageSwitcher";
+import ResponsiveNavLink from "@/Components/ResponsiveNavLink";
 import ThemeSwitcher from "@/Components/ThemeSwitcher";
+import { useTheme } from "@/Hooks/useTheme";
+import { BarChart3, Bot, FileText, Home, LogOut, User } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useTheme } from "@/Hooks/useTheme"; 
+import { usePage } from "@inertiajs/react";
+
+interface CustomAvatarProps {
+  src?: string | null;
+  name?: string;
+  size?: "sm" | "md" | "lg";
+  className?: string;
+}
+
+function CustomAvatar({
+  src,
+  name = "User",
+  size = "md",
+  className = "",
+}: CustomAvatarProps) {
+  const { theme } = useTheme();
+
+  const getInitials = (name: string) => {
+    if (!name.trim()) return "U";
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  const sizeClasses = {
+    sm: "w-8 h-8 text-xs",
+    md: "w-10 h-10 text-sm",
+    lg: "w-12 h-12 text-base",
+  };
+
+  const avatarBgClass =
+    theme === "dark"
+      ? "bg-gradient-to-br from-orange-900/30 to-purple-900/30"
+      : "bg-gradient-to-br from-orange-100 to-purple-100";
+
+  const avatarTextClass =
+    theme === "dark" ? "text-orange-200" : "text-orange-800";
+
+  return (
+    <div
+      className={`${sizeClasses[size]} ${className} relative rounded-full overflow-hidden flex items-center justify-center font-bold shadow-lg ${avatarBgClass}`}
+    >
+      {src ? (
+        <img
+          src={src}
+          alt={name}
+          className="w-full h-full object-cover"
+          onError={(e) => {
+            // Si la imagen falla, mostrar iniciales
+            const img = e.currentTarget;
+            img.style.display = "none";
+
+            const fallback = document.createElement("div");
+            fallback.className = `w-full h-full flex items-center justify-center ${avatarTextClass} font-bold`;
+            fallback.textContent = getInitials(name);
+
+            const parent = img.parentElement;
+            if (parent) {
+              // Eliminar cualquier fallback existente
+              const existingFallback = parent.querySelector(".avatar-fallback");
+              if (existingFallback) {
+                parent.removeChild(existingFallback);
+              }
+
+              fallback.className += " avatar-fallback";
+              parent.appendChild(fallback);
+            }
+          }}
+        />
+      ) : (
+        <div
+          className={`w-full h-full flex items-center justify-center ${avatarTextClass} avatar-fallback`}
+        >
+          {getInitials(name)}
+        </div>
+      )}
+    </div>
+  );
+}
 
 interface MobileNavbarProps {
   user: {
     name?: string;
+    photo_url?: string;
+    email?: string;
     [key: string]: any;
   };
   showingNavigationDropdown: boolean;
@@ -34,108 +119,107 @@ export default function MobileNavbar({
 }: MobileNavbarProps) {
   const { t } = useTranslation();
   const { theme } = useTheme();
+  const { url } = usePage();
+
+  const isActiveRoute = (routeName: string) => {
+    return (
+      url.includes(routeName.replace(".index", "")) ||
+      url === route(routeName) ||
+      route().current(routeName)
+    );
+  };
+
+  const isProfileActive = isActiveRoute("profile.edit");
 
   return (
-    <>
-      <nav
-        className={` w-full  lg:hidden shadow-lg sticky top-0 z-50 backdrop-blur-2xl
-        ${theme === "dark" ? "bg-neutral-900/95" : "bg-beige-200/95"}`}
-      >
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <div className="flex h-16 justify-between items-center">
-            <button
-              onClick={() =>
-                setShowingNavigationDropdown(!showingNavigationDropdown)
-              }
-              className={`inline-flex items-center justify-center p-3 rounded-2xl
+    <nav
+      className={`w-full lg:hidden shadow-lg sticky top-0 z-50 backdrop-blur-2xl
+        ${theme === "dark" ? "bg-neutral-900/60" : "bg-beige-200/90"}`}
+    >
+      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+        <div className="flex h-16 justify-between items-center">
+          <button
+            onClick={() =>
+              setShowingNavigationDropdown(!showingNavigationDropdown)
+            }
+            className={`inline-flex items-center justify-center p-3 rounded-lg
                 ${
                   theme === "dark"
                     ? "text-gray-400 hover:text-orange-400"
                     : "text-gray-700 hover:text-orange-600"
                 }`}
+            aria-label={showingNavigationDropdown ? "Close menu" : "Open menu"}
+          >
+            <svg
+              className="h-6 w-6"
+              stroke="currentColor"
+              fill="none"
+              viewBox="0 0 24 24"
             >
-              <svg
-                className="h-6 w-6"
-                stroke="currentColor"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  className={
-                    !showingNavigationDropdown ? "inline-flex" : "hidden"
-                  }
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-                <path
-                  className={
-                    showingNavigationDropdown ? "inline-flex" : "hidden"
-                  }
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
+              <path
+                className={
+                  !showingNavigationDropdown ? "inline-flex" : "hidden"
+                }
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+              <path
+                className={showingNavigationDropdown ? "inline-flex" : "hidden"}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
 
-            <div className="flex items-center space-x-3">
-              <div
-                className={`w-10 h-10 bg-gradient-to-r rounded-full flex items-center justify-center
-                ${
-                  theme === "dark"
-                    ? "from-orange-500 to-orange-700"
-                    : "from-orange-600 to-orange-800"
-                }`}
-              >
-                <span className="text-white font-bold text-lg">CF</span>
-              </div>
-              <div>
-                <h1
-                  className={`text-lg font-bold bg-gradient-to-r bg-clip-text text-transparent
-                  ${
-                    theme === "dark"
-                      ? "from-gray-200 to-gray-400"
-                      : "from-gray-800 to-gray-600"
-                  }`}
-                >
-                  ContentFlow
-                </h1>
-              </div>
-            </div>
+          <div className="flex items-center space-x-3">
+            <img src={Logo} alt="Logo" className="w-48 h-24" />
+          </div>
 
-            <div className="flex items-center">
-              <Dropdown>
-                <Dropdown.Trigger>
-                  <span className="inline-flex">
-                    <button
-                      type="button"
-                      className={`inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 shadow-sm hover:shadow-md
+          <div className="flex items-center">
+            <Dropdown>
+              <Dropdown.Trigger>
+                <span className="inline-flex">
+                  <button
+                    type="button"
+                    className={`inline-flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 shadow-sm hover:shadow-md
                         ${
                           theme === "dark"
                             ? "text-gray-200 hover:bg-neutral-800"
                             : "text-gray-700 hover:bg-beige-300"
                         }`}
-                    >
+                  >
+                    <div className="flex items-center gap-2">
                       <div
-                        className={`w-8 h-8 mr-3 bg-gradient-to-r rounded-full flex items-center justify-center
-                        ${
+                        className={`rounded-full ring-2 shadow-lg ${
                           theme === "dark"
-                            ? "from-orange-500 to-orange-700"
-                            : "from-orange-600 to-orange-800"
+                            ? "ring-purple-900/50"
+                            : "ring-green-200"
+                        } ${
+                          isProfileActive
+                            ? theme === "dark"
+                              ? "ring-orange-500"
+                              : "ring-orange-600"
+                            : ""
                         }`}
                       >
-                        <span className="text-white text-sm font-bold">
-                          {user.name?.charAt(0)?.toUpperCase() || "U"}
-                        </span>
+                        <CustomAvatar
+                          src={user.photo_url}
+                          name={user.name}
+                          size="md"
+                        />
                       </div>
-                      <span className="hidden sm:block">
-                        {user.name || "User"}
-                      </span>
+                      <div className="hidden sm:block flex-col items-start">
+                        <span className="font-medium truncate max-w-[120px]">
+                          {user.name || "User"}
+                        </span>
+                        
+                      </div>
                       <svg
-                        className={`ml-2 h-4 w-4 ${
+                        className={`ml-1 h-4 w-4 ${
                           theme === "dark" ? "text-gray-400" : "text-gray-500"
                         }`}
                         xmlns="http://www.w3.org/2000/svg"
@@ -148,63 +232,110 @@ export default function MobileNavbar({
                           clipRule="evenodd"
                         />
                       </svg>
-                    </button>
-                  </span>
-                </Dropdown.Trigger>
+                    </div>
+                  </button>
+                </span>
+              </Dropdown.Trigger>
 
-                <Dropdown.Content
-                  className={`shadow-xl
+              <Dropdown.Content
+                className={`shadow-xl min-w-[200px]
                   ${
                     theme === "dark"
                       ? "bg-neutral-800 text-gray-200"
                       : "bg-white text-gray-700"
                   }`}
+              >
+                <div className="p-3 border-b border-neutral-700/50 dark:border-gray-200/10">
+                  <div className="flex items-center gap-3">
+                    <CustomAvatar
+                      src={user.photo_url}
+                      name={user.name}
+                      size="md"
+                    />
+                    <div>
+                      <p className="font-medium">{user.name || "User"}</p>
+                      <p
+                        className={`text-xs ${
+                          theme === "dark" ? "text-gray-400" : "text-gray-500"
+                        }`}
+                      >
+                        {user.email}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <Dropdown.Link
+                  href={route("profile.edit")}
+                  className={`flex items-center space-x-2 px-3 py-2.5 transition-colors
+                    ${
+                      isProfileActive
+                        ? theme === "dark"
+                          ? "bg-orange-900/30 text-orange-300"
+                          : "bg-orange-100 text-orange-700"
+                        : theme === "dark"
+                        ? "hover:bg-neutral-700 hover:text-orange-400"
+                        : "hover:bg-gray-100 hover:text-orange-600"
+                    }`}
                 >
-                  <Dropdown.Link
-                    href={route("profile.edit")}
-                    className={`flex items-center space-x-2
-                      ${
-                        theme === "dark"
-                          ? "hover:bg-neutral-700"
-                          : "hover:bg-gray-100"
-                      }`}
-                  >
-                    <User className="h-4 w-4" />
-                    <span>{t("nav.profile")}</span>
-                  </Dropdown.Link>
-                  <Dropdown.Link
-                    href={route("logout")}
-                    method="post"
-                    as="button"
-                    className={`flex items-center space-x-2
-                      ${
-                        theme === "dark"
-                          ? "hover:bg-neutral-700"
-                          : "hover:bg-gray-100"
-                      }`}
-                  >
-                    <LogOut className="h-4 w-4" />
-                    <span>{t("nav.logout")}</span>
-                  </Dropdown.Link>
-                </Dropdown.Content>
-              </Dropdown>
-            </div>
+                  <User
+                    className={`h-4 w-4 ${
+                      isProfileActive
+                        ? theme === "dark"
+                          ? "text-orange-400"
+                          : "text-orange-600"
+                        : ""
+                    }`}
+                  />
+                  <span className={`${isProfileActive ? "font-semibold" : ""}`}>
+                    {t("nav.profile")}
+                  </span>
+                  {isProfileActive && (
+                    <span className="ml-auto">
+                      <div
+                        className={`w-2 h-2 rounded-full ${
+                          theme === "dark" ? "bg-orange-400" : "bg-orange-600"
+                        }`}
+                      ></div>
+                    </span>
+                  )}
+                </Dropdown.Link>
+
+                <Dropdown.Link
+                  href={route("logout")}
+                  method="post"
+                  as="button"
+                  className={`flex items-center space-x-2 px-3 py-2.5 transition-colors
+                    ${
+                      theme === "dark"
+                        ? "hover:bg-neutral-700 hover:text-red-400"
+                        : "hover:bg-gray-100 hover:text-red-600"
+                    }`}
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span>{t("nav.logout")}</span>
+                </Dropdown.Link>
+              </Dropdown.Content>
+            </Dropdown>
           </div>
         </div>
+      </div>
 
-        <div
-          className={`${showingNavigationDropdown ? "block" : "hidden"}
+      <div
+        className={`${showingNavigationDropdown ? "block" : "hidden"}
           ${theme === "dark" ? "bg-neutral-900/95" : "bg-beige-200/95"}`}
-        >
-          <div className="px-4 py-6 space-y-2">
-            {mobileNavigationItems.map((item) => (
+      >
+        <div className="px-4 py-6 space-y-2">
+          {mobileNavigationItems.map((item) => {
+            const isActive = isActiveRoute(item.href);
+            return (
               <ResponsiveNavLink
                 key={item.href}
                 href={route(item.href)}
-                active={route().current(item.href)}
+                active={isActive}
                 className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-300
                   ${
-                    route().current(item.href)
+                    isActive
                       ? `bg-gradient-to-r ${
                           theme === "dark"
                             ? "from-orange-600 to-orange-800"
@@ -219,41 +350,48 @@ export default function MobileNavbar({
               >
                 <item.lucideIcon className="h-5 w-5" />
                 <span className="font-medium">{t(item.nameKey)}</span>
+                {isActive && (
+                  <span className="ml-auto">
+                    <div
+                      className={`w-2 h-2 rounded-full ${
+                        theme === "dark" ? "bg-orange-300" : "bg-orange-500"
+                      }`}
+                    ></div>
+                  </span>
+                )}
               </ResponsiveNavLink>
-            ))}
+            );
+          })}
 
-            <div
-              className={`pt-4 border-t ${
-                theme === "dark"
-                  ? "border-neutral-700/50"
-                  : "border-beige-300/50"
-              }`}
-            >
-              <div className="flex items-center gap-2">
-                <ResponsiveNavLink
-                  href={route("logout")}
-                  method="post"
-                  as="button"
-                  className={`flex-1 flex items-center justify-center space-x-3 px-4 py-3 rounded-lg border transition-all duration-300
+          <div
+            className={`pt-4 border-t ${
+              theme === "dark" ? "border-neutral-700/50" : "border-beige-300/50"
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <ResponsiveNavLink
+                href={route("logout")}
+                method="post"
+                as="button"
+                className={`flex-1 flex items-center justify-center space-x-3 px-4 py-3 rounded-lg border transition-all duration-300
                     ${
                       theme === "dark"
                         ? "bg-neutral-800 border-neutral-700 text-gray-200 hover:bg-red-900/30 hover:text-red-300"
                         : "bg-beige-300 border-beige-400 text-gray-700 hover:bg-red-50 hover:text-red-600"
                     }`}
-                >
-                  <LogOut className="h-5 w-5" />
-                  <span className="font-medium">{t("nav.logout")}</span>
-                </ResponsiveNavLink>
+              >
+                <LogOut className="h-5 w-5" />
+                <span className="font-medium">{t("nav.logout")}</span>
+              </ResponsiveNavLink>
 
-                <div className="flex items-center justify-center gap-2">
-                  <ThemeSwitcher />
-                  <LanguageSwitcher />
-                </div>
+              <div className="flex items-center justify-center gap-2">
+                <ThemeSwitcher />
+                <LanguageSwitcher />
               </div>
             </div>
           </div>
         </div>
-      </nav>
-    </>
+      </div>
+    </nav>
   );
 }

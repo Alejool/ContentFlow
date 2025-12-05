@@ -147,7 +147,7 @@ export default function Dashboard({ auth, stats, status }: DashboardProps) {
           min-h-screen transition-colors duration-300 `}
       >
         <div
-          className={`rounded-2xl p-8 mb-8 shadow-sm transition-colors duration-300 ${
+          className={`rounded-lg p-8 mb-8 shadow-sm transition-colors duration-300 ${
             theme === "dark"
               ? "bg-gradient-to-r from-neutral-800/50 to-purple-900/20 border border-neutral-700/50"
               : "bg-gradient-to-r from-orange-50/50 to-purple-50/50 border border-orange-100"
@@ -165,7 +165,7 @@ export default function Dashboard({ auth, stats, status }: DashboardProps) {
               </p>
             </div>
             <div
-              className={`flex items-center gap-4 p-4 rounded-xl ${
+              className={`flex items-center gap-4 p-4 rounded-lg ${
                 theme === "dark" ? "bg-neutral-800/30" : "bg-white/60"
               }`}
             >
@@ -186,7 +186,7 @@ export default function Dashboard({ auth, stats, status }: DashboardProps) {
 
         {!auth.user.email_verified_at && showBanner && (
           <div
-            className={`mb-8 rounded-2xl p-6 shadow-sm transition-colors duration-300 ${
+            className={`mb-8 rounded-lg p-6 shadow-sm transition-colors duration-300 ${
               theme === "dark"
                 ? "bg-gradient-to-r from-blue-900/20 to-purple-900/20 border border-blue-800/30"
                 : "bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200"
@@ -240,7 +240,7 @@ export default function Dashboard({ auth, stats, status }: DashboardProps) {
                     disabled={sending}
                     className={
                       getGradientButton("from-blue-600", "to-purple-600") +
-                      " disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                      " disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none p-2"
                     }
                   >
                     {sending
@@ -315,7 +315,7 @@ export default function Dashboard({ auth, stats, status }: DashboardProps) {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {stats.engagementTrends.length > 0 && (
             <div
-              className={`rounded-2xl p-6 shadow-sm transition-colors duration-300 ${getCardBg()}`}
+              className={`rounded-lg p-6 shadow-sm transition-colors duration-300 ${getCardBg()}`}
             >
               <h2
                 className={`text-xl font-bold mb-4 flex items-center gap-2 ${getTextColor(
@@ -362,7 +362,7 @@ export default function Dashboard({ auth, stats, status }: DashboardProps) {
 
           {stats.platformData.length > 0 && (
             <div
-              className={`rounded-2xl p-6 shadow-sm transition-colors duration-300 ${getCardBg()}`}
+              className={`rounded-lg p-6 shadow-sm transition-colors duration-300 ${getCardBg()}`}
             >
               <h2
                 className={`text-xl font-bold mb-4 flex items-center gap-2 ${getTextColor(
@@ -394,7 +394,7 @@ export default function Dashboard({ auth, stats, status }: DashboardProps) {
 
         {campaignChartData.length > 0 && (
           <div
-            className={`rounded-2xl p-6 shadow-sm transition-colors duration-300 mb-8 ${getCardBg()}`}
+            className={`rounded-lg p-6 shadow-sm transition-colors duration-300 mb-8 ${getCardBg()}`}
           >
             <div className="flex items-center justify-between mb-4">
               <h2
@@ -456,14 +456,14 @@ export default function Dashboard({ auth, stats, status }: DashboardProps) {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Link
             href="/campaigns"
-            className={`group relative overflow-hidden rounded-2xl p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${
+            className={`group relative overflow-hidden rounded-lg p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${
               theme === "dark"
                 ? "bg-gradient-to-r from-blue-900/40 to-blue-800/40 border border-blue-800/30"
                 : "bg-gradient-to-r from-blue-500 to-blue-600"
             }`}
           >
             <div
-              className={`p-3 rounded-xl inline-block mb-4 ${
+              className={`p-3 rounded-lg inline-block mb-4 ${
                 theme === "dark" ? "bg-blue-900/30" : "bg-white/20"
               }`}
             >
@@ -498,14 +498,14 @@ export default function Dashboard({ auth, stats, status }: DashboardProps) {
 
           <Link
             href="/analytics"
-            className={`group relative overflow-hidden rounded-2xl p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${
+            className={`group relative overflow-hidden rounded-lg p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${
               theme === "dark"
                 ? "bg-gradient-to-r from-purple-900/40 to-purple-800/40 border border-purple-800/30"
                 : "bg-gradient-to-r from-purple-500 to-purple-600"
             }`}
           >
             <div
-              className={`p-3 rounded-xl inline-block mb-4 ${
+              className={`p-3 rounded-lg inline-block mb-4 ${
                 theme === "dark" ? "bg-purple-900/30" : "bg-white/20"
               }`}
             >
@@ -540,14 +540,14 @@ export default function Dashboard({ auth, stats, status }: DashboardProps) {
 
           <Link
             href="/manage-content"
-            className={`group relative overflow-hidden rounded-2xl p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${
+            className={`group relative overflow-hidden rounded-lg p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${
               theme === "dark"
                 ? "bg-gradient-to-r from-green-900/40 to-green-800/40 border border-green-800/30"
                 : "bg-gradient-to-r from-green-500 to-green-600"
             }`}
           >
             <div
-              className={`p-3 rounded-xl inline-block mb-4 ${
+              className={`p-3 rounded-lg inline-block mb-4 ${
                 theme === "dark" ? "bg-green-900/30" : "bg-white/20"
               }`}
             >
@@ -583,7 +583,7 @@ export default function Dashboard({ auth, stats, status }: DashboardProps) {
 
         {stats.campaigns.length === 0 && (
           <div
-            className={`rounded-2xl p-12 text-center transition-colors duration-300 ${getCardBg()}`}
+            className={`rounded-lg p-12 text-center transition-colors duration-300 ${getCardBg()}`}
           >
             <div className="max-w-md mx-auto">
               <div

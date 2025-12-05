@@ -59,7 +59,12 @@ export default function Welcome({ auth, canLogin, canRegister }: WelcomeProps) {
       description:
         t("welcome.contentManagement.description") ||
         "Organiza y gestiona archivos multimedia con sistemas avanzados de filtrado y etiquetas.",
-      tags: [t("welcome.tags.collections"), t("welcome.tags.tags"), t("welcome.tags.search"), t("welcome.tags.filters")],
+      tags: [
+        t("welcome.tags.collections"),
+        t("welcome.tags.tags"),
+        t("welcome.tags.search"),
+        t("welcome.tags.filters"),
+      ],
     },
     {
       href: canLogin ? "/dashboard" : "/register",
@@ -69,7 +74,13 @@ export default function Welcome({ auth, canLogin, canRegister }: WelcomeProps) {
       description:
         t("welcome.socialIntegration.description") ||
         "Conecta y gestiona contenido en Facebook, Instagram, TikTok, YouTube y más.",
-      tags: [t("welcome.tags.facebook"), t("welcome.tags.instagram"), t("welcome.tags.tiktok"), t("welcome.tags.youtube"), t("welcome.tags.twitter")],
+      tags: [
+        t("welcome.tags.facebook"),
+        t("welcome.tags.instagram"),
+        t("welcome.tags.tiktok"),
+        t("welcome.tags.youtube"),
+        t("welcome.tags.twitter"),
+      ],
     },
     {
       href: canLogin ? "/dashboard" : "/register",
@@ -78,7 +89,12 @@ export default function Welcome({ auth, canLogin, canRegister }: WelcomeProps) {
       description:
         t("welcome.scheduling.description") ||
         "Programa publicaciones en horarios óptimos con recomendaciones impulsadas por IA.",
-      tags: [t("welcome.tags.calendar"), t("welcome.tags.queue"), t("welcome.tags.auto_post"), t("welcome.tags.time_zones")],
+      tags: [
+        t("welcome.tags.calendar"),
+        t("welcome.tags.queue"),
+        t("welcome.tags.auto_post"),
+        t("welcome.tags.time_zones"),
+      ],
     },
     {
       href: canLogin ? "/dashboard" : "/register",
@@ -87,7 +103,12 @@ export default function Welcome({ auth, canLogin, canRegister }: WelcomeProps) {
       description:
         t("welcome.aiTools.description") ||
         "Obtén recomendaciones de hashtags, horarios óptimos y sugerencias de contenido.",
-      tags: [t("welcome.tags.hashtags"), t("welcome.tags.optimization"), t("welcome.tags.recommendations"), t("welcome.tags.ai")],
+      tags: [
+        t("welcome.tags.hashtags"),
+        t("welcome.tags.optimization"),
+        t("welcome.tags.recommendations"),
+        t("welcome.tags.ai"),
+      ],
     },
   ];
 
@@ -210,7 +231,7 @@ export default function Welcome({ auth, canLogin, canRegister }: WelcomeProps) {
                 </div>
               </div>
 
-              <div className="mt-20 relative overflow-hidden rounded-2xl bg-gradient-to-r from-red-50 to-pink-50 dark:from-red-900/20 dark:to-pink-900/20 backdrop-blur-sm p-8">
+              <div className="mt-20 relative overflow-hidden rounded-lg bg-gradient-to-r from-red-50 to-pink-50 dark:from-red-900/20 dark:to-pink-900/20 backdrop-blur-sm p-8">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-red-200/20 dark:bg-red-500/10 rounded-full -translate-y-32 translate-x-32"></div>
                 <div className="relative text-center">
                   <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
