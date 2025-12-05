@@ -272,7 +272,7 @@ export default function AddCampaignModal({
       const success = await addCampaign(formData);
       if (success) {
         if (onSubmit) {
-          onSubmit(data);
+          onSubmit(success);
         }
         handleClose();
       }
