@@ -1,9 +1,10 @@
 import { useCampaignManagement } from "@/Hooks/useCampaignManagement";
-import { useTheme } from "@/Hooks/useTheme"; 
+import { useTheme } from "@/Hooks/useTheme";
 import { zodResolver } from "@hookform/resolvers/zod";
+import axios from "axios";
 import {
   AlertTriangle,
-  Camera,
+  Clock,
   FileImage,
   FileText,
   Hash,
@@ -13,28 +14,18 @@ import {
   Upload,
   X,
 } from "lucide-react";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
-
 
 interface AddCampaignModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: any) => void;
 }
-interface validationSchema {
-  title: string;
-  description: string;
-  goal: string;
-  hashtags: string;
-}
-interface validationImage {
-  image: File;
-}
 
-const createSchema = (t: validationSchema) =>
+const createSchema = (t: any) =>
   z.object({
     title: z
       .string()
@@ -59,34 +50,46 @@ const createSchema = (t: validationSchema) =>
         const hashtags = val.split(" ").filter((tag) => tag.startsWith("#"));
         return hashtags.length <= 10;
       }, t("manageContent.modals.validation.hashtagMax")),
+    scheduled_at: z.string().optional(),
+    social_accounts: z.array(z.number()).optional(),
   });
 
-const validateImage = (file: File, t: validationImage) => {
-  if (!file) {
-    return t("manageContent.modals.validation.imageRequired");
-  }
-
-  if (file.size > 5 * 1024 * 1024) {
+const validateFile = (file: File, t: any) => {
+  if (file.size > 50 * 1024 * 1024) {
     return t("manageContent.modals.validation.imageSize");
   }
 
-  if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+  const allowedTypes = [
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+    "image/gif",
+    "video/mp4",
+    "video/quicktime",
+    "video/x-msvideo",
+  ];
+  if (!allowedTypes.includes(file.type)) {
     return t("manageContent.modals.validation.imageType");
   }
 
   return null;
 };
 
-export default function AddCampaignModal({ isOpen, onClose, onSubmit }: AddCampaignModalProps) {
+export default function AddCampaignModal({
+  isOpen,
+  onClose,
+  onSubmit,
+}: AddCampaignModalProps) {
   const { t } = useTranslation();
   const { theme } = useTheme();
   const { addCampaign } = useCampaignManagement();
-  const [imageFile, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
-  const [imageError, setImageError] = useState(null);
+  const [mediaFiles, setMediaFiles] = useState<File[]>([]);
+  const [mediaPreviews, setMediaPreviews] = useState<string[]>([]);
+  const [imageError, setImageError] = useState<string | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const fileInputRef = useRef(null);
+  const [socialAccounts, setSocialAccounts] = useState<any[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const schema = useMemo(() => createSchema(t), [t]);
 
@@ -104,6 +107,23 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }: AddCampa
   });
 
   const watchedFields = watch();
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchSocialAccounts();
+    }
+  }, [isOpen]);
+
+  const fetchSocialAccounts = async () => {
+    try {
+      const response = await axios.get("/social-accounts");
+      if (response.data && response.data.accounts) {
+        setSocialAccounts(response.data.accounts);
+      }
+    } catch (error) {
+      console.error("Error fetching social accounts:", error);
+    }
+  };
 
   const modalBg = theme === "dark" ? "bg-neutral-800" : "bg-white";
   const modalHeaderBg =
@@ -150,56 +170,62 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }: AddCampa
       ? "bg-gradient-to-r from-orange-600 to-orange-800 hover:shadow-orange-500/20"
       : "bg-gradient-to-r from-orange-600 to-orange-700 hover:shadow-orange-200";
 
-  const handleImageChange = (files) => {
+  const handleFileChange = (files: FileList | null) => {
     if (files && files.length > 0) {
-      const file = files[0];
-      const error = validateImage(file, t);
+      const newFiles = Array.from(files);
+      const validFiles: File[] = [];
+      const newPreviews: string[] = [];
+      let error = null;
+
+      for (const file of newFiles) {
+        const validationError = validateFile(file, t);
+        if (validationError) {
+          error = validationError;
+          break;
+        }
+        validFiles.push(file);
+        newPreviews.push(URL.createObjectURL(file));
+      }
 
       if (error) {
         setImageError(error);
-        setImageFile(null);
-        setImagePreview(null);
         return;
       }
 
       setImageError(null);
-      setImageFile(file);
-
-      const reader = new FileReader();
-      reader.onload = (e) => setImagePreview(e.target.result);
-      reader.readAsDataURL(file);
-
-      trigger(["title", "description", "goal", "hashtags"]);
+      setMediaFiles((prev) => [...prev, ...validFiles]);
+      setMediaPreviews((prev) => [...prev, ...newPreviews]);
     }
   };
 
-  const handleDrop = (e) => {
+  const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragOver(false);
     const files = e.dataTransfer.files;
-    handleImageChange(files);
+    handleFileChange(files);
   };
 
-  const handleDragOver = (e) => {
+  const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragOver(true);
   };
 
-  const handleDragLeave = (e) => {
+  const handleDragLeave = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragOver(false);
   };
 
-  const removeImage = () => {
-    setImageFile(null);
-    setImagePreview(null);
-    setImageError(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
+  const removeMedia = (index: number) => {
+    setMediaFiles((prev) => prev.filter((_, i) => i !== index));
+    setMediaPreviews((prev) => prev.filter((_, i) => i !== index));
+    if (mediaFiles.length === 1) {
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     }
   };
 
-  const formatHashtags = (value) => {
+  const formatHashtags = (value: string) => {
     if (!value.trim()) return "";
 
     return value
@@ -210,20 +236,14 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }: AddCampa
       .join(" ");
   };
 
-  const handleHashtagChange = (e) => {
+  const handleHashtagChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatHashtags(e.target.value);
     setValue("hashtags", formatted, { shouldValidate: true });
   };
 
-  const onFormSubmit = async (data) => {
-    if (!imageFile) {
+  const onFormSubmit = async (data: any) => {
+    if (mediaFiles.length === 0) {
       setImageError(t("manageContent.modals.validation.imageRequired"));
-      return;
-    }
-
-    const imageValidationError = validateImage(imageFile, t);
-    if (imageValidationError) {
-      setImageError(imageValidationError);
       return;
     }
 
@@ -234,12 +254,25 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }: AddCampa
       formData.append("description", data.description);
       formData.append("goal", data.goal);
       formData.append("hashtags", data.hashtags);
-      formData.append("image", imageFile);
+
+      mediaFiles.forEach((file, index) => {
+        formData.append(`media[${index}]`, file);
+      });
+
+      if (data.scheduled_at) {
+        formData.append("scheduled_at", data.scheduled_at);
+      }
+
+      if (data.social_accounts && data.social_accounts.length > 0) {
+        data.social_accounts.forEach((id: number, index: number) => {
+          formData.append(`social_accounts[${index}]`, id.toString());
+        });
+      }
 
       const success = await addCampaign(formData);
       if (success) {
         if (onSubmit) {
-          onSubmit();
+          onSubmit(data);
         }
         handleClose();
       }
@@ -252,8 +285,8 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }: AddCampa
 
   const handleClose = () => {
     reset();
-    setImageFile(null);
-    setImagePreview(null);
+    setMediaFiles([]);
+    setMediaPreviews([]);
     setImageError(null);
     setIsSubmitting(false);
     onClose();
@@ -271,7 +304,7 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }: AddCampa
       ></div>
 
       <div
-        className={`relative w-full max-w-4xl ${modalBg} rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300`}
+        className={`relative w-full max-w-4xl ${modalBg} rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300`}
       >
         {/* Header */}
         <div
@@ -330,7 +363,7 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }: AddCampa
                     onClick={() => fileInputRef.current?.click()}
                   >
                     <div
-                      className={`aspect-[4/3] rounded-2xl border-2 border-dashed flex flex-col items-center justify-center p-6 text-center transition-colors overflow-hidden ${
+                      className={`min-h-[200px] rounded-lg border-2 border-dashed flex flex-col items-center justify-center p-6 text-center transition-colors overflow-hidden ${
                         imageError
                           ? `${
                               theme === "dark"
@@ -346,33 +379,46 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }: AddCampa
                             } ${uploadBg}`
                       }`}
                     >
-                      {imagePreview ? (
-                        <div className="relative w-full h-full group-hover:opacity-90 transition-opacity">
-                          <img
-                            src={imagePreview}
-                            alt="Preview"
-                            className="w-full h-full object-cover rounded-xl shadow-sm"
-                          />
-                          <div
-                            className={`absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity ${
-                              theme === "dark" ? "bg-black/60" : "bg-black/40"
-                            } rounded-xl`}
-                          >
-                            <p className="text-white font-medium flex items-center gap-2">
-                              <Camera className="w-5 h-5" />
-                              {t("manageContent.campaigns.change")}
-                            </p>
+                      {mediaPreviews.length > 0 ? (
+                        <div className="grid grid-cols-2 gap-4 w-full">
+                          {mediaPreviews.map((preview, index) => (
+                            <div
+                              key={index}
+                              className="relative group/item aspect-video"
+                            >
+                              {mediaFiles[index].type.startsWith("video") ? (
+                                <video
+                                  src={preview}
+                                  className="w-full h-full object-cover rounded-lg"
+                                  controls
+                                />
+                              ) : (
+                                <img
+                                  src={preview}
+                                  alt={`Preview ${index}`}
+                                  className="w-full h-full object-cover rounded-lg shadow-sm"
+                                />
+                              )}
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  removeMedia(index);
+                                }}
+                                className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors opacity-0 group-hover/item:opacity-100"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </div>
+                          ))}
+                          <div className="flex items-center justify-center aspect-video border-2 border-dashed border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                            <div className="text-center">
+                              <Upload className="w-6 h-6 mx-auto text-gray-400" />
+                              <span className="text-xs text-gray-500">
+                                Add more
+                              </span>
+                            </div>
                           </div>
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              removeImage();
-                            }}
-                            className="absolute top-3 right-3 p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-                          >
-                            <X className="w-4 h-4" />
-                          </button>
                         </div>
                       ) : (
                         <div className="space-y-4">
@@ -402,8 +448,9 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }: AddCampa
                       type="file"
                       ref={fileInputRef}
                       className="hidden"
-                      accept="image/jpeg,image/png,image/webp"
-                      onChange={(e) => handleImageChange(e.target.files)}
+                      multiple
+                      accept="image/*,video/*"
+                      onChange={(e) => handleFileChange(e.target.files)}
                     />
                   </div>
                   {imageError && (
@@ -426,7 +473,7 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }: AddCampa
                   <div className="relative">
                     <input
                       {...register("hashtags")}
-                      className={`w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-offset-0 transition-all ${inputBg} ${
+                      className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-offset-0 transition-all ${inputBg} ${
                         errors.hashtags
                           ? errorBorder
                           : `${borderColor} ${focusBorder}`
@@ -448,7 +495,7 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }: AddCampa
                       {watchedFields.hashtags
                         ? watchedFields.hashtags
                             .split(" ")
-                            .filter((tag) => tag.startsWith("#")).length
+                            .filter((tag: string) => tag.startsWith("#")).length
                         : 0}
                       /10 hashtags
                     </span>
@@ -457,6 +504,65 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }: AddCampa
                     </span>
                   </div>
                 </div>
+
+                {/* Scheduling Field */}
+                <div className="form-group">
+                  <label
+                    className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
+                  >
+                    <Clock className={`w-4 h-4 ${iconColor}`} />
+                    Schedule Publication (Optional)
+                  </label>
+                  <input
+                    type="datetime-local"
+                    {...register("scheduled_at")}
+                    className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-offset-0 transition-all ${inputBg} ${borderColor} ${focusBorder}`}
+                  />
+                  <p className={`text-xs mt-1 ${textTertiary}`}>
+                    Leave empty to save as draft or publish immediately.
+                  </p>
+                </div>
+
+                {/* Social Accounts Selection */}
+                {watchedFields.scheduled_at && (
+                  <div className="form-group animate-in fade-in slide-in-from-top-2">
+                    <label
+                      className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
+                    >
+                      <Target className={`w-4 h-4 ${iconColor}`} />
+                      Select Social Networks
+                    </label>
+                    <div className="grid grid-cols-2 gap-3">
+                      {socialAccounts.map((account) => (
+                        <label
+                          key={account.id}
+                          className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all ${
+                            watchedFields.social_accounts?.includes(account.id)
+                              ? `border-orange-500 bg-orange-50 dark:bg-orange-900/20`
+                              : `${borderColor} ${inputBg}`
+                          }`}
+                        >
+                          <input
+                            type="checkbox"
+                            value={account.id}
+                            {...register("social_accounts")}
+                            className="w-4 h-4 text-orange-600 rounded focus:ring-orange-500"
+                          />
+                          <span
+                            className={`text-sm font-medium ${textPrimary}`}
+                          >
+                            {account.platform}
+                          </span>
+                        </label>
+                      ))}
+                      {socialAccounts.length === 0 && (
+                        <p className={`col-span-2 text-sm ${textSecondary}`}>
+                          No connected accounts found.
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Right Column - Details */}
@@ -472,7 +578,7 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }: AddCampa
                   </label>
                   <input
                     {...register("title")}
-                    className={`w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-offset-0 transition-all ${inputBg} ${
+                    className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-offset-0 transition-all ${inputBg} ${
                       errors.title
                         ? errorBorder
                         : `${borderColor} ${focusBorder}`
@@ -506,7 +612,7 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }: AddCampa
                   <textarea
                     {...register("description")}
                     rows={4}
-                    className={`w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-offset-0 transition-all resize-none ${inputBg} ${
+                    className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-offset-0 transition-all resize-none ${inputBg} ${
                       errors.description
                         ? errorBorder
                         : `${borderColor} ${focusBorder}`
@@ -545,7 +651,7 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }: AddCampa
                   </label>
                   <input
                     {...register("goal")}
-                    className={`w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-offset-0 transition-all ${inputBg} ${
+                    className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-offset-0 transition-all ${inputBg} ${
                       errors.goal
                         ? errorBorder
                         : `${borderColor} ${focusBorder}`
@@ -584,14 +690,14 @@ export default function AddCampaignModal({ isOpen, onClose, onSubmit }: AddCampa
           <button
             type="button"
             onClick={handleClose}
-            className={`px-6 py-2.5 rounded-xl font-medium transition-colors ${cancelButton}`}
+            className={`px-6 py-2.5 rounded-lg font-medium transition-colors ${cancelButton}`}
           >
             {t("common.cancel")}
           </button>
           <button
             onClick={handleSubmit(onFormSubmit)}
             disabled={isSubmitting}
-            className={`px-8 py-2.5 rounded-xl text-white font-medium hover:shadow-lg transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2 ${submitButton}`}
+            className={`px-8 py-2.5 rounded-lg text-white font-medium hover:shadow-lg transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2 ${submitButton}`}
           >
             {isSubmitting ? (
               <>

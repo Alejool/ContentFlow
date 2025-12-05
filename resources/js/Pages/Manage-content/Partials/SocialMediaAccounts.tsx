@@ -1,26 +1,24 @@
-import { useState, useEffect, useRef } from "react";
 import IconFacebook from "@/../assets/Icons/facebook.svg";
 import IconInstagram from "@/../assets/Icons/instagram.svg";
 import IconTiktok from "@/../assets/Icons/tiktok.svg";
 import IconTwitter from "@/../assets/Icons/x.svg";
 import IconYoutube from "@/../assets/Icons/youtube.svg";
 import { useSocialMediaAuth } from "@/Hooks/useSocialMediaAuth";
-import axios from "axios";
-import { toast } from "react-hot-toast";
-import {
-  Check,
-  X,
-  ExternalLink,
-  AlertCircle,
-  Loader2,
-  Link2,
-  Globe,
-  Shield,
-  Zap,
-  BarChart3,
-} from "lucide-react";
-import { useTranslation } from "react-i18next";
 import { useTheme } from "@/Hooks/useTheme";
+import axios from "axios";
+import {
+  AlertCircle,
+  BarChart3,
+  Check,
+  ExternalLink,
+  Loader2,
+  Shield,
+  X,
+  Zap,
+} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 interface Account {
   id: number;
@@ -36,7 +34,8 @@ interface Account {
 export default function SocialMediaAccounts() {
   const { t } = useTranslation();
   const { theme } = useTheme();
-  const { isAuthenticating, connectSocialMedia, disconnectSocialMedia } = useSocialMediaAuth();
+  const { isAuthenticating, connectSocialMedia, disconnectSocialMedia } =
+    useSocialMediaAuth();
   const [accounts, setAccounts] = useState<Account[]>([
     {
       id: 1,
@@ -158,7 +157,7 @@ export default function SocialMediaAccounts() {
   const fetchConnectedAccounts = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("/api/social-accounts", {
+      const response = await axios.get("/social-accounts", {
         headers: {
           "X-CSRF-TOKEN": document
             .querySelector('meta[name="csrf-token"]')
@@ -255,7 +254,7 @@ export default function SocialMediaAccounts() {
         setAuthInProgress(true);
 
         const response = await axios.get(
-          `/api/social-accounts/auth-url/${account.platform}`,
+          `/social-accounts/auth-url/${account.platform}`,
           {
             headers: {
               "X-CSRF-TOKEN": document
@@ -314,46 +313,88 @@ export default function SocialMediaAccounts() {
   return (
     <div className="space-y-8">
       <div
-        className={`rounded-2xl p-8 shadow-sm border transition-colors duration-300
+        className={`rounded-lg p-8 border transition-colors duration-300
         ${
           theme === "dark"
-            ? "bg-neutral-800/50 backdrop-blur-sm border-neutral-700/50"
-            : "bg-white border-gray-100"
+            ? "bg-gradient-to-br from-neutral-900/50 to-neutral-800/50 border-neutral-700/50"
+            : "bg-gradient-to-br from-orange-50/50 to-pink-50/50 border-orange-100"
         }`}
       >
-        <div className="max-w-3xl">
-          <h2
-            className={`text-2xl font-bold mb-3 flex items-center gap-2
-            ${theme === "dark" ? "text-gray-100" : "text-gray-900"}`}
-          >
+        <div className="flex items-start gap-4">
+          <div>
+            <h3
+              className={`text-lg font-bold mb-3
+              ${theme === "dark" ? "text-gray-100" : "text-orange-900"}`}
+            >
+              {t("manageContent.socialMedia.whyConnect")}
+            </h3>
+
+            <div className="grid sm:grid-cols-3 gap-6 mb-6">
+              {[
+                {
+                  icon: Zap,
+                  title: t("manageContent.socialMedia.benefits.autoPublish"),
+                  color: "text-orange-500",
+                },
+                {
+                  icon: BarChart3,
+                  title: t("manageContent.socialMedia.benefits.manageAll"),
+                  color: "text-blue-500",
+                },
+                {
+                  icon: Shield,
+                  title: t("manageContent.socialMedia.benefits.control"),
+                  color: "text-green-500",
+                },
+              ].map((item, i) => (
+                <div
+                  key={i}
+                  className={`flex flex-col lg:flex-row items-center gap-3 p-4 rounded-lg
+                  ${
+                    theme === "dark"
+                      ? "bg-neutral-800/30 border border-neutral-700/30"
+                      : "bg-white/60 border border-orange-100"
+                  }`}
+                >
+                  <div
+                    className={`p-2 rounded-lg ${
+                      theme === "dark" ? "bg-neutral-800" : "bg-white"
+                    }`}
+                  >
+                    <item.icon className={`w-5 h-5 ${item.color}`} />
+                  </div>
+                  <p
+                    className={`text-sm font-medium ${
+                      theme === "dark" ? "text-gray-300" : "text-gray-700"
+                    }`}
+                  >
+                    {item.title}
+                  </p>
+                </div>
+              ))}
+            </div>
+
             <div
-              className={`p-2 rounded-lg ${
+              className={`text-sm p-4 rounded-lg inline-block
+              ${
                 theme === "dark"
-                  ? "bg-gradient-to-r from-orange-600/20 to-orange-800/20"
-                  : "bg-gradient-to-r from-orange-100 to-orange-50"
+                  ? "bg-neutral-800/40 text-gray-400 border border-neutral-700/40"
+                  : "bg-white/60 text-orange-600/80 border border-orange-100"
               }`}
             >
-              <Link2
-                className={`w-6 h-6 ${
-                  theme === "dark" ? "text-orange-400" : "text-orange-600"
-                }`}
-              />
+              <div className="flex items-center gap-2 mb-2">
+                <AlertCircle className="w-4 h-4" />
+                <span className="font-semibold">{t("common.note")}:</span>
+              </div>
+              {t("manageContent.socialMedia.disclaimer")}
             </div>
-            {t("manageContent.socialMedia.title")}
-          </h2>
-          <p
-            className={`text-lg leading-relaxed ${
-              theme === "dark" ? "text-gray-400" : "text-gray-600"
-            }`}
-          >
-            {t("manageContent.socialMedia.description")}
-          </p>
+          </div>
         </div>
       </div>
 
       {loading ? (
         <div
-          className={`flex flex-col items-center justify-center py-12 rounded-2xl border transition-colors duration-300
+          className={`flex flex-col items-center justify-center py-12 rounded-lg border transition-colors duration-300
           ${
             theme === "dark"
               ? "bg-neutral-800/30 border-neutral-700/50"
@@ -430,7 +471,7 @@ export default function SocialMediaAccounts() {
                    `}
                   >
                     <div
-                      className={`w-12 h-12 p-2 rounded-xl
+                      className={`w-12 h-12 p-2 rounded-lg
                       ${
                         theme === "dark" && !account.isConnected
                           ? "bg-neutral-800"
@@ -490,7 +531,7 @@ export default function SocialMediaAccounts() {
               <button
                 onClick={() => handleConnectionToggle(account.id)}
                 disabled={isAuthenticating || authInProgress}
-                className={`w-full py-3 px-4 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 
+                className={`w-full py-3 px-4 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 
                   transition-all duration-200 relative overflow-hidden group/btn
                   ${
                     isAuthenticating || authInProgress
@@ -536,86 +577,6 @@ export default function SocialMediaAccounts() {
           ))}
         </div>
       )}
-
-      <div
-        className={`rounded-2xl p-8 border transition-colors duration-300
-        ${
-          theme === "dark"
-            ? "bg-gradient-to-br from-neutral-900/50 to-neutral-800/50 border-neutral-700/50"
-            : "bg-gradient-to-br from-orange-50/50 to-pink-50/50 border-orange-100"
-        }`}
-      >
-        <div className="flex items-start gap-4">
-          <div>
-            <h3
-              className={`text-lg font-bold mb-3
-              ${theme === "dark" ? "text-gray-100" : "text-orange-900"}`}
-            >
-              {t("manageContent.socialMedia.whyConnect")}
-            </h3>
-
-            <div className="grid sm:grid-cols-3 gap-6 mb-6">
-              {[
-                {
-                  icon: Zap,
-                  title: t("manageContent.socialMedia.benefits.autoPublish"),
-                  color: "text-orange-500",
-                },
-                {
-                  icon: BarChart3,
-                  title: t("manageContent.socialMedia.benefits.manageAll"),
-                  color: "text-blue-500",
-                },
-                {
-                  icon: Shield,
-                  title: t("manageContent.socialMedia.benefits.control"),
-                  color: "text-green-500",
-                },
-              ].map((item, i) => (
-                <div
-                  key={i}
-                  className={`flex flex-col lg:flex-row items-center gap-3 p-4 rounded-xl
-                  ${
-                    theme === "dark"
-                      ? "bg-neutral-800/30 border border-neutral-700/30"
-                      : "bg-white/60 border border-orange-100"
-                  }`}
-                >
-                  <div
-                    className={`p-2 rounded-lg ${
-                      theme === "dark" ? "bg-neutral-800" : "bg-white"
-                    }`}
-                  >
-                    <item.icon className={`w-5 h-5 ${item.color}`} />
-                  </div>
-                  <p
-                    className={`text-sm font-medium ${
-                      theme === "dark" ? "text-gray-300" : "text-gray-700"
-                    }`}
-                  >
-                    {item.title}
-                  </p>
-                </div>
-              ))}
-            </div>
-
-            <div
-              className={`text-sm p-4 rounded-xl inline-block
-              ${
-                theme === "dark"
-                  ? "bg-neutral-800/40 text-gray-400 border border-neutral-700/40"
-                  : "bg-white/60 text-orange-600/80 border border-orange-100"
-              }`}
-            >
-              <div className="flex items-center gap-2 mb-2">
-                <AlertCircle className="w-4 h-4" />
-                <span className="font-semibold">{t("common.note")}:</span>
-              </div>
-              {t("manageContent.socialMedia.disclaimer")}
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
