@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Analytics;
 
 use App\Models\Analytics;
 use App\Services\StatisticsService;
@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 use Carbon\Carbon;
+use App\Http\Controllers\Controller;
 
 class AnalyticsController extends Controller
 {
