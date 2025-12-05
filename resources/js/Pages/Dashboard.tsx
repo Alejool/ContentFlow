@@ -98,7 +98,7 @@ export default function Dashboard({ auth, stats, status }: DashboardProps) {
 
   const getCardBg = () => {
     return theme === "dark"
-      ? "bg-neutral-800/50 backdrop-blur-sm border border-neutral-700/50"
+      ? "bg-neutral-800/70 backdrop-blur-sm border border-neutral-700/50"
       : "bg-white/60 backdrop-blur-lg border border-gray-100";
   };
 
@@ -149,7 +149,7 @@ export default function Dashboard({ auth, stats, status }: DashboardProps) {
         <div
           className={`rounded-lg p-8 mb-8 shadow-sm transition-colors duration-300 ${
             theme === "dark"
-              ? "bg-gradient-to-r from-neutral-800/50 to-purple-900/20 border border-neutral-700/50"
+              ? "bg-gradient-to-r from-neutral-800/50 to-purple-900/90 border border-neutral-700/50"
               : "bg-gradient-to-r from-orange-50/50 to-purple-50/50 border border-orange-100"
           }`}
         >
