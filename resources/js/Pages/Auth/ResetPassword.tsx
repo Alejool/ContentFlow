@@ -133,7 +133,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
 
             <form onSubmit={submit} className="space-y-6">
               {!errors.email && (
-                <div className="rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 p-4">
+                <div className="rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 p-4">
                   <div className="flex items-center gap-3 text-blue-700 dark:text-blue-400">
                     <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
                     <div>
@@ -160,7 +160,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                     name="email"
                     value={data.email}
                     readOnly
-                    className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 
+                    className="w-full pl-11 pr-4 py-3 rounded-lg border border-gray-300 dark:border-gray-700 
                                                  bg-gray-50 dark:bg-gray-800/50 text-gray-900 dark:text-white
                                                  cursor-not-allowed"
                   />
@@ -187,7 +187,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                     name="password"
                     value={data.password}
                     onChange={(e) => setData("password", e.target.value)}
-                    className="w-full pl-11 pr-12 py-3 rounded-xl border border-gray-300 dark:border-gray-700 
+                    className="w-full pl-11 pr-12 py-3 rounded-lg border border-gray-300 dark:border-gray-700 
                                                  bg-white dark:bg-gray-800 text-gray-900 dark:text-white
                                                  focus:ring-2 focus:ring-primary-500 focus:border-transparent
                                                  transition-all duration-200"
@@ -233,7 +233,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                     onChange={(e) =>
                       setData("password_confirmation", e.target.value)
                     }
-                    className="w-full pl-11 pr-12 py-3 rounded-xl border border-gray-300 dark:border-gray-700 
+                    className="w-full pl-11 pr-12 py-3 rounded-lg border border-gray-300 dark:border-gray-700 
                                                  bg-white dark:bg-gray-800 text-gray-900 dark:text-white
                                                  focus:ring-2 focus:ring-primary-500 focus:border-transparent
                                                  transition-all duration-200"
@@ -263,7 +263,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
               </div>
 
               {data.password && (
-                <div className="rounded-xl bg-gray-50 dark:bg-gray-800/50 p-4">
+                <div className="rounded-lg bg-gray-50 dark:bg-gray-800/50 p-4">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                       Password Strength
@@ -353,7 +353,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
               <button
                 type="submit"
                 disabled={processing}
-                className="w-full bg-gradient-primary text-white py-3 px-4 rounded-xl font-semibold
+                className="w-full bg-gradient-primary text-white py-3 px-4 rounded-lg font-semibold
                                          hover:opacity-90 active:scale-[0.98] transition-all duration-200
                                          disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >

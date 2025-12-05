@@ -21,7 +21,7 @@ export default function VerifyEmail({ status }: VerifyEmailProps) {
 
       <div className="max-w-md w-full">
         {/* Card */}
-        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+        <div className="bg-white rounded-lg shadow-xl overflow-hidden">
           {/* Header with gradient */}
           <div className="bg-gradient-to-r from-purple-600 to-blue-600 p-8 text-center">
             <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
@@ -58,7 +58,7 @@ export default function VerifyEmail({ status }: VerifyEmailProps) {
             </div>
 
             {status === "verification-link-sent" && (
-              <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl">
+              <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
                 <div className="flex items-center gap-3">
                   <div className="flex-shrink-0">
                     <svg
@@ -86,7 +86,7 @@ export default function VerifyEmail({ status }: VerifyEmailProps) {
               <button
                 type="submit"
                 disabled={processing}
-                className="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                className="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
                 {processing ? (
                   <span className="flex items-center justify-center gap-2">
@@ -117,7 +117,7 @@ export default function VerifyEmail({ status }: VerifyEmailProps) {
                 href={route("logout")}
                 method="post"
                 as="button"
-                className="w-full px-6 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition-colors duration-200"
+                className="w-full px-6 py-3 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 transition-colors duration-200"
               >
                 Log Out
               </Link>

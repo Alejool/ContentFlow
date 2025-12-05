@@ -2,9 +2,7 @@ import Logo from "@/../assets/logo.png";
 import ThemeLanguageContainer from "@/Components/common/ThemeLanguageContainer";
 import { useAuth } from "@/Hooks/useAuth";
 import GuestLayout from "@/Layouts/GuestLayout";
-import { auth, getAuthResult } from "@/firebase";
 import { Head, Link, usePage } from "@inertiajs/react";
-import { onAuthStateChanged } from "firebase/auth";
 import { motion } from "framer-motion";
 import {
   AlertCircle,
@@ -33,24 +31,11 @@ export default function Login() {
     handleEmailLogin,
     handleGoogleLogin,
     handleFacebookLogin,
-    handleAnonymousLogin,
   } = useAuth();
 
   useEffect(() => {
-    const checkRedirectResult = async () => {
-      try {
-        const result = await getAuthResult();
-        if (result?.user) {
-          window.location.href = route("dashboard");
-        }
-      } catch (err) {
-        console.error("Error processing redirection:", err);
-      }
-    };
-
-    const unsubscribe = onAuthStateChanged(auth, () => {});
-    checkRedirectResult();
-    return () => unsubscribe();
+    // Optional: Check if user is already logged in via Inertia props if needed
+    // But usually Inertia handles this via middleware redirects
   }, []);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -148,7 +133,7 @@ export default function Login() {
 
             <form onSubmit={handleEmailLogin} className="space-y-6">
               {error && (
-                <div className="rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-4">
+                <div className="rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-4">
                   <div className="flex items-center gap-3 text-red-700 dark:text-red-400">
                     <AlertCircle className="w-5 h-5 flex-shrink-0" />
                     <p className="text-sm font-medium">{error}</p>
@@ -157,7 +142,7 @@ export default function Login() {
               )}
 
               {successMessage && (
-                <div className="rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 p-4">
+                <div className="rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 p-4">
                   <div className="flex items-center gap-3 text-green-700 dark:text-green-400">
                     <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
                     <p className="text-sm font-medium">{successMessage}</p>
@@ -178,7 +163,7 @@ export default function Login() {
                     name="email"
                     value={data.email}
                     onChange={handleChange}
-                    className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 
+                    className="w-full pl-11 pr-4 py-3 rounded-lg border border-gray-300 dark:border-gray-700 
                              bg-white dark:bg-gray-800 text-gray-900 dark:text-white
                              focus:ring-2 focus:ring-primary-500 focus:border-transparent
                              transition-all duration-200"
@@ -201,7 +186,7 @@ export default function Login() {
                     name="password"
                     value={data.password}
                     onChange={handleChange}
-                    className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 
+                    className="w-full pl-11 pr-4 py-3 rounded-lg border border-gray-300 dark:border-gray-700 
                              bg-white dark:bg-gray-800 text-gray-900 dark:text-white
                              focus:ring-2 focus:ring-primary-500 focus:border-transparent
                              transition-all duration-200"
@@ -238,7 +223,7 @@ export default function Login() {
               <button
                 type="submit"
                 disabled={processing || loading}
-                className="w-full bg-gradient-primary text-white py-3 px-4 rounded-xl font-semibold
+                className="w-full bg-gradient-primary text-white py-3 px-4 rounded-lg font-semibold
                          hover:opacity-90 active:scale-[0.98] transition-all duration-200
                          disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
@@ -272,7 +257,7 @@ export default function Login() {
                   onClick={handleGoogleLogin}
                   disabled={loading}
                   className="w-full flex items-center justify-center gap-3 px-4 py-3 
-                           rounded-xl border border-gray-300 dark:border-gray-700 
+                           rounded-lg border border-gray-300 dark:border-gray-700 
                            bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300
                            hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors
                            disabled:opacity-50 disabled:cursor-not-allowed"
