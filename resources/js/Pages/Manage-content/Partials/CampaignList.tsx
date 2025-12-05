@@ -263,8 +263,12 @@ export default function CampaignList({
               >
                 <option value="all">{t("campaigns.filters.all")}</option>
                 <option value="active">{t("campaigns.filters.active")}</option>
-                <option value="upcoming">{t("campaigns.filters.upcoming")}</option>
-                <option value="completed">{t("campaigns.filters.completed")}</option>
+                <option value="upcoming">
+                  {t("campaigns.filters.upcoming")}
+                </option>
+                <option value="completed">
+                  {t("campaigns.filters.completed")}
+                </option>
                 <option value="draft">{t("campaigns.filters.draft")}</option>
               </select>
             </div>
@@ -330,12 +334,18 @@ export default function CampaignList({
               `}
             >
               <th className="px-6 py-4 font-semibold"></th>
-              <th className="px-6 py-4 font-semibold">{t("campaigns.headers.status")}</th>
-              <th className="px-6 py-4 font-semibold">{t("campaigns.headers.duration")}</th>
+              <th className="px-6 py-4 font-semibold">
+                {t("campaigns.headers.status")}
+              </th>
+              <th className="px-6 py-4 font-semibold">
+                {t("campaigns.headers.duration")}
+              </th>
               <th className="px-6 py-4 font-semibold text-center">
                 {t("campaigns.headers.mediaFiles")}
               </th>
-              <th className="px-6 py-4 font-semibold text-right">{t("campaigns.headers.actions")}</th>
+              <th className="px-6 py-4 font-semibold text-right">
+                {t("campaigns.headers.actions")}
+              </th>
             </tr>
           </thead>
           <tbody

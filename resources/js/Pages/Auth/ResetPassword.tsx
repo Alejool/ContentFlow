@@ -2,7 +2,7 @@ import Logo from "@/../assets/logo.png";
 import ThemeLanguageContainer from "@/Components/common/ThemeLanguageContainer";
 import GuestLayout from "@/Layouts/GuestLayout";
 import { Head, useForm } from "@inertiajs/react";
-import { motion } from "framer-motion";
+
 import {
   AlertCircle,
   Check,
@@ -51,12 +51,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
           <div className="absolute inset-0 bg-black/10" />
 
           <div className="relative h-full flex flex-col items-center justify-center p-8 text-white">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="text-center max-w-xl"
-            >
+            <div className="text-center max-w-xl">
               <div className="mb-8">
                 <img src={Logo} alt="logo" className="w-36 h-36 mx-auto" />
                 <h1 className="text-4xl font-bold  mb-4">Set New Password</h1>
@@ -111,17 +106,12 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                   encrypted.
                 </p>
               </div>
-            </motion.div>
+            </div>
           </div>
         </div>
 
         <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-8">
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="w-full max-w-md"
-          >
+          <div className="w-full max-w-md">
             <div className="mb-8 text-center">
               <h2 className="text-3xl font-bold text-gray-900 dark:text-white ">
                 Reset Password
@@ -398,7 +388,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                 </div>
               )}
             </form>
-          </motion.div>
+          </div>
         </div>
       </div>
     </GuestLayout>

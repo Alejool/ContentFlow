@@ -8,7 +8,7 @@ import {
   Trail,
 } from "@react-three/drei";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { AnimatePresence, motion } from "framer-motion";
+
 import {
   BarChart3,
   ChevronDown,

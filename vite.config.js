@@ -19,7 +19,7 @@ export default defineConfig({
         tsconfigPaths(),
     ],
     optimizeDeps: {
-        include: ['@ffmpeg/ffmpeg'], // Asegúrate de incluir la biblioteca
+        include: ['@ffmpeg/ffmpeg'],
     },
     server: {
         proxy: {

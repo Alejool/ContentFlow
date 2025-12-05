@@ -3,7 +3,7 @@ import ThemeLanguageContainer from "@/Components/common/ThemeLanguageContainer";
 import { useAuth } from "@/Hooks/useAuth";
 import GuestLayout from "@/Layouts/GuestLayout";
 import { Head, Link, usePage } from "@inertiajs/react";
-import { motion } from "framer-motion";
+
 import {
   AlertCircle,
   CheckCircle2,
@@ -54,12 +54,7 @@ export default function Login() {
           <div className="absolute inset-0 bg-black/10" />
 
           <div className="relative h-full flex flex-col items-center justify-center p-8 text-white">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="text-center max-w-xl"
-            >
+            <div className="text-center max-w-xl">
               <div className="mb-8">
                 <img src={Logo} alt="logo" className="w-36 h-36 mx-auto" />
                 <h1 className="text-4xl font-bold  mb-4">
@@ -111,17 +106,12 @@ export default function Login() {
                   </div>
                 </div>
               </div>
-            </motion.div>
+            </div>
           </div>
         </div>
 
         <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-8">
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="w-full max-w-md"
-          >
+          <div className="w-full max-w-md">
             <div className="mb-8 text-center">
               <h2 className="text-3xl font-bold text-gray-900 dark:text-white ">
                 {t("auth.login.title")}
@@ -299,7 +289,7 @@ export default function Login() {
                 </p>
               </div>
             </form>
-          </motion.div>
+          </div>
         </div>
       </div>
     </GuestLayout>

@@ -73,13 +73,13 @@ export default function ManageContentPage() {
     }
   };
 
-  const handleAddCampaign = async (success: boolean) => {;
+  const handleAddCampaign = async (success: boolean) => {
     if (success) {
       setIsModalOpen(false);
       await fetchCampaigns(filters);
     }
   };
-  const handleUpdateCampaign = async (success: boolean) => {;
+  const handleUpdateCampaign = async (success: boolean) => {
     if (success) {
       await fetchCampaigns(filters);
     }
