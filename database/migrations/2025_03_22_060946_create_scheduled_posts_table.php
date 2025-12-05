@@ -17,10 +17,11 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained();
             $table->foreignId('social_account_id')->constrained();
+            $table->foreignId('campaign_id')->nullable()->constrained('campaigns')->onDelete('set null');
             $table->foreignId('media_file_id')->nullable()->constrained();
             $table->text('caption')->nullable();
             $table->dateTime('scheduled_at');
-            $table->enum('status', ["pending","posted","failed"])->default('pending');
+            $table->enum('status', ["pending", "posted", "failed"])->default('pending');
             $table->timestamps();
         });
 

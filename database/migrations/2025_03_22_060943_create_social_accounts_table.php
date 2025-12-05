@@ -16,11 +16,16 @@ return new class extends Migration
         Schema::create('social_accounts', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained();
-            $table->enum('platform', ["facebook","instagram","tiktok","twitter","youtube"]);
+            $table->enum('platform', ["facebook", "instagram", "tiktok", "twitter", "youtube"]);
             $table->string('account_id');
+            $table->string('account_name')->nullable();
             $table->text('access_token');
             $table->text('refresh_token')->nullable();
             $table->timestamp('token_expires_at')->nullable();
+            $table->boolean('is_active')->default(true);
+            $table->timestamp('last_failed_at')->nullable();
+            $table->integer('failure_count')->default(0);
+            $table->json('account_metadata')->nullable();
             $table->timestamps();
         });
 
