@@ -16,10 +16,9 @@ return new class extends Migration
         Schema::create('media_files', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained();
-            $table->foreignId('collection_id')->nullable()->constrained();
             $table->string('file_name');
             $table->string('file_path');
-            $table->enum('file_type', ["image","video"]);
+            $table->enum('file_type', ["image", "video"]);
             $table->string('mime_type')->nullable();
             $table->integer('size');
             $table->timestamps();
