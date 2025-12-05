@@ -41,32 +41,18 @@ class LoginRequest extends FormRequest
     public function authenticate(): array
     {
         $this->ensureIsNotRateLimited();
-
-        if (!$this->has('firebase_user') || !isset($this->firebase_user['email'])) {
-            throw ValidationException::withMessages([
-                'email' => 'Invalid firebase user data'
-            ]);
-        }
-
-        $firebaseUser = $this->input('firebase_user');
-        $user = User::where('email', $firebaseUser['email'])->first();
+        $credentials = [
+            'email' => $this->input('email'),
+            'password' => $this->input('password')
+        ];
+        
+        $user = User::where('email', $credentials['email'])->first();
 
         if (!$user) {
             throw ValidationException::withMessages([
                 'email' => 'User not found in the system'
             ]);
         }
-
-        // Debug credentials
-        $credentials = [
-            'email' => $firebaseUser['email'],
-            'password' => $this->input('password')
-        ];
-
-        \Log::info('Auth attempt credentials:', [
-            'email' => $credentials['email'],
-            'hasPassword' => !empty($credentials['password'])
-        ]);
 
         if (!Auth::attempt($credentials, true)) {
             RateLimiter::hit($this->throttleKey());

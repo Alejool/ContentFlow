@@ -29,7 +29,7 @@ class HandleInertiaRequests extends Middleware
      * @return array<string, mixed>
      */
     public function share(Request $request): array
-    {
+    {  
         return array_merge(parent::share($request), [
             'auth' => [
                 'user' => $request->user() ? [
@@ -39,6 +39,9 @@ class HandleInertiaRequests extends Middleware
                     'email_verified_at' => $request->user()->email_verified_at,
                     'locale' => $request->user()->locale ?? 'es',
                     'created_at' => $request->user()->created_at,
+                    'photo_url' => $request->user()->photo_url,
+                    'theme' => $request->user()->theme,
+                    
   
                 ] : null,
             ],
