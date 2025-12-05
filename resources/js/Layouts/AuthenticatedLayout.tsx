@@ -30,7 +30,9 @@ export default function AuthenticatedLayout({
 
   return (
     <div
-      className="min-h-screen relative overflow-hidden"
+      className={`min-h-screen relative overflow-hidden ${
+        theme === "dark" ? "bg-gray-900/95" : "bg-white/95"
+      }`}
       style={{
         backgroundImage: `url(${Bg})`,
         backgroundSize: "cover",
@@ -40,12 +42,7 @@ export default function AuthenticatedLayout({
     >
       <div
         className={`
-          absolute inset-0 pointer-events-none backdrop-blur-md transition-all duration-300
-          ${
-            theme === "dark"
-              ? "bg-gray-900/95 backdrop-blur-sm"
-              : "bg-white/20 backdrop-blur-md"
-          }
+          absolute  
         `}
       />
 
