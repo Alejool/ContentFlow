@@ -1,20 +1,11 @@
-import React from "react";
-import { useUpdatePassword } from "../Hooks/useUpdatePassword.ts";
-import ModernInput from "@/Components/Modern/ModernInput";
 import ModernButton from "@/Components/Modern/ModernButton";
 import ModernCard from "@/Components/Modern/ModernCard";
-import { Transition } from "@headlessui/react";
-import { useTranslation } from "react-i18next";
+import ModernInput from "@/Components/Modern/ModernInput";
 import { useTheme } from "@/Hooks/useTheme";
-import {
-  Lock,
-  Check,
-  AlertTriangle,
-  Shield,
-  Key,
-  Eye,
-  EyeOff,
-} from "lucide-react";
+import { Transition } from "@headlessui/react";
+import { AlertTriangle, Check, Key, Lock, Shield } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { useUpdatePassword } from "../Hooks/useUpdatePassword.ts";
 
 interface UpdatePasswordFormProps {
   className?: string;
@@ -47,7 +38,7 @@ const SuccessAlert = ({ show, t, theme }: SuccessAlertProps) => (
     leaveTo="translate-y-2 opacity-0"
   >
     <div
-      className={`flex items-center gap-3 p-4 rounded-xl mb-6 ${
+      className={`flex items-center gap-3 p-4 rounded-lg mb-6 ${
         theme === "dark"
           ? "bg-green-900/20 border border-green-800/30"
           : "bg-green-50 border border-green-200"
@@ -107,7 +98,7 @@ const UpdatePasswordForm = ({ className = "" }: UpdatePasswordFormProps) => {
     >
       {Object.keys(errors).length > 0 && (
         <div
-          className={`p-4 mb-6 rounded-xl ${
+          className={`p-4 mb-6 rounded-lg ${
             theme === "dark"
               ? "bg-red-900/20 border border-red-800/30"
               : "bg-red-50 border border-red-100"
@@ -218,7 +209,7 @@ const UpdatePasswordForm = ({ className = "" }: UpdatePasswordFormProps) => {
       </form>
 
       <div
-        className={`mt-8 p-4 rounded-xl border ${
+        className={`mt-8 p-4 rounded-lg border ${
           theme === "dark"
             ? "bg-orange-900/10 border-orange-800/30"
             : "bg-orange-50 border-orange-100"

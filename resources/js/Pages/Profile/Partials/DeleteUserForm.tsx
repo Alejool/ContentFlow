@@ -1,12 +1,12 @@
-import React, { useState, useRef } from "react";
-import { useForm as useHookForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { deleteUserSchema } from "@/schemas/schemas";
 import Modal from "@/Components/Modal";
-import ModernInput from "@/Components/Modern/ModernInput";
 import ModernButton from "@/Components/Modern/ModernButton";
 import ModernCard from "@/Components/Modern/ModernCard";
+import ModernInput from "@/Components/Modern/ModernInput";
+import { deleteUserSchema } from "@/schemas/schemas";
+import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
+import { useRef, useState } from "react";
+import { useForm as useHookForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
 const TrashIcon = ({ className }) => (
@@ -93,7 +93,7 @@ export default function DeleteUserForm({ className = "" }) {
       className={className}
     >
       <div className="space-y-6">
-        <div className="p-4 bg-red-50 border border-red-200 rounded-xl flex gap-4">
+        <div className="p-4 bg-red-50 border border-red-200 rounded-lg flex gap-4">
           <div className="flex-shrink-0 text-red-500">
             <WarningIcon className="w-6 h-6" />
           </div>

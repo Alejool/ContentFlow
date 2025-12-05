@@ -72,7 +72,7 @@ export default function ConnectedAccounts({ className = "" }) {
   const fetchConnectedAccounts = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("/api/social-accounts");
+      const response = await axios.get("/social-accounts");
       if (response.data && response.data.accounts) {
         updateAccountsStatus(response.data.accounts);
       }
@@ -120,7 +120,7 @@ export default function ConnectedAccounts({ className = "" }) {
           {accounts.map((account) => (
             <div
               key={account.id}
-              className={`flex items-center p-3 rounded-xl border transition-all duration-200 ${
+              className={`flex items-center p-3 rounded-lg border transition-all duration-200 ${
                 account.isConnected
                   ? "bg-purple-50 dark: border-purple-200 shadow-sm"
                   : "bg-gray-50 border-gray-100 opacity-60 grayscale hover:grayscale-0 hover:opacity-100"
