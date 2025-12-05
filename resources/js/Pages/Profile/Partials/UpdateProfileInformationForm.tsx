@@ -1,16 +1,12 @@
+import LanguageSwitcher from "@/Components/LanguageSwitcher";
+import ModernButton from "@/Components/Modern/ModernButton";
+import ModernCard from "@/Components/Modern/ModernCard";
+import ModernInput from "@/Components/Modern/ModernInput";
 import { useTheme } from "@/Hooks/useTheme";
 import { profileSchema } from "@/schemas/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, usePage } from "@inertiajs/react";
 import axios from "axios";
-import { useState } from "react";
-import { useForm as useHookForm } from "react-hook-form";
-import { toast } from "react-hot-toast";
-import { useTranslation } from "react-i18next";
-import LanguageSwitcher from "@/Components/LanguageSwitcher";
-import ModernButton from "@/Components/Modern/ModernButton";
-import ModernCard from "@/Components/Modern/ModernCard";
-import ModernInput from "@/Components/Modern/ModernInput";
 import {
   AlertTriangle,
   CheckCircle,
@@ -21,6 +17,10 @@ import {
   Send,
   User,
 } from "lucide-react";
+import { useState } from "react";
+import { useForm as useHookForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 interface UpdateProfileInformationProps {
   mustVerifyEmail: boolean;
@@ -103,7 +103,6 @@ export default function UpdateProfileInformation({
       icon={User}
       headerColor="green"
       className={className}
-      variant="elevated"
     >
       <form onSubmit={handleSubmit(submit)} className="space-y-6">
         <ModernInput
@@ -146,7 +145,7 @@ export default function UpdateProfileInformation({
 
         {mustVerifyEmail && user.email_verified_at === null && (
           <div
-            className={`rounded-xl p-4 space-y-3 transition-colors duration-300
+            className={`rounded-lg p-4 space-y-3 transition-colors duration-300
               ${
                 theme === "dark"
                   ? "bg-yellow-900/20 border border-yellow-800/30"
@@ -164,7 +163,7 @@ export default function UpdateProfileInformation({
               </span>
             </div>
 
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
               <p
                 className={`text-sm flex-1
                   ${
@@ -225,7 +224,7 @@ export default function UpdateProfileInformation({
           </div>
 
           <div
-            className={`p-4 rounded-xl border transition-colors duration-300
+            className={`p-4 rounded-lg border transition-colors duration-300
               ${
                 theme === "dark"
                   ? "bg-neutral-800/30 border-neutral-700/50"
@@ -272,7 +271,6 @@ export default function UpdateProfileInformation({
         >
           <ModernButton
             disabled={isSubmitting || !isDirty}
-            variant="primary"
             icon={Save}
             theme={theme}
             loading={isSubmitting}

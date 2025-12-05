@@ -1,22 +1,86 @@
+import { useTheme } from "@/Hooks/useTheme";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, usePage } from "@inertiajs/react";
-import DeleteUserForm from "./Partials/DeleteUserForm";
+import { Mail, Shield, User } from "lucide-react";
+import AccountStatistics from "./Partials/AccountStatistics";
+import ConnectedAccounts from "./Partials/ConnectedAccounts";
 import UpdatePasswordForm from "./Partials/UpdatePasswordForm";
 import UpdateProfileInformationForm from "./Partials/UpdateProfileInformationForm";
-import ConnectedAccounts from "./Partials/ConnectedAccounts";
-import AccountStatistics from "./Partials/AccountStatistics";
-import { Avatar } from "@chakra-ui/react";
-import { useTheme } from "@/Hooks/useTheme";
-import { User, Mail, Shield, Link as LinkIcon } from "lucide-react";
 
 interface EditProps {
   mustVerifyEmail: boolean;
   status?: string;
 }
 
+// Componente Avatar personalizado sin Chakra
+interface AvatarProps {
+  src?: string;
+  name: string;
+  size?: "sm" | "md" | "lg" | "xl" | "2xl";
+  className?: string;
+}
+
+function CustomAvatar({ src, name, size = "md", className = "" }: AvatarProps) {
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  const sizeClasses = {
+    sm: "w-8 h-8 text-xs",
+    md: "w-12 h-12 text-sm",
+    lg: "w-16 h-16 text-base",
+    xl: "w-20 h-20 text-xl",
+    "2xl": "w-24 h-24 text-2xl",
+  };
+
+  return (
+    <div className={`relative ${className}`}>
+      <div
+        className={`${sizeClasses[size]} rounded-full overflow-hidden flex items-center justify-center font-bold shadow-lg`}
+      >
+        {src ? (
+          <img
+            src={src}
+            alt={name}
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              // Si la imagen falla, muestra las iniciales
+              e.currentTarget.style.display = "none";
+              const fallback =
+                e.currentTarget.parentElement?.querySelector(
+                  ".avatar-fallback"
+                );
+              if (fallback) fallback.classList.remove("hidden");
+            }}
+          />
+        ) : null}
+        <div
+          className={`avatar-fallback ${
+            src ? "hidden" : ""
+          } w-full h-full flex items-center justify-center`}
+        >
+          {getInitials(name)}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Edit({ mustVerifyEmail, status }: EditProps) {
   const user = usePage().props.auth.user;
   const { theme } = useTheme();
+
+  const getAvatarColor = () => {
+    if (theme === "dark") {
+      return "bg-gradient-to-br from-orange-900/30 to-purple-900/30 text-orange-200 ring-4 ring-purple-900/50";
+    }
+    return "bg-gradient-to-br from-orange-100 to-purple-100 text-orange-800 ring-4 ring-green-200";
+  };
 
   return (
     <AuthenticatedLayout
@@ -26,26 +90,15 @@ export default function Edit({ mustVerifyEmail, status }: EditProps) {
         `}
         >
           <div className="relative">
-            <Avatar.Root
-              colorPalette="orange"
-              size="2xl"
-              variant="subtle"
-              className={`w-24 h-24 ring-4 shadow-lg
-                ${
-                  theme === "dark"
-                    ? "ring-purple-900/50 bg-neutral-800"
-                    : "ring-green-200 bg-gradient-to-br from-orange-100 to-purple-100"
-                }
-              `}
+            <div
+              className={`${getAvatarColor()} w-24 h-24 rounded-full shadow-lg flex items-center justify-center`}
             >
-              <Avatar.Fallback
+              <CustomAvatar
+                src={user.photo_url || user.avatar}
                 name={user.name}
-                className={`text-2xl font-bold ${
-                  theme === "dark" ? "text-white" : "text-orange-800"
-                }`}
+                size="2xl"
               />
-              <Avatar.Image src={user.avatar} />
-            </Avatar.Root>
+            </div>
             <div className="absolute bottom-0 right-0 translate-x-1/4 translate-y-1/4">
               <div
                 className={`w-6 h-6 rounded-full border-4 shadow-sm animate-pulse
@@ -125,10 +178,8 @@ export default function Edit({ mustVerifyEmail, status }: EditProps) {
       `}
       >
         <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
-        
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="space-y-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+            <div className="space-y-3">
               <UpdateProfileInformationForm
                 mustVerifyEmail={mustVerifyEmail}
                 status={status}
@@ -137,7 +188,7 @@ export default function Edit({ mustVerifyEmail, status }: EditProps) {
               <AccountStatistics status={status} />
             </div>
 
-            <div className="space-y-8">
+            <div className="space-y-3">
               <ConnectedAccounts />
               <UpdatePasswordForm className="w-full" />
             </div>

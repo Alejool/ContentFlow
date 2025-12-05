@@ -125,7 +125,7 @@ export default function AccountStatistics({
           {statisticsItems.map((item, index) => (
             <div
               key={index}
-              className={`p-4 rounded-xl transition-all duration-300 hover:scale-[1.02] ${item.bgColor}`}
+              className={`p-4 rounded-lg transition-all duration-300 hover:scale-[1.02] ${item.bgColor}`}
             >
               <div className="flex items-center gap-3 mb-2">
                 <div
@@ -158,7 +158,7 @@ export default function AccountStatistics({
         </div>
 
         <div
-          className={`p-4 rounded-xl border transition-colors duration-300
+          className={`p-4 rounded-lg border transition-colors duration-300
           ${
             theme === "dark"
               ? "bg-gradient-to-r from-yellow-900/10 to-orange-900/10 border-yellow-800/30"
