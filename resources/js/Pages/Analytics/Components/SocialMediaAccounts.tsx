@@ -1,4 +1,3 @@
-import React from "react";
 import { useTranslation } from "react-i18next";
 
 interface SocialMediaAccount {
@@ -22,7 +21,7 @@ export default function SocialMediaAccounts({
 
   return (
     <div
-      className={`rounded-2xl p-6 transition-colors duration-300
+      className={`rounded-lg p-6 transition-colors duration-300
             ${
               theme === "dark"
                 ? "bg-neutral-800/50 backdrop-blur-sm border border-neutral-700/50"
@@ -39,7 +38,7 @@ export default function SocialMediaAccounts({
         {accounts.map((account) => (
           <div
             key={account.platform}
-            className={`rounded-xl p-6 transition-all duration-300 hover:scale-[1.02]
+            className={`rounded-lg p-6 transition-all duration-300 hover:scale-[1.02]
                             ${
                               theme === "dark"
                                 ? "bg-neutral-800/30 border border-neutral-700/30 hover:border-neutral-600/50"

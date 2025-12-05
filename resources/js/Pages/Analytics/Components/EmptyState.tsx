@@ -13,7 +13,7 @@ export default function EmptyState({
 }: EmptyStateProps) {
   return (
     <div
-      className={`rounded-2xl p-12 text-center transition-colors duration-300
+      className={`rounded-lg p-12 text-center transition-colors duration-300
             ${
               theme === "dark"
                 ? "bg-neutral-800/50 backdrop-blur-sm border border-neutral-700/50"

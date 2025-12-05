@@ -163,7 +163,7 @@ export default function Index({ stats, period }: AnalyticsProps) {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           <div
-            className={`rounded-2xl p-6 transition-colors duration-300
+            className={`rounded-lg p-6 transition-colors duration-300
                         ${
                           theme === "dark"
                             ? "bg-neutral-800/50 backdrop-blur-sm border border-neutral-700/50"
@@ -184,7 +184,7 @@ export default function Index({ stats, period }: AnalyticsProps) {
           </div>
 
           <div
-            className={`rounded-2xl p-6 transition-colors duration-300
+            className={`rounded-lg p-6 transition-colors duration-300
                         ${
                           theme === "dark"
                             ? "bg-neutral-800/50 backdrop-blur-sm border border-neutral-700/50"
