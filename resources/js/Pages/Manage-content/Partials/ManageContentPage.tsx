@@ -27,8 +27,14 @@ export default function ManageContentPage() {
   );
   const [filters, setFilters] = useState<any>({});
 
-  const { campaigns, isLoading, fetchCampaigns, addCampaign, deleteCampaign } =
-    useCampaignManagement();
+  const {
+    campaigns,
+    isLoading,
+    fetchCampaigns,
+    addCampaign,
+    deleteCampaign,
+    updateCampaign,
+  } = useCampaignManagement();
 
   useEffect(() => {
     fetchCampaigns(filters);
@@ -67,10 +73,14 @@ export default function ManageContentPage() {
     }
   };
 
-  const handleAddCampaign = async (data: Campaign) => {
-    const success = await addCampaign(data);
+  const handleAddCampaign = async (success: boolean) => {;
     if (success) {
       setIsModalOpen(false);
+      await fetchCampaigns(filters);
+    }
+  };
+  const handleUpdateCampaign = async (success: boolean) => {;
+    if (success) {
       await fetchCampaigns(filters);
     }
   };
@@ -159,6 +169,7 @@ export default function ManageContentPage() {
             setSelectedCampaign(null);
           }}
           campaign={selectedCampaign}
+          onSubmit={handleUpdateCampaign}
         />,
         document.body
       )}

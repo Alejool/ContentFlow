@@ -316,8 +316,8 @@ export default function SocialMediaAccounts() {
         className={`rounded-lg p-8 border transition-colors duration-300
         ${
           theme === "dark"
-            ? "bg-gradient-to-br from-neutral-900/50 to-neutral-800/50 border-neutral-700/50"
-            : "bg-gradient-to-br from-orange-50/50 to-pink-50/50 border-orange-100"
+            ? "bg-gradient-to-br from-neutral-900/80 to-neutral-800/80 border-neutral-700/50"
+            : "bg-gradient-to-br from-orange-50/80 to-pink-50/80 border-orange-100"
         }`}
       >
         <div className="flex items-start gap-4">
@@ -397,7 +397,7 @@ export default function SocialMediaAccounts() {
           className={`flex flex-col items-center justify-center py-12 rounded-lg border transition-colors duration-300
           ${
             theme === "dark"
-              ? "bg-neutral-800/30 border-neutral-700/50"
+              ? "bg-neutral-800/50 border-neutral-700/50"
               : "bg-white border-gray-100"
           }`}
         >
@@ -423,8 +423,8 @@ export default function SocialMediaAccounts() {
                 hover:shadow-xl hover:-translate-y-1
                 ${
                   theme === "dark"
-                    ? "bg-neutral-800/30 backdrop-blur-sm border-neutral-700/50 hover:border-neutral-600"
-                    : "bg-white border-gray-100 hover:border-gray-200"
+                    ? "bg-neutral-800/70 backdrop-blur-sm border-neutral-700/70 hover:border-neutral-600"
+                    : "bg-white/70 backdrop-blur-sm border-gray-100/70 hover:border-gray-200"
                 }
                 ${
                   account.isConnected
@@ -442,7 +442,7 @@ export default function SocialMediaAccounts() {
                     ${
                       account.isConnected
                         ? theme === "dark"
-                          ? "bg-green-900/30 text-green-300 border-green-700/50"
+                          ? "bg-green-900/30 text-green-300 border-green-700/80"
                           : "bg-green-50 text-green-700 border-green-100"
                         : theme === "dark"
                         ? "bg-neutral-800 text-gray-400 border-neutral-700"

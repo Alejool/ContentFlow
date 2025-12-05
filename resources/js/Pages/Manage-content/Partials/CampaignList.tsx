@@ -5,12 +5,15 @@ import {
   Calendar,
   Edit,
   Eye,
+  File,
   Filter,
+  Image as ImageIcon,
   MoreVertical,
   Plus,
   Search,
   Share2,
   Trash2,
+  Video,
 } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -44,16 +47,14 @@ export default function CampaignList({
   const [dateStart, setDateStart] = useState("");
   const [dateEnd, setDateEnd] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const itemsPerPage = 7;
 
-  // Filter campaigns locally by search
   const filteredCampaigns = campaigns.filter(
     (campaign) =>
       campaign.title.toLowerCase().includes(search.toLowerCase()) ||
       campaign.description.toLowerCase().includes(search.toLowerCase())
   );
 
-  // Calculate pagination
   const totalPages = Math.ceil(filteredCampaigns.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -94,17 +95,105 @@ export default function CampaignList({
     return index >= totalItems - 2;
   };
 
+  const countMediaFiles = (campaign: Campaign) => {
+    if (!campaign.media_files || campaign.media_files.length === 0) {
+      return { images: 0, videos: 0, total: 0 };
+    }
+
+    const images = campaign.media_files.filter((file) => {
+      const fileType = file.file_type?.toLowerCase() || "";
+      return (
+        fileType.startsWith("image/") ||
+        file.file_path?.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i) ||
+        file.file_type === "image" ||
+        file.file_type?.includes("image")
+      );
+    }).length;
+
+    const videos = campaign.media_files.filter((file) => {
+      const fileType = file.file_type?.toLowerCase() || "";
+      return (
+        fileType.startsWith("video/") ||
+        file.file_path?.match(/\.(mp4|avi|mov|wmv|flv|webm)$/i) ||
+        file.file_type === "video" ||
+        file.file_type?.includes("video")
+      );
+    }).length;
+
+    return {
+      images,
+      videos,
+      total: campaign.media_files.length,
+    };
+  };
+
+  const getThumbnail = (campaign: Campaign) => {
+    if (!campaign.media_files || campaign.media_files.length === 0) {
+      return {
+        type: "none" as const,
+        url: null,
+      };
+    }
+
+    const imageFile = campaign.media_files.find((file) => {
+      const fileType = file.file_type?.toLowerCase() || "";
+      return (
+        fileType.startsWith("image/") ||
+        file.file_path?.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i) ||
+        file.file_type === "image" ||
+        file.file_type?.includes("image")
+      );
+    });
+
+    if (imageFile && imageFile.file_path) {
+      return {
+        type: "image" as const,
+        url: imageFile.file_path,
+      };
+    }
+
+    const videoFile = campaign.media_files.find((file) => {
+      const fileType = file.file_type?.toLowerCase() || "";
+      return (
+        fileType.startsWith("video/") ||
+        file.file_path?.match(/\.(mp4|avi|mov|wmv|flv|webm)$/i) ||
+        file.file_type === "video" ||
+        file.file_type?.includes("video")
+      );
+    });
+
+    if (videoFile && videoFile.file_path) {
+      return {
+        type: "video" as const,
+        url: videoFile.file_path,
+      };
+    }
+
+    const firstFile = campaign.media_files[0];
+    if (firstFile && firstFile.file_path) {
+      return {
+        type: "unknown" as const,
+        url: firstFile.file_path,
+      };
+    }
+
+    return {
+      type: "none" as const,
+      url: null,
+    };
+  };
+
   return (
     <div
-      className={`rounded-lg overflow-hidden shadow-lg border transition-all duration-300
+      className={`rounded-lg overflow-hidden shadow-lg border transition-all 
+        duration-300 backdrop-blur-lg
         ${
           theme === "dark"
-            ? "bg-neutral-800/50 border-neutral-700/50"
-            : "bg-white border-gray-100"
+            ? "bg-neutral-800/70 border-neutral-700/70 text-white"
+            : "bg-white/70 border-gray-100/70 text-gray-900"
         }
       `}
     >
-      {/* Header & Actions */}
       <div className="p-6 border-b border-gray-100 dark:border-neutral-700/50">
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
           <div>
@@ -113,14 +202,14 @@ export default function CampaignList({
                 theme === "dark" ? "text-white" : "text-gray-900"
               }`}
             >
-              {t("manageContent.campaigns.yourContent")}
+              {t("campaigns.yourContent")}
             </h2>
             <p
               className={`text-sm mt-1 ${
                 theme === "dark" ? "text-gray-400" : "text-gray-500"
               }`}
             >
-              Manage, track and analyze your social media campaigns
+              {t("campaigns.description")}
             </p>
           </div>
           <button
@@ -128,11 +217,10 @@ export default function CampaignList({
             className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white rounded-lg font-medium transition-all shadow-md hover:shadow-lg active:scale-95"
           >
             <Plus className="w-4 h-4" />
-            {t("manageContent.campaigns.addNew")}
+            {t("campaigns.addNew")}
           </button>
         </div>
 
-        {/* Filters Toolbar */}
         <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-gray-50 dark:bg-neutral-900/30 p-4 rounded-lg">
           <div className="flex items-center gap-2 w-full md:w-auto relative">
             <Search
@@ -168,16 +256,16 @@ export default function CampaignList({
                 className={`py-2 pl-3 pr-8 rounded-lg text-sm border focus:ring-2 focus:ring-orange-500 focus:border-transparent cursor-pointer
                   ${
                     theme === "dark"
-                      ? "bg-neutral-800 border-neutral-700 text-white"
-                      : "bg-white border-gray-200 text-gray-700"
+                      ? "bg-neutral-800/70 border-neutral-700/70 text-white"
+                      : "bg-white/70 border-gray-200/70 text-gray-700"
                   }
                 `}
               >
-                <option value="all">All Status</option>
-                <option value="active">Active</option>
-                <option value="upcoming">Upcoming</option>
-                <option value="completed">Completed</option>
-                <option value="draft">Draft</option>
+                <option value="all">{t("campaigns.filters.all")}</option>
+                <option value="active">{t("campaigns.filters.active")}</option>
+                <option value="upcoming">{t("campaigns.filters.upcoming")}</option>
+                <option value="completed">{t("campaigns.filters.completed")}</option>
+                <option value="draft">{t("campaigns.filters.draft")}</option>
               </select>
             </div>
 
@@ -223,24 +311,31 @@ export default function CampaignList({
         </div>
       </div>
 
-      {/* Table Content */}
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
-          <thead>
+          <thead
+            className={` ${
+              theme === "dark"
+                ? "bg-neutral-800/90  border-neutral-700"
+                : "bg-gray-50/90  border-gray-100"
+            }`}
+          >
             <tr
               className={`text-xs uppercase tracking-wider border-b
                 ${
                   theme === "dark"
-                    ? "bg-neutral-800/50 text-gray-400 border-neutral-700"
-                    : "bg-gray-50 text-gray-500 border-gray-100"
+                    ? "bg-neutral-800/50  border-neutral-700"
+                    : "bg-gray-50  border-gray-100"
                 }
               `}
             >
-              <th className="px-6 py-4 font-semibold">Campaign</th>
-              <th className="px-6 py-4 font-semibold">Status</th>
-              <th className="px-6 py-4 font-semibold">Duration</th>
-              <th className="px-6 py-4 font-semibold text-center">Platforms</th>
-              <th className="px-6 py-4 font-semibold text-right">Actions</th>
+              <th className="px-6 py-4 font-semibold"></th>
+              <th className="px-6 py-4 font-semibold">{t("campaigns.headers.status")}</th>
+              <th className="px-6 py-4 font-semibold">{t("campaigns.headers.duration")}</th>
+              <th className="px-6 py-4 font-semibold text-center">
+                {t("campaigns.headers.mediaFiles")}
+              </th>
+              <th className="px-6 py-4 font-semibold text-right">{t("campaigns.headers.actions")}</th>
             </tr>
           </thead>
           <tbody
@@ -249,211 +344,304 @@ export default function CampaignList({
             }`}
           >
             {currentCampaigns.length > 0 ? (
-              currentCampaigns.map((campaign, index) => (
-                <tr
-                  key={campaign.id}
-                  className={`group transition-colors
-                    ${
-                      theme === "dark"
-                        ? "hover:bg-neutral-700/30"
-                        : "hover:bg-gray-50/50"
-                    }
-                  `}
-                >
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-4">
-                      <div
-                        className={`w-12 h-12 rounded-lg flex-shrink-0 bg-cover bg-center border
-                          ${
-                            theme === "dark"
-                              ? "border-neutral-700 bg-neutral-800"
-                              : "border-gray-200 bg-gray-100"
-                          }
+              currentCampaigns.map((campaign, index) => {
+                const mediaCount = countMediaFiles(campaign);
+                const thumbnail = getThumbnail(campaign);
+
+                return (
+                  <tr
+                    key={campaign.id}
+                    className={`group transition-colors
+                      ${
+                        theme === "dark"
+                          ? "hover:bg-neutral-700/30"
+                          : "hover:bg-gray-50/50"
+                      }
+                    `}
+                  >
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-4">
+                        <div
+                          className={`w-12 h-12 rounded-lg flex-shrink-0 border overflow-hidden relative flex items-center justify-center
+                            ${
+                              theme === "dark"
+                                ? "border-neutral-700 bg-neutral-800"
+                                : "border-gray-200 bg-gray-100"
+                            }
+                          `}
+                        >
+                          {thumbnail.type === "image" ? (
+                            <>
+                              <img
+                                src={thumbnail.url || ""}
+                                alt={campaign.title}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  const img = e.currentTarget;
+                                  img.style.display = "none";
+                                  const parent = img.parentElement;
+                                  if (parent) {
+                                    const icon = document.createElement("div");
+                                    icon.className =
+                                      "flex items-center justify-center";
+                                    icon.innerHTML =
+                                      '<svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>';
+                                    parent.appendChild(icon);
+                                  }
+                                }}
+                              />
+                              {mediaCount.total > 1 && (
+                                <div className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center shadow-sm">
+                                  +{mediaCount.total - 1}
+                                </div>
+                              )}
+                            </>
+                          ) : thumbnail.type === "video" ? (
+                            <>
+                              <div className="w-full h-full flex items-center justify-center bg-gray-800">
+                                <Video className="w-6 h-6 text-gray-300" />
+                              </div>
+                              {mediaCount.total > 1 && (
+                                <div className="absolute -top-1 -right-1 bg-purple-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center shadow-sm">
+                                  +{mediaCount.total - 1}
+                                </div>
+                              )}
+                            </>
+                          ) : thumbnail.type === "unknown" ? (
+                            <>
+                              <File className="w-6 h-6 text-gray-400" />
+                              {mediaCount.total > 1 && (
+                                <div className="absolute -top-1 -right-1 bg-gray-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center shadow-sm">
+                                  +{mediaCount.total - 1}
+                                </div>
+                              )}
+                            </>
+                          ) : (
+                            <div className="flex flex-col items-center justify-center text-gray-400">
+                              <File className="w-6 h-6 mb-1" />
+                              <span className="text-xs">No media</span>
+                            </div>
+                          )}
+                        </div>
+                        <div>
+                          <h3
+                            className={`font-medium text-sm ${
+                              theme === "dark" ? "text-white" : "text-gray-900"
+                            }`}
+                          >
+                            {campaign.title}
+                          </h3>
+                          <p
+                            className={`text-xs mt-0.5 line-clamp-1 ${
+                              theme === "dark"
+                                ? "text-gray-400"
+                                : "text-gray-500"
+                            }`}
+                          >
+                            {campaign.description}
+                          </p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize
+                          ${getStatusColor(campaign.status)}
                         `}
-                        style={{
-                          backgroundImage: campaign.image
-                            ? `url(${campaign.image})`
-                            : "none",
-                        }}
                       >
-                        {!campaign.image && (
-                          <div className="w-full h-full flex items-center justify-center text-xs text-gray-400">
-                            No Img
+                        {campaign.status || "Draft"}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex flex-col text-xs">
+                        <span
+                          className={
+                            theme === "dark" ? "text-gray-300" : "text-gray-700"
+                          }
+                        >
+                          Start: {campaign.start_date || "Not set"}
+                        </span>
+                        <span
+                          className={
+                            theme === "dark" ? "text-gray-500" : "text-gray-400"
+                          }
+                        >
+                          End: {campaign.end_date || "Not set"}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex flex-col items-center gap-1">
+                        {mediaCount.total > 0 ? (
+                          <div className="flex items-center gap-3">
+                            {mediaCount.images > 0 && (
+                              <div
+                                className="flex items-center gap-1"
+                                title={`${mediaCount.images} images`}
+                              >
+                                <ImageIcon className="w-4 h-4 text-blue-500" />
+                                <span className="text-xs font-medium">
+                                  {mediaCount.images}
+                                </span>
+                              </div>
+                            )}
+                            {mediaCount.videos > 0 && (
+                              <div
+                                className="flex items-center gap-1"
+                                title={`${mediaCount.videos} videos`}
+                              >
+                                <Video className="w-4 h-4 text-purple-500" />
+                                <span className="text-xs font-medium">
+                                  {mediaCount.videos}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <span
+                            className={`text-xs ${
+                              theme === "dark"
+                                ? "text-gray-500"
+                                : "text-gray-400"
+                            }`}
+                          >
+                            No media
+                          </span>
+                        )}
+                        {mediaCount.total > 0 && (
+                          <div
+                            className={`text-xs ${
+                              theme === "dark"
+                                ? "text-gray-500"
+                                : "text-gray-400"
+                            }`}
+                          >
+                            {mediaCount.total} total
                           </div>
                         )}
                       </div>
-                      <div>
-                        <h3
-                          className={`font-medium text-sm ${
-                            theme === "dark" ? "text-white" : "text-gray-900"
-                          }`}
+                    </td>
+                    <td className="px-6 py-4 text-right relative">
+                      <Menu
+                        as="div"
+                        className="relative inline-block text-left"
+                      >
+                        <MenuButton
+                          className={`p-2 rounded-lg transition-colors
+                            ${
+                              theme === "dark"
+                                ? "hover:bg-neutral-700 text-gray-400"
+                                : "hover:bg-gray-100 text-gray-500"
+                            }
+                          `}
                         >
-                          {campaign.title}
-                        </h3>
-                        <p
-                          className={`text-xs mt-0.5 line-clamp-1 ${
-                            theme === "dark" ? "text-gray-400" : "text-gray-500"
-                          }`}
-                        >
-                          {campaign.description}
-                        </p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize
-                        ${getStatusColor(campaign.status)}
-                      `}
-                    >
-                      {campaign.status || "Draft"}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex flex-col text-xs">
-                      <span
-                        className={
-                          theme === "dark" ? "text-gray-300" : "text-gray-700"
-                        }
-                      >
-                        Start: {campaign.start_date || "Not set"}
-                      </span>
-                      <span
-                        className={
-                          theme === "dark" ? "text-gray-500" : "text-gray-400"
-                        }
-                      >
-                        End: {campaign.end_date || "Not set"}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-center">
-                    <span
-                      className={`text-xs ${
-                        theme === "dark" ? "text-gray-500" : "text-gray-400"
-                      }`}
-                    >
-                      -
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-right relative">
-                    <Menu as="div" className="relative inline-block text-left">
-                      <MenuButton
-                        className={`p-2 rounded-lg transition-colors
-                          ${
-                            theme === "dark"
-                              ? "hover:bg-neutral-700 text-gray-400"
-                              : "hover:bg-gray-100 text-gray-500"
-                          }
-                        `}
-                      >
-                        <MoreVertical className="w-4 h-4" />
-                      </MenuButton>
+                          <MoreVertical className="w-4 h-4" />
+                        </MenuButton>
 
-                      {/* Menú que se abre hacia arriba para los últimos elementos */}
-                      <MenuItems
-                        className={`absolute ${
-                          shouldOpenUpwards(index)
-                            ? "bottom-full mb-2"
-                            : "top-full mt-2"
-                        } right-0 w-48 origin-top-right rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50
-                          ${
-                            theme === "dark"
-                              ? "bg-neutral-800 ring-neutral-700"
-                              : "bg-white"
-                          }
-                        `}
-                      >
-                        <div className="p-1">
-                          <MenuItem>
-                            {({ active }) => (
-                              <button
-                                onClick={() => onEdit(campaign)}
-                                className={`flex w-full items-center gap-2 px-3 py-2 rounded-lg text-sm
-                                  ${
-                                    active
-                                      ? theme === "dark"
-                                        ? "bg-neutral-700 text-white"
-                                        : "bg-gray-50 text-gray-900"
-                                      : theme === "dark"
-                                      ? "text-gray-300"
-                                      : "text-gray-700"
-                                  }
-                                `}
-                              >
-                                <Edit className="w-4 h-4" />
-                                Edit
-                              </button>
-                            )}
-                          </MenuItem>
-                          <MenuItem>
-                            {({ active }) => (
-                              <button
-                                onClick={() => onPublish(campaign)}
-                                className={`flex w-full items-center gap-2 px-3 py-2 rounded-lg text-sm
-                                  ${
-                                    active
-                                      ? theme === "dark"
-                                        ? "bg-neutral-700 text-white"
-                                        : "bg-gray-50 text-gray-900"
-                                      : theme === "dark"
-                                      ? "text-gray-300"
-                                      : "text-gray-700"
-                                  }
-                                `}
-                              >
-                                <Share2 className="w-4 h-4" />
-                                Publish Now
-                              </button>
-                            )}
-                          </MenuItem>
-                          <MenuItem>
-                            {({ active }) => (
-                              <button
-                                onClick={() => onViewDetails(campaign)}
-                                className={`flex w-full items-center gap-2 px-3 py-2 rounded-lg text-sm
-                                  ${
-                                    active
-                                      ? theme === "dark"
-                                        ? "bg-neutral-700 text-white"
-                                        : "bg-gray-50 text-gray-900"
-                                      : theme === "dark"
-                                      ? "text-gray-300"
-                                      : "text-gray-700"
-                                  }
-                                `}
-                              >
-                                <Eye className="w-4 h-4" />
-                                View Details
-                              </button>
-                            )}
-                          </MenuItem>
-                          <div className="my-1 border-t border-gray-100 dark:border-neutral-700" />
-                          <MenuItem>
-                            {({ active }) => (
-                              <button
-                                onClick={() => onDelete(campaign.id)}
-                                className={`flex w-full items-center gap-2 px-3 py-2 rounded-lg text-sm text-red-600
-                                  ${
-                                    active
-                                      ? theme === "dark"
-                                        ? "bg-red-900/20"
-                                        : "bg-red-50"
-                                      : ""
-                                  }
-                                `}
-                              >
-                                <Trash2 className="w-4 h-4" />
-                                Delete
-                              </button>
-                            )}
-                          </MenuItem>
-                        </div>
-                      </MenuItems>
-                    </Menu>
-                  </td>
-                </tr>
-              ))
+                        <MenuItems
+                          className={`absolute ${
+                            shouldOpenUpwards(index)
+                              ? "bottom-full mb-2"
+                              : "top-full mt-2"
+                          } right-0 w-48 origin-top-right rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50
+                            ${
+                              theme === "dark"
+                                ? "bg-neutral-800 ring-neutral-700"
+                                : "bg-white"
+                            }
+                          `}
+                        >
+                          <div className="p-1">
+                            <MenuItem>
+                              {({ active }) => (
+                                <button
+                                  onClick={() => onEdit(campaign)}
+                                  className={`flex w-full items-center gap-2 px-3 py-2 rounded-lg text-sm
+                                    ${
+                                      active
+                                        ? theme === "dark"
+                                          ? "bg-neutral-700 text-white"
+                                          : "bg-gray-50 text-gray-900"
+                                        : theme === "dark"
+                                        ? "text-gray-300"
+                                        : "text-gray-700"
+                                    }
+                                  `}
+                                >
+                                  <Edit className="w-4 h-4" />
+                                  {t("campaigns.actions.edit")}
+                                </button>
+                              )}
+                            </MenuItem>
+                            <MenuItem>
+                              {({ active }) => (
+                                <button
+                                  onClick={() => onPublish(campaign)}
+                                  className={`flex w-full items-center gap-2 px-3 py-2 rounded-lg text-sm
+                                    ${
+                                      active
+                                        ? theme === "dark"
+                                          ? "bg-neutral-700 text-white"
+                                          : "bg-gray-50 text-gray-900"
+                                        : theme === "dark"
+                                        ? "text-gray-300"
+                                        : "text-gray-700"
+                                    }
+                                  `}
+                                >
+                                  <Share2 className="w-4 h-4" />
+                                  {t("campaigns.actions.publishNow")}
+                                </button>
+                              )}
+                            </MenuItem>
+                            <MenuItem>
+                              {({ active }) => (
+                                <button
+                                  onClick={() => onViewDetails(campaign)}
+                                  className={`flex w-full items-center gap-2 px-3 py-2 rounded-lg text-sm
+                                    ${
+                                      active
+                                        ? theme === "dark"
+                                          ? "bg-neutral-700 text-white"
+                                          : "bg-gray-50 text-gray-900"
+                                        : theme === "dark"
+                                        ? "text-gray-300"
+                                        : "text-gray-700"
+                                    }
+                                  `}
+                                >
+                                  <Eye className="w-4 h-4" />
+                                  {t("campaigns.actions.viewDetails")}
+                                </button>
+                              )}
+                            </MenuItem>
+                            <div className="my-1 border-t border-gray-100 dark:border-neutral-700" />
+                            <MenuItem>
+                              {({ active }) => (
+                                <button
+                                  onClick={() => onDelete(campaign.id)}
+                                  className={`flex w-full items-center gap-2 px-3 py-2 rounded-lg text-sm text-red-600
+                                    ${
+                                      active
+                                        ? theme === "dark"
+                                          ? "bg-red-900/20"
+                                          : "bg-red-50"
+                                        : ""
+                                    }
+                                  `}
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                  Delete
+                                </button>
+                              )}
+                            </MenuItem>
+                          </div>
+                        </MenuItems>
+                      </Menu>
+                    </td>
+                  </tr>
+                );
+              })
             ) : (
               <tr>
                 <td colSpan={5} className="px-6 py-12 text-center">
@@ -492,7 +680,6 @@ export default function CampaignList({
         </table>
       </div>
 
-      {/* Pagination Controls */}
       {filteredCampaigns.length > 0 && (
         <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 dark:border-neutral-700">
           <div

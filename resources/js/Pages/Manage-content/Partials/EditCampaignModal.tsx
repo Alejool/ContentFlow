@@ -62,6 +62,7 @@ interface EditCampaignModalProps {
   isOpen: boolean;
   onClose: () => void;
   campaign: Campaign;
+  onSubmit: (success: boolean) => void;
 }
 
 const validateFile = (file: File, t: any) => {
@@ -89,10 +90,11 @@ export default function EditCampaignModal({
   isOpen,
   onClose,
   campaign,
+  onSubmit,
 }: EditCampaignModalProps) {
   const { t } = useTranslation();
   const { theme } = useTheme();
-  const { updateCampaign } = useCampaignManagement();
+  const { updateCampaign, fetchCampaigns } = useCampaignManagement();
   const [mediaFiles, setMediaFiles] = useState<File[]>([]);
   const [mediaPreviews, setMediaPreviews] = useState<
     { id?: number; url: string; type: string; isNew: boolean }[]
@@ -153,7 +155,12 @@ export default function EditCampaignModal({
         social_accounts: scheduledAccountIds,
       });
 
-      const previews: { id?: number; url: string; type: string; isNew: boolean }[] = [];
+      const previews: {
+        id?: number;
+        url: string;
+        type: string;
+        isNew: boolean;
+      }[] = [];
       if (campaign.media_files && campaign.media_files.length > 0) {
         campaign.media_files.forEach((m) => {
           previews.push({
@@ -168,7 +175,7 @@ export default function EditCampaignModal({
       } else if (campaign.image) {
         previews.push({
           url: campaign.image,
-          type: "image/jpeg", 
+          type: "image/jpeg",
           isNew: false,
         });
       }
@@ -331,7 +338,7 @@ export default function EditCampaignModal({
       }
 
       const mediaFilesToKeep = mediaPreviews
-        .filter((p) => !p.isNew && p.id) 
+        .filter((p) => !p.isNew && p.id)
         .map((p) => p.id as number);
 
       mediaFiles.forEach((file, index) => {
@@ -340,7 +347,6 @@ export default function EditCampaignModal({
       mediaFilesToKeep.forEach((id: number, index: number) => {
         submitData.append(`media_keep_ids[${index}]`, id.toString());
       });
-
 
       if (data.scheduled_at) {
         submitData.append("scheduled_at", data.scheduled_at);
@@ -355,12 +361,12 @@ export default function EditCampaignModal({
       submitData.append("_method", "PUT");
 
       const success = await updateCampaign(campaign.id, submitData);
-
       if (success) {
         reset();
         setMediaPreviews([]);
         setMediaFiles([]);
         onClose();
+        onSubmit(success);
       }
     } catch (error) {
       console.error("Error updating campaign:", error);
@@ -380,7 +386,11 @@ export default function EditCampaignModal({
   if (!isOpen) return null;
 
   return (
-    <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+    <div
+      className={`fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 ${
+        theme === "dark" ? "text-white" : "text-gray-900"
+      }`}
+    >
       <div
         className={`absolute inset-0 ${
           theme === "dark" ? "bg-black/50" : "bg-gray-900/50"
