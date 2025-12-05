@@ -128,7 +128,7 @@ export default function ForgotPassword({ status }: ForgotPasswordProps) {
 
             <form onSubmit={submit} className="space-y-6">
               {status && (
-                <div className="rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 p-4">
+                <div className="rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 p-4">
                   <div className="flex items-center gap-3 text-green-700 dark:text-green-400">
                     <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
                     <p className="text-sm font-medium">{status}</p>
@@ -136,7 +136,7 @@ export default function ForgotPassword({ status }: ForgotPasswordProps) {
                 </div>
               )}
 
-              <div className="rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 p-4">
+              <div className="rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 p-4">
                 <p className="text-sm text-gray-700 dark:text-gray-300">
                   Forgot your password? No problem. Just enter your email
                   address below and we'll email you a password reset link that
@@ -158,7 +158,7 @@ export default function ForgotPassword({ status }: ForgotPasswordProps) {
                     name="email"
                     value={data.email}
                     onChange={(e) => setData("email", e.target.value)}
-                    className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-300 dark:border-gray-700 
+                    className="w-full pl-11 pr-4 py-3 rounded-lg border border-gray-300 dark:border-gray-700 
                                                  bg-white dark:bg-gray-800 text-gray-900 dark:text-white
                                                  focus:ring-2 focus:ring-primary-500 focus:border-transparent
                                                  transition-all duration-200"
@@ -178,7 +178,7 @@ export default function ForgotPassword({ status }: ForgotPasswordProps) {
               <button
                 type="submit"
                 disabled={processing}
-                className="w-full bg-gradient-primary text-white py-3 px-4 rounded-xl font-semibold
+                className="w-full bg-gradient-primary text-white py-3 px-4 rounded-lg font-semibold
                                          hover:opacity-90 active:scale-[0.98] transition-all duration-200
                                          disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
