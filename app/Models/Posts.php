@@ -2,9 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Posts extends Model
 {
-    //
+    use HasFactory;
+
+    // Este modelo no tiene migración - dejarlo vacío
 }

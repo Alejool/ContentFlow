@@ -11,29 +11,28 @@ class SocialAccount extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
     protected $fillable = [
         'user_id',
         'platform',
         'account_id',
+        'account_name',
         'access_token',
         'refresh_token',
         'token_expires_at',
+        'is_active',
+        'last_failed_at',
+        'failure_count',
+        'account_metadata',
     ];
 
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
     protected $casts = [
         'id' => 'integer',
         'user_id' => 'integer',
         'token_expires_at' => 'timestamp',
+        'is_active' => 'boolean',
+        'last_failed_at' => 'timestamp',
+        'failure_count' => 'integer',
+        'account_metadata' => 'array',
     ];
 
     public function user(): BelongsTo
@@ -49,6 +48,44 @@ class SocialAccount extends Model
     public function metrics(): HasMany
     {
         return $this->hasMany(SocialMediaMetrics::class);
+    }
+
+    public function postLogs(): HasMany
+    {
+        return $this->hasMany(SocialPostLog::class);
+    }
+
+    // Helper methods
+    public function isTokenExpired(): bool
+    {
+        if (!$this->token_expires_at) {
+            return false;
+        }
+
+        return $this->token_expires_at->isPast();
+    }
+
+    public function needsReconnection(): bool
+    {
+        return !$this->is_active || $this->failure_count >= 3;
+    }
+
+    public function markAsActive(): void
+    {
+        $this->update([
+            'is_active' => true,
+            'failure_count' => 0,
+            'last_failed_at' => null,
+        ]);
+    }
+
+    public function markAsInactive(string $reason = null): void
+    {
+        $this->update([
+            'is_active' => false,
+            'last_failed_at' => now(),
+            'failure_count' => $this->failure_count + 1,
+        ]);
     }
 
     public function getLatestMetrics()
