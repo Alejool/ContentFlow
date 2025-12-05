@@ -1,13 +1,13 @@
+import ThemedToaster from "@/Components/ThemedToaster";
 import { ThemeProvider } from "@/Contexts/ThemeContext";
 import { PageProps } from "@/types";
-import { ChakraProvider, defaultSystem } from "@chakra-ui/react";
 import { createInertiaApp } from "@inertiajs/react";
 import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
 import { createRoot } from "react-dom/client";
-import { Toaster } from "react-hot-toast";
 import "../css/app.css";
 import "./bootstrap";
 import "./i18n";
+
 const appName = import.meta.env.VITE_APP_NAME || "contentFlow";
 
 createInertiaApp<PageProps>({
@@ -32,14 +32,10 @@ createInertiaApp<PageProps>({
     }
 
     root.render(
-      <>
-        <ThemeProvider>
-          <ChakraProvider value={defaultSystem}>
-            <App {...props} />
-          </ChakraProvider>
-          <Toaster />
-        </ThemeProvider>
-      </>
+      <ThemeProvider>
+        <App {...props} />
+        <ThemedToaster />
+      </ThemeProvider>
     );
   },
   progress: {
