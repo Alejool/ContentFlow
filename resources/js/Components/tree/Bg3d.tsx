@@ -1,43 +1,39 @@
-import React, {
-  useRef,
-  useState,
-  useEffect,
-  useMemo,
-  useCallback,
-  Suspense,
-} from "react";
-import { Canvas, useFrame, ThreeElements } from "@react-three/fiber";
-import * as THREE from "three";
 import {
-  OrbitControls,
-  Text,
-  Html,
-  Float,
-  Sparkles,
-  Trail,
-  Stars,
-  Sky,
   Environment,
-  Lightformer,
+  Html,
+  OrbitControls,
+  Sparkles,
+  Stars,
+  Text,
+  Trail,
 } from "@react-three/drei";
-import { motion, AnimatePresence } from "framer-motion";
+import { Canvas, useFrame } from "@react-three/fiber";
+import { AnimatePresence, motion } from "framer-motion";
 import {
-  Share2,
-  TrendingUp,
-  Zap,
-  RefreshCw,
-  Play,
-  Pause,
+  BarChart3,
+  ChevronDown,
+  Globe,
   Maximize2,
   Minimize2,
-  Settings,
-  ChevronDown,
+  Pause,
+  Play,
+  RefreshCw,
+  Share2,
   Sparkles as SparklesIcon,
-  Globe,
-  BarChart3,
-  Users,
   Target,
+  TrendingUp,
+  Users,
+  Zap,
 } from "lucide-react";
+import React, {
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import * as THREE from "three";
 
 // Types
 interface PlatformConfig {
@@ -588,12 +584,12 @@ const PlatformNode: React.FC<PlatformNodeProps> = React.memo(
               initial={{ opacity: 0, scale: 0.9, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               transition={{ type: "spring", stiffness: 300, damping: 25 }}
-              className="bg-gray-900/95 backdrop-blur-xl p-4 rounded-xl border border-gray-800 shadow-2xl min-w-[240px]"
+              className="bg-gray-900/95 backdrop-blur-xl p-4 rounded-lg border border-gray-800 shadow-2xl min-w-[240px]"
               style={{ borderColor: config.color }}
             >
               <div className="flex items-start gap-3 mb-3">
                 <div
-                  className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-sm"
+                  className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-sm"
                   style={{
                     background: `linear-gradient(135deg, ${config.gradient[0]}, ${config.gradient[1]})`,
                   }}
@@ -836,7 +832,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
       initial={{ x: -20, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ delay: 0.2 }}
-      className="absolute top-6 left-6 z-50 bg-gray-900/90 backdrop-blur-xl rounded-2xl border border-gray-800/50 shadow-2xl overflow-hidden"
+      className="absolute top-6 left-6 z-50 bg-gray-900/90 backdrop-blur-xl rounded-lg border border-gray-800/50 shadow-2xl overflow-hidden"
     >
       <div className="p-4">
         {/* Header */}
@@ -925,7 +921,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
                         <button
                           key={platform.id}
                           onClick={() => onTogglePlatform(platform.id)}
-                          className={`flex items-center gap-2 p-3 rounded-xl transition-all ${
+                          className={`flex items-center gap-2 p-3 rounded-lg transition-all ${
                             activePlatforms.includes(platform.id)
                               ? "bg-gray-800 ring-1 ring-opacity-30"
                               : "bg-gray-800/30 hover:bg-gray-800/50"
@@ -963,7 +959,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
                     <div className="flex gap-2">
                       <button
                         onClick={onPlayPause}
-                        className="flex-1 flex items-center justify-center gap-2 p-3 bg-gray-800/50 hover:bg-gray-800 rounded-xl transition-colors"
+                        className="flex-1 flex items-center justify-center gap-2 p-3 bg-gray-800/50 hover:bg-gray-800 rounded-lg transition-colors"
                       >
                         {isPlaying ? (
                           <>
@@ -979,7 +975,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
                       </button>
                       <button
                         onClick={onReset}
-                        className="p-3 bg-gray-800/50 hover:bg-gray-800 rounded-xl transition-colors"
+                        className="p-3 bg-gray-800/50 hover:bg-gray-800 rounded-lg transition-colors"
                       >
                         <RefreshCw className="w-4 h-4" />
                       </button>
@@ -1065,7 +1061,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
 
                 {activeTab === "data" && (
                   <div className="space-y-3">
-                    <div className="bg-gray-800/30 p-3 rounded-xl">
+                    <div className="bg-gray-800/30 p-3 rounded-lg">
                       <div className="text-gray-400 text-xs mb-2">
                         Data Flow Rate
                       </div>
@@ -1088,13 +1084,13 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-2">
-                      <div className="bg-gray-800/30 p-3 rounded-xl">
+                      <div className="bg-gray-800/30 p-3 rounded-lg">
                         <div className="text-gray-400 text-xs">Posts Today</div>
                         <div className="text-white font-bold">
                           {totalMetrics.totalPosts}
                         </div>
                       </div>
-                      <div className="bg-gray-800/30 p-3 rounded-xl">
+                      <div className="bg-gray-800/30 p-3 rounded-lg">
                         <div className="text-gray-400 text-xs">
                           Engagement Rate
                         </div>
@@ -1353,7 +1349,7 @@ const Bg3d: React.FC<{
 
       {/* Stats Overview */}
       <div className="absolute top-6 right-6 z-50">
-        <div className="bg-gray-900/90 backdrop-blur-xl rounded-2xl p-4 border border-gray-800/50 shadow-2xl">
+        <div className="bg-gray-900/90 backdrop-blur-xl rounded-lg p-4 border border-gray-800/50 shadow-2xl">
           <div className="flex items-center gap-6">
             <div className="text-center">
               <div className="text-3xl font-bold text-white bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
@@ -1387,7 +1383,7 @@ const Bg3d: React.FC<{
       {/* Fullscreen Toggle */}
       <button
         onClick={() => setFullscreen(!fullscreen)}
-        className="absolute top-6 right-48 z-50 p-3 bg-gray-900/90 backdrop-blur-xl rounded-xl border border-gray-800/50 hover:bg-gray-800/80 transition-all hover:scale-105"
+        className="absolute top-6 right-48 z-50 p-3 bg-gray-900/90 backdrop-blur-xl rounded-lg border border-gray-800/50 hover:bg-gray-800/80 transition-all hover:scale-105"
       >
         {fullscreen ? (
           <Minimize2 className="w-5 h-5 text-gray-300" />
@@ -1560,10 +1556,10 @@ const Bg3d: React.FC<{
         transition={{ delay: 0.6, type: "spring", stiffness: 100 }}
         className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-40"
       >
-        <div className="bg-gray-900/90 backdrop-blur-xl rounded-2xl p-5 border border-gray-800/50 shadow-2xl min-w-[500px]">
+        <div className="bg-gray-900/90 backdrop-blur-xl rounded-lg p-5 border border-gray-800/50 shadow-2xl min-w-[500px]">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-purple-900/30 rounded-xl">
+              <div className="p-3 bg-purple-900/30 rounded-lg">
                 <Share2 className="w-6 h-6 text-purple-400" />
               </div>
               <div>

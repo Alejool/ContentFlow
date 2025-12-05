@@ -1,6 +1,6 @@
 import { Link } from "@inertiajs/react";
-import { ReactNode } from "react";
 import { ChevronRight } from "lucide-react";
+import { ReactNode } from "react";
 
 const CustomIcon = ({
   children,
@@ -36,7 +36,7 @@ export default function FeatureCard({
   return (
     <Link
       href={href}
-      className={`group relative overflow-hidden rounded-xl backdrop-blur-sm p-5 shadow-lg ring-1 ring-gray-200/50 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] hover:ring-red-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 dark:bg-gray-900/80 dark:ring-gray-700/50 dark:hover:ring-red-700 ${className}`}
+      className={`group relative overflow-hidden rounded-lg backdrop-blur-sm p-5 shadow-lg ring-1 ring-gray-200/50 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] hover:ring-red-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 dark:bg-gray-900/80 dark:ring-gray-700/50 dark:hover:ring-red-700 ${className}`}
     >
       <div className="flex items-start gap-3">
         <CustomIcon className="w-11 h-11 shrink-0 group-hover:scale-110 transition-transform duration-300">
