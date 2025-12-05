@@ -24,7 +24,7 @@ export default defineConfig({
     server: {
         proxy: {
             '*': {
-                target: 'http://127.0.0.1:8000', // URL del backend
+                target: 'http://127.0.0.1:8000', 
                 changeOrigin: true,
                 secure: true,
             },
