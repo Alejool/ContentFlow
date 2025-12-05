@@ -1,19 +1,37 @@
-import { useState } from "react";
 import axios from "axios";
+import { useState } from "react";
 import { toast } from "react-hot-toast";
-import Swal from "sweetalert2";
 import { useTranslation } from "react-i18next";
+
+
+interface Campaign {
+  id: number;
+}
 
 export function useCampaignManagement() {
   const { t } = useTranslation();
-  const [campaigns, setCampaigns] = useState([]);
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchCampaigns = async () => {
+  const fetchCampaigns = async (filters: any = {}) => {
     try {
-      const response = await axios.get("/campaigns");
+      const params = new URLSearchParams();
+      if (filters.status) params.append("status", filters.status);
+      if (filters.date_start) params.append("date_start", filters.date_start);
+      if (filters.date_end) params.append("date_end", filters.date_end);
+
+      const response = await axios.get(`/campaigns?${params.toString()}`);
       console.log(response.data.campaigns);
-      setCampaigns(response.data.campaigns);
+      // Handle pagination response structure if needed, assuming API returns { campaigns: { data: [...] } } or just { campaigns: [...] }
+      // Based on controller, it returns paginate object. So response.data.campaigns.data is the array.
+      // But previous code expected response.data.campaigns to be the array.
+      // Controller was updated to return paginate(10).
+      // So response.data.campaigns will be the paginator object.
+      // We need to set campaigns to response.data.campaigns.data if it exists, or response.data.campaigns if it's a simple array.
+
+      const campaignsData =
+        response.data.campaigns.data || response.data.campaigns;
+      setCampaigns(campaignsData);
     } catch (error) {
       toast.error(t("campaigns.messages.fetchError"));
     } finally {
@@ -21,7 +39,7 @@ export function useCampaignManagement() {
     }
   };
 
-  const addCampaign = async (data) => {
+  const addCampaign = async (data: any) => {
     try {
       let formData;
       if (data instanceof FormData) {
@@ -48,7 +66,7 @@ export function useCampaignManagement() {
     }
   };
 
-  const updateCampaign = async (id, data) => {
+  const updateCampaign = async (id: number, data: any) => {
     try {
       let response;
       if (data instanceof FormData) {
@@ -98,29 +116,16 @@ export function useCampaignManagement() {
     }
   };
 
-  const deleteCampaign = async (id) => {
-    const result = await Swal.fire({
-      title: t("campaigns.messages.confirmDelete.title"),
-      text: t("campaigns.messages.confirmDelete.text"),
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: t("campaigns.messages.confirmDelete.confirmButton"),
-      cancelButtonText: t("campaigns.messages.confirmDelete.cancelButton"),
-    });
-
-    if (result.isConfirmed) {
-      try {
-        await axios.delete(`/campaigns/${id}`);
-        setCampaigns((prevCampaigns) =>
-          prevCampaigns.filter((campaign) => campaign.id !== id)
-        );
-        await fetchCampaigns();
-        toast.success(t("campaigns.messages.deleteSuccess"));
-      } catch (error) {
-        toast.error(t("campaigns.messages.deleteError"));
-      }
+  const deleteCampaign = async (id: number) => {
+    try {
+      await axios.delete(`/campaigns/${id}`);
+      setCampaigns((prevCampaigns) =>
+        prevCampaigns.filter((campaign) => campaign.id !== id)
+      );
+      await fetchCampaigns();
+      toast.success(t("campaigns.messages.deleteSuccess"));
+    } catch (error) {
+      toast.error(t("campaigns.messages.deleteError"));
     }
   };
 

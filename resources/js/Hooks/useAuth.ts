@@ -1,14 +1,6 @@
-import { useState } from "react";
 import { useForm } from "@inertiajs/react";
-import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
-import {
-  auth,
-  signInWithGoogle,
-  signInWithFacebook,
-  getAuthResult,
-  loginAnonymously,
-} from "@/firebase";
 import axios from "axios";
+import { useState } from "react";
 
 interface LoginFormData {
   email: string;
@@ -35,11 +27,12 @@ export const useAuth = () => {
     setSuccessMessage("");
 
     try {
-      const response = await axios.post("/check-user", {
+      // Check if user exists and has a provider
+      const checkResponse = await axios.post("/check-user", {
         email: data.email,
       });
 
-      const userData = response.data;
+      const userData = checkResponse.data;
 
       if (userData.provider) {
         setError(
@@ -48,78 +41,45 @@ export const useAuth = () => {
         return;
       }
 
-      await signInWithEmailAndPassword(auth, data.email, data.password);
-
+      // Standard Laravel Login
       const loginResponse = await axios.post("/login", {
         email: data.email,
         password: data.password,
-        firebase_user: {
-          email: data.email,
-        },
+        remember: data.remember,
       });
 
       if (loginResponse.data.success) {
         setSuccessMessage("Login exitoso. Redirecting...");
-        window.location.href = loginResponse.data.redirect;
+        window.location.href = loginResponse.data.redirect || "/dashboard";
+      } else {
+        // Fallback if success is not explicitly true but no error thrown (unlikely with axios)
+        window.location.href = "/dashboard";
       }
     } catch (err: any) {
+      console.error("Login error:", err);
       if (err.response?.data?.error) {
         setError(err.response.data.error);
-      } else if (err.code) {
-        setError("Credenciales incorrectas. Por favor, inténtalo de nuevo.");
+      } else if (err.response?.data?.message) {
+        setError(err.response.data.message);
       } else {
-        setError("Ocurrió un error inesperado. Por favor, inténtalo de nuevo.");
+        setError("Credenciales incorrectas o error en el servidor.");
       }
     } finally {
       setLoading(false);
     }
   };
 
-  const handleGoogleLogin = async () => {
+  const handleGoogleLogin = () => {
     setLoading(true);
     setError("");
 
-    try {
-      await signInWithGoogle();
-      
-    } catch (err) {
-      setError(
-        "Error al iniciar sesión con Google. Por favor, inténtalo de nuevo."
-      );
-    } finally {
-      setLoading(false);
-    }
+    // Redirect to Laravel Google Auth endpoint
+    window.location.href = "/auth/google/redirect";
   };
 
-  const handleFacebookLogin = async () => {
-    setLoading(true);
-    setError("");
-
-    try {
-      await signInWithFacebook();
-    } catch (err) {
-      setError(
-        "Error al iniciar sesión con Facebook. Por favor, inténtalo de nuevo."
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleAnonymousLogin = async () => {
-    setLoading(true);
-    setError("");
-
-    try {
-      await loginAnonymously();
-      setSuccessMessage("Login exitoso. Redirecting...");
-    } catch (err) {
-      setError(
-        "Error al iniciar sesión anónimamente. Por favor, inténtalo de nuevo."
-      );
-    } finally {
-      setLoading(false);
-    }
+  const handleFacebookLogin = () => {
+    // Placeholder for future Socialite implementation
+    setError("Facebook login is currently disabled during migration.");
   };
 
   return {
@@ -132,6 +92,5 @@ export const useAuth = () => {
     handleEmailLogin,
     handleGoogleLogin,
     handleFacebookLogin,
-    handleAnonymousLogin,
   };
 };

@@ -1,21 +1,21 @@
-import { initializeApp, FirebaseApp } from "firebase/app";
+import { FirebaseApp, initializeApp } from "firebase/app";
 import {
-  getAuth,
+  Auth,
+  FacebookAuthProvider,
+  GoogleAuthProvider,
+  NextOrObserver,
+  User,
+  UserCredential,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword as firebaseSignInWithEmail,
-  GoogleAuthProvider,
-  FacebookAuthProvider,
-  signInWithPopup,
-  signInWithRedirect,
+  signOut as firebaseSignOut,
+  getAuth,
   getRedirectResult,
-  updateProfile,
   onAuthStateChanged,
   signInAnonymously,
-  signOut as firebaseSignOut,
-  Auth,
-  UserCredential,
-  User,
-  NextOrObserver,
+  signInWithPopup,
+  signInWithRedirect,
+  updateProfile,
 } from "firebase/auth";
 
 const firebaseConfig = {
@@ -86,9 +86,9 @@ const getCurrentUser = (): User | null => {
 
 // Sign in with Google
 const signInWithGoogle = async (): Promise<UserCredential | true | null> => {
-  console.log('isLocalHost'+ isLocalHost);
-  console.log( googleProvider);
-  console.log( auth);
+  console.log("isLocalHost" + isLocalHost);
+  console.log(googleProvider);
+  console.log(auth);
   try {
     if (isLocalHost) {
       const result = await signInWithPopup(auth, googleProvider);
@@ -173,19 +173,73 @@ const loginAnonymously = async (): Promise<{ user: User }> => {
   }
 };
 
+// Importar GoogleAuthProvider si no está ya en el scope de la función
+// import { GoogleAuthProvider, User, UserCredential } from "firebase/auth";
+
+// ... (El resto de tu código de Firebase/auth)
+
+/**
+ * Extrae los datos esenciales del usuario (email, nombre) de un resultado de Google Auth.
+ * * @param result El resultado de signInWithPopup o getAuthResult.
+ * @returns Un objeto con los datos esenciales del usuario.
+ */
+const extractGoogleUserData = async (
+  result: UserCredential
+): Promise<{
+  uid: string;
+  email: string;
+  displayName: string;
+  photoURL: string | null;
+  emailVerified: boolean;
+}> => {
+  const user: User = result.user;
+
+  // 1. Intentar obtener el perfil directamente del credential (método más fiable)
+  let email: string = user.email || "";
+  let name: string = user.displayName || "User";
+
+  const credential = GoogleAuthProvider.credentialFromResult(result);
+
+  if (credential && credential.profile) {
+    // Si tenemos acceso al perfil de Google
+    email = credential.profile.email || email;
+    name = credential.profile.name || name;
+  }
+
+  // 2. Si el email aún falta, intentar con las claims (aunque es menos común)
+  if (!email) {
+    try {
+      const idTokenResult = await user.getIdTokenResult();
+      email = (idTokenResult.claims.email as string) || email;
+      name = (idTokenResult.claims.name as string) || name;
+    } catch (e) {
+      console.warn("Could not retrieve ID Token claims.", e);
+    }
+  }
+
+  return {
+    uid: user.uid,
+    email: email,
+    displayName: name,
+    photoURL: user.photoURL,
+    emailVerified: user.emailVerified,
+  };
+};
+
 export {
   app,
+  auth,
+  extractGoogleUserData,
+  facebookProvider,
+  getAuthResult,
   getCurrentUser,
-  signInWithEmailAndPassword,
-  signOut,
+  googleProvider,
+  loginAnonymously,
   onAuthChanged,
   registerWithEmailAndPassword,
-  updateUserProfile,
-  auth,
-  googleProvider,
-  facebookProvider,
-  signInWithGoogle,
+  signInWithEmailAndPassword,
   signInWithFacebook,
-  getAuthResult,
-  loginAnonymously,
+  signInWithGoogle,
+  signOut,
+  updateUserProfile,
 };

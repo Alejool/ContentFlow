@@ -1,25 +1,5 @@
-import useAIChat from "@/Hooks/useAIChat";
 import { useTheme } from "@/Hooks/useTheme";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import {
-  Avatar,
-  Badge,
-  Box,
-  Button,
-  Card,
-  Container,
-  Drawer,
-  Flex,
-  Grid,
-  Heading,
-  IconButton,
-  Separator,
-  Spinner,
-  Stack,
-  Text,
-  Textarea,
-  useDisclosure,
-} from "@chakra-ui/react";
 import { Head, usePage } from "@inertiajs/react";
 import {
   Brain,
@@ -33,103 +13,83 @@ import {
   User as UserIcon,
   Users,
   Zap,
+  ChevronDown,
+  X,
 } from "lucide-react";
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { Dialog } from "@headlessui/react";
 
-const Icon = ({
-  type,
-  size = 20,
-  className = "",
-  theme,
-}: {
-  type: string;
-  size?: number;
+// Componente Avatar personalizado
+interface AvatarProps {
+  src?: string | null;
+  name?: string;
+  size?: "sm" | "md" | "lg" | "xl";
   className?: string;
-  theme?: "dark" | "light";
-}) => {
-  const icons: Record<string, React.ReactNode> = {
-    ai: (
-      <svg
-        width={size}
-        height={size}
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        className={className}
-      >
-        <circle cx="12" cy="12" r="3" />
-        <path d="M12 1v6m0 6v6" />
-        <path d="m21 12-6-6-6 6-6-6" />
-      </svg>
-    ),
-    send: (
-      <svg
-        width={size}
-        height={size}
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        className={className}
-      >
-        <path d="m22 2-7 20-4-9-9-4Z" />
-      </svg>
-    ),
-    lightbulb: (
-      <svg
-        width={size}
-        height={size}
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        className={className}
-      >
-        <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5" />
-        <path d="M9 18h6" />
-        <path d="M10 22h4" />
-      </svg>
-    ),
-    trending: (
-      <svg
-        width={size}
-        height={size}
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        className={className}
-      >
-        <polyline points="22,6 13.5,15.5 8.5,10.5 1,18" />
-        <polyline points="22,6 18,6 18,10" />
-      </svg>
-    ),
-    stats: (
-      <svg
-        width={size}
-        height={size}
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        className={className}
-      >
-        <line x1="12" y1="20" x2="12" y2="10" />
-        <line x1="18" y1="20" x2="18" y2="4" />
-        <line x1="6" y1="20" x2="6" y2="16" />
-      </svg>
-    ),
+}
+
+function Avatar({
+  src,
+  name = "User",
+  size = "md",
+  className = "",
+}: AvatarProps) {
+  const { theme } = useTheme();
+
+  const getInitials = (name: string) => {
+    if (!name.trim()) return "?";
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
   };
 
-  return (
-    <Box as="span" display="inline-flex" alignItems="center">
-      {icons[type]}
-    </Box>
-  );
-};
+  const sizeClasses = {
+    sm: "w-8 h-8 text-xs",
+    md: "w-10 h-10 text-sm",
+    lg: "w-12 h-12 text-base",
+    xl: "w-16 h-16 text-lg",
+  };
 
+  const avatarBgClass =
+    theme === "dark"
+      ? "bg-gradient-to-br from-orange-900/30 to-purple-900/30"
+      : "bg-gradient-to-br from-orange-100 to-purple-100";
+
+  const avatarTextClass =
+    theme === "dark" ? "text-orange-200" : "text-orange-800";
+
+  return (
+    <div
+      className={`${sizeClasses[size]} ${avatarBgClass} ${className} rounded-full overflow-hidden flex items-center justify-center font-bold shadow-lg`}
+    >
+      {src ? (
+        <img
+          src={src}
+          alt={name}
+          className="w-full h-full object-cover"
+          onError={(e) => {
+            e.currentTarget.style.display = "none";
+            const fallback = document.createElement("div");
+            fallback.className = `w-full h-full flex items-center justify-center ${avatarTextClass}`;
+            fallback.textContent = getInitials(name);
+            e.currentTarget.parentElement?.appendChild(fallback);
+          }}
+        />
+      ) : (
+        <div
+          className={`w-full h-full flex items-center justify-center ${avatarTextClass}`}
+        >
+          {getInitials(name)}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Componente de mensaje de chat
 interface Message {
   id: number;
   sender: string;
@@ -139,6 +99,7 @@ interface Message {
 
 interface User {
   name?: string;
+  photo_url?: string;
   [key: string]: any;
 }
 
@@ -154,77 +115,56 @@ const ChatMessage = ({
   const isAI = message.sender === "AI";
 
   return (
-    <Flex gap={4} p={2} direction={isAI ? "row" : "row-reverse"}>
-      <Avatar.Root flexShrink={0}>
-        <Avatar.Fallback
-          bg={
+    <div className={`flex gap-3 p-2 ${isAI ? "flex-row" : "flex-row-reverse"}`}>
+      <div className="flex-shrink-0">
+        <Avatar
+          src={isAI ? null : user.photo_url}
+          name={isAI ? "AI" : user.name}
+          size="md"
+          className={
             isAI
               ? theme === "dark"
-                ? "orange.700"
-                : "orange.600"
+                ? "bg-gradient-to-br from-orange-600 to-orange-800"
+                : "bg-gradient-to-br from-orange-500 to-orange-700"
               : theme === "dark"
-              ? "purple.700"
-              : "purple.500"
+              ? "bg-gradient-to-br from-purple-600 to-purple-800"
+              : "bg-gradient-to-br from-purple-500 to-purple-700"
           }
-          color="white"
-          fontSize="sm"
-          h={10}
-          p={2}
-          w={10}
-          borderRadius="full"
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          {isAI ? "AI" : user.name?.charAt(0)?.toUpperCase() || "U"}
-        </Avatar.Fallback>
-      </Avatar.Root>
+        />
+      </div>
 
-      <Box
-        bg={
+      <div
+        className={`max-w-[80%] rounded-2xl shadow-sm border px-4 py-3
+        ${
           isAI
             ? theme === "dark"
-              ? "neutral.800"
-              : "white"
+              ? "bg-neutral-800 border-neutral-700"
+              : "bg-white border-gray-100"
             : theme === "dark"
-            ? "purple.900/30"
-            : "red.50"
-        }
-        px={4}
-        py={3}
-        rounded="2xl"
-        maxW="80%"
-        shadow="sm"
-        border="1px"
-        borderColor={
-          isAI
-            ? theme === "dark"
-              ? "neutral.700"
-              : "gray.100"
-            : theme === "dark"
-            ? "purple.800/30"
-            : "red.100"
-        }
+            ? "bg-purple-900/30 border-purple-800/30"
+            : "bg-red-50 border-red-100"
+        }`}
       >
-        <Text
-          fontSize="sm"
-          lineHeight="1.5"
-          color={theme === "dark" ? "gray.100" : "gray.700"}
+        <p
+          className={`text-sm leading-relaxed ${
+            theme === "dark" ? "text-gray-100" : "text-gray-700"
+          }`}
         >
           {message.message}
-        </Text>
-        <Text
-          fontSize="xs"
-          mt={1}
-          color={theme === "dark" ? "gray.400" : "gray.400"}
+        </p>
+        <p
+          className={`text-xs mt-1 ${
+            theme === "dark" ? "text-gray-400" : "text-gray-500"
+          }`}
         >
           {message.timestamp}
-        </Text>
-      </Box>
-    </Flex>
+        </p>
+      </div>
+    </div>
   );
 };
 
+// Estadísticas compactas
 interface Campaign {
   status: string;
   [key: string]: any;
@@ -242,35 +182,44 @@ const CompactStats = ({
   const total = campaigns.length;
 
   return (
-    <Flex gap={6}>
-      <Box textAlign="center">
-        <Text
-          fontSize="lg"
-          fontWeight="bold"
-          color={theme === "dark" ? "orange.400" : "red.600"}
+    <div className="flex gap-6">
+      <div className="text-center">
+        <p
+          className={`text-lg font-bold ${
+            theme === "dark" ? "text-orange-400" : "text-red-600"
+          }`}
         >
           {active}
-        </Text>
-        <Text fontSize="xs" color={theme === "dark" ? "gray.400" : "gray.500"}>
+        </p>
+        <p
+          className={`text-xs ${
+            theme === "dark" ? "text-gray-400" : "text-gray-500"
+          }`}
+        >
           {t("aiChat.stats.active")}
-        </Text>
-      </Box>
-      <Box textAlign="center">
-        <Text
-          fontSize="lg"
-          fontWeight="bold"
-          color={theme === "dark" ? "blue.400" : "blue.600"}
+        </p>
+      </div>
+      <div className="text-center">
+        <p
+          className={`text-lg font-bold ${
+            theme === "dark" ? "text-blue-400" : "text-blue-600"
+          }`}
         >
           {total}
-        </Text>
-        <Text fontSize="xs" color={theme === "dark" ? "gray.400" : "gray.500"}>
+        </p>
+        <p
+          className={`text-xs ${
+            theme === "dark" ? "text-gray-400" : "text-gray-500"
+          }`}
+        >
           {t("aiChat.stats.total")}
-        </Text>
-      </Box>
-    </Flex>
+        </p>
+      </div>
+    </div>
   );
 };
 
+// Tarjeta de idea
 interface Idea {
   id: number;
   titleKey: string;
@@ -290,48 +239,39 @@ const IdeaCard = ({
   const { t } = useTranslation();
 
   return (
-    <Button
-      variant="ghost"
-      h="auto"
-      p={4}
-      justifyContent="start"
-      textAlign="left"
+    <button
       onClick={() => onUse(idea)}
-      _hover={{
-        bg: theme === "dark" ? "neutral.800" : "red.50",
-        transform: "translateY(-1px)",
-      }}
-      transition="all 0.2s"
+      className={`w-full text-left p-4 rounded-lg transition-all duration-200 hover:transform hover:-translate-y-0.5
+        ${theme === "dark" ? "hover:bg-neutral-800" : "hover:bg-red-50"}`}
     >
-      <Flex align="start" gap={3} w="full" flex={1}>
+      <div className="flex items-start gap-3">
         <idea.icon
-          className={`h-5 w-5 ${
+          className={`h-5 w-5 flex-shrink-0 ${
             theme === "dark" ? "text-orange-400" : "text-red-600"
           }`}
         />
-        <Box flex={1}>
-          <Text
-            fontSize="sm"
-            fontWeight="600"
-            color={theme === "dark" ? "gray.100" : "gray.800"}
-            mb={1}
+        <div className="flex-1">
+          <p
+            className={`text-sm font-semibold mb-1 ${
+              theme === "dark" ? "text-gray-100" : "text-gray-800"
+            }`}
           >
             {t(idea.titleKey)}
-          </Text>
-          <Text
-            fontSize="xs"
-            color={theme === "dark" ? "gray.400" : "gray.600"}
-            lineHeight="1.4"
-            textWrap="wrap"
+          </p>
+          <p
+            className={`text-xs ${
+              theme === "dark" ? "text-gray-400" : "text-gray-600"
+            } leading-relaxed`}
           >
             {t(idea.descriptionKey)}
-          </Text>
-        </Box>
-      </Flex>
-    </Button>
+          </p>
+        </div>
+      </div>
+    </button>
   );
 };
 
+// Panel de ideas
 const IdeasPanel = ({
   ideas,
   onUse,
@@ -344,37 +284,44 @@ const IdeasPanel = ({
   const { t } = useTranslation();
 
   return (
-    <Card.Root
-      bg={theme === "dark" ? "neutral.800/50" : "white"}
-      shadow="sm"
-      border="1px"
-      borderColor={theme === "dark" ? "neutral.700/50" : "gray.100"}
+    <div
+      className={`rounded-xl shadow-sm border transition-colors duration-300 ${
+        theme === "dark"
+          ? "bg-neutral-800/50 border-neutral-700/50"
+          : "bg-white border-gray-100"
+      }`}
     >
-      <Card.Body p={5}>
-        <Flex align="center" gap={3} mb={5}>
-          <Box
-            p={2}
-            rounded="lg"
-            color={theme === "dark" ? "orange.400" : "red.600"}
-            bg={theme === "dark" ? "orange.900/20" : "red.100"}
+      <div className="p-5">
+        <div className="flex items-center gap-3 mb-5">
+          <div
+            className={`p-2 rounded-lg ${
+              theme === "dark"
+                ? "bg-orange-900/20 text-orange-400"
+                : "bg-red-100 text-red-600"
+            }`}
           >
             <Lightbulb className="w-5 h-5" />
-          </Box>
-          <Heading size="md" color={theme === "dark" ? "gray.100" : "gray.800"}>
+          </div>
+          <h3
+            className={`text-lg font-semibold ${
+              theme === "dark" ? "text-gray-100" : "text-gray-800"
+            }`}
+          >
             {t("aiChat.ideas.title")}
-          </Heading>
-        </Flex>
+          </h3>
+        </div>
 
-        <Stack gap={2}>
+        <div className="space-y-2">
           {ideas.map((idea) => (
             <IdeaCard key={idea.id} idea={idea} onUse={onUse} theme={theme} />
           ))}
-        </Stack>
-      </Card.Body>
-    </Card.Root>
+        </div>
+      </div>
+    </div>
   );
 };
 
+// Drawer móvil de ideas
 const MobileIdeasDrawer = ({
   isOpen,
   onClose,
@@ -391,28 +338,53 @@ const MobileIdeasDrawer = ({
   const { t } = useTranslation();
 
   return (
-    <Drawer.Root open={isOpen} onOpenChange={onClose} placement="bottom">
-      <Drawer.Backdrop />
-      <Drawer.Positioner>
-        <Drawer.Content bg={theme === "dark" ? "neutral.900" : "white"}>
-          <Drawer.Header
-            borderBottom="1px"
-            borderColor={theme === "dark" ? "neutral.700" : "gray.100"}
+    <Dialog open={isOpen} onClose={onClose} className="relative z-50">
+      <div
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm"
+        aria-hidden="true"
+      />
+
+      <div className="fixed inset-0 flex items-end justify-center p-4">
+        <Dialog.Panel
+          className={`w-full max-w-2xl rounded-t-2xl shadow-2xl ${
+            theme === "dark" ? "bg-neutral-900" : "bg-white"
+          } max-h-[80vh] overflow-hidden`}
+        >
+          <div
+            className={`p-4 border-b ${
+              theme === "dark" ? "border-neutral-700" : "border-gray-100"
+            }`}
           >
-            <Flex align="center" gap={2}>
-              <Lightbulb
-                className={`h-4 w-4 ${
-                  theme === "dark" ? "text-orange-400" : "text-red-600"
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Lightbulb
+                  className={`h-4 w-4 ${
+                    theme === "dark" ? "text-orange-400" : "text-red-600"
+                  }`}
+                />
+                <Dialog.Title
+                  className={`font-semibold ${
+                    theme === "dark" ? "text-gray-100" : "text-gray-800"
+                  }`}
+                >
+                  {t("aiChat.ideas.panelTitle")}
+                </Dialog.Title>
+              </div>
+              <button
+                onClick={onClose}
+                className={`p-1 rounded-lg ${
+                  theme === "dark"
+                    ? "hover:bg-neutral-800 text-gray-400"
+                    : "hover:bg-gray-100 text-gray-500"
                 }`}
-              />
-              <Drawer.Title color={theme === "dark" ? "gray.100" : "gray.800"}>
-                {t("aiChat.ideas.panelTitle")}
-              </Drawer.Title>
-            </Flex>
-            <Drawer.CloseTrigger />
-          </Drawer.Header>
-          <Drawer.Body p={4}>
-            <Stack gap={2}>
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+
+          <div className="p-4 overflow-y-auto max-h-[calc(80vh-80px)]">
+            <div className="space-y-2">
               {ideas.map((idea) => (
                 <IdeaCard
                   key={idea.id}
@@ -424,28 +396,126 @@ const MobileIdeasDrawer = ({
                   theme={theme}
                 />
               ))}
-            </Stack>
-          </Drawer.Body>
-        </Drawer.Content>
-      </Drawer.Positioner>
-    </Drawer.Root>
+            </div>
+          </div>
+        </Dialog.Panel>
+      </div>
+    </Dialog>
   );
 };
 
+// Componente Badge personalizado
+interface BadgeProps {
+  children: React.ReactNode;
+  variant?: "default" | "outline" | "subtle";
+  colorScheme?: "orange" | "red" | "green" | "blue";
+  className?: string;
+}
+
+function Badge({
+  children,
+  variant = "default",
+  colorScheme = "orange",
+  className = "",
+}: BadgeProps) {
+  const { theme } = useTheme();
+
+  const colorClasses = {
+    orange:
+      theme === "dark"
+        ? "bg-orange-900/30 text-orange-300 border-orange-800/50"
+        : "bg-orange-100 text-orange-800 border-orange-200",
+    red:
+      theme === "dark"
+        ? "bg-red-900/30 text-red-300 border-red-800/50"
+        : "bg-red-100 text-red-800 border-red-200",
+    green:
+      theme === "dark"
+        ? "bg-green-900/30 text-green-300 border-green-800/50"
+        : "bg-green-100 text-green-800 border-green-200",
+    blue:
+      theme === "dark"
+        ? "bg-blue-900/30 text-blue-300 border-blue-800/50"
+        : "bg-blue-100 text-blue-800 border-blue-200",
+  };
+
+  const variantClasses = {
+    default: "px-3 py-1 rounded-full text-xs font-medium border",
+    outline: "px-3 py-1 rounded-full text-xs font-medium border",
+    subtle: "px-3 py-1 rounded-full text-xs font-medium border",
+  };
+
+  return (
+    <span
+      className={`${variantClasses[variant]} ${colorClasses[colorScheme]} ${className} inline-flex items-center gap-1`}
+    >
+      {children}
+    </span>
+  );
+}
+
+// Componente principal
 export default function Index() {
   const { t } = useTranslation();
   const { theme } = useTheme();
-  const {
-    messages,
-    inputMessage,
-    campaigns,
-    loading,
-    handleInputChange,
-    handleKeyPress,
-    sendMessage,
-  } = useAIChat();
+  const user = (usePage().props as any).auth.user || {};
 
-  const { open, onOpen, onClose } = useDisclosure();
+  // Estado simulado para el chat (reemplaza con useAIChat)
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      id: 1,
+      sender: "AI",
+      message: t("aiChat.welcomeMessage"),
+      timestamp: "Just now",
+    },
+  ]);
+  const [inputMessage, setInputMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [campaigns] = useState<Campaign[]>([]);
+  const [isIdeasDrawerOpen, setIsIdeasDrawerOpen] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const handleSendMessage = () => {
+    if (!inputMessage.trim()) return;
+
+    const newMessage: Message = {
+      id: messages.length + 1,
+      sender: "User",
+      message: inputMessage,
+      timestamp: "Just now",
+    };
+
+    setMessages([...messages, newMessage]);
+    setInputMessage("");
+    setLoading(true);
+
+    // Simular respuesta de AI
+    setTimeout(() => {
+      const aiResponse: Message = {
+        id: messages.length + 2,
+        sender: "AI",
+        message: `Gracias por tu mensaje: "${inputMessage}". Como asistente de IA, puedo ayudarte con estrategias de marketing, ideas de contenido y análisis de campañas. ¿En qué más puedo asistirte?`,
+        timestamp: "Just now",
+      };
+      setMessages((prev) => [...prev, aiResponse]);
+      setLoading(false);
+    }, 1500);
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
 
   const [ideas] = useState<Idea[]>([
     {
@@ -485,13 +555,13 @@ export default function Index() {
       icon: MessageSquare,
     },
   ]);
-  const user = (usePage().props as any).auth.user || {};
 
   const useIdeaAsPrompt = (idea: Idea) => {
     const prompt = `${t("aiChat.promptPrefix")} ${t(idea.titleKey)}`;
-    handleInputChange({ target: { value: prompt } } as any);
+    setInputMessage(prompt);
   };
 
+  // Clases de utilidad
   const getBgColor = () => (theme === "dark" ? "bg-neutral-900" : "bg-gray-50");
   const getTextColor = (type: "primary" | "secondary" = "primary") => {
     if (theme === "dark") {
@@ -508,145 +578,99 @@ export default function Index() {
     <AuthenticatedLayout>
       <Head title={t("aiChat.title")} />
 
-      <Box minH="100vh" className={`transition-colors duration-300 mt-8`}>
-        <Container maxW="6xl" py={6}>
-          <Stack gap={6} mb={8}>
-            <Flex
-              direction={{ base: "column", md: "row" }}
-              justify="space-between"
-              align={{ base: "start", md: "center" }}
-              gap={6}
-            >
-              <Box>
-                <Heading
-                  fontSize={{ base: "3xl", md: "5xl" }}
-                  fontWeight="800"
-                  bgGradient="to-r"
-                  gradientFrom={theme === "dark" ? "orange.500" : "red.500"}
-                  gradientTo={theme === "dark" ? "orange.700" : "orange.700"}
-                  bgClip="text"
-                  className=" my-6 text-center"
+      <div
+        className={`min-h-screen transition-colors duration-300 mt-8 ${getBgColor()}`}
+      >
+        <div className="max-w-6xl mx-auto py-6 px-4 sm:px-6">
+          <div className="space-y-6 mb-8">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+              <div>
+                <h1
+                  className={`text-3xl md:text-5xl font-bold my-6 text-center bg-gradient-to-r ${
+                    theme === "dark"
+                      ? "from-orange-500 to-orange-700"
+                      : "from-red-500 to-orange-700"
+                  } bg-clip-text text-transparent`}
                 >
                   {t("aiChat.title")}
-                </Heading>
-                <Text
-                  className={`mt-2 ${getTextColor("secondary")}`}
-                  fontSize="lg"
-                >
+                </h1>
+                <p className={`mt-2 text-lg ${getTextColor("secondary")}`}>
                   {t("aiChat.subtitle")}
-                </Text>
-              </Box>
+                </p>
+              </div>
 
-              <Flex align="center" gap={4}>
+              <div className="flex items-center gap-4">
                 {campaigns.length > 0 && (
-                  <Box
-                    className={`px-4 py-3 rounded-xl shadow-sm border ${getBorderColor()} ${getCardBg()}`}
+                  <div
+                    className={`px-4 py-3 rounded-lg shadow-sm border ${getBorderColor()} ${getCardBg()}`}
                   >
                     <CompactStats campaigns={campaigns} theme={theme} />
-                  </Box>
+                  </div>
                 )}
 
-                <IconButton
-                  onClick={onOpen}
-                  variant="outline"
-                  size="md"
-                  rounded="xl"
-                  display={{ base: "flex", lg: "none" }}
-                  colorScheme={theme === "dark" ? "orange" : "red"}
+                <button
+                  onClick={() => setIsIdeasDrawerOpen(true)}
+                  className={`p-2 rounded-xl border lg:hidden ${
+                    theme === "dark"
+                      ? "border-orange-800 text-orange-400 hover:bg-orange-900/20"
+                      : "border-red-200 text-red-600 hover:bg-red-50"
+                  }`}
                 >
                   <Lightbulb className="w-5 h-5" />
-                </IconButton>
-              </Flex>
-            </Flex>
+                </button>
+              </div>
+            </div>
 
             {campaigns.length > 0 && (
               <Badge
-                variant="subtle"
-                px={3}
-                py={1}
-                rounded="full"
-                alignSelf="start"
                 colorScheme={theme === "dark" ? "orange" : "red"}
+                className="self-start"
               >
                 {campaigns.length} {t("aiChat.campaignsAvailable")}
               </Badge>
             )}
-          </Stack>
+          </div>
 
-          <Grid templateColumns={{ base: "1fr", lg: "1fr 350px" }} gap={6}>
-            <Card.Root
-              className={`shadow-sm border transition-colors duration-300 ${getCardBg()} ${getBorderColor()}`}
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_350px] gap-6">
+            {/* Chat Panel */}
+            <div
+              className={`rounded-xl shadow-sm border transition-colors duration-300 ${getCardBg()} ${getBorderColor()}`}
             >
-              <Card.Body p={6}>
-                <Flex justify="space-between" align="center" mb={6}>
-                  <Flex align="center" gap={3}>
-                    <Box
-                      p={2}
-                      rounded="lg"
-                      className={
+              <div className="p-6">
+                <div className="flex justify-between items-center mb-6">
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={`p-2 rounded-lg ${
                         theme === "dark"
                           ? "bg-orange-900/20 text-orange-400"
                           : "bg-red-100 text-red-600"
-                      }
+                      }`}
                     >
                       <Brain className="w-5 h-5" />
-                    </Box>
-                    <Heading
-                      size="xl"
-                      fontWeight="600"
-                      className={getTextColor("primary")}
+                    </div>
+                    <h2
+                      className={`text-xl font-semibold ${getTextColor(
+                        "primary"
+                      )}`}
                     >
                       {t("aiChat.chatTitle")}
-                    </Heading>
-                  </Flex>
-                  <Badge
-                    variant="subtle"
-                    rounded="full"
-                    colorScheme={theme === "dark" ? "green" : "green"}
-                  >
+                    </h2>
+                  </div>
+                  <Badge colorScheme="green">
                     <Sparkles className="inline h-3 w-3 mr-1" />
                     {t("aiChat.online")}
                   </Badge>
-                </Flex>
+                </div>
 
-                <Box
-                  h="400px"
-                  px={2}
-                  overflowY="auto"
-                  mb={6}
-                  className={
-                    theme === "dark" ? "scrollbar-dark" : "scrollbar-light"
-                  }
-                  css={{
-                    "&::-webkit-scrollbar": {
-                      width: "6px",
-                    },
-                    "&::-webkit-scrollbar-track": {
-                      background: theme === "dark" ? "#1f2937" : "#f3f4f6",
-                      borderRadius: "3px",
-                    },
-                    "&::-webkit-scrollbar-thumb": {
-                      background: theme === "dark" ? "#c2530a" : "#dc2626",
-                      borderRadius: "3px",
-                    },
-                    "&::-ms-scrollbar": {
-                      width: "6px",
-                    },
-                    "&::-ms-scrollbar-thumb": {
-                      background: theme === "dark" ? "#c2530a" : "#dc2626",
-                    },
-                  }}
-                >
-                  <Stack gap={4} py={1}>
+                {/* Mensajes del chat */}
+                <div className="h-[400px] px-2 overflow-y-auto mb-6 scrollbar-thin scrollbar-thumb-orange-500 scrollbar-track-gray-100 dark:scrollbar-track-neutral-700">
+                  <div className="space-y-4 py-1">
                     {messages.length === 0 && (
-                      <Box textAlign="center" py={8}>
-                        <Text
-                          className={getTextColor("secondary")}
-                          fontSize="sm"
-                        >
+                      <div className="text-center py-8">
+                        <p className={`text-sm ${getTextColor("secondary")}`}>
                           {t("aiChat.welcomeMessage")}
-                        </Text>
-                      </Box>
+                        </p>
+                      </div>
                     )}
 
                     {messages.map((msg) => (
@@ -659,105 +683,105 @@ export default function Index() {
                     ))}
 
                     {loading && (
-                      <Flex gap={3} align="center">
-                        <Avatar.Root size="sm">
-                          <Avatar.Fallback
-                            bg={theme === "dark" ? "orange.700" : "orange.600"}
-                            color="white"
-                            fontSize="sm"
-                            h={10}
-                            p={2}
-                            w={10}
-                            borderRadius="full"
-                            display="flex"
-                            alignItems="center"
-                            justifyContent="center"
-                          >
-                            AI
-                          </Avatar.Fallback>
-                        </Avatar.Root>
-
-                        <Box
-                          className={`px-4 py-3 rounded-2xl shadow-sm border ${getBorderColor()} ${getCardBg()}`}
+                      <div className="flex gap-3 items-center">
+                        <Avatar
+                          src={null}
+                          name="AI"
+                          size="md"
+                          className={
+                            theme === "dark"
+                              ? "bg-gradient-to-br from-orange-600 to-orange-800"
+                              : "bg-gradient-to-br from-orange-500 to-orange-700"
+                          }
+                        />
+                        <div
+                          className={`px-4 py-3 rounded-lg shadow-sm border ${getBorderColor()} ${getCardBg()}`}
                         >
-                          <Flex align="center" gap={2}>
-                            <Spinner
-                              size="sm"
-                              color={
-                                theme === "dark" ? "orange.400" : "red.500"
-                              }
-                            />
-                            <Text
-                              fontSize="sm"
-                              className={getTextColor("secondary")}
+                          <div className="flex items-center gap-2">
+                            <div
+                              className={`w-4 h-4 rounded-full border-2 ${
+                                theme === "dark"
+                                  ? "border-orange-400 border-t-transparent"
+                                  : "border-red-500 border-t-transparent"
+                              } animate-spin`}
+                            ></div>
+                            <p
+                              className={`text-sm ${getTextColor("secondary")}`}
                             >
                               {t("aiChat.thinking")}
-                            </Text>
-                          </Flex>
-                        </Box>
-                      </Flex>
+                            </p>
+                          </div>
+                        </div>
+                      </div>
                     )}
-                  </Stack>
-                </Box>
+                    <div ref={messagesEndRef} />
+                  </div>
+                </div>
 
-                <Separator
-                  mb={6}
-                  borderColor={theme === "dark" ? "neutral.700" : "gray.200"}
+                {/* Separador */}
+                <hr
+                  className={`mb-6 ${
+                    theme === "dark" ? "border-neutral-700" : "border-gray-200"
+                  }`}
                 />
 
-                <Stack gap={3}>
-                  <Textarea
+                {/* Input del chat */}
+                <div className="space-y-3">
+                  <textarea
                     value={inputMessage}
-                    onChange={handleInputChange}
+                    onChange={(e) => setInputMessage(e.target.value)}
+                    onKeyDown={handleKeyPress}
                     placeholder={t("aiChat.inputPlaceholder")}
-                    resize="none"
-                    p={4}
+                    className={`w-full border rounded-xl p-4 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-1 resize-none
+                      ${
+                        theme === "dark"
+                          ? "bg-neutral-800 border-neutral-700 text-gray-100 placeholder-gray-400 focus:ring-orange-500 focus:border-orange-500"
+                          : "bg-white border-gray-200 text-gray-900 placeholder-gray-500 focus:ring-red-500 focus:border-red-500"
+                      }`}
                     rows={3}
-                    rounded="xl"
-                    _focus={{
-                      borderColor: theme === "dark" ? "orange.500" : "red.500",
-                    }}
-                    className={`border transition-colors duration-300 ${
-                      theme === "dark"
-                        ? "bg-neutral-800 border-neutral-700 text-gray-100 placeholder-gray-400"
-                        : "bg-white border-gray-200 text-gray-900 placeholder-gray-500"
-                    }`}
                   />
-                  <Flex justify="space-between" align="center">
-                    <Text fontSize="xs" className={getTextColor("secondary")}>
+                  <div className="flex justify-between items-center">
+                    <p className={`text-xs ${getTextColor("secondary")}`}>
                       {t("aiChat.enterToSend")}
-                    </Text>
-                    <Button
-                      onClick={sendMessage}
+                    </p>
+                    <button
+                      onClick={handleSendMessage}
                       disabled={loading || !inputMessage.trim()}
-                      colorScheme={theme === "dark" ? "orange" : "red"}
-                      size="md"
-                      rounded="xl"
-                      minW="100px"
-                      className="transition-all duration-300"
+                      className={`px-4 py-2 rounded-xl min-w-[100px] flex items-center justify-center gap-2 transition-all duration-300
+                        ${
+                          loading || !inputMessage.trim()
+                            ? theme === "dark"
+                              ? "bg-neutral-700 text-gray-400 cursor-not-allowed"
+                              : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                            : theme === "dark"
+                            ? "bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-white"
+                            : "bg-gradient-to-r from-red-600 to-orange-700 hover:from-red-700 hover:to-orange-800 text-white"
+                        }`}
                     >
-                      <Send className="w-4 h-4 mr-2" />
+                      <Send className="w-4 h-4" />
                       {t("aiChat.send")}
-                    </Button>
-                  </Flex>
-                </Stack>
-              </Card.Body>
-            </Card.Root>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-            <Box display={{ base: "none", lg: "block" }}>
+            {/* Panel de ideas (desktop) */}
+            <div className="hidden lg:block">
               <IdeasPanel ideas={ideas} onUse={useIdeaAsPrompt} theme={theme} />
-            </Box>
-          </Grid>
+            </div>
+          </div>
 
+          {/* Drawer móvil de ideas */}
           <MobileIdeasDrawer
-            isOpen={open}
-            onClose={onClose}
+            isOpen={isIdeasDrawerOpen}
+            onClose={() => setIsIdeasDrawerOpen(false)}
             ideas={ideas}
             onUse={useIdeaAsPrompt}
             theme={theme}
           />
-        </Container>
-      </Box>
+        </div>
+      </div>
     </AuthenticatedLayout>
   );
 }

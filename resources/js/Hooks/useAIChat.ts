@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
 import axios from "axios";
+import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 
 import { useTranslation } from "react-i18next";
@@ -70,7 +70,7 @@ export default function useAIChat() {
         hashtags: campaign.hashtags,
       }));
 
-      const response = await axios.post("/api/ai-chat/message", {
+      const response = await axios.post("/api/ai/chat", {
         message: inputMessage,
         context: {
           campaigns: campaignContext,
