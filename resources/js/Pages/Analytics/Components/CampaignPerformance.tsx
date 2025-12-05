@@ -1,6 +1,5 @@
-import React from "react";
-import { useTranslation } from "react-i18next";
 import BarChart from "@/Components/Statistics/BarChart";
+import { useTranslation } from "react-i18next";
 
 interface Campaign {
   title: string;
@@ -69,7 +68,7 @@ export default function CampaignPerformance({
 
   return (
     <div
-      className={`rounded-2xl p-6 mb-8 transition-colors duration-300
+      className={`rounded-lg p-6 mb-8 transition-colors duration-300
             ${
               theme === "dark"
                 ? "bg-neutral-800/50 backdrop-blur-sm border border-neutral-700/50"
