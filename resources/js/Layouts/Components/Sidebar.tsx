@@ -120,7 +120,7 @@ export default function Sidebar({
   setIsSidebarOpen,
 }: SidebarProps) {
   const { t } = useTranslation();
-  const { theme } = useTheme(); 
+  const { theme } = useTheme();
 
   const sidebarBg = theme === "dark" ? "bg-neutral-900/90" : "bg-beige-200/90";
 
@@ -187,7 +187,7 @@ export default function Sidebar({
           >
             <div
               className={`w-12 h-12 bg-gradient-to-r ${logoGradient} 
-                rounded-2xl flex items-center justify-center flex-shrink-0`}
+                rounded-lg flex items-center justify-center flex-shrink-0`}
             >
               <img
                 src={Logo}
@@ -211,7 +211,7 @@ export default function Sidebar({
 
           <button
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className={`p-2 rounded-xl transition-colors duration-200 ${buttonHoverBg} ${textColor}`}
+            className={`p-2 rounded-lg transition-colors duration-200 ${buttonHoverBg} ${textColor}`}
           >
             <div className="relative">
               {isSidebarOpen ? (
@@ -333,7 +333,7 @@ export default function Sidebar({
             href={route("logout")}
             method="post"
             as="button"
-            className={`group relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 
+            className={`group relative flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300 
               ${textColor}
               ${logoutHoverBg}
               ${isSidebarOpen ? "flex-1" : "justify-center w-full"}`}

@@ -121,7 +121,7 @@ export default function DashboardCard({
   return (
     <div
       className={`
-        relative overflow-hidden rounded-2xl p-6 
+        relative overflow-hidden rounded-lg p-6 
         transition-all duration-300 
         hover:shadow-xl hover:-translate-y-1
         ${getCardBgColor()}
@@ -143,7 +143,7 @@ export default function DashboardCard({
         <div className="mb-6 flex justify-center">
           <div
             className={`
-            w-16 h-16 rounded-2xl flex items-center justify-center
+            w-16 h-16 rounded-lg flex items-center justify-center
             ${getIconBgColor()}
             transition-transform duration-300 group-hover:scale-110
           `}
@@ -182,7 +182,7 @@ export default function DashboardCard({
           href={href}
           className={`
             inline-flex items-center justify-center gap-2 
-            py-3 px-6 rounded-xl font-semibold text-sm
+            py-3 px-6 rounded-lg font-semibold text-sm
             ${getButtonStyles()}
           `}
         >

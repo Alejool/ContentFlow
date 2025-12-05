@@ -1,10 +1,10 @@
-import { usePage } from "@inertiajs/react";
-import { useState, ReactNode } from "react";
-import Sidebar from "./Components/Sidebar";
-import MobileNavbar from "./Components/MobileNavbar";
 import Bg from "@/../assets/background.svg";
 import GlobalAiAssistant from "@/Components/AiAssistant/GlobalAiAssistant";
 import { useTheme } from "@/Hooks/useTheme";
+import { usePage } from "@inertiajs/react";
+import { ReactNode, useState } from "react";
+import MobileNavbar from "./Components/MobileNavbar";
+import Sidebar from "./Components/Sidebar";
 
 interface AuthenticatedLayoutProps {
   header?: ReactNode;
@@ -43,8 +43,8 @@ export default function AuthenticatedLayout({
           absolute inset-0 pointer-events-none backdrop-blur-md transition-all duration-300
           ${
             theme === "dark"
-              ? "bg-black/10 backdrop-blur-lg"
-              : "bg-white/10 backdrop-blur-md"
+              ? "bg-gray-900/95 backdrop-blur-sm"
+              : "bg-white/20 backdrop-blur-md"
           }
         `}
       />
