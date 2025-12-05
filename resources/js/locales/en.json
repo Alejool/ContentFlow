@@ -156,7 +156,7 @@
     "editCampaign": "Edit Campaign",
     "deleteCampaign": "Delete Campaign",
     "campaignTitle": "Campaign Title",
-    "description": "Description",
+    "description": "Manage, track and analyze your social media campaigns",
     "hashtags": "Hashtags",
     "image": "Image",
     "objective": "Objective",
@@ -165,8 +165,9 @@
     "endDate": "End Date",
     "publishDate": "Publish Date",
     "draft": "Draft",
-    "active": "Active",
     "completed": "Completed",
+    "yourContent": "Your Content",
+    "addNew": "Add New Content",
     "messages": {
       "addSuccess": "Campaign added successfully!",
       "addError": "Failed to add campaign",
@@ -181,6 +182,28 @@
         "confirmButton": "Yes, delete it!",
         "cancelButton": "Cancel"
       }
+    },
+    "actions":{
+      "edit":"Edit",
+      "delete":"Delete",
+      "publishNow":"Publish Now",
+      "viewDetails":"View Details", 
+      "active":"Active",
+      "remove":"Remove",
+      "change":"Change"
+    },
+     "headers": {
+     "status": "Status",
+     "duration": "Duration",
+     "mediaFiles": "Media Files",
+     "actions": "Actions"
+    },
+    "filters": 
+    {
+      "all": "All",
+      "active": "Active",
+      "completed": "Completed",
+      "draft": "Draft"
     }
   },
 
@@ -435,15 +458,7 @@
         "connectError": "Error connecting with"
       }
     },
-    "campaigns": {
-      "yourContent": "Your Content",
-      "addNew": "Add New Content",
-      "edit": "Edit",
-      "delete": "Delete",
-      "active": "Active",
-      "remove": "Remove",
-      "change": "Change"
-    },
+
     "modals": {
       "add": {
         "title": "New Campaign",

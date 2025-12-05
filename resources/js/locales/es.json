@@ -157,7 +157,7 @@
     "editCampaign": "Editar Campaña",
     "deleteCampaign": "Eliminar Campaña",
     "campaignTitle": "Título de Campaña",
-    "description": "Descripción",
+    "description": "Gestionar, rastrear y analizar tus campañas de redes sociales",
     "hashtags": "Hashtags",
     "image": "Imagen",
     "objective": "Objetivo",
@@ -168,6 +168,12 @@
     "draft": "Borrador",
     "active": "Activa",
     "completed": "Completada",
+    "yourContent": "Tu Contenido",
+    "addNew": "Agregar Nuevo Contenido",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "remove": "Eliminar",
+    "change": "Cambiar",
     "messages": {
       "addSuccess": "¡Campaña agregada exitosamente!",
       "addError": "Error al agregar campaña",
@@ -182,6 +188,28 @@
         "confirmButton": "Sí, eliminarla!",
         "cancelButton": "Cancelar"
       }
+    },
+    "actions":{
+      "edit":"Editar",
+      "publishNow":"Publicar Ahora",
+      "viewDetails":"Ver Detalles",
+      "delete":"Eliminar",
+      "active":"Activa",
+      "remove":"Eliminar",
+      "change":"Cambiar"
+    },
+    "headers": {
+     "status": "Estado",
+     "duration": "Duración",
+     "mediaFiles": "Archivos",
+     "actions": "Acciones"
+    },
+    "filters": 
+    {
+      "all": "Todo",
+      "active": "Activa",
+      "completed": "Completada",
+      "draft": "Borrador"
     }
   },
 
@@ -435,15 +463,7 @@
         "connectError": "Error al conectar con"
       }
     },
-    "campaigns": {
-      "yourContent": "Tu Contenido",
-      "addNew": "Agregar Nuevo Contenido",
-      "edit": "Editar",
-      "delete": "Eliminar",
-      "active": "Activo",
-      "remove": "Eliminar",
-      "change": "Cambiar"
-    },
+
     "modals": {
       "add": {
         "title": "Nueva Campaña",

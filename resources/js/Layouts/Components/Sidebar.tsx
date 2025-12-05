@@ -122,7 +122,7 @@ export default function Sidebar({
   const { t } = useTranslation();
   const { theme } = useTheme();
 
-  const sidebarBg = theme === "dark" ? "bg-neutral-900/90" : "bg-beige-200/90";
+  const sidebarBg = theme === "dark" ? "bg-neutral-900" : "bg-beige-200";
 
   const borderColor =
     theme === "dark" ? "border-neutral-700/50" : "border-beige-300/50";
@@ -287,7 +287,7 @@ export default function Sidebar({
                   <div
                     className={`transition-colors ${
                       route().current(item.href)
-                        ? ` text-white shadow-lg`
+                        ? ` `
                         : `${textColor} ${hoverText}`
                     }`}
                   >

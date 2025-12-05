@@ -61,11 +61,11 @@ export default function ModernCard({
   return (
     <div
       className={`rounded-lg overflow-hidden transition-all duration-300
-        ${theme === "dark" ? "bg-neutral-800/50" : "bg-white"}
+        ${theme === "dark" ? "bg-neutral-800/65" : "bg-white/70"}
         ${
           !noBorder &&
           (theme === "dark"
-            ? "border border-neutral-700/50"
+            ? "border border-neutral-700/70"
             : "border border-gray-200")
         }
         ${hoverEffect && "hover:shadow-lg "}
