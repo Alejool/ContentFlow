@@ -58,7 +58,6 @@ export function useCampaignManagement() {
       }
       await axios.post("/campaigns", formData);
       toast.success(t("campaigns.messages.addSuccess"));
-      await fetchCampaigns();
       return true;
     } catch (error) {
       toast.error(t("campaigns.messages.addError"));
@@ -107,7 +106,6 @@ export function useCampaignManagement() {
         )
       );
       toast.success(t("campaigns.messages.updateSuccess"));
-      await fetchCampaigns();
       return true;
     } catch (error) {
       console.error(error);
