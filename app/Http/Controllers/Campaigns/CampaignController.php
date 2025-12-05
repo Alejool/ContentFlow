@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use App\Services\FileUploadService;
 
 class CampaignController extends Controller
 {
@@ -59,7 +58,7 @@ class CampaignController extends Controller
         return view('campaigns.create');
     }
 
-    public function store(Request $request, FileUploadService $fileUploadService)
+    public function store(Request $request)
     {
         // Check if the campaign already exists
         if (Campaign::where('title', $request->title)->exists()) {
@@ -188,7 +187,7 @@ class CampaignController extends Controller
         ]);
     }
 
-    public function update(Request $request, $id, FileUploadService $fileUploadService)
+    public function update(Request $request, $id)
     {
         $validatedData = $request->validate([
             'title' => 'required|string|max:255',
