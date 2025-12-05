@@ -1,103 +1,88 @@
 <?php
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\ImageController;
-use App\Http\Controllers\CollectionController;
+
+use App\Http\Controllers\Profile\ProfileController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AnalyticsController; 
+use App\Http\Controllers\Analytics\AnalyticsController;
 use App\Http\Controllers\AIChatController;
 use Inertia\Inertia;
-use App\Http\Controllers\ManageContentController;
-use App\Http\Controllers\PostsController;
+use App\Http\Controllers\ManageContent\ManageContentController;
+use App\Http\Controllers\Posts\PostsController;
 use App\Http\Controllers\Campaigns\CampaignController;
-use App\Http\Controllers\SocialAccountController;
-use App\Http\Controllers\ThemeController;
- 
-  
+use App\Http\Controllers\SocialAccount\SocialAccountController;
+use App\Http\Controllers\Theme\ThemeController;
+use App\Http\Controllers\Locale\LocaleController;
+
+// Public routes
 Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
-    ]);     
+    ]);
 })->middleware('guest')->name('welcome');
-      
-      
-Route::get('/dashboard', [AnalyticsController::class, 'dashboard'])->middleware(['auth'])->name('dashboard');  
-  
-      
-                   
-// Protected routes     
+
+// Dashboard
+Route::get('/dashboard', [AnalyticsController::class, 'dashboard'])
+    ->middleware(['auth'])
+    ->name('dashboard');
+
+// Protected routes
 Route::middleware(['auth'])->group(function () {
+
+    // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::put('/profile', [ProfileController::class, 'changePassword'])->name('profile.changePassword');
-    Route::patch('/locale', [App\Http\Controllers\LocaleController::class, 'update'])->name('locale.update');
+
+    // User preferences
+    Route::patch('/locale', [LocaleController::class, 'update'])->name('locale.update');
     Route::patch('/theme', [ThemeController::class, 'update'])->name('theme.update');
 
-                
-    // ManageContent
+    // Manage Content
     Route::get('/manage-content', [ManageContentController::class, 'index'])->name('manage-content.index');
 
     // Analytics
     Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics.index');
-    Route::get('/api/statistics/dashboard', [AnalyticsController::class, 'getDashboardStats'])->name('statistics.dashboard');
-    Route::get('/api/statistics/campaigns/{id}', [AnalyticsController::class, 'getCampaignAnalytics'])->name('statistics.campaign');
-    Route::get('/api/statistics/social-media', [AnalyticsController::class, 'getSocialMediaMetrics'])->name('statistics.social');
-    Route::get('/api/statistics/engagement', [AnalyticsController::class, 'getEngagementData'])->name('statistics.engagement');
-    Route::get('/api/statistics/platform-comparison', [AnalyticsController::class, 'getPlatformComparison'])->name('statistics.platforms');
-    Route::get('/api/statistics/export', [AnalyticsController::class, 'exportData'])->name('statistics.export');
-    Route::post('/analytics', [AnalyticsController::class, 'store'])->name('analytics.store');
 
-    // POST Controller
+    // Posts
     Route::get('/posts', [PostsController::class, 'index'])->name('posts.index');
 
     // AI Chat
     Route::get('/ai-chat', [AIChatController::class, 'index'])->name('ai-chat.index');
     Route::post('/ai-chat/process', [AIChatController::class, 'processMessage'])->name('ai-chat.process');
-   
-});
 
-
-
-// routes for campaigns      
-Route::middleware(['auth'])->group(function () {
-    Route::prefix('campaigns')->group(function () { 
+    // Campaigns
+    Route::prefix('campaigns')->group(function () {
         Route::get('/', [CampaignController::class, 'index'])->name('campaigns.index');
         Route::post('/', [CampaignController::class, 'store'])->name('campaigns.store');
         Route::put('/{campaign}', [CampaignController::class, 'update'])->name('campaigns.update');
         Route::delete('/{campaign}', [CampaignController::class, 'destroy'])->name('campaigns.destroy');
     });
+
+    // Social Media Accounts Management
+    Route::prefix('social-accounts')->group(function () {
+        // Get connected accounts
+        Route::get('/', [SocialAccountController::class, 'index'])->name('social-accounts.index');
+
+        // Get OAuth URL for connecting new account
+        Route::get('/auth-url/{platform}', [SocialAccountController::class, 'getAuthUrl'])->name('social-accounts.auth-url');
+
+        // Disconnect account
+        Route::delete('/{id}', [SocialAccountController::class, 'destroy'])->name('social-accounts.destroy');
+    });
 });
 
-// Routes for OAuth callbacks
-Route::middleware(['web'])->group(function () {
-    Route::get('/auth/facebook/callback', [SocialAccountController::class, 'handleFacebookCallback']);
-    Route::get('/auth/instagram/callback', [SocialAccountController::class, 'handleInstagramCallback']);
-    Route::get('/auth/twitter/callback', [SocialAccountController::class, 'handleTwitterCallback']);
-    Route::get('/auth/youtube/callback', [SocialAccountController::class, 'handleYoutubeCallback']);
-    Route::get('/auth/tiktok/callback', [SocialAccountController::class, 'handleTiktokCallback']);
+// OAuth Callbacks (public - no auth required for callbacks)
+Route::prefix('auth')->group(function () {
+    Route::get('/facebook/callback', [SocialAccountController::class, 'handleFacebookCallback'])->name('auth.facebook.callback');
+    Route::get('/instagram/callback', [SocialAccountController::class, 'handleInstagramCallback'])->name('auth.instagram.callback');
+    Route::get('/twitter/callback', [SocialAccountController::class, 'handleTwitterCallback'])->name('auth.twitter.callback');
+    Route::get('/youtube/callback', [SocialAccountController::class, 'handleYoutubeCallback'])->name('auth.youtube.callback');
+    Route::get('/tiktok/callback', [SocialAccountController::class, 'handleTiktokCallback'])->name('auth.tiktok.callback');
+
+    // Google Login Routes
+    Route::get('/google/redirect', [\App\Http\Controllers\Auth\AuthController::class, 'redirectToGoogle'])->name('auth.google.redirect');
+    Route::get('/google/callback', [\App\Http\Controllers\Auth\AuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
 });
 
-// TEMPORARY: Test route to send verification email
-Route::get('/test-verification-email', function () {
-    $user = auth()->user();
-    
-    if (!$user) {
-        return response()->json(['error' => 'Not authenticated'], 401);
-    }
-    
-    // Send the verification email
-    $user->sendEmailVerificationNotification();
-    
-    return response()->json([
-        'success' => true,
-        'message' => 'Verification email sent to: ' . $user->email,
-        'user' => [
-            'name' => $user->name,
-            'email' => $user->email,
-            'email_verified_at' => $user->email_verified_at,
-        ]
-    ]);
-})->middleware('auth');
-   
 require __DIR__ . '/auth.php';

@@ -1,33 +1,36 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\SocialAccountController;
-use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
+use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\AIChatController;
+use App\Http\Controllers\Analytics\AnalyticsController;
+use App\Http\Controllers\Campaigns\CampaignController;
 
-// routes/api.php
-Route::post('/verify-firebase-token', [AuthController::class, 'verifyFirebaseToken']);
+// Google Authentication (receives user data from frontend)
+Route::post('/auth/google', [AuthController::class, 'handleGoogleAuth']);
 
-// Ensures frontend requests are treated as stateful
-Route::middleware(EnsureFrontendRequestsAreStateful::class)->group(function () {
-    // Routes for social accounts that require authentication
-    Route::middleware('auth:sanctum')->group(function () {
-        Route::get('/social-accounts', [SocialAccountController::class, 'index']);
-        Route::get('/social-accounts/auth-url/{platform}', [SocialAccountController::class, 'getAuthUrl']);
-        Route::post('/social-accounts', [SocialAccountController::class, 'store']);
-        Route::delete('/social-accounts/{id}', [SocialAccountController::class, 'destroy']);
-        
-        // Move AI chat route inside authentication middleware
-        Route::post('/ai-chat/message', [AIChatController::class, 'processMessage']);
-    });
-
-    Route::get('/test-curl', function() {
-    return [
-        'curl.cainfo' => ini_get('curl.cainfo'),
-        'openssl.cafile' => ini_get('openssl.cafile'),
-    ];
+// AI Chat API
+Route::middleware(['auth:sanctum'])->prefix('ai')->group(function () {
+    Route::post('/chat', [AIChatController::class, 'processMessage']);
 });
 
+// Analytics API
+Route::middleware(['auth:sanctum'])->prefix('analytics')->group(function () {
+    Route::get('/dashboard', [AnalyticsController::class, 'getDashboardStats']);
+    Route::get('/campaigns/{id}', [AnalyticsController::class, 'getCampaignAnalytics']);
+    Route::get('/social-media', [AnalyticsController::class, 'getSocialMediaMetrics']);
+    Route::get('/engagement', [AnalyticsController::class, 'getEngagementData']);
+    Route::get('/platform-comparison', [AnalyticsController::class, 'getPlatformComparison']);
+    Route::get('/export', [AnalyticsController::class, 'exportData']);
+    Route::post('/', [AnalyticsController::class, 'store']);
 });
 
+// Campaigns API
+Route::middleware(['auth:sanctum'])->prefix('campaigns')->group(function () {
+    Route::get('/', [CampaignController::class, 'index']);
+    Route::post('/', [CampaignController::class, 'store']);
+    Route::get('/{campaign}', [CampaignController::class, 'show']);
+    Route::put('/{campaign}', [CampaignController::class, 'update']);
+    Route::delete('/{campaign}', [CampaignController::class, 'destroy']);
+    Route::post('/{campaign}/duplicate', [CampaignController::class, 'duplicate']);
+});
