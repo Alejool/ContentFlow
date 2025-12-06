@@ -1,4 +1,5 @@
 import { useTheme } from "@/Hooks/useTheme";
+import { convertDate } from "@/Utils/date";
 import { Campaign } from "@/types/Campaign";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import {
@@ -86,6 +87,12 @@ export default function CampaignList({
         return "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300";
     }
   };
+  const colorIcon =
+    theme === "dark"
+      ? `[&::-webkit-calendar-picker-indicator]:invert 
+         [&::-webkit-calendar-picker-indicator]:opacity-80
+         [&::-webkit-calendar-picker-indicator]:cursor-pointer`
+      : "";
 
   const shouldOpenUpwards = (index: number) => {
     const totalItems = currentCampaigns.length;
@@ -285,7 +292,7 @@ export default function CampaignList({
                 onChange={(e) =>
                   handleFilterChange("date_start", e.target.value)
                 }
-                className={`py-2 px-3 rounded-lg text-sm border focus:ring-2 focus:ring-orange-500 focus:border-transparent
+                className={`py-2 px-3 rounded-lg text-sm border focus:ring-2 focus:ring-orange-500 focus:border-transparent ${colorIcon}
                   ${
                     theme === "dark"
                       ? "bg-neutral-800 border-neutral-700 text-white"
@@ -302,7 +309,7 @@ export default function CampaignList({
                 type="date"
                 value={dateEnd}
                 onChange={(e) => handleFilterChange("date_end", e.target.value)}
-                className={`py-2 px-3 rounded-lg text-sm border focus:ring-2 focus:ring-orange-500 focus:border-transparent
+                className={`py-2 px-3 rounded-lg text-sm border focus:ring-2 focus:ring-orange-500 focus:border-transparent ${colorIcon}
                   ${
                     theme === "dark"
                       ? "bg-neutral-800 border-neutral-700 text-white"
@@ -316,7 +323,7 @@ export default function CampaignList({
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
+        <table className="w-full text-left border-collapse z-0">
           <thead
             className={` ${
               theme === "dark"
@@ -469,14 +476,16 @@ export default function CampaignList({
                             theme === "dark" ? "text-gray-300" : "text-gray-700"
                           }
                         >
-                          Start: {campaign.start_date || "Not set"}
+                          {t("campaigns.startDate")}:{" "}
+                          {convertDate(campaign.start_date || "Not set")}
                         </span>
                         <span
                           className={
                             theme === "dark" ? "text-gray-500" : "text-gray-400"
                           }
                         >
-                          End: {campaign.end_date || "Not set"}
+                          {t("campaigns.endDate")}:{" "}
+                          {convertDate(campaign.end_date || "Not set")}
                         </span>
                       </div>
                     </td>
@@ -531,35 +540,24 @@ export default function CampaignList({
                         )}
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-right relative">
+                    <td className="px-6 py-4 text-right relative isolate">
                       <Menu
                         as="div"
                         className="relative inline-block text-left"
                       >
                         <MenuButton
-                          className={`p-2 rounded-lg transition-colors
-                            ${
-                              theme === "dark"
-                                ? "hover:bg-neutral-700 text-gray-400"
-                                : "hover:bg-gray-100 text-gray-500"
-                            }
-                          `}
+                          className={`p-2 rounded-lg transition-colors`}
                         >
                           <MoreVertical className="w-4 h-4" />
                         </MenuButton>
-
                         <MenuItems
-                          className={`absolute ${
+                          className={`absolute z-[100] ${
                             shouldOpenUpwards(index)
                               ? "bottom-full mb-2"
                               : "top-full mt-2"
-                          } right-0 w-48 origin-top-right rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50
-                            ${
-                              theme === "dark"
-                                ? "bg-neutral-800 ring-neutral-700"
-                                : "bg-white"
-                            }
-                          `}
+                          } right-0 w-48 origin-top-right rounded-lg shadow-lg ring-1 ring-primary-500 focus:outline-none
+                            ${theme === "dark" ? "bg-neutral-800 ring-neutral-700" : "bg-white"}
+                            z-50`}
                         >
                           <div className="p-1">
                             <MenuItem>
@@ -641,7 +639,7 @@ export default function CampaignList({
                                   `}
                                 >
                                   <Trash2 className="w-4 h-4" />
-                                  Delete
+                                  {t("campaigns.actions.delete")}
                                 </button>
                               )}
                             </MenuItem>
@@ -723,14 +721,12 @@ export default function CampaignList({
             <div className="flex items-center gap-1">
               {Array.from({ length: totalPages }, (_, i) => i + 1).map(
                 (page) => {
-                  // Show first page, last page, current page, and pages around current
                   const showPage =
                     page === 1 ||
                     page === totalPages ||
                     (page >= currentPage - 1 && page <= currentPage + 1);
 
                   if (!showPage) {
-                    // Show ellipsis
                     if (page === currentPage - 2 || page === currentPage + 2) {
                       return (
                         <span

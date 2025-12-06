@@ -64,7 +64,7 @@ export default function ViewCampaignModal({
                 theme === "dark" ? "text-white" : "text-gray-900"
               }`}
             >
-              Campaign Details
+              {t("campaigns.actions.viewCampaign")}
             </DialogTitle>
             <button
               onClick={onClose}
@@ -132,7 +132,7 @@ export default function ViewCampaignModal({
                           theme === "dark" ? "text-gray-400" : "text-gray-500"
                         }`}
                       >
-                        Goal
+                        {t("campaigns.objective")}
                       </span>
                     </div>
                     <p
@@ -162,7 +162,7 @@ export default function ViewCampaignModal({
                           theme === "dark" ? "text-gray-400" : "text-gray-500"
                         }`}
                       >
-                        Hashtags
+                        {t("campaigns.hashtags")}
                       </span>
                     </div>
                     <p
@@ -191,7 +191,7 @@ export default function ViewCampaignModal({
                         theme === "dark" ? "text-gray-400" : "text-gray-500"
                       }`}
                     >
-                      Start Date
+                      {t("campaigns.startDate")}
                     </span>
                   </div>
                   <p
@@ -219,7 +219,7 @@ export default function ViewCampaignModal({
                         theme === "dark" ? "text-gray-400" : "text-gray-500"
                       }`}
                     >
-                      End Date
+                      {t("campaigns.endDate")}
                     </span>
                   </div>
                   <p
@@ -229,6 +229,79 @@ export default function ViewCampaignModal({
                   >
                     {formatDate(campaign.end_date)}
                   </p>
+                </div>
+
+                <div
+                  className={`p-4 rounded-lg md:col-span-2 ${
+                    theme === "dark" ? "bg-neutral-900/50" : "bg-gray-50"
+                  }`}
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <Calendar
+                      className={`w-4 h-4 ${
+                        theme === "dark" ? "text-purple-400" : "text-purple-600"
+                      }`}
+                    />
+                    <span
+                      className={`text-sm font-semibold ${
+                        theme === "dark" ? "text-gray-400" : "text-gray-500"
+                      }`}
+                    >
+                      {t("campaigns.scheduledPosts")}
+                    </span>
+                  </div>
+
+                  {campaign.scheduled_posts &&
+                  campaign.scheduled_posts.length > 0 ? (
+                    <div className="space-y-2 mt-2">
+                      {campaign.scheduled_posts.map(
+                        (post: any, index: number) => (
+                          <div
+                            key={post.id || index}
+                            className={`flex items-center justify-between p-2 rounded border ${
+                              theme === "dark"
+                                ? "bg-neutral-800 border-neutral-700"
+                                : "bg-white border-gray-200"
+                            }`}
+                          >
+                            <div className="flex items-center gap-2">
+                              <span className="capitalize font-medium text-sm">
+                                {post.platform || "Platform"}
+                              </span>
+                              {post.status && (
+                                <span
+                                  className={`text-xs px-1.5 py-0.5 rounded capitalize ${
+                                    post.status === "posted"
+                                      ? "bg-green-100 text-green-700"
+                                      : post.status === "failed"
+                                      ? "bg-red-100 text-red-700"
+                                      : "bg-yellow-100 text-yellow-700"
+                                  }`}
+                                >
+                                  {post.status}
+                                </span>
+                              )}
+                            </div>
+                            <div className="text-sm opacity-80">
+                              {formatDate(post.scheduled_at)}{" "}
+                              {new Date(post.scheduled_at).toLocaleTimeString(
+                                [],
+                                { hour: "2-digit", minute: "2-digit" }
+                              )}
+                            </div>
+                          </div>
+                        )
+                      )}
+                    </div>
+                  ) : (
+                    <p
+                      className={`text-sm ${
+                        theme === "dark" ? "text-white" : "text-gray-900"
+                      }`}
+                    >
+                      {t("campaigns.noScheduledPosts")}
+                    </p>
+                  )}
                 </div>
 
                 {campaign.publish_date && (

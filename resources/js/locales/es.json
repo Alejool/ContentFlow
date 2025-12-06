@@ -165,6 +165,8 @@
     "startDate": "Fecha de Inicio",
     "endDate": "Fecha de Fin",
     "publishDate": "Fecha de Publicación",
+    "scheduledPosts": "Publicaciones Programadas",
+    "noScheduledPosts": "No hay publicaciones programadas específicamente.",
     "draft": "Borrador",
     "active": "Activa",
     "completed": "Completada",
@@ -190,6 +192,7 @@
       }
     },
     "actions":{
+      "viewCampaign":"Ver Campaña",
       "edit":"Editar",
       "publishNow":"Publicar Ahora",
       "viewDetails":"Ver Detalles",
@@ -209,6 +212,7 @@
       "all": "Todo",
       "active": "Activa",
       "completed": "Completada",
+      "upcoming": "Proximas",
       "draft": "Borrador"
     }
   },
@@ -461,6 +465,17 @@
         "popupBlocked": "El navegador bloqueó la ventana emergente. Por favor permite ventanas emergentes para este sitio.",
         "urlError": "No se pudo obtener la URL de autenticación",
         "connectError": "Error al conectar con"
+      },
+      "disconnectModal": {
+        "title": "Advertencia de desconexión",
+        "warning": "Cuenta con publicaciones pendientes",
+        "explanation": "Esta cuenta tiene publicaciones programadas asociadas. Para desconectarla, debes eliminar estas publicaciones primero o forzar la desconexión.",
+        "table": {
+            "date": "Fecha",
+            "campaign": "Campaña"
+        },
+        "cancelButton": "Mantener conectado",
+        "confirmButton": "Desconectar y eliminar todo"
       }
     },
 
@@ -486,6 +501,11 @@
         "goal": "Objetivo de la Campaña",
         "hashtags": "Hashtags",
         "optional": "(Opcional)",
+        "schedulePublication": "Programar Publicación (Opcional)",
+        "optionalSchedule": "Dejar vacío para guardar como borrador o publicar inmediatamente.",
+        "socialAccounts": "Seleccionar Redes Sociales",
+        "noConnectedAccounts": "No se encontraron cuentas conectadas.",
+        "alreadyScheduled": "Ya se programó una publicación para esta fecha.",
         "placeholders": {
           "title": "Ej: Campaña de Verano 2024",
           "description": "Describe tu campaña de manera detallada y atractiva...",

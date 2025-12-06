@@ -19,7 +19,7 @@ class CampaignController extends Controller
     public function index(Request $request)
     {
         $query = Campaign::where('user_id', Auth::id())
-            ->with('mediaFiles');
+            ->with(['mediaFiles', 'scheduledPosts']);
 
         // Status Filter
         if ($request->has('status') && $request->status !== 'all') {
@@ -139,15 +139,19 @@ class CampaignController extends Controller
 
             // Handle Scheduling
             if (!empty($validatedData['scheduled_at']) && !empty($validatedData['social_accounts'])) {
+                $schedules = $request->input('social_account_schedules', []);
+
                 foreach ($validatedData['social_accounts'] as $accountId) {
+                    $scheduledAt = isset($schedules[$accountId]) ? $schedules[$accountId] : $validatedData['scheduled_at'];
+
                     ScheduledPost::create([
                         'user_id' => Auth::id(),
                         'social_account_id' => $accountId,
                         'campaign_id' => $campaign->id,
                         'media_file_id' => $firstMediaFileId, // Attach the first media file
                         'caption' => $campaign->title . "\n\n" . $campaign->description . "\n\n" . $campaign->hashtags,
-                        'scheduled_at' => $validatedData['scheduled_at'],
-                        'status' => 'scheduled',
+                        'scheduled_at' => $scheduledAt,
+                        'status' => 'pending',
                     ]);
                 }
             }
@@ -286,27 +290,30 @@ class CampaignController extends Controller
             if (!empty($validatedData['scheduled_at']) && !empty($validatedData['social_accounts'])) {
                 // Remove existing scheduled posts that are still pending
                 ScheduledPost::where('campaign_id', $campaign->id)
-                    ->where('status', 'scheduled')
+                    ->where('status', 'pending')
                     ->delete();
 
                 $firstMedia = $campaign->media()->with('mediaFile')->first();
                 $mediaFileId = $firstMedia ? $firstMedia->media_file_id : null;
+                $schedules = $request->input('social_account_schedules', []);
 
                 foreach ($validatedData['social_accounts'] as $accountId) {
+                    $scheduledAt = isset($schedules[$accountId]) ? $schedules[$accountId] : $validatedData['scheduled_at'];
+
                     ScheduledPost::create([
                         'user_id' => Auth::id(),
                         'social_account_id' => $accountId,
                         'campaign_id' => $campaign->id,
                         'media_file_id' => $mediaFileId,
                         'caption' => $campaign->title . "\n\n" . $campaign->description . "\n\n" . $campaign->hashtags,
-                        'scheduled_at' => $validatedData['scheduled_at'],
-                        'status' => 'scheduled',
+                        'scheduled_at' => $scheduledAt,
+                        'status' => 'pending',
                     ]);
                 }
             } elseif (!empty($validatedData['scheduled_at'])) {
                 // Update time for existing scheduled posts
                 ScheduledPost::where('campaign_id', $campaign->id)
-                    ->where('status', 'scheduled')
+                    ->where('status', 'pending')
                     ->update(['scheduled_at' => $validatedData['scheduled_at']]);
             }
 

@@ -168,6 +168,7 @@
     "completed": "Completed",
     "yourContent": "Your Content",
     "addNew": "Add New Content",
+  
     "messages": {
       "addSuccess": "Campaign added successfully!",
       "addError": "Failed to add campaign",
@@ -184,6 +185,7 @@
       }
     },
     "actions":{
+      "viewCampaign":"View Campaign",
       "edit":"Edit",
       "delete":"Delete",
       "publishNow":"Publish Now",
@@ -203,6 +205,7 @@
       "all": "All",
       "active": "Active",
       "completed": "Completed",
+      "upcoming": "Upcoming",
       "draft": "Draft"
     }
   },
@@ -481,6 +484,11 @@
         "goal": "Campaign goal",
         "hashtags": "Hashtags",
         "optional": "(Optional)",
+        "schedulePublication": "Schedule Publication (Optional)",
+        "optionalSchedule": "Leave empty to save as draft or publish immediately.",
+        "socialAccounts": "Select Social Networks",
+        "noConnectedAccounts": "No connected accounts found.",
+        "alreadyScheduled": "A publication has already been scheduled for this date.",
         "placeholders": {
           "title": "Eg: Summer Campaign 2024",
           "description": "Describe your campaign in a detailed and attractive way...",

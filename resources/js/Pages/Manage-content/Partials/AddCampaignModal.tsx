@@ -89,6 +89,10 @@ export default function AddCampaignModal({
   const [isDragOver, setIsDragOver] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [socialAccounts, setSocialAccounts] = useState<any[]>([]);
+  const [accountSchedules, setAccountSchedules] = useState<
+    Record<number, string>
+  >({});
+  const [activePopover, setActivePopover] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const schema = useMemo(() => createSchema(t), [t]);
@@ -169,6 +173,12 @@ export default function AddCampaignModal({
     theme === "dark"
       ? "bg-gradient-to-r from-orange-600 to-orange-800 hover:shadow-orange-500/20"
       : "bg-gradient-to-r from-orange-600 to-orange-700 hover:shadow-orange-200";
+  const colorIconInput =
+    theme === "dark"
+      ? `[&::-webkit-calendar-picker-indicator]:invert 
+         [&::-webkit-calendar-picker-indicator]:opacity-80
+         [&::-webkit-calendar-picker-indicator]:cursor-pointer`
+      : "";
 
   const handleFileChange = (files: FileList | null) => {
     if (files && files.length > 0) {
@@ -241,6 +251,10 @@ export default function AddCampaignModal({
     setValue("hashtags", formatted, { shouldValidate: true });
   };
 
+  const toggleSchedulePopover = (accountId: number) => {
+    setActivePopover(activePopover === accountId ? null : accountId);
+  };
+
   const onFormSubmit = async (data: any) => {
     if (mediaFiles.length === 0) {
       setImageError(t("manageContent.modals.validation.imageRequired"));
@@ -266,6 +280,12 @@ export default function AddCampaignModal({
       if (data.social_accounts && data.social_accounts.length > 0) {
         data.social_accounts.forEach((id: number, index: number) => {
           formData.append(`social_accounts[${index}]`, id.toString());
+          if (accountSchedules[id]) {
+            formData.append(
+              `social_account_schedules[${id}]`,
+              accountSchedules[id]
+            );
+          }
         });
       }
 
@@ -295,7 +315,11 @@ export default function AddCampaignModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
+    <div
+      className={`fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 ${
+        theme === "dark" ? "text-white" : "text-gray-900"
+      }`}
+    >
       <div
         className={`absolute inset-0 ${
           theme === "dark" ? "bg-black/70" : "bg-gray-900/60"
@@ -511,15 +535,17 @@ export default function AddCampaignModal({
                     className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
                   >
                     <Clock className={`w-4 h-4 ${iconColor}`} />
-                    Schedule Publication (Optional)
+                    {t("manageContent.modals.fields.schedulePublication")}
                   </label>
                   <input
                     type="datetime-local"
                     {...register("scheduled_at")}
-                    className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-offset-0 transition-all ${inputBg} ${borderColor} ${focusBorder}`}
+                    className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-offset-0 transition-all ${inputBg} ${borderColor} ${focusBorder} ${colorIconInput}`}
                   />
                   <p className={`text-xs mt-1 ${textTertiary}`}>
-                    Leave empty to save as draft or publish immediately.
+                    {t(
+                      "manageContent.modals.fields.schedulePublicationOptional"
+                    )}
                   </p>
                 </div>
 
@@ -533,28 +559,161 @@ export default function AddCampaignModal({
                       Select Social Networks
                     </label>
                     <div className="grid grid-cols-2 gap-3">
-                      {socialAccounts.map((account) => (
-                        <label
-                          key={account.id}
-                          className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all ${
-                            watchedFields.social_accounts?.includes(account.id)
-                              ? `border-orange-500 bg-orange-50 dark:bg-orange-900/20`
-                              : `${borderColor} ${inputBg}`
-                          }`}
-                        >
-                          <input
-                            type="checkbox"
-                            value={account.id}
-                            {...register("social_accounts")}
-                            className="w-4 h-4 text-orange-600 rounded focus:ring-orange-500"
-                          />
-                          <span
-                            className={`text-sm font-medium ${textPrimary}`}
+                      {socialAccounts.map((account) => {
+                        const isChecked =
+                          watchedFields.social_accounts?.includes(account.id) ||
+                          false;
+                        const customSchedule = accountSchedules[account.id];
+
+                        return (
+                          <div
+                            key={account.id}
+                            className={`relative flex items-center p-3 rounded-lg border transition-all ${
+                              isChecked
+                                ? `border-orange-500 bg-orange-50 dark:bg-orange-900/20`
+                                : `${borderColor} ${inputBg}`
+                            }`}
                           >
-                            {account.platform}
-                          </span>
-                        </label>
-                      ))}
+                            <label className="flex items-center gap-3 flex-1 cursor-pointer">
+                              <input
+                                type="checkbox"
+                                value={account.id}
+                                {...register("social_accounts")}
+                                onChange={(e) => {
+                                  // We need to handle the change manually if we want to clean up schedules
+                                  // But register handles the array.
+                                  // Let's hook into the register's onChange if possible or just use a side effect?
+                                  // Actually, with `register`, `watchedFields` updates.
+                                  // But clearing `accountSchedules` on uncheck is harder with just `register`.
+                                  // Let's use `setValue` like in EditModal for consistency if we want that control.
+                                  // But AddModal uses `register` for array... wait, EditModal used `setValue` because of array issues.
+                                  // Let's use setValue here too for consistency and control.
+                                  const currentAccounts =
+                                    watchedFields.social_accounts || [];
+                                  const numericId = Number(account.id);
+                                  // Note: data.social_accounts coming from register might be strings if value is set.
+                                  // Let's normalize.
+
+                                  // Actually, let's stick to the EditModal pattern completely for checkboxes.
+                                  // It implies NOT using {...register} for the checkbox itself, but managing it via setValue.
+                                  if (e.target.checked) {
+                                    setValue("social_accounts", [
+                                      ...currentAccounts.map(Number),
+                                      numericId,
+                                    ]);
+                                  } else {
+                                    setValue(
+                                      "social_accounts",
+                                      currentAccounts
+                                        .map(Number)
+                                        .filter(
+                                          (id: number) => id !== numericId
+                                        )
+                                    );
+                                    const newSchedules = {
+                                      ...accountSchedules,
+                                    };
+                                    delete newSchedules[numericId];
+                                    setAccountSchedules(newSchedules);
+                                  }
+                                }}
+                                className="w-4 h-4 text-orange-600 rounded focus:ring-orange-500"
+                              />
+                              <div className="flex flex-col">
+                                <span
+                                  className={`text-sm font-medium ${textPrimary}`}
+                                >
+                                  {account.platform}
+                                </span>
+                                {customSchedule && isChecked && (
+                                  <span className="text-xs text-orange-600 dark:text-orange-400 flex items-center gap-1">
+                                    <Clock className="w-3 h-3" />
+                                    {new Date(customSchedule).toLocaleString(
+                                      [],
+                                      { dateStyle: "short", timeStyle: "short" }
+                                    )}
+                                  </span>
+                                )}
+                              </div>
+                            </label>
+
+                            {isChecked && (
+                              <div className="ml-2">
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    toggleSchedulePopover(account.id)
+                                  }
+                                  className={`p-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 ${
+                                    customSchedule
+                                      ? "text-orange-500"
+                                      : textSecondary
+                                  }`}
+                                  title="Set individual time"
+                                >
+                                  <Clock className="w-4 h-4" />
+                                </button>
+
+                                {activePopover === account.id && (
+                                  <div
+                                    className={`absolute right-0 top-full mt-2 z-50 p-4 rounded-lg shadow-xl border w-64 ${modalBg} ${borderColor} animate-in fade-in zoom-in-95`}
+                                  >
+                                    <div className="flex justify-between items-center mb-3">
+                                      <h4
+                                        className={`text-sm font-semibold ${textPrimary}`}
+                                      >
+                                        Schedule for {account.platform}
+                                      </h4>
+                                      <button
+                                        type="button"
+                                        onClick={() => setActivePopover(null)}
+                                      >
+                                        <X
+                                          className={`w-4 h-4 ${textSecondary}`}
+                                        />
+                                      </button>
+                                    </div>
+                                    <input
+                                      type="datetime-local"
+                                      className={`w-full px-3 py-2 text-sm rounded border mb-3 ${inputBg} ${borderColor} ${textPrimary} ${colorIconInput}`}
+                                      value={customSchedule || ""}
+                                      onChange={(e) => {
+                                        setAccountSchedules((prev) => ({
+                                          ...prev,
+                                          [account.id]: e.target.value,
+                                        }));
+                                      }}
+                                    />
+                                    <div className="flex justify-end gap-2">
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          const newSchedules = {
+                                            ...accountSchedules,
+                                          };
+                                          delete newSchedules[account.id];
+                                          setAccountSchedules(newSchedules);
+                                          setActivePopover(null);
+                                        }}
+                                        className="text-xs text-red-500 hover:text-red-700 font-medium px-2 py-1"
+                                      >
+                                        Clear
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => setActivePopover(null)}
+                                        className="text-xs bg-orange-600 text-white px-3 py-1.5 rounded hover:bg-orange-700"
+                                      >
+                                        Done
+                                      </button>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
                       {socialAccounts.length === 0 && (
                         <p className={`col-span-2 text-sm ${textSecondary}`}>
                           No connected accounts found.

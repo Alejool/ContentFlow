@@ -3,29 +3,21 @@ import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 
 export const useSocialMediaAuth = () => {
-  const [isAuthenticating, setIsAuthenticating] = useState(false);
-  const [accounts, setAccounts] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [accounts, setAccounts] = useState<any[]>([]);
 
   useEffect(() => {
     // Escuchar mensajes de la ventana emergente
-    const handleMessage = async (event) => {
-      console.log("Mensaje recibido:", event.data);
-
+    const handleMessage = async (event: any) => {
       if (event.data && event.data.type === "social_auth_callback") {
-        setIsAuthenticating(false);
+        setIsLoading(false);
 
         if (event.data.success) {
-          // La autenticación fue exitosa
-          console.log("Autenticación exitosa:", event.data.data);
-
           try {
-            // Parsear los datos recibidos del callback
             const responseData = JSON.parse(event.data.data);
-            console.log("Datos parseados:", responseData);
-
-            // Guardar los datos en el backend
             await axios.post(
-              "/social-accounts",
+              "/api/social-accounts",
               {
                 platform: responseData.platform,
                 account_id: responseData.account_id,
@@ -49,35 +41,26 @@ export const useSocialMediaAuth = () => {
               `Cuenta de ${responseData.platform} conectada exitosamente`
             );
 
-            // Recargar las cuentas conectadas
-            await loadConnectedAccounts();
-          } catch (error) {
+            await fetchAccounts();
+          } catch (error: any) {
             console.error("Error al guardar datos de la cuenta:", error);
-            toast.error(
-              "Error al guardar los datos de la cuenta: " +
-                (error.response?.data?.message || error.message)
-            );
+            const msg = error.response?.data?.message || error.message;
+            toast.error("Error al guardar los datos de la cuenta: " + msg);
+            setError(msg);
           }
         } else {
-          // La autenticación falló
-          console.error("Error en la autenticación:", event.data.message);
-          toast.error(
-            "Error en la autenticación: " +
-              (event.data.message || "Error desconocido")
-          );
+          const msg = event.data.message || "Error desconocido";
+          toast.error("Error en la autenticación: " + msg);
+          setError(msg);
         }
       }
     };
 
     window.addEventListener("message", handleMessage);
-
-    return () => {
-      window.removeEventListener("message", handleMessage);
-    };
+    return () => window.removeEventListener("message", handleMessage);
   }, []);
 
-  // Cargar cuentas conectadas del usuario
-  const loadConnectedAccounts = async () => {
+  const fetchAccounts = async () => {
     try {
       const response = await axios.get("/api/social-accounts", {
         headers: {
@@ -93,20 +76,18 @@ export const useSocialMediaAuth = () => {
         setAccounts(response.data.accounts);
         return response.data.accounts;
       }
-
       return [];
     } catch (error) {
       console.error("Error al cargar cuentas sociales:", error);
-      toast.error("No se pudieron cargar las cuentas conectadas");
       return [];
     }
   };
 
-  const connectSocialMedia = async (platform) => {
+  const connectAccount = async (platform: string) => {
     try {
-      setIsAuthenticating(true);
+      setIsLoading(true);
+      setError(null);
 
-      // Obtener URL de autenticación
       const response = await axios.get(
         `/api/social-accounts/auth-url/${platform}`,
         {
@@ -121,7 +102,6 @@ export const useSocialMediaAuth = () => {
       );
 
       if (response.data.success && response.data.url) {
-        // Abrir ventana emergente para autenticación
         const authWindow = window.open(
           response.data.url,
           `${platform}Auth`,
@@ -129,84 +109,79 @@ export const useSocialMediaAuth = () => {
         );
 
         if (!authWindow) {
-          setIsAuthenticating(false);
-          toast.error(
-            "El navegador bloqueó la ventana emergente. Por favor, permita ventanas emergentes para este sitio."
-          );
+          setIsLoading(false);
+          toast.error("El navegador bloqueó la ventana emergente.");
           return false;
         }
 
-        // Verificar si la ventana se cerró manualmente
         const checkWindowClosed = setInterval(() => {
           if (authWindow.closed) {
             clearInterval(checkWindowClosed);
-            setIsAuthenticating(false);
+            setIsLoading(false);
           }
         }, 1000);
 
         return true;
       } else {
-        setIsAuthenticating(false);
+        setIsLoading(false);
         toast.error("No se pudo obtener la URL de autenticación");
-        throw new Error("No se pudo obtener la URL de autenticación");
+        return false;
       }
-    } catch (error) {
-      setIsAuthenticating(false);
-      console.error("Error al conectar con la red social:", error);
-      toast.error(
-        "Error al conectar con la red social: " +
-          (error.response?.data?.message || error.message)
-      );
+    } catch (error: any) {
+      setIsLoading(false);
+      const msg = error.response?.data?.message || error.message;
+      toast.error("Error al conectar: " + msg);
+      setError(msg);
       throw error;
     }
   };
 
-  const disconnectSocialMedia = async (platform, accountId) => {
+  const disconnectAccount = async (id: number, force: boolean = false) => {
+    setIsLoading(true);
+    setError(null);
     try {
-      setIsAuthenticating(true);
-
-      const response = await axios.delete(`/api/social-accounts/${accountId}`, {
-        headers: {
-          "X-CSRF-TOKEN": document
-            .querySelector('meta[name="csrf-token"]')
-            ?.getAttribute("content"),
-          Accept: "application/json",
-        },
-        withCredentials: true,
-      });
-
-      setIsAuthenticating(false);
-
-      if (response.data.success) {
-        toast.success(`Cuenta de ${platform} desconectada exitosamente`);
-
-        // Recargar las cuentas conectadas después de desconectar
-        await loadConnectedAccounts();
-
-        return true;
-      } else {
-        toast.error(
-          "Error al desconectar la cuenta: " +
-            (response.data.message || "Error desconocido")
-        );
-        return false;
-      }
-    } catch (error) {
-      setIsAuthenticating(false);
-      console.error("Error al desconectar la red social:", error);
-      toast.error(
-        "Error al desconectar la red social: " +
-          (error.response?.data?.message || error.message)
+      await axios.delete(
+        `/api/social-accounts/${id}${force ? "?force=true" : ""}`,
+        {
+          headers: {
+            "X-CSRF-TOKEN": document
+              .querySelector('meta[name="csrf-token"]')
+              ?.getAttribute("content"),
+            Accept: "application/json",
+          },
+          withCredentials: true,
+        }
       );
-      throw error;
+      setAccounts((prev) => prev.filter((a) => a.id !== id));
+      toast.success("Cuenta desconectada exitosamente");
+      return { success: true };
+    } catch (err: any) {
+      if (err.response && err.response.status === 400) {
+        // Return structured error for UI handling
+        const msg = err.response.data.message;
+        setError(msg);
+        return {
+          success: false,
+          error: msg,
+          posts: err.response.data.posts, // Assuming backend sends posts if blocker
+        };
+      }
+      const errorMessage =
+        err.response?.data?.message || "Failed to disconnect account";
+      setError(errorMessage);
+      toast.error(errorMessage);
+      return { success: false, error: errorMessage };
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return {
     accounts,
-    isAuthenticating,
-    loadConnectedAccounts,
-    connectSocialMedia,
-    disconnectSocialMedia,
+    isLoading,
+    error,
+    connectAccount,
+    disconnectAccount,
+    fetchAccounts,
   };
 };

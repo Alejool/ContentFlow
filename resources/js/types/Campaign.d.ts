@@ -19,8 +19,9 @@ export type Campaign = {
     id: number;
     social_account_id: number;
     scheduled_at: string;
+    status: "pending" | "posted" | "failed";
   }[];
-}
+};
 
 export type MediaFile = {
   id: number;
@@ -39,4 +40,3 @@ export type MediaFile = {
     order: number;
   };
 };
-

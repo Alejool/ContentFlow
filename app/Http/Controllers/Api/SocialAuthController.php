@@ -58,7 +58,7 @@ class SocialAuthController extends Controller
   {
     return match ($platform) {
       'facebook' => [
-        'pages_manage_posts',
+        'pages_show_list,pages_read_engagement ',
         'pages_read_engagement',
         'pages_show_list',
         'instagram_basic',

@@ -27,15 +27,26 @@ interface Account {
   logo: any;
   isConnected: boolean;
   accountId: number | null;
+  accountDetails?: any; // Add accountDetails
   color: string;
   gradient: string;
 }
 
+import DisconnectWarningModal from "./DisconnectWarningModal";
+
 export default function SocialMediaAccounts() {
   const { t } = useTranslation();
   const { theme } = useTheme();
-  const { isAuthenticating, connectSocialMedia, disconnectSocialMedia } =
-    useSocialMediaAuth();
+  const { isLoading, connectAccount, disconnectAccount } = useSocialMediaAuth();
+  // Adapter for old function name if needed or just use disconnectAccount
+  const disconnectSocialMedia = (
+    platform: string,
+    id: number | null,
+    force: boolean = false
+  ) => {
+    if (!id) return { success: false };
+    return disconnectAccount(id, force);
+  };
   const [accounts, setAccounts] = useState<Account[]>([
     {
       id: 1,
@@ -142,14 +153,14 @@ export default function SocialMediaAccounts() {
                 tiktok: "bg-neutral-900",
                 twitter: "bg-neutral-800",
                 youtube: "bg-red-700",
-              }[account.platform]
+              }[account.platform] || "bg-gray-500"
             : {
                 facebook: "bg-blue-600",
                 instagram: "bg-pink-600",
                 tiktok: "bg-black",
                 twitter: "bg-gray-900",
                 youtube: "bg-red-600",
-              }[account.platform],
+              }[account.platform] || "bg-gray-400",
       }))
     );
   }, [theme]);
@@ -212,18 +223,29 @@ export default function SocialMediaAccounts() {
     );
   };
 
+  const [blockerModalData, setBlockerModalData] = useState<{
+    account: any;
+    posts: any[];
+  } | null>(null);
+
   const handleConnectionToggle = async (accountId: number) => {
     const account = accounts.find((acc) => acc.id === accountId);
 
     if (!account) return;
 
+    // Clear any existing blocker for this account (though with modal we probably don't need this check same way)
+    if (blockerModalData?.account?.id === accountId) {
+      setBlockerModalData(null);
+    }
+
     if (account.isConnected) {
       try {
-        const success = await disconnectSocialMedia(
+        const result: any = await disconnectSocialMedia(
           account.platform,
           account.accountId
         );
-        if (success) {
+
+        if (result && result.success) {
           setAccounts((prevAccounts) =>
             prevAccounts.map((acc) =>
               acc.id === accountId
@@ -241,72 +263,75 @@ export default function SocialMediaAccounts() {
               "manageContent.socialMedia.messages.disconnectSuccess"
             )}`
           );
+        } else if (result && !result.success && result.posts) {
+          // Blocker detected - Open Modal
+          setBlockerModalData({
+            account,
+            posts: result.posts,
+          });
         }
       } catch (error: any) {
-        toast.error(
-          `${t("manageContent.socialMedia.messages.disconnectError")} ${
-            account.name
-          }: ${error.message}`
-        );
+        // Error handled in hook/result logic mostly, but catch generic
+        console.error("Disconnect error", error);
       }
     } else {
       try {
         setAuthInProgress(true);
 
-        const response = await axios.get(
-          `/social-accounts/auth-url/${account.platform}`,
-          {
-            headers: {
-              "X-CSRF-TOKEN": document
-                .querySelector('meta[name="csrf-token"]')
-                ?.getAttribute("content"),
-              Accept: "application/json",
-            },
-            withCredentials: true,
-          }
-        );
+        // using new connectAccount from hook?
+        // Hook has `connectAccount` which returns boolean directly and handles window.
+        // Let's use that instead of manual logic if possible, or keep manual logic if hook doesn't support the custom UI flow (interval etc).
+        // The manual logic here is quite complex (custom interval, timeout, etc).
+        // The hook's `connectAccount` does window open and interval too.
+        // Let's try to switch to the hook's unified `connectAccount` to simplify code,
+        // but `SocialMediaAccounts.tsx` has some specific UI state `authInProgress`.
 
-        if (response.data.success && response.data.url) {
-          if (authWindowRef.current && !authWindowRef.current.closed) {
-            authWindowRef.current.close();
-          }
+        // Actually, the hook is robust enough now. Let's try to delegate.
+        // But `connectAccount` in hook returns true/false.
+        const success = await connectAccount(account.platform);
 
-          authWindowRef.current = window.open(
-            response.data.url,
-            `${account.platform}Auth`,
-            "width=600,height=700,left=200,top=100"
-          );
-
-          if (!authWindowRef.current) {
-            setAuthInProgress(false);
-            toast.error(t("manageContent.socialMedia.messages.popupBlocked"));
-            return;
-          }
-
-          authCheckIntervalRef.current = setInterval(() => {
-            if (authWindowRef.current.closed) {
-              clearInterval(authCheckIntervalRef.current);
-              authCheckIntervalRef.current = null;
-              setAuthInProgress(false);
-
-              setTimeout(() => {
-                fetchConnectedAccounts();
-              }, 1000);
-            }
-          }, 500);
-        } else {
-          setAuthInProgress(false);
-          toast.error(t("manageContent.socialMedia.messages.urlError"));
+        if (success) {
+          toast.success(t("manageContent.socialMedia.messages.connectSuccess"));
+          fetchConnectedAccounts();
         }
-      } catch (error) {
+        setAuthInProgress(false);
+      } catch (error: any) {
         setAuthInProgress(false);
         console.error("Error connecting to social network:", error);
-        toast.error(
-          `${t("manageContent.socialMedia.messages.connectError")} ${
-            account.name
-          }: ${error.response?.data?.message || error.message}`
-        );
+        // toast already handled by hook partially, but maybe strict error msg here
       }
+    }
+  };
+
+  const handleForceDisconnect = async (accountId: number) => {
+    const account = accounts.find((acc) => acc.id === accountId);
+    if (!account) return;
+
+    const result = await disconnectSocialMedia(
+      account.platform,
+      account.accountId,
+      true
+    );
+
+    if (result && result.success) {
+      setAccounts((prevAccounts) =>
+        prevAccounts.map((acc) =>
+          acc.id === accountId
+            ? {
+                ...acc,
+                isConnected: false,
+                accountId: null,
+                accountDetails: null,
+              }
+            : acc
+        )
+      );
+      setBlockerModalData(null);
+      toast.success(
+        `${account.name} ${t(
+          "manageContent.socialMedia.messages.disconnectSuccess"
+        )}`
+      );
     }
   };
 
@@ -530,11 +555,11 @@ export default function SocialMediaAccounts() {
 
               <button
                 onClick={() => handleConnectionToggle(account.id)}
-                disabled={isAuthenticating || authInProgress}
+                disabled={isLoading || authInProgress}
                 className={`w-full py-3 px-4 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 
                   transition-all duration-200 relative overflow-hidden group/btn
                   ${
-                    isAuthenticating || authInProgress
+                    isLoading || authInProgress
                       ? theme === "dark"
                         ? "bg-neutral-700/50 text-gray-400 cursor-not-allowed"
                         : "bg-gray-100 text-gray-400 cursor-not-allowed"
@@ -546,7 +571,7 @@ export default function SocialMediaAccounts() {
                   }`}
               >
                 <span className="relative z-10 flex items-center gap-2">
-                  {isAuthenticating || authInProgress ? (
+                  {authInProgress ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
                       {t("manageContent.socialMedia.actions.processing")}
@@ -563,7 +588,6 @@ export default function SocialMediaAccounts() {
                     </>
                   )}
                 </span>
-
                 <div
                   className={`absolute inset-0 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700
                   ${
@@ -576,6 +600,18 @@ export default function SocialMediaAccounts() {
             </div>
           ))}
         </div>
+      )}
+
+      {/* Disconnect Warning Modal */}
+      {blockerModalData && (
+        <DisconnectWarningModal
+          isOpen={!!blockerModalData}
+          onClose={() => setBlockerModalData(null)}
+          onConfirm={() => handleForceDisconnect(blockerModalData.account.id)}
+          accountName={blockerModalData.account.name}
+          posts={blockerModalData.posts}
+          isLoading={isLoading}
+        />
       )}
     </div>
   );

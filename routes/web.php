@@ -70,6 +70,17 @@ Route::middleware(['auth'])->group(function () {
         // Disconnect account
         Route::delete('/{id}', [SocialAccountController::class, 'destroy'])->name('social-accounts.destroy');
     });
+
+    // Social Media Accounts API (with /api prefix for frontend axios calls)
+    Route::prefix('api/social-accounts')->group(function () {
+        Route::get('/', [SocialAccountController::class, 'index']);
+        Route::post('/', [SocialAccountController::class, 'store']);
+        Route::get('/auth-url/{platform}', [SocialAccountController::class, 'getAuthUrl']);
+        Route::delete('/{id}', [SocialAccountController::class, 'destroy']);
+    });
+
+    // Scheduled Posts API
+    Route::delete('/api/scheduled-posts/{id}', [\App\Http\Controllers\Campaigns\ScheduledPostController::class, 'destroy']);
 });
 
 // OAuth Callbacks (public - no auth required for callbacks)
