@@ -38,6 +38,7 @@ export default function PublishCampaignModal({
   const [selectedPlatforms, setSelectedPlatforms] = useState<number[]>([]);
   const [loading, setLoading] = useState(false);
   const [publishing, setPublishing] = useState(false);
+  const [miniature, setMiniature] = useState<boolean>(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -61,11 +62,18 @@ export default function PublishCampaignModal({
   };
 
   const togglePlatform = (accountId: number) => {
+    // buscar el id para saber si es youtube para gregar la miniatura de youtube
     setSelectedPlatforms((prev) =>
       prev.includes(accountId)
-        ? prev.filter((id) => id !== accountId)
-        : [...prev, accountId]
-    );
+    ? prev.filter((id) => id !== accountId)
+    : [...prev, accountId]
+  );
+
+  const account = connectedAccounts.find((acc) => acc.id === accountId);
+  const selectedAccount = selectedPlatforms.find((id) => id === accountId);
+
+  (account?.platform === "youtube" && selectedAccount) ? setMiniature(true) : setMiniature(false);
+
   };
 
   const selectAll = () => {
@@ -110,12 +118,12 @@ export default function PublishCampaignModal({
   };
 
   const getPlatformGradient = (platform: string) => {
-    const gradients: any = {
+    const gradients: any = { 
       facebook: "from-blue-500 to-blue-700",
       twitter: "from-neutral-800 to-neutral-900",
       instagram: "from-pink-500 to-purple-700",
       tiktok: "from-neutral-900 via-neutral-800 to-rose-900",
-      youtube: "from-red-600 to-red-800",
+      youtube: "from-primary-600 to-primary-800",
     };
     return gradients[platform.toLowerCase()] || "from-gray-500 to-gray-700";
   };
@@ -123,6 +131,7 @@ export default function PublishCampaignModal({
   if (!campaign) return null;
 
   return (
+    <>
     <Dialog open={isOpen} onClose={onClose} className="relative z-50">
       <div
         className="fixed inset-0 bg-black/30 backdrop-blur-sm"
@@ -146,7 +155,7 @@ export default function PublishCampaignModal({
               }`}
             >
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-gradient-to-r from-orange-500 to-pink-500 rounded-lg">
+                <div className="p-2 bg-gradient-to-r from-primary-500 to-pink-500 rounded-lg">
                   <Share2 className="w-6 h-6 text-white" />
                 </div>
                 Publish Campaign
@@ -197,7 +206,7 @@ export default function PublishCampaignModal({
               <div className="flex gap-2">
                 <button
                   onClick={selectAll}
-                  className="text-sm text-orange-500 hover:text-orange-600 font-medium"
+                  className="text-sm text-primary-500 hover:text-primary-600 font-medium"
                 >
                   Select All
                 </button>
@@ -210,7 +219,7 @@ export default function PublishCampaignModal({
                 </span>
                 <button
                   onClick={deselectAll}
-                  className="text-sm text-orange-500 hover:text-orange-600 font-medium"
+                  className="text-sm text-primary-500 hover:text-primary-600 font-medium"
                 >
                   Deselect All
                 </button>
@@ -219,7 +228,7 @@ export default function PublishCampaignModal({
 
             {loading ? (
               <div className="text-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500 mx-auto"></div>
               </div>
             ) : connectedAccounts.length === 0 ? (
               <div
@@ -250,7 +259,7 @@ export default function PublishCampaignModal({
                       onClick={() => togglePlatform(account.id)}
                       className={`flex items-center gap-3 p-4 rounded-lg border-2 transition-all ${
                         isSelected
-                          ? "border-orange-500 bg-orange-50 dark:bg-orange-900/20"
+                          ? "border-primary-500 bg-primary-50 dark:bg-primary-900/20"
                           : theme === "dark"
                           ? "border-neutral-700 hover:border-neutral-600 bg-neutral-900/30"
                           : "border-gray-200 hover:border-gray-300 bg-white"
@@ -282,7 +291,7 @@ export default function PublishCampaignModal({
                         </p>
                       </div>
                       {isSelected && (
-                        <CheckCircle className="w-5 h-5 text-orange-500" />
+                        <CheckCircle className="w-5 h-5 text-primary-500" />
                       )}
                     </button>
                   );
@@ -305,7 +314,7 @@ export default function PublishCampaignModal({
             <button
               onClick={handlePublish}
               disabled={publishing || selectedPlatforms.length === 0}
-              className="flex-1 px-4 py-3 rounded-lg font-medium bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="flex-1 px-4 py-3 rounded-lg font-medium bg-gradient-to-r from-primary-500 to-pink-500 hover:from-primary-600 hover:to-pink-600 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {publishing ? (
                 <>
@@ -324,5 +333,12 @@ export default function PublishCampaignModal({
         </DialogPanel>
       </div>
     </Dialog>
+
+    {miniature && (
+      <div className="fixed inset-0 flex items-center justify-center p-4">
+        <div>Neceista miniatura</div>
+      </div>
+    ) }
+    </>
   );
 }

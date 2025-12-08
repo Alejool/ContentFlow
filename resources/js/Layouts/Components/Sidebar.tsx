@@ -133,20 +133,20 @@ export default function Sidebar({
     theme === "dark" ? "hover:bg-neutral-800" : "hover:bg-beige-300";
 
   const hoverText =
-    theme === "dark" ? "hover:text-orange-400" : "hover:text-orange-600";
+    theme === "dark" ? "hover:text-primary-400" : "hover:text-primary-600";
 
   const activeGradient =
     theme === "dark"
-      ? "bg-gradient-to-r from-orange-600 to-orange-800"
-      : "bg-gradient-to-r from-orange-600 to-orange-700";
+      ? "bg-gradient-to-r from-primary-600 to-primary-800"
+      : "bg-gradient-to-r from-primary-600 to-primary-700";
 
   const buttonHoverBg =
     theme === "dark" ? "hover:bg-neutral-800" : "hover:bg-beige-300";
 
   const logoGradient =
     theme === "dark"
-      ? "from-orange-500 to-orange-700"
-      : "from-orange-600 to-orange-800";
+      ? "from-primary-500 to-primary-700"
+      : "from-primary-600 to-primary-800";
 
   const titleGradient =
     theme === "dark"
@@ -157,8 +157,8 @@ export default function Sidebar({
 
   const logoutHoverBg =
     theme === "dark"
-      ? "hover:bg-red-900/30 hover:text-red-300"
-      : "hover:bg-red-50 hover:text-red-600";
+      ? "hover:bg-primary-900/30 hover:text-primary-300"
+      : "hover:bg-primary-50 hover:text-primary-600";
 
   const tooltipBg =
     theme === "dark"
@@ -186,14 +186,10 @@ export default function Sidebar({
             }`}
           >
             <div
-              className={`w-12 h-12 bg-gradient-to-r ${logoGradient} 
+              className={`w-12 h-12 bg-gradient-to-r 
                 rounded-lg flex items-center justify-center flex-shrink-0`}
             >
-              <img
-                src={Logo}
-                alt="logo"
-                className="w-8 h-8 object-contain filter brightness-0 invert"
-              />
+              <img src={Logo} alt="logo" className="w-16 h-16 object-contain" />
             </div>
             {isSidebarOpen && (
               <div className="ml-4 opacity-100 transition-opacity duration-300">
@@ -218,8 +214,8 @@ export default function Sidebar({
                 <svg
                   className={`h-5 w-5 transition-colors ${
                     theme === "dark"
-                      ? "text-gray-400 hover:text-orange-400"
-                      : "text-gray-600 hover:text-orange-600"
+                      ? "text-gray-400 hover:text-primary-400"
+                      : "text-gray-600 hover:text-primary-600"
                   }`}
                   fill="none"
                   stroke="currentColor"
@@ -236,8 +232,8 @@ export default function Sidebar({
                 <svg
                   className={`h-5 w-5 transition-colors ${
                     theme === "dark"
-                      ? "text-gray-400 hover:text-orange-400"
-                      : "text-gray-600 hover:text-orange-600"
+                      ? "text-gray-400 hover:text-primary-400"
+                      : "text-gray-600 hover:text-primary-600"
                   }`}
                   fill="none"
                   stroke="currentColor"
@@ -269,7 +265,6 @@ export default function Sidebar({
                     font-medium rounded-lg transition-all duration-300 
                     ${hoverBg}
                     ${textColor}
-                    ${hoverText}
                     hover:shadow-lg 
                     ${
                       route().current(item.href)
@@ -287,7 +282,7 @@ export default function Sidebar({
                   <div
                     className={`transition-colors ${
                       route().current(item.href)
-                        ? ` `
+                        ? `${activeGradient}  text-white shadow-lg hover:text-white `
                         : `${textColor} ${hoverText}`
                     }`}
                   >

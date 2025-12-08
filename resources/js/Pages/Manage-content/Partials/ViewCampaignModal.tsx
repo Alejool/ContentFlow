@@ -123,8 +123,8 @@ export default function ViewCampaignModal({
                       <Target
                         className={`w-4 h-4 ${
                           theme === "dark"
-                            ? "text-orange-400"
-                            : "text-orange-600"
+                            ? "text-primary-400"
+                            : "text-primary-600"
                         }`}
                       />
                       <span
@@ -211,7 +211,9 @@ export default function ViewCampaignModal({
                   <div className="flex items-center gap-2 mb-2">
                     <Calendar
                       className={`w-4 h-4 ${
-                        theme === "dark" ? "text-red-400" : "text-red-600"
+                        theme === "dark"
+                          ? "text-primary-400"
+                          : "text-primary-600"
                       }`}
                     />
                     <span
@@ -253,7 +255,11 @@ export default function ViewCampaignModal({
 
                   {campaign.scheduled_posts &&
                   campaign.scheduled_posts.length > 0 ? (
-                    <div className={`space-y-2 mt-2 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                    <div
+                      className={`space-y-2 mt-2 ${
+                        theme === "dark" ? "text-white" : "text-gray-900"
+                      }`}
+                    >
                       {campaign.scheduled_posts.map(
                         (post: any, index: number) => (
                           <div
@@ -266,7 +272,8 @@ export default function ViewCampaignModal({
                           >
                             <div className="flex items-center gap-2 da">
                               <span className="capitalize font-medium text-sm">
-                                {post?.social_account?.platform || t("common.platform")}
+                                {post?.social_account?.platform ||
+                                  t("common.platform")}
                               </span>
                               {post.status && (
                                 <span
@@ -274,7 +281,7 @@ export default function ViewCampaignModal({
                                     post.status === "posted"
                                       ? "bg-green-100 text-green-700"
                                       : post.status === "failed"
-                                      ? "bg-red-100 text-red-700"
+                                      ? "bg-primary-100 text-primary-700"
                                       : "bg-yellow-100 text-yellow-700"
                                   }`}
                                 >

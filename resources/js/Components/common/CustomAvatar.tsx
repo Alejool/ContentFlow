@@ -41,17 +41,17 @@ export default function Avatar({
   const statusColors = {
     online: theme === "dark" ? "bg-green-500" : "bg-green-400",
     offline: theme === "dark" ? "bg-gray-400" : "bg-gray-300",
-    busy: theme === "dark" ? "bg-red-500" : "bg-red-400",
+    busy: theme === "dark" ? "bg-primary-500" : "bg-primary-400",
     away: theme === "dark" ? "bg-yellow-500" : "bg-yellow-400",
   };
 
   const avatarBgClass =
     theme === "dark"
-      ? "bg-gradient-to-br from-orange-900/30 to-purple-900/30"
-      : "bg-gradient-to-br from-orange-100 to-purple-100";
+      ? "bg-gradient-to-br from-primary-900/30 to-purple-900/30"
+      : "bg-gradient-to-br from-primary-100 to-purple-100";
 
   const avatarTextClass =
-    theme === "dark" ? "text-orange-200" : "text-orange-800";
+    theme === "dark" ? "text-primary-200" : "text-primary-800";
 
   const borderClass =
     theme === "dark" ? "ring-2 ring-purple-900/50" : "ring-2 ring-green-200";

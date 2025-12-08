@@ -77,13 +77,13 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-orange-500 rounded-full;
-    border: 2px solid transparent; /* Padding around thumb */
-    background-clip: content-box; /* Makes thumb smaller than track */
+    @apply bg-primary-500 rounded-full;
+    border: 2px solid transparent;
+    background-clip: content-box;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-orange-600;
+    @apply bg-primary-600;
   }
 
   /* Firefox */
@@ -92,9 +92,8 @@
     scrollbar-color: #f97316 transparent;
   }
 
-  /* Dark mode overrides for Firefox if needed, but orange on transparent is usually fine */
   .dark {
-    scrollbar-color: #f97316 #262626; /* orange-500 on neutral-800 */
+    scrollbar-color: #f97316 #262626;
   }
 }
 

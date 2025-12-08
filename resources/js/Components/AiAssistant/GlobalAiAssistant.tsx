@@ -1,21 +1,19 @@
-import { useState, useRef, useEffect, FormEvent } from "react";
+import { useTheme } from "@/Hooks/useTheme";
+import { usePage } from "@inertiajs/react";
+import axios from "axios";
 import {
-  MessageSquare,
-  X,
-  Send,
-  Loader2,
-  Sparkles,
-  Minimize2,
-  Maximize2,
-  Bot,
   Brain,
+  Loader2,
+  Maximize2,
+  Minimize2,
+  Send,
+  Sparkles,
+  X,
   Zap,
 } from "lucide-react";
-import axios from "axios";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
-import { usePage } from "@inertiajs/react";
-import { useTheme } from "@/Hooks/useTheme";
 
 interface Message {
   id: number;
@@ -107,8 +105,8 @@ export default function GlobalAiAssistant() {
   // Estilos según el tema
   const getButtonBg = () => {
     return theme === "dark"
-      ? "bg-gradient-to-r from-orange-600 to-orange-800 hover:from-orange-700 hover:to-orange-900"
-      : "bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700";
+      ? "bg-gradient-to-r from-primary-600 to-primary-800 hover:from-primary-700 hover:to-primary-900"
+      : "bg-gradient-to-r from-primary-600 to-primary-600 hover:from-primary-700 hover:to-primary-700";
   };
 
   const getCardBg = () => {
@@ -119,8 +117,8 @@ export default function GlobalAiAssistant() {
 
   const getHeaderBg = () => {
     return theme === "dark"
-      ? "bg-gradient-to-r from-orange-700 to-orange-900"
-      : "bg-gradient-to-r from-red-600 to-orange-600";
+      ? "bg-gradient-to-r from-primary-700 to-primary-900"
+      : "bg-gradient-to-r from-primary-600 to-primary-600";
   };
 
   const getTextColor = (type: "primary" | "secondary" = "primary") => {
@@ -135,7 +133,7 @@ export default function GlobalAiAssistant() {
     if (role === "user") {
       return theme === "dark"
         ? "bg-gradient-to-r from-purple-700 to-purple-800 text-white"
-        : "bg-gradient-to-r from-red-600 to-orange-600 text-white";
+        : "bg-gradient-to-r from-primary-600 to-primary-600 text-white";
     } else {
       return theme === "dark"
         ? "bg-neutral-700/70 text-gray-100 border border-neutral-600/50"
@@ -145,8 +143,8 @@ export default function GlobalAiAssistant() {
 
   const getInputBg = () => {
     return theme === "dark"
-      ? "bg-neutral-700/50 border border-neutral-600/50 text-gray-100 placeholder-gray-400 focus:border-orange-500 focus:ring-orange-500/20"
-      : "bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-500 focus:border-red-500 focus:ring-red-500/20";
+      ? "bg-neutral-700/50 border border-neutral-600/50 text-gray-100 placeholder-gray-400 focus:border-primary-500 focus:ring-primary-500/20"
+      : "bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-500 focus:border-primary-500 focus:ring-primary-500/20";
   };
 
   if (!isOpen) {
@@ -169,7 +167,7 @@ export default function GlobalAiAssistant() {
         {/* Efecto de pulso */}
         <div
           className={`absolute inset-0 rounded-full animate-ping ${
-            theme === "dark" ? "bg-orange-600/30" : "bg-red-600/30"
+            theme === "dark" ? "bg-primary-600/30" : "bg-primary-600/30"
           }`}
         ></div>
       </button>
@@ -189,7 +187,7 @@ export default function GlobalAiAssistant() {
         <div className="flex items-center gap-3">
           <div
             className={`p-2 rounded-lg ${
-              theme === "dark" ? "bg-orange-800/40" : "bg-white/20"
+              theme === "dark" ? "bg-primary-800/40" : "bg-white/20"
             }`}
           >
             <Brain className="w-5 h-5" />
@@ -200,7 +198,7 @@ export default function GlobalAiAssistant() {
             </span>
             <p
               className={`text-xs ${
-                theme === "dark" ? "text-orange-200/80" : "text-white/90"
+                theme === "dark" ? "text-primary-200/80" : "text-white/90"
               }`}
             >
               {t("aiAssistant.subtitle")}
@@ -215,9 +213,10 @@ export default function GlobalAiAssistant() {
             }}
             className={`p-2 rounded transition-colors 
               ${
-              theme === "dark" ? "hover:bg-orange-800/40" 
-              : "hover:bg-white/20"
-            }
+                theme === "dark"
+                  ? "hover:bg-primary-800/40"
+                  : "hover:bg-white/20"
+              }
               `}
           >
             {isMinimized ? (
@@ -232,7 +231,7 @@ export default function GlobalAiAssistant() {
               setIsOpen(false);
             }}
             className={`p-2 rounded transition-colors ${
-              theme === "dark" ? "hover:bg-orange-800/40" : "hover:bg-white/20"
+              theme === "dark" ? "hover:bg-primary-800/40" : "hover:bg-white/20"
             }`}
           >
             <X className="w-4 h-4" />
@@ -266,15 +265,17 @@ export default function GlobalAiAssistant() {
                     <div
                       className={`mt-3 pt-3 
                         ${
-                        theme === "dark"
-                          ? "border-t border-neutral-600/50"
-                          : "border-t border-gray-100"
-                      }
+                          theme === "dark"
+                            ? "border-t border-neutral-600/50"
+                            : "border-t border-gray-100"
+                        }
                           `}
                     >
                       <div
                         className={`text-xs font-medium mb-1 uppercase tracking-wider ${
-                          theme === "dark" ? "text-orange-400" : "text-gray-500"
+                          theme === "dark"
+                            ? "text-primary-400"
+                            : "text-gray-500"
                         }`}
                       >
                         {t("aiAssistant.suggestion")}
@@ -282,10 +283,10 @@ export default function GlobalAiAssistant() {
                       <div
                         className={`rounded p-2 text-xs font-mono 
                           ${
-                          theme === "dark"
-                            ? "bg-neutral-800/50 text-gray-300"
-                            : "bg-gray-50 text-gray-600"
-                        }
+                            theme === "dark"
+                              ? "bg-neutral-800/50 text-gray-300"
+                              : "bg-gray-50 text-gray-600"
+                          }
                             `}
                       >
                         {JSON.stringify(msg.suggestion.data, null, 2)}
@@ -307,7 +308,7 @@ export default function GlobalAiAssistant() {
                 >
                   <Loader2
                     className={`w-4 h-4 animate-spin ${
-                      theme === "dark" ? "text-orange-400" : "text-red-600"
+                      theme === "dark" ? "text-primary-400" : "text-primary-600"
                     }`}
                   />
                   <span
@@ -327,10 +328,10 @@ export default function GlobalAiAssistant() {
           <div
             className={`p-4 border-t transition-colors 
               ${
-              theme === "dark"
-                ? "bg-neutral-800/50 border-neutral-700/50"
-                : "bg-white/90 border-gray-100"
-            }
+                theme === "dark"
+                  ? "bg-neutral-800/50 border-neutral-700/50"
+                  : "bg-white/90 border-gray-100"
+              }
                 `}
           >
             <form onSubmit={handleSubmit} className="flex items-center gap-2">
@@ -346,8 +347,8 @@ export default function GlobalAiAssistant() {
                 disabled={!inputValue.trim() || isLoading}
                 className={`p-3 rounded-lg transition-all duration-300 shadow-sm ${
                   theme === "dark"
-                    ? "bg-gradient-to-r from-orange-600 to-orange-700 text-white hover:from-orange-700 hover:to-orange-800 disabled:opacity-50 disabled:cursor-not-allowed"
-                    : "bg-gradient-to-r from-red-600 to-orange-600 text-white hover:from-red-700 hover:to-orange-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    ? "bg-gradient-to-r from-primary-600 to-primary-700 text-white hover:from-primary-700 hover:to-primary-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                    : "bg-gradient-to-r from-primary-600 to-primary-600 text-white hover:from-primary-700 hover:to-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 }`}
               >
                 <Send className="w-4 h-4" />

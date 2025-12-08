@@ -149,7 +149,7 @@ export default function Welcome({ auth, canLogin, canRegister }: WelcomeProps) {
           <main className="pt-32 pb-20">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
               <div className="text-center">
-                <div className="inline-flex items-center justify-center px-4 py-2 rounded-full bg-red-50 dark:bg-red-900/20 mb-6">
+                <div className="inline-flex items-center justify-center px-4 py-2 rounded-full bg-primary-50 dark:bg-primary-900/20 mb-6">
                   <span className="text-sm font-medium text-primary-600 dark:text-primary-400 flex items-center gap-1">
                     <Sparkles className="w-4 h-4" />
                     {t("welcome.beta") || "Beta Activa"} v.1.0
@@ -181,7 +181,7 @@ export default function Welcome({ auth, canLogin, canRegister }: WelcomeProps) {
                     <>
                       <Link
                         href="/register"
-                        className="inline-flex items-center justify-center px-8 py-3 text-base font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors shadow-lg hover:shadow-xl"
+                        className="inline-flex items-center justify-center px-8 py-3 text-base font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors shadow-lg hover:shadow-xl"
                       >
                         {t("welcome.startFree") || "Comenzar Gratis"}
                         <ArrowRight className="w-5 h-5 ml-2" />
@@ -197,7 +197,7 @@ export default function Welcome({ auth, canLogin, canRegister }: WelcomeProps) {
                   ) : canLogin ? (
                     <Link
                       href="/dashboard"
-                      className="inline-flex items-center justify-center px-8 py-3 text-base font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors shadow-lg hover:shadow-xl"
+                      className="inline-flex items-center justify-center px-8 py-3 text-base font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors shadow-lg hover:shadow-xl"
                     >
                       {t("welcome.goToDashboard") || "Ir al Dashboard"}
                       <ArrowRight className="w-5 h-5 ml-2" />
@@ -231,8 +231,8 @@ export default function Welcome({ auth, canLogin, canRegister }: WelcomeProps) {
                 </div>
               </div>
 
-              <div className="mt-20 relative overflow-hidden rounded-lg bg-gradient-to-r from-red-50 to-pink-50 dark:from-red-900/20 dark:to-pink-900/20 backdrop-blur-sm p-8">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-red-200/20 dark:bg-red-500/10 rounded-full -translate-y-32 translate-x-32"></div>
+              <div className="mt-20 relative overflow-hidden rounded-lg bg-gradient-to-r from-primary-50 to-pink-50 dark:from-primary-900/20 dark:to-pink-900/20 backdrop-blur-sm p-8">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-primary-200/20 dark:bg-primary-500/10 rounded-full -translate-y-32 translate-x-32"></div>
                 <div className="relative text-center">
                   <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
                     {t("welcome.readyToStart") ||
@@ -247,7 +247,7 @@ export default function Welcome({ auth, canLogin, canRegister }: WelcomeProps) {
                     {canRegister ? (
                       <Link
                         href="/register"
-                        className="inline-flex items-center justify-center px-8 py-3 text-lg font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors shadow-lg hover:shadow-xl"
+                        className="inline-flex items-center justify-center px-8 py-3 text-lg font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors shadow-lg hover:shadow-xl"
                       >
                         {t("welcome.createAccount") || "Crear Cuenta Gratis"}
                         <Rocket className="w-6 h-6 ml-2" />
@@ -255,7 +255,7 @@ export default function Welcome({ auth, canLogin, canRegister }: WelcomeProps) {
                     ) : canLogin ? (
                       <Link
                         href="/dashboard"
-                        className="inline-flex items-center justify-center px-8 py-3 text-lg font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors shadow-lg hover:shadow-xl"
+                        className="inline-flex items-center justify-center px-8 py-3 text-lg font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors shadow-lg hover:shadow-xl"
                       >
                         {t("welcome.continue") || "Continuar al Dashboard"}
                         <ArrowRight className="w-6 h-6 ml-2" />

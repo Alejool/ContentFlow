@@ -35,7 +35,7 @@ export default function ThemeLanguageContainer({
           {canLogin && (
             <Link
               href="/login"
-              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
             >
               {t("welcome.login")}
             </Link>
@@ -44,7 +44,7 @@ export default function ThemeLanguageContainer({
           {canRegister && (
             <Link
               href="/register"
-              className="px-4 py-2 text-sm font-medium bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              className="px-4 py-2 text-sm font-medium bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
             >
               {t("welcome.getStarted")}
             </Link>
@@ -97,7 +97,7 @@ export default function ThemeLanguageContainer({
                 {canLogin && (
                   <Link
                     href="/login"
-                    className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 transition-colors text-center"
+                    className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors text-center"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {t("welcome.login")}
@@ -107,7 +107,7 @@ export default function ThemeLanguageContainer({
                 {canRegister && (
                   <Link
                     href="/register"
-                    className="px-4 py-2 text-sm font-medium bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-center"
+                    className="px-4 py-2 text-sm font-medium bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-center"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {t("welcome.getStarted")}

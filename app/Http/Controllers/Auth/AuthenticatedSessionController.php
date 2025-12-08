@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Inertia\Response;
-use Illuminate\Http\RedirectResponse;
+use App\Models\User;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,6 +21,7 @@ use Illuminate\Http\RedirectResponse;
 | to conveniently provide its functionality to your applications.
 |
 */
+
 class AuthenticatedSessionController extends Controller
 {
     public function create(): Response
@@ -38,7 +39,7 @@ class AuthenticatedSessionController extends Controller
             $request->session()->regenerate();
             return response()->json($return);
             // return redirect(route('/dashboard', absolute: true));
-            
+
 
         } catch (\Exception $e) {
             return response()->json([
@@ -63,7 +64,7 @@ class AuthenticatedSessionController extends Controller
             'email' => 'required|email',
         ]);
 
-        $user = \App\Models\User::where('email', $request->email)->first();
+        $user = User::where('email', $request->email)->first();
 
         if ($user && $user->provider) {
             return response()->json([

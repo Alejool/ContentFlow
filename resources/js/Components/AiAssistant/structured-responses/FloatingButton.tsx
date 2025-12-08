@@ -14,8 +14,8 @@ export default function FloatingButton({
 
   const getButtonBg = () => {
     return theme === "dark"
-      ? "bg-gradient-to-r from-orange-600 to-orange-800 hover:from-orange-700 hover:to-orange-900"
-      : "bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700";
+      ? "bg-gradient-to-r from-primary-600 to-primary-800 hover:from-primary-700 hover:to-primary-900"
+      : "bg-gradient-to-r from-primary-600 to-primary-600 hover:from-primary-700 hover:to-primary-700";
   };
 
   return (
@@ -37,7 +37,7 @@ export default function FloatingButton({
       {/* Efecto de pulso */}
       <div
         className={`absolute inset-0 rounded-full animate-ping ${
-          theme === "dark" ? "bg-orange-600/30" : "bg-red-600/30"
+          theme === "dark" ? "bg-primary-600/30" : "bg-primary-600/30"
         }`}
       ></div>
     </button>

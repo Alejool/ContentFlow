@@ -1,6 +1,6 @@
-import React from "react";
-import { TrendingUp, TrendingDown, Minus, LucideIcon } from "lucide-react";
 import { useTheme } from "@/Hooks/useTheme";
+import { LucideIcon, Minus, TrendingDown, TrendingUp } from "lucide-react";
+import React from "react";
 
 interface StatCardProps {
   title: string;
@@ -72,30 +72,30 @@ const StatCard: React.FC<StatCardProps> = ({
       },
       orange: {
         dark: {
-          gradient: "from-orange-600 to-orange-700",
-          bg: "bg-orange-900/20",
-          text: "text-orange-400",
-          border: "border-orange-800/30",
+          gradient: "from-primary-600 to-primary-700",
+          bg: "bg-primary-900/20",
+          text: "text-primary-400",
+          border: "border-primary-800/30",
         },
         light: {
-          gradient: "from-orange-500 to-orange-600",
-          bg: "bg-orange-100",
-          text: "text-orange-600",
-          border: "border-orange-200",
+          gradient: "from-primary-500 to-primary-600",
+          bg: "bg-primary-100",
+          text: "text-primary-600",
+          border: "border-primary-200",
         },
       },
       red: {
         dark: {
-          gradient: "from-red-700 to-red-800",
-          bg: "bg-red-900/20",
-          text: "text-red-400",
-          border: "border-red-800/30",
+          gradient: "from-primary-700 to-primary-800",
+          bg: "bg-primary-900/20",
+          text: "text-primary-400",
+          border: "border-primary-800/30",
         },
         light: {
-          gradient: "from-red-500 to-red-600",
-          bg: "bg-red-100",
-          text: "text-red-600",
-          border: "border-red-200",
+          gradient: "from-primary-500 to-primary-600",
+          bg: "bg-primary-100",
+          text: "text-primary-600",
+          border: "border-primary-200",
         },
       },
       indigo: {
@@ -149,7 +149,8 @@ const StatCard: React.FC<StatCardProps> = ({
   const getTrendIcon = () => {
     if (change === undefined || change === null) return null;
     if (change > 0) return <TrendingUp className="w-4 h-4 text-green-500" />;
-    if (change < 0) return <TrendingDown className="w-4 h-4 text-red-500" />;
+    if (change < 0)
+      return <TrendingDown className="w-4 h-4 text-primary-500" />;
     return <Minus className="w-4 h-4 text-gray-400" />;
   };
 
@@ -157,7 +158,7 @@ const StatCard: React.FC<StatCardProps> = ({
     if (change === undefined || change === null)
       return theme === "dark" ? "text-gray-400" : "text-gray-600";
     if (change > 0) return "text-green-500";
-    if (change < 0) return "text-red-500";
+    if (change < 0) return "text-primary-500";
     return theme === "dark" ? "text-gray-400" : "text-gray-600";
   };
 
@@ -165,7 +166,8 @@ const StatCard: React.FC<StatCardProps> = ({
     if (change === undefined || change === null)
       return theme === "dark" ? "bg-neutral-800/50" : "bg-gray-100";
     if (change > 0) return theme === "dark" ? "bg-green-900/20" : "bg-green-50";
-    if (change < 0) return theme === "dark" ? "bg-red-900/20" : "bg-red-50";
+    if (change < 0)
+      return theme === "dark" ? "bg-primary-900/20" : "bg-primary-50";
     return theme === "dark" ? "bg-neutral-800/50" : "bg-gray-100";
   };
 

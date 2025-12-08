@@ -18,8 +18,8 @@ export default function ChatHeader({
 
   const getHeaderBg = () => {
     return theme === "dark"
-      ? "bg-gradient-to-r from-orange-700 to-orange-900"
-      : "bg-gradient-to-r from-red-600 to-orange-600";
+      ? "bg-gradient-to-r from-primary-700 to-primary-900"
+      : "bg-gradient-to-r from-primary-600 to-primary-600";
   };
 
   return (
@@ -30,7 +30,7 @@ export default function ChatHeader({
       <div className="flex items-center gap-3">
         <div
           className={`p-2 rounded-lg ${
-            theme === "dark" ? "bg-orange-800/40" : "bg-white/20"
+            theme === "dark" ? "bg-primary-800/40" : "bg-white/20"
           }`}
         >
           <Brain className="w-5 h-5" />
@@ -39,7 +39,7 @@ export default function ChatHeader({
           <span className="font-semibold">{t("aiAssistant.headerTitle")}</span>
           <p
             className={`text-xs ${
-              theme === "dark" ? "text-orange-200/80" : "text-white/90"
+              theme === "dark" ? "text-primary-200/80" : "text-white/90"
             }`}
           >
             {t("aiAssistant.subtitle")}
@@ -53,7 +53,9 @@ export default function ChatHeader({
             onMinimize();
           }}
           className={`p-2 rounded transition-colors 
-            ${theme === "dark" ? "hover:bg-orange-800/40" : "hover:bg-white/20"}
+            ${
+              theme === "dark" ? "hover:bg-primary-800/40" : "hover:bg-white/20"
+            }
           `}
         >
           {isMinimized ? (
@@ -68,7 +70,7 @@ export default function ChatHeader({
             onClose();
           }}
           className={`p-2 rounded transition-colors ${
-            theme === "dark" ? "hover:bg-orange-800/40" : "hover:bg-white/20"
+            theme === "dark" ? "hover:bg-primary-800/40" : "hover:bg-white/20"
           }`}
         >
           <X className="w-4 h-4" />

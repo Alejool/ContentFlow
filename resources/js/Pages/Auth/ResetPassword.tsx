@@ -156,7 +156,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                   />
                 </div>
                 {errors.email && (
-                  <div className="mt-2 flex items-center gap-2 text-red-600 dark:text-red-400 text-sm">
+                  <div className="mt-2 flex items-center gap-2 text-primary-600 dark:text-primary-400 text-sm">
                     <AlertCircle className="w-4 h-4" />
                     {errors.email}
                   </div>
@@ -200,7 +200,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                   </button>
                 </div>
                 {errors.password && (
-                  <div className="mt-2 flex items-center gap-2 text-red-600 dark:text-red-400 text-sm">
+                  <div className="mt-2 flex items-center gap-2 text-primary-600 dark:text-primary-400 text-sm">
                     <AlertCircle className="w-4 h-4" />
                     {errors.password}
                   </div>
@@ -245,7 +245,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                   </button>
                 </div>
                 {errors.password_confirmation && (
-                  <div className="mt-2 flex items-center gap-2 text-red-600 dark:text-red-400 text-sm">
+                  <div className="mt-2 flex items-center gap-2 text-primary-600 dark:text-primary-400 text-sm">
                     <AlertCircle className="w-4 h-4" />
                     {errors.password_confirmation}
                   </div>
@@ -264,7 +264,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                           ? "bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400"
                           : data.password.length >= 4
                           ? "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400"
-                          : "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400"
+                          : "bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400"
                       }`}
                     >
                       {data.password.length >= 8
@@ -281,7 +281,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                           ? "bg-green-500 w-full"
                           : data.password.length >= 4
                           ? "bg-yellow-500 w-1/2"
-                          : "bg-red-500 w-1/4"
+                          : "bg-primary-500 w-1/4"
                       }`}
                     />
                   </div>
@@ -365,7 +365,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                   className={`p-3 rounded-lg ${
                     data.password === data.password_confirmation
                       ? "bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800"
-                      : "bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800"
+                      : "bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800"
                   }`}
                 >
                   <div className="flex items-center gap-2">
@@ -378,8 +378,8 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                       </>
                     ) : (
                       <>
-                        <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400" />
-                        <span className="text-sm text-red-600 dark:text-red-400">
+                        <AlertCircle className="w-4 h-4 text-primary-600 dark:text-primary-400" />
+                        <span className="text-sm text-primary-600 dark:text-primary-400">
                           Passwords don't match
                         </span>
                       </>

@@ -150,7 +150,7 @@ export default function Dashboard({ auth, stats, status }: DashboardProps) {
           className={`rounded-lg p-8 mb-8 shadow-sm transition-colors duration-300 ${
             theme === "dark"
               ? "bg-gradient-to-r from-neutral-800/50 to-purple-900/90 border border-neutral-700/50"
-              : "bg-gradient-to-r from-orange-50/50 to-purple-50/50 border border-orange-100"
+              : "bg-gradient-to-r from-primary-50/50 to-purple-50/50 border border-primary-100"
           }`}
         >
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -371,12 +371,12 @@ export default function Dashboard({ auth, stats, status }: DashboardProps) {
               >
                 <div
                   className={`p-2 rounded-lg ${
-                    theme === "dark" ? "bg-orange-900/20" : "bg-orange-100"
+                    theme === "dark" ? "bg-primary-900/20" : "bg-primary-100"
                   }`}
                 >
                   <Target
                     className={`w-5 h-5 ${
-                      theme === "dark" ? "text-orange-400" : "text-orange-600"
+                      theme === "dark" ? "text-primary-400" : "text-primary-600"
                     }`}
                   />
                 </div>

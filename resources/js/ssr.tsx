@@ -13,8 +13,8 @@ createServer((page) =>
         title: (title) => `${title} - ${appName}`,
         resolve: (name) =>
             resolvePageComponent(
-                `./Pages/${name}.jsx`,
-                import.meta.glob('./Pages/**/*.jsx'),
+                `./Pages/${name}.tsx`,
+                import.meta.glob('./Pages/**/*.tsx'),
             ),
         setup: ({ App, props }) => {
             global.route = (name, params, absolute) =>

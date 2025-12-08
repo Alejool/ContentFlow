@@ -1,5 +1,6 @@
 import { useTheme } from "@/Hooks/useTheme";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
+import { Dialog } from "@headlessui/react";
 import { Head, usePage } from "@inertiajs/react";
 import {
   Brain,
@@ -12,13 +13,11 @@ import {
   Sparkles,
   User as UserIcon,
   Users,
-  Zap,
-  ChevronDown,
   X,
+  Zap,
 } from "lucide-react";
-import React, { useState, useRef, useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Dialog } from "@headlessui/react";
 
 // Componente Avatar personalizado
 interface AvatarProps {
@@ -55,11 +54,11 @@ function Avatar({
 
   const avatarBgClass =
     theme === "dark"
-      ? "bg-gradient-to-br from-orange-900/30 to-purple-900/30"
-      : "bg-gradient-to-br from-orange-100 to-purple-100";
+      ? "bg-gradient-to-br from-primary-900/30 to-purple-900/30"
+      : "bg-gradient-to-br from-primary-100 to-purple-100";
 
   const avatarTextClass =
-    theme === "dark" ? "text-orange-200" : "text-orange-800";
+    theme === "dark" ? "text-primary-200" : "text-primary-800";
 
   return (
     <div
@@ -124,8 +123,8 @@ const ChatMessage = ({
           className={
             isAI
               ? theme === "dark"
-                ? "bg-gradient-to-br from-orange-600 to-orange-800"
-                : "bg-gradient-to-br from-orange-500 to-orange-700"
+                ? "bg-gradient-to-br from-primary-600 to-primary-800"
+                : "bg-gradient-to-br from-primary-500 to-primary-700"
               : theme === "dark"
               ? "bg-gradient-to-br from-purple-600 to-purple-800"
               : "bg-gradient-to-br from-purple-500 to-purple-700"
@@ -142,7 +141,7 @@ const ChatMessage = ({
               : "bg-white border-gray-100"
             : theme === "dark"
             ? "bg-purple-900/30 border-purple-800/30"
-            : "bg-red-50 border-red-100"
+            : "bg-primary-50 border-primary-100"
         }`}
       >
         <p
@@ -186,7 +185,7 @@ const CompactStats = ({
       <div className="text-center">
         <p
           className={`text-lg font-bold ${
-            theme === "dark" ? "text-orange-400" : "text-red-600"
+            theme === "dark" ? "text-primary-400" : "text-primary-600"
           }`}
         >
           {active}
@@ -242,12 +241,12 @@ const IdeaCard = ({
     <button
       onClick={() => onUse(idea)}
       className={`w-full text-left p-4 rounded-lg transition-all duration-200 hover:transform hover:-translate-y-0.5
-        ${theme === "dark" ? "hover:bg-neutral-800" : "hover:bg-red-50"}`}
+        ${theme === "dark" ? "hover:bg-neutral-800" : "hover:bg-primary-50"}`}
     >
       <div className="flex items-start gap-3">
         <idea.icon
           className={`h-5 w-5 flex-shrink-0 ${
-            theme === "dark" ? "text-orange-400" : "text-red-600"
+            theme === "dark" ? "text-primary-400" : "text-primary-600"
           }`}
         />
         <div className="flex-1">
@@ -296,8 +295,8 @@ const IdeasPanel = ({
           <div
             className={`p-2 rounded-lg ${
               theme === "dark"
-                ? "bg-orange-900/20 text-orange-400"
-                : "bg-red-100 text-red-600"
+                ? "bg-primary-900/20 text-primary-400"
+                : "bg-primary-100 text-primary-600"
             }`}
           >
             <Lightbulb className="w-5 h-5" />
@@ -359,7 +358,7 @@ const MobileIdeasDrawer = ({
               <div className="flex items-center gap-2">
                 <Lightbulb
                   className={`h-4 w-4 ${
-                    theme === "dark" ? "text-orange-400" : "text-red-600"
+                    theme === "dark" ? "text-primary-400" : "text-primary-600"
                   }`}
                 />
                 <Dialog.Title
@@ -423,12 +422,12 @@ function Badge({
   const colorClasses = {
     orange:
       theme === "dark"
-        ? "bg-orange-900/30 text-orange-300 border-orange-800/50"
-        : "bg-orange-100 text-orange-800 border-orange-200",
+        ? "bg-primary-900/30 text-primary-300 border-primary-800/50"
+        : "bg-primary-100 text-primary-800 border-primary-200",
     red:
       theme === "dark"
-        ? "bg-red-900/30 text-red-300 border-red-800/50"
-        : "bg-red-100 text-red-800 border-red-200",
+        ? "bg-primary-900/30 text-primary-300 border-primary-800/50"
+        : "bg-primary-100 text-primary-800 border-primary-200",
     green:
       theme === "dark"
         ? "bg-green-900/30 text-green-300 border-green-800/50"
@@ -588,8 +587,8 @@ export default function Index() {
                 <h1
                   className={`text-3xl md:text-5xl font-bold my-6 text-center bg-gradient-to-r ${
                     theme === "dark"
-                      ? "from-orange-500 to-orange-700"
-                      : "from-red-500 to-orange-700"
+                      ? "from-primary-500 to-primary-700"
+                      : "from-primary-500 to-primary-700"
                   } bg-clip-text text-transparent`}
                 >
                   {t("aiChat.title")}
@@ -612,8 +611,8 @@ export default function Index() {
                   onClick={() => setIsIdeasDrawerOpen(true)}
                   className={`p-2 rounded-xl border lg:hidden ${
                     theme === "dark"
-                      ? "border-orange-800 text-orange-400 hover:bg-orange-900/20"
-                      : "border-red-200 text-red-600 hover:bg-red-50"
+                      ? "border-primary-800 text-primary-400 hover:bg-primary-900/20"
+                      : "border-primary-200 text-primary-600 hover:bg-primary-50"
                   }`}
                 >
                   <Lightbulb className="w-5 h-5" />
@@ -642,8 +641,8 @@ export default function Index() {
                     <div
                       className={`p-2 rounded-lg ${
                         theme === "dark"
-                          ? "bg-orange-900/20 text-orange-400"
-                          : "bg-red-100 text-red-600"
+                          ? "bg-primary-900/20 text-primary-400"
+                          : "bg-primary-100 text-primary-600"
                       }`}
                     >
                       <Brain className="w-5 h-5" />
@@ -663,7 +662,7 @@ export default function Index() {
                 </div>
 
                 {/* Mensajes del chat */}
-                <div className="h-[400px] px-2 overflow-y-auto mb-6 scrollbar-thin scrollbar-thumb-orange-500 scrollbar-track-gray-100 dark:scrollbar-track-neutral-700">
+                <div className="h-[400px] px-2 overflow-y-auto mb-6 scrollbar-thin scrollbar-thumb-primary-500 scrollbar-track-gray-100 dark:scrollbar-track-neutral-700">
                   <div className="space-y-4 py-1">
                     {messages.length === 0 && (
                       <div className="text-center py-8">
@@ -690,8 +689,8 @@ export default function Index() {
                           size="md"
                           className={
                             theme === "dark"
-                              ? "bg-gradient-to-br from-orange-600 to-orange-800"
-                              : "bg-gradient-to-br from-orange-500 to-orange-700"
+                              ? "bg-gradient-to-br from-primary-600 to-primary-800"
+                              : "bg-gradient-to-br from-primary-500 to-primary-700"
                           }
                         />
                         <div
@@ -701,8 +700,8 @@ export default function Index() {
                             <div
                               className={`w-4 h-4 rounded-full border-2 ${
                                 theme === "dark"
-                                  ? "border-orange-400 border-t-transparent"
-                                  : "border-red-500 border-t-transparent"
+                                  ? "border-primary-400 border-t-transparent"
+                                  : "border-primary-500 border-t-transparent"
                               } animate-spin`}
                             ></div>
                             <p
@@ -735,8 +734,8 @@ export default function Index() {
                     className={`w-full border rounded-xl p-4 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-1 resize-none
                       ${
                         theme === "dark"
-                          ? "bg-neutral-800 border-neutral-700 text-gray-100 placeholder-gray-400 focus:ring-orange-500 focus:border-orange-500"
-                          : "bg-white border-gray-200 text-gray-900 placeholder-gray-500 focus:ring-red-500 focus:border-red-500"
+                          ? "bg-neutral-800 border-neutral-700 text-gray-100 placeholder-gray-400 focus:ring-primary-500 focus:border-primary-500"
+                          : "bg-white border-gray-200 text-gray-900 placeholder-gray-500 focus:ring-primary-500 focus:border-primary-500"
                       }`}
                     rows={3}
                   />
@@ -754,8 +753,8 @@ export default function Index() {
                               ? "bg-neutral-700 text-gray-400 cursor-not-allowed"
                               : "bg-gray-200 text-gray-400 cursor-not-allowed"
                             : theme === "dark"
-                            ? "bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-white"
-                            : "bg-gradient-to-r from-red-600 to-orange-700 hover:from-red-700 hover:to-orange-800 text-white"
+                            ? "bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white"
+                            : "bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white"
                         }`}
                     >
                       <Send className="w-4 h-4" />

@@ -1,5 +1,5 @@
-import { Sparkles } from "lucide-react";
 import { AIResponse } from "@/Hooks/useAIChat";
+import { Sparkles } from "lucide-react";
 
 interface RecommendationResponseProps {
   data: AIResponse;
@@ -24,8 +24,8 @@ export default function RecommendationResponse({
               key={index}
               className={`p-3 rounded-lg ${
                 theme === "dark"
-                  ? "bg-gradient-to-r from-yellow-900/10 to-orange-900/10"
-                  : "bg-gradient-to-r from-yellow-50 to-orange-50"
+                  ? "bg-gradient-to-r from-yellow-900/10 to-primary-900/10"
+                  : "bg-gradient-to-r from-yellow-50 to-primary-50"
               }`}
             >
               <div className="flex items-start gap-3">

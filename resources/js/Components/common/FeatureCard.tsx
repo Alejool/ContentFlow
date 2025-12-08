@@ -10,7 +10,7 @@ const CustomIcon = ({
   className?: string;
 }) => (
   <div
-    className={`flex items-center justify-center rounded-full bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 p-3 ${className}`}
+    className={`flex items-center justify-center rounded-full bg-gradient-to-br from-primary-50 to-primary-50 dark:from-primary-900/20 dark:to-primary-900/20 p-3 ${className}`}
   >
     {children}
   </div>
@@ -36,7 +36,7 @@ export default function FeatureCard({
   return (
     <Link
       href={href}
-      className={`group relative overflow-hidden rounded-lg backdrop-blur-sm p-5 shadow-lg ring-1 ring-gray-200/50 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] hover:ring-red-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 dark:bg-gray-900/80 dark:ring-gray-700/50 dark:hover:ring-red-700 ${className}`}
+      className={`group relative overflow-hidden rounded-lg backdrop-blur-sm p-5 shadow-lg ring-1 ring-gray-200/50 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] hover:ring-primary-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 dark:bg-gray-900/80 dark:ring-gray-700/50 dark:hover:ring-primary-700 ${className}`}
     >
       <div className="flex items-start gap-3">
         <CustomIcon className="w-11 h-11 shrink-0 group-hover:scale-110 transition-transform duration-300">
@@ -44,7 +44,7 @@ export default function FeatureCard({
         </CustomIcon>
 
         <div className="flex-1 min-w-0">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
             {title}
           </h3>
           <p className="mt-2 text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
@@ -56,7 +56,7 @@ export default function FeatureCard({
               {tags.map((tag, index) => (
                 <span
                   key={index}
-                  className="inline-flex items-center rounded-full bg-red-50 px-2.5 py-1 text-xs font-medium text-red-700 dark:bg-red-900/30 dark:text-red-300 border border-red-100 dark:border-red-800/30"
+                  className="inline-flex items-center rounded-full bg-primary-50 px-2.5 py-1 text-xs font-medium text-primary-700 dark:bg-primary-900/30 dark:text-primary-300 border border-primary-100 dark:border-primary-800/30"
                 >
                   {tag}
                 </span>
@@ -65,7 +65,7 @@ export default function FeatureCard({
           )}
         </div>
 
-        <ChevronRight className="w-5 h-5 text-red-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 shrink-0 mt-1" />
+        <ChevronRight className="w-5 h-5 text-primary-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 shrink-0 mt-1" />
       </div>
     </Link>
   );

@@ -27,6 +27,7 @@ export default defineConfig({
     optimizeDeps: {
         include: ['@ffmpeg/ffmpeg'],
     },
+    
     server: {
         host: 'localhost',
         port: 5173,
@@ -40,7 +41,7 @@ export default defineConfig({
         //     protocol: 'ws', 
         //     port: 5173,
         // },
-        hmr: false,
+        hmr: true,
         allowedHosts: [
             '.ngrok-free.app',
             '.trycloudflare.com',

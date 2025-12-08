@@ -92,7 +92,7 @@ export default function ModernInput<T extends FieldValues>({
             border border-neutral-700/50
             ${
               error
-                ? "border-red-500/50 bg-red-900/10 focus:border-red-500"
+                ? "border-primary-500/50 bg-primary-900/10 focus:border-primary-500"
                 : success
                 ? "border-green-500/50 bg-green-900/10 focus:border-green-500"
                 : isFocused
@@ -109,7 +109,7 @@ export default function ModernInput<T extends FieldValues>({
             border-2
             ${
               error
-                ? "border-red-500/50 focus:border-red-500"
+                ? "border-primary-500/50 focus:border-primary-500"
                 : success
                 ? "border-green-500/50 focus:border-green-500"
                 : isFocused
@@ -127,7 +127,7 @@ export default function ModernInput<T extends FieldValues>({
             shadow-sm
             ${
               error
-                ? "border-red-500/50 bg-red-900/10 focus:border-red-500"
+                ? "border-primary-500/50 bg-primary-900/10 focus:border-primary-500"
                 : success
                 ? "border-green-500/50 bg-green-900/10 focus:border-green-500"
                 : isFocused
@@ -146,7 +146,7 @@ export default function ModernInput<T extends FieldValues>({
             border border-gray-200
             ${
               error
-                ? "border-red-300 bg-red-50 focus:border-red-500"
+                ? "border-primary-300 bg-primary-50 focus:border-primary-500"
                 : success
                 ? "border-green-300 bg-green-50 focus:border-green-500"
                 : isFocused
@@ -163,7 +163,7 @@ export default function ModernInput<T extends FieldValues>({
             border-2
             ${
               error
-                ? "border-red-300 focus:border-red-500"
+                ? "border-primary-300 focus:border-primary-500"
                 : success
                 ? "border-green-300 focus:border-green-500"
                 : isFocused
@@ -181,7 +181,7 @@ export default function ModernInput<T extends FieldValues>({
             shadow-sm
             ${
               error
-                ? "border-red-300 bg-red-50 focus:border-red-500"
+                ? "border-primary-300 bg-primary-50 focus:border-primary-500"
                 : success
                 ? "border-green-300 bg-green-50 focus:border-green-500"
                 : isFocused
@@ -196,19 +196,23 @@ export default function ModernInput<T extends FieldValues>({
   const getLabelStyles = () => {
     if (theme === "dark") {
       return `block text-sm font-medium mb-2 ${
-        error ? "text-red-400" : success ? "text-green-400" : "text-gray-300"
+        error
+          ? "text-primary-400"
+          : success
+          ? "text-green-400"
+          : "text-gray-300"
       }`;
     }
     return `block text-sm font-medium mb-2 ${
-      error ? "text-red-600" : success ? "text-green-600" : "text-gray-700"
+      error ? "text-primary-600" : success ? "text-green-600" : "text-gray-700"
     }`;
   };
 
   const getErrorStyles = () => {
     if (theme === "dark") {
-      return "text-red-400 bg-red-900/20 border border-red-800/30";
+      return "text-primary-400 bg-primary-900/20 border border-primary-800/30";
     }
-    return "text-red-600 bg-red-50 border border-red-100";
+    return "text-primary-600 bg-primary-50 border border-primary-100";
   };
 
   const getSuccessStyles = () => {
@@ -244,12 +248,12 @@ export default function ModernInput<T extends FieldValues>({
             ${
               theme === "dark"
                 ? error
-                  ? "text-red-400"
+                  ? "text-primary-400"
                   : success
                   ? "text-green-400"
                   : "text-gray-400"
                 : error
-                ? "text-red-500"
+                ? "text-primary-500"
                 : success
                 ? "text-green-500"
                 : "text-gray-400"
@@ -281,7 +285,7 @@ export default function ModernInput<T extends FieldValues>({
         {(error || success) && !suffix && !showPasswordToggle && (
           <div className="absolute right-4 top-1/2 -translate-y-1/2">
             {error ? (
-              <AlertCircle className="w-5 h-5 text-red-500" />
+              <AlertCircle className="w-5 h-5 text-primary-500" />
             ) : success ? (
               <CheckCircle className="w-5 h-5 text-green-500" />
             ) : null}

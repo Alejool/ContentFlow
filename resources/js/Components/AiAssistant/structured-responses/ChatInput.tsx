@@ -21,8 +21,8 @@ export default function ChatInput({
 
   const getInputBg = () => {
     return theme === "dark"
-      ? "bg-neutral-700/50 border border-neutral-600/50 text-gray-100 placeholder-gray-400 focus:border-orange-500 focus:ring-orange-500/20"
-      : "bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-500 focus:border-red-500 focus:ring-red-500/20";
+      ? "bg-neutral-700/50 border border-neutral-600/50 text-gray-100 placeholder-gray-400 focus:border-primary-500 focus:ring-primary-500/20"
+      : "bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-500 focus:border-primary-500 focus:ring-primary-500/20";
   };
 
   return (
@@ -46,8 +46,8 @@ export default function ChatInput({
           disabled={!inputValue.trim() || isLoading}
           className={`p-3 rounded-lg transition-all duration-300 shadow-sm ${
             theme === "dark"
-              ? "bg-gradient-to-r from-orange-600 to-orange-700 text-white hover:from-orange-700 hover:to-orange-800 disabled:opacity-50 disabled:cursor-not-allowed"
-              : "bg-gradient-to-r from-red-600 to-orange-600 text-white hover:from-red-700 hover:to-orange-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              ? "bg-gradient-to-r from-primary-600 to-primary-700 text-white hover:from-primary-700 hover:to-primary-800 disabled:opacity-50 disabled:cursor-not-allowed"
+              : "bg-gradient-to-r from-primary-600 to-primary-600 text-white hover:from-primary-700 hover:to-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
           }`}
         >
           <Send className="w-4 h-4" />

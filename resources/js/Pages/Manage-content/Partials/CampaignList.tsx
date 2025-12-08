@@ -222,7 +222,7 @@ export default function CampaignList({
           </div>
           <button
             onClick={onAdd}
-            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white rounded-lg font-medium transition-all shadow-md hover:shadow-lg active:scale-95"
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-700 hover:to-primary-600 text-white rounded-lg font-medium transition-all shadow-md hover:shadow-lg active:scale-95"
           >
             <Plus className="w-4 h-4" />
             {t("campaigns.addNew")}
@@ -241,7 +241,7 @@ export default function CampaignList({
               placeholder={t("common.search")}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className={`pl-9 pr-4 py-2 rounded-lg w-full md:w-64 text-sm border focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all
+              className={`pl-9 pr-4 py-2 rounded-lg w-full md:w-64 text-sm border focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all
                 ${
                   theme === "dark"
                     ? "bg-neutral-800 border-neutral-700 text-white placeholder-gray-500"
@@ -261,7 +261,7 @@ export default function CampaignList({
               <select
                 value={statusFilter}
                 onChange={(e) => handleFilterChange("status", e.target.value)}
-                className={`py-2 pl-3 pr-8 rounded-lg text-sm border focus:ring-2 focus:ring-orange-500 focus:border-transparent cursor-pointer
+                className={`py-2 pl-3 pr-8 rounded-lg text-sm border focus:ring-2 focus:ring-primary-500 focus:border-transparent cursor-pointer
                   ${
                     theme === "dark"
                       ? "bg-neutral-800/70 border-neutral-700/70 text-white"
@@ -409,7 +409,7 @@ export default function CampaignList({
                                 }}
                               />
                               {mediaCount.total > 1 && (
-                                <div className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center shadow-sm">
+                                <div className="absolute -top-1 -right-1 bg-primary-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center shadow-sm">
                                   +{mediaCount.total - 1}
                                 </div>
                               )}
@@ -633,12 +633,12 @@ export default function CampaignList({
                               {({ active }) => (
                                 <button
                                   onClick={() => onDelete(campaign.id)}
-                                  className={`flex w-full items-center gap-2 px-3 py-2 rounded-lg text-sm text-red-600
+                                  className={`flex w-full items-center gap-2 px-3 py-2 rounded-lg text-sm text-primary-600
                                     ${
                                       active
                                         ? theme === "dark"
-                                          ? "bg-red-900/20"
-                                          : "bg-red-50"
+                                          ? "bg-primary-900/20"
+                                          : "bg-primary-50"
                                         : ""
                                     }
                                   `}
@@ -754,7 +754,7 @@ export default function CampaignList({
                       className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors
                       ${
                         currentPage === page
-                          ? "bg-orange-500 text-white"
+                          ? "bg-primary-500 text-white"
                           : theme === "dark"
                           ? "bg-neutral-700 hover:bg-neutral-600 text-white"
                           : "bg-gray-100 hover:bg-gray-200 text-gray-700"

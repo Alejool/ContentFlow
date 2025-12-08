@@ -3,15 +3,15 @@ import React, { ButtonHTMLAttributes, ReactNode, ElementType } from 'react';
 interface PrimaryButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     className?: string;
     disabled?: boolean;
-    children?: ReactNode; // children can also be optional if the button might only have an icon
-    icon?: ElementType; // For passing an SVG component or similar
+    children?: ReactNode;
+    icon?: ElementType;
 }
 
 export default function PrimaryButton({
     className = '',
     disabled,
     children,
-    icon: Icon, // Destructure icon prop and alias it to Icon for use as a component
+    icon: Icon,
     ...props
 }: PrimaryButtonProps) {
     return (

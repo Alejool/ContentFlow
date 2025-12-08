@@ -92,8 +92,8 @@ export default function ManageContentPage() {
 
   const iconGradient =
     theme === "dark"
-      ? "from-orange-500 to-orange-700"
-      : "from-orange-600 to-orange-800";
+      ? "from-primary-500 to-primary-700"
+      : "from-primary-600 to-primary-800";
 
   const titleGradient =
     theme === "dark"

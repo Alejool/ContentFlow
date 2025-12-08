@@ -23,10 +23,7 @@ class YouTubeService extends BaseSocialService
 
     try {
       $videoFile = $this->downloadVideo($data['video_path']);
-
-      // Determinar si es un Short
       $isShort = $this->determineIfShort($videoFile, $data);
-
       $metadata = $this->buildMetadata($data, $isShort);
       $response = $this->uploadToYouTube($videoFile, $metadata);
 

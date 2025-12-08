@@ -149,32 +149,32 @@ export default function AddCampaignModal({
     theme === "dark" ? "border-neutral-600" : "border-gray-200";
   const focusBorder =
     theme === "dark"
-      ? "focus:border-orange-500 focus:ring-orange-500/20"
-      : "focus:border-orange-500 focus:ring-orange-200";
+      ? "focus:border-primary-500 focus:ring-primary-500/20"
+      : "focus:border-primary-500 focus:ring-primary-200";
   const errorBorder =
     theme === "dark"
-      ? "border-red-500 focus:border-red-500 focus:ring-red-500/20"
-      : "border-red-300 focus:border-red-500 focus:ring-red-200";
+      ? "border-primary-500 focus:border-primary-500 focus:ring-primary-500/20"
+      : "border-primary-300 focus:border-primary-500 focus:ring-primary-200";
   const inputBg = theme === "dark" ? "bg-neutral-700" : "bg-white";
   const labelText = theme === "dark" ? "text-gray-300" : "text-gray-700";
-  const iconColor = theme === "dark" ? "text-orange-400" : "text-orange-600";
+  const iconColor = theme === "dark" ? "text-primary-400" : "text-primary-600";
   const uploadBg = theme === "dark" ? "bg-neutral-700" : "bg-gray-50";
   const uploadBorder =
     theme === "dark"
-      ? "border-neutral-600 hover:border-orange-400"
-      : "border-gray-200 hover:border-orange-300";
+      ? "border-neutral-600 hover:border-primary-400"
+      : "border-gray-200 hover:border-primary-300";
   const dragOverBg =
     theme === "dark"
-      ? "bg-orange-900/20 border-orange-400"
-      : "bg-orange-50 border-orange-500";
+      ? "bg-primary-900/20 border-primary-400"
+      : "bg-primary-50 border-primary-500";
   const cancelButton =
     theme === "dark"
       ? "text-gray-300 hover:bg-neutral-700"
       : "text-gray-700 hover:bg-gray-200";
   const submitButton =
     theme === "dark"
-      ? "bg-gradient-to-r from-orange-600 to-orange-800 hover:shadow-orange-500/20"
-      : "bg-gradient-to-r from-orange-600 to-orange-700 hover:shadow-orange-200";
+      ? "bg-gradient-to-r from-primary-600 to-primary-800 hover:shadow-primary-500/20"
+      : "bg-gradient-to-r from-primary-600 to-primary-700 hover:shadow-primary-200";
   const colorIconInput =
     theme === "dark"
       ? `[&::-webkit-calendar-picker-indicator]:invert 
@@ -371,15 +371,15 @@ export default function AddCampaignModal({
                   >
                     <FileImage className={`w-4 h-4 ${iconColor}`} />
                     {t("manageContent.modals.fields.image")}
-                    <span className="text-red-500 ml-1">*</span>
+                    <span className="text-primary-500 ml-1">*</span>
                   </label>
                   <div
                     className={`relative group cursor-pointer transition-all duration-300 ${
                       isDragOver
                         ? `scale-[1.02] ring-2 ${
                             theme === "dark"
-                              ? "ring-orange-400"
-                              : "ring-orange-500"
+                              ? "ring-primary-400"
+                              : "ring-primary-500"
                           } ring-offset-2`
                         : ""
                     }`}
@@ -393,8 +393,8 @@ export default function AddCampaignModal({
                         imageError
                           ? `${
                               theme === "dark"
-                                ? "border-red-500 bg-red-900/20"
-                                : "border-red-300 bg-red-50"
+                                ? "border-primary-500 bg-primary-900/20"
+                                : "border-primary-300 bg-primary-50"
                             }`
                           : isDragOver
                           ? `${dragOverBg}`
@@ -431,7 +431,7 @@ export default function AddCampaignModal({
                                   e.stopPropagation();
                                   removeMedia(index);
                                 }}
-                                className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors opacity-0 group-hover/item:opacity-100"
+                                className="absolute top-2 right-2 p-1.5 bg-primary-500 text-white rounded-full hover:bg-primary-600 transition-colors opacity-0 group-hover/item:opacity-100"
                               >
                                 <X className="w-3 h-3" />
                               </button>
@@ -451,8 +451,8 @@ export default function AddCampaignModal({
                           <div
                             className={`w-16 h-16 rounded-full ${
                               theme === "dark"
-                                ? "bg-orange-900/30"
-                                : "bg-orange-100"
+                                ? "bg-primary-900/30"
+                                : "bg-primary-100"
                             } flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300`}
                           >
                             <Upload className={`w-8 h-8 ${iconColor}`} />
@@ -480,7 +480,7 @@ export default function AddCampaignModal({
                     />
                   </div>
                   {imageError && (
-                    <p className="mt-2 text-sm text-red-500 flex items-center gap-1 animate-in slide-in-from-left-1">
+                    <p className="mt-2 text-sm text-primary-500 flex items-center gap-1 animate-in slide-in-from-left-1">
                       <AlertTriangle className="w-4 h-4" />
                       {imageError}
                     </p>
@@ -494,7 +494,7 @@ export default function AddCampaignModal({
                   >
                     <Hash className={`w-4 h-4 ${iconColor}`} />
                     {t("manageContent.modals.fields.hashtags")}
-                    <span className="text-red-500 ml-1">*</span>
+                    <span className="text-primary-500 ml-1">*</span>
                   </label>
                   <div className="relative">
                     <input
@@ -511,7 +511,7 @@ export default function AddCampaignModal({
                     />
                   </div>
                   {errors.hashtags && (
-                    <p className="mt-2 text-sm text-red-500 flex items-center gap-1">
+                    <p className="mt-2 text-sm text-primary-500 flex items-center gap-1">
                       <AlertTriangle className="w-4 h-4" />
                       {errors.hashtags.message}
                     </p>
@@ -579,12 +579,16 @@ export default function AddCampaignModal({
                     </label>
                     <div className="grid grid-cols-2 gap-3">
                       {socialAccounts.map((account) => {
-                        if (!watchedFields?.social_accounts || watchedFields.social_accounts.length === 0) {
+                        if (
+                          !watchedFields?.social_accounts ||
+                          watchedFields.social_accounts.length === 0
+                        ) {
                           return null;
                         }
                         const isChecked =
-                          watchedFields?.social_accounts?.includes(account.id) ||
-                          false;
+                          watchedFields?.social_accounts?.includes(
+                            account.id
+                          ) || false;
                         const customSchedule = accountSchedules[account.id];
 
                         return (
@@ -592,7 +596,7 @@ export default function AddCampaignModal({
                             key={account.id}
                             className={`relative flex items-center p-3 rounded-lg border transition-all ${
                               isChecked
-                                ? `border-orange-500 bg-orange-50 dark:bg-orange-900/20`
+                                ? `border-primary-500 bg-primary-50 dark:bg-primary-900/20`
                                 : `${borderColor} ${inputBg}`
                             }`}
                           >
@@ -639,7 +643,7 @@ export default function AddCampaignModal({
                                     setAccountSchedules(newSchedules);
                                   }
                                 }}
-                                className="w-4 h-4 text-orange-600 rounded focus:ring-orange-500"
+                                className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
                               />
                               <div className="flex flex-col">
                                 <span
@@ -648,7 +652,7 @@ export default function AddCampaignModal({
                                   {account.platform}
                                 </span>
                                 {customSchedule && isChecked && (
-                                  <span className="text-xs text-orange-600 dark:text-orange-400 flex items-center gap-1">
+                                  <span className="text-xs text-primary-600 dark:text-primary-400 flex items-center gap-1">
                                     <Clock className="w-3 h-3" />
                                     {new Date(customSchedule).toLocaleString(
                                       [],
@@ -668,7 +672,7 @@ export default function AddCampaignModal({
                                   }
                                   className={`p-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 ${
                                     customSchedule
-                                      ? "text-orange-500"
+                                      ? "text-primary-500"
                                       : textSecondary
                                   }`}
                                   title="Set individual time"
@@ -732,14 +736,14 @@ export default function AddCampaignModal({
                                           setAccountSchedules(newSchedules);
                                           setActivePopover(null);
                                         }}
-                                        className="text-xs text-red-500 hover:text-red-700 font-medium px-2 py-1"
+                                        className="text-xs text-primary-500 hover:text-primary-700 font-medium px-2 py-1"
                                       >
                                         Clear
                                       </button>
                                       <button
                                         type="button"
                                         onClick={() => setActivePopover(null)}
-                                        className="text-xs bg-orange-600 text-white px-3 py-1.5 rounded hover:bg-orange-700"
+                                        className="text-xs bg-primary-600 text-white px-3 py-1.5 rounded hover:bg-primary-700"
                                       >
                                         Done
                                       </button>
@@ -770,7 +774,7 @@ export default function AddCampaignModal({
                   >
                     <FileText className={`w-4 h-4 ${iconColor}`} />
                     {t("manageContent.modals.fields.title")}
-                    <span className="text-red-500 ml-1">*</span>
+                    <span className="text-primary-500 ml-1">*</span>
                   </label>
                   <input
                     {...register("title")}
@@ -784,7 +788,7 @@ export default function AddCampaignModal({
                     )}
                   />
                   {errors.title && (
-                    <p className="mt-2 text-sm text-red-500 flex items-center gap-1">
+                    <p className="mt-2 text-sm text-primary-500 flex items-center gap-1">
                       <AlertTriangle className="w-4 h-4" />
                       {errors.title.message}
                     </p>
@@ -803,7 +807,7 @@ export default function AddCampaignModal({
                   >
                     <FileText className={`w-4 h-4 ${iconColor}`} />
                     {t("manageContent.modals.fields.description")}
-                    <span className="text-red-500 ml-1">*</span>
+                    <span className="text-primary-500 ml-1">*</span>
                   </label>
                   <textarea
                     {...register("description")}
@@ -818,7 +822,7 @@ export default function AddCampaignModal({
                     )}
                   />
                   {errors.description && (
-                    <p className="mt-2 text-sm text-red-500 flex items-center gap-1">
+                    <p className="mt-2 text-sm text-primary-500 flex items-center gap-1">
                       <AlertTriangle className="w-4 h-4" />
                       {errors.description.message}
                     </p>
@@ -827,7 +831,7 @@ export default function AddCampaignModal({
                     <span
                       className={`text-xs ${
                         (watchedFields.description?.length || 0) > 500
-                          ? "text-red-500"
+                          ? "text-primary-500"
                           : textTertiary
                       }`}
                     >
@@ -843,7 +847,7 @@ export default function AddCampaignModal({
                   >
                     <Target className={`w-4 h-4 ${iconColor}`} />
                     {t("manageContent.modals.fields.goal")}
-                    <span className="text-red-500 ml-1">*</span>
+                    <span className="text-primary-500 ml-1">*</span>
                   </label>
                   <input
                     {...register("goal")}
@@ -857,7 +861,7 @@ export default function AddCampaignModal({
                     )}
                   />
                   {errors.goal && (
-                    <p className="mt-2 text-sm text-red-500 flex items-center gap-1">
+                    <p className="mt-2 text-sm text-primary-500 flex items-center gap-1">
                       <AlertTriangle className="w-4 h-4" />
                       {errors.goal.message}
                     </p>
@@ -866,7 +870,7 @@ export default function AddCampaignModal({
                     <span
                       className={`text-xs ${
                         (watchedFields.goal?.length || 0) > 200
-                          ? "text-red-500"
+                          ? "text-primary-500"
                           : textTertiary
                       }`}
                     >

@@ -36,7 +36,7 @@ import theme from '@/theme';
 </Box>
 
 // Método 3: Con Tailwind CSS (recomendado)
-<div className="bg-red-600">
+<div className="bg-primary-600">
   Contenido
 </div>
 ```
@@ -57,7 +57,7 @@ import { getGradient } from '@/theme';
 </div>
 
 // Método 3: Con Tailwind CSS
-<div className="bg-gradient-to-r from-red-600 to-orange-600">
+<div className="bg-gradient-to-r from-primary-600 to-primary-600">
   Gradiente
 </div>
 ```
@@ -140,8 +140,8 @@ const color = getColor('primary.600');
 
 ```jsx
 <button 
-  className="bg-gradient-to-r from-red-600 to-orange-600 
-             hover:from-red-700 hover:to-orange-700 
+  className="bg-gradient-to-r from-primary-600 to-primary-600 
+             hover:from-primary-700 hover:to-primary-700 
              text-white px-6 py-3 rounded-lg 
              shadow-lg hover:shadow-xl 
              transition-all duration-200"
@@ -169,7 +169,7 @@ const color = getColor('primary.600');
   className={`w-full px-4 py-3 rounded-lg 
               border transition-all duration-300
               ${error 
-                ? 'border-red-300 bg-red-50 focus:ring-red-200' 
+                ? 'border-primary-300 bg-primary-50 focus:ring-primary-200' 
                 : 'border-gray-300 bg-white focus:ring-blue-200'
               }`}
 />
@@ -215,10 +215,10 @@ Si encuentras código con colores hardcodeados, reemplázalos así:
 
 ```jsx
 // Antes ❌
-<div className="bg-red-600">
+<div className="bg-primary-600">
 
 // Después ✅
-<div className="bg-red-600"> // Tailwind CSS
+<div className="bg-primary-600"> // Tailwind CSS
 // o
 <div style={{ backgroundColor: theme.colors.primary[600] }}>
 ```

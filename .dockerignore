@@ -1,0 +1,63 @@
+# Dependencies
+/node_modules
+/vendor
+
+# Build artifacts
+/public/build
+/public/hot
+/public/storage
+/storage/*.key
+
+# Environment files
+.env
+.env.backup
+.env.production
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Tests
+/tests
+/phpunit.xml
+/.phpunit.result.cache
+
+# Documentation
+/docs
+README.md
+CHANGELOG.md
+
+# CI/CD
+.github
+.gitlab-ci.yml
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Cache
+/bootstrap/cache/*
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/logs/*
+
+# Misc
+.editorconfig
+.styleci.yml
+docker-compose.yml
+Dockerfile

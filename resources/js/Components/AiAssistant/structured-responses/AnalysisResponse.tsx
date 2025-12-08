@@ -1,5 +1,5 @@
-import { TrendingUp, Lightbulb, CheckCircle } from "lucide-react";
 import { AIResponse } from "@/Hooks/useAIChat";
+import { CheckCircle, Lightbulb, TrendingUp } from "lucide-react";
 
 interface AnalysisResponseProps {
   data: AIResponse;
@@ -33,8 +33,8 @@ export default function AnalysisResponse({
                   className={`p-1 rounded-full ${
                     insight.impact === "High"
                       ? theme === "dark"
-                        ? "bg-red-900/30"
-                        : "bg-red-100"
+                        ? "bg-primary-900/30"
+                        : "bg-primary-100"
                       : insight.impact === "Medium"
                       ? theme === "dark"
                         ? "bg-yellow-900/30"
@@ -48,8 +48,8 @@ export default function AnalysisResponse({
                     className={`w-4 h-4 ${
                       insight.impact === "High"
                         ? theme === "dark"
-                          ? "text-red-400"
-                          : "text-red-600"
+                          ? "text-primary-400"
+                          : "text-primary-600"
                         : insight.impact === "Medium"
                         ? theme === "dark"
                           ? "text-yellow-400"
@@ -77,8 +77,8 @@ export default function AnalysisResponse({
                       className={`px-2 py-0.5 text-xs rounded-full ${
                         insight.impact === "High"
                           ? theme === "dark"
-                            ? "bg-red-900/30 text-red-300"
-                            : "bg-red-100 text-red-700"
+                            ? "bg-primary-900/30 text-primary-300"
+                            : "bg-primary-100 text-primary-700"
                           : insight.impact === "Medium"
                           ? theme === "dark"
                             ? "bg-yellow-900/30 text-yellow-300"

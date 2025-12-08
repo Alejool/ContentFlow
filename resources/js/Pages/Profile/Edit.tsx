@@ -77,9 +77,9 @@ export default function Edit({ mustVerifyEmail, status }: EditProps) {
 
   const getAvatarColor = () => {
     if (theme === "dark") {
-      return "bg-gradient-to-br from-orange-900/30 to-purple-900/30 text-orange-200 ring-4 ring-purple-900/50";
+      return "bg-gradient-to-br from-primary-900/30 to-purple-900/30 text-primary-200 ring-4 ring-purple-900/50";
     }
-    return "bg-gradient-to-br from-orange-100 to-purple-100 text-orange-800 ring-4 ring-green-200";
+    return "bg-gradient-to-br from-primary-100 to-purple-100 text-primary-800 ring-4 ring-green-200";
   };
 
   return (

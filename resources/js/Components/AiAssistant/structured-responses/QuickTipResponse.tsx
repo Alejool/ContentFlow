@@ -21,7 +21,7 @@ export default function QuickTipResponse({
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2 mb-3">
-        <Zap className="w-5 h-5 text-orange-500" />
+        <Zap className="w-5 h-5 text-primary-500" />
         <h3 className="font-semibold text-lg">
           {data.title || "Consejo rápido"}
         </h3>
@@ -31,8 +31,8 @@ export default function QuickTipResponse({
         <div
           className={`p-4 rounded-lg ${
             theme === "dark"
-              ? "bg-gradient-to-r from-orange-900/20 to-yellow-900/20"
-              : "bg-gradient-to-r from-orange-50 to-yellow-50"
+              ? "bg-gradient-to-r from-primary-900/20 to-yellow-900/20"
+              : "bg-gradient-to-r from-primary-50 to-yellow-50"
           }`}
         >
           <p className="text-sm leading-relaxed">{data.tip}</p>
@@ -253,12 +253,12 @@ function StepsList({ steps, theme }: StepsListProps) {
           >
             <div
               className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center ${
-                theme === "dark" ? "bg-orange-900/30" : "bg-orange-100"
+                theme === "dark" ? "bg-primary-900/30" : "bg-primary-100"
               }`}
             >
               <span
                 className={`text-xs font-bold ${
-                  theme === "dark" ? "text-orange-400" : "text-orange-600"
+                  theme === "dark" ? "text-primary-400" : "text-primary-600"
                 }`}
               >
                 {index + 1}

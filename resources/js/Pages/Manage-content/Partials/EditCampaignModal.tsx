@@ -31,8 +31,8 @@ const createEditSchema = (t: any) =>
       .max(100, t("manageContent.modals.validation.titleLength")),
     description: z
       .string()
-      .min(10, t("manageContent.modals.validation.descRequired"))
-      .max(500, t("manageContent.modals.validation.descMax")),
+      .min(10, t("manageContent.modals.validation.descRequired")),
+    // .max(500, t("manageContent.modals.validation.descMax")),
     goal: z
       .string()
       .min(5, t("manageContent.modals.validation.objRequired"))
@@ -214,32 +214,32 @@ export default function EditCampaignModal({
     theme === "dark" ? "border-neutral-600" : "border-gray-200";
   const focusBorder =
     theme === "dark"
-      ? "focus:border-orange-500 focus:ring-orange-500/20"
-      : "focus:border-orange-500 focus:ring-orange-200";
+      ? "focus:border-primary-500 focus:ring-primary-500/20"
+      : "focus:border-primary-500 focus:ring-primary-200";
   const errorBorder =
     theme === "dark"
-      ? "border-red-500 focus:border-red-500 focus:ring-red-500/20"
-      : "border-red-300 focus:border-red-500 focus:ring-red-200";
+      ? "border-primary-500 focus:border-primary-500 focus:ring-primary-500/20"
+      : "border-primary-300 focus:border-primary-500 focus:ring-primary-200";
   const inputBg = theme === "dark" ? "bg-neutral-700" : "bg-white";
   const labelText = theme === "dark" ? "text-gray-200" : "text-gray-700";
-  const iconColor = theme === "dark" ? "text-orange-400" : "text-orange-600";
+  const iconColor = theme === "dark" ? "text-primary-400" : "text-primary-600";
   const uploadBg = theme === "dark" ? "bg-neutral-700" : "bg-gray-50";
   const uploadBorder =
     theme === "dark"
-      ? "border-neutral-600 hover:border-orange-400"
-      : "border-gray-200 hover:border-orange-300";
+      ? "border-neutral-600 hover:border-primary-400"
+      : "border-gray-200 hover:border-primary-300";
   const dragOverBg =
     theme === "dark"
-      ? "bg-orange-900/20 border-orange-400"
-      : "bg-orange-50 border-orange-500";
+      ? "bg-primary-900/20 border-primary-400"
+      : "bg-primary-50 border-primary-500";
   const cancelButton =
     theme === "dark"
       ? "text-gray-300 hover:bg-neutral-700"
       : "text-gray-700 hover:bg-gray-200";
   const submitButton =
     theme === "dark"
-      ? "bg-gradient-to-r from-orange-600 to-orange-800 hover:shadow-orange-500/20"
-      : "bg-gradient-to-r from-orange-600 to-orange-700 hover:shadow-orange-200";
+      ? "bg-gradient-to-r from-primary-600 to-primary-800 hover:shadow-primary-500/20"
+      : "bg-gradient-to-r from-primary-600 to-primary-700 hover:shadow-primary-200";
   const colorIconInput =
     theme === "dark"
       ? `[&::-webkit-calendar-picker-indicator]:invert 
@@ -493,8 +493,8 @@ export default function EditCampaignModal({
                         isDragOver
                           ? `scale-[1.02] ring-2 ${
                               theme === "dark"
-                                ? "ring-orange-400"
-                                : "ring-orange-500"
+                                ? "ring-primary-400"
+                                : "ring-primary-500"
                             } ring-offset-2`
                           : ""
                       }`}
@@ -540,7 +540,7 @@ export default function EditCampaignModal({
                                     e.stopPropagation();
                                     removeMedia(index);
                                   }}
-                                  className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors opacity-0 group-hover/item:opacity-100"
+                                  className="absolute top-2 right-2 p-1.5 bg-primary-500 text-white rounded-full hover:bg-primary-600 transition-colors opacity-0 group-hover/item:opacity-100"
                                 >
                                   <X className="w-3 h-3" />
                                 </button>
@@ -560,8 +560,8 @@ export default function EditCampaignModal({
                             <div
                               className={`w-16 h-16 rounded-full ${
                                 theme === "dark"
-                                  ? "bg-orange-900/30"
-                                  : "bg-orange-100"
+                                  ? "bg-primary-900/30"
+                                  : "bg-primary-100"
                               } flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300`}
                             >
                               <Upload className={`w-8 h-8 ${iconColor}`} />
@@ -593,7 +593,7 @@ export default function EditCampaignModal({
                       />
                     </div>
                     {imageError && (
-                      <p className="mt-2 text-sm text-red-500 flex items-center gap-1 animate-in slide-in-from-left-1">
+                      <p className="mt-2 text-sm text-primary-500 flex items-center gap-1 animate-in slide-in-from-left-1">
                         <AlertTriangle className="w-4 h-4" />
                         {imageError}
                       </p>
@@ -622,7 +622,7 @@ export default function EditCampaignModal({
                       />
                     </div>
                     {errors.hashtags && (
-                      <p className="mt-2 text-sm text-red-500 flex items-center gap-1">
+                      <p className="mt-2 text-sm text-primary-500 flex items-center gap-1">
                         <AlertTriangle className="w-4 h-4" />
                         {errors.hashtags.message}
                       </p>
@@ -760,7 +760,7 @@ export default function EditCampaignModal({
                                           post.status === "posted"
                                             ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
                                             : post.status === "failed"
-                                            ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
+                                            ? "bg-primary-100 text-primary-800 dark:bg-primary-900/30 dark:text-primary-400"
                                             : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"
                                         }`}
                                           >
@@ -774,7 +774,7 @@ export default function EditCampaignModal({
                                                   post.id
                                                 )
                                               }
-                                              className="p-1 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
+                                              className="p-1 text-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded transition-colors"
                                               title="Delete scheduled post"
                                             >
                                               <X className="w-3 h-3" />
@@ -813,7 +813,7 @@ export default function EditCampaignModal({
                               key={account.id}
                               className={`relative flex items-center p-3 rounded-lg border transition-all ${
                                 isChecked
-                                  ? `border-orange-500 bg-orange-50 dark:bg-orange-900/20`
+                                  ? `border-primary-500 bg-primary-50 dark:bg-primary-900/20`
                                   : `${borderColor} ${inputBg}`
                               }`}
                             >
@@ -843,7 +843,7 @@ export default function EditCampaignModal({
                                       setAccountSchedules(newSchedules);
                                     }
                                   }}
-                                  className="w-4 h-4 text-orange-600 rounded focus:ring-orange-500"
+                                  className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
                                 />
                                 <div className="flex flex-col">
                                   <span
@@ -852,7 +852,7 @@ export default function EditCampaignModal({
                                     {account.platform}
                                   </span>
                                   {customSchedule && isChecked && (
-                                    <span className="text-xs text-orange-600 dark:text-orange-400 flex items-center gap-1">
+                                    <span className="text-xs text-primary-600 dark:text-primary-400 flex items-center gap-1">
                                       <Clock className="w-3 h-3" />
                                       {new Date(customSchedule).toLocaleString(
                                         [],
@@ -875,7 +875,7 @@ export default function EditCampaignModal({
                                     }
                                     className={`p-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 ${
                                       customSchedule
-                                        ? "text-orange-500"
+                                        ? "text-primary-500"
                                         : textSecondary
                                     }`}
                                     title="Set individual time"
@@ -939,14 +939,14 @@ export default function EditCampaignModal({
                                             setAccountSchedules(newSchedules);
                                             setActivePopover(null);
                                           }}
-                                          className="text-xs text-red-500 hover:text-red-700 font-medium px-2 py-1"
+                                          className="text-xs text-primary-500 hover:text-primary-700 font-medium px-2 py-1"
                                         >
                                           Clear
                                         </button>
                                         <button
                                           type="button"
                                           onClick={() => setActivePopover(null)}
-                                          className="text-xs bg-orange-600 text-white px-3 py-1.5 rounded hover:bg-orange-700"
+                                          className="text-xs bg-primary-600 text-white px-3 py-1.5 rounded hover:bg-primary-700"
                                         >
                                           Done
                                         </button>
@@ -990,7 +990,7 @@ export default function EditCampaignModal({
                       )}
                     />
                     {errors.title && (
-                      <p className="mt-2 text-sm text-red-500 flex items-center gap-1">
+                      <p className="mt-2 text-sm text-primary-500 flex items-center gap-1">
                         <AlertTriangle className="w-4 h-4" />
                         {errors.title.message}
                       </p>
@@ -1017,7 +1017,7 @@ export default function EditCampaignModal({
                       )}
                     />
                     {errors.description && (
-                      <p className="mt-2 text-sm text-red-500 flex items-center gap-1">
+                      <p className="mt-2 text-sm text-primary-500 flex items-center gap-1">
                         <AlertTriangle className="w-4 h-4" />
                         {errors.description.message}
                       </p>
@@ -1026,11 +1026,11 @@ export default function EditCampaignModal({
                       <span
                         className={`text-xs ${
                           (watchedFields.description?.length || 0) > 500
-                            ? "text-red-500"
+                            ? "text-primary-500"
                             : textTertiary
                         }`}
                       >
-                        {watchedFields.description?.length || 0}/500
+                        {watchedFields.description?.length || 0}
                       </span>
                     </div>
                   </div>
@@ -1054,7 +1054,7 @@ export default function EditCampaignModal({
                       )}
                     />
                     {errors.goal && (
-                      <p className="mt-2 text-sm text-red-500 flex items-center gap-1">
+                      <p className="mt-2 text-sm text-primary-500 flex items-center gap-1">
                         <AlertTriangle className="w-4 h-4" />
                         {errors.goal.message}
                       </p>
@@ -1063,7 +1063,7 @@ export default function EditCampaignModal({
                       <span
                         className={`text-xs ${
                           (watchedFields.goal?.length || 0) > 200
-                            ? "text-red-500"
+                            ? "text-primary-500"
                             : textTertiary
                         }`}
                       >

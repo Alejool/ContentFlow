@@ -6,7 +6,6 @@ import DatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useTranslation } from "react-i18next";
 
-// Register locales
 registerLocale("es", es);
 registerLocale("en", enUS);
 
@@ -39,11 +38,8 @@ const ModernDatePicker = ({
   const { i18n } = useTranslation();
 
   const currentLocale = i18n.language.startsWith("es") ? "es" : "en";
-  const defaultDateFormat = showTimeSelect
-    ? "Pp" // localized date and time
-    : "P"; // localized date
+  const defaultDateFormat = showTimeSelect ? "Pp" : "P";
 
-  // Custom Input Component to ensure full styling control
   const CustomInput = forwardRef<HTMLButtonElement, any>(
     ({ value, onClick, placeholder }, ref) => (
       <button
@@ -53,8 +49,8 @@ const ModernDatePicker = ({
         className={`w-full flex items-center justify-between px-4 py-2.5 rounded-lg border transition-all text-sm
           ${
             theme === "dark"
-              ? "bg-neutral-800 border-neutral-700 text-gray-200 hover:border-neutral-600 focus:border-orange-500 focus:ring-1 focus:ring-orange-500/50"
-              : "bg-white border-gray-200 text-gray-700 hover:border-gray-300 focus:border-orange-500 focus:ring-1 focus:ring-orange-500/50"
+              ? "bg-neutral-800 border-neutral-700 text-gray-200 hover:border-neutral-600 focus:border-primary-500 focus:ring-1 focus:ring-primary-500/50"
+              : "bg-white border-gray-200 text-gray-700 hover:border-gray-300 focus:border-primary-500 focus:ring-1 focus:ring-primary-500/50"
           }
           ${className}`}
       >
@@ -157,7 +153,6 @@ const ModernDatePicker = ({
         .react-datepicker__navigation-icon::before {
           border-color: ${theme === "dark" ? "#9ca3af" : "#6b7280"};
         }
-        /* Portal styles override */
         .react-datepicker-popper {
           z-index: 9999 !important;
         }

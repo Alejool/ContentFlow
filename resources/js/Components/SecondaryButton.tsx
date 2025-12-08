@@ -4,7 +4,7 @@ interface SecondaryButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     type?: 'button' | 'submit' | 'reset';
     className?: string;
     disabled?: boolean;
-    children?: ReactNode; // children can be optional
+    children?: ReactNode;
 }
 
 export default function SecondaryButton({

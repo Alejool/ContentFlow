@@ -100,25 +100,25 @@ const UpdatePasswordForm = ({ className = "" }: UpdatePasswordFormProps) => {
         <div
           className={`p-4 mb-6 rounded-lg ${
             theme === "dark"
-              ? "bg-red-900/20 border border-red-800/30"
-              : "bg-red-50 border border-red-100"
+              ? "bg-primary-900/20 border border-primary-800/30"
+              : "bg-primary-50 border border-primary-100"
           }`}
         >
           <div className="flex items-center gap-3 mb-2">
             <div
               className={`w-6 h-6 rounded-full flex items-center justify-center ${
-                theme === "dark" ? "bg-red-800/40" : "bg-red-100"
+                theme === "dark" ? "bg-primary-800/40" : "bg-primary-100"
               }`}
             >
               <AlertTriangle
                 className={`w-4 h-4 ${
-                  theme === "dark" ? "text-red-400" : "text-red-600"
+                  theme === "dark" ? "text-primary-400" : "text-primary-600"
                 }`}
               />
             </div>
             <h3
               className={`font-semibold text-sm ${
-                theme === "dark" ? "text-red-300" : "text-red-800"
+                theme === "dark" ? "text-primary-300" : "text-primary-800"
               }`}
             >
               {t("profile.password.errorTitle")}
@@ -126,7 +126,7 @@ const UpdatePasswordForm = ({ className = "" }: UpdatePasswordFormProps) => {
           </div>
           <ul
             className={`space-y-1 text-sm ml-9 list-disc ${
-              theme === "dark" ? "text-red-400" : "text-red-700"
+              theme === "dark" ? "text-primary-400" : "text-primary-700"
             }`}
           >
             {Object.entries(errors).map(([field, error]: [string, any]) => (
@@ -211,19 +211,19 @@ const UpdatePasswordForm = ({ className = "" }: UpdatePasswordFormProps) => {
       <div
         className={`mt-8 p-4 rounded-lg border ${
           theme === "dark"
-            ? "bg-orange-900/10 border-orange-800/30"
-            : "bg-orange-50 border-orange-100"
+            ? "bg-primary-900/10 border-primary-800/30"
+            : "bg-primary-50 border-primary-100"
         }`}
       >
         <div className="flex items-center gap-2 mb-3">
           <Shield
             className={`w-5 h-5 ${
-              theme === "dark" ? "text-orange-400" : "text-orange-700"
+              theme === "dark" ? "text-primary-400" : "text-primary-700"
             }`}
           />
           <h4
             className={`text-sm font-semibold ${
-              theme === "dark" ? "text-orange-300" : "text-orange-900"
+              theme === "dark" ? "text-primary-300" : "text-primary-900"
             }`}
           >
             {t("profile.password.securityTips")}
@@ -231,7 +231,7 @@ const UpdatePasswordForm = ({ className = "" }: UpdatePasswordFormProps) => {
         </div>
         <ul
           className={`text-xs space-y-2 ${
-            theme === "dark" ? "text-orange-400/80" : "text-orange-800"
+            theme === "dark" ? "text-primary-400/80" : "text-primary-800"
           }`}
         >
           <li className="flex items-start gap-2">

@@ -93,15 +93,15 @@ export default function DeleteUserForm({ className = "" }) {
       className={className}
     >
       <div className="space-y-6">
-        <div className="p-4 bg-red-50 border border-red-200 rounded-lg flex gap-4">
-          <div className="flex-shrink-0 text-red-500">
+        <div className="p-4 bg-primary-50 border border-primary-200 rounded-lg flex gap-4">
+          <div className="flex-shrink-0 text-primary-500">
             <WarningIcon className="w-6 h-6" />
           </div>
           <div>
-            <h3 className="text-sm font-bold text-red-800">
+            <h3 className="text-sm font-bold text-primary-800">
               {t("profile.delete.warningTitle")}
             </h3>
-            <p className="mt-1 text-sm text-red-700">
+            <p className="mt-1 text-sm text-primary-700">
               {t("profile.delete.warningMessage")}
             </p>
           </div>
@@ -118,7 +118,7 @@ export default function DeleteUserForm({ className = "" }) {
 
       <Modal show={confirmingUserDeletion} onClose={closeModal}>
         <form onSubmit={handleSubmit(deleteUser)} className="p-6">
-          <div className="flex items-center gap-3 mb-4 text-red-600">
+          <div className="flex items-center gap-3 mb-4 text-primary-600">
             <WarningIcon className="w-8 h-8" />
             <h2 className="text-xl font-bold text-gray-900">
               {t("profile.delete.confirmTitle")}

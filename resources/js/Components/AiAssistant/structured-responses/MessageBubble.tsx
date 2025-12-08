@@ -1,5 +1,5 @@
-import { Bot } from "lucide-react";
 import { AIMessage } from "@/Hooks/useAIChat";
+import { Bot } from "lucide-react";
 import StructuredResponseRenderer from "./StructuredResponseRenderer";
 
 interface MessageBubbleProps {
@@ -12,7 +12,7 @@ export default function MessageBubble({ message, theme }: MessageBubbleProps) {
     if (role === "user") {
       return theme === "dark"
         ? "bg-gradient-to-r from-purple-700 to-purple-800 text-white"
-        : "bg-gradient-to-r from-red-600 to-orange-600 text-white";
+        : "bg-gradient-to-r from-primary-600 to-primary-600 text-white";
     } else {
       return theme === "dark"
         ? "bg-neutral-700/70 text-gray-100 border border-neutral-600/50"

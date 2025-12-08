@@ -1,14 +1,14 @@
 "use client";
 
-import * as React from "react";
 import {
-  X,
-  CheckCircle,
   AlertCircle,
+  AlertTriangle,
+  CheckCircle,
   Info,
   Loader2,
-  AlertTriangle,
+  X,
 } from "lucide-react";
+import * as React from "react";
 
 export type ToastType = "success" | "error" | "warning" | "info" | "loading";
 
@@ -47,7 +47,7 @@ export function useToast() {
 // Iconos para cada tipo de toast
 const ToastIcons: Record<ToastType, React.ReactNode> = {
   success: <CheckCircle className="w-5 h-5 text-green-500" />,
-  error: <AlertCircle className="w-5 h-5 text-red-500" />,
+  error: <AlertCircle className="w-5 h-5 text-primary-500" />,
   warning: <AlertTriangle className="w-5 h-5 text-yellow-500" />,
   info: <Info className="w-5 h-5 text-blue-500" />,
   loading: <Loader2 className="w-5 h-5 text-blue-500 animate-spin" />,
@@ -57,7 +57,8 @@ const ToastIcons: Record<ToastType, React.ReactNode> = {
 const ToastBgColors: Record<ToastType, string> = {
   success:
     "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800/50",
-  error: "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800/50",
+  error:
+    "bg-primary-50 dark:bg-primary-900/20 border-primary-200 dark:border-primary-800/50",
   warning:
     "bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800/50",
   info: "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800/50",
@@ -68,7 +69,7 @@ const ToastBgColors: Record<ToastType, string> = {
 // Text colors for each type
 const ToastTextColors: Record<ToastType, string> = {
   success: "text-green-800 dark:text-green-300",
-  error: "text-red-800 dark:text-red-300",
+  error: "text-primary-800 dark:text-primary-300",
   warning: "text-yellow-800 dark:text-yellow-300",
   info: "text-blue-800 dark:text-blue-300",
   loading: "text-blue-800 dark:text-blue-300",
@@ -77,7 +78,7 @@ const ToastTextColors: Record<ToastType, string> = {
 // Progress bar colors for each type
 const ToastProgressColors: Record<ToastType, string> = {
   success: "bg-green-500",
-  error: "bg-red-500",
+  error: "bg-primary-500",
   warning: "bg-yellow-500",
   info: "bg-blue-500",
   loading: "bg-blue-500",

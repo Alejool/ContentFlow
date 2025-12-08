@@ -1,4 +1,3 @@
-import React from "react";
 import { useTranslation } from "react-i18next";
 
 interface PeriodSelectorProps {
@@ -25,8 +24,8 @@ export default function PeriodSelector({
                         ${
                           selectedPeriod === days
                             ? theme === "dark"
-                              ? "bg-gradient-to-r from-orange-600 to-orange-800 text-white shadow-lg"
-                              : "bg-gradient-to-r from-orange-600 to-orange-700 text-white shadow-lg"
+                              ? "bg-gradient-to-r from-primary-600 to-primary-800 text-white shadow-lg"
+                              : "bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-lg"
                             : theme === "dark"
                             ? "bg-neutral-800 text-gray-300 hover:bg-neutral-700 hover:text-gray-100 border border-neutral-700"
                             : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200"

@@ -257,7 +257,7 @@ import { getGradient } from '@/theme';
 El tema está diseñado para complementar Tailwind CSS. Puedes usar las clases de Tailwind normalmente:
 
 ```jsx
-<button className="bg-red-600 hover:bg-red-700 text-white">
+<button className="bg-primary-600 hover:bg-primary-700 text-white">
   Botón
 </button>
 ```

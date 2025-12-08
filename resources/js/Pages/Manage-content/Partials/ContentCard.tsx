@@ -1,7 +1,7 @@
+import { useTheme } from "@/Hooks/useTheme";
+import { Calendar, Edit2, Image, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useTheme } from "@/Hooks/useTheme";
-import { Edit2, Trash2, Calendar, Image, CheckCircle } from "lucide-react";
 
 export default function ContentCard({ content, onEdit, onDelete }) {
   const { t, i18n } = useTranslation();
@@ -65,7 +65,7 @@ export default function ContentCard({ content, onEdit, onDelete }) {
 
           <button
             onClick={onDelete}
-            className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors duration-200 font-medium flex items-center space-x-2 shadow-lg"
+            className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors duration-200 font-medium flex items-center space-x-2 shadow-lg"
           >
             <Trash2 className="w-4 h-4" />
             <span>{t("manageContent.campaigns.delete")}</span>
@@ -103,8 +103,8 @@ export default function ContentCard({ content, onEdit, onDelete }) {
                   className={`px-3 py-1 text-xs font-medium rounded-full
                       ${
                         theme === "dark"
-                          ? "bg-orange-900/30 text-orange-300"
-                          : "bg-orange-50 text-orange-600"
+                          ? "bg-primary-900/30 text-primary-300"
+                          : "bg-primary-50 text-primary-600"
                       }`}
                 >
                   {tag}

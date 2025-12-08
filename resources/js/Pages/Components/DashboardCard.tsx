@@ -42,7 +42,7 @@ export default function DashboardCard({
     } else {
       switch (variant) {
         case "gradient":
-          return "bg-gradient-to-br from-orange-50/80 to-pink-50/80";
+          return "bg-gradient-to-br from-primary-50/80 to-pink-50/80";
         case "outline":
           return "bg-transparent";
         default:
@@ -66,7 +66,7 @@ export default function DashboardCard({
         case "outline":
           return "border-2 border-gray-200";
         case "gradient":
-          return "border border-orange-100/50";
+          return "border border-primary-100/50";
         default:
           return "border border-gray-100";
       }
@@ -76,18 +76,18 @@ export default function DashboardCard({
   const getIconBgColor = () => {
     if (theme === "dark") {
       return (
-        iconColor || "bg-gradient-to-r from-orange-600/20 to-orange-800/20"
+        iconColor || "bg-gradient-to-r from-primary-600/20 to-primary-800/20"
       );
     } else {
-      return iconColor || "bg-gradient-to-r from-orange-100 to-orange-50";
+      return iconColor || "bg-gradient-to-r from-primary-100 to-primary-50";
     }
   };
 
   const getIconColor = () => {
     if (theme === "dark") {
-      return "text-orange-400";
+      return "text-primary-400";
     } else {
-      return "text-orange-600";
+      return "text-primary-600";
     }
   };
 
@@ -112,9 +112,9 @@ export default function DashboardCard({
       "group relative overflow-hidden transition-all duration-300";
 
     if (theme === "dark") {
-      return `${baseStyles} bg-gradient-to-r from-orange-600 to-orange-800 text-white hover:from-orange-700 hover:to-orange-900`;
+      return `${baseStyles} bg-gradient-to-r from-primary-600 to-primary-800 text-white hover:from-primary-700 hover:to-primary-900`;
     } else {
-      return `${baseStyles} bg-gradient-to-r from-orange-600 to-orange-700 text-white hover:from-orange-700 hover:to-orange-800`;
+      return `${baseStyles} bg-gradient-to-r from-primary-600 to-primary-700 text-white hover:from-primary-700 hover:to-primary-800`;
     }
   };
 
@@ -133,8 +133,8 @@ export default function DashboardCard({
         <div
           className={`absolute -inset-1 bg-gradient-to-r ${
             theme === "dark"
-              ? "from-orange-600/10 via-purple-600/5 to-pink-600/10"
-              : "from-orange-200/20 via-pink-200/10 to-purple-200/20"
+              ? "from-primary-600/10 via-purple-600/5 to-pink-600/10"
+              : "from-primary-200/20 via-pink-200/10 to-purple-200/20"
           } blur-xl`}
         ></div>
       </div>
@@ -215,8 +215,8 @@ export default function DashboardCard({
           transform rotate-45 translate-x-16 -translate-y-16
           ${
             theme === "dark"
-              ? "bg-gradient-to-br from-orange-600/10 to-transparent"
-              : "bg-gradient-to-br from-orange-600/5 to-transparent"
+              ? "bg-gradient-to-br from-primary-600/10 to-transparent"
+              : "bg-gradient-to-br from-primary-600/5 to-transparent"
           }
         `}
         ></div>

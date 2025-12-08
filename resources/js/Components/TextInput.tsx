@@ -8,7 +8,6 @@ import {
   useState,
 } from "react";
 
-// Define the props for the TextInput component
 interface TextInputProps extends InputHTMLAttributes<HTMLInputElement> {
   isFocused?: boolean;
   label?: string;
@@ -16,12 +15,10 @@ interface TextInputProps extends InputHTMLAttributes<HTMLInputElement> {
   showPasswordToggle?: boolean;
 }
 
-// Define the type for the ref methods that can be called from parent components
 export interface TextInputRef {
   focus: () => void;
 }
 
-// Eye icons as SVG components
 const EyeIcon = () => (
   <svg
     className="w-5 h-5"
@@ -79,17 +76,14 @@ const TextInput = forwardRef<TextInputRef, TextInputProps>(function TextInput(
   const localRef = useRef<HTMLInputElement>(null);
   const [showPassword, setShowPassword] = useState(false);
 
-  // Determine the input type based on password visibility
   const inputType = type === "password" && showPassword ? "text" : type;
 
-  // Expose the focus method to parent components via the ref
   useImperativeHandle(ref, () => ({
     focus: () => {
       localRef.current?.focus();
     },
   }));
 
-  // Focus the input element if isFocused is true
   useEffect(() => {
     if (isFocused && localRef.current) {
       localRef.current.focus();
@@ -125,7 +119,7 @@ const TextInput = forwardRef<TextInputRef, TextInputProps>(function TextInput(
                         focus:outline-none focus:ring-0 hover:shadow-md
                         ${
                           error
-                            ? "border-red-300 focus:border-red-500 bg-red-50"
+                            ? "border-primary-300 focus:border-primary-500 bg-primary-50"
                             : "border-gray-200 focus:border-blue-500 focus:bg-gray-50"
                         }
                         ${showPasswordToggle ? "pr-12" : ""}
@@ -145,7 +139,7 @@ const TextInput = forwardRef<TextInputRef, TextInputProps>(function TextInput(
         )}
       </div>
       {error && (
-        <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">
+        <div className="flex items-center gap-2 text-sm text-primary-600 bg-primary-50 px-3 py-2 rounded-lg">
           <svg
             className="w-4 h-4 flex-shrink-0"
             fill="currentColor"

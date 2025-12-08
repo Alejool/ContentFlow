@@ -34,15 +34,15 @@ export default function ConfirmDialog({
     switch (type) {
       case "danger":
         return {
-          iconBg: "bg-red-100 dark:bg-red-900/30",
-          iconColor: "text-red-600 dark:text-red-400",
-          confirmBtn: "bg-red-600 hover:bg-red-700 text-white",
+          iconBg: "bg-primary-100 dark:bg-primary-900/30",
+          iconColor: "text-primary-600 dark:text-primary-400",
+          confirmBtn: "bg-primary-600 hover:bg-primary-700 text-white",
         };
       case "warning":
         return {
-          iconBg: "bg-orange-100 dark:bg-orange-900/30",
-          iconColor: "text-orange-600 dark:text-orange-400",
-          confirmBtn: "bg-orange-600 hover:bg-orange-700 text-white",
+          iconBg: "bg-primary-100 dark:bg-primary-900/30",
+          iconColor: "text-primary-600 dark:text-primary-400",
+          confirmBtn: "bg-primary-600 hover:bg-primary-700 text-white",
         };
       case "info":
         return {
@@ -73,14 +73,12 @@ export default function ConfirmDialog({
           `}
         >
           <div className="flex items-start gap-4">
-            {/* Icon */}
             <div
               className={`flex-shrink-0 w-12 h-12 rounded-full ${styles.iconBg} flex items-center justify-center`}
             >
               <AlertTriangle className={`w-6 h-6 ${styles.iconColor}`} />
             </div>
 
-            {/* Content */}
             <div className="flex-1">
               <DialogTitle
                 className={`text-lg font-bold mb-2 ${
@@ -98,7 +96,6 @@ export default function ConfirmDialog({
               </p>
             </div>
 
-            {/* Close button */}
             <button
               onClick={onClose}
               className={`flex-shrink-0 p-1 rounded-lg transition-colors ${
@@ -111,7 +108,6 @@ export default function ConfirmDialog({
             </button>
           </div>
 
-          {/* Actions */}
           <div className="flex gap-3 mt-6">
             <button
               onClick={onClose}

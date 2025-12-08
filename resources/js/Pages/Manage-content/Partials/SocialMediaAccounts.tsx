@@ -1,5 +1,4 @@
 import IconFacebook from "@/../assets/Icons/facebook.svg";
-import IconInstagram from "@/../assets/Icons/instagram.svg";
 import IconTiktok from "@/../assets/Icons/tiktok.svg";
 import IconTwitter from "@/../assets/Icons/x.svg";
 import IconYoutube from "@/../assets/Icons/youtube.svg";
@@ -95,8 +94,8 @@ export default function SocialMediaAccounts() {
       logo: IconYoutube,
       isConnected: false,
       accountId: null,
-      color: theme === "dark" ? "bg-red-700" : "bg-red-600",
-      gradient: "from-red-600 to-red-800",
+      color: theme === "dark" ? "bg-primary-700" : "bg-primary-600",
+      gradient: "from-primary-600 to-primary-800",
     },
   ]);
   const [loading, setLoading] = useState(true);
@@ -152,14 +151,14 @@ export default function SocialMediaAccounts() {
                 instagram: "bg-pink-700",
                 tiktok: "bg-neutral-900",
                 twitter: "bg-neutral-800",
-                youtube: "bg-red-700",
+                youtube: "bg-primary-700",
               }[account.platform] || "bg-gray-500"
             : {
                 facebook: "bg-blue-600",
                 instagram: "bg-pink-600",
                 tiktok: "bg-black",
                 twitter: "bg-gray-900",
-                youtube: "bg-red-600",
+                youtube: "bg-primary-600",
               }[account.platform] || "bg-gray-400",
       }))
     );
@@ -342,14 +341,14 @@ export default function SocialMediaAccounts() {
         ${
           theme === "dark"
             ? "bg-gradient-to-br from-neutral-900/80 to-neutral-800/80 border-neutral-700/50"
-            : "bg-gradient-to-br from-orange-50/80 to-pink-50/80 border-orange-100"
+            : "bg-gradient-to-br from-primary-50/80 to-pink-50/80 border-primary-100"
         }`}
       >
         <div className="flex items-start gap-4">
           <div>
             <h3
               className={`text-lg font-bold mb-3
-              ${theme === "dark" ? "text-gray-100" : "text-orange-900"}`}
+              ${theme === "dark" ? "text-gray-100" : "text-primary-900"}`}
             >
               {t("manageContent.socialMedia.whyConnect")}
             </h3>
@@ -359,7 +358,7 @@ export default function SocialMediaAccounts() {
                 {
                   icon: Zap,
                   title: t("manageContent.socialMedia.benefits.autoPublish"),
-                  color: "text-orange-500",
+                  color: "text-primary-500",
                 },
                 {
                   icon: BarChart3,
@@ -378,7 +377,7 @@ export default function SocialMediaAccounts() {
                   ${
                     theme === "dark"
                       ? "bg-neutral-800/30 border border-neutral-700/30"
-                      : "bg-white/60 border border-orange-100"
+                      : "bg-white/60 border border-primary-100"
                   }`}
                 >
                   <div
@@ -404,7 +403,7 @@ export default function SocialMediaAccounts() {
               ${
                 theme === "dark"
                   ? "bg-neutral-800/40 text-gray-400 border border-neutral-700/40"
-                  : "bg-white/60 text-orange-600/80 border border-orange-100"
+                  : "bg-white/60 text-primary-600/80 border border-primary-100"
               }`}
             >
               <div className="flex items-center gap-2 mb-2">
@@ -428,7 +427,7 @@ export default function SocialMediaAccounts() {
         >
           <Loader2
             className={`w-10 h-10 animate-spin mb-4 ${
-              theme === "dark" ? "text-orange-400" : "text-orange-600"
+              theme === "dark" ? "text-primary-400" : "text-primary-600"
             }`}
           />
           <p
@@ -586,8 +585,8 @@ export default function SocialMediaAccounts() {
                         : "bg-gray-100 text-gray-400 cursor-not-allowed"
                       : account.isConnected
                       ? theme === "dark"
-                        ? "bg-gradient-to-r from-red-900/30 to-red-800/30 text-red-300 border border-red-700/30 hover:from-red-800/40 hover:to-red-700/40"
-                        : "bg-gradient-to-r from-red-50 to-red-100 text-red-600 border border-red-200 hover:from-red-100 hover:to-red-50"
+                        ? "bg-gradient-to-r from-primary-900/30 to-primary-800/30 text-primary-300 border border-primary-700/30 hover:from-primary-800/40 hover:to-primary-700/40"
+                        : "bg-gradient-to-r from-primary-50 to-primary-100 text-primary-600 border border-primary-200 hover:from-primary-100 hover:to-primary-50"
                       : `bg-gradient-to-r ${account.gradient} text-white shadow-lg hover:shadow-xl hover:scale-[1.02]`
                   }`}
               >

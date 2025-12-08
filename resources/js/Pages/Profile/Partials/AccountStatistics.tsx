@@ -91,11 +91,11 @@ export default function AccountStatistics({
       value: `${getDaysSinceJoining(user?.created_at || null)} ${t(
         "profile.statistics.days"
       )}`,
-      color: theme === "dark" ? "text-orange-400" : "text-orange-600",
+      color: theme === "dark" ? "text-primary-400" : "text-primary-600",
       bgColor:
         theme === "dark"
-          ? "bg-gradient-to-r from-orange-900/20 to-orange-800/20 border border-orange-800/30"
-          : "bg-gradient-to-r from-orange-50 to-orange-100/50 border border-orange-100",
+          ? "bg-gradient-to-r from-primary-900/20 to-primary-800/20 border border-primary-800/30"
+          : "bg-gradient-to-r from-primary-50 to-primary-100/50 border border-primary-100",
     },
     {
       icon: Shield,
@@ -161,8 +161,8 @@ export default function AccountStatistics({
           className={`p-4 rounded-lg border transition-colors duration-300
           ${
             theme === "dark"
-              ? "bg-gradient-to-r from-yellow-900/10 to-orange-900/10 border-yellow-800/30"
-              : "bg-gradient-to-r from-yellow-50 to-orange-50/50 border-yellow-200"
+              ? "bg-gradient-to-r from-yellow-900/10 to-primary-900/10 border-yellow-800/30"
+              : "bg-gradient-to-r from-yellow-50 to-primary-50/50 border-yellow-200"
           }`}
         >
           <div className="flex items-center justify-between mb-3">

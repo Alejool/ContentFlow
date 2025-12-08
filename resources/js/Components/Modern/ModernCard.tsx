@@ -35,20 +35,22 @@ export default function ModernCard({
         ? "from-blue-700 to-blue-900"
         : "from-blue-600 to-blue-800",
     red:
-      theme === "dark" ? "from-red-700 to-red-900" : "from-red-600 to-red-800",
+      theme === "dark"
+        ? "from-primary-700 to-primary-900"
+        : "from-primary-600 to-primary-800",
     green:
       theme === "dark"
         ? "from-green-700 to-green-900"
         : "from-green-600 to-green-800",
     orange:
       theme === "dark"
-        ? "from-orange-600 to-orange-800"
-        : "from-orange-600 to-orange-700",
+        ? "from-primary-600 to-primary-800"
+        : "from-primary-600 to-primary-700",
     purple:
       theme === "dark"
         ? "from-purple-700 to-purple-900"
         : "from-purple-600 to-purple-800",
-    custom: customGradient || "from-orange-600 to-orange-700",
+    custom: customGradient || "from-primary-600 to-primary-700",
   };
 
   const gradientClass =

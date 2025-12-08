@@ -4,9 +4,9 @@ import LanguageSwitcher from "@/Components/LanguageSwitcher";
 import ResponsiveNavLink from "@/Components/ResponsiveNavLink";
 import ThemeSwitcher from "@/Components/ThemeSwitcher";
 import { useTheme } from "@/Hooks/useTheme";
+import { usePage } from "@inertiajs/react";
 import { BarChart3, Bot, FileText, Home, LogOut, User } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { usePage } from "@inertiajs/react";
 
 interface CustomAvatarProps {
   src?: string | null;
@@ -41,11 +41,11 @@ function CustomAvatar({
 
   const avatarBgClass =
     theme === "dark"
-      ? "bg-gradient-to-br from-orange-900/30 to-purple-900/30"
-      : "bg-gradient-to-br from-orange-100 to-purple-100";
+      ? "bg-gradient-to-br from-primary-900/30 to-purple-900/30"
+      : "bg-gradient-to-br from-primary-100 to-purple-100";
 
   const avatarTextClass =
-    theme === "dark" ? "text-orange-200" : "text-orange-800";
+    theme === "dark" ? "text-primary-200" : "text-primary-800";
 
   return (
     <div
@@ -57,7 +57,6 @@ function CustomAvatar({
           alt={name}
           className="w-full h-full object-cover"
           onError={(e) => {
-            // Si la imagen falla, mostrar iniciales
             const img = e.currentTarget;
             img.style.display = "none";
 
@@ -67,7 +66,6 @@ function CustomAvatar({
 
             const parent = img.parentElement;
             if (parent) {
-              // Eliminar cualquier fallback existente
               const existingFallback = parent.querySelector(".avatar-fallback");
               if (existingFallback) {
                 parent.removeChild(existingFallback);
@@ -121,6 +119,18 @@ export default function MobileNavbar({
   const { theme } = useTheme();
   const { url } = usePage();
 
+  const colorNoActive = `${
+    theme === "dark"
+      ? "text-beige-400 hover:text-orange-400 hover:bg-neutral-600/40"
+      : "text-gray-700 hover:text-orange-600 hover:bg-gray-200/40"
+  }`;
+
+  const colorActive = `${
+    theme === "dark"
+      ? "bg-primary-900/30 text-primary-300"
+      : "bg-primary-100 text-primary-700"
+  }`;
+
   const isActiveRoute = (routeName: string) => {
     return (
       url.includes(routeName.replace(".index", "")) ||
@@ -145,8 +155,8 @@ export default function MobileNavbar({
             className={`inline-flex items-center justify-center p-3 rounded-lg
                 ${
                   theme === "dark"
-                    ? "text-gray-400 hover:text-orange-400"
-                    : "text-gray-700 hover:text-orange-600"
+                    ? "text-gray-400 hover:text-primary-400"
+                    : "text-gray-700 hover:text-primary-600"
                 }`}
             aria-label={showingNavigationDropdown ? "Close menu" : "Open menu"}
           >
@@ -176,7 +186,7 @@ export default function MobileNavbar({
           </button>
 
           <div className="flex items-center space-x-3">
-            <img src={Logo} alt="Logo" className="w-48 h-24" />
+            <img src={Logo} alt="Logo" className="w-56 h-24" />
           </div>
 
           <div className="flex items-center">
@@ -201,8 +211,8 @@ export default function MobileNavbar({
                         } ${
                           isProfileActive
                             ? theme === "dark"
-                              ? "ring-orange-500"
-                              : "ring-orange-600"
+                              ? "ring-primary-500"
+                              : "ring-primary-600"
                             : ""
                         }`}
                       >
@@ -216,7 +226,6 @@ export default function MobileNavbar({
                         <span className="font-medium truncate max-w-[120px]">
                           {user.name || "User"}
                         </span>
-                        
                       </div>
                       <svg
                         className={`ml-1 h-4 w-4 ${
@@ -238,14 +247,16 @@ export default function MobileNavbar({
               </Dropdown.Trigger>
 
               <Dropdown.Content
-                className={`shadow-xl min-w-[200px]
+                contentClasses={`shadow-xl min-w-[200px]
                   ${
                     theme === "dark"
-                      ? "bg-neutral-800 text-gray-200"
+                      ? "bg-neutral-800 text-white"
                       : "bg-white text-gray-700"
                   }`}
               >
-                <div className="p-3 border-b border-neutral-700/50 dark:border-gray-200/10">
+                <div
+                  className={`p-3 border-b border-neutral-700/50 dark:border-gray-200/10 $`}
+                >
                   <div className="flex items-center gap-3">
                     <CustomAvatar
                       src={user.photo_url}
@@ -267,23 +278,15 @@ export default function MobileNavbar({
 
                 <Dropdown.Link
                   href={route("profile.edit")}
-                  className={`flex items-center space-x-2 px-3 py-2.5 transition-colors
-                    ${
-                      isProfileActive
-                        ? theme === "dark"
-                          ? "bg-orange-900/30 text-orange-300"
-                          : "bg-orange-100 text-orange-700"
-                        : theme === "dark"
-                        ? "hover:bg-neutral-700 hover:text-orange-400"
-                        : "hover:bg-gray-100 hover:text-orange-600"
-                    }`}
+                  className={`flex items-center space-x-2 px-3 py-2.5 transition-colors ${colorNoActive}
+                    ${isProfileActive ? colorActive : ""}`}
                 >
                   <User
                     className={`h-4 w-4 ${
                       isProfileActive
                         ? theme === "dark"
-                          ? "text-orange-400"
-                          : "text-orange-600"
+                          ? "text-primary-400"
+                          : "text-primary-600"
                         : ""
                     }`}
                   />
@@ -294,7 +297,7 @@ export default function MobileNavbar({
                     <span className="ml-auto">
                       <div
                         className={`w-2 h-2 rounded-full ${
-                          theme === "dark" ? "bg-orange-400" : "bg-orange-600"
+                          theme === "dark" ? "bg-primary-400" : "bg-primary-600"
                         }`}
                       ></div>
                     </span>
@@ -305,12 +308,7 @@ export default function MobileNavbar({
                   href={route("logout")}
                   method="post"
                   as="button"
-                  className={`flex items-center space-x-2 px-3 py-2.5 transition-colors
-                    ${
-                      theme === "dark"
-                        ? "hover:bg-neutral-700 hover:text-red-400"
-                        : "hover:bg-gray-100 hover:text-red-600"
-                    }`}
+                  className={`flex items-center space-x-2 px-3 py-2.5 transition-colors ${colorNoActive}`}
                 >
                   <LogOut className="h-4 w-4" />
                   <span>{t("nav.logout")}</span>
@@ -323,7 +321,7 @@ export default function MobileNavbar({
 
       <div
         className={`${showingNavigationDropdown ? "block" : "hidden"}
-          ${theme === "dark" ? "bg-neutral-900/95" : "bg-beige-200/95"}`}
+         `}
       >
         <div className="px-4 py-6 space-y-2">
           {mobileNavigationItems.map((item) => {
@@ -338,13 +336,13 @@ export default function MobileNavbar({
                     isActive
                       ? `bg-gradient-to-r ${
                           theme === "dark"
-                            ? "from-orange-600 to-orange-800"
-                            : "from-orange-600 to-orange-700"
+                            ? "from-primary-600 to-primary-800"
+                            : "from-primary-600 to-primary-700"
                         } text-white shadow-lg`
                       : `${
                           theme === "dark"
-                            ? "text-gray-200 hover:bg-neutral-800 hover:text-orange-400"
-                            : "text-gray-700 hover:bg-beige-300 hover:text-orange-600"
+                            ? "text-gray-200 hover:bg-neutral-800 hover:text-primary-400"
+                            : "text-gray-700 hover:bg-beige-300 hover:text-primary-600"
                         }`
                   }`}
               >
@@ -354,7 +352,7 @@ export default function MobileNavbar({
                   <span className="ml-auto">
                     <div
                       className={`w-2 h-2 rounded-full ${
-                        theme === "dark" ? "bg-orange-300" : "bg-orange-500"
+                        theme === "dark" ? "bg-primary-300" : "bg-primary-500"
                       }`}
                     ></div>
                   </span>
@@ -376,8 +374,8 @@ export default function MobileNavbar({
                 className={`flex-1 flex items-center justify-center space-x-3 px-4 py-3 rounded-lg border transition-all duration-300
                     ${
                       theme === "dark"
-                        ? "bg-neutral-800 border-neutral-700 text-gray-200 hover:bg-red-900/30 hover:text-red-300"
-                        : "bg-beige-300 border-beige-400 text-gray-700 hover:bg-red-50 hover:text-red-600"
+                        ? "bg-neutral-800 border-neutral-700 text-gray-200 hover:bg-primary-900/30 hover:text-primary-300"
+                        : "bg-beige-300 border-beige-400 text-gray-700 hover:bg-primary-50 hover:text-primary-600"
                     }`}
               >
                 <LogOut className="h-5 w-5" />

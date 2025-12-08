@@ -12,16 +12,21 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use App\Services\SocialPlatforms\FacebookService;
+use App\Services\SocialPlatforms\InstagramService;
+use App\Services\SocialPlatforms\TwitterService;
+use App\Services\SocialPlatforms\YouTubeService;
+use Illuminate\Support\Facades\Log;
+use App\Models\SocialAccount;
 
 class CampaignController extends Controller
 {
-
     public function index(Request $request)
     {
         $query = Campaign::where('user_id', Auth::id())
-            ->with(['mediaFiles', 'scheduledPosts']);
+            ->with(['mediaFiles', 'scheduledPosts.socialAccount']);
 
-        // Status Filter
+        
         if ($request->has('status') && $request->status !== 'all') {
             switch ($request->status) {
                 case 'active':
@@ -39,7 +44,6 @@ class CampaignController extends Controller
             }
         }
 
-        // Date Range Filter (Creation Date)
         if ($request->has('date_start') && $request->has('date_end')) {
             $query->byDateRange($request->date_start, $request->date_end);
         }
@@ -60,7 +64,6 @@ class CampaignController extends Controller
 
     public function store(Request $request)
     {
-        // Check if the campaign already exists
         if (Campaign::where('title', $request->title)->exists()) {
             return response()->json([
                 'success' => false,
@@ -69,12 +72,10 @@ class CampaignController extends Controller
             ], 409);
         }
 
-        // Validate input data
         $validatedData = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'hashtags' => 'nullable|string',
-            'media.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,webp,mp4,mov,avi|max:51200', // 50MB max
             'goal' => 'nullable|string',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
@@ -87,7 +88,6 @@ class CampaignController extends Controller
         DB::beginTransaction();
 
         try {
-            // Create the campaign
             $campaign = Campaign::create([
                 'title' => $validatedData['title'],
                 'description' => $validatedData['description'],
@@ -104,14 +104,12 @@ class CampaignController extends Controller
 
             $firstMediaFileId = null;
 
-            // Handle Media Uploads
             if ($request->hasFile('media')) {
                 foreach ($request->file('media') as $index => $file) {
                     $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
                     $path = $file->storeAs('campaigns', $filename, 's3');
                     $absolutePath = Storage::disk('s3')->url($path);
 
-                    // Create MediaFile record
                     $mediaFile = MediaFile::create([
                         'user_id' => Auth::id(),
                         'campaign_id' => $campaign->id,
@@ -122,7 +120,6 @@ class CampaignController extends Controller
                         'size' => $file->getSize(),
                     ]);
 
-                    // Link to Campaign
                     CampaignMedia::create([
                         'campaign_id' => $campaign->id,
                         'media_file_id' => $mediaFile->id,
@@ -131,13 +128,11 @@ class CampaignController extends Controller
 
                     if ($index === 0) {
                         $firstMediaFileId = $mediaFile->id;
-                        // For backward compatibility, update the image column if it exists and is used
                         $campaign->update(['image' => asset('storage/' . $path)]);
                     }
                 }
             }
 
-            // Handle Scheduling
             if (!empty($validatedData['scheduled_at']) && !empty($validatedData['social_accounts'])) {
                 $schedules = $request->input('social_account_schedules', []);
 
@@ -148,7 +143,6 @@ class CampaignController extends Controller
                         'user_id' => Auth::id(),
                         'social_account_id' => $accountId,
                         'campaign_id' => $campaign->id,
-                        'media_file_id' => $firstMediaFileId, // Attach the first media file
                         'caption' => $campaign->title . "\n\n" . $campaign->description . "\n\n" . $campaign->hashtags,
                         'scheduled_at' => $scheduledAt,
                         'status' => 'pending',
@@ -252,7 +246,7 @@ class CampaignController extends Controller
             $idsToDelete = $mediaFilesToDelete->pluck('id');
             if ($idsToDelete->isNotEmpty()) {
                 $campaign->mediaFiles()->detach($idsToDelete);
-                MediaFile::whereIn('id', $idsToDelete)->delete();
+                CampaignMedia::whereIn('media_file_id', $idsToDelete)->delete();
             }
 
             if ($request->hasFile('media')) {
@@ -279,16 +273,13 @@ class CampaignController extends Controller
                         'order' => $currentMaxOrder + 1 + $index,
                     ]);
 
-                    // Update legacy image if it was empty
                     if (!$campaign->image) {
                         $campaign->update(['image' => asset('storage/' . $path)]);
                     }
                 }
             }
 
-            // Handle Scheduling Update
             if (!empty($validatedData['scheduled_at']) && !empty($validatedData['social_accounts'])) {
-                // Remove existing scheduled posts that are still pending
                 ScheduledPost::where('campaign_id', $campaign->id)
                     ->where('status', 'pending')
                     ->delete();
@@ -311,7 +302,6 @@ class CampaignController extends Controller
                     ]);
                 }
             } elseif (!empty($validatedData['scheduled_at'])) {
-                // Update time for existing scheduled posts
                 ScheduledPost::where('campaign_id', $campaign->id)
                     ->where('status', 'pending')
                     ->update(['scheduled_at' => $validatedData['scheduled_at']]);
@@ -319,7 +309,6 @@ class CampaignController extends Controller
 
             DB::commit();
 
-            // Return response with the updated campaign
             return response()->json([
                 'success' => true,
                 'message' => 'Campaign updated successfully',
@@ -334,5 +323,94 @@ class CampaignController extends Controller
                 'status' => 500
             ], 500);
         }
+    }
+    public function publish(Request $request, $id)
+    {
+
+        $campaign = Campaign::with('mediaFiles')->findOrFail($id);
+        $platformIds = $request->input('platforms');
+
+        Log::info('campaign: ');
+        Log::info($campaign);
+
+
+        if (!$platformIds) {
+            return response()->json([
+                'success' => false,
+                'message' => 'The "platforms" field is required in the payload.',
+            ], 422);
+        }
+
+        $platformIds = array_values($platformIds);
+        $socialAccounts = SocialAccount::where('user_id', $campaign->user_id)
+            ->whereIn('id', $platformIds)
+            ->get();
+
+
+        if ($socialAccounts->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => "Social account for platform '{$platformIds}' not found for this campaign.",
+            ], 404);
+        }
+
+        Log::info('files: ');
+        Log::info($campaign->mediaFiles);
+
+
+        foreach ($socialAccounts as $socialAccount) {
+            $platformService = self::getPlatformService($socialAccount->platform, $socialAccount->access_token);
+
+            if ($socialAccount->platform == 'youtube') {
+                $firstMediaFile = $campaign->mediaFiles->first();
+                $platformService->publishPost([
+                    'campaign_id'   => $campaign->id,
+                    'privacy' => 'private',
+                    'video_path' => $firstMediaFile->file_path,
+                    'caption'       => $campaign->title . "\n\n" . $campaign->description . "\n\n" . $campaign->hashtags,
+                    'social_account_id' => $socialAccount->id,
+                    'content' => $campaign->title . "\n\n" . $campaign->description . "\n\n" . $campaign->hashtags,
+                    'title' => $campaign->title,
+                    'description' => $campaign->description,
+                    'hashtags' => $campaign->hashtags,
+                    'refresh_token' => $socialAccount->refresh_token,
+                ]);
+
+
+
+
+            } else {
+                foreach ($campaign->mediaFiles as $mediaFile) {
+                    $platformService->publishPost([
+                        'campaign_id'   => $campaign->id,
+                        'privacy' => 'private',
+                        'video_path' => $mediaFile->file_path,
+                        'caption'       => $campaign->title . "\n\n" . $campaign->description . "\n\n" . $campaign->hashtags,
+                        'social_account_id' => $socialAccount->id,
+                        'content' => $campaign->title . "\n\n" . $campaign->description . "\n\n" . $campaign->hashtags,
+                        'title' => $campaign->title,
+                        'description' => $campaign->description,
+                        'hashtags' => $campaign->hashtags,
+                        'refresh_token' => $socialAccount->refresh_token,
+                    ]);
+                }
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Campaign published successfully',
+        ]);
+    }
+
+    private static function getPlatformService(string $platform, string $token)
+    {
+        return match ($platform) {
+            'facebook' => new FacebookService($token),
+            'instagram' => new InstagramService($token),
+            'twitter' => new TwitterService($token),
+            'youtube' => new YoutubeService($token),
+            default => throw new \Exception('Invalid platform'),
+        };
     }
 }
