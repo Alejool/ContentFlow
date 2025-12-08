@@ -111,7 +111,7 @@ class SocialPostService
   /**
    * Get the appropriate platform service
    */
-  protected function getPlatformService(string $platform, string $token)
+  public function getPlatformService(string $platform, string $token)
   {
     return match ($platform) {
       'facebook' => new FacebookService($token),

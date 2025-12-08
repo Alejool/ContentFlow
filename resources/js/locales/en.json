@@ -19,9 +19,18 @@
     "previous": "Previous",
     "showing": "Showing",
     "of": "of",
-    "results": "Results",
-    "perPage": "per page",
-    "noResults": "No results"
+     "results": "resultados",
+    "perPage": "por página",
+    "noResults": "No se encontraron resultados",
+    "search": "Buscar por nombre",
+    "noCreditCard": "No requiere tarjeta de crédito",
+    "unknown": "Desconocido",
+    "platform": "Plataforma",
+    "close": "Cerrar",
+    "created": "Creado",
+    "lastUpdated": "Última Actualización",
+    "startDate": "Fecha de Inicio",
+    "endDate": "Fecha de Fin"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -164,6 +173,9 @@
     "startDate": "Start Date",
     "endDate": "End Date",
     "publishDate": "Publish Date",
+    "publishedOn": "Published On",
+    "scheduledPosts": "Scheduled Posts",
+    "noScheduledPosts": "No scheduled posts specifically.",
     "draft": "Draft",
     "completed": "Completed",
     "yourContent": "Your Content",
@@ -459,6 +471,17 @@
         "popupBlocked": "The browser blocked the pop-up window. Please allow pop-ups for this site.",
         "urlError": "Could not get authentication URL",
         "connectError": "Error connecting with"
+      },
+      "disconnectModal": {
+        "title": "Disconnect Account",
+        "warning": "Account has pending posts",
+        "explanation": "This account has scheduled posts associated. To disconnect it, you must first delete these posts or force the disconnection.",
+        "table": {
+            "date": "Date",
+            "campaign": "Campaign"
+        },
+        "cancelButton": "Keep connected",
+        "confirmButton": "Disconnect and delete all"
       }
     },
 
@@ -484,6 +507,7 @@
         "goal": "Campaign goal",
         "hashtags": "Hashtags",
         "optional": "(Optional)",
+        "selectSocialAccounts": "Select Social Networks",
         "schedulePublication": "Schedule Publication (Optional)",
         "optionalSchedule": "Leave empty to save as draft or publish immediately.",
         "socialAccounts": "Select Social Networks",
@@ -514,7 +538,11 @@
         "objMax": "Objective cannot exceed 200 characters",
         "hashtagsRequired": "Hashtags are required",
         "hashtagValid": "Must include at least one valid hashtag (#example)",
-        "hashtagMax": "Maximum 10 hashtags allowed"
+        "hashtagMax": "Maximum 10 hashtags allowed",
+        "confirmDeleteSchedule": "Are you sure you want to delete this scheduled post? This action cannot be undone.",
+        "deleteScheduleTitle": "Delete Scheduled Post?",
+        "scheduleDeleted": "Scheduled post deleted successfully",
+        "scheduleDeleteError": "Failed to delete scheduled post"
       }
     }
   }

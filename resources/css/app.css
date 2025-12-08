@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -6,114 +6,175 @@
 
 @layer base {
   html {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      "Helvetica Neue", Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
-  
-  h1, h2, h3, h4, h5, h6 {
-    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI",
+      Roboto, sans-serif;
     font-weight: 600;
     letter-spacing: -0.025em;
   }
-  
-  button, .btn, .button, [type="button"], [type="submit"], [type="reset"] {
-    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  button,
+  .btn,
+  .button,
+  [type="button"],
+  [type="submit"],
+  [type="reset"] {
+    font-family: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI",
+      Roboto, sans-serif;
   }
-  
-  label, .badge, .tag, .chip, .pill {
-    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  label,
+  .badge,
+  .tag,
+  .chip,
+  .pill {
+    font-family: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI",
+      Roboto, sans-serif;
   }
-  
+
   span {
   }
-  
-  p, li, td, th, div, section, article, main, aside {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  p,
+  li,
+  td,
+  th,
+  div,
+  section,
+  article,
+  main,
+  aside {
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      sans-serif;
   }
-  
-  input, textarea, select {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  input,
+  textarea,
+  select {
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      sans-serif;
+  }
+
+  /* Custom Orange Scrollbars */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-orange-500 rounded-full;
+    border: 2px solid transparent; /* Padding around thumb */
+    background-clip: content-box; /* Makes thumb smaller than track */
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-orange-600;
+  }
+
+  /* Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #f97316 transparent;
+  }
+
+  /* Dark mode overrides for Firefox if needed, but orange on transparent is usually fine */
+  .dark {
+    scrollbar-color: #f97316 #262626; /* orange-500 on neutral-800 */
   }
 }
 
 @layer components {
-  
   .heading-1 {
     @apply text-4xl md:text-5xl lg:text-6xl font-heading font-bold tracking-tight;
   }
-  
+
   .heading-2 {
     @apply text-3xl md:text-4xl font-heading font-semibold tracking-tight;
   }
-  
+
   .heading-3 {
     @apply text-2xl md:text-3xl font-heading font-semibold;
   }
-  
+
   .body-lg {
     @apply text-lg font-sans leading-relaxed;
   }
-  
+
   .body-md {
     @apply text-base font-sans leading-relaxed;
   }
-  
+
   .body-sm {
     @apply text-sm font-sans leading-normal;
   }
-  
+
   .btn {
     @apply font-heading font-medium;
   }
-  
+
   .btn-primary {
     @apply font-heading font-semibold;
   }
-  
+
   .nav-link {
     @apply font-heading font-medium;
   }
-  
+
   .card-title {
     @apply font-heading font-semibold;
   }
-  
+
   .card-subtitle {
     @apply font-sans font-medium;
   }
-  
+
   .stat-number {
     @apply font-heading font-bold;
   }
-  
+
   .stat-label {
     @apply font-sans font-medium uppercase tracking-wide;
   }
-  
+
   .span-poppins {
     @apply font-heading;
   }
-  
+
   .span-inter {
     @apply font-sans;
   }
 }
 
 @layer utilities {
-  
   .font-poppins {
-    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI",
+      Roboto, sans-serif;
   }
-  
+
   .font-inter {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      sans-serif;
   }
-  
+
   .span-ui {
     @apply font-poppins font-medium;
   }
-  
+
   .span-content {
     @apply font-inter font-normal;
   }

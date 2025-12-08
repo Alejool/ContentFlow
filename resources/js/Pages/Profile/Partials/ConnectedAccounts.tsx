@@ -34,13 +34,13 @@ export default function ConnectedAccounts({ className = "" }) {
       logo: IconFacebook,
       isConnected: false,
     },
-    {
-      id: 2,
-      platform: "instagram",
-      name: "Instagram",
-      logo: IconInstagram,
-      isConnected: false,
-    },
+    // {
+    //   id: 2,
+    //   platform: "instagram",
+    //   name: "Instagram",
+    //   logo: IconInstagram,
+    //   isConnected: false,
+    // },
     {
       id: 3,
       platform: "tiktok",

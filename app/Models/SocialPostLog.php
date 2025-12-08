@@ -14,14 +14,22 @@ class SocialPostLog extends Model
         'user_id',
         'social_account_id',
         'scheduled_post_id',
+        'campaign_id',
+        'media_file_id',
         'platform',
         'platform_post_id',
+        'post_type',
+        'post_url',
         'content',
         'media_urls',
+        'thumbnail_url',
         'published_at',
         'status',
         'error_message',
+        'retry_count',
+        'last_retry_at',
         'engagement_data',
+        'post_metadata',
     ];
 
     protected $casts = [
@@ -32,6 +40,9 @@ class SocialPostLog extends Model
         'media_urls' => 'array',
         'published_at' => 'timestamp',
         'engagement_data' => 'array',
+        'post_metadata' => 'array',
+        'retry_count' => 'integer',
+        'last_retry_at' => 'timestamp',
     ];
 
     public function user(): BelongsTo
@@ -49,6 +60,16 @@ class SocialPostLog extends Model
         return $this->belongsTo(ScheduledPost::class);
     }
 
+    public function campaign(): BelongsTo
+    {
+        return $this->belongsTo(Campaign::class);
+    }
+
+    public function mediaFile(): BelongsTo
+    {
+        return $this->belongsTo(MediaFile::class);
+    }
+
     public function getEngagementMetrics(): array
     {
         if (!$this->engagement_data) {
@@ -62,6 +83,25 @@ class SocialPostLog extends Model
 
         return $this->engagement_data;
     }
+    public function canRetry(): bool
+    {
+        return $this->status === 'failed' && $this->retry_count < 3;
+    }
+    public function isPublished(): bool
+    {
+        return $this->status === 'published';
+    }
+
+    public function isFailed(): bool
+    {
+        return $this->status === 'failed';
+    }
+
+    public function isPending(): bool
+    {
+        return $this->status === 'pending';
+    }
+
 
     public function scopePublished($query)
     {
@@ -73,6 +113,11 @@ class SocialPostLog extends Model
         return $query->where('status', 'failed');
     }
 
+    public function scopePending($query)
+    {
+        return $query->where('status', 'pending');
+    }
+
     public function scopeByPlatform($query, string $platform)
     {
         return $query->where('platform', $platform);
@@ -82,4 +127,19 @@ class SocialPostLog extends Model
     {
         return $query->whereBetween('published_at', [$startDate, $endDate]);
     }
+
+    public function scopeByCampaign($query, $campaignId)
+    {
+        return $query->where('campaign_id', $campaignId);
+    }
+    public function scopeRetryable($query)
+    {
+        return $query->where('status', 'failed')
+            ->where('retry_count', '<', 3);
+    }
+    public function scopeByMediaFile($query, $mediaFileId)
+    {
+        return $query->where('media_file_id', $mediaFileId);
+    }
+
 }

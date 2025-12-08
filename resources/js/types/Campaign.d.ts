@@ -20,7 +20,22 @@ export type Campaign = {
     social_account_id: number;
     scheduled_at: string;
     status: "pending" | "posted" | "failed";
+    social_account?: SocialAccount;
   }[];
+};
+
+export type SocialAccount = {
+  id: number;
+  platform: string;
+  account_id: string;
+  account_name: string;
+  access_token: string;
+  refresh_token: string;
+  token_expires_at: string;
+  is_active: boolean;
+  last_failed_at: string;
+  failure_count: number;
+  account_metadata: any;
 };
 
 export type MediaFile = {

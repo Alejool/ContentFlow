@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ScheduledPost extends Model
 {
-    use HasFactory;
+    use HasFactory, \Illuminate\Database\Eloquent\SoftDeletes;
 
     protected $fillable = [
         'user_id',
@@ -37,7 +37,7 @@ class ScheduledPost extends Model
 
     public function socialAccount(): BelongsTo
     {
-        return $this->belongsTo(SocialAccount::class);
+        return $this->belongsTo(SocialAccount::class)->withTrashed();
     }
 
     public function mediaFile(): BelongsTo

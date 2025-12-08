@@ -34,7 +34,7 @@ export default function DisconnectWarningModal({
 
       <div className="fixed inset-0 flex items-center justify-center p-4">
         <DialogPanel
-          className={`w-full max-w-lg transform overflow-hidden rounded-2xl p-6 text-left align-middle shadow-xl transition-all ${
+          className={`w-full max-w-lg transform overflow-hidden rounded-lg p-6 text-left align-middle shadow-xl transition-all ${
             theme === "dark"
               ? "bg-neutral-800 border border-neutral-700"
               : "bg-white"
@@ -123,7 +123,7 @@ export default function DisconnectWarningModal({
                               </div>
                             </td>
                             <td className="px-4 py-2">
-                              {post.campaign?.title || "Unknown"}
+                              {post.campaign?.title || t("common.unknown")}
                             </td>
                           </tr>
                         ))}

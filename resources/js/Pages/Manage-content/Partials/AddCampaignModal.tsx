@@ -1,7 +1,9 @@
+import ModernDatePicker from "@/Components/ui/ModernDatePicker";
 import { useCampaignManagement } from "@/Hooks/useCampaignManagement";
 import { useTheme } from "@/Hooks/useTheme";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
+import { format } from "date-fns";
 import {
   AlertTriangle,
   Clock,
@@ -537,15 +539,32 @@ export default function AddCampaignModal({
                     <Clock className={`w-4 h-4 ${iconColor}`} />
                     {t("manageContent.modals.fields.schedulePublication")}
                   </label>
-                  <input
-                    type="datetime-local"
-                    {...register("scheduled_at")}
-                    className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-offset-0 transition-all ${inputBg} ${borderColor} ${focusBorder} ${colorIconInput}`}
-                  />
+                  <div className={colorIconInput}>
+                    <ModernDatePicker
+                      selected={
+                        watch("scheduled_at")
+                          ? new Date(watch("scheduled_at")!)
+                          : null
+                      }
+                      onChange={(date: Date | null) => {
+                        setValue(
+                          "scheduled_at",
+                          date ? format(date, "yyyy-MM-dd'T'HH:mm") : ""
+                        );
+                      }}
+                      showTimeSelect
+                      placeholder={
+                        t("manageContent.modals.fields.schedulePublication") ||
+                        "Schedule Publication"
+                      }
+                      dateFormat="Pp"
+                      minDate={new Date()}
+                      withPortal
+                      popperPlacement="bottom-start"
+                    />
+                  </div>
                   <p className={`text-xs mt-1 ${textTertiary}`}>
-                    {t(
-                      "manageContent.modals.fields.schedulePublicationOptional"
-                    )}
+                    {t("manageContent.modals.fields.optionalSchedule")}
                   </p>
                 </div>
 
@@ -556,12 +575,15 @@ export default function AddCampaignModal({
                       className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
                     >
                       <Target className={`w-4 h-4 ${iconColor}`} />
-                      Select Social Networks
+                      {t("manageContent.modals.fields.selectSocialAccounts")}
                     </label>
                     <div className="grid grid-cols-2 gap-3">
                       {socialAccounts.map((account) => {
+                        if (!watchedFields?.social_accounts || watchedFields.social_accounts.length === 0) {
+                          return null;
+                        }
                         const isChecked =
-                          watchedFields.social_accounts?.includes(account.id) ||
+                          watchedFields?.social_accounts?.includes(account.id) ||
                           false;
                         const customSchedule = accountSchedules[account.id];
 
@@ -673,17 +695,32 @@ export default function AddCampaignModal({
                                         />
                                       </button>
                                     </div>
-                                    <input
-                                      type="datetime-local"
-                                      className={`w-full px-3 py-2 text-sm rounded border mb-3 ${inputBg} ${borderColor} ${textPrimary} ${colorIconInput}`}
-                                      value={customSchedule || ""}
-                                      onChange={(e) => {
-                                        setAccountSchedules((prev) => ({
-                                          ...prev,
-                                          [account.id]: e.target.value,
-                                        }));
-                                      }}
-                                    />
+                                    <div className={colorIconInput}>
+                                      <ModernDatePicker
+                                        selected={
+                                          customSchedule
+                                            ? new Date(customSchedule)
+                                            : null
+                                        }
+                                        onChange={(date: Date | null) => {
+                                          setAccountSchedules((prev) => ({
+                                            ...prev,
+                                            [account.id]: date
+                                              ? format(
+                                                  date,
+                                                  "yyyy-MM-dd'T'HH:mm"
+                                                )
+                                              : "",
+                                          }));
+                                        }}
+                                        showTimeSelect
+                                        placeholder="Select date & time"
+                                        dateFormat="Pp"
+                                        minDate={new Date()}
+                                        withPortal
+                                        popperPlacement="bottom-start"
+                                      />
+                                    </div>
                                     <div className="flex justify-end gap-2">
                                       <button
                                         type="button"

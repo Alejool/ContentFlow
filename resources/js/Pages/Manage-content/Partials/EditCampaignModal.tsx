@@ -1,8 +1,10 @@
+import ModernDatePicker from "@/Components/ui/ModernDatePicker";
 import { useCampaignManagement } from "@/Hooks/useCampaignManagement";
 import { useTheme } from "@/Hooks/useTheme";
 import { Campaign } from "@/types/Campaign";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
+import { format } from "date-fns";
 import {
   AlertTriangle,
   Clock,
@@ -17,6 +19,7 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 
@@ -86,6 +89,8 @@ const validateFile = (file: File, t: any) => {
   return null;
 };
 
+import { useConfirm } from "@/Hooks/useConfirm";
+
 export default function EditCampaignModal({
   isOpen,
   onClose,
@@ -102,6 +107,8 @@ export default function EditCampaignModal({
   const [imageError, setImageError] = useState<string | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { confirm, ConfirmDialog } = useConfirm();
   const [socialAccounts, setSocialAccounts] = useState<any[]>([]);
   const [accountSchedules, setAccountSchedules] = useState<
     Record<number, string>
@@ -340,20 +347,23 @@ export default function EditCampaignModal({
   };
 
   const handleDeleteScheduledPost = async (postId: number) => {
-    // confirm is blocking, better to use a custom dialog, but native is fine for now
-    if (
-      !window.confirm(
-        t("manageContent.modals.validation.confirmDeleteSchedule")
-      )
-    )
-      return;
+    const isConfirmed = await confirm({
+      title: t("manageContent.modals.validation.deleteScheduleTitle"),
+      message: t("manageContent.modals.validation.confirmDeleteSchedule"),
+      confirmText: t("common.delete"),
+      cancelText: t("common.cancel"),
+      type: "danger",
+    });
+
+    if (!isConfirmed) return;
 
     try {
-      await axios.delete(`/api/scheduled-posts/${postId}`);
+      await axios.delete(`/scheduled-posts/${postId}`);
       setDeletedPostIds((prev) => [...prev, postId]);
-      // Optional: toast success
+      toast.success(t("manageContent.modals.validation.scheduleDeleted"));
     } catch (error) {
       console.error("Failed to delete scheduled post", error);
+      toast.error(t("manageContent.modals.validation.scheduleDeleteError"));
     }
   };
 
@@ -425,298 +435,327 @@ export default function EditCampaignModal({
   if (!isOpen) return null;
 
   return (
-    <div
-      className={`fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 ${
-        theme === "dark" ? "text-white" : "text-gray-900"
-      }`}
-    >
+    <>
       <div
-        className={`absolute inset-0 ${
-          theme === "dark" ? "bg-black/50" : "bg-gray-900/50"
-        } backdrop-blur-sm transition-opacity`}
-        onClick={onClose}
-      ></div>
-
-      <div
-        className={`relative w-full max-w-4xl ${modalBg} rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300`}
+        className={`fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 ${
+          theme === "dark" ? "text-white" : "text-gray-900"
+        }`}
       >
         <div
-          className={`px-8 py-6 border-b ${modalHeaderBorder} ${modalHeaderBg} flex items-center justify-between sticky top-0 z-10`}
+          className={`absolute inset-0 ${
+            theme === "dark" ? "bg-black/50" : "bg-gray-900/50"
+          } backdrop-blur-sm transition-opacity`}
+          onClick={onClose}
+        ></div>
+
+        <div
+          className={`relative w-full max-w-4xl ${modalBg} rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300`}
         >
-          <div>
-            <h2
-              className={`text-2xl font-bold ${textPrimary} flex items-center gap-2`}
-            >
-              <Edit className={`w-6 h-6 ${iconColor}`} />
-              {t("manageContent.modals.edit.title")}
-            </h2>
-            <p className={`${textSecondary} mt-1`}>
-              {t("manageContent.modals.edit.subtitle")}
-            </p>
-          </div>
-          <button
-            onClick={onClose}
-            className={`p-2 hover:${
-              theme === "dark" ? "bg-neutral-700" : "bg-gray-100"
-            } rounded-full transition-colors ${textTertiary} hover:${
-              theme === "dark" ? "text-gray-200" : "text-gray-600"
-            }`}
+          <div
+            className={`px-8 py-6 border-b ${modalHeaderBorder} ${modalHeaderBg} flex items-center justify-between sticky top-0 z-10`}
           >
-            <X className="w-6 h-6" />
-          </button>
-        </div>
+            <div>
+              <h2
+                className={`text-2xl font-bold ${textPrimary} flex items-center gap-2`}
+              >
+                <Edit className={`w-6 h-6 ${iconColor}`} />
+                {t("manageContent.modals.edit.title")}
+              </h2>
+              <p className={`${textSecondary} mt-1`}>
+                {t("manageContent.modals.edit.subtitle")}
+              </p>
+            </div>
+            <button
+              onClick={onClose}
+              className={`p-2 hover:${
+                theme === "dark" ? "bg-neutral-700" : "bg-gray-100"
+              } rounded-full transition-colors ${textTertiary} hover:${
+                theme === "dark" ? "text-gray-200" : "text-gray-600"
+              }`}
+            >
+              <X className="w-6 h-6" />
+            </button>
+          </div>
 
-        <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
-          <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <div className="space-y-6">
-                <div className="form-group">
-                  <label
-                    className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
-                  >
-                    <FileImage className={`w-4 h-4 ${iconColor}`} />
-                    {t("manageContent.modals.fields.image")}
-                  </label>
-                  <div
-                    className={`relative group cursor-pointer transition-all duration-300 ${
-                      isDragOver
-                        ? `scale-[1.02] ring-2 ${
-                            theme === "dark"
-                              ? "ring-orange-400"
-                              : "ring-orange-500"
-                          } ring-offset-2`
-                        : ""
-                    }`}
-                    onDrop={handleDrop}
-                    onDragOver={handleDragOver}
-                    onDragLeave={handleDragLeave}
-                    onClick={() => fileInputRef.current?.click()}
-                  >
-                    <div
-                      className={`min-h-[200px] rounded-lg border-2 border-dashed flex flex-col items-center justify-center p-6 text-center transition-colors overflow-hidden ${
-                        isDragOver
-                          ? `${dragOverBg}`
-                          : `${uploadBorder} hover:${
-                              theme === "dark"
-                                ? "bg-neutral-600"
-                                : "bg-gray-100"
-                            } ${uploadBg}`
-                      }`}
+          <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
+            <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-8">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div className="space-y-6">
+                  <div className="form-group">
+                    <label
+                      className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
                     >
-                      {mediaPreviews.length > 0 ? (
-                        <div className="grid grid-cols-2 gap-4 w-full">
-                          {mediaPreviews.map((preview, index) => (
-                            <div
-                              key={index}
-                              className="relative group/item aspect-video"
-                            >
-                              {preview.type.startsWith("video") ? (
-                                <video
-                                  src={preview.url}
-                                  className="w-full h-full object-cover rounded-lg"
-                                  controls
-                                />
-                              ) : (
-                                <img
-                                  src={preview.url}
-                                  alt={`Preview ${index}`}
-                                  className="w-full h-full object-cover rounded-lg shadow-sm"
-                                />
-                              )}
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  removeMedia(index);
-                                }}
-                                className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors opacity-0 group-hover/item:opacity-100"
-                              >
-                                <X className="w-3 h-3" />
-                              </button>
-                            </div>
-                          ))}
-                          <div className="flex items-center justify-center aspect-video border-2 border-dashed border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-                            <div className="text-center">
-                              <Upload className="w-6 h-6 mx-auto text-gray-400" />
-                              <span className="text-xs text-gray-500">
-                                Add more
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="space-y-4">
-                          <div
-                            className={`w-16 h-16 rounded-full ${
+                      <FileImage className={`w-4 h-4 ${iconColor}`} />
+                      {t("manageContent.modals.fields.image")}
+                    </label>
+                    <div
+                      className={`relative group cursor-pointer transition-all duration-300 ${
+                        isDragOver
+                          ? `scale-[1.02] ring-2 ${
                               theme === "dark"
-                                ? "bg-orange-900/30"
-                                : "bg-orange-100"
-                            } flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300`}
-                          >
-                            <Upload className={`w-8 h-8 ${iconColor}`} />
-                          </div>
-                          <div>
-                            <p className={`${textPrimary} font-medium text-lg`}>
-                              {t("manageContent.modals.fields.dragDrop.title")}
-                            </p>
-                            <p className={`${textSecondary} text-sm mt-1`}>
-                              {t(
-                                "manageContent.modals.fields.dragDrop.subtitle"
-                              )}
-                            </p>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                    <input
-                      type="file"
-                      ref={fileInputRef}
-                      className="hidden"
-                      multiple
-                      accept="image/*,video/*"
-                      onChange={(e) => handleFileChange(e.target.files)}
-                    />
-                  </div>
-                  {imageError && (
-                    <p className="mt-2 text-sm text-red-500 flex items-center gap-1 animate-in slide-in-from-left-1">
-                      <AlertTriangle className="w-4 h-4" />
-                      {imageError}
-                    </p>
-                  )}
-                </div>
-
-                <div className="form-group">
-                  <label
-                    className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
-                  >
-                    <Hash className={`w-4 h-4 ${iconColor}`} />
-                    {t("manageContent.modals.fields.hashtags")}
-                  </label>
-                  <div className="relative">
-                    <input
-                      {...register("hashtags")}
-                      className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-offset-0 transition-all ${inputBg}  ${
-                        errors.hashtags
-                          ? errorBorder
-                          : `${borderColor} ${focusBorder}`
+                                ? "ring-orange-400"
+                                : "ring-orange-500"
+                            } ring-offset-2`
+                          : ""
                       }`}
-                      placeholder={t(
-                        "manageContent.modals.fields.placeholders.hashtags"
-                      )}
-                      onChange={handleHashtagChange}
-                    />
-                  </div>
-                  {errors.hashtags && (
-                    <p className="mt-2 text-sm text-red-500 flex items-center gap-1">
-                      <AlertTriangle className="w-4 h-4" />
-                      {errors.hashtags.message}
-                    </p>
-                  )}
-                  <div className="mt-1 flex justify-end">
-                    <span className={`text-xs ${textTertiary}`}>
-                      {watchedFields.hashtags
-                        ? watchedFields.hashtags
-                            .split(" ")
-                            .filter((tag) => tag.startsWith("#")).length
-                        : 0}
-                      /10 hashtags
-                    </span>
-                  </div>
-                </div>
-
-                {/* Scheduling Field */}
-                <div className="form-group">
-                  <label
-                    className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
-                  >
-                    <Clock className={`w-4 h-4 ${iconColor}`} />
-                    {t("manageContent.modals.fields.schedulePublication")}
-                  </label>
-                  <input
-                    type="datetime-local"
-                    {...register("scheduled_at")}
-                    className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-offset-0 transition-all ${inputBg} ${borderColor} ${focusBorder} ${colorIconInput}`}
-                  />
-                  <p className={`text-xs mt-1 ${textTertiary}`}>
-                    {t("manageContent.modals.fields.optionalSchedule")}
-                  </p>
-                </div>
-
-                {/* Already Scheduled Posts List */}
-                {campaign.scheduled_posts &&
-                  campaign.scheduled_posts.length > 0 && (
-                    <div className="form-group animate-in fade-in slide-in-from-top-2">
-                      <label
-                        className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
-                      >
-                        <Clock className={`w-4 h-4 ${iconColor}`} />
-                        {t("manageContent.modals.fields.alreadyScheduled")}
-                      </label>
+                      onDrop={handleDrop}
+                      onDragOver={handleDragOver}
+                      onDragLeave={handleDragLeave}
+                      onClick={() => fileInputRef.current?.click()}
+                    >
                       <div
-                        className={`rounded-lg border overflow-hidden ${borderColor}`}
+                        className={`min-h-[200px] rounded-lg border-2 border-dashed flex flex-col items-center justify-center p-6 text-center transition-colors overflow-hidden ${
+                          isDragOver
+                            ? `${dragOverBg}`
+                            : `${uploadBorder} hover:${
+                                theme === "dark"
+                                  ? "bg-neutral-600"
+                                  : "bg-gray-100"
+                              } ${uploadBg}`
+                        }`}
                       >
-                        <table className="w-full text-sm text-left">
-                          <thead
-                            className={
-                              theme === "dark" ? "bg-neutral-800" : "bg-gray-50"
-                            }
-                          >
-                            <tr>
-                              <th
-                                className={`px-4 py-2 font-medium ${textSecondary}`}
+                        {mediaPreviews.length > 0 ? (
+                          <div className="grid grid-cols-2 gap-4 w-full">
+                            {mediaPreviews.map((preview, index) => (
+                              <div
+                                key={index}
+                                className="relative group/item aspect-video"
                               >
-                                Platform
-                              </th>
-                              <th
-                                className={`px-4 py-2 font-medium ${textSecondary}`}
+                                {preview.type.startsWith("video") ? (
+                                  <video
+                                    src={preview.url}
+                                    className="w-full h-full object-cover rounded-lg"
+                                    controls
+                                  />
+                                ) : (
+                                  <img
+                                    src={preview.url}
+                                    alt={`Preview ${index}`}
+                                    className="w-full h-full object-cover rounded-lg shadow-sm"
+                                  />
+                                )}
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    removeMedia(index);
+                                  }}
+                                  className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors opacity-0 group-hover/item:opacity-100"
+                                >
+                                  <X className="w-3 h-3" />
+                                </button>
+                              </div>
+                            ))}
+                            <div className="flex items-center justify-center aspect-video border-2 border-dashed border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                              <div className="text-center">
+                                <Upload className="w-6 h-6 mx-auto text-gray-400" />
+                                <span className="text-xs text-gray-500">
+                                  Add more
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="space-y-4">
+                            <div
+                              className={`w-16 h-16 rounded-full ${
+                                theme === "dark"
+                                  ? "bg-orange-900/30"
+                                  : "bg-orange-100"
+                              } flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300`}
+                            >
+                              <Upload className={`w-8 h-8 ${iconColor}`} />
+                            </div>
+                            <div>
+                              <p
+                                className={`${textPrimary} font-medium text-lg`}
                               >
-                                Date
-                              </th>
-                              <th
-                                className={`px-4 py-2 font-medium ${textSecondary}`}
-                              >
-                                Status
-                              </th>
-                            </tr>
-                          </thead>
-                          <tbody
-                            className={`divide-y ${
-                              theme === "dark"
-                                ? "divide-neutral-700"
-                                : "divide-gray-100"
-                            }`}
-                          >
-                            {campaign.scheduled_posts
-                              .filter((p) => !deletedPostIds.includes(p.id))
-                              .map((post) => {
-                                const account = socialAccounts.find(
-                                  (a) => a.id === post.social_account_id
-                                );
-                                return (
-                                  <tr
-                                    key={post.id}
-                                    className={
-                                      theme === "dark"
-                                        ? "bg-neutral-900/50"
-                                        : "bg-white"
-                                    }
-                                  >
-                                    <td
-                                      className={`px-4 py-2 ${textPrimary} font-medium`}
+                                {t(
+                                  "manageContent.modals.fields.dragDrop.title"
+                                )}
+                              </p>
+                              <p className={`${textSecondary} text-sm mt-1`}>
+                                {t(
+                                  "manageContent.modals.fields.dragDrop.subtitle"
+                                )}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        className="hidden"
+                        multiple
+                        accept="image/*,video/*"
+                        onChange={(e) => handleFileChange(e.target.files)}
+                      />
+                    </div>
+                    {imageError && (
+                      <p className="mt-2 text-sm text-red-500 flex items-center gap-1 animate-in slide-in-from-left-1">
+                        <AlertTriangle className="w-4 h-4" />
+                        {imageError}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="form-group">
+                    <label
+                      className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
+                    >
+                      <Hash className={`w-4 h-4 ${iconColor}`} />
+                      {t("manageContent.modals.fields.hashtags")}
+                    </label>
+                    <div className="relative">
+                      <input
+                        {...register("hashtags")}
+                        className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-offset-0 transition-all ${inputBg}  ${
+                          errors.hashtags
+                            ? errorBorder
+                            : `${borderColor} ${focusBorder}`
+                        }`}
+                        placeholder={t(
+                          "manageContent.modals.fields.placeholders.hashtags"
+                        )}
+                        onChange={handleHashtagChange}
+                      />
+                    </div>
+                    {errors.hashtags && (
+                      <p className="mt-2 text-sm text-red-500 flex items-center gap-1">
+                        <AlertTriangle className="w-4 h-4" />
+                        {errors.hashtags.message}
+                      </p>
+                    )}
+                    <div className="mt-1 flex justify-end">
+                      <span className={`text-xs ${textTertiary}`}>
+                        {watchedFields.hashtags
+                          ? watchedFields.hashtags
+                              .split(" ")
+                              .filter((tag) => tag.startsWith("#")).length
+                          : 0}
+                        /10 hashtags
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Scheduling Field */}
+                  <div className="form-group">
+                    <label
+                      className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
+                    >
+                      <Clock className={`w-4 h-4 ${iconColor}`} />
+                      {t("manageContent.modals.fields.schedulePublication")}
+                    </label>
+                    <div className={colorIconInput}>
+                      <ModernDatePicker
+                        selected={
+                          watch("scheduled_at")
+                            ? new Date(watch("scheduled_at")!)
+                            : null
+                        }
+                        onChange={(date: Date | null) => {
+                          setValue(
+                            "scheduled_at",
+                            date ? format(date, "yyyy-MM-dd'T'HH:mm") : ""
+                          );
+                        }}
+                        showTimeSelect
+                        placeholder={
+                          t(
+                            "manageContent.modals.fields.schedulePublication"
+                          ) || "Schedule Publication"
+                        }
+                        dateFormat="Pp"
+                        minDate={new Date()}
+                        withPortal
+                        popperPlacement="bottom-start"
+                      />
+                    </div>
+                    <p className={`text-xs mt-1 ${textTertiary}`}>
+                      {t("manageContent.modals.fields.optionalSchedule")}
+                    </p>
+                  </div>
+
+                  {/* Already Scheduled Posts List */}
+                  {campaign.scheduled_posts &&
+                    campaign.scheduled_posts.length > 0 && (
+                      <div className="form-group animate-in fade-in slide-in-from-top-2">
+                        <label
+                          className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
+                        >
+                          <Clock className={`w-4 h-4 ${iconColor}`} />
+                          {t("manageContent.modals.fields.alreadyScheduled")}
+                        </label>
+                        <div
+                          className={`rounded-lg border overflow-hidden ${borderColor}`}
+                        >
+                          <table className="w-full text-sm text-left">
+                            <thead
+                              className={
+                                theme === "dark"
+                                  ? "bg-neutral-800"
+                                  : "bg-gray-50"
+                              }
+                            >
+                              <tr>
+                                <th
+                                  className={`px-4 py-2 font-medium ${textSecondary}`}
+                                >
+                                  Platform
+                                </th>
+                                <th
+                                  className={`px-4 py-2 font-medium ${textSecondary}`}
+                                >
+                                  Date
+                                </th>
+                                <th
+                                  className={`px-4 py-2 font-medium ${textSecondary}`}
+                                >
+                                  Status
+                                </th>
+                              </tr>
+                            </thead>
+                            <tbody
+                              className={`divide-y ${
+                                theme === "dark"
+                                  ? "divide-neutral-700"
+                                  : "divide-gray-100"
+                              }`}
+                            >
+                              {campaign.scheduled_posts
+                                .filter((p) => !deletedPostIds.includes(p.id))
+                                .map((post) => {
+                                  const account = socialAccounts.find(
+                                    (a) => a.id === post.social_account_id
+                                  );
+                                  return (
+                                    <tr
+                                      key={post.id}
+                                      className={
+                                        theme === "dark"
+                                          ? "bg-neutral-900/50"
+                                          : "bg-white"
+                                      }
                                     >
-                                      {account
-                                        ? account.platform
-                                        : "Unknown Account"}
-                                    </td>
-                                    <td className={`px-4 py-2 ${textPrimary}`}>
-                                      {new Date(
-                                        post.scheduled_at
-                                      ).toLocaleString()}
-                                    </td>
-                                    <td className="px-4 py-2">
-                                      <div className="flex items-center gap-2">
-                                        <span
-                                          className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium capitalize
+                                      <td
+                                        className={`px-4 py-2 ${textPrimary} font-medium`}
+                                      >
+                                        {account
+                                          ? account.platform
+                                          : "Account no connected"}
+                                      </td>
+                                      <td
+                                        className={`px-4 py-2 ${textPrimary}`}
+                                      >
+                                        {new Date(
+                                          post.scheduled_at
+                                        ).toLocaleString()}
+                                      </td>
+                                      <td className="px-4 py-2">
+                                        <div className="flex items-center gap-2">
+                                          <span
+                                            className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium capitalize
                                         ${
                                           post.status === "posted"
                                             ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
@@ -724,326 +763,350 @@ export default function EditCampaignModal({
                                             ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
                                             : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"
                                         }`}
-                                        >
-                                          {post.status || "pending"}
-                                        </span>
-                                        {post.status === "pending" && (
-                                          <button
-                                            type="button"
-                                            onClick={() =>
-                                              handleDeleteScheduledPost(post.id)
-                                            }
-                                            className="p-1 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
-                                            title="Delete scheduled post"
                                           >
-                                            <X className="w-3 h-3" />
-                                          </button>
-                                        )}
+                                            {post.status || "pending"}
+                                          </span>
+                                          {post.status === "pending" && (
+                                            <button
+                                              type="button"
+                                              onClick={() =>
+                                                handleDeleteScheduledPost(
+                                                  post.id
+                                                )
+                                              }
+                                              className="p-1 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
+                                              title="Delete scheduled post"
+                                            >
+                                              <X className="w-3 h-3" />
+                                            </button>
+                                          )}
+                                        </div>
+                                      </td>
+                                    </tr>
+                                  );
+                                })}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    )}
+
+                  {/* Social Accounts Selection */}
+                  {watchedFields.scheduled_at && (
+                    <div className="form-group animate-in fade-in slide-in-from-top-2">
+                      <label
+                        className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
+                      >
+                        <Target className={`w-4 h-4 ${iconColor}`} />
+                        {t("manageContent.modals.fields.socialAccounts")}
+                      </label>
+                      <div className="grid grid-cols-1 gap-3">
+                        {socialAccounts.map((account) => {
+                          const isChecked =
+                            watchedFields.social_accounts?.includes(
+                              account.id
+                            ) || false;
+                          const customSchedule = accountSchedules[account.id];
+
+                          return (
+                            <div
+                              key={account.id}
+                              className={`relative flex items-center p-3 rounded-lg border transition-all ${
+                                isChecked
+                                  ? `border-orange-500 bg-orange-50 dark:bg-orange-900/20`
+                                  : `${borderColor} ${inputBg}`
+                              }`}
+                            >
+                              <label className="flex items-center gap-3 flex-1 cursor-pointer">
+                                <input
+                                  type="checkbox"
+                                  checked={isChecked}
+                                  onChange={(e) => {
+                                    const currentAccounts =
+                                      watchedFields.social_accounts || [];
+                                    if (e.target.checked) {
+                                      setValue("social_accounts", [
+                                        ...currentAccounts,
+                                        account.id,
+                                      ]);
+                                    } else {
+                                      setValue(
+                                        "social_accounts",
+                                        currentAccounts.filter(
+                                          (id) => id !== account.id
+                                        )
+                                      );
+                                      const newSchedules = {
+                                        ...accountSchedules,
+                                      };
+                                      delete newSchedules[account.id];
+                                      setAccountSchedules(newSchedules);
+                                    }
+                                  }}
+                                  className="w-4 h-4 text-orange-600 rounded focus:ring-orange-500"
+                                />
+                                <div className="flex flex-col">
+                                  <span
+                                    className={`text-sm font-medium ${textPrimary}`}
+                                  >
+                                    {account.platform}
+                                  </span>
+                                  {customSchedule && isChecked && (
+                                    <span className="text-xs text-orange-600 dark:text-orange-400 flex items-center gap-1">
+                                      <Clock className="w-3 h-3" />
+                                      {new Date(customSchedule).toLocaleString(
+                                        [],
+                                        {
+                                          dateStyle: "short",
+                                          timeStyle: "short",
+                                        }
+                                      )}
+                                    </span>
+                                  )}
+                                </div>
+                              </label>
+
+                              {isChecked && (
+                                <div className="ml-2">
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      toggleSchedulePopover(account.id)
+                                    }
+                                    className={`p-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 ${
+                                      customSchedule
+                                        ? "text-orange-500"
+                                        : textSecondary
+                                    }`}
+                                    title="Set individual time"
+                                  >
+                                    <Clock className="w-4 h-4" />
+                                  </button>
+
+                                  {activePopover === account.id && (
+                                    <div
+                                      className={`absolute right-0 top-full mt-2 z-50 p-4 rounded-lg shadow-xl border w-64 ${modalBg} ${borderColor} animate-in fade-in zoom-in-95`}
+                                    >
+                                      <div className="flex justify-between items-center mb-3">
+                                        <h4
+                                          className={`text-sm font-semibold ${textPrimary}`}
+                                        >
+                                          Schedule for {account.platform}
+                                        </h4>
+                                        <button
+                                          type="button"
+                                          onClick={() => setActivePopover(null)}
+                                        >
+                                          <X
+                                            className={`w-4 h-4 ${textSecondary}`}
+                                          />
+                                        </button>
                                       </div>
-                                    </td>
-                                  </tr>
-                                );
-                              })}
-                          </tbody>
-                        </table>
+                                      <div className={colorIconInput}>
+                                        <ModernDatePicker
+                                          selected={
+                                            customSchedule
+                                              ? new Date(customSchedule)
+                                              : null
+                                          }
+                                          onChange={(date: Date | null) => {
+                                            setAccountSchedules((prev) => ({
+                                              ...prev,
+                                              [account.id]: date
+                                                ? format(
+                                                    date,
+                                                    "yyyy-MM-dd'T'HH:mm"
+                                                  )
+                                                : "",
+                                            }));
+                                          }}
+                                          showTimeSelect
+                                          placeholder="Select date & time"
+                                          dateFormat="Pp"
+                                          minDate={new Date()}
+                                          withPortal
+                                          popperPlacement="bottom-start"
+                                        />
+                                      </div>
+                                      <div className="flex justify-end gap-2">
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            const newSchedules = {
+                                              ...accountSchedules,
+                                            };
+                                            delete newSchedules[account.id];
+                                            setAccountSchedules(newSchedules);
+                                            setActivePopover(null);
+                                          }}
+                                          className="text-xs text-red-500 hover:text-red-700 font-medium px-2 py-1"
+                                        >
+                                          Clear
+                                        </button>
+                                        <button
+                                          type="button"
+                                          onClick={() => setActivePopover(null)}
+                                          className="text-xs bg-orange-600 text-white px-3 py-1.5 rounded hover:bg-orange-700"
+                                        >
+                                          Done
+                                        </button>
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                        {socialAccounts.length === 0 && (
+                          <p className={`col-span-2 text-sm ${textSecondary}`}>
+                            {t(
+                              "manageContent.modals.fields.noConnectedAccounts"
+                            )}
+                          </p>
+                        )}
                       </div>
                     </div>
                   )}
+                </div>
 
-                {/* Social Accounts Selection */}
-                {watchedFields.scheduled_at && (
-                  <div className="form-group animate-in fade-in slide-in-from-top-2">
+                <div className="space-y-6">
+                  <div className="form-group">
+                    <label
+                      className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
+                    >
+                      <FileText className={`w-4 h-4 ${iconColor}`} />
+                      {t("manageContent.modals.fields.title")}
+                    </label>
+                    <input
+                      {...register("title")}
+                      className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-offset-0 transition-all ${inputBg} ${
+                        errors.title
+                          ? errorBorder
+                          : `${borderColor} ${focusBorder}`
+                      }`}
+                      placeholder={t(
+                        "manageContent.modals.fields.placeholders.title"
+                      )}
+                    />
+                    {errors.title && (
+                      <p className="mt-2 text-sm text-red-500 flex items-center gap-1">
+                        <AlertTriangle className="w-4 h-4" />
+                        {errors.title.message}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="form-group">
+                    <label
+                      className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
+                    >
+                      <FileText className={`w-4 h-4 ${iconColor}`} />
+                      {t("manageContent.modals.fields.description")}
+                    </label>
+                    <textarea
+                      {...register("description")}
+                      rows={4}
+                      className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-offset-0 transition-all resize-none ${inputBg} ${
+                        errors.description
+                          ? errorBorder
+                          : `${borderColor} ${focusBorder}`
+                      }`}
+                      placeholder={t(
+                        "manageContent.modals.fields.placeholders.description"
+                      )}
+                    />
+                    {errors.description && (
+                      <p className="mt-2 text-sm text-red-500 flex items-center gap-1">
+                        <AlertTriangle className="w-4 h-4" />
+                        {errors.description.message}
+                      </p>
+                    )}
+                    <div className="mt-1 flex justify-end">
+                      <span
+                        className={`text-xs ${
+                          (watchedFields.description?.length || 0) > 500
+                            ? "text-red-500"
+                            : textTertiary
+                        }`}
+                      >
+                        {watchedFields.description?.length || 0}/500
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="form-group">
                     <label
                       className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
                     >
                       <Target className={`w-4 h-4 ${iconColor}`} />
-                      {t("manageContent.modals.fields.socialAccounts")}
+                      {t("manageContent.modals.fields.goal")}
                     </label>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {socialAccounts.map((account) => {
-                        const isChecked =
-                          watchedFields.social_accounts?.includes(account.id) ||
-                          false;
-                        const customSchedule = accountSchedules[account.id];
-
-                        return (
-                          <div
-                            key={account.id}
-                            className={`relative flex items-center p-3 rounded-lg border transition-all ${
-                              isChecked
-                                ? `border-orange-500 bg-orange-50 dark:bg-orange-900/20`
-                                : `${borderColor} ${inputBg}`
-                            }`}
-                          >
-                            <label className="flex items-center gap-3 flex-1 cursor-pointer">
-                              <input
-                                type="checkbox"
-                                checked={isChecked}
-                                onChange={(e) => {
-                                  const currentAccounts =
-                                    watchedFields.social_accounts || [];
-                                  if (e.target.checked) {
-                                    setValue("social_accounts", [
-                                      ...currentAccounts,
-                                      account.id,
-                                    ]);
-                                  } else {
-                                    setValue(
-                                      "social_accounts",
-                                      currentAccounts.filter(
-                                        (id) => id !== account.id
-                                      )
-                                    );
-                                    // Also remove custom schedule if exists
-                                    const newSchedules = {
-                                      ...accountSchedules,
-                                    };
-                                    delete newSchedules[account.id];
-                                    setAccountSchedules(newSchedules);
-                                  }
-                                }}
-                                className="w-4 h-4 text-orange-600 rounded focus:ring-orange-500"
-                              />
-                              <div className="flex flex-col">
-                                <span
-                                  className={`text-sm font-medium ${textPrimary}`}
-                                >
-                                  {account.platform}
-                                </span>
-                                {customSchedule && isChecked && (
-                                  <span className="text-xs text-orange-600 dark:text-orange-400 flex items-center gap-1">
-                                    <Clock className="w-3 h-3" />
-                                    {new Date(customSchedule).toLocaleString(
-                                      [],
-                                      { dateStyle: "short", timeStyle: "short" }
-                                    )}
-                                  </span>
-                                )}
-                              </div>
-                            </label>
-
-                            {isChecked && (
-                              <div className="ml-2">
-                                <button
-                                  type="button"
-                                  onClick={() =>
-                                    toggleSchedulePopover(account.id)
-                                  }
-                                  className={`p-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 ${
-                                    customSchedule
-                                      ? "text-orange-500"
-                                      : textSecondary
-                                  }`}
-                                  title="Set individual time"
-                                >
-                                  <Clock className="w-4 h-4" />
-                                </button>
-
-                                {activePopover === account.id && (
-                                  <div
-                                    className={`absolute right-0 top-full mt-2 z-50 p-4 rounded-lg shadow-xl border w-64 ${modalBg} ${borderColor} animate-in fade-in zoom-in-95`}
-                                  >
-                                    <div className="flex justify-between items-center mb-3">
-                                      <h4
-                                        className={`text-sm font-semibold ${textPrimary}`}
-                                      >
-                                        Schedule for {account.platform}
-                                      </h4>
-                                      <button
-                                        type="button"
-                                        onClick={() => setActivePopover(null)}
-                                      >
-                                        <X
-                                          className={`w-4 h-4 ${textSecondary}`}
-                                        />
-                                      </button>
-                                    </div>
-                                    <input
-                                      type="datetime-local"
-                                      className={`w-full px-3 py-2 text-sm rounded border mb-3 ${inputBg} ${borderColor} ${textPrimary} ${colorIconInput}`}
-                                      value={customSchedule || ""}
-                                      onChange={(e) => {
-                                        setAccountSchedules((prev) => ({
-                                          ...prev,
-                                          [account.id]: e.target.value,
-                                        }));
-                                      }}
-                                    />
-                                    <div className="flex justify-end gap-2">
-                                      <button
-                                        type="button"
-                                        onClick={() => {
-                                          const newSchedules = {
-                                            ...accountSchedules,
-                                          };
-                                          delete newSchedules[account.id];
-                                          setAccountSchedules(newSchedules);
-                                          setActivePopover(null);
-                                        }}
-                                        className="text-xs text-red-500 hover:text-red-700 font-medium px-2 py-1"
-                                      >
-                                        Clear
-                                      </button>
-                                      <button
-                                        type="button"
-                                        onClick={() => setActivePopover(null)}
-                                        className="text-xs bg-orange-600 text-white px-3 py-1.5 rounded hover:bg-orange-700"
-                                      >
-                                        Done
-                                      </button>
-                                    </div>
-                                  </div>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
-                      {socialAccounts.length === 0 && (
-                        <p className={`col-span-2 text-sm ${textSecondary}`}>
-                          {t("manageContent.modals.fields.noConnectedAccounts")}
-                        </p>
+                    <input
+                      {...register("goal")}
+                      className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-offset-0 transition-all ${inputBg} ${
+                        errors.goal
+                          ? errorBorder
+                          : `${borderColor} ${focusBorder}`
+                      }`}
+                      placeholder={t(
+                        "manageContent.modals.fields.placeholders.goal"
                       )}
+                    />
+                    {errors.goal && (
+                      <p className="mt-2 text-sm text-red-500 flex items-center gap-1">
+                        <AlertTriangle className="w-4 h-4" />
+                        {errors.goal.message}
+                      </p>
+                    )}
+                    <div className="mt-1 flex justify-end">
+                      <span
+                        className={`text-xs ${
+                          (watchedFields.goal?.length || 0) > 200
+                            ? "text-red-500"
+                            : textTertiary
+                        }`}
+                      >
+                        {watchedFields.goal?.length || 0}/200
+                      </span>
                     </div>
                   </div>
-                )}
-              </div>
-
-              <div className="space-y-6">
-                <div className="form-group">
-                  <label
-                    className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
-                  >
-                    <FileText className={`w-4 h-4 ${iconColor}`} />
-                    {t("manageContent.modals.fields.title")}
-                  </label>
-                  <input
-                    {...register("title")}
-                    className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-offset-0 transition-all ${inputBg} ${
-                      errors.title
-                        ? errorBorder
-                        : `${borderColor} ${focusBorder}`
-                    }`}
-                    placeholder={t(
-                      "manageContent.modals.fields.placeholders.title"
-                    )}
-                  />
-                  {errors.title && (
-                    <p className="mt-2 text-sm text-red-500 flex items-center gap-1">
-                      <AlertTriangle className="w-4 h-4" />
-                      {errors.title.message}
-                    </p>
-                  )}
-                </div>
-
-                <div className="form-group">
-                  <label
-                    className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
-                  >
-                    <FileText className={`w-4 h-4 ${iconColor}`} />
-                    {t("manageContent.modals.fields.description")}
-                  </label>
-                  <textarea
-                    {...register("description")}
-                    rows={4}
-                    className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-offset-0 transition-all resize-none ${inputBg} ${
-                      errors.description
-                        ? errorBorder
-                        : `${borderColor} ${focusBorder}`
-                    }`}
-                    placeholder={t(
-                      "manageContent.modals.fields.placeholders.description"
-                    )}
-                  />
-                  {errors.description && (
-                    <p className="mt-2 text-sm text-red-500 flex items-center gap-1">
-                      <AlertTriangle className="w-4 h-4" />
-                      {errors.description.message}
-                    </p>
-                  )}
-                  <div className="mt-1 flex justify-end">
-                    <span
-                      className={`text-xs ${
-                        (watchedFields.description?.length || 0) > 500
-                          ? "text-red-500"
-                          : textTertiary
-                      }`}
-                    >
-                      {watchedFields.description?.length || 0}/500
-                    </span>
-                  </div>
-                </div>
-
-                <div className="form-group">
-                  <label
-                    className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
-                  >
-                    <Target className={`w-4 h-4 ${iconColor}`} />
-                    {t("manageContent.modals.fields.goal")}
-                  </label>
-                  <input
-                    {...register("goal")}
-                    className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-offset-0 transition-all ${inputBg} ${
-                      errors.goal
-                        ? errorBorder
-                        : `${borderColor} ${focusBorder}`
-                    }`}
-                    placeholder={t(
-                      "manageContent.modals.fields.placeholders.goal"
-                    )}
-                  />
-                  {errors.goal && (
-                    <p className="mt-2 text-sm text-red-500 flex items-center gap-1">
-                      <AlertTriangle className="w-4 h-4" />
-                      {errors.goal.message}
-                    </p>
-                  )}
-                  <div className="mt-1 flex justify-end">
-                    <span
-                      className={`text-xs ${
-                        (watchedFields.goal?.length || 0) > 200
-                          ? "text-red-500"
-                          : textTertiary
-                      }`}
-                    >
-                      {watchedFields.goal?.length || 0}/200
-                    </span>
-                  </div>
                 </div>
               </div>
-            </div>
-          </form>
-        </div>
+            </form>
+          </div>
 
-        <div
-          className={`px-8 py-6 border-t ${modalFooterBg} flex items-center justify-end gap-4 sticky bottom-0 z-10`}
-        >
-          <button
-            type="button"
-            onClick={onClose}
-            className={`px-6 py-2.5 rounded-lg font-medium transition-colors ${cancelButton}`}
+          <div
+            className={`px-8 py-6 border-t ${modalFooterBg} flex items-center justify-end gap-4 sticky bottom-0 z-10`}
           >
-            {t("common.cancel")}
-          </button>
-          <button
-            onClick={handleSubmit(onFormSubmit)}
-            disabled={isSubmitting}
-            className={`px-8 py-2.5 rounded-lg text-white font-medium hover:shadow-lg transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2 ${submitButton}`}
-          >
-            {isSubmitting ? (
-              <>
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                {t("manageContent.modals.edit.saving")}
-              </>
-            ) : (
-              <>
-                <Save className="w-4 h-4" />
-                {t("manageContent.modals.edit.save")}
-              </>
-            )}
-          </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className={`px-6 py-2.5 rounded-lg font-medium transition-colors ${cancelButton}`}
+            >
+              {t("common.cancel")}
+            </button>
+            <button
+              onClick={handleSubmit(onFormSubmit)}
+              disabled={isSubmitting}
+              className={`px-8 py-2.5 rounded-lg text-white font-medium hover:shadow-lg transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2 ${submitButton}`}
+            >
+              {isSubmitting ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  {t("manageContent.modals.edit.saving")}
+                </>
+              ) : (
+                <>
+                  <Save className="w-4 h-4" />
+                  {t("manageContent.modals.edit.save")}
+                </>
+              )}
+            </button>
+          </div>
+          <ConfirmDialog />
         </div>
       </div>
-    </div>
+    </>
   );
 }

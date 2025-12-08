@@ -66,8 +66,8 @@ class SocialAuthController extends Controller
       ],
       'google' => [
         'https://www.googleapis.com/auth/youtube.upload',
-        'https://www.googleapis.com/auth/youtube.readonly',
-        'https://www.googleapis.com/auth/youtube.force-ssl'
+        'https://www.googleapis.com/auth/youtube.force-ssl',
+        'https://www.googleapis.com/auth/youtube',
       ],
       'twitter' => ['tweet.read', 'tweet.write', 'users.read', 'offline.access'],
       default => [],

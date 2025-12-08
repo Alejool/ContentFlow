@@ -253,7 +253,7 @@ export default function ViewCampaignModal({
 
                   {campaign.scheduled_posts &&
                   campaign.scheduled_posts.length > 0 ? (
-                    <div className="space-y-2 mt-2">
+                    <div className={`space-y-2 mt-2 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
                       {campaign.scheduled_posts.map(
                         (post: any, index: number) => (
                           <div
@@ -264,9 +264,9 @@ export default function ViewCampaignModal({
                                 : "bg-white border-gray-200"
                             }`}
                           >
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 da">
                               <span className="capitalize font-medium text-sm">
-                                {post.platform || "Platform"}
+                                {post?.social_account?.platform || t("common.platform")}
                               </span>
                               {post.status && (
                                 <span
@@ -323,7 +323,7 @@ export default function ViewCampaignModal({
                           theme === "dark" ? "text-gray-400" : "text-gray-500"
                         }`}
                       >
-                        Published On
+                        {t("campaigns.publishedOn")}
                       </span>
                     </div>
                     <p
@@ -350,14 +350,14 @@ export default function ViewCampaignModal({
                       theme === "dark" ? "text-gray-400" : "text-gray-500"
                     }
                   >
-                    Created: {formatDate(campaign.created_at)}
+                    {t("common.created")}: {formatDate(campaign.created_at)}
                   </span>
                   <span
                     className={
                       theme === "dark" ? "text-gray-400" : "text-gray-500"
                     }
                   >
-                    Last Updated: {formatDate(campaign.updated_at)}
+                    {t("common.lastUpdated")}: {formatDate(campaign.updated_at)}
                   </span>
                 </div>
               </div>
@@ -373,7 +373,7 @@ export default function ViewCampaignModal({
                   : "bg-gray-100 hover:bg-gray-200 text-gray-700"
               }`}
             >
-              Close
+              {t("common.close")}
             </button>
           </div>
         </DialogPanel>

@@ -7,6 +7,9 @@ use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
 class Kernel extends ConsoleKernel
 {
+  protected $middleware = [
+    \App\Http\Middleware\ForceAssetHttps::class,
+];
   protected function schedule(Schedule $schedule)
   {
     // Procesar posts programados cada minuto

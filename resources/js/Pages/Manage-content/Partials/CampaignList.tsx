@@ -1,9 +1,10 @@
+import ModernDatePicker from "@/Components/ui/ModernDatePicker";
 import { useTheme } from "@/Hooks/useTheme";
 import { convertDate } from "@/Utils/date";
 import { Campaign } from "@/types/Campaign";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
+import { format } from "date-fns";
 import {
-  Calendar,
   Edit,
   Eye,
   File,
@@ -48,7 +49,7 @@ export default function CampaignList({
   const [dateStart, setDateStart] = useState("");
   const [dateEnd, setDateEnd] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 7;
+  const itemsPerPage = 10;
 
   const filteredCampaigns = campaigns.filter(
     (campaign) =>
@@ -281,42 +282,42 @@ export default function CampaignList({
             </div>
 
             <div className="flex items-center gap-2">
-              <Calendar
-                className={`w-4 h-4 ${
-                  theme === "dark" ? "text-gray-400" : "text-gray-500"
-                }`}
-              />
-              <input
-                type="date"
-                value={dateStart}
-                onChange={(e) =>
-                  handleFilterChange("date_start", e.target.value)
-                }
-                className={`py-2 px-3 rounded-lg text-sm border focus:ring-2 focus:ring-orange-500 focus:border-transparent ${colorIcon}
-                  ${
-                    theme === "dark"
-                      ? "bg-neutral-800 border-neutral-700 text-white"
-                      : "bg-white border-gray-200 text-gray-700"
+              <div className="w-36">
+                <ModernDatePicker
+                  selected={
+                    dateStart ? new Date(dateStart + "T00:00:00") : null
                   }
-                `}
-              />
+                  onChange={(date: Date | null) =>
+                    handleFilterChange(
+                      "date_start",
+                      date ? format(date, "yyyy-MM-dd") : ""
+                    )
+                  }
+                  placeholder={t("common.startDate") || "Start Date"}
+                  withPortal
+                />
+              </div>
               <span
                 className={theme === "dark" ? "text-gray-500" : "text-gray-400"}
               >
                 -
               </span>
-              <input
-                type="date"
-                value={dateEnd}
-                onChange={(e) => handleFilterChange("date_end", e.target.value)}
-                className={`py-2 px-3 rounded-lg text-sm border focus:ring-2 focus:ring-orange-500 focus:border-transparent ${colorIcon}
-                  ${
-                    theme === "dark"
-                      ? "bg-neutral-800 border-neutral-700 text-white"
-                      : "bg-white border-gray-200 text-gray-700"
+              <div className="w-36">
+                <ModernDatePicker
+                  selected={dateEnd ? new Date(dateEnd + "T00:00:00") : null}
+                  onChange={(date: Date | null) =>
+                    handleFilterChange(
+                      "date_end",
+                      date ? format(date, "yyyy-MM-dd") : ""
+                    )
                   }
-                `}
-              />
+                  placeholder={t("common.endDate") || "End Date"}
+                  minDate={
+                    dateStart ? new Date(dateStart + "T00:00:00") : undefined
+                  }
+                  withPortal
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -556,7 +557,11 @@ export default function CampaignList({
                               ? "bottom-full mb-2"
                               : "top-full mt-2"
                           } right-0 w-48 origin-top-right rounded-lg shadow-lg ring-1 ring-primary-500 focus:outline-none
-                            ${theme === "dark" ? "bg-neutral-800 ring-neutral-700" : "bg-white"}
+                            ${
+                              theme === "dark"
+                                ? "bg-neutral-800 ring-neutral-700"
+                                : "bg-white"
+                            }
                             z-50`}
                         >
                           <div className="p-1">

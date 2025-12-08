@@ -22,7 +22,14 @@
     "noResults": "No se encontraron resultados",
     "search": "Buscar por nombre",
     "processing": "Procesando...",
-    "noCreditCard": "No requiere tarjeta de crédito"
+    "noCreditCard": "No requiere tarjeta de crédito",
+    "unknown": "Desconocido",
+    "platform": "Plataforma",
+    "close": "Cerrar",
+    "created": "Creado",
+    "lastUpdated": "Última Actualización",
+    "startDate": "Fecha de Inicio",
+    "endDate": "Fecha de Fin"
   },
   "nav": {
     "dashboard": "Panel",
@@ -165,6 +172,7 @@
     "startDate": "Fecha de Inicio",
     "endDate": "Fecha de Fin",
     "publishDate": "Fecha de Publicación",
+    "publishedOn": "Publicado el",
     "scheduledPosts": "Publicaciones Programadas",
     "noScheduledPosts": "No hay publicaciones programadas específicamente.",
     "draft": "Borrador",
@@ -503,6 +511,7 @@
         "optional": "(Opcional)",
         "schedulePublication": "Programar Publicación (Opcional)",
         "optionalSchedule": "Dejar vacío para guardar como borrador o publicar inmediatamente.",
+        "selectSocialAccounts": "Seleccionar Redes Sociales",
         "socialAccounts": "Seleccionar Redes Sociales",
         "noConnectedAccounts": "No se encontraron cuentas conectadas.",
         "alreadyScheduled": "Ya se programó una publicación para esta fecha.",
@@ -531,7 +540,11 @@
         "objMax": "El objetivo no puede exceder los 200 caracteres",
         "hashtagsRequired": "Los hashtags son obligatorios",
         "hashtagValid": "Debe incluir al menos un hashtag válido (#ejemplo)",
-        "hashtagMax": "Máximo 10 hashtags permitidos"
+        "hashtagMax": "Máximo 10 hashtags permitidos",
+        "confirmDeleteSchedule": "¿Estás seguro de que deseas eliminar esta publicación programada? Esta acción no se puede deshacer.",
+        "deleteScheduleTitle": "¿Eliminar publicación programada?",
+        "scheduleDeleted": "Publicación programada eliminada correctamente",
+        "scheduleDeleteError": "Error al eliminar la publicación programada"
       }
     }
   }

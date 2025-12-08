@@ -7,62 +7,64 @@ export const useSocialMediaAuth = () => {
   const [error, setError] = useState<string | null>(null);
   const [accounts, setAccounts] = useState<any[]>([]);
 
-  useEffect(() => {
-    // Escuchar mensajes de la ventana emergente
-    const handleMessage = async (event: any) => {
-      if (event.data && event.data.type === "social_auth_callback") {
-        setIsLoading(false);
+  // useEffect(() => {
+  //   // Escuchar mensajes de la ventana emergente
+  //   const handleMessage = async (event: any) => {
+  //     if (event.data && event.data.type === "social_auth_callback") {
+  //       setIsLoading(false);
 
-        if (event.data.success) {
-          try {
-            const responseData = JSON.parse(event.data.data);
-            await axios.post(
-              "/api/social-accounts",
-              {
-                platform: responseData.platform,
-                account_id: responseData.account_id,
-                access_token: responseData.access_token,
-                refresh_token: responseData.refresh_token || null,
-                token_expires_at: responseData.token_expires_at || null,
-              },
-              {
-                headers: {
-                  "X-CSRF-TOKEN": document
-                    .querySelector('meta[name="csrf-token"]')
-                    ?.getAttribute("content"),
-                  Accept: "application/json",
-                  "Content-Type": "application/json",
-                },
-                withCredentials: true,
-              }
-            );
+  //       if (event.data.success) {
+  //         try {
+  //           const responseData = JSON.parse(event.data.data);
+  //           await axios.post(
+  //             "/social-accounts",
+  //             {
+  //               platform: responseData.platform,
+  //               account_id: responseData.account_id,
+  //               access_token: responseData.access_token,
+  //               refresh_token: responseData.refresh_token || null,
+  //               token_expires_at: responseData.token_expires_at || null,
+  //             },
+  //             {
+  //               headers: {
+  //                 "X-CSRF-TOKEN": document
+  //                   .querySelector('meta[name="csrf-token"]')
+  //                   ?.getAttribute("content"),
+  //                 Accept: "application/json",
+  //                 "Content-Type": "application/json",
+  //               },
+  //               withCredentials: true,
+  //             }
+  //           );
 
-            toast.success(
-              `Cuenta de ${responseData.platform} conectada exitosamente`
-            );
+  //           toast.success(
+  //             `Cuenta de ${responseData.platform} conectada exitosamente`
+  //           );
 
-            await fetchAccounts();
-          } catch (error: any) {
-            console.error("Error al guardar datos de la cuenta:", error);
-            const msg = error.response?.data?.message || error.message;
-            toast.error("Error al guardar los datos de la cuenta: " + msg);
-            setError(msg);
-          }
-        } else {
-          const msg = event.data.message || "Error desconocido";
-          toast.error("Error en la autenticación: " + msg);
-          setError(msg);
-        }
-      }
-    };
+  //           // await fetchAccounts();
+  //         } catch (error: any) {
+  //           const msg = error.response?.data?.message || error.message;
+  //           toast.error("Error al guardar los datos de la cuenta: " + msg);
+  //           console.log('meensaje error');
+  //           console.log(msg);
+  //           setError(msg);
+  //           console.error("Error al guardar datos de la cuenta:", error);
+  //         }
+  //       } else {
+  //         const msg = event.data.message || "Error desconocido";
+  //         toast.error("Error en la autenticación: " + msg);
+  //         setError(msg);
+  //       }
+  //     }
+  //   };
 
-    window.addEventListener("message", handleMessage);
-    return () => window.removeEventListener("message", handleMessage);
-  }, []);
+  //   window.addEventListener("message", handleMessage);
+  //   return () => window.removeEventListener("message", handleMessage);
+  // }, []);
 
   const fetchAccounts = async () => {
     try {
-      const response = await axios.get("/api/social-accounts", {
+      const response = await axios.get("/social-accounts", {
         headers: {
           "X-CSRF-TOKEN": document
             .querySelector('meta[name="csrf-token"]')
@@ -89,7 +91,7 @@ export const useSocialMediaAuth = () => {
       setError(null);
 
       const response = await axios.get(
-        `/api/social-accounts/auth-url/${platform}`,
+        `/social-accounts/auth-url/${platform}`,
         {
           headers: {
             "X-CSRF-TOKEN": document
@@ -141,7 +143,7 @@ export const useSocialMediaAuth = () => {
     setError(null);
     try {
       await axios.delete(
-        `/api/social-accounts/${id}${force ? "?force=true" : ""}`,
+        `/social-accounts/${id}${force ? "?force=true" : ""}`,
         {
           headers: {
             "X-CSRF-TOKEN": document

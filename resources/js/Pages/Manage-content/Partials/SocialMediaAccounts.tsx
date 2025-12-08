@@ -58,16 +58,16 @@ export default function SocialMediaAccounts() {
       color: theme === "dark" ? "bg-blue-700" : "bg-blue-600",
       gradient: "from-blue-500 to-blue-700",
     },
-    {
-      id: 2,
-      platform: "instagram",
-      name: "Instagram",
-      logo: IconInstagram,
-      isConnected: false,
-      accountId: null,
-      color: theme === "dark" ? "bg-pink-700" : "bg-pink-600",
-      gradient: "from-pink-500 to-purple-700",
-    },
+    // {
+    //   id: 2,
+    //   platform: "instagram",
+    //   name: "Instagram",
+    //   logo: IconInstagram,
+    //   isConnected: false,
+    //   accountId: null,
+    //   color: theme === "dark" ? "bg-pink-700" : "bg-pink-600",
+    //   gradient: "from-pink-500 to-purple-700",
+    // },
     {
       id: 3,
       platform: "tiktok",
@@ -440,7 +440,7 @@ export default function SocialMediaAccounts() {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2  gap-6">
           {accounts.map((account) => (
             <div
               key={account.id}
@@ -496,19 +496,36 @@ export default function SocialMediaAccounts() {
                    `}
                   >
                     <div
-                      className={`w-12 h-12 p-2 rounded-lg
+                      className={`w-12 h-12 rounded-lg overflow-hidden
+                      ${
+                        account.isConnected &&
+                        account.accountDetails?.account_metadata?.avatar
+                          ? ""
+                          : "p-2"
+                      }
                       ${
                         theme === "dark" && !account.isConnected
                           ? "bg-neutral-800"
                           : "bg-white/90"
                       }`}
                     >
-                      <img
-                        src={account.logo}
-                        alt={`${account.name} Logo`}
-                        className={`w-full h-full object-contain transition-all duration-300
-                         `}
-                      />
+                      {account.isConnected &&
+                      account.accountDetails?.account_metadata?.avatar ? (
+                        <img
+                          src={account.accountDetails.account_metadata.avatar}
+                          alt={
+                            account.accountDetails.account_name || account.name
+                          }
+                          className="w-full h-full object-cover rounded-lg"
+                        />
+                      ) : (
+                        <img
+                          src={account.logo}
+                          alt={`${account.name} Logo`}
+                          className={`w-full h-full object-contain transition-all duration-300
+                             `}
+                        />
+                      )}
                     </div>
                   </div>
 
@@ -529,7 +546,9 @@ export default function SocialMediaAccounts() {
                   className={`text-xl font-bold mb-1
                   ${theme === "dark" ? "text-gray-100" : "text-gray-900"}`}
                 >
-                  {account.name}
+                  {account.isConnected && account.accountDetails?.account_name
+                    ? account.accountDetails.account_name
+                    : account.name}
                 </h3>
                 {account.isConnected && account.accountDetails ? (
                   <p
@@ -540,7 +559,9 @@ export default function SocialMediaAccounts() {
                         : "bg-gray-50 text-gray-500"
                     }`}
                   >
-                    ID: {account.accountDetails.account_id}
+                    {account.accountDetails.account_metadata?.username
+                      ? `@${account.accountDetails.account_metadata.username}`
+                      : `ID: ${account.accountDetails.account_id}`}
                   </p>
                 ) : (
                   <p

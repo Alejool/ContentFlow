@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use App\Models\MediaFile;
+use App\Models\SocialAccount;
 
 class Campaign extends Model
 {
@@ -120,4 +121,6 @@ class Campaign extends Model
             $this->start_date <= now() &&
             $this->end_date >= now();
     }
+
+
 }
