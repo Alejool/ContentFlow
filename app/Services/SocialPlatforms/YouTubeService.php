@@ -421,6 +421,15 @@ class YouTubeService extends BaseSocialService
       'response' => $responseBody,
     ]);
 
+    // Try to parse the actual JSON error message from YouTube
+    $apiMessage = null;
+    try {
+      $jsonError = json_decode($responseBody, true);
+      $apiMessage = $jsonError['error']['message'] ?? null;
+    } catch (\Exception $parseException) {
+      // Failed to parse JSON, stick to defaults
+    }
+
     $errorMessage = match ($statusCode) {
       401 => 'Authentication failed. Please reconnect your YouTube account.',
       403 => 'Access forbidden. Check your API quotas and permissions.',
@@ -428,6 +437,21 @@ class YouTubeService extends BaseSocialService
       default => "YouTube API error (HTTP {$statusCode})",
     };
 
+    // Use the actual API message if available and meaningful
+    if ($apiMessage) {
+      // Check for specific error message about exceeded upload limit
+      if (str_contains($apiMessage, 'exceeded the number of videos') || str_contains($apiMessage, 'upload limit')) {
+        $errorMessage = 'You have reached your daily YouTube upload limit. Please try again in 24 hours.';
+      } else {
+        // Use the YouTube message directly as it's usually descriptive enough
+        $errorMessage = $apiMessage;
+      }
+
+      // Throw clean exception without technical Guzzle details
+      throw new \Exception($errorMessage);
+    }
+
+    // Fallback including technical details if we couldn't parse a clean message
     throw new \Exception("{$errorMessage} Details: {$e->getMessage()}");
   }
 
@@ -669,6 +693,7 @@ class YouTubeService extends BaseSocialService
   public function deletePost(string $postId): bool
   {
     try {
+      $this->ensureValidToken();
       // YouTube API DELETE video
       $this->client->delete('https://www.googleapis.com/youtube/v3/videos', [
         'headers' => [

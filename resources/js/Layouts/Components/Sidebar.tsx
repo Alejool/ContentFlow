@@ -268,7 +268,7 @@ export default function Sidebar({
                     hover:shadow-lg 
                     ${
                       route().current(item.href)
-                        ? `${activeGradient} text-white shadow-lg hover:text-white`
+                        ? ` text-white shadow-lg hover:text-white`
                         : `${textColor} ${hoverText}`
                     }`}
             >
