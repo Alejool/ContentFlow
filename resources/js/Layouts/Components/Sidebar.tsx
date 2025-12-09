@@ -1,23 +1,24 @@
 import Logo from "@/../assets/logo.png";
 import LanguageSwitcher from "@/Components/LanguageSwitcher";
 import NavLink from "@/Components/NavLink";
+import NotificationsModal from "@/Components/Notifications/NotificationsModal";
 import ThemeSwitcher from "@/Components/ThemeSwitcher";
+import { useNotifications } from "@/Hooks/useNotifications";
 import { useTheme } from "@/Hooks/useTheme";
 import { Link } from "@inertiajs/react";
 import {
   BarChart3,
+  Bell,
   Bot,
+  ChevronLeft,
+  ChevronRight,
   FileText,
   Home,
   LogOut,
   User,
-  ChevronLeft,
-  ChevronRight,
-  Bell,
 } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import NotificationsModal from "@/Components/Notifications/NotificationsModal";
 interface SidebarProps {
   isSidebarOpen: boolean;
   setIsSidebarOpen: (isOpen: boolean) => void;
@@ -58,7 +59,7 @@ export default function Sidebar({
   const { t } = useTranslation();
   const { theme } = useTheme();
   const [showNotifications, setShowNotifications] = useState(false);
-  const [notificationCount, setNotificationCount] = useState(3); 
+  const { unreadCount } = useNotifications();
 
   const isRouteActive = (routeName: string): boolean => {
     if (typeof window === "undefined") return false;
@@ -258,9 +259,9 @@ export default function Sidebar({
             >
               <div className="relative">
                 <Bell className="h-5 w-5" />
-                {notificationCount > 0 && (
+                {unreadCount > 0 && (
                   <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs text-white">
-                    {notificationCount}
+                    {unreadCount}
                   </span>
                 )}
               </div>
@@ -278,9 +279,9 @@ export default function Sidebar({
                     z-50`}
                 >
                   {t("nav.notifications")}
-                  {notificationCount > 0 && (
+                  {unreadCount > 0 && (
                     <span className="ml-2 bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">
-                      {notificationCount}
+                      {unreadCount}
                     </span>
                   )}
                 </div>
@@ -333,8 +334,6 @@ export default function Sidebar({
       <NotificationsModal
         isOpen={showNotifications}
         onClose={() => setShowNotifications(false)}
-        notificationCount={notificationCount}
-        setNotificationCount={setNotificationCount}
       />
     </>
   );

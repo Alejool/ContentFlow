@@ -7,6 +7,8 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
+use App\Channels\ExtendedDatabaseChannel;
+
 class PublicationStatusUpdate extends Notification
 {
     use Queueable;
@@ -26,7 +28,15 @@ class PublicationStatusUpdate extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['database']; // We start with database notifications
+        return [ExtendedDatabaseChannel::class]; // Use custom channel
+    }
+
+    /**
+     * Get the category of the notification.
+     */
+    public function getCategory(): string
+    {
+        return 'application';
     }
 
     /**
@@ -45,6 +55,7 @@ class PublicationStatusUpdate extends Notification
             'message' => $this->statusData['message'] ?? 'Status update available',
             'details' => $this->statusData['details'] ?? [],
             'title' => $this->log->publication->title ?? 'Untitled Publication',
+            'category' => 'application', // Keep it in data as well for frontend compatibility if needed
         ];
     }
 }

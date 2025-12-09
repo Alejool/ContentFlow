@@ -4,12 +4,12 @@ import { AlertCircle, CheckCircle, Info, X } from "lucide-react";
 
 interface NotificationItemProps {
   notification: any;
-  onRead: (id: string) => void;
+  onMarkAsRead: (id: string) => void;
 }
 
 export default function NotificationItem({
   notification,
-  onRead,
+  onMarkAsRead,
 }: NotificationItemProps) {
   const { theme } = useTheme();
   const { data, created_at, read_at } = notification;
@@ -43,7 +43,7 @@ export default function NotificationItem({
             : "bg-blue-50/50"
           : ""
       }`}
-      onClick={() => onRead(notification.id)}
+      onClick={() => onMarkAsRead(notification.id)}
     >
       <div className="flex gap-3">
         <div className="mt-1 flex-shrink-0">{getIcon()}</div>

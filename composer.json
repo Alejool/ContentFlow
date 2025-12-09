@@ -10,7 +10,7 @@
         "doctrine/dbal": "^4.4",
         "guzzlehttp/guzzle": "^7.10",
         "inertiajs/inertia-laravel": "^2.0",
-        "james-heinrich/getid3": "*",
+        "james-heinrich/getid3": "^1.9",
         "kreait/firebase-php": "^7.18",
         "laravel/framework": "^11.31",
         "laravel/sanctum": "^4.1",

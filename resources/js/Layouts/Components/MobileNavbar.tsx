@@ -4,6 +4,7 @@ import LanguageSwitcher from "@/Components/LanguageSwitcher";
 import NotificationsModal from "@/Components/Notifications/NotificationsModal";
 import ResponsiveNavLink from "@/Components/ResponsiveNavLink";
 import ThemeSwitcher from "@/Components/ThemeSwitcher";
+import { useNotifications } from "@/Hooks/useNotifications";
 import { useTheme } from "@/Hooks/useTheme";
 import { usePage } from "@inertiajs/react";
 import {
@@ -129,7 +130,7 @@ export default function MobileNavbar({
   const { theme } = useTheme();
   const { url } = usePage();
   const [showNotifications, setShowNotifications] = useState(false);
-  const [notificationCount, setNotificationCount] = useState(3);
+  const { unreadCount } = useNotifications();
 
   const colorNoActive = `${
     theme === "dark"
@@ -229,9 +230,9 @@ export default function MobileNavbar({
             >
               <div className="relative">
                 <Bell className="h-6 w-6" />
-                {notificationCount > 0 && (
+                {unreadCount > 0 && (
                   <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs text-white">
-                    {notificationCount}
+                    {unreadCount}
                   </span>
                 )}
               </div>
@@ -439,8 +440,6 @@ export default function MobileNavbar({
       <NotificationsModal
         isOpen={showNotifications}
         onClose={() => setShowNotifications(false)}
-        notificationCount={notificationCount}
-        setNotificationCount={setNotificationCount}
       />
     </nav>
   );
