@@ -37,6 +37,7 @@ type CampaignListProps = {
     per_page: number;
   };
   onPageChange: (page: number) => void;
+  onUnpublishRequest?: (item: any) => void;
 };
 
 export default function CampaignList({
@@ -52,6 +53,7 @@ export default function CampaignList({
   onRefresh,
   pagination,
   onPageChange,
+  onUnpublishRequest,
 }: CampaignListProps) {
   const { t } = useTranslation();
   const { theme } = useTheme();
@@ -594,15 +596,46 @@ export default function CampaignList({
                         {mode === "publications" && (
                           <button
                             onClick={() => onPublish(item)}
-                            className="p-2 text-green-500 hover:bg-green-50 rounded-lg dark:hover:bg-green-900/20"
-                            title={t("campaigns.actions.publish") || "Publish"}
+                            disabled={
+                              (item as Publication).status === "published"
+                            }
+                            className={`p-2 text-green-500 hover:bg-green-50 rounded-lg dark:hover:bg-green-900/20 ${
+                              (item as Publication).status === "published"
+                                ? "opacity-50 cursor-not-allowed grayscale"
+                                : ""
+                            }`}
+                            title={
+                              (item as Publication).status === "published"
+                                ? "Already published"
+                                : t("campaigns.actions.publish") || "Publish"
+                            }
                           >
                             <Rocket className="w-4 h-4" />
                           </button>
                         )}
                         <button
-                          onClick={() => onEdit(item)}
-                          className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg dark:hover:bg-blue-900/20"
+                          onClick={() => {
+                            // If publication is published, request unpublish first
+                            if (
+                              mode === "publications" &&
+                              (item as Publication).status === "published"
+                            ) {
+                              onUnpublishRequest?.(item);
+                            } else {
+                              onEdit(item);
+                            }
+                          }}
+                          className={`p-2 text-blue-500 hover:bg-blue-50 rounded-lg dark:hover:bg-blue-900/20 ${
+                            (item as Publication).status === "published"
+                              ? "text-amber-500"
+                              : ""
+                          }`}
+                          title={
+                            mode === "publications" &&
+                            (item as Publication).status === "published"
+                              ? "Unpublish to Edit"
+                              : "Edit"
+                          }
                         >
                           <Edit className="w-4 h-4" />
                         </button>

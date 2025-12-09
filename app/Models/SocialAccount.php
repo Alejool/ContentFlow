@@ -28,7 +28,7 @@ class SocialAccount extends Model
     protected $casts = [
         'id' => 'integer',
         'user_id' => 'integer',
-        'token_expires_at' => 'timestamp',
+        'token_expires_at' => 'datetime',
         'is_active' => 'boolean',
         'last_failed_at' => 'timestamp',
         'failure_count' => 'integer',

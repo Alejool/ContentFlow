@@ -64,6 +64,14 @@ class MediaFile extends Model
             ->first();
     }
 
+    public function getYoutubeThumbnail()
+    {
+        return $this->derivatives()
+            ->where('derivative_type', 'thumbnail')
+            ->where('platform', 'youtube')
+            ->first();
+    }
+
     public function getFullPathAttribute(): string
     {
         return storage_path('app/' . $this->file_path);

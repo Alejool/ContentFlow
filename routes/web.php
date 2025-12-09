@@ -112,6 +112,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::delete('/{publication}', [PublicationController::class, 'destroy'])->name('destroy');
         Route::post('/{publication}/duplicate', [PublicationController::class, 'duplicate'])->name('duplicate');
         Route::post('/{id}/publish', [PublicationController::class, 'publish'])->name('publish');
+        Route::post('/{id}/unpublish', [PublicationController::class, 'unpublish'])->name('unpublish');
     });
 
     /*

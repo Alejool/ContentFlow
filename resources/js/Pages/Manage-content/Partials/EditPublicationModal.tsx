@@ -1,4 +1,5 @@
 import ModernDatePicker from "@/Components/ui/ModernDatePicker";
+import YouTubeThumbnailUploader from "@/Components/YouTubeThumbnailUploader";
 import { useCampaignManagement } from "@/Hooks/useCampaignManagement";
 import { useConfirm } from "@/Hooks/useConfirm";
 import { useTheme } from "@/Hooks/useTheme";
@@ -105,6 +106,11 @@ export default function EditPublicationModal({
   const [isDragOver, setIsDragOver] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [campaigns, setCampaigns] = useState<any[]>([]);
+  const [youtubeThumbnail, setYoutubeThumbnail] = useState<File | null>(null);
+  const [existingThumbnail, setExistingThumbnail] = useState<{
+    url: string;
+    id: number;
+  } | null>(null);
 
   const fetchCampaigns = async () => {
     try {
@@ -200,26 +206,44 @@ export default function EditPublicationModal({
         type: string;
         isNew: boolean;
       }[] = [];
-
-      if (publication.media_files && publication.media_files.length > 0) {
-        publication.media_files.forEach((m) => {
-          previews.push({
-            id: m.id,
-            url: m.file_path.startsWith("http")
-              ? m.file_path
-              : `/storage/${m.file_path}`,
-            type: m.file_type,
-            isNew: false,
-          });
-        });
-      }
-      // Legacy image support if any
-      else if ((publication as any).image) {
+      publication.media_files?.forEach((media: any) => {
+        const url = media.file_path.startsWith("http")
+          ? media.file_path
+          : `/storage/${media.file_path}`;
         previews.push({
-          url: (publication as any).image,
-          type: "image/jpeg",
+          id: media.id,
+          url,
+          type: media.file_type,
           isNew: false,
         });
+
+        // Check for YouTube thumbnail in derivatives
+        if (media.file_type.includes("video")) {
+          const thumbnail = media.derivatives?.find(
+            (d: any) =>
+              d.derivative_type === "thumbnail" && d.platform === "youtube"
+          );
+          if (thumbnail) {
+            const thumbnailUrl = thumbnail.file_path.startsWith("http")
+              ? thumbnail.file_path
+              : `/storage/${thumbnail.file_path}`;
+            setExistingThumbnail({
+              url: thumbnailUrl,
+              id: thumbnail.id,
+            });
+          }
+        }
+      });
+
+      // Legacy image support if any
+      if (!publication.media_files || publication.media_files.length === 0) {
+        if ((publication as any).image) {
+          previews.push({
+            url: (publication as any).image,
+            type: "image/jpeg",
+            isNew: false,
+          });
+        }
       }
 
       setMediaPreviews(previews);
@@ -397,6 +421,15 @@ export default function EditPublicationModal({
 
       if (data.campaign_id) {
         submitData.append("campaign_id", data.campaign_id);
+      }
+
+      // Add YouTube thumbnail if present
+      if (youtubeThumbnail) {
+        const videoId = mediaPreviews.find((p) => p.type.includes("video"))?.id;
+        if (videoId) {
+          submitData.append("youtube_thumbnail", youtubeThumbnail);
+          submitData.append("youtube_thumbnail_video_id", videoId.toString());
+        }
       }
 
       submitData.append("_method", "PUT");
@@ -859,6 +892,29 @@ export default function EditPublicationModal({
                         );
                       })}
                     </div>
+                  </div>
+                )}
+
+                {/* YouTube Thumbnail - Only show if YouTube is selected */}
+                {watched.social_accounts?.some((id: number) => {
+                  const account = socialAccounts.find((a) => a.id === id);
+                  return account?.platform?.toLowerCase() === "youtube";
+                }) && (
+                  <div className="mt-6">
+                    <YouTubeThumbnailUploader
+                      videoId={
+                        mediaPreviews.find((p) => p.type.includes("video"))
+                          ?.id || 0
+                      }
+                      existingThumbnail={existingThumbnail}
+                      onThumbnailChange={(file: File | null) =>
+                        setYoutubeThumbnail(file)
+                      }
+                      onThumbnailDelete={() => {
+                        setExistingThumbnail(null);
+                        setYoutubeThumbnail(null);
+                      }}
+                    />
                   </div>
                 )}
               </div>

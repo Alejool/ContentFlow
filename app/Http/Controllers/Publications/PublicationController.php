@@ -26,7 +26,7 @@ class PublicationController extends Controller
   {
     $query = Publication::where('user_id', Auth::id())
       ->with(['mediaFiles' => function ($query) {
-        $query->orderBy('publication_media.order', 'asc');
+        $query->with('derivatives')->orderBy('publication_media.order', 'asc');
       }, 'scheduledPosts.socialAccount', 'campaigns']);
 
 
@@ -184,7 +184,6 @@ class PublicationController extends Controller
             'user_id' => Auth::id(),
             'social_account_id' => $accountId,
             'publication_id' => $publication->id,
-            'caption' => $publication->title . "\n\n" . $publication->description . "\n\n" . $publication->hashtags,
             'scheduled_at' => $scheduledAt,
             'status' => 'pending',
           ]);
@@ -330,7 +329,6 @@ class PublicationController extends Controller
             // Assuming editing allows updating pending posts.
             if ($existingPost->status === 'pending') {
               $existingPost->update([
-                'caption' => $publication->title . "\n\n" . $publication->description . "\n\n" . ($publication->hashtags ?? ''),
                 'scheduled_at' => $postSchedule,
               ]);
             }
@@ -340,7 +338,6 @@ class PublicationController extends Controller
               'user_id' => Auth::id(),
               'social_account_id' => $accountId,
               'publication_id' => $publication->id,
-              'caption' => $publication->title . "\n\n" . $publication->description . "\n\n" . ($publication->hashtags ?? ''),
               'scheduled_at' => $postSchedule,
               'status' => 'pending',
             ]);
@@ -446,6 +443,46 @@ class PublicationController extends Controller
         }
       }
 
+      // Handle YouTube Thumbnail
+      if ($request->hasFile('youtube_thumbnail') && $request->has('youtube_thumbnail_video_id')) {
+        $videoId = $request->input('youtube_thumbnail_video_id');
+        $mediaFile = MediaFile::find($videoId);
+
+        if ($mediaFile && $mediaFile->file_type === 'video') {
+          $thumbFile = $request->file('youtube_thumbnail');
+          $thumbFilename = Str::uuid() . '_youtube_thumb.' . $thumbFile->getClientOriginalExtension();
+          $thumbPath = $thumbFile->storeAs('derivatives/youtube/thumbnails', $thumbFilename, 's3');
+          $thumbUrl = Storage::disk('s3')->url($thumbPath);
+
+          // Check if YouTube thumbnail already exists
+          $existingThumb = $mediaFile->derivatives()
+            ->where('derivative_type', 'thumbnail')
+            ->where('platform', 'youtube')
+            ->first();
+
+          if ($existingThumb) {
+            // Update existing thumbnail
+            $existingThumb->update([
+              'file_path' => $thumbUrl,
+              'file_name' => $thumbFilename,
+              'mime_type' => $thumbFile->getClientMimeType(),
+              'size' => $thumbFile->getSize(),
+            ]);
+          } else {
+            // Create new YouTube thumbnail
+            MediaDerivative::create([
+              'media_file_id' => $mediaFile->id,
+              'derivative_type' => 'thumbnail',
+              'file_path' => $thumbUrl,
+              'file_name' => $thumbFilename,
+              'mime_type' => $thumbFile->getClientMimeType(),
+              'size' => $thumbFile->getSize(),
+              'platform' => 'youtube',
+            ]);
+          }
+        }
+      }
+
       // Handle Thumbnails for EXISTING media
       if ($request->has('thumbnails')) {
         foreach ($request->file('thumbnails') as $key => $file) {
@@ -472,8 +509,6 @@ class PublicationController extends Controller
           ->where('status', 'pending')
           ->delete();
 
-        $firstMedia = $publication->media()->with('mediaFile')->first();
-        $mediaFileId = $firstMedia ? $firstMedia->media_file_id : null;
         $schedules = $request->input('social_account_schedules', []);
 
         foreach ($validatedData['social_accounts'] as $accountId) {
@@ -483,8 +518,7 @@ class PublicationController extends Controller
             'user_id' => Auth::id(),
             'social_account_id' => $accountId,
             'publication_id' => $publication->id,
-            'media_file_id' => $mediaFileId,
-            'caption' => $publication->title . "\n\n" . $publication->description . "\n\n" . $publication->hashtags,
+
             'scheduled_at' => $scheduledAt,
             'status' => 'pending',
           ]);
@@ -515,7 +549,15 @@ class PublicationController extends Controller
   public function publish(Request $request, $id)
   {
 
-    $publication = Publication::with('mediaFiles')->findOrFail($id);
+    $publication = Publication::with(['mediaFiles', 'campaigns'])->findOrFail($id);
+
+    if ($publication->status === 'published') {
+      return response()->json([
+        'success' => false,
+        'message' => 'This publication is already published. Unpublish it first if you want to repost.',
+      ], 400);
+    }
+
     $platformIds = $request->input('platforms');
 
     Log::info('publish request:', $request->all());
@@ -578,6 +620,51 @@ class PublicationController extends Controller
       }
     }
 
+    // Handle YouTube Thumbnail
+    if ($request->hasFile('youtube_thumbnail') && $request->has('youtube_thumbnail_video_id')) {
+      $videoId = $request->input('youtube_thumbnail_video_id');
+      $mediaFile = MediaFile::find($videoId);
+
+      if ($mediaFile && $mediaFile->file_type === 'video') {
+        try {
+          $thumbFile = $request->file('youtube_thumbnail');
+          $thumbFilename = Str::uuid() . '_youtube_thumb.' . $thumbFile->getClientOriginalExtension();
+          $thumbPath = $thumbFile->storeAs('derivatives/youtube/thumbnails', $thumbFilename, 's3');
+          $thumbUrl = Storage::disk('s3')->url($thumbPath);
+
+          // Check if YouTube thumbnail already exists
+          $existingThumb = $mediaFile->derivatives()
+            ->where('derivative_type', 'thumbnail')
+            ->where('platform', 'youtube')
+            ->first();
+
+          if ($existingThumb) {
+            // Update existing thumbnail
+            $existingThumb->update([
+              'file_path' => $thumbUrl,
+              'file_name' => $thumbFilename,
+              'mime_type' => $thumbFile->getClientMimeType(),
+              'size' => $thumbFile->getSize(),
+            ]);
+          } else {
+            // Create new YouTube thumbnail
+            \App\Models\MediaDerivative::create([
+              'media_file_id' => $mediaFile->id,
+              'derivative_type' => 'thumbnail',
+              'file_path' => $thumbUrl,
+              'file_name' => $thumbFilename,
+              'mime_type' => $thumbFile->getClientMimeType(),
+              'size' => $thumbFile->getSize(),
+              'platform' => 'youtube',
+            ]);
+          }
+          Log::info('YouTube thumbnail persisted for publish', ['media_id' => $mediaFile->id, 'path' => $thumbUrl]);
+        } catch (\Exception $e) {
+          Log::error('Failed to save YouTube thumbnail for publish', ['media_id' => $mediaFile->id, 'error' => $e->getMessage()]);
+        }
+      }
+    }
+
     // Use PlatformPublishService to handle publishing + Playlists
     $publishService = app(\App\Services\Publish\PlatformPublishService::class);
     $result = $publishService->publishToAllPlatforms($publication, $socialAccounts);
@@ -587,6 +674,25 @@ class PublicationController extends Controller
       'message' => $result['has_errors'] ? 'Some publications failed' : 'Publication published successfully',
       'details' => $result
     ]);
+  }
+
+  public function unpublish(Request $request, $id)
+  {
+    $publication = Publication::findOrFail($id);
+
+    if ($publication->status !== 'published') {
+      return response()->json(['message' => 'Publication is not published'], 400);
+    }
+
+    $publishService = app(\App\Services\Publish\PlatformPublishService::class);
+    $result = $publishService->unpublishFromAllPlatforms($publication);
+
+    if ($result['success']) {
+      $publication->update(['status' => 'draft']);
+      return response()->json(['success' => true, 'message' => 'Publication unpublished successfully']);
+    } else {
+      return response()->json(['success' => false, 'message' => 'Failed to unpublish', 'details' => $result], 500);
+    }
   }
 
   private static function getPlatformService(string $platform, string $token)

@@ -3,11 +3,12 @@ import IconInstagram from "@/../assets/Icons/instagram.svg";
 import IconTiktok from "@/../assets/Icons/tiktok.svg";
 import IconTwitter from "@/../assets/Icons/x.svg";
 import IconYoutube from "@/../assets/Icons/youtube.svg";
+import YouTubeThumbnailUploader from "@/Components/YouTubeThumbnailUploader";
 import { useTheme } from "@/Hooks/useTheme";
 import { Publication } from "@/types/Publication";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import axios from "axios";
-import { CheckCircle, Share2, Upload, X } from "lucide-react";
+import { CheckCircle, Share2, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 
@@ -36,18 +37,48 @@ export default function PublishPublicationModal({
   const [selectedPlatforms, setSelectedPlatforms] = useState<number[]>([]);
   const [loading, setLoading] = useState(false);
   const [publishing, setPublishing] = useState(false);
-  const [thumbnails, setThumbnails] = useState<Record<number, File>>({});
-  const [previews, setPreviews] = useState<Record<number, string>>({});
+  const [youtubeThumbnails, setYoutubeThumbnails] = useState<
+    Record<number, File | null>
+  >({});
+  const [existingThumbnails, setExistingThumbnails] = useState<
+    Record<number, { url: string; id: number }>
+  >({});
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && publication) {
       fetchConnectedAccounts();
+      loadExistingThumbnails();
       // Reset state on open
       setSelectedPlatforms([]);
-      setThumbnails({});
-      setPreviews({});
+      setYoutubeThumbnails({});
     }
   }, [isOpen, publication]);
+
+  const loadExistingThumbnails = () => {
+    if (!publication?.media_files) return;
+
+    const thumbnails: Record<number, { url: string; id: number }> = {};
+
+    publication.media_files.forEach((media: any) => {
+      if (media.file_type.includes("video")) {
+        const thumbnail = media.derivatives?.find(
+          (d: any) =>
+            d.derivative_type === "thumbnail" && d.platform === "youtube"
+        );
+        if (thumbnail) {
+          const thumbnailUrl = thumbnail.file_path.startsWith("http")
+            ? thumbnail.file_path
+            : `/storage/${thumbnail.file_path}`;
+          thumbnails[media.id] = {
+            url: thumbnailUrl,
+            id: thumbnail.id,
+          };
+        }
+      }
+    });
+
+    setExistingThumbnails(thumbnails);
+  };
 
   const fetchConnectedAccounts = async () => {
     setLoading(true);
@@ -86,12 +117,6 @@ export default function PublishPublicationModal({
     );
   };
 
-  const handleThumbnailChange = (mediaId: number, file: File) => {
-    setThumbnails((prev) => ({ ...prev, [mediaId]: file }));
-    const url = URL.createObjectURL(file);
-    setPreviews((prev) => ({ ...prev, [mediaId]: url }));
-  };
-
   const handlePublish = async () => {
     if (selectedPlatforms.length === 0) {
       toast.error("Please select at least one platform");
@@ -119,9 +144,12 @@ export default function PublishPublicationModal({
         formData.append("platforms[]", id.toString())
       );
 
-      // Add thumbnails
-      Object.entries(thumbnails).forEach(([mediaId, file]) => {
-        formData.append(`thumbnails[${mediaId}]`, file);
+      // Add YouTube thumbnails
+      Object.entries(youtubeThumbnails).forEach(([videoId, file]) => {
+        if (file) {
+          formData.append("youtube_thumbnail", file);
+          formData.append("youtube_thumbnail_video_id", videoId);
+        }
       });
 
       await axios.post(`/publications/${publication.id}/publish`, formData, {
@@ -133,6 +161,29 @@ export default function PublishPublicationModal({
       toast.success("Publication published successfully!");
       onClose();
     } catch (error: any) {
+      // If there was a server response (meaning request reached backend),
+      // the thumbnail likely saved even if publishing failed.
+      // Update UI to show the new thumbnail as "existing".
+      if (error.response) {
+        const updatedExisting = { ...existingThumbnails };
+        let hasUpdates = false;
+
+        Object.entries(youtubeThumbnails).forEach(([vidId, file]) => {
+          if (file) {
+            updatedExisting[Number(vidId)] = {
+              url: URL.createObjectURL(file),
+              id: Date.now(), // Temporary ID
+            };
+            hasUpdates = true;
+          }
+        });
+
+        if (hasUpdates) {
+          setExistingThumbnails(updatedExisting);
+          setYoutubeThumbnails({});
+        }
+      }
+
       toast.error(
         error.response?.data?.message || "Error publishing publication"
       );
@@ -339,14 +390,8 @@ export default function PublishPublicationModal({
 
           {/* YouTube Thumbnail Section */}
           {isYoutubeSelected() && videoFiles.length > 0 && (
-            <div
-              className={`mb-6 p-4 rounded-lg border ${
-                theme === "dark"
-                  ? "border-primary-500/30 bg-primary-900/10"
-                  : "border-primary-200 bg-primary-50"
-              }`}
-            >
-              <div className="flex items-center gap-2 mb-3">
+            <div className="mb-6">
+              <div className="flex items-center gap-2 mb-4">
                 <img src={IconYoutube} className="w-5 h-5" />
                 <h4
                   className={`font-semibold ${
@@ -356,98 +401,27 @@ export default function PublishPublicationModal({
                   YouTube Thumbnails
                 </h4>
               </div>
-              <p
-                className={`text-sm mb-4 ${
-                  theme === "dark" ? "text-gray-300" : "text-gray-600"
-                }`}
-              >
-                Upload custom thumbnails for your videos. recommended logic
-                1280x720.
-              </p>
 
               <div className="space-y-4">
                 {videoFiles.map((video) => (
-                  <div
+                  <YouTubeThumbnailUploader
                     key={video.id}
-                    className={`flex items-start gap-4 p-3 rounded-lg border ${
-                      theme === "dark"
-                        ? "border-neutral-700 bg-neutral-800"
-                        : "border-gray-200 bg-white"
-                    }`}
-                  >
-                    {/* Video Preview/Icon */}
-                    <div className="w-20 h-20 bg-black flex-shrink-0 rounded flex items-center justify-center overflow-hidden">
-                      <video
-                        src={video.file_path}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-
-                    <div className="flex-1">
-                      <p
-                        className={`text-sm font-medium truncate mb-2 ${
-                          theme === "dark" ? "text-gray-200" : "text-gray-700"
-                        }`}
-                      >
-                        {video.file_name}
-                      </p>
-
-                      <div className="flex items-center gap-4">
-                        {/* Upload Button */}
-                        <label className="cursor-pointer">
-                          <div
-                            className={`flex items-center gap-2 px-3 py-1.5 rounded text-xs font-medium transition-colors ${
-                              theme === "dark"
-                                ? "bg-neutral-700 hover:bg-neutral-600 text-gray-200"
-                                : "bg-gray-100 hover:bg-gray-200 text-gray-700"
-                            }`}
-                          >
-                            <Upload className="w-3 h-3" />
-                            {thumbnails[video.id]
-                              ? "Change Thumbnail"
-                              : "Upload Thumbnail"}
-                          </div>
-                          <input
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            onChange={(e) => {
-                              if (e.target.files?.[0]) {
-                                handleThumbnailChange(
-                                  video.id,
-                                  e.target.files[0]
-                                );
-                              }
-                            }}
-                          />
-                        </label>
-
-                        {/* Thumbnail Preview */}
-                        {previews[video.id] && (
-                          <div className="relative group">
-                            <img
-                              src={previews[video.id]}
-                              className="h-10 w-16 object-cover rounded border border-gray-500"
-                            />
-                            <button
-                              onClick={() => {
-                                const newThumbs = { ...thumbnails };
-                                delete newThumbs[video.id];
-                                setThumbnails(newThumbs);
-
-                                const newPreviews = { ...previews };
-                                delete newPreviews[video.id];
-                                setPreviews(newPreviews);
-                              }}
-                              className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
-                            >
-                              <X className="w-3 h-3" />
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
+                    videoId={video.id}
+                    existingThumbnail={existingThumbnails[video.id] || null}
+                    onThumbnailChange={(file: File | null) =>
+                      setYoutubeThumbnails((prev) => ({
+                        ...prev,
+                        [video.id]: file,
+                      }))
+                    }
+                    onThumbnailDelete={() => {
+                      setYoutubeThumbnails((prev) => {
+                        const newThumbs = { ...prev };
+                        delete newThumbs[video.id];
+                        return newThumbs;
+                      });
+                    }}
+                  />
                 ))}
               </div>
             </div>

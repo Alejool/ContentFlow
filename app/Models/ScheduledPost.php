@@ -15,8 +15,7 @@ class ScheduledPost extends Model
         'user_id',
         'social_account_id',
         'campaign_id',
-        'media_file_id',
-        'caption',
+        'publication_id',
         'scheduled_at',
         'status',
     ];
@@ -26,7 +25,6 @@ class ScheduledPost extends Model
         'user_id' => 'integer',
         'social_account_id' => 'integer',
         'campaign_id' => 'integer',
-        'media_file_id' => 'integer',
         'scheduled_at' => 'datetime',
     ];
 

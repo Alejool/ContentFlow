@@ -15,9 +15,11 @@ import ViewCampaignModal from "@/Pages/Manage-content/Partials/ViewCampaignModal
 import { Campaign } from "@/types/Campaign";
 import { Publication } from "@/types/Publication";
 import { Head } from "@inertiajs/react";
+import axios from "axios";
 import { FileText, Folder, Target } from "lucide-react";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
 export default function ManageContentPage() {
@@ -88,6 +90,40 @@ export default function ManageContentPage() {
 
     if (confirmed) {
       await deleteCampaign(id);
+    }
+  };
+
+  const handleUnpublish = async (item: Publication | any) => {
+    const confirmed = await confirm({
+      title: "Unpublish & Edit",
+      message:
+        "This publication is currently live. To edit it, we must first delete it from all social platforms (YouTube, etc). This cannot be undone. Continue?",
+      confirmText: "Unpublish & Edit",
+      cancelText: "Cancel",
+      type: "warning",
+    });
+
+    if (confirmed) {
+      const toastId = toast.loading("Unpublishing...");
+      try {
+        const response = await axios.post(`/publications/${item.id}/unpublish`);
+        if (response.data.success) {
+          toast.success("Unpublished successfully", { id: toastId });
+          await fetchCampaigns(filters); // Refresh list to update status
+          // The item passed to openEditModal needs to be refreshed or we trust it will be fetched again?
+          // Actually fetchCampaigns updates the list. We should open the modal with the updated item ideally,
+          // or just open it and let it be (EditPublicationModal takes props).
+          // But if we open it immediately, the old 'published' item might be passed if we use 'item'.
+          // However, EditPublicationModal uses the passed 'publication' prop.
+          // Let's refetch or just change status locally.
+          openEditModal({ ...item, status: "draft" });
+        }
+      } catch (error: any) {
+        toast.error(error.response?.data?.message || "Failed to unpublish", {
+          id: toastId,
+        });
+        console.error(error);
+      }
     }
   };
 
@@ -212,6 +248,7 @@ export default function ManageContentPage() {
                     isLoading={isLoading}
                     onFilterChange={handleFilterChange}
                     onRefresh={fetchCampaigns}
+                    onUnpublishRequest={handleUnpublish}
                   />
                 )}
               </div>

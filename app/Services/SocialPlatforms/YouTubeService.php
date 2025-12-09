@@ -78,6 +78,24 @@ class YouTubeService extends BaseSocialService
 
   private function ensureValidToken(): void
   {
+    // Check for expiration and refresh if necessary
+    if ($this->socialAccount && $this->socialAccount->token_expires_at) {
+      // Refresh if expired or expiring soon (within 5 minutes)
+      if (now()->addMinutes(5)->gte($this->socialAccount->token_expires_at)) {
+        Log::info('Token expired or expiring soon, attempting refresh', ['account_id' => $this->socialAccount->id]);
+        try {
+          $this->refreshToken();
+        } catch (\Exception $e) {
+          Log::error('Token refresh failed', ['error' => $e->getMessage()]);
+          // Continue execution? Maybe token is still barely valid or we rely on catch later.
+          // But usually we should throw if we know it's expired.
+          if (now()->gte($this->socialAccount->token_expires_at)) {
+            throw $e;
+          }
+        }
+      }
+    }
+
     if (empty($this->accessToken)) {
       throw new \Exception('Access token is missing');
     }
@@ -85,6 +103,48 @@ class YouTubeService extends BaseSocialService
     Log::info('Using access token', [
       'token_preview' => substr($this->accessToken, 0, 20) . '...'
     ]);
+  }
+
+  private function refreshToken(): void
+  {
+    if (!$this->socialAccount || !$this->socialAccount->refresh_token) {
+      throw new \Exception('Cannot refresh token: Missing refresh token');
+    }
+
+    try {
+      $client = new \GuzzleHttp\Client();
+      $response = $client->post('https://oauth2.googleapis.com/token', [
+        'form_params' => [
+          'client_id' => config('services.google.client_id'),
+          'client_secret' => config('services.google.client_secret'),
+          'refresh_token' => $this->socialAccount->refresh_token,
+          'grant_type' => 'refresh_token',
+        ],
+      ]);
+
+      $data = json_decode($response->getBody(), true);
+
+      if (isset($data['access_token'])) {
+        $this->accessToken = $data['access_token'];
+        $this->socialAccount->update([
+          'access_token' => $data['access_token'],
+          'token_expires_at' => now()->addSeconds($data['expires_in']),
+        ]);
+
+        // Update client with new token
+        $this->client = new \GuzzleHttp\Client([
+          'timeout' => 30,
+          'connect_timeout' => 10,
+        ]);
+
+        Log::info('Token refreshed successfully');
+      } else {
+        throw new \Exception('Failed to refresh token: No access_token in response');
+      }
+    } catch (\Exception $e) {
+      Log::error('Refresh token request failed', ['error' => $e->getMessage()]);
+      throw $e;
+    }
   }
 
   private function downloadVideo(string $videoUrl): string

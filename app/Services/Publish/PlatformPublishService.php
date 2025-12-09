@@ -46,6 +46,8 @@ class PlatformPublishService
       $firstMediaFile->id
     );
 
+    $uploadedPostId = null;
+
     try {
       $postData = [
         'video_path' => $firstMediaFile->file_path,
@@ -58,13 +60,21 @@ class PlatformPublishService
       // Buscar Thumbnail Derivatives
       $thumbnail = $firstMediaFile->derivatives()
         ->where('derivative_type', 'thumbnail')
-        ->first();
+        ->where('platform', 'youtube')
+        ->first(); // Prioritize YouTube specific thumbnail
+
+      if (!$thumbnail) {
+        $thumbnail = $firstMediaFile->derivatives()
+          ->where('derivative_type', 'thumbnail')
+          ->first(); // Fallback to generic thumbnail
+      }
 
       if ($thumbnail) {
         $postData['thumbnail_path'] = $thumbnail->file_path; // Asumiendo URL o path accesible
       }
 
       $response = $platformService->publishPost($postData);
+      $uploadedPostId = $response['post_id'] ?? $response['id'] ?? null;
 
       // --- LOGICA DE PLAYLIST ---
       // Si la publicación pertenece a una Campaña (agrupación), agregar a Playlist
@@ -91,16 +101,22 @@ class PlatformPublishService
             if ($playlistId) {
               $campaignGroup->youtube_playlist_id = $playlistId;
               $campaignGroup->save();
+            } else {
+              throw new \Exception("Could not find or create playlist '{$campaignGroup->name}'");
             }
           }
 
           // Agregar video a la playlist
-          if ($playlistId && isset($response['post_id'])) {
-            $platformService->addVideoToPlaylist($playlistId, $response['post_id']);
+          if ($playlistId && $uploadedPostId) {
+            $added = $platformService->addVideoToPlaylist($playlistId, $uploadedPostId);
+            if (!$added) {
+              throw new \Exception("Video uploaded but failed to add to playlist '{$campaignGroup->name}'");
+            }
           }
         } catch (\Exception $e) {
-          Log::warning('Failed to handle YouTube Playlist', ['error' => $e->getMessage()]);
-          // No fallamos la publicación completa si falla la playlist
+          Log::error('Failed to handle YouTube Playlist', ['error' => $e->getMessage()]);
+          // Re-lanzar excepción para que falle la publicación completa y haga rollback
+          throw $e;
         }
       }
       // --------------------------
@@ -114,6 +130,16 @@ class PlatformPublishService
         'error' => null,
       ];
     } catch (\Exception $e) {
+      // Rollback: Eliminar video si se subió pero falló algo más (ej. Playlist)
+      if ($uploadedPostId) {
+        try {
+          $platformService->deletePost($uploadedPostId);
+          Log::info('Rolled back YouTube upload due to secondary error', ['video_id' => $uploadedPostId]);
+        } catch (\Exception $de) {
+          Log::error('Failed to rollback YouTube upload', ['video_id' => $uploadedPostId, 'error' => $de->getMessage()]);
+        }
+      }
+
       // Marcar como fallido
       $this->logService->markAsFailed($postLog, $e->getMessage());
 
@@ -194,10 +220,7 @@ class PlatformPublishService
         $platformLogs = [];
         $platformErrors = [];
 
-        $platformService = $this->getPlatformService(
-          $socialAccount->platform,
-          $socialAccount->access_token
-        );
+        $platformService = $this->getPlatformService($socialAccount);
 
         if ($socialAccount->platform === 'youtube') {
           $result = $this->publishToYouTube($publication, $socialAccount, $platformService);
@@ -304,10 +327,7 @@ class PlatformPublishService
       $publication = $postLog->publication;
       $socialAccount = $postLog->socialAccount;
 
-      $platformService = $this->getPlatformService(
-        $socialAccount->platform,
-        $socialAccount->access_token
-      );
+      $platformService = $this->getPlatformService($socialAccount);
 
       if ($socialAccount->platform === 'youtube') {
         $result = $this->retryYouTubePublication($postLog, $publication, $platformService);
@@ -440,14 +460,70 @@ class PlatformPublishService
     return $matches[1] ?? [];
   }
 
-  private function getPlatformService(string $platform, string $accessToken)
+  private function getPlatformService(SocialAccount $socialAccount)
   {
-    return match ($platform) {
-      'youtube' => new YouTubeService($accessToken),
-      'instagram' => new InstagramService($accessToken),
-      'facebook' => new FacebookService($accessToken),
-      'tiktok' => new TikTokService($accessToken),
-      default => throw new \Exception("Unsupported platform: {$platform}"),
+    return match ($socialAccount->platform) {
+      'youtube' => new YouTubeService($socialAccount->access_token, $socialAccount),
+      'instagram' => new InstagramService($socialAccount->access_token, $socialAccount),
+      'facebook' => new FacebookService($socialAccount->access_token, $socialAccount),
+      'tiktok' => new TikTokService($socialAccount->access_token, $socialAccount),
+      default => throw new \Exception("Unsupported platform: {$socialAccount->platform}"),
     };
+  }
+  /**
+   * Elimina la publicación de todas las plataformas sociales
+   */
+  public function unpublishFromAllPlatforms(Publication $publication): array
+  {
+    $logs = SocialPostLog::where('publication_id', $publication->id)
+      ->where('status', 'published')
+      ->get();
+
+    $results = [];
+    $allSuccess = true;
+
+    // Si no hay logs publicados, consideramos éxito (nada que borrar)
+    if ($logs->isEmpty()) {
+      return ['success' => true, 'message' => 'No active posts found', 'results' => []];
+    }
+
+    foreach ($logs as $log) {
+      try {
+        $socialAccount = $log->socialAccount;
+
+        if (!$socialAccount) {
+          $results[] = ['log_id' => $log->id, 'platform' => $log->platform, 'status' => 'failed', 'error' => 'Account not found'];
+          $allSuccess = false;
+          continue;
+        }
+
+        $platformService = $this->getPlatformService($socialAccount);
+
+        if ($log->platform_post_id) {
+          // Intentar eliminar
+          $deleted = $platformService->deletePost($log->platform_post_id);
+
+          if ($deleted) {
+            $log->update(['status' => 'deleted']);
+            $results[] = ['log_id' => $log->id, 'platform' => $log->platform, 'status' => 'deleted'];
+          } else {
+            // Si falla, quizás ya fue borrado o error de red
+            // Deberíamos marcar error, y el usuario tendrá que decidir.
+            // El requerimiento dice: "se elimine si falla algo y luego si volver a permitir publicarlo"
+            // Interpretación: Si falla, NO permitir proceder.
+            $allSuccess = false;
+            $results[] = ['log_id' => $log->id, 'platform' => $log->platform, 'status' => 'failed', 'error' => 'Failed to delete on platform'];
+          }
+        } else {
+          // Log marcado como posted pero sin ID? Raro.
+          $log->update(['status' => 'deleted']); // Asumimos borrado lógico
+        }
+      } catch (\Exception $e) {
+        $allSuccess = false;
+        $results[] = ['log_id' => $log->id, 'platform' => $log->platform ?? 'unknown', 'status' => 'failed', 'error' => $e->getMessage()];
+      }
+    }
+
+    return ['success' => $allSuccess, 'results' => $results];
   }
 }
