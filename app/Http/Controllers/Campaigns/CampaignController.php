@@ -25,7 +25,7 @@ class CampaignController extends Controller
             $query->byDateRange($request->date_start, $request->date_end);
         }
 
-        $campaigns = $query->orderBy('created_at', 'desc')->paginate(10);
+        $campaigns = $query->orderBy('created_at', 'desc')->paginate(5);
 
         return response()->json([
             'success' => true,
