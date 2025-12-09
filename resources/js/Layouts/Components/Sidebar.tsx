@@ -268,7 +268,7 @@ export default function Sidebar({
                     hover:shadow-lg 
                     ${
                       route().current(item.href)
-                        ? ` text-white shadow-lg hover:text-white`
+                        ? `${activeGradient} text-white shadow-lg hover:text-white`
                         : `${textColor} ${hoverText}`
                     }`}
             >
@@ -279,13 +279,7 @@ export default function Sidebar({
                 {isSidebarOpen ? (
                   <item.lucideIcon className="h-5 w-5" />
                 ) : (
-                  <div
-                    className={`transition-colors ${
-                      route().current(item.href)
-                        ? `${activeGradient}  text-white shadow-lg hover:text-white `
-                        : `${textColor} ${hoverText}`
-                    }`}
-                  >
+                  <div className={`transition-colors`}>
                     {item.icon}
                   </div>
                 )}
