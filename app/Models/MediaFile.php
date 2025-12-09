@@ -16,6 +16,8 @@ class MediaFile extends Model
         'file_name',
         'file_path',
         'file_type',
+        'youtube_type',
+        'duration',
         'mime_type',
         'size',
     ];
@@ -24,6 +26,7 @@ class MediaFile extends Model
         'id' => 'integer',
         'user_id' => 'integer',
         'size' => 'integer',
+        'duration' => 'integer',
     ];
 
     public function user(): BelongsTo
@@ -80,5 +83,41 @@ class MediaFile extends Model
     public function getUrlAttribute(): string
     {
         return asset('storage/' . $this->file_path);
+    }
+
+    /**
+     * Check if video can be marked as a YouTube Short
+     * Shorts must be 60 seconds or less
+     */
+    public function canBeYoutubeShort(): bool
+    {
+        if ($this->file_type !== 'video') {
+            return false;
+        }
+
+        if ($this->duration === null) {
+            return false;
+        }
+
+        return $this->duration <= 60;
+    }
+
+    /**
+     * Get formatted duration string
+     */
+    public function getFormattedDuration(): ?string
+    {
+        if ($this->duration === null) {
+            return null;
+        }
+
+        $minutes = floor($this->duration / 60);
+        $seconds = $this->duration % 60;
+
+        if ($minutes > 0) {
+            return sprintf('%d:%02d', $minutes, $seconds);
+        }
+
+        return sprintf('0:%02d', $seconds);
     }
 }

@@ -154,15 +154,25 @@ export default function PublishPublicationModal({
         }
       });
 
-      await axios.post(`/publications/${publication.id}/publish`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      const response = await axios.post(
+        `/publications/${publication.id}/publish`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
-      toast.success("Publication published successfully!");
-      if (onSuccess) onSuccess();
-      onClose();
+      // Check if the response indicates success
+      if (response.data.success) {
+        toast.success("Publication published successfully!");
+        if (onSuccess) onSuccess();
+        onClose();
+      } else {
+        // Handle partial or complete failure
+        handlePublishErrors(response.data);
+      }
     } catch (error: any) {
       // If there was a server response (meaning request reached backend),
       // the thumbnail likely saved even if publishing failed.
@@ -185,13 +195,67 @@ export default function PublishPublicationModal({
           setExistingThumbnails(updatedExisting);
           setYoutubeThumbnails({});
         }
-      }
 
-      toast.error(
-        error.response?.data?.message || "Error publishing publication"
-      );
+        // Show error details if available
+        if (error.response.data) {
+          handlePublishErrors(error.response.data);
+        } else {
+          toast.error(
+            error.response?.data?.message || "Error publishing publication"
+          );
+        }
+      } else {
+        toast.error("Network error. Please check your connection.");
+      }
     } finally {
       setPublishing(false);
+    }
+  };
+
+  const handlePublishErrors = (data: any) => {
+    const { details } = data;
+
+    if (!details) {
+      toast.error(data.message || "Publishing failed");
+      return;
+    }
+
+    const { platform_results, errors } = details;
+
+    // Build detailed error message
+    let errorLines: string[] = [];
+    let successLines: string[] = [];
+
+    // Check each platform result
+    if (platform_results) {
+      Object.entries(platform_results).forEach(
+        ([platform, result]: [string, any]) => {
+          if (result.success) {
+            successLines.push(`✓ ${platform}: ${result.published} published`);
+          } else {
+            const errorMsg = result.errors?.[0]?.message || "Unknown error";
+            errorLines.push(`✗ ${platform}: ${errorMsg}`);
+          }
+        }
+      );
+    }
+
+    // Show combined message
+    if (successLines.length > 0 && errorLines.length > 0) {
+      // Partial success
+      toast.error(
+        `Partial success:\n${successLines.join("\n")}\n${errorLines.join(
+          "\n"
+        )}`,
+        { duration: 6000 }
+      );
+    } else if (errorLines.length > 0) {
+      // Complete failure
+      toast.error(`Publishing failed:\n${errorLines.join("\n")}`, {
+        duration: 6000,
+      });
+    } else {
+      toast.error(data.message || "Publishing failed");
     }
   };
 

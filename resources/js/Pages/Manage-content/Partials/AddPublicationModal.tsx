@@ -91,6 +91,9 @@ export default function AddPublicationModal({
   const [mediaFiles, setMediaFiles] = useState<File[]>([]);
   const [mediaPreviews, setMediaPreviews] = useState<string[]>([]);
   const [thumbnails, setThumbnails] = useState<Record<number, File>>({});
+  const [videoMetadata, setVideoMetadata] = useState<
+    Record<number, { duration: number; youtubeType: "short" | "video" }>
+  >({});
   const [imageError, setImageError] = useState<string | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -206,7 +209,25 @@ export default function AddPublicationModal({
          [&::-webkit-calendar-picker-indicator]:cursor-pointer`
       : "";
 
-  const handleFileChange = (files: FileList | null) => {
+  const getVideoDuration = (file: File): Promise<number> => {
+    return new Promise((resolve, reject) => {
+      const video = document.createElement("video");
+      video.preload = "metadata";
+
+      video.onloadedmetadata = () => {
+        window.URL.revokeObjectURL(video.src);
+        resolve(Math.floor(video.duration));
+      };
+
+      video.onerror = () => {
+        reject(new Error("Failed to load video metadata"));
+      };
+
+      video.src = URL.createObjectURL(file);
+    });
+  };
+
+  const handleFileChange = async (files: FileList | null) => {
     if (files && files.length > 0) {
       const newFiles = Array.from(files);
       const validFiles: File[] = [];
@@ -229,8 +250,29 @@ export default function AddPublicationModal({
       }
 
       setImageError(null);
+      const currentLength = mediaFiles.length;
       setMediaFiles((prev) => [...prev, ...validFiles]);
       setMediaPreviews((prev) => [...prev, ...newPreviews]);
+
+      // Extract duration for videos
+      for (let i = 0; i < validFiles.length; i++) {
+        const file = validFiles[i];
+        if (file.type.startsWith("video/")) {
+          try {
+            const duration = await getVideoDuration(file);
+            const index = currentLength + i;
+            setVideoMetadata((prev) => ({
+              ...prev,
+              [index]: {
+                duration,
+                youtubeType: duration <= 60 ? "short" : "video",
+              },
+            }));
+          } catch (err) {
+            console.error("Failed to get video duration:", err);
+          }
+        }
+      }
     }
   };
 
@@ -254,6 +296,27 @@ export default function AddPublicationModal({
   const removeMedia = (index: number) => {
     setMediaFiles((prev) => prev.filter((_, i) => i !== index));
     setMediaPreviews((prev) => prev.filter((_, i) => i !== index));
+
+    // Remove video metadata
+    setVideoMetadata((prev) => {
+      const newMetadata = { ...prev };
+      delete newMetadata[index];
+      // Reindex remaining items
+      const reindexed: Record<
+        number,
+        { duration: number; youtubeType: "short" | "video" }
+      > = {};
+      Object.keys(newMetadata).forEach((key) => {
+        const oldIndex = parseInt(key);
+        if (oldIndex > index) {
+          reindexed[oldIndex - 1] = newMetadata[oldIndex];
+        } else {
+          reindexed[oldIndex] = newMetadata[oldIndex];
+        }
+      });
+      return reindexed;
+    });
+
     if (mediaFiles.length === 1) {
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
@@ -301,6 +364,17 @@ export default function AddPublicationModal({
         if (thumbnails[index]) {
           formData.append(`thumbnails[${index}]`, thumbnails[index]);
         }
+        // Append video metadata if exists
+        if (videoMetadata[index]) {
+          formData.append(
+            `youtube_types[${index}]`,
+            videoMetadata[index].youtubeType
+          );
+          formData.append(
+            `durations[${index}]`,
+            videoMetadata[index].duration.toString()
+          );
+        }
       });
 
       if (data.scheduled_at) {
@@ -341,6 +415,7 @@ export default function AddPublicationModal({
     reset();
     setMediaFiles([]);
     setMediaPreviews([]);
+    setVideoMetadata({});
     setImageError(null);
     setIsSubmitting(false);
     onClose();
@@ -515,6 +590,92 @@ export default function AddPublicationModal({
                               >
                                 <X className="w-3 h-3" />
                               </button>
+
+                              {/* Video Duration and Type Selection */}
+                              {mediaFiles[index].type.startsWith("video") &&
+                                videoMetadata[index] && (
+                                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2 space-y-1">
+                                    <div className="flex items-center justify-between text-xs text-white">
+                                      <span className="font-medium">
+                                        {Math.floor(
+                                          videoMetadata[index].duration / 60
+                                        )}
+                                        :
+                                        {String(
+                                          videoMetadata[index].duration % 60
+                                        ).padStart(2, "0")}
+                                      </span>
+                                      <div className="flex gap-1">
+                                        <button
+                                          type="button"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            if (
+                                              videoMetadata[index].duration <=
+                                              60
+                                            ) {
+                                              setVideoMetadata((prev) => ({
+                                                ...prev,
+                                                [index]: {
+                                                  ...prev[index],
+                                                  youtubeType: "short",
+                                                },
+                                              }));
+                                            }
+                                          }}
+                                          disabled={
+                                            videoMetadata[index].duration > 60
+                                          }
+                                          className={`px-2 py-0.5 rounded text-[10px] font-medium transition-colors ${
+                                            videoMetadata[index].youtubeType ===
+                                            "short"
+                                              ? "bg-primary-500 text-white"
+                                              : videoMetadata[index].duration >
+                                                60
+                                              ? "bg-gray-600/50 text-gray-400 cursor-not-allowed"
+                                              : "bg-white/20 text-white hover:bg-white/30"
+                                          }`}
+                                          title={
+                                            videoMetadata[index].duration > 60
+                                              ? `Video too long for Short (${videoMetadata[index].duration}s > 60s)`
+                                              : ""
+                                          }
+                                        >
+                                          Short
+                                        </button>
+                                        <button
+                                          type="button"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setVideoMetadata((prev) => ({
+                                              ...prev,
+                                              [index]: {
+                                                ...prev[index],
+                                                youtubeType: "video",
+                                              },
+                                            }));
+                                          }}
+                                          className={`px-2 py-0.5 rounded text-[10px] font-medium transition-colors ${
+                                            videoMetadata[index].youtubeType ===
+                                            "video"
+                                              ? "bg-primary-500 text-white"
+                                              : "bg-white/20 text-white hover:bg-white/30"
+                                          }`}
+                                        >
+                                          Video
+                                        </button>
+                                      </div>
+                                    </div>
+                                    {videoMetadata[index].duration > 60 &&
+                                      videoMetadata[index].youtubeType ===
+                                        "short" && (
+                                        <div className="text-[9px] text-yellow-300 flex items-center gap-1">
+                                          <AlertTriangle className="w-2.5 h-2.5" />
+                                          Too long for Short
+                                        </div>
+                                      )}
+                                  </div>
+                                )}
                             </div>
                           ))}
                           <div

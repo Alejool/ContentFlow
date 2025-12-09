@@ -136,12 +136,28 @@ class PublicationController extends Controller
           $path = $file->storeAs('publications', $filename, 's3');
           $absolutePath = Storage::disk('s3')->url($path);
 
+          $fileType = str_starts_with($file->getClientMimeType(), 'video/') ? 'video' : 'image';
+
+          // Get youtube_type and duration from request
+          $youtubeTypes = $request->input('youtube_types', []);
+          $durations = $request->input('durations', []);
+
+          $youtubeType = $youtubeTypes[$index] ?? null;
+          $duration = isset($durations[$index]) ? (int)$durations[$index] : null;
+
+          // Validate: cannot mark video as 'short' if duration > 60 seconds
+          if ($fileType === 'video' && $youtubeType === 'short' && $duration && $duration > 60) {
+            throw new \Exception("Video '{$file->getClientOriginalName()}' is {$duration}s long and cannot be marked as a Short (max 60s)");
+          }
+
           $mediaFile = MediaFile::create([
             'user_id' => Auth::id(),
             'publication_id' => $publication->id,
             'file_name' => $file->getClientOriginalName(),
             'file_path' => $absolutePath,
-            'file_type' => str_starts_with($file->getClientMimeType(), 'video/') ? 'video' : 'image',
+            'file_type' => $fileType,
+            'youtube_type' => $fileType === 'video' ? $youtubeType : null,
+            'duration' => $fileType === 'video' ? $duration : null,
             'mime_type' => $file->getClientMimeType(),
             'size' => $file->getSize(),
           ]);
@@ -372,12 +388,28 @@ class PublicationController extends Controller
           $path = $file->storeAs('publications', $filename, 's3');
           $absolutePath = Storage::disk('s3')->url($path);
 
+          $fileType = str_starts_with($file->getClientMimeType(), 'video/') ? 'video' : 'image';
+
+          // Get youtube_type and duration from request for NEW files
+          $youtubeTypes = $request->input('youtube_types_new', []);
+          $durations = $request->input('durations_new', []);
+
+          $youtubeType = $youtubeTypes[$index] ?? null;
+          $duration = isset($durations[$index]) ? (int)$durations[$index] : null;
+
+          // Validate: cannot mark video as 'short' if duration > 60 seconds
+          if ($fileType === 'video' && $youtubeType === 'short' && $duration && $duration > 60) {
+            throw new \Exception("Video '{$file->getClientOriginalName()}' is {$duration}s long and cannot be marked as a Short (max 60s)");
+          }
+
           $mediaFile = MediaFile::create([
             'user_id' => Auth::id(),
             'publication_id' => $publication->id,
             'file_name' => $file->getClientOriginalName(),
             'file_path' => $absolutePath,
-            'file_type' => str_starts_with($file->getClientMimeType(), 'video/') ? 'video' : 'image',
+            'file_type' => $fileType,
+            'youtube_type' => $fileType === 'video' ? $youtubeType : null,
+            'duration' => $fileType === 'video' ? $duration : null,
             'mime_type' => $file->getClientMimeType(),
             'size' => $file->getSize(),
           ]);
