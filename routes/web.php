@@ -11,6 +11,7 @@ use App\Http\Controllers\SocialAccount\SocialAccountController;
 use App\Http\Controllers\Theme\ThemeController;
 use App\Http\Controllers\Locale\LocaleController;
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\NotificationsController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -82,9 +83,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     | Notifications
     |----------------------------------------------------------------------
     */
-    Route::get('/notifications', [\App\Http\Controllers\NotificationsController::class, 'index'])->name('notifications.index');
-    Route::post('/notifications/{id}/read', [\App\Http\Controllers\NotificationsController::class, 'markAsRead'])->name('notifications.read');
-    Route::post('/notifications/read-all', [\App\Http\Controllers\NotificationsController::class, 'markAllAsRead'])->name('notifications.read-all');
+    Route::get('/notifications', [NotificationsController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{id}/read', [NotificationsController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('/notifications/read-all', [NotificationsController::class, 'markAllAsRead'])->name('notifications.read-all');
 
     /*
     |----------------------------------------------------------------------
