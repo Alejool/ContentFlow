@@ -196,6 +196,10 @@
           "schedulePublication": "Schedule Publication",
           "goal": "Goal"
         
+        },
+        "button":{
+          "save":"Save",
+          "cancel":"Cancel"
         }
        
       },
@@ -231,6 +235,10 @@
           "hashtags": "Hashtags",
           "schedulePublication": "Schedule Publication",
           "goal": "Goal"
+        },
+        "button":{
+          "save":"Update",
+          "cancel":"Cancel"
         }
       },
       "validation":{
@@ -250,11 +258,7 @@
         "schedulePublicationRequired":"Schedule Publication is required"
       }
     },
-    "button": {
-      "addPublication": "Add Publication",
-      "editPublication": "Edit Publication",
-      "deletePublication": "Delete Publication"
-    },
+  
     "table": {
       "name": "Name",
       "description": "Description",

@@ -192,7 +192,10 @@
           "hashtags": "#marketing #publicidad #comunicación",
           "schedulePublication": "Programar Publicación",
           "goal": "Objetivo"
-        
+        },
+        "button":{
+          "save":"Guardar",
+          "cancel":"Cancelar"
         }
        
       },
@@ -228,6 +231,10 @@
           "hashtags": "Hashtags",
           "schedulePublication": "Programar Publicación",
           "goal": "Objetivo"
+        },
+        "button":{
+          "save":"Actualizar",
+          "cancel":"Cancelar"
         }
       },
       "validation":{

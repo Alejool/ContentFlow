@@ -921,6 +921,60 @@ export default function EditPublicationModal({
                     </p>
                   )}
                 </div>
+
+                {/* Campaign Selection - Only if not published to social networks */}
+                {(!publication?.scheduled_posts ||
+                  publication.scheduled_posts.length === 0) && (
+                  <div className="form-group animate-in fade-in slide-in-from-top-3">
+                    <label
+                      className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
+                    >
+                      <Target className={`w-4 h-4 ${iconColor}`} />
+                      {t("publications.modal.edit.addCampaign") ||
+                        "Add to Campaign"}
+                    </label>
+                    <div className="relative">
+                      <select
+                        {...register("campaign_id")}
+                        className={`w-full px-4 py-3 rounded-xl border transition-all duration-200 outline-none appearance-none ${
+                          errors.campaign_id
+                            ? "border-red-500 focus:ring-2 focus:ring-red-200"
+                            : `${borderColor} ${focusBorder}`
+                        } ${inputBg} ${
+                          theme === "dark" ? "text-white" : "text-gray-900"
+                        }`}
+                      >
+                        <option value="">
+                          {t("common.select") || "Select a campaign..."}
+                        </option>
+                        {campaigns.map((campaign) => (
+                          <option key={campaign.id} value={campaign.id}>
+                            {campaign.name || campaign.title}
+                          </option>
+                        ))}
+                      </select>
+                      <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none">
+                        <svg
+                          className={`w-4 h-4 ${
+                            theme === "dark" ? "text-gray-400" : "text-gray-500"
+                          }`}
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 9l-7 7-7-7"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Goal */}
               </div>
             </div>
 
@@ -937,7 +991,7 @@ export default function EditPublicationModal({
                     : "hover:bg-gray-100 text-gray-700"
                 }`}
               >
-                Cancel
+                {t("publications.modal.edit.button.cancel")}
               </button>
               <button
                 type="submit"
@@ -956,7 +1010,7 @@ export default function EditPublicationModal({
                 ) : (
                   <>
                     <Upload className="w-4 h-4" />
-                    Update Publication
+                    {t("publications.modal.edit.button.save")}
                   </>
                 )}
               </button>

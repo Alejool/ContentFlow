@@ -661,10 +661,12 @@ export default function AddPublicationModal({
                   <div className="relative">
                     <select
                       {...register("campaign_id")}
-                      className={`w-full px-4 py-3 rounded-xl border bg-transparent transition-all duration-200 outline-none appearance-none ${
+                      className={`w-full px-4 py-3 rounded-xl border transition-all duration-200 outline-none appearance-none ${
                         errors.campaign_id
                           ? "border-red-500 focus:ring-2 focus:ring-red-200"
                           : `${borderColor} ${focusBorder}`
+                      } ${inputBg} ${
+                        theme === "dark" ? "text-white" : "text-gray-900"
                       }`}
                     >
                       <option value="">
@@ -1013,7 +1015,7 @@ export default function AddPublicationModal({
             onClick={handleClose}
             className={`px-6 py-2.5 rounded-lg font-medium transition-colors ${cancelButton}`}
           >
-            {t("common.cancel")}
+            {t("publications.modal.add.button.cancel")}
           </button>
           <button
             onClick={handleSubmit(onFormSubmit)}
@@ -1028,7 +1030,7 @@ export default function AddPublicationModal({
             ) : (
               <>
                 <Rocket className="w-4 h-4" />
-                {t("publications.modal.add.save")}
+                {t("publications.modal.add.button.save")}
               </>
             )}
           </button>
