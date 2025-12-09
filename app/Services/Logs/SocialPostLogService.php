@@ -52,7 +52,7 @@ class SocialPostLogService
                 'privacy' => $response['privacy'] ?? null,
                 'title' => $response['title'] ?? null,
             ],
-            'error_message' => null, // Limpiar errores previos
+            'error_message' => null, 
         ]);
 
         Log::info('Post published successfully', [

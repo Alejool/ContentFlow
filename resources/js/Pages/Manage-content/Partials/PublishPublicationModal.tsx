@@ -5,6 +5,7 @@ import IconTwitter from "@/../assets/Icons/x.svg";
 import IconYoutube from "@/../assets/Icons/youtube.svg";
 import YouTubeThumbnailUploader from "@/Components/YouTubeThumbnailUploader";
 import { useConfirm } from "@/Hooks/useConfirm";
+import { useNotifications } from "@/Hooks/useNotifications";
 import { useTheme } from "@/Hooks/useTheme";
 import { Publication } from "@/types/Publication";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
@@ -35,6 +36,7 @@ export default function PublishPublicationModal({
 }: PublishPublicationModalProps) {
   const { theme } = useTheme();
   const { confirm, ConfirmDialog } = useConfirm();
+  const { refreshNotifications } = useNotifications();
   const [connectedAccounts, setConnectedAccounts] = useState<SocialAccount[]>(
     []
   );
@@ -141,6 +143,9 @@ export default function PublishPublicationModal({
       toast.success(`Unpublished from ${platform}`);
       setPublishedPlatforms((prev) => prev.filter((id) => id !== accountId));
 
+      // Refresh notifications immediately
+      refreshNotifications();
+
       if (onSuccess) onSuccess();
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Error unpublishing");
@@ -219,11 +224,18 @@ export default function PublishPublicationModal({
       // Check if the response indicates success
       if (response.data.success) {
         toast.success("Publication published successfully!");
+
+        // Refresh notifications immediately
+        refreshNotifications();
+
         if (onSuccess) onSuccess();
         onClose();
       } else {
         // Handle partial or complete failure
         handlePublishErrors(response.data);
+
+        // Refresh notifications even on partial failure to show error notifications
+        refreshNotifications();
       }
     } catch (error: any) {
       // If there was a server response (meaning request reached backend),
@@ -259,6 +271,9 @@ export default function PublishPublicationModal({
       } else {
         toast.error("Network error. Please check your connection.");
       }
+
+      // Refresh notifications to show any error notifications
+      refreshNotifications();
     } finally {
       setPublishing(false);
     }

@@ -28,7 +28,7 @@ class PublicationStatusUpdate extends Notification
      */
     public function via(object $notifiable): array
     {
-        return [ExtendedDatabaseChannel::class]; // Use custom channel
+        return [ExtendedDatabaseChannel::class];
     }
 
     /**

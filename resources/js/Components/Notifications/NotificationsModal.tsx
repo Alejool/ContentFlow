@@ -30,8 +30,8 @@ export default function NotificationsModal({
 
   // Definir colores según tema
   const colors = {
-    bg: isDark ? "bg-neutral-900" : "bg-white",
-    text: isDark ? "text-gray-100" : "text-gray-900",
+    bg: isDark ? "bg-neutral-900/95" : "bg-white",
+    text: isDark ? "text-white" : "text-gray-900",
     textSecondary: isDark ? "text-gray-400" : "text-gray-600",
     textTertiary: isDark ? "text-gray-500" : "text-gray-500",
     border: isDark ? "border-neutral-700" : "border-gray-200",
@@ -42,13 +42,13 @@ export default function NotificationsModal({
       ? "hover:bg-neutral-800 text-gray-400 hover:text-gray-300"
       : "hover:bg-gray-100 text-gray-400 hover:text-gray-500",
     tabSelected: isDark
-      ? "border-main-color text-main-color"
-      : "border-main-color text-main-color",
+      ? "border-primary-color text-primary-color"
+      : "border-primary-color text-primary-color",
     tabUnselected: isDark
       ? "border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-600"
       : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300",
     countBg: isDark
-      ? "bg-neutral-800 text-gray-300"
+      ? "bg-primary-color text-gray-300"
       : "bg-gray-100 text-gray-600",
     emptyBg: isDark ? "bg-neutral-800" : "bg-gray-100",
     emptyText: isDark ? "text-gray-500" : "text-gray-400",
@@ -57,8 +57,8 @@ export default function NotificationsModal({
       ? "text-gray-600 cursor-not-allowed"
       : "text-gray-400 cursor-not-allowed",
     active: isDark
-      ? "text-main-color hover:text-main-color/80"
-      : "text-main-color hover:text-main-color/80",
+      ? "text-primary-color hover:text-primary-color/80"
+      : "text-primary-color hover:text-primary-color/80",
   };
 
   const categories = [
@@ -197,47 +197,95 @@ export default function NotificationsModal({
                       </div>
 
                       {/* Tabs Content */}
-                      <Tab.Panels className="flex-1 overflow-y-auto">
+                      <Tab.Panels className="flex-1 overflow-y-auto custom-scrollbar">
                         {/* All Notifications */}
-                        <Tab.Panel className="h-full p-4 sm:p-6 space-y-4">
+                        <Tab.Panel className="h-full">
                           {notifications.length > 0 ? (
-                            notifications.map((notification) => (
-                              <NotificationItem
-                                key={notification.id}
-                                notification={notification}
-                                onMarkAsRead={() => markAsRead(notification.id)}
-                              />
-                            ))
+                            <div className="divide-y divide-transparent">
+                              {notifications.slice(0, 50).map((notification) => (
+                                <NotificationItem
+                                  key={notification.id}
+                                  notification={notification}
+                                  onMarkAsRead={() => markAsRead(notification.id)}
+                                />
+                              ))}
+                              {notifications.length > 50 && (
+                                <div
+                                  className={`p-4 text-center ${
+                                    theme === "dark"
+                                      ? "text-gray-500"
+                                      : "text-gray-400"
+                                  }`}
+                                >
+                                  <p className="text-sm">
+                                    Showing 50 of {notifications.length} notifications
+                                  </p>
+                                  <p className="text-xs mt-1">
+                                    Older notifications are automatically archived
+                                  </p>
+                                </div>
+                              )}
+                            </div>
                           ) : (
                             <EmptyState t={t} isDark={isDark} colors={colors} />
                           )}
                         </Tab.Panel>
 
                         {/* Application Notifications */}
-                        <Tab.Panel className="h-full p-4 sm:p-6 space-y-4">
+                        <Tab.Panel className="h-full">
                           {applicationNotifications.length > 0 ? (
-                            applicationNotifications.map((notification) => (
-                              <NotificationItem
-                                key={notification.id}
-                                notification={notification}
-                                onMarkAsRead={() => markAsRead(notification.id)}
-                              />
-                            ))
+                            <div className="divide-y divide-transparent">
+                              {applicationNotifications.slice(0, 50).map((notification) => (
+                                <NotificationItem
+                                  key={notification.id}
+                                  notification={notification}
+                                  onMarkAsRead={() => markAsRead(notification.id)}
+                                />
+                              ))}
+                              {applicationNotifications.length > 50 && (
+                                <div
+                                  className={`p-4 text-center ${
+                                    theme === "dark"
+                                      ? "text-gray-500"
+                                      : "text-gray-400"
+                                  }`}
+                                >
+                                  <p className="text-sm">
+                                    Showing 50 of {applicationNotifications.length} notifications
+                                  </p>
+                                </div>
+                              )}
+                            </div>
                           ) : (
                             <EmptyState t={t} isDark={isDark} colors={colors} />
                           )}
                         </Tab.Panel>
 
                         {/* System Notifications */}
-                        <Tab.Panel className="h-full p-4 sm:p-6 space-y-4">
+                        <Tab.Panel className="h-full">
                           {systemNotifications.length > 0 ? (
-                            systemNotifications.map((notification) => (
-                              <NotificationItem
-                                key={notification.id}
-                                notification={notification}
-                                onMarkAsRead={() => markAsRead(notification.id)}
-                              />
-                            ))
+                            <div className="divide-y divide-transparent">
+                              {systemNotifications.slice(0, 50).map((notification) => (
+                                <NotificationItem
+                                  key={notification.id}
+                                  notification={notification}
+                                  onMarkAsRead={() => markAsRead(notification.id)}
+                                />
+                              ))}
+                              {systemNotifications.length > 50 && (
+                                <div
+                                  className={`p-4 text-center ${
+                                    theme === "dark"
+                                      ? "text-gray-500"
+                                      : "text-gray-400"
+                                  }`}
+                                >
+                                  <p className="text-sm">
+                                    Showing 50 of {systemNotifications.length} notifications
+                                  </p>
+                                </div>
+                              )}
+                            </div>
                           ) : (
                             <EmptyState t={t} isDark={isDark} colors={colors} />
                           )}
@@ -268,13 +316,11 @@ interface EmptyStateProps {
 
 function EmptyState({ t, colors }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center h-64 text-center">
+    <div className="flex flex-col items-center justify-center h-64 text-center p-4">
       <div className={`rounded-full p-4 mb-4 ${colors.emptyBg}`}>
         <Bell className={`h-8 w-8 ${colors.emptyText}`} />
       </div>
       <h3 className={`text-sm font-medium ${colors.text} mb-1`}>
-        {t("notifications.no_notifications")}
-      </h3>
       <p className={`text-sm ${colors.textSecondary}`}>
         {t("notifications.empty_description") ||
           "No hay notificaciones para mostrar"}

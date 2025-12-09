@@ -1,4 +1,5 @@
 import ThemedToaster from "@/Components/ThemedToaster";
+import { NotificationProvider } from "@/Contexts/NotificationContext";
 import { ThemeProvider } from "@/Contexts/ThemeContext";
 import { PageProps } from "@/types";
 import { createInertiaApp } from "@inertiajs/react";
@@ -33,8 +34,10 @@ createInertiaApp<PageProps>({
 
     root.render(
       <ThemeProvider>
-        <App {...props} />
-        <ThemedToaster />
+        <NotificationProvider user={props.initialPage.props.auth?.user}>
+          <App {...props} />
+          <ThemedToaster />
+        </NotificationProvider>
       </ThemeProvider>
     );
   },

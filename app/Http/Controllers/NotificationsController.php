@@ -10,7 +10,7 @@ class NotificationsController extends Controller
 {
     public function index()
     {
-        $notifications = Auth::user()->notifications()->take(20)->get();
+        $notifications = Auth::user()->notifications()->latest()->take(20)->get();
         return response()->json([
             'notifications' => $notifications,
             'unread_count' => Auth::user()->unreadNotifications->count()

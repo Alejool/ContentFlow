@@ -9,7 +9,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class VideoUploadedNotification extends Notification
+class VideoUploadedNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -30,7 +30,15 @@ class VideoUploadedNotification extends Notification
      */
     public function via(object $notifiable): array
     {
-        return [ExtendedDatabaseChannel::class];
+        $channels = [ExtendedDatabaseChannel::class];
+
+        // Only broadcast when Redis or Reverb is configured
+        $broadcastDriver = config('broadcasting.default');
+        if (in_array($broadcastDriver, ['redis', 'reverb'])) {
+            $channels[] = 'broadcast';
+        }
+
+        return $channels;
     }
 
     /**

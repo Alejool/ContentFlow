@@ -30,7 +30,15 @@ class VideoDeletedNotification extends Notification
      */
     public function via(object $notifiable): array
     {
-        return [ExtendedDatabaseChannel::class];
+        $channels = [ExtendedDatabaseChannel::class];
+
+        // Only broadcast when Redis or Reverb is configured
+        $broadcastDriver = config('broadcasting.default');
+        if (in_array($broadcastDriver, ['redis', 'reverb'])) {
+            $channels[] = 'broadcast';
+        }
+
+        return $channels;
     }
 
     /**
