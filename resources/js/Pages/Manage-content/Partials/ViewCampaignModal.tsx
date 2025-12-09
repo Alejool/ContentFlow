@@ -1,25 +1,37 @@
 import CampaignMediaCarousel from "@/Components/Campaigns/CampaignMediaCarousel";
 import { useTheme } from "@/Hooks/useTheme";
 import { Campaign } from "@/types/Campaign";
+import { Publication } from "@/types/Publication";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
-import { Calendar, Hash, Target, X } from "lucide-react";
+import { Calendar, FileText, Hash, Layers, Target, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 interface ViewCampaignModalProps {
   isOpen: boolean;
   onClose: () => void;
-  campaign: Campaign | null;
+  campaign: Campaign | Publication | null;
 }
 
 export default function ViewCampaignModal({
   isOpen,
   onClose,
-  campaign,
+  campaign: item, // rename prop to generic 'item' for internal use
 }: ViewCampaignModalProps) {
   const { t } = useTranslation();
   const { theme } = useTheme();
 
-  if (!campaign) return null;
+  if (!item) return null;
+
+  // Type guards or simple checks
+  const isPublication = (i: any): i is Publication => {
+    // items with media_files or scheduled_posts are definitely publications (or old campaigns behaving as such)
+    return !!i.media_files || !!i.scheduled_posts || i.type === "publication";
+  };
+
+  const title = (item as any).title || (item as any).name || "Untitled";
+  const desc = item.description || "No description provided.";
+  const media = (item as any).media_files || [];
+  const publications = (item as any).publications || [];
 
   const getStatusColor = (status?: string) => {
     switch (status) {
@@ -62,9 +74,16 @@ export default function ViewCampaignModal({
             <DialogTitle
               className={`text-2xl font-bold ${
                 theme === "dark" ? "text-white" : "text-gray-900"
-              }`}
+              } flex items-center gap-2`}
             >
-              {t("campaigns.actions.viewCampaign")}
+              {publications.length > 0 ? (
+                <Layers className="w-6 h-6 text-primary-500" />
+              ) : (
+                <FileText className="w-6 h-6 text-primary-500" />
+              )}
+              {publications.length > 0
+                ? "Campaign Details"
+                : "Publication Details"}
             </DialogTitle>
             <button
               onClick={onClose}
@@ -80,9 +99,10 @@ export default function ViewCampaignModal({
 
           <div className="flex-1 overflow-y-auto p-6">
             <div className="space-y-6">
-              {campaign.media_files && campaign.media_files.length > 0 && (
+              {/* Media Carousel (Only for Publications) */}
+              {media.length > 0 && (
                 <div className="relative w-full h-64 rounded-lg overflow-hidden bg-gray-100 dark:bg-neutral-900">
-                  <CampaignMediaCarousel mediaFiles={campaign.media_files} />
+                  <CampaignMediaCarousel mediaFiles={media} />
                 </div>
               )}
 
@@ -93,27 +113,78 @@ export default function ViewCampaignModal({
                       theme === "dark" ? "text-white" : "text-gray-900"
                     }`}
                   >
-                    {campaign.title}
+                    {title}
                   </h3>
-                  <span
-                    className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium capitalize whitespace-nowrap self-start
-                      ${getStatusColor(campaign.status)}
-                    `}
-                  >
-                    {campaign.status || "Draft"}
-                  </span>
+                  {/* Status if available */}
+                  {(item as any).status && (
+                    <span
+                      className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium capitalize whitespace-nowrap self-start ${getStatusColor(
+                        (item as any).status
+                      )}`}
+                    >
+                      {(item as any).status}
+                    </span>
+                  )}
                 </div>
                 <p
                   className={`text-base leading-relaxed ${
                     theme === "dark" ? "text-gray-300" : "text-gray-600"
                   }`}
                 >
-                  {campaign.description}
+                  {desc}
                 </p>
               </div>
 
+              {/* Publications List (Only for Campaigns) */}
+              {publications.length > 0 && (
+                <div
+                  className={`p-4 rounded-lg border ${
+                    theme === "dark"
+                      ? "bg-neutral-900/30 border-neutral-700"
+                      : "bg-gray-50 border-gray-200"
+                  }`}
+                >
+                  <h4
+                    className={`text-sm font-semibold mb-3 flex items-center gap-2 ${
+                      theme === "dark" ? "text-gray-300" : "text-gray-700"
+                    }`}
+                  >
+                    <Layers className="w-4 h-4" />
+                    Included Publications ({publications.length})
+                  </h4>
+                  <div className="space-y-2">
+                    {publications.map((pub: any) => (
+                      <div
+                        key={pub.id}
+                        className={`flex items-center gap-3 p-2 rounded ${
+                          theme === "dark" ? "bg-neutral-800" : "bg-white"
+                        } shadow-sm`}
+                      >
+                        {pub.media_files?.[0] ? (
+                          <img
+                            src={pub.media_files[0].file_path}
+                            className="w-8 h-8 rounded object-cover"
+                          />
+                        ) : (
+                          <div className="w-8 h-8 rounded bg-gray-200 flex items-center justify-center">
+                            <FileText className="w-4 h-4 text-gray-400" />
+                          </div>
+                        )}
+                        <span
+                          className={`text-sm font-medium ${
+                            theme === "dark" ? "text-gray-200" : "text-gray-700"
+                          }`}
+                        >
+                          {pub.title || pub.name || "Untitled"}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {campaign.goal && (
+                {(item as any).goal && (
                   <div
                     className={`p-4 rounded-lg ${
                       theme === "dark" ? "bg-neutral-900/50" : "bg-gray-50"
@@ -140,12 +211,12 @@ export default function ViewCampaignModal({
                         theme === "dark" ? "text-white" : "text-gray-900"
                       }`}
                     >
-                      {campaign.goal}
+                      {(item as any).goal}
                     </p>
                   </div>
                 )}
 
-                {campaign.hashtags && (
+                {(item as any).hashtags && (
                   <div
                     className={`p-4 rounded-lg ${
                       theme === "dark" ? "bg-neutral-900/50" : "bg-gray-50"
@@ -170,148 +241,146 @@ export default function ViewCampaignModal({
                         theme === "dark" ? "text-white" : "text-gray-900"
                       }`}
                     >
-                      {campaign.hashtags}
+                      {(item as any).hashtags}
                     </p>
                   </div>
                 )}
 
-                <div
-                  className={`p-4 rounded-lg ${
-                    theme === "dark" ? "bg-neutral-900/50" : "bg-gray-50"
-                  }`}
-                >
-                  <div className="flex items-center gap-2 mb-2">
-                    <Calendar
-                      className={`w-4 h-4 ${
-                        theme === "dark" ? "text-green-400" : "text-green-600"
-                      }`}
-                    />
-                    <span
-                      className={`text-sm font-semibold ${
-                        theme === "dark" ? "text-gray-400" : "text-gray-500"
-                      }`}
-                    >
-                      {t("campaigns.startDate")}
-                    </span>
-                  </div>
-                  <p
-                    className={`text-sm ${
-                      theme === "dark" ? "text-white" : "text-gray-900"
+                {(item as any).start_date && (
+                  <div
+                    className={`p-4 rounded-lg ${
+                      theme === "dark" ? "bg-neutral-900/50" : "bg-gray-50"
                     }`}
                   >
-                    {formatDate(campaign.start_date)}
-                  </p>
-                </div>
-
-                <div
-                  className={`p-4 rounded-lg ${
-                    theme === "dark" ? "bg-neutral-900/50" : "bg-gray-50"
-                  }`}
-                >
-                  <div className="flex items-center gap-2 mb-2">
-                    <Calendar
-                      className={`w-4 h-4 ${
-                        theme === "dark"
-                          ? "text-primary-400"
-                          : "text-primary-600"
-                      }`}
-                    />
-                    <span
-                      className={`text-sm font-semibold ${
-                        theme === "dark" ? "text-gray-400" : "text-gray-500"
-                      }`}
-                    >
-                      {t("campaigns.endDate")}
-                    </span>
-                  </div>
-                  <p
-                    className={`text-sm ${
-                      theme === "dark" ? "text-white" : "text-gray-900"
-                    }`}
-                  >
-                    {formatDate(campaign.end_date)}
-                  </p>
-                </div>
-
-                <div
-                  className={`p-4 rounded-lg md:col-span-2 ${
-                    theme === "dark" ? "bg-neutral-900/50" : "bg-gray-50"
-                  }`}
-                >
-                  <div className="flex items-center gap-2 mb-2">
-                    <Calendar
-                      className={`w-4 h-4 ${
-                        theme === "dark" ? "text-purple-400" : "text-purple-600"
-                      }`}
-                    />
-                    <span
-                      className={`text-sm font-semibold ${
-                        theme === "dark" ? "text-gray-400" : "text-gray-500"
-                      }`}
-                    >
-                      {t("campaigns.scheduledPosts")}
-                    </span>
-                  </div>
-
-                  {campaign.scheduled_posts &&
-                  campaign.scheduled_posts.length > 0 ? (
-                    <div
-                      className={`space-y-2 mt-2 ${
-                        theme === "dark" ? "text-white" : "text-gray-900"
-                      }`}
-                    >
-                      {campaign.scheduled_posts.map(
-                        (post: any, index: number) => (
-                          <div
-                            key={post.id || index}
-                            className={`flex items-center justify-between p-2 rounded border ${
-                              theme === "dark"
-                                ? "bg-neutral-800 border-neutral-700"
-                                : "bg-white border-gray-200"
-                            }`}
-                          >
-                            <div className="flex items-center gap-2 da">
-                              <span className="capitalize font-medium text-sm">
-                                {post?.social_account?.platform ||
-                                  t("common.platform")}
-                              </span>
-                              {post.status && (
-                                <span
-                                  className={`text-xs px-1.5 py-0.5 rounded capitalize ${
-                                    post.status === "posted"
-                                      ? "bg-green-100 text-green-700"
-                                      : post.status === "failed"
-                                      ? "bg-primary-100 text-primary-700"
-                                      : "bg-yellow-100 text-yellow-700"
-                                  }`}
-                                >
-                                  {post.status}
-                                </span>
-                              )}
-                            </div>
-                            <div className="text-sm opacity-80">
-                              {formatDate(post.scheduled_at)}{" "}
-                              {new Date(post.scheduled_at).toLocaleTimeString(
-                                [],
-                                { hour: "2-digit", minute: "2-digit" }
-                              )}
-                            </div>
-                          </div>
-                        )
-                      )}
+                    <div className="flex items-center gap-2 mb-2">
+                      <Calendar
+                        className={`w-4 h-4 ${
+                          theme === "dark" ? "text-green-400" : "text-green-600"
+                        }`}
+                      />
+                      <span
+                        className={`text-sm font-semibold ${
+                          theme === "dark" ? "text-gray-400" : "text-gray-500"
+                        }`}
+                      >
+                        {t("campaigns.startDate")}
+                      </span>
                     </div>
-                  ) : (
                     <p
                       className={`text-sm ${
                         theme === "dark" ? "text-white" : "text-gray-900"
                       }`}
                     >
-                      {t("campaigns.noScheduledPosts")}
+                      {formatDate((item as any).start_date)}
                     </p>
-                  )}
-                </div>
+                  </div>
+                )}
 
-                {campaign.publish_date && (
+                {(item as any).end_date && (
+                  <div
+                    className={`p-4 rounded-lg ${
+                      theme === "dark" ? "bg-neutral-900/50" : "bg-gray-50"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 mb-2">
+                      <Calendar
+                        className={`w-4 h-4 ${
+                          theme === "dark"
+                            ? "text-primary-400"
+                            : "text-primary-600"
+                        }`}
+                      />
+                      <span
+                        className={`text-sm font-semibold ${
+                          theme === "dark" ? "text-gray-400" : "text-gray-500"
+                        }`}
+                      >
+                        {t("campaigns.endDate")}
+                      </span>
+                    </div>
+                    <p
+                      className={`text-sm ${
+                        theme === "dark" ? "text-white" : "text-gray-900"
+                      }`}
+                    >
+                      {formatDate((item as any).end_date)}
+                    </p>
+                  </div>
+                )}
+
+                {(item as any).scheduled_posts &&
+                  (item as any).scheduled_posts.length > 0 && (
+                    <div
+                      className={`p-4 rounded-lg md:col-span-2 ${
+                        theme === "dark" ? "bg-neutral-900/50" : "bg-gray-50"
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 mb-2">
+                        <Calendar
+                          className={`w-4 h-4 ${
+                            theme === "dark"
+                              ? "text-purple-400"
+                              : "text-purple-600"
+                          }`}
+                        />
+                        <span
+                          className={`text-sm font-semibold ${
+                            theme === "dark" ? "text-gray-400" : "text-gray-500"
+                          }`}
+                        >
+                          {t("campaigns.scheduledPosts")}
+                        </span>
+                      </div>
+
+                      <div
+                        className={`space-y-2 mt-2 ${
+                          theme === "dark" ? "text-white" : "text-gray-900"
+                        }`}
+                      >
+                        {(item as any).scheduled_posts.map(
+                          (post: any, index: number) => (
+                            <div
+                              key={post.id || index}
+                              className={`flex items-center justify-between p-2 rounded border ${
+                                theme === "dark"
+                                  ? "bg-neutral-800 border-neutral-700"
+                                  : "bg-white border-gray-200"
+                              }`}
+                            >
+                              <div className="flex items-center gap-2 da">
+                                <span className="capitalize font-medium text-sm">
+                                  {post?.social_account?.platform ||
+                                    t("common.platform")}
+                                </span>
+                                {post.status && (
+                                  <span
+                                    className={`text-xs px-1.5 py-0.5 rounded capitalize ${
+                                      post.status === "posted"
+                                        ? "bg-green-100 text-green-700"
+                                        : post.status === "failed"
+                                        ? "bg-primary-100 text-primary-700"
+                                        : "bg-yellow-100 text-yellow-700"
+                                    }`}
+                                  >
+                                    {post.status}
+                                  </span>
+                                )}
+                              </div>
+                              <div className="text-sm opacity-80">
+                                {formatDate(post.scheduled_at)}{" "}
+                                {new Date(post.scheduled_at).toLocaleTimeString(
+                                  [],
+                                  { hour: "2-digit", minute: "2-digit" }
+                                )}
+                              </div>
+                            </div>
+                          )
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                {(item as any).publish_date && (
                   <div
                     className={`p-4 rounded-lg md:col-span-2 ${
                       theme === "dark" ? "bg-neutral-900/50" : "bg-gray-50"
@@ -338,7 +407,7 @@ export default function ViewCampaignModal({
                         theme === "dark" ? "text-white" : "text-gray-900"
                       }`}
                     >
-                      {formatDate(campaign.publish_date)}
+                      {formatDate((item as any).publish_date)}
                     </p>
                   </div>
                 )}
@@ -357,14 +426,16 @@ export default function ViewCampaignModal({
                       theme === "dark" ? "text-gray-400" : "text-gray-500"
                     }
                   >
-                    {t("common.created")}: {formatDate(campaign.created_at)}
+                    {t("common.created")}:{" "}
+                    {formatDate((item as any).created_at)}
                   </span>
                   <span
                     className={
                       theme === "dark" ? "text-gray-400" : "text-gray-500"
                     }
                   >
-                    {t("common.lastUpdated")}: {formatDate(campaign.updated_at)}
+                    {t("common.lastUpdated")}:{" "}
+                    {formatDate((item as any).updated_at)}
                   </span>
                 </div>
               </div>

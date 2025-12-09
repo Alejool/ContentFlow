@@ -1,17 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Campaigns;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\Campaign;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class CampaignController extends Controller
 {
-    /**
-     * Display a listing of campaigns (grouping of publications)
-     */
     public function index(Request $request)
     {
         $query = Campaign::where('user_id', Auth::id())
@@ -34,9 +30,6 @@ class CampaignController extends Controller
         ]);
     }
 
-    /**
-     * Store a new campaign
-     */
     public function store(Request $request)
     {
         $validatedData = $request->validate([
@@ -47,8 +40,6 @@ class CampaignController extends Controller
             'end_date' => 'nullable|date|after_or_equal:start_date',
             'goal' => 'nullable|string',
             'budget' => 'nullable|numeric|min:0',
-            'publication_ids' => 'nullable|array',
-            'publication_ids.*' => 'exists:publications,id',
         ]);
 
         $campaign = Campaign::create([
@@ -62,13 +53,6 @@ class CampaignController extends Controller
             'budget' => $validatedData['budget'] ?? null,
         ]);
 
-        // Attach publications if provided
-        if (!empty($validatedData['publication_ids'])) {
-            foreach ($validatedData['publication_ids'] as $index => $publicationId) {
-                $campaign->publications()->attach($publicationId, ['order' => $index + 1]);
-            }
-        }
-
         return response()->json([
             'success' => true,
             'message' => 'Campaign created successfully',
@@ -76,12 +60,9 @@ class CampaignController extends Controller
         ]);
     }
 
-    /**
-     * Display the specified campaign
-     */
     public function show($id)
     {
-        $campaign = Campaign::with(['publications.mediaFiles'])->findOrFail($id);
+        $campaign = Campaign::with(['publications'])->findOrFail($id);
 
         return response()->json([
             'success' => true,
@@ -89,9 +70,6 @@ class CampaignController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified campaign
-     */
     public function update(Request $request, $id)
     {
         $campaign = Campaign::findOrFail($id);
@@ -104,20 +82,9 @@ class CampaignController extends Controller
             'end_date' => 'nullable|date|after_or_equal:start_date',
             'goal' => 'nullable|string',
             'budget' => 'nullable|numeric|min:0',
-            'publication_ids' => 'nullable|array',
-            'publication_ids.*' => 'exists:publications,id',
         ]);
 
         $campaign->update($validatedData);
-
-        // Sync publications if provided
-        if (isset($validatedData['publication_ids'])) {
-            $syncData = [];
-            foreach ($validatedData['publication_ids'] as $index => $publicationId) {
-                $syncData[$publicationId] = ['order' => $index + 1];
-            }
-            $campaign->publications()->sync($syncData);
-        }
 
         return response()->json([
             'success' => true,
@@ -126,9 +93,6 @@ class CampaignController extends Controller
         ]);
     }
 
-    /**
-     * Remove the specified campaign
-     */
     public function destroy($id)
     {
         $campaign = Campaign::findOrFail($id);
@@ -137,54 +101,6 @@ class CampaignController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Campaign deleted successfully',
-        ]);
-    }
-
-    /**
-     * Add publications to a campaign
-     */
-    public function addPublications(Request $request, $id)
-    {
-        $campaign = Campaign::findOrFail($id);
-
-        $validatedData = $request->validate([
-            'publication_ids' => 'required|array',
-            'publication_ids.*' => 'exists:publications,id',
-        ]);
-
-        $currentMax = $campaign->publications()->max('order') ?? 0;
-
-        foreach ($validatedData['publication_ids'] as $index => $publicationId) {
-            $campaign->publications()->attach($publicationId, [
-                'order' => $currentMax + $index + 1
-            ]);
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Publications added to campaign',
-            'campaign' => $campaign->load('publications'),
-        ]);
-    }
-
-    /**
-     * Remove publications from a campaign
-     */
-    public function removePublications(Request $request, $id)
-    {
-        $campaign = Campaign::findOrFail($id);
-
-        $validatedData = $request->validate([
-            'publication_ids' => 'required|array',
-            'publication_ids.*' => 'exists:publications,id',
-        ]);
-
-        $campaign->publications()->detach($validatedData['publication_ids']);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Publications removed from campaign',
-            'campaign' => $campaign->load('publications'),
         ]);
     }
 }

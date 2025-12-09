@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Services\SocialPlatforms;
+
 use Exception;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Support\Facades\Log;
@@ -10,7 +11,6 @@ class YouTubeService extends BaseSocialService
 {
   public function publishPost(array $data): array
   {
-    #TODO: Añade la imagen de miniatura del video subido  
     $this->validateVideoData($data);
     $this->ensureValidToken();
 
@@ -27,12 +27,45 @@ class YouTubeService extends BaseSocialService
       $metadata = $this->buildMetadata($data, $isShort);
       $response = $this->uploadToYouTube($videoFile, $metadata);
 
+      // Upload thumbnail if provided and not a Short
+      if (isset($data['thumbnail_path']) && !$isShort) {
+        $this->setThumbnail($response['id'], $data['thumbnail_path']);
+      }
+
       return $this->formatSuccessResponse($response, $isShort);
     } catch (ClientException $e) {
       $this->handleApiError($e);
     } catch (Exception $e) {
       Log::error('YouTube upload failed', ['error' => $e->getMessage()]);
       throw $e;
+    }
+  }
+
+  public function setThumbnail(string $videoId, string $thumbnailPath): void
+  {
+    $tempThumbnail = $this->downloadVideo($thumbnailPath); // Reuse download logic for generic file download
+
+    try {
+      $response = $this->client->post("https://www.googleapis.com/upload/youtube/v3/thumbnails/set", [
+        'headers' => [
+          'Authorization' => "Bearer {$this->accessToken}",
+          'Content-Type' => 'image/jpeg', // Ensure content type is correct or detected
+        ],
+        'query' => [
+          'videoId' => $videoId,
+          'uploadType' => 'media',
+        ],
+        'body' => fopen($tempThumbnail, 'r'),
+      ]);
+
+      Log::info('Thumbnail uploaded successfully', ['video_id' => $videoId]);
+    } catch (\Exception $e) {
+      Log::warning('Failed to upload thumbnail', ['video_id' => $videoId, 'error' => $e->getMessage()]);
+      // Don't throw, just log warning so video remains published
+    } finally {
+      if (file_exists($tempThumbnail)) {
+        unlink($tempThumbnail);
+      }
     }
   }
 
@@ -419,7 +452,7 @@ class YouTubeService extends BaseSocialService
     } catch (\Exception $e) {
       Log::error('Token test failed', [
         'error' => $e->getMessage(),
-         'no response'
+        'no response'
       ]);
     }
   }

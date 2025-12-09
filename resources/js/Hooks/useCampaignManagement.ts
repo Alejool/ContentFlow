@@ -3,14 +3,14 @@ import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
+import { Campaign } from "@/types/Campaign";
+import { Publication } from "@/types/Publication";
 
-interface Campaign {
-  id: number;
-}
-
-export function useCampaignManagement() {
+export function useCampaignManagement(
+  endpoint: "publications" | "campaigns" = "publications"
+) {
   const { t } = useTranslation();
-  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [campaigns, setCampaigns] = useState<(Campaign | Publication)[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchCampaigns = async (filters: any = {}) => {
@@ -20,17 +20,14 @@ export function useCampaignManagement() {
       if (filters.date_start) params.append("date_start", filters.date_start);
       if (filters.date_end) params.append("date_end", filters.date_end);
 
-      const response = await axios.get(`/campaigns?${params.toString()}`);
-      console.log(response.data.campaigns);
-      // Handle pagination response structure if needed, assuming API returns { campaigns: { data: [...] } } or just { campaigns: [...] }
-      // Based on controller, it returns paginate object. So response.data.campaigns.data is the array.
-      // But previous code expected response.data.campaigns to be the array.
-      // Controller was updated to return paginate(10).
-      // So response.data.campaigns will be the paginator object.
-      // We need to set campaigns to response.data.campaigns.data if it exists, or response.data.campaigns if it's a simple array.
+      const response = await axios.get(`/${endpoint}?${params.toString()}`);
+      console.log(response.data);
 
+      // Handle both publications and campaigns response structure
+      const dataKey =
+        endpoint === "publications" ? "publications" : "campaigns";
       const campaignsData =
-        response.data.campaigns.data || response.data.campaigns;
+        response.data[dataKey]?.data || response.data[dataKey];
       setCampaigns(campaignsData);
     } catch (error) {
       toast.error(t("campaigns.messages.fetchError"));
@@ -56,7 +53,7 @@ export function useCampaignManagement() {
           }
         });
       }
-      await axios.post("/campaigns", formData);
+      await axios.post(`/${endpoint}`, formData);
       toast.success(t("campaigns.messages.addSuccess"));
       return true;
     } catch (error) {
@@ -69,12 +66,15 @@ export function useCampaignManagement() {
     try {
       let response;
       if (data instanceof FormData) {
-        response = await axios.post(`/campaigns/${id}`, data, {
+        response = await axios.post(`/${endpoint}/${id}`, data, {
           headers: { "Content-Type": "multipart/form-data" },
         });
       } else {
         const hasFile =
-          data.image instanceof File || data.image instanceof FileList;
+          data.image instanceof File ||
+          data.image instanceof FileList ||
+          (Array.isArray(data.media) &&
+            data.media.some((item: any) => item instanceof File));
 
         if (hasFile) {
           const formData = new FormData();
@@ -87,16 +87,29 @@ export function useCampaignManagement() {
               } else if (data[key] instanceof File) {
                 formData.append(key, data[key]);
               }
+            } else if (key === "media" && Array.isArray(data[key])) {
+              data[key].forEach((file: File) => {
+                if (file instanceof File) {
+                  formData.append("media[]", file);
+                }
+              });
             } else {
-              formData.append(key, data[key] === null ? "" : data[key]);
+              // Handle other arrays (like social_accounts)
+              if (Array.isArray(data[key])) {
+                data[key].forEach((item: any) => {
+                  formData.append(`${key}[]`, item);
+                });
+              } else {
+                formData.append(key, data[key] === null ? "" : data[key]);
+              }
             }
           });
 
-          response = await axios.post(`/campaigns/${id}`, formData, {
+          response = await axios.post(`/${endpoint}/${id}`, formData, {
             headers: { "Content-Type": "multipart/form-data" },
           });
         } else {
-          response = await axios.put(`/campaigns/${id}`, data);
+          response = await axios.put(`/${endpoint}/${id}`, data);
         }
       }
 
@@ -116,7 +129,7 @@ export function useCampaignManagement() {
 
   const deleteCampaign = async (id: number) => {
     try {
-      await axios.delete(`/campaigns/${id}`);
+      await axios.delete(`/${endpoint}/${id}`);
       setCampaigns((prevCampaigns) =>
         prevCampaigns.filter((campaign) => campaign.id !== id)
       );

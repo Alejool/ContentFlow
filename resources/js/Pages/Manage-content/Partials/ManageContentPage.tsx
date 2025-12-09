@@ -3,13 +3,19 @@ import { useConfirm } from "@/Hooks/useConfirm";
 import { useTheme } from "@/Hooks/useTheme";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import AddCampaignModal from "@/Pages/Manage-content/Partials/AddCampaignModal";
+import AddPublicationModal from "@/Pages/Manage-content/Partials/AddPublicationModal";
 import CampaignList from "@/Pages/Manage-content/Partials/CampaignList";
 import EditCampaignModal from "@/Pages/Manage-content/Partials/EditCampaignModal";
+import EditPublicationModal from "@/Pages/Manage-content/Partials/EditPublicationModal";
+import LogsList from "@/Pages/Manage-content/Partials/LogsList";
 import PublishCampaignModal from "@/Pages/Manage-content/Partials/PublishCampaignModal";
+import PublishPublicationModal from "@/Pages/Manage-content/Partials/PublishPublicationModal";
 import SocialMediaAccounts from "@/Pages/Manage-content/Partials/SocialMediaAccounts";
 import ViewCampaignModal from "@/Pages/Manage-content/Partials/ViewCampaignModal";
 import { Campaign } from "@/types/Campaign";
+import { Publication } from "@/types/Publication";
 import { Head } from "@inertiajs/react";
+import { FileText, Folder, Target } from "lucide-react";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
@@ -18,13 +24,18 @@ export default function ManageContentPage() {
   const { t } = useTranslation();
   const { theme } = useTheme();
   const { confirm, ConfirmDialog } = useConfirm();
+  const [activeTab, setActiveTab] = useState<
+    "publications" | "campaigns" | "logs"
+  >("publications");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
   const [isViewDetailsModalOpen, setIsViewDetailsModalOpen] = useState(false);
-  const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(
-    null
-  );
+
+  // Unified state for selected item (Publication or Campaign)
+  const [selectedItem, setSelectedItem] = useState<
+    Campaign | Publication | null
+  >(null);
   const [filters, setFilters] = useState<any>({});
 
   const {
@@ -34,32 +45,34 @@ export default function ManageContentPage() {
     addCampaign,
     deleteCampaign,
     updateCampaign,
-  } = useCampaignManagement();
+  } = useCampaignManagement(
+    activeTab === "publications" ? "publications" : "campaigns"
+  );
 
   useEffect(() => {
     fetchCampaigns(filters);
-  }, [filters]);
+  }, [filters, activeTab]);
 
   const handleFilterChange = (newFilters: any) => {
     setFilters(newFilters);
   };
 
-  const openEditModal = (campaign: Campaign) => {
-    setSelectedCampaign(campaign);
+  const openEditModal = (item: Campaign | Publication) => {
+    setSelectedItem(item);
     setIsEditModalOpen(true);
   };
 
-  const openPublishModal = (campaign: Campaign) => {
-    setSelectedCampaign(campaign);
+  const openPublishModal = (item: any) => {
+    setSelectedItem(item);
     setIsPublishModalOpen(true);
   };
 
-  const openViewDetailsModal = (campaign: Campaign) => {
-    setSelectedCampaign(campaign);
+  const openViewDetailsModal = (item: any) => {
+    setSelectedItem(item);
     setIsViewDetailsModalOpen(true);
   };
 
-  const handleDeleteCampaign = async (campaignId: number) => {
+  const handleDeleteCampaign = async (id: number) => {
     const confirmed = await confirm({
       title: t("campaigns.messages.confirmDelete.title"),
       message: t("campaigns.messages.confirmDelete.text"),
@@ -69,7 +82,7 @@ export default function ManageContentPage() {
     });
 
     if (confirmed) {
-      await deleteCampaign(campaignId);
+      await deleteCampaign(id);
     }
   };
 
@@ -79,8 +92,10 @@ export default function ManageContentPage() {
       await fetchCampaigns(filters);
     }
   };
-  const handleUpdateCampaign = async (success: boolean) => {
+
+  const handleUpdate = async (success: boolean) => {
     if (success) {
+      // Modal usually closes itself via onClose, but we trigger refresh
       await fetchCampaigns(filters);
     }
   };
@@ -102,6 +117,12 @@ export default function ManageContentPage() {
 
   const subtitleColor = theme === "dark" ? "text-gray-400" : "text-gray-600";
 
+  const tabBg = theme === "dark" ? "bg-neutral-800" : "bg-white";
+  const tabActiveBg = theme === "dark" ? "bg-primary-600" : "bg-primary-500";
+  const tabInactiveBg = theme === "dark" ? "bg-neutral-700" : "bg-gray-100";
+  const tabActiveText = "text-white";
+  const tabInactiveText = theme === "dark" ? "text-gray-400" : "text-gray-600";
+
   return (
     <AuthenticatedLayout>
       <Head title={t("manageContent.title")} />
@@ -111,19 +132,7 @@ export default function ManageContentPage() {
             <div
               className={`inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r ${iconGradient} rounded-lg mb-6`}
             >
-              <svg
-                className="w-8 h-8 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-                />
-              </svg>
+              <Folder className="w-8 h-8 text-white" />
             </div>
             <h1
               className={`text-4xl font-bold bg-gradient-to-r ${titleGradient} bg-clip-text text-transparent mb-4`}
@@ -138,51 +147,130 @@ export default function ManageContentPage() {
 
           <div className="space-y-8">
             <SocialMediaAccounts />
-            <CampaignList
-              campaigns={campaigns}
-              onEdit={openEditModal}
-              onDelete={handleDeleteCampaign}
-              onAdd={() => setIsModalOpen(true)}
-              onPublish={openPublishModal}
-              onViewDetails={openViewDetailsModal}
-              isLoading={isLoading}
-              onFilterChange={handleFilterChange}
-            />
+
+            {/* Tabs */}
+            <div className={`${tabBg} rounded-xl shadow-lg p-6`}>
+              <div className="flex space-x-2 mb-6 border-b border-gray-200 dark:border-gray-700">
+                <button
+                  onClick={() => setActiveTab("publications")}
+                  className={`px-6 py-3 rounded-t-lg font-medium transition-all duration-200 flex items-center gap-2 ${
+                    activeTab === "publications"
+                      ? `${tabActiveBg} ${tabActiveText} shadow-md`
+                      : `${tabInactiveBg} ${tabInactiveText} hover:bg-opacity-80`
+                  }`}
+                >
+                  <FileText className="w-5 h-5" />
+                  Publicaciones
+                </button>
+                <button
+                  onClick={() => setActiveTab("campaigns")}
+                  className={`px-6 py-3 rounded-t-lg font-medium transition-all duration-200 flex items-center gap-2 ${
+                    activeTab === "campaigns"
+                      ? `${tabActiveBg} ${tabActiveText} shadow-md`
+                      : `${tabInactiveBg} ${tabInactiveText} hover:bg-opacity-80`
+                  }`}
+                >
+                  <Target className="w-5 h-5" />
+                  Campañas
+                </button>
+                <button
+                  onClick={() => setActiveTab("logs")}
+                  className={`px-6 py-3 rounded-t-lg font-medium transition-all duration-200 flex items-center gap-2 ${
+                    activeTab === "logs"
+                      ? `${tabActiveBg} ${tabActiveText} shadow-md`
+                      : `${tabInactiveBg} ${tabInactiveText} hover:bg-opacity-80`
+                  }`}
+                >
+                  <FileText className="w-5 h-5" />
+                  Logs
+                </button>
+              </div>
+
+              {/* Content */}
+              <div className="mt-4">
+                {activeTab === "logs" ? (
+                  <LogsList />
+                ) : (
+                  <CampaignList
+                    items={campaigns}
+                    mode={activeTab as "campaigns" | "publications"}
+                    onEdit={openEditModal}
+                    onDelete={handleDeleteCampaign}
+                    onAdd={() => setIsModalOpen(true)}
+                    onPublish={openPublishModal}
+                    onViewDetails={openViewDetailsModal}
+                    isLoading={isLoading}
+                    onFilterChange={handleFilterChange}
+                  />
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
       {createPortal(
-        <AddCampaignModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          onSubmit={handleAddCampaign}
-        />,
+        activeTab === "publications" ? (
+          <AddPublicationModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            onSubmit={handleAddCampaign}
+          />
+        ) : (
+          <AddCampaignModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            onSubmit={handleAddCampaign}
+          />
+        ),
         document.body
       )}
 
       {createPortal(
-        <EditCampaignModal
-          isOpen={isEditModalOpen}
-          onClose={() => {
-            setIsEditModalOpen(false);
-            setSelectedCampaign(null);
-          }}
-          campaign={selectedCampaign}
-          onSubmit={handleUpdateCampaign}
-        />,
+        activeTab === "publications" ? (
+          <EditPublicationModal
+            isOpen={isEditModalOpen}
+            onClose={() => {
+              setIsEditModalOpen(false);
+              setSelectedItem(null);
+            }}
+            publication={selectedItem as Publication}
+            onSubmit={handleUpdate}
+          />
+        ) : (
+          <EditCampaignModal
+            isOpen={isEditModalOpen}
+            onClose={() => {
+              setIsEditModalOpen(false);
+              setSelectedItem(null);
+            }}
+            campaign={selectedItem as Campaign}
+            onSubmit={handleUpdate}
+          />
+        ),
         document.body
       )}
 
       {createPortal(
-        <PublishCampaignModal
-          isOpen={isPublishModalOpen}
-          onClose={() => {
-            setIsPublishModalOpen(false);
-            setSelectedCampaign(null);
-          }}
-          campaign={selectedCampaign}
-        />,
+        activeTab === "publications" ? (
+          <PublishPublicationModal
+            isOpen={isPublishModalOpen}
+            onClose={() => {
+              setIsPublishModalOpen(false);
+              setSelectedItem(null);
+            }}
+            publication={selectedItem as Publication}
+          />
+        ) : (
+          <PublishCampaignModal
+            isOpen={isPublishModalOpen}
+            onClose={() => {
+              setIsPublishModalOpen(false);
+              setSelectedItem(null);
+            }}
+            campaign={selectedItem as Campaign}
+          />
+        ),
         document.body
       )}
 
@@ -191,9 +279,9 @@ export default function ManageContentPage() {
           isOpen={isViewDetailsModalOpen}
           onClose={() => {
             setIsViewDetailsModalOpen(false);
-            setSelectedCampaign(null);
+            setSelectedItem(null);
           }}
-          campaign={selectedCampaign}
+          campaign={selectedItem as any} // Same for view
         />,
         document.body
       )}

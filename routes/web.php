@@ -6,6 +6,7 @@ use App\Http\Controllers\AIChatController;
 use App\Http\Controllers\ManageContent\ManageContentController;
 use App\Http\Controllers\Posts\PostsController;
 use App\Http\Controllers\Campaigns\CampaignController;
+use App\Http\Controllers\Publications\PublicationController;
 use App\Http\Controllers\SocialAccount\SocialAccountController;
 use App\Http\Controllers\Theme\ThemeController;
 use App\Http\Controllers\Locale\LocaleController;
@@ -100,7 +101,22 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     /*
     |----------------------------------------------------------------------
-    | Campaigns API
+    | Publications API (formerly Campaigns)
+    |----------------------------------------------------------------------
+    */
+    Route::prefix('publications')->name('publications.')->group(function () {
+        Route::get('/', [PublicationController::class, 'index'])->name('index');
+        Route::post('/', [PublicationController::class, 'store'])->name('store');
+        Route::get('/{publication}', [PublicationController::class, 'show'])->name('show');
+        Route::put('/{publication}', [PublicationController::class, 'update'])->name('update');
+        Route::delete('/{publication}', [PublicationController::class, 'destroy'])->name('destroy');
+        Route::post('/{publication}/duplicate', [PublicationController::class, 'duplicate'])->name('duplicate');
+        Route::post('/{id}/publish', [PublicationController::class, 'publish'])->name('publish');
+    });
+
+    /*
+    |----------------------------------------------------------------------
+    | Campaigns API (NEW - for grouping publications)
     |----------------------------------------------------------------------
     */
     Route::prefix('campaigns')->name('campaigns.')->group(function () {
@@ -109,8 +125,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/{campaign}', [CampaignController::class, 'show'])->name('show');
         Route::put('/{campaign}', [CampaignController::class, 'update'])->name('update');
         Route::delete('/{campaign}', [CampaignController::class, 'destroy'])->name('destroy');
-        Route::post('/{campaign}/duplicate', [CampaignController::class, 'duplicate'])->name('duplicate');
-        Route::post('/{id}/publish', [CampaignController::class, 'publish'])->name('publish');
     });
 
     /*
@@ -127,10 +141,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::delete('/{id}', [SocialAccountController::class, 'destroy'])->name('destroy');
     });
 
-    
-
-
-    
+    /*
+    |----------------------------------------------------------------------
+    | Social Post Logs
+    |----------------------------------------------------------------------
+    */
+    Route::get('/social-logs', [\App\Http\Controllers\SocialPostLogController::class, 'index'])->name('social-logs.index');
 });
 
 require __DIR__ . '/auth.php';

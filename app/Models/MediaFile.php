@@ -36,6 +36,34 @@ class MediaFile extends Model
         return $this->hasMany(ScheduledPost::class);
     }
 
+    public function derivatives(): HasMany
+    {
+        return $this->hasMany(MediaDerivative::class);
+    }
+
+    // Helper methods for derivatives
+    public function getThumbnail()
+    {
+        return $this->derivatives()
+            ->where('derivative_type', 'thumbnail')
+            ->first();
+    }
+
+    public function getDerivativeForPlatform($platform, $type = 'platform_variant')
+    {
+        return $this->derivatives()
+            ->where('derivative_type', $type)
+            ->where('platform', $platform)
+            ->first();
+    }
+
+    public function getPreview()
+    {
+        return $this->derivatives()
+            ->where('derivative_type', 'preview')
+            ->first();
+    }
+
     public function getFullPathAttribute(): string
     {
         return storage_path('app/' . $this->file_path);

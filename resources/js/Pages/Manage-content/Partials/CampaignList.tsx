@@ -1,38 +1,38 @@
 import ModernDatePicker from "@/Components/ui/ModernDatePicker";
 import { useTheme } from "@/Hooks/useTheme";
-import { convertDate } from "@/Utils/date";
 import { Campaign } from "@/types/Campaign";
-import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
+import { Publication } from "@/types/Publication";
 import { format } from "date-fns";
 import {
+  ChevronDown,
+  ChevronRight,
   Edit,
-  Eye,
   File,
   Filter,
-  Image as ImageIcon,
-  MoreVertical,
+  Layers,
   Plus,
+  Rocket,
   Search,
-  Share2,
   Trash2,
-  Video,
 } from "lucide-react";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 type CampaignListProps = {
-  campaigns: Campaign[];
-  onEdit: (campaign: Campaign) => void;
-  onDelete: (campaignId: number) => void;
+  items: (Campaign | Publication)[];
+  mode: "campaigns" | "publications";
+  onEdit: (item: any) => void;
+  onDelete: (itemId: number) => void;
   onAdd: () => void;
-  onPublish: (campaign: Campaign) => void;
-  onViewDetails: (campaign: Campaign) => void;
+  onPublish: (item: any) => void;
+  onViewDetails: (item: any) => void;
   isLoading: boolean;
   onFilterChange?: (filters: any) => void;
 };
 
 export default function CampaignList({
-  campaigns,
+  items,
+  mode,
   onEdit,
   onDelete,
   onAdd,
@@ -46,32 +46,56 @@ export default function CampaignList({
 
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [platformFilter, setPlatformFilter] = useState("all"); // For publications
   const [dateStart, setDateStart] = useState("");
   const [dateEnd, setDateEnd] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [expandedCampaigns, setExpandedCampaigns] = useState<number[]>([]);
+
   const itemsPerPage = 10;
 
-  const filteredCampaigns = campaigns.filter(
-    (campaign) =>
-      campaign.title.toLowerCase().includes(search.toLowerCase()) ||
-      campaign.description.toLowerCase().includes(search.toLowerCase())
-  );
+  // Filter Logic
+  const filteredItems = items.filter((item) => {
+    const searchLower = search.toLowerCase();
+    // Handle both Campaign (name) and Publication (title)
+    const title = (
+      (item as Campaign).name ||
+      (item as Publication).title ||
+      ""
+    ).toLowerCase();
+    const description = (item.description || "").toLowerCase();
+    const searchMatch =
+      title.includes(searchLower) || description.includes(searchLower);
 
-  const totalPages = Math.ceil(filteredCampaigns.length / itemsPerPage);
+    // TODO: Add platform filtering logic if backend supports it or if we filter client-side
+    // const platformMatch = platformFilter === 'all' || ...
+
+    return searchMatch;
+  });
+
+  const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentCampaigns = filteredCampaigns.slice(startIndex, endIndex);
+  const currentItems = filteredItems.slice(startIndex, endIndex);
+
+  const toggleExpand = (id: number) => {
+    setExpandedCampaigns((prev) =>
+      prev.includes(id) ? prev.filter((cId) => cId !== id) : [...prev, id]
+    );
+  };
 
   const handleFilterChange = (key: string, value: string) => {
     if (key === "status") setStatusFilter(value);
+    if (key === "platform") setPlatformFilter(value);
     if (key === "date_start") setDateStart(value);
     if (key === "date_end") setDateEnd(value);
 
-    setCurrentPage(1);
+    setCurrentPage(1); // Reset to page 1
 
     if (onFilterChange) {
       onFilterChange({
         status: key === "status" ? value : statusFilter,
+        platform: key === "platform" ? value : platformFilter, // Ensure backend handles this
         date_start: key === "date_start" ? value : dateStart,
         date_end: key === "date_end" ? value : dateEnd,
       });
@@ -80,128 +104,47 @@ export default function CampaignList({
 
   const getStatusColor = (status?: string) => {
     switch (status) {
+      case "active":
       case "published":
         return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400";
       case "draft":
         return "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300";
+      case "scheduled":
+        return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400";
       default:
         return "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300";
     }
   };
-  const colorIcon =
-    theme === "dark"
-      ? `[&::-webkit-calendar-picker-indicator]:invert 
-         [&::-webkit-calendar-picker-indicator]:opacity-80
-         [&::-webkit-calendar-picker-indicator]:cursor-pointer`
-      : "";
 
-  const shouldOpenUpwards = (index: number) => {
-    const totalItems = currentCampaigns.length;
-    if (totalItems < 2) {
-      return false;
-    }
-    return index >= totalItems - 2;
-  };
-
-  const countMediaFiles = (campaign: Campaign) => {
-    if (!campaign.media_files || campaign.media_files.length === 0) {
+  // Helper to count media for a Publication
+  const countMediaFiles = (pub: Publication) => {
+    if (!pub.media_files || pub.media_files.length === 0) {
       return { images: 0, videos: 0, total: 0 };
     }
-
-    const images = campaign.media_files.filter((file) => {
-      const fileType = file.file_type?.toLowerCase() || "";
-      return (
-        fileType.startsWith("image/") ||
-        file.file_path?.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i) ||
-        file.file_type === "image" ||
-        file.file_type?.includes("image")
-      );
-    }).length;
-
-    const videos = campaign.media_files.filter((file) => {
-      const fileType = file.file_type?.toLowerCase() || "";
-      return (
-        fileType.startsWith("video/") ||
-        file.file_path?.match(/\.(mp4|avi|mov|wmv|flv|webm)$/i) ||
-        file.file_type === "video" ||
-        file.file_type?.includes("video")
-      );
-    }).length;
-
-    return {
-      images,
-      videos,
-      total: campaign.media_files.length,
-    };
+    const images = pub.media_files.filter((f) =>
+      f.file_type.includes("image")
+    ).length;
+    const videos = pub.media_files.filter((f) =>
+      f.file_type.includes("video")
+    ).length;
+    return { images, videos, total: pub.media_files.length };
   };
 
-  const getThumbnail = (campaign: Campaign) => {
-    if (!campaign.media_files || campaign.media_files.length === 0) {
-      return {
-        type: "none" as const,
-        url: null,
-      };
-    }
-
-    const imageFile = campaign.media_files.find((file) => {
-      const fileType = file.file_type?.toLowerCase() || "";
-      return (
-        fileType.startsWith("image/") ||
-        file.file_path?.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i) ||
-        file.file_type === "image" ||
-        file.file_type?.includes("image")
-      );
-    });
-
-    if (imageFile && imageFile.file_path) {
-      return {
-        type: "image" as const,
-        url: imageFile.file_path,
-      };
-    }
-
-    const videoFile = campaign.media_files.find((file) => {
-      const fileType = file.file_type?.toLowerCase() || "";
-      return (
-        fileType.startsWith("video/") ||
-        file.file_path?.match(/\.(mp4|avi|mov|wmv|flv|webm)$/i) ||
-        file.file_type === "video" ||
-        file.file_type?.includes("video")
-      );
-    });
-
-    if (videoFile && videoFile.file_path) {
-      return {
-        type: "video" as const,
-        url: videoFile.file_path,
-      };
-    }
-
-    const firstFile = campaign.media_files[0];
-    if (firstFile && firstFile.file_path) {
-      return {
-        type: "unknown" as const,
-        url: firstFile.file_path,
-      };
-    }
-
-    return {
-      type: "none" as const,
-      url: null,
-    };
+  // Helper to get thumbnail for Publication
+  const getThumbnail = (pub: Publication) => {
+    if (!pub.media_files || pub.media_files.length === 0) return null;
+    return pub.media_files[0].file_path; // Simple check for now
   };
 
   return (
     <div
-      className={`rounded-lg overflow-hidden shadow-lg border transition-all 
-        duration-300 backdrop-blur-lg
-        ${
-          theme === "dark"
-            ? "bg-neutral-800/70 border-neutral-700/70 text-white"
-            : "bg-white/70 border-gray-100/70 text-gray-900"
-        }
-      `}
+      className={`rounded-lg overflow-hidden shadow-lg border transition-all duration-300 backdrop-blur-lg ${
+        theme === "dark"
+          ? "bg-neutral-800/70 border-neutral-700/70 text-white"
+          : "bg-white/70 border-gray-100/70 text-gray-900"
+      }`}
     >
+      {/* Header */}
       <div className="p-6 border-b border-gray-100 dark:border-neutral-700/50">
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
           <div>
@@ -210,14 +153,18 @@ export default function CampaignList({
                 theme === "dark" ? "text-white" : "text-gray-900"
               }`}
             >
-              {t("campaigns.yourContent")}
+              {mode === "campaigns"
+                ? t("campaigns.yourCampaigns") || "Campaign Groups"
+                : t("campaigns.yourContent") || "Your Publications"}
             </h2>
             <p
               className={`text-sm mt-1 ${
                 theme === "dark" ? "text-gray-400" : "text-gray-500"
               }`}
             >
-              {t("campaigns.description")}
+              {mode === "campaigns"
+                ? "Manage your content groups and goals"
+                : "Manage your individual posts and media"}
             </p>
           </div>
           <button
@@ -225,10 +172,13 @@ export default function CampaignList({
             className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-700 hover:to-primary-600 text-white rounded-lg font-medium transition-all shadow-md hover:shadow-lg active:scale-95"
           >
             <Plus className="w-4 h-4" />
-            {t("campaigns.addNew")}
+            {mode === "campaigns"
+              ? t("campaigns.addNewGroup") || "New Campaign"
+              : t("campaigns.addNew") || "New Publication"}
           </button>
         </div>
 
+        {/* Filters */}
         <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-gray-50 dark:bg-neutral-900/30 p-4 rounded-lg">
           <div className="flex items-center gap-2 w-full md:w-auto relative">
             <Search
@@ -241,13 +191,11 @@ export default function CampaignList({
               placeholder={t("common.search")}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className={`pl-9 pr-4 py-2 rounded-lg w-full md:w-64 text-sm border focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all
-                ${
-                  theme === "dark"
-                    ? "bg-neutral-800 border-neutral-700 text-white placeholder-gray-500"
-                    : "bg-white border-gray-200 text-gray-900 placeholder-gray-400"
-                }
-              `}
+              className={`pl-9 pr-4 py-2 rounded-lg w-full md:w-64 text-sm border focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all ${
+                theme === "dark"
+                  ? "bg-neutral-800 border-neutral-700 text-white placeholder-gray-500"
+                  : "bg-white border-gray-200 text-gray-900 placeholder-gray-400"
+              }`}
             />
           </div>
 
@@ -261,60 +209,71 @@ export default function CampaignList({
               <select
                 value={statusFilter}
                 onChange={(e) => handleFilterChange("status", e.target.value)}
-                className={`py-2 pl-3 pr-8 rounded-lg text-sm border focus:ring-2 focus:ring-primary-500 focus:border-transparent cursor-pointer
-                  ${
-                    theme === "dark"
-                      ? "bg-neutral-800/70 border-neutral-700/70 text-white"
-                      : "bg-white/70 border-gray-200/70 text-gray-700"
-                  }
-                `}
+                className={`py-2 pl-3 pr-8 rounded-lg text-sm border focus:ring-2 focus:ring-primary-500 focus:border-transparent cursor-pointer ${
+                  theme === "dark"
+                    ? "bg-neutral-800/70 border-neutral-700/70 text-white"
+                    : "bg-white/70 border-gray-200/70 text-gray-700"
+                }`}
               >
                 <option value="all">{t("campaigns.filters.all")}</option>
                 <option value="active">{t("campaigns.filters.active")}</option>
-                <option value="upcoming">
-                  {t("campaigns.filters.upcoming")}
-                </option>
-                <option value="completed">
-                  {t("campaigns.filters.completed")}
-                </option>
                 <option value="draft">{t("campaigns.filters.draft")}</option>
+                {mode === "campaigns" && (
+                  <option value="completed">
+                    {t("campaigns.filters.completed")}
+                  </option>
+                )}
               </select>
             </div>
 
-            <div className="flex items-center gap-2">
-              <div className="w-36">
-                <ModernDatePicker
-                  selected={
-                    dateStart ? new Date(dateStart + "T00:00:00") : null
+            {mode === "publications" && (
+              <div className="flex items-center gap-2">
+                <select
+                  value={platformFilter}
+                  onChange={(e) =>
+                    handleFilterChange("platform", e.target.value)
                   }
-                  onChange={(date: Date | null) =>
+                  className={`py-2 pl-3 pr-8 rounded-lg text-sm border focus:ring-2 focus:ring-primary-500 focus:border-transparent cursor-pointer ${
+                    theme === "dark"
+                      ? "bg-neutral-800/70 border-neutral-700/70 text-white"
+                      : "bg-white/70 border-gray-200/70 text-gray-700"
+                  }`}
+                >
+                  <option value="all">All Platforms</option>
+                  <option value="instagram">Instagram</option>
+                  <option value="facebook">Facebook</option>
+                  <option value="twitter">Twitter</option>
+                  <option value="linkedin">LinkedIn</option>
+                  <option value="tiktok">TikTok</option>
+                </select>
+              </div>
+            )}
+
+            <div className="flex items-center gap-2">
+              <div className="w-32">
+                <ModernDatePicker
+                  selected={dateStart ? new Date(dateStart) : null}
+                  onChange={(d) =>
                     handleFilterChange(
                       "date_start",
-                      date ? format(date, "yyyy-MM-dd") : ""
+                      d ? format(d, "yyyy-MM-dd") : ""
                     )
                   }
-                  placeholder={t("common.startDate") || "Start Date"}
+                  placeholder="Start"
                   withPortal
                 />
               </div>
-              <span
-                className={theme === "dark" ? "text-gray-500" : "text-gray-400"}
-              >
-                -
-              </span>
-              <div className="w-36">
+              <span className="text-gray-400">-</span>
+              <div className="w-32">
                 <ModernDatePicker
-                  selected={dateEnd ? new Date(dateEnd + "T00:00:00") : null}
-                  onChange={(date: Date | null) =>
+                  selected={dateEnd ? new Date(dateEnd) : null}
+                  onChange={(d) =>
                     handleFilterChange(
                       "date_end",
-                      date ? format(date, "yyyy-MM-dd") : ""
+                      d ? format(d, "yyyy-MM-dd") : ""
                     )
                   }
-                  placeholder={t("common.endDate") || "End Date"}
-                  minDate={
-                    dateStart ? new Date(dateStart + "T00:00:00") : undefined
-                  }
+                  placeholder="End"
                   withPortal
                 />
               </div>
@@ -323,33 +282,30 @@ export default function CampaignList({
         </div>
       </div>
 
+      {/* List */}
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse z-0">
           <thead
-            className={` ${
+            className={`${
               theme === "dark"
-                ? "bg-neutral-800/90  border-neutral-700"
-                : "bg-gray-50/90  border-gray-100"
+                ? "bg-neutral-800/90 border-neutral-700"
+                : "bg-gray-50/90 border-gray-100"
             }`}
           >
             <tr
-              className={`text-xs uppercase tracking-wider border-b
-                ${
-                  theme === "dark"
-                    ? "bg-neutral-800/50  border-neutral-700"
-                    : "bg-gray-50  border-gray-100"
-                }
-              `}
+              className={`text-xs uppercase tracking-wider border-b ${
+                theme === "dark"
+                  ? "bg-neutral-800/50 border-neutral-700"
+                  : "bg-gray-50 border-gray-100"
+              }`}
             >
-              <th className="px-6 py-4 font-semibold"></th>
+              <th className="px-6 py-4 font-semibold w-8"></th>
+              <th className="px-6 py-4 font-semibold">{t("common.name")}</th>
               <th className="px-6 py-4 font-semibold">
                 {t("campaigns.headers.status")}
               </th>
               <th className="px-6 py-4 font-semibold">
-                {t("campaigns.headers.duration")}
-              </th>
-              <th className="px-6 py-4 font-semibold text-center">
-                {t("campaigns.headers.mediaFiles")}
+                {mode === "campaigns" ? "Publications" : "Media"}
               </th>
               <th className="px-6 py-4 font-semibold text-right">
                 {t("campaigns.headers.actions")}
@@ -361,84 +317,59 @@ export default function CampaignList({
               theme === "dark" ? "divide-neutral-700/50" : "divide-gray-100"
             }`}
           >
-            {currentCampaigns.length > 0 ? (
-              currentCampaigns.map((campaign, index) => {
-                const mediaCount = countMediaFiles(campaign);
-                const thumbnail = getThumbnail(campaign);
-
-                return (
+            {currentItems.length > 0 ? (
+              currentItems.map((item, index) => (
+                <Fragment key={item.id}>
                   <tr
-                    key={campaign.id}
-                    className={`group transition-colors
-                      ${
-                        theme === "dark"
-                          ? "hover:bg-neutral-700/30"
-                          : "hover:bg-gray-50/50"
-                      }
-                    `}
+                    className={`group transition-colors ${
+                      theme === "dark"
+                        ? "hover:bg-neutral-700/30"
+                        : "hover:bg-gray-50/50"
+                    } ${
+                      expandedCampaigns.includes(item.id)
+                        ? theme === "dark"
+                          ? "bg-neutral-800"
+                          : "bg-gray-50"
+                        : ""
+                    }`}
                   >
+                    <td className="px-2 py-4 text-center">
+                      {mode === "campaigns" && (
+                        <button
+                          onClick={() => toggleExpand(item.id)}
+                          className={`p-1 rounded-full transition-colors ${
+                            theme === "dark"
+                              ? "hover:bg-white/10"
+                              : "hover:bg-black/5"
+                          }`}
+                        >
+                          {expandedCampaigns.includes(item.id) ? (
+                            <ChevronDown className="w-4 h-4 text-gray-500" />
+                          ) : (
+                            <ChevronRight className="w-4 h-4 text-gray-500" />
+                          )}
+                        </button>
+                      )}
+                    </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-4">
+                        {/* Icon/Thumbnail */}
                         <div
-                          className={`w-12 h-12 rounded-lg flex-shrink-0 border overflow-hidden relative flex items-center justify-center
-                            ${
-                              theme === "dark"
-                                ? "border-neutral-700 bg-neutral-800"
-                                : "border-gray-200 bg-gray-100"
-                            }
-                          `}
+                          className={`w-12 h-12 rounded-lg flex-shrink-0 border overflow-hidden flex items-center justify-center ${
+                            theme === "dark"
+                              ? "border-neutral-700 bg-neutral-800"
+                              : "border-gray-200 bg-gray-100"
+                          }`}
                         >
-                          {thumbnail.type === "image" ? (
-                            <>
-                              <img
-                                src={thumbnail.url || ""}
-                                alt={campaign.title}
-                                className="w-full h-full object-cover"
-                                onError={(e) => {
-                                  const img = e.currentTarget;
-                                  img.style.display = "none";
-                                  const parent = img.parentElement;
-                                  if (parent) {
-                                    const icon = document.createElement("div");
-                                    icon.className =
-                                      "flex items-center justify-center";
-                                    icon.innerHTML =
-                                      '<svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>';
-                                    parent.appendChild(icon);
-                                  }
-                                }}
-                              />
-                              {mediaCount.total > 1 && (
-                                <div className="absolute -top-1 -right-1 bg-primary-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center shadow-sm">
-                                  +{mediaCount.total - 1}
-                                </div>
-                              )}
-                            </>
-                          ) : thumbnail.type === "video" ? (
-                            <>
-                              <div className="w-full h-full flex items-center justify-center bg-gray-800">
-                                <Video className="w-6 h-6 text-gray-300" />
-                              </div>
-                              {mediaCount.total > 1 && (
-                                <div className="absolute -top-1 -right-1 bg-purple-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center shadow-sm">
-                                  +{mediaCount.total - 1}
-                                </div>
-                              )}
-                            </>
-                          ) : thumbnail.type === "unknown" ? (
-                            <>
-                              <File className="w-6 h-6 text-gray-400" />
-                              {mediaCount.total > 1 && (
-                                <div className="absolute -top-1 -right-1 bg-gray-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center shadow-sm">
-                                  +{mediaCount.total - 1}
-                                </div>
-                              )}
-                            </>
+                          {mode === "campaigns" ? (
+                            <Layers className="w-6 h-6 text-gray-400" />
+                          ) : getThumbnail(item as Publication) ? (
+                            <img
+                              src={getThumbnail(item as Publication)!}
+                              className="w-full h-full object-cover"
+                            />
                           ) : (
-                            <div className="flex flex-col items-center justify-center text-gray-400">
-                              <File className="w-6 h-6 mb-1" />
-                              <span className="text-xs">No media</span>
-                            </div>
+                            <File className="w-6 h-6 text-gray-400" />
                           )}
                         </div>
                         <div>
@@ -447,7 +378,9 @@ export default function CampaignList({
                               theme === "dark" ? "text-white" : "text-gray-900"
                             }`}
                           >
-                            {campaign.title}
+                            {mode === "campaigns"
+                              ? (item as Campaign).name
+                              : (item as Publication).title || "Untitled"}
                           </h3>
                           <p
                             className={`text-xs mt-0.5 line-clamp-1 ${
@@ -456,336 +389,154 @@ export default function CampaignList({
                                 : "text-gray-500"
                             }`}
                           >
-                            {campaign.description}
+                            {(item as Campaign).description || "No description"}
                           </p>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4">
                       <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize
-                          ${getStatusColor(campaign.status)}
-                        `}
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${getStatusColor(
+                          item.status
+                        )}`}
                       >
-                        {campaign.status || "Draft"}
+                        {item.status || "Draft"}
                       </span>
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="flex flex-col text-xs">
-                        <span
-                          className={
-                            theme === "dark" ? "text-gray-300" : "text-gray-700"
-                          }
-                        >
-                          {t("campaigns.startDate")}:{" "}
-                          {convertDate(campaign.start_date || "Not set")}
+                    <td className="px-6 py-4 text-sm text-gray-500">
+                      {mode === "campaigns" ? (
+                        <span>
+                          {(item as Campaign).publications_count ||
+                            (item as Campaign).publications?.length ||
+                            0}{" "}
+                          items
                         </span>
-                        <span
-                          className={
-                            theme === "dark" ? "text-gray-500" : "text-gray-400"
-                          }
-                        >
-                          {t("campaigns.endDate")}:{" "}
-                          {convertDate(campaign.end_date || "Not set")}
+                      ) : (
+                        <span>
+                          {(item as Publication).media_files?.length || 0} files
                         </span>
-                      </div>
+                      )}
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="flex flex-col items-center gap-1">
-                        {mediaCount.total > 0 ? (
-                          <div className="flex items-center gap-3">
-                            {mediaCount.images > 0 && (
-                              <div
-                                className="flex items-center gap-1"
-                                title={`${mediaCount.images} images`}
-                              >
-                                <ImageIcon className="w-4 h-4 text-blue-500" />
-                                <span className="text-xs font-medium">
-                                  {mediaCount.images}
-                                </span>
-                              </div>
-                            )}
-                            {mediaCount.videos > 0 && (
-                              <div
-                                className="flex items-center gap-1"
-                                title={`${mediaCount.videos} videos`}
-                              >
-                                <Video className="w-4 h-4 text-purple-500" />
-                                <span className="text-xs font-medium">
-                                  {mediaCount.videos}
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                        ) : (
-                          <span
-                            className={`text-xs ${
-                              theme === "dark"
-                                ? "text-gray-500"
-                                : "text-gray-400"
-                            }`}
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        {mode === "publications" && (
+                          <button
+                            onClick={() => onPublish(item)}
+                            className="p-2 text-green-500 hover:bg-green-50 rounded-lg dark:hover:bg-green-900/20"
+                            title={t("campaigns.actions.publish") || "Publish"}
                           >
-                            No media
-                          </span>
+                            <Rocket className="w-4 h-4" />
+                          </button>
                         )}
-                        {mediaCount.total > 0 && (
-                          <div
-                            className={`text-xs ${
-                              theme === "dark"
-                                ? "text-gray-500"
-                                : "text-gray-400"
-                            }`}
-                          >
-                            {mediaCount.total} total
-                          </div>
-                        )}
+                        <button
+                          onClick={() => onEdit(item)}
+                          className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg dark:hover:bg-blue-900/20"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => onDelete(item.id)}
+                          className="p-2 text-red-500 hover:bg-red-50 rounded-lg dark:hover:bg-red-900/20"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
                       </div>
-                    </td>
-                    <td className="px-6 py-4 text-right relative isolate">
-                      <Menu
-                        as="div"
-                        className="relative inline-block text-left"
-                      >
-                        <MenuButton
-                          className={`p-2 rounded-lg transition-colors`}
-                        >
-                          <MoreVertical className="w-4 h-4" />
-                        </MenuButton>
-                        <MenuItems
-                          className={`absolute z-[100] ${
-                            shouldOpenUpwards(index)
-                              ? "bottom-full mb-2"
-                              : "top-full mt-2"
-                          } right-0 w-48 origin-top-right rounded-lg shadow-lg ring-1 ring-primary-500 focus:outline-none
-                            ${
-                              theme === "dark"
-                                ? "bg-neutral-800 ring-neutral-700"
-                                : "bg-white"
-                            }
-                            z-50`}
-                        >
-                          <div className="p-1">
-                            <MenuItem>
-                              {({ active }) => (
-                                <button
-                                  onClick={() => onEdit(campaign)}
-                                  className={`flex w-full items-center gap-2 px-3 py-2 rounded-lg text-sm
-                                    ${
-                                      active
-                                        ? theme === "dark"
-                                          ? "bg-neutral-700 text-white"
-                                          : "bg-gray-50 text-gray-900"
-                                        : theme === "dark"
-                                        ? "text-gray-300"
-                                        : "text-gray-700"
-                                    }
-                                  `}
-                                >
-                                  <Edit className="w-4 h-4" />
-                                  {t("campaigns.actions.edit")}
-                                </button>
-                              )}
-                            </MenuItem>
-                            <MenuItem>
-                              {({ active }) => (
-                                <button
-                                  onClick={() => onPublish(campaign)}
-                                  className={`flex w-full items-center gap-2 px-3 py-2 rounded-lg text-sm
-                                    ${
-                                      active
-                                        ? theme === "dark"
-                                          ? "bg-neutral-700 text-white"
-                                          : "bg-gray-50 text-gray-900"
-                                        : theme === "dark"
-                                        ? "text-gray-300"
-                                        : "text-gray-700"
-                                    }
-                                  `}
-                                >
-                                  <Share2 className="w-4 h-4" />
-                                  {t("campaigns.actions.publishNow")}
-                                </button>
-                              )}
-                            </MenuItem>
-                            <MenuItem>
-                              {({ active }) => (
-                                <button
-                                  onClick={() => onViewDetails(campaign)}
-                                  className={`flex w-full items-center gap-2 px-3 py-2 rounded-lg text-sm
-                                    ${
-                                      active
-                                        ? theme === "dark"
-                                          ? "bg-neutral-700 text-white"
-                                          : "bg-gray-50 text-gray-900"
-                                        : theme === "dark"
-                                        ? "text-gray-300"
-                                        : "text-gray-700"
-                                    }
-                                  `}
-                                >
-                                  <Eye className="w-4 h-4" />
-                                  {t("campaigns.actions.viewDetails")}
-                                </button>
-                              )}
-                            </MenuItem>
-                            <div className="my-1 border-t border-gray-100 dark:border-neutral-700" />
-                            <MenuItem>
-                              {({ active }) => (
-                                <button
-                                  onClick={() => onDelete(campaign.id)}
-                                  className={`flex w-full items-center gap-2 px-3 py-2 rounded-lg text-sm text-primary-600
-                                    ${
-                                      active
-                                        ? theme === "dark"
-                                          ? "bg-primary-900/20"
-                                          : "bg-primary-50"
-                                        : ""
-                                    }
-                                  `}
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                  {t("campaigns.actions.delete")}
-                                </button>
-                              )}
-                            </MenuItem>
-                          </div>
-                        </MenuItems>
-                      </Menu>
                     </td>
                   </tr>
-                );
-              })
+
+                  {/* Nested Publications for Campaigns */}
+                  {mode === "campaigns" &&
+                    expandedCampaigns.includes(item.id) && (
+                      <tr>
+                        <td
+                          colSpan={5}
+                          className={`px-0 ${
+                            theme === "dark"
+                              ? "bg-neutral-900/30"
+                              : "bg-gray-50/50"
+                          }`}
+                        >
+                          <div className="px-12 py-4">
+                            <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3 pl-2 border-l-2 border-primary-500">
+                              Associated Publications
+                            </div>
+                            {(item as Campaign).publications &&
+                            (item as Campaign).publications!.length > 0 ? (
+                              <div className="grid grid-cols-1 gap-2">
+                                {(item as Campaign).publications!.map((pub) => (
+                                  <div
+                                    key={pub.id}
+                                    className={`flex items-center gap-3 p-3 rounded-lg border ml-2 ${
+                                      theme === "dark"
+                                        ? "bg-neutral-800 border-neutral-700"
+                                        : "bg-white border-gray-200"
+                                    }`}
+                                  >
+                                    {/* Pub Thumbnail */}
+                                    <div className="w-10 h-10 rounded bg-gray-100 flex items-center justify-center overflow-hidden">
+                                      {pub.media_files?.[0] ? (
+                                        <img
+                                          src={pub.media_files[0].file_path}
+                                          className="w-full h-full object-cover"
+                                        />
+                                      ) : (
+                                        <File className="w-4 h-4 text-gray-400" />
+                                      )}
+                                    </div>
+                                    <div className="flex-1">
+                                      <div
+                                        className={`text-sm font-medium ${
+                                          theme === "dark"
+                                            ? "text-gray-200"
+                                            : "text-gray-800"
+                                        }`}
+                                      >
+                                        {pub.title}
+                                      </div>
+                                      <div className="text-xs text-gray-500">
+                                        {format(
+                                          new Date(pub.created_at),
+                                          "MMM d, yyyy"
+                                        )}
+                                      </div>
+                                    </div>
+                                    <div
+                                      className={`text-xs px-2 py-1 rounded-full ${getStatusColor(
+                                        pub.status
+                                      )}`}
+                                    >
+                                      {pub.status}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <div className="text-sm text-gray-500 italic ml-4">
+                                No publications attached.
+                              </div>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                </Fragment>
+              ))
             ) : (
               <tr>
-                <td colSpan={5} className="px-6 py-12 text-center">
-                  <div className="flex flex-col items-center justify-center">
-                    <div
-                      className={`w-16 h-16 rounded-full flex items-center justify-center mb-4
-                      ${
-                        theme === "dark"
-                          ? "bg-neutral-800 text-gray-600"
-                          : "bg-gray-100 text-gray-400"
-                      }
-                    `}
-                    >
-                      <Search className="w-8 h-8" />
-                    </div>
-                    <h3
-                      className={`text-lg font-medium ${
-                        theme === "dark" ? "text-white" : "text-gray-900"
-                      }`}
-                    >
-                      No campaigns found
-                    </h3>
-                    <p
-                      className={`text-sm mt-1 max-w-xs mx-auto ${
-                        theme === "dark" ? "text-gray-400" : "text-gray-500"
-                      }`}
-                    >
-                      Try adjusting your search or filters to find what you're
-                      looking for.
-                    </p>
-                  </div>
+                <td
+                  colSpan={5}
+                  className="px-6 py-12 text-center text-gray-500"
+                >
+                  No {mode} found.{" "}
+                  {mode === "campaigns"
+                    ? "Create a group to organize your content."
+                    : "Start creating content!"}
                 </td>
               </tr>
             )}
           </tbody>
         </table>
       </div>
-
-      {filteredCampaigns.length > 0 && (
-        <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 dark:border-neutral-700">
-          <div
-            className={`text-sm ${
-              theme === "dark" ? "text-gray-400" : "text-gray-600"
-            }`}
-          >
-            Showing <span className="font-medium">{startIndex + 1}</span> to{" "}
-            <span className="font-medium">
-              {Math.min(endIndex, filteredCampaigns.length)}
-            </span>{" "}
-            of <span className="font-medium">{filteredCampaigns.length}</span>{" "}
-            campaigns
-          </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-              disabled={currentPage === 1}
-              className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed
-                ${
-                  theme === "dark"
-                    ? "bg-neutral-700 hover:bg-neutral-600 text-white"
-                    : "bg-gray-100 hover:bg-gray-200 text-gray-700"
-                }
-              `}
-            >
-              Previous
-            </button>
-
-            <div className="flex items-center gap-1">
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                (page) => {
-                  const showPage =
-                    page === 1 ||
-                    page === totalPages ||
-                    (page >= currentPage - 1 && page <= currentPage + 1);
-
-                  if (!showPage) {
-                    if (page === currentPage - 2 || page === currentPage + 2) {
-                      return (
-                        <span
-                          key={page}
-                          className={`px-2 ${
-                            theme === "dark" ? "text-gray-500" : "text-gray-400"
-                          }`}
-                        >
-                          ...
-                        </span>
-                      );
-                    }
-                    return null;
-                  }
-
-                  return (
-                    <button
-                      key={page}
-                      onClick={() => setCurrentPage(page)}
-                      className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors
-                      ${
-                        currentPage === page
-                          ? "bg-primary-500 text-white"
-                          : theme === "dark"
-                          ? "bg-neutral-700 hover:bg-neutral-600 text-white"
-                          : "bg-gray-100 hover:bg-gray-200 text-gray-700"
-                      }
-                    `}
-                    >
-                      {page}
-                    </button>
-                  );
-                }
-              )}
-            </div>
-
-            <button
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(totalPages, prev + 1))
-              }
-              disabled={currentPage === totalPages}
-              className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed
-                ${
-                  theme === "dark"
-                    ? "bg-neutral-700 hover:bg-neutral-600 text-white"
-                    : "bg-gray-100 hover:bg-gray-200 text-gray-700"
-                }
-              `}
-            >
-              Next
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

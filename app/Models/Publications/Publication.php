@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Models\Campaigns;
+namespace App\Models\Publications;
 
 use App\Models\User;
 use App\Models\CampaignAnalytics;
 use App\Models\ScheduledPost;
+use App\Models\Campaign;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,9 +14,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use App\Models\MediaFile;
 use App\Models\SocialAccount;
 
-class Campaign extends Model
+class Publication extends Model
 {
     use HasFactory;
+
+    protected $table = 'publications';
 
     protected $fillable = [
         'user_id',
@@ -43,7 +46,7 @@ class Campaign extends Model
 
     public function media(): HasMany
     {
-        return $this->hasMany(CampaignMedia::class)->orderBy('order');
+        return $this->hasMany(PublicationMedia::class)->orderBy('order');
     }
 
     public function user(): BelongsTo
@@ -51,14 +54,22 @@ class Campaign extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function mediaFiles(): BelongsToMany
+    {
+        return $this->belongsToMany(MediaFile::class, 'publication_media', 'publication_id', 'media_file_id')
+            ->withPivot('order')
+            ->withTimestamps()
+            ->orderBy('pivot_order');
+    }
+
     public function analytics(): HasMany
     {
-        return $this->hasMany(CampaignAnalytics::class);
+        return $this->hasMany(CampaignAnalytics::class, 'publication_id');
     }
 
     public function scheduledPosts(): HasMany
     {
-        return $this->hasMany(ScheduledPost::class);
+        return $this->hasMany(ScheduledPost::class, 'publication_id');
     }
 
     // Helper methods for analytics
@@ -107,6 +118,14 @@ class Campaign extends Model
         return $query;
     }
 
+
+    public function campaigns(): BelongsToMany
+    {
+        return $this->belongsToMany(Campaign::class, 'campaign_publication')
+            ->withPivot('order')
+            ->withTimestamps();
+    }
+
     // Accessors
     public function getIsActiveAttribute()
     {
@@ -114,6 +133,4 @@ class Campaign extends Model
             $this->start_date <= now() &&
             $this->end_date >= now();
     }
-
-
 }

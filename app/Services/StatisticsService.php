@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Models\Analytics;
 use App\Models\CampaignAnalytics;
 use App\Models\SocialMediaMetrics;
-use App\Models\Campaigns\Campaign;
+use App\Models\Publications\Publication;
 use App\Models\SocialAccount;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -34,9 +34,9 @@ class StatisticsService
      */
     public function getOverviewStats(int $userId, $startDate, $endDate)
     {
-        $campaigns = Campaign::where('user_id', $userId)->pluck('id');
-        
-        $currentPeriod = CampaignAnalytics::whereIn('campaign_id', $campaigns)
+        $campaigns = Publication::where('user_id', $userId)->pluck('id');
+
+        $currentPeriod = CampaignAnalytics::whereIn('publication_id', $campaigns)
             ->whereBetween('date', [$startDate, $endDate])
             ->selectRaw('
                 SUM(views) as total_views,
@@ -55,7 +55,7 @@ class StatisticsService
         $previousStart = Carbon::parse($startDate)->subDays($endDate->diffInDays($startDate));
         $previousEnd = Carbon::parse($startDate)->subDay();
 
-        $previousPeriod = CampaignAnalytics::whereIn('campaign_id', $campaigns)
+        $previousPeriod = CampaignAnalytics::whereIn('publication_id', $campaigns)
             ->whereBetween('date', [$previousStart, $previousEnd])
             ->selectRaw('
                 SUM(views) as total_views,
@@ -91,17 +91,17 @@ class StatisticsService
      */
     public function getTopCampaigns(int $userId, int $limit = 5)
     {
-        return Campaign::where('user_id', $userId)
+        return Publication::where('user_id', $userId)
             ->with(['analytics' => function ($query) {
                 $query->selectRaw('
-                    campaign_id,
+                    publication_id,
                     SUM(views) as total_views,
                     SUM(clicks) as total_clicks,
                     SUM(conversions) as total_conversions,
                     SUM(likes + comments + shares + saves) as total_engagement,
                     AVG(engagement_rate) as avg_engagement_rate
                 ')
-                ->groupBy('campaign_id');
+                    ->groupBy('publication_id');
             }])
             ->get()
             ->map(function ($campaign) {
@@ -129,7 +129,7 @@ class StatisticsService
     public function getSocialMediaOverview(int $userId)
     {
         $socialAccounts = SocialAccount::where('user_id', $userId)->get();
-        
+
         return $socialAccounts->map(function ($account) {
             $latestMetrics = $account->getLatestMetrics();
             $followerGrowth = $account->getFollowerGrowth(30);
@@ -151,9 +151,9 @@ class StatisticsService
      */
     public function getEngagementTrends(int $userId, $startDate, $endDate)
     {
-        $campaigns = Campaign::where('user_id', $userId)->pluck('id');
+        $campaigns = Publication::where('user_id', $userId)->pluck('id');
 
-        return CampaignAnalytics::whereIn('campaign_id', $campaigns)
+        return CampaignAnalytics::whereIn('publication_id', $campaigns)
             ->whereBetween('date', [$startDate, $endDate])
             ->selectRaw('
                 date,
@@ -186,7 +186,7 @@ class StatisticsService
      */
     public function getCampaignAnalytics(int $campaignId, $startDate = null, $endDate = null)
     {
-        $query = CampaignAnalytics::where('campaign_id', $campaignId);
+        $query = CampaignAnalytics::where('publication_id', $campaignId);
 
         if ($startDate && $endDate) {
             $query->whereBetween('date', [$startDate, $endDate]);
@@ -233,7 +233,7 @@ class StatisticsService
      */
     public function getRecentActivity(int $userId, int $limit = 10)
     {
-        $campaigns = Campaign::where('user_id', $userId)
+        $campaigns = Publication::where('user_id', $userId)
             ->latest()
             ->take($limit)
             ->get()
