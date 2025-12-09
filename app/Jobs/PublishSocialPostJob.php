@@ -8,6 +8,7 @@ use App\Services\SocialTokenManager;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use App\Models\SocialAccount;
 
 class PublishSocialPostJob implements ShouldQueue
 {
@@ -25,7 +26,7 @@ class PublishSocialPostJob implements ShouldQueue
 
     foreach ($this->post->platform_targets as $accountId) {
       try {
-        $account = \App\Models\SocialAccount::find($accountId);
+        $account = SocialAccount::find($accountId);
 
         if (!$account || !$account->is_active) {
           continue;
