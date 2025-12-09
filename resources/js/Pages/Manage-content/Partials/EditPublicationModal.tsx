@@ -101,6 +101,7 @@ export default function EditPublicationModal({
   const [mediaPreviews, setMediaPreviews] = useState<
     {
       id?: number;
+      tempId: string;
       url: string;
       type: string;
       isNew: boolean;
@@ -208,6 +209,7 @@ export default function EditPublicationModal({
 
       const previews: {
         id?: number;
+        tempId: string;
         url: string;
         type: string;
         isNew: boolean;
@@ -244,6 +246,7 @@ export default function EditPublicationModal({
 
         previews.push({
           id: media.id,
+          tempId: `existing_${media.id}`,
           url,
           type: media.file_type,
           isNew: false,
@@ -255,6 +258,7 @@ export default function EditPublicationModal({
       if (!publication.media_files || publication.media_files.length === 0) {
         if ((publication as any).image) {
           previews.push({
+            tempId: "legacy_image",
             url: (publication as any).image,
             type: "image/jpeg",
             isNew: false,
@@ -311,7 +315,12 @@ export default function EditPublicationModal({
     if (files && files.length > 0) {
       const newFiles = Array.from(files);
       const validFiles: File[] = [];
-      const newPreviews: { url: string; type: string; isNew: boolean }[] = [];
+      const newPreviews: {
+        tempId: string;
+        url: string;
+        type: string;
+        isNew: boolean;
+      }[] = [];
       let error = null;
 
       for (const file of newFiles) {
@@ -321,7 +330,11 @@ export default function EditPublicationModal({
           break;
         }
         validFiles.push(file);
+        const tempId = `new_${Date.now()}_${Math.random()
+          .toString(36)
+          .substr(2, 9)}`;
         newPreviews.push({
+          tempId,
           url: URL.createObjectURL(file),
           type: file.type,
           isNew: true,
@@ -348,6 +361,14 @@ export default function EditPublicationModal({
       }
       setMediaFiles((prev) => prev.filter((_, i) => i !== newFileIndex));
     }
+
+    // Clean up thumbnails state to avoid leaks
+    if (thumbnails[previewToRemove.tempId]) {
+      const newThumbs = { ...thumbnails };
+      delete newThumbs[previewToRemove.tempId];
+      setThumbnails(newThumbs);
+    }
+
     setMediaPreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
@@ -398,21 +419,21 @@ export default function EditPublicationModal({
       });
 
       // Pass all collected thumbnails
-      Object.entries(thumbnails).forEach(([previewIndexStr, file]) => {
-        const previewIndex = parseInt(previewIndexStr);
-        const preview = mediaPreviews[previewIndex];
+      // Pass all collected thumbnails using stable tempId mapping
+      Object.entries(thumbnails).forEach(([tempId, file]) => {
+        const preview = mediaPreviews.find((p) => p.tempId === tempId);
 
-        if (preview && preview.id) {
-          // Logic for existing media thumbnails: key by ID.
+        if (preview && !preview.isNew && preview.id) {
+          // Existing media: key by database ID
           submitData.append(`thumbnails[${preview.id}]`, file);
-        } else if (preview) {
-          // Logic for new media thumbnails: key by new index?
-          // We need to map global preview index to relative new file index.
-          let newFileIndex = 0;
-          for (let i = 0; i < previewIndex; i++) {
-            if (mediaPreviews[i].isNew) newFileIndex++;
+        } else if (preview && preview.isNew) {
+          // New media: find relative index among new files
+          const newPreviews = mediaPreviews.filter((p) => p.isNew);
+          const indexInNew = newPreviews.findIndex((p) => p.tempId === tempId);
+
+          if (indexInNew !== -1) {
+            submitData.append(`thumbnails[new_${indexInNew}]`, file);
           }
-          submitData.append(`thumbnails[new_${newFileIndex}]`, file);
         }
       });
 
@@ -579,7 +600,7 @@ export default function EditPublicationModal({
                                     >
                                       <input
                                         type="file"
-                                        id={`edit-thumb-${index}`}
+                                        id={`edit-thumb-${preview.tempId}`}
                                         className="hidden"
                                         accept="image/*"
                                         onChange={(e) => {
@@ -587,30 +608,30 @@ export default function EditPublicationModal({
                                           if (file)
                                             setThumbnails((prev) => ({
                                               ...prev,
-                                              [index]: file,
+                                              [preview.tempId]: file,
                                             }));
                                         }}
                                       />
                                       <label
-                                        htmlFor={`edit-thumb-${index}`}
+                                        htmlFor={`edit-thumb-${preview.tempId}`}
                                         className="cursor-pointer bg-white/10 hover:bg-white/20 text-white text-xs px-3 py-1.5 rounded-full backdrop-blur-sm transition-colors flex items-center gap-1 border border-white/20"
                                       >
                                         <FileImage className="w-3 h-3" />
-                                        {thumbnails[index] ||
+                                        {thumbnails[preview.tempId] ||
                                         preview.thumbnailUrl
                                           ? "Change Thumb"
                                           : "Set Thumb"}
                                       </label>
                                     </div>
                                   </div>
-                                  {(thumbnails[index] ||
+                                  {(thumbnails[preview.tempId] ||
                                     preview.thumbnailUrl) && (
                                     <div className="absolute top-2 left-2 w-8 h-8 rounded border border-white/30 overflow-hidden shadow-lg z-10">
                                       <img
                                         src={
-                                          thumbnails[index]
+                                          thumbnails[preview.tempId]
                                             ? URL.createObjectURL(
-                                                thumbnails[index]
+                                                thumbnails[preview.tempId]
                                               )
                                             : preview.thumbnailUrl
                                         }
