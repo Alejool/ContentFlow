@@ -488,6 +488,43 @@
       "languageChanged": "Language changed successfully."
     }
   },
+  "logs": {
+    "title": "Activity Logs",
+    "refresh": "Refresh",
+    "filters": {
+      "campaign": "Filter by Campaign",
+      "dateRange": "Date Range",
+      "allCampaigns": "All Campaigns",
+      "from": "From",
+      "to": "To",
+      "apply": "Apply Filters",
+      "clear": "Clear"
+    },
+    "table": {
+      "date": "Date",
+      "platform": "Platform",
+      "source": "Source",
+      "campaign": "Campaign",
+      "status": "Status",
+      "message": "Message",
+      "error": "Error",
+      "video": "Video"
+    },
+    "status": {
+      "success": "Success",
+      "failed": "Failed",
+      "pending": "Pending",
+      "published": "Published"
+    },
+    "empty": "No logs found",
+    "loading": "Loading logs...",
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next",
+      "page": "Page",
+      "of": "of"
+    }
+  },
   "auth": {
     "login": {
       "title": "Login",
@@ -720,6 +757,9 @@
   "manageContent": {
     "title": "Content Management",
     "subtitle": "Organize and manage your multimedia content elegantly and efficiently",
+    "publications": "Publications",
+    "campaigns": "Campaigns",
+    "logs": "Logs",
     "socialMedia": {
       "title": "Connect Your Social Networks",
       "description": "Connect your social media accounts to allow automatic content publishing. Your information will be kept secure and will only be used for the functions you authorize.",

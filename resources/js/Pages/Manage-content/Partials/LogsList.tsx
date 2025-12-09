@@ -5,8 +5,11 @@ import {
   AlertCircle,
   CheckCircle,
   Clock,
+  Filter,
   MessageCircle,
   RotateCcw,
+  Video,
+  X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -18,27 +21,61 @@ interface Log {
   status: "success" | "failed" | "pending" | "published";
   message?: string;
   error_message?: string;
-  campaign?: { name: string };
+  campaign?: { id: number; name: string };
   publication?: { title: string };
   social_account?: { name: string; username: string; platform: string };
+  video_url?: string;
+}
+
+interface Campaign {
+  id: number;
+  name: string;
+  title?: string;
 }
 
 export default function LogsList() {
   const { t } = useTranslation();
   const { theme } = useTheme();
   const [logs, setLogs] = useState<Log[]>([]);
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
 
+  // Filters
+  const [selectedCampaign, setSelectedCampaign] = useState<string>("");
+  const [dateFrom, setDateFrom] = useState<string>("");
+  const [dateTo, setDateTo] = useState<string>("");
+  const [showFilters, setShowFilters] = useState(false);
+
+  useEffect(() => {
+    fetchCampaigns();
+  }, []);
+
   useEffect(() => {
     fetchLogs();
-  }, [page]);
+  }, [page, selectedCampaign, dateFrom, dateTo]);
+
+  const fetchCampaigns = async () => {
+    try {
+      const response = await axios.get("/campaigns");
+      if (response.data.campaigns) {
+        setCampaigns(response.data.campaigns.data || response.data.campaigns);
+      }
+    } catch (error) {
+      console.error("Failed to fetch campaigns", error);
+    }
+  };
 
   const fetchLogs = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get(`/social-logs?page=${page}`);
+      let url = `/social-logs?page=${page}`;
+      if (selectedCampaign) url += `&campaign_id=${selectedCampaign}`;
+      if (dateFrom) url += `&date_from=${dateFrom}`;
+      if (dateTo) url += `&date_to=${dateTo}`;
+
+      const response = await axios.get(url);
       if (response.data.success) {
         setLogs(response.data.logs.data);
         setLastPage(response.data.logs.last_page);
@@ -47,6 +84,32 @@ export default function LogsList() {
       console.error("Failed to fetch logs", error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const clearFilters = () => {
+    setSelectedCampaign("");
+    setDateFrom("");
+    setDateTo("");
+    setPage(1);
+  };
+
+  const navigateToCampaign = (campaignId: number) => {
+    const campaignTab = document.querySelector('[data-tab="campaigns"]');
+    if (campaignTab) {
+      (campaignTab as HTMLElement).click();
+      setTimeout(() => {
+        const campaignRow = document.querySelector(
+          `[data-campaign-id="${campaignId}"]`
+        );
+        if (campaignRow) {
+          campaignRow.scrollIntoView({ behavior: "smooth", block: "center" });
+          const expandButton = campaignRow.querySelector("button[data-expand]");
+          if (expandButton && !expandButton.getAttribute("data-expanded")) {
+            (expandButton as HTMLElement).click();
+          }
+        }
+      }, 100);
     }
   };
 
@@ -64,6 +127,10 @@ export default function LogsList() {
     }
   };
 
+  const borderColor =
+    theme === "dark" ? "border-neutral-700" : "border-gray-200";
+  const inputBg = theme === "dark" ? "bg-neutral-700" : "bg-white";
+
   return (
     <div
       className={`rounded-lg overflow-hidden shadow-lg border transition-all duration-300 backdrop-blur-lg ${
@@ -72,16 +139,108 @@ export default function LogsList() {
           : "bg-white/70 border-gray-100/70 text-gray-900"
       }`}
     >
+      {/* Header */}
       <div className="p-6 border-b border-gray-100 dark:border-neutral-700/50 flex justify-between items-center">
-        <h2 className="text-xl font-bold">Activity Logs</h2>
-        <button
-          onClick={fetchLogs}
-          className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-700 transition-colors"
-        >
-          <RotateCcw className="w-4 h-4" />
-        </button>
+        <h2 className="text-xl font-bold">{t("logs.title")}</h2>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className={`p-2 rounded-lg transition-colors ${
+              showFilters
+                ? "bg-primary-500 text-white"
+                : "hover:bg-gray-100 dark:hover:bg-neutral-700"
+            }`}
+            title={t("logs.filters.campaign")}
+          >
+            <Filter className="w-4 h-4" />
+          </button>
+          <button
+            onClick={fetchLogs}
+            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-700 transition-colors"
+            title={t("logs.refresh")}
+          >
+            <RotateCcw className="w-4 h-4" />
+          </button>
+        </div>
       </div>
 
+      {/* Filters */}
+      {showFilters && (
+        <div
+          className={`p-4 border-b ${borderColor} ${
+            theme === "dark" ? "bg-neutral-900/30" : "bg-gray-50/50"
+          }`}
+        >
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            {/* Campaign Filter */}
+            <div>
+              <label className="block text-sm font-medium mb-1.5">
+                {t("logs.filters.campaign")}
+              </label>
+              <select
+                value={selectedCampaign}
+                onChange={(e) => {
+                  setSelectedCampaign(e.target.value);
+                  setPage(1);
+                }}
+                className={`w-full px-3 py-2 rounded-lg border ${borderColor} ${inputBg} focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all`}
+              >
+                <option value="">{t("logs.filters.allCampaigns")}</option>
+                {campaigns.map((campaign) => (
+                  <option key={campaign.id} value={campaign.id}>
+                    {campaign.name || campaign.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Date From */}
+            <div>
+              <label className="block text-sm font-medium mb-1.5">
+                {t("logs.filters.from")}
+              </label>
+              <input
+                type="date"
+                value={dateFrom}
+                onChange={(e) => {
+                  setDateFrom(e.target.value);
+                  setPage(1);
+                }}
+                className={`w-full px-3 py-2 rounded-lg border ${borderColor} ${inputBg} focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all`}
+              />
+            </div>
+
+            {/* Date To */}
+            <div>
+              <label className="block text-sm font-medium mb-1.5">
+                {t("logs.filters.to")}
+              </label>
+              <input
+                type="date"
+                value={dateTo}
+                onChange={(e) => {
+                  setDateTo(e.target.value);
+                  setPage(1);
+                }}
+                className={`w-full px-3 py-2 rounded-lg border ${borderColor} ${inputBg} focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all`}
+              />
+            </div>
+
+            {/* Clear Button */}
+            <div className="flex items-end">
+              <button
+                onClick={clearFilters}
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-neutral-600 hover:bg-gray-100 dark:hover:bg-neutral-700 transition-colors flex items-center justify-center gap-2"
+              >
+                <X className="w-4 h-4" />
+                {t("logs.filters.clear")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Table */}
       <div className="overflow-x-auto">
         <table className="w-full text-left text-sm">
           <thead
@@ -92,11 +251,24 @@ export default function LogsList() {
             } border-b`}
           >
             <tr>
-              <th className="px-6 py-4 font-semibold">Date</th>
-              <th className="px-6 py-4 font-semibold">Platform</th>
-              <th className="px-6 py-4 font-semibold">Source</th>
-              <th className="px-6 py-4 font-semibold">Status</th>
-              <th className="px-6 py-4 font-semibold">Message</th>
+              <th className="px-6 py-4 font-semibold">
+                {t("logs.table.date")}
+              </th>
+              <th className="px-6 py-4 font-semibold">
+                {t("logs.table.platform")}
+              </th>
+              <th className="px-6 py-4 font-semibold">
+                {t("logs.table.source")}
+              </th>
+              <th className="px-6 py-4 font-semibold">
+                {t("logs.table.status")}
+              </th>
+              <th className="px-6 py-4 font-semibold">
+                {t("logs.table.message")}
+              </th>
+              <th className="px-6 py-4 font-semibold text-center">
+                {t("logs.table.video")}
+              </th>
             </tr>
           </thead>
           <tbody
@@ -106,14 +278,14 @@ export default function LogsList() {
           >
             {isLoading ? (
               <tr>
-                <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
-                  Loading logs...
+                <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+                  {t("logs.loading")}
                 </td>
               </tr>
             ) : logs.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
-                  No activity logs found.
+                <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+                  {t("logs.empty")}
                 </td>
               </tr>
             ) : (
@@ -142,15 +314,18 @@ export default function LogsList() {
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="flex flex-col">
+                    <div className="flex flex-col gap-1">
                       {log.campaign && (
-                        <span className="text-xs text-blue-500 bg-blue-50 dark:bg-blue-900/20 px-1.5 py-0.5 rounded w-fit mb-1">
-                          Campaign: {log.campaign.name}
-                        </span>
+                        <button
+                          onClick={() => navigateToCampaign(log.campaign!.id)}
+                          className="text-xs text-blue-500 bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded w-fit hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
+                        >
+                          {t("logs.table.campaign")}: {log.campaign.name}
+                        </button>
                       )}
                       {log.publication && (
-                        <span className="text-xs text-purple-500 bg-purple-50 dark:bg-purple-900/20 px-1.5 py-0.5 rounded w-fit">
-                          Pub: {log.publication.title}
+                        <span className="text-xs text-purple-500 bg-purple-50 dark:bg-purple-900/20 px-2 py-1 rounded w-fit">
+                          {log.publication.title}
                         </span>
                       )}
                     </div>
@@ -158,14 +333,45 @@ export default function LogsList() {
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
                       {getStatusIcon(log.status)}
-                      <span className="capitalize">{log.status}</span>
+                      <span className="capitalize">
+                        {t(`logs.status.${log.status}`) || log.status}
+                      </span>
                     </div>
                   </td>
-                  <td
-                    className="px-6 py-4 max-w-xs truncate text-gray-500"
-                    title={log.error_message || log.message}
-                  >
-                    {log.error_message || log.message || "-"}
+                  <td className="px-6 py-4 max-w-xs">
+                    {log.error_message ? (
+                      <div className="flex flex-col gap-1">
+                        <span className="text-red-500 text-xs font-medium">
+                          {t("logs.table.error")}:
+                        </span>
+                        <span
+                          className="text-gray-500 text-xs truncate"
+                          title={log.error_message}
+                        >
+                          {log.error_message}
+                        </span>
+                      </div>
+                    ) : (
+                      <span
+                        className="text-gray-500 truncate block"
+                        title={log.message}
+                      >
+                        {log.message || "-"}
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-6 py-4 text-center">
+                    {log.video_url && (
+                      <a
+                        href={log.video_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-primary-700 hover:from-primary-600 hover:to-primary-800 transition-all"
+                        title={t("logs.table.video")}
+                      >
+                        <Video className="w-4 h-4 text-white" />
+                      </a>
+                    )}
                   </td>
                 </tr>
               ))
@@ -174,24 +380,26 @@ export default function LogsList() {
         </table>
       </div>
 
+      {/* Pagination */}
       {lastPage > 1 && (
         <div className="p-4 flex justify-between items-center text-sm border-t border-gray-100 dark:border-neutral-700">
           <button
             disabled={page === 1}
             onClick={() => setPage((p) => Math.max(1, p - 1))}
-            className="px-3 py-1 rounded border disabled:opacity-50"
+            className="px-3 py-1 rounded border disabled:opacity-50 hover:bg-gray-100 dark:hover:bg-neutral-700 transition-colors"
           >
-            Previous
+            {t("logs.pagination.previous")}
           </button>
           <span>
-            Page {page} of {lastPage}
+            {t("logs.pagination.page")} {page} {t("logs.pagination.of")}{" "}
+            {lastPage}
           </span>
           <button
             disabled={page === lastPage}
             onClick={() => setPage((p) => Math.min(lastPage, p + 1))}
-            className="px-3 py-1 rounded border disabled:opacity-50"
+            className="px-3 py-1 rounded border disabled:opacity-50 hover:bg-gray-100 dark:hover:bg-neutral-700 transition-colors"
           >
-            Next
+            {t("logs.pagination.next")}
           </button>
         </div>
       )}

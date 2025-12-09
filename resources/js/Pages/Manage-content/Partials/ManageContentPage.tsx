@@ -122,7 +122,7 @@ export default function ManageContentPage() {
 
   const subtitleColor = theme === "dark" ? "text-gray-400" : "text-gray-600";
 
-  const tabBg = theme === "dark" ? "bg-neutral-800" : "bg-white";
+  const tabBg = theme === "dark" ? "bg-neutral-800/60" : "bg-white/60";
   const tabActiveBg = theme === "dark" ? "bg-primary-600" : "bg-primary-500";
   const tabInactiveBg = theme === "dark" ? "bg-neutral-700" : "bg-gray-100";
   const tabActiveText = "text-white";
@@ -155,7 +155,7 @@ export default function ManageContentPage() {
 
             {/* Tabs */}
             <div className={`${tabBg} rounded-xl shadow-lg p-6`}>
-              <div className="flex space-x-2 mb-6 border-b border-gray-200 dark:border-gray-700">
+              <div className="flex flex-col md:flex-row justify-center text-center gap-2 md:gap-0 md:space-x-2 mb-6 border-b border-gray-200 dark:border-gray-700">
                 <button
                   data-tab="publications"
                   onClick={() => setActiveTab("publications")}
@@ -166,7 +166,7 @@ export default function ManageContentPage() {
                   }`}
                 >
                   <FileText className="w-5 h-5" />
-                  Publicaciones
+                  {t("manageContent.publications")}
                 </button>
                 <button
                   data-tab="campaigns"
@@ -178,7 +178,7 @@ export default function ManageContentPage() {
                   }`}
                 >
                   <Target className="w-5 h-5" />
-                  Campañas
+                  {t("manageContent.campaigns")}
                 </button>
                 <button
                   data-tab="logs"
@@ -190,7 +190,7 @@ export default function ManageContentPage() {
                   }`}
                 >
                   <FileText className="w-5 h-5" />
-                  Logs
+                  {t("manageContent.logs")}
                 </button>
               </div>
 
@@ -211,6 +211,7 @@ export default function ManageContentPage() {
                     onViewDetails={openViewDetailsModal}
                     isLoading={isLoading}
                     onFilterChange={handleFilterChange}
+                    onRefresh={fetchCampaigns}
                   />
                 )}
               </div>
@@ -291,7 +292,7 @@ export default function ManageContentPage() {
             setIsViewDetailsModalOpen(false);
             setSelectedItem(null);
           }}
-          campaign={selectedItem as any} // Same for view
+          campaign={selectedItem as any}
         />,
         document.body
       )}

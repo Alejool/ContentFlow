@@ -484,6 +484,43 @@
       "languageChanged": "Idioma cambiado exitosamente."
     }
   },
+  "logs": {
+    "title": "Registro de Actividad",
+    "refresh": "Actualizar",
+    "filters": {
+      "campaign": "Filtrar por Campaña",
+      "dateRange": "Rango de Fechas",
+      "allCampaigns": "Todas las Campañas",
+      "from": "Desde",
+      "to": "Hasta",
+      "apply": "Aplicar Filtros",
+      "clear": "Limpiar"
+    },
+    "table": {
+      "date": "Fecha",
+      "platform": "Plataforma",
+      "source": "Origen",
+      "campaign": "Campaña",
+      "status": "Estado",
+      "message": "Mensaje",
+      "error": "Error",
+      "video": "Video"
+    },
+    "status": {
+      "success": "Exitoso",
+      "failed": "Fallido",
+      "pending": "Pendiente",
+      "published": "Publicado"
+    },
+    "empty": "No se encontraron registros",
+    "loading": "Cargando registros...",
+    "pagination": {
+      "previous": "Anterior",
+      "next": "Siguiente",
+      "page": "Página",
+      "of": "de"
+    }
+  },
   "auth": {
     "login": {
       "title": "Iniciar Sesión",
@@ -714,6 +751,9 @@
   "manageContent": {
     "title": "Gestión de Contenido",
     "subtitle": "Organiza y gestiona tu contenido multimedia de forma elegante y eficiente",
+    "publications": "Publicaciones",
+    "campaigns": "Campañas",
+    "logs": "Registros",
     "socialMedia": {
       "title": "Conecta tus Redes Sociales",
       "description": "Conecta tus cuentas de redes sociales para permitir la publicación automática de contenido. Tu información se mantendrá segura y solo se utilizará para las funciones que autorices.",

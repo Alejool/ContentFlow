@@ -168,6 +168,32 @@ export default function EditCampaignModal({
     }
   };
 
+  // Helper to get thumbnail for Publication
+  const getThumbnail = (pub: any) => {
+    if (!pub.media_files || pub.media_files.length === 0) return null;
+
+    // First, try to find an image
+    const firstImage = pub.media_files.find((f: any) =>
+      f.file_type.includes("image")
+    );
+    if (firstImage) {
+      const url = firstImage.file_path.startsWith("http")
+        ? firstImage.file_path
+        : `/storage/${firstImage.file_path}`;
+      return { url, type: "image" };
+    }
+
+    // If no images, check if there's a video and return video indicator
+    const hasVideo = pub.media_files.some((f: any) =>
+      f.file_type.includes("video")
+    );
+    if (hasVideo) {
+      return { url: null, type: "video" };
+    }
+
+    return null;
+  };
+
   if (!isOpen || !campaign) return null;
 
   // Styles (copied from AddCampaignModal)
@@ -397,12 +423,31 @@ export default function EditCampaignModal({
                               <Check className="w-3 h-3 text-white" />
                             )}
                           </div>
-                          {pub.media_files?.[0] && (
-                            <img
-                              src={pub.media_files[0].file_path}
-                              className="w-8 h-8 rounded object-cover"
-                            />
-                          )}
+                          {(() => {
+                            const thumbnail = getThumbnail(pub);
+                            if (!thumbnail) return null;
+                            if (thumbnail.type === "image" && thumbnail.url) {
+                              return (
+                                <img
+                                  src={thumbnail.url}
+                                  className="w-8 h-8 rounded object-cover"
+                                  alt="Thumbnail"
+                                />
+                              );
+                            }
+                            // Video icon
+                            return (
+                              <div className="w-8 h-8 rounded bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center">
+                                <svg
+                                  className="w-4 h-4 text-white"
+                                  fill="currentColor"
+                                  viewBox="0 0 20 20"
+                                >
+                                  <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z" />
+                                </svg>
+                              </div>
+                            );
+                          })()}
                           <div className="flex-1 min-w-0">
                             <p
                               className={`text-sm font-medium truncate ${textPrimary}`}

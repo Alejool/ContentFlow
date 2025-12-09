@@ -12,6 +12,7 @@ import {
   Layers,
   Plus,
   Rocket,
+  RotateCcw,
   Search,
   Trash2,
 } from "lucide-react";
@@ -28,6 +29,7 @@ type CampaignListProps = {
   onViewDetails: (item: any) => void;
   isLoading: boolean;
   onFilterChange?: (filters: any) => void;
+  onRefresh?: () => void;
   pagination: {
     current_page: number;
     last_page: number;
@@ -47,6 +49,7 @@ export default function CampaignList({
   onViewDetails,
   isLoading,
   onFilterChange,
+  onRefresh,
   pagination,
   onPageChange,
 }: CampaignListProps) {
@@ -55,10 +58,11 @@ export default function CampaignList({
 
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [platformFilter, setPlatformFilter] = useState("all"); // For publications
+  const [platformFilter, setPlatformFilter] = useState("all");
   const [dateStart, setDateStart] = useState("");
   const [dateEnd, setDateEnd] = useState("");
   const [expandedCampaigns, setExpandedCampaigns] = useState<number[]>([]);
+  const [showFilters, setShowFilters] = useState(false);
 
   // Filter Logic (Client-side filtering of the CURRENT PAGE items)
   // Ideally search should be server-side, but keeping this for now as per request scope.
@@ -137,7 +141,27 @@ export default function CampaignList({
   // Helper to get thumbnail for Publication
   const getThumbnail = (pub: Publication) => {
     if (!pub.media_files || pub.media_files.length === 0) return null;
-    return pub.media_files[0].file_path; // Simple check for now
+
+    // First, try to find an image
+    const firstImage = pub.media_files.find((f) =>
+      f.file_type.includes("image")
+    );
+    if (firstImage) {
+      // Check if the path already includes /storage/ or is a full URL
+      let url = firstImage.file_path;
+      if (!url.startsWith("http") && !url.startsWith("/storage/")) {
+        url = `/storage/${url}`;
+      }
+      return { url, type: "image" };
+    }
+
+    // If no images, check if there's a video and return video indicator
+    const hasVideo = pub.media_files.some((f) => f.file_type.includes("video"));
+    if (hasVideo) {
+      return { url: null, type: "video" };
+    }
+
+    return null;
   };
 
   return (
@@ -171,119 +195,149 @@ export default function CampaignList({
                 : t("publications.subtitle") || "Your Publications"}
             </p>
           </div>
-          <button
-            onClick={onAdd}
-            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-700 hover:to-primary-600 text-white rounded-lg font-medium transition-all shadow-md hover:shadow-lg active:scale-95"
-          >
-            <Plus className="w-4 h-4" />
-            {mode === "campaigns"
-              ? t("campaigns.button.addCampaign") || "New Campaign"
-              : t("publications.button.addPublication") || "New Publication"}
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className={`p-2 rounded-lg transition-colors ${
+                showFilters
+                  ? "bg-primary-500 text-white"
+                  : "hover:bg-gray-100 dark:hover:bg-neutral-700"
+              }`}
+              title={
+                mode === "campaigns"
+                  ? t("campaigns.filters.title")
+                  : t("publications.filters.title")
+              }
+            >
+              <Filter className="w-4 h-4" />
+            </button>
+            {onRefresh && (
+              <button
+                onClick={onRefresh}
+                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-700 transition-colors"
+                title={t("common.refresh") || "Refresh"}
+              >
+                <RotateCcw className="w-4 h-4" />
+              </button>
+            )}
+            <button
+              onClick={onAdd}
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-700 hover:to-primary-600 text-white rounded-lg font-medium transition-all shadow-md hover:shadow-lg active:scale-95"
+            >
+              <Plus className="w-4 h-4" />
+              {mode === "campaigns"
+                ? t("campaigns.button.addCampaign") || "New Campaign"
+                : t("publications.button.addPublication") || "New Publication"}
+            </button>
+          </div>
         </div>
 
-        {/* Filters */}
-        <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-gray-50 dark:bg-neutral-900/30 p-4 rounded-lg">
-          <div className="flex items-center gap-2 w-full md:w-auto relative">
-            <Search
-              className={`absolute left-3 w-4 h-4 ${
-                theme === "dark" ? "text-gray-500" : "text-gray-400"
-              }`}
-            />
-            <input
-              type="text"
-              placeholder={t("common.search")}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className={`pl-9 pr-4 py-2 rounded-lg w-full md:w-64 text-sm border focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all ${
-                theme === "dark"
-                  ? "bg-neutral-800 border-neutral-700 text-white placeholder-gray-500"
-                  : "bg-white border-gray-200 text-gray-900 placeholder-gray-400"
-              }`}
-            />
-          </div>
-
-          <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-            <div className="flex items-center gap-2">
-              <Filter
-                className={`w-4 h-4 ${
-                  theme === "dark" ? "text-gray-400" : "text-gray-500"
+        {/* Filters - Now Collapsible */}
+        {showFilters && (
+          <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-gray-50 dark:bg-neutral-900/30 p-4 rounded-lg mt-4">
+            <div className="flex items-center gap-2 w-full md:w-auto relative">
+              <Search
+                className={`absolute left-3 w-4 h-4 ${
+                  theme === "dark" ? "text-gray-500" : "text-gray-400"
                 }`}
               />
-              <select
-                value={statusFilter}
-                onChange={(e) => handleFilterChange("status", e.target.value)}
-                className={`py-2 pl-3 pr-8 rounded-lg text-sm border focus:ring-2 focus:ring-primary-500 focus:border-transparent cursor-pointer ${
+              <input
+                type="text"
+                placeholder={t("common.search")}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className={`pl-9 pr-4 py-2 rounded-lg w-full md:w-64 text-sm border focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all ${
                   theme === "dark"
-                    ? "bg-neutral-800/70 border-neutral-700/70 text-white"
-                    : "bg-white/70 border-gray-200/70 text-gray-700"
+                    ? "bg-neutral-800 border-neutral-700 text-white placeholder-gray-500"
+                    : "bg-white border-gray-200 text-gray-900 placeholder-gray-400"
                 }`}
-              >
-                <option value="all">{t("campaigns.filters.all")}</option>
-                <option value="active">{t("campaigns.filters.active")}</option>
-                <option value="draft">{t("campaigns.filters.draft")}</option>
-                {mode === "campaigns" && (
-                  <option value="completed">
-                    {t("campaigns.filters.completed")}
-                  </option>
-                )}
-              </select>
+              />
             </div>
 
-            {mode === "publications" && (
+            <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
               <div className="flex items-center gap-2">
+                <Filter
+                  className={`w-4 h-4 ${
+                    theme === "dark" ? "text-gray-400" : "text-gray-500"
+                  }`}
+                />
                 <select
-                  value={platformFilter}
-                  onChange={(e) =>
-                    handleFilterChange("platform", e.target.value)
-                  }
+                  value={statusFilter}
+                  onChange={(e) => handleFilterChange("status", e.target.value)}
                   className={`py-2 pl-3 pr-8 rounded-lg text-sm border focus:ring-2 focus:ring-primary-500 focus:border-transparent cursor-pointer ${
                     theme === "dark"
                       ? "bg-neutral-800/70 border-neutral-700/70 text-white"
                       : "bg-white/70 border-gray-200/70 text-gray-700"
                   }`}
                 >
-                  <option value="all">All Platforms</option>
-                  <option value="instagram">Instagram</option>
-                  <option value="facebook">Facebook</option>
-                  <option value="twitter">Twitter</option>
-                  <option value="linkedin">LinkedIn</option>
-                  <option value="tiktok">TikTok</option>
+                  <option value="all">{t("campaigns.filters.all")}</option>
+                  <option value="active">
+                    {t("campaigns.filters.active")}
+                  </option>
+                  <option value="draft">{t("campaigns.filters.draft")}</option>
+                  {mode === "campaigns" && (
+                    <option value="completed">
+                      {t("campaigns.filters.completed")}
+                    </option>
+                  )}
                 </select>
               </div>
-            )}
 
-            <div className="flex items-center gap-2">
-              <div className="w-32">
-                <ModernDatePicker
-                  selected={dateStart ? new Date(dateStart) : null}
-                  onChange={(d) =>
-                    handleFilterChange(
-                      "date_start",
-                      d ? format(d, "yyyy-MM-dd") : ""
-                    )
-                  }
-                  placeholder="Start"
-                  withPortal
-                />
-              </div>
-              <span className="text-gray-400">-</span>
-              <div className="w-32">
-                <ModernDatePicker
-                  selected={dateEnd ? new Date(dateEnd) : null}
-                  onChange={(d) =>
-                    handleFilterChange(
-                      "date_end",
-                      d ? format(d, "yyyy-MM-dd") : ""
-                    )
-                  }
-                  placeholder="End"
-                  withPortal
-                />
+              {mode === "publications" && (
+                <div className="flex items-center gap-2">
+                  <select
+                    value={platformFilter}
+                    onChange={(e) =>
+                      handleFilterChange("platform", e.target.value)
+                    }
+                    className={`py-2 pl-3 pr-8 rounded-lg text-sm border focus:ring-2 focus:ring-primary-500 focus:border-transparent cursor-pointer ${
+                      theme === "dark"
+                        ? "bg-neutral-800/70 border-neutral-700/70 text-white"
+                        : "bg-white/70 border-gray-200/70 text-gray-700"
+                    }`}
+                  >
+                    <option value="all">All Platforms</option>
+                    <option value="instagram">Instagram</option>
+                    <option value="facebook">Facebook</option>
+                    <option value="twitter">Twitter</option>
+                    <option value="linkedin">LinkedIn</option>
+                    <option value="tiktok">TikTok</option>
+                  </select>
+                </div>
+              )}
+
+              <div className="flex items-center gap-2">
+                <div className="w-32">
+                  <ModernDatePicker
+                    selected={dateStart ? new Date(dateStart) : null}
+                    onChange={(d) =>
+                      handleFilterChange(
+                        "date_start",
+                        d ? format(d, "yyyy-MM-dd") : ""
+                      )
+                    }
+                    placeholder="Start"
+                    withPortal
+                  />
+                </div>
+                <span className="text-gray-400">-</span>
+                <div className="w-32">
+                  <ModernDatePicker
+                    selected={dateEnd ? new Date(dateEnd) : null}
+                    onChange={(d) =>
+                      handleFilterChange(
+                        "date_end",
+                        d ? format(d, "yyyy-MM-dd") : ""
+                      )
+                    }
+                    placeholder="End"
+                    withPortal
+                  />
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* List */}
@@ -385,13 +439,38 @@ export default function CampaignList({
                         >
                           {mode === "campaigns" ? (
                             <Layers className="w-6 h-6 text-gray-400" />
-                          ) : getThumbnail(item as Publication) ? (
-                            <img
-                              src={getThumbnail(item as Publication)!}
-                              className="w-full h-full object-cover"
-                            />
                           ) : (
-                            <File className="w-6 h-6 text-gray-400" />
+                            (() => {
+                              const thumbnail = getThumbnail(
+                                item as Publication
+                              );
+                              if (!thumbnail) {
+                                return (
+                                  <File className="w-6 h-6 text-gray-400" />
+                                );
+                              }
+                              if (thumbnail.type === "image" && thumbnail.url) {
+                                return (
+                                  <img
+                                    src={thumbnail.url}
+                                    className="w-full h-full object-cover"
+                                    alt="Thumbnail"
+                                  />
+                                );
+                              }
+                              // Video icon
+                              return (
+                                <div className="relative w-full h-full bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center">
+                                  <svg
+                                    className="w-6 h-6 text-white"
+                                    fill="currentColor"
+                                    viewBox="0 0 20 20"
+                                  >
+                                    <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z" />
+                                  </svg>
+                                </div>
+                              );
+                            })()
                           )}
                         </div>
                         <div>
@@ -483,7 +562,7 @@ export default function CampaignList({
                                       }, 100);
                                     }
                                   }}
-                                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium transition-all hover:scale-105 ${
+                                  className={`inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-medium transition-all  ${
                                     theme === "dark"
                                       ? "bg-primary-900/30 text-primary-400 hover:bg-primary-900/50"
                                       : "bg-primary-100 text-primary-800 hover:bg-primary-200"
@@ -565,32 +644,63 @@ export default function CampaignList({
                                         : "bg-white border-gray-200"
                                     }`}
                                   >
-                                    {/* Pub Thumbnail */}
-                                    <div className="w-10 h-10 rounded bg-gray-100 flex items-center justify-center overflow-hidden">
-                                      {pub.media_files?.[0] ? (
-                                        <img
-                                          src={pub.media_files[0].file_path}
-                                          className="w-full h-full object-cover"
-                                        />
-                                      ) : (
-                                        <File className="w-4 h-4 text-gray-400" />
-                                      )}
-                                    </div>
-                                    <div className="flex-1">
+                                    <div className="flex items-center gap-3 p-2">
                                       <div
-                                        className={`text-sm font-medium ${
+                                        className={`w-10 h-10 rounded flex-shrink-0 border overflow-hidden flex items-center justify-center ${
                                           theme === "dark"
-                                            ? "text-gray-200"
-                                            : "text-gray-800"
+                                            ? "border-neutral-700 bg-neutral-800"
+                                            : "border-gray-200 bg-gray-100"
                                         }`}
                                       >
-                                        {pub.title}
+                                        {(() => {
+                                          const thumbnail = getThumbnail(pub);
+                                          if (!thumbnail) {
+                                            return (
+                                              <File className="w-5 h-5 text-gray-400" />
+                                            );
+                                          }
+                                          if (
+                                            thumbnail.type === "image" &&
+                                            thumbnail.url
+                                          ) {
+                                            return (
+                                              <img
+                                                src={thumbnail.url}
+                                                className="w-full h-full object-cover"
+                                                alt="Thumbnail"
+                                              />
+                                            );
+                                          }
+                                          // Video icon
+                                          return (
+                                            <div className="relative w-full h-full bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center">
+                                              <svg
+                                                className="w-5 h-5 text-white"
+                                                fill="currentColor"
+                                                viewBox="0 0 20 20"
+                                              >
+                                                <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z" />
+                                              </svg>
+                                            </div>
+                                          );
+                                        })()}
                                       </div>
-                                      <div className="text-xs text-gray-500">
-                                        {format(
-                                          new Date(pub.created_at),
-                                          "MMM d, yyyy"
-                                        )}
+                                      <div className="flex-1">
+                                        <div
+                                          className={`text-sm font-medium ${
+                                            theme === "dark"
+                                              ? "text-gray-200"
+                                              : "text-gray-800"
+                                          }`}
+                                        >
+                                          {pub.title}
+                                        </div>
+                                        <div className="text-xs text-gray-500">
+                                          {format(
+                                            new Date(pub.created_at),
+                                            "MMM d, yyyy"
+                                          )}
+                                        </div>
                                       </div>
                                     </div>
                                     <div
