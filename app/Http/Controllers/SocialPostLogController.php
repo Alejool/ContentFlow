@@ -14,7 +14,7 @@ class SocialPostLogController extends Controller
   public function index(Request $request)
   {
     $query = SocialPostLog::where('user_id', Auth::id())
-      ->with(['socialAccount', 'publication', 'campaign']);
+      ->with(['socialAccount', 'publication', 'mediaFile']);
 
     if ($request->has('status') && $request->status !== 'all') {
       $query->where('status', $request->status);
@@ -28,7 +28,7 @@ class SocialPostLogController extends Controller
       $query->whereBetween('created_at', [$request->date_start, $request->date_end]);
     }
 
-    $logs = $query->orderBy('created_at', 'desc')->paginate(20);
+    $logs = $query->orderBy('created_at', 'desc')->paginate(5);
 
     return response()->json([
       'success' => true,

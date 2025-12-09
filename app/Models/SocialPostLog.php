@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+use App\Models\Publications\Publication;
+
 class SocialPostLog extends Model
 {
     use HasFactory;
@@ -14,7 +16,7 @@ class SocialPostLog extends Model
         'user_id',
         'social_account_id',
         'scheduled_post_id',
-        'campaign_id',
+        'publication_id',
         'media_file_id',
         'platform',
         'platform_post_id',
@@ -60,9 +62,9 @@ class SocialPostLog extends Model
         return $this->belongsTo(ScheduledPost::class);
     }
 
-    public function campaign(): BelongsTo
+    public function publication(): BelongsTo
     {
-        return $this->belongsTo(Campaign::class);
+        return $this->belongsTo(Publication::class);
     }
 
     public function mediaFile(): BelongsTo
@@ -128,9 +130,9 @@ class SocialPostLog extends Model
         return $query->whereBetween('published_at', [$startDate, $endDate]);
     }
 
-    public function scopeByCampaign($query, $campaignId)
+    public function scopeByPublication($query, $publicationId)
     {
-        return $query->where('campaign_id', $campaignId);
+        return $query->where('publication_id', $publicationId);
     }
     public function scopeRetryable($query)
     {
@@ -141,5 +143,4 @@ class SocialPostLog extends Model
     {
         return $query->where('media_file_id', $mediaFileId);
     }
-
 }

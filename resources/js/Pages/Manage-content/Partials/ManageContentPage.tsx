@@ -40,6 +40,7 @@ export default function ManageContentPage() {
 
   const {
     campaigns,
+    pagination,
     isLoading,
     fetchCampaigns,
     addCampaign,
@@ -52,6 +53,10 @@ export default function ManageContentPage() {
   useEffect(() => {
     fetchCampaigns(filters);
   }, [filters, activeTab]);
+
+  const handlePageChange = (page: number) => {
+    fetchCampaigns(filters, page);
+  };
 
   const handleFilterChange = (newFilters: any) => {
     setFilters(newFilters);
@@ -152,6 +157,7 @@ export default function ManageContentPage() {
             <div className={`${tabBg} rounded-xl shadow-lg p-6`}>
               <div className="flex space-x-2 mb-6 border-b border-gray-200 dark:border-gray-700">
                 <button
+                  data-tab="publications"
                   onClick={() => setActiveTab("publications")}
                   className={`px-6 py-3 rounded-t-lg font-medium transition-all duration-200 flex items-center gap-2 ${
                     activeTab === "publications"
@@ -163,6 +169,7 @@ export default function ManageContentPage() {
                   Publicaciones
                 </button>
                 <button
+                  data-tab="campaigns"
                   onClick={() => setActiveTab("campaigns")}
                   className={`px-6 py-3 rounded-t-lg font-medium transition-all duration-200 flex items-center gap-2 ${
                     activeTab === "campaigns"
@@ -174,6 +181,7 @@ export default function ManageContentPage() {
                   Campañas
                 </button>
                 <button
+                  data-tab="logs"
                   onClick={() => setActiveTab("logs")}
                   className={`px-6 py-3 rounded-t-lg font-medium transition-all duration-200 flex items-center gap-2 ${
                     activeTab === "logs"
@@ -193,6 +201,8 @@ export default function ManageContentPage() {
                 ) : (
                   <CampaignList
                     items={campaigns}
+                    pagination={pagination}
+                    onPageChange={handlePageChange}
                     mode={activeTab as "campaigns" | "publications"}
                     onEdit={openEditModal}
                     onDelete={handleDeleteCampaign}

@@ -31,34 +31,35 @@ const createSchema = (t: any) =>
   z.object({
     title: z
       .string()
-      .min(1, t("manageContent.modals.validation.titleRequired"))
-      .max(100, t("manageContent.modals.validation.titleLength")),
+      .min(1, t("publications.modal.validation.titleRequired"))
+      .max(100, t("publications.modal.validation.titleLength")),
     description: z
       .string()
-      .min(10, t("manageContent.modals.validation.descMin"))
-      .max(500, t("manageContent.modals.validation.descMax")),
+      .min(10, t("publications.modal.validation.descMin"))
+      .max(500, t("publications.modal.validation.descMax")),
     goal: z
       .string()
-      .min(5, t("manageContent.modals.validation.objRequired"))
-      .max(200, t("manageContent.modals.validation.objMax")),
+      .min(5, t("publications.modal.validation.objRequired"))
+      .max(200, t("publications.modal.validation.objMax")),
     hashtags: z
       .string()
-      .min(1, t("manageContent.modals.validation.hashtagsRequired"))
+      .min(1, t("publications.modal.validation.hashtagsRequired"))
       .refine((val) => {
         const hashtags = val.split(" ").filter((tag) => tag.startsWith("#"));
         return hashtags.length > 0;
-      }, t("manageContent.modals.validation.hashtagValid"))
+      }, t("publications.modal.validation.hashtagValid"))
       .refine((val) => {
         const hashtags = val.split(" ").filter((tag) => tag.startsWith("#"));
         return hashtags.length <= 10;
-      }, t("manageContent.modals.validation.hashtagMax")),
+      }, t("publications.modal.validation.hashtagMax")),
     scheduled_at: z.string().optional(),
     social_accounts: z.array(z.number()).optional(),
+    campaign_id: z.string().optional(), // campaign selection
   });
 
 const validateFile = (file: File, t: any) => {
   if (file.size > 50 * 1024 * 1024) {
-    return t("manageContent.modals.validation.imageSize");
+    return t("publications.modal.validation.imageSize");
   }
 
   const allowedTypes = [
@@ -71,7 +72,7 @@ const validateFile = (file: File, t: any) => {
     "video/x-msvideo",
   ];
   if (!allowedTypes.includes(file.type)) {
-    return t("manageContent.modals.validation.imageType");
+    return t("publications.modal.validation.imageType");
   }
 
   return null;
@@ -98,6 +99,26 @@ export default function AddPublicationModal({
     Record<number, string>
   >({});
   const [activePopover, setActivePopover] = useState<number | null>(null);
+  const [campaigns, setCampaigns] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchCampaigns();
+    }
+  }, [isOpen]);
+
+  const fetchCampaigns = async () => {
+    try {
+      const response = await axios.get("/campaigns");
+      if (response.data?.campaigns?.data) {
+        setCampaigns(response.data.campaigns.data);
+      } else if (Array.isArray(response.data?.campaigns)) {
+        setCampaigns(response.data.campaigns);
+      }
+    } catch (error) {
+      console.error("Failed to fetch campaigns", error);
+    }
+  };
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const schema = useMemo(() => createSchema(t), [t]);
@@ -115,7 +136,7 @@ export default function AddPublicationModal({
     mode: "onChange",
   });
 
-  const watchedFields = watch();
+  const watchedadd = watch();
 
   useEffect(() => {
     if (isOpen) {
@@ -262,7 +283,7 @@ export default function AddPublicationModal({
 
   const onFormSubmit = async (data: any) => {
     if (mediaFiles.length === 0) {
-      setImageError(t("manageContent.modals.validation.imageRequired"));
+      setImageError(t("publications.modal.validation.imageRequired"));
       return;
     }
 
@@ -296,6 +317,10 @@ export default function AddPublicationModal({
             );
           }
         });
+      }
+
+      if (data.campaign_id) {
+        formData.append("campaign_id", data.campaign_id);
       }
 
       const success = await addPublication(formData);
@@ -348,11 +373,10 @@ export default function AddPublicationModal({
               className={`text-2xl font-bold ${textPrimary} flex items-center gap-2`}
             >
               <Sparkles className={`w-6 h-6 ${iconColor}`} />
-              {t("manageContent.modals.add.titlePublication") ||
-                "New Publication"}
+              {t("publications.modal.add.title") || "New Publication"}
             </h2>
             <p className={`${textSecondary} mt-1`}>
-              {t("manageContent.modals.add.subtitlePublication") ||
+              {t("publications.modal.add.subtitle") ||
                 "Create and schedule your content"}
             </p>
           </div>
@@ -379,7 +403,7 @@ export default function AddPublicationModal({
                     className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
                   >
                     <FileImage className={`w-4 h-4 ${iconColor}`} />
-                    {t("manageContent.modals.fields.image")}
+                    {t("publications.modal.add.image")}
                     <span className="text-primary-500 ml-1">*</span>
                   </label>
                   <div
@@ -518,12 +542,10 @@ export default function AddPublicationModal({
                           </div>
                           <div>
                             <p className={`${textPrimary} font-medium text-lg`}>
-                              {t("manageContent.modals.fields.dragDrop.title")}
+                              {t("publications.modal.add.dragDrop.title")}
                             </p>
                             <p className={`${textSecondary} text-sm mt-1`}>
-                              {t(
-                                "manageContent.modals.fields.dragDrop.subtitle"
-                              )}
+                              {t("publications.modal.add.dragDrop.subtitle")}
                             </p>
                           </div>
                         </div>
@@ -552,7 +574,7 @@ export default function AddPublicationModal({
                     className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
                   >
                     <Hash className={`w-4 h-4 ${iconColor}`} />
-                    {t("manageContent.modals.fields.hashtags")}
+                    {t("publications.modal.add.hashtags")}
                     <span className="text-primary-500 ml-1">*</span>
                   </label>
                   <div className="relative">
@@ -564,7 +586,7 @@ export default function AddPublicationModal({
                           : `${borderColor} ${focusBorder}`
                       }`}
                       placeholder={t(
-                        "manageContent.modals.fields.placeholders.hashtags"
+                        "publications.modal.add.placeholders.hashtags"
                       )}
                       onChange={handleHashtagChange}
                     />
@@ -577,15 +599,15 @@ export default function AddPublicationModal({
                   )}
                   <div className="mt-1 flex justify-between text-xs">
                     <span className={textTertiary}>
-                      {watchedFields.hashtags
-                        ? watchedFields.hashtags
+                      {watchedadd.hashtags
+                        ? watchedadd.hashtags
                             .split(" ")
                             .filter((tag: string) => tag.startsWith("#")).length
                         : 0}
                       /10 hashtags
                     </span>
                     <span className={textTertiary}>
-                      {watchedFields.hashtags?.length || 0} caracteres
+                      {watchedadd.hashtags?.length || 0} caracteres
                     </span>
                   </div>
                 </div>
@@ -596,7 +618,7 @@ export default function AddPublicationModal({
                     className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
                   >
                     <Clock className={`w-4 h-4 ${iconColor}`} />
-                    {t("manageContent.modals.fields.schedulePublication")}
+                    {t("publications.modal.add.schedulePublication")}
                   </label>
                   <div className={colorIconInput}>
                     <ModernDatePicker
@@ -613,7 +635,7 @@ export default function AddPublicationModal({
                       }}
                       showTimeSelect
                       placeholder={
-                        t("manageContent.modals.fields.schedulePublication") ||
+                        t("publications.modal.add.schedulePublication") ||
                         "Schedule Publication"
                       }
                       dateFormat="Pp"
@@ -623,31 +645,75 @@ export default function AddPublicationModal({
                     />
                   </div>
                   <p className={`text-xs mt-1 ${textTertiary}`}>
-                    {t("manageContent.modals.fields.optionalSchedule")}
+                    {t("publications.modal.add.optionalSchedule")}
                   </p>
                 </div>
 
+                {/* Campaign Selection */}
+                <div className="form-group animate-in fade-in slide-in-from-top-3">
+                  <label
+                    className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
+                  >
+                    <Target className={`w-4 h-4 ${iconColor}`} />
+                    {t("publications.modal.edit.addCampaign") ||
+                      "Add to Campaign"}
+                  </label>
+                  <div className="relative">
+                    <select
+                      {...register("campaign_id")}
+                      className={`w-full px-4 py-3 rounded-xl border bg-transparent transition-all duration-200 outline-none appearance-none ${
+                        errors.campaign_id
+                          ? "border-red-500 focus:ring-2 focus:ring-red-200"
+                          : `${borderColor} ${focusBorder}`
+                      }`}
+                    >
+                      <option value="">
+                        {t("common.select") || "Select a campaign..."}
+                      </option>
+                      {campaigns.map((campaign) => (
+                        <option key={campaign.id} value={campaign.id}>
+                          {campaign.name || campaign.title}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none">
+                      <svg
+                        className={`w-4 h-4 ${textTertiary}`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Social Accounts Selection */}
-                {watchedFields.scheduled_at && (
+                {watchedadd.scheduled_at && (
                   <div className="form-group animate-in fade-in slide-in-from-top-2">
                     <label
                       className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
                     >
                       <Target className={`w-4 h-4 ${iconColor}`} />
-                      {t("manageContent.modals.fields.selectSocialAccounts")}
+                      {t("publications.modal.add.selectSocialAccounts")}
                     </label>
                     <div className="grid grid-cols-2 gap-3">
                       {socialAccounts.map((account) => {
                         if (
-                          !watchedFields?.social_accounts ||
-                          watchedFields.social_accounts.length === 0
+                          !watchedadd?.social_accounts ||
+                          watchedadd.social_accounts.length === 0
                         ) {
                           return null;
                         }
                         const isChecked =
-                          watchedFields?.social_accounts?.includes(
-                            account.id
-                          ) || false;
+                          watchedadd?.social_accounts?.includes(account.id) ||
+                          false;
                         const customSchedule = accountSchedules[account.id];
 
                         return (
@@ -668,13 +734,13 @@ export default function AddPublicationModal({
                                   // We need to handle the change manually if we want to clean up schedules
                                   // But register handles the array.
                                   // Let's hook into the register's onChange if possible or just use a side effect?
-                                  // Actually, with `register`, `watchedFields` updates.
+                                  // Actually, with `register`, `watchedadd` updates.
                                   // But clearing `accountSchedules` on uncheck is harder with just `register`.
                                   // Let's use `setValue` like in EditModal for consistency if we want that control.
                                   // But AddModal uses `register` for array... wait, EditModal used `setValue` because of array issues.
                                   // Let's use setValue here too for consistency and control.
                                   const currentAccounts =
-                                    watchedFields.social_accounts || [];
+                                    watchedadd.social_accounts || [];
                                   const numericId = Number(account.id);
                                   // Note: data.social_accounts coming from register might be strings if value is set.
                                   // Let's normalize.
@@ -832,7 +898,7 @@ export default function AddPublicationModal({
                     className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
                   >
                     <FileText className={`w-4 h-4 ${iconColor}`} />
-                    {t("manageContent.modals.fields.title")}
+                    {t("publications.modal.add.title")}
                     <span className="text-primary-500 ml-1">*</span>
                   </label>
                   <input
@@ -842,9 +908,7 @@ export default function AddPublicationModal({
                         ? errorBorder
                         : `${borderColor} ${focusBorder}`
                     }`}
-                    placeholder={t(
-                      "manageContent.modals.fields.placeholders.title"
-                    )}
+                    placeholder={t("publications.modal.add.placeholders.title")}
                   />
                   {errors.title && (
                     <p className="mt-2 text-sm text-primary-500 flex items-center gap-1">
@@ -854,7 +918,7 @@ export default function AddPublicationModal({
                   )}
                   <div className="mt-1 flex justify-end text-xs">
                     <span className={textTertiary}>
-                      {watchedFields.title?.length || 0}/100 caracteres
+                      {watchedadd.title?.length || 0}/100 caracteres
                     </span>
                   </div>
                 </div>
@@ -865,7 +929,7 @@ export default function AddPublicationModal({
                     className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
                   >
                     <FileText className={`w-4 h-4 ${iconColor}`} />
-                    {t("manageContent.modals.fields.description")}
+                    {t("publications.modal.add.description")}
                     <span className="text-primary-500 ml-1">*</span>
                   </label>
                   <textarea
@@ -877,7 +941,7 @@ export default function AddPublicationModal({
                         : `${borderColor} ${focusBorder}`
                     }`}
                     placeholder={t(
-                      "manageContent.modals.fields.placeholders.description"
+                      "publications.modal.add.placeholders.description"
                     )}
                   />
                   {errors.description && (
@@ -889,12 +953,12 @@ export default function AddPublicationModal({
                   <div className="mt-1 flex justify-end">
                     <span
                       className={`text-xs ${
-                        (watchedFields.description?.length || 0) > 500
+                        (watchedadd.description?.length || 0) > 500
                           ? "text-primary-500"
                           : textTertiary
                       }`}
                     >
-                      {watchedFields.description?.length || 0}/500 caracteres
+                      {watchedadd.description?.length || 0}/500 caracteres
                     </span>
                   </div>
                 </div>
@@ -905,7 +969,7 @@ export default function AddPublicationModal({
                     className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
                   >
                     <Target className={`w-4 h-4 ${iconColor}`} />
-                    {t("manageContent.modals.fields.goal")}
+                    {t("publications.modal.add.goal")}
                     <span className="text-primary-500 ml-1">*</span>
                   </label>
                   <input
@@ -915,9 +979,7 @@ export default function AddPublicationModal({
                         ? errorBorder
                         : `${borderColor} ${focusBorder}`
                     }`}
-                    placeholder={t(
-                      "manageContent.modals.fields.placeholders.goal"
-                    )}
+                    placeholder={t("publications.modal.add.placeholders.goal")}
                   />
                   {errors.goal && (
                     <p className="mt-2 text-sm text-primary-500 flex items-center gap-1">
@@ -928,12 +990,12 @@ export default function AddPublicationModal({
                   <div className="mt-1 flex justify-end">
                     <span
                       className={`text-xs ${
-                        (watchedFields.goal?.length || 0) > 200
+                        (watchedadd.goal?.length || 0) > 200
                           ? "text-primary-500"
                           : textTertiary
                       }`}
                     >
-                      {watchedFields.goal?.length || 0}/200 caracteres
+                      {watchedadd.goal?.length || 0}/200 caracteres
                     </span>
                   </div>
                 </div>
@@ -961,12 +1023,12 @@ export default function AddPublicationModal({
             {isSubmitting ? (
               <>
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                {t("manageContent.modals.add.creating")}
+                {t("publications.modal.add.creating")}
               </>
             ) : (
               <>
                 <Rocket className="w-4 h-4" />
-                {t("manageContent.modals.add.save")}
+                {t("publications.modal.add.save")}
               </>
             )}
           </button>

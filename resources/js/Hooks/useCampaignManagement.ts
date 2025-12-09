@@ -3,19 +3,24 @@ import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
-import { Campaign } from "@/types/Campaign";
-import { Publication } from "@/types/Publication";
-
 export function useCampaignManagement(
   endpoint: "publications" | "campaigns" = "publications"
 ) {
   const { t } = useTranslation();
   const [campaigns, setCampaigns] = useState<(Campaign | Publication)[]>([]);
+  const [pagination, setPagination] = useState({
+    current_page: 1,
+    last_page: 1,
+    total: 0,
+    per_page: 5,
+  });
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchCampaigns = async (filters: any = {}) => {
+  const fetchCampaigns = async (filters: any = {}, page: number = 1) => {
     try {
+      setIsLoading(true);
       const params = new URLSearchParams();
+      params.append("page", page.toString());
       if (filters.status) params.append("status", filters.status);
       if (filters.date_start) params.append("date_start", filters.date_start);
       if (filters.date_end) params.append("date_end", filters.date_end);
@@ -26,15 +31,25 @@ export function useCampaignManagement(
       // Handle both publications and campaigns response structure
       const dataKey =
         endpoint === "publications" ? "publications" : "campaigns";
-      const campaignsData =
-        response.data[dataKey]?.data || response.data[dataKey];
-      setCampaigns(campaignsData);
+
+      const responseData = response.data[dataKey];
+      const items = responseData?.data || [];
+
+      setCampaigns(items);
+      setPagination({
+        current_page: responseData.current_page || 1,
+        last_page: responseData.last_page || 1,
+        total: responseData.total || 0,
+        per_page: responseData.per_page || 5,
+      });
     } catch (error) {
       toast.error(t("campaigns.messages.fetchError"));
     } finally {
       setIsLoading(false);
     }
   };
+
+  // ... (add, update, delete methods remain mostly same, but might trigger fetchCampaigns with current page)
 
   const addCampaign = async (data: any) => {
     try {
@@ -55,6 +70,8 @@ export function useCampaignManagement(
       }
       await axios.post(`/${endpoint}`, formData);
       toast.success(t("campaigns.messages.addSuccess"));
+      // Refresh current page
+      await fetchCampaigns({}, pagination.current_page);
       return true;
     } catch (error) {
       toast.error(t("campaigns.messages.addError"));
@@ -113,9 +130,13 @@ export function useCampaignManagement(
         }
       }
 
+      // Optimistic update for list, but re-fetch to ensure order/pagination correct?
+      // Actually we just updated one item.
       setCampaigns((prevCampaigns) =>
         prevCampaigns.map((campaign) =>
-          campaign.id === id ? response.data.campaign : campaign
+          campaign.id === id
+            ? response.data.campaign || response.data.publication
+            : campaign
         )
       );
       toast.success(t("campaigns.messages.updateSuccess"));
@@ -133,7 +154,8 @@ export function useCampaignManagement(
       setCampaigns((prevCampaigns) =>
         prevCampaigns.filter((campaign) => campaign.id !== id)
       );
-      await fetchCampaigns();
+      // If page becomes empty, maybe go back one page? For now just fetch current.
+      await fetchCampaigns({}, pagination.current_page);
       toast.success(t("campaigns.messages.deleteSuccess"));
     } catch (error) {
       toast.error(t("campaigns.messages.deleteError"));
@@ -142,6 +164,7 @@ export function useCampaignManagement(
 
   return {
     campaigns,
+    pagination,
     isLoading,
     fetchCampaigns,
     addCampaign,

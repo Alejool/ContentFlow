@@ -97,7 +97,11 @@ export default function EditCampaignModal({
   const fetchPublications = async () => {
     setLoadingPubs(true);
     try {
-      const response = await axios.get("/publications?simplified=true");
+      let url = "/publications?simplified=true&exclude_assigned=true";
+      if (campaign?.id) {
+        url += `&include_campaign_id=${campaign.id}`;
+      }
+      const response = await axios.get(url);
       // Handle both simplified (array) and paginated (object with data) structures
       if (response.data?.publications) {
         if (Array.isArray(response.data.publications)) {
@@ -201,10 +205,10 @@ export default function EditCampaignModal({
               className={`text-xl font-bold ${textPrimary} flex items-center gap-2`}
             >
               <Target className="w-5 h-5 text-primary-500" />
-              {t("manageContent.modals.edit.title") || "Edit Campaign Group"}
+              {t("campaigns.modal.edit.title") || "Edit Campaign Group"}
             </h2>
             <p className={`${textSecondary} text-sm mt-0.5`}>
-              {t("manageContent.modals.edit.subtitle") ||
+              {t("campaigns.modal.edit.subtitle") ||
                 "Update your campaign details"}
             </p>
           </div>
@@ -224,7 +228,7 @@ export default function EditCampaignModal({
               <label
                 className={`block text-sm font-semibold ${labelText} mb-1.5`}
               >
-                {t("common.name") || "Campaign Name"}{" "}
+                {t("campaigns.modal.edit.name") || "Campaign Name"}{" "}
                 <span className="text-primary-500">*</span>
               </label>
               <input
@@ -245,7 +249,7 @@ export default function EditCampaignModal({
               <label
                 className={`block text-sm font-semibold ${labelText} mb-1.5`}
               >
-                {t("common.description") || "Description"}
+                {t("campaigns.modal.edit.description") || "Description"}
               </label>
               <textarea
                 {...register("description")}
@@ -260,7 +264,7 @@ export default function EditCampaignModal({
                 <label
                   className={`block text-sm font-semibold ${labelText} mb-1.5`}
                 >
-                  {t("common.goal") || "Goal"}
+                  {t("campaigns.modal.edit.goal") || "Goal"}
                 </label>
                 <div className="relative">
                   <Target
@@ -278,7 +282,7 @@ export default function EditCampaignModal({
                 <label
                   className={`block text-sm font-semibold ${labelText} mb-1.5`}
                 >
-                  {t("common.budget") || "Budget"}
+                  {t("campaigns.modal.edit.budget") || "Budget"}
                 </label>
                 <div className="relative">
                   <DollarSign
@@ -300,7 +304,7 @@ export default function EditCampaignModal({
                 <label
                   className={`block text-sm font-semibold ${labelText} mb-1.5`}
                 >
-                  {t("common.startDate") || "Start Date"}
+                  {t("campaigns.modal.edit.startDate") || "Start Date"}
                 </label>
                 <ModernDatePicker
                   selected={
@@ -320,7 +324,7 @@ export default function EditCampaignModal({
                 <label
                   className={`block text-sm font-semibold ${labelText} mb-1.5`}
                 >
-                  {t("common.endDate") || "End Date"}
+                  {t("campaigns.modal.edit.endDate") || "End Date"}
                 </label>
                 <ModernDatePicker
                   selected={
@@ -345,7 +349,8 @@ export default function EditCampaignModal({
               <label
                 className={`block text-sm font-semibold ${labelText} mb-2`}
               >
-                Associated Publications
+                {t("campaigns.modal.edit.associatedPublications") ||
+                  "Associated Publications"}
               </label>
 
               <div

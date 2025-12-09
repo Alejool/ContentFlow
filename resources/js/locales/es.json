@@ -2,6 +2,7 @@
   "common": {
     "welcome": "Bienvenido",
     "loading": "Cargando...",
+    "select": "Seleccionar",
     "save": "Guardar",
     "cancel": "Cancelar",
     "delete": "Eliminar",
@@ -158,32 +159,203 @@
       }
     }
   },
+   "publications": {
+    "title": "Publicaciones",
+    "subtitle": "Gestionar tus publicaciones",
+    "modal": {
+      "add": {
+        "title": "Agregar Publicación",
+        "titleField": "Título",
+        "subtitle": "Crear una publicación",
+        "name": "Nombre",
+        "description": "Descripción",
+        "image": "Imagen",
+        "hashtags": "Hashtags",
+        "schedulePublication": "Programar Publicación",
+        "goal": "Objetivo",
+        "status": "Estado",
+        "budget": "Presupuesto",
+        "startDate": "Fecha de Inicio",
+        "endDate": "Fecha de Fin",
+        "publishDate": "Fecha de Publicación",
+        "publishedOn": "Publicado el",
+        "publications": "Publicaciones",
+        "optionalSchedule": "Programación Opcional",
+        "dragDrop": {
+          "title": "Arrastra y suelta para ordenar",
+          "subtitle": "Sube tus archivos multimedia aquí"
+        },
+        "placeholders": 
+        {
+          "title": "Título",
+          "description": "Descripción",
+          "hashtags": "#marketing #publicidad #comunicación",
+          "schedulePublication": "Programar Publicación",
+          "goal": "Objetivo"
+        
+        }
+       
+      },
+      "edit": {
+        "title": "Editar Publicación",
+        "titleField": "Título",
+        "subtitle": "Actualizar la publicación existente",
+        "description": "Descripción",
+        "hashtags": "Hashtags",
+        "schedulePublication": "Programar Publicación",
+        "addCampaign": "Agregar Campaña",
+        "editCampaign": "Editar Campaña",
+        "deleteCampaign": "Eliminar Campaña",
+        "campaignTitle": "Campaign Title",
+        "name": "Nombre",
+        "image": "Imagen",
+        "goal": "Objetivo",
+        "status": "Estado",
+        "budget": "Presupuesto",
+        "startDate": "Fecha de Inicio",
+        "endDate": "Fecha de Fin",
+        "publishDate": "Fecha de Publicación",
+        "publishedOn": "Publicado el",
+        "associatedPublications": "Publicaciones Asociadas",
+        "dragDrop": {
+          "title": "Arrastra y suelta para ordenar",
+          "subtitle": "Sube tus archivos multimedia aquí"
+        },
+        "placeholders": 
+        {
+          "title": "Arrastra y suelta para ordenar",
+          "description": "Descripción",
+          "hashtags": "Hashtags",
+          "schedulePublication": "Programar Publicación",
+          "goal": "Objetivo"
+        }
+      },
+      "validation":{
+        "descRequired":"Descripción es requerida",
+        "nameRequired":"Nombre es requerido",
+        "goalRequired":"Objetivo es requerido",
+        "statusRequired":"Estado es requerido",
+        "budgetRequired":"Presupuesto es requerido",
+        "startDateRequired":"Fecha de Inicio es requerida",
+        "endDateRequired":"Fecha de Fin es requerida",
+        "publishDateRequired":"Fecha de Publicación es requerida",
+        "publishedOnRequired":"Publicado el es requerido",
+        "associatedPublicationsRequired":"Publicaciones Asociadas es requerida",
+        "titleRequired":"Título es requerido",
+        "descriptionRequired":"Descripción es requerida",
+        "hashtagsRequired":"Hashtags es requerido",
+        "schedulePublicationRequired":"Programar Publicación es requerido"
+      }
+    },
+    "button": {
+      "addPublication": "Agregar publicación",
+      "editPublication": "Editar publicación",
+      "deletePublication": "Eliminar publicación"
+    },
+    "table": {
+      "name": "Nombre",
+      "description": "Descripción",
+      "publications": "Publicaciones",
+      "media": "Archivos",
+      "campaign": "Campaña",
+      "status": "Estado",
+      "actions": "Acciones"
+    },
+    "noCampaign": "Sin Campaña",
+    "messages": {
+      "addSuccess": "¡Publicación agregada exitosamente!",
+      "addError": "Error al agregar publicación",
+      "updateSuccess": "¡Publicación actualizada exitosamente!",
+      "updateError": "Error al actualizar publicación",
+      "deleteSuccess": "¡Publicación eliminada exitosamente!",
+      "deleteError": "Error al eliminar publicación",
+      "fetchError": "Error al cargar campañas",
+      "confirmDelete": {
+        "title": "¿Estás seguro?",
+        "text": "¡No podrás recuperar esta campaña!",
+        "confirmButton": "Sí, eliminarla!",
+        "cancelButton": "Cancelar"
+      }
+    },
+    "actions":{
+      "viewCampaign":"Ver Campaña",
+      "edit":"Editar",
+      "publishNow":"Publicar Ahora",
+      "viewDetails":"Ver Detalles",
+      "delete":"Eliminar",
+      "active":"Activa",
+      "remove":"Eliminar",
+      "change":"Cambiar"
+    },
+    "headers": {
+     "status": "Estado",
+     "duration": "Duración",
+     "mediaFiles": "Archivos",
+     "actions": "Acciones"
+    },
+    "filters": 
+    {
+      "all": "Todo",
+      "active": "Activa",
+      "completed": "Completada",
+      "upcoming": "Proximas",
+      "draft": "Borrador"
+    }
+  },
   "campaigns": {
     "title": "Campañas",
-    "addCampaign": "Agregar Campaña",
-    "editCampaign": "Editar Campaña",
-    "deleteCampaign": "Eliminar Campaña",
-    "campaignTitle": "Título de Campaña",
-    "description": "Gestionar, rastrear y analizar tus campañas de redes sociales",
-    "hashtags": "Hashtags",
-    "image": "Imagen",
-    "objective": "Objetivo",
-    "status": "Estado",
-    "startDate": "Fecha de Inicio",
-    "endDate": "Fecha de Fin",
-    "publishDate": "Fecha de Publicación",
-    "publishedOn": "Publicado el",
-    "scheduledPosts": "Publicaciones Programadas",
-    "noScheduledPosts": "No hay publicaciones programadas específicamente.",
-    "draft": "Borrador",
-    "active": "Activa",
-    "completed": "Completada",
-    "yourContent": "Tu Contenido",
-    "addNew": "Agregar Nuevo Contenido",
-    "edit": "Editar",
-    "delete": "Eliminar",
-    "remove": "Eliminar",
-    "change": "Cambiar",
+    "subtitle": "Gestionar, rastrear y analizar tus campañas de redes sociales",
+    "modal": {
+      "add": {
+        "title": "Agregar Campaña",
+        "subtitle": "Crea una campaña impactante y atractiva",
+        "name": "Nombre",
+        "description": "Descripción",
+        "image": "Imagen",
+        "goal": "Objetivo",
+        "status": "Estado",
+        "budget": "Presupuesto",
+        "startDate": "Fecha de Inicio",
+        "endDate": "Fecha de Fin",
+        "publishDate": "Fecha de Publicación",
+        "publishedOn": "Publicado el",
+        "publications": "Publicaciones",
+         "associatedPublicationsRequired":"Publicaciones Asociadas es requerida"
+      },
+      "edit": {
+        "title": "Editar Campaña",
+        "subtitle": "Actualiza la campaña existente",
+        "description": "Descripción",
+        "addCampaign": "Agregar Campaña",
+        "editCampaign": "Editar Campaña",
+        "deleteCampaign": "Eliminar Campaña",
+        "campaignTitle": "Título de Campaña",
+        "name": "Nombre",
+        "hashtags": "Hashtags",
+        "image": "Imagen",
+        "goal": "Objetivo",
+        "status": "Estado",
+        "budget": "Presupuesto",
+        "startDate": "Fecha de Inicio",
+        "endDate": "Fecha de Fin",
+        "publishDate": "Fecha de Publicación",
+        "publishedOn": "Publicado el",
+        "associatedPublications": "Publicaciones Asociadas"
+      }
+    },
+    "button": {
+      "addCampaign": "Agregar Campaña",
+      "editCampaign": "Editar Campaña",
+      "deleteCampaign": "Eliminar Campaña"
+    },
+    "table": {
+      "name": "Nombre",
+      "description": "Descripción",
+      "publications": "Publicaciones",
+      "media": "Archivos",
+      "status": "Estado",
+      "actions": "Acciones"
+    },
     "messages": {
       "addSuccess": "¡Campaña agregada exitosamente!",
       "addError": "Error al agregar campaña",

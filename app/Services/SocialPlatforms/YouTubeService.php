@@ -201,7 +201,8 @@ class YouTubeService extends BaseSocialService
    */
   private function isFFprobeAvailable(): bool
   {
-    $output = shell_exec('which ffprobe 2>/dev/null');
+    $command = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' ? 'where ffprobe' : 'which ffprobe 2>/dev/null';
+    $output = shell_exec($command);
     return !empty($output);
   }
 
@@ -457,6 +458,8 @@ class YouTubeService extends BaseSocialService
     }
   }
 
+
+
   public function validateCredentials(): bool
   {
     try {
@@ -471,6 +474,119 @@ class YouTubeService extends BaseSocialService
       ]);
       return true;
     } catch (\Exception $e) {
+      return false;
+    }
+  }
+
+  /**
+   * Busca una playlist por título y retorna su ID
+   */
+  public function findPlaylistByName(string $title): ?string
+  {
+    try {
+      $response = $this->client->get('https://www.googleapis.com/youtube/v3/playlists', [
+        'headers' => [
+          'Authorization' => "Bearer {$this->accessToken}",
+        ],
+        'query' => [
+          'part' => 'snippet,id',
+          'mine' => 'true',
+          'maxResults' => 50, // Check first 50 playlists
+        ],
+      ]);
+
+      $data = json_decode($response->getBody(), true);
+
+      if (isset($data['items'])) {
+        foreach ($data['items'] as $item) {
+          if (strcasecmp($item['snippet']['title'], $title) === 0) {
+            return $item['id'];
+          }
+        }
+      }
+
+      return null;
+    } catch (\Exception $e) {
+      Log::warning('Failed to search playlists', ['error' => $e->getMessage()]);
+      return null;
+    }
+  }
+
+  /**
+   * Crea una nueva playlist
+   */
+  public function createPlaylist(string $title, string $description = '', string $privacy = 'public'): ?string
+  {
+    try {
+      $response = $this->client->post('https://www.googleapis.com/youtube/v3/playlists', [
+        'headers' => [
+          'Authorization' => "Bearer {$this->accessToken}",
+          'Content-Type' => 'application/json',
+        ],
+        'query' => [
+          'part' => 'snippet,status',
+        ],
+        'json' => [
+          'snippet' => [
+            'title' => $title,
+            'description' => $description,
+          ],
+          'status' => [
+            'privacyStatus' => $privacy,
+          ],
+        ],
+      ]);
+
+      $data = json_decode($response->getBody(), true);
+
+      Log::info('Created YouTube Playlist', ['title' => $title, 'id' => $data['id'] ?? null]);
+
+      return $data['id'] ?? null;
+    } catch (\Exception $e) {
+      Log::error('Failed to create playlist', ['error' => $e->getMessage()]);
+      return null;
+    }
+  }
+
+  /**
+   * Agrega un video a una playlist
+   */
+  public function addVideoToPlaylist(string $playlistId, string $videoId): bool
+  {
+    try {
+      $response = $this->client->post('https://www.googleapis.com/youtube/v3/playlistItems', [
+        'headers' => [
+          'Authorization' => "Bearer {$this->accessToken}",
+          'Content-Type' => 'application/json',
+        ],
+        'query' => [
+          'part' => 'snippet',
+        ],
+        'json' => [
+          'snippet' => [
+            'playlistId' => $playlistId,
+            'resourceId' => [
+              'kind' => 'youtube#video',
+              'videoId' => $videoId,
+            ],
+          ],
+        ],
+      ]);
+
+      $statusCode = $response->getStatusCode();
+
+      if ($statusCode === 200 || $statusCode === 201) {
+        Log::info('Added video to playlist', ['playlist_id' => $playlistId, 'video_id' => $videoId]);
+        return true;
+      }
+
+      return false;
+    } catch (\Exception $e) {
+      Log::error('Failed to add video to playlist', [
+        'playlist_id' => $playlistId,
+        'video_id' => $videoId,
+        'error' => $e->getMessage()
+      ]);
       return false;
     }
   }

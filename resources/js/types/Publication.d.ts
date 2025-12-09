@@ -12,6 +12,7 @@ export type Publication = {
   is_active?: boolean;
   media_files?: MediaFile[];
   scheduled_posts?: ScheduledPost[];
+  campaigns?: Array<{ id: number; name: string; title?: string }>;
 };
 
 export type ScheduledPost = {

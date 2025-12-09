@@ -1,8 +1,11 @@
 <?php
-namespace App\Services;
-use App\Models\Campaigns\Campaign;
+
+namespace App\Services\Publish;
+
+use App\Models\Publications\Publication;
 use App\Models\SocialAccount;
-use App\Http\Controllers\Logs\SocialPostLogService;
+use App\Models\SocialPostLog;
+use App\Services\Logs\SocialPostLogService;
 use App\Services\SocialPlatforms\YouTubeService;
 use App\Services\SocialPlatforms\InstagramService;
 use App\Services\SocialPlatforms\FacebookService;
@@ -20,11 +23,11 @@ class PlatformPublishService
    * Publica en YouTube (solo primer video)
    */
   public function publishToYouTube(
-    Campaign $campaign,
+    Publication $publication,
     SocialAccount $socialAccount,
     $platformService
   ): array {
-    $firstMediaFile = $campaign->mediaFiles->first();
+    $firstMediaFile = $publication->mediaFiles->first();
 
     if (!$firstMediaFile) {
       return [
@@ -36,21 +39,71 @@ class PlatformPublishService
 
     // Crear log pendiente
     $postLog = $this->logService->createPendingLog(
-      $campaign,
+      $publication,
       $socialAccount,
       [$firstMediaFile->file_path],
-      $this->buildDescription($campaign),
+      $this->buildDescription($publication),
       $firstMediaFile->id
     );
 
     try {
-      $response = $platformService->publishPost([
+      $postData = [
         'video_path' => $firstMediaFile->file_path,
-        'title' => $campaign->title,
-        'content' => $this->buildDescription($campaign),
-        'tags' => $this->extractHashtags($campaign->hashtags),
+        'title' => $publication->title,
+        'content' => $this->buildDescription($publication),
+        'tags' => $this->extractHashtags($publication->hashtags),
         'privacy' => 'public',
-      ]);
+      ];
+
+      // Buscar Thumbnail Derivatives
+      $thumbnail = $firstMediaFile->derivatives()
+        ->where('derivative_type', 'thumbnail')
+        ->first();
+
+      if ($thumbnail) {
+        $postData['thumbnail_path'] = $thumbnail->file_path; // Asumiendo URL o path accesible
+      }
+
+      $response = $platformService->publishPost($postData);
+
+      // --- LOGICA DE PLAYLIST ---
+      // Si la publicación pertenece a una Campaña (agrupación), agregar a Playlist
+      $campaignGroup = $publication->campaigns->first();
+
+      if ($campaignGroup) {
+        try {
+          $playlistId = $campaignGroup->youtube_playlist_id;
+
+          // Si la campaña no tiene playlist asignada, buscar o crear
+          if (!$playlistId) {
+            // Intentar buscar por nombre
+            $playlistId = $platformService->findPlaylistByName($campaignGroup->name);
+
+            // Si no existe, crear nueva
+            if (!$playlistId) {
+              $playlistId = $platformService->createPlaylist(
+                $campaignGroup->name,
+                $campaignGroup->description ?? $campaignGroup->name
+              );
+            }
+
+            // Guardar ID en la campaña
+            if ($playlistId) {
+              $campaignGroup->youtube_playlist_id = $playlistId;
+              $campaignGroup->save();
+            }
+          }
+
+          // Agregar video a la playlist
+          if ($playlistId && isset($response['post_id'])) {
+            $platformService->addVideoToPlaylist($playlistId, $response['post_id']);
+          }
+        } catch (\Exception $e) {
+          Log::warning('Failed to handle YouTube Playlist', ['error' => $e->getMessage()]);
+          // No fallamos la publicación completa si falla la playlist
+        }
+      }
+      // --------------------------
 
       // Marcar como publicado
       $postLog = $this->logService->markAsPublished($postLog, $response);
@@ -76,27 +129,27 @@ class PlatformPublishService
    * Publica en otras plataformas (múltiples archivos)
    */
   public function publishToOtherPlatform(
-    Campaign $campaign,
+    Publication $publication,
     SocialAccount $socialAccount,
     $mediaFile,
     $platformService
   ): array {
     // Crear log pendiente
     $postLog = $this->logService->createPendingLog(
-      $campaign,
+      $publication,
       $socialAccount,
       [$mediaFile->file_path],
-      $this->buildCaption($campaign),
+      $this->buildCaption($publication),
       $mediaFile->id
     );
 
     try {
       $postData = [
         'video_path' => $mediaFile->file_path,
-        'caption' => $this->buildCaption($campaign),
-        'title' => $campaign->title,
-        'description' => $campaign->description,
-        'hashtags' => $campaign->hashtags,
+        'caption' => $this->buildCaption($publication),
+        'title' => $publication->title,
+        'description' => $publication->description,
+        'hashtags' => $publication->hashtags,
       ];
 
       $response = $platformService->publishPost($postData);
@@ -126,7 +179,7 @@ class PlatformPublishService
    * TRANSACCIÓN POR PLATAFORMA (no global)
    */
   public function publishToAllPlatforms(
-    Campaign $campaign,
+    Publication $publication,
     $socialAccounts
   ): array {
     $allLogs = [];
@@ -147,20 +200,20 @@ class PlatformPublishService
         );
 
         if ($socialAccount->platform === 'youtube') {
-          $result = $this->publishToYouTube($campaign, $socialAccount, $platformService);
+          $result = $this->publishToYouTube($publication, $socialAccount, $platformService);
 
           if ($result['success']) {
             $platformLogs[] = $result['log'];
           } else {
             $platformErrors[] = [
-              'media_file' => $campaign->mediaFiles->first()->file_name ?? 'Unknown',
+              'media_file' => $publication->mediaFiles->first()->file_name ?? 'Unknown',
               'message' => $result['error'],
             ];
           }
         } else {
-          foreach ($campaign->mediaFiles as $mediaFile) {
+          foreach ($publication->mediaFiles as $mediaFile) {
             $result = $this->publishToOtherPlatform(
-              $campaign,
+              $publication,
               $socialAccount,
               $mediaFile,
               $platformService
@@ -207,7 +260,7 @@ class PlatformPublishService
 
         Log::error('Platform publication error', [
           'platform' => $socialAccount->platform,
-          'campaign_id' => $campaign->id,
+          'campaign_id' => $publication->id,
           'error' => $e->getMessage(),
         ]);
 
@@ -248,7 +301,7 @@ class PlatformPublishService
     DB::beginTransaction();
 
     try {
-      $campaign = $postLog->campaign;
+      $publication = $postLog->publication;
       $socialAccount = $postLog->socialAccount;
 
       $platformService = $this->getPlatformService(
@@ -257,9 +310,9 @@ class PlatformPublishService
       );
 
       if ($socialAccount->platform === 'youtube') {
-        $result = $this->retryYouTubePublication($postLog, $campaign, $platformService);
+        $result = $this->retryYouTubePublication($postLog, $publication, $platformService);
       } else {
-        $result = $this->retryOtherPlatformPublication($postLog, $campaign, $platformService);
+        $result = $this->retryOtherPlatformPublication($postLog, $publication, $platformService);
       }
 
       if ($result['success']) {
@@ -281,16 +334,16 @@ class PlatformPublishService
     }
   }
 
-  private function retryYouTubePublication($postLog, $campaign, $platformService): array
+  private function retryYouTubePublication($postLog, $publication, $platformService): array
   {
     try {
-      $mediaFile = $postLog->mediaFile ?? $campaign->mediaFiles->first();
+      $mediaFile = $postLog->mediaFile ?? $publication->mediaFiles->first();
 
       $response = $platformService->publishPost([
         'video_path' => $mediaFile->file_path,
-        'title' => $campaign->title,
-        'content' => $this->buildDescription($campaign),
-        'tags' => $this->extractHashtags($campaign->hashtags),
+        'title' => $publication->title,
+        'content' => $this->buildDescription($publication),
+        'tags' => $this->extractHashtags($publication->hashtags),
         'privacy' => 'public',
       ]);
 
@@ -310,7 +363,7 @@ class PlatformPublishService
     }
   }
 
-  private function retryOtherPlatformPublication($postLog, $campaign, $platformService): array
+  private function retryOtherPlatformPublication($postLog, $publication, $platformService): array
   {
     try {
       $mediaFile = $postLog->mediaFile;
@@ -321,10 +374,10 @@ class PlatformPublishService
 
       $response = $platformService->publishPost([
         'video_path' => $mediaFile->file_path,
-        'caption' => $this->buildCaption($campaign),
-        'title' => $campaign->title,
-        'description' => $campaign->description,
-        'hashtags' => $campaign->hashtags,
+        'caption' => $this->buildCaption($publication),
+        'title' => $publication->title,
+        'description' => $publication->description,
+        'hashtags' => $publication->hashtags,
       ]);
 
       $this->logService->markAsPublished($postLog, $response);
@@ -343,35 +396,35 @@ class PlatformPublishService
     }
   }
 
-  private function buildDescription(Campaign $campaign): string
+  private function buildDescription(Publication $publication): string
   {
     $parts = [];
 
-    if ($campaign->description) {
-      $parts[] = $campaign->description;
+    if ($publication->description) {
+      $parts[] = $publication->description;
     }
 
-    if ($campaign->hashtags) {
-      $parts[] = $campaign->hashtags;
+    if ($publication->hashtags) {
+      $parts[] = $publication->hashtags;
     }
 
     return implode("\n\n", array_filter($parts));
   }
 
-  private function buildCaption(Campaign $campaign): string
+  private function buildCaption(Publication $publication): string
   {
     $parts = [];
 
-    if ($campaign->title) {
-      $parts[] = $campaign->title;
+    if ($publication->title) {
+      $parts[] = $publication->title;
     }
 
-    if ($campaign->description) {
-      $parts[] = $campaign->description;
+    if ($publication->description) {
+      $parts[] = $publication->description;
     }
 
-    if ($campaign->hashtags) {
-      $parts[] = $campaign->hashtags;
+    if ($publication->hashtags) {
+      $parts[] = $publication->hashtags;
     }
 
     return implode("\n\n", array_filter($parts));

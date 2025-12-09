@@ -6,7 +6,17 @@ import { Publication } from "@/types/Publication";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { format } from "date-fns";
-import { Edit, FileImage, Loader2, Save, Upload, X } from "lucide-react";
+import {
+  AlertTriangle,
+  Clock,
+  FileImage,
+  FileText,
+  Hash,
+  Sparkles,
+  Target,
+  Upload,
+  X,
+} from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -18,24 +28,24 @@ const createEditSchema = (t: any) =>
       .string()
       .min(
         1,
-        t("manageContent.modals.validation.titleRequired") ||
-          "Title is required"
+        t("publications.modal.validation.titleRequired") || "Title is required"
       )
       .max(
         100,
-        t("manageContent.modals.validation.titleLength") || "Title too long"
+        t("publications.modal.validation.titleLength") || "Title too long"
       ),
     description: z
       .string()
       .min(
         10,
-        t("manageContent.modals.validation.descRequired") ||
+        t("publications.modal.validation.descRequired") ||
           "Description too short"
       ),
     goal: z.string().optional(),
     hashtags: z.string().optional(),
     scheduled_at: z.string().optional(),
     social_accounts: z.array(z.number()).optional(),
+    campaign_id: z.string().optional(),
   });
 
 type EditPublicationFormData = {
@@ -45,6 +55,7 @@ type EditPublicationFormData = {
   hashtags?: string;
   scheduled_at?: string;
   social_accounts?: number[];
+  campaign_id?: string;
 };
 
 interface EditPublicationModalProps {
@@ -56,7 +67,7 @@ interface EditPublicationModalProps {
 
 const validateFile = (file: File, t: any) => {
   if (file.size > 50 * 1024 * 1024) {
-    return t("manageContent.modals.validation.imageSize");
+    return t("publications.modal.validation.imageSize");
   }
 
   const allowedTypes = [
@@ -69,7 +80,7 @@ const validateFile = (file: File, t: any) => {
     "video/x-msvideo",
   ];
   if (!allowedTypes.includes(file.type)) {
-    return t("manageContent.modals.validation.imageType");
+    return t("publications.modal.validation.imageType");
   }
 
   return null;
@@ -89,10 +100,24 @@ export default function EditPublicationModal({
   const [mediaPreviews, setMediaPreviews] = useState<
     { id?: number; url: string; type: string; isNew: boolean }[]
   >([]);
-  const [thumbnails, setThumbnails] = useState<Record<number, File>>({});
+  const [thumbnails, setThumbnails] = useState<Record<string, File>>({});
   const [imageError, setImageError] = useState<string | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [campaigns, setCampaigns] = useState<any[]>([]);
+
+  const fetchCampaigns = async () => {
+    try {
+      const response = await axios.get("/campaigns");
+      if (response.data?.campaigns?.data) {
+        setCampaigns(response.data.campaigns.data);
+      } else if (Array.isArray(response.data?.campaigns)) {
+        setCampaigns(response.data.campaigns);
+      }
+    } catch (error) {
+      console.error("Failed to fetch campaigns", error);
+    }
+  };
 
   const { confirm } = useConfirm();
   const [socialAccounts, setSocialAccounts] = useState<any[]>([]);
@@ -100,7 +125,6 @@ export default function EditPublicationModal({
     Record<number, string>
   >({});
   const [activePopover, setActivePopover] = useState<number | null>(null);
-  const [deletedPostIds, setDeletedPostIds] = useState<number[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const schema = useMemo(() => createEditSchema(t), [t]);
@@ -108,20 +132,29 @@ export default function EditPublicationModal({
   const {
     register,
     handleSubmit,
-    formState: { errors },
-    watch,
     setValue,
+    watch,
     reset,
+    formState: { errors },
   } = useForm<EditPublicationFormData>({
-    resolver: zodResolver(schema),
-    mode: "onChange",
+    resolver: zodResolver(createEditSchema(t)),
+    defaultValues: {
+      title: "",
+      description: "",
+      goal: "",
+      hashtags: "",
+      scheduled_at: "",
+      social_accounts: [],
+      campaign_id: "",
+    },
   });
 
-  const watchedFields = watch();
+  const watched = watch();
 
   useEffect(() => {
     if (isOpen) {
       fetchSocialAccounts();
+      fetchCampaigns();
     }
   }, [isOpen]);
 
@@ -137,24 +170,28 @@ export default function EditPublicationModal({
   };
 
   useEffect(() => {
-    if (publication && isOpen) {
-      const scheduledAccountIds =
-        publication.scheduled_posts?.map((post) => post.social_account_id) ||
-        [];
+    if (publication) {
+      const schedules: Record<number, string> = {};
+      const scheduledAccountIds: number[] = [];
+
+      publication.scheduled_posts?.forEach((post) => {
+        if (post.scheduled_at) {
+          schedules[post.social_account_id] = post.scheduled_at;
+          scheduledAccountIds.push(post.social_account_id);
+        }
+      });
+      setAccountSchedules(schedules);
 
       reset({
         title: publication.title || "",
         description: publication.description || "",
-        // Publication model might not have goal/budget but old one did in FE.
-        // Assuming goal is still relevant or stored in metadata?
-        // If not in model, these fields might be empty or unused.
-        // Let's keep them optional.
         goal: (publication as any).goal || "",
         hashtags: publication.hashtags || "",
         scheduled_at: publication.scheduled_at
           ? new Date(publication.scheduled_at).toISOString().slice(0, 16)
           : undefined,
         social_accounts: scheduledAccountIds,
+        campaign_id: publication.campaigns?.[0]?.id?.toString() || "",
       });
 
       const previews: {
@@ -192,15 +229,43 @@ export default function EditPublicationModal({
 
   // Styles
   const modalBg = theme === "dark" ? "bg-neutral-800" : "bg-white";
-  const modalHeaderBg = theme === "dark" ? "bg-neutral-900" : "bg-white";
+  const modalHeaderBg =
+    theme === "dark"
+      ? "bg-gradient-to-r from-neutral-900 to-neutral-800"
+      : "bg-gradient-to-r from-gray-50 to-white";
+  const modalHeaderBorder =
+    theme === "dark" ? "border-neutral-700" : "border-gray-100";
   const textPrimary = theme === "dark" ? "text-gray-100" : "text-gray-900";
   const textSecondary = theme === "dark" ? "text-gray-400" : "text-gray-500";
   const textTertiary = theme === "dark" ? "text-gray-500" : "text-gray-400";
   const borderColor =
-    theme === "dark" ? "border-neutral-700" : "border-gray-200";
+    theme === "dark" ? "border-neutral-600" : "border-gray-200";
+  const focusBorder =
+    theme === "dark"
+      ? "focus:border-primary-500 focus:ring-primary-500/20"
+      : "focus:border-primary-500 focus:ring-primary-200";
+  const errorBorder =
+    theme === "dark"
+      ? "border-primary-500 focus:border-primary-500 focus:ring-primary-500/20"
+      : "border-primary-300 focus:border-primary-500 focus:ring-primary-200";
   const inputBg = theme === "dark" ? "bg-neutral-700" : "bg-white";
-  const iconColor = theme === "dark" ? "text-primary-400" : "text-primary-600";
   const labelText = theme === "dark" ? "text-gray-300" : "text-gray-700";
+  const iconColor = theme === "dark" ? "text-primary-400" : "text-primary-600";
+  const uploadBg = theme === "dark" ? "bg-neutral-700" : "bg-gray-50";
+  const uploadBorder =
+    theme === "dark"
+      ? "border-neutral-600 hover:border-primary-400"
+      : "border-gray-200 hover:border-primary-300";
+  const dragOverBg =
+    theme === "dark"
+      ? "bg-primary-900/20 border-primary-400"
+      : "bg-primary-50 border-primary-500";
+  const colorIconInput =
+    theme === "dark"
+      ? `[&::-webkit-calendar-picker-indicator]:invert 
+         [&::-webkit-calendar-picker-indicator]:opacity-80
+         [&::-webkit-calendar-picker-indicator]:cursor-pointer`
+      : "";
 
   const handleFileChange = (files: FileList | null) => {
     if (files && files.length > 0) {
@@ -237,11 +302,6 @@ export default function EditPublicationModal({
   const removeMedia = (index: number) => {
     const previewToRemove = mediaPreviews[index];
     if (previewToRemove.isNew) {
-      // Logic only removes newly added files correctly if inserted in order
-      // Simplified: filter from mediaFiles if strictly appended
-      // Since we reconstruct previews, it's safer to not support removing non-new files easily OR
-      // we need a robust mapping.
-      // For now, let's just trigger update.
       let newFileIndex = 0;
       for (let i = 0; i < index; i++) {
         if (mediaPreviews[i].isNew) newFileIndex++;
@@ -268,12 +328,15 @@ export default function EditPublicationModal({
   };
 
   const handleHashtagChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // format logic
     const val = e.target.value
       .split(/\s+/)
       .map((tag) => (tag.startsWith("#") ? tag : `#${tag}`))
       .join(" ");
     setValue("hashtags", val);
+  };
+
+  const toggleSchedulePopover = (accountId: number) => {
+    setActivePopover(activePopover === accountId ? null : accountId);
   };
 
   const onFormSubmit = async (data: EditPublicationFormData) => {
@@ -292,37 +355,19 @@ export default function EditPublicationModal({
 
       mediaFiles.forEach((file, index) => {
         submitData.append(`media[${index}]`, file);
-        // Thumbnails for NEW media
-        // Note: `thumbnails` state uses `idx` from `mediaPreviews`.
-        // We need to map correctly if indexes diverge, but here we assume parallelism or index match is simple.
-        // Actually, `mediaFiles` corresponds to `newPreviews` which are appended to `mediaPreviews`.
-        // Let's rely on matching logic. If `thumbnails[index]` corresponds to `mediaFiles[index]`.
-        // BUT `thumbnails` are keyed by preview index (mixed old and new).
-        // Backend expects `thumbnails[media_file_id]` for existing, OR `thumbnails[upload_index]` for new?
-        // This is complex. Let's simplify: Send all thumbnails with keys hinting their target.
-        // If preview is existing, use media ID: `thumbnails[media_id_123]`
-        // If preview is new, use upload index: `thumbnails[new_0]` (handled by controller logic or simple order?)
-
-        // Let's look at controller logic I plan: Controller `update` iterates request->file('media').
-        // And check `existing` media.
-
-        // Let's append ALL `thumbnails` present in state.
-        // If the preview at `idx` has an ID, it's existing => `thumbnails[existing_ID]`.
-        // If it is new, it needs to map to the uploaded file.
-        // Find which `mediaFiles` index corresponds to this preview index.
       });
 
       // Pass all collected thumbnails
       Object.entries(thumbnails).forEach(([previewIndexStr, file]) => {
         const previewIndex = parseInt(previewIndexStr);
         const preview = mediaPreviews[previewIndex];
-        if (preview.id) {
-          // Existing media
+
+        if (preview && preview.id) {
+          // Logic for existing media thumbnails: key by ID.
           submitData.append(`thumbnails[${preview.id}]`, file);
-        } else {
-          // New media
-          // We need to find which "new file index" this corresponds to
-          // Count how many new files are *before* this preview index
+        } else if (preview) {
+          // Logic for new media thumbnails: key by new index?
+          // We need to map global preview index to relative new file index.
           let newFileIndex = 0;
           for (let i = 0; i < previewIndex; i++) {
             if (mediaPreviews[i].isNew) newFileIndex++;
@@ -330,8 +375,7 @@ export default function EditPublicationModal({
           submitData.append(`thumbnails[new_${newFileIndex}]`, file);
         }
       });
-      // We pass ids to keep. Backend should handle diffing.
-      // Or we pass `media_keep_ids` array.
+
       mediaFilesToKeep.forEach((id: number, index: number) => {
         submitData.append(`media_keep_ids[${index}]`, id.toString());
       });
@@ -351,6 +395,10 @@ export default function EditPublicationModal({
         });
       }
 
+      if (data.campaign_id) {
+        submitData.append("campaign_id", data.campaign_id);
+      }
+
       submitData.append("_method", "PUT");
 
       const success = await updateCampaign(publication.id, submitData);
@@ -368,10 +416,6 @@ export default function EditPublicationModal({
     }
   };
 
-  const toggleSchedulePopover = (accountId: number) => {
-    setActivePopover(activePopover === accountId ? null : accountId);
-  };
-
   if (!isOpen || !publication) return null;
 
   return (
@@ -385,277 +429,536 @@ export default function EditPublicationModal({
           theme === "dark" ? "bg-black/70" : "bg-gray-900/60"
         } backdrop-blur-sm`}
         onClick={onClose}
-      ></div>
+      />
 
       <div
         className={`relative w-full max-w-4xl ${modalBg} rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300`}
       >
         {/* Header */}
         <div
-          className={`px-6 py-4 border-b ${borderColor} ${modalHeaderBg} flex items-center justify-between sticky top-0 z-10`}
+          className={`px-8 py-6 border-b ${modalHeaderBorder} ${modalHeaderBg} flex items-center justify-between sticky top-0 z-10`}
         >
           <div>
             <h2
-              className={`text-xl font-bold ${textPrimary} flex items-center gap-2`}
+              className={`text-2xl font-bold ${textPrimary} flex items-center gap-2`}
             >
-              <Edit className="w-5 h-5 text-primary-500" />
-              {t("manageContent.modals.edit.title") || "Edit Publication"}
+              <Sparkles className={`w-6 h-6 ${iconColor}`} />
+              {t("publications.modal.edit.title") || "Edit Publication"}
             </h2>
+            <p className={`${textSecondary} mt-1`}>
+              {t("publications.modal.add.subtitle") ||
+                "Update your content details"}
+            </p>
           </div>
           <button
             onClick={onClose}
-            className={`p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors ${textSecondary}`}
+            className={`p-2 hover:${
+              theme === "dark" ? "bg-neutral-700" : "bg-gray-100"
+            } rounded-full transition-colors ${textTertiary}`}
           >
-            <X className="w-5 h-5" />
+            <X className="w-6 h-6" />
           </button>
         </div>
 
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
-          <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-6">
+        {/* Form Content */}
+        <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
+          <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Media Section */}
-              <div className="space-y-4">
-                <label
-                  className={`block text-sm font-semibold ${labelText} flex items-center gap-2`}
-                >
-                  <FileImage className="w-4 h-4 text-primary-500" />
-                  Media Files
-                </label>
+              {/* Left Column - Media */}
+              <div className="space-y-6">
+                <div className="form-group">
+                  <label
+                    className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
+                  >
+                    <FileImage className={`w-4 h-4 ${iconColor}`} />
+                    Media
+                    <span className="text-primary-500 ml-1">*</span>
+                  </label>
 
-                <div
-                  className={`min-h-[200px] rounded-lg border-2 border-dashed flex flex-col items-center justify-center p-6 text-center transition-colors cursor-pointer ${
-                    isDragOver
-                      ? "border-primary-500 bg-primary-50 dark:bg-primary-900/10"
-                      : `${borderColor} hover:border-primary-300`
-                  }`}
-                  onDrop={handleDrop}
-                  onDragOver={handleDragOver}
-                  onDragLeave={handleDragLeave}
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  {mediaPreviews.length > 0 ? (
-                    <div className="grid grid-cols-2 gap-2 w-full">
-                      {mediaPreviews.map((preview, idx) => (
-                        <div
-                          key={idx}
-                          className="relative group aspect-video bg-gray-900 border overflow-hidden rounded"
-                        >
-                          {preview.type.includes("video") ? (
-                            <>
-                              <video
-                                src={preview.url}
-                                className="w-full h-full object-cover opacity-80"
-                              />
-                              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
-                                <span className="text-white/80 text-xs font-medium bg-black/50 px-2 py-1 rounded">
-                                  Video
-                                </span>
-                                {/* Thumbnail Upload Button */}
-                                <div className="relative z-20">
-                                  <input
-                                    type="file"
-                                    id={`edit-thumbnail-${idx}`}
-                                    className="hidden"
-                                    accept="image/*"
-                                    onChange={(e) => {
-                                      const file = e.target.files?.[0];
-                                      if (file) {
-                                        setThumbnails((prev) => ({
-                                          ...prev,
-                                          [idx]: file,
-                                        }));
-                                      }
-                                    }}
-                                    onClick={(e) => e.stopPropagation()}
+                  <div
+                    className={`relative group cursor-pointer transition-all duration-300 ${
+                      isDragOver
+                        ? `scale-[1.02] ring-2 ${
+                            theme === "dark"
+                              ? "ring-primary-400"
+                              : "ring-primary-500"
+                          } ring-offset-2`
+                        : ""
+                    }`}
+                    onDrop={handleDrop}
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <div
+                      className={`min-h-[200px] rounded-lg border-2 border-dashed flex flex-col items-center justify-center p-6 text-center transition-colors overflow-hidden ${
+                        imageError
+                          ? theme === "dark"
+                            ? "border-primary-500 bg-primary-900/20"
+                            : "border-primary-300 bg-primary-50"
+                          : isDragOver
+                          ? dragOverBg
+                          : `${uploadBorder} hover:${
+                              theme === "dark"
+                                ? "bg-neutral-600"
+                                : "bg-gray-100"
+                            } ${uploadBg}`
+                      }`}
+                    >
+                      {mediaPreviews.length > 0 ? (
+                        <div className="grid grid-cols-2 gap-4 w-full">
+                          {mediaPreviews.map((preview, index) => (
+                            <div
+                              key={index}
+                              className="relative group/item aspect-video border rounded-lg overflow-hidden bg-gray-900"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              {preview.type.includes("video") ? (
+                                <>
+                                  <video
+                                    src={preview.url}
+                                    className="w-full h-full object-cover opacity-80"
                                   />
-                                  <label
-                                    htmlFor={`edit-thumbnail-${idx}`}
-                                    className="cursor-pointer bg-white/10 hover:bg-white/20 text-white text-xs px-3 py-1.5 rounded-full backdrop-blur-sm transition-colors flex items-center gap-1 border border-white/20"
-                                    onClick={(e) => e.stopPropagation()}
-                                  >
-                                    <FileImage className="w-3 h-3" />
-                                    {thumbnails[idx]
-                                      ? "Change Thumb"
-                                      : "Edit Thumb"}
-                                  </label>
-                                </div>
-                              </div>
-                              {thumbnails[idx] && (
-                                <div className="absolute top-2 left-2 w-8 h-8 rounded border border-white/30 overflow-hidden shadow-lg z-10">
-                                  <img
-                                    src={URL.createObjectURL(thumbnails[idx])}
-                                    className="w-full h-full object-cover"
-                                  />
-                                </div>
+                                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+                                    <span className="text-white/80 text-xs font-medium bg-black/50 px-2 py-1 rounded">
+                                      Video
+                                    </span>
+                                    {/* Thumbnail Upload */}
+                                    <div
+                                      className="relative"
+                                      onClick={(e) => e.stopPropagation()}
+                                    >
+                                      <input
+                                        type="file"
+                                        id={`edit-thumb-${index}`}
+                                        className="hidden"
+                                        accept="image/*"
+                                        onChange={(e) => {
+                                          const file = e.target.files?.[0];
+                                          if (file)
+                                            setThumbnails((prev) => ({
+                                              ...prev,
+                                              [index]: file,
+                                            }));
+                                        }}
+                                      />
+                                      <label
+                                        htmlFor={`edit-thumb-${index}`}
+                                        className="cursor-pointer bg-white/10 hover:bg-white/20 text-white text-xs px-3 py-1.5 rounded-full backdrop-blur-sm transition-colors flex items-center gap-1 border border-white/20"
+                                      >
+                                        <FileImage className="w-3 h-3" />
+                                        {thumbnails[index]
+                                          ? "Change Thumb"
+                                          : "Set Thumb"}
+                                      </label>
+                                    </div>
+                                  </div>
+                                  {thumbnails[index] && (
+                                    <div className="absolute top-2 left-2 w-8 h-8 rounded border border-white/30 overflow-hidden shadow-lg z-10">
+                                      <img
+                                        src={URL.createObjectURL(
+                                          thumbnails[index]
+                                        )}
+                                        className="w-full h-full object-cover"
+                                      />
+                                    </div>
+                                  )}
+                                </>
+                              ) : (
+                                <img
+                                  src={preview.url}
+                                  className="w-full h-full object-cover"
+                                />
                               )}
-                            </>
-                          ) : (
-                            <img
-                              src={preview.url}
-                              className="w-full h-full object-cover rounded"
-                            />
-                          )}
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              removeMedia(idx);
-                            }}
-                            className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-20"
+
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  removeMedia(index);
+                                }}
+                                className="absolute top-2 right-2 p-1.5 bg-red-500/80 text-white rounded-full hover:bg-red-600 transition-colors opacity-0 group-hover/item:opacity-100 backdrop-blur-sm"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </div>
+                          ))}
+
+                          <div
+                            className="flex items-center justify-center aspect-video border-2 border-dashed border-gray-300 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+                            onClick={() => fileInputRef.current?.click()}
                           >
-                            <X className="w-3 h-3" />
-                          </button>
+                            <div className="text-center">
+                              <Upload className="w-6 h-6 mx-auto text-gray-400" />
+                              <span className="text-xs text-gray-500">
+                                Add more
+                              </span>
+                            </div>
+                          </div>
                         </div>
-                      ))}
-                      <div
-                        className="flex items-center justify-center aspect-video border-2 border-dashed rounded opacity-50 cursor-pointer hover:opacity-100 transition-opacity"
-                        onClick={() => fileInputRef.current?.click()}
-                      >
-                        <Upload className="w-6 h-6" />
-                      </div>
+                      ) : (
+                        <div className="space-y-4">
+                          <div
+                            className={`w-16 h-16 rounded-full ${
+                              theme === "dark"
+                                ? "bg-primary-900/30"
+                                : "bg-primary-100"
+                            } flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300`}
+                          >
+                            <Upload className={`w-8 h-8 ${iconColor}`} />
+                          </div>
+                          <div>
+                            <p className={`${textPrimary} font-medium text-lg`}>
+                              {t("publications.modal.edit.dragDrop.title")}
+                            </p>
+                            <p className={`${textSecondary} text-sm mt-1`}>
+                              {t("publications.modal.edit.dragDrop.subtitle")}
+                            </p>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  ) : (
-                    <div className="flex flex-col items-center">
-                      <Upload className="w-8 h-8 text-gray-400 mb-2" />
-                      <p className="text-sm">Click or drag files to upload</p>
-                    </div>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      className="hidden"
+                      multiple
+                      accept="image/*,video/*"
+                      onChange={(e) => handleFileChange(e.target.files)}
+                    />
+                  </div>
+                  {imageError && (
+                    <p className="mt-2 text-sm text-primary-500 flex items-center gap-1 animate-in slide-in-from-left-1">
+                      <AlertTriangle className="w-4 h-4" />
+                      {imageError}
+                    </p>
                   )}
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    className="hidden"
-                    multiple
-                    accept="image/*,video/*"
-                    onChange={(e) => handleFileChange(e.target.files)}
-                  />
                 </div>
-                {imageError && (
-                  <p className="text-sm text-red-500">{imageError}</p>
+
+                {/* Hashtags */}
+                <div className="form-group">
+                  <label
+                    className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
+                  >
+                    <Hash className={`w-4 h-4 ${iconColor}`} />
+                    {t("publications.modal.edit.hashtags")}
+                  </label>
+                  <div className="relative">
+                    <input
+                      {...register("hashtags")}
+                      className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-offset-0 transition-all ${inputBg} ${
+                        errors.hashtags
+                          ? errorBorder
+                          : `${borderColor} ${focusBorder}`
+                      }`}
+                      placeholder={t(
+                        "publications.modal.edit.placeholders.hashtags"
+                      )}
+                      onChange={handleHashtagChange}
+                    />
+                  </div>
+                  <div className="mt-1 flex justify-between text-xs">
+                    <span className={textTertiary}>
+                      {watched.hashtags
+                        ? watched.hashtags
+                            .split(" ")
+                            .filter((tag: string) => tag.startsWith("#")).length
+                        : 0}
+                      /10 hashtags
+                    </span>
+                  </div>
+                </div>
+
+                {/* Scheduling */}
+                <div className="form-group">
+                  <label
+                    className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
+                  >
+                    <Clock className={`w-4 h-4 ${iconColor}`} />
+                    {t("publications.modal.edit.schedulePublication")}
+                  </label>
+                  <div className={colorIconInput}>
+                    <ModernDatePicker
+                      selected={
+                        watch("scheduled_at")
+                          ? new Date(watch("scheduled_at")!)
+                          : null
+                      }
+                      onChange={(date) =>
+                        setValue(
+                          "scheduled_at",
+                          date ? format(date, "yyyy-MM-dd'T'HH:mm") : ""
+                        )
+                      }
+                      showTimeSelect
+                      placeholder="Select general date & time"
+                      dateFormat="Pp"
+                      minDate={new Date()}
+                      withPortal
+                      popperPlacement="bottom-start"
+                    />
+                  </div>
+                </div>
+
+                {/* Social Accounts */}
+                {watched.scheduled_at && (
+                  <div className="form-group animate-in fade-in slide-in-from-top-2">
+                    <label
+                      className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
+                    >
+                      <Target className={`w-4 h-4 ${iconColor}`} />
+                      Select Platforms
+                    </label>
+                    <div className="grid grid-cols-2 gap-3">
+                      {socialAccounts.map((account) => {
+                        const isChecked =
+                          watched?.social_accounts?.includes(account.id) ||
+                          false;
+                        const customSchedule = accountSchedules[account.id];
+
+                        return (
+                          <div
+                            key={account.id}
+                            className={`relative flex items-center p-3 rounded-lg border transition-all ${
+                              isChecked
+                                ? `border-primary-500 bg-primary-50 dark:bg-primary-900/20`
+                                : `${borderColor} ${inputBg}`
+                            }`}
+                          >
+                            <label className="flex items-center gap-3 flex-1 cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={isChecked}
+                                onChange={(e) => {
+                                  const current = watched.social_accounts || [];
+                                  const id = Number(account.id);
+                                  if (e.target.checked) {
+                                    setValue("social_accounts", [
+                                      ...current,
+                                      id,
+                                    ]);
+                                  } else {
+                                    setValue(
+                                      "social_accounts",
+                                      current.filter((x: number) => x !== id)
+                                    );
+                                    const newScheds = { ...accountSchedules };
+                                    delete newScheds[id];
+                                    setAccountSchedules(newScheds);
+                                  }
+                                }}
+                                className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
+                              />
+                              <div className="flex flex-col">
+                                <span
+                                  className={`text-sm font-medium ${textPrimary}`}
+                                >
+                                  {account.platform}
+                                </span>
+                                {customSchedule && isChecked && (
+                                  <span className="text-xs text-primary-600 dark:text-primary-400 flex items-center gap-1">
+                                    <Clock className="w-3 h-3" />
+                                    {new Date(customSchedule).toLocaleString(
+                                      [],
+                                      { dateStyle: "short", timeStyle: "short" }
+                                    )}
+                                  </span>
+                                )}
+                              </div>
+                            </label>
+
+                            {isChecked && (
+                              <div className="ml-2">
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    toggleSchedulePopover(account.id)
+                                  }
+                                  className={`p-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 ${
+                                    customSchedule
+                                      ? "text-primary-500"
+                                      : textSecondary
+                                  }`}
+                                >
+                                  <Clock className="w-4 h-4" />
+                                </button>
+
+                                {activePopover === account.id && (
+                                  <div
+                                    className={`absolute right-0 top-full mt-2 z-50 p-4 rounded-lg shadow-xl border w-64 ${modalBg} ${borderColor} animate-in fade-in zoom-in-95`}
+                                  >
+                                    <div className="flex justify-between items-center mb-3">
+                                      <h4
+                                        className={`text-sm font-semibold ${textPrimary}`}
+                                      >
+                                        Schedule for {account.platform}
+                                      </h4>
+                                      <button
+                                        type="button"
+                                        onClick={() => setActivePopover(null)}
+                                      >
+                                        <X
+                                          className={`w-4 h-4 ${textSecondary}`}
+                                        />
+                                      </button>
+                                    </div>
+                                    <div className={colorIconInput}>
+                                      <ModernDatePicker
+                                        selected={
+                                          customSchedule
+                                            ? new Date(customSchedule)
+                                            : null
+                                        }
+                                        onChange={(date) => {
+                                          setAccountSchedules((prev) => ({
+                                            ...prev,
+                                            [account.id]: date
+                                              ? format(
+                                                  date,
+                                                  "yyyy-MM-dd'T'HH:mm"
+                                                )
+                                              : "",
+                                          }));
+                                        }}
+                                        showTimeSelect
+                                        placeholder="Select date & time"
+                                        dateFormat="Pp"
+                                        minDate={new Date()}
+                                        withPortal
+                                        popperPlacement="bottom-start"
+                                      />
+                                    </div>
+                                    <div className="flex justify-end gap-2 mt-2">
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          const newScheds = {
+                                            ...accountSchedules,
+                                          };
+                                          delete newScheds[account.id];
+                                          setAccountSchedules(newScheds);
+                                          setActivePopover(null);
+                                        }}
+                                        className="text-xs text-primary-500 hover:text-primary-700 font-medium px-2 py-1"
+                                      >
+                                        Clear
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => setActivePopover(null)}
+                                        className="text-xs bg-primary-600 text-white px-3 py-1.5 rounded hover:bg-primary-700"
+                                      >
+                                        Done
+                                      </button>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
                 )}
               </div>
 
-              {/* Info Section */}
-              <div className="space-y-4">
-                <div>
+              {/* Right Column - Info */}
+              <div className="space-y-6">
+                {/* Title */}
+                <div className="form-group">
                   <label
-                    className={`block text-sm font-semibold ${labelText} mb-1.5`}
+                    className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
                   >
-                    Title
+                    <FileText className={`w-4 h-4 ${iconColor}`} />
+                    {t("publications.modal.edit.title")}
+                    <span className="text-primary-500 ml-1">*</span>
                   </label>
                   <input
                     {...register("title")}
-                    className={`w-full px-4 py-2 rounded-lg border ${borderColor} ${inputBg}`}
+                    className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-offset-0 transition-all ${inputBg} ${
+                      errors.title
+                        ? errorBorder
+                        : `${borderColor} ${focusBorder}`
+                    }`}
+                    placeholder={t(
+                      "publications.modal.edit.placeholders.title"
+                    )}
                   />
                   {errors.title && (
-                    <p className="text-sm text-red-500 mt-1">
+                    <p className="mt-2 text-sm text-primary-500 flex items-center gap-1">
+                      <AlertTriangle className="w-4 h-4" />
                       {errors.title.message}
                     </p>
                   )}
                 </div>
-                <div>
+
+                {/* Description */}
+                <div className="form-group">
                   <label
-                    className={`block text-sm font-semibold ${labelText} mb-1.5`}
+                    className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
                   >
-                    Description
+                    <FileText className={`w-4 h-4 ${iconColor}`} />
+                    {t("publications.modal.edit.description")}
+                    <span className="text-primary-500 ml-1">*</span>
                   </label>
                   <textarea
                     {...register("description")}
-                    rows={4}
-                    className={`w-full px-4 py-2 rounded-lg border ${borderColor} ${inputBg}`}
+                    rows={8}
+                    className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-offset-0 transition-all resize-none ${inputBg} ${
+                      errors.description
+                        ? errorBorder
+                        : `${borderColor} ${focusBorder}`
+                    }`}
+                    placeholder={t(
+                      "publications.modal.edit.placeholders.description"
+                    )}
                   />
-                </div>
-                <div>
-                  <label
-                    className={`block text-sm font-semibold ${labelText} mb-1.5`}
-                  >
-                    Hashtags
-                  </label>
-                  <input
-                    {...register("hashtags")}
-                    onChange={handleHashtagChange}
-                    className={`w-full px-4 py-2 rounded-lg border ${borderColor} ${inputBg}`}
-                    placeholder="#social #marketing"
-                  />
-                </div>
-                {/* Scheduling - Simplified for brevity */}
-                <div>
-                  <label
-                    className={`block text-sm font-semibold ${labelText} mb-1.5`}
-                  >
-                    Schedule
-                  </label>
-                  <ModernDatePicker
-                    selected={
-                      watch("scheduled_at")
-                        ? new Date(watch("scheduled_at")!)
-                        : null
-                    }
-                    onChange={(d) =>
-                      setValue(
-                        "scheduled_at",
-                        d ? format(d, "yyyy-MM-dd'T'HH:mm") : ""
-                      )
-                    }
-                    showTimeSelect
-                    withPortal
-                    placeholder="Schedule post..."
-                  />
-                </div>
-
-                {/* Social Accounts List - Simplified */}
-                <div>
-                  <label
-                    className={`block text-sm font-semibold ${labelText} mb-1.5`}
-                  >
-                    Platforms
-                  </label>
-                  <div className="space-y-2">
-                    {socialAccounts.map((acc) => (
-                      <label key={acc.id} className="flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          checked={(
-                            watchedFields.social_accounts || []
-                          ).includes(acc.id)}
-                          onChange={(e) => {
-                            const current = watchedFields.social_accounts || [];
-                            if (e.target.checked)
-                              setValue("social_accounts", [...current, acc.id]);
-                            else
-                              setValue(
-                                "social_accounts",
-                                current.filter((id) => id !== acc.id)
-                              );
-                          }}
-                        />
-                        <span className={textSecondary}>{acc.platform}</span>
-                      </label>
-                    ))}
-                  </div>
+                  {errors.description && (
+                    <p className="mt-2 text-sm text-primary-500 flex items-center gap-1">
+                      <AlertTriangle className="w-4 h-4" />
+                      {errors.description.message}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
 
-            <div className="flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-neutral-700">
+            {/* Footer */}
+            <div
+              className={`pt-6 border-t ${borderColor} flex justify-end gap-3`}
+            >
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 rounded text-gray-500 hover:bg-gray-100"
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                  theme === "dark"
+                    ? "hover:bg-neutral-700 text-gray-300"
+                    : "hover:bg-gray-100 text-gray-700"
+                }`}
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-6 py-2 rounded bg-primary-600 text-white flex items-center gap-2"
+                className={`px-6 py-2 rounded-lg font-medium text-white shadow-lg transition-all flex items-center gap-2 ${
+                  isSubmitting
+                    ? "opacity-50 cursor-not-allowed"
+                    : "hover:shadow-primary-500/25 active:scale-95"
+                } bg-gradient-to-r from-primary-600 to-primary-700`}
               >
                 {isSubmitting ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <>
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Updating...
+                  </>
                 ) : (
-                  <Save className="w-4 h-4" />
+                  <>
+                    <Upload className="w-4 h-4" />
+                    Update Publication
+                  </>
                 )}
-                Save Changes
               </button>
             </div>
           </form>

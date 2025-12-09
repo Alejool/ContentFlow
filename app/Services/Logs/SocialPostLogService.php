@@ -2,9 +2,10 @@
 
 namespace App\Services\Logs;
 
-use App\Models\Campaigns\Campaign;
-use App\Models\SocialAccounts\SocialAccount;
+use App\Models\Publications\Publication;
+use App\Models\SocialAccount;
 use App\Models\SocialPostLog;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 
 class SocialPostLogService
@@ -13,16 +14,16 @@ class SocialPostLogService
      * Crea un log inicial en estado pending
      */
     public function createPendingLog(
-        Campaign $campaign,
+        Publication $publication,
         SocialAccount $socialAccount,
         array $mediaUrls,
         string $content,
         ?int $mediaFileId = null
     ): SocialPostLog {
         return SocialPostLog::create([
-            'user_id' => $campaign->user_id,
+            'user_id' => $publication->user_id,
             'social_account_id' => $socialAccount->id,
-            'campaign_id' => $campaign->id,
+            'publication_id' => $publication->id,
             'media_file_id' => $mediaFileId,
             'platform' => $socialAccount->platform,
             'content' => $content,
@@ -57,7 +58,7 @@ class SocialPostLogService
             'post_log_id' => $postLog->id,
             'platform' => $postLog->platform,
             'platform_post_id' => $postLog->platform_post_id,
-            'campaign_id' => $postLog->campaign_id,
+            'publication_id' => $postLog->publication_id,
         ]);
 
         return $postLog->fresh();
@@ -78,7 +79,7 @@ class SocialPostLogService
         Log::error('Post publication failed', [
             'post_log_id' => $postLog->id,
             'platform' => $postLog->platform,
-            'campaign_id' => $postLog->campaign_id,
+            'publication_id' => $postLog->publication_id,
             'error' => $errorMessage,
         ]);
 
@@ -120,11 +121,11 @@ class SocialPostLogService
     }
 
     /**
-     * Obtiene estadísticas de una campaña
+     * Obtiene estadísticas de una publicación
      */
-    public function getCampaignStats(int $campaignId): array
+    public function getPublicationStats(int $publicationId): array
     {
-        $logs = SocialPostLog::where('campaign_id', $campaignId)->get();
+        $logs = SocialPostLog::where('publication_id', $publicationId)->get();
 
         $byPlatform = [];
         foreach ($logs->groupBy('platform') as $platform => $platformLogs) {
@@ -146,30 +147,60 @@ class SocialPostLogService
     }
 
     /**
-     * Obtiene los logs de una campaña con detalles
+     * Obtiene los logs de una publicación con detalles
      */
-    public function getCampaignLogs(int $campaignId): array
+    public function getPublicationLogs(int $publicationId): array
     {
-        $logs = SocialPostLog::where('campaign_id', $campaignId)
+        $logs = SocialPostLog::where('publication_id', $publicationId)
             ->with(['socialAccount', 'mediaFile'])
             ->orderBy('created_at', 'desc')
             ->get();
 
         return [
             'logs' => $logs,
-            'summary' => $this->getCampaignStats($campaignId),
+            'summary' => $this->getPublicationStats($publicationId),
         ];
     }
 
     /**
      * Obtiene logs fallidos que pueden reintentarse
      */
-    public function getRetryableLogs(int $campaignId): \Illuminate\Support\Collection
+    public function getRetryableLogs(int $publicationId): Collection
     {
-        return SocialPostLog::where('campaign_id', $campaignId)
+        return SocialPostLog::where('publication_id', $publicationId)
             ->where('status', 'failed')
             ->where('retry_count', '<', 3)
             ->with(['socialAccount', 'mediaFile'])
             ->get();
+    }
+
+    /**
+     * Obtiene logs de todas las publicaciones de una campaña
+     */
+    public function getCampaignLogs(int $campaignId, int $userId): array
+    {
+        // Obtener IDs de publicaciones de la campaña
+        $publicationIds = Publication::whereHas('campaigns', function ($q) use ($campaignId) {
+            $q->where('campaigns.id', $campaignId);
+        })->pluck('id');
+
+        $logs = SocialPostLog::whereIn('publication_id', $publicationIds)
+            ->where('user_id', $userId)
+            ->with(['socialAccount', 'mediaFile', 'publication'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // Calcular resumen
+        $summary = [
+            'total' => $logs->count(),
+            'published' => $logs->where('status', 'published')->count(),
+            'failed' => $logs->where('status', 'failed')->count(),
+            'pending' => $logs->where('status', 'pending')->count(),
+        ];
+
+        return [
+            'logs' => $logs,
+            'summary' => $summary,
+        ];
     }
 }

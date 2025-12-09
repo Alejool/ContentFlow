@@ -29,11 +29,11 @@ const createSchema = (t: any) =>
       .string()
       .min(
         1,
-        t("manageContent.modals.validation.titleRequired") || "Name is required"
+        t("manageContent.modal.validation.titleRequired") || "Name is required"
       )
       .max(
         100,
-        t("manageContent.modals.validation.titleLength") || "Name too long"
+        t("manageContent.modal.validation.titleLength") || "Name too long"
       ),
     description: z.string().optional(),
     goal: z.string().optional(),
@@ -84,7 +84,9 @@ export default function AddCampaignModal({
     setLoadingPubs(true);
     try {
       // Fetch publications to associate
-      const response = await axios.get("/publications?simplified=true");
+      const response = await axios.get(
+        "/publications?simplified=true&exclude_assigned=true"
+      );
       // Handle both simplified (array) and paginated (object with data) structures
       if (response.data?.publications) {
         if (Array.isArray(response.data.publications)) {
@@ -188,11 +190,10 @@ export default function AddCampaignModal({
               className={`text-xl font-bold ${textPrimary} flex items-center gap-2`}
             >
               <Target className="w-5 h-5 text-primary-500" />
-              {t("manageContent.modals.add.titleCampaign") ||
-                "New Campaign Group"}
+              {t("campaigns.modal.add.title") || "New Campaign Group"}
             </h2>
             <p className={`${textSecondary} text-sm mt-0.5`}>
-              {t("manageContent.modals.add.subtitleCampaign") ||
+              {t("campaigns.modal.add.subtitle") ||
                 "Group your publications together"}
             </p>
           </div>
@@ -212,7 +213,7 @@ export default function AddCampaignModal({
               <label
                 className={`block text-sm font-semibold ${labelText} mb-1.5`}
               >
-                {t("common.name") || "Campaign Name"}{" "}
+                {t("campaigns.modal.add.name") || "Campaign Name"}{" "}
                 <span className="text-primary-500">*</span>
               </label>
               <input
@@ -233,7 +234,7 @@ export default function AddCampaignModal({
               <label
                 className={`block text-sm font-semibold ${labelText} mb-1.5`}
               >
-                {t("common.description") || "Description"}
+                {t("campaigns.modal.add.description") || "Description"}
               </label>
               <textarea
                 {...register("description")}
@@ -249,7 +250,7 @@ export default function AddCampaignModal({
                 <label
                   className={`block text-sm font-semibold ${labelText} mb-1.5`}
                 >
-                  {t("common.goal") || "Goal"}
+                  {t("campaigns.modal.add.goal") || "Goal"}
                 </label>
                 <div className="relative">
                   <Target
@@ -268,7 +269,7 @@ export default function AddCampaignModal({
                 <label
                   className={`block text-sm font-semibold ${labelText} mb-1.5`}
                 >
-                  {t("common.budget") || "Budget"}
+                  {t("campaigns.modal.add.budget") || "Budget"}
                 </label>
                 <div className="relative">
                   <DollarSign
@@ -291,7 +292,7 @@ export default function AddCampaignModal({
                 <label
                   className={`block text-sm font-semibold ${labelText} mb-1.5`}
                 >
-                  {t("common.startDate") || "Start Date"}
+                  {t("campaigns.modal.add.startDate") || "Start Date"}
                 </label>
                 <ModernDatePicker
                   selected={
@@ -311,7 +312,7 @@ export default function AddCampaignModal({
                 <label
                   className={`block text-sm font-semibold ${labelText} mb-1.5`}
                 >
-                  {t("common.endDate") || "End Date"}
+                  {t("campaigns.modal.add.endDate") || "End Date"}
                 </label>
                 <ModernDatePicker
                   selected={
@@ -336,7 +337,7 @@ export default function AddCampaignModal({
               <label
                 className={`block text-sm font-semibold ${labelText} mb-2`}
               >
-                Attach Publications
+                {t("campaigns.modal.add.publications") || "Publications"}
               </label>
 
               <div
@@ -404,7 +405,8 @@ export default function AddCampaignModal({
                 )}
               </div>
               <p className={`text-xs mt-1.5 ${textSecondary}`}>
-                Select publications to include in this campaign.
+                {t("campaigns.modal.add.associatedPublicationsRequired") ||
+                  "Associated Publications is required"}
               </p>
             </div>
 

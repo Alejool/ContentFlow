@@ -2,6 +2,7 @@
   "common": {
     "welcome": "Welcome",
     "loading": "Loading...",
+    "select": "Select",
     "processing": "Processing...",
     "save": "Save",
     "cancel": "Cancel",
@@ -159,54 +160,137 @@
       }
     }
   },
-  "campaigns": {
-    "title": "Campaigns",
-    "addCampaign": "Add Campaign",
-    "editCampaign": "Edit Campaign",
-    "deleteCampaign": "Delete Campaign",
-    "campaignTitle": "Campaign Title",
-    "description": "Manage, track and analyze your social media campaigns",
-    "hashtags": "Hashtags",
-    "image": "Image",
-    "objective": "Objective",
-    "status": "Status",
-    "startDate": "Start Date",
-    "endDate": "End Date",
-    "publishDate": "Publish Date",
-    "publishedOn": "Published On",
-    "scheduledPosts": "Scheduled Posts",
-    "noScheduledPosts": "No scheduled posts specifically.",
-    "draft": "Draft",
-    "completed": "Completed",
-    "yourContent": "Your Content",
-    "addNew": "Add New Content",
-  
+
+ "publications": {
+    "title": "Publications",
+    "subtitle": "Manage your publications",
+    "modal": {
+      "add": {
+        "title": "Add Publication",
+        "titleField": "Title",
+        "subtitle": "Create a publication",
+        "name": "Name",
+        "description": "Description",
+        "image": "Image",
+        "hashtags": "Hashtags",
+        "schedulePublication": "Schedule Publication",
+        "goal": "Goal",
+        "status": "Status",
+        "budget": "Budget",
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "publishDate": "Publish Date",
+        "publishedOn": "Published On",
+        "publications": "Publications",
+        "optionalSchedule": "Optional Schedule",
+        "associatedPublicationsRequired":"Associated Publications is required",
+        "dragDrop": {
+          "title": "Drag and drop to sort",
+          "subtitle": "Upload your multimedia files here"
+        },
+        "placeholders": 
+        {
+          "title": "Title",
+          "description": "Description",
+          "hashtags": "#marketing #publicidad #comunicación",
+          "schedulePublication": "Schedule Publication",
+          "goal": "Goal"
+        
+        }
+       
+      },
+      "edit": {
+        "title": "Edit Publication",
+        "titleField": "Title",
+        "subtitle": "Update the existing publication",
+        "description": "Description",
+        "hashtags": "Hashtags",
+        "schedulePublication": "Schedule Publication",
+        "addCampaign": "Add Campaign",
+        "editCampaign": "Edit Campaign",
+        "deleteCampaign": "Delete Campaign",
+        "campaignTitle": "Campaign Title",
+        "name": "Name",
+        "image": "Image",
+        "goal": "Goal",
+        "status": "Status",
+        "budget": "Budget",
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "publishDate": "Publish Date",
+        "publishedOn": "Published On",
+        "associatedPublications": "Associated Publications",
+        "dragDrop": {
+          "title": "Drag and drop to sort",
+          "subtitle": "Upload your multimedia files here"
+        },
+        "placeholders": 
+        {
+          "title": "Title",
+          "description": "Description",
+          "hashtags": "Hashtags",
+          "schedulePublication": "Schedule Publication",
+          "goal": "Goal"
+        }
+      },
+      "validation":{
+        "descRequired":"Description is required",
+        "nameRequired":"Name is required",
+        "goalRequired":"Goal is required",
+        "statusRequired":"Status is required",
+        "budgetRequired":"Budget is required",
+        "startDateRequired":"Start Date is required",
+        "endDateRequired":"End Date is required",
+        "publishDateRequired":"Publish Date is required",
+        "publishedOnRequired":"Published On is required",
+        "associatedPublicationsRequired":"Associated Publications is required",
+        "titleRequired":"Title is required",
+        "descriptionRequired":"Description is required",
+        "hashtagsRequired":"Hashtags is required",
+        "schedulePublicationRequired":"Schedule Publication is required"
+      }
+    },
+    "button": {
+      "addPublication": "Add Publication",
+      "editPublication": "Edit Publication",
+      "deletePublication": "Delete Publication"
+    },
+    "table": {
+      "name": "Name",
+      "description": "Description",
+      "publications": "Publications",
+      "media": "Media",
+      "campaign": "Campaign",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "noCampaign": "No Campaign",
     "messages": {
-      "addSuccess": "Campaign added successfully!",
-      "addError": "Failed to add campaign",
-      "updateSuccess": "Campaign updated successfully!",
-      "updateError": "Failed to update campaign",
-      "deleteSuccess": "Campaign deleted successfully!",
-      "deleteError": "Failed to delete campaign",
-      "fetchError": "Failed to fetch campaigns",
+      "addSuccess": "Publication added successfully!",
+      "addError": "Error adding publication",
+      "updateSuccess": "Publication updated successfully!",
+      "updateError": "Error updating publication",
+      "deleteSuccess": "Publication deleted successfully!",
+      "deleteError": "Error deleting publication",
+      "fetchError": "Error fetching campaigns",
       "confirmDelete": {
         "title": "Are you sure?",
-        "text": "You will not be able to recover this campaign!",
+        "text": "You won't be able to revert this!",
         "confirmButton": "Yes, delete it!",
         "cancelButton": "Cancel"
       }
     },
     "actions":{
-      "viewCampaign":"View Campaign",
+      "viewCampaign":"View publication",
       "edit":"Edit",
-      "delete":"Delete",
       "publishNow":"Publish Now",
-      "viewDetails":"View Details", 
+      "viewDetails":"View Details",
+      "delete":"Delete",
       "active":"Active",
       "remove":"Remove",
       "change":"Change"
     },
-     "headers": {
+    "headers": {
      "status": "Status",
      "duration": "Duration",
      "mediaFiles": "Media Files",
@@ -219,6 +303,101 @@
       "completed": "Completed",
       "upcoming": "Upcoming",
       "draft": "Draft"
+    }
+  },
+
+  "campaigns": {
+    "title": "Campaigns",
+    "subtitle": "Manage, track and analyze your social media campaigns",
+    "modal": {
+      "add": {
+        "title": "Add Campaign",
+        "subtitle": "Create an impact and engaging campaign",
+        "name": "Name",
+        "description": "Description",
+        "image": "Image",
+        "goal": "Goal",
+        "status": "Status",
+        "budget": "Budget",
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "publishDate": "Publish Date",
+        "publishedOn": "Published On",
+        "publications": "Publications",
+         "associatedPublicationsRequired":"Associated Publications is required"
+      },
+      "edit": {
+        "title": "Edit Campaign",
+        "subtitle": "Update the existing campaign",
+        "description": "Description",
+        "addCampaign": "Add Campaign",
+        "editCampaign": "Edit Campaign",
+        "deleteCampaign": "Delete Campaign",
+        "campaignTitle": "Campaign Title",
+        "name": "Name",
+        "hashtags": "Hashtags",
+        "image": "Image",
+        "goal": "Goal",
+        "status": "Status",
+        "budget": "Budget",
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "publishDate": "Publish Date",
+        "publishedOn": "Published On",
+        "associatedPublications": "Associated Publications"
+      }
+    },
+    "button": {
+      "addCampaign": "Agregar Campaña",
+      "editCampaign": "Editar Campaña",
+      "deleteCampaign": "Eliminar Campaña"
+    },
+    "table": {
+      "name": "Nombre",
+      "description": "Descripción",
+      "publications": "Publicaciones",
+      "media": "Archivos",
+      "status": "Estado",
+      "actions": "Acciones"
+    },
+    "messages": {
+      "addSuccess": "¡Campaña agregada exitosamente!",
+      "addError": "Error al agregar campaña",
+      "updateSuccess": "¡Campaña actualizada exitosamente!",
+      "updateError": "Error al actualizar campaña",
+      "deleteSuccess": "¡Campaña eliminada exitosamente!",
+      "deleteError": "Error al eliminar campaña",
+      "fetchError": "Error al cargar campañas",
+      "confirmDelete": {
+        "title": "¿Estás seguro?",
+        "text": "¡No podrás recuperar esta campaña!",
+        "confirmButton": "Sí, eliminarla!",
+        "cancelButton": "Cancelar"
+      }
+    },
+    "actions":{
+      "viewCampaign":"Ver Campaña",
+      "edit":"Editar",
+      "publishNow":"Publicar Ahora",
+      "viewDetails":"Ver Detalles",
+      "delete":"Eliminar",
+      "active":"Activa",
+      "remove":"Eliminar",
+      "change":"Cambiar"
+    },
+    "headers": {
+     "status": "Estado",
+     "duration": "Duración",
+     "mediaFiles": "Archivos",
+     "actions": "Acciones"
+    },
+    "filters": 
+    {
+      "all": "Todo",
+      "active": "Activa",
+      "completed": "Completada",
+      "upcoming": "Proximas",
+      "draft": "Borrador"
     }
   },
 

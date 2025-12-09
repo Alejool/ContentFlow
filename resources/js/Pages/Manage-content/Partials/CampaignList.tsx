@@ -28,6 +28,13 @@ type CampaignListProps = {
   onViewDetails: (item: any) => void;
   isLoading: boolean;
   onFilterChange?: (filters: any) => void;
+  pagination: {
+    current_page: number;
+    last_page: number;
+    total: number;
+    per_page: number;
+  };
+  onPageChange: (page: number) => void;
 };
 
 export default function CampaignList({
@@ -40,6 +47,8 @@ export default function CampaignList({
   onViewDetails,
   isLoading,
   onFilterChange,
+  pagination,
+  onPageChange,
 }: CampaignListProps) {
   const { t } = useTranslation();
   const { theme } = useTheme();
@@ -49,12 +58,10 @@ export default function CampaignList({
   const [platformFilter, setPlatformFilter] = useState("all"); // For publications
   const [dateStart, setDateStart] = useState("");
   const [dateEnd, setDateEnd] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
   const [expandedCampaigns, setExpandedCampaigns] = useState<number[]>([]);
 
-  const itemsPerPage = 10;
-
-  // Filter Logic
+  // Filter Logic (Client-side filtering of the CURRENT PAGE items)
+  // Ideally search should be server-side, but keeping this for now as per request scope.
   const filteredItems = items.filter((item) => {
     const searchLower = search.toLowerCase();
     // Handle both Campaign (name) and Publication (title)
@@ -67,16 +74,10 @@ export default function CampaignList({
     const searchMatch =
       title.includes(searchLower) || description.includes(searchLower);
 
-    // TODO: Add platform filtering logic if backend supports it or if we filter client-side
-    // const platformMatch = platformFilter === 'all' || ...
-
     return searchMatch;
   });
 
-  const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentItems = filteredItems.slice(startIndex, endIndex);
+  const currentItems = filteredItems;
 
   const toggleExpand = (id: number) => {
     setExpandedCampaigns((prev) =>
@@ -90,16 +91,19 @@ export default function CampaignList({
     if (key === "date_start") setDateStart(value);
     if (key === "date_end") setDateEnd(value);
 
-    setCurrentPage(1); // Reset to page 1
-
+    // Reset to page 1 for filter changes is handled by parent if we passed it up?
+    // But here we just update local state. Parent fetch dependencies should include these if we passed them up.
+    // CampaignList calls onFilterChange, parent updates filters, parent fetches.
+    // We should also trigger page 1 here? No, parent handles fetch.
     if (onFilterChange) {
       onFilterChange({
         status: key === "status" ? value : statusFilter,
-        platform: key === "platform" ? value : platformFilter, // Ensure backend handles this
+        platform: key === "platform" ? value : platformFilter,
         date_start: key === "date_start" ? value : dateStart,
         date_end: key === "date_end" ? value : dateEnd,
       });
     }
+    // We don't control page here anymore
   };
 
   const getStatusColor = (status?: string) => {
@@ -154,8 +158,8 @@ export default function CampaignList({
               }`}
             >
               {mode === "campaigns"
-                ? t("campaigns.yourCampaigns") || "Campaign Groups"
-                : t("campaigns.yourContent") || "Your Publications"}
+                ? t("campaigns.title") || "Campaign Groups"
+                : t("publications.title") || "Your Publications"}
             </h2>
             <p
               className={`text-sm mt-1 ${
@@ -163,8 +167,8 @@ export default function CampaignList({
               }`}
             >
               {mode === "campaigns"
-                ? "Manage your content groups and goals"
-                : "Manage your individual posts and media"}
+                ? t("campaigns.subtitle") || "Campaign Groups"
+                : t("publications.subtitle") || "Your Publications"}
             </p>
           </div>
           <button
@@ -173,8 +177,8 @@ export default function CampaignList({
           >
             <Plus className="w-4 h-4" />
             {mode === "campaigns"
-              ? t("campaigns.addNewGroup") || "New Campaign"
-              : t("campaigns.addNew") || "New Publication"}
+              ? t("campaigns.button.addCampaign") || "New Campaign"
+              : t("publications.button.addPublication") || "New Publication"}
           </button>
         </div>
 
@@ -300,15 +304,24 @@ export default function CampaignList({
               }`}
             >
               <th className="px-6 py-4 font-semibold w-8"></th>
-              <th className="px-6 py-4 font-semibold">{t("common.name")}</th>
               <th className="px-6 py-4 font-semibold">
-                {t("campaigns.headers.status")}
+                {t("campaigns.table.name")}
               </th>
               <th className="px-6 py-4 font-semibold">
-                {mode === "campaigns" ? "Publications" : "Media"}
+                {t("campaigns.table.status")}
               </th>
+              <th className="px-6 py-4 font-semibold">
+                {mode === "campaigns"
+                  ? t("campaigns.table.publications")
+                  : t("campaigns.table.media")}
+              </th>
+              {mode === "publications" && (
+                <th className="px-6 py-4 font-semibold">
+                  {t("publications.table.campaign")}
+                </th>
+              )}
               <th className="px-6 py-4 font-semibold text-right">
-                {t("campaigns.headers.actions")}
+                {t("campaigns.table.actions")}
               </th>
             </tr>
           </thead>
@@ -321,6 +334,9 @@ export default function CampaignList({
               currentItems.map((item, index) => (
                 <Fragment key={item.id}>
                   <tr
+                    data-campaign-id={
+                      mode === "campaigns" ? item.id : undefined
+                    }
                     className={`group transition-colors ${
                       theme === "dark"
                         ? "hover:bg-neutral-700/30"
@@ -336,6 +352,12 @@ export default function CampaignList({
                     <td className="px-2 py-4 text-center">
                       {mode === "campaigns" && (
                         <button
+                          data-expand="true"
+                          data-expanded={
+                            expandedCampaigns.includes(item.id)
+                              ? "true"
+                              : "false"
+                          }
                           onClick={() => toggleExpand(item.id)}
                           className={`p-1 rounded-full transition-colors ${
                             theme === "dark"
@@ -417,6 +439,77 @@ export default function CampaignList({
                         </span>
                       )}
                     </td>
+                    {mode === "publications" && (
+                      <td className="px-6 py-4">
+                        {(item as Publication).campaigns &&
+                        (item as Publication).campaigns!.length > 0 ? (
+                          <div className="flex flex-wrap gap-1">
+                            {(item as Publication).campaigns!.map(
+                              (campaign) => (
+                                <button
+                                  key={campaign.id}
+                                  onClick={() => {
+                                    // Navigate to campaigns tab and expand the campaign
+                                    const campaignTab = document.querySelector(
+                                      '[data-tab="campaigns"]'
+                                    ) as HTMLButtonElement;
+                                    if (campaignTab) {
+                                      campaignTab.click();
+                                      // Small delay to allow tab switch, then expand campaign
+                                      setTimeout(() => {
+                                        const campaignRow =
+                                          document.querySelector(
+                                            `[data-campaign-id="${campaign.id}"]`
+                                          );
+                                        if (campaignRow) {
+                                          campaignRow.scrollIntoView({
+                                            behavior: "smooth",
+                                            block: "center",
+                                          });
+                                          // Trigger expand if not already expanded
+                                          const expandButton =
+                                            campaignRow.querySelector(
+                                              "button[data-expand]"
+                                            ) as HTMLButtonElement;
+                                          if (
+                                            expandButton &&
+                                            !expandButton.getAttribute(
+                                              "data-expanded"
+                                            )
+                                          ) {
+                                            expandButton.click();
+                                          }
+                                        }
+                                      }, 100);
+                                    }
+                                  }}
+                                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium transition-all hover:scale-105 ${
+                                    theme === "dark"
+                                      ? "bg-primary-900/30 text-primary-400 hover:bg-primary-900/50"
+                                      : "bg-primary-100 text-primary-800 hover:bg-primary-200"
+                                  }`}
+                                  title={`Click to view ${
+                                    campaign.name || campaign.title
+                                  }`}
+                                >
+                                  {campaign.name || campaign.title}
+                                </button>
+                              )
+                            )}
+                          </div>
+                        ) : (
+                          <span
+                            className={`text-xs italic ${
+                              theme === "dark"
+                                ? "text-gray-500"
+                                : "text-gray-400"
+                            }`}
+                          >
+                            {t("publications.noCampaign")}
+                          </span>
+                        )}
+                      </td>
+                    )}
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-2">
                         {mode === "publications" && (
@@ -524,7 +617,7 @@ export default function CampaignList({
             ) : (
               <tr>
                 <td
-                  colSpan={5}
+                  colSpan={mode === "publications" ? 6 : 5}
                   className="px-6 py-12 text-center text-gray-500"
                 >
                   No {mode} found.{" "}
@@ -537,6 +630,45 @@ export default function CampaignList({
           </tbody>
         </table>
       </div>
+
+      {/* Pagination Controls */}
+      {pagination && pagination.last_page > 1 && (
+        <div className="p-4 flex justify-between items-center text-sm border-t border-gray-100 dark:border-neutral-700">
+          <button
+            disabled={pagination.current_page === 1}
+            onClick={() =>
+              onPageChange(Math.max(1, pagination.current_page - 1))
+            }
+            className={`px-3 py-1 rounded border disabled:opacity-50 transition-colors ${
+              theme === "dark"
+                ? "border-neutral-700 hover:bg-neutral-700 text-gray-300"
+                : "border-gray-200 hover:bg-gray-50 text-gray-700"
+            }`}
+          >
+            Previous
+          </button>
+          <span
+            className={theme === "dark" ? "text-gray-400" : "text-gray-600"}
+          >
+            Page {pagination.current_page} of {pagination.last_page}
+          </span>
+          <button
+            disabled={pagination.current_page === pagination.last_page}
+            onClick={() =>
+              onPageChange(
+                Math.min(pagination.last_page, pagination.current_page + 1)
+              )
+            }
+            className={`px-3 py-1 rounded border disabled:opacity-50 transition-colors ${
+              theme === "dark"
+                ? "border-neutral-700 hover:bg-neutral-700 text-gray-300"
+                : "border-gray-200 hover:bg-gray-50 text-gray-700"
+            }`}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 }

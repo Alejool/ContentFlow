@@ -32,6 +32,7 @@ class Campaign extends Model
         'hashtags',
         'description',
         'scheduled_at',
+        'youtube_playlist_id',
     ];
 
     protected $casts = [
@@ -114,6 +115,4 @@ class Campaign extends Model
             $this->start_date <= now() &&
             $this->end_date >= now();
     }
-
-
 }
