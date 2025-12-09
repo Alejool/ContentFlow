@@ -111,6 +111,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::put('/{publication}', [PublicationController::class, 'update'])->name('update');
         Route::delete('/{publication}', [PublicationController::class, 'destroy'])->name('destroy');
         Route::post('/{publication}/duplicate', [PublicationController::class, 'duplicate'])->name('duplicate');
+        Route::get('/{id}/published-platforms', [PublicationController::class, 'getPublishedPlatforms'])->name('published-platforms');
         Route::post('/{id}/publish', [PublicationController::class, 'publish'])->name('publish');
         Route::post('/{id}/unpublish', [PublicationController::class, 'unpublish'])->name('unpublish');
     });

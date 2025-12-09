@@ -99,7 +99,13 @@ export default function EditPublicationModal({
   const { updateCampaign } = useCampaignManagement("publications");
   const [mediaFiles, setMediaFiles] = useState<File[]>([]);
   const [mediaPreviews, setMediaPreviews] = useState<
-    { id?: number; url: string; type: string; isNew: boolean }[]
+    {
+      id?: number;
+      url: string;
+      type: string;
+      isNew: boolean;
+      thumbnailUrl?: string;
+    }[]
   >([]);
   const [thumbnails, setThumbnails] = useState<Record<string, File>>({});
   const [imageError, setImageError] = useState<string | null>(null);
@@ -205,34 +211,44 @@ export default function EditPublicationModal({
         url: string;
         type: string;
         isNew: boolean;
+        thumbnailUrl?: string; // Added field
       }[] = [];
+
       publication.media_files?.forEach((media: any) => {
         const url = media.file_path.startsWith("http")
           ? media.file_path
           : `/storage/${media.file_path}`;
-        previews.push({
-          id: media.id,
-          url,
-          type: media.file_type,
-          isNew: false,
-        });
 
-        // Check for YouTube thumbnail in derivatives
+        let thumbnailUrl;
+        // Check for thumbnail in derivatives
         if (media.file_type.includes("video")) {
           const thumbnail = media.derivatives?.find(
             (d: any) =>
-              d.derivative_type === "thumbnail" && d.platform === "youtube"
+              d.derivative_type === "thumbnail" &&
+              (d.platform === "youtube" ||
+                d.platform === "all" ||
+                d.platform === "generic")
           );
           if (thumbnail) {
-            const thumbnailUrl = thumbnail.file_path.startsWith("http")
+            thumbnailUrl = thumbnail.file_path.startsWith("http")
               ? thumbnail.file_path
               : `/storage/${thumbnail.file_path}`;
+
+            // Also set for YouTube specific field if needed (legacy behavior?)
             setExistingThumbnail({
               url: thumbnailUrl,
               id: thumbnail.id,
             });
           }
         }
+
+        previews.push({
+          id: media.id,
+          url,
+          type: media.file_type,
+          isNew: false,
+          thumbnailUrl,
+        });
       });
 
       // Legacy image support if any
@@ -580,18 +596,24 @@ export default function EditPublicationModal({
                                         className="cursor-pointer bg-white/10 hover:bg-white/20 text-white text-xs px-3 py-1.5 rounded-full backdrop-blur-sm transition-colors flex items-center gap-1 border border-white/20"
                                       >
                                         <FileImage className="w-3 h-3" />
-                                        {thumbnails[index]
+                                        {thumbnails[index] ||
+                                        preview.thumbnailUrl
                                           ? "Change Thumb"
                                           : "Set Thumb"}
                                       </label>
                                     </div>
                                   </div>
-                                  {thumbnails[index] && (
+                                  {(thumbnails[index] ||
+                                    preview.thumbnailUrl) && (
                                     <div className="absolute top-2 left-2 w-8 h-8 rounded border border-white/30 overflow-hidden shadow-lg z-10">
                                       <img
-                                        src={URL.createObjectURL(
+                                        src={
                                           thumbnails[index]
-                                        )}
+                                            ? URL.createObjectURL(
+                                                thumbnails[index]
+                                              )
+                                            : preview.thumbnailUrl
+                                        }
                                         className="w-full h-full object-cover"
                                       />
                                     </div>

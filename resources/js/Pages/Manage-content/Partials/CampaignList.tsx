@@ -596,19 +596,8 @@ export default function CampaignList({
                         {mode === "publications" && (
                           <button
                             onClick={() => onPublish(item)}
-                            disabled={
-                              (item as Publication).status === "published"
-                            }
-                            className={`p-2 text-green-500 hover:bg-green-50 rounded-lg dark:hover:bg-green-900/20 ${
-                              (item as Publication).status === "published"
-                                ? "opacity-50 cursor-not-allowed grayscale"
-                                : ""
-                            }`}
-                            title={
-                              (item as Publication).status === "published"
-                                ? "Already published"
-                                : t("campaigns.actions.publish") || "Publish"
-                            }
+                            className="p-2 text-green-500 hover:bg-green-50 rounded-lg dark:hover:bg-green-900/20"
+                            title={t("campaigns.actions.publish") || "Publish"}
                           >
                             <Rocket className="w-4 h-4" />
                           </button>

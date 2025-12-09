@@ -59,7 +59,7 @@ class Publication extends Model
         return $this->belongsToMany(MediaFile::class, 'publication_media', 'publication_id', 'media_file_id')
             ->withPivot('order')
             ->withTimestamps()
-            ->orderBy('pivot_order');
+            ->orderBy('publication_media.order');
     }
 
     public function analytics(): HasMany

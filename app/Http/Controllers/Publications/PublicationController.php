@@ -19,6 +19,7 @@ use App\Services\SocialPlatforms\TwitterService;
 use App\Services\SocialPlatforms\YouTubeService;
 use Illuminate\Support\Facades\Log;
 use App\Models\SocialAccount;
+use App\Models\Campaigns\Campaign;
 
 class PublicationController extends Controller
 {
@@ -122,7 +123,7 @@ class PublicationController extends Controller
       ]);
 
       if ($request->has('campaign_id')) {
-        $campaign = \App\Models\Campaigns\Campaign::find($request->campaign_id);
+        $campaign = Campaign::find($request->campaign_id);
         if ($campaign) {
           $publication->campaigns()->attach($campaign->id);
         }
@@ -173,17 +174,37 @@ class PublicationController extends Controller
             $publication->update(['image' => asset('storage/' . $path)]);
           }
 
+
           // Handle Thumbnail Upload for this new media file
           if ($request->hasFile("thumbnails.{$index}")) {
             $thumbFile = $request->file("thumbnails.{$index}");
             $thumbFilename = Str::uuid() . '_thumb.' . $thumbFile->getClientOriginalExtension();
             $thumbPath = $thumbFile->storeAs('derivatives/thumbnails', $thumbFilename, 's3');
 
+            // DELETE ALL existing thumbnails for this video first
+            $existingThumbs = $mediaFile->derivatives()
+              ->where('derivative_type', 'thumbnail')
+              ->get();
+
+            foreach ($existingThumbs as $existingThumb) {
+              try {
+                $filePath = str_replace(Storage::disk('s3')->url(''), '', $existingThumb->file_path);
+                Storage::disk('s3')->delete($filePath);
+              } catch (\Exception $e) {
+                Log::warning('Failed to delete old thumbnail', ['error' => $e->getMessage()]);
+              }
+              $existingThumb->delete();
+            }
+
+            // Create new thumbnail for ALL platforms (YouTube, etc.)
             \App\Models\MediaDerivative::create([
               'media_file_id' => $mediaFile->id,
               'derivative_type' => 'thumbnail',
               'file_path' => Storage::disk('s3')->url($thumbPath),
-              'platform' => 'generic', // or 'youtube', 'all'
+              'file_name' => $thumbFilename,
+              'mime_type' => $thumbFile->getClientMimeType(),
+              'size' => $thumbFile->getSize(),
+              'platform' => 'all', // Works for YouTube and all other platforms
               'resolution' => 'custom',
             ]);
           }
@@ -304,7 +325,7 @@ class PublicationController extends Controller
       $publication->save();
 
       if ($request->has('campaign_id')) {
-        $campaign = \App\Models\Campaigns\Campaign::find($request->campaign_id);
+        $campaign = Campaign::find($request->campaign_id);
         if ($campaign) {
           $publication->campaigns()->sync([$campaign->id]);
         } else {
@@ -430,11 +451,30 @@ class PublicationController extends Controller
             $thumbFilename = Str::uuid() . '_thumb.' . $thumbFile->getClientOriginalExtension();
             $thumbPath = $thumbFile->storeAs('derivatives/thumbnails', $thumbFilename, 's3');
 
+            // DELETE ALL existing thumbnails for this video first
+            $existingThumbs = $mediaFile->derivatives()
+              ->where('derivative_type', 'thumbnail')
+              ->get();
+
+            foreach ($existingThumbs as $existingThumb) {
+              try {
+                $filePath = str_replace(Storage::disk('s3')->url(''), '', $existingThumb->file_path);
+                Storage::disk('s3')->delete($filePath);
+              } catch (\Exception $e) {
+                Log::warning('Failed to delete old thumbnail', ['error' => $e->getMessage()]);
+              }
+              $existingThumb->delete();
+            }
+
+            // Create new thumbnail for ALL platforms
             \App\Models\MediaDerivative::create([
               'media_file_id' => $mediaFile->id,
               'derivative_type' => 'thumbnail',
               'file_path' => Storage::disk('s3')->url($thumbPath),
-              'platform' => 'generic',
+              'file_name' => $thumbFilename,
+              'mime_type' => $thumbFile->getClientMimeType(),
+              'size' => $thumbFile->getSize(),
+              'platform' => 'all', // Works for YouTube and all other platforms
               'resolution' => 'custom',
             ]);
           }
@@ -446,30 +486,46 @@ class PublicationController extends Controller
         foreach ($request->file('thumbnails') as $key => $thumbFile) {
           // Check if key is a numeric ID (representing an existing media file)
           if (is_numeric($key)) {
+            // Get media file and verify it belongs to this publication
             $mediaFile = MediaFile::find($key);
-            if ($mediaFile && $mediaFile->publication_id === $publication->id) {
 
+            // Check if this media file belongs to the publication through pivot table
+            $belongsToPublication = \DB::table('publication_media')
+              ->where('publication_id', $publication->id)
+              ->where('media_file_id', $key)
+              ->exists();
+
+            if ($mediaFile && $belongsToPublication) {
               // Upload new thumbnail
               $thumbFilename = Str::uuid() . '_thumb.' . $thumbFile->getClientOriginalExtension();
               $thumbPath = $thumbFile->storeAs('derivatives/thumbnails', $thumbFilename, 's3');
               $thumbUrl = Storage::disk('s3')->url($thumbPath);
 
-              // Check if thumbnail exists and update, or create new
-              $existingThumb = $mediaFile->derivatives()->where('derivative_type', 'thumbnail')->first();
+              // DELETE ALL existing thumbnails for this video first
+              $existingThumbs = $mediaFile->derivatives()
+                ->where('derivative_type', 'thumbnail')
+                ->get();
 
-              if ($existingThumb) {
-                // Optionally delete old file from S3? For safety, maybe just update record.
-                $existingThumb->update([
-                  'file_path' => $thumbUrl,
-                ]);
-              } else {
-                $mediaFile->derivatives()->create([
-                  'derivative_type' => 'thumbnail',
-                  'file_path' => $thumbUrl,
-                  'platform' => 'generic',
-                  'resolution' => 'custom',
-                ]);
+              foreach ($existingThumbs as $existingThumb) {
+                try {
+                  $filePath = str_replace(Storage::disk('s3')->url(''), '', $existingThumb->file_path);
+                  Storage::disk('s3')->delete($filePath);
+                } catch (\Exception $e) {
+                  Log::warning('Failed to delete old thumbnail', ['error' => $e->getMessage()]);
+                }
+                $existingThumb->delete();
               }
+
+              // Create new thumbnail for ALL platforms
+              $mediaFile->derivatives()->create([
+                'derivative_type' => 'thumbnail',
+                'file_path' => $thumbUrl,
+                'file_name' => $thumbFilename,
+                'mime_type' => $thumbFile->getClientMimeType(),
+                'size' => $thumbFile->getSize(),
+                'platform' => 'all', // Works for YouTube and all other platforms
+                'resolution' => 'custom',
+              ]);
             }
           }
         }
@@ -478,63 +534,54 @@ class PublicationController extends Controller
       // Handle YouTube Thumbnail
       if ($request->hasFile('youtube_thumbnail') && $request->has('youtube_thumbnail_video_id')) {
         $videoId = $request->input('youtube_thumbnail_video_id');
+
+        // Get media file and verify it belongs to this publication
         $mediaFile = MediaFile::find($videoId);
 
-        if ($mediaFile && $mediaFile->file_type === 'video') {
+        // Check if this media file belongs to the publication through pivot table
+        $belongsToPublication = \DB::table('publication_media')
+          ->where('publication_id', $publication->id)
+          ->where('media_file_id', $videoId)
+          ->exists();
+
+        if ($mediaFile && $belongsToPublication && $mediaFile->file_type === 'video') {
           $thumbFile = $request->file('youtube_thumbnail');
           $thumbFilename = Str::uuid() . '_youtube_thumb.' . $thumbFile->getClientOriginalExtension();
           $thumbPath = $thumbFile->storeAs('derivatives/youtube/thumbnails', $thumbFilename, 's3');
           $thumbUrl = Storage::disk('s3')->url($thumbPath);
 
-          // Check if YouTube thumbnail already exists
-          $existingThumb = $mediaFile->derivatives()
+          // DELETE ALL existing thumbnails for this video (YouTube and generic)
+          // This ensures the new thumbnail takes priority
+          $existingThumbs = $mediaFile->derivatives()
             ->where('derivative_type', 'thumbnail')
-            ->where('platform', 'youtube')
-            ->first();
+            ->get();
 
-          if ($existingThumb) {
-            // Update existing thumbnail
-            $existingThumb->update([
-              'file_path' => $thumbUrl,
-              'file_name' => $thumbFilename,
-              'mime_type' => $thumbFile->getClientMimeType(),
-              'size' => $thumbFile->getSize(),
-            ]);
-          } else {
-            // Create new YouTube thumbnail
-            MediaDerivative::create([
-              'media_file_id' => $mediaFile->id,
-              'derivative_type' => 'thumbnail',
-              'file_path' => $thumbUrl,
-              'file_name' => $thumbFilename,
-              'mime_type' => $thumbFile->getClientMimeType(),
-              'size' => $thumbFile->getSize(),
-              'platform' => 'youtube',
-            ]);
-          }
-        }
-      }
-
-      // Handle Thumbnails for EXISTING media
-      if ($request->has('thumbnails')) {
-        foreach ($request->file('thumbnails') as $key => $file) {
-          if (is_numeric($key)) {
-            $mediaId = (int)$key;
-            if ($publication->mediaFiles()->where('id', $mediaId)->exists()) {
-              $thumbFilename = Str::uuid() . '_thumb.' . $file->getClientOriginalExtension();
-              $thumbPath = $file->storeAs('derivatives/thumbnails', $thumbFilename, 's3');
-              \App\Models\MediaDerivative::updateOrCreate(
-                ['media_file_id' => $mediaId, 'derivative_type' => 'thumbnail'],
-                [
-                  'file_path' => Storage::disk('s3')->url($thumbPath),
-                  'platform' => 'generic',
-                  'resolution' => 'custom',
-                ]
-              );
+          foreach ($existingThumbs as $existingThumb) {
+            // Delete file from storage
+            try {
+              $filePath = str_replace(Storage::disk('s3')->url(''), '', $existingThumb->file_path);
+              Storage::disk('s3')->delete($filePath);
+            } catch (\Exception $e) {
+              Log::warning('Failed to delete old thumbnail file', ['error' => $e->getMessage()]);
             }
+            // Delete database record
+            $existingThumb->delete();
           }
+
+          // Create new YouTube thumbnail (replaces all previous)
+          MediaDerivative::create([
+            'media_file_id' => $mediaFile->id,
+            'derivative_type' => 'thumbnail',
+            'file_path' => $thumbUrl,
+            'file_name' => $thumbFilename,
+            'mime_type' => $thumbFile->getClientMimeType(),
+            'size' => $thumbFile->getSize(),
+            'platform' => 'all', // Works for YouTube and all other platforms (1-to-1)
+          ]);
         }
       }
+
+
 
       if (!empty($validatedData['scheduled_at']) && !empty($validatedData['social_accounts'])) {
         ScheduledPost::where('publication_id', $publication->id)
@@ -655,41 +702,50 @@ class PublicationController extends Controller
     // Handle YouTube Thumbnail
     if ($request->hasFile('youtube_thumbnail') && $request->has('youtube_thumbnail_video_id')) {
       $videoId = $request->input('youtube_thumbnail_video_id');
+
+      // Get media file and verify it belongs to this publication
       $mediaFile = MediaFile::find($videoId);
 
-      if ($mediaFile && $mediaFile->file_type === 'video') {
+      $belongsToPublication = \DB::table('publication_media')
+        ->where('publication_id', $publication->id)
+        ->where('media_file_id', $videoId)
+        ->exists();
+
+      if ($mediaFile && $belongsToPublication && $mediaFile->file_type === 'video') {
         try {
           $thumbFile = $request->file('youtube_thumbnail');
           $thumbFilename = Str::uuid() . '_youtube_thumb.' . $thumbFile->getClientOriginalExtension();
           $thumbPath = $thumbFile->storeAs('derivatives/youtube/thumbnails', $thumbFilename, 's3');
           $thumbUrl = Storage::disk('s3')->url($thumbPath);
 
-          // Check if YouTube thumbnail already exists
-          $existingThumb = $mediaFile->derivatives()
+          // DELETE ALL existing thumbnails for this video (YouTube and generic)
+          $existingThumbs = $mediaFile->derivatives()
             ->where('derivative_type', 'thumbnail')
-            ->where('platform', 'youtube')
-            ->first();
+            ->get();
 
-          if ($existingThumb) {
-            // Update existing thumbnail
-            $existingThumb->update([
-              'file_path' => $thumbUrl,
-              'file_name' => $thumbFilename,
-              'mime_type' => $thumbFile->getClientMimeType(),
-              'size' => $thumbFile->getSize(),
-            ]);
-          } else {
-            // Create new YouTube thumbnail
-            \App\Models\MediaDerivative::create([
-              'media_file_id' => $mediaFile->id,
-              'derivative_type' => 'thumbnail',
-              'file_path' => $thumbUrl,
-              'file_name' => $thumbFilename,
-              'mime_type' => $thumbFile->getClientMimeType(),
-              'size' => $thumbFile->getSize(),
-              'platform' => 'youtube',
-            ]);
+          foreach ($existingThumbs as $existingThumb) {
+            // Delete file from storage
+            try {
+              $filePath = str_replace(Storage::disk('s3')->url(''), '', $existingThumb->file_path);
+              Storage::disk('s3')->delete($filePath);
+            } catch (\Exception $e) {
+              Log::warning('Failed to delete old thumbnail file', ['error' => $e->getMessage()]);
+            }
+            // Delete database record
+            $existingThumb->delete();
           }
+
+          // Create new YouTube thumbnail (replaces all previous)
+          \App\Models\MediaDerivative::create([
+            'media_file_id' => $mediaFile->id,
+            'derivative_type' => 'thumbnail',
+            'file_path' => $thumbUrl,
+            'file_name' => $thumbFilename,
+            'mime_type' => $thumbFile->getClientMimeType(),
+            'size' => $thumbFile->getSize(),
+            'platform' => 'all', // Works for YouTube and all other platforms (1-to-1)
+          ]);
+
           Log::info('YouTube thumbnail persisted for publish', ['media_id' => $mediaFile->id, 'path' => $thumbUrl]);
         } catch (\Exception $e) {
           Log::error('Failed to save YouTube thumbnail for publish', ['media_id' => $mediaFile->id, 'error' => $e->getMessage()]);
@@ -752,6 +808,30 @@ class PublicationController extends Controller
     } else {
       return response()->json(['success' => false, 'message' => 'Failed to unpublish', 'details' => $result], 500);
     }
+  }
+
+  /**
+   * Get list of social account IDs where this publication is published
+   */
+  public function getPublishedPlatforms($id)
+  {
+    $publication = Publication::find($id);
+
+    if (!$publication) {
+      return response()->json(['error' => 'Publication not found'], 404);
+    }
+
+    // Get social account IDs where status is 'published'
+    $publishedAccountIds = \App\Models\SocialPostLog::where('publication_id', $publication->id)
+      ->where('status', 'published')
+      ->pluck('social_account_id')
+      ->unique()
+      ->values()
+      ->toArray();
+
+    return response()->json([
+      'published_platforms' => $publishedAccountIds
+    ]);
   }
 
   private static function getPlatformService(string $platform, string $token)
