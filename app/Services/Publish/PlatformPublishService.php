@@ -10,8 +10,12 @@ use App\Services\SocialPlatforms\YouTubeService;
 use App\Services\SocialPlatforms\InstagramService;
 use App\Services\SocialPlatforms\FacebookService;
 use App\Services\SocialPlatforms\TikTokService;
+use App\Notifications\VideoUploadedNotification; // Import Notification
+use App\Notifications\VideoDeletedNotification; // Import Notification
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Artisan;
 
 class PlatformPublishService
 {
@@ -50,8 +54,10 @@ class PlatformPublishService
 
     try {
       // PASO 1: Subir el video a YouTube
+      $videoAbsolutePath = $this->resolveFilePath($firstMediaFile->file_path);
+
       $postData = [
-        'video_path' => $firstMediaFile->file_path,
+        'video_path' => $videoAbsolutePath,
         'title' => $publication->title,
         'content' => $this->buildDescription($publication),
         'tags' => $this->extractHashtags($publication->hashtags),
@@ -61,7 +67,7 @@ class PlatformPublishService
       // Buscar Thumbnail Derivatives
       $thumbnail = $firstMediaFile->derivatives()
         ->where('derivative_type', 'thumbnail')
-        ->where('platform', 'youtube')
+        ->where('platform', 'all')
         ->first(); // Prioritize YouTube specific thumbnail
 
       if (!$thumbnail) {
@@ -70,8 +76,17 @@ class PlatformPublishService
           ->first(); // Fallback to generic thumbnail
       }
 
-      if ($thumbnail) {
-        $postData['thumbnail_path'] = $thumbnail->file_path;
+      // Fallback: Check if there is an explicit image uploaded in the publication
+      if (!$thumbnail) {
+        $customThumbnail = $publication->mediaFiles
+          ->where('file_type', 'image')
+          ->first();
+
+        if ($customThumbnail) {
+          $postData['thumbnail_path'] = $this->resolveFilePath($customThumbnail->file_path);
+        }
+      } elseif ($thumbnail) {
+        $postData['thumbnail_path'] = $this->resolveFilePath($thumbnail->file_path);
       }
 
       // Upload video
@@ -80,6 +95,9 @@ class PlatformPublishService
 
       // PASO 2: Marcar como publicado INMEDIATAMENTE después de subir
       $postLog = $this->logService->markAsPublished($postLog, $response);
+
+      // Notify User
+      $publication->user->notify(new VideoUploadedNotification($postLog));
 
       Log::info('YouTube video uploaded successfully', [
         'video_id' => $uploadedPostId,
@@ -128,6 +146,21 @@ class PlatformPublishService
           'campaign' => $campaignGroup->name,
           'error' => $e->getMessage()
         ]);
+      }
+
+      // Trigger queue processing immediately in background
+      try {
+        Artisan::queue('youtube:process-playlist-queue');
+      } catch (\Exception $e) {
+        Log::warning('Could not trigger background playlist processing (Redis/Queue down?), trying sync', [
+          'error' => $e->getMessage()
+        ]);
+        // Fallback to synchronous execution if queue is down
+        try {
+          Artisan::call('youtube:process-playlist-queue');
+        } catch (\Exception $ex) {
+          Log::error('Synchronous playlist processing also failed', ['error' => $ex->getMessage()]);
+        }
       }
     }
 
@@ -357,6 +390,9 @@ class PlatformPublishService
 
       $this->logService->markAsPublished($postLog, $response);
 
+      // Notify User
+      $publication->user->notify(new VideoUploadedNotification($postLog));
+
       return [
         'success' => true,
         'log' => $postLog->fresh(),
@@ -501,6 +537,8 @@ class PlatformPublishService
 
             if ($deleted) {
               $log->update(['status' => 'deleted']);
+              // Notify User
+              $publication->user->notify(new VideoDeletedNotification($log));
               $results[] = ['log_id' => $log->id, 'platform' => $log->platform, 'status' => 'deleted'];
             } else {
               // Post no existe en plataforma - marcar como deleted de todas formas
@@ -560,5 +598,28 @@ class PlatformPublishService
     }
 
     return ['success' => $allSuccess, 'results' => $results];
+  }
+  /**
+   * Resolve file path for local or remote storage
+   */
+  private function resolveFilePath(string $path): string
+  {
+    // If it's already a URL, return it as is
+    if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+      return $path;
+    }
+
+    $disk = config('filesystems.default');
+
+    if ($disk === 'local' || $disk === 'public') {
+      return Storage::path($path);
+    }
+
+    // For S3 or other remote drivers
+    try {
+      return Storage::temporaryUrl($path, now()->addMinutes(60));
+    } catch (\Exception $e) {
+      return Storage::url($path);
+    }
   }
 }

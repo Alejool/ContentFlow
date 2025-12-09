@@ -23,6 +23,8 @@ class ExtendedDatabaseChannel extends DatabaseChannel
       'read_at' => null,
       'user_id' => $notifiable->id, // Assuming notifiable is User
       'category' => method_exists($notification, 'getCategory') ? $notification->getCategory() : 'system',
+      'publication_id' => method_exists($notification, 'getPublicationId') ? $notification->getPublicationId() : null,
+      'social_post_log_id' => method_exists($notification, 'getSocialPostLogId') ? $notification->getSocialPostLogId() : null,
     ]);
   }
 }

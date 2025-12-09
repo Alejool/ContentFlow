@@ -885,6 +885,13 @@
     "post_scheduled": "Your post has been successfully scheduled.",
     "warning": "System warning",
     "api_limit": "You are approaching your monthly API limit.",
-    "no_notifications": "You have no pending notifications"
+    "no_notifications": "You have no pending notifications",
+    "categories": {
+      "all": "All",
+      "application": "Application",
+      "content": "Content",
+      "system": "System",
+      "analytics": "Analytics"
+    }
   }
 }

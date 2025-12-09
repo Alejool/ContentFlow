@@ -45,9 +45,9 @@ export default function NotificationItem({
       }`}
       onClick={() => onMarkAsRead(notification.id)}
     >
-      <div className="flex gap-3">
+      <div className="flex gap-3 items-start">
         <div className="mt-1 flex-shrink-0">{getIcon()}</div>
-        <div className="flex-1">
+        <div className="flex-1 w-full min-w-0">
           <h4
             className={`text-sm font-semibold mb-1 ${
               theme === "dark" ? "text-gray-200" : "text-gray-800"
@@ -55,6 +55,24 @@ export default function NotificationItem({
           >
             {data.message}
           </h4>
+          {data.thumbnail_url && (
+            <div className="mb-2 w-full h-32 bg-gray-100 rounded-md overflow-hidden relative">
+              <img
+                src={data.thumbnail_url}
+                alt={data.publication_title || "Video Thumbnail"}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          )}
+          {data.publication_title && (
+            <p
+              className={`text-xs font-medium mb-1 ${
+                theme === "dark" ? "text-primary-400" : "text-primary-600"
+              }`}
+            >
+              {data.publication_title}
+            </p>
+          )}
           <p
             className={`text-xs mb-2 ${
               theme === "dark" ? "text-gray-400" : "text-gray-500"

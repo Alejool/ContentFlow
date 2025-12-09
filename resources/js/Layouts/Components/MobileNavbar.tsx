@@ -148,7 +148,6 @@ export default function MobileNavbar({
     if (typeof window === "undefined") return false;
     const currentPath = window.location.pathname;
 
-    // Simple mapping for active checks
     const routePatterns: Record<string, string[]> = {
       dashboard: ["/dashboard"],
       "profile.edit": ["/profile", "/profile/edit"],

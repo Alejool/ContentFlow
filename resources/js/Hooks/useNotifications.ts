@@ -63,9 +63,8 @@ export const useNotifications = () => {
 
   useEffect(() => {
     fetchNotifications();
-    // Optional: Set up polling here if needed
-    // const interval = setInterval(fetchNotifications, 60000);
-    // return () => clearInterval(interval);
+    const interval = setInterval(fetchNotifications, 10000);
+    return () => clearInterval(interval);
   }, [fetchNotifications]);
 
   const applicationNotifications = notifications.filter(

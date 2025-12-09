@@ -881,6 +881,13 @@
     "post_scheduled": "Tu publicación ha sido programada exitosamente.",
     "warning": "Advertencia de sistema",
     "api_limit": "Estás cerca de alcanzar tu límite de API mensual.",
-    "no_notifications": "No tienes notificaciones pendientes"
+    "no_notifications": "No tienes notificaciones pendientes",
+    "categories": {
+      "all": "Todo",
+      "application": "Aplicación",
+      "content": "Contenido",
+      "system": "Sistema",
+      "analytics": "Analíticas"
+    }
   }
 }

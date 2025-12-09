@@ -18,6 +18,10 @@ use App\Http\Controllers\SocialLogs\SocialPostLogController;
 // Google Authentication (receives user data from frontend)
 Route::post('/auth/google', [AuthController::class, 'handleGoogleAuth']);
 
+// Webhooks
+Route::post('/webhooks/youtube', [\App\Http\Controllers\Webhooks\YouTubeWebhookController::class, 'handle']);
+Route::get('/webhooks/youtube', [\App\Http\Controllers\Webhooks\YouTubeWebhookController::class, 'handle']); // For verification
+
 /*
 |--------------------------------------------------------------------------
 | Protected API Routes
@@ -50,7 +54,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/', [AnalyticsController::class, 'store'])->name('store');
     });
 
-   
+
 
     /*
     |----------------------------------------------------------------------
