@@ -511,13 +511,15 @@
       "status": "Estado",
       "message": "Mensaje",
       "error": "Error",
-      "video": "Video"
+      "video": "Video",
+      "link": "Enlace"
     },
     "status": {
       "success": "Exitoso",
       "failed": "Fallido",
       "pending": "Pendiente",
-      "published": "Publicado"
+      "published": "Publicado",
+      "deleted": "Eliminado"
     },
     "empty": "No se encontraron registros",
     "loading": "Cargando registros...",

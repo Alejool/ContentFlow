@@ -5,10 +5,10 @@ import {
   AlertCircle,
   CheckCircle,
   Clock,
+  ExternalLink,
   Filter,
   MessageCircle,
   RotateCcw,
-  Video,
   X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -18,13 +18,15 @@ interface Log {
   id: number;
   created_at: string;
   platform: string;
-  status: "success" | "failed" | "pending" | "published";
+  status: "success" | "failed" | "pending" | "published" | "deleted";
   message?: string;
   error_message?: string;
   campaign?: { id: number; name: string };
   publication?: { title: string };
   social_account?: { name: string; username: string; platform: string };
+  post_url?: string;
   video_url?: string;
+  engagement_data?: { post_url?: string };
 }
 
 interface Campaign {
@@ -267,7 +269,7 @@ export default function LogsList() {
                 {t("logs.table.message")}
               </th>
               <th className="px-6 py-4 font-semibold text-center">
-                {t("logs.table.video")}
+                {t("logs.table.link")}
               </th>
             </tr>
           </thead>
@@ -361,17 +363,24 @@ export default function LogsList() {
                     )}
                   </td>
                   <td className="px-6 py-4 text-center">
-                    {log.video_url && (
-                      <a
-                        href={log.video_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-primary-700 hover:from-primary-600 hover:to-primary-800 transition-all"
-                        title={t("logs.table.video")}
-                      >
-                        <Video className="w-4 h-4 text-white" />
-                      </a>
-                    )}
+                    {(log.post_url ||
+                      log.engagement_data?.post_url ||
+                      log.video_url) &&
+                      log.status !== "deleted" && (
+                        <a
+                          href={
+                            log.post_url ||
+                            log.engagement_data?.post_url ||
+                            log.video_url
+                          }
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-primary-700 hover:from-primary-600 hover:to-primary-800 transition-all shadow-md hover:shadow-lg"
+                          title={t("logs.table.link")}
+                        >
+                          <ExternalLink className="w-4 h-4 text-white" />
+                        </a>
+                      )}
                   </td>
                 </tr>
               ))

@@ -45,6 +45,7 @@ class SocialPostLogService
             'platform_post_id' => $response['post_id'] ?? null,
             'post_type' => $response['type'] ?? 'post',
             'published_at' => now(),
+            'post_url' => $response['url'] ?? null,
             'engagement_data' => [
                 'post_url' => $response['url'] ?? null,
                 'post_type' => $response['type'] ?? 'post',

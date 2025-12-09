@@ -775,6 +775,13 @@ class PublicationController extends Controller
         'status' => 'published',
         'publish_date' => now(),
       ]);
+
+      // Update associated campaigns status
+      foreach ($publication->campaigns as $campaign) {
+        if ($campaign->status !== 'published') {
+          $campaign->update(['status' => 'published']);
+        }
+      }
     } elseif ($anySuccess && $result['has_errors']) {
       // Parcialmente exitoso (algunos fallaron)
       // Igual marcamos como publicado porque hay contenido en vivo que requiere unpublish
@@ -782,6 +789,13 @@ class PublicationController extends Controller
         'status' => 'published',
         'publish_date' => now(),
       ]);
+
+      // Update associated campaigns status
+      foreach ($publication->campaigns as $campaign) {
+        if ($campaign->status !== 'published') {
+          $campaign->update(['status' => 'published']);
+        }
+      }
     }
 
     return response()->json([

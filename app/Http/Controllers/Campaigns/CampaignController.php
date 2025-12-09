@@ -108,6 +108,21 @@ class CampaignController extends Controller
             'publication_ids.*' => 'exists:publications,id',
         ]);
 
+        // Check if campaign has published publications before allowing name change
+        if ($request->has('name') && $request->name !== $campaign->name) {
+            $hasPublishedPosts = $campaign->publications()
+                ->where('status', 'published')
+                ->exists();
+
+            if ($hasPublishedPosts) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cannot change the name of a campaign that has published posts.',
+                    'errors' => ['name' => ['Cannot change the name of a campaign that has published posts.']],
+                ], 422);
+            }
+        }
+
         $campaign->update($validatedData);
 
         // Sync publications if provided
