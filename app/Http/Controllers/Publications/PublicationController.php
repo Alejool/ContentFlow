@@ -669,6 +669,33 @@ class PublicationController extends Controller
     $publishService = app(\App\Services\Publish\PlatformPublishService::class);
     $result = $publishService->publishToAllPlatforms($publication, $socialAccounts);
 
+    // Check if any platform was successful
+    $anySuccess = false;
+    if (isset($result['platform_results'])) {
+      foreach ($result['platform_results'] as $platformResult) {
+        if (!empty($platformResult['success'])) {
+          $anySuccess = true;
+          break;
+        }
+      }
+    }
+
+    // Update publication status if at least one platform succeeded
+    if ($anySuccess && !$result['has_errors']) {
+      // Completamente exitoso
+      $publication->update([
+        'status' => 'published',
+        'publish_date' => now(),
+      ]);
+    } elseif ($anySuccess && $result['has_errors']) {
+      // Parcialmente exitoso (algunos fallaron)
+      // Igual marcamos como publicado porque hay contenido en vivo que requiere unpublish
+      $publication->update([
+        'status' => 'published',
+        'publish_date' => now(),
+      ]);
+    }
+
     return response()->json([
       'success' => !$result['has_errors'],
       'message' => $result['has_errors'] ? 'Some publications failed' : 'Publication published successfully',

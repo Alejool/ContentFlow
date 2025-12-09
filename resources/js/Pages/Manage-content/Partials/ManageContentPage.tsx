@@ -308,6 +308,7 @@ export default function ManageContentPage() {
               setSelectedItem(null);
             }}
             publication={selectedItem as Publication}
+            onSuccess={() => fetchCampaigns(filters)}
           />
         ) : (
           <PublishCampaignModal

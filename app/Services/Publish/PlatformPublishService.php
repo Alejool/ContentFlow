@@ -108,10 +108,7 @@ class PlatformPublishService
 
           // Agregar video a la playlist
           if ($playlistId && $uploadedPostId) {
-            $added = $platformService->addVideoToPlaylist($playlistId, $uploadedPostId);
-            if (!$added) {
-              throw new \Exception("Video uploaded but failed to add to playlist '{$campaignGroup->name}'");
-            }
+            $platformService->addVideoToPlaylist($playlistId, $uploadedPostId);
           }
         } catch (\Exception $e) {
           Log::error('Failed to handle YouTube Playlist', ['error' => $e->getMessage()]);

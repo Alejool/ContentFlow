@@ -640,13 +640,49 @@ class YouTubeService extends BaseSocialService
         return true;
       }
 
-      return false;
+      throw new \Exception("YouTube API returned unexpected status code: {$statusCode}");
+    } catch (\GuzzleHttp\Exception\ClientException $e) {
+      $message = $e->getMessage();
+      if ($e->hasResponse()) {
+        $body = json_decode($e->getResponse()->getBody()->getContents(), true);
+        $message = $body['error']['message'] ?? $message;
+      }
+      Log::error('Failed to add video to playlist (ClientException)', [
+        'playlist_id' => $playlistId,
+        'video_id' => $videoId,
+        'error' => $message
+      ]);
+      throw new \Exception("YouTube Playlist Error: " . $message);
     } catch (\Exception $e) {
       Log::error('Failed to add video to playlist', [
         'playlist_id' => $playlistId,
         'video_id' => $videoId,
         'error' => $e->getMessage()
       ]);
+      throw $e;
+    }
+  }
+
+  /**
+   * Elimina un video de YouTube
+   */
+  public function deletePost(string $postId): bool
+  {
+    try {
+      // YouTube API DELETE video
+      $this->client->delete('https://www.googleapis.com/youtube/v3/videos', [
+        'headers' => [
+          'Authorization' => "Bearer {$this->accessToken}",
+        ],
+        'query' => [
+          'id' => $postId,
+        ],
+      ]);
+
+      Log::info('Deleted YouTube video', ['video_id' => $postId]);
+      return true;
+    } catch (\Exception $e) {
+      Log::error('Failed to delete YouTube video', ['video_id' => $postId, 'error' => $e->getMessage()]);
       return false;
     }
   }

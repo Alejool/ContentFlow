@@ -16,6 +16,7 @@ interface PublishPublicationModalProps {
   isOpen: boolean;
   onClose: () => void;
   publication: Publication | null;
+  onSuccess?: () => void;
 }
 
 interface SocialAccount {
@@ -29,6 +30,7 @@ export default function PublishPublicationModal({
   isOpen,
   onClose,
   publication,
+  onSuccess,
 }: PublishPublicationModalProps) {
   const { theme } = useTheme();
   const [connectedAccounts, setConnectedAccounts] = useState<SocialAccount[]>(
@@ -159,6 +161,7 @@ export default function PublishPublicationModal({
       });
 
       toast.success("Publication published successfully!");
+      if (onSuccess) onSuccess();
       onClose();
     } catch (error: any) {
       // If there was a server response (meaning request reached backend),
