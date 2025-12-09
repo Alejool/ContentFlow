@@ -711,4 +711,57 @@ class YouTubeService extends BaseSocialService
       return false;
     }
   }
+
+  /**
+   * Checks the current status of a video on YouTube.
+   * Returns details about upload status, rejection reasons, and licensing.
+   */
+  public function checkVideoStatus(string $videoId): array
+  {
+    try {
+      $this->ensureValidToken();
+
+      $response = $this->client->get('https://www.googleapis.com/youtube/v3/videos', [
+        'headers' => [
+          'Authorization' => "Bearer {$this->accessToken}",
+        ],
+        'query' => [
+          'part' => 'status,contentDetails',
+          'id' => $videoId,
+        ],
+      ]);
+
+      $data = json_decode($response->getBody(), true);
+
+      if (empty($data['items'])) {
+        return [
+          'exists' => false,
+          'status' => 'deleted', // Video not found means it's likely deleted or private/unavailable
+        ];
+      }
+
+      $item = $data['items'][0];
+      $status = $item['status'] ?? [];
+      $contentDetails = $item['contentDetails'] ?? [];
+
+      return [
+        'exists' => true,
+        'uploadStatus' => $status['uploadStatus'] ?? null, // 'processed', 'uploaded', 'rejected', 'failed'
+        'privacyStatus' => $status['privacyStatus'] ?? null,
+        'rejectionReason' => $status['rejectionReason'] ?? null, // e.g., 'copyright', 'inappropriate', 'duplicate'
+        'license' => $status['license'] ?? null,
+        'embeddable' => $status['embeddable'] ?? true,
+        'publicStatsViewable' => $status['publicStatsViewable'] ?? true,
+        // Check for copyright claims if available in contentDetails (regionRestriction often implies issues)
+        'regionRestriction' => $contentDetails['regionRestriction'] ?? null,
+      ];
+    } catch (\Exception $e) {
+      Log::error('Failed to check video status', ['video_id' => $videoId, 'error' => $e->getMessage()]);
+      // Verify if error is 404
+      if ($e instanceof \GuzzleHttp\Exception\ClientException && $e->getResponse()->getStatusCode() === 404) {
+        return ['exists' => false, 'status' => 'not_found'];
+      }
+      return ['exists' => false, 'error' => $e->getMessage()];
+    }
+  }
 }

@@ -1,11 +1,21 @@
 import Logo from "@/../assets/logo-with-name.png";
 import Dropdown from "@/Components/Dropdown";
 import LanguageSwitcher from "@/Components/LanguageSwitcher";
+import NotificationsModal from "@/Components/Notifications/NotificationsModal";
 import ResponsiveNavLink from "@/Components/ResponsiveNavLink";
 import ThemeSwitcher from "@/Components/ThemeSwitcher";
 import { useTheme } from "@/Hooks/useTheme";
 import { usePage } from "@inertiajs/react";
-import { BarChart3, Bot, FileText, Home, LogOut, User } from "lucide-react";
+import {
+  BarChart3,
+  Bell,
+  Bot,
+  FileText,
+  Home,
+  LogOut,
+  User,
+} from "lucide-react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 interface CustomAvatarProps {
@@ -118,6 +128,8 @@ export default function MobileNavbar({
   const { t } = useTranslation();
   const { theme } = useTheme();
   const { url } = usePage();
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notificationCount, setNotificationCount] = useState(3);
 
   const colorNoActive = `${
     theme === "dark"
@@ -132,10 +144,25 @@ export default function MobileNavbar({
   }`;
 
   const isActiveRoute = (routeName: string) => {
-    return (
-      url.includes(routeName.replace(".index", "")) ||
-      url === route(routeName) ||
-      route().current(routeName)
+    if (typeof window === "undefined") return false;
+    const currentPath = window.location.pathname;
+
+    // Simple mapping for active checks
+    const routePatterns: Record<string, string[]> = {
+      dashboard: ["/dashboard"],
+      "profile.edit": ["/profile", "/profile/edit"],
+      "manage-content.index": ["/manage-content"],
+      "analytics.index": ["/analytics"],
+      "ai-chat.index": ["/ai-chat"],
+    };
+
+    const patterns = routePatterns[routeName] || [
+      `/${routeName.replace(".", "/")}`,
+    ];
+
+    return patterns.some(
+      (pattern) =>
+        currentPath === pattern || currentPath.startsWith(pattern + "/")
     );
   };
 
@@ -189,7 +216,26 @@ export default function MobileNavbar({
             <img src={Logo} alt="Logo" className="w-56 h-24" />
           </div>
 
-          <div className="flex items-center">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowNotifications(true)}
+              className={`group relative p-2 rounded-lg transition-colors
+                  ${
+                    theme === "dark"
+                      ? "text-gray-400 hover:text-primary-400 hover:bg-neutral-800"
+                      : "text-gray-600 hover:text-primary-600 hover:bg-beige-300"
+                  }
+                `}
+            >
+              <div className="relative">
+                <Bell className="h-6 w-6" />
+                {notificationCount > 0 && (
+                  <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs text-white">
+                    {notificationCount}
+                  </span>
+                )}
+              </div>
+            </button>
             <Dropdown>
               <Dropdown.Trigger>
                 <span className="inline-flex">
@@ -390,6 +436,12 @@ export default function MobileNavbar({
           </div>
         </div>
       </div>
+      <NotificationsModal
+        isOpen={showNotifications}
+        onClose={() => setShowNotifications(false)}
+        notificationCount={notificationCount}
+        setNotificationCount={setNotificationCount}
+      />
     </nav>
   );
 }

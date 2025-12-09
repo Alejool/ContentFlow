@@ -79,6 +79,15 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     /*
     |----------------------------------------------------------------------
+    | Notifications
+    |----------------------------------------------------------------------
+    */
+    Route::get('/notifications', [\App\Http\Controllers\NotificationsController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{id}/read', [\App\Http\Controllers\NotificationsController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('/notifications/read-all', [\App\Http\Controllers\NotificationsController::class, 'markAllAsRead'])->name('notifications.read-all');
+
+    /*
+    |----------------------------------------------------------------------
     | Content Management (Inertia Views)
     |----------------------------------------------------------------------
     */

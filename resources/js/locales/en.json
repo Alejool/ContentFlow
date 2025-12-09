@@ -39,7 +39,8 @@
     "manageContent": "Manage Content",
     "analytics": "Analytics",
     "aiChat": "AI Chat",
-    "logout": "Log Out"
+    "logout": "Log Out",
+    "notifications": "Notifications"
   },
   "welcome": {
     "title": "Manage your content",
@@ -797,11 +798,10 @@
         "authError": "Authentication error",
         "unauthorized": "Unauthorized. Please log in again.",
         "loadError": "Could not load connected accounts",
-        "disconnectError": "Error disconnecting",
-        "popupBlocked": "The browser blocked the pop-up window. Please allow pop-ups for this site.",
-        "urlError": "Could not get authentication URL",
-        "connectError": "Error connecting with"
-      },
+        "disconnectError": "Error disconnecting"
+      }
+    }
+  },
       "disconnectModal": {
         "title": "Disconnect Account",
         "warning": "Account has pending posts",
@@ -812,9 +812,7 @@
         },
         "cancelButton": "Keep connected",
         "confirmButton": "Disconnect and delete all"
-      }
-    },
-
+      },
     "modals": {
       "add": {
         "title": "New Campaign",
@@ -874,6 +872,19 @@
         "scheduleDeleted": "Scheduled post deleted successfully",
         "scheduleDeleteError": "Failed to delete scheduled post"
       }
-    }
+    },
+  "notifications": {
+    "title": "Notifications",
+    "new": "new",
+    "mark_all_read": "Mark all as read",
+    "new_content": "New content available",
+    "content_ready": "Your content has been processed and is ready to publish.",
+    "analytics_ready": "Analytics report",
+    "report_generated": "Monthly performance report is available.",
+    "scheduled_post": "Scheduled post",
+    "post_scheduled": "Your post has been successfully scheduled.",
+    "warning": "System warning",
+    "api_limit": "You are approaching your monthly API limit.",
+    "no_notifications": "You have no pending notifications"
   }
 }
