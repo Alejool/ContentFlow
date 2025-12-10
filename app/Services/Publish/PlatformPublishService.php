@@ -62,18 +62,20 @@ class PlatformPublishService
         'content' => $this->buildDescription($publication),
         'tags' => $this->extractHashtags($publication->hashtags),
         'privacy' => 'public',
+        'type' => $firstMediaFile->youtube_type ?? 'regular', // Pass youtube_type from DB ('short' or 'regular')
       ];
 
       // Buscar Thumbnail Derivatives
       $thumbnail = $firstMediaFile->derivatives()
         ->where('derivative_type', 'thumbnail')
-        ->where('platform', 'all')
-        ->first(); // Prioritize YouTube specific thumbnail
+        ->where('platform', 'youtube')
+        ->first();
 
       if (!$thumbnail) {
         $thumbnail = $firstMediaFile->derivatives()
           ->where('derivative_type', 'thumbnail')
-          ->first(); // Fallback to generic thumbnail
+          ->where('platform', 'all')
+          ->first();
       }
 
       // Fallback: Check if there is an explicit image uploaded in the publication
@@ -88,6 +90,8 @@ class PlatformPublishService
       } elseif ($thumbnail) {
         $postData['thumbnail_path'] = $this->resolveFilePath($thumbnail->file_path);
       }
+
+      Log::info('Thumbnail path: ' . $postData['thumbnail_path']);
 
       // Upload video
       $response = $platformService->publishPost($postData);

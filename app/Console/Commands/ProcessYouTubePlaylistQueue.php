@@ -5,6 +5,8 @@ namespace App\Console\Commands;
 use App\Models\YouTubePlaylistQueue;
 use App\Models\SocialAccount;
 use App\Services\SocialPlatforms\YouTubeService;
+use App\Notifications\PlaylistProcessedNotification;
+use App\Notifications\PlaylistProcessFailedNotification;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
@@ -31,7 +33,6 @@ class ProcessYouTubePlaylistQueue extends Command
     {
         $this->info('Processing YouTube playlist queue...');
 
-        // Obtener items pendientes o fallidos que pueden reintentar
         $pendingItems = YouTubePlaylistQueue::where('status', 'pending')
             ->orWhere(function ($q) {
                 $q->where('status', 'failed')
@@ -39,7 +40,7 @@ class ProcessYouTubePlaylistQueue extends Command
                     ->where('last_attempt_at', '<', now()->subMinutes(30));
             })
             ->orderBy('created_at', 'asc')
-            ->limit(50) // Procesar máximo 50 por ejecución
+            ->limit(50)
             ->get();
 
         if ($pendingItems->isEmpty()) {
@@ -136,6 +137,18 @@ class ProcessYouTubePlaylistQueue extends Command
             // Marcar como completado
             $item->markAsCompleted();
 
+            // Get video title from publication if available
+            $videoTitle = null;
+            if ($socialPostLog->publication) {
+                $videoTitle = $socialPostLog->publication->title;
+            }
+
+            // Send success notification to user
+            $user = $socialPostLog->publication ? $socialPostLog->publication->user : null;
+            if ($user) {
+                $user->notify(new PlaylistProcessedNotification($item, $videoTitle));
+            }
+
             Log::info('Playlist operation completed', [
                 'video_id' => $item->video_id,
                 'playlist_id' => $playlistId,
@@ -148,6 +161,19 @@ class ProcessYouTubePlaylistQueue extends Command
         } catch (\Exception $e) {
             // Marcar como fallido
             $item->markAsFailed($e->getMessage());
+
+            // Get video title from publication if available
+            $videoTitle = null;
+            $user = null;
+            if ($socialPostLog && $socialPostLog->publication) {
+                $videoTitle = $socialPostLog->publication->title;
+                $user = $socialPostLog->publication->user;
+            }
+
+            // Send failure notification to user (only on final failure or first attempt)
+            if ($user && ($item->retry_count >= 3 || $item->retry_count === 1)) {
+                $user->notify(new PlaylistProcessFailedNotification($item, $e->getMessage(), $videoTitle));
+            }
 
             Log::error('Playlist operation failed', [
                 'video_id' => $item->video_id,

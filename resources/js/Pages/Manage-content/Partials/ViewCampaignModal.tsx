@@ -426,7 +426,7 @@ export default function ViewCampaignModal({
                       theme === "dark" ? "text-gray-400" : "text-gray-500"
                     }
                   >
-                    {t("common.created")}:{" "}
+                    {t("campaigns.created")}:{" "}
                     {formatDate((item as any).created_at)}
                   </span>
                   <span
@@ -434,7 +434,7 @@ export default function ViewCampaignModal({
                       theme === "dark" ? "text-gray-400" : "text-gray-500"
                     }
                   >
-                    {t("common.lastUpdated")}:{" "}
+                    {t("campaigns.lastUpdated")}:{" "}
                     {formatDate((item as any).updated_at)}
                   </span>
                 </div>
