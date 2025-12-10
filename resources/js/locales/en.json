@@ -885,6 +885,10 @@
     "post_scheduled": "Your post has been successfully scheduled.",
     "warning": "System warning",
     "api_limit": "You are approaching your monthly API limit.",
+    "high_priority": "High priority",
+    "normal_priority": "Normal priority",
+    "low_priority": "Low priority",
+    "all": "All",
     "modal": {
       "title": "Notifications",
       "new": "new",

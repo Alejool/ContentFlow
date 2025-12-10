@@ -28,6 +28,7 @@ class SocialPostLog extends Model
         'published_at',
         'status',
         'error_message',
+        'notes',
         'retry_count',
         'last_retry_at',
         'engagement_data',

@@ -290,11 +290,11 @@ export default function Sidebar({
                             border-2 ${
                               isDark ? "border-neutral-900" : "border-beige-200"
                             }
-                            animate-pulse`}
+                            `}
                         >
                           {unreadCount > 9 ? "9+" : unreadCount}
                         </span>
-                        <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 animate-ping rounded-full bg-red-400 opacity-60" />
+                        <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5  rounded-full bg-red-400 opacity-0" />
                       </>
                     )}
                   </div>

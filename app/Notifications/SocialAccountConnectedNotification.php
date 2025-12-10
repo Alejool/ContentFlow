@@ -10,22 +10,27 @@ class SocialAccountConnectedNotification extends BaseNotification
   protected string $category = self::CATEGORY_APPLICATION;
 
   public function __construct(
-    protected string $platformName
+    protected string $platformName,
+    protected string $accountName,
+    protected bool $wasReconnection = false
   ) {
     $this->platform = strtolower($platformName);
   }
 
   public function toArray($notifiable): array
   {
+    $message = $this->wasReconnection
+      ? "Reconectaste tu cuenta de {$this->getPlatformName($this->platform)}"
+      : "Conectaste exitosamente tu cuenta de {$this->getPlatformName($this->platform)}";
+
     return [
-      'title' => 'Account Connected',
-      'message' => "{$this->getPlatformName($this->platform)} account connected successfully",
+      'title' => $this->wasReconnection ? 'Cuenta Reconectada' : 'Cuenta Conectada',
+      'message' => $message,
+      'description' => "Cuenta: {$this->accountName}",
       'status' => 'success',
       'icon' => $this->getPlatformIcon($this->platform),
-      'action' => $this->createAction(
-        'Manage Accounts',
-        route('social-accounts.index')
-      ),
+      'account_name' => $this->accountName,
+      'timestamp' => now()->toIso8601String(),
     ];
   }
 }

@@ -1,17 +1,29 @@
 import { useNotifications } from "@/Hooks/useNotifications";
 import { useTheme } from "@/Hooks/useTheme";
-import { Dialog, DialogPanel, DialogTitle, Tab, Transition } from "@headlessui/react";
-import { Bell, CheckCheck, Layers, Settings, X } from "lucide-react";
-import { Fragment } from "react";
-import { useTranslation } from "react-i18next";
-import NotificationItem from "./NotificationItem";
 import {
+  Dialog,
+  DialogPanel,
+  DialogTitle,
+  Tab,
+  TabGroup,
   TabList,
   TabPanel,
   TabPanels,
+  Transition,
   TransitionChild,
-  TabGroup,
 } from "@headlessui/react";
+import {
+  AlertCircle,
+  Bell,
+  CheckCheck,
+  Info,
+  Layers,
+  Settings,
+  X,
+} from "lucide-react";
+import { Fragment, useState } from "react";
+import { useTranslation } from "react-i18next";
+import NotificationItem from "./NotificationItem";
 interface NotificationsModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -30,7 +42,10 @@ export default function NotificationsModal({
     unreadCount,
     markAsRead,
     markAllAsRead,
+    filterByPriority,
   } = useNotifications();
+
+  const [selectedPriority, setSelectedPriority] = useState<string | null>(null);
 
   const isDark = theme === "dark";
 
@@ -236,38 +251,133 @@ export default function NotificationsModal({
                         </TabPanel>
 
                         <TabPanel className="h-full">
-                          {applicationNotifications.length > 0 ? (
-                            <div className="divide-y divide-transparent">
-                              {applicationNotifications
-                                .slice(0, 50)
-                                .map((notification) => (
-                                  <NotificationItem
-                                    key={notification.id}
-                                    notification={notification}
-                                    onMarkAsRead={() =>
-                                      markAsRead(notification.id)
-                                    }
-                                  />
-                                ))}
-                              {applicationNotifications.length > 50 && (
-                                <div
-                                  className={`p-4 text-center ${
-                                    theme === "dark"
-                                      ? "text-gray-500"
-                                      : "text-gray-400"
-                                  }`}
-                                >
-                                  <p className="text-sm">
-                                    Showing 50 of{" "}
-                                    {applicationNotifications.length}{" "}
-                                    notifications
-                                  </p>
-                                </div>
+                          {/* Priority Filter Chips */}
+                          <div
+                            className={`px-4 py-3 border-b ${colors.border} flex gap-2 flex-wrap`}
+                          >
+                            <button
+                              onClick={() => setSelectedPriority(null)}
+                              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                                selectedPriority === null
+                                  ? "bg-gray-800 text-white"
+                                  : isDark
+                                  ? "bg-neutral-800 text-gray-400 hover:bg-neutral-700"
+                                  : "bg-gray-100 text-black hover:bg-gray-200"
+                              }`}
+                            >
+                              <Layers className="h-3.5 w-3.5" />
+                              {t("notifications.all")}
+                            </button>
+                            <button
+                              onClick={() => setSelectedPriority("high")}
+                              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                                selectedPriority === "high"
+                                  ? "bg-orange-800 text-white"
+                                  : isDark
+                                  ? "bg-neutral-800 text-gray-400 hover:bg-neutral-700"
+                                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                              }`}
+                            >
+                              <AlertCircle className="h-3.5 w-3.5" />
+                              {t("notifications.high_priority")}
+                              {filterByPriority("high").filter(
+                                (n) => n.data.category === "application"
+                              ).length > 0 && (
+                                <span className="ml-1 px-1.5 py-0.5 rounded-full bg-white/20 text-xs">
+                                  {
+                                    filterByPriority("high").filter(
+                                      (n) => n.data.category === "application"
+                                    ).length
+                                  }
+                                </span>
                               )}
-                            </div>
-                          ) : (
-                            <EmptyState t={t} isDark={isDark} colors={colors} />
-                          )}
+                            </button>
+                            <button
+                              onClick={() => setSelectedPriority("normal")}
+                              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                                selectedPriority === "normal"
+                                  ? "bg-blue-500 text-white"
+                                  : isDark
+                                  ? "bg-neutral-800 text-gray-400 hover:bg-neutral-700"
+                                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                              }`}
+                            >
+                              <Info className="h-3.5 w-3.5" />
+                              {t("notifications.normal_priority")}
+                            </button>
+                          </div>
+
+                          {/* Notifications List */}
+                          {(() => {
+                            const filteredNotifications = selectedPriority
+                              ? applicationNotifications.filter((n) => {
+                                  // Si no tiene priority definido, tratarlo como 'normal'
+                                  const priority = n.data.priority || "normal";
+                                  return priority === selectedPriority;
+                                })
+                              : applicationNotifications;
+
+                            return filteredNotifications.length > 0 ? (
+                              <div className="divide-y divide-transparent">
+                                {filteredNotifications
+                                  .slice(0, 50)
+                                  .map((notification) => (
+                                    <NotificationItem
+                                      key={notification.id}
+                                      notification={notification}
+                                      onMarkAsRead={() =>
+                                        markAsRead(notification.id)
+                                      }
+                                    />
+                                  ))}
+                                {filteredNotifications.length > 50 && (
+                                  <div
+                                    className={`p-4 text-center ${
+                                      theme === "dark"
+                                        ? "text-gray-500"
+                                        : "text-gray-400"
+                                    }`}
+                                  >
+                                    <p className="text-sm">
+                                      Showing 50 of{" "}
+                                      {filteredNotifications.length}{" "}
+                                      notifications
+                                    </p>
+                                  </div>
+                                )}
+                              </div>
+                            ) : (
+                              <div className="flex flex-col items-center justify-center h-64 text-center p-4">
+                                <div
+                                  className={`rounded-full p-4 mb-4 ${colors.emptyBg}`}
+                                >
+                                  {selectedPriority === "high" ? (
+                                    <AlertCircle
+                                      className={`h-8 w-8 ${colors.emptyText}`}
+                                    />
+                                  ) : (
+                                    <Bell
+                                      className={`h-8 w-8 ${colors.emptyText}`}
+                                    />
+                                  )}
+                                </div>
+                                <h3
+                                  className={`text-sm font-medium ${colors.text} mb-1`}
+                                >
+                                  {selectedPriority === "high"
+                                    ? "No hay notificaciones importantes"
+                                    : "No hay notificaciones"}
+                                </h3>
+                                <p
+                                  className={`text-sm ${colors.textSecondary}`}
+                                >
+                                  {selectedPriority === "high"
+                                    ? "Las notificaciones importantes aparecerán aquí"
+                                    : "No hay notificaciones para mostrar"}
+                                </p>
+                              </div>
+                            );
+                          })()}
                         </TabPanel>
 
                         <TabPanel className="h-full">

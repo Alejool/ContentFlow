@@ -652,21 +652,38 @@ class SocialAccountController extends Controller
             $accountData['account_metadata'] = $data['account_metadata'];
         }
 
+        $isNewConnection = false;
+        $wasReconnection = false;
+
         if ($existingAccount) {
             // Restore if deleted
             if ($existingAccount->trashed()) {
                 $existingAccount->restore();
+                $wasReconnection = true;
             }
 
             // Update existing account
             $existingAccount->update($accountData);
-            return $existingAccount;
+            $account = $existingAccount;
         } else {
             // Create new account
             $accountData['user_id'] = Auth::id();
             $accountData['platform'] = $data['platform'];
-            return SocialAccount::create($accountData);
+            $account = SocialAccount::create($accountData);
+            $isNewConnection = true;
         }
+
+        // Send system notification for account connection
+        $user = Auth::user();
+        if ($user) {
+            $user->notify(new \App\Notifications\SocialAccountConnectedNotification(
+                $data['platform'],
+                $data['account_name'] ?? $data['account_id'],
+                $wasReconnection
+            ));
+        }
+
+        return $account;
     }
 
     // ... (rest of the file: handleOAuthError, closeWindowWithMessage, store, destroy)
@@ -740,6 +757,30 @@ class SocialAccountController extends Controller
 
             $force = $request->query('force') === 'true' || $request->input('force') === true;
 
+            // Check for active published posts (not just scheduled)
+            $activePosts = \App\Models\SocialPostLog::where('social_account_id', $account->id)
+                ->whereIn('status', ['published', 'pending'])
+                ->with('publication:id,title')
+                ->get();
+
+            if ($activePosts->count() > 0 && !$force) {
+                return response()->json([
+                    'success' => false,
+                    'can_disconnect' => false,
+                    'active_posts_count' => $activePosts->count(),
+                    'account_name' => $account->account_name ?? $account->account_id,
+                    'platform' => $account->platform,
+                    'posts' => $activePosts->map(fn($log) => [
+                        'id' => $log->publication_id,
+                        'title' => $log->publication->title ?? 'Untitled',
+                        'platform_post_id' => $log->platform_post_id,
+                        'status' => $log->status,
+                        'published_at' => $log->published_at,
+                    ]),
+                    'message' => "Esta cuenta ({$account->account_name}) tiene {$activePosts->count()} publicaciones activas. Si la desconectas, no podrás eliminarlas automáticamente de {$account->platform}."
+                ], 400);
+            }
+
             // Check for associated scheduled posts
             $pendingPosts = ScheduledPost::where('social_account_id', $account->id)
                 ->where('status', 'pending')
@@ -755,19 +796,38 @@ class SocialAccountController extends Controller
                     ], 400);
                 } else {
                     // Force delete: delete posts first
-                    // We should only delete the ScheduledPost records specific to this account
-                    // If a campaign has other posts, they remain.
                     foreach ($pendingPosts as $post) {
                         $post->delete();
                     }
                 }
             }
 
+            // If forcing disconnect with active posts, mark them as orphaned
+            if ($force && $activePosts->count() > 0) {
+                \App\Models\SocialPostLog::where('social_account_id', $account->id)
+                    ->whereIn('status', ['published', 'pending'])
+                    ->update([
+                        'status' => 'orphaned',
+                        'error_message' => "Account '{$account->account_name}' was disconnected - cannot manage remotely"
+                    ]);
+            }
+
+            // Send application notification for account disconnection
+            $user = Auth::user();
+            if ($user) {
+                $user->notify(new \App\Notifications\SocialAccountDisconnectedNotification(
+                    $account->platform,
+                    $account->account_name ?? $account->account_id,
+                    $activePosts->count()
+                ));
+            }
+
             $account->delete();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Account disconnected successfully'
+                'message' => 'Account disconnected successfully',
+                'orphaned_posts' => $force ? $activePosts->count() : 0
             ]);
         } catch (\Exception $e) {
             return response()->json([
