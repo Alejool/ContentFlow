@@ -24,6 +24,7 @@ import {
 import { Fragment, useState } from "react";
 import { useTranslation } from "react-i18next";
 import NotificationItem from "./NotificationItem";
+
 interface NotificationsModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -136,11 +137,11 @@ export default function NotificationsModal({
                 leaveTo="translate-x-full"
               >
                 <DialogPanel
-                  className={`pointer-events-auto w-screen max-w-md ${colors.bg} flex flex-col`}
+                  className={`pointer-events-auto w-screen max-w-md ${colors.bg} flex flex-col h-screen max-h-screen`}
                 >
-                  <div className="flex h-full flex-col shadow-xl">
+                  <div className="flex flex-col h-full shadow-xl">
                     <div
-                      className={`px-4 py-6 sm:px-6 shadow-sm border-b ${colors.border}`}
+                      className={`px-4 py-6 sm:px-6 shadow-sm border-b ${colors.border} shrink-0`}
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex items-center gap-2">
@@ -182,239 +183,257 @@ export default function NotificationsModal({
                       )}
                     </div>
 
-                    <TabGroup>
-                      <div className={`border-b ${colors.border}`}>
-                        <TabList className="-mb-px flex space-x-4 px-4 sm:px-6">
-                          {categories.map((category) => (
-                            <Tab
-                              key={category.id}
-                              className={({ selected }) =>
-                                classNames(
-                                  selected
-                                    ? colors.tabSelected
-                                    : colors.tabUnselected,
-                                  "whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium flex items-center gap-2 outline-none transition-colors"
-                                )
-                              }
-                            >
-                              <category.icon className="h-4 w-4" />
-                              {category.label}
-                              {category.count > 0 && (
-                                <span
-                                  className={`ml-1.5 rounded-full py-0.5 px-2 text-xs font-medium ${colors.countBg}`}
-                                >
-                                  {category.count}
-                                </span>
-                              )}
-                            </Tab>
-                          ))}
-                        </TabList>
-                      </div>
-
-                      <TabPanels className="flex-1 overflow-y-auto custom-scrollbar">
-                        <TabPanel className="h-full">
-                          {notifications.length > 0 ? (
-                            <div className="divide-y divide-transparent">
-                              {notifications
-                                .slice(0, 50)
-                                .map((notification) => (
-                                  <NotificationItem
-                                    key={notification.id}
-                                    notification={notification}
-                                    onMarkAsRead={() =>
-                                      markAsRead(notification.id)
-                                    }
-                                  />
-                                ))}
-                              {notifications.length > 50 && (
-                                <div
-                                  className={`p-4 text-center ${
-                                    theme === "dark"
-                                      ? "text-gray-500"
-                                      : "text-gray-400"
-                                  }`}
-                                >
-                                  <p className="text-sm">
-                                    Showing 50 of {notifications.length}{" "}
-                                    notifications
-                                  </p>
-                                  <p className="text-xs mt-1">
-                                    Older notifications are automatically
-                                    archived
-                                  </p>
-                                </div>
-                              )}
-                            </div>
-                          ) : (
-                            <EmptyState t={t} isDark={isDark} colors={colors} />
-                          )}
-                        </TabPanel>
-
-                        <TabPanel className="h-full">
-                          {/* Priority Filter Chips */}
-                          <div
-                            className={`px-4 py-3 border-b ${colors.border} flex gap-2 flex-wrap`}
-                          >
-                            <button
-                              onClick={() => setSelectedPriority(null)}
-                              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                                selectedPriority === null
-                                  ? "bg-gray-800 text-white"
-                                  : isDark
-                                  ? "bg-neutral-800 text-gray-400 hover:bg-neutral-700"
-                                  : "bg-gray-100 text-black hover:bg-gray-200"
-                              }`}
-                            >
-                              <Layers className="h-3.5 w-3.5" />
-                              {t("notifications.all")}
-                            </button>
-                            <button
-                              onClick={() => setSelectedPriority("high")}
-                              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                                selectedPriority === "high"
-                                  ? "bg-orange-800 text-white"
-                                  : isDark
-                                  ? "bg-neutral-800 text-gray-400 hover:bg-neutral-700"
-                                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                              }`}
-                            >
-                              <AlertCircle className="h-3.5 w-3.5" />
-                              {t("notifications.high_priority")}
-                              {filterByPriority("high").filter(
-                                (n) => n.data.category === "application"
-                              ).length > 0 && (
-                                <span className="ml-1 px-1.5 py-0.5 rounded-full bg-white/20 text-xs">
-                                  {
-                                    filterByPriority("high").filter(
-                                      (n) => n.data.category === "application"
-                                    ).length
-                                  }
-                                </span>
-                              )}
-                            </button>
-                            <button
-                              onClick={() => setSelectedPriority("normal")}
-                              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                                selectedPriority === "normal"
-                                  ? "bg-blue-500 text-white"
-                                  : isDark
-                                  ? "bg-neutral-800 text-gray-400 hover:bg-neutral-700"
-                                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                              }`}
-                            >
-                              <Info className="h-3.5 w-3.5" />
-                              {t("notifications.normal_priority")}
-                            </button>
-                          </div>
-
-                          {/* Notifications List */}
-                          {(() => {
-                            const filteredNotifications = selectedPriority
-                              ? applicationNotifications.filter((n) => {
-                                  // Si no tiene priority definido, tratarlo como 'normal'
-                                  const priority = n.data.priority || "normal";
-                                  return priority === selectedPriority;
-                                })
-                              : applicationNotifications;
-
-                            return filteredNotifications.length > 0 ? (
-                              <div className="divide-y divide-transparent">
-                                {filteredNotifications
-                                  .slice(0, 50)
-                                  .map((notification) => (
-                                    <NotificationItem
-                                      key={notification.id}
-                                      notification={notification}
-                                      onMarkAsRead={() =>
-                                        markAsRead(notification.id)
-                                      }
-                                    />
-                                  ))}
-                                {filteredNotifications.length > 50 && (
-                                  <div
-                                    className={`p-4 text-center ${
-                                      theme === "dark"
-                                        ? "text-gray-500"
-                                        : "text-gray-400"
-                                    }`}
+                    <div className="flex-1 min-h-0 flex flex-col">
+                      <TabGroup className="flex-1 min-h-0 flex flex-col">
+                        <div className={`border-b ${colors.border} shrink-0`}>
+                          <TabList className="-mb-px flex space-x-4 px-4 sm:px-6">
+                            {categories.map((category) => (
+                              <Tab
+                                key={category.id}
+                                className={({ selected }) =>
+                                  classNames(
+                                    selected
+                                      ? colors.tabSelected
+                                      : colors.tabUnselected,
+                                    "whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium flex items-center gap-2 outline-none transition-colors"
+                                  )
+                                }
+                              >
+                                <category.icon className="h-4 w-4" />
+                                {category.label}
+                                {category.count > 0 && (
+                                  <span
+                                    className={`ml-1.5 rounded-full py-0.5 px-2 text-xs font-medium ${colors.countBg}`}
                                   >
-                                    <p className="text-sm">
-                                      Showing 50 of{" "}
-                                      {filteredNotifications.length}{" "}
-                                      notifications
-                                    </p>
-                                  </div>
+                                    {category.count}
+                                  </span>
                                 )}
-                              </div>
-                            ) : (
-                              <div className="flex flex-col items-center justify-center h-64 text-center p-4">
-                                <div
-                                  className={`rounded-full p-4 mb-4 ${colors.emptyBg}`}
-                                >
-                                  {selectedPriority === "high" ? (
-                                    <AlertCircle
-                                      className={`h-8 w-8 ${colors.emptyText}`}
-                                    />
-                                  ) : (
-                                    <Bell
-                                      className={`h-8 w-8 ${colors.emptyText}`}
-                                    />
+                              </Tab>
+                            ))}
+                          </TabList>
+                        </div>
+
+                        <TabPanels className="flex-1 min-h-0">
+                          <TabPanel className="h-full">
+                            <div className="h-full overflow-y-auto custom-scrollbar">
+                              {notifications.length > 0 ? (
+                                <div className="divide-y divide-transparent">
+                                  {notifications
+                                    .slice(0, 50)
+                                    .map((notification) => (
+                                      <NotificationItem
+                                        key={notification.id}
+                                        notification={notification}
+                                        onMarkAsRead={() =>
+                                          markAsRead(notification.id)
+                                        }
+                                      />
+                                    ))}
+                                  {notifications.length > 50 && (
+                                    <div
+                                      className={`p-4 text-center ${
+                                        theme === "dark"
+                                          ? "text-gray-500"
+                                          : "text-gray-400"
+                                      }`}
+                                    >
+                                      <p className="text-sm">
+                                        Showing 50 of {notifications.length}{" "}
+                                        notifications
+                                      </p>
+                                      <p className="text-xs mt-1">
+                                        Older notifications are automatically
+                                        archived
+                                      </p>
+                                    </div>
                                   )}
                                 </div>
-                                <h3
-                                  className={`text-sm font-medium ${colors.text} mb-1`}
-                                >
-                                  {selectedPriority === "high"
-                                    ? "No hay notificaciones importantes"
-                                    : "No hay notificaciones"}
-                                </h3>
-                                <p
-                                  className={`text-sm ${colors.textSecondary}`}
-                                >
-                                  {selectedPriority === "high"
-                                    ? "Las notificaciones importantes aparecerán aquí"
-                                    : "No hay notificaciones para mostrar"}
-                                </p>
-                              </div>
-                            );
-                          })()}
-                        </TabPanel>
-
-                        <TabPanel className="h-full">
-                          {systemNotifications.length > 0 ? (
-                            <div className="divide-y divide-transparent">
-                              {systemNotifications
-                                .slice(0, 50)
-                                .map((notification) => (
-                                  <NotificationItem
-                                    key={notification.id}
-                                    notification={notification}
-                                    onMarkAsRead={() =>
-                                      markAsRead(notification.id)
-                                    }
-                                  />
-                                ))}
-                              {systemNotifications.length > 50 && (
-                                <div
-                                  className={`p-4 text-center ${
-                                    theme === "dark"
-                                      ? "text-gray-500"
-                                      : "text-gray-400"
-                                  }`}
-                                >
-                                  <p className="text-sm">
-                                    Showing 50 of {systemNotifications.length}{" "}
-                                    notifications
-                                  </p>
-                                </div>
+                              ) : (
+                                <EmptyState
+                                  t={t}
+                                  isDark={isDark}
+                                  colors={colors}
+                                />
                               )}
                             </div>
-                          ) : (
-                            <EmptyState t={t} isDark={isDark} colors={colors} />
-                          )}
-                        </TabPanel>
-                      </TabPanels>
-                    </TabGroup>
+                          </TabPanel>
+
+                          <TabPanel className="h-full">
+                            <div className="h-full flex flex-col">
+                              <div
+                                className={`px-4 py-3 border-b ${colors.border} flex gap-2 flex-wrap shrink-0`}
+                              >
+                                <button
+                                  onClick={() => setSelectedPriority(null)}
+                                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                                    selectedPriority === null
+                                      ? "bg-gray-800 text-white"
+                                      : isDark
+                                      ? "bg-neutral-800 text-gray-400 hover:bg-neutral-700"
+                                      : "bg-gray-100 text-black hover:bg-gray-200"
+                                  }`}
+                                >
+                                  <Layers className="h-3.5 w-3.5" />
+                                  {t("notifications.all")}
+                                </button>
+                                <button
+                                  onClick={() => setSelectedPriority("high")}
+                                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                                    selectedPriority === "high"
+                                      ? "bg-orange-800 text-white"
+                                      : isDark
+                                      ? "bg-neutral-800 text-gray-400 hover:bg-neutral-700"
+                                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                                  }`}
+                                >
+                                  <AlertCircle className="h-3.5 w-3.5" />
+                                  {t("notifications.high_priority")}
+                                  {filterByPriority("high").filter(
+                                    (n) => n.data.category === "application"
+                                  ).length > 0 && (
+                                    <span className="ml-1 px-1.5 py-0.5 rounded-full bg-white/20 text-xs">
+                                      {
+                                        filterByPriority("high").filter(
+                                          (n) =>
+                                            n.data.category === "application"
+                                        ).length
+                                      }
+                                    </span>
+                                  )}
+                                </button>
+                                <button
+                                  onClick={() => setSelectedPriority("normal")}
+                                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                                    selectedPriority === "normal"
+                                      ? "bg-blue-500 text-white"
+                                      : isDark
+                                      ? "bg-neutral-800 text-gray-400 hover:bg-neutral-700"
+                                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                                  }`}
+                                >
+                                  <Info className="h-3.5 w-3.5" />
+                                  {t("notifications.normal_priority")}
+                                </button>
+                              </div>
+
+                              <div className="flex-1 overflow-y-auto custom-scrollbar">
+                                {(() => {
+                                  const filteredNotifications = selectedPriority
+                                    ? applicationNotifications.filter((n) => {
+                                        const priority =
+                                          n.data.priority || "normal";
+                                        return priority === selectedPriority;
+                                      })
+                                    : applicationNotifications;
+
+                                  return filteredNotifications.length > 0 ? (
+                                    <div className="divide-y divide-transparent">
+                                      {filteredNotifications
+                                        .slice(0, 50)
+                                        .map((notification) => (
+                                          <NotificationItem
+                                            key={notification.id}
+                                            notification={notification}
+                                            onMarkAsRead={() =>
+                                              markAsRead(notification.id)
+                                            }
+                                          />
+                                        ))}
+                                      {filteredNotifications.length > 50 && (
+                                        <div
+                                          className={`p-4 text-center ${
+                                            theme === "dark"
+                                              ? "text-gray-500"
+                                              : "text-gray-400"
+                                          }`}
+                                        >
+                                          <p className="text-sm">
+                                            Showing 50 of{" "}
+                                            {filteredNotifications.length}{" "}
+                                            notifications
+                                          </p>
+                                        </div>
+                                      )}
+                                    </div>
+                                  ) : (
+                                    <div className="flex flex-col items-center justify-center h-full text-center p-4">
+                                      <div
+                                        className={`rounded-full p-4 mb-4 ${colors.emptyBg}`}
+                                      >
+                                        {selectedPriority === "high" ? (
+                                          <AlertCircle
+                                            className={`h-8 w-8 ${colors.emptyText}`}
+                                          />
+                                        ) : (
+                                          <Bell
+                                            className={`h-8 w-8 ${colors.emptyText}`}
+                                          />
+                                        )}
+                                      </div>
+                                      <h3
+                                        className={`text-sm font-medium ${colors.text} mb-1`}
+                                      >
+                                        {selectedPriority === "high"
+                                          ? "No hay notificaciones importantes"
+                                          : "No hay notificaciones"}
+                                      </h3>
+                                      <p
+                                        className={`text-sm ${colors.textSecondary}`}
+                                      >
+                                        {selectedPriority === "high"
+                                          ? "Las notificaciones importantes aparecerán aquí"
+                                          : "No hay notificaciones para mostrar"}
+                                      </p>
+                                    </div>
+                                  );
+                                })()}
+                              </div>
+                            </div>
+                          </TabPanel>
+
+                          <TabPanel className="h-full">
+                            <div className="h-full overflow-y-auto custom-scrollbar">
+                              {systemNotifications.length > 0 ? (
+                                <div className="divide-y divide-transparent">
+                                  {systemNotifications
+                                    .slice(0, 50)
+                                    .map((notification) => (
+                                      <NotificationItem
+                                        key={notification.id}
+                                        notification={notification}
+                                        onMarkAsRead={() =>
+                                          markAsRead(notification.id)
+                                        }
+                                      />
+                                    ))}
+                                  {systemNotifications.length > 50 && (
+                                    <div
+                                      className={`p-4 text-center ${
+                                        theme === "dark"
+                                          ? "text-gray-500"
+                                          : "text-gray-400"
+                                      }`}
+                                    >
+                                      <p className="text-sm">
+                                        Showing 50 of{" "}
+                                        {systemNotifications.length}{" "}
+                                        notifications
+                                      </p>
+                                    </div>
+                                  )}
+                                </div>
+                              ) : (
+                                <EmptyState
+                                  t={t}
+                                  isDark={isDark}
+                                  colors={colors}
+                                />
+                              )}
+                            </div>
+                          </TabPanel>
+                        </TabPanels>
+                      </TabGroup>
+                    </div>
                   </div>
                 </DialogPanel>
               </TransitionChild>
@@ -439,7 +458,7 @@ interface EmptyStateProps {
 
 function EmptyState({ t, colors }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center h-64 text-center p-4">
+    <div className="flex flex-col items-center justify-center h-full text-center p-4">
       <div className={`rounded-full p-4 mb-4 ${colors.emptyBg}`}>
         <Bell className={`h-8 w-8 ${colors.emptyText}`} />
       </div>
