@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+
 interface SidebarProps {
   isSidebarOpen: boolean;
   setIsSidebarOpen: (isOpen: boolean) => void;
@@ -147,8 +148,7 @@ export default function Sidebar({
               }`}
             >
               <div
-                className={`w-12 h-12 bg-gradient-to-r 
-                  rounded-lg flex items-center justify-center flex-shrink-0`}
+                className={`w-12 h-12 bg-gradient-to-r rounded-lg flex items-center justify-center flex-shrink-0`}
               >
                 <img
                   src={Logo}
@@ -247,84 +247,121 @@ export default function Sidebar({
             })}
           </nav>
 
-          {/* Footer - Acciones (Theme, Language, Notifications, Logout) */}
-          <div className={`p-4 border-t ${classes.borderColor} space-y-3`}>
-            {/* Botón de notificaciones */}
-            <button
-              onClick={() => setShowNotifications(true)}
-              className={`group relative w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300 
-                ${classes.textColor}
-                ${classes.hoverBg}
-                ${isSidebarOpen ? "" : "justify-center"}`}
-            >
-              <div className="relative">
-                <Bell className="h-5 w-5" />
-                {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs text-white">
-                    {unreadCount}
-                  </span>
-                )}
-              </div>
-
-              {isSidebarOpen && (
-                <span className="font-medium">{t("nav.notifications")}</span>
-              )}
-
-              {!isSidebarOpen && (
-                <div
-                  className={`absolute left-full ml-2 px-3 py-2 
-                    ${classes.tooltipBg} text-sm rounded-lg 
-                    opacity-0 group-hover:opacity-100 transition-opacity 
-                    duration-200 pointer-events-none whitespace-nowrap 
-                    z-50`}
-                >
-                  {t("nav.notifications")}
-                  {unreadCount > 0 && (
-                    <span className="ml-2 bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">
-                      {unreadCount}
-                    </span>
-                  )}
-                </div>
-              )}
-            </button>
-
-            {/* Logout */}
-            <NavLink
-              href={getRouteUrl("logout")}
-              method="post"
-              as="button"
-              className={`group relative flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300 
-                ${classes.textColor}
-                ${classes.logoutHoverBg}
-                ${isSidebarOpen ? "" : "justify-center w-full"}`}
-            >
-              <div className="flex items-center justify-center rounded-full h-10">
-                <LogOut className="h-5 w-5" />
-              </div>
-              {isSidebarOpen && (
-                <div className="flex-1">
-                  <span className="font-medium">{t("nav.logout")}</span>
-                </div>
-              )}
-              {!isSidebarOpen && (
-                <div
-                  className={`absolute left-full ml-2 px-2 py-1 ${classes.tooltipBg} text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none`}
-                >
-                  {t("nav.logout")}
-                </div>
-              )}
-            </NavLink>
-
-            {/* Theme y Language */}
+          {/* Footer */}
+          <div className="mt-auto">
+            {/* Sección de controles (Notificaciones, Theme, Language) */}
             <div
-              className={`flex ${
+              className={`p-4 border-t ${classes.borderColor} ${
                 isSidebarOpen
-                  ? "justify-between"
-                  : "flex-col gap-2 items-center"
+                  ? "flex items-center justify-between"
+                  : "flex flex-col items-center gap-3"
               }`}
             >
-              <ThemeSwitcher />
-              <LanguageSwitcher />
+              <div
+                className={`flex items-center gap-3 ${
+                  isSidebarOpen ? "" : "flex-col"
+                }`}
+              >
+                {/* Controles de tema e idioma */}
+                <div
+                  className={`flex items-center gap-2 ${
+                    isSidebarOpen ? "" : "flex-col"
+                  }`}
+                >
+                  <ThemeSwitcher />
+                  <LanguageSwitcher />
+                </div>
+                {/* Botón de notificaciones */}
+                <button
+                  onClick={() => setShowNotifications(true)}
+                  className={`group relative p-2.5 rounded-lg transition-all duration-300 
+                    ${classes.hoverBg} ${classes.textColor}
+                    hover:text-primary-600 hover:shadow-md
+                    flex items-center justify-center`}
+                  aria-label={t("nav.notifications")}
+                >
+                  <div className="relative">
+                    <Bell className="h-6 w-6" />
+                    {unreadCount > 0 && (
+                      <>
+                        <span
+                          className={`absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full 
+                            bg-red-500 text-[10px] font-bold text-white shadow-md
+                            border-2 ${
+                              isDark ? "border-neutral-900" : "border-beige-200"
+                            }
+                            animate-pulse`}
+                        >
+                          {unreadCount > 9 ? "9+" : unreadCount}
+                        </span>
+                        <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 animate-ping rounded-full bg-red-400 opacity-60" />
+                      </>
+                    )}
+                  </div>
+
+                  {/* Tooltip para sidebar colapsado */}
+                  {!isSidebarOpen && (
+                    <div
+                      className={`absolute left-full ml-3 px-3 py-2 
+                        ${classes.tooltipBg} text-sm rounded-lg 
+                        opacity-0 group-hover:opacity-100 transition-opacity 
+                        duration-200 pointer-events-none whitespace-nowrap 
+                        z-50 flex items-center gap-2`}
+                    >
+                      {t("nav.notifications")}
+                      {unreadCount > 0 && (
+                        <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full font-bold">
+                          {unreadCount > 9 ? "9+" : unreadCount}
+                        </span>
+                      )}
+                      <div
+                        className={`absolute left-0 top-1/2 transform 
+                          -translate-y-1/2 -translate-x-1 w-2 h-2
+                          ${
+                            isDark ? "bg-neutral-800" : "bg-gray-900"
+                          } rotate-45`}
+                      />
+                    </div>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Logout - Separado en su propia sección */}
+            <div className={`p-4 border-t ${classes.borderColor}`}>
+              <NavLink
+                href={getRouteUrl("logout")}
+                method="post"
+                as="button"
+                className={`group w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300 
+                  ${classes.textColor} ${classes.logoutHoverBg}
+                  ${isSidebarOpen ? "" : "justify-center"}`}
+              >
+                <div className="flex items-center justify-center">
+                  <LogOut className="h-5 w-5" />
+                </div>
+
+                {isSidebarOpen && (
+                  <span className="font-medium">{t("nav.logout")}</span>
+                )}
+
+                {!isSidebarOpen && (
+                  <div
+                    className={`absolute left-full ml-2 px-3 py-2 
+                      ${classes.tooltipBg} text-sm rounded-lg 
+                      opacity-0 group-hover:opacity-100 transition-opacity 
+                      duration-200 pointer-events-none whitespace-nowrap 
+                      z-50`}
+                  >
+                    {t("nav.logout")}
+                    <div
+                      className={`absolute left-0 top-1/2 transform 
+                        -translate-y-1/2 -translate-x-1 w-2 h-2
+                        ${isDark ? "bg-neutral-800" : "bg-gray-900"} rotate-45`}
+                    />
+                  </div>
+                )}
+              </NavLink>
             </div>
           </div>
         </div>
