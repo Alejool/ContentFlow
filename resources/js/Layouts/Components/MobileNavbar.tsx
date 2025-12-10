@@ -134,7 +134,7 @@ export default function MobileNavbar({
 
   const colorNoActive = `${
     theme === "dark"
-      ? "text-beige-400 hover:text-orange-400 hover:bg-neutral-600/40"
+      ? "text-white hover:text-orange-600 hover:bg-neutral-600/40"
       : "text-gray-700 hover:text-orange-600 hover:bg-gray-200/40"
   }`;
 
@@ -324,7 +324,7 @@ export default function MobileNavbar({
 
                 <Dropdown.Link
                   href={route("profile.edit")}
-                  className={`flex items-center space-x-2 px-3 py-2.5 transition-colors ${colorNoActive}
+                  className={`flex items-center space-x-2 px-3 py-2.5 transition-colors  ${colorNoActive}
                     ${isProfileActive ? colorActive : ""}`}
                 >
                   <User
@@ -336,7 +336,9 @@ export default function MobileNavbar({
                         : ""
                     }`}
                   />
-                  <span className={`${isProfileActive ? "font-semibold" : ""}`}>
+                  <span
+                    className={`${isProfileActive ? "font-semibold " :``}`}
+                  >
                     {t("nav.profile")}
                   </span>
                   {isProfileActive && (
@@ -357,7 +359,7 @@ export default function MobileNavbar({
                   className={`flex items-center space-x-2 px-3 py-2.5 transition-colors ${colorNoActive}`}
                 >
                   <LogOut className="h-4 w-4" />
-                  <span>{t("nav.logout")}</span>
+                  <span className={``}>{t("nav.logout")}</span>
                 </Dropdown.Link>
               </Dropdown.Content>
             </Dropdown>
