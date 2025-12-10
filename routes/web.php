@@ -108,6 +108,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     |----------------------------------------------------------------------
     */
     Route::get('/ai-chat', [AIChatController::class, 'index'])->name('ai-chat.index');
+    Route::post('/ai-chat/process', [AIChatController::class, 'processMessage'])->name('ai-chat.process');
 
     /*
     |----------------------------------------------------------------------

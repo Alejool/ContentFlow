@@ -13,7 +13,7 @@ use App\Services\AIService;
 class AIChatController extends Controller
 {
     protected AIService $aiService;
-    
+
     public function __construct(AIService $aiService)
     {
         $this->aiService = $aiService;
@@ -44,20 +44,21 @@ class AIChatController extends Controller
 
         try {
             // Get user information
+            /** @var \App\Models\User $user */
             $user = Auth::user();
-            
+
             // Determine if we should include campaign context
             $source = $request->input('source', 'chat');
             $includeContext = $source === 'assistant';
 
             $campaigns = [];
             $socialAccounts = [];
-            
+
             if ($includeContext) {
                 $campaigns = $request->input('context.campaigns', []);
                 if (empty($campaigns)) {
                     $campaigns = Campaign::where('user_id', $user->id)
-                        ->select('id', 'title', 'description', 'status', 'start_date', 'end_date')
+                        ->select('id', 'name as title', 'description', 'status', 'start_date', 'end_date')
                         ->get()
                         ->toArray();
                 }
@@ -109,7 +110,6 @@ class AIChatController extends Controller
                 'usage' => $aiResponse['usage'] ?? null,
                 'timestamp' => now()->toISOString()
             ]);
-
         } catch (\Exception $e) {
             Log::error('AI Chat Processing Error', [
                 'user_id' => Auth::id(),
@@ -132,7 +132,7 @@ class AIChatController extends Controller
     {
         try {
             $campaigns = Campaign::where('user_id', Auth::id())
-                ->select('id', 'title', 'description', 'status', 'start_date', 'end_date')
+                ->select('id', 'name as title', 'description', 'status', 'start_date', 'end_date')
                 ->orderBy('created_at', 'desc')
                 ->get();
 
@@ -161,17 +161,15 @@ class AIChatController extends Controller
     {
         try {
             $models = $this->aiService->getAvailableModels();
-            
+
             return response()->json([
                 'success' => true,
                 'models' => $models,
-                'default_provider' => config('services.deepseek.enabled') ? 'deepseek' : 
-                                    (config('services.gemini.enabled') ? 'gemini' : 
-                                    (config('services.openai.enabled') ? 'openai' : null))
+                'default_provider' => config('services.deepseek.enabled') ? 'deepseek' : (config('services.gemini.enabled') ? 'gemini' : (config('services.openai.enabled') ? 'openai' : null))
             ]);
         } catch (\Exception $e) {
             Log::error('Failed to get available models', ['error' => $e->getMessage()]);
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to load AI models'
@@ -216,7 +214,7 @@ class AIChatController extends Controller
     {
         try {
             $stats = $this->aiService->getProviderStats();
-            
+
             return response()->json([
                 'success' => true,
                 'stats' => $stats,
@@ -224,7 +222,7 @@ class AIChatController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error('Failed to get AI stats', ['error' => $e->getMessage()]);
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to load statistics'
