@@ -28,9 +28,8 @@ export default function NotificationsModal({
 
   const isDark = theme === "dark";
 
-  // Definir colores según tema
   const colors = {
-    bg: isDark ? "bg-neutral-900/90" : "bg-white/90",
+    bg: isDark ? "bg-neutral-900/95" : "bg-white/90",
     text: isDark ? "text-white" : "text-gray-900",
     textSecondary: isDark ? "text-gray-400" : "text-gray-600",
     textTertiary: isDark ? "text-gray-500" : "text-gray-500",
@@ -52,7 +51,7 @@ export default function NotificationsModal({
       : "bg-gray-100 text-gray-600",
     emptyBg: isDark ? "bg-neutral-800" : "bg-gray-100",
     emptyText: isDark ? "text-gray-500" : "text-gray-400",
-    overlay: isDark ? "bg-black/50" : "bg-gray-500/75",
+    overlay: isDark ? "bg-black/50" : "bg-gray-500/50",
     disabled: isDark
       ? "text-gray-600 cursor-not-allowed"
       : "text-gray-400 cursor-not-allowed",
@@ -64,19 +63,19 @@ export default function NotificationsModal({
   const categories = [
     {
       id: "all",
-      label: t("notifications.categories.all") || "All",
+      label: t("notifications.modal.categories.all") || "All",
       icon: Layers,
       count: notifications.length,
     },
     {
       id: "application",
-      label: t("notifications.categories.application") || "Application",
+      label: t("notifications.modal.categories.application") || "Application",
       icon: Bell,
       count: applicationNotifications.length,
     },
     {
       id: "system",
-      label: t("notifications.categories.system") || "System",
+      label: t("notifications.modal.categories.system") || "System",
       icon: Settings,
       count: systemNotifications.length,
     },
@@ -89,7 +88,6 @@ export default function NotificationsModal({
   return (
     <Transition.Root show={isOpen} as={Fragment}>
       <Dialog as="div" className="relative z-50" onClose={onClose}>
-        {/* Overlay */}
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -100,7 +98,7 @@ export default function NotificationsModal({
           leaveTo="opacity-0"
         >
           <div
-            className={`fixed inset-0 ${colors.overlay} transition-opacity`}
+            className={`fixed inset-0 ${colors.overlay} transition-opacity backdrop-blur-sm`}
           />
         </Transition.Child>
 
@@ -120,7 +118,6 @@ export default function NotificationsModal({
                   className={`pointer-events-auto w-screen max-w-md ${colors.bg} flex flex-col`}
                 >
                   <div className="flex h-full flex-col shadow-xl">
-                    {/* Header */}
                     <div
                       className={`px-4 py-6 sm:px-6 shadow-sm border-b ${colors.border}`}
                     >
@@ -150,7 +147,6 @@ export default function NotificationsModal({
                         </div>
                       </div>
 
-                      {/* Mark all as read button */}
                       {unreadCount > 0 && (
                         <div className="mt-4 flex justify-end">
                           <button
@@ -165,9 +161,7 @@ export default function NotificationsModal({
                       )}
                     </div>
 
-                    {/* Tabs & Content */}
                     <Tab.Group>
-                      {/* Tabs Navigation */}
                       <div className={`border-b ${colors.border}`}>
                         <Tab.List className="-mb-px flex space-x-4 px-4 sm:px-6">
                           {categories.map((category) => (
@@ -196,9 +190,7 @@ export default function NotificationsModal({
                         </Tab.List>
                       </div>
 
-                      {/* Tabs Content */}
                       <Tab.Panels className="flex-1 overflow-y-auto custom-scrollbar">
-                        {/* All Notifications */}
                         <Tab.Panel className="h-full">
                           {notifications.length > 0 ? (
                             <div className="divide-y divide-transparent">
@@ -237,7 +229,6 @@ export default function NotificationsModal({
                           )}
                         </Tab.Panel>
 
-                        {/* Application Notifications */}
                         <Tab.Panel className="h-full">
                           {applicationNotifications.length > 0 ? (
                             <div className="divide-y divide-transparent">
@@ -273,7 +264,6 @@ export default function NotificationsModal({
                           )}
                         </Tab.Panel>
 
-                        {/* System Notifications */}
                         <Tab.Panel className="h-full">
                           {systemNotifications.length > 0 ? (
                             <div className="divide-y divide-transparent">
@@ -338,10 +328,10 @@ function EmptyState({ t, colors }: EmptyStateProps) {
         <Bell className={`h-8 w-8 ${colors.emptyText}`} />
       </div>
       <h3 className={`text-sm font-medium ${colors.text} mb-1`}>
-        {t("notifications.no_notifications")}
+        {t("notifications.modal.no_notifications")}
       </h3>
       <p className={`text-sm ${colors.textSecondary}`}>
-        {t("notifications.empty_description") ||
+        {t("notifications.modal.empty_description") ||
           "No hay notificaciones para mostrar"}
       </p>
     </div>

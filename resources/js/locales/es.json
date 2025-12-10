@@ -881,13 +881,28 @@
     "post_scheduled": "Tu publicación ha sido programada exitosamente.",
     "warning": "Advertencia de sistema",
     "api_limit": "Estás cerca de alcanzar tu límite de API mensual.",
-    "no_notifications": "No tienes notificaciones pendientes",
-    "categories": {
-      "all": "Todo",
-      "application": "Aplicación",
-      "content": "Contenido",
-      "system": "Sistema",
-      "analytics": "Analíticas"
+  
+    "modal": {
+      "title": "Notificaciones",
+      "new": "nuevas",
+      "mark_all_read": "Marcar todo como leído",
+      "new_content": "Nuevo contenido disponible",
+      "content_ready": "Tu contenido ha sido procesado y está listo para publicar.",
+      "analytics_ready": "Reporte de analíticas",
+      "report_generated": "El reporte mensual de rendimiento está disponible.",
+      "scheduled_post": "Publicación programada",
+      "post_scheduled": "Tu publicación ha sido programada exitosamente.",
+      "warning": "Advertencia de sistema",
+      "api_limit": "Estás cerca de alcanzar tu límite de API mensual.",
+      "no_notifications": "No tienes notificaciones pendientes",
+      "empty_description": "El sistema no tiene notificaciones para mostrar",
+      "categories": {
+        "all": "Todo",
+        "application": "Aplicación",
+        "content": "Contenido",
+        "system": "Sistema",
+        "analytics": "Analíticas"
+      }
     }
   }
 }

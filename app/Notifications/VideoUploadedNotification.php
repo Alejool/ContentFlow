@@ -75,7 +75,7 @@ class VideoUploadedNotification extends Notification implements ShouldQueue
                 if ($path) {
                     try {
                         // Check if it's already a full URL (S3 public)
-                        if (str_starts_with($path, 'http')) {
+                        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
                             $thumbnailUrl = $path;
                         } else {
                             $thumbnailUrl = \Illuminate\Support\Facades\Storage::url($path);

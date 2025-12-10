@@ -71,12 +71,9 @@ export default function NotificationItem({
       onClick={() => onMarkAsRead(notification.id)}
     >
       <div className="flex gap-3 items-start">
-        {/* Icon */}
         <div className="mt-0.5 flex-shrink-0">{getIcon()}</div>
 
-        {/* Content */}
         <div className="flex-1 min-w-0">
-          {/* Message */}
           <p
             className={`text-sm mb-1 line-clamp-2 ${
               theme === "dark" ? "text-gray-200" : "text-gray-800"
@@ -85,7 +82,6 @@ export default function NotificationItem({
             {data.message || data.title}
           </p>
 
-          {/* Publication title & time */}
           <div className="flex items-center gap-2 flex-wrap">
             {data.publication_title && (
               <>
@@ -129,7 +125,6 @@ export default function NotificationItem({
           </div>
         </div>
 
-        {/* Thumbnail */}
         {data.thumbnail_url && !imageError && (
           <div
             className={`w-16 h-16 rounded-md overflow-hidden flex-shrink-0 ${
@@ -146,7 +141,6 @@ export default function NotificationItem({
           </div>
         )}
 
-        {/* Fallback icon when image fails */}
         {data.thumbnail_url && imageError && (
           <div
             className={`w-16 h-16 rounded-md flex items-center justify-center flex-shrink-0 ${
@@ -161,7 +155,6 @@ export default function NotificationItem({
           </div>
         )}
 
-        {/* Unread indicator */}
         {!isRead && (
           <div className="absolute top-3 right-3 w-2 h-2 rounded-full bg-primary-500 flex-shrink-0" />
         )}
