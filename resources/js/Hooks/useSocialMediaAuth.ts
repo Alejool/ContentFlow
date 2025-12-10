@@ -1,67 +1,12 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "react-hot-toast";
 
 export const useSocialMediaAuth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [accounts, setAccounts] = useState<any[]>([]);
-
-  // useEffect(() => {
-  //   // Escuchar mensajes de la ventana emergente
-  //   const handleMessage = async (event: any) => {
-  //     if (event.data && event.data.type === "social_auth_callback") {
-  //       setIsLoading(false);
-
-  //       if (event.data.success) {
-  //         try {
-  //           const responseData = JSON.parse(event.data.data);
-  //           await axios.post(
-  //             "/social-accounts",
-  //             {
-  //               platform: responseData.platform,
-  //               account_id: responseData.account_id,
-  //               access_token: responseData.access_token,
-  //               refresh_token: responseData.refresh_token || null,
-  //               token_expires_at: responseData.token_expires_at || null,
-  //             },
-  //             {
-  //               headers: {
-  //                 "X-CSRF-TOKEN": document
-  //                   .querySelector('meta[name="csrf-token"]')
-  //                   ?.getAttribute("content"),
-  //                 Accept: "application/json",
-  //                 "Content-Type": "application/json",
-  //               },
-  //               withCredentials: true,
-  //             }
-  //           );
-
-  //           toast.success(
-  //             `Cuenta de ${responseData.platform} conectada exitosamente`
-  //           );
-
-  //           // await fetchAccounts();
-  //         } catch (error: any) {
-  //           const msg = error.response?.data?.message || error.message;
-  //           toast.error("Error al guardar los datos de la cuenta: " + msg);
-  //           console.log('meensaje error');
-  //           console.log(msg);
-  //           setError(msg);
-  //           console.error("Error al guardar datos de la cuenta:", error);
-  //         }
-  //       } else {
-  //         const msg = event.data.message || "Error desconocido";
-  //         toast.error("Error en la autenticación: " + msg);
-  //         setError(msg);
-  //       }
-  //     }
-  //   };
-
-  //   window.addEventListener("message", handleMessage);
-  //   return () => window.removeEventListener("message", handleMessage);
-  // }, []);
-
+  
   const fetchAccounts = async () => {
     try {
       const response = await axios.get("/social-accounts", {
@@ -155,17 +100,15 @@ export const useSocialMediaAuth = () => {
         }
       );
       setAccounts((prev) => prev.filter((a) => a.id !== id));
-      toast.success("Cuenta desconectada exitosamente");
       return { success: true };
     } catch (err: any) {
       if (err.response && err.response.status === 400) {
-        // Return structured error for UI handling
         const msg = err.response.data.message;
         setError(msg);
         return {
           success: false,
           error: msg,
-          posts: err.response.data.posts, // Assuming backend sends posts if blocker
+          posts: err.response.data.posts,
         };
       }
       const errorMessage =
