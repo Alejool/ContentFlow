@@ -439,12 +439,12 @@ export default function SocialMediaAccounts() {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2  gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4  gap-6">
           {accounts.map((account) => (
             <div
               key={account.id}
               className={`group relative rounded-lg p-6 border transition-all duration-300 
-                hover:shadow-xl hover:-translate-y-1
+                hover:shadow-xl 
                 ${
                   theme === "dark"
                     ? "bg-neutral-800/70 backdrop-blur-sm border-neutral-700/70 hover:border-neutral-600"
@@ -466,7 +466,7 @@ export default function SocialMediaAccounts() {
                     ${
                       account.isConnected
                         ? theme === "dark"
-                          ? "bg-green-900/30 text-green-300 border-green-700/80"
+                          ? "bg-green-900/30 text-green-400 border-green-900/80"
                           : "bg-green-50 text-green-700 border-green-100"
                         : theme === "dark"
                         ? "bg-neutral-800 text-gray-400 border-neutral-700"
@@ -475,7 +475,7 @@ export default function SocialMediaAccounts() {
                 >
                   {account.isConnected ? (
                     <>
-                      <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                      <div className="w-1.5 h-1.5 rounded-full bg-green-600 animate-pulse" />
                       {t("manageContent.socialMedia.status.connected")}
                     </>
                   ) : (
@@ -491,7 +491,6 @@ export default function SocialMediaAccounts() {
                 <div className="relative mb-4">
                   <div
                     className={`w-20 h-12 rounded-lg flex items-center justify-center pt-6 
-                    
                    `}
                   >
                     <div
@@ -502,11 +501,7 @@ export default function SocialMediaAccounts() {
                           ? ""
                           : "p-2"
                       }
-                      ${
-                        theme === "dark" && !account.isConnected
-                          ? "bg-neutral-800"
-                          : "bg-white/90"
-                      }`}
+                      `}
                     >
                       {account.isConnected &&
                       account.accountDetails?.account_metadata?.avatar ? (
@@ -551,7 +546,7 @@ export default function SocialMediaAccounts() {
                 </h3>
                 {account.isConnected && account.accountDetails ? (
                   <p
-                    className={`text-xs font-mono px-2 py-1 rounded
+                    className={`text-xs font-mono font-bold px-2 py-1 rounded
                     ${
                       theme === "dark"
                         ? "bg-neutral-800 text-gray-400"
@@ -586,7 +581,7 @@ export default function SocialMediaAccounts() {
                       : account.isConnected
                       ? theme === "dark"
                         ? "bg-gradient-to-r from-primary-900/30 to-primary-800/30 text-primary-300 border border-primary-700/30 hover:from-primary-800/40 hover:to-primary-700/40"
-                        : "bg-gradient-to-r from-primary-50 to-primary-100 text-primary-600 border border-primary-200 hover:from-primary-100 hover:to-primary-50"
+                        : "bg-gradient-to-r from-primary-50 to-primary-50 text-primary-600 border border-primary-200 hover:from-primary-50 hover:to-primary-50"
                       : `bg-gradient-to-r ${account.gradient} text-white shadow-lg hover:shadow-xl hover:scale-[1.02]`
                   }`}
               >
