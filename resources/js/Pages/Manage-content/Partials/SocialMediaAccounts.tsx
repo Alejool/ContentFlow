@@ -15,7 +15,7 @@ import {
   X,
   Zap,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
@@ -99,9 +99,6 @@ export default function SocialMediaAccounts() {
     },
   ]);
   const [loading, setLoading] = useState(true);
-  const [authInProgress, setAuthInProgress] = useState(false);
-  const authWindowRef = useRef(null);
-  const authCheckIntervalRef = useRef(null);
 
   useEffect(() => {
     fetchConnectedAccounts();
@@ -110,8 +107,6 @@ export default function SocialMediaAccounts() {
       console.log("Message received in SocialMediaAccounts:", event.data);
 
       if (event.data && event.data.type === "social_auth_callback") {
-        setAuthInProgress(false);
-
         if (event.data.success) {
           toast.success(t("manageContent.socialMedia.messages.connectSuccess"));
           fetchConnectedAccounts();
@@ -122,11 +117,6 @@ export default function SocialMediaAccounts() {
             }`
           );
         }
-
-        if (authCheckIntervalRef.current) {
-          clearInterval(authCheckIntervalRef.current);
-          authCheckIntervalRef.current = null;
-        }
       }
     };
 
@@ -134,9 +124,6 @@ export default function SocialMediaAccounts() {
 
     return () => {
       window.removeEventListener("message", handleAuthMessage);
-      if (authCheckIntervalRef.current) {
-        clearInterval(authCheckIntervalRef.current);
-      }
     };
   }, []);
 
@@ -275,29 +262,10 @@ export default function SocialMediaAccounts() {
       }
     } else {
       try {
-        setAuthInProgress(true);
-
-        // using new connectAccount from hook?
-        // Hook has `connectAccount` which returns boolean directly and handles window.
-        // Let's use that instead of manual logic if possible, or keep manual logic if hook doesn't support the custom UI flow (interval etc).
-        // The manual logic here is quite complex (custom interval, timeout, etc).
-        // The hook's `connectAccount` does window open and interval too.
-        // Let's try to switch to the hook's unified `connectAccount` to simplify code,
-        // but `SocialMediaAccounts.tsx` has some specific UI state `authInProgress`.
-
-        // Actually, the hook is robust enough now. Let's try to delegate.
-        // But `connectAccount` in hook returns true/false.
-        const success = await connectAccount(account.platform);
-
-        if (success) {
-          toast.success(t("manageContent.socialMedia.messages.connectSuccess"));
-          fetchConnectedAccounts();
-        }
-        setAuthInProgress(false);
+        await connectAccount(account.platform);
+        // Toast and refresh handled by message listener
       } catch (error: any) {
-        setAuthInProgress(false);
         console.error("Error connecting to social network:", error);
-        // toast already handled by hook partially, but maybe strict error msg here
       }
     }
   };
@@ -570,11 +538,11 @@ export default function SocialMediaAccounts() {
 
               <button
                 onClick={() => handleConnectionToggle(account.id)}
-                disabled={isLoading || authInProgress}
+                disabled={isLoading}
                 className={`w-full py-3 px-4 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 
                   transition-all duration-200 relative overflow-hidden group/btn
                   ${
-                    isLoading || authInProgress
+                    isLoading
                       ? theme === "dark"
                         ? "bg-neutral-700/50 text-gray-400 cursor-not-allowed"
                         : "bg-gray-100 text-gray-400 cursor-not-allowed"
@@ -586,7 +554,7 @@ export default function SocialMediaAccounts() {
                   }`}
               >
                 <span className="relative z-10 flex items-center gap-2">
-                  {authInProgress ? (
+                  {isLoading ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
                       {t("manageContent.socialMedia.actions.processing")}
