@@ -30,7 +30,7 @@ export default function NotificationsModal({
 
   // Definir colores según tema
   const colors = {
-    bg: isDark ? "bg-neutral-900/95" : "bg-white",
+    bg: isDark ? "bg-neutral-900/90" : "bg-white/90",
     text: isDark ? "text-white" : "text-gray-900",
     textSecondary: isDark ? "text-gray-400" : "text-gray-600",
     textTertiary: isDark ? "text-gray-500" : "text-gray-500",
@@ -42,8 +42,8 @@ export default function NotificationsModal({
       ? "hover:bg-neutral-800 text-gray-400 hover:text-gray-300"
       : "hover:bg-gray-100 text-gray-400 hover:text-gray-500",
     tabSelected: isDark
-      ? "border-primary-color text-primary-color"
-      : "border-primary-color text-primary-color",
+      ? "border-primary-color text-primary-500"
+      : "border-primary-color text-primary-500",
     tabUnselected: isDark
       ? "border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-600"
       : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300",
@@ -117,7 +117,7 @@ export default function NotificationsModal({
                 leaveTo="translate-x-full"
               >
                 <Dialog.Panel
-                  className={`pointer-events-auto w-screen max-w-md ${colors.bg}`}
+                  className={`pointer-events-auto w-screen max-w-md ${colors.bg} flex flex-col`}
                 >
                   <div className="flex h-full flex-col shadow-xl">
                     {/* Header */}
@@ -202,13 +202,17 @@ export default function NotificationsModal({
                         <Tab.Panel className="h-full">
                           {notifications.length > 0 ? (
                             <div className="divide-y divide-transparent">
-                              {notifications.slice(0, 50).map((notification) => (
-                                <NotificationItem
-                                  key={notification.id}
-                                  notification={notification}
-                                  onMarkAsRead={() => markAsRead(notification.id)}
-                                />
-                              ))}
+                              {notifications
+                                .slice(0, 50)
+                                .map((notification) => (
+                                  <NotificationItem
+                                    key={notification.id}
+                                    notification={notification}
+                                    onMarkAsRead={() =>
+                                      markAsRead(notification.id)
+                                    }
+                                  />
+                                ))}
                               {notifications.length > 50 && (
                                 <div
                                   className={`p-4 text-center ${
@@ -218,10 +222,12 @@ export default function NotificationsModal({
                                   }`}
                                 >
                                   <p className="text-sm">
-                                    Showing 50 of {notifications.length} notifications
+                                    Showing 50 of {notifications.length}{" "}
+                                    notifications
                                   </p>
                                   <p className="text-xs mt-1">
-                                    Older notifications are automatically archived
+                                    Older notifications are automatically
+                                    archived
                                   </p>
                                 </div>
                               )}
@@ -235,13 +241,17 @@ export default function NotificationsModal({
                         <Tab.Panel className="h-full">
                           {applicationNotifications.length > 0 ? (
                             <div className="divide-y divide-transparent">
-                              {applicationNotifications.slice(0, 50).map((notification) => (
-                                <NotificationItem
-                                  key={notification.id}
-                                  notification={notification}
-                                  onMarkAsRead={() => markAsRead(notification.id)}
-                                />
-                              ))}
+                              {applicationNotifications
+                                .slice(0, 50)
+                                .map((notification) => (
+                                  <NotificationItem
+                                    key={notification.id}
+                                    notification={notification}
+                                    onMarkAsRead={() =>
+                                      markAsRead(notification.id)
+                                    }
+                                  />
+                                ))}
                               {applicationNotifications.length > 50 && (
                                 <div
                                   className={`p-4 text-center ${
@@ -251,7 +261,9 @@ export default function NotificationsModal({
                                   }`}
                                 >
                                   <p className="text-sm">
-                                    Showing 50 of {applicationNotifications.length} notifications
+                                    Showing 50 of{" "}
+                                    {applicationNotifications.length}{" "}
+                                    notifications
                                   </p>
                                 </div>
                               )}
@@ -265,13 +277,17 @@ export default function NotificationsModal({
                         <Tab.Panel className="h-full">
                           {systemNotifications.length > 0 ? (
                             <div className="divide-y divide-transparent">
-                              {systemNotifications.slice(0, 50).map((notification) => (
-                                <NotificationItem
-                                  key={notification.id}
-                                  notification={notification}
-                                  onMarkAsRead={() => markAsRead(notification.id)}
-                                />
-                              ))}
+                              {systemNotifications
+                                .slice(0, 50)
+                                .map((notification) => (
+                                  <NotificationItem
+                                    key={notification.id}
+                                    notification={notification}
+                                    onMarkAsRead={() =>
+                                      markAsRead(notification.id)
+                                    }
+                                  />
+                                ))}
                               {systemNotifications.length > 50 && (
                                 <div
                                   className={`p-4 text-center ${
@@ -281,7 +297,8 @@ export default function NotificationsModal({
                                   }`}
                                 >
                                   <p className="text-sm">
-                                    Showing 50 of {systemNotifications.length} notifications
+                                    Showing 50 of {systemNotifications.length}{" "}
+                                    notifications
                                   </p>
                                 </div>
                               )}
@@ -321,6 +338,8 @@ function EmptyState({ t, colors }: EmptyStateProps) {
         <Bell className={`h-8 w-8 ${colors.emptyText}`} />
       </div>
       <h3 className={`text-sm font-medium ${colors.text} mb-1`}>
+        {t("notifications.no_notifications")}
+      </h3>
       <p className={`text-sm ${colors.textSecondary}`}>
         {t("notifications.empty_description") ||
           "No hay notificaciones para mostrar"}

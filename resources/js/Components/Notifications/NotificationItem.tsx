@@ -22,6 +22,8 @@ export default function NotificationItem({
       case "success":
       case "published":
         return <CheckCircle className="w-4 h-4 text-green-500" />;
+      case "deleted":
+        return <X className="w-4 h-4 text-gray-500" />;
       case "rejected":
       case "failed":
       case "error":
@@ -39,6 +41,8 @@ export default function NotificationItem({
       case "success":
       case "published":
         return theme === "dark" ? "text-green-400" : "text-green-600";
+      case "deleted":
+        return theme === "dark" ? "text-gray-400" : "text-gray-600";
       case "rejected":
       case "failed":
       case "error":
