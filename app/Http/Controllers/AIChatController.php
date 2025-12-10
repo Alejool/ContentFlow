@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Campaigns\Campaign;
+use App\Models\Campaign;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;

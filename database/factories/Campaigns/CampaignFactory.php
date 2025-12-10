@@ -5,7 +5,7 @@ namespace Database\Factories\Campaigns;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 use App\Models\User;
-use App\Models\Campaigns\Campaign;
+use App\Models\Campaign;
 
 class CampaignFactory extends Factory
 {

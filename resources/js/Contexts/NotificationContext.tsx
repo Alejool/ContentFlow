@@ -33,6 +33,11 @@ interface NotificationContextType {
   refreshNotifications: () => Promise<void>;
   markAsRead: (id: string) => Promise<void>;
   markAllAsRead: () => Promise<void>;
+  deleteNotification: (id: string) => Promise<void>;
+  deleteAllRead: () => Promise<void>;
+  filterByPlatform: (platform: string | null) => NotificationData[];
+  filterByPriority: (priority: string | null) => NotificationData[];
+  getPlatformNotifications: (platform: string) => NotificationData[];
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(
@@ -98,6 +103,47 @@ export const NotificationProvider = ({
     } catch (error) {
       console.error("Failed to mark all notifications as read", error);
     }
+  };
+
+  const deleteNotification = async (id: string) => {
+    try {
+      await axios.delete(`/notifications/${id}`);
+      setNotifications((prev) => prev.filter((n) => n.id !== id));
+      // Update unread count if it was unread
+      const notification = notifications.find((n) => n.id === id);
+      if (notification && !notification.read_at) {
+        setUnreadCount((prev) => Math.max(0, prev - 1));
+      }
+    } catch (error) {
+      console.error("Failed to delete notification", error);
+    }
+  };
+
+  const deleteAllRead = async () => {
+    try {
+      await axios.delete("/notifications/read");
+      setNotifications((prev) => prev.filter((n) => !n.read_at));
+    } catch (error) {
+      console.error("Failed to delete read notifications", error);
+    }
+  };
+
+  const filterByPlatform = (platform: string | null): NotificationData[] => {
+    if (!platform) return notifications;
+    return notifications.filter(
+      (n) => n.data.platform?.toLowerCase() === platform.toLowerCase()
+    );
+  };
+
+  const filterByPriority = (priority: string | null): NotificationData[] => {
+    if (!priority) return notifications;
+    return notifications.filter((n) => n.data.priority === priority);
+  };
+
+  const getPlatformNotifications = (platform: string): NotificationData[] => {
+    return applicationNotifications.filter(
+      (n) => n.data.platform?.toLowerCase() === platform.toLowerCase()
+    );
   };
 
   useEffect(() => {
@@ -167,9 +213,14 @@ export const NotificationProvider = ({
         unreadCount,
         loading,
         fetchNotifications,
-        refreshNotifications: fetchNotifications, // Alias for manual refresh
+        refreshNotifications: fetchNotifications,
         markAsRead,
         markAllAsRead,
+        deleteNotification,
+        deleteAllRead,
+        filterByPlatform,
+        filterByPriority,
+        getPlatformNotifications,
       }}
     >
       {children}

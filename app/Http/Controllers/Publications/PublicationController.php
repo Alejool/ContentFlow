@@ -19,7 +19,7 @@ use App\Services\SocialPlatforms\TwitterService;
 use App\Services\SocialPlatforms\YouTubeService;
 use Illuminate\Support\Facades\Log;
 use App\Models\SocialAccount;
-use App\Models\Campaigns\Campaign;
+use App\Models\Campaign;
 
 class PublicationController extends Controller
 {

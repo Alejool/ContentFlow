@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\Campaigns\Campaign;
+use App\Models\Campaign;
 use App\Models\ScheduledPost;
 use App\Models\SocialPostLog;
 use Illuminate\Support\Facades\DB;

@@ -14,7 +14,7 @@ use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Notifications\VerifyEmailNotification;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use App\Models\Campaigns\Campaign;
+use App\Models\Campaign;
 
 class User extends Model implements Authenticatable, MustVerifyEmail, CanResetPassword
 {

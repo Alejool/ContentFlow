@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\CampaignAnalytics;
-use App\Models\Campaigns\Campaign;
+use App\Models\Campaign;
 use Carbon\Carbon;
 
 class CampaignAnalyticsSeeder extends Seeder
@@ -34,16 +34,16 @@ class CampaignAnalyticsSeeder extends Seeder
                 // Simulate realistic growth/decline
                 $dayOfWeek = $currentDate->dayOfWeek;
                 $weekendMultiplier = ($dayOfWeek == 0 || $dayOfWeek == 6) ? 0.7 : 1.0; // Lower on weekends
-                
+
                 $views = (int)($baseViews * $weekendMultiplier * (1 + rand(-20, 20) / 100));
                 $uniqueVisitors = (int)($views * rand(60, 80) / 100); // 60-80% unique
                 $impressions = (int)($views * rand(120, 200) / 100); // Impressions > views
                 $reach = (int)($uniqueVisitors * rand(80, 95) / 100);
-                
+
                 // Engagement metrics
                 $clicks = (int)($views * rand(5, 15) / 100); // 5-15% CTR
                 $conversions = (int)($clicks * rand(2, 8) / 100); // 2-8% conversion
-                
+
                 $likes = (int)($views * rand(3, 12) / 100);
                 $comments = (int)($likes * rand(10, 30) / 100);
                 $shares = (int)($likes * rand(5, 20) / 100);

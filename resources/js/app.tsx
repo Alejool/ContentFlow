@@ -1,6 +1,8 @@
+import { ErrorBoundary } from "@/Components/ErrorBoundary";
 import ThemedToaster from "@/Components/ThemedToaster";
 import { NotificationProvider } from "@/Contexts/NotificationContext";
 import { ThemeProvider } from "@/Contexts/ThemeContext";
+import { ErrorInterceptor } from "@/Services/ErrorInterceptor";
 import { PageProps } from "@/types";
 import { createInertiaApp } from "@inertiajs/react";
 import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
@@ -8,6 +10,9 @@ import { createRoot } from "react-dom/client";
 import "../css/app.css";
 import "./bootstrap";
 import "./i18n";
+
+// Initialize error interceptor
+ErrorInterceptor.initialize();
 
 const appName = import.meta.env.VITE_APP_NAME || "contentFlow";
 
@@ -33,12 +38,14 @@ createInertiaApp<PageProps>({
     }
 
     root.render(
-      <ThemeProvider>
-        <NotificationProvider user={props.initialPage.props.auth?.user}>
-          <App {...props} />
-          <ThemedToaster />
-        </NotificationProvider>
-      </ThemeProvider>
+      <ErrorBoundary>
+        <ThemeProvider>
+          <NotificationProvider user={props.initialPage.props.auth?.user}>
+            <App {...props} />
+            <ThemedToaster />
+          </NotificationProvider>
+        </ThemeProvider>
+      </ErrorBoundary>
     );
   },
   progress: {

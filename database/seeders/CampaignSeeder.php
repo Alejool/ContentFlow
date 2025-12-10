@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Campaigns\Campaign;
+use App\Models\Campaign;
 use Illuminate\Database\Seeder;
 
 class CampaignSeeder extends Seeder

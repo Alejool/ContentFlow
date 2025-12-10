@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\User;
-use App\Models\Campaigns\Campaign;
+use App\Models\Campaign;
 use App\Models\SocialAccount;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
@@ -105,7 +105,7 @@ class CompleteTestDataSeeder extends Seeder
 
         // Create social media accounts
         $platforms = ['facebook', 'instagram', 'twitter', 'tiktok', 'youtube'];
-        
+
         foreach ($platforms as $platform) {
             SocialAccount::create([
                 'user_id' => $user->id,
@@ -121,7 +121,7 @@ class CompleteTestDataSeeder extends Seeder
 
         // Now seed analytics for all campaigns
         $this->call(CampaignAnalyticsSeeder::class);
-        
+
         // Seed social media metrics
         $this->call(SocialMediaMetricsSeeder::class);
 

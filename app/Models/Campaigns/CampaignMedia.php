@@ -5,7 +5,7 @@ namespace App\Models\Campaigns;
 use Illuminate\Database\Eloquent\Model;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use App\Models\Campaigns\Campaign;
+use App\Models\Campaign;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 

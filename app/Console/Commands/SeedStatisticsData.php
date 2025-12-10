@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\User;
-use App\Models\Campaigns\Campaign;
+use App\Models\Campaign;
 use App\Models\SocialAccount;
 use App\Models\CampaignAnalytics;
 use App\Models\SocialMediaMetrics;
