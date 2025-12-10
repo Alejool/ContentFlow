@@ -1,11 +1,17 @@
 import { useNotifications } from "@/Hooks/useNotifications";
 import { useTheme } from "@/Hooks/useTheme";
-import { Dialog, Tab, Transition } from "@headlessui/react";
+import { Dialog, DialogPanel, DialogTitle, Tab, Transition } from "@headlessui/react";
 import { Bell, CheckCheck, Layers, Settings, X } from "lucide-react";
 import { Fragment } from "react";
 import { useTranslation } from "react-i18next";
 import NotificationItem from "./NotificationItem";
-
+import {
+  TabList,
+  TabPanel,
+  TabPanels,
+  TransitionChild,
+  TabGroup,
+} from "@headlessui/react";
 interface NotificationsModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -86,9 +92,9 @@ export default function NotificationsModal({
   };
 
   return (
-    <Transition.Root show={isOpen} as={Fragment}>
+    <Transition show={isOpen} as={Fragment}>
       <Dialog as="div" className="relative z-50" onClose={onClose}>
-        <Transition.Child
+        <TransitionChild
           as={Fragment}
           enter="ease-out duration-300"
           enterFrom="opacity-0"
@@ -100,12 +106,12 @@ export default function NotificationsModal({
           <div
             className={`fixed inset-0 ${colors.overlay} transition-opacity backdrop-blur-sm`}
           />
-        </Transition.Child>
+        </TransitionChild>
 
         <div className={`fixed inset-0 z-10 overflow-hidden ${colors.text}`}>
           <div className="absolute inset-0 overflow-hidden">
             <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
-              <Transition.Child
+              <TransitionChild
                 as={Fragment}
                 enter="transform transition ease-in-out duration-300"
                 enterFrom="translate-x-full"
@@ -114,7 +120,7 @@ export default function NotificationsModal({
                 leaveFrom="translate-x-0"
                 leaveTo="translate-x-full"
               >
-                <Dialog.Panel
+                <DialogPanel
                   className={`pointer-events-auto w-screen max-w-md ${colors.bg} flex flex-col`}
                 >
                   <div className="flex h-full flex-col shadow-xl">
@@ -123,11 +129,11 @@ export default function NotificationsModal({
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex items-center gap-2">
-                          <Dialog.Title
+                          <DialogTitle
                             className={`text-lg font-semibold leading-6 ${colors.text}`}
                           >
                             {t("notifications.title")}
-                          </Dialog.Title>
+                          </DialogTitle>
                           {unreadCount > 0 && (
                             <span className="inline-flex items-center rounded-md bg-main-color/10 px-2 py-1 text-xs font-medium text-main-color ring-1 ring-inset ring-main-color/20">
                               {unreadCount} {t("notifications.new")}
@@ -161,9 +167,9 @@ export default function NotificationsModal({
                       )}
                     </div>
 
-                    <Tab.Group>
+                    <TabGroup>
                       <div className={`border-b ${colors.border}`}>
-                        <Tab.List className="-mb-px flex space-x-4 px-4 sm:px-6">
+                        <TabList className="-mb-px flex space-x-4 px-4 sm:px-6">
                           {categories.map((category) => (
                             <Tab
                               key={category.id}
@@ -187,11 +193,11 @@ export default function NotificationsModal({
                               )}
                             </Tab>
                           ))}
-                        </Tab.List>
+                        </TabList>
                       </div>
 
-                      <Tab.Panels className="flex-1 overflow-y-auto custom-scrollbar">
-                        <Tab.Panel className="h-full">
+                      <TabPanels className="flex-1 overflow-y-auto custom-scrollbar">
+                        <TabPanel className="h-full">
                           {notifications.length > 0 ? (
                             <div className="divide-y divide-transparent">
                               {notifications
@@ -227,9 +233,9 @@ export default function NotificationsModal({
                           ) : (
                             <EmptyState t={t} isDark={isDark} colors={colors} />
                           )}
-                        </Tab.Panel>
+                        </TabPanel>
 
-                        <Tab.Panel className="h-full">
+                        <TabPanel className="h-full">
                           {applicationNotifications.length > 0 ? (
                             <div className="divide-y divide-transparent">
                               {applicationNotifications
@@ -262,9 +268,9 @@ export default function NotificationsModal({
                           ) : (
                             <EmptyState t={t} isDark={isDark} colors={colors} />
                           )}
-                        </Tab.Panel>
+                        </TabPanel>
 
-                        <Tab.Panel className="h-full">
+                        <TabPanel className="h-full">
                           {systemNotifications.length > 0 ? (
                             <div className="divide-y divide-transparent">
                               {systemNotifications
@@ -296,17 +302,17 @@ export default function NotificationsModal({
                           ) : (
                             <EmptyState t={t} isDark={isDark} colors={colors} />
                           )}
-                        </Tab.Panel>
-                      </Tab.Panels>
-                    </Tab.Group>
+                        </TabPanel>
+                      </TabPanels>
+                    </TabGroup>
                   </div>
-                </Dialog.Panel>
-              </Transition.Child>
+                </DialogPanel>
+              </TransitionChild>
             </div>
           </div>
         </div>
       </Dialog>
-    </Transition.Root>
+    </Transition>
   );
 }
 
