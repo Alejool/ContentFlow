@@ -10,6 +10,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 use App\Services\AIService;
 
+
 class AIChatController extends Controller
 {
     protected AIService $aiService;

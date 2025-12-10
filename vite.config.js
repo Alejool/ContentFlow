@@ -16,7 +16,6 @@ export default defineConfig({
             input: [
                 'resources/css/app.css',
                 'resources/js/app.tsx',
-                'resources/js/firebase.ts',
             ],
             ssr: 'resources/js/ssr.tsx',
             refresh: true,

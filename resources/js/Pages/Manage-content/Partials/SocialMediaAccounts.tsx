@@ -26,7 +26,7 @@ interface Account {
   logo: any;
   isConnected: boolean;
   accountId: number | null;
-  accountDetails?: any; // Add accountDetails
+  accountDetails?: any; 
   color: string;
   gradient: string;
 }
@@ -37,7 +37,6 @@ export default function SocialMediaAccounts() {
   const { t } = useTranslation();
   const { theme } = useTheme();
   const { isLoading, connectAccount, disconnectAccount } = useSocialMediaAuth();
-  // Adapter for old function name if needed or just use disconnectAccount
   const disconnectSocialMedia = (
     platform: string,
     id: number | null,
@@ -57,16 +56,6 @@ export default function SocialMediaAccounts() {
       color: theme === "dark" ? "bg-blue-700" : "bg-blue-600",
       gradient: "from-blue-500 to-blue-700",
     },
-    // {
-    //   id: 2,
-    //   platform: "instagram",
-    //   name: "Instagram",
-    //   logo: IconInstagram,
-    //   isConnected: false,
-    //   accountId: null,
-    //   color: theme === "dark" ? "bg-pink-700" : "bg-pink-600",
-    //   gradient: "from-pink-500 to-purple-700",
-    // },
     {
       id: 3,
       platform: "tiktok",
@@ -135,14 +124,12 @@ export default function SocialMediaAccounts() {
           theme === "dark"
             ? {
                 facebook: "bg-blue-700",
-                instagram: "bg-pink-700",
                 tiktok: "bg-neutral-900",
                 twitter: "bg-neutral-800",
                 youtube: "bg-primary-700",
               }[account.platform] || "bg-gray-500"
             : {
                 facebook: "bg-blue-600",
-                instagram: "bg-pink-600",
                 tiktok: "bg-black",
                 twitter: "bg-gray-900",
                 youtube: "bg-primary-600",
@@ -219,7 +206,6 @@ export default function SocialMediaAccounts() {
 
     if (!account) return;
 
-    // Clear any existing blocker for this account (though with modal we probably don't need this check same way)
     if (blockerModalData?.account?.id === accountId) {
       setBlockerModalData(null);
     }
@@ -250,20 +236,17 @@ export default function SocialMediaAccounts() {
             )}`
           );
         } else if (result && !result.success && result.posts) {
-          // Blocker detected - Open Modal
           setBlockerModalData({
             account,
             posts: result.posts,
           });
         }
       } catch (error: any) {
-        // Error handled in hook/result logic mostly, but catch generic
         console.error("Disconnect error", error);
       }
     } else {
       try {
         await connectAccount(account.platform);
-        // Toast and refresh handled by message listener
       } catch (error: any) {
         console.error("Error connecting to social network:", error);
       }
@@ -585,7 +568,6 @@ export default function SocialMediaAccounts() {
         </div>
       )}
 
-      {/* Disconnect Warning Modal */}
       {blockerModalData && (
         <DisconnectWarningModal
           isOpen={!!blockerModalData}

@@ -19,6 +19,6 @@
         },
         "types": ["vite/client"]
     },
-    "include": ["resources/js/**/*.ts", "resources/js/**/*.tsx", "./vendor/tightenco/ziggy/**/*.js"],
+    "include": ["resources/js/**/*.ts", "resources/js/**/*.tsx", "./vendor/tightenco/ziggy/**/*.js", "resources/js/echo.js"],
     "exclude": ["node_modules"]
 }

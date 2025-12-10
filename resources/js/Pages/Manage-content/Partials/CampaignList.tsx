@@ -168,10 +168,10 @@ export default function CampaignList({
 
   return (
     <div
-      className={`rounded-lg overflow-hidden shadow-lg border transition-all duration-300 backdrop-blur-lg ${
+      className={`overflow-hidden shadow-lg border transition-all duration-300 backdrop-blur-lg ${
         theme === "dark"
-          ? "bg-neutral-800/70 border-neutral-700/70 text-white"
-          : "bg-white/70 border-gray-100/70 text-gray-900"
+          ? "bg-black/95 border-black/95 text-white"
+          : "bg-white/95 border-gray-100/95 text-gray-900"
       }`}
     >
       {/* Header */}

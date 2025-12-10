@@ -52,6 +52,24 @@ export default function ManageContentPage() {
     activeTab === "publications" ? "publications" : "campaigns"
   );
 
+  const tabs = [
+    {
+      id: "publications",
+      icon: FileText,
+      label: t("manageContent.publications"),
+    },
+    {
+      id: "campaigns",
+      icon: Target,
+      label: t("manageContent.campaigns"),
+    },
+    {
+      id: "logs",
+      icon: FileText,
+      label: t("manageContent.logs"),
+    },
+  ];
+
   useEffect(() => {
     fetchCampaigns(filters);
   }, [filters, activeTab]);
@@ -158,11 +176,8 @@ export default function ManageContentPage() {
 
   const subtitleColor = theme === "dark" ? "text-gray-400" : "text-gray-600";
 
-  const tabBg = theme === "dark" ? "bg-neutral-800/60" : "bg-white/60";
-  const tabActiveBg = theme === "dark" ? "bg-primary-600" : "bg-primary-500";
-  const tabInactiveBg = theme === "dark" ? "bg-neutral-700" : "bg-gray-100";
-  const tabActiveText = "text-white";
-  const tabInactiveText = theme === "dark" ? "text-gray-400" : "text-gray-600";
+  const tabBg = theme === "dark" ? "" : "bg-white/60";
+
 
   return (
     <AuthenticatedLayout>
@@ -190,48 +205,46 @@ export default function ManageContentPage() {
             <SocialMediaAccounts />
 
             {/* Tabs */}
-            <div className={`${tabBg} rounded-xl shadow-lg p-6`}>
-              <div className="flex flex-col md:flex-row justify-center text-center gap-2 md:gap-0 md:space-x-2 mb-6 border-b border-gray-200 dark:border-gray-700">
-                <button
-                  data-tab="publications"
-                  onClick={() => setActiveTab("publications")}
-                  className={`px-6 py-3 rounded-t-lg font-medium transition-all duration-200 flex items-center gap-2 ${
-                    activeTab === "publications"
-                      ? `${tabActiveBg} ${tabActiveText} shadow-md`
-                      : `${tabInactiveBg} ${tabInactiveText} hover:bg-opacity-80`
-                  }`}
-                >
-                  <FileText className="w-5 h-5" />
-                  {t("manageContent.publications")}
-                </button>
-                <button
-                  data-tab="campaigns"
-                  onClick={() => setActiveTab("campaigns")}
-                  className={`px-6 py-3 rounded-t-lg font-medium transition-all duration-200 flex items-center gap-2 ${
-                    activeTab === "campaigns"
-                      ? `${tabActiveBg} ${tabActiveText} shadow-md`
-                      : `${tabInactiveBg} ${tabInactiveText} hover:bg-opacity-80`
-                  }`}
-                >
-                  <Target className="w-5 h-5" />
-                  {t("manageContent.campaigns")}
-                </button>
-                <button
-                  data-tab="logs"
-                  onClick={() => setActiveTab("logs")}
-                  className={`px-6 py-3 rounded-t-lg font-medium transition-all duration-200 flex items-center gap-2 ${
-                    activeTab === "logs"
-                      ? `${tabActiveBg} ${tabActiveText} shadow-md`
-                      : `${tabInactiveBg} ${tabInactiveText} hover:bg-opacity-80`
-                  }`}
-                >
-                  <FileText className="w-5 h-5" />
-                  {t("manageContent.logs")}
-                </button>
+            <div className={`${tabBg} rounded-xl shadow-lg `}>
+              <div className="">
+                <div className="flex items-center justify-center gap-0.5 p-1 rounded-xl max-w-md mx-auto pt-6">
+                  {tabs.map((tab) => {
+                    const isActive = activeTab === tab.id;
+
+                    return (
+                      <button
+                        key={tab.id}
+                        onClick={() => setActiveTab(tab.id)}
+                        className={`group relative flex-1 px-4 py-2.5 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
+                          isActive
+                            ? "bg-white dark:bg-gray-900 shadow-sm text-primary-600 dark:text-primary-400"
+                            : "text-gray-600 dark:text-gray-400 hover:text-primary-500 dark:hover:text-primary-300"
+                        }`}
+                      >
+                        {/* Línea inferior activa */}
+                        {isActive && (
+                          <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-8 h-0.5 bg-primary-500 rounded-full"></div>
+                        )}
+
+                        <tab.icon
+                          className={`w-4 h-4 transition-colors duration-200 ${
+                            isActive
+                              ? "text-primary-500"
+                              : "group-hover:text-primary-400"
+                          }`}
+                        />
+
+                        <span className="hidden sm:inline text-sm font-medium">
+                          {tab.label}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
               {/* Content */}
-              <div className="mt-4">
+              <div className="">
                 {activeTab === "logs" ? (
                   <LogsList />
                 ) : (
