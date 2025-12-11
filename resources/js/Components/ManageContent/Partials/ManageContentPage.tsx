@@ -1,18 +1,18 @@
+import AddCampaignModal from "@/Components/ManageContent/Partials/AddCampaignModal";
+import AddPublicationModal from "@/Components/ManageContent/Partials/AddPublicationModal";
+import CampaignList from "@/Components/ManageContent/Partials/CampaignList";
+import EditCampaignModal from "@/Components/ManageContent/Partials/EditCampaignModal";
+import EditPublicationModal from "@/Components/ManageContent/Partials/EditPublicationModal";
+import LogsList from "@/Components/ManageContent/Partials/LogsList";
+import PublishCampaignModal from "@/Components/ManageContent/Partials/PublishCampaignModal";
+import PublishPublicationModal from "@/Components/ManageContent/Partials/PublishPublicationModal";
+import SocialMediaAccounts from "@/Components/ManageContent/Partials/SocialMediaAccounts";
+import ViewCampaignModal from "@/Components/ManageContent/Partials/ViewCampaignModal";
 import { useCampaignManagement } from "@/Hooks/useCampaignManagement";
 import { useConfirm } from "@/Hooks/useConfirm";
 import { useSocialMediaAuth } from "@/Hooks/useSocialMediaAuth";
 import { useTheme } from "@/Hooks/useTheme";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import AddCampaignModal from "@/Pages/Manage-content/Partials/AddCampaignModal";
-import AddPublicationModal from "@/Pages/Manage-content/Partials/AddPublicationModal";
-import CampaignList from "@/Pages/Manage-content/Partials/CampaignList";
-import EditCampaignModal from "@/Pages/Manage-content/Partials/EditCampaignModal";
-import EditPublicationModal from "@/Pages/Manage-content/Partials/EditPublicationModal";
-import LogsList from "@/Pages/Manage-content/Partials/LogsList";
-import PublishCampaignModal from "@/Pages/Manage-content/Partials/PublishCampaignModal";
-import PublishPublicationModal from "@/Pages/Manage-content/Partials/PublishPublicationModal";
-import SocialMediaAccounts from "@/Pages/Manage-content/Partials/SocialMediaAccounts";
-import ViewCampaignModal from "@/Pages/Manage-content/Partials/ViewCampaignModal";
 import { Campaign } from "@/types/Campaign";
 import { Publication } from "@/types/Publication";
 import { Head } from "@inertiajs/react";
@@ -154,7 +154,11 @@ export default function ManageContentPage() {
       publishedPost = postLogs[0] || scheduledPosts[0];
     }
 
-    if (publishedPost && publishedPost.social_account_id && publishedPost.status !== "deleted") {
+    if (
+      publishedPost &&
+      publishedPost.social_account_id &&
+      publishedPost.status !== "deleted"
+    ) {
       const accountId = publishedPost.social_account_id;
       const foundAccount = connectedAccounts.find(
         (acc: any) => acc.id === accountId
