@@ -31,7 +31,7 @@ interface Account {
   gradient: string;
 }
 
-import DisconnectWarningModal from "./DisconnectWarningModal";
+import DisconnectWarningModal from "@/Components/ManageContent/modals/DisconnectWarningModal";
 
 export default function SocialMediaAccounts() {
   const { t } = useTranslation();
