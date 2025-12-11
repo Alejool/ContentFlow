@@ -13,6 +13,15 @@ class Campaign extends Model
 {
     use HasFactory, SoftDeletes;
 
+    private static $status = [
+        'active',
+        'inactive',
+        'completed',
+        'deleted',
+        'paused',
+    ];
+
+
     protected $fillable = [
         'user_id',
         'name',
@@ -46,23 +55,25 @@ class Campaign extends Model
     // Scopes
     public function scopeActive($query)
     {
-        return $query->where('status', 'active');
+        return $query->where('status', SELF::$status[0]);
     }
-
-    public function scopePaused($query)
+    public function scopeInactive($query)
     {
-        return $query->where('status', 'paused');
+        return $query->where('status', SELF::$status[1]);
     }
-
     public function scopeCompleted($query)
     {
-        return $query->where('status', 'completed');
+        return $query->where('status', SELF::$status[2]);
+    }
+    public function scopeDeleted($query)
+    {
+        return $query->where('status', SELF::$status[3]);
+    }
+    public function scopePaused($query)
+    {
+        return $query->where('status', SELF::$status[4]);
     }
 
-    public function scopeDraft($query)
-    {
-        return $query->where('status', 'draft');
-    }
 
     public function scopeByDateRange($query, $start, $end)
     {

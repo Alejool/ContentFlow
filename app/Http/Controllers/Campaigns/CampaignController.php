@@ -20,6 +20,25 @@ class CampaignController extends Controller
         if ($request->has('status') && $request->status !== 'all') {
             $query->where('status', $request->status);
         }
+        if ($request->has('status') && $request->status !== 'all') {
+            switch ($request->status) {
+                case 'active':
+                    $query->active();
+                    break;
+                case 'inactive':
+                    $query->inactive();
+                    break;
+                case 'completed':
+                    $query->completed();
+                    break;
+                case 'deleted':
+                    $query->deleted();
+                    break;
+                case 'paused':
+                    $query->paused();
+                    break;
+            }
+        }
 
         if ($request->has('date_start') && $request->has('date_end')) {
             $query->byDateRange($request->date_start, $request->date_end);
@@ -55,7 +74,7 @@ class CampaignController extends Controller
             'user_id' => Auth::id(),
             'name' => $validatedData['name'],
             'description' => $validatedData['description'] ?? null,
-            'status' => $validatedData['status'] ?? 'draft',
+            'status' => $validatedData['status'] ?? 'active',
             'start_date' => $validatedData['start_date'] ?? null,
             'end_date' => $validatedData['end_date'] ?? null,
             'goal' => $validatedData['goal'] ?? null,

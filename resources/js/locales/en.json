@@ -359,6 +359,24 @@
         "publishedOn": "Published On",
         "associatedPublications": "Associated Publications"
       },
+       "showCampaign": 
+      {
+        "title": "View Campaign",
+        "subtitle": "Campaign Details",
+        "name": "Name",
+        "description": "Description",
+        "image": "Image",
+        "goal": "Goal",
+        "status": "Status",
+        "budget": "Budget",
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "publishDate": "Publish Date",
+        "publishedOn": "Published On",
+        "created": "Created",
+        "lastUpdated": "Last Updated",
+        "associatedPublications": "Associated Publications"
+      },
       "validation":{
         "descMin":"Description must have at least 10 characters",
         "objRequired":"Objective is required",

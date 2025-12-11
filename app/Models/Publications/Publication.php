@@ -19,6 +19,10 @@ class Publication extends Model
     use HasFactory;
 
     protected $table = 'publications';
+    protected $status = [
+        'draft',
+        'published',
+    ];
 
     protected $fillable = [
         'user_id',
@@ -43,6 +47,16 @@ class Publication extends Model
         'publish_date' => 'date',
         'scheduled_at' => 'datetime',
     ];
+
+    public function scopeDraft($query)
+    {
+        return $query->where('status', $this->status[0]);
+    }
+
+    public function scopePublished($query)
+    {
+        return $query->where('status', $this->status[1]);
+    }
 
     public function media(): HasMany
     {

@@ -36,17 +36,11 @@ class PublicationController extends Controller
 
     if ($request->has('status') && $request->status !== 'all') {
       switch ($request->status) {
-        case 'active':
-          $query->active();
-          break;
-        case 'upcoming':
-          $query->upcoming();
-          break;
-        case 'completed':
-          $query->completed();
-          break;
         case 'draft':
-          $query->where('status', 'draft');
+          $query->draft();
+          break;
+        case 'published':
+          $query->published();
           break;
       }
     }

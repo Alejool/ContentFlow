@@ -81,9 +81,7 @@ export default function ViewCampaignModal({
               ) : (
                 <FileText className="w-6 h-6 text-primary-500" />
               )}
-              {publications.length > 0
-                ? "Campaign Details"
-                : "Publication Details"}
+              {t("campaigns.modal.showCampaign.title")}
             </DialogTitle>
             <button
               onClick={onClose}
@@ -150,7 +148,8 @@ export default function ViewCampaignModal({
                     }`}
                   >
                     <Layers className="w-4 h-4" />
-                    Included Publications ({publications.length})
+                    {t("campaigns.modal.showCampaign.associatedPublications")} (
+                    {publications.length})
                   </h4>
                   <div className="space-y-2">
                     {publications.map((pub: any) => (
@@ -203,7 +202,7 @@ export default function ViewCampaignModal({
                           theme === "dark" ? "text-gray-400" : "text-gray-500"
                         }`}
                       >
-                        {t("campaigns.objective")}
+                        {t("campaigns.modal.showCampaign.goal")}
                       </span>
                     </div>
                     <p
@@ -233,7 +232,7 @@ export default function ViewCampaignModal({
                           theme === "dark" ? "text-gray-400" : "text-gray-500"
                         }`}
                       >
-                        {t("campaigns.hashtags")}
+                        {t("campaigns.modal.showCampaign.hashtags")}
                       </span>
                     </div>
                     <p
@@ -263,7 +262,7 @@ export default function ViewCampaignModal({
                           theme === "dark" ? "text-gray-400" : "text-gray-500"
                         }`}
                       >
-                        {t("campaigns.startDate")}
+                        {t("campaigns.modal.showCampaign.startDate")}
                       </span>
                     </div>
                     <p
@@ -295,7 +294,7 @@ export default function ViewCampaignModal({
                           theme === "dark" ? "text-gray-400" : "text-gray-500"
                         }`}
                       >
-                        {t("campaigns.endDate")}
+                        {t("campaigns.modal.showCampaign.endDate")}
                       </span>
                     </div>
                     <p
@@ -399,7 +398,7 @@ export default function ViewCampaignModal({
                           theme === "dark" ? "text-gray-400" : "text-gray-500"
                         }`}
                       >
-                        {t("campaigns.publishedOn")}
+                        {t("campaigns.modal.showCampaign.publishedOn")}
                       </span>
                     </div>
                     <p
@@ -426,7 +425,7 @@ export default function ViewCampaignModal({
                       theme === "dark" ? "text-gray-400" : "text-gray-500"
                     }
                   >
-                    {t("campaigns.created")}:{" "}
+                    {t("campaigns.modal.showCampaign.created")}:{" "}
                     {formatDate((item as any).created_at)}
                   </span>
                   <span
@@ -434,7 +433,7 @@ export default function ViewCampaignModal({
                       theme === "dark" ? "text-gray-400" : "text-gray-500"
                     }
                   >
-                    {t("campaigns.lastUpdated")}:{" "}
+                    {t("campaigns.modal.showCampaign.lastUpdated")}:{" "}
                     {formatDate((item as any).updated_at)}
                   </span>
                 </div>

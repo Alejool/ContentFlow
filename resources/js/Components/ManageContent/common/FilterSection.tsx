@@ -1,6 +1,6 @@
-import ModernDatePicker from "@/Components/common/ui/ModernDatePicker"
-import { Search, Filter } from "lucide-react";
+import ModernDatePicker from "@/Components/common/ui/ModernDatePicker";
 import { format } from "date-fns";
+import { Filter, Search } from "lucide-react";
 
 interface FilterSectionProps {
   mode: "campaigns" | "publications";
@@ -27,6 +27,29 @@ export default function FilterSection({
   dateEnd,
   handleFilterChange,
 }: FilterSectionProps) {
+  const statusCampaignsOptions = [
+    { value: "all", label: t("common.filters.all") },
+    { value: "active", label: t("campaigns.filters.active") },
+    { value: "inactive", label: t("campaigns.filters.inactive") },
+    { value: "completed", label: t("campaigns.filters.completed") },
+    { value: "deleted", label: t("campaigns.filters.deleted") },
+    { value: "paused", label: t("campaigns.filters.paused") },
+  ];
+
+  const statusPublicationsOptions = [
+    { value: "all", label: t("common.filters.all") },
+    { value: "published", label: t("publications.filters.published") },
+    { value: "draft", label: t("publications.filters.draft") },
+  ];
+
+  const platformOptions = [
+    { value: "all", label: t("common.filters.all") },
+    { value: "facebook", label: "Facebook" },
+    { value: "twitter", label: "Twitter" },
+    { value: "tiktok", label: "TikTok" },
+    { value: "youtube", label: "Youtube" },
+  ];
+
   return (
     <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-gray-50 dark:bg-neutral-900/30 p-4 rounded-lg mt-4">
       <div className="flex items-center gap-2 w-full md:w-auto relative">
@@ -55,27 +78,43 @@ export default function FilterSection({
               theme === "dark" ? "text-gray-400" : "text-gray-500"
             }`}
           />
-          <select
-            value={statusFilter}
-            onChange={(e) => handleFilterChange("status", e.target.value)}
-            className={`py-2 pl-3 pr-8 rounded-lg text-sm border focus:ring-2 focus:ring-primary-500 focus:border-transparent cursor-pointer ${
-              theme === "dark"
-                ? "bg-neutral-800/70 border-neutral-700/70 text-white"
-                : "bg-white/70 border-gray-200/70 text-gray-700"
-            }`}
-          >
-            <option value="all">{t("campaigns.filters.all")}</option>
-            <option value="active">{t("campaigns.filters.active")}</option>
-            <option value="draft">{t("campaigns.filters.draft")}</option>
-            {mode === "campaigns" && (
-              <option value="completed">
-                {t("campaigns.filters.completed")}
-              </option>
-            )}
-          </select>
-        </div>
 
-        {mode === "publications" && (
+          {mode === "campaigns" && (
+            <select
+              value={statusFilter}
+              onChange={(e) => handleFilterChange("status", e.target.value)}
+              className={`py-2 pl-3 pr-8 rounded-lg text-sm border focus:ring-2 focus:ring-primary-500 focus:border-transparent cursor-pointer ${
+                theme === "dark"
+                  ? "bg-neutral-800/70 border-neutral-700/70 text-white"
+                  : "bg-white/70 border-gray-200/70 text-gray-700"
+              }`}
+            >
+              {statusCampaignsOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          )}
+
+          {mode === "publications" && (
+            <select
+              value={statusFilter}
+              onChange={(e) => handleFilterChange("status", e.target.value)}
+              className={`py-2 pl-3 pr-8 rounded-lg text-sm border focus:ring-2 focus:ring-primary-500 focus:border-transparent cursor-pointer ${
+                theme === "dark"
+                  ? "bg-neutral-800/70 border-neutral-700/70 text-white"
+                  : "bg-white/70 border-gray-200/70 text-gray-700"
+              }`}
+            >
+              {statusPublicationsOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          )}
+
           <div className="flex items-center gap-2">
             <select
               value={platformFilter}
@@ -86,15 +125,14 @@ export default function FilterSection({
                   : "bg-white/70 border-gray-200/70 text-gray-700"
               }`}
             >
-              <option value="all">All Platforms</option>
-              <option value="instagram">Instagram</option>
-              <option value="facebook">Facebook</option>
-              <option value="twitter">Twitter</option>
-              <option value="linkedin">LinkedIn</option>
-              <option value="tiktok">TikTok</option>
+              {platformOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
             </select>
           </div>
-        )}
+        </div>
 
         <div className="flex items-center gap-2">
           <div className="w-32">

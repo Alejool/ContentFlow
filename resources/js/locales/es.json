@@ -31,7 +31,10 @@
     "created": "Creado",
     "lastUpdated": "Última Actualización",
     "startDate": "Fecha de Inicio",
-    "endDate": "Fecha de Fin"
+    "endDate": "Fecha de Fin",
+    "filters": {
+      "all": "Todos"
+    }
   },
   "nav": {
     "dashboard": "Panel",
@@ -309,9 +312,7 @@
     "filters": 
     {
       "all": "Todo",
-      "active": "Activa",
-      "completed": "Completada",
-      "upcoming": "Proximas",
+      "published": "Publicadas",
       "draft": "Borrador"
     }
   },
@@ -354,6 +355,42 @@
         "publishDate": "Fecha de Publicación",
         "publishedOn": "Publicado el",
         "associatedPublications": "Publicaciones Asociadas"
+      },
+      "showCampaign": 
+      {
+        "title": "Ver Campaña",
+        "subtitle": "Detalles de la Campaña",
+        "name": "Nombre",
+        "description": "Descripción",
+        "image": "Imagen",
+        "goal": "Objetivo",
+        "status": "Estado",
+        "budget": "Presupuesto",
+        "startDate": "Fecha de Inicio",
+        "endDate": "Fecha de Fin",
+        "publishDate": "Fecha de Publicación",
+        "publishedOn": "Publicado",
+        "created": "Creado",
+        "lastUpdated": "Ultima Actualización",
+        "associatedPublications": "Publicaciones Asociadas"
+      },
+      "validation":{
+        "descMin":"Descripción debe tener al menos 10 caracteres",
+        "objRequired":"Objetivo es requerido",
+        "descRequired":"Descripción es requerida",
+        "nameRequired":"Nombre es requerido",
+        "goalRequired":"Objetivo es requerido",
+        "statusRequired":"Estado es requerido",
+        "budgetRequired":"Presupuesto es requerido",
+        "startDateRequired":"Fecha de Inicio es requerida",
+        "endDateRequired":"Fecha de Fin es requerida",
+        "publishDateRequired":"Fecha de Publicación es requerida",
+        "publishedOnRequired":"Publicado el es requerido",
+        "associatedPublicationsRequired":"Publicaciones Asociadas es requerida",
+        "titleRequired":"Título es requerido",
+        "descriptionRequired":"Descripción es requerida",
+        "hashtagsRequired":"Hashtags es requerido",
+        "schedulePublicationRequired":"Programar Publicación es requerido"
       }
     },
     "button": {
@@ -405,9 +442,10 @@
     {
       "all": "Todo",
       "active": "Activa",
+      "inactive": "Inactiva",
       "completed": "Completada",
-      "upcoming": "Proximas",
-      "draft": "Borrador"
+      "deleted": "Eliminada",
+      "paused": "Pausada"
     }
   },
 
