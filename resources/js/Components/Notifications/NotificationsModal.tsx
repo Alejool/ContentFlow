@@ -219,7 +219,7 @@ export default function NotificationsModal({
                               {notifications.length > 0 ? (
                                 <div className="divide-y divide-transparent">
                                   {notifications
-                                    .slice(0, 50)
+                                    .slice(0, 100)
                                     .map((notification) => (
                                       <NotificationItem
                                         key={notification.id}
@@ -229,7 +229,7 @@ export default function NotificationsModal({
                                         }
                                       />
                                     ))}
-                                  {notifications.length > 50 && (
+                                  {notifications.length > 100 && (
                                     <div
                                       className={`p-4 text-center ${
                                         theme === "dark"
@@ -238,7 +238,7 @@ export default function NotificationsModal({
                                       }`}
                                     >
                                       <p className="text-sm">
-                                        Showing 50 of {notifications.length}{" "}
+                                        Showing 100 of {notifications.length}{" "}
                                         notifications
                                       </p>
                                       <p className="text-xs mt-1">
@@ -329,7 +329,7 @@ export default function NotificationsModal({
                                   return filteredNotifications.length > 0 ? (
                                     <div className="divide-y divide-transparent">
                                       {filteredNotifications
-                                        .slice(0, 50)
+                                        .slice(0, 100)
                                         .map((notification) => (
                                           <NotificationItem
                                             key={notification.id}
@@ -339,7 +339,7 @@ export default function NotificationsModal({
                                             }
                                           />
                                         ))}
-                                      {filteredNotifications.length > 50 && (
+                                      {filteredNotifications.length > 100 && (
                                         <div
                                           className={`p-4 text-center ${
                                             theme === "dark"
@@ -348,7 +348,7 @@ export default function NotificationsModal({
                                           }`}
                                         >
                                           <p className="text-sm">
-                                            Showing 50 of{" "}
+                                            Showing 100 of{" "}
                                             {filteredNotifications.length}{" "}
                                             notifications
                                           </p>
@@ -396,7 +396,7 @@ export default function NotificationsModal({
                               {systemNotifications.length > 0 ? (
                                 <div className="divide-y divide-transparent">
                                   {systemNotifications
-                                    .slice(0, 50)
+                                    .slice(0, 100)
                                     .map((notification) => (
                                       <NotificationItem
                                         key={notification.id}
@@ -406,7 +406,7 @@ export default function NotificationsModal({
                                         }
                                       />
                                     ))}
-                                  {systemNotifications.length > 50 && (
+                                  {systemNotifications.length > 100 && (
                                     <div
                                       className={`p-4 text-center ${
                                         theme === "dark"
@@ -415,7 +415,7 @@ export default function NotificationsModal({
                                       }`}
                                     >
                                       <p className="text-sm">
-                                        Showing 50 of{" "}
+                                        Showing 100 of{" "}
                                         {systemNotifications.length}{" "}
                                         notifications
                                       </p>

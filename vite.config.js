@@ -16,6 +16,7 @@ export default defineConfig({
             input: [
                 'resources/css/app.css',
                 'resources/js/app.tsx',
+                'resources/js/bootstrap.ts',
             ],
             ssr: 'resources/js/ssr.tsx',
             refresh: true,
@@ -31,20 +32,24 @@ export default defineConfig({
         host: 'localhost',
         port: 5173,
         strictPort: true,
+
         https: !isUsingTunnel && fs.existsSync(keyPath) && fs.existsSync(certPath) ? {
             key: fs.readFileSync(keyPath),
             cert: fs.readFileSync(certPath),
         } : undefined,
-        // hmr: {
-        //     host: 'localhost',
-        //     protocol: 'ws', 
-        //     port: 5173,
-        // },
-        hmr: true,
+        
+        hmr: {
+            host: 'localhost',
+            clientPort: 5173,
+        },
+        
+        cors: true,  // ✅ Esto SÍ es para CORS en Vite
+        
         allowedHosts: [
+            'localhost',
+            '127.0.0.1',
             '.ngrok-free.app',
             '.trycloudflare.com',
         ],
-     
     },
 });

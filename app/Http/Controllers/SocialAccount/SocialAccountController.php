@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use App\Http\Controllers\Controller;
+use App\Notifications\SocialAccountConnectedNotification;
+use App\Notifications\SocialAccountDisconnectedNotification;
+use App\Models\SocialPostLog;
 
 class SocialAccountController extends Controller
 {
@@ -420,79 +423,6 @@ class SocialAccountController extends Controller
         }
     }
 
-    // Callback for TikTok
-    // public function handleTiktokCallback(Request $request)
-    // {
-    //     if ($request->state !== session('social_auth_state')) {
-    //         return $this->handleOAuthError('Invalid state');
-    //     }
-    //     if (!$request->has('code')) {
-    //         return $this->handleOAuthError('Authorization code not received');
-    //     }
-
-    //     try {
-    //         $codeVerifier = session('tiktok_code_verifier');
-    //         if (!$codeVerifier) {
-    //             return $this->handleOAuthError('Code verifier not found');
-    //         }
-
-    //         $response = Http::asForm()->post('https://open.tiktokapis.com/v2/oauth/token/', [
-    //             'client_key' => config('services.tiktok.client_key'),
-    //             'client_secret' => config('services.tiktok.client_secret'),
-    //             'code' => $request->code,
-    //             'grant_type' => 'authorization_code',
-    //             'redirect_uri' => url('/auth/tiktok/callback'),
-    //             'code_verifier' => $codeVerifier,
-    //         ]);
-
-    //         $data = $response->json();
-    //         session()->forget('tiktok_code_verifier');
-
-    //         if (!isset($data['access_token']) && !isset($data['data']['access_token'])) {
-    //             return $this->handleOAuthError('Could not obtain access token');
-    //         }
-
-    //         // Should normalize data structure as TikTok API response might vary or wrap in 'data'
-    //         $accessToken = $data['data']['access_token'] ?? $data['access_token'];
-    //         $openId = $data['data']['open_id'] ?? $data['open_id'];
-    //         $expiresIn = $data['data']['expires_in'] ?? $data['expires_in'];
-    //         $refreshToken = $data['data']['refresh_token'] ?? $data['refresh_token'];
-
-    //         // Get user info
-    //         $userResponse = Http::withToken($accessToken)
-    //             ->get('https://open.tiktokapis.com/v2/user/info/', [
-    //                 'fields' => 'display_name,avatar_url'
-    //             ]);
-
-    //         $userData = $userResponse->json();
-    //         $userInfo = $userData['data']['user'] ?? [];
-
-    //         $account = $this->saveAccount([
-    //             'platform' => 'tiktok',
-    //             'account_id' => $openId,
-    //             'account_name' => $userInfo['display_name'] ?? null,
-    //             'account_metadata' => [
-    //                 'avatar' => $userInfo['avatar_url'] ?? null
-    //             ],
-    //             'access_token' => $accessToken,
-    //             'refresh_token' => $refreshToken,
-    //             'token_expires_at' => $expiresIn ? now()->addSeconds($expiresIn) : null,
-    //         ]);
-
-    //         return $this->closeWindowWithMessage('success', [
-    //             'platform' => 'tiktok',
-    //             'account_id' => $openId,
-    //             'account_name' => $userInfo['display_name'] ?? null,
-    //             'avatar' => $userInfo['avatar_url'] ?? null,
-    //             'access_token' => $accessToken,
-    //             'refresh_token' => $refreshToken,
-    //             'token_expires_at' => $expiresIn ? now()->addSeconds($expiresIn)->toIso8601String() : null
-    //         ]);
-    //     } catch (\Exception $e) {
-    //         return $this->handleOAuthError('Error processing authentication: ' . $e->getMessage());
-    //     }
-    // }
-
     public function handleTiktokCallback(Request $request)
     {
         if ($request->state !== session('social_auth_state')) {
@@ -676,7 +606,7 @@ class SocialAccountController extends Controller
         // Send system notification for account connection
         $user = Auth::user();
         if ($user) {
-            $user->notify(new \App\Notifications\SocialAccountConnectedNotification(
+            $user->notify(new SocialAccountConnectedNotification(
                 $data['platform'],
                 $data['account_name'] ?? $data['account_id'],
                 $wasReconnection
@@ -758,7 +688,7 @@ class SocialAccountController extends Controller
             $force = $request->query('force') === 'true' || $request->input('force') === true;
 
             // Check for active published posts (not just scheduled)
-            $activePosts = \App\Models\SocialPostLog::where('social_account_id', $account->id)
+            $activePosts = SocialPostLog::where('social_account_id', $account->id)
                 ->whereIn('status', ['published', 'pending'])
                 ->with('publication:id,title')
                 ->get();
@@ -804,7 +734,7 @@ class SocialAccountController extends Controller
 
             // If forcing disconnect with active posts, mark them as orphaned
             if ($force && $activePosts->count() > 0) {
-                \App\Models\SocialPostLog::where('social_account_id', $account->id)
+                SocialPostLog::where('social_account_id', $account->id)
                     ->whereIn('status', ['published', 'pending'])
                     ->update([
                         'status' => 'orphaned',
@@ -815,7 +745,7 @@ class SocialAccountController extends Controller
             // Send application notification for account disconnection
             $user = Auth::user();
             if ($user) {
-                $user->notify(new \App\Notifications\SocialAccountDisconnectedNotification(
+                $user->notify(new SocialAccountDisconnectedNotification(
                     $account->platform,
                     $account->account_name ?? $account->account_id,
                     $activePosts->count()

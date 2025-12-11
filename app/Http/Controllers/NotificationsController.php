@@ -41,7 +41,7 @@ class NotificationsController extends Controller
             });
         }
 
-        $notifications = $query->latest()->paginate($request->per_page ?? 20);
+        $notifications = $query->latest()->paginate($request->per_page ?? 100);
 
         return response()->json([
             'notifications' => $notifications->items(),

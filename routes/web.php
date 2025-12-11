@@ -163,6 +163,15 @@ Route::middleware(['auth:sanctum'])->group(function () {
     |----------------------------------------------------------------------
     */
     Route::get('/social-logs', [\App\Http\Controllers\SocialPostLogController::class, 'index'])->name('social-logs.index');
+
+    Route::get('/test-notification', function () {
+        $user = auth()->user();
+        if ($user) {
+            $user->notifyNow(new \App\Notifications\TestNotification());
+            return 'Notification sent immediately to user ' . $user->id;
+        }
+        return 'No user logged in';
+    });
 });
 
 require __DIR__ . '/auth.php';

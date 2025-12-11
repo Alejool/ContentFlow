@@ -11,7 +11,6 @@ import "../css/app.css";
 import "./bootstrap";
 import "./i18n";
 
-// Initialize error interceptor
 ErrorInterceptor.initialize();
 
 const appName = import.meta.env.VITE_APP_NAME || "contentFlow";

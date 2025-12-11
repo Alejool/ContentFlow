@@ -6,6 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
+use App\Channels\EnhancedDatabaseChannel;
 
 abstract class BaseNotification extends Notification implements ShouldQueue
 {
@@ -55,9 +56,12 @@ abstract class BaseNotification extends Notification implements ShouldQueue
   /**
    * Get the notification's delivery channels.
    */
+  /**
+   * Get the notification's delivery channels.
+   */
   public function via($notifiable): array
   {
-    return ['database', 'broadcast'];
+    return [EnhancedDatabaseChannel::class, 'broadcast'];
   }
 
   /**

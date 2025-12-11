@@ -93,19 +93,11 @@ export default function SocialMediaAccounts() {
     fetchConnectedAccounts();
 
     const handleAuthMessage = (event: MessageEvent) => {
-      console.log("Message received in SocialMediaAccounts:", event.data);
 
       if (event.data && event.data.type === "social_auth_callback") {
         if (event.data.success) {
-          toast.success(t("manageContent.socialMedia.messages.connectSuccess"));
           fetchConnectedAccounts();
-        } else {
-          toast.error(
-            `${t("manageContent.socialMedia.messages.authError")}: ${
-              event.data.message || "Unknown error"
-            }`
-          );
-        }
+        } 
       }
     };
 
@@ -229,11 +221,6 @@ export default function SocialMediaAccounts() {
                   }
                 : acc
             )
-          );
-          toast.success(
-            `${account.name} ${t(
-              "manageContent.socialMedia.messages.disconnectSuccess"
-            )}`
           );
         } else if (result && !result.success && result.posts) {
           setBlockerModalData({

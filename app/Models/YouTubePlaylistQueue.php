@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\Campaigns\Campaign;
 
 class YouTubePlaylistQueue extends Model
 {
@@ -42,7 +43,7 @@ class YouTubePlaylistQueue extends Model
    */
   public function campaign(): BelongsTo
   {
-    return $this->belongsTo(\App\Models\Campaigns\Campaign::class);
+    return $this->belongsTo(Campaign::class);
   }
 
   /**

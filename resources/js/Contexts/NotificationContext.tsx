@@ -6,6 +6,7 @@ import React, {
   useEffect,
   useState,
 } from "react";
+import toast from "react-hot-toast";
 
 export interface NotificationData {
   id: string;
@@ -162,9 +163,6 @@ export const NotificationProvider = ({
       );
 
       channel.notification((notification: any) => {
-        // Flatten structure if needed, depends on how basic Notification broadcast works
-        // Usually notification contains the data merged.
-        // We wrap it to match NotificationData structure
         const { id, type, ...rest } = notification;
         const newNotif: NotificationData = {
           id: id,
@@ -175,11 +173,27 @@ export const NotificationProvider = ({
           created_at: new Date().toISOString(),
         };
 
+        if (newNotif.data.message) {
+          const toastOptions = {
+            duration: 3000,
+            position: "top-center" as const,
+          };
+
+          if (newNotif.data.status === "success") {
+            toast.success(newNotif.data.message, toastOptions);
+          } else if (newNotif.data.status === "error") {
+            toast.error(newNotif.data.message, toastOptions);
+          } else if (newNotif.data.status === "warning") {
+            toast(newNotif.data.message, { ...toastOptions, icon: "⚠️" });
+          } else {
+            toast(newNotif.data.message, toastOptions);
+          }
+        }
+
         setNotifications((prev) => {
           const exists = prev.find((n) => n.id === newNotif.id);
           if (exists) return prev;
 
-          // Add to top
           return [newNotif, ...prev];
         });
 
