@@ -28,7 +28,7 @@ export default function FilterSection({
   handleFilterChange,
 }: FilterSectionProps) {
   const statusCampaignsOptions = [
-    { value: "all", label: t("common.filters.all") },
+    { value: "all", label: t("campaigns.filters.all") },
     { value: "active", label: t("campaigns.filters.active") },
     { value: "inactive", label: t("campaigns.filters.inactive") },
     { value: "completed", label: t("campaigns.filters.completed") },
@@ -37,13 +37,13 @@ export default function FilterSection({
   ];
 
   const statusPublicationsOptions = [
-    { value: "all", label: t("common.filters.all") },
+    { value: "all", label: t("publications.filters.all") },
     { value: "published", label: t("publications.filters.published") },
     { value: "draft", label: t("publications.filters.draft") },
   ];
 
   const platformOptions = [
-    { value: "all", label: t("common.filters.all") },
+    { value: "all", label: t("publications.filters.all") },
     { value: "facebook", label: "Facebook" },
     { value: "twitter", label: "Twitter" },
     { value: "tiktok", label: "TikTok" },

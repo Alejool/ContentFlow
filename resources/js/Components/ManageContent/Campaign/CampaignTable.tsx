@@ -93,7 +93,7 @@ export default function CampaignTable({
           ) : (
             <tr>
               <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
-                No campaigns found. Create a group to organize your content.
+                  {t("campaigns.table.emptyState.title")}
               </td>
             </tr>
           )}

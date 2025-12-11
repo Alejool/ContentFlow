@@ -300,7 +300,12 @@
       "campaign": "Campaign",
       "status": "Status",
       "actions": "Actions",
-      "noCampaign": "No Campaign"
+      "noCampaign": "No Campaign",
+      "emptyState": {
+        "title": "No publications found",
+        "description": "Create a publication to start publishing content.",
+        "button": "Add Publication"
+      }
     },
     "messages": {
       "addSuccess": "Publication added successfully!",
@@ -336,9 +341,7 @@
     "filters": 
     {
       "all": "All",
-      "active": "Active",
-      "completed": "Completed",
-      "upcoming": "Upcoming",
+      "published": "Published",
       "draft": "Draft"
     }
   },
@@ -432,14 +435,19 @@
       "media": "Media",
       "status": "Status",
       "linkedAccount": "Linked Account",
-      "actions": "Actions"
+      "actions": "Actions",
+       "emptyState": {
+        "title": "No campaigns found",
+        "description": "Create a campaign to start publishing content.",
+        "button": "Add Campaign"
+      }
     },
     "messages": {
-      "addSuccess": "¡Campaign added successfully!",
+      "addSuccess": "Campaign added successfully!",
       "addError": "Error adding campaign",
-      "updateSuccess": "¡Campaign updated successfully!",
+      "updateSuccess": "Campaign updated successfully!",
       "updateError": "Error updating campaign",
-      "deleteSuccess": "¡Campaign deleted successfully!",
+      "deleteSuccess": "Campaign deleted successfully!",
       "deleteError": "Error deleting campaign",
       "fetchError": "Error fetching campaigns",
       "confirmDelete": {
@@ -467,11 +475,12 @@
     },
     "filters": 
     {
-      "all": "All",
+     "all": "All",
       "active": "Active",
+      "inactive": "Inactive",
       "completed": "Completed",
-      "upcoming": "Upcoming",
-      "draft": "Draft"
+      "deleted": "Deleted",
+      "paused": "Paused"
     }
   },
 

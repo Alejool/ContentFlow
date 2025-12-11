@@ -80,7 +80,7 @@ export default function PublicationTable({
           ) : (
             <tr>
               <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
-                No publications found. Start creating content!
+                {t("publications.table.emptyState.title")}
               </td>
             </tr>
           )}

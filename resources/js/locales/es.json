@@ -300,7 +300,12 @@
       "campaign": "Campaña",
       "status": "Estado",
       "actions": "Acciones",
-      "noCampaign": "Sin Campaña"
+      "noCampaign": "Sin Campaña",
+      "emptyState": {
+        "title": "No se encontraron publicaciones",
+        "description": "Crea una publicación para comenzar a publicar contenido.",
+        "button": "Agregar Publicación"
+      }
     },
     "messages": {
       "addSuccess": "¡Publicación agregada exitosamente!",
@@ -429,7 +434,12 @@
       "media": "Archivos",
       "status": "Estado",
       "actions": "Acciones",
-      "linkedAccount": "Cuentas Asociadas"
+      "linkedAccount": "Cuentas Asociadas",
+      "emptyState": {
+        "title": "No se encontraron campañas",
+        "description": "Crea una campaña para comenzar a publicar contenido.",
+        "button": "Agregar Campaña"
+      }
     },
     "messages": {
       "addSuccess": "¡Campaña agregada exitosamente!",
