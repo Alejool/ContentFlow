@@ -13,7 +13,6 @@ import { useConfirm } from "@/Hooks/useConfirm";
 import { useSocialMediaAuth } from "@/Hooks/useSocialMediaAuth";
 import { useTheme } from "@/Hooks/useTheme";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { useAccountsStore } from "@/stores/socialAccountsStore";
 import { Campaign } from "@/types/Campaign";
 import { Publication } from "@/types/Publication";
 import { Head } from "@inertiajs/react";
@@ -272,7 +271,7 @@ export default function ManageContentPage() {
     <AuthenticatedLayout>
       <Head title={t("manageContent.title")} />
       <div className={`min-h-screen transition-colors duration-300`}>
-        <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mx-auto  px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-12 text-center">
             <div
               className={`inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r ${iconGradient} rounded-lg mb-6`}

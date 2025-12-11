@@ -4,28 +4,20 @@ import IconTiktok from "@/../assets/Icons/tiktok.svg";
 import IconTwitter from "@/../assets/Icons/x.svg";
 import IconYoutube from "@/../assets/Icons/youtube.svg";
 import YouTubeThumbnailUploader from "@/Components/common/ui/YouTubeThumbnailUploader";
+import { usePublishPublication } from "@/Hooks/publication/usePublishPublication";
 import { useConfirm } from "@/Hooks/useConfirm";
 import { useNotifications } from "@/Hooks/useNotifications";
 import { useTheme } from "@/Hooks/useTheme";
 import { Publication } from "@/types/Publication";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
-import axios from "axios";
 import { CheckCircle, Share2, X } from "lucide-react";
-import { useEffect, useState } from "react";
-import { toast } from "react-hot-toast";
+import { useEffect } from "react";
 
 interface PublishPublicationModalProps {
   isOpen: boolean;
   onClose: () => void;
   publication: Publication | null;
   onSuccess?: () => void;
-}
-
-interface SocialAccount {
-  id: number;
-  platform: string;
-  account_name: string;
-  is_active: boolean;
 }
 
 export default function PublishPublicationModal({
@@ -37,91 +29,42 @@ export default function PublishPublicationModal({
   const { theme } = useTheme();
   const { confirm, ConfirmDialog } = useConfirm();
   const { refreshNotifications } = useNotifications();
-  const [connectedAccounts, setConnectedAccounts] = useState<SocialAccount[]>(
-    []
-  );
-  const [selectedPlatforms, setSelectedPlatforms] = useState<number[]>([]);
-  const [publishedPlatforms, setPublishedPlatforms] = useState<number[]>([]); // Track which platforms are already published
-  const [loading, setLoading] = useState(false);
-  const [publishing, setPublishing] = useState(false);
-  const [unpublishing, setUnpublishing] = useState<number | null>(null);
-  const [youtubeThumbnails, setYoutubeThumbnails] = useState<
-    Record<number, File | null>
-  >({});
-  const [existingThumbnails, setExistingThumbnails] = useState<
-    Record<number, { url: string; id: number }>
-  >({});
+
+  const {
+    connectedAccounts,
+    selectedPlatforms,
+    publishedPlatforms,
+    publishing,
+    unpublishing,
+    existingThumbnails,
+    isLoadingThumbnails,
+    fetchPublishedPlatforms,
+    loadExistingThumbnails,
+    handleUnpublish,
+    togglePlatform,
+    selectAll,
+    deselectAll,
+    isYoutubeSelected,
+    handlePublish,
+    handleThumbnailChange,
+    handleThumbnailDelete,
+    setUnpublishing,
+    resetState,
+  } = usePublishPublication();
 
   useEffect(() => {
     if (isOpen && publication) {
-      fetchConnectedAccounts();
-      fetchPublishedPlatforms();
-      loadExistingThumbnails();
-      // Reset state on open
-      setSelectedPlatforms([]);
-      setYoutubeThumbnails({});
+      console.log("Loading publication thumbnails...");
+      fetchPublishedPlatforms(publication.id);
+      loadExistingThumbnails(publication);
+      resetState();
     }
   }, [isOpen, publication]);
 
-  const loadExistingThumbnails = () => {
-    if (!publication?.media_files) return;
-
-    const thumbnails: Record<number, { url: string; id: number }> = {};
-
-    publication.media_files.forEach((media: any) => {
-      if (media.file_type.includes("video")) {
-        const thumbnail = media.derivatives?.find(
-          (d: any) =>
-            d.derivative_type === "thumbnail" &&
-            (d.platform === "youtube" ||
-              d.platform === "all" ||
-              d.platform === "generic")
-        );
-        if (thumbnail) {
-          const thumbnailUrl = thumbnail.file_path.startsWith("http")
-            ? thumbnail.file_path
-            : `/storage/${thumbnail.file_path}`;
-          thumbnails[media.id] = {
-            url: thumbnailUrl,
-            id: thumbnail.id,
-          };
-        }
-      }
-    });
-
-    setExistingThumbnails(thumbnails);
-  };
-
-  const fetchConnectedAccounts = async () => {
-    setLoading(true);
-    try {
-      const response = await axios.get("/social-accounts");
-      const accounts = response.data.accounts || [];
-      setConnectedAccounts(
-        accounts.filter((acc: SocialAccount) => acc.is_active)
-      );
-    } catch (error) {
-      toast.error("Error loading connected accounts");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchPublishedPlatforms = async () => {
-    if (!publication) return;
-
-    try {
-      const response = await axios.get(
-        `/publications/${publication.id}/published-platforms`
-      );
-      const publishedAccountIds = response.data.published_platforms || [];
-      setPublishedPlatforms(publishedAccountIds);
-    } catch (error) {
-      console.error("Error loading published platforms:", error);
-    }
-  };
-
-  const handleUnpublish = async (accountId: number, platform: string) => {
+  const handleUnpublishWithConfirm = async (
+    accountId: number,
+    platform: string
+  ) => {
     if (!publication) return;
 
     const confirmed = await confirm({
@@ -136,193 +79,28 @@ export default function PublishPublicationModal({
 
     setUnpublishing(accountId);
     try {
-      await axios.post(`/publications/${publication.id}/unpublish`, {
-        platform_ids: [accountId],
-      });
-
-      toast.success(`Unpublished from ${platform}`);
-      setPublishedPlatforms((prev) => prev.filter((id) => id !== accountId));
-
-      // Refresh notifications immediately
-      refreshNotifications();
-
-      if (onSuccess) onSuccess();
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || "Error unpublishing");
+      const success = await handleUnpublish(
+        publication.id,
+        accountId,
+        platform
+      );
+      if (success) {
+        refreshNotifications();
+        if (onSuccess) onSuccess();
+      }
     } finally {
       setUnpublishing(null);
     }
   };
 
-  const togglePlatform = (accountId: number) => {
-    setSelectedPlatforms((prev) =>
-      prev.includes(accountId)
-        ? prev.filter((id) => id !== accountId)
-        : [...prev, accountId]
-    );
-  };
-
-  const selectAll = () => {
-    setSelectedPlatforms(connectedAccounts.map((acc) => acc.id));
-  };
-
-  const deselectAll = () => {
-    setSelectedPlatforms([]);
-  };
-
-  const isYoutubeSelected = () => {
-    return connectedAccounts.some(
-      (acc) => acc.platform === "youtube" && selectedPlatforms.includes(acc.id)
-    );
-  };
-
-  const handlePublish = async () => {
-    if (selectedPlatforms.length === 0) {
-      toast.error("Please select at least one platform");
-      return;
-    }
-
+  const handlePublishWithNotifications = async () => {
     if (!publication) return;
 
-    // Validation for YouTube
-    if (isYoutubeSelected()) {
-      const videoFiles =
-        publication.media_files?.filter((m) => m.file_type === "video") || [];
-      // Only require thumbnail if it's a video.
-      // Note: Backend assumes updated YouTubeService supports thumbnails.
-      // Strict validation: Every video needs a thumbnail? Or at least one?
-      // Let's warn but allow proceed if users want default thumbnails (though API might fail if service demands it)
-      // The user specially asked for a modal to add logic.
-    }
-
-    setPublishing(true);
-    try {
-      const formData = new FormData();
-      // Add platforms as array
-      selectedPlatforms.forEach((id) =>
-        formData.append("platforms[]", id.toString())
-      );
-
-      // Add YouTube thumbnails
-      Object.entries(youtubeThumbnails).forEach(([videoId, file]) => {
-        if (file) {
-          formData.append("youtube_thumbnail", file);
-          formData.append("youtube_thumbnail_video_id", videoId);
-        }
-      });
-
-      const response = await axios.post(
-        `/publications/${publication.id}/publish`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
-      // Check if the response indicates success
-      if (response.data.success) {
-        toast.success("Publication published successfully!");
-
-        // Refresh notifications immediately
-        refreshNotifications();
-
-        if (onSuccess) onSuccess();
-        onClose();
-      } else {
-        // Handle partial or complete failure
-        handlePublishErrors(response.data);
-
-        // Refresh notifications even on partial failure to show error notifications
-        refreshNotifications();
-      }
-    } catch (error: any) {
-      // If there was a server response (meaning request reached backend),
-      // the thumbnail likely saved even if publishing failed.
-      // Update UI to show the new thumbnail as "existing".
-      if (error.response) {
-        const updatedExisting = { ...existingThumbnails };
-        let hasUpdates = false;
-
-        Object.entries(youtubeThumbnails).forEach(([vidId, file]) => {
-          if (file) {
-            updatedExisting[Number(vidId)] = {
-              url: URL.createObjectURL(file),
-              id: Date.now(), // Temporary ID
-            };
-            hasUpdates = true;
-          }
-        });
-
-        if (hasUpdates) {
-          setExistingThumbnails(updatedExisting);
-          setYoutubeThumbnails({});
-        }
-
-        // Show error details if available
-        if (error.response.data) {
-          handlePublishErrors(error.response.data);
-        } else {
-          toast.error(
-            error.response?.data?.message || "Error publishing publication"
-          );
-        }
-      } else {
-        toast.error("Network error. Please check your connection.");
-      }
-
-      // Refresh notifications to show any error notifications
+    const success = await handlePublish(publication, youtubeThumbnails);
+    if (success) {
       refreshNotifications();
-    } finally {
-      setPublishing(false);
-    }
-  };
-
-  const handlePublishErrors = (data: any) => {
-    const { details } = data;
-
-    if (!details) {
-      toast.error(data.message || "Publishing failed");
-      return;
-    }
-
-    const { platform_results, errors } = details;
-
-    // Build detailed error message
-    let errorLines: string[] = [];
-    let successLines: string[] = [];
-
-    // Check each platform result
-    if (platform_results) {
-      Object.entries(platform_results).forEach(
-        ([platform, result]: [string, any]) => {
-          if (result.success) {
-            successLines.push(`✓ ${platform}: ${result.published} published`);
-          } else {
-            const errorMsg = result.errors?.[0]?.message || "Unknown error";
-            errorLines.push(`✗ ${platform}: ${errorMsg}`);
-          }
-        }
-      );
-    }
-
-    // Show combined message
-    if (successLines.length > 0 && errorLines.length > 0) {
-      // Partial success
-      toast.error(
-        `Partial success:\n${successLines.join("\n")}\n${errorLines.join(
-          "\n"
-        )}`,
-        { duration: 6000 }
-      );
-    } else if (errorLines.length > 0) {
-      // Complete failure
-      toast.error(`Publishing failed:\n${errorLines.join("\n")}`, {
-        duration: 6000,
-      });
-    } else {
-      toast.error(data.message || "Publishing failed");
+      if (onSuccess) onSuccess();
+      onClose();
     }
   };
 
@@ -449,11 +227,7 @@ export default function PublishPublicationModal({
                 </div>
               </div>
 
-              {loading ? (
-                <div className="text-center py-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500 mx-auto"></div>
-                </div>
-              ) : connectedAccounts.length === 0 ? (
+              {connectedAccounts.length === 0 ? (
                 <div
                   className={`text-center py-8 rounded-lg ${
                     theme === "dark" ? "bg-neutral-900/50" : "bg-gray-50"
@@ -515,7 +289,7 @@ export default function PublishPublicationModal({
                                   : "text-gray-500"
                               }`}
                             >
-                              {account.account_name}
+                              {account.account_name || account.name}
                             </div>
                           </div>
                           {isPublished && (
@@ -536,7 +310,10 @@ export default function PublishPublicationModal({
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleUnpublish(account.id, account.platform);
+                              handleUnpublishWithConfirm(
+                                account.id,
+                                account.platform
+                              );
                             }}
                             disabled={isUnpublishing}
                             className="absolute top-2 right-2 p-1.5 bg-red-500/80 hover:bg-red-600 text-white rounded-full transition-colors disabled:opacity-50"
@@ -560,38 +337,60 @@ export default function PublishPublicationModal({
             {isYoutubeSelected() && videoFiles.length > 0 && (
               <div className="mb-6">
                 <div className="flex items-center gap-2 mb-4">
-                  <img src={IconYoutube} className="w-5 h-5" />
+                  <img src={IconYoutube} className="w-5 h-5" alt="YouTube" />
                   <h4
                     className={`font-semibold ${
                       theme === "dark" ? "text-white" : "text-gray-900"
                     }`}
                   >
                     YouTube Thumbnails
+                    {isLoadingThumbnails && (
+                      <span className="ml-2 text-xs text-gray-500">
+                        (Loading...)
+                      </span>
+                    )}
                   </h4>
                 </div>
 
-                <div className="space-y-4">
-                  {videoFiles.map((video) => (
-                    <YouTubeThumbnailUploader
-                      key={video.id}
-                      videoId={video.id}
-                      existingThumbnail={existingThumbnails[video.id] || null}
-                      onThumbnailChange={(file: File | null) =>
-                        setYoutubeThumbnails((prev) => ({
-                          ...prev,
-                          [video.id]: file,
-                        }))
-                      }
-                      onThumbnailDelete={() => {
-                        setYoutubeThumbnails((prev) => {
-                          const newThumbs = { ...prev };
-                          delete newThumbs[video.id];
-                          return newThumbs;
-                        });
-                      }}
-                    />
-                  ))}
-                </div>
+                {isLoadingThumbnails ? (
+                  <div className="text-center py-4">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500 mx-auto"></div>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {videoFiles.map((video) => {
+                      const videoId = video.id;
+                      const existingThumbnail = existingThumbnails[videoId];
+
+                      console.log(`Video ${videoId}:`, {
+                        hasThumbnail: !!existingThumbnail,
+                        thumbnail: existingThumbnail,
+                        metadata: video.metadata,
+                      });
+
+                      return (
+                        <YouTubeThumbnailUploader
+                          key={videoId}
+                          videoId={videoId}
+                          existingThumbnail={existingThumbnail || null}
+                          onThumbnailChange={(file: File | null) => {
+                            console.log(
+                              `Thumbnail changed for video ${videoId}:`,
+                              file
+                            );
+                            handleThumbnailChange(videoId, file);
+                          }}
+                          onThumbnailDelete={() => {
+                            console.log(
+                              `Thumbnail deleted for video ${videoId}`
+                            );
+                            handleThumbnailDelete(videoId);
+                          }}
+                        />
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             )}
 
@@ -607,7 +406,7 @@ export default function PublishPublicationModal({
                 Cancel
               </button>
               <button
-                onClick={handlePublish}
+                onClick={handlePublishWithNotifications}
                 disabled={publishing || selectedPlatforms.length === 0}
                 className="flex-1 px-4 py-3 rounded-lg font-medium bg-gradient-to-r from-primary-500 to-pink-500 hover:from-primary-600 hover:to-pink-600 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >

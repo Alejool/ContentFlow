@@ -1,5 +1,4 @@
 import Logo from "@/../assets/logo.png";
-import wave from "@/../assets/wave.svg";
 import ForgotPasswordSection from "@/Components/Auth/ForgotPasswordSection";
 import LoginSection from "@/Components/Auth/LoginSection";
 import RegisterSection from "@/Components/Auth/RegisterSection";
@@ -12,10 +11,7 @@ interface GuestLayoutProps {
   section?: string;
 }
 
-export default function GuestLayout({
-  children,
-  section,
-}: GuestLayoutProps) {
+export default function GuestLayout({ children, section }: GuestLayoutProps) {
   const { t } = useTranslation();
 
   return (

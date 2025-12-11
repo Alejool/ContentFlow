@@ -1,10 +1,10 @@
 import Bg from "@/../assets/background.svg";
 import GlobalAiAssistant from "@/Components/AiAssistant/GlobalAiAssistant";
+import MobileNavbar from "@/Components/Layout/MobileNavbar";
+import Sidebar from "@/Components/Layout/Sidebar";
 import { useTheme } from "@/Hooks/useTheme";
 import { usePage } from "@inertiajs/react";
 import { ReactNode, useState } from "react";
-import MobileNavbar from "../Components/Layout/MobileNavbar";
-import Sidebar from "../Components/Layout/Sidebar";
 
 interface AuthenticatedLayoutProps {
   header?: ReactNode;

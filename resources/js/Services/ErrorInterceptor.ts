@@ -67,12 +67,12 @@ class ErrorInterceptorClass {
     ToastService.error(message);
   }
 
-  private handle401() {
-    ToastService.error("Your session has expired. Please log in again.");
-    setTimeout(() => {
-      router.visit("/login");
-    }, 1500);
-  }
+  // private handle401() {
+  //   ToastService.error("Your session has expired. Please log in again.");
+  //   setTimeout(() => {
+  //     router.visit("/login");
+  //   }, 1500);
+  // }
 
   private handle403(data?: ErrorResponse) {
     const message =

@@ -1,9 +1,11 @@
-import {create} from "zustand";
+// stores/socialAccountsStore.ts
+import { create } from "zustand";
 
 export interface SocialAccount {
   id: number;
   platform: string;
   name: string;
+  account_name?: string; // Mantener compatibilidad
   avatar?: string;
   is_active: boolean;
 }
@@ -32,14 +34,24 @@ export const useAccountsStore = create<AccountsStore>((set) => ({
 
   setAccounts: (accounts) =>
     set({
-      accounts,
+      accounts: accounts.map((acc) => ({
+        ...acc,
+        // Asegurarnos de que siempre tenga account_name
+        account_name: acc.account_name || acc.name,
+      })),
       lastUpdated: new Date(),
       error: null,
     }),
 
   addAccount: (account) =>
     set((state) => ({
-      accounts: [...state.accounts, account],
+      accounts: [
+        ...state.accounts,
+        {
+          ...account,
+          account_name: account.account_name || account.name,
+        },
+      ],
       lastUpdated: new Date(),
     })),
 
@@ -52,7 +64,14 @@ export const useAccountsStore = create<AccountsStore>((set) => ({
   updateAccount: (accountId, updates) =>
     set((state) => ({
       accounts: state.accounts.map((account) =>
-        account.id === accountId ? { ...account, ...updates } : account
+        account.id === accountId
+          ? {
+              ...account,
+              ...updates,
+              account_name:
+                updates.account_name || account.account_name || account.name,
+            }
+          : account
       ),
       lastUpdated: new Date(),
     })),
