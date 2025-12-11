@@ -2,10 +2,10 @@ import { useTheme } from "@/Hooks/useTheme";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, usePage } from "@inertiajs/react";
 import { Mail, Shield, User } from "lucide-react";
-import AccountStatistics from "./Partials/AccountStatistics";
-import ConnectedAccounts from "./Partials/ConnectedAccounts";
-import UpdatePasswordForm from "./Partials/UpdatePasswordForm";
-import UpdateProfileInformationForm from "./Partials/UpdateProfileInformationForm";
+import AccountStatistics from "../../Components/profile/Partials/AccountStatistics";
+import ConnectedAccounts from "../../Components/profile/Partials/ConnectedAccounts";
+import UpdatePasswordForm from "../../Components/profile/Partials/UpdatePasswordForm";
+import UpdateProfileInformationForm from "../../Components/profile/Partials/UpdateProfileInformationForm";
 
 interface EditProps {
   mustVerifyEmail: boolean;
