@@ -67,6 +67,7 @@ export default function PublicationTable({
               <PublicationRow
                 key={item.id}
                 item={item}
+                t={t}
                 theme={theme}
                 connectedAccounts={connectedAccounts}
                 getStatusColor={getStatusColor}

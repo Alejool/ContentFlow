@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Log;
 use App\Models\SocialAccount;
 use App\Models\Campaign;
 use App\Models\SocialPostLog;
+use App\Services\Publish\PlatformPublishService;
 
 class PublicationController extends Controller
 {
@@ -709,7 +710,7 @@ class PublicationController extends Controller
       // Get media file and verify it belongs to this publication
       $mediaFile = MediaFile::find($videoId);
 
-      $belongsToPublication = \DB::table('publication_media')
+      $belongsToPublication = DB::table('publication_media')
         ->where('publication_id', $publication->id)
         ->where('media_file_id', $videoId)
         ->exists();
@@ -757,7 +758,7 @@ class PublicationController extends Controller
     }
 
     // Use PlatformPublishService to handle publishing + Playlists
-    $publishService = app(\App\Services\Publish\PlatformPublishService::class);
+    $publishService = app(PlatformPublishService::class);
     $result = $publishService->publishToAllPlatforms($publication, $socialAccounts);
 
     // Check if any platform was successful
@@ -816,7 +817,7 @@ class PublicationController extends Controller
       return response()->json(['message' => 'Publication is not published'], 400);
     }
 
-    $publishService = app(\App\Services\Publish\PlatformPublishService::class);
+    $publishService = app(PlatformPublishService::class);
     $result = $publishService->unpublishFromAllPlatforms($publication);
 
     if ($result['success']) {

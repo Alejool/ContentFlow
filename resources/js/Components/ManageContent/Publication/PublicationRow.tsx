@@ -1,12 +1,13 @@
-import { Publication } from "@/types/Publication";
-import { Edit, Trash2, Rocket, Image, Video } from "lucide-react";
+import CampaignTags from "@/Components/ManageContent/Publication/CampaignTags";
 import PublicationThumbnail from "@/Components/ManageContent/Publication/PublicationThumbnail";
 import SocialAccountsDisplay from "@/Components/ManageContent/Publication/SocialAccountsDisplay";
-import CampaignTags from "@/Components/ManageContent/Publication/CampaignTags";
+import { Publication } from "@/types/Publication";
+import { Edit, Image, Rocket, Trash2, Video } from "lucide-react";
 
 interface PublicationRowProps {
   item: Publication;
   theme: string;
+  t: (key: string) => string;
   connectedAccounts: any[];
   getStatusColor: (status?: string) => string;
   onEdit: (item: Publication) => void;
@@ -18,6 +19,7 @@ interface PublicationRowProps {
 export default function PublicationRow({
   item,
   theme,
+  t,
   connectedAccounts,
   getStatusColor,
   onEdit,
@@ -104,7 +106,7 @@ export default function PublicationRow({
         <CampaignTags
           publication={item}
           theme={theme}
-          t={(key: string) => key}
+          t={t}
         />
       </td>
       <td className="px-6 py-4">
