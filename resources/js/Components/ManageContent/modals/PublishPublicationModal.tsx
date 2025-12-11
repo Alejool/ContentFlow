@@ -12,6 +12,7 @@ import { Publication } from "@/types/Publication";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { CheckCircle, Share2, X } from "lucide-react";
 import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
 interface PublishPublicationModalProps {
   isOpen: boolean;
@@ -29,6 +30,7 @@ export default function PublishPublicationModal({
   const { theme } = useTheme();
   const { confirm, ConfirmDialog } = useConfirm();
   const { refreshNotifications } = useNotifications();
+  const { t } = useTranslation();
 
   const {
     connectedAccounts,
@@ -162,7 +164,7 @@ export default function PublishPublicationModal({
                   <div className="p-2 bg-gradient-to-r from-primary-500 to-pink-500 rounded-lg">
                     <Share2 className="w-6 h-6 text-white" />
                   </div>
-                  Publish Publication
+                  {t("publications.modal.publish.title")}
                 </div>
               </DialogTitle>
               <button
@@ -205,14 +207,14 @@ export default function PublishPublicationModal({
                     theme === "dark" ? "text-white" : "text-gray-900"
                   }`}
                 >
-                  Select Platforms
+                  {t("publications.modal.publish.selectPlatforms")}
                 </h4>
                 <div className="flex gap-2">
                   <button
                     onClick={selectAll}
                     className="text-sm text-primary-500 hover:text-primary-600 font-medium"
                   >
-                    Select All
+                    {t("publications.modal.publish.selectAll")}
                   </button>
                   <span
                     className={
@@ -225,7 +227,7 @@ export default function PublishPublicationModal({
                     onClick={deselectAll}
                     className="text-sm text-primary-500 hover:text-primary-600 font-medium"
                   >
-                    Deselect All
+                    {t("publications.modal.publish.deselectAll")}
                   </button>
                 </div>
               </div>
@@ -241,9 +243,9 @@ export default function PublishPublicationModal({
                       theme === "dark" ? "text-gray-400" : "text-gray-600"
                     }`}
                   >
-                    No connected social media accounts found.
+                   {t("publications.modal.publish.noConnectedAccounts")}
                     <br />
-                    Please connect your accounts first.
+                    {t("publications.modal.publish.connectAccounts")}
                   </p>
                 </div>
               ) : (
@@ -295,7 +297,7 @@ export default function PublishPublicationModal({
                             <div className="flex items-center gap-2">
                               <span className="flex items-center gap-1 text-xs font-medium text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/30 px-2 py-1 rounded-full">
                                 <CheckCircle className="w-3 h-3" />
-                                Published
+                                {t("publications.modal.publish.published")}
                               </span>
                             </div>
                           )}
@@ -342,10 +344,10 @@ export default function PublishPublicationModal({
                       theme === "dark" ? "text-white" : "text-gray-900"
                     }`}
                   >
-                    YouTube Thumbnails
+                    {t("publications.modal.publish.youtube.youtubeThumbnails")}
                     {isLoadingThumbnails && (
                       <span className="ml-2 text-xs text-gray-500">
-                        (Loading...)
+                        {t("publications.modal.publish.loading")}
                       </span>
                     )}
                   </h4>
@@ -403,7 +405,7 @@ export default function PublishPublicationModal({
                     : "bg-gray-100 hover:bg-gray-200 text-gray-700"
                 }`}
               >
-                Cancel
+                {t("publications.modal.publish.button.cancel")}
               </button>
               <button
                 onClick={handlePublishWithNotifications}
@@ -413,13 +415,12 @@ export default function PublishPublicationModal({
                 {publishing ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    Publishing...
+                    {t("publications.modal.publish.publishing")}
                   </>
                 ) : (
                   <>
                     <Share2 className="w-4 h-4" />
-                    Publish to {selectedPlatforms.length} Platform
-                    {selectedPlatforms.length !== 1 ? "s" : ""}
+                    {t("publications.modal.publish.button.publish")}  {selectedPlatforms.length} {t("publications.modal.publish.platforms")}
                   </>
                 )}
               </button>

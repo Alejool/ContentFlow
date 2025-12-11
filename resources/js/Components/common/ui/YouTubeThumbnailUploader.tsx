@@ -143,7 +143,7 @@ export default function YouTubeThumbnailUploader({
             onClick={() => fileInputRef.current?.click()}
             className={`w-full px-3 py-2 text-sm rounded-lg border ${borderColor} ${bgColor} hover:bg-opacity-80 transition-colors ${textColor}`}
           >
-            Change Thumbnail
+            {t("publications.modal.publish.button.change")}
           </button>
         </div>
       ) : (
@@ -164,9 +164,9 @@ export default function YouTubeThumbnailUploader({
             }`}
           />
           <p className={`text-sm ${textColor} mb-1`}>
-            Click to upload or drag and drop
+            {t("publications.modal.publish.dragDrop.title")}
           </p>
-          <p className="text-xs text-gray-500">PNG, JPG, WebP (max 2MB)</p>
+          <p className="text-xs text-gray-500">{t("publications.modal.publish.dragDrop.subtitle")}</p>
         </div>
       )}
 

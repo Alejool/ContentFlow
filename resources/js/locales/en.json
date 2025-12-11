@@ -245,6 +245,30 @@
           "cancel":"Cancel"
         }
       },
+      "publish":{
+        "title":"Publish",
+        "selectPlatforms":"Select Platforms",
+        "selectAll":"Select All",
+        "deselectAll":"Deselect All",
+        "noConnectedAccounts":"No accounts found.",
+        "connectAccounts":"Please connect your accounts first.",
+        "published":"Published",
+        "loading":"Loading...",
+        "publishing":"Publishing...",
+        "platforms":"Platforms",
+        "youtube":{
+          "youtubeThumbnails":"YouTube Thumbnails"
+        },
+        "dragDrop":{
+          "title":"Drag and drop to add",
+          "subtitle":"PNG, JPG, WebP (max 2MB)"
+        },
+        "button":{
+          "publish":"Publish",
+          "cancel":"Cancel",
+          "change":"Change"
+        }
+      },
       "validation":{
         "descRequired":"Description is required",
         "nameRequired":"Name is required",

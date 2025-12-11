@@ -244,6 +244,30 @@
           "cancel":"Cancelar"
         }
       },
+      "publish":{
+        "title":"Publicar",
+        "selectPlatforms":"Seleccionar Plataformas",
+        "selectAll":"Seleccionar Todo",
+        "deselectAll":"Deseleccionar Todo",
+        "noConnectedAccounts":"No se encontraron cuentas sociales conectadas.",
+        "connectAccounts":"Por favor, conecta tus cuentas primero.",
+        "published":"Publicado",
+        "loading":"Cargando...",
+        "publishing":"Publicando...",
+        "platforms":"Plataformas",
+        "youtube":{
+          "youtubeThumbnails":"Thumbnails de YouTube"
+        },
+        "dragDrop":{
+          "title":"Arrastra y suelta para agregar",
+          "subtitle":"PNG, JPG, WebP (max 2MB)"
+        },
+        "button":{
+          "publish":"Publicar",
+          "cancel":"Cancelar",
+          "change":"Cambiar"
+        }
+      },
       "validation":{
         "descMin":"Descripción debe tener al menos 10 caracteres",
         "objRequired":"Objetivo es requerido",

@@ -42,6 +42,7 @@ export default function CampaignList({
   };
 
   const handleFilterChange = (key: string, value: string) => {
+    
     if (key === "status") setStatusFilter(value);
     if (key === "platform") setPlatformFilter(value);
     if (key === "date_start") setDateStart(value);

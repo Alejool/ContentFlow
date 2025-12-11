@@ -53,12 +53,12 @@ export default function FilterSection({
   return (
     <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-gray-50 dark:bg-neutral-900/30 p-4 rounded-lg mt-4">
       <div className="flex items-center gap-2 w-full md:w-auto relative">
-        <Search
+        {/* <Search
           className={`absolute left-3 w-4 h-4 ${
             theme === "dark" ? "text-gray-500" : "text-gray-400"
           }`}
-        />
-        <input
+        /> */}
+        {/* <input
           type="text"
           placeholder={t("common.search")}
           value={search}
@@ -68,7 +68,7 @@ export default function FilterSection({
               ? "bg-neutral-800 border-neutral-700 text-white placeholder-gray-500"
               : "bg-white border-gray-200 text-gray-900 placeholder-gray-400"
           }`}
-        />
+        /> */}
       </div>
 
       <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
