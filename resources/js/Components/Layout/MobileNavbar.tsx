@@ -114,7 +114,7 @@ const mobileNavigationItems = [
   { nameKey: "nav.profile", href: "profile.edit", lucideIcon: User },
   {
     nameKey: "nav.manageContent",
-    href: "manage-content.index",
+    href: "/ManageContent.index",
     lucideIcon: FileText,
   },
   { nameKey: "nav.analytics", href: "analytics.index", lucideIcon: BarChart3 },
@@ -151,7 +151,7 @@ export default function MobileNavbar({
     const routePatterns: Record<string, string[]> = {
       dashboard: ["/dashboard"],
       "profile.edit": ["/profile", "/profile/edit"],
-      "manage-content.index": ["/manage-content"],
+      "/ManageContent.index": ["/manageContent"],
       "analytics.index": ["/analytics"],
       "ai-chat.index": ["/ai-chat"],
     };

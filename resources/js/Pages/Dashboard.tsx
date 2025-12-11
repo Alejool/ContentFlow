@@ -539,7 +539,7 @@ export default function Dashboard({ auth, stats, status }: DashboardProps) {
           </Link>
 
           <Link
-            href="/manage-content"
+            href="/ManageContent"
             className={`group relative overflow-hidden rounded-lg p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${
               theme === "dark"
                 ? "bg-gradient-to-r from-green-900/40 to-green-800/40 border border-green-800/30"

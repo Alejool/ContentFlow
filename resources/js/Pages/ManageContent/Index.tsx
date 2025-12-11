@@ -1,2 +1,2 @@
-import ManageContentPage from "../../Components/ManageContent/Partials/ManageContentPage";
+import ManageContentPage from "@/Components/ManageContent/Partials/ManageContentPage";
 export default ManageContentPage;

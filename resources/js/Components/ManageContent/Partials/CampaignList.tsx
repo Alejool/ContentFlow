@@ -1,11 +1,12 @@
 import { Fragment, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "@/Hooks/useTheme";
-import { CampaignListProps } from "./types";
-import HeaderSection from "./HeaderSection";
-import FilterSection from "./FilterSection";
-import CampaignTable from "./CampaignTable";
-import PublicationTable from "./PublicationTable";
+import { CampaignListProps } from "@/types/CampaignListProps";
+import HeaderSection from "@/Components/ManageContent/common/HeaderSection";
+import FilterSection from "@/Components/ManageContent/common/FilterSection";
+import CampaignTable from "@/Components/ManageContent/Campaign/CampaignTable";
+import PublicationTable from "@/Components/ManageContent/Publication/PublicationTable";
+import Pagination from "@/Components/ManageContent/common/Pagination";
 
 export default function CampaignList({
   items,

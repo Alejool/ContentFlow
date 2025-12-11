@@ -95,7 +95,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     | Content Management (Inertia Views)
     |----------------------------------------------------------------------
     */
-    Route::get('/manage-content', [ManageContentController::class, 'index'])->name('manage-content.index');
+    Route::get('/ManageContent', [ManageContentController::class, 'index'])->name('/ManageContent.index');
     Route::get('/posts', [PostsController::class, 'index'])->name('posts.index');
 
     /*

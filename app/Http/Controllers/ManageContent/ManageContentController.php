@@ -13,9 +13,6 @@ class ManageContentController extends Controller
 {
   public function index(Request $request): Response
   {
-    return Inertia::render('Manage-content/Index', [
-   
-    ]);
-  }  
-
+    return Inertia::render('/ManageContent/Index', []);
+  }
 }

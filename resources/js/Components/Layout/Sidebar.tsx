@@ -38,7 +38,7 @@ const navigationItems = [
   },
   {
     nameKey: "nav.manageContent",
-    href: "manage-content.index",
+    href: "/ManageContent.index",
     icon: FileText,
   },
   {
@@ -70,7 +70,7 @@ export default function Sidebar({
     const routePatterns: Record<string, string[]> = {
       dashboard: ["/dashboard"],
       "profile.edit": ["/profile", "/profile/edit"],
-      "manage-content.index": ["/manage-content"],
+      "/ManageContent.index": ["/ManageContent"],
       "analytics.index": ["/analytics"],
       "ai-chat.index": ["/ai-chat"],
     };
@@ -89,7 +89,7 @@ export default function Sidebar({
     const routeUrls: Record<string, string> = {
       dashboard: "/dashboard",
       "profile.edit": "/profile",
-      "manage-content.index": "/manage-content",
+      "/ManageContent.index": "/ManageContent",
       "analytics.index": "/analytics",
       "ai-chat.index": "/ai-chat",
       logout: "/logout",

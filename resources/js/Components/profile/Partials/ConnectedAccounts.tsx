@@ -154,7 +154,7 @@ export default function ConnectedAccounts({ className = "" }) {
 
       <div className="mt-6 text-center">
         <a
-          href="/manage-content"
+          href="/ManageContent"
           className="text-sm text-purple-600 hover:text-purple-800 font-medium hover:underline"
         >
           {t("profile.connectedAccounts.manageLink")} &rarr;
