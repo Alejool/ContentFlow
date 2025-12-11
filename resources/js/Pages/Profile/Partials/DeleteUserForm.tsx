@@ -1,7 +1,7 @@
-import Modal from "@/Components/Modal";
-import ModernButton from "@/Components/Modern/ModernButton";
-import ModernCard from "@/Components/Modern/ModernCard";
-import ModernInput from "@/Components/Modern/ModernInput";
+import Modal from "@/Components/common/ui/Modal";
+import ModernButton from "@/Components/common/Modern/ModernButton";
+import ModernCard from "@/Components/common/Modern/ModernCard";
+import ModernInput from "@/Components/common/Modern/ModernInput";
 import { deleteUserSchema } from "@/schemas/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";

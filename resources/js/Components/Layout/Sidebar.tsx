@@ -1,8 +1,8 @@
 import Logo from "@/../assets/logo.png";
-import LanguageSwitcher from "@/Components/LanguageSwitcher";
-import NavLink from "@/Components/NavLink";
 import NotificationsModal from "@/Components/Notifications/NotificationsModal";
-import ThemeSwitcher from "@/Components/ThemeSwitcher";
+import LanguageSwitcher from "@/Components/common/ui/LanguageSwitcher";
+import NavLink from "@/Components/common/ui/NavLink";
+import ThemeSwitcher from "@/Components/common/ui/ThemeSwitcher";
 import { useNotifications } from "@/Hooks/useNotifications";
 import { useTheme } from "@/Hooks/useTheme";
 import { Link } from "@inertiajs/react";

@@ -3,8 +3,8 @@ import GlobalAiAssistant from "@/Components/AiAssistant/GlobalAiAssistant";
 import { useTheme } from "@/Hooks/useTheme";
 import { usePage } from "@inertiajs/react";
 import { ReactNode, useState } from "react";
-import MobileNavbar from "./Components/MobileNavbar";
-import Sidebar from "./Components/Sidebar";
+import MobileNavbar from "../Components/Layout/MobileNavbar";
+import Sidebar from "../Components/Layout/Sidebar";
 
 interface AuthenticatedLayoutProps {
   header?: ReactNode;

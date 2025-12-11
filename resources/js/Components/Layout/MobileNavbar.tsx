@@ -1,9 +1,9 @@
 import Logo from "@/../assets/logo-with-name.png";
-import Dropdown from "@/Components/Dropdown";
-import LanguageSwitcher from "@/Components/LanguageSwitcher";
 import NotificationsModal from "@/Components/Notifications/NotificationsModal";
-import ResponsiveNavLink from "@/Components/ResponsiveNavLink";
-import ThemeSwitcher from "@/Components/ThemeSwitcher";
+import Dropdown from "@/Components/common/ui/Dropdown";
+import LanguageSwitcher from "@/Components/common/ui/LanguageSwitcher";
+import ResponsiveNavLink from "@/Components/common/ui/ResponsiveNavLink";
+import ThemeSwitcher from "@/Components/common/ui/ThemeSwitcher";
 import { useNotifications } from "@/Hooks/useNotifications";
 import { useTheme } from "@/Hooks/useTheme";
 import { usePage } from "@inertiajs/react";
@@ -337,7 +337,7 @@ export default function MobileNavbar({
                     }`}
                   />
                   <span
-                    className={`${isProfileActive ? "font-semibold " :``}`}
+                    className={`${isProfileActive ? "font-semibold " : ``}`}
                   >
                     {t("nav.profile")}
                   </span>

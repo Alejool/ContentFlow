@@ -1,7 +1,7 @@
-import LanguageSwitcher from "@/Components/LanguageSwitcher";
-import ModernButton from "@/Components/Modern/ModernButton";
-import ModernCard from "@/Components/Modern/ModernCard";
-import ModernInput from "@/Components/Modern/ModernInput";
+import ModernButton from "@/Components/common/Modern/ModernButton";
+import ModernCard from "@/Components/common/Modern/ModernCard";
+import ModernInput from "@/Components/common/Modern/ModernInput";
+import LanguageSwitcher from "@/Components/common/ui/LanguageSwitcher";
 import { useTheme } from "@/Hooks/useTheme";
 import { profileSchema } from "@/schemas/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";

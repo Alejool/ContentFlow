@@ -1,4 +1,4 @@
-import ConfirmDialog from "@/Components/ConfirmDialog";
+import ConfirmDialog from "@/Components/common/ui/ConfirmDialog";
 import React, { useState } from "react";
 
 interface ConfirmOptions {

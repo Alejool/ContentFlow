@@ -1,11 +1,14 @@
 import axios from "axios";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
+import { useCampaignManagement } from "@/Hooks/useCampaignManagement";
 
 export const useSocialMediaAuth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [accounts, setAccounts] = useState<any[]>([]);
+  const { fetchCampaigns } = useCampaignManagement();
+
 
   const fetchAccounts = async () => {
     try {
@@ -77,7 +80,8 @@ export const useSocialMediaAuth = () => {
               // authWindow.close(); // Optional: popup usually closes itself
               setIsLoading(false);
               toast.success("Cuenta conectada exitosamente");
-              await fetchAccounts(); // Update local state for good measure
+              await fetchAccounts(); 
+              // await fetchCampaigns();
               resolve(true);
             }
           };
@@ -125,6 +129,7 @@ export const useSocialMediaAuth = () => {
         }
       );
       setAccounts((prev) => prev.filter((a) => a.id !== id));
+      // await fetchCampaigns();
       return { success: true };
     } catch (err: any) {
       if (err.response && err.response.status === 400) {

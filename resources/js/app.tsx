@@ -1,5 +1,5 @@
-import { ErrorBoundary } from "@/Components/ErrorBoundary";
-import ThemedToaster from "@/Components/ThemedToaster";
+import { ErrorBoundary } from "@/Components/common/ui/ErrorBoundary";
+import ThemedToaster from "@/Components/common/ui/ThemedToaster";
 import { NotificationProvider } from "@/Contexts/NotificationContext";
 import { ThemeProvider } from "@/Contexts/ThemeContext";
 import { ErrorInterceptor } from "@/Services/ErrorInterceptor";

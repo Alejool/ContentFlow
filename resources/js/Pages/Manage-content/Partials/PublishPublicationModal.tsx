@@ -3,7 +3,7 @@ import IconInstagram from "@/../assets/Icons/instagram.svg";
 import IconTiktok from "@/../assets/Icons/tiktok.svg";
 import IconTwitter from "@/../assets/Icons/x.svg";
 import IconYoutube from "@/../assets/Icons/youtube.svg";
-import YouTubeThumbnailUploader from "@/Components/YouTubeThumbnailUploader";
+import YouTubeThumbnailUploader from "@/Components/common/ui/YouTubeThumbnailUploader";
 import { useConfirm } from "@/Hooks/useConfirm";
 import { useNotifications } from "@/Hooks/useNotifications";
 import { useTheme } from "@/Hooks/useTheme";

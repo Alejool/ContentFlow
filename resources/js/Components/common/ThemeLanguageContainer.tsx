@@ -1,5 +1,5 @@
-import LanguageSwitcher from "@/Components/LanguageSwitcher";
-import ThemeSwitcher from "@/Components/ThemeSwitcher";
+import LanguageSwitcher from "@/Components/common/ui/LanguageSwitcher";
+import ThemeSwitcher from "@/Components/common/ui/ThemeSwitcher";
 import { Link } from "@inertiajs/react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";

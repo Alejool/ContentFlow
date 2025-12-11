@@ -1,6 +1,6 @@
-import ModernButton from "@/Components/Modern/ModernButton";
-import ModernCard from "@/Components/Modern/ModernCard";
-import ModernInput from "@/Components/Modern/ModernInput";
+import ModernButton from "@/Components/common/Modern/ModernButton.js";
+import ModernCard from "@/Components/common/Modern/ModernCard.js";
+import ModernInput from "@/Components/common/Modern/ModernInput.js";
 import { useTheme } from "@/Hooks/useTheme";
 import { Transition } from "@headlessui/react";
 import { AlertTriangle, Check, Key, Lock, Shield } from "lucide-react";

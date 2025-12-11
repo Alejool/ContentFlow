@@ -1,9 +1,8 @@
 import IconFacebook from "@/../assets/Icons/facebook.svg";
-import IconInstagram from "@/../assets/Icons/instagram.svg";
 import IconTiktok from "@/../assets/Icons/tiktok.svg";
 import IconTwitter from "@/../assets/Icons/x.svg";
 import IconYoutube from "@/../assets/Icons/youtube.svg";
-import ModernCard from "@/Components/Modern/ModernCard";
+import ModernCard from "@/Components/common/Modern/ModernCard";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";

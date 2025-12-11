@@ -1,5 +1,5 @@
-import ModernDatePicker from "@/Components/ui/ModernDatePicker";
-import YouTubeThumbnailUploader from "@/Components/YouTubeThumbnailUploader";
+import ModernDatePicker from "@/Components/common/ui/ModernDatePicker";
+import YouTubeThumbnailUploader from "@/Components/common/ui/YouTubeThumbnailUploader";
 import { useCampaignManagement } from "@/Hooks/useCampaignManagement";
 import { useConfirm } from "@/Hooks/useConfirm";
 import { useTheme } from "@/Hooks/useTheme";

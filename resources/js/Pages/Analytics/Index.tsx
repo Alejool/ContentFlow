@@ -7,10 +7,10 @@ import { Head } from "@inertiajs/react";
 import { Eye, Heart, MousePointerClick, TrendingUp, Users } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import CampaignPerformance from "./Components/CampaignPerformance";
-import EmptyState from "./Components/EmptyState";
-import PeriodSelector from "./Components/PeriodSelector";
-import SocialMediaAccounts from "./Components/SocialMediaAccounts";
+import CampaignPerformance from "../../Components/Analytics/CampaignPerformance";
+import EmptyState from "../../Components/Analytics/EmptyState";
+import PeriodSelector from "../../Components/Analytics/PeriodSelector";
+import SocialMediaAccounts from "../../Components/Analytics/SocialMediaAccounts";
 
 interface OverviewStats {
   total_views: number;
