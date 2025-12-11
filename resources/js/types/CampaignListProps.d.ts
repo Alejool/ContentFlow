@@ -21,4 +21,5 @@ export type CampaignListProps = {
   onPageChange: (page: number) => void;
   onEditRequest?: (item: any) => void;
   connectedAccounts?: any[];
+  onForceRefresh?: () => void;
 };

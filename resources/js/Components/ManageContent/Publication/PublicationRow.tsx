@@ -1,5 +1,5 @@
 import { Publication } from "@/types/Publication";
-import { Edit, Trash2, Rocket } from "lucide-react";
+import { Edit, Trash2, Rocket, Image, Video } from "lucide-react";
 import PublicationThumbnail from "@/Components/ManageContent/Publication/PublicationThumbnail";
 import SocialAccountsDisplay from "@/Components/ManageContent/Publication/SocialAccountsDisplay";
 import CampaignTags from "@/Components/ManageContent/Publication/CampaignTags";
@@ -90,10 +90,14 @@ export default function PublicationRow({
       <td className="px-6 py-4 text-sm text-gray-500">
         <span>{mediaCount.total} files</span>
         {mediaCount.images > 0 && (
-          <span className="text-xs ml-2">📷 {mediaCount.images}</span>
+          <span className="text-xs ml-2 flex items-center">
+            <Image className="w-3 h-3 mr-1" /> {mediaCount.images}
+          </span>
         )}
         {mediaCount.videos > 0 && (
-          <span className="text-xs ml-2">🎬 {mediaCount.videos}</span>
+          <span className="text-xs ml-2 flex items-center">
+            <Video className="w-3 h-3 mr-1" /> {mediaCount.videos}
+          </span>
         )}
       </td>
       <td className="px-6 py-4">

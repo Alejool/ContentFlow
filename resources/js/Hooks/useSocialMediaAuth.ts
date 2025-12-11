@@ -1,17 +1,23 @@
+import { useAccountsStore } from "@/stores/socialAccountsStore";
 import axios from "axios";
-import { useState } from "react";
 import { toast } from "react-hot-toast";
-import { useCampaignManagement } from "@/Hooks/useCampaignManagement";
 
 export const useSocialMediaAuth = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [accounts, setAccounts] = useState<any[]>([]);
-  const { fetchCampaigns } = useCampaignManagement();
-
+  const {
+    accounts,
+    isLoading,
+    error,
+    setAccounts,
+    setLoading,
+    setError,
+    removeAccount,
+  } = useAccountsStore();
 
   const fetchAccounts = async () => {
     try {
+      setLoading(true);
+      setError(null);
+
       const response = await axios.get("/social-accounts", {
         headers: {
           "X-CSRF-TOKEN": document
@@ -22,6 +28,7 @@ export const useSocialMediaAuth = () => {
         withCredentials: true,
       });
 
+      console.log("fetchAccounts", response);
       if (response.data && response.data.accounts) {
         setAccounts(response.data.accounts);
         return response.data.accounts;
@@ -29,14 +36,19 @@ export const useSocialMediaAuth = () => {
       return [];
     } catch (error) {
       console.error("Error al cargar cuentas sociales:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Error desconocido";
+      setError(errorMessage);
       return [];
+    } finally {
+      setLoading(false);
     }
   };
 
   const connectAccount = (platform: string): Promise<boolean> => {
     return new Promise(async (resolve, reject) => {
       try {
-        setIsLoading(true);
+        setLoading(true);
         setError(null);
 
         const response = await axios.get(
@@ -53,8 +65,8 @@ export const useSocialMediaAuth = () => {
         );
 
         if (response.data.success && response.data.url) {
-          const width = 600;
-          const height = 700;
+          const width = 400;
+          const height = 600;
           const left = window.screen.width / 2 - width / 2;
           const top = window.screen.height / 2 - height / 2;
 
@@ -65,7 +77,7 @@ export const useSocialMediaAuth = () => {
           );
 
           if (!authWindow) {
-            setIsLoading(false);
+            setLoading(false);
             toast.error("El navegador bloqueó la ventana emergente.");
             resolve(false);
             return;
@@ -77,11 +89,12 @@ export const useSocialMediaAuth = () => {
               event.data?.type === "SOCIAL_AUTH_SUCCESS"
             ) {
               window.removeEventListener("message", handleMessage);
-              // authWindow.close(); // Optional: popup usually closes itself
-              setIsLoading(false);
+              authWindow.close();
+
+              await fetchAccounts();
+
+              setLoading(false);
               toast.success("Cuenta conectada exitosamente");
-              await fetchAccounts(); 
-              // await fetchCampaigns();
               resolve(true);
             }
           };
@@ -92,28 +105,30 @@ export const useSocialMediaAuth = () => {
             if (authWindow.closed) {
               clearInterval(checkWindowClosed);
               window.removeEventListener("message", handleMessage);
-              setIsLoading(false);
-              // Resolve false if closed without success message
+              setLoading(false);
+              setTimeout(async () => {
+                await fetchAccounts();
+              }, 1000);
               resolve(false);
             }
           }, 1000);
         } else {
-          setIsLoading(false);
+          setLoading(false);
           toast.error("No se pudo obtener la URL de autenticación");
           resolve(false);
         }
       } catch (error: any) {
-        setIsLoading(false);
+        setLoading(false);
         const msg = error.response?.data?.message || error.message;
         toast.error("Error al conectar: " + msg);
         setError(msg);
-        resolve(false); // Resolve false instead of throw to prevent crash
+        resolve(false);
       }
     });
   };
 
   const disconnectAccount = async (id: number, force: boolean = false) => {
-    setIsLoading(true);
+    setLoading(true);
     setError(null);
     try {
       await axios.delete(
@@ -128,8 +143,9 @@ export const useSocialMediaAuth = () => {
           withCredentials: true,
         }
       );
-      setAccounts((prev) => prev.filter((a) => a.id !== id));
-      // await fetchCampaigns();
+      removeAccount(id);
+      await fetchAccounts();
+
       return { success: true };
     } catch (err: any) {
       if (err.response && err.response.status === 400) {
@@ -147,7 +163,7 @@ export const useSocialMediaAuth = () => {
       toast.error(errorMessage);
       return { success: false, error: errorMessage };
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 

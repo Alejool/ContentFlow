@@ -275,9 +275,9 @@
       "media": "Media",
       "campaign": "Campaign",
       "status": "Status",
-      "actions": "Actions"
+      "actions": "Actions",
+      "noCampaign": "No Campaign"
     },
-    "noCampaign": "No Campaign",
     "messages": {
       "addSuccess": "Publication added successfully!",
       "addError": "Error adding publication",

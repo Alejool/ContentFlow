@@ -1,6 +1,6 @@
-import { Publication } from "@/types/Publication";
 import PublicationRow from "@/Components/ManageContent/Publication/PublicationRow";
 import { TableHeader } from "@/Components/ManageContent/Publication/TableHeader";
+import { Publication } from "@/types/Publication";
 
 interface PublicationTableProps {
   items: Publication[];

@@ -1,18 +1,19 @@
+import LogsList from "@/Components/ManageContent/Logs/LogsList";
+import CampaignList from "@/Components/ManageContent/Partials/CampaignList";
 import AddCampaignModal from "@/Components/ManageContent/modals/AddCampaignModal";
 import AddPublicationModal from "@/Components/ManageContent/modals/AddPublicationModal";
-import CampaignList from "@/Components/ManageContent/Partials/CampaignList";
 import EditCampaignModal from "@/Components/ManageContent/modals/EditCampaignModal";
 import EditPublicationModal from "@/Components/ManageContent/modals/EditPublicationModal";
-import LogsList from "@/Components/ManageContent/Logs/LogsList";
 import PublishCampaignModal from "@/Components/ManageContent/modals/PublishCampaignModal";
 import PublishPublicationModal from "@/Components/ManageContent/modals/PublishPublicationModal";
-import SocialMediaAccounts from "@/Components/ManageContent/socialAccount/SocialMediaAccounts";
 import ViewCampaignModal from "@/Components/ManageContent/modals/ViewCampaignModal";
+import SocialMediaAccounts from "@/Components/ManageContent/socialAccount/SocialMediaAccounts";
 import { useCampaignManagement } from "@/Hooks/useCampaignManagement";
 import { useConfirm } from "@/Hooks/useConfirm";
 import { useSocialMediaAuth } from "@/Hooks/useSocialMediaAuth";
 import { useTheme } from "@/Hooks/useTheme";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
+import { useAccountsStore } from "@/stores/socialAccountsStore";
 import { Campaign } from "@/types/Campaign";
 import { Publication } from "@/types/Publication";
 import { Head } from "@inertiajs/react";
@@ -112,20 +113,17 @@ export default function ManageContentPage() {
     }
   };
 
-  // Fetch connected accounts for verification
-  const {
-    accounts: connectedAccounts = [],
-    isLoading: isLoadingAccounts,
-    fetchAccounts,
-  } = useSocialMediaAuth();
+  const { fetchAccounts, accounts: connectedAccounts } = useSocialMediaAuth();
 
   useEffect(() => {
-    // Ensure we have the latest connected accounts status
-    if (fetchAccounts) fetchAccounts();
+    fetchAccounts();
   }, []);
 
+  const handleRefreshAccounts = async () => {
+    await fetchAccounts();
+  };
+
   const handleEditRequest = async (item: Publication | any) => {
-    // If it's not published, just open edit modal
     if (item.status !== "published") {
       openEditModal(item);
       return;
@@ -247,7 +245,6 @@ export default function ManageContentPage() {
 
   const handleUpdate = async (success: boolean) => {
     if (success) {
-      // Modal usually closes itself via onClose, but we trigger refresh
       await fetchCampaigns(filters);
     }
   };
@@ -294,11 +291,7 @@ export default function ManageContentPage() {
           </div>
 
           <div className="space-y-8">
-            <SocialMediaAccounts
-              connectedAccounts={connectedAccounts}
-              isLoadingProp={isLoadingAccounts}
-              onForceRefresh={fetchAccounts}
-            />
+            <SocialMediaAccounts />
 
             {/* Tabs */}
             <div className={`${tabBg} rounded-xl shadow-lg `}>
@@ -349,6 +342,7 @@ export default function ManageContentPage() {
                   <LogsList />
                 ) : (
                   <CampaignList
+                    key={`campaigns-${connectedAccounts.length}`}
                     items={campaigns}
                     pagination={pagination}
                     onPageChange={handlePageChange}

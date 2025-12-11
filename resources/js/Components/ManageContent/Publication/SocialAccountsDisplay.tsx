@@ -48,6 +48,8 @@ export default function SocialAccountsDisplay({
           (acc) => acc.id === item.social_account_id
         );
 
+        console.log(connectedAccounts);
+
         return (
           <div
             key={`${item.id}-${platform}`}

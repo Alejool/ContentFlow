@@ -20,7 +20,7 @@ export default function CampaignTags({
           theme === "dark" ? "text-gray-500" : "text-gray-400"
         }`}
       >
-        {t("publications.noCampaign")}
+        {t("publications.table.noCampaign")}
       </span>
     );
   }

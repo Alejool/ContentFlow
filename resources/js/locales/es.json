@@ -270,9 +270,9 @@
       "media": "Archivos",
       "campaign": "Campaña",
       "status": "Estado",
-      "actions": "Acciones"
+      "actions": "Acciones",
+      "noCampaign": "Sin Campaña"
     },
-    "noCampaign": "Sin Campaña",
     "messages": {
       "addSuccess": "¡Publicación agregada exitosamente!",
       "addError": "Error al agregar publicación",

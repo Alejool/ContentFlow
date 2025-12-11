@@ -2,6 +2,7 @@ import IconFacebook from "@/../assets/Icons/facebook.svg";
 import IconTiktok from "@/../assets/Icons/tiktok.svg";
 import IconTwitter from "@/../assets/Icons/x.svg";
 import IconYoutube from "@/../assets/Icons/youtube.svg";
+import DisconnectWarningModal from "@/Components/ManageContent/modals/DisconnectWarningModal";
 import { useSocialMediaAuth } from "@/Hooks/useSocialMediaAuth";
 import { useTheme } from "@/Hooks/useTheme";
 import axios from "axios";
@@ -30,8 +31,6 @@ interface Account {
   color: string;
   gradient: string;
 }
-
-import DisconnectWarningModal from "@/Components/ManageContent/modals/DisconnectWarningModal";
 
 export default function SocialMediaAccounts() {
   const { t } = useTranslation();
