@@ -1,8 +1,8 @@
 import { Publication } from "@/types/Publication";
 import { Edit, Trash2, Rocket } from "lucide-react";
-import PublicationThumbnail from "@Pages/Manage-content/Partials/Campaign/PublicationThumbnail";
-import SocialAccountsDisplay from "@Pages/Manage-content/Partials/Campaign/SocialAccountsDisplay";
-import CampaignTags from "@Pages/Manage-content/Partials/Campaign/CampaignTags";
+import PublicationThumbnail from "@/Components/ManageContent/Publication/PublicationThumbnail";
+import SocialAccountsDisplay from "@/Components/ManageContent/Publication/SocialAccountsDisplay";
+import CampaignTags from "@/Components/ManageContent/Publication/CampaignTags";
 
 interface PublicationRowProps {
   item: Publication;

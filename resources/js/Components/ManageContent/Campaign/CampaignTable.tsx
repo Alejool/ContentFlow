@@ -1,8 +1,8 @@
 import { Fragment } from "react";
 import { Campaign } from "@/types/Campaign";
-import CampaignRow from "./CampaignRow";
-import CampaignPublications from "./CampaignPublications";
-import { TableHeader } from "./TableHeader";
+import CampaignRow from "@/Components/ManageContent/Campaign/CampaignRow";
+import CampaignPublications from "@/Components/ManageContent/Campaign/CampaignPublications";
+import { TableHeader } from "@/Components/ManageContent/Publication/TableHeader";
 
 interface CampaignTableProps {
   items: Campaign[];

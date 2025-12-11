@@ -1,6 +1,6 @@
 import { Campaign } from "@/types/Campaign";
 import { format } from "date-fns";
-import PublicationThumbnail from "@Pages/Manage-content/Partials/Publication/PublicationThumbnail";
+import PublicationThumbnail from "@/Components/ManageContent/Publication/PublicationThumbnail";
 
 interface CampaignPublicationsProps {
   campaign: Campaign;
