@@ -100,6 +100,8 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
           (m: any) => m.file_type && m.file_type.includes("video")
         );
 
+        console.log("Video files:", videoFiles);
+
         for (const video of videoFiles) {
           // Buscar thumbnails en metadata
           if (video.metadata?.thumbnail_url) {

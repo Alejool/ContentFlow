@@ -358,6 +358,24 @@
         "publishDate": "Publish Date",
         "publishedOn": "Published On",
         "associatedPublications": "Associated Publications"
+      },
+      "validation":{
+        "descMin":"Description must have at least 10 characters",
+        "objRequired":"Objective is required",
+        "descRequired":"Description is required",
+        "nameRequired":"Name is required",
+        "goalRequired":"Objective is required",
+        "statusRequired":"Status is required",
+        "budgetRequired":"Budget is required",
+        "startDateRequired":"Start Date is required",
+        "endDateRequired":"End Date is required",
+        "publishDateRequired":"Publish Date is required",
+        "publishedOnRequired":"Published On is required",
+        "associatedPublicationsRequired":"Associated Publications is required",
+        "titleRequired":"Title is required",
+        "descriptionRequired":"Description is required",
+        "hashtagsRequired":"Hashtags is required",
+        "schedulePublicationRequired":"Schedule Publication is required"
       }
     },
     "button": {

@@ -242,6 +242,8 @@
         }
       },
       "validation":{
+        "descMin":"Descripción debe tener al menos 10 caracteres",
+        "objRequired":"Objetivo es requerido",
         "descRequired":"Descripción es requerida",
         "nameRequired":"Nombre es requerido",
         "goalRequired":"Objetivo es requerido",

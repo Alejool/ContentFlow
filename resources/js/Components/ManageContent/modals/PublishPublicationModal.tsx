@@ -57,6 +57,9 @@ export default function PublishPublicationModal({
       console.log("Loading publication thumbnails...");
       fetchPublishedPlatforms(publication.id);
       loadExistingThumbnails(publication);
+    }
+
+    if (!isOpen) {
       resetState();
     }
   }, [isOpen, publication]);
@@ -270,13 +273,9 @@ export default function PublishPublicationModal({
                           }`}
                         >
                           <div
-                            className={`w-12 h-12 rounded-lg bg-gradient-to-br ${gradient} flex items-center justify-center flex-shrink-0`}
+                            className={`w-12 h-12 rounded-lg  flex items-center justify-center flex-shrink-0`}
                           >
-                            <img
-                              src={iconSrc}
-                              alt={account.platform}
-                              className="w-6 h-6 brightness-0 invert"
-                            />
+                            <img src={iconSrc} alt={account.platform} />
                           </div>
                           <div className="flex-1 text-left">
                             <div className="font-medium capitalize text-sm">
@@ -359,6 +358,7 @@ export default function PublishPublicationModal({
                 ) : (
                   <div className="space-y-4">
                     {videoFiles.map((video) => {
+                      console.log("existingThumbnail:", existingThumbnails);
                       const videoId = video.id;
                       const existingThumbnail = existingThumbnails[videoId];
 
