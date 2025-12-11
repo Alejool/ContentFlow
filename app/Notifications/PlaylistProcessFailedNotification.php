@@ -2,66 +2,61 @@
 
 namespace App\Notifications;
 
-use App\Channels\ExtendedDatabaseChannel;
+use App\Notifications\BaseNotification;
 use App\Models\YouTubePlaylistQueue;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Notification;
 
-class PlaylistProcessFailedNotification extends Notification implements ShouldQueue
+class PlaylistProcessFailedNotification extends BaseNotification
 {
-  use Queueable;
+  protected string $priority = self::PRIORITY_HIGH;
+  protected string $category = self::CATEGORY_APPLICATION;
 
   protected $queueItem;
   protected $playlistName;
   protected $errorMessage;
   protected $videoTitle;
+  protected $accountIdentifier;
 
-  public function __construct(YouTubePlaylistQueue $queueItem, string $errorMessage, string $videoTitle = null)
+  public function __construct(YouTubePlaylistQueue $queueItem, string $errorMessage, string $videoTitle = null, string $accountIdentifier = 'Unknown')
   {
     $this->queueItem = $queueItem;
     $this->playlistName = $queueItem->playlist_name;
     $this->errorMessage = $errorMessage;
     $this->videoTitle = $videoTitle;
+    $this->accountIdentifier = $accountIdentifier;
   }
 
-  public function via(object $notifiable): array
+  public function toArray($notifiable): array
   {
-    $channels = [ExtendedDatabaseChannel::class];
+    $locale = method_exists($notifiable, 'preferredLocale') ? $notifiable->preferredLocale() : app()->getLocale();
+    $message = trans('notifications.playlist_failed', ['platform' => 'YouTube'], $locale);
 
-    // Only broadcast if using redis or reverb
-    if (in_array(config('broadcasting.default'), ['redis', 'reverb'])) {
-      $channels[] = 'broadcast';
+    $videoInfo = $this->videoTitle ?? "Video";
+    $description = trans('notifications.playlist_failed_description', [
+      'video_title' => $videoInfo,
+      'playlist_name' => $this->playlistName,
+      'account' => $this->accountIdentifier
+    ], $locale);
+
+    if ($this->queueItem->retry_count >= 3) {
+      $description .= " " . trans('notifications.retry_max_reached', [], $locale);
+    } else {
+      $description .= " " . trans('notifications.retry_auto', [], $locale);
     }
 
-    return $channels;
-  }
-
-  public function toDatabase(object $notifiable): array
-  {
-    $videoInfo = $this->videoTitle ? "'{$this->videoTitle}'" : "Video";
-    $retryInfo = $this->queueItem->retry_count >= 3
-      ? " Maximum retries reached."
-      : " Will retry automatically.";
-
-    $message = "{$videoInfo} failed to be added to playlist '{$this->playlistName}'.{$retryInfo}";
-
     return [
-      'type' => 'playlist_process_failed',
-      'category' => 'system',
-      'status' => 'error',
+      'title' => 'Playlist Update Failed',
       'message' => $message,
+      'description' => $description,
+      'status' => 'error',
+      'icon' => 'Youtube',
+      'account_identifier' => $this->accountIdentifier,
       'error_message' => $this->errorMessage,
       'playlist_name' => $this->playlistName,
       'video_id' => $this->queueItem->video_id,
+      'video_title' => $this->videoTitle,
       'campaign_id' => $this->queueItem->campaign_id,
       'retry_count' => $this->queueItem->retry_count,
       'max_retries_reached' => $this->queueItem->retry_count >= 3,
     ];
-  }
-
-  public function toBroadcast(object $notifiable): array
-  {
-    return $this->toDatabase($notifiable);
   }
 }

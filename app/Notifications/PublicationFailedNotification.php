@@ -19,14 +19,20 @@ class PublicationFailedNotification extends BaseNotification
 
   public function toArray($notifiable): array
   {
+    $platformName = $this->getPlatformName($this->platform);
+    $locale = method_exists($notifiable, 'preferredLocale') ? $notifiable->preferredLocale() : app()->getLocale();
+    $campaign = $this->publication->campaigns->first();
+
     return [
       'title' => 'Publication Failed',
-      'message' => "Failed to publish to {$this->getPlatformName($this->platform)}",
+      'message' => trans('notifications.publication_failed', ['platform' => $platformName], $locale),
       'description' => $this->errorMessage,
       'status' => 'error',
       'icon' => $this->getPlatformIcon($this->platform),
       'publication_id' => $this->publication->id,
       'publication_title' => $this->publication->title,
+      'campaign_id' => $campaign ? $campaign->id : null,
+      'campaign_name' => $campaign ? $campaign->name : null,
       'error' => $this->errorMessage,
       'action' => $this->createAction(
         'Retry',

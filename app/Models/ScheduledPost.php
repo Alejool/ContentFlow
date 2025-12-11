@@ -18,6 +18,8 @@ class ScheduledPost extends Model
         'publication_id',
         'scheduled_at',
         'status',
+        'account_name',
+        'platform',
     ];
 
     protected $casts = [
@@ -46,6 +48,11 @@ class ScheduledPost extends Model
     public function campaign(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Campaigns\Campaign::class);
+    }
+
+    public function publication(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Publication::class);
     }
 
     public function postLogs(): HasMany

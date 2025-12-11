@@ -46,16 +46,26 @@ class PublicationStatusUpdate extends Notification
      */
     public function toArray(object $notifiable): array
     {
+        $publication = $this->log->publication;
+        $campaign = $publication ? $publication->campaigns->first() : null;
+        $account = $this->log->socialAccount;
+        // Determine locale
+        $locale = method_exists($notifiable, 'preferredLocale') ? $notifiable->preferredLocale() : app()->getLocale();
+
         return [
             'type' => 'status_update',
             'publication_id' => $this->log->publication_id,
             'log_id' => $this->log->id,
             'platform' => $this->log->platform,
-            'status' => $this->statusData['status'], // e.g., 'rejected', 'copyright_claim'
-            'message' => $this->statusData['message'] ?? 'Status update available',
+            'status' => $this->statusData['status'],
+            'message' => trans('notifications.status_update', ['platform' => $this->log->platform], $locale),
+            'description' => $this->statusData['message'] ?? 'Status update available',
             'details' => $this->statusData['details'] ?? [],
-            'title' => $this->log->publication->title ?? 'Untitled Publication',
-            'category' => 'application', // Keep it in data as well for frontend compatibility if needed
+            'title' => $publication ? $publication->title : 'Untitled Publication',
+            'campaign_id' => $campaign ? $campaign->id : null,
+            'campaign_name' => $campaign ? $campaign->name : null,
+            'account_name' => $account ? $account->name : 'Unknown Account',
+            'category' => 'application',
         ];
     }
 }

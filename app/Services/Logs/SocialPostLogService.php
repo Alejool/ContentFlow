@@ -26,6 +26,7 @@ class SocialPostLogService
             'publication_id' => $publication->id,
             'media_file_id' => $mediaFileId,
             'platform' => $socialAccount->platform,
+            'account_name' => $socialAccount->account_name,
             'content' => $content,
             'media_urls' => $mediaUrls,
             'status' => 'pending',
@@ -52,7 +53,7 @@ class SocialPostLogService
                 'privacy' => $response['privacy'] ?? null,
                 'title' => $response['title'] ?? null,
             ],
-            'error_message' => null, 
+            'error_message' => null,
         ]);
 
         Log::info('Post published successfully', [

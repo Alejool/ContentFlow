@@ -16,6 +16,7 @@ export default function NotificationItem({
   const { data, created_at, read_at } = notification;
   const isRead = !!read_at;
   const [imageError, setImageError] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const getIcon = () => {
     switch (data.status) {
@@ -74,15 +75,58 @@ export default function NotificationItem({
         <div className="mt-0.5 flex-shrink-0">{getIcon()}</div>
 
         <div className="flex-1 min-w-0">
-          <p
-            className={`text-sm mb-1 line-clamp-2 ${
-              theme === "dark" ? "text-gray-200" : "text-gray-800"
-            }`}
+          <div
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsExpanded(!isExpanded);
+            }}
           >
-            {data.message || data.title}
-          </p>
+            <p
+              className={`text-sm mb-1 ${isExpanded ? "" : "line-clamp-2"} ${
+                theme === "dark" ? "text-gray-200" : "text-gray-800"
+              }`}
+            >
+              {data.message || data.title}
+            </p>
+            {/* Show 'Read more' hint if likely truncated (this is an approximation, real detection needs refs) */}
+            {(data.message || data.title).length > 100 && (
+              <span
+                className={`text-xs hover:underline cursor-pointer ${
+                  theme === "dark" ? "text-primary-400" : "text-primary-600"
+                }`}
+              >
+                {isExpanded
+                  ? theme === "dark"
+                    ? "Menos"
+                    : "Less"
+                  : theme === "dark"
+                  ? "Leer más"
+                  : "Read more"}
+              </span>
+            )}
+          </div>
 
           <div className="flex items-center gap-2 flex-wrap">
+            {data.description && (
+              <p
+                className={`text-xs mb-1.5 ${
+                  theme === "dark" ? "text-gray-400" : "text-gray-500"
+                }`}
+              >
+                {data.description}
+              </p>
+            )}
+
+            {data.account_name && (
+              <p
+                className={`text-xs mb-1 font-medium ${
+                  theme === "dark" ? "text-primary-400" : "text-primary-600"
+                }`}
+              >
+                {data.account_name}
+              </p>
+            )}
+
             {data.publication_title && (
               <>
                 <span
@@ -91,6 +135,25 @@ export default function NotificationItem({
                   }`}
                 >
                   {data.publication_title}
+                </span>
+                <span
+                  className={`text-xs ${
+                    theme === "dark" ? "text-gray-600" : "text-gray-400"
+                  }`}
+                >
+                  •
+                </span>
+              </>
+            )}
+
+            {data.campaign_name && (
+              <>
+                <span
+                  className={`text-xs italic ${
+                    theme === "dark" ? "text-gray-500" : "text-gray-500"
+                  }`}
+                >
+                  {data.campaign_name}
                 </span>
                 <span
                   className={`text-xs ${
@@ -120,9 +183,49 @@ export default function NotificationItem({
                 theme === "dark" ? "text-gray-500" : "text-gray-400"
               }`}
             >
-              {formatDistanceToNow(new Date(created_at), { addSuffix: true })}
+              {created_at && !isNaN(new Date(created_at).getTime())
+                ? formatDistanceToNow(new Date(created_at), { addSuffix: true })
+                : ""}
             </span>
           </div>
+
+          {/* Orphaned Posts List */}
+          {data.orphaned_posts_list && data.orphaned_posts_list.length > 0 && (
+            <div
+              className={`mt-2 p-2 rounded text-xs ${
+                theme === "dark" ? "bg-neutral-800" : "bg-gray-100"
+              }`}
+            >
+              <p
+                className={`font-semibold mb-1 ${
+                  theme === "dark" ? "text-gray-300" : "text-gray-700"
+                }`}
+              >
+                {theme === "dark"
+                  ? "Publicaciones afectadas:"
+                  : "Affected publications:"}
+              </p>
+              <ul
+                className={`list-disc list-inside ${
+                  theme === "dark" ? "text-gray-400" : "text-gray-600"
+                }`}
+              >
+                {data.orphaned_posts_list
+                  .slice(0, 3)
+                  .map((title: string, index: number) => (
+                    <li key={index} className="truncate">
+                      {title}
+                    </li>
+                  ))}
+                {data.orphaned_posts_list.length > 3 && (
+                  <li className="list-none pt-1 opacity-75">
+                    + {data.orphaned_posts_list.length - 3}{" "}
+                    {theme === "dark" ? "más..." : "more..."}
+                  </li>
+                )}
+              </ul>
+            </div>
+          )}
         </div>
 
         {data.thumbnail_url && !imageError && (

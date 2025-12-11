@@ -86,6 +86,7 @@ class SocialAccountController extends Controller
                         'https://www.googleapis.com/auth/youtube.upload',
                         'https://www.googleapis.com/auth/youtube',
                         'https://www.googleapis.com/auth/youtube.force-ssl',
+                        'https://www.googleapis.com/auth/userinfo.email',
                     ]),
                     'access_type' => 'offline',
                     'prompt' => 'consent',
@@ -392,13 +393,21 @@ class SocialAccountController extends Controller
 
             $channelInfo = $channelData['items'][0]['snippet'];
 
+            // Get Google User Info (Email)
+            $userInfoResponse = Http::withToken($data['access_token'])
+                ->get('https://www.googleapis.com/oauth2/v3/userinfo');
+            $userInfo = $userInfoResponse->json();
+            $userEmail = $userInfo['email'] ?? null;
+
             $account = $this->saveAccount([
                 'platform' => 'youtube',
                 'account_id' => $channelData['items'][0]['id'],
                 'account_name' => $channelInfo['title'] ?? null,
                 'account_metadata' => [
                     'avatar' => $channelInfo['thumbnails']['default']['url'] ?? null,
-                    'description' => $channelInfo['description'] ?? null
+                    'description' => $channelInfo['description'] ?? null,
+                    'username' => $channelInfo['customUrl'] ?? null,
+                    'email' => $userEmail // Save email in metadata
                 ],
                 'access_token' => $data['access_token'],
                 'refresh_token' => $data['refresh_token'] ?? null,
@@ -564,6 +573,7 @@ class SocialAccountController extends Controller
         $existingAccount = SocialAccount::withTrashed()
             ->where('user_id', Auth::id())
             ->where('platform', $data['platform'])
+            ->where('account_id', $data['account_id'])
             ->first();
 
         // Prepare data for update/create
@@ -590,6 +600,15 @@ class SocialAccountController extends Controller
             if ($existingAccount->trashed()) {
                 $existingAccount->restore();
                 $wasReconnection = true;
+
+                // Healing Logic: Restore 'orphaned' posts to 'published'
+                // This ensures re-linking if the SAME account connects again
+                SocialPostLog::where('social_account_id', $existingAccount->id)
+                    ->where('status', 'orphaned')
+                    ->update([
+                        'status' => 'published',
+                        'error_message' => null
+                    ]);
             }
 
             // Update existing account
@@ -603,12 +622,21 @@ class SocialAccountController extends Controller
             $isNewConnection = true;
         }
 
+        // Determine best identifier for notification
+        $identifier = $data['account_name'] ?? $data['account_id'];
+
+        if (isset($data['account_metadata']['email'])) {
+            $identifier = "{$identifier} ({$data['account_metadata']['email']})";
+        } elseif (isset($data['account_metadata']['username'])) {
+            $identifier = "{$identifier} (@{$data['account_metadata']['username']})";
+        }
+
         // Send system notification for account connection
         $user = Auth::user();
         if ($user) {
             $user->notify(new SocialAccountConnectedNotification(
                 $data['platform'],
-                $data['account_name'] ?? $data['account_id'],
+                $identifier,
                 $wasReconnection
             ));
         }
@@ -693,36 +721,65 @@ class SocialAccountController extends Controller
                 ->with('publication:id,title')
                 ->get();
 
-            if ($activePosts->count() > 0 && !$force) {
+            // Deduplicate active posts by publication_id
+            $uniqueActivePosts = $activePosts->unique('publication_id');
+
+            if ($uniqueActivePosts->count() > 0 && !$force) {
                 return response()->json([
                     'success' => false,
                     'can_disconnect' => false,
-                    'active_posts_count' => $activePosts->count(),
+                    'active_posts_count' => $uniqueActivePosts->count(),
                     'account_name' => $account->account_name ?? $account->account_id,
                     'platform' => $account->platform,
-                    'posts' => $activePosts->map(fn($log) => [
-                        'id' => $log->publication_id,
-                        'title' => $log->publication->title ?? 'Untitled',
-                        'platform_post_id' => $log->platform_post_id,
-                        'status' => $log->status,
-                        'published_at' => $log->published_at,
-                    ]),
-                    'message' => "Esta cuenta ({$account->account_name}) tiene {$activePosts->count()} publicaciones activas. Si la desconectas, no podrás eliminarlas automáticamente de {$account->platform}."
+                    'posts' => $uniqueActivePosts->map(function ($log) {
+                        $date = $log->published_at instanceof \DateTimeInterface ? $log->published_at : null;
+                        // Fallback to created_at if published_at is missing/invalid
+                        if (!$date && $log->created_at instanceof \DateTimeInterface) $date = $log->created_at;
+
+                        if ($date && $date->format('Y') < 2000) $date = null; // Sanity check
+
+                        return [
+                            'id' => $log->publication_id,
+                            'title' => optional($log->publication)->title ?? 'Untitled',
+                            'platform_post_id' => $log->platform_post_id,
+                            'status' => $log->status,
+                            'published_at' => $date ? $date->toIso8601String() : null,
+                        ];
+                    })->values(),
+                    'message' => "Esta cuenta ({$account->account_name}) tiene {$uniqueActivePosts->count()} publicaciones activas. Si la desconectas, no podrás eliminarlas automáticamente de {$account->platform}."
                 ], 400);
             }
 
             // Check for associated scheduled posts
             $pendingPosts = ScheduledPost::where('social_account_id', $account->id)
                 ->where('status', 'pending')
-                ->with('campaign:id,title')
+                ->with(['campaign:id,title', 'publication:id,title'])
                 ->get();
 
-            if ($pendingPosts->count() > 0) {
+            // Deduplicate pending posts by publication_id (or id if null, though duplications usually share publication_id)
+            $uniquePendingPosts = $pendingPosts->unique(function ($item) {
+                return $item->publication_id ? 'p' . $item->publication_id : 'c' . $item->campaign_id . '_' . $item->id;
+            });
+
+            if ($uniquePendingPosts->count() > 0) {
                 if (!$force) {
                     return response()->json([
                         'success' => false,
-                        'message' => 'Cannot disconnect account. It has ' . $pendingPosts->count() . ' scheduled post(s). Please remove them from campaigns first.',
-                        'posts' => $pendingPosts
+                        'message' => 'Cannot disconnect account. It has ' . $uniquePendingPosts->count() . ' scheduled post(s). Please remove them from campaigns first.',
+                        'posts' => $uniquePendingPosts->map(function ($post) {
+                            $date = $post->scheduled_at instanceof \DateTimeInterface ? $post->scheduled_at : null;
+                            // Fallback to created_at if scheduled_at is missing
+                            if (!$date && $post->created_at instanceof \DateTimeInterface) $date = $post->created_at;
+
+                            if ($date && $date->format('Y') < 2000) $date = null;
+
+                            return [
+                                'id' => $post->id,
+                                'title' => optional($post->publication)->title ?? optional($post->campaign)->title ?? 'Untitled',
+                                'scheduled_at' => $date ? $date->toIso8601String() : null,
+                                'status' => $post->status,
+                            ];
+                        })->values()
                     ], 400);
                 } else {
                     // Force delete: delete posts first
@@ -733,7 +790,11 @@ class SocialAccountController extends Controller
             }
 
             // If forcing disconnect with active posts, mark them as orphaned
-            if ($force && $activePosts->count() > 0) {
+            $orphanedPostsList = [];
+            if ($force && $uniqueActivePosts->count() > 0) {
+                // Keep track of unique titles for notification
+                $orphanedPostsList = $uniqueActivePosts->map(fn($log) => optional($log->publication)->title ?? 'Untitled')->toArray();
+
                 SocialPostLog::where('social_account_id', $account->id)
                     ->whereIn('status', ['published', 'pending'])
                     ->update([
@@ -745,10 +806,19 @@ class SocialAccountController extends Controller
             // Send application notification for account disconnection
             $user = Auth::user();
             if ($user) {
+                $identifier = $account->account_name ?? $account->account_id;
+
+                if (isset($account->account_metadata['email'])) {
+                    $identifier = "{$identifier} ({$account->account_metadata['email']})";
+                } elseif (isset($account->account_metadata['username'])) {
+                    $identifier = "{$identifier} (@{$account->account_metadata['username']})";
+                }
+
                 $user->notify(new SocialAccountDisconnectedNotification(
                     $account->platform,
-                    $account->account_name ?? $account->account_id,
-                    $activePosts->count()
+                    $identifier,
+                    $uniqueActivePosts->count(),
+                    $orphanedPostsList
                 ));
             }
 
@@ -757,7 +827,7 @@ class SocialAccountController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Account disconnected successfully',
-                'orphaned_posts' => $force ? $activePosts->count() : 0
+                'orphaned_posts' => $force ? $activePosts->count() : 0,
             ]);
         } catch (\Exception $e) {
             return response()->json([

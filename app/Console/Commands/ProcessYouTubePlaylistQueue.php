@@ -128,7 +128,45 @@ class ProcessYouTubePlaylistQueue extends Command
             }
 
             // PASO 2: Agregar video a la playlist
-            $success = $youtubeService->addVideoToPlaylist($playlistId, $item->video_id);
+            try {
+                $success = $youtubeService->addVideoToPlaylist($playlistId, $item->video_id);
+            } catch (\Exception $e) {
+                // Si el error es 404 (playlist no encontrada), intentamos crearla
+                // La API de Google suele retornar mensajes como "Playlist not found" o código 404
+                if (str_contains($e->getMessage(), '404') || stripos($e->getMessage(), 'not found') !== false) {
+
+                    $this->info("  Playlist '{$playlistId}' not found. Attempting to create new playlist '{$item->playlist_name}'...");
+
+                    // Crear nueva playlist
+                    $campaign = $item->campaign;
+                    $description = $campaign ? ($campaign->description ?? $item->playlist_name) : $item->playlist_name;
+
+                    $newPlaylistId = $youtubeService->createPlaylist(
+                        $item->playlist_name,
+                        $description,
+                        'public'
+                    );
+
+                    if ($newPlaylistId) {
+                        $this->info("  New playlist created with ID: {$newPlaylistId}");
+
+                        // Actualizar campaña y queue item
+                        if ($campaign) {
+                            $campaign->youtube_playlist_id = $newPlaylistId;
+                            $campaign->save();
+                        }
+                        $item->playlist_id = $newPlaylistId;
+                        $item->save();
+
+                        // Reintentar agregar video
+                        $success = $youtubeService->addVideoToPlaylist($newPlaylistId, $item->video_id);
+                    } else {
+                        throw new \Exception("Failed to create playlist '{$item->playlist_name}' after 404 error.");
+                    }
+                } else {
+                    throw $e; // Re-lanzar si no es un error de "no encontrado"
+                }
+            }
 
             if (!$success) {
                 throw new \Exception('Failed to add video to playlist');
@@ -151,7 +189,7 @@ class ProcessYouTubePlaylistQueue extends Command
 
             Log::info('Playlist operation completed', [
                 'video_id' => $item->video_id,
-                'playlist_id' => $playlistId,
+                'playlist_id' => $item->playlist_id, // Use updated ID
                 'playlist_name' => $item->playlist_name
             ]);
 
@@ -172,7 +210,14 @@ class ProcessYouTubePlaylistQueue extends Command
 
             // Send failure notification to user (only on final failure or first attempt)
             if ($user && ($item->retry_count >= 3 || $item->retry_count === 1)) {
-                $user->notify(new PlaylistProcessFailedNotification($item, $e->getMessage(), $videoTitle));
+                $identifier = $socialAccount->account_name ?? 'Unknown';
+                if (isset($socialAccount->account_metadata['email'])) {
+                    $identifier .= " ({$socialAccount->account_metadata['email']})";
+                } elseif (isset($socialAccount->account_metadata['username'])) {
+                    $identifier .= " (@{$socialAccount->account_metadata['username']})";
+                }
+
+                $user->notify(new PlaylistProcessFailedNotification($item, $e->getMessage(), $videoTitle, $identifier));
             }
 
             Log::error('Playlist operation failed', [

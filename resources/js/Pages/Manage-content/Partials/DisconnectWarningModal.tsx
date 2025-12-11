@@ -102,7 +102,7 @@ export default function DisconnectWarningModal({
                           </th>
                           <th className="px-4 py-2 font-medium">
                             {t(
-                              "manageContent.socialMedia.disconnectModal.table.campaign"
+                              "manageContent.socialMedia.disconnectModal.table.publication"
                             )}
                           </th>
                         </tr>
@@ -119,11 +119,27 @@ export default function DisconnectWarningModal({
                             <td className="px-4 py-2 whitespace-nowrap">
                               <div className="flex items-center gap-2">
                                 <Calendar className="w-3 h-3 opacity-60" />
-                                {new Date(post.scheduled_at).toLocaleString()}
+                                {(() => {
+                                  const dateVal =
+                                    post.scheduled_at || post.published_at;
+                                  if (!dateVal)
+                                    return (
+                                      <span className="text-xs opacity-50">
+                                        {t("common.noDate") || "Sin fecha"}
+                                      </span>
+                                    );
+                                  const dateObj = new Date(dateVal);
+                                  return !isNaN(dateObj.getTime())
+                                    ? dateObj.toLocaleString()
+                                    : t("common.invalidDate") ||
+                                        "Fecha inválida";
+                                })()}
                               </div>
                             </td>
                             <td className="px-4 py-2">
-                              {post.campaign?.title || t("common.unknown")}
+                              {post.title ||
+                                post.campaign?.title ||
+                                t("common.unknown")}
                             </td>
                           </tr>
                         ))}

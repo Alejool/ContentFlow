@@ -7,7 +7,7 @@ use App\Notifications\BaseNotification;
 class APIQuotaWarningNotification extends BaseNotification
 {
   protected string $priority = self::PRIORITY_HIGH;
-  protected string $category = self::CATEGORY_SYSTEM;
+  protected string $category = self::CATEGORY_APPLICATION;
 
   public function __construct(
     protected string $platformName,
@@ -19,7 +19,9 @@ class APIQuotaWarningNotification extends BaseNotification
 
   public function toArray($notifiable): array
   {
-    $message = "API quota for {$this->getPlatformName($this->platform)} is at {$this->percentageUsed}%";
+    $platformName = $this->getPlatformName($this->platform);
+    $locale = method_exists($notifiable, 'preferredLocale') ? $notifiable->preferredLocale() : app()->getLocale();
+    $message = trans('notifications.api_quota_warning', ['platform' => $platformName], $locale) . " ({$this->percentageUsed}%)";
 
     if ($this->resetDate) {
       $message .= ". Resets on {$this->resetDate}";
@@ -28,7 +30,7 @@ class APIQuotaWarningNotification extends BaseNotification
     return [
       'title' => 'API Quota Warning',
       'message' => $message,
-      'description' => 'Consider reducing API usage to avoid service interruption',
+      'description' => trans('notifications.api_quota_description', [], $locale),
       'status' => 'warning',
       'icon' => $this->getPlatformIcon($this->platform),
       'percentage_used' => $this->percentageUsed,

@@ -72,6 +72,11 @@ class Publication extends Model
         return $this->hasMany(ScheduledPost::class, 'publication_id');
     }
 
+    public function socialPostLogs(): HasMany
+    {
+        return $this->hasMany(\App\Models\SocialPostLog::class, 'publication_id');
+    }
+
     // Helper methods for analytics
     public function getTotalViews()
     {

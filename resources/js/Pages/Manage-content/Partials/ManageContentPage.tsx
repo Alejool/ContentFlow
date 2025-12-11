@@ -1,5 +1,6 @@
 import { useCampaignManagement } from "@/Hooks/useCampaignManagement";
 import { useConfirm } from "@/Hooks/useConfirm";
+import { useSocialMediaAuth } from "@/Hooks/useSocialMediaAuth";
 import { useTheme } from "@/Hooks/useTheme";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import AddCampaignModal from "@/Pages/Manage-content/Partials/AddCampaignModal";
@@ -111,7 +112,101 @@ export default function ManageContentPage() {
     }
   };
 
-  const handleUnpublish = async (item: Publication | any) => {
+  // Fetch connected accounts for verification
+  const {
+    accounts: connectedAccounts = [],
+    isLoading: isLoadingAccounts,
+    fetchAccounts,
+  } = useSocialMediaAuth();
+
+  useEffect(() => {
+    // Ensure we have the latest connected accounts status
+    if (fetchAccounts) fetchAccounts();
+  }, []);
+
+  const handleEditRequest = async (item: Publication | any) => {
+    // If it's not published, just open edit modal
+    if (item.status !== "published") {
+      openEditModal(item);
+      return;
+    }
+
+    // Check availability of the linked account
+    let isLinkedAccountConnected = false;
+    let linkedAccountName = "Unknown";
+
+    // Find the scheduled post (published one) or fallback to any associated post
+    const postLogs = item.social_post_logs || [];
+    const scheduledPosts = item.scheduled_posts || [];
+
+    // Prioritize finding a published log/record
+    let publishedPost = postLogs.find(
+      (l: any) => l.status === "published" || l.status === "success"
+    );
+
+    if (!publishedPost) {
+      publishedPost = scheduledPosts.find(
+        (p: any) => p.status === "posted" || p.status === "published"
+      );
+    }
+
+    if (!publishedPost && (postLogs.length > 0 || scheduledPosts.length > 0)) {
+      publishedPost = postLogs[0] || scheduledPosts[0];
+    }
+
+    if (publishedPost && publishedPost.social_account_id) {
+      const accountId = publishedPost.social_account_id;
+      const foundAccount = connectedAccounts.find(
+        (acc: any) => acc.id === accountId
+      );
+
+      if (foundAccount) {
+        isLinkedAccountConnected = true;
+        linkedAccountName = foundAccount.name || foundAccount.platform;
+      } else {
+        // Try to find name from historical data if available
+        linkedAccountName =
+          publishedPost.social_account?.account_name ||
+          publishedPost.account_name ||
+          "Unknown Account";
+      }
+    } else {
+      // Fallback if no specific scheduled post found but status is published (legacy or other)
+      // Assume connected if we can't prove otherwise? No, safer to warn.
+      // Actually, if we can't find the record, we can't Unpublish via API anyway.
+      isLinkedAccountConnected = false;
+    }
+
+    if (!isLinkedAccountConnected) {
+      // NEW FLOW: Account missing/different
+      const confirmed = await confirm({
+        title:
+          t("publications.modal.edit.accountMissingTitle") ||
+          "Account Disconnected",
+        message:
+          t("publications.modal.edit.accountMissingText", {
+            account: linkedAccountName,
+          }) ||
+          `This publication was posted on an account (${linkedAccountName}) that is no longer connected. Editing it will create a new version for your current account(s). Proceed?`,
+        confirmText: t("common.continue") || "Continue & Edit",
+        cancelText: t("common.cancel"),
+        type: "warning",
+      });
+
+      if (confirmed) {
+        // Open edit modal directly without unpublishing
+        // Clear association to force "fresh start" behavior
+        openEditModal({
+          ...item,
+          status: "draft",
+          social_account_id: null,
+          scheduled_posts: [], // Remove history of scheduling from the new draft version
+        });
+      }
+      return;
+    }
+
+    // STANDARD FLOW: Account connected
     const confirmed = await confirm({
       title: "Unpublish & Edit",
       message:
@@ -127,13 +222,7 @@ export default function ManageContentPage() {
         const response = await axios.post(`/publications/${item.id}/unpublish`);
         if (response.data.success) {
           toast.success("Unpublished successfully", { id: toastId });
-          await fetchCampaigns(filters); // Refresh list to update status
-          // The item passed to openEditModal needs to be refreshed or we trust it will be fetched again?
-          // Actually fetchCampaigns updates the list. We should open the modal with the updated item ideally,
-          // or just open it and let it be (EditPublicationModal takes props).
-          // But if we open it immediately, the old 'published' item might be passed if we use 'item'.
-          // However, EditPublicationModal uses the passed 'publication' prop.
-          // Let's refetch or just change status locally.
+          await fetchCampaigns(filters);
           openEditModal({ ...item, status: "draft" });
         }
       } catch (error: any) {
@@ -178,7 +267,6 @@ export default function ManageContentPage() {
 
   const tabBg = theme === "dark" ? "" : "bg-white/60";
 
-
   return (
     <AuthenticatedLayout>
       <Head title={t("manageContent.title")} />
@@ -202,7 +290,11 @@ export default function ManageContentPage() {
           </div>
 
           <div className="space-y-8">
-            <SocialMediaAccounts />
+            <SocialMediaAccounts
+              connectedAccounts={connectedAccounts}
+              isLoadingProp={isLoadingAccounts}
+              onForceRefresh={fetchAccounts}
+            />
 
             {/* Tabs */}
             <div className={`${tabBg} rounded-xl shadow-lg `}>
@@ -214,7 +306,11 @@ export default function ManageContentPage() {
                     return (
                       <button
                         key={tab.id}
-                        onClick={() => setActiveTab(tab.id)}
+                        onClick={() =>
+                          setActiveTab(
+                            tab.id as "publications" | "campaigns" | "logs"
+                          )
+                        }
                         className={`group relative flex-1 px-4 py-2.5 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
                           isActive
                             ? "bg-white dark:bg-gray-900 shadow-sm text-primary-600 dark:text-primary-400"
@@ -261,7 +357,8 @@ export default function ManageContentPage() {
                     isLoading={isLoading}
                     onFilterChange={handleFilterChange}
                     onRefresh={fetchCampaigns}
-                    onUnpublishRequest={handleUnpublish}
+                    onEditRequest={handleEditRequest}
+                    connectedAccounts={connectedAccounts}
                   />
                 )}
               </div>

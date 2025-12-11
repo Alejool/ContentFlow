@@ -5,6 +5,7 @@
     "select": "Seleccionar",
     "save": "Guardar",
     "cancel": "Cancelar",
+    "continue": "Continuar",
     "delete": "Eliminar",
     "edit": "Editar",
     "analytics": "Analíticas",
@@ -221,6 +222,8 @@
         "publishDate": "Fecha de Publicación",
         "publishedOn": "Publicado el",
         "associatedPublications": "Publicaciones Asociadas",
+        "accountMissingTitle": "Cuenta Desconectada",
+        "accountMissingText": "Esta publicación se publicó en una cuenta ({{account}}) que ya no está conectada. Al editarla se creará una nueva versión para tu cuenta actual. ¿Continuar?",
         "dragDrop": {
           "title": "Arrastra y suelta para ordenar",
           "subtitle": "Sube tus archivos multimedia aquí"
@@ -362,7 +365,8 @@
       "publications": "Publicaciones",
       "media": "Archivos",
       "status": "Estado",
-      "actions": "Acciones"
+      "actions": "Acciones",
+      "linkedAccount": "Cuentas Asociadas"
     },
     "messages": {
       "addSuccess": "¡Campaña agregada exitosamente!",
@@ -520,7 +524,8 @@
       "failed": "Fallido",
       "pending": "Pendiente",
       "published": "Publicado",
-      "deleted": "Eliminado"
+      "deleted": "Eliminado",
+      "orphaned": "huérfano"
     },
     "empty": "No se encontraron registros",
     "loading": "Cargando registros...",
@@ -768,6 +773,7 @@
       "title": "Conecta tus Redes Sociales",
       "description": "Conecta tus cuentas de redes sociales para permitir la publicación automática de contenido. Tu información se mantendrá segura y solo se utilizará para las funciones que autorices.",
       "whyConnect": "¿Por qué conectar tus redes sociales?",
+      
       "benefits": {
         "autoPublish": "Publicar contenido automáticamente",
         "manageAll": "Gestionar todas las cuentas en un solo lugar",
@@ -802,7 +808,7 @@
         "explanation": "Esta cuenta tiene publicaciones programadas asociadas. Para desconectarla, debes eliminar estas publicaciones primero o forzar la desconexión.",
         "table": {
             "date": "Fecha",
-            "campaign": "Campaña"
+            "publication": "Publicación"
         },
         "cancelButton": "Mantener conectado",
         "confirmButton": "Desconectar y eliminar todo"

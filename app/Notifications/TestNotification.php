@@ -17,10 +17,12 @@ class TestNotification extends BaseNotification
 
   public function toArray($notifiable): array
   {
+    $locale = method_exists($notifiable, 'preferredLocale') ? $notifiable->preferredLocale() : app()->getLocale();
+
     return [
       'title' => 'Reverb Test 🚀',
-      'message' => 'Si ves esto, Reverb está funcionando correctamente.',
-      'description' => 'Esta es una prueba de tiempo real.',
+      'message' => trans('notifications.test_notification', [], $locale),
+      'description' => $locale === 'es' ? 'Esta es una prueba de tiempo real.' : 'This is a real-time test.',
       'status' => 'success',
       'icon' => 'CheckCircle',
       'timestamp' => now()->toIso8601String(),

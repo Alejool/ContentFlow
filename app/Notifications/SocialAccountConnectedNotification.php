@@ -19,9 +19,12 @@ class SocialAccountConnectedNotification extends BaseNotification
 
   public function toArray($notifiable): array
   {
+    $platformName = $this->getPlatformName($this->platform);
+    $locale = method_exists($notifiable, 'preferredLocale') ? $notifiable->preferredLocale() : app()->getLocale();
+
     $message = $this->wasReconnection
-      ? "Reconectaste tu cuenta de {$this->getPlatformName($this->platform)}"
-      : "Conectaste exitosamente tu cuenta de {$this->getPlatformName($this->platform)}";
+      ? trans('notifications.social_account_connected', ['platform' => $platformName], $locale)
+      : trans('notifications.social_account_connected', ['platform' => $platformName], $locale);
 
     return [
       'title' => $this->wasReconnection ? 'Cuenta Reconectada' : 'Cuenta Conectada',

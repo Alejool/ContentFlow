@@ -28,7 +28,7 @@ class PublicationController extends Controller
     $query = Publication::where('user_id', Auth::id())
       ->with(['mediaFiles' => function ($query) {
         $query->with('derivatives')->orderBy('publication_media.order', 'asc');
-      }, 'scheduledPosts.socialAccount', 'campaigns']);
+      }, 'scheduledPosts.socialAccount', 'socialPostLogs.socialAccount', 'campaigns']);
 
 
     if ($request->has('status') && $request->status !== 'all') {
@@ -214,8 +214,11 @@ class PublicationController extends Controller
       if (!empty($validatedData['scheduled_at']) && !empty($validatedData['social_accounts'])) {
         $schedules = $request->input('social_account_schedules', []);
 
+        $socialAccounts = \App\Models\SocialAccount::whereIn('id', $validatedData['social_accounts'])->get()->keyBy('id');
+
         foreach ($validatedData['social_accounts'] as $accountId) {
           $scheduledAt = isset($schedules[$accountId]) ? $schedules[$accountId] : $validatedData['scheduled_at'];
+          $socialAccount = $socialAccounts[$accountId] ?? null;
 
           ScheduledPost::create([
             'user_id' => Auth::id(),
@@ -223,6 +226,8 @@ class PublicationController extends Controller
             'publication_id' => $publication->id,
             'scheduled_at' => $scheduledAt,
             'status' => 'pending',
+            'account_name' => $socialAccount ? $socialAccount->account_name : 'Unknown',
+            'platform' => $socialAccount ? $socialAccount->platform : 'unknown',
           ]);
         }
       }
@@ -590,16 +595,20 @@ class PublicationController extends Controller
 
         $schedules = $request->input('social_account_schedules', []);
 
+        $socialAccounts = \App\Models\SocialAccount::whereIn('id', $validatedData['social_accounts'])->get()->keyBy('id');
+
         foreach ($validatedData['social_accounts'] as $accountId) {
           $scheduledAt = isset($schedules[$accountId]) ? $schedules[$accountId] : $validatedData['scheduled_at'];
+          $socialAccount = $socialAccounts[$accountId] ?? null;
 
           ScheduledPost::create([
             'user_id' => Auth::id(),
             'social_account_id' => $accountId,
             'publication_id' => $publication->id,
-
             'scheduled_at' => $scheduledAt,
             'status' => 'pending',
+            'account_name' => $socialAccount ? $socialAccount->account_name : 'Unknown',
+            'platform' => $socialAccount ? $socialAccount->platform : 'unknown',
           ]);
         }
       } elseif (!empty($validatedData['scheduled_at'])) {
@@ -630,12 +639,6 @@ class PublicationController extends Controller
 
     $publication = Publication::with(['mediaFiles', 'campaigns'])->findOrFail($id);
 
-    if ($publication->status === 'published') {
-      return response()->json([
-        'success' => false,
-        'message' => 'This publication is already published. Unpublish it first if you want to repost.',
-      ], 400);
-    }
 
     $platformIds = $request->input('platforms');
 

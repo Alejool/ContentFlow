@@ -26,7 +26,7 @@ interface Account {
   logo: any;
   isConnected: boolean;
   accountId: number | null;
-  accountDetails?: any; 
+  accountDetails?: any;
   color: string;
   gradient: string;
 }
@@ -93,11 +93,10 @@ export default function SocialMediaAccounts() {
     fetchConnectedAccounts();
 
     const handleAuthMessage = (event: MessageEvent) => {
-
       if (event.data && event.data.type === "social_auth_callback") {
         if (event.data.success) {
           fetchConnectedAccounts();
-        } 
+        }
       }
     };
 

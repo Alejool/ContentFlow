@@ -12,7 +12,8 @@ class SocialAccountDisconnectedNotification extends BaseNotification
   public function __construct(
     protected string $platformName,
     protected string $accountName,
-    protected int $orphanedPostsCount = 0
+    protected int $orphanedPostsCount = 0,
+    protected array $orphanedPostsList = []
   ) {
     $this->platform = strtolower($platformName);
 
@@ -25,7 +26,10 @@ class SocialAccountDisconnectedNotification extends BaseNotification
 
   public function toArray($notifiable): array
   {
-    $message = "Desconectaste tu cuenta de {$this->getPlatformName($this->platform)}: {$this->accountName}";
+    $platformName = $this->getPlatformName($this->platform);
+    $locale = method_exists($notifiable, 'preferredLocale') ? $notifiable->preferredLocale() : app()->getLocale();
+
+    $message = trans('notifications.social_account_disconnected', ['platform' => $platformName], $locale);
 
     if ($this->orphanedPostsCount > 0) {
       $message .= ". {$this->orphanedPostsCount} publicaciones quedaron huérfanas y no podrán ser eliminadas automáticamente.";
@@ -35,12 +39,13 @@ class SocialAccountDisconnectedNotification extends BaseNotification
       'title' => 'Cuenta Desconectada',
       'message' => $message,
       'description' => $this->orphanedPostsCount > 0
-        ? "Deberás eliminar manualmente las publicaciones desde {$this->getPlatformName($this->platform)}"
-        : null,
+        ? "Deberás eliminar manualmente las publicaciones desde {$platformName}"
+        : "Cuenta: {$this->accountName}",
       'status' => $this->orphanedPostsCount > 0 ? 'warning' : 'info',
       'icon' => $this->getPlatformIcon($this->platform),
       'account_name' => $this->accountName,
       'orphaned_count' => $this->orphanedPostsCount,
+      'orphaned_posts_list' => $this->orphanedPostsList,
       'timestamp' => now()->toIso8601String(),
     ];
   }

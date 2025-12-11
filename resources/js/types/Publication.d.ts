@@ -12,6 +12,7 @@ export type Publication = {
   is_active?: boolean;
   media_files?: MediaFile[];
   scheduled_posts?: ScheduledPost[];
+  social_post_logs?: SocialPostLog[];
   campaigns?: Array<{ id: number; name: string; title?: string }>;
 };
 
@@ -21,6 +22,18 @@ export type ScheduledPost = {
   scheduled_at: string;
   status: "pending" | "posted" | "failed";
   social_account?: SocialAccount;
+  account_name?: string;
+  platform?: string;
+};
+
+export type SocialPostLog = {
+  id: number;
+  social_account_id: number;
+  status: "published" | "failed" | "deleted" | "pending" | "success";
+  social_account?: SocialAccount;
+  platform: string;
+  created_at: string;
+  account_name?: string;
 };
 
 export type SocialAccount = {

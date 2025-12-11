@@ -6,6 +6,7 @@
     "processing": "Processing...",
     "save": "Save",
     "cancel": "Cancel",
+    "continue": "Continue",
     "delete": "Delete",
     "edit": "Edit",
     "analytics": "Analytics",
@@ -225,6 +226,8 @@
         "publishDate": "Publish Date",
         "publishedOn": "Published On",
         "associatedPublications": "Associated Publications",
+        "accountMissingTitle": "Account Disconnected",
+        "accountMissingText": "This publication was posted on an account ({{account}}) that is no longer connected. Editing it will create a new version for your current account(s). Proceed?",
         "dragDrop": {
           "title": "Drag and drop to sort",
           "subtitle": "Upload your multimedia files here"
@@ -368,6 +371,7 @@
       "publications": "Publications",
       "media": "Media",
       "status": "Status",
+      "linkedAccount": "Linked Account",
       "actions": "Actions"
     },
     "messages": {
@@ -525,7 +529,8 @@
       "failed": "Failed",
       "pending": "Pending",
       "published": "Published",
-      "deleted": "Deleted"
+      "deleted": "Deleted",
+      "orphaned": "Orphaned"
     },
     "empty": "No logs found",
     "loading": "Loading logs...",
@@ -808,7 +813,7 @@
         "explanation": "This account has scheduled posts associated. To disconnect it, you must first delete these posts or force the disconnection.",
         "table": {
             "date": "Date",
-            "campaign": "Campaign"
+            "publication": "Publication"
         },
         "cancelButton": "Keep connected",
         "confirmButton": "Disconnect and delete all"

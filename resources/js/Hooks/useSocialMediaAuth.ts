@@ -6,7 +6,7 @@ export const useSocialMediaAuth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [accounts, setAccounts] = useState<any[]>([]);
-  
+
   const fetchAccounts = async () => {
     try {
       const response = await axios.get("/social-accounts", {
@@ -30,57 +30,82 @@ export const useSocialMediaAuth = () => {
     }
   };
 
-  const connectAccount = async (platform: string) => {
-    try {
-      setIsLoading(true);
-      setError(null);
+  const connectAccount = (platform: string): Promise<boolean> => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        setIsLoading(true);
+        setError(null);
 
-      const response = await axios.get(
-        `/social-accounts/auth-url/${platform}`,
-        {
-          headers: {
-            "X-CSRF-TOKEN": document
-              .querySelector('meta[name="csrf-token"]')
-              ?.getAttribute("content"),
-            Accept: "application/json",
-          },
-          withCredentials: true,
-        }
-      );
-
-      if (response.data.success && response.data.url) {
-        const authWindow = window.open(
-          response.data.url,
-          `${platform}Auth`,
-          "width=600,height=700,left=200,top=100"
+        const response = await axios.get(
+          `/social-accounts/auth-url/${platform}`,
+          {
+            headers: {
+              "X-CSRF-TOKEN": document
+                .querySelector('meta[name="csrf-token"]')
+                ?.getAttribute("content"),
+              Accept: "application/json",
+            },
+            withCredentials: true,
+          }
         );
 
-        if (!authWindow) {
-          setIsLoading(false);
-          toast.error("El navegador bloqueó la ventana emergente.");
-          return false;
-        }
+        if (response.data.success && response.data.url) {
+          const width = 600;
+          const height = 700;
+          const left = window.screen.width / 2 - width / 2;
+          const top = window.screen.height / 2 - height / 2;
 
-        const checkWindowClosed = setInterval(() => {
-          if (authWindow.closed) {
-            clearInterval(checkWindowClosed);
+          const authWindow = window.open(
+            response.data.url,
+            `${platform}Auth`,
+            `width=${width},height=${height},left=${left},top=${top}`
+          );
+
+          if (!authWindow) {
             setIsLoading(false);
+            toast.error("El navegador bloqueó la ventana emergente.");
+            resolve(false);
+            return;
           }
-        }, 1000);
 
-        return true;
-      } else {
+          const handleMessage = async (event: MessageEvent) => {
+            if (
+              event.data === "social-auth-success" ||
+              event.data?.type === "SOCIAL_AUTH_SUCCESS"
+            ) {
+              window.removeEventListener("message", handleMessage);
+              // authWindow.close(); // Optional: popup usually closes itself
+              setIsLoading(false);
+              toast.success("Cuenta conectada exitosamente");
+              await fetchAccounts(); // Update local state for good measure
+              resolve(true);
+            }
+          };
+
+          window.addEventListener("message", handleMessage);
+
+          const checkWindowClosed = setInterval(() => {
+            if (authWindow.closed) {
+              clearInterval(checkWindowClosed);
+              window.removeEventListener("message", handleMessage);
+              setIsLoading(false);
+              // Resolve false if closed without success message
+              resolve(false);
+            }
+          }, 1000);
+        } else {
+          setIsLoading(false);
+          toast.error("No se pudo obtener la URL de autenticación");
+          resolve(false);
+        }
+      } catch (error: any) {
         setIsLoading(false);
-        toast.error("No se pudo obtener la URL de autenticación");
-        return false;
+        const msg = error.response?.data?.message || error.message;
+        toast.error("Error al conectar: " + msg);
+        setError(msg);
+        resolve(false); // Resolve false instead of throw to prevent crash
       }
-    } catch (error: any) {
-      setIsLoading(false);
-      const msg = error.response?.data?.message || error.message;
-      toast.error("Error al conectar: " + msg);
-      setError(msg);
-      throw error;
-    }
+    });
   };
 
   const disconnectAccount = async (id: number, force: boolean = false) => {

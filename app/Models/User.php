@@ -14,9 +14,10 @@ use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Notifications\VerifyEmailNotification;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Contracts\Translation\HasLocalePreference;
 use App\Models\Campaign;
 
-class User extends Model implements Authenticatable, MustVerifyEmail, CanResetPassword
+class User extends Model implements Authenticatable, MustVerifyEmail, CanResetPassword, HasLocalePreference
 {
     use AuthenticatableTrait;
     use MustVerifyEmailTrait;
@@ -45,6 +46,15 @@ class User extends Model implements Authenticatable, MustVerifyEmail, CanResetPa
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    /**
+     * Get the user's preferred locale.
+     */
+    public function preferredLocale(): string
+    {
+        return $this->locale ?? app()->getLocale();
+    }
+
 
     public function sendEmailVerificationNotification()
     {

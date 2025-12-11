@@ -200,9 +200,11 @@ export default function EditPublicationModal({
         description: publication.description || "",
         goal: (publication as any).goal || "",
         hashtags: publication.hashtags || "",
-        scheduled_at: publication.scheduled_at
-          ? new Date(publication.scheduled_at).toISOString().slice(0, 16)
-          : undefined,
+        scheduled_at:
+          publication.scheduled_at &&
+          new Date(publication.scheduled_at) > new Date()
+            ? new Date(publication.scheduled_at).toISOString().slice(0, 16)
+            : "", // Reset if past date to avoid validation error
         social_accounts: scheduledAccountIds,
         campaign_id: publication.campaigns?.[0]?.id?.toString() || "",
       });

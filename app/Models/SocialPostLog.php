@@ -19,6 +19,7 @@ class SocialPostLog extends Model
         'publication_id',
         'media_file_id',
         'platform',
+        'account_name',
         'platform_post_id',
         'post_type',
         'post_url',
@@ -55,7 +56,7 @@ class SocialPostLog extends Model
 
     public function socialAccount(): BelongsTo
     {
-        return $this->belongsTo(SocialAccount::class);
+        return $this->belongsTo(SocialAccount::class)->withTrashed();
     }
 
     public function scheduledPost(): BelongsTo
