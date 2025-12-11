@@ -5,7 +5,8 @@ namespace App\Services\SocialPlatforms;
 use Exception;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Support\Facades\Log;
-
+use App\Models\Publication;
+use GuzzleHttp\Client;
 
 class YouTubeService extends BaseSocialService
 {
@@ -411,7 +412,7 @@ class YouTubeService extends BaseSocialService
     ];
   }
 
-  private function handleApiError(\GuzzleHttp\Exception\ClientException $e): never
+  private function handleApiError(ClientException $e): never
   {
     $statusCode = $e->getResponse()->getStatusCode();
     $responseBody = $e->getResponse()->getBody()->getContents();
@@ -665,7 +666,7 @@ class YouTubeService extends BaseSocialService
       }
 
       throw new \Exception("YouTube API returned unexpected status code: {$statusCode}");
-    } catch (\GuzzleHttp\Exception\ClientException $e) {
+    } catch (ClientException $e) {
       $message = $e->getMessage();
       if ($e->hasResponse()) {
         $body = json_decode($e->getResponse()->getBody()->getContents(), true);
@@ -704,7 +705,12 @@ class YouTubeService extends BaseSocialService
         ],
       ]);
 
-      Log::info('Deleted YouTube video', ['video_id' => $postId]);
+      // udpate status in database when change to post related to this   
+    //  $post= SocialPostLog::where('platform_id', $postId)->first();
+    //  $post->status = 'deleted';
+    //  $post->save();
+
+    //   Log::info('Deleted YouTube video', ['video_id' => $postId]);
       return true;
     } catch (\Exception $e) {
       Log::error('Failed to delete YouTube video', ['video_id' => $postId, 'error' => $e->getMessage()]);
@@ -758,7 +764,7 @@ class YouTubeService extends BaseSocialService
     } catch (\Exception $e) {
       Log::error('Failed to check video status', ['video_id' => $videoId, 'error' => $e->getMessage()]);
       // Verify if error is 404
-      if ($e instanceof \GuzzleHttp\Exception\ClientException && $e->getResponse()->getStatusCode() === 404) {
+      if ($e instanceof ClientException && $e->getResponse()->getStatusCode() === 404) {
         return ['exists' => false, 'status' => 'not_found'];
       }
       return ['exists' => false, 'error' => $e->getMessage()];

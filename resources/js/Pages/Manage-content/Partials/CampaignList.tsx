@@ -598,6 +598,7 @@ export default function CampaignList({
                         )}
                       </td>
                     )}
+
                     {mode === "publications" && (
                       <td className="px-6 py-4">
                         {(() => {
@@ -610,13 +611,13 @@ export default function CampaignList({
 
                           // Add scheduled first
                           scheduledPosts.forEach((p) => {
-                            if (p.social_account_id)
+                            if (p.social_account_id )
                               combined.set(p.social_account_id, p);
                           });
 
                           // Add logs (overwriting scheduled if same account)
                           postLogs.forEach((l) => {
-                            if (l.social_account_id)
+                            if (l.social_account_id && l.status !== "deleted")
                               combined.set(l.social_account_id, l);
                           });
 

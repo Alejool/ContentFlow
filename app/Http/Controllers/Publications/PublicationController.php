@@ -20,11 +20,13 @@ use App\Services\SocialPlatforms\YouTubeService;
 use Illuminate\Support\Facades\Log;
 use App\Models\SocialAccount;
 use App\Models\Campaign;
+use App\Models\SocialPostLog;
 
 class PublicationController extends Controller
 {
   public function index(Request $request)
   {
+
     $query = Publication::where('user_id', Auth::id())
       ->with(['mediaFiles' => function ($query) {
         $query->with('derivatives')->orderBy('publication_media.order', 'asc');
@@ -197,7 +199,7 @@ class PublicationController extends Controller
             }
 
             // Create new thumbnail for ALL platforms (YouTube, etc.)
-            \App\Models\MediaDerivative::create([
+            MediaDerivative::create([
               'media_file_id' => $mediaFile->id,
               'derivative_type' => 'thumbnail',
               'file_path' => Storage::disk('s3')->url($thumbPath),
@@ -214,7 +216,7 @@ class PublicationController extends Controller
       if (!empty($validatedData['scheduled_at']) && !empty($validatedData['social_accounts'])) {
         $schedules = $request->input('social_account_schedules', []);
 
-        $socialAccounts = \App\Models\SocialAccount::whereIn('id', $validatedData['social_accounts'])->get()->keyBy('id');
+        $socialAccounts = SocialAccount::whereIn('id', $validatedData['social_accounts'])->get()->keyBy('id');
 
         foreach ($validatedData['social_accounts'] as $accountId) {
           $scheduledAt = isset($schedules[$accountId]) ? $schedules[$accountId] : $validatedData['scheduled_at'];
@@ -261,10 +263,10 @@ class PublicationController extends Controller
 
   public function destroy($id)
   {
-    Publication::destroy($id);
-    return response()->json([
-      'message' => 'Publication deleted successfully',
-    ]);
+    // Publication::destroy($id);
+    // return response()->json([
+    //   'message' => 'Publication deleted successfully',
+    // ]);
   }
 
   public function update(Request $request, $id)
@@ -472,7 +474,7 @@ class PublicationController extends Controller
             }
 
             // Create new thumbnail for ALL platforms
-            \App\Models\MediaDerivative::create([
+            MediaDerivative::create([
               'media_file_id' => $mediaFile->id,
               'derivative_type' => 'thumbnail',
               'file_path' => Storage::disk('s3')->url($thumbPath),
@@ -595,7 +597,7 @@ class PublicationController extends Controller
 
         $schedules = $request->input('social_account_schedules', []);
 
-        $socialAccounts = \App\Models\SocialAccount::whereIn('id', $validatedData['social_accounts'])->get()->keyBy('id');
+        $socialAccounts = SocialAccount::whereIn('id', $validatedData['social_accounts'])->get()->keyBy('id');
 
         foreach ($validatedData['social_accounts'] as $accountId) {
           $scheduledAt = isset($schedules[$accountId]) ? $schedules[$accountId] : $validatedData['scheduled_at'];
@@ -638,8 +640,6 @@ class PublicationController extends Controller
   {
 
     $publication = Publication::with(['mediaFiles', 'campaigns'])->findOrFail($id);
-
-
     $platformIds = $request->input('platforms');
 
     Log::info('publish request:', $request->all());
@@ -681,7 +681,7 @@ class PublicationController extends Controller
             $fullThumbUrl = Storage::disk('s3')->url($thumbPath);
 
             // Create or Update Derivative
-            \App\Models\MediaDerivative::updateOrCreate(
+            MediaDerivative::updateOrCreate(
               [
                 'media_file_id' => $mediaId,
                 'derivative_type' => 'thumbnail',
@@ -739,7 +739,7 @@ class PublicationController extends Controller
           }
 
           // Create new YouTube thumbnail (replaces all previous)
-          \App\Models\MediaDerivative::create([
+          MediaDerivative::create([
             'media_file_id' => $mediaFile->id,
             'derivative_type' => 'thumbnail',
             'file_path' => $thumbUrl,
@@ -839,7 +839,7 @@ class PublicationController extends Controller
     }
 
     // Get social account IDs where status is 'published'
-    $publishedAccountIds = \App\Models\SocialPostLog::where('publication_id', $publication->id)
+    $publishedAccountIds = SocialPostLog::where('publication_id', $publication->id)
       ->where('status', 'published')
       ->pluck('social_account_id')
       ->unique()

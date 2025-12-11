@@ -154,7 +154,7 @@ export default function ManageContentPage() {
       publishedPost = postLogs[0] || scheduledPosts[0];
     }
 
-    if (publishedPost && publishedPost.social_account_id) {
+    if (publishedPost && publishedPost.social_account_id && publishedPost.status !== "deleted") {
       const accountId = publishedPost.social_account_id;
       const foundAccount = connectedAccounts.find(
         (acc: any) => acc.id === accountId
