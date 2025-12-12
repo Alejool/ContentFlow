@@ -16,7 +16,6 @@ use App\Models\SocialPostLog;
 
 class SocialAccountController extends Controller
 {
-    // Get all connected accounts for the user
     public function index()
     {
         $accounts = SocialAccount::where('user_id', Auth::id())->get();
@@ -27,10 +26,8 @@ class SocialAccountController extends Controller
         ]);
     }
 
-    // Method to get authentication URL
     public function getAuthUrl(Request $request, $platform)
     {
-        // Generate random state to prevent CSRF
         $state = Str::random(40);
         session(['social_auth_state' => $state]);
 
@@ -95,11 +92,8 @@ class SocialAccountController extends Controller
                 break;
 
             case 'tiktok':
-                // Generate PKCE code verifier and challenge for TikTok
                 $codeVerifier = Str::random(128);
                 $codeChallenge = rtrim(strtr(base64_encode(hash('sha256', $codeVerifier, true)), '+/', '-_'), '=');
-
-                // Store code verifier in session for later use in callback
                 session(['tiktok_code_verifier' => $codeVerifier]);
 
                 $url = 'https://www.tiktok.com/v2/auth/authorize?' . http_build_query([
@@ -126,37 +120,28 @@ class SocialAccountController extends Controller
         ]);
     }
 
-    // Callback for Facebook
     public function handleFacebookCallback(Request $request)
     {
-        // Verify state to prevent CSRF
         if ($request->state !== session('social_auth_state')) {
             return $this->handleOAuthError('Invalid state');
         }
-
-        // Check if there is an authorization code
         if (!$request->has('code')) {
             return $this->handleOAuthError('Authorization code not received');
         }
 
-
-
         try {
-            // Exchange code for access token
             $response = Http::post('https://graph.facebook.com/v18.0/oauth/access_token', [
                 'client_id' => config('services.facebook.client_id'),
                 'client_secret' => config('services.facebook.client_secret'),
                 'redirect_uri' => url('/auth/facebook/callback'),
                 'code' => $request->code,
             ]);
-
             $data = $response->json();
 
             if (!isset($data['access_token'])) {
                 return $this->handleOAuthError('Could not obtain access token');
             }
 
-            // Get user/page information
             $userResponse = Http::withToken($data['access_token'])
                 ->get('https://graph.facebook.com/me?fields=id,name,picture');
 
@@ -166,7 +151,6 @@ class SocialAccountController extends Controller
                 return $this->handleOAuthError('Could not obtain user information');
             }
 
-            // Save the account to the database
             $account = $this->saveAccount([
                 'platform' => 'facebook',
                 'account_id' => $userData['id'],
@@ -181,7 +165,6 @@ class SocialAccountController extends Controller
                     : null,
             ]);
 
-            // Close the window and send message to the main window
             return $this->closeWindowWithMessage('success', [
                 'platform' => 'facebook',
                 'account_id' => $userData['id'],
@@ -198,11 +181,8 @@ class SocialAccountController extends Controller
         }
     }
 
-    // Callback for Instagram
     public function handleInstagramCallback(Request $request)
     {
-        // ... (Verification logic remains same until user info fetch)
-        // Verify state to prevent CSRF
         if ($request->state !== session('social_auth_state')) {
             return $this->handleOAuthError('Invalid state');
         }
@@ -227,7 +207,6 @@ class SocialAccountController extends Controller
                 return $this->handleOAuthError('Could not obtain access token: ' . json_encode($data));
             }
 
-            // Fetch user profile (username) - Basic Display API
             $userResponse = Http::get("https://graph.instagram.com/{$data['user_id']}", [
                 'fields' => 'id,username,account_type',
                 'access_token' => $data['access_token']
@@ -235,7 +214,6 @@ class SocialAccountController extends Controller
 
             $userData = $userResponse->json();
 
-            // Exchange for long-lived token
             $longLivedResponse = Http::get('https://graph.instagram.com/access_token', [
                 'grant_type' => 'ig_exchange_token',
                 'client_secret' => config('services.instagram.client_secret'),
@@ -272,10 +250,8 @@ class SocialAccountController extends Controller
         }
     }
 
-    // Callback for Twitter
     public function handleTwitterCallback(Request $request)
     {
-        // ... (Verification logic)
         if ($request->state !== session('social_auth_state')) {
             return $this->handleOAuthError('Invalid state');
         }
@@ -306,7 +282,6 @@ class SocialAccountController extends Controller
                 return $this->handleOAuthError('Could not obtain access token');
             }
 
-            // Get user information with profile fields
             $userResponse = Http::withToken($data['access_token'])
                 ->get('https://api.twitter.com/2/users/me', [
                     'user.fields' => 'profile_image_url,username,name'
@@ -320,7 +295,7 @@ class SocialAccountController extends Controller
 
             $userInfo = $userData['data'];
 
-            $account = $this->saveAccount([
+            $this->saveAccount([
                 'platform' => 'twitter',
                 'account_id' => $userInfo['id'],
                 'account_name' => $userInfo['name'] ?? $userInfo['username'] ?? null,
@@ -352,7 +327,6 @@ class SocialAccountController extends Controller
         }
     }
 
-    // Callback for YouTube
     public function handleYoutubeCallback(Request $request)
     {
         if ($request->state !== session('social_auth_state')) {
@@ -377,7 +351,6 @@ class SocialAccountController extends Controller
                 return $this->handleOAuthError('Could not obtain access token');
             }
 
-            // Get channel information
             $channelResponse = Http::withToken($data['access_token'])
                 ->get('https://www.googleapis.com/youtube/v3/channels', [
                     'part' => 'snippet',
@@ -392,13 +365,12 @@ class SocialAccountController extends Controller
 
             $channelInfo = $channelData['items'][0]['snippet'];
 
-            // Get Google User Info (Email)
             $userInfoResponse = Http::withToken($data['access_token'])
                 ->get('https://www.googleapis.com/oauth2/v3/userinfo');
             $userInfo = $userInfoResponse->json();
             $userEmail = $userInfo['email'] ?? null;
 
-            $account = $this->saveAccount([
+            $this->saveAccount([
                 'platform' => 'youtube',
                 'account_id' => $channelData['items'][0]['id'],
                 'account_name' => $channelInfo['title'] ?? null,
@@ -406,7 +378,7 @@ class SocialAccountController extends Controller
                     'avatar' => $channelInfo['thumbnails']['default']['url'] ?? null,
                     'description' => $channelInfo['description'] ?? null,
                     'username' => $channelInfo['customUrl'] ?? null,
-                    'email' => $userEmail // Save email in metadata
+                    'email' => $userEmail
                 ],
                 'access_token' => $data['access_token'],
                 'refresh_token' => $data['refresh_token'] ?? null,
@@ -448,7 +420,6 @@ class SocialAccountController extends Controller
         }
 
         try {
-            // Preparar los datos del request
             $tokenData = [
                 'client_key' => config('services.tiktok.client_key'),
                 'client_secret' => config('services.tiktok.client_secret'),
@@ -458,67 +429,31 @@ class SocialAccountController extends Controller
                 'code_verifier' => $codeVerifier,
             ];
 
-            // Log para debugging (eliminar en producción)
-            \Log::info('TikTok Token Request', [
-                'url' => 'https://open.tiktokapis.com/v2/oauth/token/',
-                'data' => array_merge($tokenData, [
-                    'client_secret' => '***', // Ocultar en logs
-                    'code_verifier' => '***'
-                ])
-            ]);
-
-
-            // ✅ LOG COMPLETO DE LO QUE ENVÍAS
-            \Log::info('TikTok Token Request FULL', [
-                'url' => 'https://open.tiktokapis.com/v2/oauth/token',
-                'client_key' => $tokenData['client_key'],
-                'client_secret_length' => strlen($tokenData['client_secret']),
-                'code' => $tokenData['code'],
-                'code_length' => strlen($tokenData['code']),
-                'grant_type' => $tokenData['grant_type'],
-                'redirect_uri' => $tokenData['redirect_uri'],
-                'code_verifier' => $tokenData['code_verifier'],
-                'code_verifier_length' => strlen($tokenData['code_verifier']),
-            ]);
-
             $response = Http::asForm()->post('https://open.tiktokapis.com/v2/oauth/token/', $tokenData);
 
             $data = $response->json();
 
-            // Log de la respuesta completa
-            \Log::info('TikTok Token Response', [
-                'status' => $response->status(),
-                'body' => $data
-            ]);
-
-            // Limpiar sesión
             session()->forget(['tiktok_code_verifier', 'social_auth_state']);
 
-            // Verificar errores en la respuesta
             if (isset($data['error'])) {
-                \Log::error('TikTok OAuth Error', $data);
                 return $this->handleOAuthError(
                     'TikTok error: ' . ($data['error_description'] ?? $data['error']['message'] ?? $data['error'])
                 );
             }
 
-            // TikTok puede retornar en diferentes estructuras
             $accessToken = $data['access_token'] ?? $data['data']['access_token'] ?? null;
             $openId = $data['open_id'] ?? $data['data']['open_id'] ?? null;
             $expiresIn = $data['expires_in'] ?? $data['data']['expires_in'] ?? null;
             $refreshToken = $data['refresh_token'] ?? $data['data']['refresh_token'] ?? null;
 
             if (!$accessToken) {
-                \Log::error('TikTok Access Token Not Found', ['response' => $data]);
                 return $this->handleOAuthError('Could not obtain access token from TikTok');
             }
 
             if (!$openId) {
-                \Log::error('TikTok Open ID Not Found', ['response' => $data]);
                 return $this->handleOAuthError('Could not obtain user ID from TikTok');
             }
 
-            // Obtener información del usuario
             $userResponse = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $accessToken,
             ])->post('https://open.tiktokapis.com/v2/user/info/', [
@@ -527,14 +462,9 @@ class SocialAccountController extends Controller
 
             $userData = $userResponse->json();
 
-            \Log::info('TikTok User Info Response', [
-                'status' => $userResponse->status(),
-                'body' => $userData
-            ]);
-
             $userInfo = $userData['data']['user'] ?? [];
 
-            $account = $this->saveAccount([
+            $this->saveAccount([
                 'platform' => 'tiktok',
                 'account_id' => $openId,
                 'account_name' => $userInfo['display_name'] ?? 'TikTok User',
@@ -557,25 +487,18 @@ class SocialAccountController extends Controller
                 'token_expires_at' => $expiresIn ? now()->addSeconds($expiresIn)->toIso8601String() : null
             ]);
         } catch (\Exception $e) {
-            \Log::error('TikTok OAuth Exception', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
             return $this->handleOAuthError('Error processing authentication: ' . $e->getMessage());
         }
     }
 
-    // Helper method to save the account
     private function saveAccount($data)
     {
-        // Check if an account already exists for this platform (including trashed)
         $existingAccount = SocialAccount::withTrashed()
             ->where('user_id', Auth::id())
             ->where('platform', $data['platform'])
             ->where('account_id', $data['account_id'])
             ->first();
 
-        // Prepare data for update/create
         $accountData = [
             'account_id' => $data['account_id'],
             'access_token' => $data['access_token'],
@@ -595,13 +518,10 @@ class SocialAccountController extends Controller
         $wasReconnection = false;
 
         if ($existingAccount) {
-            // Restore if deleted
             if ($existingAccount->trashed()) {
                 $existingAccount->restore();
                 $wasReconnection = true;
 
-                // Healing Logic: Restore 'orphaned' posts to 'published'
-                // This ensures re-linking if the SAME account connects again
                 SocialPostLog::where('social_account_id', $existingAccount->id)
                     ->where('status', 'orphaned')
                     ->update([
@@ -610,18 +530,15 @@ class SocialAccountController extends Controller
                     ]);
             }
 
-            // Update existing account
             $existingAccount->update($accountData);
             $account = $existingAccount;
         } else {
-            // Create new account
             $accountData['user_id'] = Auth::id();
             $accountData['platform'] = $data['platform'];
             $account = SocialAccount::create($accountData);
             $isNewConnection = true;
         }
 
-        // Determine best identifier for notification
         $identifier = $data['account_name'] ?? $data['account_id'];
 
         if (isset($data['account_metadata']['email'])) {
@@ -630,7 +547,6 @@ class SocialAccountController extends Controller
             $identifier = "{$identifier} (@{$data['account_metadata']['username']})";
         }
 
-        // Send system notification for account connection
         $user = Auth::user();
         if ($user) {
             $user->notify(new SocialAccountConnectedNotification(
@@ -643,7 +559,6 @@ class SocialAccountController extends Controller
         return $account;
     }
 
-    // ... (rest of the file: handleOAuthError, closeWindowWithMessage, store, destroy)
     private function handleOAuthError($message)
     {
         return view('oauth.callback', [
@@ -668,7 +583,6 @@ class SocialAccountController extends Controller
             'access_token' => 'required|string',
             'refresh_token' => 'nullable|string',
             'token_expires_at' => 'nullable|date',
-            // Validation for optional fields
             'account_name' => 'nullable|string',
             'account_metadata' => 'nullable|array',
         ]);
@@ -697,7 +611,6 @@ class SocialAccountController extends Controller
         }
     }
 
-    // Delete/disconnect a social account
     public function destroy(Request $request, $id)
     {
         try {
@@ -714,13 +627,11 @@ class SocialAccountController extends Controller
 
             $force = $request->query('force') === 'true' || $request->input('force') === true;
 
-            // Check for active published posts (not just scheduled)
             $activePosts = SocialPostLog::where('social_account_id', $account->id)
                 ->whereIn('status', ['published', 'pending'])
                 ->with('publication:id,title')
                 ->get();
 
-            // Deduplicate active posts by publication_id
             $uniqueActivePosts = $activePosts->unique('publication_id');
 
             if ($uniqueActivePosts->count() > 0 && !$force) {
@@ -732,10 +643,9 @@ class SocialAccountController extends Controller
                     'platform' => $account->platform,
                     'posts' => $uniqueActivePosts->map(function ($log) {
                         $date = $log->published_at instanceof \DateTimeInterface ? $log->published_at : null;
-                        // Fallback to created_at if published_at is missing/invalid
                         if (!$date && $log->created_at instanceof \DateTimeInterface) $date = $log->created_at;
 
-                        if ($date && $date->format('Y') < 2000) $date = null; // Sanity check
+                        if ($date && $date->format('Y') < 2000) $date = null;
 
                         return [
                             'id' => $log->publication_id,
@@ -749,13 +659,10 @@ class SocialAccountController extends Controller
                 ], 400);
             }
 
-            // Check for associated scheduled posts
             $pendingPosts = ScheduledPost::where('social_account_id', $account->id)
                 ->where('status', 'pending')
                 ->with(['campaign:id,title', 'publication:id,title'])
                 ->get();
-
-            // Deduplicate pending posts by publication_id (or id if null, though duplications usually share publication_id)
             $uniquePendingPosts = $pendingPosts->unique(function ($item) {
                 return $item->publication_id ? 'p' . $item->publication_id : 'c' . $item->campaign_id . '_' . $item->id;
             });
@@ -767,7 +674,6 @@ class SocialAccountController extends Controller
                         'message' => 'Cannot disconnect account. It has ' . $uniquePendingPosts->count() . ' scheduled post(s). Please remove them from campaigns first.',
                         'posts' => $uniquePendingPosts->map(function ($post) {
                             $date = $post->scheduled_at instanceof \DateTimeInterface ? $post->scheduled_at : null;
-                            // Fallback to created_at if scheduled_at is missing
                             if (!$date && $post->created_at instanceof \DateTimeInterface) $date = $post->created_at;
 
                             if ($date && $date->format('Y') < 2000) $date = null;
@@ -781,17 +687,14 @@ class SocialAccountController extends Controller
                         })->values()
                     ], 400);
                 } else {
-                    // Force delete: delete posts first
                     foreach ($pendingPosts as $post) {
                         $post->delete();
                     }
                 }
             }
 
-            // If forcing disconnect with active posts, mark them as orphaned
             $orphanedPostsList = [];
             if ($force && $uniqueActivePosts->count() > 0) {
-                // Keep track of unique titles for notification
                 $orphanedPostsList = $uniqueActivePosts->map(fn($log) => optional($log->publication)->title ?? 'Untitled')->toArray();
 
                 SocialPostLog::where('social_account_id', $account->id)
@@ -802,7 +705,6 @@ class SocialAccountController extends Controller
                     ]);
             }
 
-            // Send application notification for account disconnection
             $user = Auth::user();
             if ($user) {
                 $identifier = $account->account_name ?? $account->account_id;
