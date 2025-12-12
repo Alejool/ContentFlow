@@ -709,7 +709,7 @@ class SocialAccountController extends Controller
             if (!$account) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Account not found'
+                    'message' => trans('notifications.account_not_found', [], $account->user->preferredLocale())
                 ], 404);
             }
 
@@ -746,7 +746,7 @@ class SocialAccountController extends Controller
                             'published_at' => $date ? $date->toIso8601String() : null,
                         ];
                     })->values(),
-                    'message' => "Esta cuenta ({$account->account_name}) tiene {$uniqueActivePosts->count()} publicaciones activas. Si la desconectas, no podrás eliminarlas automáticamente de {$account->platform}."
+                    'message' => trans('notifications.try_account_disconnected', ['account_name' => $account->account_name, 'uniqueActivePosts' => $uniqueActivePosts->count(), 'platform' => $account->platform], $account->user->preferredLocale())
                 ], 400);
             }
 

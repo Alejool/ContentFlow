@@ -20,9 +20,15 @@ export default function DisconnectWarningModal({
   posts,
   isLoading = false,
 }: DisconnectWarningModalProps) {
-  const { t } = useTranslation();
   const { theme } = useTheme();
+  const { t, i18n } = useTranslation();
 
+ console.log("=== DEBUG i18n ===");
+ console.log("Idioma actual:", i18n.language);
+ console.log("Idioma resuelto:", i18n.resolvedLanguage);
+ console.log("Storage:", localStorage.getItem("i18nextLng"));
+ console.log("Navegador:", navigator.language);
+ console.log("Navegador langs:", navigator.languages);
   if (!isOpen) return null;
 
   return (

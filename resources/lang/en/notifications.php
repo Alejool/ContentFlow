@@ -18,4 +18,6 @@ return [
   'test_notification' => 'This is a test notification',
   'view_publication' => 'View Publication',
   'view_account' => 'View Account',
+  'try_account_disconnected' => 'This account :account_name has :uniqueActivePosts active posts. If you disconnect it, you will not be able to automatically delete them from :platform.',
+  'account_not_found' => 'Account not found',
 ];

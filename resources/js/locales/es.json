@@ -885,7 +885,7 @@
             "publication": "Publicación"
         },
         "cancelButton": "Mantener conectado",
-        "confirmButton": "Desconectar y eliminar todo"
+        "confirmButton": "Desconectar"
       }
     },
     "modals": {

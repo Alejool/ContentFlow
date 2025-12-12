@@ -866,6 +866,17 @@
         "disconnect": "Disconnect",
         "processing": "Processing..."
       },
+      "disconnectModal": {
+        "title": "Disconnect Account",
+        "warning": "Account has pending posts",
+        "explanation": "This account has scheduled posts associated. To disconnect it, you must first delete these posts or force the disconnection.",
+        "table": {
+            "date": "Date",
+            "publication": "Publication"
+        },
+        "cancelButton": "Keep connected",
+        "confirmButton": "Disconnect "
+      },
       "messages": {
         "connectSuccess": "Account connected successfully",
         "disconnectSuccess": "Account disconnected successfully",
@@ -876,17 +887,7 @@
       }
     }
   },
-      "disconnectModal": {
-        "title": "Disconnect Account",
-        "warning": "Account has pending posts",
-        "explanation": "This account has scheduled posts associated. To disconnect it, you must first delete these posts or force the disconnection.",
-        "table": {
-            "date": "Date",
-            "publication": "Publication"
-        },
-        "cancelButton": "Keep connected",
-        "confirmButton": "Disconnect and delete all"
-      },
+ 
     "modals": {
       "add": {
         "title": "New Campaign",

@@ -18,4 +18,6 @@ return [
   'test_notification' => 'Esta es una notificación de prueba',
   'view_publication' => 'Ver Publicación',
   'view_account' => 'Ver Cuenta',
+  'try_account_disconnected' => 'Esta cuenta :account_name tiene :uniqueActivePosts publicaciones activas. Si la desconecta, no podrá eliminarlas automáticamente de :platform.',
+  'account_not_found' => 'Cuenta no encontrada',
 ];
