@@ -28,14 +28,12 @@ export const useSocialMediaAuth = () => {
         withCredentials: true,
       });
 
-      console.log("fetchAccounts", response);
       if (response.data && response.data.accounts) {
         setAccounts(response.data.accounts);
         return response.data.accounts;
       }
       return [];
     } catch (error) {
-      console.error("Error al cargar cuentas sociales:", error);
       const errorMessage =
         error instanceof Error ? error.message : "Error desconocido";
       setError(errorMessage);
@@ -84,6 +82,8 @@ export const useSocialMediaAuth = () => {
           }
 
           const handleMessage = async (event: MessageEvent) => {
+            console.log("event");
+            console.log(event.data);
             if (
               event.data === "social-auth-success" ||
               event.data?.type === "SOCIAL_AUTH_SUCCESS"

@@ -151,7 +151,7 @@ class SocialAccountController extends Controller
                 return $this->handleOAuthError('Could not obtain user information');
             }
 
-            $account = $this->saveAccount([
+             $this->saveAccount([
                 'platform' => 'facebook',
                 'account_id' => $userData['id'],
                 'account_name' => $userData['name'] ?? null,
@@ -167,14 +167,8 @@ class SocialAccountController extends Controller
 
             return $this->closeWindowWithMessage('success', [
                 'platform' => 'facebook',
-                'account_id' => $userData['id'],
                 'account_name' => $userData['name'] ?? null,
                 'avatar' => $userData['picture']['data']['url'] ?? null,
-                'access_token' => $data['access_token'],
-                'refresh_token' => null,
-                'token_expires_at' => isset($data['expires_in'])
-                    ? now()->addSeconds($data['expires_in'])->toIso8601String()
-                    : null
             ]);
         } catch (\Exception $e) {
             return $this->handleOAuthError('Error processing authentication: ' . $e->getMessage());
@@ -238,11 +232,7 @@ class SocialAccountController extends Controller
 
             return $this->closeWindowWithMessage('success', [
                 'platform' => 'instagram',
-                'account_id' => $data['user_id'],
                 'account_name' => $userData['username'] ?? null,
-                'access_token' => $finalAccessToken,
-                'refresh_token' => null,
-                'token_expires_at' => $expiresIn ? now()->addSeconds($expiresIn)->toIso8601String() : null
             ]);
         } catch (\Exception $e) {
             Log::error('Instagram OAuth Exception:', ['message' => $e->getMessage()]);
@@ -312,15 +302,9 @@ class SocialAccountController extends Controller
 
             return $this->closeWindowWithMessage('success', [
                 'platform' => 'twitter',
-                'account_id' => $userInfo['id'],
                 'account_name' => $userInfo['name'] ?? null,
                 'username' => $userInfo['username'] ?? null,
                 'avatar' => $userInfo['profile_image_url'] ?? null,
-                'access_token' => $data['access_token'],
-                'refresh_token' => $data['refresh_token'] ?? null,
-                'token_expires_at' => isset($data['expires_in'])
-                    ? now()->addSeconds($data['expires_in'])->toIso8601String()
-                    : null
             ]);
         } catch (\Exception $e) {
             return $this->handleOAuthError('Error processing authentication: ' . $e->getMessage());
@@ -389,14 +373,8 @@ class SocialAccountController extends Controller
 
             return $this->closeWindowWithMessage('success', [
                 'platform' => 'youtube',
-                'account_id' => $channelData['items'][0]['id'],
                 'account_name' => $channelInfo['title'] ?? null,
                 'avatar' => $channelInfo['thumbnails']['default']['url'] ?? null,
-                'access_token' => $data['access_token'],
-                'refresh_token' => $data['refresh_token'] ?? null,
-                'token_expires_at' => isset($data['expires_in'])
-                    ? now()->addSeconds($data['expires_in'])->toIso8601String()
-                    : null
             ]);
         } catch (\Exception $e) {
             return $this->handleOAuthError('Error processing authentication: ' . $e->getMessage());
@@ -479,12 +457,8 @@ class SocialAccountController extends Controller
 
             return $this->closeWindowWithMessage('success', [
                 'platform' => 'tiktok',
-                'account_id' => $openId,
                 'account_name' => $userInfo['display_name'] ?? null,
                 'avatar' => $userInfo['avatar_url'] ?? null,
-                'access_token' => $accessToken,
-                'refresh_token' => $refreshToken,
-                'token_expires_at' => $expiresIn ? now()->addSeconds($expiresIn)->toIso8601String() : null
             ]);
         } catch (\Exception $e) {
             return $this->handleOAuthError('Error processing authentication: ' . $e->getMessage());
@@ -574,6 +548,7 @@ class SocialAccountController extends Controller
             'data' => json_encode($data)
         ]);
     }
+    
 
     public function store(Request $request)
     {

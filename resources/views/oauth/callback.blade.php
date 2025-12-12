@@ -4,7 +4,6 @@
     <title>Authentication completed</title>
     <script>
         window.onload = function() {
-            // Enviar mensaje a la ventana principal
             if (window.opener) {
                 window.opener.postMessage({
                     type: 'social_auth_callback',
@@ -12,10 +11,9 @@
                     data: {!! isset($data) ? $data : 'null' !!}
                 }, '*');
                 
-                // Cerrar esta ventana después de un breve retraso
                 setTimeout(function() {
                     window.close();
-                }, 1000);
+                }, 500);
             }
         };
     </script>
