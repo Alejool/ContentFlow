@@ -1,6 +1,6 @@
 import ModernDatePicker from "@/Components/common/ui/ModernDatePicker";
 import { format } from "date-fns";
-import { Filter, Search } from "lucide-react";
+import { Filter } from "lucide-react";
 
 interface FilterSectionProps {
   mode: "campaigns" | "publications";
@@ -115,7 +115,7 @@ export default function FilterSection({
             </select>
           )}
 
-          <div className="flex items-center gap-2">
+          {/* <div className="flex items-center gap-2">
             <select
               value={platformFilter}
               onChange={(e) => handleFilterChange("platform", e.target.value)}
@@ -131,7 +131,7 @@ export default function FilterSection({
                 </option>
               ))}
             </select>
-          </div>
+          </div> */}
         </div>
 
         <div className="flex items-center gap-2">

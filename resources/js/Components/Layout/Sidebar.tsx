@@ -327,14 +327,14 @@ export default function Sidebar({
               </div>
             </div>
 
-            {/* Logout - Separado en su propia sección */}
-            <div className={`p-4 border-t ${classes.borderColor}`}>
+            <div
+              className={`p-4 border-t ${classes.borderColor} ${classes.textColor} ${classes.logoutHoverBg}`}
+            >
               <NavLink
                 href={getRouteUrl("logout")}
                 method="post"
                 as="button"
                 className={`group w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300 
-                  ${classes.textColor} ${classes.logoutHoverBg}
                   ${isSidebarOpen ? "" : "justify-center"}`}
               >
                 <div className="flex items-center justify-center">

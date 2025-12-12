@@ -847,7 +847,11 @@
       "title": "Conecta tus Redes Sociales",
       "description": "Conecta tus cuentas de redes sociales para permitir la publicación automática de contenido. Tu información se mantendrá segura y solo se utilizará para las funciones que autorices.",
       "whyConnect": "¿Por qué conectar tus redes sociales?",
-      
+      "connectedAccounts": "Cuentas Conectadas",
+      "of": "de",
+      "accounts": "cuentas",
+      "seeAccounts": "Ver redes",
+      "hide": "Ocultar",
       "benefits": {
         "autoPublish": "Publicar contenido automáticamente",
         "manageAll": "Gestionar todas las cuentas en un solo lugar",

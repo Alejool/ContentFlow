@@ -73,7 +73,7 @@ export default function NotificationsModal({
       : "bg-gray-100 text-gray-600",
     emptyBg: isDark ? "bg-neutral-800" : "bg-gray-100",
     emptyText: isDark ? "text-gray-500" : "text-gray-400",
-    overlay: isDark ? "bg-black/50" : "bg-gray-500/50",
+    overlay: isDark ? "bg-black/80" : "bg-gray-500/80",
     disabled: isDark
       ? "text-gray-600 cursor-not-allowed"
       : "text-gray-400 cursor-not-allowed",

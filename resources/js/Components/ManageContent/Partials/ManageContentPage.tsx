@@ -271,7 +271,7 @@ export default function ManageContentPage() {
     <AuthenticatedLayout>
       <Head title={t("manageContent.title")} />
       <div className={`min-h-screen transition-colors duration-300`}>
-        <div className="mx-auto  px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-12 text-center">
             <div
               className={`inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r ${iconGradient} rounded-lg mb-6`}
@@ -293,46 +293,44 @@ export default function ManageContentPage() {
             <SocialMediaAccounts />
 
             {/* Tabs */}
-            <div className={`${tabBg} rounded-xl shadow-lg `}>
-              <div className="">
-                <div className="flex items-center justify-center gap-0.5 p-1 rounded-xl max-w-md mx-auto pt-6">
-                  {tabs.map((tab) => {
-                    const isActive = activeTab === tab.id;
+            <div className={` rounded-lg `}>
+              <div className="flex items-center justify-center gap-0.5 p-1 rounded-lg max-w-md mx-auto pt-6">
+                {tabs.map((tab) => {
+                  const isActive = activeTab === tab.id;
 
-                    return (
-                      <button
-                        key={tab.id}
-                        onClick={() =>
-                          setActiveTab(
-                            tab.id as "publications" | "campaigns" | "logs"
-                          )
-                        }
-                        className={`group relative flex-1 px-4 py-2.5 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() =>
+                        setActiveTab(
+                          tab.id as "publications" | "campaigns" | "logs"
+                        )
+                      }
+                      className={`group relative flex-1 px-4 py-2.5 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
+                        isActive
+                          ? "bg-white dark:bg-gray-900 shadow-sm text-primary-600 dark:text-primary-400"
+                          : "text-gray-600 dark:text-gray-400 hover:text-primary-500 dark:hover:text-primary-300"
+                      }`}
+                    >
+                      {/* Línea inferior activa */}
+                      {isActive && (
+                        <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-8 h-0.5 bg-primary-500 rounded-full"></div>
+                      )}
+
+                      <tab.icon
+                        className={`w-4 h-4 transition-colors duration-200 ${
                           isActive
-                            ? "bg-white dark:bg-gray-900 shadow-sm text-primary-600 dark:text-primary-400"
-                            : "text-gray-600 dark:text-gray-400 hover:text-primary-500 dark:hover:text-primary-300"
+                            ? "text-primary-500"
+                            : "group-hover:text-primary-400"
                         }`}
-                      >
-                        {/* Línea inferior activa */}
-                        {isActive && (
-                          <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-8 h-0.5 bg-primary-500 rounded-full"></div>
-                        )}
+                      />
 
-                        <tab.icon
-                          className={`w-4 h-4 transition-colors duration-200 ${
-                            isActive
-                              ? "text-primary-500"
-                              : "group-hover:text-primary-400"
-                          }`}
-                        />
-
-                        <span className="hidden sm:inline text-sm font-medium">
-                          {tab.label}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
+                      <span className="hidden sm:inline text-sm font-medium">
+                        {tab.label}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
 
               {/* Content */}

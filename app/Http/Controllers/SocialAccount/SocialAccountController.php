@@ -355,7 +355,6 @@ class SocialAccountController extends Controller
     // Callback for YouTube
     public function handleYoutubeCallback(Request $request)
     {
-        // ... (Verification logic)
         if ($request->state !== session('social_auth_state')) {
             return $this->handleOAuthError('Invalid state');
         }
