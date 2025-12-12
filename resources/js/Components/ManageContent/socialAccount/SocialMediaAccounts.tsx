@@ -286,20 +286,19 @@ export default function SocialMediaAccounts() {
 
   return (
     <div className="mb-6">
-      {/* Botón para expandir/colapsar */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
         className={`w-full flex items-center justify-between p-4 rounded-lg border transition-all duration-300 hover:shadow-sm
           ${
             theme === "dark"
-              ? "bg-neutral-800/30 border-neutral-700/50 hover:border-neutral-600"
+              ? "bg-black/70 border-black/50 hover:border-black-600"
               : "bg-white border-gray-200 hover:border-gray-300"
           }`}
       >
         <div className="flex items-center gap-3">
           <div
             className={`p-2 rounded-lg ${
-              theme === "dark" ? "bg-neutral-700" : "bg-gray-100"
+              theme === "dark" ? "bg-black/50" : "bg-gray-100"
             }`}
           >
             <BarChart3 className="w-5 h-5 text-primary-500" />

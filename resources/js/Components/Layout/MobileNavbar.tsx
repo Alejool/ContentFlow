@@ -70,7 +70,6 @@ function CustomAvatar({
           onError={(e) => {
             const img = e.currentTarget;
             img.style.display = "none";
-
             const fallback = document.createElement("div");
             fallback.className = `w-full h-full flex items-center justify-center ${avatarTextClass} font-bold`;
             fallback.textContent = getInitials(name);
