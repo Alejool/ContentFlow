@@ -3,6 +3,7 @@ import YouTubeThumbnailUploader from "@/Components/common/ui/YouTubeThumbnailUpl
 import { useCampaignManagement } from "@/Hooks/useCampaignManagement";
 import { useConfirm } from "@/Hooks/useConfirm";
 import { useTheme } from "@/Hooks/useTheme";
+import { publicationSchema } from "@/schemas/publication";
 import { Publication } from "@/types/Publication";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
@@ -21,33 +22,6 @@ import {
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { z } from "zod";
-
-const createEditSchema = (t: any) =>
-  z.object({
-    title: z
-      .string()
-      .min(
-        1,
-        t("publications.modal.validation.titleRequired") || "Title is required"
-      )
-      .max(
-        100,
-        t("publications.modal.validation.titleLength") || "Title too long"
-      ),
-    description: z
-      .string()
-      .min(
-        10,
-        t("publications.modal.validation.descRequired") ||
-          "Description too short"
-      ),
-    goal: z.string().optional(),
-    hashtags: z.string().optional(),
-    scheduled_at: z.string().optional(),
-    social_accounts: z.array(z.number()).optional(),
-    campaign_id: z.string().optional(),
-  });
 
 type EditPublicationFormData = {
   title: string;
@@ -140,7 +114,7 @@ export default function EditPublicationModal({
   const [activePopover, setActivePopover] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const schema = useMemo(() => createEditSchema(t), [t]);
+  const schema = useMemo(() => publicationSchema(t), [t]);
 
   const {
     register,
@@ -149,8 +123,8 @@ export default function EditPublicationModal({
     watch,
     reset,
     formState: { errors },
-  } = useForm<EditPublicationFormData>({
-    resolver: zodResolver(createEditSchema(t)),
+  } = useForm({
+    resolver: zodResolver(schema),
     defaultValues: {
       title: "",
       description: "",
@@ -506,7 +480,6 @@ export default function EditPublicationModal({
       <div
         className={`relative w-full max-w-4xl ${modalBg} rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300`}
       >
-        {/* Header */}
         <div
           className={`px-8 py-6 border-b ${modalHeaderBorder} ${modalHeaderBg} flex items-center justify-between sticky top-0 z-10`}
         >
@@ -532,11 +505,9 @@ export default function EditPublicationModal({
           </button>
         </div>
 
-        {/* Form Content */}
         <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
           <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Left Column - Media */}
               <div className="space-y-6">
                 <div className="form-group">
                   <label
@@ -595,7 +566,6 @@ export default function EditPublicationModal({
                                     <span className="text-white/80 text-xs font-medium bg-black/50 px-2 py-1 rounded">
                                       Video
                                     </span>
-                                    {/* Thumbnail Upload */}
                                     <div
                                       className="relative"
                                       onClick={(e) => e.stopPropagation()}
@@ -713,7 +683,6 @@ export default function EditPublicationModal({
                   )}
                 </div>
 
-                {/* Hashtags */}
                 <div className="form-group">
                   <label
                     className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
@@ -747,7 +716,6 @@ export default function EditPublicationModal({
                   </div>
                 </div>
 
-                {/* Scheduling */}
                 <div className="form-group">
                   <label
                     className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
@@ -778,7 +746,6 @@ export default function EditPublicationModal({
                   </div>
                 </div>
 
-                {/* Social Accounts */}
                 {watched.scheduled_at && (
                   <div className="form-group animate-in fade-in slide-in-from-top-2">
                     <label
@@ -940,7 +907,6 @@ export default function EditPublicationModal({
                   </div>
                 )}
 
-                {/* YouTube Thumbnail - Only show if YouTube is selected */}
                 {watched.social_accounts?.some((id: number) => {
                   const account = socialAccounts.find((a) => a.id === id);
                   return account?.platform?.toLowerCase() === "youtube";
@@ -964,9 +930,7 @@ export default function EditPublicationModal({
                 )}
               </div>
 
-              {/* Right Column - Info */}
               <div className="space-y-6">
-                {/* Title */}
                 <div className="form-group">
                   <label
                     className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
@@ -994,7 +958,6 @@ export default function EditPublicationModal({
                   )}
                 </div>
 
-                {/* Description */}
                 <div className="form-group">
                   <label
                     className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
@@ -1023,7 +986,6 @@ export default function EditPublicationModal({
                   )}
                 </div>
 
-                {/* Campaign Selection - Only if not published to social networks */}
                 {(!publication?.scheduled_posts ||
                   publication.scheduled_posts.length === 0) && (
                   <div className="form-group animate-in fade-in slide-in-from-top-3">
@@ -1074,12 +1036,9 @@ export default function EditPublicationModal({
                     </div>
                   </div>
                 )}
-
-                {/* Goal */}
               </div>
             </div>
 
-            {/* Footer */}
             <div
               className={`pt-6 border-t ${borderColor} flex justify-end gap-3`}
             >

@@ -1,6 +1,7 @@
 import ModernDatePicker from "@/Components/common/ui/ModernDatePicker";
 import { useCampaignManagement } from "@/Hooks/useCampaignManagement";
 import { useTheme } from "@/Hooks/useTheme";
+import { publicationSchema } from "@/schemas/publication";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { format } from "date-fns";
@@ -19,43 +20,11 @@ import {
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { z } from "zod";
-
 interface AddCampaignModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: any) => void;
 }
-
-const createSchema = (t: any) =>
-  z.object({
-    title: z
-      .string()
-      .min(1, t("publications.modal.validation.titleRequired"))
-      .max(100, t("publications.modal.validation.titleLength")),
-    description: z
-      .string()
-      .min(10, t("publications.modal.validation.descMin"))
-      .max(500, t("publications.modal.validation.descMax")),
-    goal: z
-      .string()
-      .min(5, t("publications.modal.validation.objRequired"))
-      .max(200, t("publications.modal.validation.objMax")),
-    hashtags: z
-      .string()
-      .min(1, t("publications.modal.validation.hashtagsRequired"))
-      .refine((val) => {
-        const hashtags = val.split(" ").filter((tag) => tag.startsWith("#"));
-        return hashtags.length > 0;
-      }, t("publications.modal.validation.hashtagValid"))
-      .refine((val) => {
-        const hashtags = val.split(" ").filter((tag) => tag.startsWith("#"));
-        return hashtags.length <= 10;
-      }, t("publications.modal.validation.hashtagMax")),
-    scheduled_at: z.string().optional(),
-    social_accounts: z.array(z.number()).optional(),
-    campaign_id: z.string().optional(), // campaign selection
-  });
 
 const validateFile = (file: File, t: any) => {
   if (file.size > 50 * 1024 * 1024) {
@@ -85,8 +54,7 @@ export default function AddPublicationModal({
 }: AddCampaignModalProps) {
   const { t } = useTranslation();
   const { theme } = useTheme();
-  // We'll need a hook for publications. For now reusing campaign hook with 'publications' endpoint or similar
-  // But wait, useCampaignManagement accepts an endpoint now!
+
   const { addCampaign: addPublication } = useCampaignManagement("publications");
   const [mediaFiles, setMediaFiles] = useState<File[]>([]);
   const [mediaPreviews, setMediaPreviews] = useState<string[]>([]);
@@ -124,7 +92,7 @@ export default function AddPublicationModal({
   };
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const schema = useMemo(() => createSchema(t), [t]);
+  const schema = useMemo(() => publicationSchema(t), [t]);
 
   const {
     register,
@@ -439,7 +407,6 @@ export default function AddPublicationModal({
       <div
         className={`relative w-full max-w-4xl ${modalBg} rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300`}
       >
-        {/* Header */}
         <div
           className={`px-8 py-6 border-b ${modalHeaderBorder} ${modalHeaderBg} flex items-center justify-between sticky top-0 z-10`}
         >
@@ -467,11 +434,9 @@ export default function AddPublicationModal({
           </button>
         </div>
 
-        {/* Form Content */}
         <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
           <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Left Column - Image Upload */}
               <div className="space-y-6">
                 <div className="form-group">
                   <label
@@ -530,7 +495,6 @@ export default function AddPublicationModal({
                                     <span className="text-white/80 text-xs font-medium bg-black/50 px-2 py-1 rounded">
                                       Video
                                     </span>
-                                    {/* Thumbnail Upload Button */}
                                     <div className="relative">
                                       <input
                                         type="file"
@@ -591,7 +555,6 @@ export default function AddPublicationModal({
                                 <X className="w-3 h-3" />
                               </button>
 
-                              {/* Video Duration and Type Selection */}
                               {mediaFiles[index].type.startsWith("video") &&
                                 videoMetadata[index] && (
                                   <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2 space-y-1">
@@ -729,7 +692,6 @@ export default function AddPublicationModal({
                   )}
                 </div>
 
-                {/* Hashtags Field */}
                 <div className="form-group">
                   <label
                     className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
@@ -773,7 +735,6 @@ export default function AddPublicationModal({
                   </div>
                 </div>
 
-                {/* Scheduling Field */}
                 <div className="form-group">
                   <label
                     className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
@@ -810,7 +771,6 @@ export default function AddPublicationModal({
                   </p>
                 </div>
 
-                {/* Campaign Selection */}
                 <div className="form-group animate-in fade-in slide-in-from-top-3">
                   <label
                     className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
@@ -857,7 +817,6 @@ export default function AddPublicationModal({
                   </div>
                 </div>
 
-                {/* Social Accounts Selection */}
                 {watchedadd.scheduled_at && (
                   <div className="form-group animate-in fade-in slide-in-from-top-2">
                     <label
@@ -1053,9 +1012,7 @@ export default function AddPublicationModal({
                 )}
               </div>
 
-              {/* Right Column - Details */}
               <div className="space-y-6">
-                {/* Title Field */}
                 <div className="form-group">
                   <label
                     className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
@@ -1081,12 +1038,11 @@ export default function AddPublicationModal({
                   )}
                   <div className="mt-1 flex justify-end text-xs">
                     <span className={textTertiary}>
-                      {watchedadd.title?.length || 0}/100 caracteres
+                      {watchedadd.title?.length || 0}/70 caracteres
                     </span>
                   </div>
                 </div>
 
-                {/* Description Field */}
                 <div className="form-group">
                   <label
                     className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
@@ -1116,17 +1072,16 @@ export default function AddPublicationModal({
                   <div className="mt-1 flex justify-end">
                     <span
                       className={`text-xs ${
-                        (watchedadd.description?.length || 0) > 500
+                        (watchedadd.description?.length || 0) > 200
                           ? "text-primary-500"
                           : textTertiary
                       }`}
                     >
-                      {watchedadd.description?.length || 0}/500 caracteres
+                      {watchedadd.description?.length || 0}/200 caracteres
                     </span>
                   </div>
                 </div>
 
-                {/* Goal Field */}
                 <div className="form-group">
                   <label
                     className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
@@ -1167,7 +1122,6 @@ export default function AddPublicationModal({
           </form>
         </div>
 
-        {/* Footer */}
         <div
           className={`px-8 py-6 border-t ${modalFooterBg} flex items-center justify-end gap-4 sticky bottom-0 z-10`}
         >

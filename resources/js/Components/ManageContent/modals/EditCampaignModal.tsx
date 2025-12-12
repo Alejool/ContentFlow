@@ -1,6 +1,7 @@
 import ModernDatePicker from "@/Components/common/ui/ModernDatePicker";
 import { useCampaignManagement } from "@/Hooks/useCampaignManagement";
 import { useTheme } from "@/Hooks/useTheme";
+import { campaignSchema } from "@/schemas/campaign";
 import { Campaign } from "@/types/Campaign";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
@@ -17,7 +18,6 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { z } from "zod";
 
 interface EditCampaignModalProps {
   isOpen: boolean;
@@ -25,26 +25,6 @@ interface EditCampaignModalProps {
   campaign: Campaign | null;
   onSubmit: (success: boolean) => void;
 }
-
-const createSchema = (t: any) =>
-  z.object({
-    name: z
-      .string()
-      .min(
-        1,
-        t("manageContent.modals.validation.titleRequired") || "Name is required"
-      )
-      .max(
-        100,
-        t("manageContent.modals.validation.titleLength") || "Name too long"
-      ),
-    description: z.string().optional(),
-    goal: z.string().optional(),
-    budget: z.any().optional(), // Allow string or number
-    start_date: z.string().optional(),
-    end_date: z.string().optional(),
-    publication_ids: z.array(z.number()).optional(),
-  });
 
 export default function EditCampaignModal({
   isOpen,
@@ -54,13 +34,12 @@ export default function EditCampaignModal({
 }: EditCampaignModalProps) {
   const { t } = useTranslation();
   const { theme } = useTheme();
-  // Grouping endpoint
   const { updateCampaign } = useCampaignManagement("campaigns");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [availablePublications, setAvailablePublications] = useState<any[]>([]);
   const [loadingPubs, setLoadingPubs] = useState(false);
 
-  const schema = useMemo(() => createSchema(t), [t]);
+  const schema = useMemo(() => campaignSchema(t), [t]);
 
   const {
     register,
@@ -76,7 +55,6 @@ export default function EditCampaignModal({
 
   const watchedFields = watch();
 
-  // Populate form when campaign changes
   useEffect(() => {
     if (isOpen && campaign) {
       reset({
@@ -86,8 +64,6 @@ export default function EditCampaignModal({
         budget: campaign.budget || "",
         start_date: campaign.start_date || "",
         end_date: campaign.end_date || "",
-        // We need to extract publication IDs from the campaign object if they exist
-        // Assuming campaign.publications is populated
         publication_ids: campaign.publications?.map((p: any) => p.id) || [],
       });
       fetchPublications();
@@ -222,7 +198,6 @@ export default function EditCampaignModal({
       <div
         className={`relative w-full max-w-2xl ${modalBg} rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300`}
       >
-        {/* Header */}
         <div
           className={`px-6 py-4 border-b ${borderColor} ${modalHeaderBg} flex items-center justify-between sticky top-0 z-10`}
         >
@@ -246,10 +221,8 @@ export default function EditCampaignModal({
           </button>
         </div>
 
-        {/* Content */}
         <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
           <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-6">
-            {/* Name */}
             <div className="form-group">
               <label
                 className={`block text-sm font-semibold ${labelText} mb-1.5`}
@@ -260,7 +233,7 @@ export default function EditCampaignModal({
               <input
                 {...register("name")}
                 className={`w-full px-4 py-2.5 rounded-lg border ${borderColor} ${inputBg} focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all`}
-                placeholder="e.g. Summer Sale 2024"
+                placeholder={t("campaigns.modal.edit.placeholders.name")}
               />
               {errors.name && (
                 <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
@@ -270,7 +243,6 @@ export default function EditCampaignModal({
               )}
             </div>
 
-            {/* Description */}
             <div className="form-group">
               <label
                 className={`block text-sm font-semibold ${labelText} mb-1.5`}
@@ -281,11 +253,17 @@ export default function EditCampaignModal({
                 {...register("description")}
                 rows={3}
                 className={`w-full px-4 py-2.5 rounded-lg border ${borderColor} ${inputBg} focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all resize-none`}
+                placeholder={t("campaigns.modal.edit.placeholders.description")}
               />
+              {errors.description && (
+                <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
+                  <AlertTriangle className="w-3 h-3" />{" "}
+                  {errors.description.message as string}
+                </p>
+              )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Goal */}
               <div className="form-group">
                 <label
                   className={`block text-sm font-semibold ${labelText} mb-1.5`}
@@ -299,11 +277,17 @@ export default function EditCampaignModal({
                   <input
                     {...register("goal")}
                     className={`w-full pl-10 pr-4 py-2.5 rounded-lg border ${borderColor} ${inputBg} focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all`}
+                    placeholder={t("campaigns.modal.edit.placeholders.goal")}
                   />
                 </div>
+                  {errors.goal && (
+                    <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
+                      <AlertTriangle className="w-3 h-3" />{" "}
+                      {errors.goal.message as string}
+                    </p>
+                  )}
               </div>
 
-              {/* Budget */}
               <div className="form-group">
                 <label
                   className={`block text-sm font-semibold ${labelText} mb-1.5`}
@@ -319,12 +303,18 @@ export default function EditCampaignModal({
                     type="number"
                     step="0.01"
                     className={`w-full pl-10 pr-4 py-2.5 rounded-lg border ${borderColor} ${inputBg} focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all`}
+                    placeholder={t("campaigns.modal.edit.placeholders.budget")}
                   />
                 </div>
+                  {errors.budget && (
+                    <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
+                      <AlertTriangle className="w-3 h-3" />{" "}
+                      {errors.budget.message as string}
+                    </p>
+                  )}
               </div>
             </div>
 
-            {/* Dates */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="form-group">
                 <label
@@ -342,9 +332,15 @@ export default function EditCampaignModal({
                       date ? format(date, "yyyy-MM-dd") : ""
                     )
                   }
-                  placeholder="Select start date"
+                  placeholder={t("campaigns.modal.edit.placeholders.startDate")}
                   withPortal
                 />
+                {errors.start_date && (
+                  <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
+                    <AlertTriangle className="w-3 h-3" />{" "}
+                    {errors.start_date.message as string}
+                  </p>
+                )}
               </div>
               <div className="form-group">
                 <label
@@ -359,7 +355,7 @@ export default function EditCampaignModal({
                   onChange={(date: Date | null) =>
                     setValue("end_date", date ? format(date, "yyyy-MM-dd") : "")
                   }
-                  placeholder="Select end date"
+                  placeholder={t("campaigns.modal.edit.placeholders.endDate")}
                   minDate={
                     watch("start_date")
                       ? new Date(watch("start_date")!)
@@ -367,10 +363,15 @@ export default function EditCampaignModal({
                   }
                   withPortal
                 />
+                {errors.end_date && (
+                  <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
+                    <AlertTriangle className="w-3 h-3" />{" "}
+                    {errors.end_date.message as string}
+                  </p>
+                )}
               </div>
             </div>
 
-            {/* Associate Publications */}
             <div className="form-group">
               <label
                 className={`block text-sm font-semibold ${labelText} mb-2`}
@@ -463,7 +464,6 @@ export default function EditCampaignModal({
               </div>
             </div>
 
-            {/* Footer */}
             <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100 dark:border-neutral-700">
               <button
                 type="button"

@@ -196,7 +196,10 @@
           "description": "Descripción",
           "hashtags": "#marketing #publicidad #comunicación",
           "schedulePublication": "Programar Publicación",
-          "goal": "Objetivo"
+          "goal": "Objetivo",
+          "startDate": "12/12/2025",
+          "endDate": "12/12/2026"
+
         },
         "button":{
           "save":"Guardar",
@@ -237,7 +240,9 @@
           "description": "Descripción",
           "hashtags": "Hashtags",
           "schedulePublication": "Programar Publicación",
-          "goal": "Objetivo"
+          "goal": "Objetivo",
+          "startDate": "12/12/2025",
+          "endDate": "12/12/2026"
         },
         "button":{
           "save":"Actualizar",
@@ -270,8 +275,13 @@
       },
       "validation":{
         "descMin":"Descripción debe tener al menos 10 caracteres",
+        "descMax":"Descripción debe tener menos de 200 caracteres",
+        "objMin":"Objetivo debe tener al menos 5 caracteres",
+        "objMax":"Objetivo debe tener menos de 200 caracteres",
         "objRequired":"Objetivo es requerido",
         "descRequired":"Descripción es requerida",
+        "titleRequired":"Título es requerido",
+        "titleLength":"Título debe tener menos de 70 caracteres",
         "nameRequired":"Nombre es requerido",
         "goalRequired":"Objetivo es requerido",
         "statusRequired":"Estado es requerido",
@@ -281,11 +291,10 @@
         "publishDateRequired":"Fecha de Publicación es requerida",
         "publishedOnRequired":"Publicado el es requerido",
         "associatedPublicationsRequired":"Publicaciones Asociadas es requerida",
-        "titleRequired":"Título es requerido",
         "descriptionRequired":"Descripción es requerida",
         "hashtagsRequired":"Hashtags es requerido",
         "schedulePublicationRequired":"Programar Publicación es requerido",
-        "titleLength":"Título debe tener al menos 10 caracteres",
+        "nameLength":"Nombre debe tener al menos 10 caracteres",
         "descriptionLength":"Descripción debe tener al menos 10 caracteres",
         "hashtagsLength":"Hashtags debe tener al menos 10 caracteres",
         "schedulePublicationLength":"Programar Publicación debe tener al menos 10 caracteres"
@@ -367,7 +376,16 @@
         "publishDate": "Fecha de Publicación",
         "publishedOn": "Publicado el",
         "publications": "Publicaciones",
-         "associatedPublicationsRequired":"Publicaciones Asociadas es requerida"
+         "associatedPublicationsRequired":"Publicaciones Asociadas es requerida",
+         "placeholders":
+         {
+          "budget": "0.00",
+          "goal": "e.g.Incrementa la conciencia de marca",
+          "description": "¡describe la campaña!",
+          "name": "campaña verano 2026",
+          "startDate": "12/12/2025",
+          "endDate": "12/12/2026"
+         }
       },
       "edit": {
         "title": "Editar Campaña",
@@ -387,7 +405,16 @@
         "endDate": "Fecha de Fin",
         "publishDate": "Fecha de Publicación",
         "publishedOn": "Publicado el",
-        "associatedPublications": "Publicaciones Asociadas"
+        "associatedPublications": "Publicaciones Asociadas",
+         "placeholders":
+         {
+          "budget": "0.00",
+          "goal": "e.g.Incrementa la conciencia de marca",
+          "description": "¡describe la campaña!",
+          "name": "campaña verano 2026",
+          "startDate": "12/12/2025",
+          "endDate": "12/12/2026"
+         }
       },
       "showCampaign": 
       {
@@ -940,7 +967,7 @@
         "titleLength": "El título no puede exceder los 100 caracteres",
         "descRequired": "La descripción es obligatoria",
         "descMin": "La descripción debe tener al menos 10 caracteres",
-        "descMax": "La descripción no puede exceder los 500 caracteres",
+        "descMax": "La descripción no puede exceder los 200 caracteres",
         "imageRequired": "La imagen es obligatoria",
         "imageSize": "La imagen debe ser menor a 5MB",
         "imageType": "Solo se permiten archivos JPG, PNG o WebP",
