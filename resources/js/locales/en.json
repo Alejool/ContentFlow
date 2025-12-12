@@ -619,7 +619,10 @@
       "status": "Status",
       "message": "Message",
       "error": "Error",
-      "video": "Video"
+      "video": "Video",
+      "copy": "Copy",
+      "less": "Less",
+      "more": "More"  
     },
     "status": {
       "success": "Success",

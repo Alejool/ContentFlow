@@ -622,7 +622,10 @@
       "message": "Mensaje",
       "error": "Error",
       "video": "Video",
-      "link": "Enlace"
+      "link": "Enlace",
+      "copy": "Copiar",
+      "less": "Menos",
+      "more": "Mas"
     },
     "status": {
       "success": "Exitoso",

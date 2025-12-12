@@ -1,3 +1,4 @@
+import ExpandableText from "@/Components/ManageContent/common/ExpandableText";
 import { useTheme } from "@/Hooks/useTheme";
 import axios from "axios";
 import { format } from "date-fns";
@@ -23,7 +24,12 @@ interface Log {
   error_message?: string;
   campaign?: { id: number; name: string };
   publication?: { title: string };
-  social_account?: { name: string; username: string; platform: string };
+  social_account?: {
+    name: string;
+    username: string;
+    platform: string;
+    account_metadata: { email: string };
+  };
   post_url?: string;
   video_url?: string;
   engagement_data?: { post_url?: string };
@@ -44,7 +50,6 @@ export default function LogsList() {
   const [page, setPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
 
-  // Filters
   const [selectedCampaign, setSelectedCampaign] = useState<string>("");
   const [dateFrom, setDateFrom] = useState<string>("");
   const [dateTo, setDateTo] = useState<string>("");
@@ -306,11 +311,11 @@ export default function LogsList() {
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
                       <span className="capitalize font-medium">
-                        {log.platform}
+                        {log.social_account?.platform}
                       </span>
                       {log.social_account && (
                         <span className="text-xs text-gray-400">
-                          ({log.social_account.username})
+                          {log.social_account?.account_metadata.email}
                         </span>
                       )}
                     </div>
@@ -333,33 +338,42 @@ export default function LogsList() {
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 text-xs">
                       {getStatusIcon(log.status)}
                       <span className="capitalize">
                         {t(`logs.status.${log.status}`) || log.status}
                       </span>
                     </div>
                   </td>
-                  <td className="px-6 py-4 max-w-xs">
+                  <td>
                     {log.error_message ? (
-                      <div className="flex flex-col gap-1">
-                        <span className="text-red-500 text-xs font-medium">
-                          {t("logs.table.error")}:
-                        </span>
-                        <span
-                          className="text-gray-500 text-xs truncate"
-                          title={log.error_message}
-                        >
-                          {log.error_message}
-                        </span>
+                      <div className="leading-tight">
+                        <div className="flex items-center ">
+                          <span className="text-red-500 text-[10px] font-medium">
+                            {t("logs.table.error")}:
+                          </span>
+                        </div>
+                        <ExpandableText
+                          text={log.error_message}
+                          maxLength={60}
+                          className="text-[11px]"
+                        />
                       </div>
                     ) : (
-                      <span
-                        className="text-gray-500 truncate block"
-                        title={log.message}
-                      >
-                        {log.message || "-"}
-                      </span>
+                      <div className="group relative">
+                        <ExpandableText
+                          text={log.message || "-"}
+                          maxLength={80}
+                          className="text-[11px]"
+                        />
+                        {(log.message?.length ?? 0) > 30 && (
+                          <div className="invisible group-hover:visible absolute left-0 top-full mt-1 z-10 w-64">
+                            <div className="px-3 py-2 bg-gray-900 text-white text-xs rounded-lg shadow-lg">
+                              {log.message}
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     )}
                   </td>
                   <td className="px-6 py-4 text-center">

@@ -49,7 +49,6 @@ class PublicationController extends Controller
       $query->byDateRange($request->date_start, $request->date_end);
     }
 
-    // Filter publications not associated with any campaign
     if ($request->has('exclude_assigned') && $request->exclude_assigned === 'true') {
       $query->where(function ($q) use ($request) {
         $q->doesntHave('campaigns');
@@ -64,7 +63,7 @@ class PublicationController extends Controller
     if ($request->query('simplified') === 'true') {
       $publications = $query->orderBy('created_at', 'desc')->get();
     } else {
-      $publications = $query->orderBy('created_at', 'desc')->paginate(5);
+      $publications = $query->orderBy('created_at', 'desc')->paginate($request->query('per_page', 7));
     }
 
     return response()->json([
