@@ -116,12 +116,12 @@
 <body>
     <div class="email-wrapper">
         <div class="email-header">
-            <h1>✨ {{ __('verification.title', [], $locale ?? 'en') }}</h1>
+            <h1>{{ __('verification.title', [], $locale ?? 'en') }}</h1>
             <p>{{ __('verification.welcome', ['app' => config('app.name')], $locale ?? 'en') }}</p>
         </div>
         
         <div class="email-body">
-            <p class="greeting">{{ __('verification.greeting', ['name' => $user->name], $locale ?? 'en') }} 👋</p>
+            <p class="greeting">{{ __('verification.greeting', ['name' => $user->name], $locale ?? 'en') }} </p>
             
             <p class="content">
                 {{ __('verification.thanks', [], $locale ?? 'en') }}
@@ -135,7 +135,7 @@
             
             <div class="info-box">
                 <p>
-                    <strong>🔒 {{ __('verification.security_note', [], $locale ?? 'en') }}</strong> {{ __('verification.security_message', [], $locale ?? 'en') }}
+                    <strong>{{ __('verification.security_note', [], $locale ?? 'en') }}</strong> {{ __('verification.security_message', [], $locale ?? 'en') }}
                 </p>
             </div>
             
@@ -144,7 +144,7 @@
             </p>
             
             <div class="link-text">
-                {{ $verificationUrl }}
+                <a href="{{ $verificationUrl }}">{{ $verificationUrl }}</a>
             </div>
         </div>
         

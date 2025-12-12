@@ -213,10 +213,10 @@ export default function Dashboard({ auth, stats, status }: DashboardProps) {
                       "title"
                     )}`}
                   >
-                    {t("verification.banner.title")}
+                    {t("auth.verification.banner.title")}
                   </h3>
                   <p className={`text-sm mb-4 ${getTextColor("secondary")}`}>
-                    {t("verification.banner.message")}
+                    {t("auth.verification.banner.message")}
                   </p>
                   {successMessage && (
                     <div
@@ -231,7 +231,7 @@ export default function Dashboard({ auth, stats, status }: DashboardProps) {
                           theme === "dark" ? "text-green-300" : "text-green-800"
                         }`}
                       >
-                        ✓ {t("verification.banner.successMessage")}
+                        ✓ {t("auth.verification.banner.successMessage")}
                       </p>
                     </div>
                   )}
@@ -244,8 +244,8 @@ export default function Dashboard({ auth, stats, status }: DashboardProps) {
                     }
                   >
                     {sending
-                      ? t("verification.banner.sending")
-                      : t("verification.banner.resendButton")}
+                      ? t("auth.verification.banner.sending")
+                      : t("auth.verification.banner.resendButton")}
                   </button>
                 </div>
               </div>
@@ -263,7 +263,7 @@ export default function Dashboard({ auth, stats, status }: DashboardProps) {
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
           <StatCard
             title={t("dashboard.totalViews")}
             value={stats.totalViews}
@@ -294,7 +294,7 @@ export default function Dashboard({ auth, stats, status }: DashboardProps) {
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
           <StatCard
             title={t("dashboard.totalEngagement")}
             value={stats.totalEngagement}

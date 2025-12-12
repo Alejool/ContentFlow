@@ -539,7 +539,7 @@
       "namePlaceholder": "Tu Nombre",
       "emailLabel": "Correo Electrónico",
       "emailPlaceholder": "tu.correo@ejemplo.com",
-      "emailUnverified": "Tu dirección de correo electrónico no está verificada. Por favor verif ícala para acceder a todas las funciones.",
+      "emailUnverified": "Tu dirección de correo electrónico no está verificada. Por favor verifícala para acceder a todas las funciones.",
       "sendVerification": "Enviar Correo de Verificación",
       "verificationSent": "Se ha enviado un nuevo enlace de verificación a tu dirección de correo electrónico.",
       "applicationLanguage": "Idioma de la Aplicación",
