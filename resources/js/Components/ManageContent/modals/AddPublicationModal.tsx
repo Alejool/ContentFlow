@@ -1061,7 +1061,7 @@ export default function AddPublicationModal({
                     className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
                   >
                     <FileText className={`w-4 h-4 ${iconColor}`} />
-                    {t("publications.modal.add.title")}
+                    {t("publications.modal.add.titleField")}
                     <span className="text-primary-500 ml-1">*</span>
                   </label>
                   <input

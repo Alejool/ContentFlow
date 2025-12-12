@@ -972,7 +972,7 @@ export default function EditPublicationModal({
                     className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
                   >
                     <FileText className={`w-4 h-4 ${iconColor}`} />
-                    {t("publications.modal.edit.title")}
+                    {t("publications.modal.edit.titleField")}
                     <span className="text-primary-500 ml-1">*</span>
                   </label>
                   <input

@@ -283,7 +283,11 @@
         "titleRequired":"Title is required",
         "descriptionRequired":"Description is required",
         "hashtagsRequired":"Hashtags is required",
-        "schedulePublicationRequired":"Schedule Publication is required"
+        "schedulePublicationRequired":"Schedule Publication is required",
+        "titleLength":"Title must be at least 10 characters long",
+        "descriptionLength":"Description must be at least 10 characters long",
+        "hashtagsLength":"Hashtags must be at least 10 characters long",
+        "schedulePublicationLength":"Schedule Publication must be at least 10 characters long"
       }
     },
     "button":{

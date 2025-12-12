@@ -15,16 +15,14 @@ interface ViewCampaignModalProps {
 export default function ViewCampaignModal({
   isOpen,
   onClose,
-  campaign: item, // rename prop to generic 'item' for internal use
+  campaign: item,
 }: ViewCampaignModalProps) {
   const { t } = useTranslation();
   const { theme } = useTheme();
 
   if (!item) return null;
 
-  // Type guards or simple checks
   const isPublication = (i: any): i is Publication => {
-    // items with media_files or scheduled_posts are definitely publications (or old campaigns behaving as such)
     return !!i.media_files || !!i.scheduled_posts || i.type === "publication";
   };
 
@@ -35,10 +33,16 @@ export default function ViewCampaignModal({
 
   const getStatusColor = (status?: string) => {
     switch (status) {
-      case "published":
+      case "active":
         return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400";
-      case "draft":
+      case "inactive":
         return "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300";
+      case "completed":
+        return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400";
+      case "deleted":
+        return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400";
+      case "paused":
+        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400";
       default:
         return "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300";
     }
@@ -97,7 +101,6 @@ export default function ViewCampaignModal({
 
           <div className="flex-1 overflow-y-auto p-6">
             <div className="space-y-6">
-              {/* Media Carousel (Only for Publications) */}
               {media.length > 0 && (
                 <div className="relative w-full h-64 rounded-lg overflow-hidden bg-gray-100 dark:bg-neutral-900">
                   <CampaignMediaCarousel mediaFiles={media} />
@@ -113,7 +116,6 @@ export default function ViewCampaignModal({
                   >
                     {title}
                   </h3>
-                  {/* Status if available */}
                   {(item as any).status && (
                     <span
                       className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium capitalize whitespace-nowrap self-start ${getStatusColor(
@@ -133,7 +135,6 @@ export default function ViewCampaignModal({
                 </p>
               </div>
 
-              {/* Publications List (Only for Campaigns) */}
               {publications.length > 0 && (
                 <div
                   className={`p-4 rounded-lg border ${
@@ -142,15 +143,15 @@ export default function ViewCampaignModal({
                       : "bg-gray-50 border-gray-200"
                   }`}
                 >
-                  <h4
+                  <h3
                     className={`text-sm font-semibold mb-3 flex items-center gap-2 ${
                       theme === "dark" ? "text-gray-300" : "text-gray-700"
                     }`}
                   >
                     <Layers className="w-4 h-4" />
                     {t("campaigns.modal.showCampaign.associatedPublications")} (
-                    {publications.length})
-                  </h4>
+                    <span className="font-bold">{publications.length}</span>)
+                  </h3>
                   <div className="space-y-2">
                     {publications.map((pub: any) => (
                       <div

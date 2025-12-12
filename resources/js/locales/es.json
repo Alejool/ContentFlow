@@ -284,7 +284,11 @@
         "titleRequired":"Título es requerido",
         "descriptionRequired":"Descripción es requerida",
         "hashtagsRequired":"Hashtags es requerido",
-        "schedulePublicationRequired":"Programar Publicación es requerido"
+        "schedulePublicationRequired":"Programar Publicación es requerido",
+        "titleLength":"Título debe tener al menos 10 caracteres",
+        "descriptionLength":"Descripción debe tener al menos 10 caracteres",
+        "hashtagsLength":"Hashtags debe tener al menos 10 caracteres",
+        "schedulePublicationLength":"Programar Publicación debe tener al menos 10 caracteres"
       }
     },
     "button": {
