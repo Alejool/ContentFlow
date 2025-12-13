@@ -63,8 +63,8 @@ export default function NotificationsModal({
       ? "hover:bg-neutral-800 text-gray-400 hover:text-gray-300"
       : "hover:bg-gray-100 text-gray-400 hover:text-gray-500",
     tabSelected: isDark
-      ? "border-primary-color text-primary-500"
-      : "border-primary-color text-primary-500",
+      ? "border-primary-color text-primary-500 border-primary-500"
+      : "border-primary-color text-primary-500 border-primary-500",
     tabUnselected: isDark
       ? "border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-600"
       : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300",
@@ -195,7 +195,7 @@ export default function NotificationsModal({
                                     selected
                                       ? colors.tabSelected
                                       : colors.tabUnselected,
-                                    "whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium flex items-center gap-2 outline-none transition-colors"
+                                    "whitespace-nowrap  pt-4 pb-3 px-1 text-sm font-medium flex items-center gap-2 outline-none transition-colors border-b-2 "
                                   )
                                 }
                               >
@@ -217,7 +217,7 @@ export default function NotificationsModal({
                           <TabPanel className="h-full">
                             <div className="h-full overflow-y-auto custom-scrollbar">
                               {notifications.length > 0 ? (
-                                <div className="divide-y divide-transparent">
+                                <div className="divide-y ">
                                   {notifications
                                     .slice(0, 100)
                                     .map((notification) => (

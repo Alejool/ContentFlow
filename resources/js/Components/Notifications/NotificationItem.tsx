@@ -58,7 +58,7 @@ export default function NotificationItem({
 
   return (
     <div
-      className={`p-3 border-b transition-all duration-200 cursor-pointer relative group ${
+      className={`p-3 border-b border-color border-gray-200 transition-all duration-200 cursor-pointer relative group  ${
         theme === "dark"
           ? "border-neutral-800 hover:bg-neutral-800/50"
           : "border-gray-100 hover:bg-gray-50"
@@ -88,7 +88,7 @@ export default function NotificationItem({
             >
               {data.message || data.title}
             </p>
-            {/* Show 'Read more' hint if likely truncated (this is an approximation, real detection needs refs) */}
+        
             {(data.message || data.title).length > 100 && (
               <span
                 className={`text-xs hover:underline cursor-pointer ${

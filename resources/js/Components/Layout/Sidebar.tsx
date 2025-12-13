@@ -101,7 +101,7 @@ export default function Sidebar({
   const isDark = theme === "dark";
 
   const classes = {
-    sidebarBg: isDark ? "bg-neutral-900" : "bg-beige-200",
+    sidebarBg: isDark ? "bg-neutral-900" : "bg-white/50",
     borderColor: isDark ? "border-neutral-700/50" : "border-beige-300/50",
     textColor: isDark ? "text-gray-300" : "text-gray-700",
     hoverBg: isDark ? "hover:bg-neutral-800" : "hover:bg-beige-300",

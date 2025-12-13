@@ -12,27 +12,22 @@ class NotificationsController extends Controller
     {
         $query = Auth::user()->notifications();
 
-        // Filter by category
         if ($request->has('category')) {
             $query->whereJsonContains('data->category', $request->category);
         }
 
-        // Filter by platform
         if ($request->has('platform')) {
             $query->whereJsonContains('data->platform', $request->platform);
         }
 
-        // Filter by priority
         if ($request->has('priority')) {
             $query->whereJsonContains('data->priority', $request->priority);
         }
 
-        // Filter by read status
         if ($request->has('unread_only') && $request->unread_only) {
             $query->whereNull('read_at');
         }
 
-        // Search
         if ($request->has('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
@@ -41,7 +36,9 @@ class NotificationsController extends Controller
             });
         }
 
-        $notifications = $query->latest()->paginate($request->per_page ?? 100);
+        ($request->has('sort')) ? $query->orderBy($request->sort, $request->sort_order ?? 'asc') : $query->orderBy('created_at', 'asc');
+
+        $notifications = $query->paginate($request->per_page ?? 50);
 
         return response()->json([
             'notifications' => $notifications->items(),

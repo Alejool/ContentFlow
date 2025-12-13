@@ -359,16 +359,12 @@ export default function AddPublicationModal({
       if (data.campaign_id) {
         formData.append("campaign_id", data.campaign_id);
       }
-
-      // Use axios directly as per store pattern or implement addPublication in store to handle API
-      // Since store's addPublication is currently synchronous (just state update), we do API call here
       const response = await axios.post("/publications", formData);
 
       if (response.data && response.data.publication) {
-        // Update store
         addPublication(response.data.publication);
         if (onSubmit) {
-          onSubmit(true); // Notify parent (ManageContentPage)
+          onSubmit(true);
         }
         handleClose();
         toast.success(
@@ -394,8 +390,6 @@ export default function AddPublicationModal({
     setImageError(null);
     setIsSubmitting(false);
     onClose();
-    // Refresh campaigns list if we are in campaigns tab?
-    // Actually ManageContentPage handles refresh via onSubmit callback if needed
   };
 
   if (!isOpen) return null;

@@ -1,4 +1,4 @@
-import Bg from "@/../assets/background.svg";
+import Bg from "@/../assets/b-8.svg";
 import GlobalAiAssistant from "@/Components/AiAssistant/GlobalAiAssistant";
 import MobileNavbar from "@/Components/Layout/MobileNavbar";
 import Sidebar from "@/Components/Layout/Sidebar";
@@ -30,9 +30,7 @@ export default function AuthenticatedLayout({
 
   return (
     <div
-      className={`min-h-screen relative overflow-hidden ${
-        theme === "dark" ? "bg-gray-900/95" : "bg-white/95"
-      }`}
+      className={`min-h-screen relative overflow-hidden  `}
       style={{
         backgroundImage: `url(${Bg})`,
         backgroundSize: "cover",
@@ -42,7 +40,8 @@ export default function AuthenticatedLayout({
     >
       <div
         className={`
-          absolute  
+          absolute inset-0
+          ${theme === "dark" ? "bg-black/90" : "bg-white/90"}
         `}
       />
 

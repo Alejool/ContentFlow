@@ -24,6 +24,7 @@ export default {
         error: theme.colors.error,
         warning: theme.colors.warning,
         info: theme.colors.info,
+        white: theme.colors.white,
         
         red: theme.colors.primary, 
         orange: theme.colors.primary,

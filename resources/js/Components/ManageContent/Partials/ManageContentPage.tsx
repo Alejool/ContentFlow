@@ -220,23 +220,18 @@ export default function ManageContentPage() {
     await fetchAccounts();
   };
 
-  // ... rest of component logic (handleEditRequest, etc) needs to use 'items' now instead of campaigns/publications directly if possible, or just pass correct one.
-
   const handleEditRequest = async (item: Publication | any) => {
     if (item.status !== "published") {
       openEditModal(item);
       return;
     }
 
-    // Check availability of the linked account
     let isLinkedAccountConnected = false;
     let linkedAccountName = "Unknown";
 
-    // Find the scheduled post (published one) or fallback to any associated post
     const postLogs = item.social_post_logs || [];
     const scheduledPosts = item.scheduled_posts || [];
 
-    // Prioritize finding a published log/record
     let publishedPost = postLogs.find(
       (l: any) => l.status === "published" || l.status === "success"
     );
@@ -265,21 +260,16 @@ export default function ManageContentPage() {
         isLinkedAccountConnected = true;
         linkedAccountName = foundAccount.name || foundAccount.platform;
       } else {
-        // Try to find name from historical data if available
         linkedAccountName =
           publishedPost.social_account?.account_name ||
           publishedPost.account_name ||
           "Unknown Account";
       }
     } else {
-      // Fallback if no specific scheduled post found but status is published (legacy or other)
-      // Assume connected if we can't prove otherwise? No, safer to warn.
-      // Actually, if we can't find the record, we can't Unpublish via API anyway.
       isLinkedAccountConnected = false;
     }
 
     if (!isLinkedAccountConnected) {
-      // NEW FLOW: Account missing/different
       const confirmed = await confirm({
         title:
           t("publications.modal.edit.accountMissingTitle") ||
@@ -295,8 +285,6 @@ export default function ManageContentPage() {
       });
 
       if (confirmed) {
-        // Open edit modal directly without unpublishing
-        // Clear association to force "fresh start" behavior
         openEditModal({
           ...item,
           status: "draft",
@@ -307,7 +295,6 @@ export default function ManageContentPage() {
       return;
     }
 
-    // STANDARD FLOW: Account connected
     const confirmed = await confirm({
       title: "Unpublish & Edit",
       message:
@@ -370,18 +357,14 @@ export default function ManageContentPage() {
   return (
     <AuthenticatedLayout>
       <Head title={t("manageContent.title")} />
-      <div className={`min-h-screen transition-colors duration-300`}>
+      <div className={`min-h-screen transition-colors duration-300 mt-12`}>
         <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-12 text-center">
-            <div
-              className={`inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r ${iconGradient} rounded-lg mb-6`}
-            >
-              <Folder className="w-8 h-8 text-white" />
-            </div>
             <h1
-              className={`text-4xl font-bold bg-gradient-to-r ${titleGradient} bg-clip-text text-transparent mb-4`}
+              className={`text-4xl font-bold bg-gradient-to-r ${titleGradient} bg-clip-text text-transparent mb-4 flex items-center gap-2 justify-center`}
             >
-              ✨ {t("manageContent.title")}
+              <Folder className="w-8 h-8  text-primary-600 mr-2" />
+              {t("manageContent.title")}
             </h1>
 
             <p className={`text-lg ${subtitleColor} max-w-2xl mx-auto`}>
