@@ -4,7 +4,6 @@ import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
 export function useCampaignManagement(
-  endpoint: "publications" | "campaigns" = "publications"
 ) {
   const { t } = useTranslation();
   const [campaigns, setCampaigns] = useState<(Campaign | Publication)[]>([]);
@@ -16,7 +15,7 @@ export function useCampaignManagement(
   });
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchCampaigns = async (filters: any = {}, page: number = 1) => {
+  const fetchCampaigns = async (filters: any = {}, page: number = 1, endpoint: "publications" | "campaigns"| "logs") => {
     try {
       setIsLoading(true);
       const params = new URLSearchParams();
@@ -79,7 +78,7 @@ export function useCampaignManagement(
     }
   };
 
-  const updateCampaign = async (id: number, data: any) => {
+  const updateCampaign = async (id: number, data: any, endpoint: "publications" | "campaigns" = "publications") => {
     try {
       let response;
       if (data instanceof FormData) {

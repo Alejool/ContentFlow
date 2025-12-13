@@ -12,6 +12,13 @@ class SocialPostLog extends Model
 {
     use HasFactory;
 
+    protected $status = [
+        'published',
+        'failed',
+        'pending',
+        'orphaned',
+    ];
+
     protected $fillable = [
         'user_id',
         'social_account_id',

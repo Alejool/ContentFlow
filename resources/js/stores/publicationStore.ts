@@ -5,7 +5,7 @@ import { create } from "zustand";
 interface PublicationState {
   publications: Publication[];
   currentPublication: Publication | null;
-  publishedPlatforms: Record<number, number[]>; // publicationId -> accountIds[]
+  publishedPlatforms: Record<number, number[]>;
   isLoading: boolean;
   error: string | null;
 

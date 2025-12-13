@@ -34,7 +34,7 @@ export default function EditCampaignModal({
 }: EditCampaignModalProps) {
   const { t } = useTranslation();
   const { theme } = useTheme();
-  const { updateCampaign } = useCampaignManagement("campaigns");
+  const { updateCampaign } = useCampaignManagement();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [availablePublications, setAvailablePublications] = useState<any[]>([]);
   const [loadingPubs, setLoadingPubs] = useState(false);
@@ -113,7 +113,7 @@ export default function EditCampaignModal({
         publication_ids: data.publication_ids || [],
       };
 
-      const success = await updateCampaign(campaign.id, payload);
+      const success = await updateCampaign(campaign.id, payload, 'campaigns');
       if (success) {
         if (onSubmit) {
           onSubmit(true);

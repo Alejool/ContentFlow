@@ -31,8 +31,7 @@ export interface UsePublishPublicationReturn extends PublishPublicationState {
   deselectAll: () => void;
   isYoutubeSelected: () => boolean;
   handlePublish: (
-    publication: Publication,
-    thumbnails: Record<number, File | null>
+    publication: Publication
   ) => Promise<boolean>;
   setYoutubeThumbnails: React.Dispatch<
     React.SetStateAction<Record<number, File | null>>
@@ -249,8 +248,16 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
 
   // Seleccionar todas las plataformas
   const selectAll = useCallback(() => {
-    setSelectedPlatforms(activeAccounts.map((acc) => acc.id));
-  }, [activeAccounts]);
+    const published = currentPublicationId
+      ? publishedPlatformsCache[currentPublicationId] || []
+      : [];
+
+    const availableAccounts = activeAccounts.filter(
+      (acc) => !published.includes(acc.id)
+    );
+
+    setSelectedPlatforms(availableAccounts.map((acc) => acc.id));
+  }, [activeAccounts, currentPublicationId, publishedPlatformsCache]);
 
   // Deseleccionar todas las plataformas
   const deselectAll = useCallback(() => {
@@ -269,8 +276,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
   // Manejar publicación
   const handlePublish = useCallback(
     async (
-      publication: Publication,
-      thumbnails: Record<number, File | null>
+      publication: Publication
     ): Promise<boolean> => {
       if (selectedPlatforms.length === 0) {
         toast.error("Please select at least one platform");
@@ -287,7 +293,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
         });
 
         // Add YouTube thumbnails si existen
-        Object.entries(thumbnails).forEach(([videoId, file]) => {
+        Object.entries(youtubeThumbnails).forEach(([videoId, file]) => {
           if (file) {
             formData.append("youtube_thumbnails[]", file);
             formData.append("youtube_thumbnail_video_ids[]", videoId);
@@ -308,7 +314,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
           toast.success("Publication published successfully!");
 
           // Actualizar thumbnails existentes
-          Object.entries(thumbnails).forEach(([videoId, file]) => {
+          Object.entries(youtubeThumbnails).forEach(([videoId, file]) => {
             if (file) {
               setExistingThumbnails((prev) => ({
                 ...prev,

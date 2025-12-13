@@ -1,12 +1,12 @@
-import { Fragment, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { useTheme } from "@/Hooks/useTheme";
-import { CampaignListProps } from "@/types/CampaignListProps";
-import HeaderSection from "@/Components/ManageContent/common/HeaderSection";
-import FilterSection from "@/Components/ManageContent/common/FilterSection";
 import CampaignTable from "@/Components/ManageContent/Campaign/CampaignTable";
 import PublicationTable from "@/Components/ManageContent/Publication/PublicationTable";
+import FilterSection from "@/Components/ManageContent/common/FilterSection";
+import HeaderSection from "@/Components/ManageContent/common/HeaderSection";
 import Pagination from "@/Components/ManageContent/common/Pagination";
+import { useTheme } from "@/Hooks/useTheme";
+import { CampaignListProps } from "@/types/CampaignListProps";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export default function CampaignList({
   items,
@@ -42,7 +42,6 @@ export default function CampaignList({
   };
 
   const handleFilterChange = (key: string, value: string) => {
-    
     if (key === "status") setStatusFilter(value);
     if (key === "platform") setPlatformFilter(value);
     if (key === "date_start") setDateStart(value);
@@ -93,7 +92,7 @@ export default function CampaignList({
 
       {mode === "campaigns" ? (
         <CampaignTable
-          items={items}
+          items={items as any}
           theme={theme}
           t={t}
           expandedCampaigns={expandedCampaigns}
@@ -105,7 +104,7 @@ export default function CampaignList({
         />
       ) : (
         <PublicationTable
-          items={items}
+          items={items as any}
           theme={theme}
           t={t}
           connectedAccounts={connectedAccounts}

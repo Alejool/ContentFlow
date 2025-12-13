@@ -1,6 +1,7 @@
 import ExpandableText from "@/Components/ManageContent/common/ExpandableText";
+import Pagination from "@/Components/ManageContent/common/Pagination";
 import { useTheme } from "@/Hooks/useTheme";
-import axios from "axios";
+import { SocialPostLog } from "@/types/Publication";
 import { format } from "date-fns";
 import {
   AlertCircle,
@@ -10,96 +11,53 @@ import {
   Filter,
   MessageCircle,
   RotateCcw,
-  X,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-interface Log {
-  id: number;
-  created_at: string;
-  platform: string;
-  status: "success" | "failed" | "pending" | "published" | "deleted";
-  message?: string;
-  error_message?: string;
-  campaign?: { id: number; name: string };
-  publication?: { title: string };
-  social_account?: {
-    name: string;
-    username: string;
-    platform: string;
-    account_metadata: { email: string };
-  };
-  post_url?: string;
-  video_url?: string;
-  engagement_data?: { post_url?: string };
+interface LogsListProps {
+  logs: SocialPostLog[];
+  isLoading: boolean;
+  pagination?: any;
+  onPageChange?: (page: number) => void;
+  onRefresh?: () => void;
 }
 
-interface Campaign {
-  id: number;
-  name: string;
-  title?: string;
-}
-
-export default function LogsList() {
+export default function LogsList({
+  logs = [],
+  isLoading,
+  pagination,
+  onPageChange,
+  onRefresh,
+}: LogsListProps) {
   const { t } = useTranslation();
   const { theme } = useTheme();
-  const [logs, setLogs] = useState<Log[]>([]);
-  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [page, setPage] = useState(1);
-  const [lastPage, setLastPage] = useState(1);
 
-  const [selectedCampaign, setSelectedCampaign] = useState<string>("");
-  const [dateFrom, setDateFrom] = useState<string>("");
-  const [dateTo, setDateTo] = useState<string>("");
+  const [selectedStatus, setSelectedStatus] = useState<string>("all");
   const [showFilters, setShowFilters] = useState(false);
 
-  useEffect(() => {
-    fetchCampaigns();
-  }, []);
+  const filteredLogs = logs.filter((log) => {
+    if (selectedStatus !== "all" && log.status !== selectedStatus) return false;
+    return true;
+  });
 
-  useEffect(() => {
-    fetchLogs();
-  }, [page, selectedCampaign, dateFrom, dateTo]);
-
-  const fetchCampaigns = async () => {
-    try {
-      const response = await axios.get("/campaigns");
-      if (response.data.campaigns) {
-        setCampaigns(response.data.campaigns.data || response.data.campaigns);
-      }
-    } catch (error) {
-      console.error("Failed to fetch campaigns", error);
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case "published":
+      case "success":
+        return <CheckCircle className="w-4 h-4 text-green-500" />;
+      case "failed":
+        return <AlertCircle className="w-4 h-4 text-red-500" />;
+      case "pending":
+        return <Clock className="w-4 h-4 text-yellow-500" />;
+      default:
+        return <MessageCircle className="w-4 h-4 text-gray-500" />;
     }
   };
 
-  const fetchLogs = async () => {
-    setIsLoading(true);
-    try {
-      let url = `/social-logs?page=${page}`;
-      if (selectedCampaign) url += `&campaign_id=${selectedCampaign}`;
-      if (dateFrom) url += `&date_from=${dateFrom}`;
-      if (dateTo) url += `&date_to=${dateTo}`;
-
-      const response = await axios.get(url);
-      if (response.data.success) {
-        setLogs(response.data.logs.data);
-        setLastPage(response.data.logs.last_page);
-      }
-    } catch (error) {
-      console.error("Failed to fetch logs", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const clearFilters = () => {
-    setSelectedCampaign("");
-    setDateFrom("");
-    setDateTo("");
-    setPage(1);
-  };
+  const borderColor =
+    theme === "dark" ? "border-neutral-700" : "border-gray-200";
+  const inputBg = theme === "dark" ? "bg-neutral-700" : "bg-white";
 
   const navigateToCampaign = (campaignId: number) => {
     const campaignTab = document.querySelector('[data-tab="campaigns"]');
@@ -120,24 +78,6 @@ export default function LogsList() {
     }
   };
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "published":
-      case "success":
-        return <CheckCircle className="w-4 h-4 text-green-500" />;
-      case "failed":
-        return <AlertCircle className="w-4 h-4 text-red-500" />;
-      case "pending":
-        return <Clock className="w-4 h-4 text-yellow-500" />;
-      default:
-        return <MessageCircle className="w-4 h-4 text-gray-500" />;
-    }
-  };
-
-  const borderColor =
-    theme === "dark" ? "border-neutral-700" : "border-gray-200";
-  const inputBg = theme === "dark" ? "bg-neutral-700" : "bg-white";
-
   return (
     <div
       className={`rounded-lg overflow-hidden shadow-lg border transition-all duration-300 backdrop-blur-lg ${
@@ -157,12 +97,12 @@ export default function LogsList() {
                 ? "bg-primary-500 text-white"
                 : "hover:bg-gray-100 dark:hover:bg-neutral-700"
             }`}
-            title={t("logs.filters.campaign")}
+            title={t("logs.filters.title")}
           >
             <Filter className="w-4 h-4" />
           </button>
           <button
-            onClick={fetchLogs}
+            onClick={onRefresh}
             className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-700 transition-colors"
             title={t("logs.refresh")}
           >
@@ -171,83 +111,8 @@ export default function LogsList() {
         </div>
       </div>
 
-      {/* Filters */}
-      {showFilters && (
-        <div
-          className={`p-4 border-b ${borderColor} ${
-            theme === "dark" ? "bg-neutral-900/30" : "bg-gray-50/50"
-          }`}
-        >
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {/* Campaign Filter */}
-            <div>
-              <label className="block text-sm font-medium mb-1.5">
-                {t("logs.filters.campaign")}
-              </label>
-              <select
-                value={selectedCampaign}
-                onChange={(e) => {
-                  setSelectedCampaign(e.target.value);
-                  setPage(1);
-                }}
-                className={`w-full px-3 py-2 rounded-lg border ${borderColor} ${inputBg} focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all`}
-              >
-                <option value="">{t("logs.filters.allCampaigns")}</option>
-                {campaigns.map((campaign) => (
-                  <option key={campaign.id} value={campaign.id}>
-                    {campaign.name || campaign.title}
-                  </option>
-                ))}
-              </select>
-            </div>
+     
 
-            {/* Date From */}
-            <div>
-              <label className="block text-sm font-medium mb-1.5">
-                {t("logs.filters.from")}
-              </label>
-              <input
-                type="date"
-                value={dateFrom}
-                onChange={(e) => {
-                  setDateFrom(e.target.value);
-                  setPage(1);
-                }}
-                className={`w-full px-3 py-2 rounded-lg border ${borderColor} ${inputBg} focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all`}
-              />
-            </div>
-
-            {/* Date To */}
-            <div>
-              <label className="block text-sm font-medium mb-1.5">
-                {t("logs.filters.to")}
-              </label>
-              <input
-                type="date"
-                value={dateTo}
-                onChange={(e) => {
-                  setDateTo(e.target.value);
-                  setPage(1);
-                }}
-                className={`w-full px-3 py-2 rounded-lg border ${borderColor} ${inputBg} focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all`}
-              />
-            </div>
-
-            {/* Clear Button */}
-            <div className="flex items-end">
-              <button
-                onClick={clearFilters}
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-neutral-600 hover:bg-gray-100 dark:hover:bg-neutral-700 transition-colors flex items-center justify-center gap-2"
-              >
-                <X className="w-4 h-4" />
-                {t("logs.filters.clear")}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Table */}
       <div className="overflow-x-auto">
         <table className="w-full text-left text-sm">
           <thead
@@ -271,7 +136,10 @@ export default function LogsList() {
                 {t("logs.table.status")}
               </th>
               <th className="px-6 py-4 font-semibold">
-                {t("logs.table.message")}
+                {t("logs.table.content")}
+              </th>
+              <th className="px-6 py-4 font-semibold">
+                {t("logs.table.error")}
               </th>
               <th className="px-6 py-4 font-semibold text-center">
                 {t("logs.table.link")}
@@ -285,18 +153,18 @@ export default function LogsList() {
           >
             {isLoading ? (
               <tr>
-                <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+                <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
                   {t("logs.loading")}
                 </td>
               </tr>
-            ) : logs.length === 0 ? (
+            ) : filteredLogs.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+                <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
                   {t("logs.empty")}
                 </td>
               </tr>
             ) : (
-              logs.map((log) => (
+              filteredLogs.map((log) => (
                 <tr
                   key={log.id}
                   className={`group transition-colors ${
@@ -311,13 +179,11 @@ export default function LogsList() {
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
                       <span className="capitalize font-medium">
-                        {log.social_account?.platform}
+                        {log.social_account?.platform || log.platform}
                       </span>
-                      {log.social_account && (
-                        <span className="text-xs text-gray-400">
-                          {log.social_account?.account_metadata.email}
-                        </span>
-                      )}
+                      <span className="text-xs text-gray-400">
+                        {log.account_name || log.social_account?.account_name}
+                      </span>
                     </div>
                   </td>
                   <td className="px-6 py-4">
@@ -345,52 +211,38 @@ export default function LogsList() {
                       </span>
                     </div>
                   </td>
-                  <td>
+                  <td className="px-6 py-4">
+                    <div className="group relative">
+                      <ExpandableText
+                        text={log.content || "-"}
+                        maxLength={50}
+                        className="text-[11px]"
+                      />
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
                     {log.error_message ? (
                       <div className="leading-tight">
-                        <div className="flex items-center ">
-                          <span className="text-red-500 text-[10px] font-medium">
-                            {t("logs.table.error")}:
-                          </span>
-                        </div>
                         <ExpandableText
                           text={log.error_message}
                           maxLength={60}
-                          className="text-[11px]"
+                          className="text-[11px] text-red-500"
                         />
                       </div>
                     ) : (
-                      <div className="group relative">
-                        <ExpandableText
-                          text={log.message || "-"}
-                          maxLength={80}
-                          className="text-[11px]"
-                        />
-                        {(log.message?.length ?? 0) > 30 && (
-                          <div className="invisible group-hover:visible absolute left-0 top-full mt-1 z-10 w-64">
-                            <div className="px-3 py-2 bg-gray-900 text-white text-xs rounded-lg shadow-lg">
-                              {log.message}
-                            </div>
-                          </div>
-                        )}
-                      </div>
+                      <span className="text-gray-400 text-xs">-</span>
                     )}
                   </td>
                   <td className="px-6 py-4 text-center">
-                    {(log.post_url ||
-                      log.engagement_data?.post_url ||
-                      log.video_url) &&
-                      log.status !== "deleted" && (
+                    {((log.post_url && log.post_url !== "") ||
+                      (log.video_url && log.video_url !== "")) &&
+                      (log.status === "published" ||
+                        log.status === "orphaned") && (
                         <a
-                          href={
-                            log.post_url ||
-                            log.engagement_data?.post_url ||
-                            log.video_url
-                          }
+                          href={log.post_url || log.video_url}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-primary-700 hover:from-primary-600 hover:to-primary-800 transition-all shadow-md hover:shadow-lg"
-                          title={t("logs.table.link")}
                         >
                           <ExternalLink className="w-4 h-4 text-white" />
                         </a>
@@ -403,28 +255,11 @@ export default function LogsList() {
         </table>
       </div>
 
-      {/* Pagination */}
-      {lastPage > 1 && (
-        <div className="p-4 flex justify-between items-center text-sm border-t border-gray-100 dark:border-neutral-700">
-          <button
-            disabled={page === 1}
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
-            className="px-3 py-1 rounded border disabled:opacity-50 hover:bg-gray-100 dark:hover:bg-neutral-700 transition-colors"
-          >
-            {t("logs.pagination.previous")}
-          </button>
-          <span>
-            {t("logs.pagination.page")} {page} {t("logs.pagination.of")}{" "}
-            {lastPage}
-          </span>
-          <button
-            disabled={page === lastPage}
-            onClick={() => setPage((p) => Math.min(lastPage, p + 1))}
-            className="px-3 py-1 rounded border disabled:opacity-50 hover:bg-gray-100 dark:hover:bg-neutral-700 transition-colors"
-          >
-            {t("logs.pagination.next")}
-          </button>
-        </div>
+      {pagination && pagination.last_page > 1 && (
+        <Pagination
+          pagination={pagination}
+          onPageChange={onPageChange || (() => {})}
+        />
       )}
     </div>
   );

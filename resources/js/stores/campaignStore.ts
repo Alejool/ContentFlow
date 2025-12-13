@@ -19,7 +19,13 @@ interface CampaignState {
   campaigns: Campaign[];
   isLoading: boolean;
   error: string | null;
-  fetchCampaigns: () => Promise<void>;
+  pagination: {
+    current_page: number;
+    last_page: number;
+    total: number;
+    per_page: number;
+  };
+  fetchCampaigns: (filters?: any, page?: number) => Promise<void>;
   getCampaignById: (id: number) => Campaign | undefined;
   addCampaign: (campaign: Campaign) => void;
   updateCampaign: (id: number, campaign: Partial<Campaign>) => void;
@@ -31,22 +37,57 @@ export const useCampaignStore = create<CampaignState>((set, get) => ({
   isLoading: false,
   error: null,
 
-  fetchCampaigns: async () => {
+  pagination: {
+    current_page: 1,
+    last_page: 1,
+    total: 0,
+    per_page: 5,
+  },
+
+  fetchCampaigns: async (filters = {}, page = 1) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await axios.get("/campaigns");
+      const params = { ...filters, page };
+      const response = await axios.get("/campaigns", { params });
+
       let campaignsData = [];
-      if (
-        response.data?.campaigns?.data &&
-        Array.isArray(response.data.campaigns.data)
-      ) {
+      let paginationData = {
+        current_page: 1,
+        last_page: 1,
+        total: 0,
+        per_page: 5,
+      };
+
+      if (response.data?.campaigns?.data) {
         campaignsData = response.data.campaigns.data;
+        paginationData = {
+          current_page: response.data.campaigns.current_page || 1,
+          last_page: response.data.campaigns.last_page || 1,
+          total: response.data.campaigns.total || 0,
+          per_page: response.data.campaigns.per_page || 5,
+        };
       } else if (Array.isArray(response.data?.campaigns)) {
+        // Fallback for flat array response
         campaignsData = response.data.campaigns;
+        paginationData.total = campaignsData.length;
       } else if (Array.isArray(response.data?.data)) {
         campaignsData = response.data.data;
+        // Attempt to extract pagination if available at root
+        if (response.data.current_page) {
+          paginationData = {
+            current_page: response.data.current_page,
+            last_page: response.data.last_page,
+            total: response.data.total,
+            per_page: response.data.per_page,
+          };
+        }
       }
-      set({ campaigns: campaignsData, isLoading: false });
+
+      set({
+        campaigns: campaignsData,
+        isLoading: false,
+        pagination: paginationData,
+      });
     } catch (error: any) {
       console.error("Error fetching campaigns:", error);
       set({

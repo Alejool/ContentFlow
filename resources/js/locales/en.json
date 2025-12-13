@@ -621,7 +621,7 @@
       "source": "Source",
       "campaign": "Campaign",
       "status": "Status",
-      "message": "Message",
+      "description": "Description",      "message": "Message",
       "error": "Error",
       "video": "Video",
       "copy": "Copy",

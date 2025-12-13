@@ -1,15 +1,6 @@
-// stores/socialAccountsStore.ts
 import axios from "axios";
 import { create } from "zustand";
-
-export interface SocialAccount {
-  id: number;
-  platform: string;
-  name: string;
-  account_name?: string; // Mantener compatibilidad
-  avatar?: string;
-  is_active: boolean;
-}
+import { SocialAccount } from "@/types/SocialAccount";
 
 interface AccountsStore {
   accounts: SocialAccount[];
@@ -17,7 +8,6 @@ interface AccountsStore {
   error: string | null;
   lastUpdated: Date | null;
 
-  // Actions
   setAccounts: (accounts: SocialAccount[]) => void;
   addAccount: (account: SocialAccount) => void;
   removeAccount: (accountId: number) => void;
@@ -38,7 +28,6 @@ export const useAccountsStore = create<AccountsStore>((set) => ({
     set({
       accounts: accounts.map((acc) => ({
         ...acc,
-        // Asegurarnos de que siempre tenga account_name
         account_name: acc.account_name || acc.name,
       })),
       lastUpdated: new Date(),

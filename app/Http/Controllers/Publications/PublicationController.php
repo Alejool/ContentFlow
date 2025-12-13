@@ -57,6 +57,10 @@ class PublicationController extends Controller
       });
     }
 
+    if ($request->has('has_logs') && $request->has_logs === 'true') {
+      $query->has('socialPostLogs');
+    }
+
     if ($request->query('simplified') === 'true') {
       $publications = $query->get();
     } else {
@@ -809,9 +813,10 @@ class PublicationController extends Controller
   {
     $publication = Publication::findOrFail($id);
 
-    if ($publication->status !== 'published') {
-      return response()->json(['message' => 'Publication is not published'], 400);
-    }
+    Log::info('Publication unpublishing', ['publication' => $publication]);
+    // if ($publication->status !== 'published') {
+    //   return response()->json(['message' => 'Publication is not published'], 400);
+    // }
 
     $publishService = app(PlatformPublishService::class);
     $result = $publishService->unpublishFromAllPlatforms($publication);

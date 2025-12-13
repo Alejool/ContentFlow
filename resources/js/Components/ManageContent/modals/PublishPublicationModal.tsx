@@ -101,7 +101,7 @@ export default function PublishPublicationModal({
   const handlePublishWithNotifications = async () => {
     if (!publication) return;
 
-    const success = await handlePublish(publication, youtubeThumbnails);
+    const success = await handlePublish(publication);
     if (success) {
       refreshNotifications();
       if (onSuccess) onSuccess();

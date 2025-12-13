@@ -621,6 +621,7 @@
       "date": "Fecha",
       "platform": "Plataforma",
       "source": "Origen",
+      "description": "Descripción",
       "campaign": "Campaña",
       "status": "Estado",
       "message": "Mensaje",

@@ -29,11 +29,18 @@ export type ScheduledPost = {
 export type SocialPostLog = {
   id: number;
   social_account_id: number;
-  status: "published" | "failed" | "deleted" | "pending" | "success";
+  status: "published" | "failed" | "deleted" | "pending" | "success" | "orphaned";
   social_account?: SocialAccount;
   platform: string;
   created_at: string;
   account_name?: string;
+  error_message?: string;
+  content?: string;
+  post_url?: string;
+  video_url?: string;
+  engagement_data?: any;
+  publication?: Publication; // For mapped logs
+  campaign?: { id: number; name: string }; // For mapped logs
 };
 
 export type SocialAccount = {

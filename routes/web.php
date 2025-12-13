@@ -14,6 +14,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\NotificationsController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\SocialPostLogController;
 
 /*
 |--------------------------------------------------------------------------
@@ -162,7 +163,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     | Social Post Logs
     |----------------------------------------------------------------------
     */
-    Route::get('/social-logs', [\App\Http\Controllers\SocialPostLogController::class, 'index'])->name('social-logs.index');
+    Route::get('/social-logs', [SocialPostLogController::class, 'index'])->name('social-logs.index');
+    Route::get('/logs', [SocialPostLogController::class, 'index'])->name('logs');
 
     Route::get('/test-notification', function () {
         $user = auth()->user();

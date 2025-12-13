@@ -8,7 +8,6 @@ import PublishCampaignModal from "@/Components/ManageContent/modals/PublishCampa
 import PublishPublicationModal from "@/Components/ManageContent/modals/PublishPublicationModal";
 import ViewCampaignModal from "@/Components/ManageContent/modals/ViewCampaignModal";
 import SocialMediaAccounts from "@/Components/ManageContent/socialAccount/SocialMediaAccounts";
-import { useCampaignManagement } from "@/Hooks/useCampaignManagement";
 import { useConfirm } from "@/Hooks/useConfirm";
 import { useSocialMediaAuth } from "@/Hooks/useSocialMediaAuth";
 import { useTheme } from "@/Hooks/useTheme";
@@ -23,6 +22,7 @@ import { createPortal } from "react-dom";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
+import { useCampaignStore } from "@/stores/campaignStore";
 import { usePublicationStore } from "@/stores/publicationStore";
 
 export default function ManageContentPage() {
@@ -37,51 +37,84 @@ export default function ManageContentPage() {
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
   const [isViewDetailsModalOpen, setIsViewDetailsModalOpen] = useState(false);
 
-  // Unified state for selected item (Publication or Campaign)
   const [selectedItem, setSelectedItem] = useState<
     Campaign | Publication | null
   >(null);
   const [filters, setFilters] = useState<any>({});
 
-  // Stores
   const publicationStore = usePublicationStore();
-  const campaignManagement = useCampaignManagement("campaigns");
+  const campaignStore = useCampaignStore();
 
-  const {
-    campaigns,
-    pagination: campaignPagination,
-    isLoading: isCampaignLoading,
-    fetchCampaigns,
-    deleteCampaign,
-    updateCampaign,
-  } = campaignManagement;
+  const getItems = () => {
+    switch (activeTab) {
+      case "publications":
+        return publicationStore.publications;
+      case "campaigns":
+        return campaignStore.campaigns;
+      case "logs":
+        return publicationStore.publications.flatMap((pub) =>
+          (pub.social_post_logs || []).map((log) => ({
+            ...log,
+            publication: pub,
+            campaign: pub.campaigns?.[0],
+          }))
+        );
+      default:
+        return [];
+    }
+  };
 
-  // Derived state based on active tab
-  const items =
-    activeTab === "publications" ? publicationStore.publications : campaigns;
-  const pagination =
-    activeTab === "publications"
-      ? publicationStore.pagination
-      : campaignPagination;
-  const isLoading =
-    activeTab === "publications"
-      ? publicationStore.isLoading
-      : isCampaignLoading;
+  const getPagination = () => {
+    switch (activeTab) {
+      case "publications":
+        return publicationStore.pagination;
+      case "campaigns":
+        return campaignStore.pagination;
+      case "logs":
+        return publicationStore.pagination;
+      default:
+        return { current_page: 1, last_page: 1, total: 0, per_page: 10 };
+    }
+  };
+
+  const getIsLoading = () => {
+    switch (activeTab) {
+      case "publications":
+        return publicationStore.isLoading;
+      case "campaigns":
+        return campaignStore.isLoading;
+      case "logs":
+        return publicationStore.isLoading;
+      default:
+        return false;
+    }
+  };
+
+  const fetchData = async (page = 1) => {
+    switch (activeTab) {
+      case "publications":
+        await publicationStore.fetchPublications(filters, page);
+        break;
+      case "campaigns":
+        await campaignStore.fetchCampaigns(filters, page);
+        break;
+      case "logs":
+        // For logs, we fetch publications since logs are derived from them
+        // We ensure we only get publications that actually HAVE logs to avoid empty pages
+        await publicationStore.fetchPublications(
+          { ...filters, has_logs: true },
+          page
+        );
+        break;
+    }
+  };
 
   useEffect(() => {
-    if (activeTab === "publications") {
-      publicationStore.fetchPublications(filters);
-    } else if (activeTab === "campaigns") {
-      fetchCampaigns(filters);
-    }
-  }, [filters, activeTab]);
+    fetchData();
+  }, [filters, activeTab, !isEditModalOpen, !isPublishModalOpen]);
 
   const handlePageChange = (page: number) => {
-    if (activeTab === "publications") {
-      publicationStore.fetchPublications(filters, page);
-    } else {
-      fetchCampaigns(filters, page);
-    }
+    fetchData(page);
   };
 
   const handleFilterChange = (newFilters: any) => {
@@ -145,13 +178,19 @@ export default function ManageContentPage() {
       if (isPublication) {
         try {
           await axios.delete(`/publications/${id}`);
-          publicationStore.removePublication(id); // Update store after successful API call
+          publicationStore.removePublication(id);
           toast.success(t("publications.messages.deleteSuccess"));
         } catch (e) {
           toast.error(t("publications.messages.deleteError"));
         }
       } else {
-        await deleteCampaign(id);
+        try {
+          await axios.delete(`/campaigns/${id}`);
+          campaignStore.removeCampaign(id);
+          toast.success(t("campaigns.messages.deleteSuccess"));
+        } catch (e) {
+          toast.error(t("campaigns.messages.deleteError"));
+        }
       }
     }
   };
@@ -245,7 +284,7 @@ export default function ManageContentPage() {
           ...item,
           status: "draft",
           social_account_id: null,
-          scheduled_posts: [], // Remove history of scheduling from the new draft version
+          scheduled_posts: [],
         });
       }
       return;
@@ -267,7 +306,7 @@ export default function ManageContentPage() {
         const response = await axios.post(`/publications/${item.id}/unpublish`);
         if (response.data.success) {
           toast.success("Unpublished successfully", { id: toastId });
-          await fetchCampaigns(filters);
+          await fetchData(getPagination().current_page);
           openEditModal({ ...item, status: "draft" });
         }
       } catch (error: any) {
@@ -282,13 +321,13 @@ export default function ManageContentPage() {
   const handleAddCampaign = async (success: boolean) => {
     if (success) {
       setIsModalOpen(false);
-      await fetchCampaigns(filters);
+      await fetchData();
     }
   };
 
   const handleUpdate = async (success: boolean) => {
     if (success) {
-      await fetchCampaigns(filters);
+      await fetchData(getPagination().current_page);
     }
   };
 
@@ -380,26 +419,28 @@ export default function ManageContentPage() {
               {/* Content */}
               <div className="">
                 {activeTab === "logs" ? (
-                  <LogsList />
+                  <LogsList
+                    logs={getItems() as any}
+                    isLoading={getIsLoading()}
+                    pagination={getPagination()}
+                    onPageChange={handlePageChange}
+                    onRefresh={() => fetchData(getPagination().current_page)}
+                  />
                 ) : (
                   <CampaignList
                     key={`campaigns-${connectedAccounts.length}`}
-                    items={items} // Use unified items
-                    pagination={pagination} // Use unified pagination
+                    items={getItems() as any}
+                    pagination={getPagination()}
                     onPageChange={handlePageChange}
                     mode={activeTab as "campaigns" | "publications"}
                     onEdit={openEditModal}
-                    onDelete={handleDeleteItem} // Use new unified delete handler
+                    onDelete={handleDeleteItem}
                     onAdd={() => setIsModalOpen(true)}
                     onPublish={openPublishModal}
                     onViewDetails={openViewDetailsModal}
-                    isLoading={isLoading} // Use unified loading state
+                    isLoading={getIsLoading()}
                     onFilterChange={handleFilterChange}
-                    onRefresh={() =>
-                      activeTab === "publications"
-                        ? publicationStore.fetchPublications(filters)
-                        : fetchCampaigns(filters)
-                    }
+                    onRefresh={() => fetchData(getPagination().current_page)}
                     onEditRequest={handleEditRequest}
                     connectedAccounts={connectedAccounts}
                   />
@@ -461,7 +502,7 @@ export default function ManageContentPage() {
               setSelectedItem(null);
             }}
             publication={selectedItem as Publication}
-            onSuccess={() => fetchCampaigns(filters)}
+            onSuccess={() => fetchData(getPagination().current_page)}
           />
         ) : (
           <PublishCampaignModal

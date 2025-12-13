@@ -428,8 +428,6 @@ export default function EditPublicationModal({
       }
 
       submitData.append("_method", "PUT");
-
-      // Use axios directly then update store
       const response = await axios.post(
         `/publications/${publication.id}`,
         submitData
@@ -453,7 +451,7 @@ export default function EditPublicationModal({
         setMediaPreviews([]);
         setMediaFiles([]);
         onClose();
-        onSubmit(true); // Notify parent (ManageContentPage)
+        onSubmit(true); 
         toast.success(
           t("publications.messages.updateSuccess") || "Publication updated"
         );

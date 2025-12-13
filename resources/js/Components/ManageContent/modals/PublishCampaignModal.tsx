@@ -11,6 +11,7 @@ import { CheckCircle, Share2, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
+import { useAccountsStore } from "@/stores/socialAccountsStore";
 
 interface PublishCampaignModalProps {
   isOpen: boolean;
@@ -18,12 +19,6 @@ interface PublishCampaignModalProps {
   campaign: Campaign | null;
 }
 
-interface SocialAccount {
-  id: number;
-  platform: string;
-  account_name: string;
-  is_active: boolean;
-}
 
 export default function PublishCampaignModal({
   isOpen,
@@ -32,44 +27,30 @@ export default function PublishCampaignModal({
 }: PublishCampaignModalProps) {
   const { t } = useTranslation();
   const { theme } = useTheme();
-  const [connectedAccounts, setConnectedAccounts] = useState<SocialAccount[]>(
-    []
-  );
   const [selectedPlatforms, setSelectedPlatforms] = useState<number[]>([]);
   const [loading, setLoading] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [miniature, setMiniature] = useState<boolean>(false);
 
-  useEffect(() => {
-    if (isOpen) {
-      fetchConnectedAccounts();
-    }
-  }, [isOpen]);
+  const { accounts: socialAccounts, fetchAccounts: fetchSocialAccounts } =
+    useAccountsStore();
 
-  const fetchConnectedAccounts = async () => {
-    setLoading(true);
-    try {
-      const response = await axios.get("/social-accounts");
-      const accounts = response.data.accounts || [];
-      setConnectedAccounts(
-        accounts.filter((acc: SocialAccount) => acc.is_active)
-      );
-    } catch (error) {
-      toast.error("Error loading connected accounts");
-    } finally {
-      setLoading(false);
-    }
-  };
+    useEffect(() => {
+      if (isOpen) {
+        socialAccounts.filter((acc) => acc.is_active)
+      }
+    }, [isOpen]);
+
+
 
   const togglePlatform = (accountId: number) => {
-    // buscar el id para saber si es youtube para gregar la miniatura de youtube
     setSelectedPlatforms((prev) =>
       prev.includes(accountId)
     ? prev.filter((id) => id !== accountId)
     : [...prev, accountId]
   );
 
-  const account = connectedAccounts.find((acc) => acc.id === accountId);
+  const account = socialAccounts.find((acc) => acc.id === accountId);
   const selectedAccount = selectedPlatforms.find((id) => id === accountId);
 
   (account?.platform === "youtube" && selectedAccount) ? setMiniature(true) : setMiniature(false);
@@ -77,7 +58,7 @@ export default function PublishCampaignModal({
   };
 
   const selectAll = () => {
-    setSelectedPlatforms(connectedAccounts.map((acc) => acc.id));
+    setSelectedPlatforms(socialAccounts.map((acc) => acc.id));
   };
 
   const deselectAll = () => {
@@ -230,7 +211,7 @@ export default function PublishCampaignModal({
               <div className="text-center py-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500 mx-auto"></div>
               </div>
-            ) : connectedAccounts.length === 0 ? (
+            ) : socialAccounts.length === 0 ? (
               <div
                 className={`text-center py-8 rounded-lg ${
                   theme === "dark" ? "bg-neutral-900/50" : "bg-gray-50"
@@ -248,7 +229,7 @@ export default function PublishCampaignModal({
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {connectedAccounts.map((account) => {
+                {socialAccounts.map((account) => {
                   const iconSrc = getPlatformIcon(account.platform);
                   const gradient = getPlatformGradient(account.platform);
                   const isSelected = selectedPlatforms.includes(account.id);
