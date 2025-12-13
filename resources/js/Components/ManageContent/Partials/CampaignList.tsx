@@ -93,6 +93,7 @@ export default function CampaignList({
       {mode === "campaigns" ? (
         <CampaignTable
           items={items as any}
+          key={items.length}
           theme={theme}
           t={t}
           expandedCampaigns={expandedCampaigns}
@@ -105,6 +106,7 @@ export default function CampaignList({
       ) : (
         <PublicationTable
           items={items as any}
+          key={items.length}
           theme={theme}
           t={t}
           connectedAccounts={connectedAccounts}

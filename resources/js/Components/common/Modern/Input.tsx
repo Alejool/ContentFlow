@@ -180,16 +180,16 @@ export default function Input<T extends FieldValues>({
 
     if (theme === "dark") {
       return type === "error"
-        ? `${base} text-primary-300 bg-primary-900/30 border border-primary-800/50`
-        : `${base} text-green-300 bg-green-900/30 border border-green-800/50`;
+        ? `${base} text-primary-300 bg-primary-900 border border-primary-800/50`
+        : `${base} text-green-300 bg-green-900 border border-green-800/50`;
     }
     return type === "error"
-      ? `${base} text-primary-600 bg-primary-50/80 border border-primary-100`
-      : `${base} text-green-600 bg-green-50/80 border border-green-100`;
+      ? `${base} text-primary-600 bg-primary-50 border border-primary-100`
+      : `${base} text-green-600 bg-green-50 border border-green-100`;
   };
 
   return (
-    <div className={`space-y-2 ${containerClassName}`}>
+    <div className={` ${containerClassName}`}>
       {(label || hint) && (
         <div>
           {label && (
@@ -265,15 +265,7 @@ export default function Input<T extends FieldValues>({
           <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
             {suffix}
 
-            {!suffix &&
-              (error || success) &&
-              (error ? (
-                <AlertCircle
-                  className={`${currentSize.icon} text-primary-500`}
-                />
-              ) : (
-                <CheckCircle className={`${currentSize.icon} text-green-500`} />
-              ))}
+           
 
             {showPasswordToggle && !disabled && (
               <button
@@ -305,14 +297,14 @@ export default function Input<T extends FieldValues>({
 
       {error && (
         <div className={getMessageStyles("error")} role="alert">
-          <AlertCircle className={`${currentSize.icon} mt-0.5 flex-shrink-0`} />
+          <AlertCircle className={`${currentSize.icon}  flex-shrink-0`} />
           <span>{error}</span>
         </div>
       )}
 
       {success && !error && (
         <div className={getMessageStyles("success")} role="status">
-          <CheckCircle className={`${currentSize.icon} mt-0.5 flex-shrink-0`} />
+          <CheckCircle className={`${currentSize.icon}  flex-shrink-0`} />
           <span>{success}</span>
         </div>
       )}

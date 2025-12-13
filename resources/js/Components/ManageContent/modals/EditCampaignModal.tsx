@@ -1,3 +1,5 @@
+import Input from "@/Components/common/Modern/Input";
+import Textarea from "@/Components/common/Modern/Textarea";
 import ModernDatePicker from "@/Components/common/ui/ModernDatePicker";
 import { useCampaignManagement } from "@/Hooks/useCampaignManagement";
 import { useTheme } from "@/Hooks/useTheme";
@@ -9,7 +11,7 @@ import { format } from "date-fns";
 import {
   AlertTriangle,
   Check,
-  DollarSign,
+  FileText,
   Loader2,
   Save,
   Target,
@@ -113,7 +115,7 @@ export default function EditCampaignModal({
         publication_ids: data.publication_ids || [],
       };
 
-      const success = await updateCampaign(campaign.id, payload, 'campaigns');
+      const success = await updateCampaign(campaign.id, payload, "campaigns");
       if (success) {
         if (onSubmit) {
           onSubmit(true);
@@ -144,11 +146,9 @@ export default function EditCampaignModal({
     }
   };
 
-  // Helper to get thumbnail for Publication
   const getThumbnail = (pub: any) => {
     if (!pub.media_files || pub.media_files.length === 0) return null;
 
-    // First, try to find an image
     const firstImage = pub.media_files.find((f: any) =>
       f.file_type.includes("image")
     );
@@ -159,7 +159,6 @@ export default function EditCampaignModal({
       return { url, type: "image" };
     }
 
-    // If no images, check if there's a video and return video indicator
     const hasVideo = pub.media_files.some((f: any) =>
       f.file_type.includes("video")
     );
@@ -172,7 +171,6 @@ export default function EditCampaignModal({
 
   if (!isOpen || !campaign) return null;
 
-  // Styles (copied from AddCampaignModal)
   const modalBg = theme === "dark" ? "bg-neutral-800" : "bg-white";
   const modalHeaderBg = theme === "dark" ? "bg-neutral-900" : "bg-white";
   const textPrimary = theme === "dark" ? "text-gray-100" : "text-gray-900";
@@ -224,138 +222,107 @@ export default function EditCampaignModal({
         <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
           <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-6">
             <div className="form-group">
-              <label
-                className={`block text-sm font-semibold ${labelText} mb-1.5`}
-              >
-                {t("campaigns.modal.edit.name") || "Campaign Name"}{" "}
-                <span className="text-primary-500">*</span>
-              </label>
-              <input
-                {...register("name")}
-                className={`w-full px-4 py-2.5 rounded-lg border ${borderColor} ${inputBg} focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all`}
-                placeholder={t("campaigns.modal.edit.placeholders.name")}
+              <Input
+                id="name"
+                label={t("campaigns.modal.add.name") || "Campaign Name"}
+                register={register}
+                name="name"
+                placeholder={
+                  t("campaigns.modal.add.placeholders.name") ||
+                  "e.g. Summer Sale 2024"
+                }
+                error={errors.name?.message as string}
               />
-              {errors.name && (
-                <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
-                  <AlertTriangle className="w-3 h-3" />{" "}
-                  {errors.name.message as string}
-                </p>
-              )}
             </div>
 
             <div className="form-group">
-              <label
-                className={`block text-sm font-semibold ${labelText} mb-1.5`}
-              >
-                {t("campaigns.modal.edit.description") || "Description"}
-              </label>
-              <textarea
-                {...register("description")}
-                rows={3}
-                className={`w-full px-4 py-2.5 rounded-lg border ${borderColor} ${inputBg} focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all resize-none`}
-                placeholder={t("campaigns.modal.edit.placeholders.description")}
+              <Textarea
+                id="description"
+                label={t("campaigns.modal.add.description")}
+                register={register}
+                name="description"
+                placeholder={t("campaigns.modal.add.placeholders.description")}
+                error={errors.description?.message as string}
+                icon={FileText}
+                theme={theme}
+                variant="filled"
+                rows={4}
+                maxLength={200}
+                showCharCount
+                hint="Maximum 200 characters"
               />
-              {errors.description && (
-                <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
-                  <AlertTriangle className="w-3 h-3" />{" "}
-                  {errors.description.message as string}
-                </p>
-              )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="form-group">
-                <label
-                  className={`block text-sm font-semibold ${labelText} mb-1.5`}
-                >
-                  {t("campaigns.modal.edit.goal") || "Goal"}
-                </label>
-                <div className="relative">
-                  <Target
-                    className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${textSecondary}`}
-                  />
-                  <input
-                    {...register("goal")}
-                    className={`w-full pl-10 pr-4 py-2.5 rounded-lg border ${borderColor} ${inputBg} focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all`}
-                    placeholder={t("campaigns.modal.edit.placeholders.goal")}
-                  />
-                </div>
-                  {errors.goal && (
-                    <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
-                      <AlertTriangle className="w-3 h-3" />{" "}
-                      {errors.goal.message as string}
-                    </p>
-                  )}
+                <Input
+                  id="goal"
+                  label={t("campaigns.modal.edit.goal") || "Goal"}
+                  register={register}
+                  name="goal"
+                  placeholder={
+                    t("campaigns.modal.edit.placeholders.goal") ||
+                    "e.g. $1000.00"
+                  }
+                  error={errors.goal?.message as string}
+                />
               </div>
 
               <div className="form-group">
-                <label
-                  className={`block text-sm font-semibold ${labelText} mb-1.5`}
-                >
-                  {t("campaigns.modal.edit.budget") || "Budget"}
-                </label>
-                <div className="relative">
-                  <DollarSign
-                    className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${textSecondary}`}
-                  />
-                  <input
-                    {...register("budget")}
-                    type="number"
-                    step="0.01"
-                    className={`w-full pl-10 pr-4 py-2.5 rounded-lg border ${borderColor} ${inputBg} focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all`}
-                    placeholder={t("campaigns.modal.edit.placeholders.budget")}
-                  />
-                </div>
-                  {errors.budget && (
-                    <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
-                      <AlertTriangle className="w-3 h-3" />{" "}
-                      {errors.budget.message as string}
-                    </p>
-                  )}
+                <Input
+                  id="budget"
+                  label={t("campaigns.modal.edit.budget") || "Budget"}
+                  register={register}
+                  name="budget"
+                  placeholder={
+                    t("campaigns.modal.edit.placeholders.budget") ||
+                    "e.g. $1000.00"
+                  }
+                  error={errors.budget?.message as string}
+                />
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="form-group">
-                <label
-                  className={`block text-sm font-semibold ${labelText} mb-1.5`}
-                >
-                  {t("campaigns.modal.edit.startDate") || "Start Date"}
-                </label>
                 <ModernDatePicker
+                  register={register}
+                  name="start_date"
+                  error={errors.start_date?.message as string}
+                  label={t("campaigns.modal.add.startDate") || "Start Date"}
                   selected={
                     watch("start_date") ? new Date(watch("start_date")!) : null
                   }
                   onChange={(date: Date | null) =>
                     setValue(
                       "start_date",
-                      date ? format(date, "yyyy-MM-dd") : ""
+                      date ? format(date, "yyyy-MM-dd") : "",
+                      { shouldValidate: true }
                     )
                   }
-                  placeholder={t("campaigns.modal.edit.placeholders.startDate")}
+                  placeholder={
+                    t("campaigns.modal.edit.placeholders.startDate") ||
+                    "Select start date"
+                  }
                   withPortal
                 />
-                {errors.start_date && (
-                  <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
-                    <AlertTriangle className="w-3 h-3" />{" "}
-                    {errors.start_date.message as string}
-                  </p>
-                )}
               </div>
               <div className="form-group">
-                <label
-                  className={`block text-sm font-semibold ${labelText} mb-1.5`}
-                >
-                  {t("campaigns.modal.edit.endDate") || "End Date"}
-                </label>
                 <ModernDatePicker
+                  register={register}
+                  name="end_date"
+                  error={errors.end_date?.message as string}
+                  label={t("campaigns.modal.add.endDate") || "End Date"}
                   selected={
                     watch("end_date") ? new Date(watch("end_date")!) : null
                   }
                   onChange={(date: Date | null) =>
                     setValue("end_date", date ? format(date, "yyyy-MM-dd") : "")
                   }
-                  placeholder={t("campaigns.modal.edit.placeholders.endDate")}
+                  placeholder={
+                    t("campaigns.modal.edit.placeholders.endDate") ||
+                    "Select end date"
+                  }
                   minDate={
                     watch("start_date")
                       ? new Date(watch("start_date")!)

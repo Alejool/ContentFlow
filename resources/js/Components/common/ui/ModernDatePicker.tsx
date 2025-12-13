@@ -1,16 +1,17 @@
+import Label from "@/Components/common/Modern/Label";
 import { useTheme } from "@/Hooks/useTheme";
 import { enUS, es } from "date-fns/locale";
-import { Calendar, Clock } from "lucide-react";
-import { forwardRef, ReactNode } from "react";
+import { AlertCircle, Calendar, Check, Clock } from "lucide-react";
+import { ReactNode, forwardRef } from "react";
 import DatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { FieldValues, UseFormRegister } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import Label from "@/Components/common/Modern/Label";
 
 registerLocale("es", es);
 registerLocale("en", enUS);
 
-interface ModernDatePickerProps {
+interface ModernDatePickerProps<T extends FieldValues> {
   selected?: Date | null;
   onChange: (date: Date | null) => void;
   showTimeSelect?: boolean;
@@ -21,9 +22,11 @@ interface ModernDatePickerProps {
   isClearable?: boolean;
   popperPlacement?: "top-start" | "top-end" | "bottom-start" | "bottom-end";
   withPortal?: boolean;
-  // Props para label
+
+  register?: UseFormRegister<T>;
   label?: string;
   error?: string;
+  name?: string;
   success?: string;
   hint?: string;
   required?: boolean;
@@ -45,8 +48,10 @@ const ModernDatePicker = ({
   isClearable = false,
   popperPlacement = "bottom-start",
   withPortal = false,
+  register,
   label,
   error,
+  name,
   success,
   hint,
   required = false,
@@ -55,7 +60,7 @@ const ModernDatePicker = ({
   size = "md",
   variant = "default",
   containerClassName = "",
-}: ModernDatePickerProps) => {
+}: ModernDatePickerProps<T>) => {
   const { theme } = useTheme();
   const { i18n } = useTranslation();
 
@@ -145,6 +150,7 @@ const ModernDatePicker = ({
         className={`${getInputStyles()} ${className} ${
           disabled ? "cursor-not-allowed" : ""
         }`}
+        {...register}
         aria-invalid={!!error}
         aria-describedby={
           error
@@ -203,39 +209,6 @@ const ModernDatePicker = ({
             </span>
           </div>
         </div>
-        {(error || success) && (
-          <div className="ml-2">
-            {error ? (
-              <svg
-                className={`${currentSize.icon} text-primary-500`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            ) : success ? (
-              <svg
-                className={`${currentSize.icon} text-green-500`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M5 13l4 4L19 7"
-                />
-              </svg>
-            ) : null}
-          </div>
-        )}
       </button>
     )
   );
@@ -244,7 +217,6 @@ const ModernDatePicker = ({
 
   return (
     <div className={`space-y-2 ${containerClassName}`}>
-      {/* Header con label y hint */}
       {(label || hint) && (
         <div className="flex items-center justify-between">
           {label && (
@@ -365,6 +337,7 @@ const ModernDatePicker = ({
         `}</style>
 
         <DatePicker
+          name={name}
           selected={selected}
           onChange={onChange}
           showTimeSelect={showTimeSelect}
@@ -383,26 +356,13 @@ const ModernDatePicker = ({
         />
       </div>
 
-      {/* Mensajes de error y éxito */}
       {error && (
         <div
           id={`${label?.toLowerCase().replace(/\s+/g, "-")}-error`}
           className={getMessageStyles("error")}
           role="alert"
         >
-          <svg
-            className="w-4 h-4 mt-0.5 flex-shrink-0 text-primary-500"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
+          <AlertCircle />
           <span>{error}</span>
         </div>
       )}
@@ -413,19 +373,7 @@ const ModernDatePicker = ({
           className={getMessageStyles("success")}
           role="status"
         >
-          <svg
-            className="w-4 h-4 mt-0.5 flex-shrink-0 text-green-500"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M5 13l4 4L19 7"
-            />
-          </svg>
+          <Check />
           <span>{success}</span>
         </div>
       )}

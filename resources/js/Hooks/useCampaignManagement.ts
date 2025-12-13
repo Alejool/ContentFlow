@@ -51,6 +51,8 @@ export function useCampaignManagement(
   // ... (add, update, delete methods remain mostly same, but might trigger fetchCampaigns with current page)
 
   const addCampaign = async (data: any) => {
+
+    console.log(data);
     try {
       let formData;
       if (data instanceof FormData) {
