@@ -11,37 +11,12 @@ export const useSocialMediaAuth = () => {
     setLoading,
     setError,
     removeAccount,
+    fetchAccounts,
   } = useAccountsStore();
 
-  const fetchAccounts = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const response = await axios.get("/social-accounts", {
-        headers: {
-          "X-CSRF-TOKEN": document
-            .querySelector('meta[name="csrf-token"]')
-            ?.getAttribute("content"),
-          Accept: "application/json",
-        },
-        withCredentials: true,
-      });
-
-      if (response.data && response.data.accounts) {
-        setAccounts(response.data.accounts);
-        return response.data.accounts;
-      }
-      return [];
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Error desconocido";
-      setError(errorMessage);
-      return [];
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Removing local fetchAccounts in favor of store's fetchAccounts
+  // Warning: ensure all consumers of useSocialMediaAuth are compatible with this change or update them.
+  // The store's fetchAccounts returns Promise<SocialAccount[]>, which matches the local signature.
 
   const connectAccount = (platform: string): Promise<boolean> => {
     return new Promise(async (resolve, reject) => {

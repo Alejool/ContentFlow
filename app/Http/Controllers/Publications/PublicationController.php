@@ -238,8 +238,17 @@ class PublicationController extends Controller
     }
   }
 
-  public function show($id)
+  public function show(Request $request, $id)
   {
+    if ($request->wantsJson()) {
+      $publication = Publication::with(['mediaFiles.derivatives', 'scheduledPosts.socialAccount', 'socialPostLogs.socialAccount', 'campaigns'])
+        ->findOrFail($id);
+
+      return response()->json([
+        'success' => true,
+        'publication' => $publication
+      ]);
+    }
     return view('publications.show');
   }
 

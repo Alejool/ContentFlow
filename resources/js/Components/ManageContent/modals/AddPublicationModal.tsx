@@ -1,5 +1,4 @@
 import ModernDatePicker from "@/Components/common/ui/ModernDatePicker";
-import { useCampaignManagement } from "@/Hooks/useCampaignManagement";
 import { useTheme } from "@/Hooks/useTheme";
 import { publicationSchema } from "@/schemas/publication";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -19,6 +18,7 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 interface AddCampaignModalProps {
   isOpen: boolean;
@@ -47,6 +47,9 @@ const validateFile = (file: File, t: any) => {
   return null;
 };
 
+import { usePublicationStore } from "@/stores/publicationStore";
+import { useAccountsStore } from "@/stores/socialAccountsStore";
+
 export default function AddPublicationModal({
   isOpen,
   onClose,
@@ -55,7 +58,8 @@ export default function AddPublicationModal({
   const { t } = useTranslation();
   const { theme } = useTheme();
 
-  const { addCampaign: addPublication } = useCampaignManagement("publications");
+  // Use store
+  const { addPublication, fetchPublications } = usePublicationStore();
   const [mediaFiles, setMediaFiles] = useState<File[]>([]);
   const [mediaPreviews, setMediaPreviews] = useState<string[]>([]);
   const [thumbnails, setThumbnails] = useState<Record<number, File>>({});
@@ -65,7 +69,8 @@ export default function AddPublicationModal({
   const [imageError, setImageError] = useState<string | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [socialAccounts, setSocialAccounts] = useState<any[]>([]);
+  const { accounts: socialAccounts, fetchAccounts: fetchSocialAccounts } =
+    useAccountsStore();
   const [accountSchedules, setAccountSchedules] = useState<
     Record<number, string>
   >({});
@@ -114,17 +119,6 @@ export default function AddPublicationModal({
       fetchSocialAccounts();
     }
   }, [isOpen]);
-
-  const fetchSocialAccounts = async () => {
-    try {
-      const response = await axios.get("/social-accounts");
-      if (response.data && response.data.accounts) {
-        setSocialAccounts(response.data.accounts);
-      }
-    } catch (error) {
-      console.error("Error fetching social accounts:", error);
-    }
-  };
 
   const modalBg = theme === "dark" ? "bg-neutral-800" : "bg-white";
   const modalHeaderBg =
@@ -313,7 +307,6 @@ export default function AddPublicationModal({
   };
 
   const onFormSubmit = async (data: any) => {
-
     console.log(data);
     if (mediaFiles.length === 0) {
       setImageError(t("publications.modal.validation.imageRequired"));
@@ -367,15 +360,27 @@ export default function AddPublicationModal({
         formData.append("campaign_id", data.campaign_id);
       }
 
-      const success = await addPublication(formData);
-      if (success) {
+      // Use axios directly as per store pattern or implement addPublication in store to handle API
+      // Since store's addPublication is currently synchronous (just state update), we do API call here
+      const response = await axios.post("/publications", formData);
+
+      if (response.data && response.data.publication) {
+        // Update store
+        addPublication(response.data.publication);
         if (onSubmit) {
-          onSubmit(success);
+          onSubmit(true); // Notify parent (ManageContentPage)
         }
         handleClose();
+        toast.success(
+          t("publications.messages.createSuccess") ||
+            "Publication created successfully"
+        );
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error submitting form:", error);
+      toast.error(
+        error.response?.data?.message || t("publications.messages.createError")
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -389,6 +394,8 @@ export default function AddPublicationModal({
     setImageError(null);
     setIsSubmitting(false);
     onClose();
+    // Refresh campaigns list if we are in campaigns tab?
+    // Actually ManageContentPage handles refresh via onSubmit callback if needed
   };
 
   if (!isOpen) return null;
@@ -795,11 +802,12 @@ export default function AddPublicationModal({
                       <option value="">
                         {t("common.select") || "Select a campaign..."}
                       </option>
-                      {campaigns.map((campaign) => (
-                        <option key={campaign.id} value={campaign.id}>
-                          {campaign.name || campaign.title}
-                        </option>
-                      ))}
+                      {Array.isArray(campaigns) &&
+                        campaigns.map((campaign) => (
+                          <option key={campaign.id} value={campaign.id}>
+                            {campaign.name || campaign.title}
+                          </option>
+                        ))}
                     </select>
                     <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none">
                       <svg

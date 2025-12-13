@@ -1,5 +1,6 @@
 // hooks/usePublishPublication.ts
 import { useCampaignStore } from "@/stores/campaignStore";
+import { usePublicationStore } from "@/stores/publicationStore";
 import { SocialAccount, useAccountsStore } from "@/stores/socialAccountsStore";
 import { Publication } from "@/types/Publication";
 import axios from "axios";
@@ -73,9 +74,15 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
     }
   }, [campaigns.length, fetchCampaigns]);
 
-  // Estado específico de publicación
+  // Obtener estado y métodos del store de publicaciones
+  const {
+    publishedPlatforms: publishedPlatformsCache,
+    fetchPublishedPlatforms: fetchPublishedPlatformsFromStore,
+    setPublishedPlatforms: setPublishedPlatformsInStore,
+  } = usePublicationStore();
+
+  // Estado local
   const [selectedPlatforms, setSelectedPlatforms] = useState<number[]>([]);
-  const [publishedPlatforms, setPublishedPlatforms] = useState<number[]>([]);
   const [publishing, setPublishing] = useState(false);
   const [unpublishing, setUnpublishing] = useState<number | null>(null);
   const [youtubeThumbnails, setYoutubeThumbnails] = useState<
@@ -86,13 +93,25 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
   >({});
   const [isLoadingThumbnails, setIsLoadingThumbnails] = useState(false);
 
-  // Función para resetear el estado
+  // ID de la publicación actual (se actualizará cuando se llame a fetchPublishedPlatforms)
+  const [currentPublicationId, setCurrentPublicationId] = useState<
+    number | null
+  >(null);
+
+  // Obtener plataformas publicadas para la publicación actual del caché
+  const publishedPlatforms = useMemo(() => {
+    return currentPublicationId
+      ? publishedPlatformsCache[currentPublicationId] || []
+      : [];
+  }, [publishedPlatformsCache, currentPublicationId]);
+
+  // Función para resetear el estado local
   const resetState = useCallback(() => {
     setSelectedPlatforms([]);
     setYoutubeThumbnails({});
     setExistingThumbnails({});
-    setPublishedPlatforms([]);
     setUnpublishing(null);
+    setCurrentPublicationId(null);
   }, []);
 
   // Cargar thumbnails existentes
@@ -108,7 +127,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
         const thumbnails: Record<number, { url: string; id: number }> = {};
 
         const videoFiles = publication.media_files.filter(
-          (m: any) => m.file_type && m.file_type.includes("video")
+          (m) => m.file_type && m.file_type.includes("video")
         );
 
         console.log("Video files:", videoFiles);
@@ -185,17 +204,13 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
   }, []);
 
   // Obtener plataformas ya publicadas
-  const fetchPublishedPlatforms = useCallback(async (publicationId: number) => {
-    try {
-      const response = await axios.get(
-        `/publications/${publicationId}/published-platforms`
-      );
-      const publishedAccountIds = response.data.published_platforms || [];
-      setPublishedPlatforms(publishedAccountIds);
-    } catch (error) {
-      console.error("Error loading published platforms:", error);
-    }
-  }, []);
+  const fetchPublishedPlatforms = useCallback(
+    async (publicationId: number) => {
+      setCurrentPublicationId(publicationId);
+      await fetchPublishedPlatformsFromStore(publicationId);
+    },
+    [fetchPublishedPlatformsFromStore]
+  );
 
   // Despublicar
   const handleUnpublish = useCallback(
@@ -206,14 +221,21 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
         });
 
         toast.success(`Unpublished from ${platform}`);
-        setPublishedPlatforms((prev) => prev.filter((id) => id !== accountId));
+
+        // Actualizar el store
+        const currentPublished = publishedPlatformsCache[publicationId] || [];
+        setPublishedPlatformsInStore(
+          publicationId,
+          currentPublished.filter((id) => id !== accountId)
+        );
+
         return true;
       } catch (error: any) {
         toast.error(error.response?.data?.message || "Error unpublishing");
         return false;
       }
     },
-    []
+    [publishedPlatformsCache, setPublishedPlatformsInStore]
   );
 
   // Alternar plataforma seleccionada

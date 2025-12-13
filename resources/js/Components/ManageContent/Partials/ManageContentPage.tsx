@@ -23,6 +23,8 @@ import { createPortal } from "react-dom";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
+import { usePublicationStore } from "@/stores/publicationStore";
+
 export default function ManageContentPage() {
   const { t } = useTranslation();
   const { theme } = useTheme();
@@ -41,17 +43,50 @@ export default function ManageContentPage() {
   >(null);
   const [filters, setFilters] = useState<any>({});
 
+  // Stores
+  const publicationStore = usePublicationStore();
+  const campaignManagement = useCampaignManagement("campaigns");
+
   const {
     campaigns,
-    pagination,
-    isLoading,
+    pagination: campaignPagination,
+    isLoading: isCampaignLoading,
     fetchCampaigns,
-    addCampaign,
     deleteCampaign,
     updateCampaign,
-  } = useCampaignManagement(
-    activeTab === "publications" ? "publications" : "campaigns"
-  );
+  } = campaignManagement;
+
+  // Derived state based on active tab
+  const items =
+    activeTab === "publications" ? publicationStore.publications : campaigns;
+  const pagination =
+    activeTab === "publications"
+      ? publicationStore.pagination
+      : campaignPagination;
+  const isLoading =
+    activeTab === "publications"
+      ? publicationStore.isLoading
+      : isCampaignLoading;
+
+  useEffect(() => {
+    if (activeTab === "publications") {
+      publicationStore.fetchPublications(filters);
+    } else if (activeTab === "campaigns") {
+      fetchCampaigns(filters);
+    }
+  }, [filters, activeTab]);
+
+  const handlePageChange = (page: number) => {
+    if (activeTab === "publications") {
+      publicationStore.fetchPublications(filters, page);
+    } else {
+      fetchCampaigns(filters, page);
+    }
+  };
+
+  const handleFilterChange = (newFilters: any) => {
+    setFilters(newFilters);
+  };
 
   const tabs = [
     {
@@ -71,18 +106,6 @@ export default function ManageContentPage() {
     },
   ];
 
-  useEffect(() => {
-    fetchCampaigns(filters);
-  }, [filters, activeTab]);
-
-  const handlePageChange = (page: number) => {
-    fetchCampaigns(filters, page);
-  };
-
-  const handleFilterChange = (newFilters: any) => {
-    setFilters(newFilters);
-  };
-
   const openEditModal = (item: Campaign | Publication) => {
     setSelectedItem(item);
     setIsEditModalOpen(true);
@@ -98,21 +121,40 @@ export default function ManageContentPage() {
     setIsViewDetailsModalOpen(true);
   };
 
-  const handleDeleteCampaign = async (id: number) => {
+  // Delete handling logic is now consolidated in handleDeleteItem below
+  const { fetchAccounts, accounts: connectedAccounts } = useSocialMediaAuth();
+
+  // Delete handling
+  const handleDeleteItem = async (id: number) => {
+    const isPublication = activeTab === "publications";
+    const itemType = isPublication ? "publication" : "campaign";
+
+    // We can add specific messages for publication vs campaign deletion if needed
     const confirmed = await confirm({
-      title: t("campaigns.messages.confirmDelete.title"),
-      message: t("campaigns.messages.confirmDelete.text"),
-      confirmText: t("campaigns.messages.confirmDelete.confirmButton"),
-      cancelText: t("campaigns.messages.confirmDelete.cancelButton"),
+      title: t(`${itemType}s.messages.confirmDelete.title`) || "Confirm Delete",
+      message:
+        t(`${itemType}s.messages.confirmDelete.text`) ||
+        "Are you sure you want to delete this item?",
+      confirmText:
+        t(`${itemType}s.messages.confirmDelete.confirmButton`) || "Delete",
+      cancelText: t(`common.cancel`) || "Cancel",
       type: "danger",
     });
 
     if (confirmed) {
-      await deleteCampaign(id);
+      if (isPublication) {
+        try {
+          await axios.delete(`/publications/${id}`);
+          publicationStore.removePublication(id); // Update store after successful API call
+          toast.success(t("publications.messages.deleteSuccess"));
+        } catch (e) {
+          toast.error(t("publications.messages.deleteError"));
+        }
+      } else {
+        await deleteCampaign(id);
+      }
     }
   };
-
-  const { fetchAccounts, accounts: connectedAccounts } = useSocialMediaAuth();
 
   useEffect(() => {
     fetchAccounts();
@@ -121,6 +163,8 @@ export default function ManageContentPage() {
   const handleRefreshAccounts = async () => {
     await fetchAccounts();
   };
+
+  // ... rest of component logic (handleEditRequest, etc) needs to use 'items' now instead of campaigns/publications directly if possible, or just pass correct one.
 
   const handleEditRequest = async (item: Publication | any) => {
     if (item.status !== "published") {
@@ -340,18 +384,22 @@ export default function ManageContentPage() {
                 ) : (
                   <CampaignList
                     key={`campaigns-${connectedAccounts.length}`}
-                    items={campaigns}
-                    pagination={pagination}
+                    items={items} // Use unified items
+                    pagination={pagination} // Use unified pagination
                     onPageChange={handlePageChange}
                     mode={activeTab as "campaigns" | "publications"}
                     onEdit={openEditModal}
-                    onDelete={handleDeleteCampaign}
+                    onDelete={handleDeleteItem} // Use new unified delete handler
                     onAdd={() => setIsModalOpen(true)}
                     onPublish={openPublishModal}
                     onViewDetails={openViewDetailsModal}
-                    isLoading={isLoading}
+                    isLoading={isLoading} // Use unified loading state
                     onFilterChange={handleFilterChange}
-                    onRefresh={fetchCampaigns}
+                    onRefresh={() =>
+                      activeTab === "publications"
+                        ? publicationStore.fetchPublications(filters)
+                        : fetchCampaigns(filters)
+                    }
                     onEditRequest={handleEditRequest}
                     connectedAccounts={connectedAccounts}
                   />

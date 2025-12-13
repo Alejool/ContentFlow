@@ -35,8 +35,18 @@ export const useCampaignStore = create<CampaignState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const response = await axios.get("/campaigns");
-      const campaigns = response.data.campaigns || response.data.data || [];
-      set({ campaigns, isLoading: false });
+      let campaignsData = [];
+      if (
+        response.data?.campaigns?.data &&
+        Array.isArray(response.data.campaigns.data)
+      ) {
+        campaignsData = response.data.campaigns.data;
+      } else if (Array.isArray(response.data?.campaigns)) {
+        campaignsData = response.data.campaigns;
+      } else if (Array.isArray(response.data?.data)) {
+        campaignsData = response.data.data;
+      }
+      set({ campaigns: campaignsData, isLoading: false });
     } catch (error: any) {
       console.error("Error fetching campaigns:", error);
       set({

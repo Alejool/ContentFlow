@@ -1,9 +1,11 @@
 import ModernDatePicker from "@/Components/common/ui/ModernDatePicker";
 import YouTubeThumbnailUploader from "@/Components/common/ui/YouTubeThumbnailUploader";
-import { useCampaignManagement } from "@/Hooks/useCampaignManagement";
 import { useConfirm } from "@/Hooks/useConfirm";
 import { useTheme } from "@/Hooks/useTheme";
 import { publicationSchema } from "@/schemas/publication";
+import { useCampaignStore } from "@/stores/campaignStore";
+import { usePublicationStore } from "@/stores/publicationStore";
+import { useAccountsStore } from "@/stores/socialAccountsStore";
 import { Publication } from "@/types/Publication";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
@@ -21,6 +23,7 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
 type EditPublicationFormData = {
@@ -69,8 +72,19 @@ export default function EditPublicationModal({
 }: EditPublicationModalProps) {
   const { t } = useTranslation();
   const { theme } = useTheme();
-  // Use 'publications' endpoint
-  const { updateCampaign } = useCampaignManagement("publications");
+
+  const { updatePublication } = usePublicationStore();
+  const { campaigns, fetchCampaigns } = useCampaignStore();
+
+  const { confirm } = useConfirm();
+  const { accounts: socialAccounts, fetchAccounts: fetchSocialAccounts } =
+    useAccountsStore();
+  const [accountSchedules, setAccountSchedules] = useState<
+    Record<number, string>
+  >({});
+  const [activePopover, setActivePopover] = useState<number | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const [mediaFiles, setMediaFiles] = useState<File[]>([]);
   const [mediaPreviews, setMediaPreviews] = useState<
     {
@@ -86,33 +100,11 @@ export default function EditPublicationModal({
   const [imageError, setImageError] = useState<string | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [campaigns, setCampaigns] = useState<any[]>([]);
   const [youtubeThumbnail, setYoutubeThumbnail] = useState<File | null>(null);
   const [existingThumbnail, setExistingThumbnail] = useState<{
     url: string;
     id: number;
   } | null>(null);
-
-  const fetchCampaigns = async () => {
-    try {
-      const response = await axios.get("/campaigns");
-      if (response.data?.campaigns?.data) {
-        setCampaigns(response.data.campaigns.data);
-      } else if (Array.isArray(response.data?.campaigns)) {
-        setCampaigns(response.data.campaigns);
-      }
-    } catch (error) {
-      console.error("Failed to fetch campaigns", error);
-    }
-  };
-
-  const { confirm } = useConfirm();
-  const [socialAccounts, setSocialAccounts] = useState<any[]>([]);
-  const [accountSchedules, setAccountSchedules] = useState<
-    Record<number, string>
-  >({});
-  const [activePopover, setActivePopover] = useState<number | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const schema = useMemo(() => publicationSchema(t), [t]);
 
@@ -138,23 +130,14 @@ export default function EditPublicationModal({
 
   const watched = watch();
 
-  useEffect(() => {
-    if (isOpen) {
-      fetchSocialAccounts();
-      fetchCampaigns();
-    }
-  }, [isOpen]);
-
-  const fetchSocialAccounts = async () => {
-    try {
-      const response = await axios.get("/social-accounts");
-      if (response.data && response.data.accounts) {
-        setSocialAccounts(response.data.accounts);
-      }
-    } catch (error) {
-      console.error("Error fetching social accounts:", error);
-    }
-  };
+  // useEffect(() => {
+  //   if (isOpen) {
+  //     fetchSocialAccounts();
+  //     if (campaigns.length === 0) {
+  //       fetchCampaigns().catch(console.error);
+  //     }
+  //   }
+  // }, [isOpen]);
 
   useEffect(() => {
     if (publication) {
@@ -178,7 +161,7 @@ export default function EditPublicationModal({
           publication.scheduled_at &&
           new Date(publication.scheduled_at) > new Date()
             ? new Date(publication.scheduled_at).toISOString().slice(0, 16)
-            : "", // Reset if past date to avoid validation error
+            : "",
         social_accounts: scheduledAccountIds,
         campaign_id: publication.campaigns?.[0]?.id?.toString() || "",
       });
@@ -189,7 +172,7 @@ export default function EditPublicationModal({
         url: string;
         type: string;
         isNew: boolean;
-        thumbnailUrl?: string; // Added field
+        thumbnailUrl?: string;
       }[] = [];
 
       publication.media_files?.forEach((media: any) => {
@@ -199,7 +182,6 @@ export default function EditPublicationModal({
           : `/storage/${media.file_path}`;
 
         let thumbnailUrl;
-        // Check for thumbnail in derivatives
         if (media.file_type.includes("video")) {
           const thumbnail = media.derivatives?.find(
             (d: any) =>
@@ -214,7 +196,6 @@ export default function EditPublicationModal({
               ? thumbnail.file_path
               : `/storage/${thumbnail.file_path}`;
 
-            // Also set for YouTube specific field if needed (legacy behavior?)
             setExistingThumbnail({
               url: thumbnailUrl,
               id: thumbnail.id,
@@ -232,7 +213,6 @@ export default function EditPublicationModal({
         });
       });
 
-      // Legacy image support if any
       if (!publication.media_files || publication.media_files.length === 0) {
         if ((publication as any).image) {
           previews.push({
@@ -449,16 +429,40 @@ export default function EditPublicationModal({
 
       submitData.append("_method", "PUT");
 
-      const success = await updateCampaign(publication.id, submitData);
-      if (success) {
+      // Use axios directly then update store
+      const response = await axios.post(
+        `/publications/${publication.id}`,
+        submitData
+      );
+
+      if (
+        response.data &&
+        (response.data.publication || response.data.success)
+      ) {
+        const updatedPub = response.data.publication || response.data.data;
+        // Update store
+        if (updatedPub) {
+          updatePublication(publication.id, updatedPub);
+        } else {
+          // Fallback if API doesn't return object: fetch details or just close
+          // But usually we get it. If not, maybe just re-fetch list handled by parent?
+          // Actually parent's onSuccess fetches list? No, parent passes onSubmit(success).
+        }
+
         reset();
         setMediaPreviews([]);
         setMediaFiles([]);
         onClose();
-        onSubmit(success);
+        onSubmit(true); // Notify parent (ManageContentPage)
+        toast.success(
+          t("publications.messages.updateSuccess") || "Publication updated"
+        );
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error updating publication:", error);
+      toast.error(
+        error.response?.data?.message || t("publications.messages.updateError")
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -1012,11 +1016,12 @@ export default function EditPublicationModal({
                         <option value="">
                           {t("common.select") || "Select a campaign..."}
                         </option>
-                        {campaigns.map((campaign) => (
-                          <option key={campaign.id} value={campaign.id}>
-                            {campaign.name || campaign.title}
-                          </option>
-                        ))}
+                        {Array.isArray(campaigns) &&
+                          campaigns.map((campaign) => (
+                            <option key={campaign.id} value={campaign.id}>
+                              {campaign.name || campaign.title}
+                            </option>
+                          ))}
                       </select>
                       <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none">
                         <svg
