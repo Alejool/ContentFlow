@@ -193,6 +193,7 @@ export default function EditPublicationModal({
       }[] = [];
 
       publication.media_files?.forEach((media: any) => {
+        if (!media.file_path) return;
         const url = media.file_path.startsWith("http")
           ? media.file_path
           : `/storage/${media.file_path}`;
@@ -208,6 +209,7 @@ export default function EditPublicationModal({
                 d.platform === "generic")
           );
           if (thumbnail) {
+            if (!thumbnail.file_path) return;
             thumbnailUrl = thumbnail.file_path.startsWith("http")
               ? thumbnail.file_path
               : `/storage/${thumbnail.file_path}`;

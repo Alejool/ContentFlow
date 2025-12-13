@@ -5,11 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
 
 class MediaDerivative extends Model
 {
     use HasFactory;
-    protected $appends = ['file_url'];
+    protected $appends = [];
+
 
     protected $fillable = [
         'media_file_id',
@@ -57,15 +59,10 @@ class MediaDerivative extends Model
         return $query->where('derivative_type', 'preview');
     }
 
-    // Accessors
- 
-    public function getFileUrlAttribute()
-    {
-        return $this->file_path ? Storage::disk('s3')->url($this->file_path) : null;
-    }
 
-    public function getFullPathAttribute(): string
+    // Accessors
+    public function getFilePathAttribute($value)
     {
-        return storage_path('app/' . $this->file_path);
+        return $value ? (str_starts_with($value, 'http') ? $value : Storage::disk('s3')->url($value)) : null;
     }
 }

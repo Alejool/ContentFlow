@@ -64,14 +64,6 @@ class PublicationController extends Controller
       $publications = $query->paginate($perPage);
     }
 
-    $publications->getCollection()->transform(function ($pub) {
-      $pub->mediaFiles->each->append('file_url');
-      $pub->mediaFiles->each(function ($media) {
-        $media->derivatives->each->append('file_url');
-      });
-      return $pub;
-    });
-
     return response()->json([
       'success' => true,
       'publications' => $publications,
@@ -236,7 +228,6 @@ class PublicationController extends Controller
         'message' => 'Publication created successfully',
         'publication' => $publication,
       ]);
-      
     } catch (\Exception $e) {
       DB::rollBack();
       return response()->json([

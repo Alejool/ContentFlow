@@ -16,6 +16,7 @@ export default function PublicationThumbnail({
     );
     if (firstImage) {
       let url = firstImage.file_path;
+      if(!url) return null;
       if (!url.startsWith("http") && !url.startsWith("/storage/")) {
         url = `/storage/${url}`;
       }

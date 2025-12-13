@@ -6,11 +6,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
 
 class MediaFile extends Model
 {
     use HasFactory;
-    protected $appends = ['file_url'];
+    protected $appends = [];
 
     protected $fillable = [
         'user_id',
@@ -45,13 +46,12 @@ class MediaFile extends Model
         return $this->hasMany(MediaDerivative::class);
     }
 
-    public function getFileUrlAttribute()
+    public function getFilePathAttribute($value)
     {
-        return $this->file_path ? Storage::disk('s3')->url($this->file_path) : null;
+        return $value ? (str_starts_with($value, 'http') ? $value : Storage::disk('s3')->url($value)) : null;
     }
-    
 
-    // Helper methods for derivatives
+
     public function getThumbnail()
     {
         return $this->derivatives()
@@ -80,16 +80,6 @@ class MediaFile extends Model
             ->where('derivative_type', 'thumbnail')
             ->where('platform', 'youtube')
             ->first();
-    }
-
-    public function getFullPathAttribute(): string
-    {
-        return storage_path('app/' . $this->file_path);
-    }
-
-    public function getUrlAttribute(): string
-    {
-        return asset('storage/' . $this->file_path);
     }
 
     /**
@@ -127,6 +117,4 @@ class MediaFile extends Model
 
         return sprintf('0:%02d', $seconds);
     }
-
-
 }
