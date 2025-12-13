@@ -2,6 +2,7 @@ import { z } from "zod";
 
 export const publicationSchema = (t: any) =>
   z.object({
+    
     title: z
       .string()
       .min(1, t("publications.modal.validation.titleRequired"))

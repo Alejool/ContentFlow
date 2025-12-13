@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class MediaDerivative extends Model
 {
     use HasFactory;
+    protected $appends = ['file_url'];
 
     protected $fillable = [
         'media_file_id',
@@ -57,9 +58,10 @@ class MediaDerivative extends Model
     }
 
     // Accessors
-    public function getUrlAttribute(): string
+ 
+    public function getFileUrlAttribute()
     {
-        return asset('storage/' . $this->file_path);
+        return $this->file_path ? Storage::disk('s3')->url($this->file_path) : null;
     }
 
     public function getFullPathAttribute(): string

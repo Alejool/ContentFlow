@@ -185,7 +185,9 @@
         "publishDate": "Fecha de Publicación",
         "publishedOn": "Publicado el",
         "publications": "Publicaciones",
+        "creating": "Creando",
         "optionalSchedule": "Programación Opcional",
+        "selectSocialAccounts": "Seleccionar Cuentas",
         "dragDrop": {
           "title": "Arrastra y suelta para ordenar",
           "subtitle": "Sube tus archivos multimedia aquí"
@@ -230,6 +232,7 @@
         "associatedPublications": "Publicaciones Asociadas",
         "accountMissingTitle": "Cuenta Desconectada",
         "accountMissingText": "Esta publicación se publicó en una cuenta ({{account}}) que ya no está conectada. Al editarla se creará una nueva versión para tu cuenta actual. ¿Continuar?",
+        "selectSocialAccounts": "Seleccionar Cuentas",
         "dragDrop": {
           "title": "Arrastra y suelta para ordenar",
           "subtitle": "Sube tus archivos multimedia aquí"
@@ -297,7 +300,8 @@
         "nameLength":"Nombre debe tener al menos 10 caracteres",
         "descriptionLength":"Descripción debe tener al menos 10 caracteres",
         "hashtagsLength":"Hashtags debe tener al menos 10 caracteres",
-        "schedulePublicationLength":"Programar Publicación debe tener al menos 10 caracteres"
+        "schedulePublicationLength":"Programar Publicación debe tener al menos 10 caracteres",
+        "imageRequired":"Imagen es requerida"
       }
     },
     "button": {

@@ -1,34 +1,34 @@
-#!/bin/bash
-set -e
+# Dockerfile ÚLTRA SIMPLE - sin usuarios especiales
+FROM php:8.2-fpm
 
-echo "Starting Laravel application..."
+WORKDIR /var/www/html
 
-# Wait for database to be ready
-echo "Waiting for database connection..."
-php artisan wait-for-db --timeout=60
+# Instalar dependencias
+RUN apt-get update && apt-get install -y \
+    git curl libpng-dev libonig-dev libxml2-dev libzip-dev zip unzip \
+    libicu-dev libfreetype6-dev libjpeg62-turbo-dev libwebp-dev libxpm-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-# Run migrations
-echo "Running database migrations..."
-php artisan migrate --force
+# Instalar extensiones PHP
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
+    && docker-php-ext-install \
+    pdo_mysql mbstring exif pcntl bcmath gd zip intl opcache
 
-# Clear and cache configurations
-echo "Optimizing application..."
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
+# Instalar Redis
+RUN pecl install redis && docker-php-ext-enable redis
 
-# Create storage link if it doesn't exist
-if [ ! -L /var/www/html/public/storage ]; then
-    echo "Creating storage symlink..."
-    php artisan storage:link
-fi
+# Instalar Composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Set proper permissions
-echo "Setting permissions..."
-chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
-chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+# Configurar PHP
+RUN echo 'memory_limit = 512M' >> /usr/local/etc/php/conf.d/custom.ini \
+    && echo 'upload_max_filesize = 128M' >> /usr/local/etc/php/conf.d/custom.ini \
+    && echo 'post_max_size = 128M' >> /usr/local/etc/php/conf.d/custom.ini \
+    && echo 'max_execution_time = 300' >> /usr/local/etc/php/conf.d/custom.ini \
+    && echo 'display_errors = On' >> /usr/local/etc/php/conf.d/custom.ini
 
-echo "Application ready!"
+# Exponer puerto
+EXPOSE 9000
 
-# Execute the main command
-exec "$@"
+# Comando SIMPLE - sin entrypoint complicado
+CMD ["php-fpm", "-F"]

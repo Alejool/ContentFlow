@@ -1,5 +1,4 @@
 import react from '@vitejs/plugin-react';
-import fs from 'fs';
 import laravel from 'laravel-vite-plugin';
 import { defineConfig } from 'vite';
 import tsconfigPaths from "vite-tsconfig-paths";
@@ -27,29 +26,23 @@ export default defineConfig({
     optimizeDeps: {
         include: ['@ffmpeg/ffmpeg'],
     },
-    
     server: {
-        host: 'localhost',
-        port: 5173,
-        strictPort: true,
+    host: '0.0.0.0', 
+    port: 5173,
+    strictPort: true,
 
-        https: !isUsingTunnel && fs.existsSync(keyPath) && fs.existsSync(certPath) ? {
-            key: fs.readFileSync(keyPath),
-            cert: fs.readFileSync(certPath),
-        } : undefined,
-        
-        hmr: {
-            host: 'localhost',
-            clientPort: 5173,
-        },
-        
-        cors: true,  // ✅ Esto SÍ es para CORS en Vite
-        
-        allowedHosts: [
-            'localhost',
-            '127.0.0.1',
-            '.ngrok-free.app',
-            '.trycloudflare.com',
-        ],
+    hmr: {
+        host: 'localhost', 
+        clientPort: 5173,
+    },
+
+    cors: true,
+
+    allowedHosts: [
+        'localhost',
+        '127.0.0.1',
+        '.ngrok-free.app',
+        '.trycloudflare.com',
+    ],
     },
 });

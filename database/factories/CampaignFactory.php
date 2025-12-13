@@ -1,6 +1,6 @@
 <?php
 
-namespace Database\Factories\Campaigns;
+namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
@@ -16,17 +16,12 @@ class CampaignFactory extends Factory
 
         return [
             'user_id' => User::factory(),
-            'title' => $title,
-            'slug' => Str::slug($title),
-            'image' => $this->faker->imageUrl(800, 400),
-            'status' => $this->faker->randomElement(['draft', 'published']),
+            'name' => $title,
+            'status' => $this->faker->randomElement(['active', 'inactive', 'completed', 'deleted', 'paused']),
             'start_date' => $this->faker->dateTimeBetween('-1 month', '+1 month'),
             'end_date' => $this->faker->dateTimeBetween('+1 month', '+3 months'),
-            'publish_date' => $this->faker->dateTimeBetween('-1 week', 'now'),
             'goal' => $this->faker->sentence,
-            'body' => $this->faker->paragraphs(3, true),
-            'url' => $this->faker->url,
-            'hashtags' => '#' . $this->faker->word . ' #' . $this->faker->word,
+            'budget' => $this->faker->randomNumber(5),
             'description' => $this->faker->text(200),
         ];
     }

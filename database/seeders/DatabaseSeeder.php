@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use App\Models\Campaigns\Campaign   ;
+use App\Models\Campaign   ;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -42,7 +42,7 @@ class DatabaseSeeder extends Seeder
 
         Campaign::factory(3)->create([
             'user_id' => $testUser->id,
-            'status' => 'published'
+            'status' => 'active'
         ]);
 
         // Reactivar restricciones

@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class MediaFile extends Model
 {
     use HasFactory;
+    protected $appends = ['file_url'];
 
     protected $fillable = [
         'user_id',
@@ -43,6 +44,12 @@ class MediaFile extends Model
     {
         return $this->hasMany(MediaDerivative::class);
     }
+
+    public function getFileUrlAttribute()
+    {
+        return $this->file_path ? Storage::disk('s3')->url($this->file_path) : null;
+    }
+    
 
     // Helper methods for derivatives
     public function getThumbnail()
@@ -120,4 +127,6 @@ class MediaFile extends Model
 
         return sprintf('0:%02d', $seconds);
     }
+
+
 }

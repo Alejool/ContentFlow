@@ -1,7 +1,5 @@
-version: '3.8'
-
 services:
-  # PHP Application
+  # Laravel Application (PHP-FPM)
   app:
     build:
       context: .
@@ -13,17 +11,8 @@ services:
     volumes:
       - ./:/var/www/html
       - ./storage:/var/www/html/storage
-    environment:
-      - DB_HOST=mysql
-      - DB_DATABASE=${DB_DATABASE:-laravel}
-      - DB_USERNAME=${DB_USERNAME:-laravel}
-      - DB_PASSWORD=${DB_PASSWORD:-secret}
-      - REDIS_HOST=redis
-      - REDIS_PASSWORD=null
-      - REDIS_PORT=6379
-      - QUEUE_CONNECTION=redis
-      - CACHE_DRIVER=redis
-      - SESSION_DRIVER=redis
+    env_file:
+      - .env.docker
     depends_on:
       mysql:
         condition: service_healthy
@@ -32,14 +21,13 @@ services:
     networks:
       - laravel
 
-  # Nginx Web Server
+  # Nginx
   nginx:
     image: nginx:alpine
     container_name: laravel_nginx
     restart: unless-stopped
     ports:
       - "80:80"
-      - "443:443"
     volumes:
       - ./:/var/www/html
       - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
@@ -48,18 +36,20 @@ services:
     networks:
       - laravel
 
-  # MySQL Database
+  # MySQL
   mysql:
     image: mysql:8.0
     container_name: laravel_mysql
     restart: unless-stopped
     ports:
-      - "3306:3306"
+      - "3307:3306"
+    env_file:
+      - .env.docker
     environment:
-      MYSQL_DATABASE: ${DB_DATABASE:-laravel}
-      MYSQL_USER: ${DB_USERNAME:-laravel}
-      MYSQL_PASSWORD: ${DB_PASSWORD:-secret}
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
@@ -70,7 +60,7 @@ services:
     networks:
       - laravel
 
-  # Redis Cache & Queue
+  # Redis
   redis:
     image: redis:7-alpine
     container_name: laravel_redis
@@ -99,20 +89,37 @@ services:
     command: php artisan queue:work --tries=3 --timeout=90
     volumes:
       - ./:/var/www/html
-    environment:
-      - DB_HOST=mysql
-      - DB_DATABASE=${DB_DATABASE:-laravel}
-      - DB_USERNAME=${DB_USERNAME:-laravel}
-      - DB_PASSWORD=${DB_PASSWORD:-secret}
-      - REDIS_HOST=redis
-      - QUEUE_CONNECTION=redis
+    env_file:
+      - .env.docker
     depends_on:
       - app
       - redis
     networks:
       - laravel
 
-  # Scheduler (Cron)
+  # Reverb
+  reverb:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: laravel_reverb
+    restart: unless-stopped
+    working_dir: /var/www/html
+    command: php artisan reverb:start --host=0.0.0.0 --port=8080
+    volumes:
+      - ./:/var/www/html
+    env_file:
+      - .env.docker
+    ports:
+      - "8080:8080"
+    depends_on:
+      - app
+      - redis
+    networks:
+      - laravel
+
+  # Scheduler
   scheduler:
     build:
       context: .
@@ -121,47 +128,20 @@ services:
     container_name: laravel_scheduler
     restart: unless-stopped
     working_dir: /var/www/html
-    command: >
-      sh -c "while true; do
-        php artisan schedule:run --verbose --no-interaction &
-        sleep 60
-      done"
+    command: sh -c "while true; do php artisan schedule:run --no-interaction; sleep 60; done"
     volumes:
       - ./:/var/www/html
-    environment:
-      - DB_HOST=mysql
-      - DB_DATABASE=${DB_DATABASE:-laravel}
-      - DB_USERNAME=${DB_USERNAME:-laravel}
-      - DB_PASSWORD=${DB_PASSWORD:-secret}
-      - REDIS_HOST=redis
+    env_file:
+      - .env.docker
     depends_on:
       - app
     networks:
       - laravel
 
-  # Node.js Development Server (Optional - for development only)
-  node:
-    image: node:20-alpine
-    container_name: laravel_node
-    working_dir: /app
-    ports:
-      - "5173:5173"
-    volumes:
-      - ./:/app
-    command: npm run dev
-    profiles:
-      - dev
-    networks:
-      - laravel
-
-# Networks
 networks:
   laravel:
     driver: bridge
 
-# Volumes
 volumes:
   mysql_data:
-    driver: local
   redis_data:
-    driver: local

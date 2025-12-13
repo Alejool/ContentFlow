@@ -1,5 +1,6 @@
 <?php
-namespace App\Http\Controllers\Api;
+
+namespace App\Http\Controllers\SocialLogs;
 
 use App\Http\Controllers\Controller;
 use App\Models\Campaign;
@@ -7,6 +8,9 @@ use App\Models\SocialPostLog;
 use App\Services\SocialPostLogService;
 use App\Services\PlatformPublishService;
 use Illuminate\Http\Request;
+
+
+
 
 class SocialPostLogController extends Controller
 {
@@ -22,7 +26,6 @@ class SocialPostLogController extends Controller
   {
     $campaign = Campaign::findOrFail($campaignId);
 
-    // Verificar que la campaña pertenece al usuario
     if ($campaign->user_id !== auth()->id()) {
       return response()->json([
         'success' => false,

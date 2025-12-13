@@ -313,6 +313,8 @@ export default function AddPublicationModal({
   };
 
   const onFormSubmit = async (data: any) => {
+
+    console.log(data);
     if (mediaFiles.length === 0) {
       setImageError(t("publications.modal.validation.imageRequired"));
       return;

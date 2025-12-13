@@ -184,7 +184,9 @@
         "publishDate": "Publish Date",
         "publishedOn": "Published On",
         "publications": "Publications",
+        "creating": "Creating",
         "optionalSchedule": "Optional Schedule",
+        "selectSocialAccounts": "Select Accounts",
         "associatedPublicationsRequired":"Associated Publications is required",
         "dragDrop": {
           "title": "Drag and drop to sort",
@@ -230,6 +232,7 @@
         "associatedPublications": "Associated Publications",
         "accountMissingTitle": "Account Disconnected",
         "accountMissingText": "This publication was posted on an account ({{account}}) that is no longer connected. Editing it will create a new version for your current account(s). Proceed?",
+        "selectSocialAccounts": "Select Accounts",
         "dragDrop": {
           "title": "Drag and drop to sort",
           "subtitle": "Upload your multimedia files here"
@@ -293,7 +296,8 @@
         "schedulePublicationRequired":"Schedule Publication is required",
         "descriptionLength":"Description must be at least 10 characters long",
         "hashtagsLength":"Hashtags must be at least 10 characters long",
-        "schedulePublicationLength":"Schedule Publication must be at least 10 characters long"
+        "schedulePublicationLength":"Schedule Publication must be at least 10 characters long",
+        "imageRequired":"Image is required"
       }
     },
     "button":{

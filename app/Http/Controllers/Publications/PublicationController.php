@@ -27,12 +27,9 @@ class PublicationController extends Controller
 {
   public function index(Request $request)
   {
-
     $query = Publication::where('user_id', Auth::id())
-      ->with(['mediaFiles' => function ($query) {
-        $query->with('derivatives')->orderBy('publication_media.order', 'asc');
-      }, 'scheduledPosts.socialAccount', 'socialPostLogs.socialAccount', 'campaigns']);
-
+      ->with(['mediaFiles.derivatives', 'scheduledPosts.socialAccount', 'socialPostLogs.socialAccount', 'campaigns'])
+      ->orderBy('created_at', 'desc');
 
     if ($request->has('status') && $request->status !== 'all') {
       switch ($request->status) {
@@ -61,10 +58,19 @@ class PublicationController extends Controller
     }
 
     if ($request->query('simplified') === 'true') {
-      $publications = $query->orderBy('created_at', 'desc')->get();
+      $publications = $query->get();
     } else {
-      $publications = $query->orderBy('created_at', 'desc')->paginate($request->query('per_page', 7));
+      $perPage = $request->query('per_page', 7);
+      $publications = $query->paginate($perPage);
     }
+
+    $publications->getCollection()->transform(function ($pub) {
+      $pub->mediaFiles->each->append('file_url');
+      $pub->mediaFiles->each(function ($media) {
+        $media->derivatives->each->append('file_url');
+      });
+      return $pub;
+    });
 
     return response()->json([
       'success' => true,
@@ -72,6 +78,7 @@ class PublicationController extends Controller
       'status' => 200
     ]);
   }
+
 
   public function create()
   {
@@ -131,18 +138,15 @@ class PublicationController extends Controller
         foreach ($request->file('media') as $index => $file) {
           $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
           $path = $file->storeAs('publications', $filename, 's3');
-          $absolutePath = Storage::disk('s3')->url($path);
 
           $fileType = str_starts_with($file->getClientMimeType(), 'video/') ? 'video' : 'image';
 
-          // Get youtube_type and duration from request
           $youtubeTypes = $request->input('youtube_types', []);
           $durations = $request->input('durations', []);
 
           $youtubeType = $youtubeTypes[$index] ?? null;
           $duration = isset($durations[$index]) ? (int)$durations[$index] : null;
 
-          // Validate: cannot mark video as 'short' if duration > 60 seconds
           if ($fileType === 'video' && $youtubeType === 'short' && $duration && $duration > 60) {
             throw new \Exception("Video '{$file->getClientOriginalName()}' is {$duration}s long and cannot be marked as a Short (max 60s)");
           }
@@ -151,7 +155,7 @@ class PublicationController extends Controller
             'user_id' => Auth::id(),
             'publication_id' => $publication->id,
             'file_name' => $file->getClientOriginalName(),
-            'file_path' => $absolutePath,
+            'file_path' => $path,
             'file_type' => $fileType,
             'youtube_type' => $fileType === 'video' ? $youtubeType : null,
             'duration' => $fileType === 'video' ? $duration : null,
@@ -171,13 +175,11 @@ class PublicationController extends Controller
           }
 
 
-          // Handle Thumbnail Upload for this new media file
           if ($request->hasFile("thumbnails.{$index}")) {
             $thumbFile = $request->file("thumbnails.{$index}");
             $thumbFilename = Str::uuid() . '_thumb.' . $thumbFile->getClientOriginalExtension();
             $thumbPath = $thumbFile->storeAs('derivatives/thumbnails', $thumbFilename, 's3');
 
-            // DELETE ALL existing thumbnails for this video first
             $existingThumbs = $mediaFile->derivatives()
               ->where('derivative_type', 'thumbnail')
               ->get();
@@ -192,15 +194,14 @@ class PublicationController extends Controller
               $existingThumb->delete();
             }
 
-            // Create new thumbnail for ALL platforms (YouTube, etc.)
             MediaDerivative::create([
               'media_file_id' => $mediaFile->id,
               'derivative_type' => 'thumbnail',
-              'file_path' => Storage::disk('s3')->url($thumbPath),
+              'file_path' => $thumbPath,
               'file_name' => $thumbFilename,
               'mime_type' => $thumbFile->getClientMimeType(),
               'size' => $thumbFile->getSize(),
-              'platform' => 'all', // Works for YouTube and all other platforms
+              'platform' => 'all',
               'resolution' => 'custom',
             ]);
           }
@@ -235,6 +236,7 @@ class PublicationController extends Controller
         'message' => 'Publication created successfully',
         'publication' => $publication,
       ]);
+      
     } catch (\Exception $e) {
       DB::rollBack();
       return response()->json([
@@ -558,15 +560,16 @@ class PublicationController extends Controller
             ->get();
 
           foreach ($existingThumbs as $existingThumb) {
-            // Delete file from storage
-            try {
-              $filePath = str_replace(Storage::disk('s3')->url(''), '', $existingThumb->file_path);
-              Storage::disk('s3')->delete($filePath);
-            } catch (\Exception $e) {
-              Log::warning('Failed to delete old thumbnail file', ['error' => $e->getMessage()]);
+            $filePath = $existingThumb->file_path;
+            if (!empty($filePath)) {
+              try {
+                $filePath = str_replace(Storage::disk('s3')->url(''), '', $existingThumb->file_path);
+                Storage::disk('s3')->delete($filePath);
+              } catch (\Exception $e) {
+                Log::warning('Failed to delete old thumbnail file', ['error' => $e->getMessage()]);
+              }
+              $existingThumb->delete();
             }
-            // Delete database record
-            $existingThumb->delete();
           }
 
           // Create new YouTube thumbnail (replaces all previous)
