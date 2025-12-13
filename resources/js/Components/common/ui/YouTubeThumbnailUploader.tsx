@@ -5,6 +5,8 @@ import { useTranslation } from "react-i18next";
 
 interface YouTubeThumbnailUploaderProps {
   videoId: number;
+  videoFileName?: string;
+  videoPreviewUrl?: string;
   existingThumbnail?: {
     url: string;
     id: number;
@@ -15,6 +17,8 @@ interface YouTubeThumbnailUploaderProps {
 
 export default function YouTubeThumbnailUploader({
   videoId,
+  videoFileName,
+  videoPreviewUrl,
   existingThumbnail,
   onThumbnailChange,
   onThumbnailDelete,
@@ -97,6 +101,29 @@ export default function YouTubeThumbnailUploader({
 
   return (
     <div className="space-y-3">
+      {/* Video Information */}
+      {(videoFileName || videoPreviewUrl) && (
+        <div className={`p-3 rounded-lg border ${borderColor} ${bgColor}`}>
+          <div className="flex items-center gap-3">
+            {videoPreviewUrl && (
+              <div className="flex-shrink-0">
+                <video
+                  src={videoPreviewUrl}
+                  className="w-24 h-16 object-cover rounded border border-gray-300 dark:border-gray-600"
+                  muted
+                />
+              </div>
+            )}
+            <div className="flex-1 min-w-0">
+              <p className={`text-xs font-medium ${textColor} mb-1`}>Video:</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
+                {videoFileName || `Video #${videoId}`}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="flex items-center justify-between">
         <label className={`text-sm font-medium ${textColor}`}>
           YouTube Thumbnail
@@ -166,7 +193,9 @@ export default function YouTubeThumbnailUploader({
           <p className={`text-sm ${textColor} mb-1`}>
             {t("publications.modal.publish.dragDrop.title")}
           </p>
-          <p className="text-xs text-gray-500">{t("publications.modal.publish.dragDrop.subtitle")}</p>
+          <p className="text-xs text-gray-500">
+            {t("publications.modal.publish.dragDrop.subtitle")}
+          </p>
         </div>
       )}
 

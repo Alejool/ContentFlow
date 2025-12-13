@@ -1,9 +1,10 @@
 // hooks/usePublishPublication.ts
-import { useState, useCallback, useEffect, useMemo } from "react";
-import axios from "axios";
-import { toast } from "react-hot-toast";
+import { useCampaignStore } from "@/stores/campaignStore";
+import { SocialAccount, useAccountsStore } from "@/stores/socialAccountsStore";
 import { Publication } from "@/types/Publication";
-import { useAccountsStore, SocialAccount } from "@/stores/socialAccountsStore";
+import axios from "axios";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { toast } from "react-hot-toast";
 
 export interface PublishPublicationState {
   selectedPlatforms: number[];
@@ -23,7 +24,7 @@ export interface UsePublishPublicationReturn extends PublishPublicationState {
     publicationId: number,
     accountId: number,
     platform: string
-  ) => Promise<void>;
+  ) => Promise<boolean>;
   togglePlatform: (accountId: number) => void;
   selectAll: () => void;
   deselectAll: () => void;
@@ -50,6 +51,9 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
   // Obtener cuentas del store global
   const { accounts } = useAccountsStore();
 
+  // Obtener campañas del store global
+  const { campaigns, fetchCampaigns } = useCampaignStore();
+
   // Filtrar solo cuentas activas
   const activeAccounts = useMemo(
     () =>
@@ -61,6 +65,13 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
         })),
     [accounts]
   );
+
+  // Cargar campañas si no están disponibles
+  useEffect(() => {
+    if (campaigns.length === 0) {
+      fetchCampaigns();
+    }
+  }, [campaigns.length, fetchCampaigns]);
 
   // Estado específico de publicación
   const [selectedPlatforms, setSelectedPlatforms] = useState<number[]>([]);

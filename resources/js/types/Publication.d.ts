@@ -61,6 +61,21 @@ export type MediaFile = {
   size: number;
   created_at: string;
   updated_at: string;
+  metadata?: {
+    thumbnail_url?: string;
+    duration?: number;
+    width?: number;
+    height?: number;
+    [key: string]: any;
+  };
+  derivatives?: Array<{
+    id: number;
+    derivative_type: string;
+    file_type: string;
+    file_path: string;
+    mime_type?: string;
+    [key: string]: any;
+  }>;
   pivot?: {
     publication_id: number;
     media_file_id: number;

@@ -243,7 +243,7 @@ export default function PublishPublicationModal({
                       theme === "dark" ? "text-gray-400" : "text-gray-600"
                     }`}
                   >
-                   {t("publications.modal.publish.noConnectedAccounts")}
+                    {t("publications.modal.publish.noConnectedAccounts")}
                     <br />
                     {t("publications.modal.publish.connectAccounts")}
                   </p>
@@ -370,10 +370,19 @@ export default function PublishPublicationModal({
                         metadata: video.metadata,
                       });
 
+                      // Get video preview URL
+                      const videoPreviewUrl = video.file_path?.startsWith(
+                        "http"
+                      )
+                        ? video.file_path
+                        : `/storage/${video.file_path}`;
+
                       return (
                         <YouTubeThumbnailUploader
                           key={videoId}
                           videoId={videoId}
+                          videoFileName={video.file_name}
+                          videoPreviewUrl={videoPreviewUrl}
                           existingThumbnail={existingThumbnail || null}
                           onThumbnailChange={(file: File | null) => {
                             console.log(
@@ -420,7 +429,9 @@ export default function PublishPublicationModal({
                 ) : (
                   <>
                     <Share2 className="w-4 h-4" />
-                    {t("publications.modal.publish.button.publish")}  {selectedPlatforms.length} {t("publications.modal.publish.platforms")}
+                    {t("publications.modal.publish.button.publish")}{" "}
+                    {selectedPlatforms.length}{" "}
+                    {t("publications.modal.publish.platforms")}
                   </>
                 )}
               </button>
