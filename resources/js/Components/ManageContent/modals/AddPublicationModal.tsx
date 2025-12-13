@@ -9,18 +9,18 @@ import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
 // Componentes reutilizables
+import SocialAccountsSection from "@/Components/ManageContent/Publication/common/add/SocialAccountsSection";
 import ModalHeader from "@/Components/ManageContent/modals/common/ModalHeader";
 import ScheduleSection from "@/Components/ManageContent/modals/common/ScheduleSection";
-import SocialAccountsSection from "@/Components/ManageContent/modals/common/add/SocialAccountsSection";
 import Input from "@/Components/common/Modern/Input";
 import Select from "@/Components/common/Modern/Select";
 import Textarea from "@/Components/common/Modern/Textarea";
 import { FileText, Hash, Target, Upload } from "lucide-react";
 
 // Componentes nuevos específicos
-import AddMoreButton from "@/Components/ManageContent/modals/common/add/AddMoreButton";
-import ImagePreviewItem from "@/Components/ManageContent/modals/common/add/ImagePreviewItem";
-import VideoPreviewItem from "@/Components/ManageContent/modals/common/add/VideoPreviewItem";
+import AddMoreButton from "@/Components/ManageContent/Publication/common/add/AddMoreButton";
+import ImagePreviewItem from "@/Components/ManageContent/Publication/common/add/ImagePreviewItem";
+import VideoPreviewItem from "@/Components/ManageContent/Publication/common/add/VideoPreviewItem";
 
 // Hooks
 import { useCampaigns } from "@/Hooks/campaign/useCampaigns";

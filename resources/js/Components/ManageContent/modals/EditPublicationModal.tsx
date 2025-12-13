@@ -18,12 +18,12 @@ import { publicationSchema } from "@/schemas/publication";
 import { Publication } from "@/types/Publication";
 
 // Componentes
+import SocialAccountsSection from "@/Components/ManageContent/Publication/common/add/SocialAccountsSection";
+import ContentSection from "@/Components/ManageContent/Publication/common/edit/ContentSection";
+import MediaUploadSection from "@/Components/ManageContent/Publication/common/edit/MediaUploadSection";
 import ModalFooter from "@/Components/ManageContent/modals/common/ModalFooter";
 import ModalHeader from "@/Components/ManageContent/modals/common/ModalHeader";
 import ScheduleSection from "@/Components/ManageContent/modals/common/ScheduleSection";
-import SocialAccountsSection from "@/Components/ManageContent/modals/common/add/SocialAccountsSection";
-import ContentSection from "@/Components/ManageContent/modals/common/edit/ContentSection";
-import MediaUploadSection from "@/Components/ManageContent/modals/common/edit/MediaUploadSection";
 import YouTubeThumbnailUploader from "@/Components/common/ui/YouTubeThumbnailUploader";
 
 type EditPublicationFormData = {
