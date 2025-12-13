@@ -1,33 +1,34 @@
-import Input from "@/Components/common/Modern/Input";
-import ModernDatePicker from "@/Components/common/ui/ModernDatePicker";
 import { useTheme } from "@/Hooks/useTheme";
 import { publicationSchema } from "@/schemas/publication";
+import { usePublicationStore } from "@/stores/publicationStore";
+import { useAccountsStore } from "@/stores/socialAccountsStore";
 import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios";
-import { format } from "date-fns";
-import {
-  AlertTriangle,
-  Clock,
-  FileImage,
-  FileText,
-  Hash,
-  Rocket,
-  Sparkles,
-  Target,
-  Upload,
-  X,
-} from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
+// Componentes reutilizables
+import ModalHeader from "@/Components/ManageContent/modals/common/ModalHeader";
+import ScheduleSection from "@/Components/ManageContent/modals/common/ScheduleSection";
+import SocialAccountsSection from "@/Components/ManageContent/modals/common/add/SocialAccountsSection";
+import Input from "@/Components/common/Modern/Input";
 import Select from "@/Components/common/Modern/Select";
 import Textarea from "@/Components/common/Modern/Textarea";
-import { usePublicationStore } from "@/stores/publicationStore";
-import { useAccountsStore } from "@/stores/socialAccountsStore";
+import { FileText, Hash, Target, Upload } from "lucide-react";
 
-interface AddCampaignModalProps {
+// Componentes nuevos específicos
+import AddMoreButton from "@/Components/ManageContent/modals/common/add/AddMoreButton";
+import ImagePreviewItem from "@/Components/ManageContent/modals/common/add/ImagePreviewItem";
+import VideoPreviewItem from "@/Components/ManageContent/modals/common/add/VideoPreviewItem";
+
+// Hooks
+import { useCampaigns } from "@/Hooks/campaign/useCampaigns";
+
+// Iconos
+import { AlertTriangle, Rocket } from "lucide-react";
+
+interface AddPublicationModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: any) => void;
@@ -58,12 +59,14 @@ export default function AddPublicationModal({
   isOpen,
   onClose,
   onSubmit,
-}: AddCampaignModalProps) {
+}: AddPublicationModalProps) {
   const { t } = useTranslation();
   const { theme } = useTheme();
+  const { addPublication } = usePublicationStore();
+  const { accounts: socialAccounts, fetchAccounts: fetchSocialAccounts } =
+    useAccountsStore();
+  const { campaigns } = useCampaigns();
 
-  // Use store
-  const { addPublication, fetchPublications } = usePublicationStore();
   const [mediaFiles, setMediaFiles] = useState<File[]>([]);
   const [mediaPreviews, setMediaPreviews] = useState<string[]>([]);
   const [thumbnails, setThumbnails] = useState<Record<number, File>>({});
@@ -73,32 +76,11 @@ export default function AddPublicationModal({
   const [imageError, setImageError] = useState<string | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { accounts: socialAccounts, fetchAccounts: fetchSocialAccounts } =
-    useAccountsStore();
   const [accountSchedules, setAccountSchedules] = useState<
     Record<number, string>
   >({});
   const [activePopover, setActivePopover] = useState<number | null>(null);
-  const [campaigns, setCampaigns] = useState<any[]>([]);
 
-  useEffect(() => {
-    if (isOpen) {
-      fetchCampaigns();
-    }
-  }, [isOpen]);
-
-  const fetchCampaigns = async () => {
-    try {
-      const response = await axios.get("/campaigns");
-      if (response.data?.campaigns?.data) {
-        setCampaigns(response.data.campaigns.data);
-      } else if (Array.isArray(response.data?.campaigns)) {
-        setCampaigns(response.data.campaigns);
-      }
-    } catch (error) {
-      console.error("Failed to fetch campaigns", error);
-    }
-  };
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const schema = useMemo(() => publicationSchema(t), [t]);
@@ -110,13 +92,21 @@ export default function AddPublicationModal({
     watch,
     setValue,
     reset,
-    trigger,
   } = useForm({
     resolver: zodResolver(schema),
     mode: "onChange",
+    defaultValues: {
+      title: "",
+      description: "",
+      goal: "",
+      hashtags: "",
+      scheduled_at: "",
+      social_accounts: [],
+      campaign_id: "",
+    },
   });
 
-  const watchedadd = watch();
+  const watched = watch();
 
   useEffect(() => {
     if (isOpen) {
@@ -124,42 +114,14 @@ export default function AddPublicationModal({
     }
   }, [isOpen]);
 
+  // Estilos
   const modalBg = theme === "dark" ? "bg-neutral-800" : "bg-white";
-  const modalHeaderBg =
-    theme === "dark"
-      ? "bg-gradient-to-r from-neutral-900 to-neutral-800"
-      : "bg-gradient-to-r from-gray-50 to-white";
-  const modalHeaderBorder =
-    theme === "dark" ? "border-neutral-700" : "border-gray-100";
   const modalFooterBg =
     theme === "dark"
       ? "bg-neutral-900/50 border-neutral-700"
       : "bg-gray-50 border-gray-100";
-  const textPrimary = theme === "dark" ? "text-gray-100" : "text-gray-900";
-  const textSecondary = theme === "dark" ? "text-gray-400" : "text-gray-500";
-  const textTertiary = theme === "dark" ? "text-gray-500" : "text-gray-400";
   const borderColor =
     theme === "dark" ? "border-neutral-600" : "border-gray-200";
-  const focusBorder =
-    theme === "dark"
-      ? "focus:border-primary-500 focus:ring-primary-500/20"
-      : "focus:border-primary-500 focus:ring-primary-200";
-  const errorBorder =
-    theme === "dark"
-      ? "border-primary-500 focus:border-primary-500 focus:ring-primary-500/20"
-      : "border-primary-300 focus:border-primary-500 focus:ring-primary-200";
-  const inputBg = theme === "dark" ? "bg-neutral-700" : "bg-white";
-  const labelText = theme === "dark" ? "text-gray-300" : "text-gray-700";
-  const iconColor = theme === "dark" ? "text-primary-400" : "text-primary-600";
-  const uploadBg = theme === "dark" ? "bg-neutral-700" : "bg-gray-50";
-  const uploadBorder =
-    theme === "dark"
-      ? "border-neutral-600 hover:border-primary-400"
-      : "border-gray-200 hover:border-primary-300";
-  const dragOverBg =
-    theme === "dark"
-      ? "bg-primary-900/20 border-primary-400"
-      : "bg-primary-50 border-primary-500";
   const cancelButton =
     theme === "dark"
       ? "text-gray-300 hover:bg-neutral-700"
@@ -188,49 +150,49 @@ export default function AddPublicationModal({
   };
 
   const handleFileChange = async (files: FileList | null) => {
-    if (files && files.length > 0) {
-      const newFiles = Array.from(files);
-      const validFiles: File[] = [];
-      const newPreviews: string[] = [];
-      let error = null;
+    if (!files || files.length === 0) return;
 
-      for (const file of newFiles) {
-        const validationError = validateFile(file, t);
-        if (validationError) {
-          error = validationError;
-          break;
-        }
-        validFiles.push(file);
-        newPreviews.push(URL.createObjectURL(file));
+    const newFiles = Array.from(files);
+    const validFiles: File[] = [];
+    const newPreviews: string[] = [];
+    let error = null;
+
+    for (const file of newFiles) {
+      const validationError = validateFile(file, t);
+      if (validationError) {
+        error = validationError;
+        break;
       }
+      validFiles.push(file);
+      newPreviews.push(URL.createObjectURL(file));
+    }
 
-      if (error) {
-        setImageError(error);
-        return;
-      }
+    if (error) {
+      setImageError(error);
+      return;
+    }
 
-      setImageError(null);
-      const currentLength = mediaFiles.length;
-      setMediaFiles((prev) => [...prev, ...validFiles]);
-      setMediaPreviews((prev) => [...prev, ...newPreviews]);
+    setImageError(null);
+    const currentLength = mediaFiles.length;
+    setMediaFiles((prev) => [...prev, ...validFiles]);
+    setMediaPreviews((prev) => [...prev, ...newPreviews]);
 
-      // Extract duration for videos
-      for (let i = 0; i < validFiles.length; i++) {
-        const file = validFiles[i];
-        if (file.type.startsWith("video/")) {
-          try {
-            const duration = await getVideoDuration(file);
-            const index = currentLength + i;
-            setVideoMetadata((prev) => ({
-              ...prev,
-              [index]: {
-                duration,
-                youtubeType: duration <= 60 ? "short" : "video",
-              },
-            }));
-          } catch (err) {
-            console.error("Failed to get video duration:", err);
-          }
+    // Extract duration for videos
+    for (let i = 0; i < validFiles.length; i++) {
+      const file = validFiles[i];
+      if (file.type.startsWith("video/")) {
+        try {
+          const duration = await getVideoDuration(file);
+          const index = currentLength + i;
+          setVideoMetadata((prev) => ({
+            ...prev,
+            [index]: {
+              duration,
+              youtubeType: duration <= 60 ? "short" : "video",
+            },
+          }));
+        } catch (err) {
+          console.error("Failed to get video duration:", err);
         }
       }
     }
@@ -304,8 +266,38 @@ export default function AddPublicationModal({
     setActivePopover(activePopover === accountId ? null : accountId);
   };
 
+  const handleAccountToggle = (accountId: number) => {
+    const current = watched.social_accounts || [];
+    const id = Number(accountId);
+    const isChecked = current.includes(id);
+
+    if (!isChecked) {
+      setValue("social_accounts", [...current, id]);
+    } else {
+      setValue(
+        "social_accounts",
+        current.filter((x: number) => x !== id)
+      );
+      const newScheds = { ...accountSchedules };
+      delete newScheds[id];
+      setAccountSchedules(newScheds);
+    }
+  };
+
+  const handleScheduleChange = (accountId: number, schedule: string) => {
+    setAccountSchedules((prev) => ({
+      ...prev,
+      [accountId]: schedule,
+    }));
+  };
+
+  const handleScheduleRemove = (accountId: number) => {
+    const newSchedules = { ...accountSchedules };
+    delete newSchedules[accountId];
+    setAccountSchedules(newSchedules);
+  };
+
   const onFormSubmit = async (data: any) => {
-    console.log(data);
     if (mediaFiles.length === 0) {
       setImageError(t("publications.modal.validation.imageRequired"));
       return;
@@ -321,11 +313,9 @@ export default function AddPublicationModal({
 
       mediaFiles.forEach((file, index) => {
         formData.append(`media[${index}]`, file);
-        // Append corresponding thumbnail if exists
         if (thumbnails[index]) {
           formData.append(`thumbnails[${index}]`, thumbnails[index]);
         }
-        // Append video metadata if exists
         if (videoMetadata[index]) {
           formData.append(
             `youtube_types[${index}]`,
@@ -358,15 +348,12 @@ export default function AddPublicationModal({
         formData.append("campaign_id", data.campaign_id);
       }
 
-      // Use axios directly as per store pattern or implement addPublication in store to handle API
-      // Since store's addPublication is currently synchronous (just state update), we do API call here
       const response = await axios.post("/publications", formData);
 
       if (response.data && response.data.publication) {
-        // Update store
         addPublication(response.data.publication);
         if (onSubmit) {
-          onSubmit(true); // Notify parent (ManageContentPage)
+          onSubmit(true);
         }
         handleClose();
         toast.success(
@@ -392,15 +379,59 @@ export default function AddPublicationModal({
     setImageError(null);
     setIsSubmitting(false);
     onClose();
-    // Refresh campaigns list if we are in campaigns tab?
-    // Actually ManageContentPage handles refresh via onSubmit callback if needed
   };
 
   if (!isOpen) return null;
 
+  const renderMediaPreviews = () => {
+    if (mediaPreviews.length === 0) return null;
+
+    return (
+      <div className="grid grid-cols-2 gap-4 w-full">
+        {mediaPreviews.map((preview, index) => {
+          const file = mediaFiles[index];
+          const isVideo = file.type.startsWith("video");
+
+          if (isVideo) {
+            return (
+              <VideoPreviewItem
+                key={index}
+                preview={preview}
+                index={index}
+                duration={videoMetadata[index]?.duration}
+                youtubeType={videoMetadata[index]?.youtubeType || "video"}
+                thumbnail={thumbnails[index]}
+                onRemove={() => removeMedia(index)}
+                onThumbnailChange={(file) =>
+                  setThumbnails((prev) => ({ ...prev, [index]: file }))
+                }
+                onYoutubeTypeChange={(type) =>
+                  setVideoMetadata((prev) => ({
+                    ...prev,
+                    [index]: { ...prev[index], youtubeType: type },
+                  }))
+                }
+              />
+            );
+          }
+
+          return (
+            <ImagePreviewItem
+              key={index}
+              preview={preview}
+              index={index}
+              onRemove={() => removeMedia(index)}
+            />
+          );
+        })}
+        <AddMoreButton onClick={() => fileInputRef.current?.click()} />
+      </div>
+    );
+  };
+
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6  ${
+      className={`fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 ${
         theme === "dark" ? "text-white" : "text-gray-900"
       }`}
     >
@@ -409,50 +440,25 @@ export default function AddPublicationModal({
           theme === "dark" ? "bg-black/70" : "bg-gray-900/60"
         } backdrop-blur-sm transition-opacity`}
         onClick={handleClose}
-      ></div>
+      />
 
       <div
         className={`relative w-full max-w-4xl ${modalBg} rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300`}
       >
-        <div
-          className={`px-8 py-6 border-b ${modalHeaderBorder} ${modalHeaderBg} flex items-center justify-between sticky top-0 z-10`}
-        >
-          <div>
-            <h2
-              className={`text-2xl font-bold ${textPrimary} flex items-center gap-2`}
-            >
-              <Sparkles className={`w-6 h-6 ${iconColor}`} />
-              {t("publications.modal.add.title") || "New Publication"}
-            </h2>
-            <p className={`${textSecondary} mt-1`}>
-              {t("publications.modal.add.subtitle") ||
-                "Create and schedule your content"}
-            </p>
-          </div>
-          <button
-            onClick={handleClose}
-            className={`p-2 hover:${
-              theme === "dark" ? "bg-neutral-700" : "bg-gray-100"
-            } rounded-full transition-colors ${textTertiary} hover:${
-              theme === "dark" ? "text-gray-200" : "text-gray-600"
-            }`}
-          >
-            <X className="w-6 h-6" />
-          </button>
-        </div>
+        <ModalHeader
+          theme={theme}
+          t={t}
+          onClose={handleClose}
+          title="publications.modal.add.title"
+          subtitle="publications.modal.add.subtitle"
+        />
 
         <div className="flex-1 p-8 custom-scrollbar">
           <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Columna izquierda: Medios y programación */}
               <div className="space-y-6">
                 <div className="form-group">
-                  <label
-                    className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
-                  >
-                    <FileImage className={`w-4 h-4 ${iconColor}`} />
-                    {t("publications.modal.add.image")}
-                    <span className="text-primary-500 ml-1">*</span>
-                  </label>
                   <div
                     className={`relative group cursor-pointer transition-all duration-300 ${
                       isDragOver
@@ -471,194 +477,19 @@ export default function AddPublicationModal({
                     <div
                       className={`min-h-[200px] rounded-lg border-2 border-dashed flex flex-col items-center justify-center p-6 text-center transition-colors overflow-hidden ${
                         imageError
-                          ? `${
-                              theme === "dark"
-                                ? "border-primary-500 bg-primary-900/20"
-                                : "border-primary-300 bg-primary-50"
-                            }`
+                          ? theme === "dark"
+                            ? "border-primary-500 bg-primary-900/20"
+                            : "border-primary-300 bg-primary-50"
                           : isDragOver
-                          ? `${dragOverBg}`
-                          : `${uploadBorder} hover:${
-                              theme === "dark"
-                                ? "bg-neutral-600"
-                                : "bg-gray-100"
-                            } ${uploadBg}`
+                          ? theme === "dark"
+                            ? "bg-primary-900/20 border-primary-400"
+                            : "bg-primary-50 border-primary-500"
+                          : theme === "dark"
+                          ? "border-neutral-600 hover:border-primary-400 bg-neutral-700"
+                          : "border-gray-200 hover:border-primary-300 bg-gray-50"
                       }`}
                     >
-                      {mediaPreviews.length > 0 ? (
-                        <div className="grid grid-cols-2 gap-4 w-full">
-                          {mediaPreviews.map((preview, index) => (
-                            <div
-                              key={index}
-                              className="relative group/item aspect-video border rounded-lg overflow-hidden bg-gray-900"
-                            >
-                              {mediaFiles[index].type.startsWith("video") ? (
-                                <>
-                                  <video
-                                    src={preview}
-                                    className="w-full h-full object-cover opacity-80"
-                                  />
-                                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
-                                    <span className="text-white/80 text-xs font-medium bg-black/50 px-2 py-1 rounded">
-                                      Video
-                                    </span>
-                                    <div className="relative">
-                                      <input
-                                        type="file"
-                                        id={`thumbnail-${index}`}
-                                        className="hidden"
-                                        accept="image/*"
-                                        onChange={(e) => {
-                                          const file = e.target.files?.[0];
-                                          if (file) {
-                                            setThumbnails((prev) => ({
-                                              ...prev,
-                                              [index]: file,
-                                            }));
-                                          }
-                                        }}
-                                        onClick={(e) => e.stopPropagation()}
-                                      />
-                                      <label
-                                        htmlFor={`thumbnail-${index}`}
-                                        className="cursor-pointer bg-white/10 hover:bg-white/20 text-white text-xs px-3 py-1.5 rounded-full backdrop-blur-sm transition-colors flex items-center gap-1 border border-white/20"
-                                        onClick={(e) => e.stopPropagation()}
-                                      >
-                                        <FileImage className="w-3 h-3" />
-                                        {thumbnails[index]
-                                          ? "Change Thumb"
-                                          : "Add Thumb"}
-                                      </label>
-                                    </div>
-                                  </div>
-                                  {thumbnails[index] && (
-                                    <div className="absolute top-2 left-2 w-8 h-8 rounded border border-white/30 overflow-hidden shadow-lg z-10">
-                                      <img
-                                        src={URL.createObjectURL(
-                                          thumbnails[index]
-                                        )}
-                                        className="w-full h-full object-cover"
-                                      />
-                                    </div>
-                                  )}
-                                </>
-                              ) : (
-                                <img
-                                  src={preview}
-                                  alt={`Preview ${index}`}
-                                  className="w-full h-full object-cover"
-                                />
-                              )}
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  removeMedia(index);
-                                }}
-                                className="absolute top-2 right-2 p-1.5 bg-red-500/80 text-white rounded-full hover:bg-red-600 transition-colors opacity-0 group-hover/item:opacity-100 backdrop-blur-sm"
-                              >
-                                <X className="w-3 h-3" />
-                              </button>
-
-                              {mediaFiles[index].type.startsWith("video") &&
-                                videoMetadata[index] && (
-                                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2 space-y-1">
-                                    <div className="flex items-center justify-between text-xs text-white">
-                                      <span className="font-medium">
-                                        {Math.floor(
-                                          videoMetadata[index].duration / 60
-                                        )}
-                                        :
-                                        {String(
-                                          videoMetadata[index].duration % 60
-                                        ).padStart(2, "0")}
-                                      </span>
-                                      <div className="flex gap-1">
-                                        <button
-                                          type="button"
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            if (
-                                              videoMetadata[index].duration <=
-                                              60
-                                            ) {
-                                              setVideoMetadata((prev) => ({
-                                                ...prev,
-                                                [index]: {
-                                                  ...prev[index],
-                                                  youtubeType: "short",
-                                                },
-                                              }));
-                                            }
-                                          }}
-                                          disabled={
-                                            videoMetadata[index].duration > 60
-                                          }
-                                          className={`px-2 py-0.5 rounded text-[10px] font-medium transition-colors ${
-                                            videoMetadata[index].youtubeType ===
-                                            "short"
-                                              ? "bg-primary-500 text-white"
-                                              : videoMetadata[index].duration >
-                                                60
-                                              ? "bg-gray-600/50 text-gray-400 cursor-not-allowed"
-                                              : "bg-white/20 text-white hover:bg-white/30"
-                                          }`}
-                                          title={
-                                            videoMetadata[index].duration > 60
-                                              ? `Video too long for Short (${videoMetadata[index].duration}s > 60s)`
-                                              : ""
-                                          }
-                                        >
-                                          Short
-                                        </button>
-                                        <button
-                                          type="button"
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            setVideoMetadata((prev) => ({
-                                              ...prev,
-                                              [index]: {
-                                                ...prev[index],
-                                                youtubeType: "video",
-                                              },
-                                            }));
-                                          }}
-                                          className={`px-2 py-0.5 rounded text-[10px] font-medium transition-colors ${
-                                            videoMetadata[index].youtubeType ===
-                                            "video"
-                                              ? "bg-primary-500 text-white"
-                                              : "bg-white/20 text-white hover:bg-white/30"
-                                          }`}
-                                        >
-                                          Video
-                                        </button>
-                                      </div>
-                                    </div>
-                                    {videoMetadata[index].duration > 60 &&
-                                      videoMetadata[index].youtubeType ===
-                                        "short" && (
-                                        <div className="text-[9px] text-yellow-300 flex items-center gap-1">
-                                          <AlertTriangle className="w-2.5 h-2.5" />
-                                          Too long for Short
-                                        </div>
-                                      )}
-                                  </div>
-                                )}
-                            </div>
-                          ))}
-                          <div
-                            className="flex items-center justify-center aspect-video border-2 border-dashed border-gray-300 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
-                            onClick={() => fileInputRef.current?.click()}
-                          >
-                            <div className="text-center">
-                              <Upload className="w-6 h-6 mx-auto text-gray-400" />
-                              <span className="text-xs text-gray-500">
-                                Add more
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      ) : (
+                      {renderMediaPreviews() || (
                         <div className="space-y-4">
                           <div
                             className={`w-16 h-16 rounded-full ${
@@ -667,13 +498,13 @@ export default function AddPublicationModal({
                                 : "bg-primary-100"
                             } flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300`}
                           >
-                            <Upload className={`w-8 h-8 ${iconColor}`} />
+                            <Upload className="w-8 h-8 text-primary-500" />
                           </div>
                           <div>
-                            <p className={`${textPrimary} font-medium text-lg`}>
+                            <p className="font-medium text-lg">
                               {t("publications.modal.add.dragDrop.title")}
                             </p>
-                            <p className={`${textSecondary} text-sm mt-1`}>
+                            <p className="text-sm mt-1">
                               {t("publications.modal.add.dragDrop.subtitle")}
                             </p>
                           </div>
@@ -697,338 +528,124 @@ export default function AddPublicationModal({
                   )}
                 </div>
 
-                <div className="form-group">
-                  <Input
-                    id="hashtags"
-                    label={t("publications.modal.add.hashtags")}
-                    type="text"
-                    register={register}
-                    name="hashtags"
-                    placeholder={t(
-                      "publications.modal.add.placeholders.hashtags"
-                    )}
-                    error={errors.hashtags?.message as string}
-                    onChange={handleHashtagChange}
-                    icon={Hash}
+                <ScheduleSection
+                  scheduledAt={watched.scheduled_at}
+                  theme={theme}
+                  t={t}
+                  onScheduleChange={(date) => setValue("scheduled_at", date)}
+                />
+
+                {watched.scheduled_at && (
+                  <SocialAccountsSection
+                    socialAccounts={socialAccounts}
+                    selectedAccounts={watched.social_accounts || []}
+                    accountSchedules={accountSchedules}
                     theme={theme}
-                    variant="filled"
-                    size="md"
-                    hint={`${
-                      watchedadd.hashtags
-                        ? watchedadd.hashtags
-                            .split(" ")
-                            .filter((tag: string) => tag.startsWith("#")).length
-                        : 0
-                    }/10 hashtags`}
+                    t={t}
+                    onAccountToggle={handleAccountToggle}
+                    onScheduleChange={handleScheduleChange}
+                    onScheduleRemove={handleScheduleRemove}
                   />
-                  <div className="mt-1 flex justify-between text-xs">
-                    <span className={textTertiary}>
-                      {watchedadd.hashtags
-                        ? watchedadd.hashtags
-                            .split(" ")
-                            .filter((tag: string) => tag.startsWith("#")).length
-                        : 0}
-                      /10 hashtags
-                    </span>
-                    <span className={textTertiary}>
-                      {watchedadd.hashtags?.length || 0} caracteres
-                    </span>
-                  </div>
-                </div>
-
-                <div className="form-group">
-                  <ModernDatePicker
-                    selected={
-                      watch("scheduled_at")
-                        ? new Date(watch("scheduled_at")!)
-                        : null
-                    }
-                    onChange={(date: Date | null) => {
-                      setValue(
-                        "scheduled_at",
-                        date ? format(date, "yyyy-MM-dd'T'HH:mm") : ""
-                      );
-                    }}
-                    showTimeSelect
-                    placeholder={
-                      t("publications.modal.add.schedulePublication") ||
-                      "Schedule Publication"
-                    }
-                    dateFormat="Pp"
-                    minDate={new Date()}
-                    withPortal
-                    size="md"
-                    label={
-                      t("publications.modal.add.schedulePublication") ||
-                      "Schedule Publication"
-                    }
-                    variant="default"
-                    align="left"
-                    className="w-full"
-                    popperPlacement="bottom-start"
-                  />
-                  <p className={`text-xs mt-1 ${textTertiary}`}>
-                    {t("publications.modal.add.optionalSchedule")}
-                  </p>
-                </div>
-
-                <div className="form-group animate-in fade-in slide-in-from-top-3">
-                  <Select
-                    id="campaign_id"
-                    label={
-                      t("publications.modal.edit.addCampaign") ||
-                      "Add to Campaign"
-                    }
-                    options={(campaigns || []).map((campaign: any) => ({
-                      value: campaign.id,
-                      label:
-                        campaign.name ||
-                        campaign.title ||
-                        `Campaign ${campaign.id}`,
-                    }))}
-                    register={register}
-                    name="campaign_id"
-                    placeholder={t("common.select") || "Select a campaign..."}
-                    error={errors.campaign_id?.message as string}
-                    icon={Target}
-                    theme={theme}
-                    variant="filled"
-                    size="md"
-                    clearable
-                  />
-                </div>
-
-                {watchedadd.scheduled_at && (
-                  <div className="form-group animate-in fade-in slide-in-from-top-2">
-                    <label
-                      className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
-                    >
-                      <Target className={`w-4 h-4 ${iconColor}`} />
-                      {t("publications.modal.add.selectSocialAccounts")}
-                    </label>
-                    <div className="grid grid-cols-2 gap-3">
-                      {socialAccounts.map((account) => {
-                        if (
-                          !watchedadd?.social_accounts ||
-                          watchedadd.social_accounts.length === 0
-                        ) {
-                          return null;
-                        }
-                        const isChecked =
-                          watchedadd?.social_accounts?.includes(account.id) ||
-                          false;
-                        const customSchedule = accountSchedules[account.id];
-
-                        return (
-                          <div
-                            key={account.id}
-                            className={`relative flex items-center p-3 rounded-lg border transition-all ${
-                              isChecked
-                                ? `border-primary-500 bg-primary-50 dark:bg-primary-900/20`
-                                : `${borderColor} ${inputBg}`
-                            }`}
-                          >
-                            <label className="flex items-center gap-3 flex-1 cursor-pointer">
-                              <input
-                                type="checkbox"
-                                value={account.id}
-                                {...register("social_accounts")}
-                                onChange={(e) => {
-                                  const currentAccounts =
-                                    watchedadd.social_accounts || [];
-                                  const numericId = Number(account.id);
-                                  if (e.target.checked) {
-                                    setValue("social_accounts", [
-                                      ...currentAccounts.map(Number),
-                                      numericId,
-                                    ]);
-                                  } else {
-                                    setValue(
-                                      "social_accounts",
-                                      currentAccounts
-                                        .map(Number)
-                                        .filter(
-                                          (id: number) => id !== numericId
-                                        )
-                                    );
-                                    const newSchedules = {
-                                      ...accountSchedules,
-                                    };
-                                    delete newSchedules[numericId];
-                                    setAccountSchedules(newSchedules);
-                                  }
-                                }}
-                                className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
-                              />
-                              <div className="flex flex-col">
-                                <span
-                                  className={`text-sm font-medium ${textPrimary}`}
-                                >
-                                  {account.platform}
-                                </span>
-                                {customSchedule && isChecked && (
-                                  <span className="text-xs text-primary-600 dark:text-primary-400 flex items-center gap-1">
-                                    <Clock className="w-3 h-3" />
-                                    {new Date(customSchedule).toLocaleString(
-                                      [],
-                                      { dateStyle: "short", timeStyle: "short" }
-                                    )}
-                                  </span>
-                                )}
-                              </div>
-                            </label>
-
-                            {isChecked && (
-                              <div className="ml-2">
-                                <button
-                                  type="button"
-                                  onClick={() =>
-                                    toggleSchedulePopover(account.id)
-                                  }
-                                  className={`p-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 ${
-                                    customSchedule
-                                      ? "text-primary-500"
-                                      : textSecondary
-                                  }`}
-                                  title="Set individual time"
-                                >
-                                  <Clock className="w-4 h-4" />
-                                </button>
-
-                                {activePopover === account.id && (
-                                  <div
-                                    className={`absolute right-0 top-full mt-2 z-50 p-4 rounded-lg shadow-xl border w-64 ${modalBg} ${borderColor} animate-in fade-in zoom-in-95`}
-                                  >
-                                    <div className="flex justify-between items-center mb-3">
-                                      <h4
-                                        className={`text-sm font-semibold ${textPrimary}`}
-                                      >
-                                        Schedule for {account.platform}
-                                      </h4>
-                                      <button
-                                        type="button"
-                                        onClick={() => setActivePopover(null)}
-                                      >
-                                        <X
-                                          className={`w-4 h-4 ${textSecondary}`}
-                                        />
-                                      </button>
-                                    </div>
-                                    <ModernDatePicker
-                                      selected={
-                                        customSchedule
-                                          ? new Date(customSchedule)
-                                          : null
-                                      }
-                                      onChange={(date: Date | null) => {
-                                        setAccountSchedules((prev) => ({
-                                          ...prev,
-                                          [account.id]: date
-                                            ? format(date, "yyyy-MM-dd'T'HH:mm")
-                                            : "",
-                                        }));
-                                      }}
-                                      showTimeSelect
-                                      placeholder="Select date & time"
-                                      dateFormat="Pp"
-                                      minDate={new Date()}
-                                      withPortal
-                                      popperPlacement="bottom-start"
-                                    />
-                                    <div className="flex justify-end gap-2">
-                                      <button
-                                        type="button"
-                                        onClick={() => {
-                                          const newSchedules = {
-                                            ...accountSchedules,
-                                          };
-                                          delete newSchedules[account.id];
-                                          setAccountSchedules(newSchedules);
-                                          setActivePopover(null);
-                                        }}
-                                        className="text-xs text-primary-500 hover:text-primary-700 font-medium px-2 py-1"
-                                      >
-                                        Clear
-                                      </button>
-                                      <button
-                                        type="button"
-                                        onClick={() => setActivePopover(null)}
-                                        className="text-xs bg-primary-600 text-white px-3 py-1.5 rounded hover:bg-primary-700"
-                                      >
-                                        Done
-                                      </button>
-                                    </div>
-                                  </div>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
-                      {socialAccounts.length === 0 && (
-                        <p className={`col-span-2 text-sm ${textSecondary}`}>
-                          No connected accounts found.
-                        </p>
-                      )}
-                    </div>
-                  </div>
                 )}
               </div>
 
+              {/* Columna derecha: Contenido */}
               <div className="space-y-6">
-                <div className="form-group">
-                  <Input
-                    id="title"
-                    label={t("publications.modal.add.titleField")}
-                    type="text"
-                    register={register}
-                    name="title"
-                    placeholder={t("publications.modal.add.placeholders.title")}
-                    error={errors.title?.message as string}
-                    icon={FileText}
-                    theme={theme}
-                    variant="filled"
-                    size="md"
-                    hint={`${watchedadd.title?.length || 0}/70 characters`}
-                  />
-                </div>
+                <Input
+                  id="title"
+                  label={t("publications.modal.add.titleField")}
+                  type="text"
+                  register={register}
+                  name="title"
+                  placeholder={t("publications.modal.add.placeholders.title")}
+                  error={errors.title?.message as string}
+                  icon={FileText}
+                  theme={theme}
+                  variant="filled"
+                  size="md"
+                  hint={`${watched.title?.length || 0}/70 characters`}
+                />
 
-                <div className="form-group">
-                  <Textarea
-                    id="description"
-                    label={t("publications.modal.add.description")}
-                    register={register}
-                    name="description"
-                    placeholder={t(
-                      "publications.modal.add.placeholders.description"
-                    )}
-                    error={errors.description?.message as string}
-                    icon={FileText}
-                    theme={theme}
-                    variant="filled"
-                    rows={4}
-                    maxLength={200}
-                    showCharCount
-                    hint="Maximum 200 characters"
-                  />
-                </div>
+                <Textarea
+                  id="description"
+                  label={t("publications.modal.add.description")}
+                  register={register}
+                  name="description"
+                  placeholder={t(
+                    "publications.modal.add.placeholders.description"
+                  )}
+                  error={errors.description?.message as string}
+                  icon={FileText}
+                  theme={theme}
+                  variant="filled"
+                  rows={4}
+                  maxLength={200}
+                  showCharCount
+                  hint="Maximum 200 characters"
+                />
 
-                <div className="form-group">
-                  <Input
-                    id="goal"
-                    label={t("publications.modal.add.goal")}
-                    type="text"
-                    register={register}
-                    name="goal"
-                    placeholder={t("publications.modal.add.placeholders.goal")}
-                    error={errors.goal?.message as string}
-                    icon={Target}
-                    theme={theme}
-                    variant="filled"
-                    size="md"
-                    hint={`${watchedadd.goal?.length || 0}/200 characters`}
-                  />
-                </div>
+                <Input
+                  id="goal"
+                  label={t("publications.modal.add.goal")}
+                  type="text"
+                  register={register}
+                  name="goal"
+                  placeholder={t("publications.modal.add.placeholders.goal")}
+                  error={errors.goal?.message as string}
+                  icon={Target}
+                  theme={theme}
+                  variant="filled"
+                  size="md"
+                  hint={`${watched.goal?.length || 0}/200 characters`}
+                />
+
+                <Input
+                  id="hashtags"
+                  label={t("publications.modal.add.hashtags")}
+                  type="text"
+                  register={register}
+                  name="hashtags"
+                  placeholder={t(
+                    "publications.modal.add.placeholders.hashtags"
+                  )}
+                  error={errors.hashtags?.message as string}
+                  onChange={handleHashtagChange}
+                  icon={Hash}
+                  theme={theme}
+                  variant="filled"
+                  size="md"
+                  hint={`${
+                    watched.hashtags
+                      ? watched.hashtags
+                          .split(" ")
+                          .filter((tag: string) => tag.startsWith("#")).length
+                      : 0
+                  }/10 hashtags`}
+                />
+
+                <Select
+                  id="campaign_id"
+                  label={
+                    t("publications.modal.edit.addCampaign") ||
+                    "Add to Campaign"
+                  }
+                  options={(campaigns || []).map((campaign: any) => ({
+                    value: campaign.id,
+                    label:
+                      campaign.name ||
+                      campaign.title ||
+                      `Campaign ${campaign.id}`,
+                  }))}
+                  register={register}
+                  name="campaign_id"
+                  placeholder={t("common.select") || "Select a campaign..."}
+                  error={errors.campaign_id?.message as string}
+                  icon={Target}
+                  theme={theme}
+                  variant="filled"
+                  size="md"
+                  clearable
+                />
               </div>
             </div>
           </form>
