@@ -1,3 +1,7 @@
+import Input from "@/Components/common/Modern/Input";
+import Label from "@/Components/common/Modern/Label";
+import Select from "@/Components/common/Modern/Select";
+import Textarea from "@/Components/common/Modern/Textarea";
 import ModernDatePicker from "@/Components/common/ui/ModernDatePicker";
 import YouTubeThumbnailUploader from "@/Components/common/ui/YouTubeThumbnailUploader";
 import { useConfirm } from "@/Hooks/useConfirm";
@@ -12,6 +16,7 @@ import axios from "axios";
 import { format } from "date-fns";
 import {
   AlertTriangle,
+  Check,
   Clock,
   FileImage,
   FileText,
@@ -130,15 +135,6 @@ export default function EditPublicationModal({
 
   const watched = watch();
 
-  // useEffect(() => {
-  //   if (isOpen) {
-  //     fetchSocialAccounts();
-  //     if (campaigns.length === 0) {
-  //       fetchCampaigns().catch(console.error);
-  //     }
-  //   }
-  // }, [isOpen]);
-
   useEffect(() => {
     if (publication) {
       const schedules: Record<number, string> = {};
@@ -242,32 +238,6 @@ export default function EditPublicationModal({
   const textTertiary = theme === "dark" ? "text-gray-500" : "text-gray-400";
   const borderColor =
     theme === "dark" ? "border-neutral-600" : "border-gray-200";
-  const focusBorder =
-    theme === "dark"
-      ? "focus:border-primary-500 focus:ring-primary-500/20"
-      : "focus:border-primary-500 focus:ring-primary-200";
-  const errorBorder =
-    theme === "dark"
-      ? "border-primary-500 focus:border-primary-500 focus:ring-primary-500/20"
-      : "border-primary-300 focus:border-primary-500 focus:ring-primary-200";
-  const inputBg = theme === "dark" ? "bg-neutral-700" : "bg-white";
-  const labelText = theme === "dark" ? "text-gray-300" : "text-gray-700";
-  const iconColor = theme === "dark" ? "text-primary-400" : "text-primary-600";
-  const uploadBg = theme === "dark" ? "bg-neutral-700" : "bg-gray-50";
-  const uploadBorder =
-    theme === "dark"
-      ? "border-neutral-600 hover:border-primary-400"
-      : "border-gray-200 hover:border-primary-300";
-  const dragOverBg =
-    theme === "dark"
-      ? "bg-primary-900/20 border-primary-400"
-      : "bg-primary-50 border-primary-500";
-  const colorIconInput =
-    theme === "dark"
-      ? `[&::-webkit-calendar-picker-indicator]:invert 
-         [&::-webkit-calendar-picker-indicator]:opacity-80
-         [&::-webkit-calendar-picker-indicator]:cursor-pointer`
-      : "";
 
   const handleFileChange = (files: FileList | null) => {
     if (files && files.length > 0) {
@@ -346,12 +316,12 @@ export default function EditPublicationModal({
     setIsDragOver(false);
   };
 
-  const handleHashtagChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value
+  const handleHashtagChange = (value: string) => {
+    const formatted = value
       .split(/\s+/)
       .map((tag) => (tag.startsWith("#") ? tag : `#${tag}`))
       .join(" ");
-    setValue("hashtags", val);
+    setValue("hashtags", formatted, { shouldValidate: true });
   };
 
   const toggleSchedulePopover = (accountId: number) => {
@@ -377,7 +347,6 @@ export default function EditPublicationModal({
       });
 
       // Pass all collected thumbnails
-      // Pass all collected thumbnails using stable tempId mapping
       Object.entries(thumbnails).forEach(([tempId, file]) => {
         const preview = mediaPreviews.find((p) => p.tempId === tempId);
 
@@ -441,17 +410,13 @@ export default function EditPublicationModal({
         // Update store
         if (updatedPub) {
           updatePublication(publication.id, updatedPub);
-        } else {
-          // Fallback if API doesn't return object: fetch details or just close
-          // But usually we get it. If not, maybe just re-fetch list handled by parent?
-          // Actually parent's onSuccess fetches list? No, parent passes onSubmit(success).
         }
 
         reset();
         setMediaPreviews([]);
         setMediaFiles([]);
         onClose();
-        onSubmit(true); 
+        onSubmit(true);
         toast.success(
           t("publications.messages.updateSuccess") || "Publication updated"
         );
@@ -491,7 +456,7 @@ export default function EditPublicationModal({
             <h2
               className={`text-2xl font-bold ${textPrimary} flex items-center gap-2`}
             >
-              <Sparkles className={`w-6 h-6 ${iconColor}`} />
+              <Sparkles className="w-6 h-6 text-primary-500" />
               {t("publications.modal.edit.title") || "Edit Publication"}
             </h2>
             <p className={`${textSecondary} mt-1`}>
@@ -514,13 +479,15 @@ export default function EditPublicationModal({
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <div className="space-y-6">
                 <div className="form-group">
-                  <label
-                    className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
+                  <Label
+                    htmlFor="media-upload"
+                    icon={FileImage}
+                    required
+                    variant="bold"
+                    size="lg"
                   >
-                    <FileImage className={`w-4 h-4 ${iconColor}`} />
                     Media
-                    <span className="text-primary-500 ml-1">*</span>
-                  </label>
+                  </Label>
 
                   <div
                     className={`relative group cursor-pointer transition-all duration-300 ${
@@ -544,12 +511,12 @@ export default function EditPublicationModal({
                             ? "border-primary-500 bg-primary-900/20"
                             : "border-primary-300 bg-primary-50"
                           : isDragOver
-                          ? dragOverBg
-                          : `${uploadBorder} hover:${
-                              theme === "dark"
-                                ? "bg-neutral-600"
-                                : "bg-gray-100"
-                            } ${uploadBg}`
+                          ? theme === "dark"
+                            ? "bg-primary-900/20 border-primary-400"
+                            : "bg-primary-50 border-primary-500"
+                          : theme === "dark"
+                          ? "border-neutral-600 hover:border-primary-400 bg-neutral-700"
+                          : "border-gray-200 hover:border-primary-300 bg-gray-50"
                       }`}
                     >
                       {mediaPreviews.length > 0 ? (
@@ -657,7 +624,7 @@ export default function EditPublicationModal({
                                 : "bg-primary-100"
                             } flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300`}
                           >
-                            <Upload className={`w-8 h-8 ${iconColor}`} />
+                            <Upload className="w-8 h-8 text-primary-500" />
                           </div>
                           <div>
                             <p className={`${textPrimary} font-medium text-lg`}>
@@ -680,83 +647,78 @@ export default function EditPublicationModal({
                     />
                   </div>
                   {imageError && (
-                    <p className="mt-2 text-sm text-primary-500 flex items-center gap-1 animate-in slide-in-from-left-1">
+                    <div className="mt-2 flex items-center gap-2 text-sm text-primary-500 animate-in slide-in-from-left-1">
                       <AlertTriangle className="w-4 h-4" />
                       {imageError}
-                    </p>
+                    </div>
                   )}
                 </div>
 
-                <div className="form-group">
-                  <label
-                    className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
-                  >
-                    <Hash className={`w-4 h-4 ${iconColor}`} />
-                    {t("publications.modal.edit.hashtags")}
-                  </label>
-                  <div className="relative">
-                    <input
-                      {...register("hashtags")}
-                      className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-offset-0 transition-all ${inputBg} ${
-                        errors.hashtags
-                          ? errorBorder
-                          : `${borderColor} ${focusBorder}`
-                      }`}
-                      placeholder={t(
-                        "publications.modal.edit.placeholders.hashtags"
-                      )}
-                      onChange={handleHashtagChange}
-                    />
-                  </div>
-                  <div className="mt-1 flex justify-between text-xs">
-                    <span className={textTertiary}>
-                      {watched.hashtags
-                        ? watched.hashtags
-                            .split(" ")
-                            .filter((tag: string) => tag.startsWith("#")).length
-                        : 0}
-                      /10 hashtags
-                    </span>
-                  </div>
-                </div>
+                <Input
+                  id="hashtags"
+                  label={t("publications.modal.edit.hashtags")}
+                  type="text"
+                  register={register}
+                  name="hashtags"
+                  placeholder={t(
+                    "publications.modal.edit.placeholders.hashtags"
+                  )}
+                  error={errors.hashtags?.message as string}
+                  onChange={(e) => handleHashtagChange(e.target.value)}
+                  icon={Hash}
+                  theme={theme}
+                  variant="filled"
+                  size="md"
+                  hint={`${
+                    watched.hashtags
+                      ? watched.hashtags
+                          .split(" ")
+                          .filter((tag: string) => tag.startsWith("#")).length
+                      : 0
+                  }/10 hashtags`}
+                />
 
                 <div className="form-group">
-                  <label
-                    className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
+                  <Label
+                    htmlFor="scheduled_at"
+                    icon={Clock}
+                    size="lg"
+                    hint={t("publications.modal.edit.optionalSchedule")}
                   >
-                    <Clock className={`w-4 h-4 ${iconColor}`} />
                     {t("publications.modal.edit.schedulePublication")}
-                  </label>
-                  <div className={colorIconInput}>
-                    <ModernDatePicker
-                      selected={
-                        watch("scheduled_at")
-                          ? new Date(watch("scheduled_at")!)
-                          : null
-                      }
-                      onChange={(date) =>
-                        setValue(
-                          "scheduled_at",
-                          date ? format(date, "yyyy-MM-dd'T'HH:mm") : ""
-                        )
-                      }
-                      showTimeSelect
-                      placeholder="Select general date & time"
-                      dateFormat="Pp"
-                      minDate={new Date()}
-                      withPortal
-                      popperPlacement="bottom-start"
-                    />
-                  </div>
+                  </Label>
+                  <ModernDatePicker
+                    selected={
+                      watch("scheduled_at")
+                        ? new Date(watch("scheduled_at")!)
+                        : null
+                    }
+                    onChange={(date) =>
+                      setValue(
+                        "scheduled_at",
+                        date ? format(date, "yyyy-MM-dd'T'HH:mm") : ""
+                      )
+                    }
+                    showTimeSelect
+                    placeholder={
+                      t("publications.modal.edit.schedulePublication") ||
+                      "Schedule Publication"
+                    }
+                    dateFormat="Pp"
+                    minDate={new Date()}
+                    withPortal
+                    popperPlacement="bottom-start"
+                    theme={theme}
+                  />
                 </div>
 
                 {watched.scheduled_at && (
                   <div className="form-group animate-in fade-in slide-in-from-top-2">
                     <label
-                      className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
+                      className={`text-sm font-semibold mb-2 flex items-center gap-2`}
                     >
-                      <Target className={`w-4 h-4 ${iconColor}`} />
-                      Select Platforms
+                      <Target className={`w-4 h-4`} />
+                      {t("publications.modal.add.selectSocialAccounts")}
                     </label>
                     <div className="grid grid-cols-2 gap-3">
                       {socialAccounts.map((account) => {
@@ -771,41 +733,89 @@ export default function EditPublicationModal({
                             className={`relative flex items-center p-3 rounded-lg border transition-all ${
                               isChecked
                                 ? `border-primary-500 bg-primary-50 dark:bg-primary-900/20`
-                                : `${borderColor} ${inputBg}`
+                                : `${borderColor}`
                             }`}
                           >
-                            <label className="flex items-center gap-3 flex-1 cursor-pointer">
-                              <input
-                                type="checkbox"
-                                checked={isChecked}
-                                onChange={(e) => {
-                                  const current = watched.social_accounts || [];
-                                  const id = Number(account.id);
-                                  if (e.target.checked) {
-                                    setValue("social_accounts", [
-                                      ...current,
-                                      id,
-                                    ]);
-                                  } else {
-                                    setValue(
-                                      "social_accounts",
-                                      current.filter((x: number) => x !== id)
-                                    );
-                                    const newScheds = { ...accountSchedules };
-                                    delete newScheds[id];
-                                    setAccountSchedules(newScheds);
-                                  }
-                                }}
-                                className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
-                              />
-                              <div className="flex flex-col">
-                                <span
-                                  className={`text-sm font-medium ${textPrimary}`}
+                            {/* Checkbox sin label clickable */}
+                            <div className="flex items-center gap-3 flex-1">
+                              {/* Checkbox visual */}
+                              <div className="relative">
+                                <input
+                                  id={`account-${account.id}`}
+                                  type="checkbox"
+                                  className="sr-only"
+                                  checked={isChecked}
+                                  onChange={(e) => {
+                                    const current =
+                                      watched.social_accounts || [];
+                                    const id = Number(account.id);
+                                    if (e.target.checked) {
+                                      setValue("social_accounts", [
+                                        ...current,
+                                        id,
+                                      ]);
+                                    } else {
+                                      setValue(
+                                        "social_accounts",
+                                        current.filter((x: number) => x !== id)
+                                      );
+                                      const newScheds = { ...accountSchedules };
+                                      delete newScheds[id];
+                                      setAccountSchedules(newScheds);
+                                    }
+                                  }}
+                                />
+                                <div
+                                  className={`
+                    w-5 h-5 rounded border-2 flex items-center justify-center
+                    transition-all duration-200
+                    ${
+                      isChecked
+                        ? "bg-primary-500 border-primary-500"
+                        : "border-gray-300"
+                    }
+                    ${theme === "dark" ? "bg-neutral-800" : "bg-white"}
+                  `}
+                                  onClick={() => {
+                                    const current =
+                                      watched.social_accounts || [];
+                                    const id = Number(account.id);
+                                    const newChecked = !isChecked;
+
+                                    if (newChecked) {
+                                      setValue("social_accounts", [
+                                        ...current,
+                                        id,
+                                      ]);
+                                    } else {
+                                      setValue(
+                                        "social_accounts",
+                                        current.filter((x: number) => x !== id)
+                                      );
+                                      const newScheds = { ...accountSchedules };
+                                      delete newScheds[id];
+                                      setAccountSchedules(newScheds);
+                                    }
+                                  }}
                                 >
+                                  {isChecked && (
+                                    <Check className="w-3 h-3 text-white stroke-[3]" />
+                                  )}
+                                </div>
+                              </div>
+
+                              {/* Label info */}
+                              <div className="flex flex-col">
+                                <span className="font-medium text-sm">
                                   {account.platform}
                                 </span>
+                                {account.username && (
+                                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                                    @{account.username}
+                                  </span>
+                                )}
                                 {customSchedule && isChecked && (
-                                  <span className="text-xs text-primary-600 dark:text-primary-400 flex items-center gap-1">
+                                  <span className="text-xs text-primary-600 dark:text-primary-400 flex items-center gap-1 mt-1">
                                     <Clock className="w-3 h-3" />
                                     {new Date(customSchedule).toLocaleString(
                                       [],
@@ -814,20 +824,23 @@ export default function EditPublicationModal({
                                   </span>
                                 )}
                               </div>
-                            </label>
+                            </div>
 
+                            {/* Botón de schedule */}
                             {isChecked && (
                               <div className="ml-2">
                                 <button
                                   type="button"
-                                  onClick={() =>
-                                    toggleSchedulePopover(account.id)
-                                  }
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    toggleSchedulePopover(account.id);
+                                  }}
                                   className={`p-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 ${
                                     customSchedule
                                       ? "text-primary-500"
                                       : textSecondary
                                   }`}
+                                  title="Set individual time"
                                 >
                                   <Clock className="w-4 h-4" />
                                 </button>
@@ -851,41 +864,36 @@ export default function EditPublicationModal({
                                         />
                                       </button>
                                     </div>
-                                    <div className={colorIconInput}>
-                                      <ModernDatePicker
-                                        selected={
-                                          customSchedule
-                                            ? new Date(customSchedule)
-                                            : null
-                                        }
-                                        onChange={(date) => {
-                                          setAccountSchedules((prev) => ({
-                                            ...prev,
-                                            [account.id]: date
-                                              ? format(
-                                                  date,
-                                                  "yyyy-MM-dd'T'HH:mm"
-                                                )
-                                              : "",
-                                          }));
-                                        }}
-                                        showTimeSelect
-                                        placeholder="Select date & time"
-                                        dateFormat="Pp"
-                                        minDate={new Date()}
-                                        withPortal
-                                        popperPlacement="bottom-start"
-                                      />
-                                    </div>
+                                    <ModernDatePicker
+                                      selected={
+                                        customSchedule
+                                          ? new Date(customSchedule)
+                                          : null
+                                      }
+                                      onChange={(date: Date | null) => {
+                                        setAccountSchedules((prev) => ({
+                                          ...prev,
+                                          [account.id]: date
+                                            ? format(date, "yyyy-MM-dd'T'HH:mm")
+                                            : "",
+                                        }));
+                                      }}
+                                      showTimeSelect
+                                      placeholder="Select date & time"
+                                      dateFormat="Pp"
+                                      minDate={new Date()}
+                                      withPortal
+                                      popperPlacement="bottom-start"
+                                    />
                                     <div className="flex justify-end gap-2 mt-2">
                                       <button
                                         type="button"
                                         onClick={() => {
-                                          const newScheds = {
+                                          const newSchedules = {
                                             ...accountSchedules,
                                           };
-                                          delete newScheds[account.id];
-                                          setAccountSchedules(newScheds);
+                                          delete newSchedules[account.id];
+                                          setAccountSchedules(newSchedules);
                                           setActivePopover(null);
                                         }}
                                         className="text-xs text-primary-500 hover:text-primary-700 font-medium px-2 py-1"
@@ -929,117 +937,91 @@ export default function EditPublicationModal({
                         setExistingThumbnail(null);
                         setYoutubeThumbnail(null);
                       }}
+                      theme={theme}
                     />
                   </div>
                 )}
               </div>
 
               <div className="space-y-6">
-                <div className="form-group">
-                  <label
-                    className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
-                  >
-                    <FileText className={`w-4 h-4 ${iconColor}`} />
-                    {t("publications.modal.edit.titleField")}
-                    <span className="text-primary-500 ml-1">*</span>
-                  </label>
-                  <input
-                    {...register("title")}
-                    className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-offset-0 transition-all ${inputBg} ${
-                      errors.title
-                        ? errorBorder
-                        : `${borderColor} ${focusBorder}`
-                    }`}
-                    placeholder={t(
-                      "publications.modal.edit.placeholders.title"
-                    )}
-                  />
-                  {errors.title && (
-                    <p className="mt-2 text-sm text-primary-500 flex items-center gap-1">
-                      <AlertTriangle className="w-4 h-4" />
-                      {errors.title.message}
-                    </p>
-                  )}
-                </div>
+                <Input
+                  id="title"
+                  label={t("publications.modal.edit.titleField")}
+                  type="text"
+                  register={register}
+                  name="title"
+                  placeholder={t("publications.modal.edit.placeholders.title")}
+                  error={errors.title?.message as string}
+                  icon={FileText}
+                  theme={theme}
+                  variant="filled"
+                  size="md"
+                  required
+                  hint={`${watched.title?.length || 0}/70 characters`}
+                />
 
-                <div className="form-group">
-                  <label
-                    className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
-                  >
-                    <FileText className={`w-4 h-4 ${iconColor}`} />
-                    {t("publications.modal.edit.description")}
-                    <span className="text-primary-500 ml-1">*</span>
-                  </label>
-                  <textarea
-                    {...register("description")}
-                    rows={8}
-                    className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-offset-0 transition-all resize-none ${inputBg} ${
-                      errors.description
-                        ? errorBorder
-                        : `${borderColor} ${focusBorder}`
-                    }`}
-                    placeholder={t(
-                      "publications.modal.edit.placeholders.description"
-                    )}
-                  />
-                  {errors.description && (
-                    <p className="mt-2 text-sm text-primary-500 flex items-center gap-1">
-                      <AlertTriangle className="w-4 h-4" />
-                      {errors.description.message}
-                    </p>
+                <Textarea
+                  id="description"
+                  label={t("publications.modal.edit.description")}
+                  register={register}
+                  name="description"
+                  placeholder={t(
+                    "publications.modal.edit.placeholders.description"
                   )}
-                </div>
+                  error={errors.description?.message as string}
+                  icon={FileText}
+                  theme={theme}
+                  variant="filled"
+                  size="md"
+                  required
+                  value={watched.description}
+                  rows={8}
+                  maxLength={200}
+                  showCharCount
+                  hint="Maximum 200 characters"
+                />
+
+                <Input
+                  id="goal"
+                  label={t("publications.modal.edit.goal")}
+                  type="text"
+                  register={register}
+                  name="goal"
+                  placeholder={t("publications.modal.edit.placeholders.goal")}
+                  error={errors.goal?.message as string}
+                  icon={FileText}
+                  theme={theme}
+                  variant="filled"
+                  size="md"
+                  required
+                  hint={`${watched.goal?.length || 0}/200 characters`}
+                />
 
                 {(!publication?.scheduled_posts ||
                   publication.scheduled_posts.length === 0) && (
-                  <div className="form-group animate-in fade-in slide-in-from-top-3">
-                    <label
-                      className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
-                    >
-                      <Target className={`w-4 h-4 ${iconColor}`} />
-                      {t("publications.modal.edit.addCampaign") ||
-                        "Add to Campaign"}
-                    </label>
-                    <div className="relative">
-                      <select
-                        {...register("campaign_id")}
-                        className={`w-full px-4 py-3 rounded-xl border transition-all duration-200 outline-none appearance-none ${
-                          errors.campaign_id
-                            ? "border-red-500 focus:ring-2 focus:ring-red-200"
-                            : `${borderColor} ${focusBorder}`
-                        } ${inputBg} ${
-                          theme === "dark" ? "text-white" : "text-gray-900"
-                        }`}
-                      >
-                        <option value="">
-                          {t("common.select") || "Select a campaign..."}
-                        </option>
-                        {Array.isArray(campaigns) &&
-                          campaigns.map((campaign) => (
-                            <option key={campaign.id} value={campaign.id}>
-                              {campaign.name || campaign.title}
-                            </option>
-                          ))}
-                      </select>
-                      <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none">
-                        <svg
-                          className={`w-4 h-4 ${
-                            theme === "dark" ? "text-gray-400" : "text-gray-500"
-                          }`}
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M19 9l-7 7-7-7"
-                          />
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
+                  <Select
+                    id="campaign_id"
+                    label={
+                      t("publications.modal.edit.addCampaign") ||
+                      "Add to Campaign"
+                    }
+                    options={(campaigns || []).map((campaign: any) => ({
+                      value: campaign.id,
+                      label:
+                        campaign.name ||
+                        campaign.title ||
+                        `Campaign ${campaign.id}`,
+                    }))}
+                    register={register}
+                    name="campaign_id"
+                    placeholder={t("common.select") || "Select a campaign..."}
+                    error={errors.campaign_id?.message as string}
+                    icon={Target}
+                    theme={theme}
+                    variant="filled"
+                    size="md"
+                    clearable
+                  />
                 )}
               </div>
             </div>

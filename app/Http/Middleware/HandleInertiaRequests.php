@@ -41,6 +41,7 @@ class HandleInertiaRequests extends Middleware
                     'created_at' => $request->user()->created_at,
                     'photo_url' => $request->user()->photo_url,
                     'theme' => $request->user()->theme,
+                    'provider' => $request->user()->provider,
                     
   
                 ] : null,

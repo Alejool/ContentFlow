@@ -1,6 +1,6 @@
-import ModernButton from "@/Components/common/Modern/ModernButton";
-import ModernCard from "@/Components/common/Modern/ModernCard";
-import ModernInput from "@/Components/common/Modern/ModernInput";
+import ModernButton from "@/Components/common/Modern/Button";
+import ModernCard from "@/Components/common/Modern/Card";
+import ModernInput from "@/Components/common/Modern/Input";
 import LanguageSwitcher from "@/Components/common/ui/LanguageSwitcher";
 import { useTheme } from "@/Hooks/useTheme";
 import { profileSchema } from "@/schemas/schemas";

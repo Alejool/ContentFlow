@@ -30,7 +30,7 @@ export default function AuthenticatedLayout({
 
   return (
     <div
-      className={`min-h-screen relative overflow-hidden  `}
+      className={`relative overflow-hidden scrollbar-y  `}
       style={{
         backgroundImage: `url(${Bg})`,
         backgroundSize: "cover",
@@ -67,7 +67,7 @@ export default function AuthenticatedLayout({
           </header>
         )}
 
-        <div className="p-8 min-h-screen">
+        <div className="p-8 ">
           <div className="mx-auto max-w-7xl">{children}</div>
         </div>
       </main>

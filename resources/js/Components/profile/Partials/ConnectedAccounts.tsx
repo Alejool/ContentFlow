@@ -2,7 +2,7 @@ import IconFacebook from "@/../assets/Icons/facebook.svg";
 import IconTiktok from "@/../assets/Icons/tiktok.svg";
 import IconTwitter from "@/../assets/Icons/x.svg";
 import IconYoutube from "@/../assets/Icons/youtube.svg";
-import ModernCard from "@/Components/common/Modern/ModernCard";
+import ModernCard from "@/Components/common/Modern/Card";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -23,7 +23,7 @@ const ShareIcon = ({ className }: { className: string }) => (
   </svg>
 );
 
-export default function ConnectedAccounts({ className = "" }) {
+export default function ConnectedAccounts({ className = "", header = true }) {
   const { t } = useTranslation();
   const [accounts, setAccounts] = useState([
     {
@@ -109,13 +109,14 @@ export default function ConnectedAccounts({ className = "" }) {
       icon={ShareIcon}
       headerColor="purple"
       className={className}
+      header={header}
     >
       {loading ? (
         <div className="flex justify-center py-4">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {accounts.map((account) => (
             <div
               key={account.id}

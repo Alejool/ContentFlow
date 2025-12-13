@@ -1,5 +1,5 @@
 import { PageProps } from "@/../../app/Types/inertia";
-import ModernCard from "@/Components/common/Modern/ModernCard";
+import ModernCard from "@/Components/common/Modern/Card";
 import { useTheme } from "@/Hooks/useTheme";
 import { Link, usePage } from "@inertiajs/react";
 import {

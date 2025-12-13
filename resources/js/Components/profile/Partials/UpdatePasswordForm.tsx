@@ -1,11 +1,11 @@
-import ModernButton from "@/Components/common/Modern/ModernButton.js";
-import ModernCard from "@/Components/common/Modern/ModernCard.js";
-import ModernInput from "@/Components/common/Modern/ModernInput.js";
+import ModernButton from "@/Components/common/Modern/Button.js";
+import ModernCard from "@/Components/common/Modern/Card.js";
+import ModernInput from "@/Components/common/Modern/Input.js";
+import { useUpdatePassword } from "@/Hooks/profile/useUpdatePassword.js";
 import { useTheme } from "@/Hooks/useTheme";
 import { Transition } from "@headlessui/react";
 import { AlertTriangle, Check, Key, Lock, Shield } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useUpdatePassword } from "../../../Hooks/profile/useUpdatePassword.js";
 
 interface UpdatePasswordFormProps {
   className?: string;

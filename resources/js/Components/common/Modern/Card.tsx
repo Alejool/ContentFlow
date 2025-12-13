@@ -13,6 +13,7 @@ interface ModernCardProps {
   compact?: boolean;
   noBorder?: boolean;
   hoverEffect?: boolean;
+  header?: boolean;
 }
 
 export default function ModernCard({
@@ -26,6 +27,7 @@ export default function ModernCard({
   compact = false,
   noBorder = false,
   hoverEffect = true,
+  header = true,
 }: ModernCardProps) {
   const { theme } = useTheme();
 
@@ -62,7 +64,7 @@ export default function ModernCard({
 
   return (
     <div
-      className={`rounded-lg overflow-hidden transition-all duration-300
+      className={`rounded-lg overflow-hidden transition-all duration-300 mt-4
         ${theme === "dark" ? "bg-neutral-800/65" : "bg-white/70"}
         ${
           !noBorder &&
@@ -74,38 +76,40 @@ export default function ModernCard({
         ${className}`}
     >
       {/* Header */}
-      <div className={`${padding} bg-gradient-to-r ${gradientClass}`}>
-        <div className="flex items-center gap-3">
-          {Icon && (
-            <div
-              className={`${compact ? "w-8 h-8" : "w-10 h-10"} 
+      {header && (
+        <div className={`${padding} bg-gradient-to-r ${gradientClass}`}>
+          <div className="flex items-center gap-3">
+            {Icon && (
+              <div
+                className={`${compact ? "w-8 h-8" : "w-10 h-10"} 
               bg-white/20 rounded-lg flex items-center justify-center`}
-            >
-              <Icon
-                className={`${compact ? "w-4 h-4" : "w-5 h-5"} text-white`}
-              />
-            </div>
-          )}
-          <div>
-            <h2
-              className={`font-bold text-white ${
-                compact ? "text-base" : "text-lg"
-              }`}
-            >
-              {title}
-            </h2>
-            {description && (
-              <p
-                className={`text-white/80 ${
-                  compact ? "text-xs mt-0.5" : "text-sm mt-0.5"
+              >
+                <Icon
+                  className={`${compact ? "w-4 h-4" : "w-5 h-5"} text-white`}
+                />
+              </div>
+            )}
+            <div>
+              <h2
+                className={`font-bold text-white ${
+                  compact ? "text-base" : "text-lg"
                 }`}
               >
-                {description}
-              </p>
-            )}
+                {title}
+              </h2>
+              {description && (
+                <p
+                  className={`text-white/80 ${
+                    compact ? "text-xs mt-0.5" : "text-sm mt-0.5"
+                  }`}
+                >
+                  {description}
+                </p>
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       <div
         className={`${padding} ${

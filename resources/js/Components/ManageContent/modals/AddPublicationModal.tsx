@@ -1,3 +1,4 @@
+import Input from "@/Components/common/Modern/Input";
 import ModernDatePicker from "@/Components/common/ui/ModernDatePicker";
 import { useTheme } from "@/Hooks/useTheme";
 import { publicationSchema } from "@/schemas/publication";
@@ -20,6 +21,12 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
+
+import Select from "@/Components/common/Modern/Select";
+import Textarea from "@/Components/common/Modern/Textarea";
+import { usePublicationStore } from "@/stores/publicationStore";
+import { useAccountsStore } from "@/stores/socialAccountsStore";
+
 interface AddCampaignModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -46,9 +53,6 @@ const validateFile = (file: File, t: any) => {
 
   return null;
 };
-
-import { usePublicationStore } from "@/stores/publicationStore";
-import { useAccountsStore } from "@/stores/socialAccountsStore";
 
 export default function AddPublicationModal({
   isOpen,
@@ -164,12 +168,6 @@ export default function AddPublicationModal({
     theme === "dark"
       ? "bg-gradient-to-r from-primary-600 to-primary-800 hover:shadow-primary-500/20"
       : "bg-gradient-to-r from-primary-600 to-primary-700 hover:shadow-primary-200";
-  const colorIconInput =
-    theme === "dark"
-      ? `[&::-webkit-calendar-picker-indicator]:invert 
-         [&::-webkit-calendar-picker-indicator]:opacity-80
-         [&::-webkit-calendar-picker-indicator]:cursor-pointer`
-      : "";
 
   const getVideoDuration = (file: File): Promise<number> => {
     return new Promise((resolve, reject) => {
@@ -359,12 +357,16 @@ export default function AddPublicationModal({
       if (data.campaign_id) {
         formData.append("campaign_id", data.campaign_id);
       }
+
+      // Use axios directly as per store pattern or implement addPublication in store to handle API
+      // Since store's addPublication is currently synchronous (just state update), we do API call here
       const response = await axios.post("/publications", formData);
 
       if (response.data && response.data.publication) {
+        // Update store
         addPublication(response.data.publication);
         if (onSubmit) {
-          onSubmit(true);
+          onSubmit(true); // Notify parent (ManageContentPage)
         }
         handleClose();
         toast.success(
@@ -390,13 +392,15 @@ export default function AddPublicationModal({
     setImageError(null);
     setIsSubmitting(false);
     onClose();
+    // Refresh campaigns list if we are in campaigns tab?
+    // Actually ManageContentPage handles refresh via onSubmit callback if needed
   };
 
   if (!isOpen) return null;
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 ${
+      className={`fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6  ${
         theme === "dark" ? "text-white" : "text-gray-900"
       }`}
     >
@@ -437,7 +441,7 @@ export default function AddPublicationModal({
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
+        <div className="flex-1 p-8 custom-scrollbar">
           <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <div className="space-y-6">
@@ -507,15 +511,13 @@ export default function AddPublicationModal({
                                         onChange={(e) => {
                                           const file = e.target.files?.[0];
                                           if (file) {
-                                            // Store thumbnail in state (using a map/object structure ideally, or parallel array)
-                                            // For simplicity, let's use a new state variable `thumbnails` object { [index]: File }
                                             setThumbnails((prev) => ({
                                               ...prev,
                                               [index]: file,
                                             }));
                                           }
                                         }}
-                                        onClick={(e) => e.stopPropagation()} // Prevent triggering parent click
+                                        onClick={(e) => e.stopPropagation()}
                                       />
                                       <label
                                         htmlFor={`thumbnail-${index}`}
@@ -696,33 +698,29 @@ export default function AddPublicationModal({
                 </div>
 
                 <div className="form-group">
-                  <label
-                    className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
-                  >
-                    <Hash className={`w-4 h-4 ${iconColor}`} />
-                    {t("publications.modal.add.hashtags")}
-                    <span className="text-primary-500 ml-1">*</span>
-                  </label>
-                  <div className="relative">
-                    <input
-                      {...register("hashtags")}
-                      className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-offset-0 transition-all ${inputBg} ${
-                        errors.hashtags
-                          ? errorBorder
-                          : `${borderColor} ${focusBorder}`
-                      }`}
-                      placeholder={t(
-                        "publications.modal.add.placeholders.hashtags"
-                      )}
-                      onChange={handleHashtagChange}
-                    />
-                  </div>
-                  {errors.hashtags && (
-                    <p className="mt-2 text-sm text-primary-500 flex items-center gap-1">
-                      <AlertTriangle className="w-4 h-4" />
-                      {errors.hashtags.message}
-                    </p>
-                  )}
+                  <Input
+                    id="hashtags"
+                    label={t("publications.modal.add.hashtags")}
+                    type="text"
+                    register={register}
+                    name="hashtags"
+                    placeholder={t(
+                      "publications.modal.add.placeholders.hashtags"
+                    )}
+                    error={errors.hashtags?.message as string}
+                    onChange={handleHashtagChange}
+                    icon={Hash}
+                    theme={theme}
+                    variant="filled"
+                    size="md"
+                    hint={`${
+                      watchedadd.hashtags
+                        ? watchedadd.hashtags
+                            .split(" ")
+                            .filter((tag: string) => tag.startsWith("#")).length
+                        : 0
+                    }/10 hashtags`}
+                  />
                   <div className="mt-1 flex justify-between text-xs">
                     <span className={textTertiary}>
                       {watchedadd.hashtags
@@ -739,86 +737,65 @@ export default function AddPublicationModal({
                 </div>
 
                 <div className="form-group">
-                  <label
-                    className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
-                  >
-                    <Clock className={`w-4 h-4 ${iconColor}`} />
-                    {t("publications.modal.add.schedulePublication")}
-                  </label>
-                  <div className={colorIconInput}>
-                    <ModernDatePicker
-                      selected={
-                        watch("scheduled_at")
-                          ? new Date(watch("scheduled_at")!)
-                          : null
-                      }
-                      onChange={(date: Date | null) => {
-                        setValue(
-                          "scheduled_at",
-                          date ? format(date, "yyyy-MM-dd'T'HH:mm") : ""
-                        );
-                      }}
-                      showTimeSelect
-                      placeholder={
-                        t("publications.modal.add.schedulePublication") ||
-                        "Schedule Publication"
-                      }
-                      dateFormat="Pp"
-                      minDate={new Date()}
-                      withPortal
-                      popperPlacement="bottom-start"
-                    />
-                  </div>
+                  <ModernDatePicker
+                    selected={
+                      watch("scheduled_at")
+                        ? new Date(watch("scheduled_at")!)
+                        : null
+                    }
+                    onChange={(date: Date | null) => {
+                      setValue(
+                        "scheduled_at",
+                        date ? format(date, "yyyy-MM-dd'T'HH:mm") : ""
+                      );
+                    }}
+                    showTimeSelect
+                    placeholder={
+                      t("publications.modal.add.schedulePublication") ||
+                      "Schedule Publication"
+                    }
+                    dateFormat="Pp"
+                    minDate={new Date()}
+                    withPortal
+                    size="md"
+                    label={
+                      t("publications.modal.add.schedulePublication") ||
+                      "Schedule Publication"
+                    }
+                    variant="default"
+                    align="left"
+                    className="w-full"
+                    popperPlacement="bottom-start"
+                  />
                   <p className={`text-xs mt-1 ${textTertiary}`}>
                     {t("publications.modal.add.optionalSchedule")}
                   </p>
                 </div>
 
                 <div className="form-group animate-in fade-in slide-in-from-top-3">
-                  <label
-                    className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
-                  >
-                    <Target className={`w-4 h-4 ${iconColor}`} />
-                    {t("publications.modal.edit.addCampaign") ||
-                      "Add to Campaign"}
-                  </label>
-                  <div className="relative">
-                    <select
-                      {...register("campaign_id")}
-                      className={`w-full px-4 py-3 rounded-xl border transition-all duration-200 outline-none appearance-none ${
-                        errors.campaign_id
-                          ? "border-red-500 focus:ring-2 focus:ring-red-200"
-                          : `${borderColor} ${focusBorder}`
-                      } ${inputBg} ${
-                        theme === "dark" ? "text-white" : "text-gray-900"
-                      }`}
-                    >
-                      <option value="">
-                        {t("common.select") || "Select a campaign..."}
-                      </option>
-                      {Array.isArray(campaigns) &&
-                        campaigns.map((campaign) => (
-                          <option key={campaign.id} value={campaign.id}>
-                            {campaign.name || campaign.title}
-                          </option>
-                        ))}
-                    </select>
-                    <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none">
-                      <svg
-                        className={`w-4 h-4 ${textTertiary}`}
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M19 9l-7 7-7-7"
-                        />
-                      </svg>
-                    </div>
-                  </div>
+                  <Select
+                    id="campaign_id"
+                    label={
+                      t("publications.modal.edit.addCampaign") ||
+                      "Add to Campaign"
+                    }
+                    options={(campaigns || []).map((campaign: any) => ({
+                      value: campaign.id,
+                      label:
+                        campaign.name ||
+                        campaign.title ||
+                        `Campaign ${campaign.id}`,
+                    }))}
+                    register={register}
+                    name="campaign_id"
+                    placeholder={t("common.select") || "Select a campaign..."}
+                    error={errors.campaign_id?.message as string}
+                    icon={Target}
+                    theme={theme}
+                    variant="filled"
+                    size="md"
+                    clearable
+                  />
                 </div>
 
                 {watchedadd.scheduled_at && (
@@ -857,22 +834,9 @@ export default function AddPublicationModal({
                                 value={account.id}
                                 {...register("social_accounts")}
                                 onChange={(e) => {
-                                  // We need to handle the change manually if we want to clean up schedules
-                                  // But register handles the array.
-                                  // Let's hook into the register's onChange if possible or just use a side effect?
-                                  // Actually, with `register`, `watchedadd` updates.
-                                  // But clearing `accountSchedules` on uncheck is harder with just `register`.
-                                  // Let's use `setValue` like in EditModal for consistency if we want that control.
-                                  // But AddModal uses `register` for array... wait, EditModal used `setValue` because of array issues.
-                                  // Let's use setValue here too for consistency and control.
                                   const currentAccounts =
                                     watchedadd.social_accounts || [];
                                   const numericId = Number(account.id);
-                                  // Note: data.social_accounts coming from register might be strings if value is set.
-                                  // Let's normalize.
-
-                                  // Actually, let's stick to the EditModal pattern completely for checkboxes.
-                                  // It implies NOT using {...register} for the checkbox itself, but managing it via setValue.
                                   if (e.target.checked) {
                                     setValue("social_accounts", [
                                       ...currentAccounts.map(Number),
@@ -950,32 +914,27 @@ export default function AddPublicationModal({
                                         />
                                       </button>
                                     </div>
-                                    <div className={colorIconInput}>
-                                      <ModernDatePicker
-                                        selected={
-                                          customSchedule
-                                            ? new Date(customSchedule)
-                                            : null
-                                        }
-                                        onChange={(date: Date | null) => {
-                                          setAccountSchedules((prev) => ({
-                                            ...prev,
-                                            [account.id]: date
-                                              ? format(
-                                                  date,
-                                                  "yyyy-MM-dd'T'HH:mm"
-                                                )
-                                              : "",
-                                          }));
-                                        }}
-                                        showTimeSelect
-                                        placeholder="Select date & time"
-                                        dateFormat="Pp"
-                                        minDate={new Date()}
-                                        withPortal
-                                        popperPlacement="bottom-start"
-                                      />
-                                    </div>
+                                    <ModernDatePicker
+                                      selected={
+                                        customSchedule
+                                          ? new Date(customSchedule)
+                                          : null
+                                      }
+                                      onChange={(date: Date | null) => {
+                                        setAccountSchedules((prev) => ({
+                                          ...prev,
+                                          [account.id]: date
+                                            ? format(date, "yyyy-MM-dd'T'HH:mm")
+                                            : "",
+                                        }));
+                                      }}
+                                      showTimeSelect
+                                      placeholder="Select date & time"
+                                      dateFormat="Pp"
+                                      minDate={new Date()}
+                                      withPortal
+                                      popperPlacement="bottom-start"
+                                    />
                                     <div className="flex justify-end gap-2">
                                       <button
                                         type="button"
@@ -1018,108 +977,57 @@ export default function AddPublicationModal({
 
               <div className="space-y-6">
                 <div className="form-group">
-                  <label
-                    className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
-                  >
-                    <FileText className={`w-4 h-4 ${iconColor}`} />
-                    {t("publications.modal.add.titleField")}
-                    <span className="text-primary-500 ml-1">*</span>
-                  </label>
-                  <input
-                    {...register("title")}
-                    className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-offset-0 transition-all ${inputBg} ${
-                      errors.title
-                        ? errorBorder
-                        : `${borderColor} ${focusBorder}`
-                    }`}
+                  <Input
+                    id="title"
+                    label={t("publications.modal.add.titleField")}
+                    type="text"
+                    register={register}
+                    name="title"
                     placeholder={t("publications.modal.add.placeholders.title")}
+                    error={errors.title?.message as string}
+                    icon={FileText}
+                    theme={theme}
+                    variant="filled"
+                    size="md"
+                    hint={`${watchedadd.title?.length || 0}/70 characters`}
                   />
-                  {errors.title && (
-                    <p className="mt-2 text-sm text-primary-500 flex items-center gap-1">
-                      <AlertTriangle className="w-4 h-4" />
-                      {errors.title.message}
-                    </p>
-                  )}
-                  <div className="mt-1 flex justify-end text-xs">
-                    <span className={textTertiary}>
-                      {watchedadd.title?.length || 0}/70 caracteres
-                    </span>
-                  </div>
                 </div>
 
                 <div className="form-group">
-                  <label
-                    className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
-                  >
-                    <FileText className={`w-4 h-4 ${iconColor}`} />
-                    {t("publications.modal.add.description")}
-                    <span className="text-primary-500 ml-1">*</span>
-                  </label>
-                  <textarea
-                    {...register("description")}
-                    rows={4}
-                    className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-offset-0 transition-all resize-none ${inputBg} ${
-                      errors.description
-                        ? errorBorder
-                        : `${borderColor} ${focusBorder}`
-                    }`}
+                  <Textarea
+                    id="description"
+                    label={t("publications.modal.add.description")}
+                    register={register}
+                    name="description"
                     placeholder={t(
                       "publications.modal.add.placeholders.description"
                     )}
+                    error={errors.description?.message as string}
+                    icon={FileText}
+                    theme={theme}
+                    variant="filled"
+                    rows={4}
+                    maxLength={200}
+                    showCharCount
+                    hint="Maximum 200 characters"
                   />
-                  {errors.description && (
-                    <p className="mt-2 text-sm text-primary-500 flex items-center gap-1">
-                      <AlertTriangle className="w-4 h-4" />
-                      {errors.description.message}
-                    </p>
-                  )}
-                  <div className="mt-1 flex justify-end">
-                    <span
-                      className={`text-xs ${
-                        (watchedadd.description?.length || 0) > 200
-                          ? "text-primary-500"
-                          : textTertiary
-                      }`}
-                    >
-                      {watchedadd.description?.length || 0}/200 caracteres
-                    </span>
-                  </div>
                 </div>
 
                 <div className="form-group">
-                  <label
-                    className={`block text-sm font-semibold ${labelText} mb-2 flex items-center gap-2`}
-                  >
-                    <Target className={`w-4 h-4 ${iconColor}`} />
-                    {t("publications.modal.add.goal")}
-                    <span className="text-primary-500 ml-1">*</span>
-                  </label>
-                  <input
-                    {...register("goal")}
-                    className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-offset-0 transition-all ${inputBg} ${
-                      errors.goal
-                        ? errorBorder
-                        : `${borderColor} ${focusBorder}`
-                    }`}
+                  <Input
+                    id="goal"
+                    label={t("publications.modal.add.goal")}
+                    type="text"
+                    register={register}
+                    name="goal"
                     placeholder={t("publications.modal.add.placeholders.goal")}
+                    error={errors.goal?.message as string}
+                    icon={Target}
+                    theme={theme}
+                    variant="filled"
+                    size="md"
+                    hint={`${watchedadd.goal?.length || 0}/200 characters`}
                   />
-                  {errors.goal && (
-                    <p className="mt-2 text-sm text-primary-500 flex items-center gap-1">
-                      <AlertTriangle className="w-4 h-4" />
-                      {errors.goal.message}
-                    </p>
-                  )}
-                  <div className="mt-1 flex justify-end">
-                    <span
-                      className={`text-xs ${
-                        (watchedadd.goal?.length || 0) > 200
-                          ? "text-primary-500"
-                          : textTertiary
-                      }`}
-                    >
-                      {watchedadd.goal?.length || 0}/200 caracteres
-                    </span>
-                  </div>
                 </div>
               </div>
             </div>

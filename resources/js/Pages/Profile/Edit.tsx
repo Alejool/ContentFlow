@@ -1,11 +1,11 @@
+import AccountStatistics from "@/Components/profile/Partials/AccountStatistics";
+import ConnectedAccounts from "@/Components/profile/Partials/ConnectedAccounts";
+import UpdatePasswordForm from "@/Components/profile/Partials/UpdatePasswordForm";
+import UpdateProfileInformationForm from "@/Components/profile/Partials/UpdateProfileInformationForm";
 import { useTheme } from "@/Hooks/useTheme";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, usePage } from "@inertiajs/react";
 import { Mail, Shield, User } from "lucide-react";
-import AccountStatistics from "../../Components/profile/Partials/AccountStatistics";
-import ConnectedAccounts from "../../Components/profile/Partials/ConnectedAccounts";
-import UpdatePasswordForm from "../../Components/profile/Partials/UpdatePasswordForm";
-import UpdateProfileInformationForm from "../../Components/profile/Partials/UpdateProfileInformationForm";
 
 interface EditProps {
   mustVerifyEmail: boolean;
@@ -74,6 +74,7 @@ function CustomAvatar({ src, name, size = "md", className = "" }: AvatarProps) {
 export default function Edit({ mustVerifyEmail, status }: EditProps) {
   const user = usePage().props.auth.user;
   const { theme } = useTheme();
+  console.log(user);
 
   const getAvatarColor = () => {
     if (theme === "dark") {
@@ -152,7 +153,6 @@ export default function Edit({ mustVerifyEmail, status }: EditProps) {
                 <Shield className="w-3 h-3" />
                 {user.email_verified_at ? "Verificado" : "Sin verificar"}
               </div>
-
               <div
                 className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium
                 ${
@@ -166,6 +166,7 @@ export default function Edit({ mustVerifyEmail, status }: EditProps) {
                 Miembro desde: {new Date(user.created_at).toLocaleDateString()}
               </div>
             </div>
+            <ConnectedAccounts header={false}/>
           </div>
         </div>
       }
@@ -173,7 +174,7 @@ export default function Edit({ mustVerifyEmail, status }: EditProps) {
       <Head title="Profile" />
 
       <div
-        className={`py-12 min-h-screen transition-colors duration-300
+        className={` transition-colors duration-300
         
       `}
       >
@@ -185,13 +186,17 @@ export default function Edit({ mustVerifyEmail, status }: EditProps) {
                 status={status}
                 className="h-auto"
               />
+            </div>
               <AccountStatistics status={status} />
-            </div>
 
-            <div className="space-y-3">
-              <ConnectedAccounts />
-              <UpdatePasswordForm className="w-full" />
-            </div>
+            {user.provider === null && (
+              <div className="space-y-3 col-span-2">
+                {/* <ConnectedAccounts /> */}
+                <div className="space-y-3">
+                  <UpdatePasswordForm className="w-full" />
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
