@@ -42,6 +42,15 @@ export default function ManageContentPage() {
   >(null);
   const [filters, setFilters] = useState<any>({});
 
+  const [logs, setLogs] = useState<any[]>([]);
+  const [logsPagination, setLogsPagination] = useState({
+    current_page: 1,
+    last_page: 1,
+    total: 0,
+    per_page: 10,
+  });
+  const [isLogsLoading, setIsLogsLoading] = useState(false);
+
   const publicationStore = usePublicationStore();
   const campaignStore = useCampaignStore();
 
@@ -52,13 +61,7 @@ export default function ManageContentPage() {
       case "campaigns":
         return campaignStore.campaigns;
       case "logs":
-        return publicationStore.publications.flatMap((pub) =>
-          (pub.social_post_logs || []).map((log) => ({
-            ...log,
-            publication: pub,
-            campaign: pub.campaigns?.[0],
-          }))
-        );
+        return logs;
       default:
         return [];
     }
@@ -71,7 +74,7 @@ export default function ManageContentPage() {
       case "campaigns":
         return campaignStore.pagination;
       case "logs":
-        return publicationStore.pagination;
+        return logsPagination;
       default:
         return { current_page: 1, last_page: 1, total: 0, per_page: 10 };
     }
@@ -84,7 +87,7 @@ export default function ManageContentPage() {
       case "campaigns":
         return campaignStore.isLoading;
       case "logs":
-        return publicationStore.isLoading;
+        return isLogsLoading;
       default:
         return false;
     }
@@ -99,12 +102,26 @@ export default function ManageContentPage() {
         await campaignStore.fetchCampaigns(filters, page);
         break;
       case "logs":
-        // For logs, we fetch publications since logs are derived from them
-        // We ensure we only get publications that actually HAVE logs to avoid empty pages
-        await publicationStore.fetchPublications(
-          { ...filters, has_logs: true },
-          page
-        );
+        setIsLogsLoading(true);
+        try {
+          const response = await axios.get("/logs", {
+            params: { page, ...filters },
+          });
+          if (response.data.success) {
+            setLogs(response.data.logs.data);
+            setLogsPagination({
+              current_page: response.data.logs.current_page,
+              last_page: response.data.logs.last_page,
+              total: response.data.logs.total,
+              per_page: response.data.logs.per_page,
+            });
+          }
+        } catch (error) {
+          console.error("Failed to fetch logs:", error);
+          toast.error(t("logs.error_fetching"));
+        } finally {
+          setIsLogsLoading(false);
+        }
         break;
     }
   };

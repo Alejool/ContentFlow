@@ -57,10 +57,6 @@ class PublicationController extends Controller
       });
     }
 
-    if ($request->has('has_logs') && $request->has_logs === 'true') {
-      $query->has('socialPostLogs');
-    }
-
     if ($request->query('simplified') === 'true') {
       $publications = $query->get();
     } else {

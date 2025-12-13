@@ -111,8 +111,6 @@ export default function LogsList({
         </div>
       </div>
 
-     
-
       <div className="overflow-x-auto">
         <table className="w-full text-left text-sm">
           <thead
@@ -136,7 +134,7 @@ export default function LogsList({
                 {t("logs.table.status")}
               </th>
               <th className="px-6 py-4 font-semibold">
-                {t("logs.table.content")}
+                {t("logs.table.description")}
               </th>
               <th className="px-6 py-4 font-semibold">
                 {t("logs.table.error")}
@@ -255,6 +253,7 @@ export default function LogsList({
         </table>
       </div>
 
+      {/* Pagination */}
       {pagination && pagination.last_page > 1 && (
         <Pagination
           pagination={pagination}
