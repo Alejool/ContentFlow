@@ -52,9 +52,11 @@ export default function ManageContentPage() {
   const [isLogsLoading, setIsLogsLoading] = useState(false);
 
   const publicationStore = usePublicationStore();
-  const {pagination: publicationPagination, isLoading: publicationIsLoading} = publicationStore;
+  const { pagination: publicationPagination, isLoading: publicationIsLoading } =
+    publicationStore;
   const campaignStore = useCampaignStore();
-  const {pagination: campaignPagination, isLoading: campaignIsLoading} = campaignStore;
+  const { pagination: campaignPagination, isLoading: campaignIsLoading } =
+    campaignStore;
 
   const getItems = () => {
     switch (activeTab) {
@@ -298,11 +300,11 @@ export default function ManageContentPage() {
     }
 
     const confirmed = await confirm({
-      title: "Unpublish & Edit",
-      message:
-        "This publication is currently live. To edit it, we must first delete it from all social platforms (YouTube, etc). This cannot be undone. Continue?",
-      confirmText: "Unpublish & Edit",
-      cancelText: "Cancel",
+      title: t("publications.modal.publish.modal.title") || "Unpublish & Edit",
+      message: t("publications.modal.publish.modal.message") || "",
+      confirmText:
+        t("publications.modal.publish.modal.confirmText") || "Unpublish & Edit",
+      cancelText: t("publications.modal.publish.modal.cancelText") || "Cancel",
       type: "warning",
     });
 

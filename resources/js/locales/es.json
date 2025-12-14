@@ -272,12 +272,20 @@
           "title":"Arrastra y suelta para agregar",
           "subtitle":"PNG, JPG, WebP (max 2MB)"
         },
+        "modal":
+        {
+            "title":"Despublicar",
+            "message":"¿Estás seguro de despublicar? Esto eliminará la publicación de esta plataforma.",
+            "confirmText":"Despublicar",
+            "cancelText":"Cancelar"
+        },
         "button":{
           "publish":"Publicar",
           "cancel":"Cancelar",
           "change":"Cambiar"
         }
       },
+      
       "validation":{
         "descMin":"Descripción debe tener al menos 10 caracteres",
         "descMax":"Descripción debe tener menos de 200 caracteres",
@@ -384,6 +392,7 @@
         "publishDate": "Fecha de Publicación",
         "publishedOn": "Publicado el",
         "publications": "Publicaciones",
+        "loadingPublications": "Cargando publicaciones...",
          "associatedPublicationsRequired":"Publicaciones Asociadas es requerida",
          "placeholders":
          {
@@ -414,6 +423,7 @@
         "publishDate": "Fecha de Publicación",
         "publishedOn": "Publicado el",
         "associatedPublications": "Publicaciones Asociadas",
+        "loadingPublications": "Cargando publicaciones...",
          "placeholders":
          {
           "budget": "0.00",

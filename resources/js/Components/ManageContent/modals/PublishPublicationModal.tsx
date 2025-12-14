@@ -56,9 +56,10 @@ export default function PublishPublicationModal({
 
   useEffect(() => {
     if (isOpen && publication) {
-      console.log("Loading publication thumbnails...");
       fetchPublishedPlatforms(publication.id);
       loadExistingThumbnails(publication);
+      console.log("Loading publication publishedPlatforms...");
+      console.log(publishedPlatforms);
     }
 
     if (!isOpen) {
@@ -73,10 +74,10 @@ export default function PublishPublicationModal({
     if (!publication) return;
 
     const confirmed = await confirm({
-      title: "Unpublish from " + platform,
-      message: `Are you sure you want to unpublish from ${platform}? This will remove the publication from this platform.`,
-      confirmText: "Unpublish",
-      cancelText: "Cancel",
+      title: t("publications.modal.publish.modal.title", { platform }),
+      message: t("publications.modal.publish.modal.message", { platform }),
+      confirmText: t("publications.modal.publish.modal.confirmText"),
+      cancelText: t("publications.modal.publish.modal.cancelText"),
       type: "warning",
     });
 

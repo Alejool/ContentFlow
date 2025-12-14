@@ -272,6 +272,11 @@
           "title":"Drag and drop to add",
           "subtitle":"PNG, JPG, WebP (max 2MB)"
         },
+        "modal":
+        {
+          "title":"Unpublish ",
+          "message":"Are you sure you want to unpublish? This will remove the publication from this platform."
+        },
         "button":{
           "publish":"Publish",
           "cancel":"Cancel",
@@ -383,6 +388,7 @@
         "publishedOn": "Published On",
         "publications": "Publications",
          "associatedPublicationsRequired":"Associated Publications is required",
+         "loadingPublications":"Loading Publications...",
          "placeholders":
          {
           "budget": "0.00",
@@ -412,6 +418,7 @@
         "publishDate": "Publish Date",
         "publishedOn": "Published On",
         "associatedPublications": "Associated Publications",
+        "loadingPublications":"Loading Publications...",
         "placeholders":
          {
           "budget": "0.00",

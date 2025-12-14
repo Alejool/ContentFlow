@@ -1,6 +1,6 @@
 import React from "react";
 import { Check } from "lucide-react";
-
+import Loader from "@/Components/common/Loader";
 interface PublicationSelectorProps {
   publications: any[];
   selectedIds: number[];
@@ -30,6 +30,7 @@ const PublicationSelector: React.FC<PublicationSelectorProps> = ({
   if (loading) {
     return (
       <div className="text-center py-4 text-sm text-gray-500">
+        <Loader />
         {t("campaigns.modal.add.loadingPublications") ||
           "Loading publications..."}
       </div>
