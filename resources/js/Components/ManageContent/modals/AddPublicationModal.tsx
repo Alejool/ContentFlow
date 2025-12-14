@@ -26,7 +26,8 @@ import VideoPreviewItem from "@/Components/ManageContent/Publication/common/add/
 import { useCampaigns } from "@/Hooks/campaign/useCampaigns";
 
 // Iconos
-import { AlertTriangle, Rocket } from "lucide-react";
+import ModalFooter from "@/Components/ManageContent/modals/common/ModalFooter";
+import { AlertTriangle } from "lucide-react";
 
 interface AddPublicationModalProps {
   isOpen: boolean;
@@ -431,7 +432,7 @@ export default function AddPublicationModal({
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 ${
+      className={`fixed inset-0 z-50 flex items-center justify-center  ${
         theme === "dark" ? "text-white" : "text-gray-900"
       }`}
     >
@@ -452,11 +453,9 @@ export default function AddPublicationModal({
           title="publications.modal.add.title"
           subtitle="publications.modal.add.subtitle"
         />
-
-        <div className="flex-1 p-8 custom-scrollbar">
-          <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-8">
+        <main className="flex-1  overflow-y-auto custom-scrollbar">
+          <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-8 p-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Columna izquierda: Medios y programación */}
               <div className="space-y-6">
                 <div className="form-group">
                   <div
@@ -475,7 +474,7 @@ export default function AddPublicationModal({
                     onClick={() => fileInputRef.current?.click()}
                   >
                     <div
-                      className={`min-h-[200px] rounded-lg border-2 border-dashed flex flex-col items-center justify-center p-6 text-center transition-colors overflow-hidden ${
+                      className={`min-h-[200px] rounded-lg border-2 border-dashed flex flex-col items-center justify-center  text-center transition-colors overflow-hidden ${
                         imageError
                           ? theme === "dark"
                             ? "border-primary-500 bg-primary-900/20"
@@ -562,6 +561,7 @@ export default function AddPublicationModal({
                   icon={FileText}
                   theme={theme}
                   variant="filled"
+                  required
                   size="md"
                   hint={`${watched.title?.length || 0}/70 characters`}
                 />
@@ -580,6 +580,7 @@ export default function AddPublicationModal({
                   variant="filled"
                   rows={4}
                   maxLength={200}
+                  required
                   showCharCount
                   hint="Maximum 200 characters"
                 />
@@ -595,6 +596,7 @@ export default function AddPublicationModal({
                   icon={Target}
                   theme={theme}
                   variant="filled"
+                  required
                   size="md"
                   hint={`${watched.goal?.length || 0}/200 characters`}
                 />
@@ -613,6 +615,7 @@ export default function AddPublicationModal({
                   icon={Hash}
                   theme={theme}
                   variant="filled"
+                  required
                   size="md"
                   hint={`${
                     watched.hashtags
@@ -649,36 +652,18 @@ export default function AddPublicationModal({
               </div>
             </div>
           </form>
-        </div>
+        </main>
 
-        <div
-          className={`px-8 py-6 border-t ${modalFooterBg} flex items-center justify-end gap-4 sticky bottom-0 z-10`}
-        >
-          <button
-            type="button"
-            onClick={handleClose}
-            className={`px-6 py-2.5 rounded-lg font-medium transition-colors ${cancelButton}`}
-          >
-            {t("publications.modal.add.button.cancel")}
-          </button>
-          <button
-            onClick={handleSubmit(onFormSubmit)}
-            disabled={isSubmitting}
-            className={`px-8 py-2.5 rounded-lg text-white font-medium hover:shadow-lg transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2 ${submitButton}`}
-          >
-            {isSubmitting ? (
-              <>
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                {t("publications.modal.add.creating")}
-              </>
-            ) : (
-              <>
-                <Rocket className="w-4 h-4" />
-                {t("publications.modal.add.button.save")}
-              </>
-            )}
-          </button>
-        </div>
+        <ModalFooter
+          onClose={handleClose}
+          onSubmit={handleSubmit(onFormSubmit)}
+          isSubmitting={isSubmitting}
+          theme={theme}
+          cancelButton={cancelButton}
+          submitButton={submitButton}
+          borderColor={borderColor}
+          modalFooterBg={modalFooterBg}
+        />
       </div>
     </div>
   );

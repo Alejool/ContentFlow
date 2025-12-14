@@ -9,6 +9,7 @@ interface PublicationSelectorProps {
   t: (key: string) => string;
   getThumbnail: (pub: any) => { url: string | null; type: string } | null;
   onTogglePublication: (id: number) => void;
+  mode?: "add" | "edit";
 }
 
 const PublicationSelector: React.FC<PublicationSelectorProps> = ({
@@ -19,6 +20,7 @@ const PublicationSelector: React.FC<PublicationSelectorProps> = ({
   t,
   getThumbnail,
   onTogglePublication,
+  mode = "add",
 }) => {
   const borderColor =
     theme === "dark" ? "border-neutral-700" : "border-gray-200";
@@ -37,8 +39,10 @@ const PublicationSelector: React.FC<PublicationSelectorProps> = ({
   if (publications.length === 0) {
     return (
       <div className="text-center py-4 text-sm text-gray-500">
-        {t("campaigns.modal.add.noPublications") ||
-          "No publications found. Create some first!"}
+        {mode === "edit"
+          ? t("campaigns.modal.edit.noPublications") || "No publications found."
+          : t("campaigns.modal.add.noPublications") ||
+            "No publications found. Create some first!"}
       </div>
     );
   }
@@ -77,6 +81,7 @@ const PublicationSelector: React.FC<PublicationSelectorProps> = ({
   );
 };
 
+// Componentes internos (sin cambios)
 const Checkbox: React.FC<{ isSelected: boolean }> = ({ isSelected }) => (
   <div
     className={`w-4 h-4 rounded border flex items-center justify-center ${

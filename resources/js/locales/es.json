@@ -318,6 +318,7 @@
       "status": "Estado",
       "actions": "Acciones",
       "noCampaign": "Sin Campaña",
+      "loading": "Cargando...",
       "emptyState": {
         "title": "No se encontraron publicaciones",
         "description": "Crea una publicación para comenzar a publicar contenido.",
@@ -460,6 +461,7 @@
     "button": {
       "addCampaign": "Agregar Campaña",
       "editCampaign": "Editar Campaña",
+      "close":"Cerrar",
       "deleteCampaign": "Eliminar Campaña"
     },
     "table": {
@@ -470,6 +472,7 @@
       "status": "Estado",
       "actions": "Acciones",
       "linkedAccount": "Cuentas Asociadas",
+      "loading": "Cargando...",
       "emptyState": {
         "title": "No se encontraron campañas",
         "description": "Crea una campaña para comenzar a publicar contenido.",
@@ -1030,5 +1033,9 @@
         "analytics": "Analíticas"
       }
     }
+  },
+  "pagination": {
+    "next": "Siguiente",
+    "previous": "Anterior"
   }
 }

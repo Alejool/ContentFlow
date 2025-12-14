@@ -1,25 +1,21 @@
-import Input from "@/Components/common/Modern/Input";
-import Textarea from "@/Components/common/Modern/Textarea";
-import ModernDatePicker from "@/Components/common/ui/ModernDatePicker";
-import { useCampaignManagement } from "@/Hooks/useCampaignManagement";
-import { useTheme } from "@/Hooks/useTheme";
-import { campaignSchema } from "@/schemas/campaign";
-import { Campaign } from "@/types/Campaign";
-import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios";
-import { format } from "date-fns";
-import {
-  AlertTriangle,
-  Check,
-  FileText,
-  Loader2,
-  Save,
-  Target,
-  X,
-} from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
+import { useTheme } from "@/Hooks/useTheme";
+import { useCampaignManagement } from "@/Hooks/useCampaignManagement";
+import { Campaign } from "@/types/Campaign";
+import { Save, Target, X, Loader2, AlertTriangle } from "lucide-react";
+
+// Componentes reutilizables
+import ModalHeader from "@/Components/ManageContent/modals/common/ModalHeader";
+import CampaignFormFields from "@/Components/ManageContent/Campaign/common/CampaignFormFields";
+import CampaignDateFields from "@/Components/ManageContent/Campaign/common/CampaignDateFields";
+import PublicationSelector from "@/Components/ManageContent/Campaign/common/PublicationSelector";
+
+// Hooks
+import { useEditCampaignForm } from "@/Hooks/campaign/useEditCampaignForm";
+import { usePublicationsForCampaignEdit } from "@/Hooks/campaign/usePublicationsForCampaignEdit";  
 
 interface EditCampaignModalProps {
   isOpen: boolean;
@@ -38,22 +34,15 @@ export default function EditCampaignModal({
   const { theme } = useTheme();
   const { updateCampaign } = useCampaignManagement();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [availablePublications, setAvailablePublications] = useState<any[]>([]);
-  const [loadingPubs, setLoadingPubs] = useState(false);
 
-  const schema = useMemo(() => campaignSchema(t), [t]);
+  const { register, handleSubmit, setValue, watch, reset, errors } =
+    useEditCampaignForm(t, campaign);
 
   const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    watch,
-    setValue,
-    reset,
-  } = useForm({
-    resolver: zodResolver(schema),
-    mode: "onChange",
-  });
+    availablePublications,
+    loading: loadingPubs,
+    getThumbnail,
+  } = usePublicationsForCampaignEdit(isOpen, campaign?.id);
 
   const watchedFields = watch();
 
@@ -68,41 +57,12 @@ export default function EditCampaignModal({
         end_date: campaign.end_date || "",
         publication_ids: campaign.publications?.map((p: any) => p.id) || [],
       });
-      fetchPublications();
     }
   }, [isOpen, campaign, reset]);
 
-  const fetchPublications = async () => {
-    setLoadingPubs(true);
-    try {
-      let url = "/publications?simplified=true&exclude_assigned=true";
-      if (campaign?.id) {
-        url += `&include_campaign_id=${campaign.id}`;
-      }
-      const response = await axios.get(url);
-      // Handle both simplified (array) and paginated (object with data) structures
-      if (response.data?.publications) {
-        if (Array.isArray(response.data.publications)) {
-          setAvailablePublications(response.data.publications);
-        } else if (
-          response.data.publications.data &&
-          Array.isArray(response.data.publications.data)
-        ) {
-          setAvailablePublications(response.data.publications.data);
-        }
-      } else if (Array.isArray(response.data)) {
-        // Fallback if API returns direct array
-        setAvailablePublications(response.data);
-      }
-    } catch (error) {
-      console.error("Error fetching publications:", error);
-    } finally {
-      setLoadingPubs(false);
-    }
-  };
-
   const onFormSubmit = async (data: any) => {
     if (!campaign) return;
+
     setIsSubmitting(true);
     try {
       const payload = {
@@ -117,19 +77,31 @@ export default function EditCampaignModal({
 
       const success = await updateCampaign(campaign.id, payload, "campaigns");
       if (success) {
+        toast.success(
+          t("campaigns.messages.updateSuccess") ||
+            "Campaign updated successfully"
+        );
         if (onSubmit) {
           onSubmit(true);
         }
         handleClose();
+      } else {
+        toast.error(
+          t("campaigns.messages.updateError") || "Failed to update campaign"
+        );
       }
     } catch (error) {
       console.error("Error updating campaign:", error);
+      toast.error(
+        t("campaigns.messages.updateError") || "Failed to update campaign"
+      );
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleClose = () => {
+    reset();
     setIsSubmitting(false);
     onClose();
   };
@@ -146,39 +118,14 @@ export default function EditCampaignModal({
     }
   };
 
-  const getThumbnail = (pub: any) => {
-    if (!pub.media_files || pub.media_files.length === 0) return null;
-
-    const firstImage = pub.media_files.find((f: any) =>
-      f.file_type.includes("image")
-    );
-    if (firstImage) {
-      const url = firstImage.file_path.startsWith("http")
-        ? firstImage.file_path
-        : `/storage/${firstImage.file_path}`;
-      return { url, type: "image" };
-    }
-
-    const hasVideo = pub.media_files.some((f: any) =>
-      f.file_type.includes("video")
-    );
-    if (hasVideo) {
-      return { url: null, type: "video" };
-    }
-
-    return null;
-  };
-
   if (!isOpen || !campaign) return null;
 
+  // Estilos
   const modalBg = theme === "dark" ? "bg-neutral-800" : "bg-white";
-  const modalHeaderBg = theme === "dark" ? "bg-neutral-900" : "bg-white";
-  const textPrimary = theme === "dark" ? "text-gray-100" : "text-gray-900";
-  const textSecondary = theme === "dark" ? "text-gray-400" : "text-gray-500";
   const borderColor =
     theme === "dark" ? "border-neutral-700" : "border-gray-200";
-  const inputBg = theme === "dark" ? "bg-neutral-700" : "bg-white";
   const labelText = theme === "dark" ? "text-gray-300" : "text-gray-700";
+  const textSecondary = theme === "dark" ? "text-gray-400" : "text-gray-500";
 
   return (
     <div
@@ -191,154 +138,56 @@ export default function EditCampaignModal({
           theme === "dark" ? "bg-black/70" : "bg-gray-900/60"
         } backdrop-blur-sm`}
         onClick={handleClose}
-      ></div>
+      />
 
       <div
         className={`relative w-full max-w-2xl ${modalBg} rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300`}
       >
-        <div
-          className={`px-6 py-4 border-b ${borderColor} ${modalHeaderBg} flex items-center justify-between sticky top-0 z-10`}
-        >
-          <div>
-            <h2
-              className={`text-xl font-bold ${textPrimary} flex items-center gap-2`}
-            >
-              <Target className="w-5 h-5 text-primary-500" />
-              {t("campaigns.modal.edit.title") || "Edit Campaign Group"}
-            </h2>
-            <p className={`${textSecondary} text-sm mt-0.5`}>
-              {t("campaigns.modal.edit.subtitle") ||
-                "Update your campaign details"}
-            </p>
-          </div>
-          <button
-            onClick={handleClose}
-            className={`p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors ${textSecondary}`}
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
+        <ModalHeader
+          theme={theme}
+          t={t}
+          onClose={handleClose}
+          title="campaigns.modal.edit.title"
+          subtitle="campaigns.modal.edit.subtitle"
+          icon={Target}
+          iconColor="text-primary-500"
+          size="xl"
+        />
 
         <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
           <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-6">
-            <div className="form-group">
-              <Input
-                id="name"
-                label={t("campaigns.modal.add.name") || "Campaign Name"}
-                register={register}
-                name="name"
-                placeholder={
-                  t("campaigns.modal.add.placeholders.name") ||
-                  "e.g. Summer Sale 2024"
-                }
-                error={errors.name?.message as string}
-              />
-            </div>
+            {/* Campos del formulario */}
+            <CampaignFormFields
+              register={register}
+              errors={errors}
+              watched={watchedFields}
+              theme={theme}
+              t={t}
+              mode="edit"
+            />
 
-            <div className="form-group">
-              <Textarea
-                id="description"
-                label={t("campaigns.modal.add.description")}
-                register={register}
-                name="description"
-                placeholder={t("campaigns.modal.add.placeholders.description")}
-                error={errors.description?.message as string}
-                icon={FileText}
-                theme={theme}
-                variant="filled"
-                rows={4}
-                maxLength={200}
-                showCharCount
-                hint="Maximum 200 characters"
-              />
-            </div>
+            {/* Fechas */}
+            <CampaignDateFields
+              startDate={watchedFields.start_date}
+              endDate={watchedFields.end_date}
+              errors={errors}
+              setValue={setValue}
+              watch={watch}
+              theme={theme}
+              t={t}
+            />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="form-group">
-                <Input
-                  id="goal"
-                  label={t("campaigns.modal.edit.goal") || "Goal"}
-                  register={register}
-                  name="goal"
-                  placeholder={
-                    t("campaigns.modal.edit.placeholders.goal") ||
-                    "e.g. $1000.00"
-                  }
-                  error={errors.goal?.message as string}
-                />
+            {/* Mensaje de error para fecha fin */}
+            {errors.end_date && (
+              <div className="p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
+                <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4" />
+                  {errors.end_date.message as string}
+                </p>
               </div>
+            )}
 
-              <div className="form-group">
-                <Input
-                  id="budget"
-                  label={t("campaigns.modal.edit.budget") || "Budget"}
-                  register={register}
-                  name="budget"
-                  placeholder={
-                    t("campaigns.modal.edit.placeholders.budget") ||
-                    "e.g. $1000.00"
-                  }
-                  error={errors.budget?.message as string}
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="form-group">
-                <ModernDatePicker
-                  register={register}
-                  name="start_date"
-                  error={errors.start_date?.message as string}
-                  label={t("campaigns.modal.add.startDate") || "Start Date"}
-                  selected={
-                    watch("start_date") ? new Date(watch("start_date")!) : null
-                  }
-                  onChange={(date: Date | null) =>
-                    setValue(
-                      "start_date",
-                      date ? format(date, "yyyy-MM-dd") : "",
-                      { shouldValidate: true }
-                    )
-                  }
-                  placeholder={
-                    t("campaigns.modal.edit.placeholders.startDate") ||
-                    "Select start date"
-                  }
-                  withPortal
-                />
-              </div>
-              <div className="form-group">
-                <ModernDatePicker
-                  register={register}
-                  name="end_date"
-                  error={errors.end_date?.message as string}
-                  label={t("campaigns.modal.add.endDate") || "End Date"}
-                  selected={
-                    watch("end_date") ? new Date(watch("end_date")!) : null
-                  }
-                  onChange={(date: Date | null) =>
-                    setValue("end_date", date ? format(date, "yyyy-MM-dd") : "")
-                  }
-                  placeholder={
-                    t("campaigns.modal.edit.placeholders.endDate") ||
-                    "Select end date"
-                  }
-                  minDate={
-                    watch("start_date")
-                      ? new Date(watch("start_date")!)
-                      : undefined
-                  }
-                  withPortal
-                />
-                {errors.end_date && (
-                  <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
-                    <AlertTriangle className="w-3 h-3" />{" "}
-                    {errors.end_date.message as string}
-                  </p>
-                )}
-              </div>
-            </div>
-
+            {/* Selección de Publicaciones */}
             <div className="form-group">
               <label
                 className={`block text-sm font-semibold ${labelText} mb-2`}
@@ -352,85 +201,19 @@ export default function EditCampaignModal({
                   theme === "dark" ? "bg-black/20" : "bg-gray-50"
                 }`}
               >
-                {loadingPubs ? (
-                  <div className="text-center py-4 text-sm text-gray-500">
-                    Loading publications...
-                  </div>
-                ) : availablePublications.length === 0 ? (
-                  <div className="text-center py-4 text-sm text-gray-500">
-                    No publications found.
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 gap-2">
-                    {availablePublications.map((pub) => {
-                      const isSelected = (
-                        watchedFields.publication_ids || []
-                      ).includes(pub.id);
-                      return (
-                        <div
-                          key={pub.id}
-                          onClick={() => togglePublication(pub.id)}
-                          className={`flex items-center gap-3 p-2 rounded cursor-pointer border transition-all ${
-                            isSelected
-                              ? "border-primary-500 bg-primary-50 dark:bg-primary-900/20"
-                              : `${borderColor} ${
-                                  theme === "dark"
-                                    ? "bg-neutral-800"
-                                    : "bg-white"
-                                } hover:border-primary-300`
-                          }`}
-                        >
-                          <div
-                            className={`w-4 h-4 rounded border flex items-center justify-center ${
-                              isSelected
-                                ? "bg-primary-500 border-primary-500"
-                                : "border-gray-400"
-                            }`}
-                          >
-                            {isSelected && (
-                              <Check className="w-3 h-3 text-white" />
-                            )}
-                          </div>
-                          {(() => {
-                            const thumbnail = getThumbnail(pub);
-                            if (!thumbnail) return null;
-                            if (thumbnail.type === "image" && thumbnail.url) {
-                              return (
-                                <img
-                                  src={thumbnail.url}
-                                  className="w-8 h-8 rounded object-cover"
-                                  alt="Thumbnail"
-                                />
-                              );
-                            }
-                            // Video icon
-                            return (
-                              <div className="w-8 h-8 rounded bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center">
-                                <svg
-                                  className="w-4 h-4 text-white"
-                                  fill="currentColor"
-                                  viewBox="0 0 20 20"
-                                >
-                                  <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z" />
-                                </svg>
-                              </div>
-                            );
-                          })()}
-                          <div className="flex-1 min-w-0">
-                            <p
-                              className={`text-sm font-medium truncate ${textPrimary}`}
-                            >
-                              {pub.title || pub.name || "Untitled"}
-                            </p>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
+                <PublicationSelector
+                  publications={availablePublications}
+                  selectedIds={watchedFields.publication_ids || []}
+                  loading={loadingPubs}
+                  theme={theme}
+                  t={t}
+                  getThumbnail={getThumbnail}
+                  onTogglePublication={togglePublication}
+                />
               </div>
             </div>
 
+            {/* Botones de acción */}
             <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100 dark:border-neutral-700">
               <button
                 type="button"
@@ -451,7 +234,7 @@ export default function EditCampaignModal({
                 {isSubmitting ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    Saving...
+                    {t("common.saving") || "Saving..."}
                   </>
                 ) : (
                   <>

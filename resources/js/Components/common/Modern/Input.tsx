@@ -1,6 +1,6 @@
 import { useTheme } from "@/Hooks/useTheme";
 import {
-  AlertCircle,
+  TriangleAlert,
   CheckCircle,
   Eye,
   EyeOff,
@@ -64,9 +64,9 @@ export default function Input<T extends FieldValues>({
 
   // Configuración de tamaños
   const sizeConfig = {
-    sm: { input: "py-2 px-3 text-xs", icon: "w-4 h-4", label: "text-xs" },
-    md: { input: "py-3 px-4 text-sm", icon: "w-5 h-5", label: "text-sm" },
-    lg: { input: "py-4 px-4 text-base", icon: "w-6 h-6", label: "text-base" },
+    sm: { input: "py-1 px-2 text-xs", icon: "w-3 h-3", label: "text-xs" },
+    md: { input: "py-2 px-3 text-sm", icon: "w-4 h-4", label: "text-sm" },
+    lg: { input: "py-3 px-4 text-base", icon: "w-5 h-5", label: "text-base" },
   };
 
   const currentSize = sizeConfig[size];
@@ -102,11 +102,11 @@ export default function Input<T extends FieldValues>({
           base: "bg-neutral-800/50 text-white border border-neutral-700/50",
           states: {
             error:
-              "border-primary-400 bg-primary-900/10 focus:ring-primary-500/30 focus:border-primary-400",
+              "border-primary-400  focus:ring-primary-500/30 focus:border-primary-400",
             success:
-              "border-green-400 bg-green-900/10 focus:ring-green-500/30 focus:border-green-400",
+              "border-green-400  focus:ring-green-500/30 focus:border-green-400",
             focused:
-              "border-purple-400 bg-neutral-800/70 focus:ring-purple-500/30",
+              "border-purple-400 focus:ring-purple-500/30",
             idle: "hover:border-neutral-600/70 hover:bg-neutral-800/60 focus:ring-purple-500/30",
           },
         },
@@ -123,10 +123,10 @@ export default function Input<T extends FieldValues>({
           base: "bg-neutral-800 text-white border border-neutral-700",
           states: {
             error:
-              "border-primary-400 bg-primary-900/20 focus:ring-primary-500/30",
-            success: "border-green-400 bg-green-900/20 focus:ring-green-500/30",
+              "border-primary-400 focus:ring-primary-500/30",
+            success: "border-green-400 focus:ring-green-500/30",
             focused:
-              "border-purple-400 bg-neutral-700 focus:ring-purple-500/30",
+              "border-purple-400 focus:ring-purple-500/30",
             idle: "hover:bg-neutral-700/80 focus:ring-purple-500/30",
           },
         },
@@ -136,10 +136,10 @@ export default function Input<T extends FieldValues>({
           base: "bg-white text-gray-900 border border-gray-300",
           states: {
             error:
-              "border-primary-500 bg-primary-50/50 focus:ring-primary-500/20 focus:border-primary-500",
+              "border-primary-500 focus:ring-primary-500/20 focus:border-primary-500",
             success:
-              "border-green-500 bg-green-50/50 focus:ring-green-500/20 focus:border-green-500",
-            focused: "border-purple-500 bg-gray-50 focus:ring-purple-500/20",
+              "border-green-500 focus:ring-green-500/20 focus:border-green-500",
+            focused: "border-purple-500 focus:ring-purple-500/20",
             idle: "hover:border-gray-400 focus:ring-purple-500/20",
           },
         },
@@ -155,9 +155,9 @@ export default function Input<T extends FieldValues>({
         filled: {
           base: "bg-gray-50 text-gray-900 border border-gray-300",
           states: {
-            error: "border-primary-500 bg-primary-50 focus:ring-primary-500/20",
-            success: "border-green-500 bg-green-50 focus:ring-green-500/20",
-            focused: "border-purple-500 bg-white focus:ring-purple-500/20",
+            error: "border-primary-500 focus:ring-primary-500/20",
+            success: "border-green-500 focus:ring-green-500/20",
+            focused: "border-purple-500 focus:ring-purple-500/20",
             idle: "hover:bg-white focus:ring-purple-500/20",
           },
         },
@@ -176,16 +176,16 @@ export default function Input<T extends FieldValues>({
   };
 
   const getMessageStyles = (type: "error" | "success") => {
-    const base = "flex items-start align-center gap-2 px-3 py-2 rounded-lg text-sm";
+    const base = "flex items-start align-center gap-2  py-2 rounded-lg text-sm";
 
     if (theme === "dark") {
       return type === "error"
-        ? `${base} text-primary-300 bg-primary-900 border border-primary-800/50`
-        : `${base} text-green-300 bg-green-900 border border-green-800/50`;
+        ? `${base} text-primary-600 `
+        : `${base} text-green-600`;
     }
     return type === "error"
-      ? `${base} text-primary-600 bg-primary-50 border border-primary-100`
-      : `${base} text-green-600 bg-green-50 border border-green-100`;
+      ? `${base} text-primary-600`
+      : `${base} text-green-600`;
   };
 
   return (
@@ -297,7 +297,7 @@ export default function Input<T extends FieldValues>({
 
       {error && (
         <div className={getMessageStyles("error")} role="alert">
-          <AlertCircle className={`${currentSize.icon}  flex-shrink-0`} />
+          <TriangleAlert className={`${currentSize.icon}  flex-shrink-0`} />
           <span>{error}</span>
         </div>
       )}

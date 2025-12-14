@@ -116,7 +116,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({
           icon={Target}
           theme={theme}
           variant="filled"
-          size="md"
+          size="sm"
           clearable
         />
       )}

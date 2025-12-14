@@ -52,7 +52,9 @@ export default function ManageContentPage() {
   const [isLogsLoading, setIsLogsLoading] = useState(false);
 
   const publicationStore = usePublicationStore();
+  const {pagination: publicationPagination, isLoading: publicationIsLoading} = publicationStore;
   const campaignStore = useCampaignStore();
+  const {pagination: campaignPagination, isLoading: campaignIsLoading} = campaignStore;
 
   const getItems = () => {
     switch (activeTab) {
@@ -70,9 +72,9 @@ export default function ManageContentPage() {
   const getPagination = () => {
     switch (activeTab) {
       case "publications":
-        return publicationStore.pagination;
+        return publicationPagination;
       case "campaigns":
-        return campaignStore.pagination;
+        return campaignPagination;
       case "logs":
         return logsPagination;
       default:
@@ -83,9 +85,9 @@ export default function ManageContentPage() {
   const getIsLoading = () => {
     switch (activeTab) {
       case "publications":
-        return publicationStore.isLoading;
+        return publicationIsLoading;
       case "campaigns":
-        return campaignStore.isLoading;
+        return campaignIsLoading;
       case "logs":
         return isLogsLoading;
       default:

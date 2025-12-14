@@ -1,57 +1,74 @@
+import Button from "@/Components/common/Modern/Button";
+import { Save, X } from "lucide-react";
 import React from "react";
-import { Upload } from "lucide-react";
 
 interface ModalFooterProps {
-  theme: "dark" | "light";
-  t: (key: string) => string;
-  isSubmitting: boolean;
-  onClose: () => void;
-  borderColor: string;
+  isSubmitting?: boolean;
+  onClose?: () => void;
+  submitText?: string;
+  cancelText?: string;
+  formId?: string;
+  submitIcon?: React.ReactNode;
+  cancelIcon?: React.ReactNode;
+  submitVariant?:
+    | "primary"
+    | "danger"
+    | "secondary"
+    | "success"
+    | "ghost"
+    | "warning";
+  cancelVariant?:
+    | "primary"
+    | "danger"
+    | "secondary"
+    | "success"
+    | "ghost"
+    | "warning";
+  submitStyle?: "solid" | "outline" | "gradient" | "ghost";
+  cancelStyle?: "solid" | "outline" | "gradient" | "ghost";
 }
 
-const ModalFooter: React.FC<ModalFooterProps> = ({
-  theme,
-  t,
-  isSubmitting,
+export default function ModalFooter({
+  isSubmitting = false,
   onClose,
-  borderColor,
-}) => {
+  submitText = "Save",
+  cancelText = "Cancel",
+  formId,
+  submitIcon = <Save className="w-4 h-4" />,
+  cancelIcon = <X className="w-4 h-4" />,
+  submitVariant = "primary",
+  cancelVariant = "secondary",
+  submitStyle = "gradient",
+  cancelStyle = "outline",
+}: ModalFooterProps) {
   return (
-    <div className={`pt-6 border-t ${borderColor} flex justify-end gap-3`}>
-      <button
-        type="button"
-        onClick={onClose}
-        className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-          theme === "dark"
-            ? "hover:bg-neutral-700 text-gray-300"
-            : "hover:bg-gray-100 text-gray-700"
-        }`}
-      >
-        {t("publications.modal.edit.button.cancel")}
-      </button>
-      <button
-        type="submit"
+    <div className="border-t border-gray-200 px-6 py-4 flex justify-end gap-3">
+      {onClose && (
+        <Button
+          type="button"
+          onClick={onClose}
+          disabled={isSubmitting}
+          variant={cancelVariant}
+          style={cancelStyle}
+          size="md"
+          icon={cancelIcon}
+        >
+          {cancelText}
+        </Button>
+      )}
+
+      <Button
+        type={formId ? "submit" : "button"}
+        form={formId}
         disabled={isSubmitting}
-        className={`px-6 py-2 rounded-lg font-medium text-white shadow-lg transition-all flex items-center gap-2 ${
-          isSubmitting
-            ? "opacity-50 cursor-not-allowed"
-            : "hover:shadow-primary-500/25 active:scale-95"
-        } bg-gradient-to-r from-primary-600 to-primary-700`}
+        loading={isSubmitting}
+        variant={submitVariant}
+        style={submitStyle}
+        size="md"
+        icon={submitIcon}
       >
-        {isSubmitting ? (
-          <>
-            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-            Updating...
-          </>
-        ) : (
-          <>
-            <Upload className="w-4 h-4" />
-            {t("publications.modal.edit.button.save")}
-          </>
-        )}
-      </button>
+        {submitText}
+      </Button>
     </div>
   );
-};
-
-export default ModalFooter;
+}

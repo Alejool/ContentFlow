@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import Loader from "@/Components/common/Loader";
 
 interface LogsListProps {
   logs: SocialPostLog[];
@@ -86,21 +87,9 @@ export default function LogsList({
           : "bg-white/70 border-gray-100/70 text-gray-900"
       }`}
     >
-      {/* Header */}
       <div className="p-6 border-b border-gray-100 dark:border-neutral-700/50 flex justify-between items-center">
         <h2 className="text-xl font-bold">{t("logs.title")}</h2>
         <div className="flex gap-2">
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className={`p-2 rounded-lg transition-colors ${
-              showFilters
-                ? "bg-primary-500 text-white"
-                : "hover:bg-gray-100 dark:hover:bg-neutral-700"
-            }`}
-            title={t("logs.filters.title")}
-          >
-            <Filter className="w-4 h-4" />
-          </button>
           <button
             onClick={onRefresh}
             className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-700 transition-colors"
@@ -151,8 +140,14 @@ export default function LogsList({
           >
             {isLoading ? (
               <tr>
-                <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
-                  {t("logs.loading")}
+                <td
+                  colSpan={6}
+                  className="px-6 py-12 text-center space-y-6  text-gray-500"
+                >
+                  <Loader />
+                  <span className="text-sm pt-8">
+                    {t("logs.loading")}
+                  </span>
                 </td>
               </tr>
             ) : filteredLogs.length === 0 ? (
@@ -253,11 +248,12 @@ export default function LogsList({
         </table>
       </div>
 
-      {/* Pagination */}
       {pagination && pagination.last_page > 1 && (
         <Pagination
+          theme={theme}
           pagination={pagination}
           onPageChange={onPageChange || (() => {})}
+          t={t}
         />
       )}
     </div>

@@ -4,19 +4,15 @@ import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
-
 // Hooks
 import { useTheme } from "@/Hooks/useTheme";
-
 // Stores
 import { useCampaignStore } from "@/stores/campaignStore";
 import { usePublicationStore } from "@/stores/publicationStore";
 import { useAccountsStore } from "@/stores/socialAccountsStore";
-
 // Schemas
 import { publicationSchema } from "@/schemas/publication";
 import { Publication } from "@/types/Publication";
-
 // Componentes
 import SocialAccountsSection from "@/Components/ManageContent/Publication/common/add/SocialAccountsSection";
 import ContentSection from "@/Components/ManageContent/Publication/common/edit/ContentSection";
@@ -116,7 +112,6 @@ export default function EditPublicationModal({
 
   const watched = watch();
 
-  // Estilos
   const modalBg = theme === "dark" ? "bg-neutral-800" : "bg-white";
   const borderColor =
     theme === "dark" ? "border-neutral-600" : "border-gray-200";
@@ -430,7 +425,7 @@ export default function EditPublicationModal({
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 ${
+      className={`fixed inset-0 z-50 flex items-center justify-center sm:p-6 ${
         theme === "dark" ? "text-white" : "text-gray-900"
       }`}
     >
@@ -442,14 +437,19 @@ export default function EditPublicationModal({
       />
 
       <div
-        className={`relative w-full max-w-4xl ${modalBg} rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300`}
+        className={`relative w-full max-w-4xl ${modalBg} rounded-lg shadow-2xl  flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300`}
       >
-        <ModalHeader theme={theme} t={t} onClose={onClose} />
+        <ModalHeader
+          theme={theme}
+          t={t}
+          onClose={onClose}
+          title="publications.modal.edit.title"
+          subtitle="publications.modal.edit.subtitle"
+        />
 
         <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
           <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Columna izquierda: Medios y programación */}
               <div className="space-y-6">
                 <MediaUploadSection
                   mediaPreviews={mediaPreviews}
@@ -509,7 +509,6 @@ export default function EditPublicationModal({
                 )}
               </div>
 
-              {/* Columna derecha: Contenido */}
               <div className="space-y-6">
                 <ContentSection
                   register={register}
@@ -525,11 +524,11 @@ export default function EditPublicationModal({
             </div>
 
             <ModalFooter
-              theme={theme}
-              t={t}
               isSubmitting={isSubmitting}
               onClose={onClose}
-              borderColor={borderColor}
+              submitText={t("publications.modal.button.editCampaign") || "Edit Campaign"}
+              cancelText={t("publications.modal.button.close") || "Close"}
+              formId="edit-publication-form"
             />
           </form>
         </div>

@@ -5,12 +5,14 @@ interface PaginationProps {
   };
   theme: string;
   onPageChange: (page: number) => void;
+  t: (key: string) => string;
 }
 
 export default function Pagination({
   pagination,
   theme,
   onPageChange,
+  t,
 }: PaginationProps) {
   return (
     <div className="p-4 flex justify-between items-center text-sm border-t border-gray-100 dark:border-neutral-700">
@@ -23,7 +25,7 @@ export default function Pagination({
             : "border-gray-200 hover:bg-gray-50 text-gray-700"
         }`}
       >
-        Previous
+        {t("pagination.previous")}
       </button>
       <span className={theme === "dark" ? "text-gray-400" : "text-gray-600"}>
         Page {pagination.current_page} of {pagination.last_page}
@@ -41,7 +43,7 @@ export default function Pagination({
             : "border-gray-200 hover:bg-gray-50 text-gray-700"
         }`}
       >
-        Next
+        {t("pagination.next")}
       </button>
     </div>
   );

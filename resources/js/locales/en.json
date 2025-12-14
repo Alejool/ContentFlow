@@ -315,6 +315,7 @@
       "status": "Status",
       "actions": "Actions",
       "noCampaign": "No Campaign",
+      "loading": "Loading...",
       "emptyState": {
         "title": "No publications found",
         "description": "Create a publication to start publishing content.",
@@ -468,6 +469,7 @@
       "status": "Status",
       "linkedAccount": "Linked Account",
       "actions": "Actions",
+      "loading": "Loading...",
        "emptyState": {
         "title": "No campaigns found",
         "description": "Create a campaign to start publishing content.",
@@ -1025,5 +1027,9 @@
         "analytics": "Analytics"
       }
     }
+  },
+   "pagination": {
+    "next": "Next",
+    "previous": "Previous"
   }
 }

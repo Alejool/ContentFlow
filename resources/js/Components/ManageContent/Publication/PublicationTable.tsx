@@ -1,6 +1,7 @@
 import PublicationRow from "@/Components/ManageContent/Publication/PublicationRow";
 import { TableHeader } from "@/Components/ManageContent/Publication/TableHeader";
 import { Publication } from "@/types/Publication";
+import Loader from "@/Components/common/Loader";
 
 interface PublicationTableProps {
   items: Publication[];
@@ -11,6 +12,7 @@ interface PublicationTableProps {
   onDelete: (id: number) => void;
   onPublish: (item: Publication) => void;
   onEditRequest?: (item: Publication) => void;
+  isLoading?: boolean;
 }
 
 export default function PublicationTable({
@@ -22,6 +24,7 @@ export default function PublicationTable({
   onDelete,
   onPublish,
   onEditRequest,
+  isLoading,
 }: PublicationTableProps) {
   const getStatusColor = (status?: string) => {
     switch (status) {
@@ -62,7 +65,14 @@ export default function PublicationTable({
             theme === "dark" ? "divide-neutral-700/50" : "divide-gray-100"
           }`}
         >
-          {items.length > 0 ? (
+          {isLoading ? (
+            <tr>
+              <td colSpan={6} className="px-6 py-12 text-center space-y-6  text-gray-500">
+                <Loader />
+                <span className="text-sm pt-8">{t("publications.table.loading")}</span>
+              </td>
+            </tr>
+          ) : items.length > 0 ? (
             items.map((item) => (
               <PublicationRow
                 key={item.id}

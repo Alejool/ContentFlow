@@ -96,6 +96,7 @@ export default function CampaignList({
           key={items.length}
           theme={theme}
           t={t}
+          isLoading={isLoading}
           expandedCampaigns={expandedCampaigns}
           toggleExpand={toggleExpand}
           onEdit={onEdit}
@@ -109,6 +110,7 @@ export default function CampaignList({
           key={items.length}
           theme={theme}
           t={t}
+          isLoading={isLoading}
           connectedAccounts={connectedAccounts}
           onEdit={onEdit}
           onDelete={onDelete}
@@ -122,6 +124,7 @@ export default function CampaignList({
           pagination={pagination}
           theme={theme}
           onPageChange={onPageChange}
+          t={t}
         />
       )}
     </div>

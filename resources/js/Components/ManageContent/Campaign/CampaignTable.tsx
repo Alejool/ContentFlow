@@ -3,6 +3,7 @@ import { Campaign } from "@/types/Campaign";
 import CampaignRow from "@/Components/ManageContent/Campaign/CampaignRow";
 import CampaignPublications from "@/Components/ManageContent/Campaign/CampaignPublications";
 import { TableHeader } from "@/Components/ManageContent/Publication/TableHeader";
+import Loader from "@/Components/common/Loader";
 
 interface CampaignTableProps {
   items: Campaign[];
@@ -14,6 +15,7 @@ interface CampaignTableProps {
   onDelete: (id: number) => void;
   onEditRequest?: (item: Campaign) => void;
   onViewDetails: (item: Campaign) => void;
+  isLoading?: boolean;
 }
 
 export default function CampaignTable({
@@ -26,6 +28,7 @@ export default function CampaignTable({
   onDelete,
   onEditRequest,
   onViewDetails,
+  isLoading,
 }: CampaignTableProps) {
  
   const getStatusColor = (status?: string) => {
@@ -70,7 +73,19 @@ export default function CampaignTable({
             theme === "dark" ? "divide-neutral-700/50" : "divide-gray-100"
           }`}
         >
-          {items.length > 0 ? (
+          {isLoading ? (
+            <tr>
+              <td
+                colSpan={6}
+                className="px-6 py-12 text-center space-y-6  text-gray-500"
+              >
+                <Loader />
+                <span className="text-sm pt-8">
+                  {t("campaigns.table.loading")}
+                </span>
+              </td>
+            </tr>
+          ) : items.length > 0 ? (
             items.map((item) => (
               <Fragment key={item.id}>
                 <CampaignRow
@@ -97,7 +112,7 @@ export default function CampaignTable({
           ) : (
             <tr>
               <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
-                  {t("campaigns.table.emptyState.title")}
+                {t("campaigns.table.emptyState.title")}
               </td>
             </tr>
           )}
