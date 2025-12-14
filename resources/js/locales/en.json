@@ -275,7 +275,9 @@
         "modal":
         {
           "title":"Unpublish ",
-          "message":"Are you sure you want to unpublish? This will remove the publication from this platform."
+          "message":"Are you sure you want to unpublish? This will remove the publication from this platform.",
+          "confirmText":"Unpublish",
+          "cancelText":"Cancel"
         },
         "button":{
           "publish":"Publish",
