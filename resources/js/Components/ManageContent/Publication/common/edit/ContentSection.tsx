@@ -104,7 +104,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({
         publication.scheduled_posts.length === 0) && (
         <Select
           id="campaign_id"
-          label={t("publications.modal.edit.addCampaign") || "Add to Campaign"}
+          label={t("publications.modal.edit.add") || "Add to Campaign"}
           options={(campaigns || []).map((campaign: any) => ({
             value: campaign.id,
             label: campaign.name || campaign.title || `Campaign ${campaign.id}`,

@@ -301,9 +301,10 @@
       }
     },
     "button":{
-      "addPublication":"Add Publication",
-      "editPublication":"Edit Publication",
-      "deletePublication":"Delete Publication"
+      "add":"Add Publication",
+      "edit":"Edit Publication",
+      "delete":"Delete Publication",
+      "close":"Close"
     },
   
     "table": {
@@ -457,9 +458,10 @@
       }
     },
     "button": {
-      "addCampaign": "Add Campaign",
-      "editCampaign": "Edit Campaign",
-      "deleteCampaign": "Delete Campaign"
+      "add": "Add Campaign",
+      "edit": "Edit Campaign",
+      "delete": "Delete Campaign",
+      "close": "close"
     },
     "table": {
       "name": "Name",

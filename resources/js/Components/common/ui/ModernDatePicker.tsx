@@ -1,7 +1,7 @@
 import Label from "@/Components/common/Modern/Label";
 import { useTheme } from "@/Hooks/useTheme";
 import { enUS, es } from "date-fns/locale";
-import { AlertCircle, Calendar, Check, Clock } from "lucide-react";
+import { TriangleAlert, Calendar, Check, Clock } from "lucide-react";
 import { ReactNode, forwardRef } from "react";
 import DatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -132,12 +132,12 @@ const ModernDatePicker = ({
 
     if (theme === "dark") {
       return type === "error"
-        ? `${base} text-primary-300 bg-primary-900/30 border border-primary-800/50`
-        : `${base} text-green-300 bg-green-900/30 border border-green-800/50`;
+        ? `${base} text-primary-300`
+        : `${base} text-green-300`;
     }
     return type === "error"
-      ? `${base} text-primary-600 bg-primary-50/80 border border-primary-100`
-      : `${base} text-green-600 bg-green-50/80 border border-green-100`;
+      ? `${base} text-primary-600`
+      : `${base} text-green-600`;
   };
 
   const CustomInput = forwardRef<HTMLButtonElement, any>(
@@ -216,7 +216,7 @@ const ModernDatePicker = ({
   CustomInput.displayName = "CustomDateInput";
 
   return (
-    <div className={`space-y-2 ${containerClassName}`}>
+    <div className={` ${containerClassName}`}>
       {(label || hint) && (
         <div className="flex items-center justify-between">
           {label && (
@@ -362,7 +362,7 @@ const ModernDatePicker = ({
           className={getMessageStyles("error")}
           role="alert"
         >
-          <AlertCircle />
+          <TriangleAlert className="w-4 h-4" />
           <span>{error}</span>
         </div>
       )}

@@ -448,7 +448,11 @@ export default function EditPublicationModal({
         />
 
         <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
-          <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-8">
+          <form
+            id="editPublicationForm"
+            onSubmit={handleSubmit(onFormSubmit)}
+            className="space-y-8"
+          >
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <div className="space-y-6">
                 <MediaUploadSection
@@ -526,9 +530,9 @@ export default function EditPublicationModal({
             <ModalFooter
               isSubmitting={isSubmitting}
               onClose={onClose}
-              submitText={t("publications.modal.button.editCampaign") || "Edit Campaign"}
-              cancelText={t("publications.modal.button.close") || "Close"}
-              formId="edit-publication-form"
+              submitText={t("publications.button.edit") || "Edit Campaign"}
+              cancelText={t("publications.button.close") || "Close"}
+              formId="editPublicationForm"
             />
           </form>
         </div>

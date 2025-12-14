@@ -305,9 +305,10 @@
       }
     },
     "button": {
-      "addPublication": "Agregar publicación",
-      "editPublication": "Editar publicación",
-      "deletePublication": "Eliminar publicación"
+      "add": "Agregar publicación",
+      "edit": "Editar publicación",
+      "delete": "Eliminar publicación",
+      "close": "Cerrar"
     },
     "table": {
       "name": "Nombre",
@@ -459,10 +460,10 @@
       }
     },
     "button": {
-      "addCampaign": "Agregar Campaña",
-      "editCampaign": "Editar Campaña",
+      "add": "Agregar Campaña",
+      "edit": "Editar Campaña",
       "close":"Cerrar",
-      "deleteCampaign": "Eliminar Campaña"
+      "delete": "Eliminar Campaña"
     },
     "table": {
       "name": "Nombre",

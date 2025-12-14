@@ -73,8 +73,8 @@ export default function HeaderSection({
           >
             <Plus className="w-4 h-4" />
             {mode === "campaigns"
-              ? t("campaigns.button.addCampaign") || "New Campaign"
-              : t("publications.button.addPublication") || "New Publication"}
+              ? t("campaigns.button.add") || "New Campaign"
+              : t("publications.button.add") || "New Publication"}
           </button>
         </div>
       </div>

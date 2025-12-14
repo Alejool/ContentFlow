@@ -277,7 +277,7 @@ export default function AddCampaignModal({
                 ) : (
                   <>
                     <Plus className="w-4 h-4" />
-                    {t("campaigns.button.addCampaign") || "Create Campaign"}
+                    {t("campaigns.button.add") || "Create Campaign"}
                   </>
                 )}
               </button>

@@ -41,6 +41,7 @@ export default function ModalFooter({
   submitStyle = "gradient",
   cancelStyle = "outline",
 }: ModalFooterProps) {
+  
   return (
     <div className="border-t border-gray-200 px-6 py-4 flex justify-end gap-3">
       {onClose && (

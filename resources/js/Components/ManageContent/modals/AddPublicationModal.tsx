@@ -454,7 +454,11 @@ export default function AddPublicationModal({
           subtitle="publications.modal.add.subtitle"
         />
         <main className="flex-1  overflow-y-auto custom-scrollbar">
-          <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-8 p-6">
+          <form
+            id="add-publication-form"
+            onSubmit={handleSubmit(onFormSubmit)}
+            className="space-y-8 p-6"
+          >
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <div className="space-y-6">
                 <div className="form-group">
@@ -629,7 +633,7 @@ export default function AddPublicationModal({
                 <Select
                   id="campaign_id"
                   label={
-                    t("publications.modal.edit.addCampaign") ||
+                    t("publications.modal.edit.add") ||
                     "Add to Campaign"
                   }
                   options={(campaigns || []).map((campaign: any) => ({
@@ -651,19 +655,15 @@ export default function AddPublicationModal({
                 />
               </div>
             </div>
+            <ModalFooter
+              onClose={handleClose}
+              isSubmitting={isSubmitting}
+              formId="add-publication-form"
+              submitText={t("publications.button.add") || "Add publication"}
+              cancelText={t("publications.button.close") || "Close"}
+            />
           </form>
         </main>
-
-        <ModalFooter
-          onClose={handleClose}
-          onSubmit={handleSubmit(onFormSubmit)}
-          isSubmitting={isSubmitting}
-          theme={theme}
-          cancelButton={cancelButton}
-          submitButton={submitButton}
-          borderColor={borderColor}
-          modalFooterBg={modalFooterBg}
-        />
       </div>
     </div>
   );
