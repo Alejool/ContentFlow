@@ -633,7 +633,7 @@ export default function AddPublicationModal({
                 <Select
                   id="campaign_id"
                   label={
-                    t("publications.modal.edit.add") ||
+                    t("publications.modal.edit.campaigns") ||
                     "Add to Campaign"
                   }
                   options={(campaigns || []).map((campaign: any) => ({
