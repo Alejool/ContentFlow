@@ -21,6 +21,7 @@ import { createPortal } from "react-dom";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
+import { usePublishPublication } from "@/Hooks/publication/usePublishPublication";
 import { useCampaignStore } from "@/stores/campaignStore";
 import { usePublicationStore } from "@/stores/publicationStore";
 
@@ -35,6 +36,8 @@ export default function ManageContentPage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
   const [isViewDetailsModalOpen, setIsViewDetailsModalOpen] = useState(false);
+
+  const { fetchPublishedPlatforms } = usePublishPublication();
 
   const [selectedItem, setSelectedItem] = useState<
     Campaign | Publication | null
@@ -131,7 +134,7 @@ export default function ManageContentPage() {
 
   useEffect(() => {
     fetchData();
-  }, [filters, activeTab, !isEditModalOpen, !isPublishModalOpen]);
+  }, [filters, activeTab]);
 
   const handlePageChange = (page: number) => {
     fetchData(page);
@@ -174,15 +177,11 @@ export default function ManageContentPage() {
     setIsViewDetailsModalOpen(true);
   };
 
-  // Delete handling logic is now consolidated in handleDeleteItem below
   const { fetchAccounts, accounts: connectedAccounts } = useSocialMediaAuth();
 
-  // Delete handling
   const handleDeleteItem = async (id: number) => {
     const isPublication = activeTab === "publications";
     const itemType = isPublication ? "publication" : "campaign";
-
-    // We can add specific messages for publication vs campaign deletion if needed
     const confirmed = await confirm({
       title: t(`${itemType}s.messages.confirmDelete.title`) || "Confirm Delete",
       message:
@@ -218,10 +217,6 @@ export default function ManageContentPage() {
   useEffect(() => {
     fetchAccounts();
   }, []);
-
-  const handleRefreshAccounts = async () => {
-    await fetchAccounts();
-  };
 
   const handleEditRequest = async (item: Publication | any) => {
     if (item.status !== "published") {
@@ -338,16 +333,6 @@ export default function ManageContentPage() {
     }
   };
 
-  const bgGradient =
-    theme === "dark"
-      ? "bg-gradient-to-br from-neutral-900 to-neutral-800"
-      : "bg-gradient-to-br from-beige-50 to-white";
-
-  const iconGradient =
-    theme === "dark"
-      ? "from-primary-500 to-primary-700"
-      : "from-primary-600 to-primary-800";
-
   const titleGradient =
     theme === "dark"
       ? "from-gray-200 to-gray-400"
@@ -378,7 +363,6 @@ export default function ManageContentPage() {
           <div className="space-y-8">
             <SocialMediaAccounts />
 
-            {/* Tabs */}
             <div className={` rounded-lg `}>
               <div className="flex items-center justify-center gap-0.5 p-1 rounded-lg max-w-md mx-auto pt-6">
                 {tabs.map((tab) => {
@@ -398,7 +382,6 @@ export default function ManageContentPage() {
                           : "text-gray-600 dark:text-gray-400 hover:text-primary-500 dark:hover:text-primary-300"
                       }`}
                     >
-                      {/* Línea inferior activa */}
                       {isActive && (
                         <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-8 h-0.5 bg-primary-500 rounded-full"></div>
                       )}
@@ -419,7 +402,6 @@ export default function ManageContentPage() {
                 })}
               </div>
 
-              {/* Content */}
               <div className="">
                 {activeTab === "logs" ? (
                   <LogsList
@@ -478,6 +460,7 @@ export default function ManageContentPage() {
             onClose={() => {
               setIsEditModalOpen(false);
               setSelectedItem(null);
+              fetchData(getPagination().current_page);
             }}
             publication={selectedItem as Publication}
             onSubmit={handleUpdate}
@@ -488,6 +471,7 @@ export default function ManageContentPage() {
             onClose={() => {
               setIsEditModalOpen(false);
               setSelectedItem(null);
+              fetchData(getPagination().current_page);
             }}
             campaign={selectedItem as Campaign}
             onSubmit={handleUpdate}
@@ -500,9 +484,15 @@ export default function ManageContentPage() {
         activeTab === "publications" && (
           <PublishPublicationModal
             isOpen={isPublishModalOpen}
-            onClose={() => {
+            onClose={(id?: number) => {
+              const idToRefresh = id || selectedItem?.id;
               setIsPublishModalOpen(false);
               setSelectedItem(null);
+              fetchData(getPagination().current_page);
+
+              if (idToRefresh) {
+                fetchPublishedPlatforms(idToRefresh);
+              }
             }}
             publication={selectedItem as Publication}
             onSuccess={() => fetchData(getPagination().current_page)}

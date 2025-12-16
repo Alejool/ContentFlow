@@ -3,6 +3,7 @@
     "welcome": "Welcome",
     "loading": "Loading...",
     "select": "Select",
+    "refresh": "Refresh",
     "processing": "Processing...",
     "save": "Save",
     "cancel": "Cancel",
@@ -193,7 +194,7 @@
           "title": "Drag and drop to sort",
           "subtitle": "Upload your multimedia files here"
         },
-        "placeholders": 
+        "placeholders":
         {
           "title": "Title",
           "description": "Description",
@@ -202,13 +203,13 @@
           "goal": "Goal",
           "startDate": "12/12/2025",
           "endDate": "12/12/2026"
-        
+
         },
         "button":{
           "save":"Save",
           "cancel":"Cancel"
         }
-       
+
       },
       "edit": {
         "title": "Edit Publication",
@@ -239,7 +240,7 @@
           "title": "Drag and drop to sort",
           "subtitle": "Upload your multimedia files here"
         },
-        "placeholders": 
+        "placeholders":
         {
           "title": "Title",
           "description": "Description",
@@ -306,7 +307,9 @@
         "descriptionLength":"Description must be at least 10 characters long",
         "hashtagsLength":"Hashtags must be at least 10 characters long",
         "schedulePublicationLength":"Schedule Publication must be at least 10 characters long",
-        "imageRequired":"Image is required"
+        "imageRequired":"Image is required",
+        "hashtagValid":"Hashtag must be valid",
+        "hashtagMax":"Hashtag must be at least 10 characters long"
       }
     },
     "button":{
@@ -315,7 +318,7 @@
       "delete":"Delete Publication",
       "close":"Close"
     },
-  
+
     "table": {
       "name": "Name",
       "description": "Description",
@@ -363,8 +366,9 @@
      "mediaFiles": "Media Files",
      "actions": "Actions"
     },
-    "filters": 
+    "filters":
     {
+      "title": "Publications Filters",
       "all": "All",
       "published": "Published",
       "draft": "Draft"
@@ -431,13 +435,14 @@
           "endDate": "12/12/2026"
          }
       },
-       "showCampaign": 
+       "showCampaign":
       {
         "title": "View Campaign",
         "subtitle": "Campaign Details",
         "name": "Name",
         "description": "Description",
         "image": "Image",
+        "hashtags": "Hashtags",
         "goal": "Goal",
         "status": "Status",
         "budget": "Budget",
@@ -520,8 +525,9 @@
      "mediaFiles": "Media Files",
      "actions": "Actions"
     },
-    "filters": 
+    "filters":
     {
+      "title": "Campaign Filters",
      "all": "All",
       "active": "Active",
       "inactive": "Inactive",
@@ -615,7 +621,8 @@
       "cancel": "Cancel"
     },
     "toast":{
-      "languageChanged": "Language changed successfully."
+      "languageChanged": "Language changed successfully.",
+      "languageChangeError": "Error changing language."
     }
   },
   "logs": {
@@ -641,7 +648,7 @@
       "video": "Video",
       "copy": "Copy",
       "less": "Less",
-      "more": "More"  
+      "more": "More"
     },
     "status": {
       "success": "Success",
@@ -726,7 +733,7 @@
           "title": "Secure by Default",
           "subtitle": "Security of entreprise grade"
         },
-        "syncEverywhere": 
+        "syncEverywhere":
         {
           "title": "Sync Everywhere",
           "subtitle": "Sync your data on all devices"
@@ -853,7 +860,7 @@
     "headerTitle": "AI Assistant",
     "subtitle": "Pregunta a la IA cualquier cosa. ",
     "tips": "consejo"
-    
+
   },
   "analytics": {
     "title": "Analytics & Statistics",
@@ -941,7 +948,7 @@
       }
     }
   },
- 
+
     "modals": {
       "add": {
         "title": "New Campaign",

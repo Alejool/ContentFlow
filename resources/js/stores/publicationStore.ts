@@ -115,12 +115,10 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
   },
 
   fetchPublishedPlatforms: async (publicationId: number) => {
-    // Check cache first
-    const cached = get().publishedPlatforms[publicationId];
-    if (cached) {
-      return cached;
-    }
-
+    // const cached = get().publishedPlatforms[publicationId];
+    // if (cached) {
+    //   return cached;
+    // }
     try {
       const response = await axios.get(
         `/publications/${publicationId}/published-platforms`

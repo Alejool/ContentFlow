@@ -16,7 +16,7 @@ import { useTranslation } from "react-i18next";
 
 interface PublishPublicationModalProps {
   isOpen: boolean;
-  onClose: () => void;
+  onClose: (id?: number) => void;
   publication: Publication | null;
   onSuccess?: () => void;
 }
@@ -58,8 +58,6 @@ export default function PublishPublicationModal({
     if (isOpen && publication) {
       fetchPublishedPlatforms(publication.id);
       loadExistingThumbnails(publication);
-      console.log("Loading publication publishedPlatforms...");
-      console.log(publishedPlatforms);
     }
 
     if (!isOpen) {
@@ -106,7 +104,7 @@ export default function PublishPublicationModal({
     if (success) {
       refreshNotifications();
       if (onSuccess) onSuccess();
-      onClose();
+      onClose(publication.id);
     }
   };
 
@@ -139,7 +137,11 @@ export default function PublishPublicationModal({
 
   return (
     <>
-      <Dialog open={isOpen} onClose={onClose} className="relative z-50">
+      <Dialog
+        open={isOpen}
+        onClose={() => onClose(publication.id)}
+        className="relative z-50"
+      >
         <div
           className="fixed inset-0 bg-black/30 backdrop-blur-sm"
           aria-hidden="true"
@@ -169,7 +171,7 @@ export default function PublishPublicationModal({
                 </div>
               </DialogTitle>
               <button
-                onClick={onClose}
+                onClick={() => onClose(publication.id)}
                 className={`p-2 rounded-lg transition-colors ${
                   theme === "dark"
                     ? "hover:bg-neutral-700 text-gray-400"
@@ -361,7 +363,6 @@ export default function PublishPublicationModal({
                 ) : (
                   <div className="space-y-4">
                     {videoFiles.map((video) => {
-                      console.log("existingThumbnail:", existingThumbnails);
                       const videoId = video.id;
                       const existingThumbnail = existingThumbnails[videoId];
 
@@ -408,7 +409,7 @@ export default function PublishPublicationModal({
 
             <div className="flex gap-3">
               <button
-                onClick={onClose}
+                onClick={() => onClose(publication.id)}
                 className={`flex-1 px-4 py-3 rounded-lg font-medium transition-colors ${
                   theme === "dark"
                     ? "bg-neutral-700 hover:bg-neutral-600 text-white"

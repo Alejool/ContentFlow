@@ -3,6 +3,7 @@
     "welcome": "Bienvenido",
     "loading": "Cargando...",
     "select": "Seleccionar",
+    "refresh": "Recargar",
     "save": "Guardar",
     "cancel": "Cancelar",
     "continue": "Continuar",
@@ -193,7 +194,7 @@
           "title": "Arrastra y suelta para ordenar",
           "subtitle": "Sube tus archivos multimedia aquí"
         },
-        "placeholders": 
+        "placeholders":
         {
           "title": "Título",
           "description": "Descripción",
@@ -208,7 +209,7 @@
           "save":"Guardar",
           "cancel":"Cancelar"
         }
-       
+
       },
       "edit": {
         "title": "Editar Publicación",
@@ -239,7 +240,7 @@
           "title": "Arrastra y suelta para ordenar",
           "subtitle": "Sube tus archivos multimedia aquí"
         },
-        "placeholders": 
+        "placeholders":
         {
           "title": "Arrastra y suelta para ordenar",
           "description": "Descripción",
@@ -285,7 +286,7 @@
           "change":"Cambiar"
         }
       },
-      
+
       "validation":{
         "descMin":"Descripción debe tener al menos 10 caracteres",
         "descMax":"Descripción debe tener menos de 200 caracteres",
@@ -311,7 +312,9 @@
         "descriptionLength":"Descripción debe tener al menos 10 caracteres",
         "hashtagsLength":"Hashtags debe tener al menos 10 caracteres",
         "schedulePublicationLength":"Programar Publicación debe tener al menos 10 caracteres",
-        "imageRequired":"Imagen es requerida"
+        "imageRequired":"Imagen es requerida",
+        "hashtagValid":"Hashtag debe tener al menos 10 caracteres",
+        "hashtagMax":"Hashtag debe tener menos de 10 caracteres"
       }
     },
     "button": {
@@ -367,8 +370,9 @@
      "mediaFiles": "Archivos",
      "actions": "Acciones"
     },
-    "filters": 
+    "filters":
     {
+      "title": "Filtros de publicación",
       "all": "Todo",
       "published": "Publicadas",
       "draft": "Borrador"
@@ -434,12 +438,13 @@
           "endDate": "12/12/2026"
          }
       },
-      "showCampaign": 
+      "showCampaign":
       {
         "title": "Ver Campaña",
         "subtitle": "Detalles de la Campaña",
         "name": "Nombre",
         "description": "Descripción",
+        "hashtags": "Hashtags",
         "image": "Imagen",
         "goal": "Objetivo",
         "status": "Estado",
@@ -523,8 +528,9 @@
      "mediaFiles": "Archivos",
      "actions": "Acciones"
     },
-    "filters": 
+    "filters":
     {
+      "title": "Filtros de campaña",
       "all": "Todo",
       "active": "Activa",
       "inactive": "Inactiva",
@@ -618,7 +624,8 @@
       "cancel": "Cancelar"
     },
     "toast": {
-      "languageChanged": "Idioma cambiado exitosamente."
+      "languageChanged": "Idioma cambiado exitosamente.",
+      "languageChangeError": "Error cambiando idioma."
     }
   },
   "logs": {
@@ -720,7 +727,7 @@
       "orContinueWith": "O continúa con",
       "agreeWith": "Estoy de acuerdo con",
       "and": "y",
-      
+
        "tags": {
         "freeForever":
         {
@@ -732,7 +739,7 @@
           "title": "Seguro por defecto",
           "subtitle": "Seguridad de grado empresarial"
         },
-        "syncEverywhere": 
+        "syncEverywhere":
         {
           "title": "Sincronización",
           "subtitle": "Sincronización en todos los dispositivos"
@@ -798,7 +805,7 @@
         "1": "Revisa tu carpeta de spam",
         "2": "Asegúrate de haber introducido el correo electrónico correctamente",
         "3": "Espera unos minutos e intenta de nuevo"
-      } 
+      }
     },
     "verification": {
       "banner": {

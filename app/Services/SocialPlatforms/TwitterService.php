@@ -4,17 +4,19 @@ namespace App\Services\SocialPlatforms;
 
 use Illuminate\Support\Facades\Log;
 use GuzzleHttp\Exception\ClientException;
+use League\OAuth1\Client\Server\Twitter;
+use League\OAuth1\Client\Credentials\TokenCredentials;
+use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Storage;
 
 class TwitterService extends BaseSocialService
 {
   /**
-   * Publica un tweet con o sin media
+   * publish tweet
    */
   public function publishPost(array $data): array
   {
     $mediaIds = [];
-
-    // 1. Manejar medios (imagen o video)
     $rawPath = $data['media_url'] ?? $data['video_path'] ?? $data['image_path'] ?? null;
 
     if (!empty($rawPath)) {
@@ -26,8 +28,7 @@ class TwitterService extends BaseSocialService
         $mediaCategory = $this->getMediaCategory($mimeType);
         $fileSize = filesize($mediaPath);
 
-        // Lógica para decidir tipo de subida
-        // Para API v2: imágenes normales < 5MB, videos/large > 5MB usan chunked
+        // normal images < 5MB, videos/large > 5MB used chunked
         if ($mediaCategory === 'tweet_video' || $fileSize > 5 * 1024 * 1024) {
           $mediaId = $this->uploadLargeMediaV2($mediaPath, $mimeType, $mediaCategory);
           if ($mediaCategory === 'tweet_video') {
@@ -57,7 +58,6 @@ class TwitterService extends BaseSocialService
       }
     }
 
-    // 2. Preparar tweet para API v2
     $content = $data['content'] ?? $data['caption'] ?? '';
 
     // Check length limit (280 chars) - basic check, though Twitter counts differently
@@ -71,7 +71,7 @@ class TwitterService extends BaseSocialService
       $tweetData['media'] = ['media_ids' => $mediaIds];
     }
 
-    // 3. Publicar tweet (API v2)
+    // Publicar tweet (API v2)
     try {
       $response = $this->client->post('https://api.twitter.com/2/tweets', [
         'headers' => [
@@ -102,7 +102,7 @@ class TwitterService extends BaseSocialService
   }
 
   /**
-   * Subida simple para imágenes pequeñas (API v2 / v1.1 Hybrid)
+   * upload media (API v2 / v1.1 Hybrid)
    */
   private function uploadMediaV2(string $mediaPath, string $mediaCategory = 'tweet_image'): string
   {
@@ -119,15 +119,15 @@ class TwitterService extends BaseSocialService
     ]);
 
     if ($oauthToken && $oauthSecret) {
-      // Use League\OAuth1 + Guzzle for robust upload (Bypass abraham/twitteroauth & SSL issues)
+      // Use League\OAuth1 + Guzzle for robust upload (Bypass abraham/twitteroauth & SSL issues) v1
 
-      $server = new \League\OAuth1\Client\Server\Twitter([
+      $server = new Twitter([
         'identifier' => config('services.twitter.consumer_key'),
         'secret' => config('services.twitter.consumer_secret'),
         'callback_uri' => '',
       ]);
 
-      $tokenCredentials = new \League\OAuth1\Client\Credentials\TokenCredentials();
+      $tokenCredentials = new TokenCredentials();
       $tokenCredentials->setIdentifier($oauthToken);
       $tokenCredentials->setSecret($oauthSecret);
 
@@ -148,9 +148,8 @@ class TwitterService extends BaseSocialService
             'connect_timeout' => 30,
             'timeout' => 90,
           ];
-          $uploadClient = new \GuzzleHttp\Client($clientOptions);
+          $uploadClient = new Client($clientOptions);
 
-          // Perform Upload
           $response = $uploadClient->post($uploadUrl, [
             'headers' => array_merge($headers, ['Authorization' => $headers['Authorization']]),
             'multipart' => [
@@ -248,12 +247,12 @@ class TwitterService extends BaseSocialService
     if ($oauthToken && $oauthSecret) {
       // Use League\OAuth1 + Guzzle for manual Chunked Upload
 
-      $server = new \League\OAuth1\Client\Server\Twitter([
+      $server = new Twitter([
         'identifier' => config('services.twitter.consumer_key'),
         'secret' => config('services.twitter.consumer_secret'),
         'callback_uri' => '',
       ]);
-      $tokenCredentials = new \League\OAuth1\Client\Credentials\TokenCredentials();
+      $tokenCredentials = new TokenCredentials();
       $tokenCredentials->setIdentifier($oauthToken);
       $tokenCredentials->setSecret($oauthSecret);
 
@@ -265,10 +264,9 @@ class TwitterService extends BaseSocialService
         'connect_timeout' => 30,
         'timeout' => 300,
       ];
-      $customClient = new \GuzzleHttp\Client($clientOptions);
+      $customClient = new Client($clientOptions);
 
       try {
-        // 1. INIT
         $fileSize = filesize($mediaPath);
         $initHeaders = $server->getHeaders($tokenCredentials, 'POST', $uploadUrl, [
           'command' => 'INIT',
@@ -290,7 +288,6 @@ class TwitterService extends BaseSocialService
         if (!isset($initData['media_id_string'])) throw new \Exception('V1 INIT Failed: ' . ($initData['error'] ?? json_encode($initData)));
         $mediaId = $initData['media_id_string'];
 
-        // 2. APPEND
         $chunkSize = 2 * 1024 * 1024;
         $handle = fopen($mediaPath, 'rb');
         $segmentIndex = 0;
@@ -298,7 +295,6 @@ class TwitterService extends BaseSocialService
           $chunk = fread($handle, $chunkSize);
           if (!$chunk) break;
 
-          // Sign URL only for multipart
           $appendHeaders = $server->getHeaders($tokenCredentials, 'POST', $uploadUrl);
 
           $customClient->post($uploadUrl, [
@@ -314,7 +310,6 @@ class TwitterService extends BaseSocialService
         }
         fclose($handle);
 
-        // 3. FINALIZE
         $finHeaders = $server->getHeaders($tokenCredentials, 'POST', $uploadUrl, [
           'command' => 'FINALIZE',
           'media_id' => $mediaId
@@ -337,7 +332,7 @@ class TwitterService extends BaseSocialService
 
     $fileSize = filesize($mediaPath);
 
-    // 1. INIT
+
     $initResponse = $this->client->post('https://upload.twitter.com/1.1/media/upload.json', [
       'headers' => [
         'Authorization' => "Bearer {$this->accessToken}",
@@ -358,9 +353,7 @@ class TwitterService extends BaseSocialService
     }
 
     $mediaId = $initData['media_id_string'];
-
-    // 2. APPEND (Chunked)
-    $chunkSize = 2 * 1024 * 1024; // 2MB chunks (recomendado por Twitter)
+    $chunkSize = 2 * 1024 * 1024;
     $handle = fopen($mediaPath, 'rb');
     $segmentIndex = 0;
 
@@ -387,7 +380,6 @@ class TwitterService extends BaseSocialService
       fclose($handle);
     }
 
-    // 3. FINALIZE
     $finalizeResponse = $this->client->post('https://upload.twitter.com/1.1/media/upload.json', [
       'headers' => [
         'Authorization' => "Bearer {$this->accessToken}",
@@ -409,12 +401,12 @@ class TwitterService extends BaseSocialService
   }
 
   /**
-   * Verificar estado para subidas asíncronas (videos)
+   * verify media status v2 (videos)
    */
   private function checkMediaStatusV2(string $mediaId): void
   {
     $attempts = 0;
-    $maxAttempts = 30; // Hasta 30 * 2 = 60 segundos
+    $maxAttempts = 30; // since 30 * 2 = 60 seconds
 
     // Check for V1 credentials
     $accountInfo = $this->getAccountInfoFromDb();
@@ -426,12 +418,12 @@ class TwitterService extends BaseSocialService
     $tokenCredentials = null;
 
     if ($oauthToken && $oauthSecret) {
-      $server = new \League\OAuth1\Client\Server\Twitter([
+      $server = new Twitter([
         'identifier' => config('services.twitter.consumer_key'),
         'secret' => config('services.twitter.consumer_secret'),
         'callback_uri' => '',
       ]);
-      $tokenCredentials = new \League\OAuth1\Client\Credentials\TokenCredentials();
+      $tokenCredentials = new TokenCredentials();
       $tokenCredentials->setIdentifier($oauthToken);
       $tokenCredentials->setSecret($oauthSecret);
     }
@@ -442,7 +434,7 @@ class TwitterService extends BaseSocialService
       'connect_timeout' => 30,
       'timeout' => 30,
     ];
-    $customClient = new \GuzzleHttp\Client($clientOptions);
+    $customClient = new Client($clientOptions);
 
     do {
       if ($server && $tokenCredentials) {
@@ -471,7 +463,7 @@ class TwitterService extends BaseSocialService
       $processingInfo = $status['processing_info'] ?? null;
 
       if (!$processingInfo || $processingInfo['state'] === 'succeeded') {
-        return; // ¡Listo!
+        return;
       }
 
       if ($processingInfo['state'] === 'failed') {
@@ -479,7 +471,7 @@ class TwitterService extends BaseSocialService
         throw new \Exception('Video processing failed: ' . $errorMsg);
       }
 
-      // Esperar tiempo recomendado o 2s por defecto
+      // sleep 2 seconds
       $checkAfter = $processingInfo['check_after_secs'] ?? 2;
       sleep($checkAfter);
 
@@ -490,7 +482,7 @@ class TwitterService extends BaseSocialService
   }
 
   /**
-   * Determina la categoría del media basada en MIME type
+   * determine media category based on MIME type
    */
   private function getMediaCategory(string $mimeType): string
   {
@@ -504,18 +496,18 @@ class TwitterService extends BaseSocialService
   }
 
   /**
-   * Resuelve URL si es una ruta relativa de S3
+   * resolve URL if it is a relative path from S3
    */
   private function resolveUrl(string $path): string
   {
     if (str_starts_with($path, 'http')) {
       return $path;
     }
-    return \Illuminate\Support\Facades\Storage::disk('s3')->url($path);
+    return Storage::disk('s3')->url($path);
   }
 
   /**
-   * Descarga el media a un archivo temporal
+   * download media
    */
   private function downloadMedia(string $url): string
   {
@@ -525,7 +517,7 @@ class TwitterService extends BaseSocialService
   }
 
   /**
-   * Obtiene información de la cuenta del usuario
+   * get account info
    */
   public function getAccountInfo(): array
   {
@@ -553,7 +545,7 @@ class TwitterService extends BaseSocialService
   }
 
   /**
-   * Obtiene analíticas de un tweet publicado
+   * get post analytics
    */
   public function getPostAnalytics(string $postId): array
   {
@@ -594,7 +586,7 @@ class TwitterService extends BaseSocialService
   }
 
   /**
-   * Valida que las credenciales sean correctas
+   * valid the credentials
    */
   public function validateCredentials(): bool
   {

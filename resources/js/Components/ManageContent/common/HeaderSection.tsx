@@ -52,8 +52,8 @@ export default function HeaderSection({
             }`}
             title={
               mode === "campaigns"
-                ? t("campaigns.filters.title")
-                : t("publications.filters.title")
+                ? t("campaigns.filters.title") || "Campaign Filters"
+                : t("publications.filters.title") || "Publication Filters"
             }
           >
             <Filter className="w-4 h-4" />

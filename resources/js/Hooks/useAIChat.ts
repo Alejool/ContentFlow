@@ -38,10 +38,8 @@ export default function useAIChat() {
   const fetchCampaigns = async () => {
     try {
       const response = await axios.get("/campaigns");
-      console.log("Campañas cargadas:", response.data.campaigns);
       setCampaigns(response.data.campaigns);
     } catch (error) {
-      console.error("Error al cargar campañas:", error);
       toast.error("No se pudieron cargar las campañas");
     }
   };
@@ -108,10 +106,8 @@ export default function useAIChat() {
 
   const handleSuggestion = (suggestion) => {
     if (suggestion.type === "new_campaign") {
-      console.log("Nueva campaña sugerida:", suggestion.data);
       toast("La IA ha sugerido una nueva campaña", { icon: "ℹ️" });
     } else if (suggestion.type === "improvement") {
-      console.log("Mejora sugerida para campaña:", suggestion.data);
       toast("La IA ha sugerido mejoras para una campaña existente", {
         icon: "ℹ️",
       });

@@ -30,9 +30,7 @@ export interface UsePublishPublicationReturn extends PublishPublicationState {
   selectAll: () => void;
   deselectAll: () => void;
   isYoutubeSelected: () => boolean;
-  handlePublish: (
-    publication: Publication
-  ) => Promise<boolean>;
+  handlePublish: (publication: Publication) => Promise<boolean>;
   setYoutubeThumbnails: React.Dispatch<
     React.SetStateAction<Record<number, File | null>>
   >;
@@ -129,8 +127,6 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
           (m) => m.file_type && m.file_type.includes("video")
         );
 
-        console.log("Video files:", videoFiles);
-
         for (const video of videoFiles) {
           // Buscar thumbnails en metadata
           if (video.metadata?.thumbnail_url) {
@@ -157,10 +153,8 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
           }
         }
 
-        console.log("Thumbnails loaded:", thumbnails);
         setExistingThumbnails(thumbnails);
       } catch (error) {
-        console.error("Error loading thumbnails:", error);
       } finally {
         setIsLoadingThumbnails(false);
       }
@@ -275,9 +269,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
 
   // Manejar publicación
   const handlePublish = useCallback(
-    async (
-      publication: Publication
-    ): Promise<boolean> => {
+    async (publication: Publication): Promise<boolean> => {
       if (selectedPlatforms.length === 0) {
         toast.error("Please select at least one platform");
         return false;

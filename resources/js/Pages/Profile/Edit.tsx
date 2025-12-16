@@ -74,7 +74,6 @@ function CustomAvatar({ src, name, size = "md", className = "" }: AvatarProps) {
 export default function Edit({ mustVerifyEmail, status }: EditProps) {
   const user = usePage().props.auth.user;
   const { theme } = useTheme();
-  console.log(user);
 
   const getAvatarColor = () => {
     if (theme === "dark") {
@@ -175,7 +174,7 @@ export default function Edit({ mustVerifyEmail, status }: EditProps) {
 
       <div
         className={` transition-colors duration-300
-        
+
       `}
       >
         <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
