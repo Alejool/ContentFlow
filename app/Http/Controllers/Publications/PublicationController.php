@@ -292,7 +292,7 @@ class PublicationController extends Controller
         'date',
         function ($attribute, $value, $fail) use ($publication) {
           $existing = $publication->scheduled_at;
-          // Compare timestamps to avoid format mismatch issues. 
+          // Compare timestamps to avoid format mismatch issues.
           // If value is set, and it's in the past...
           if ($value && strtotime($value) < time()) {
             // If it's effectively the same as existing (within tight tolerance), allow it.
@@ -365,7 +365,7 @@ class PublicationController extends Controller
             ->first();
 
           if ($existingPost) {
-            // Only update if pending or user explicitly wants to overwrite? 
+            // Only update if pending or user explicitly wants to overwrite?
             // Assuming editing allows updating pending posts.
             if ($existingPost->status === 'pending') {
               $existingPost->update([
@@ -649,12 +649,11 @@ class PublicationController extends Controller
       ], 422);
     }
 
-    // If platforms comes as comma separated string (from FormData)
     if (is_string($platformIds)) {
       $platformIds = explode(',', $platformIds);
     }
 
-    $platformIds = array_filter(array_values($platformIds)); // Clean up empty values
+    $platformIds = array_filter(array_values($platformIds));
     $socialAccounts = SocialAccount::where('user_id', $publication->user_id)
       ->whereIn('id', $platformIds)
       ->get();
@@ -667,17 +666,14 @@ class PublicationController extends Controller
       ], 404);
     }
 
-    // Persist Thumbnails if uploaded
     if ($request->hasFile('thumbnails')) {
       foreach ($request->file('thumbnails') as $mediaId => $thumbnailFile) {
-        // Ensure mediaId corresponds to a media file in this publication to avoid orphan derivatives
         if ($publication->mediaFiles->contains('id', $mediaId)) {
           try {
             $thumbFilename = Str::uuid() . '_thumb.' . $thumbnailFile->getClientOriginalExtension();
             $thumbPath = $thumbnailFile->storeAs('Derivatives/Thumbnails', $thumbFilename, 's3');
             $fullThumbUrl = Storage::disk('s3')->url($thumbPath);
 
-            // Create or Update Derivative
             MediaDerivative::updateOrCreate(
               [
                 'media_file_id' => $mediaId,
@@ -699,11 +695,9 @@ class PublicationController extends Controller
       }
     }
 
-    // Handle YouTube Thumbnail
     if ($request->hasFile('youtube_thumbnail') && $request->has('youtube_thumbnail_video_id')) {
       $videoId = $request->input('youtube_thumbnail_video_id');
 
-      // Get media file and verify it belongs to this publication
       $mediaFile = MediaFile::find($videoId);
 
       $belongsToPublication = DB::table('publication_media')
@@ -777,9 +771,10 @@ class PublicationController extends Controller
       ]);
 
       // Update associated campaigns status
+      // Update associated campaigns status
       foreach ($publication->campaigns as $campaign) {
-        if ($campaign->status !== 'published') {
-          $campaign->update(['status' => 'published']);
+        if ($campaign->status !== 'active') {
+          $campaign->update(['status' => 'active']);
         }
       }
     } elseif ($anySuccess && $result['has_errors']) {
@@ -791,9 +786,10 @@ class PublicationController extends Controller
       ]);
 
       // Update associated campaigns status
+      // Update associated campaigns status
       foreach ($publication->campaigns as $campaign) {
-        if ($campaign->status !== 'published') {
-          $campaign->update(['status' => 'published']);
+        if ($campaign->status !== 'active') {
+          $campaign->update(['status' => 'active']);
         }
       }
     }

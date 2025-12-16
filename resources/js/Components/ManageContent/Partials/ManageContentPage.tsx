@@ -4,7 +4,6 @@ import AddCampaignModal from "@/Components/ManageContent/modals/AddCampaignModal
 import AddPublicationModal from "@/Components/ManageContent/modals/AddPublicationModal";
 import EditCampaignModal from "@/Components/ManageContent/modals/EditCampaignModal";
 import EditPublicationModal from "@/Components/ManageContent/modals/EditPublicationModal";
-import PublishCampaignModal from "@/Components/ManageContent/modals/PublishCampaignModal";
 import PublishPublicationModal from "@/Components/ManageContent/modals/PublishPublicationModal";
 import ViewCampaignModal from "@/Components/ManageContent/modals/ViewCampaignModal";
 import SocialMediaAccounts from "@/Components/ManageContent/socialAccount/SocialMediaAccounts";
@@ -498,7 +497,7 @@ export default function ManageContentPage() {
       )}
 
       {createPortal(
-        activeTab === "publications" ? (
+        activeTab === "publications" && (
           <PublishPublicationModal
             isOpen={isPublishModalOpen}
             onClose={() => {
@@ -507,15 +506,6 @@ export default function ManageContentPage() {
             }}
             publication={selectedItem as Publication}
             onSuccess={() => fetchData(getPagination().current_page)}
-          />
-        ) : (
-          <PublishCampaignModal
-            isOpen={isPublishModalOpen}
-            onClose={() => {
-              setIsPublishModalOpen(false);
-              setSelectedItem(null);
-            }}
-            campaign={selectedItem as Campaign}
           />
         ),
         document.body

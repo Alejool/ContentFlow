@@ -10,8 +10,9 @@ use App\Services\SocialPlatforms\YouTubeService;
 use App\Services\SocialPlatforms\InstagramService;
 use App\Services\SocialPlatforms\FacebookService;
 use App\Services\SocialPlatforms\TikTokService;
-use App\Notifications\VideoUploadedNotification; 
-use App\Notifications\VideoDeletedNotification; 
+use App\Services\SocialPlatforms\TwitterService;
+use App\Notifications\VideoUploadedNotification;
+use App\Notifications\VideoDeletedNotification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -26,7 +27,7 @@ class PlatformPublishService
   /**
    * Publica en YouTube (solo primer video)
    */
-  public function publishToYouTube(
+  public function publishToPlatform(
     Publication $publication,
     SocialAccount $socialAccount,
     $platformService
@@ -238,7 +239,6 @@ class PlatformPublishService
     $platformResults = [];
 
     foreach ($socialAccounts as $socialAccount) {
-      // Transacción POR PLATAFORMA
       DB::beginTransaction();
 
       try {
@@ -248,7 +248,7 @@ class PlatformPublishService
         $platformService = $this->getPlatformService($socialAccount);
 
         if ($socialAccount->platform === 'youtube') {
-          $result = $this->publishToYouTube($publication, $socialAccount, $platformService);
+          $result = $this->publishToPlatform($publication, $socialAccount, $platformService);
 
           if ($result['success']) {
             $platformLogs[] = $result['log'];
@@ -495,6 +495,7 @@ class PlatformPublishService
       'instagram' => new InstagramService($socialAccount->access_token, $socialAccount),
       'facebook' => new FacebookService($socialAccount->access_token, $socialAccount),
       'tiktok' => new TikTokService($socialAccount->access_token, $socialAccount),
+      'twitter', 'x' => new TwitterService($socialAccount->access_token, $socialAccount),
       default => throw new \Exception("Unsupported platform: {$socialAccount->platform}"),
     };
   }
