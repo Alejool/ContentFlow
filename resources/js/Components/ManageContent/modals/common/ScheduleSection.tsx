@@ -1,8 +1,8 @@
-import React from "react";
-import { Clock } from "lucide-react";
+import DatePickerModern from "@/Components/common/Modern/DatePicker";
 import Label from "@/Components/common/Modern/Label";
-import ModernDatePicker from "@/Components/common/ui/ModernDatePicker";
 import { format } from "date-fns";
+import { Clock } from "lucide-react";
+import React from "react";
 
 interface ScheduleSectionProps {
   scheduledAt?: string;
@@ -18,17 +18,17 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
   onScheduleChange,
 }) => {
   return (
-    <div className="space-y-4">
+    <div >
       <Label
         htmlFor="scheduled_at"
         icon={Clock}
-        size="lg"
+        size="md"
         hint={t("publications.modal.edit.optionalSchedule")}
       >
         {t("publications.modal.edit.schedulePublication")}
       </Label>
 
-      <ModernDatePicker
+      <DatePickerModern
         selected={scheduledAt ? new Date(scheduledAt) : null}
         onChange={(date) =>
           onScheduleChange(date ? format(date, "yyyy-MM-dd'T'HH:mm") : "")
@@ -42,6 +42,7 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
         minDate={new Date()}
         withPortal
         popperPlacement="bottom-start"
+        size="md"
       />
     </div>
   );

@@ -13,7 +13,7 @@ interface ModalProps {
     show?: boolean;
     maxWidth?: MaxWidth;
     closeable?: boolean;
-    onClose?: () => void; // Made onClose optional as well, matching original default
+    onClose?: () => void;
 }
 
 export default function Modal({
@@ -29,7 +29,7 @@ export default function Modal({
         }
     };
 
-    const maxWidthMap: Record<MaxWidth, string> = { // Added explicit Record type
+    const maxWidthMap: Record<MaxWidth, string> = {
         sm: 'sm:max-w-sm',
         md: 'sm:max-w-md',
         lg: 'sm:max-w-lg',
@@ -48,7 +48,7 @@ export default function Modal({
                 onClose={close}
             >
                 <TransitionChild
-                    as={React.Fragment} // Added as={React.Fragment} for proper rendering
+                    as={React.Fragment}
                     enter="ease-out duration-300"
                     enterFrom="opacity-0"
                     enterTo="opacity-100"
@@ -60,7 +60,7 @@ export default function Modal({
                 </TransitionChild>
 
                 <TransitionChild
-                    as={React.Fragment} // Added as={React.Fragment} for proper rendering
+                    as={React.Fragment}
                     enter="ease-out duration-300"
                     enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                     enterTo="opacity-100 translate-y-0 sm:scale-100"

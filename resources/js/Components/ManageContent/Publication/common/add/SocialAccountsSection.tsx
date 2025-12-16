@@ -1,4 +1,4 @@
-import ModernDatePicker from "@/Components/common/ui/ModernDatePicker";
+import DatePickerModern from "@/Components/common/Modern/DatePicker";
 import { format } from "date-fns";
 import { Check, Clock, Target, X } from "lucide-react";
 import React, { useState } from "react";
@@ -258,7 +258,7 @@ const SchedulePopoverContent: React.FC<{
         </button>
       </div>
 
-      <ModernDatePicker
+      <DatePickerModern
         selected={customSchedule ? new Date(customSchedule) : null}
         onChange={(date: Date | null) => {
           onScheduleChange(date ? format(date, "yyyy-MM-dd'T'HH:mm") : "");

@@ -1,10 +1,10 @@
 import { useTheme } from "@/Hooks/useTheme";
 import {
-  TriangleAlert,
   CheckCircle,
   Eye,
   EyeOff,
   LucideIcon,
+  TriangleAlert,
 } from "lucide-react";
 import { InputHTMLAttributes, ReactNode, useState } from "react";
 import { FieldValues, Path, UseFormRegister } from "react-hook-form";
@@ -58,11 +58,9 @@ export default function Input<T extends FieldValues>({
   const theme = propTheme || themeFromHook;
   const [showPassword, setShowPassword] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
-
   const inputType = type === "password" && showPassword ? "text" : type;
   const fieldName = name || (id as Path<T>);
 
-  // Configuración de tamaños
   const sizeConfig = {
     sm: { input: "py-1 px-2 text-xs", icon: "w-3 h-3", label: "text-xs" },
     md: { input: "py-2 px-3 text-sm", icon: "w-4 h-4", label: "text-sm" },
@@ -95,7 +93,6 @@ export default function Input<T extends FieldValues>({
       ${currentSize.input}
     `;
 
-  
     const styles = {
       dark: {
         default: {
@@ -105,8 +102,7 @@ export default function Input<T extends FieldValues>({
               "border-primary-400  focus:ring-primary-500/30 focus:border-primary-400",
             success:
               "border-green-400  focus:ring-green-500/30 focus:border-green-400",
-            focused:
-              "border-purple-400 focus:ring-purple-500/30",
+            focused: "border-purple-400 focus:ring-purple-500/30",
             idle: "hover:border-neutral-600/70 hover:bg-neutral-800/60 focus:ring-purple-500/30",
           },
         },
@@ -122,11 +118,9 @@ export default function Input<T extends FieldValues>({
         filled: {
           base: "bg-neutral-800 text-white border border-neutral-700",
           states: {
-            error:
-              "border-primary-400 focus:ring-primary-500/30",
+            error: "border-primary-400 focus:ring-primary-500/30",
             success: "border-green-400 focus:ring-green-500/30",
-            focused:
-              "border-purple-400 focus:ring-purple-500/30",
+            focused: "border-purple-400 focus:ring-purple-500/30",
             idle: "hover:bg-neutral-700/80 focus:ring-purple-500/30",
           },
         },
@@ -180,7 +174,7 @@ export default function Input<T extends FieldValues>({
 
     if (theme === "dark") {
       return type === "error"
-        ? `${base} text-primary-600 `
+        ? `${base} text-primary-600`
         : `${base} text-green-600`;
     }
     return type === "error"
@@ -189,13 +183,13 @@ export default function Input<T extends FieldValues>({
   };
 
   return (
-    <div className={` ${containerClassName}`}>
+    <div className={`${containerClassName}`}>
       {(label || hint) && (
         <div>
           {label && (
             <Label
               htmlFor={id}
-              size={size === "sm" ? "sm" : size === "lg" ? "lg" : "md"}
+              size={size === "md" ? "md" : size === "lg" ? "lg" : "sm"}
               required={required}
               error={error}
               success={success}
@@ -265,8 +259,6 @@ export default function Input<T extends FieldValues>({
           <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
             {suffix}
 
-           
-
             {showPasswordToggle && !disabled && (
               <button
                 type="button"
@@ -308,7 +300,6 @@ export default function Input<T extends FieldValues>({
           <span>{success}</span>
         </div>
       )}
-
     </div>
   );
 }

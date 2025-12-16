@@ -275,7 +275,7 @@ export default function Label({
   };
 
   return (
-    <div className={`space-y-2 ${containerClassName}`}>
+    <div className={`space-y-2 mb-1 ${containerClassName}`}>
       <div className={getContainerStyles()}>
         <label
           id={id}

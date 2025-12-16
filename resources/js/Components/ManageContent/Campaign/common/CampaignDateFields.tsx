@@ -1,7 +1,7 @@
-import React from "react";
-import ModernDatePicker from "@/Components/common/ui/ModernDatePicker";
+import DatePickerModern from "@/Components/common/Modern/DatePicker";
 import { format } from "date-fns";
-import { UseFormSetValue, FieldErrors } from "react-hook-form";
+import React from "react";
+import { FieldErrors, UseFormSetValue } from "react-hook-form";
 
 interface CampaignDateFieldsProps {
   startDate?: string;
@@ -25,7 +25,7 @@ const CampaignDateFields: React.FC<CampaignDateFieldsProps> = ({
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div className="form-group">
-        <ModernDatePicker
+        <DatePickerModern
           register={undefined}
           name="start_date"
           error={errors.start_date?.message as string}
@@ -45,7 +45,7 @@ const CampaignDateFields: React.FC<CampaignDateFieldsProps> = ({
       </div>
 
       <div className="form-group">
-        <ModernDatePicker
+        <DatePickerModern
           register={undefined}
           name="end_date"
           error={errors.end_date?.message as string}

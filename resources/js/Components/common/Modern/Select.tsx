@@ -1,16 +1,16 @@
+import Label from "@/Components/common/Modern/Label";
 import { useTheme } from "@/Hooks/useTheme";
 import {
   AlertCircle,
   CheckCircle,
   ChevronDown,
+  LucideIcon,
   Search,
   X,
-  LucideIcon,
 } from "lucide-react";
 import { ReactNode, useEffect, useRef, useState } from "react";
-import { FieldValues, Path, UseFormRegister } from "react-hook-form";
-import Label from "@/Components/common/Modern/Label";
 import { createPortal } from "react-dom";
+import { FieldValues, Path, UseFormRegister } from "react-hook-form";
 
 // Componente Portal para el dropdown
 interface DropdownPortalProps {
@@ -176,41 +176,38 @@ export default function Select<T extends FieldValues>({
   const selectRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Configuración de tamaños
   const sizeConfig = {
     sm: {
-      select: "py-2 px-3 text-sm",
+      select: "py-1 px-2 text-sm",
       icon: "w-4 h-4",
-      label: "text-sm",
+      label: "text-xs",
       option: "py-2 px-3 text-sm",
       search: "py-2 px-3 text-sm",
     },
     md: {
-      select: "py-3 px-4 text-base",
+      select: "py-2 px-3 text-base",
       icon: "w-5 h-5",
-      label: "text-base",
+      label: "text-sm",
       option: "py-2.5 px-4 text-base",
       search: "py-2.5 px-4 text-base",
     },
     lg: {
-      select: "py-4 px-4 text-lg",
+      select: "py-3 px-4 text-lg",
       icon: "w-6 h-6",
-      label: "text-lg",
-      option: "py-3 px-4 text-lg",
-      search: "py-3 px-4 text-lg",
+      label: "text-base",
+      option: "py-2 px-3 text-lg",
+      search: "py-2 px-3 text-lg",
     },
   };
 
   const currentSize = sizeConfig[size];
 
-  // Filtrar opciones basadas en búsqueda
   const filteredOptions = searchable
     ? options.filter((option) =>
         option.label.toLowerCase().includes(searchTerm.toLowerCase())
       )
     : options;
 
-  // Encontrar la etiqueta seleccionada
   useEffect(() => {
     if (value !== undefined && value !== null && value !== "") {
       const selected = options.find((option) => option.value === value);
@@ -220,12 +217,10 @@ export default function Select<T extends FieldValues>({
     }
   }, [value, options, placeholder]);
 
-  // Obtener posición del select cuando se abre
   useEffect(() => {
     if (isOpen && selectRef.current) {
       setSelectRect(selectRef.current.getBoundingClientRect());
 
-      // Calcular dirección basada en espacio disponible
       const rect = selectRef.current.getBoundingClientRect();
       const spaceBelow = window.innerHeight - rect.bottom;
       const spaceAbove = rect.top;
@@ -239,13 +234,11 @@ export default function Select<T extends FieldValues>({
       }
     }
 
-    // Resetear término de búsqueda al cerrar
     if (!isOpen) {
       setSearchTerm("");
     }
   }, [isOpen, dropdownPosition]);
 
-  // Cerrar dropdown al hacer clic fuera
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -269,14 +262,12 @@ export default function Select<T extends FieldValues>({
     };
   }, [isOpen]);
 
-  // Enfocar input de búsqueda cuando se abre
   useEffect(() => {
     if (isOpen && searchable && inputRef.current) {
       setTimeout(() => inputRef.current?.focus(), 100);
     }
   }, [isOpen, searchable]);
 
-  // Actualizar posición en resize y scroll
   useEffect(() => {
     const updatePosition = () => {
       if (isOpen && selectRef.current) {
@@ -438,13 +429,12 @@ export default function Select<T extends FieldValues>({
   return (
     <>
       <div
-        className={`space-y-2 ${containerClassName}`}
+        className={`${containerClassName}`}
         ref={selectRef}
         onKeyDown={handleKeyDown}
       >
-        {/* Header con label y hint */}
         {(label || hint) && (
-          <div className="flex items-center justify-between">
+          <div>
             {label && (
               <Label
                 htmlFor={id}
@@ -472,7 +462,6 @@ export default function Select<T extends FieldValues>({
         )}
 
         <div className={getContainerStyles()}>
-          {/* Campo de selección principal */}
           <div className="relative">
             {Icon && (
               <div
@@ -485,7 +474,6 @@ export default function Select<T extends FieldValues>({
               </div>
             )}
 
-            {/* Select nativo oculto para accesibilidad */}
             <select
               id={id}
               disabled={disabled}
@@ -509,7 +497,6 @@ export default function Select<T extends FieldValues>({
               ))}
             </select>
 
-            {/* Botón trigger personalizado */}
             <button
               type="button"
               onClick={handleTriggerClick}

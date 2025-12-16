@@ -1,5 +1,5 @@
 import { Transition } from "@headlessui/react";
-import { Link as InertiaLink } from "@inertiajs/react"; // Renamed Link to InertiaLink, removed LinkProps
+import { Link as InertiaLink } from "@inertiajs/react";
 import {
   ComponentProps,
   Dispatch,
@@ -64,7 +64,7 @@ const Trigger = ({ children }: TriggerProps) => {
 
 interface ContentProps {
   align?: "left" | "right";
-  width?: "48" | string; // Allow other string values for width
+  width?: "48" | string;
   contentClasses?: string;
   children: ReactNode;
 }
@@ -110,7 +110,7 @@ const Content = ({
         onClick={() => setOpen(false)}
       >
         <div
-          className={`rounded-md ring-1 ring-black ring-opacity-5 
+          className={`rounded-md ring-1 ring-black ring-opacity-5
                         ${contentClasses}`}
         >
           {children}
@@ -120,11 +120,9 @@ const Content = ({
   );
 };
 
-// Extending ComponentProps<typeof InertiaLink> for DropdownLink
 interface DropdownLinkProps extends ComponentProps<typeof InertiaLink> {
   className?: string;
   children: ReactNode;
-  // href is already part of ComponentProps<typeof InertiaLink> if it's a valid prop for InertiaLink
 }
 
 const DropdownLink = ({
@@ -147,6 +145,5 @@ const DropdownLink = ({
 
 Dropdown.Trigger = Trigger;
 Dropdown.Content = Content;
-Dropdown.Link = DropdownLink; // This is the sub-component
-
+Dropdown.Link = DropdownLink;
 export default Dropdown;

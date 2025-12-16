@@ -7,6 +7,8 @@ import {
   Check,
   Clock,
   ChevronDown,
+  ArrowLeft,
+  ArrowRight,
 } from "lucide-react";
 import { ReactNode, forwardRef, useState } from "react";
 import DatePicker, { registerLocale } from "react-datepicker";
@@ -17,7 +19,7 @@ import { useTranslation } from "react-i18next";
 registerLocale("es", es);
 registerLocale("en", enUS);
 
-interface ModernDatePickerProps<T extends FieldValues> {
+interface DatePickerProps<T extends FieldValues> {
   selected?: Date | null;
   onChange: (date: Date | null) => void;
   showTimeSelect?: boolean;
@@ -46,7 +48,7 @@ interface ModernDatePickerProps<T extends FieldValues> {
   containerClassName?: string;
 }
 
-const ModernDatePicker = <T extends FieldValues>({
+const DatePickerModern = <T extends FieldValues>({
   selected,
   onChange,
   showTimeSelect = false,
@@ -72,7 +74,7 @@ const ModernDatePicker = <T extends FieldValues>({
   size = "md",
   variant = "default",
   containerClassName = "",
-}: ModernDatePickerProps<T>) => {
+}: DatePickerProps<T>) => {
   const { theme } = useTheme();
   const { i18n } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
@@ -82,17 +84,17 @@ const ModernDatePicker = <T extends FieldValues>({
 
   const sizeConfig = {
     sm: {
-      input: "py-2 px-3 text-sm",
+      input: "py-1 px-2 text-sm",
       icon: "w-4 h-4",
       label: "text-sm",
     },
     md: {
-      input: "py-3 px-4 text-base",
+      input: "py-2 px-4 text-base",
       icon: "w-5 h-5",
       label: "text-base",
     },
     lg: {
-      input: "py-4 px-4 text-lg",
+      input: "py-3 px-4 text-lg",
       icon: "w-6 h-6",
       label: "text-lg",
     },
@@ -226,11 +228,7 @@ const ModernDatePicker = <T extends FieldValues>({
             </span>
           </div>
         </div>
-        <ChevronDown
-          className={`w-4 h-4 transition-transform ${
-            isOpen ? "rotate-180" : ""
-          } ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}
-        />
+
       </button>
     )
   );
@@ -537,7 +535,7 @@ const ModernDatePicker = <T extends FieldValues>({
                 }`}
                 aria-label="Previous month"
               >
-                ‹
+                <ArrowLeft className="w-4 h-4" />
               </button>
 
               {showMonthDropdown && (
@@ -546,7 +544,7 @@ const ModernDatePicker = <T extends FieldValues>({
                   onChange={({ target: { value } }) =>
                     changeMonth(parseInt(value, 10))
                   }
-                  className={`px-2 py-1 rounded text-sm ${
+                  className={`pr-7 pl-2 py-1 rounded text-sm ${
                     theme === "dark"
                       ? "bg-neutral-800 text-white border-neutral-600"
                       : "bg-white text-gray-900 border-gray-300"
@@ -568,7 +566,7 @@ const ModernDatePicker = <T extends FieldValues>({
                   onChange={({ target: { value } }) =>
                     changeYear(parseInt(value, 10))
                   }
-                  className={`px-2 py-1 rounded text-sm ${
+                  className={`pr-7 pl-2 py-1 rounded text-sm ${
                     theme === "dark"
                       ? "bg-neutral-800 text-white border-neutral-600"
                       : "bg-white text-gray-900 border-gray-300"
@@ -597,7 +595,7 @@ const ModernDatePicker = <T extends FieldValues>({
                 }`}
                 aria-label="Next month"
               >
-                ›
+                <ArrowRight className="w-4 h-4" />
               </button>
             </div>
           )}
@@ -629,4 +627,4 @@ const ModernDatePicker = <T extends FieldValues>({
   );
 };
 
-export default ModernDatePicker;
+export default DatePickerModern;

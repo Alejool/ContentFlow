@@ -1,4 +1,4 @@
-import ModernDatePicker from "@/Components/common/ui/ModernDatePicker";
+import DatePickerModern from "@/Components/common/Modern/DatePicker";
 import { format } from "date-fns";
 import { Filter } from "lucide-react";
 
@@ -136,7 +136,7 @@ export default function FilterSection({
 
         <div className="flex items-center gap-2">
           <div className="w-32">
-            <ModernDatePicker
+            <DatePickerModern
               selected={dateStart ? new Date(dateStart) : null}
               onChange={(d) =>
                 handleFilterChange(
@@ -150,7 +150,7 @@ export default function FilterSection({
           </div>
           <span className="text-gray-400">-</span>
           <div className="w-32">
-            <ModernDatePicker
+            <DatePickerModern
               selected={dateEnd ? new Date(dateEnd) : null}
               onChange={(d) =>
                 handleFilterChange("date_end", d ? format(d, "yyyy-MM-dd") : "")

@@ -72,7 +72,7 @@ export default function Textarea<T extends FieldValues>({
       : `${base} text-green-600`;
   };
 
-  
+
   const getTextareaStyles = () => {
     const base = `
       block w-full rounded-lg border transition-all duration-200
@@ -102,19 +102,17 @@ export default function Textarea<T extends FieldValues>({
     }
   };
 
-  // Registrar el campo con manejo de cambio para el contador
   const { onChange, ...registerRest } = register(name);
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     if (showCharCount) {
       setCharCount(e.target.value.length);
     }
-    // Llamar al onChange original de react-hook-form
     onChange(e);
   };
 
   return (
-    <div className={`space-y-2 ${containerClassName}`}>
+    <div className={` ${containerClassName}`}>
       {label && (
         <Label
           htmlFor={id}
@@ -170,7 +168,7 @@ export default function Textarea<T extends FieldValues>({
         )}
 
         {showCharCount && maxLength && (
-          <div className="text-xs text-gray-500">
+          <div className="text-xs mt-1 text-gray-500">
             {charCount}/{maxLength} characters
           </div>
         )}
