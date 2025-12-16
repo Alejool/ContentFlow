@@ -1,8 +1,14 @@
 import Label from "@/Components/common/Modern/Label";
 import { useTheme } from "@/Hooks/useTheme";
 import { enUS, es } from "date-fns/locale";
-import { TriangleAlert, Calendar, Check, Clock } from "lucide-react";
-import { ReactNode, forwardRef } from "react";
+import {
+  TriangleAlert,
+  Calendar,
+  Check,
+  Clock,
+  ChevronDown,
+} from "lucide-react";
+import { ReactNode, forwardRef, useState } from "react";
 import DatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FieldValues, UseFormRegister } from "react-hook-form";
@@ -22,6 +28,9 @@ interface ModernDatePickerProps<T extends FieldValues> {
   isClearable?: boolean;
   popperPlacement?: "top-start" | "top-end" | "bottom-start" | "bottom-end";
   withPortal?: boolean;
+  showMonthDropdown?: boolean;
+  showYearDropdown?: boolean;
+  dropdownMode?: "scroll" | "select";
 
   register?: UseFormRegister<T>;
   label?: string;
@@ -37,7 +46,7 @@ interface ModernDatePickerProps<T extends FieldValues> {
   containerClassName?: string;
 }
 
-const ModernDatePicker = ({
+const ModernDatePicker = <T extends FieldValues>({
   selected,
   onChange,
   showTimeSelect = false,
@@ -48,6 +57,9 @@ const ModernDatePicker = ({
   isClearable = false,
   popperPlacement = "bottom-start",
   withPortal = false,
+  showMonthDropdown = true,
+  showYearDropdown = true,
+  dropdownMode = "select",
   register,
   label,
   error,
@@ -63,11 +75,11 @@ const ModernDatePicker = ({
 }: ModernDatePickerProps<T>) => {
   const { theme } = useTheme();
   const { i18n } = useTranslation();
+  const [isOpen, setIsOpen] = useState(false);
 
   const currentLocale = i18n.language.startsWith("es") ? "es" : "en";
   const defaultDateFormat = showTimeSelect ? "Pp" : "P";
 
-  // Configuración de tamaños
   const sizeConfig = {
     sm: {
       input: "py-2 px-3 text-sm",
@@ -144,7 +156,12 @@ const ModernDatePicker = ({
     ({ value, onClick, placeholder: inputPlaceholder }, ref) => (
       <button
         type="button"
-        onClick={disabled ? undefined : onClick}
+        onClick={(e) => {
+          if (!disabled) {
+            onClick(e);
+            setIsOpen(!isOpen);
+          }
+        }}
         ref={ref}
         disabled={disabled}
         className={`${getInputStyles()} ${className} ${
@@ -209,6 +226,11 @@ const ModernDatePicker = ({
             </span>
           </div>
         </div>
+        <ChevronDown
+          className={`w-4 h-4 transition-transform ${
+            isOpen ? "rotate-180" : ""
+          } ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}
+        />
       </button>
     )
   );
@@ -261,6 +283,8 @@ const ModernDatePicker = ({
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
             z-index: 9999 !important;
           }
+
+          /* Ajuste de altura del header para igualar con time header */
           .react-datepicker__header {
             background-color: ${
               theme === "dark" ? "#171717 !important" : "#f9fafb"
@@ -270,77 +294,214 @@ const ModernDatePicker = ({
             };
             border-top-left-radius: 0.5rem;
             border-top-right-radius: 0.5rem;
-            padding-top: 1rem;
+            padding: 0.75rem 1rem;
+            min-height: 4rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
           }
-          .react-datepicker__current-month, 
-          .react-datepicker-time__header, 
+
+          .react-datepicker__header--time {
+            min-height: 4rem !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+
+          .react-datepicker__current-month,
+          .react-datepicker-time__header,
           .react-datepicker-year-header {
             color: ${theme === "dark" ? "#e5e7eb !important" : "#111827"};
             font-weight: 600;
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+            margin: 0;
+            padding: 0.25rem 0;
           }
+
+          .react-datepicker-time__header {
+            font-size: 0.875rem !important;
+            padding: 0.5rem 0 !important;
+          }
+
+          /* Estilos para dropdowns de mes y año */
+          .react-datepicker__month-dropdown-container,
+          .react-datepicker__year-dropdown-container {
+            margin: 0 0.25rem;
+          }
+
+          .react-datepicker__month-dropdown,
+          .react-datepicker__year-dropdown {
+            background-color: ${theme === "dark" ? "#262626" : "#ffffff"};
+            border: 1px solid ${theme === "dark" ? "#404040" : "#e5e7eb"};
+            border-radius: 0.375rem;
+            padding: 0.25rem;
+            color: ${theme === "dark" ? "#e5e7eb" : "#374151"};
+          }
+
+          .react-datepicker__month-dropdown option,
+          .react-datepicker__year-dropdown option {
+            padding: 0.375rem 0.5rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+          }
+
+          .react-datepicker__month-dropdown option:hover,
+          .react-datepicker__year-dropdown option:hover {
+            background-color: ${theme === "dark" ? "#404040" : "#f3f4f6"};
+          }
+
+          .react-datepicker__month-dropdown option:checked,
+          .react-datepicker__year-dropdown option:checked {
+            background-color: ${theme === "dark" ? "#ea580c" : "#ea580c"};
+            color: white;
+          }
+
+          /* Estilos para navegación por dropdown */
+          .react-datepicker__navigation--years {
+            position: relative;
+            top: 0;
+          }
+
+          .react-datepicker__navigation--years-previous,
+          .react-datepicker__navigation--years-upcoming {
+            border: none;
+            line-height: 1;
+            text-align: center;
+            cursor: pointer;
+            padding: 0 0.5rem;
+          }
+
+          /* Header con dropdowns */
+          .react-datepicker__header__dropdown {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.25rem;
+            flex-wrap: wrap;
+          }
+
           .react-datepicker__day-name {
             color: ${theme === "dark" ? "#9ca3af !important" : "#6b7280"};
           }
+
           .react-datepicker__day {
             color: ${theme === "dark" ? "#e5e7eb !important" : "#374151"};
             border-radius: 0.375rem;
           }
+
           .react-datepicker__day:hover {
             background-color: ${
               theme === "dark" ? "#404040 !important" : "#f3f4f6"
             };
             color: ${theme === "dark" ? "#ffffff !important" : "#111827"};
           }
-          .react-datepicker__day--selected, 
+
+          .react-datepicker__day--selected,
           .react-datepicker__day--keyboard-selected {
             background-color: #ea580c !important;
             color: white !important;
           }
+
           .react-datepicker__day--today {
             font-weight: bold;
             color: ${theme === "dark" ? "#ea580c" : "#ea580c"};
           }
+
+          /* Ajustes para time container */
           .react-datepicker__time-container {
             border-left: 1px solid ${theme === "dark" ? "#404040" : "#e5e7eb"};
+            width: 110px !important;
           }
+
           .react-datepicker__time-container .react-datepicker__time {
             background-color: ${
               theme === "dark" ? "#262626 !important" : "#ffffff"
             };
             border-bottom-right-radius: 0.5rem;
+            height: 100%;
           }
+
+          .react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box {
+            width: 100% !important;
+            height: 100%;
+          }
+
+          .react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box ul.react-datepicker__time-list {
+            height: 280px !important;
+            padding: 0.5rem 0;
+          }
+
           .react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box ul.react-datepicker__time-list li.react-datepicker__time-list-item {
             color: ${theme === "dark" ? "#e5e7eb !important" : "#374151"};
+            height: 2.5rem !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 0.5rem;
+            margin: 0;
           }
+
           .react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box ul.react-datepicker__time-list li.react-datepicker__time-list-item:hover {
             background-color: ${
               theme === "dark" ? "#404040 !important" : "#f3f4f6"
             };
             color: ${theme === "dark" ? "#ffffff !important" : "#111827"};
           }
+
           .react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box ul.react-datepicker__time-list li.react-datepicker__time-list-item--selected {
             background-color: #ea580c !important;
             color: white !important;
           }
+
           .react-datepicker__navigation-icon::before {
             border-color: ${theme === "dark" ? "#9ca3af" : "#6b7280"};
           }
+
           .react-datepicker-popper {
             z-index: 9999 !important;
           }
+
           .react-datepicker__close-icon {
             background-color: transparent;
           }
+
           .react-datepicker__close-icon::after {
             background-color: ${theme === "dark" ? "#9ca3af" : "#6b7280"};
+          }
+
+          /* Mejoras para mobile */
+          @media (max-width: 640px) {
+            .react-datepicker {
+              width: 100%;
+              max-width: 320px;
+            }
+
+            .react-datepicker__time-container {
+              width: 100px !important;
+            }
+
+            .react-datepicker__month-dropdown,
+            .react-datepicker__year-dropdown {
+              font-size: 0.875rem;
+            }
           }
         `}</style>
 
         <DatePicker
           name={name}
           selected={selected}
-          onChange={onChange}
+          onChange={(date) => {
+            onChange(date);
+            setIsOpen(false);
+          }}
+          onCalendarClose={() => setIsOpen(false)}
+          onCalendarOpen={() => setIsOpen(true)}
           showTimeSelect={showTimeSelect}
+          showMonthDropdown={showMonthDropdown}
+          showYearDropdown={showYearDropdown}
+          dropdownMode={dropdownMode}
           dateFormat={dateFormat || defaultDateFormat}
           locale={currentLocale}
           placeholderText={placeholder}
@@ -353,6 +514,93 @@ const ModernDatePicker = ({
           portalId="root-portal"
           disabled={disabled}
           className="w-full"
+          renderCustomHeader={({
+            date,
+            changeYear,
+            changeMonth,
+            decreaseMonth,
+            increaseMonth,
+            prevMonthButtonDisabled,
+            nextMonthButtonDisabled,
+            monthDate,
+          }) => (
+            <div className="react-datepicker__header__dropdown">
+              <button
+                onClick={decreaseMonth}
+                disabled={prevMonthButtonDisabled}
+                className={`p-1 rounded ${
+                  theme === "dark"
+                    ? "hover:bg-neutral-700 text-gray-300"
+                    : "hover:bg-gray-100 text-gray-700"
+                } ${
+                  prevMonthButtonDisabled ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+                aria-label="Previous month"
+              >
+                ‹
+              </button>
+
+              {showMonthDropdown && (
+                <select
+                  value={date.getMonth()}
+                  onChange={({ target: { value } }) =>
+                    changeMonth(parseInt(value, 10))
+                  }
+                  className={`px-2 py-1 rounded text-sm ${
+                    theme === "dark"
+                      ? "bg-neutral-800 text-white border-neutral-600"
+                      : "bg-white text-gray-900 border-gray-300"
+                  } border`}
+                >
+                  {Array.from({ length: 12 }, (_, i) => (
+                    <option key={i} value={i}>
+                      {new Date(0, i).toLocaleString(currentLocale, {
+                        month: "long",
+                      })}
+                    </option>
+                  ))}
+                </select>
+              )}
+
+              {showYearDropdown && (
+                <select
+                  value={date.getFullYear()}
+                  onChange={({ target: { value } }) =>
+                    changeYear(parseInt(value, 10))
+                  }
+                  className={`px-2 py-1 rounded text-sm ${
+                    theme === "dark"
+                      ? "bg-neutral-800 text-white border-neutral-600"
+                      : "bg-white text-gray-900 border-gray-300"
+                  } border`}
+                >
+                  {Array.from({ length: 21 }, (_, i) => {
+                    const year = new Date().getFullYear() - 10 + i;
+                    return (
+                      <option key={year} value={year}>
+                        {year}
+                      </option>
+                    );
+                  })}
+                </select>
+              )}
+
+              <button
+                onClick={increaseMonth}
+                disabled={nextMonthButtonDisabled}
+                className={`p-1 rounded ${
+                  theme === "dark"
+                    ? "hover:bg-neutral-700 text-gray-300"
+                    : "hover:bg-gray-100 text-gray-700"
+                } ${
+                  nextMonthButtonDisabled ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+                aria-label="Next month"
+              >
+                ›
+              </button>
+            </div>
+          )}
         />
       </div>
 

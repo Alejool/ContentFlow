@@ -12,11 +12,10 @@ class CampaignFactory extends Factory
     protected $model = Campaign::class;
     public function definition(): array
     {
-        $title = $this->faker->sentence(3);
 
         return [
             'user_id' => User::factory(),
-            'name' => $title,
+            'name' => $this->faker->sentence(3),
             'status' => $this->faker->randomElement(['active', 'inactive', 'completed', 'deleted', 'paused']),
             'start_date' => $this->faker->dateTimeBetween('-1 month', '+1 month'),
             'end_date' => $this->faker->dateTimeBetween('+1 month', '+3 months'),

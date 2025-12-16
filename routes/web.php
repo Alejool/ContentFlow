@@ -23,10 +23,10 @@ use App\Http\Controllers\SocialPostLogController;
 */
 
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-    ]);
+  return Inertia::render('Welcome', [
+    'canLogin' => Route::has('login'),
+    'canRegister' => Route::has('register'),
+  ]);
 })->middleware('guest')->name('welcome');
 
 /*
@@ -36,16 +36,16 @@ Route::get('/', function () {
 */
 
 Route::prefix('auth')->name('auth.')->group(function () {
-    // Social Media OAuth Callbacks
-    Route::get('/facebook/callback', [SocialAccountController::class, 'handleFacebookCallback'])->name('facebook.callback');
-    Route::get('/instagram/callback', [SocialAccountController::class, 'handleInstagramCallback'])->name('instagram.callback');
-    Route::get('/twitter/callback', [SocialAccountController::class, 'handleTwitterCallback'])->name('twitter.callback');
-    Route::get('/youtube/callback', [SocialAccountController::class, 'handleYoutubeCallback'])->name('youtube.callback');
-    Route::get('/tiktok/callback', [SocialAccountController::class, 'handleTiktokCallback'])->name('tiktok.callback');
+  // Social Media OAuth Callbacks
+  Route::get('/facebook/callback', [SocialAccountController::class, 'handleFacebookCallback'])->name('facebook.callback');
+  Route::get('/instagram/callback', [SocialAccountController::class, 'handleInstagramCallback'])->name('instagram.callback');
+  Route::get('/twitter/callback', [SocialAccountController::class, 'handleTwitterCallback'])->name('twitter.callback');
+  Route::get('/youtube/callback', [SocialAccountController::class, 'handleYoutubeCallback'])->name('youtube.callback');
+  Route::get('/tiktok/callback', [SocialAccountController::class, 'handleTiktokCallback'])->name('tiktok.callback');
 
-    // Google Authentication
-    Route::get('/google/redirect', [AuthController::class, 'redirectToGoogle'])->name('google.redirect');
-    Route::get('/google/callback', [AuthController::class, 'handleGoogleCallback'])->name('google.callback');
+  // Google Authentication
+  Route::get('/google/redirect', [AuthController::class, 'redirectToGoogle'])->name('google.redirect');
+  Route::get('/google/callback', [AuthController::class, 'handleGoogleCallback'])->name('google.callback');
 });
 
 /*
@@ -56,124 +56,124 @@ Route::prefix('auth')->name('auth.')->group(function () {
 
 Route::middleware(['auth:sanctum'])->group(function () {
 
-    // Dashboard
-    Route::get('/dashboard', [AnalyticsController::class, 'dashboard'])->name('dashboard');
+  // Dashboard
+  Route::get('/dashboard', [AnalyticsController::class, 'dashboard'])->name('dashboard');
 
-    /*
+  /*
     |----------------------------------------------------------------------
     | Profile Management
     |----------------------------------------------------------------------
     */
-    Route::prefix('profile')->name('profile.')->group(function () {
-        Route::get('/', [ProfileController::class, 'edit'])->name('edit');
-        Route::patch('/', [ProfileController::class, 'update'])->name('update');
-        Route::put('/', [ProfileController::class, 'changePassword'])->name('changePassword');
-        Route::delete('/', [ProfileController::class, 'destroy'])->name('destroy');
-    });
+  Route::prefix('profile')->name('profile.')->group(function () {
+    Route::get('/', [ProfileController::class, 'edit'])->name('edit');
+    Route::patch('/', [ProfileController::class, 'update'])->name('update');
+    Route::put('/', [ProfileController::class, 'changePassword'])->name('changePassword');
+    Route::delete('/', [ProfileController::class, 'destroy'])->name('destroy');
+  });
 
-    /*
+  /*
     |----------------------------------------------------------------------
     | User Preferences
     |----------------------------------------------------------------------
     */
-    Route::patch('/locale', [LocaleController::class, 'update'])->name('locale.update');
-    Route::patch('/theme', [ThemeController::class, 'update'])->name('theme.update');
+  Route::patch('/locale', [LocaleController::class, 'update'])->name('locale.update');
+  Route::patch('/theme', [ThemeController::class, 'update'])->name('theme.update');
 
-    /*
+  /*
     |----------------------------------------------------------------------
     | Notifications
     |----------------------------------------------------------------------
     */
-    Route::get('/notifications', [NotificationsController::class, 'index'])->name('notifications.index');
-    Route::post('/notifications/{id}/read', [NotificationsController::class, 'markAsRead'])->name('notifications.read');
-    Route::post('/notifications/read-all', [NotificationsController::class, 'markAllAsRead'])->name('notifications.read-all');
-    Route::delete('/notifications/{id}', [NotificationsController::class, 'destroy'])->name('notifications.destroy');
-    Route::delete('/notifications/read', [NotificationsController::class, 'destroyRead'])->name('notifications.destroy-read');
-    Route::get('/notifications/stats', [NotificationsController::class, 'stats'])->name('notifications.stats');
+  Route::get('/notifications', [NotificationsController::class, 'index'])->name('notifications.index');
+  Route::post('/notifications/{id}/read', [NotificationsController::class, 'markAsRead'])->name('notifications.read');
+  Route::post('/notifications/read-all', [NotificationsController::class, 'markAllAsRead'])->name('notifications.read-all');
+  Route::delete('/notifications/{id}', [NotificationsController::class, 'destroy'])->name('notifications.destroy');
+  Route::delete('/notifications/read', [NotificationsController::class, 'destroyRead'])->name('notifications.destroy-read');
+  Route::get('/notifications/stats', [NotificationsController::class, 'stats'])->name('notifications.stats');
 
-    /*
+  /*
     |----------------------------------------------------------------------
     | Content Management (Inertia Views)
     |----------------------------------------------------------------------
     */
-    Route::get('/ManageContent', [ManageContentController::class, 'index'])->name('/ManageContent.index');
-    Route::get('/posts', [PostsController::class, 'index'])->name('posts.index');
+  Route::get('/ManageContent', [ManageContentController::class, 'index'])->name('/ManageContent.index');
+  Route::get('/posts', [PostsController::class, 'index'])->name('posts.index');
 
-    /*
+  /*
     |----------------------------------------------------------------------
     | Analytics (Inertia Views)
     |----------------------------------------------------------------------
     */
-    Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics.index');
+  Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics.index');
 
-    /*
+  /*
     |----------------------------------------------------------------------
     | AI Chat (Inertia Views)
     |----------------------------------------------------------------------
     */
-    Route::get('/ai-chat', [AIChatController::class, 'index'])->name('ai-chat.index');
-    Route::post('/ai-chat/process', [AIChatController::class, 'processMessage'])->name('ai-chat.process');
+  Route::get('/ai-chat', [AIChatController::class, 'index'])->name('ai-chat.index');
+  Route::post('/ai-chat/process', [AIChatController::class, 'processMessage'])->name('ai-chat.process');
 
-    /*
+  /*
     |----------------------------------------------------------------------
     | Publications API (formerly Campaigns)
     |----------------------------------------------------------------------
     */
-    Route::prefix('publications')->name('publications.')->group(function () {
-        Route::get('/', [PublicationController::class, 'index'])->name('index');
-        Route::post('/', [PublicationController::class, 'store'])->name('store');
-        Route::get('/{publication}', [PublicationController::class, 'show'])->name('show');
-        Route::put('/{publication}', [PublicationController::class, 'update'])->name('update');
-        Route::delete('/{publication}', [PublicationController::class, 'destroy'])->name('destroy');
-        Route::post('/{publication}/duplicate', [PublicationController::class, 'duplicate'])->name('duplicate');
-        Route::get('/{id}/published-platforms', [PublicationController::class, 'getPublishedPlatforms'])->name('published-platforms');
-        Route::post('/{id}/publish', [PublicationController::class, 'publish'])->name('publish');
-        Route::post('/{id}/unpublish', [PublicationController::class, 'unpublish'])->name('unpublish');
-    });
+  Route::prefix('publications')->name('publications.')->group(function () {
+    Route::get('/', [PublicationController::class, 'index'])->name('index');
+    Route::post('/', [PublicationController::class, 'store'])->name('store');
+    Route::get('/{publication}', [PublicationController::class, 'show'])->name('show');
+    Route::put('/{publication}', [PublicationController::class, 'update'])->name('update');
+    Route::delete('/{publication}', [PublicationController::class, 'destroy'])->name('destroy');
+    Route::post('/{publication}/duplicate', [PublicationController::class, 'duplicate'])->name('duplicate');
+    Route::get('/{id}/published-platforms', [PublicationController::class, 'getPublishedPlatforms'])->name('published-platforms');
+    Route::post('/{id}/publish', [PublicationController::class, 'publish'])->name('publish');
+    Route::post('/{id}/unpublish', [PublicationController::class, 'unpublish'])->name('unpublish');
+  });
 
-    /*
+  /*
     |----------------------------------------------------------------------
     | Campaigns API (NEW - for grouping publications)
     |----------------------------------------------------------------------
     */
-    Route::prefix('campaigns')->name('campaigns.')->group(function () {
-        Route::get('/', [CampaignController::class, 'index'])->name('index');
-        Route::post('/', [CampaignController::class, 'store'])->name('store');
-        Route::get('/{campaign}', [CampaignController::class, 'show'])->name('show');
-        Route::put('/{campaign}', [CampaignController::class, 'update'])->name('update');
-        Route::delete('/{campaign}', [CampaignController::class, 'destroy'])->name('destroy');
-    });
+  Route::prefix('campaigns')->name('campaigns.')->group(function () {
+    Route::get('/', [CampaignController::class, 'index'])->name('index');
+    Route::post('/', [CampaignController::class, 'store'])->name('store');
+    Route::get('/{campaign}', [CampaignController::class, 'show'])->name('show');
+    Route::put('/{campaign}', [CampaignController::class, 'update'])->name('update');
+    Route::delete('/{campaign}', [CampaignController::class, 'destroy'])->name('destroy');
+  });
 
-    /*
+  /*
     |----------------------------------------------------------------------
     | Social Media Accounts (Inertia Views)
     |----------------------------------------------------------------------
     */
-    // Route::get('/social-accounts', [SocialAccountController::class, 'index'])->name('social-accounts.index');
+  // Route::get('/social-accounts', [SocialAccountController::class, 'index'])->name('social-accounts.index');
 
-    Route::prefix('social-accounts')->name('social-accounts.')->group(function () {
-        Route::get('/', [SocialAccountController::class, 'index'])->name('index');
-        Route::post('/', [SocialAccountController::class, 'store'])->name('store');
-        Route::get('/auth-url/{platform}', [SocialAccountController::class, 'getAuthUrl'])->name('auth-url');
-        Route::delete('/{id}', [SocialAccountController::class, 'destroy'])->name('destroy');
-    });
+  Route::prefix('social-accounts')->name('social-accounts.')->group(function () {
+    Route::get('/', [SocialAccountController::class, 'index'])->name('index');
+    Route::post('/', [SocialAccountController::class, 'store'])->name('store');
+    Route::get('/auth-url/{platform}', [SocialAccountController::class, 'getAuthUrl'])->name('auth-url');
+    Route::delete('/{id}', [SocialAccountController::class, 'destroy'])->name('destroy');
+  });
 
-    /*
+  /*
     |----------------------------------------------------------------------
     | Social Post Logs
     |----------------------------------------------------------------------
     */
-    Route::get('/social-logs', [SocialPostLogController::class, 'index'])->name('social-logs.index');
-    Route::get('/logs', [SocialPostLogController::class, 'index'])->name('logs');
+  Route::get('/social-logs', [SocialPostLogController::class, 'index'])->name('social-logs.index');
+  Route::get('/logs', [SocialPostLogController::class, 'index'])->name('logs');
 
-    Route::get('/test-notification', function () {
-        $user = auth()->user();
-        if ($user) {
-            $user->notifyNow(new \App\Notifications\TestNotification());
-            return 'Notification sent immediately to user ' . $user->id;
-        }
-        return 'No user logged in';
-    });
+  Route::get('/test-notification', function () {
+    $user = auth()->user();
+    if ($user) {
+      $user->notifyNow(new \App\Notifications\TestNotification());
+      return 'Notification sent immediately to user ' . $user->id;
+    }
+    return 'No user logged in';
+  });
 });
 
 require __DIR__ . '/auth.php';

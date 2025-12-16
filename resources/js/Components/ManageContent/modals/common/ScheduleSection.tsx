@@ -42,7 +42,6 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
         minDate={new Date()}
         withPortal
         popperPlacement="bottom-start"
-        theme={theme}
       />
     </div>
   );

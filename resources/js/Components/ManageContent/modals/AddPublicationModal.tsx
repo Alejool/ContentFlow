@@ -1,31 +1,23 @@
-import { useTheme } from "@/Hooks/useTheme";
-import { publicationSchema } from "@/schemas/publication";
-import { usePublicationStore } from "@/stores/publicationStore";
-import { useAccountsStore } from "@/stores/socialAccountsStore";
-import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { useForm } from "react-hook-form";
-import { toast } from "react-hot-toast";
-import { useTranslation } from "react-i18next";
-
-// Componentes reutilizables
+import AddMoreButton from "@/Components/ManageContent/Publication/common/add/AddMoreButton";
+import ImagePreviewItem from "@/Components/ManageContent/Publication/common/add/ImagePreviewItem";
 import SocialAccountsSection from "@/Components/ManageContent/Publication/common/add/SocialAccountsSection";
+import VideoPreviewItem from "@/Components/ManageContent/Publication/common/add/VideoPreviewItem";
 import ModalHeader from "@/Components/ManageContent/modals/common/ModalHeader";
 import ScheduleSection from "@/Components/ManageContent/modals/common/ScheduleSection";
 import Input from "@/Components/common/Modern/Input";
 import Select from "@/Components/common/Modern/Select";
 import Textarea from "@/Components/common/Modern/Textarea";
+import { useTheme } from "@/Hooks/useTheme";
+import { publicationSchema } from "@/schemas/publication";
+import { usePublicationStore } from "@/stores/publicationStore";
+import { useAccountsStore } from "@/stores/socialAccountsStore";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { FileText, Hash, Target, Upload } from "lucide-react";
-
-// Componentes nuevos específicos
-import AddMoreButton from "@/Components/ManageContent/Publication/common/add/AddMoreButton";
-import ImagePreviewItem from "@/Components/ManageContent/Publication/common/add/ImagePreviewItem";
-import VideoPreviewItem from "@/Components/ManageContent/Publication/common/add/VideoPreviewItem";
-
-// Hooks
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 import { useCampaigns } from "@/Hooks/campaign/useCampaigns";
-
-// Iconos
 import ModalFooter from "@/Components/ManageContent/modals/common/ModalFooter";
 import { AlertTriangle } from "lucide-react";
 
@@ -115,7 +107,6 @@ export default function AddPublicationModal({
     }
   }, [isOpen]);
 
-  // Estilos
   const modalBg = theme === "dark" ? "bg-neutral-800" : "bg-white";
   const modalFooterBg =
     theme === "dark"
@@ -178,7 +169,6 @@ export default function AddPublicationModal({
     setMediaFiles((prev) => [...prev, ...validFiles]);
     setMediaPreviews((prev) => [...prev, ...newPreviews]);
 
-    // Extract duration for videos
     for (let i = 0; i < validFiles.length; i++) {
       const file = validFiles[i];
       if (file.type.startsWith("video/")) {
@@ -220,11 +210,9 @@ export default function AddPublicationModal({
     setMediaFiles((prev) => prev.filter((_, i) => i !== index));
     setMediaPreviews((prev) => prev.filter((_, i) => i !== index));
 
-    // Remove video metadata
     setVideoMetadata((prev) => {
       const newMetadata = { ...prev };
       delete newMetadata[index];
-      // Reindex remaining items
       const reindexed: Record<
         number,
         { duration: number; youtubeType: "short" | "video" }
@@ -552,7 +540,6 @@ export default function AddPublicationModal({
                 )}
               </div>
 
-              {/* Columna derecha: Contenido */}
               <div className="space-y-6">
                 <Input
                   id="title"
@@ -633,8 +620,7 @@ export default function AddPublicationModal({
                 <Select
                   id="campaign_id"
                   label={
-                    t("publications.modal.edit.campaigns") ||
-                    "Add to Campaign"
+                    t("publications.modal.edit.campaigns") || "Add to Campaign"
                   }
                   options={(campaigns || []).map((campaign: any) => ({
                     value: campaign.id,

@@ -1,5 +1,5 @@
 import { ButtonHTMLAttributes, ReactNode, forwardRef } from "react";
-
+import { useTheme } from "@/Hooks/useTheme";
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
   variant?:
@@ -127,20 +127,21 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       },
     };
 
+    const theme = useTheme();
+
     const colors = variantColors[variant] || variantColors.primary;
 
     const getStyleClasses = () => {
       switch (style) {
         case "gradient":
           return `
-            ${colors.text} 
+            ${colors.text}
             bg-gradient-to-r ${colors.from} ${colors.to}
             hover:bg-gradient-to-r ${colors.hoverFrom} ${colors.hoverTo}
             border-0
           `;
         case "outline":
           return `
-            ${colors.text} 
             bg-transparent
             border-2 ${colors.border}
             hover:${colors.hoverBg.replace("bg-", "bg-opacity-10 ")}
@@ -157,7 +158,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         case "solid":
         default:
           return `
-            ${colors.text} 
+            ${colors.text}
             ${colors.bg}
             ${colors.hoverBg}
             border-0
@@ -188,7 +189,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     };
 
     const baseStyles = `
-      font-medium transition-all duration-200 
+      font-medium transition-all duration-200
       flex items-center justify-center gap-2
       disabled:opacity-50 disabled:cursor-not-allowed
       focus:outline-none focus:ring-2 focus:ring-offset-2

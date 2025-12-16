@@ -12,7 +12,7 @@ interface CampaignPerformanceProps {
   campaigns: Campaign[];
   theme?: "light" | "dark";
 }
-
+ 
 export default function CampaignPerformance({
   campaigns,
   theme = "light",
