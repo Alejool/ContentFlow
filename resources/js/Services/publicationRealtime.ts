@@ -1,23 +1,20 @@
 import { usePublicationStore } from "@/stores/publicationStore";
 
-let subscriptions = new Set<number>();
+export function initPublicationsRealtime(userId: number) {
+  console.log("Initializing Echo listener for user:", userId);
 
-export function subscribeToPublication(publicationId: number) {
-  if (subscriptions.has(publicationId)) return;
-
-  subscriptions.add(publicationId);
-
-  window.Echo.channel(`publication.${publicationId}`).listen(
+  window.Echo.private(`users.${userId}`).listen(
     ".PublicationStatusUpdated",
     (e: any) => {
-      usePublicationStore
-        .getState()
-        .updatePublication(e.publicationId, { status: e.status });
+      console.log("Realtime update received for publication:", e.publicationId);
+      const publicationId =
+        typeof e.publicationId === "string"
+          ? parseInt(e.publicationId, 10)
+          : e.publicationId;
+
+      usePublicationStore.getState().updatePublication(publicationId, {
+        status: e.status,
+      });
     }
   );
-}
-
-export function unsubscribeFromPublication(publicationId: number) {
-  window.Echo.leave(`publication.${publicationId}`);
-  subscriptions.delete(publicationId);
 }

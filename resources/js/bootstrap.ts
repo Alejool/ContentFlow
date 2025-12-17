@@ -1,6 +1,5 @@
 import Echo from "laravel-echo";
 import Pusher from "pusher-js";
-import { usePublicationStore } from "./stores/publicationStore";
 
 declare global {
   interface Window {
@@ -22,15 +21,8 @@ window.Echo = new Echo({
   enabledTransports: ["ws"],
   disableStats: true,
   cluster: "mt1",
-  authEndpoint: "/broadcasting/auth", 
+  authEndpoint: "/broadcasting/auth",
   autoConnect: true,
   logToConsole: true,
-});
-
-console.log("🚀 Initializing Reverb Connection...");
-console.log("Config:", {
-  host: window.location.hostname,
-  port: 8080,
-  key: import.meta.env.VITE_REVERB_APP_KEY,
 });
 

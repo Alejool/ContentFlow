@@ -90,11 +90,12 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
   },
 
   fetchPublicationById: async (id: number) => {
-    const cached = get().publications.find((p) => p.id === id);
-    if (cached) {
-      set({ currentPublication: cached });
-      return cached;
-    }
+    // Force refresh, ignore cache
+    // const cached = get().publications.find((p) => p.id === id);
+    // if (cached) {
+    //   set({ currentPublication: cached });
+    //   return cached;
+    // }
 
     set({ isLoading: true, error: null });
     try {
@@ -102,10 +103,9 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
       const publication = response.data.publication;
 
       set((state) => ({
-        publications: [
-          ...state.publications.filter((p) => p.id !== id),
-          publication,
-        ],
+        publications: state.publications.map((p) =>
+          p.id === id ? publication : p
+        ),
         currentPublication: publication,
         isLoading: false,
       }));
@@ -160,7 +160,8 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
         state.currentPublication?.id === id
           ? { ...state.currentPublication, ...updated }
           : state.currentPublication,
-    })),
+    })
+  ),
 
   removePublication: (id) =>
     set((state) => ({

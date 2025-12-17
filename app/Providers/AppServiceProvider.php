@@ -8,7 +8,7 @@ use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
-    
+
     /**
      * Register any application services.
      */
@@ -26,6 +26,8 @@ class AppServiceProvider extends ServiceProvider
         if ($this->app->environment('local') && request()->header('X-Forwarded-Proto') === 'https') {
             URL::forceScheme('https');
         }
+
+        // Register Notification Observer
+        \Illuminate\Notifications\DatabaseNotification::observe(\App\Observers\NotificationObserver::class);
     }
-    
 }

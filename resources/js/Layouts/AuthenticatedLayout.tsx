@@ -22,6 +22,7 @@ export default function AuthenticatedLayout({
   children,
 }: AuthenticatedLayoutProps) {
   const user = usePage().props.auth.user as User;
+
   const [showingNavigationDropdown, setShowingNavigationDropdown] =
     useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);

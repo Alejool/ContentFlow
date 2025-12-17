@@ -13,7 +13,7 @@ import { useTheme } from "@/Hooks/useTheme";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Campaign } from "@/types/Campaign";
 import { Publication } from "@/types/Publication";
-import { Head } from "@inertiajs/react";
+import { Head, usePage } from "@inertiajs/react";
 import axios from "axios";
 import { FileText, Folder, Target } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -22,11 +22,17 @@ import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
 import { usePublishPublication } from "@/Hooks/publication/usePublishPublication";
+import { useRealtime } from "@/Hooks/publication/useRealtime";
 import { useCampaignStore } from "@/stores/campaignStore";
 import { usePublicationStore } from "@/stores/publicationStore";
 
 export default function ManageContentPage() {
   const { t } = useTranslation();
+  const { props } = usePage();
+  const user = props.auth.user as any;
+
+  useRealtime(user?.id);
+
   const { theme } = useTheme();
   const { confirm, ConfirmDialog } = useConfirm();
   const [activeTab, setActiveTab] = useState<
@@ -358,6 +364,27 @@ export default function ManageContentPage() {
             <p className={`text-lg ${subtitleColor} max-w-2xl mx-auto`}>
               {t("manageContent.subtitle")}
             </p>
+            {/* DEBUG BUTTON: REMOVE AFTER FIX */}
+            <button
+              onClick={() => {
+                const firstPub = publicationStore.publications[2];
+                if (firstPub) {
+                  console.log("Simulating update for:", firstPub.id);
+                  const newStatus =
+                    firstPub.status === "published" ? "draft" : "published";
+                  publicationStore.updatePublication(firstPub.id, {
+                    status: newStatus,
+                  });
+                  toast.success(`Test: Set ${firstPub.id} to ${newStatus}`);
+                } else {
+                  toast.error("No publications to test");
+                }
+              }}
+              className="mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+            >
+              DEBUG: Test Local Update
+            </button>
+            {/* END DEBUG BUTTON */}
           </div>
 
           <div className="space-y-8">
@@ -452,8 +479,6 @@ export default function ManageContentPage() {
         ),
         document.body
       )}
-
-
 
       {createPortal(
         activeTab === "publications" ? (

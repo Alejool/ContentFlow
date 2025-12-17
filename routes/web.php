@@ -22,6 +22,8 @@ use App\Http\Controllers\SocialPostLogController;
 |--------------------------------------------------------------------------
 */
 
+Illuminate\Support\Facades\Broadcast::routes();
+
 Route::get('/', function () {
   return Inertia::render('Welcome', [
     'canLogin' => Route::has('login'),

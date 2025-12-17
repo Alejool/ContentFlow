@@ -107,7 +107,6 @@ export default function CampaignList({
       ) : (
         <PublicationTable
           items={items as any}
-          key={items.length}
           theme={theme}
           t={t}
           isLoading={isLoading}

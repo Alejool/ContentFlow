@@ -37,49 +37,35 @@ class PublishToSocialMedia implements ShouldQueue
         $this->socialAccounts
       );
 
-      $anySuccess = false;
-
-      foreach ($result['platform_results'] ?? [] as $platformResult) {
-        if (!empty($platformResult['success'])) {
-          $anySuccess = true;
-          break;
-        }
-      }
+      $anySuccess = collect($result['platform_results'] ?? [])
+        ->contains(fn($r) => !empty($r['success']));
 
       if ($anySuccess) {
         $this->publication->update([
           'status' => 'published',
           'publish_date' => now(),
         ]);
-
-        foreach ($this->publication->campaigns as $campaign) {
-          if ($campaign->status !== 'active') {
-            $campaign->update(['status' => 'active']);
-          }
-        }
-
-        Log::info('Publication published (partial or full)', [
-          'publication_id' => $this->publication->id
-        ]);
       } else {
-        $this->publication->update(['status' => 'failed']);
-
-        Log::warning('Publication failed on all platforms', [
-          'publication_id' => $this->publication->id,
-          'results' => $result
+        $this->publication->update([
+          'status' => 'failed',
         ]);
       }
     } catch (\Throwable $e) {
-      $this->publication->update(['status' => 'failed']);
+
+      $this->publication->update([
+        'status' => 'failed',
+      ]);
 
       Log::error('Publishing job crashed', [
         'publication_id' => $this->publication->id,
         'error' => $e->getMessage(),
       ]);
-
-      event(new PublicationStatusUpdated(
-        $this->publication->id
-      ));
     }
+
+    event(new PublicationStatusUpdated(
+      userId: $this->publication->user_id,
+      publicationId: $this->publication->id,
+      status: $this->publication->status
+    ));
   }
 }
