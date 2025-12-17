@@ -6,7 +6,6 @@ import React, {
   useEffect,
   useState,
 } from "react";
-import toast from "react-hot-toast";
 
 export interface NotificationData {
   id: string;
@@ -149,64 +148,27 @@ export const NotificationProvider = ({
 
   useEffect(() => {
     fetchNotifications();
-    // Poll every 30 seconds for faster updates without Redis
-    const interval = setInterval(fetchNotifications, 30000);
-
-    return () => clearInterval(interval);
+    // Polling removed in favor of realtime updates
   }, [fetchNotifications]);
 
   // Real-time listener
   useEffect(() => {
     if (user?.id && (window as any).Echo) {
-      const channel = (window as any).Echo.private(
-        `App.Models.User.${user.id}`
-      );
+      console.log("Initializing Notification listener for user:", user.id);
+      const channel = (window as any).Echo.private(`users.${user.id}`);
 
-      channel.notification((notification: any) => {
-        const { id, type, ...rest } = notification;
-        const newNotif: NotificationData = {
-          id: id,
-          type: type,
-          category: rest.category || "application",
-          data: rest,
-          read_at: null,
-          created_at: new Date().toISOString(),
-        };
-
-        if (newNotif.data.message) {
-          const toastOptions = {
-            duration: 3000,
-            position: "top-center" as const,
-          };
-
-          if (newNotif.data.status === "success") {
-            toast.success(newNotif.data.message, toastOptions);
-          } else if (newNotif.data.status === "error") {
-            toast.error(newNotif.data.message, toastOptions);
-          } else if (newNotif.data.status === "warning") {
-            toast(newNotif.data.message, { ...toastOptions, icon: "⚠️" });
-          } else {
-            toast(newNotif.data.message, toastOptions);
-          }
-        }
-
-        setNotifications((prev) => {
-          const exists = prev.find((n) => n.id === newNotif.id);
-          if (exists) return prev;
-
-          return [newNotif, ...prev];
-        });
-
-        setUnreadCount((prev) => prev + 1);
+      channel.listen(".NotificationCreated", (e: any) => {
+        console.log("Notification event received, refreshing list...", e);
+        fetchNotifications();
       });
 
       return () => {
         if ((window as any).Echo) {
-          (window as any).Echo.leave(`App.Models.User.${user.id}`);
+          (window as any).Echo.leave(`users.${user.id}`);
         }
       };
     }
-  }, [user]);
+  }, [user, fetchNotifications]);
 
   const applicationNotifications = notifications.filter(
     (n) => n.category === "application" || n.data.category === "application"
