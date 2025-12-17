@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Artisan;
+use App\Models\YouTubePlaylistQueue;
 
 class PlatformPublishService
 {
@@ -25,7 +26,7 @@ class PlatformPublishService
   ) {}
 
   /**
-   * Publica en YouTube (solo primer video)
+   * Publish to platform (only first video)
    */
   public function publishToPlatform(
     Publication $publication,
@@ -42,7 +43,7 @@ class PlatformPublishService
       ];
     }
 
-    // Crear log pendiente
+    // Create pending log
     $postLog = $this->logService->createPendingLog(
       $publication,
       $socialAccount,
@@ -54,7 +55,7 @@ class PlatformPublishService
     $uploadedPostId = null;
 
     try {
-      // PASO 1: Subir el video a YouTube
+      // Step 1: Upload video to YouTube
       $videoAbsolutePath = $this->resolveFilePath($firstMediaFile->file_path);
 
       $postData = [
@@ -66,7 +67,7 @@ class PlatformPublishService
         'type' => $firstMediaFile->youtube_type ?? 'regular', // Pass youtube_type from DB ('short' or 'regular')
       ];
 
-      // Buscar Thumbnail Derivatives
+      // Search for Thumbnail Derivatives
       $thumbnail = $firstMediaFile->derivatives()
         ->where('derivative_type', 'thumbnail')
         ->where('platform', 'youtube')
@@ -98,7 +99,7 @@ class PlatformPublishService
       $response = $platformService->publishPost($postData);
       $uploadedPostId = $response['post_id'] ?? $response['id'] ?? null;
 
-      // PASO 2: Marcar como publicado INMEDIATAMENTE después de subir
+      // Step 2: Mark as published IMMEDIATELY after upload
       $postLog = $this->logService->markAsPublished($postLog, $response);
 
       // Notify User
@@ -109,7 +110,7 @@ class PlatformPublishService
         'publication_id' => $publication->id
       ]);
     } catch (\Exception $e) {
-      // Solo marcar como fallido si el VIDEO UPLOAD falló
+      // Only mark as failed if the VIDEO UPLOAD failed
       $this->logService->markAsFailed($postLog, $e->getMessage());
 
       Log::error('YouTube video upload failed', [
@@ -124,18 +125,18 @@ class PlatformPublishService
       ];
     }
 
-    // PASO 3: Manejar playlist DESPUÉS de que el video esté publicado
-    // Si falla, NO afecta el estado del video
+    // Step 3: Handle playlist AFTER the video is published
+    // If it fails, it does NOT affect the video's state
     $campaignGroup = $publication->campaigns->first();
 
     if ($campaignGroup && $uploadedPostId) {
       try {
-        // Crear entrada en la cola de playlists para procesamiento en background
-        \App\Models\YouTubePlaylistQueue::create([
+        // Create entry in the playlist queue for background processing
+        YouTubePlaylistQueue::create([
           'social_post_log_id' => $postLog->id,
           'campaign_id' => $campaignGroup->id,
           'video_id' => $uploadedPostId,
-          'playlist_id' => $campaignGroup->youtube_playlist_id, // Puede ser null
+          'playlist_id' => $campaignGroup->youtube_playlist_id,
           'playlist_name' => $campaignGroup->name,
           'status' => 'pending',
         ]);
@@ -145,7 +146,7 @@ class PlatformPublishService
           'campaign' => $campaignGroup->name
         ]);
       } catch (\Exception $e) {
-        // Log el error pero NO fallar la publicación
+        // Log the error but DO NOT fail the publication
         Log::warning('Failed to queue playlist operation', [
           'video_id' => $uploadedPostId,
           'campaign' => $campaignGroup->name,
@@ -169,7 +170,7 @@ class PlatformPublishService
       }
     }
 
-    // Retornar éxito porque el video se subió correctamente
+    // Return success because the video was uploaded successfully
     return [
       'success' => true,
       'log' => $postLog,
@@ -178,7 +179,7 @@ class PlatformPublishService
   }
 
   /**
-   * Publica en otras plataformas (múltiples archivos)
+   * Publish to other platforms (multiple files)
    */
   public function publishToOtherPlatform(
     Publication $publication,
@@ -206,8 +207,11 @@ class PlatformPublishService
 
       $response = $platformService->publishPost($postData);
 
-      // Marcar como publicado
+      // Mark as published
       $postLog = $this->logService->markAsPublished($postLog, $response);
+
+      // Notify User
+      $publication->user->notify(new VideoUploadedNotification($postLog));
 
       return [
         'success' => true,
@@ -215,7 +219,7 @@ class PlatformPublishService
         'error' => null,
       ];
     } catch (\Exception $e) {
-      // Marcar como fallido
+      // Mark as failed
       $this->logService->markAsFailed($postLog, $e->getMessage());
 
       return [
@@ -227,8 +231,8 @@ class PlatformPublishService
   }
 
   /**
-   * Publica en todas las plataformas seleccionadas
-   * TRANSACCIÓN POR PLATAFORMA (no global)
+   * Publish to all selected platforms
+   * TRANSACTION PER PLATFORM (not global)
    */
   public function publishToAllPlatforms(
     Publication $publication,
@@ -278,9 +282,15 @@ class PlatformPublishService
           }
         }
 
-        // Si hay errores en esta plataforma, revertir su transacción
         if (!empty($platformErrors)) {
           DB::rollBack();
+
+          // Notify about failure
+          $publication->user->notify(new \App\Notifications\PublicationPostFailedNotification(
+            $socialAccount->platform,
+            $platformErrors[0]['message'] ?? 'Unknown error',
+            $publication->title
+          ));
 
           $platformResults[$socialAccount->platform] = [
             'success' => false,
@@ -291,7 +301,7 @@ class PlatformPublishService
 
           $allErrors[$socialAccount->platform] = $platformErrors;
         } else {
-          // Si todo fue exitoso, confirmar la transacción de esta plataforma
+          // If everything was successful, commit the transaction for this platform
           DB::commit();
 
           $platformResults[$socialAccount->platform] = [
@@ -311,6 +321,13 @@ class PlatformPublishService
           'campaign_id' => $publication->id,
           'error' => $e->getMessage(),
         ]);
+
+        // Notify about failure
+        $publication->user->notify(new \App\Notifications\PublicationPostFailedNotification(
+          $socialAccount->platform,
+          $e->getMessage(),
+          $publication->title
+        ));
 
         $platformResults[$socialAccount->platform] = [
           'success' => false,
@@ -332,7 +349,7 @@ class PlatformPublishService
   }
 
   /**
-   * Reintenta una publicación fallida
+   * Retry a failed publication
    */
   public function retryPublication(SocialPostLog $postLog): array
   {
@@ -343,7 +360,7 @@ class PlatformPublishService
       ];
     }
 
-    // Resetear para reintento
+    // Reset for retry
     $this->logService->resetForRetry($postLog);
 
     DB::beginTransaction();
@@ -500,11 +517,115 @@ class PlatformPublishService
     };
   }
   /**
-   * Elimina la publicación de todas las plataformas sociales
+   * Unpublish from specific platforms
+   */
+  public function unpublishFromPlatforms(Publication $publication, array $accountIds): array
+  {
+    // Include published AND failed posts, filtered by account
+    $logs = SocialPostLog::where('publication_id', $publication->id)
+      ->whereIn('social_account_id', $accountIds)
+      ->whereIn('status', ['published', 'failed'])
+      ->get();
+
+    $results = [];
+    $allSuccess = true;
+
+    if ($logs->isEmpty()) {
+      return ['success' => true, 'message' => 'No active posts found for selected accounts', 'results' => []];
+    }
+
+    foreach ($logs as $log) {
+      try {
+        $socialAccount = $log->socialAccount;
+
+        if (!$socialAccount) {
+          $log->update(['status' => 'deleted']);
+          $results[] = [
+            'log_id' => $log->id,
+            'platform' => $log->platform,
+            'status' => 'deleted',
+            'note' => 'Account not found'
+          ];
+          continue;
+        }
+
+        $platformService = $this->getPlatformService($socialAccount);
+
+        if ($log->platform_post_id) {
+          try {
+            $deleted = $platformService->deletePost($log->platform_post_id);
+
+            if ($deleted) {
+              $log->update(['status' => 'deleted']);
+              $results[] = ['log_id' => $log->id, 'platform' => $log->platform, 'status' => 'deleted'];
+
+              // Notify User (Video Deleted) - Optional for other types?
+              if ($log->platform === 'youtube') {
+                $publication->user->notify(new VideoDeletedNotification($log));
+              }
+            } else {
+              // Post not found on platform - mark as deleted
+              $log->update(['status' => 'deleted']);
+              $results[] = [
+                'log_id' => $log->id,
+                'platform' => $log->platform,
+                'status' => 'deleted',
+                'note' => 'Post not found on platform'
+              ];
+            }
+          } catch (\Exception $deleteError) {
+            $errorMsg = strtolower($deleteError->getMessage());
+            if (
+              str_contains($errorMsg, 'not found') ||
+              str_contains($errorMsg, '404') ||
+              str_contains($errorMsg, 'does not exist')
+            ) {
+              $log->update(['status' => 'deleted']);
+              $results[] = [
+                'log_id' => $log->id,
+                'platform' => $log->platform,
+                'status' => 'deleted',
+                'note' => 'Already deleted or not found'
+              ];
+            } else {
+              $allSuccess = false;
+              $results[] = [
+                'log_id' => $log->id,
+                'platform' => $log->platform,
+                'status' => 'failed',
+                'error' => $deleteError->getMessage()
+              ];
+            }
+          }
+        } else {
+          $log->update(['status' => 'deleted']);
+          $results[] = [
+            'log_id' => $log->id,
+            'platform' => $log->platform,
+            'status' => 'deleted',
+            'note' => 'No platform post ID'
+          ];
+        }
+      } catch (\Exception $e) {
+        $allSuccess = false;
+        $results[] = [
+          'log_id' => $log->id,
+          'platform' => $log->platform ?? 'unknown',
+          'status' => 'failed',
+          'error' => $e->getMessage()
+        ];
+      }
+    }
+
+    return ['success' => $allSuccess, 'results' => $results];
+  }
+
+  /**
+   * Unpublish from all social platforms
    */
   public function unpublishFromAllPlatforms(Publication $publication): array
   {
-    // Incluir posts publicados Y fallidos
+    // Include published AND failed posts
     $logs = SocialPostLog::where('publication_id', $publication->id)
       ->whereIn('status', ['published', 'failed'])
       ->get();
@@ -512,7 +633,7 @@ class PlatformPublishService
     $results = [];
     $allSuccess = true;
 
-    // Si no hay logs publicados, consideramos éxito (nada que borrar)
+    // If no logs published, consider success (nothing to delete)
     if ($logs->isEmpty()) {
       return ['success' => true, 'message' => 'No active posts found', 'results' => []];
     }
@@ -537,7 +658,7 @@ class PlatformPublishService
 
         if ($log->platform_post_id) {
           try {
-            // Intentar eliminar
+            // Try to delete
             $deleted = $platformService->deletePost($log->platform_post_id);
 
             if ($deleted) {
@@ -546,7 +667,7 @@ class PlatformPublishService
               $publication->user->notify(new VideoDeletedNotification($log));
               $results[] = ['log_id' => $log->id, 'platform' => $log->platform, 'status' => 'deleted'];
             } else {
-              // Post no existe en plataforma - marcar como deleted de todas formas
+              // Post not found on platform - mark as deleted
               $log->update(['status' => 'deleted']);
               $results[] = [
                 'log_id' => $log->id,
@@ -556,7 +677,7 @@ class PlatformPublishService
               ];
             }
           } catch (\Exception $deleteError) {
-            // Si el error es "not found" o 404, marcar como deleted
+            // If the error is "not found" or 404, mark as deleted
             $errorMsg = strtolower($deleteError->getMessage());
             if (
               str_contains($errorMsg, 'not found') ||
@@ -571,7 +692,7 @@ class PlatformPublishService
                 'note' => 'Already deleted or not found'
               ];
             } else {
-              // Error real - reportar pero no fallar todo
+              // Real error - report but do not fail everything
               $allSuccess = false;
               $results[] = [
                 'log_id' => $log->id,
@@ -582,7 +703,7 @@ class PlatformPublishService
             }
           }
         } else {
-          // Log marcado como posted pero sin ID - marcar como deleted
+          // Log marked as posted but without ID - mark as deleted
           $log->update(['status' => 'deleted']);
           $results[] = [
             'log_id' => $log->id,

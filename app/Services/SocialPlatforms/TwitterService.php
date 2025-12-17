@@ -602,4 +602,24 @@ class TwitterService extends BaseSocialService
       return false;
     }
   }
+  /**
+   * Delete a tweet
+   */
+  public function deletePost(string $postId): bool
+  {
+    try {
+      $response = $this->client->delete("https://api.twitter.com/2/tweets/{$postId}", [
+        'headers' => [
+          'Authorization' => "Bearer {$this->accessToken}",
+        ],
+      ]);
+
+      $data = json_decode($response->getBody(), true);
+
+      return isset($data['data']['deleted']) && $data['data']['deleted'] === true;
+    } catch (\Exception $e) {
+      Log::error('Twitter deletePost error', ['post_id' => $postId, 'error' => $e->getMessage()]);
+      return false;
+    }
+  }
 }

@@ -453,6 +453,8 @@ export default function ManageContentPage() {
         document.body
       )}
 
+
+
       {createPortal(
         activeTab === "publications" ? (
           <EditPublicationModal
@@ -460,7 +462,6 @@ export default function ManageContentPage() {
             onClose={() => {
               setIsEditModalOpen(false);
               setSelectedItem(null);
-              fetchData(getPagination().current_page);
             }}
             publication={selectedItem as Publication}
             onSubmit={handleUpdate}

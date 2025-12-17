@@ -1,7 +1,7 @@
 import PublicationRow from "@/Components/ManageContent/Publication/PublicationRow";
 import { TableHeader } from "@/Components/ManageContent/Publication/TableHeader";
-import { Publication } from "@/types/Publication";
 import Loader from "@/Components/common/Loader";
+import { Publication } from "@/types/Publication";
 
 interface PublicationTableProps {
   items: Publication[];
@@ -28,13 +28,16 @@ export default function PublicationTable({
 }: PublicationTableProps) {
   const getStatusColor = (status?: string) => {
     switch (status) {
-      case "active":
       case "published":
         return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400";
+      case "publishing":
+        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400";
       case "draft":
         return "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300";
       case "scheduled":
         return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400";
+      case "failed":
+        return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400";
       default:
         return "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300";
     }
@@ -67,9 +70,14 @@ export default function PublicationTable({
         >
           {isLoading ? (
             <tr>
-              <td colSpan={6} className="px-6 py-12 text-center space-y-6  text-gray-500">
+              <td
+                colSpan={6}
+                className="px-6 py-12 text-center space-y-6  text-gray-500"
+              >
                 <Loader />
-                <span className="text-sm pt-8">{t("publications.table.loading")}</span>
+                <span className="text-sm pt-8">
+                  {t("publications.table.loading")}
+                </span>
               </td>
             </tr>
           ) : items.length > 0 ? (

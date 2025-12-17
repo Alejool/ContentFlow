@@ -1,5 +1,6 @@
 import Echo from "laravel-echo";
 import Pusher from "pusher-js";
+import { usePublicationStore } from "./stores/publicationStore";
 
 declare global {
   interface Window {
@@ -33,14 +34,3 @@ console.log("Config:", {
   key: import.meta.env.VITE_REVERB_APP_KEY,
 });
 
-window.Echo.connector.pusher.connection.bind("connected", () => {
-  console.log("✅ REVERB CONNECTED");
-});
-
-window.Echo.connector.pusher.connection.bind("disconnected", () => {
-  console.warn("❌ REVERB DISCONNECTED");
-});
-
-window.Echo.connector.pusher.connection.bind("error", (error: any) => {
-  console.error("⚠️ REVERB CONNECTION ERROR:", error);
-});

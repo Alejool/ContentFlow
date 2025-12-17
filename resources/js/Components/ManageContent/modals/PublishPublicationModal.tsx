@@ -36,6 +36,8 @@ export default function PublishPublicationModal({
     connectedAccounts,
     selectedPlatforms,
     publishedPlatforms,
+    failedPlatforms,
+    publishingPlatforms,
     publishing,
     unpublishing,
     existingThumbnails,
@@ -258,18 +260,26 @@ export default function PublishPublicationModal({
                     const gradient = getPlatformGradient(account.platform);
                     const isSelected = selectedPlatforms.includes(account.id);
                     const isPublished = publishedPlatforms.includes(account.id);
+                    const isFailed = failedPlatforms.includes(account.id);
+                    const isPublishing = publishingPlatforms.includes(account.id);
                     const isUnpublishing = unpublishing === account.id;
+                    const isBackgroundPublishing =
+                      publication?.status === "publishing";
 
                     return (
                       <div key={account.id} className="relative">
                         <button
                           onClick={() =>
-                            !isPublished && togglePlatform(account.id)
+                            !isPublished &&
+                            !isBackgroundPublishing &&
+                            togglePlatform(account.id)
                           }
-                          disabled={isPublished}
+                          disabled={isPublished || isBackgroundPublishing}
                           className={`w-full flex items-center gap-3 p-4 rounded-lg border-2 transition-all ${
                             isPublished
                               ? "border-green-500 bg-green-50 dark:bg-green-900/20 cursor-default"
+                              : isBackgroundPublishing
+                              ? "border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 cursor-default"
                               : isSelected
                               ? "border-primary-500 bg-primary-50 dark:bg-primary-900/20"
                               : theme === "dark"
@@ -304,9 +314,19 @@ export default function PublishPublicationModal({
                               </span>
                             </div>
                           )}
-                          {isSelected && !isPublished && (
-                            <CheckCircle className="w-5 h-5 text-primary-500" />
+                          {isBackgroundPublishing && isSelected && (
+                            <div className="flex items-center gap-2">
+                              <span className="flex items-center gap-1 text-xs font-medium text-yellow-600 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-900/30 px-2 py-1 rounded-full">
+                                <div className="w-3 h-3 border-2 border-yellow-600 border-t-transparent rounded-full animate-spin" />
+                                {t("publications.modal.publish.publishing")}
+                              </span>
+                            </div>
                           )}
+                          {isSelected &&
+                            !isPublished &&
+                            !isBackgroundPublishing && (
+                              <CheckCircle className="w-5 h-5 text-primary-500" />
+                            )}
                         </button>
 
                         {/* Unpublish button */}
@@ -420,10 +440,14 @@ export default function PublishPublicationModal({
               </button>
               <button
                 onClick={handlePublishWithNotifications}
-                disabled={publishing || selectedPlatforms.length === 0}
+                disabled={
+                  publishing ||
+                  selectedPlatforms.length === 0 ||
+                  publication.status === "publishing"
+                }
                 className="flex-1 px-4 py-3 rounded-lg font-medium bg-gradient-to-r from-primary-500 to-pink-500 hover:from-primary-600 hover:to-pink-600 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
-                {publishing ? (
+                {publishing || publication.status === "publishing" ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                     {t("publications.modal.publish.publishing")}

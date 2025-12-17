@@ -22,6 +22,7 @@ use App\Models\SocialAccount;
 use App\Models\Campaign;
 use App\Models\SocialPostLog;
 use App\Services\Publish\PlatformPublishService;
+use App\Jobs\PublishToSocialMedia;
 
 class PublicationController extends Controller
 {
@@ -747,57 +748,16 @@ class PublicationController extends Controller
       }
     }
 
-    // Use PlatformPublishService to handle publishing + Playlists
-    $publishService = app(PlatformPublishService::class);
-    $result = $publishService->publishToAllPlatforms($publication, $socialAccounts);
+    // Set status to publishing to prevent concurrent edits
+    $publication->update(['status' => 'publishing']);
 
-    // Check if any platform was successful
-    $anySuccess = false;
-    if (isset($result['platform_results'])) {
-      foreach ($result['platform_results'] as $platformResult) {
-        if (!empty($platformResult['success'])) {
-          $anySuccess = true;
-          break;
-        }
-      }
-    }
-
-    // Update publication status if at least one platform succeeded
-    if ($anySuccess && !$result['has_errors']) {
-      // Completamente exitoso
-      $publication->update([
-        'status' => 'published',
-        'publish_date' => now(),
-      ]);
-
-      // Update associated campaigns status
-      // Update associated campaigns status
-      foreach ($publication->campaigns as $campaign) {
-        if ($campaign->status !== 'active') {
-          $campaign->update(['status' => 'active']);
-        }
-      }
-    } elseif ($anySuccess && $result['has_errors']) {
-      // Parcialmente exitoso (algunos fallaron)
-      // Igual marcamos como publicado porque hay contenido en vivo que requiere unpublish
-      $publication->update([
-        'status' => 'published',
-        'publish_date' => now(),
-      ]);
-
-      // Update associated campaigns status
-      // Update associated campaigns status
-      foreach ($publication->campaigns as $campaign) {
-        if ($campaign->status !== 'active') {
-          $campaign->update(['status' => 'active']);
-        }
-      }
-    }
+    // Dispatch background job to 'publishing' queue for immediate priority
+    PublishToSocialMedia::dispatch($publication, $socialAccounts)->onQueue('publishing');
 
     return response()->json([
-      'success' => !$result['has_errors'],
-      'message' => $result['has_errors'] ? 'Some publications failed' : 'Publication published successfully',
-      'details' => $result
+      'success' => true,
+      'message' => 'Publishing started in background. You will be notified when it completes.',
+      'status' => 'publishing'
     ]);
   }
 
@@ -805,19 +765,38 @@ class PublicationController extends Controller
   {
     $publication = Publication::findOrFail($id);
 
-    Log::info('Publication unpublishing', ['publication' => $publication]);
-    // if ($publication->status !== 'published') {
-    //   return response()->json(['message' => 'Publication is not published'], 400);
-    // }
+    Log::info('Publication unpublishing', ['publication' => $publication, 'platform_ids' => $request->input('platform_ids')]);
 
     $publishService = app(PlatformPublishService::class);
-    $result = $publishService->unpublishFromAllPlatforms($publication);
+    $platformIds = $request->input('platform_ids');
+
+    if (!empty($platformIds) && is_array($platformIds)) {
+      $result = $publishService->unpublishFromPlatforms($publication, $platformIds);
+    } else {
+      $result = $publishService->unpublishFromAllPlatforms($publication);
+    }
 
     if ($result['success']) {
-      $publication->update(['status' => 'draft']);
-      return response()->json(['success' => true, 'message' => 'Publication unpublished successfully']);
+      // Solo cambiar a borrador si ya no queda ninguna plataforma publicada
+      $remaining = $publication->socialPostLogs()
+        ->where('status', 'published')
+        ->count();
+
+      if ($remaining === 0) {
+        $publication->update(['status' => 'draft']);
+      }
+
+      return response()->json([
+        'success' => true,
+        'message' => 'Publication unpublished successfully',
+        'details' => $result
+      ]);
     } else {
-      return response()->json(['success' => false, 'message' => 'Failed to unpublish', 'details' => $result], 500);
+      return response()->json([
+        'success' => false,
+        'message' => 'Failed to unpublish',
+        'details' => $result
+      ], 500);
     }
   }
 
@@ -832,7 +811,6 @@ class PublicationController extends Controller
       return response()->json(['error' => 'Publication not found'], 404);
     }
 
-    // Get social account IDs where status is 'published'
     $publishedAccountIds = SocialPostLog::where('publication_id', $publication->id)
       ->where('status', 'published')
       ->pluck('social_account_id')
@@ -840,8 +818,24 @@ class PublicationController extends Controller
       ->values()
       ->toArray();
 
+    $failedAccountIds = SocialPostLog::where('publication_id', $publication->id)
+      ->where('status', 'failed')
+      ->pluck('social_account_id')
+      ->unique()
+      ->values()
+      ->toArray();
+
+    $publishingAccountIds = SocialPostLog::where('publication_id', $publication->id)
+      ->where('status', 'publishing')
+      ->pluck('social_account_id')
+      ->unique()
+      ->values()
+      ->toArray();
+
     return response()->json([
-      'published_platforms' => $publishedAccountIds
+      'published_platforms' => $publishedAccountIds,
+      'failed_platforms' => $failedAccountIds,
+      'publishing_platforms' => $publishingAccountIds
     ]);
   }
 

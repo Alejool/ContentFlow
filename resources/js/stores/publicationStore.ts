@@ -5,7 +5,11 @@ import { create } from "zustand";
 interface PublicationState {
   publications: Publication[];
   currentPublication: Publication | null;
+
   publishedPlatforms: Record<number, number[]>;
+  failedPlatforms: Record<number, number[]>;
+  publishingPlatforms: Record<number, number[]>;
+
   isLoading: boolean;
   error: string | null;
 
@@ -16,23 +20,26 @@ interface PublicationState {
     per_page: number;
   };
 
-  // Fetch operations
   fetchPublications: (filters?: any, page?: number) => Promise<void>;
   fetchPublicationById: (id: number) => Promise<Publication | null>;
-  fetchPublishedPlatforms: (publicationId: number) => Promise<number[]>;
+  fetchPublishedPlatforms: (
+    publicationId: number
+  ) => Promise<{ published: number[]; failed: number[] }>;
 
-  // CRUD operations
   addPublication: (publication: Publication) => void;
   updatePublication: (id: number, publication: Partial<Publication>) => void;
   removePublication: (id: number) => void;
   setCurrentPublication: (publication: Publication | null) => void;
 
-  // Cache operations
   getPublicationById: (id: number) => Publication | undefined;
   getPublishedPlatforms: (publicationId: number) => number[];
-  setPublishedPlatforms: (publicationId: number, accountIds: number[]) => void;
+  getFailedPlatforms: (publicationId: number) => number[];
+  getPublishingPlatforms: (publicationId: number) => number[];
 
-  // Utility
+  setPublishedPlatforms: (publicationId: number, accountIds: number[]) => void;
+  setFailedPlatforms: (publicationId: number, accountIds: number[]) => void;
+  setPublishingPlatforms: (publicationId: number, accountIds: number[]) => void;
+
   clearError: () => void;
   reset: () => void;
 }
@@ -40,7 +47,11 @@ interface PublicationState {
 export const usePublicationStore = create<PublicationState>((set, get) => ({
   publications: [],
   currentPublication: null,
+
   publishedPlatforms: {},
+  failedPlatforms: {},
+  publishingPlatforms: {},
+
   isLoading: false,
   error: null,
 
@@ -48,40 +59,37 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
     current_page: 1,
     last_page: 1,
     total: 0,
-    per_page: 15,
+    per_page: 7,
   },
 
   fetchPublications: async (filters = {}, page = 1) => {
     set({ isLoading: true, error: null });
     try {
-      const params = { ...filters, page };
-      const response = await axios.get("/publications", { params });
+      const response = await axios.get("/publications", {
+        params: { ...filters, page },
+      });
 
-      // Handle different response structures if necessary (e.g. wrapped in 'data' or root)
-      const data = response.data.publications || response.data;
-      const publications = data.data || [];
+      const data = response.data.publications;
 
       set({
-        publications,
+        publications: data.data ?? [],
         pagination: {
-          current_page: data.current_page || 1,
-          last_page: data.last_page || 1,
-          total: data.total || 0,
-          per_page: data.per_page || 15,
+          current_page: data.current_page,
+          last_page: data.last_page,
+          total: data.total,
+          per_page: data.per_page,
         },
         isLoading: false,
       });
     } catch (error: any) {
-      console.error("Error fetching publications:", error);
       set({
-        error: error.message || "Failed to fetch publications",
+        error: error.message ?? "Failed to fetch publications",
         isLoading: false,
       });
     }
   },
 
   fetchPublicationById: async (id: number) => {
-    // Check cache first
     const cached = get().publications.find((p) => p.id === id);
     if (cached) {
       set({ currentPublication: cached });
@@ -91,9 +99,8 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const response = await axios.get(`/publications/${id}`);
-      const publication = response.data.publication || response.data;
+      const publication = response.data.publication;
 
-      // Update cache
       set((state) => ({
         publications: [
           ...state.publications.filter((p) => p.id !== id),
@@ -105,9 +112,8 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
 
       return publication;
     } catch (error: any) {
-      console.error("Error fetching publication:", error);
       set({
-        error: error.message || "Failed to fetch publication",
+        error: error.message ?? "Failed to fetch publication",
         isLoading: false,
       });
       return null;
@@ -115,94 +121,90 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
   },
 
   fetchPublishedPlatforms: async (publicationId: number) => {
-    // const cached = get().publishedPlatforms[publicationId];
-    // if (cached) {
-    //   return cached;
-    // }
     try {
       const response = await axios.get(
         `/publications/${publicationId}/published-platforms`
       );
-      const accountIds = response.data.published_platforms || [];
 
-      // Update cache
+      const published = response.data.published_platforms ?? [];
+      const failed = response.data.failed_platforms ?? [];
+
       set((state) => ({
         publishedPlatforms: {
           ...state.publishedPlatforms,
-          [publicationId]: accountIds,
+          [publicationId]: published,
+        },
+        failedPlatforms: {
+          ...state.failedPlatforms,
+          [publicationId]: failed,
         },
       }));
 
-      return accountIds;
-    } catch (error: any) {
-      console.error("Error fetching published platforms:", error);
-      return [];
+      return { published, failed };
+    } catch {
+      return { published: [], failed: [] };
     }
   },
 
-  addPublication: (publication: Publication) => {
+  addPublication: (publication) =>
     set((state) => ({
       publications: [publication, ...state.publications],
-    }));
-  },
+    })),
 
-  updatePublication: (id: number, updatedPublication: Partial<Publication>) => {
+  updatePublication: (id, updated) =>
     set((state) => ({
-      publications: state.publications.map((pub) =>
-        pub.id === id ? { ...pub, ...updatedPublication } : pub
+      publications: state.publications.map((p) =>
+        p.id === id ? { ...p, ...updated } : p
       ),
       currentPublication:
         state.currentPublication?.id === id
-          ? { ...state.currentPublication, ...updatedPublication }
+          ? { ...state.currentPublication, ...updated }
           : state.currentPublication,
-    }));
-  },
+    })),
 
-  removePublication: (id: number) => {
+  removePublication: (id) =>
     set((state) => ({
-      publications: state.publications.filter((pub) => pub.id !== id),
+      publications: state.publications.filter((p) => p.id !== id),
       currentPublication:
         state.currentPublication?.id === id ? null : state.currentPublication,
-      publishedPlatforms: Object.fromEntries(
-        Object.entries(state.publishedPlatforms).filter(
-          ([key]) => Number(key) !== id
-        )
-      ),
-    }));
-  },
+    })),
 
-  setCurrentPublication: (publication: Publication | null) => {
-    set({ currentPublication: publication });
-  },
+  setCurrentPublication: (publication) =>
+    set({ currentPublication: publication }),
 
-  getPublicationById: (id: number) => {
-    return get().publications.find((pub) => pub.id === id);
-  },
+  getPublicationById: (id) => get().publications.find((p) => p.id === id),
 
-  getPublishedPlatforms: (publicationId: number) => {
-    return get().publishedPlatforms[publicationId] || [];
-  },
+  getPublishedPlatforms: (id) => get().publishedPlatforms[id] ?? [],
 
-  setPublishedPlatforms: (publicationId: number, accountIds: number[]) => {
+  getFailedPlatforms: (id) => get().failedPlatforms[id] ?? [],
+
+  getPublishingPlatforms: (id) => get().publishingPlatforms[id] ?? [],
+
+  setPublishedPlatforms: (id, accounts) =>
     set((state) => ({
-      publishedPlatforms: {
-        ...state.publishedPlatforms,
-        [publicationId]: accountIds,
-      },
-    }));
-  },
+      publishedPlatforms: { ...state.publishedPlatforms, [id]: accounts },
+    })),
 
-  clearError: () => {
-    set({ error: null });
-  },
+  setFailedPlatforms: (id, accounts) =>
+    set((state) => ({
+      failedPlatforms: { ...state.failedPlatforms, [id]: accounts },
+    })),
 
-  reset: () => {
+  setPublishingPlatforms: (id, accounts) =>
+    set((state) => ({
+      publishingPlatforms: { ...state.publishingPlatforms, [id]: accounts },
+    })),
+
+  clearError: () => set({ error: null }),
+
+  reset: () =>
     set({
       publications: [],
       currentPublication: null,
       publishedPlatforms: {},
+      failedPlatforms: {},
+      publishingPlatforms: {},
       isLoading: false,
       error: null,
-    });
-  },
+    }),
 }));

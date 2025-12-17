@@ -8,7 +8,7 @@ export type Publication = {
   hashtags?: string;
   slug?: string;
   scheduled_at?: string;
-  status?: "draft" | "published" | "scheduled";
+  status?: "draft" | "published" | "scheduled" | "publishing";
   is_active?: boolean;
   media_files?: MediaFile[];
   scheduled_posts?: ScheduledPost[];
@@ -29,7 +29,13 @@ export type ScheduledPost = {
 export type SocialPostLog = {
   id: number;
   social_account_id: number;
-  status: "published" | "failed" | "deleted" | "pending" | "success" | "orphaned";
+  status:
+    | "published"
+    | "failed"
+    | "deleted"
+    | "pending"
+    | "success"
+    | "orphaned";
   social_account?: SocialAccount;
   platform: string;
   created_at: string;
