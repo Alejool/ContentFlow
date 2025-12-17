@@ -266,6 +266,7 @@
         "loading":"Loading...",
         "publishing":"Publishing...",
         "platforms":"Platforms",
+        "failed":"Failed",
         "youtube":{
           "youtubeThumbnails":"YouTube Thumbnails"
         },

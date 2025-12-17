@@ -34,11 +34,13 @@ export type SocialPostLog = {
     | "failed"
     | "deleted"
     | "pending"
+    | "failed"
     | "success"
     | "orphaned";
   social_account?: SocialAccount;
   platform: string;
   created_at: string;
+  updated_at: string;
   account_name?: string;
   error_message?: string;
   content?: string;

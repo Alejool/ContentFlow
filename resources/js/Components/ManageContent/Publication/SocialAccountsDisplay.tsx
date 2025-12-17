@@ -14,6 +14,8 @@ export default function SocialAccountsDisplay({
   const scheduledPosts = publication.scheduled_posts || [];
   const postLogs = publication.social_post_logs || [];
 
+  console.log(connectedAccounts);
+
   // Combine entries, preferring logs (actual status) over scheduled
   const combined = new Map<number, any>();
 
@@ -24,7 +26,7 @@ export default function SocialAccountsDisplay({
 
   // Add logs (overwriting scheduled if same account)
   postLogs.forEach((l) => {
-    if (l.social_account_id && l.status !== "deleted")
+    if (l.social_account_id && (l.status !== "deleted" && l.status !== "failed" ))
       combined.set(l.social_account_id, l);
   });
 

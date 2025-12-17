@@ -47,6 +47,7 @@ class PublishSocialPostJob implements ShouldQueue
         ];
 
         // Publicar
+        Log::info('Uploading data 5------', ['postData' => $postData]);
         $result = $platform->publishPost($postData);
         $result['account_id'] = $accountId;
         $responses[] = $result;

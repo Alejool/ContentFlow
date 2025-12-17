@@ -45,6 +45,7 @@ class SocialPostService
       ], $media, $options);
 
       // Publish post
+      Log::info('Uploading data 6------', ['postData' => $postData]);
       $result = $service->publishPost($postData);
 
       // Log successful post

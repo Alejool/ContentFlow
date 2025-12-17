@@ -16,6 +16,8 @@ class TwitterService extends BaseSocialService
    */
   public function publishPost(array $data): array
   {
+    $this->ensureValidToken();
+
     $mediaIds = [];
     $rawPath = $data['media_url'] ?? $data['video_path'] ?? $data['image_path'] ?? null;
 
@@ -73,32 +75,55 @@ class TwitterService extends BaseSocialService
 
     // Publicar tweet (API v2)
     try {
-      $response = $this->client->post('https://api.twitter.com/2/tweets', [
-        'headers' => [
-          'Authorization' => "Bearer {$this->accessToken}",
-          'Content-Type' => 'application/json',
-        ],
-        'json' => $tweetData,
-      ]);
+      return $this->sendTweet($tweetData);
+    } catch (ClientException $e) {
+      // Retry on 401 (Unauthorized) - Token might be revoked or expired despite date check
+      if ($e->getResponse()->getStatusCode() === 401) {
+        Log::warning('Twitter API 401 (Unauthorized) - Attempting token refresh and retry');
 
-      $result = json_decode($response->getBody(), true);
-
-      if (!isset($result['data']['id'])) {
-        throw new \Exception('No tweet ID returned: ' . json_encode($result));
+        try {
+          $this->refreshToken();
+          return $this->sendTweet($tweetData);
+        } catch (\Exception $refreshError) {
+          Log::error('Retry failed after token refresh', ['error' => $refreshError->getMessage()]);
+          // Throw the original or new error? Usually the original 401 or the refresh error.
+          // Let's throw the refresh error if that failed, or the new API error if retry failed.
+          throw $refreshError;
+        }
       }
 
-      return [
-        'success' => true,
-        'post_id' => $result['data']['id'],
-        'platform' => 'twitter',
-        'url' => "https://twitter.com/i/web/status/{$result['data']['id']}",
-      ];
-    } catch (ClientException $e) {
       $response = $e->getResponse();
       $responseBody = $response ? $response->getBody()->getContents() : '';
       Log::error('Twitter v2 Posting Error', ['error' => $e->getMessage(), 'response' => $responseBody]);
       throw new \Exception("Failed to post tweet: " . $e->getMessage() . " Details: " . $responseBody);
     }
+  }
+
+  /**
+   * Helper to send tweet (for retry logic)
+   */
+  private function sendTweet(array $tweetData): array
+  {
+    $response = $this->client->post('https://api.twitter.com/2/tweets', [
+      'headers' => [
+        'Authorization' => "Bearer {$this->accessToken}",
+        'Content-Type' => 'application/json',
+      ],
+      'json' => $tweetData,
+    ]);
+
+    $result = json_decode($response->getBody(), true);
+
+    if (!isset($result['data']['id'])) {
+      throw new \Exception('No tweet ID returned: ' . json_encode($result));
+    }
+
+    return [
+      'success' => true,
+      'post_id' => $result['data']['id'],
+      'platform' => 'twitter',
+      'url' => "https://twitter.com/i/web/status/{$result['data']['id']}",
+    ];
   }
 
   /**
@@ -521,6 +546,8 @@ class TwitterService extends BaseSocialService
    */
   public function getAccountInfo(): array
   {
+    $this->ensureValidToken();
+
     try {
       $response = $this->client->get('https://api.twitter.com/2/users/me', [
         'headers' => [
@@ -549,6 +576,8 @@ class TwitterService extends BaseSocialService
    */
   public function getPostAnalytics(string $postId): array
   {
+    $this->ensureValidToken();
+
     try {
       $response = $this->client->get("https://api.twitter.com/2/tweets/{$postId}", [
         'headers' => [
@@ -590,6 +619,8 @@ class TwitterService extends BaseSocialService
    */
   public function validateCredentials(): bool
   {
+    $this->ensureValidToken();
+
     try {
       $this->client->get('https://api.twitter.com/2/users/me', [
         'headers' => [
@@ -607,6 +638,8 @@ class TwitterService extends BaseSocialService
    */
   public function deletePost(string $postId): bool
   {
+    $this->ensureValidToken();
+
     try {
       $response = $this->client->delete("https://api.twitter.com/2/tweets/{$postId}", [
         'headers' => [
@@ -620,6 +653,84 @@ class TwitterService extends BaseSocialService
     } catch (\Exception $e) {
       Log::error('Twitter deletePost error', ['post_id' => $postId, 'error' => $e->getMessage()]);
       return false;
+    }
+  }
+
+  /**
+   * Ensure the access token is valid
+   */
+  private function ensureValidToken(): void
+  {
+    // Check for expiration and refresh if necessary
+    if ($this->socialAccount && $this->socialAccount->token_expires_at) {
+      // Refresh if expired or expiring soon (within 5 minutes)
+      if (now()->addMinutes(5)->gte($this->socialAccount->token_expires_at)) {
+        Log::info('Twitter Token expired or expiring soon, attempting refresh', ['account_id' => $this->socialAccount->id]);
+        try {
+          $this->refreshToken();
+        } catch (\Exception $e) {
+          Log::error('Twitter Token refresh failed', ['error' => $e->getMessage()]);
+          // If strictly expired, throw error
+          if (now()->gte($this->socialAccount->token_expires_at)) {
+            throw $e;
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Refresh the access token
+   */
+  private function refreshToken(): void
+  {
+    if (!$this->socialAccount || !$this->socialAccount->refresh_token) {
+      throw new \Exception('Cannot refresh Twitter token: Missing refresh token');
+    }
+
+    try {
+      $clientId = config('services.twitter.client_id');
+      $clientSecret = config('services.twitter.client_secret');
+
+      $client = new \GuzzleHttp\Client();
+      $response = $client->post('https://api.twitter.com/2/oauth2/token', [
+        'headers' => [
+          'Authorization' => 'Basic ' . base64_encode($clientId . ':' . $clientSecret),
+          'Content-Type' => 'application/x-www-form-urlencoded',
+        ],
+        'form_params' => [
+          'refresh_token' => $this->socialAccount->refresh_token,
+          'grant_type' => 'refresh_token',
+          'client_id' => $clientId,
+        ],
+      ]);
+
+      $data = json_decode($response->getBody(), true);
+
+      if (isset($data['access_token'])) {
+        $this->accessToken = $data['access_token'];
+
+        // Twitter ROTATES refresh tokens, so we MUST update it
+        $this->socialAccount->update([
+          'access_token' => $data['access_token'],
+          'refresh_token' => $data['refresh_token'] ?? $this->socialAccount->refresh_token,
+          'token_expires_at' => now()->addSeconds($data['expires_in']),
+        ]);
+
+        // Update client with new token
+        $this->client = new \GuzzleHttp\Client([
+          'base_uri' => 'https://api.twitter.com/2/',
+          'timeout' => 30,
+          'connect_timeout' => 10,
+        ]);
+
+        Log::info('Twitter Token refreshed successfully');
+      } else {
+        throw new \Exception('Failed to refresh Twitter token: No access_token in response');
+      }
+    } catch (\Exception $e) {
+      Log::error('Twitter refresh token request failed', ['error' => $e->getMessage()]);
+      throw $e;
     }
   }
 }

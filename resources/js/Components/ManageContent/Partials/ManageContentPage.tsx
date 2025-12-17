@@ -514,7 +514,7 @@ export default function ManageContentPage() {
               const idToRefresh = id || selectedItem?.id;
               setIsPublishModalOpen(false);
               setSelectedItem(null);
-              fetchData(getPagination().current_page);
+              // fetchData(getPagination().current_page);
 
               if (idToRefresh) {
                 fetchPublishedPlatforms(idToRefresh);

@@ -6,11 +6,10 @@ import IconYoutube from "@/../assets/Icons/youtube.svg";
 import YouTubeThumbnailUploader from "@/Components/common/ui/YouTubeThumbnailUploader";
 import { usePublishPublication } from "@/Hooks/publication/usePublishPublication";
 import { useConfirm } from "@/Hooks/useConfirm";
-import { useNotifications } from "@/Hooks/useNotifications";
 import { useTheme } from "@/Hooks/useTheme";
 import { Publication } from "@/types/Publication";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
-import { CheckCircle, Share2, X } from "lucide-react";
+import { AlertCircle, CheckCircle, Share2, X } from "lucide-react";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -29,7 +28,6 @@ export default function PublishPublicationModal({
 }: PublishPublicationModalProps) {
   const { theme } = useTheme();
   const { confirm, ConfirmDialog } = useConfirm();
-  const { refreshNotifications } = useNotifications();
   const { t } = useTranslation();
 
   const {
@@ -67,6 +65,11 @@ export default function PublishPublicationModal({
     }
   }, [isOpen, publication]);
 
+  console.log("publication", publication?.id);
+  console.log("publishedPlatforms", publishedPlatforms);
+  console.log("failedPlatforms", failedPlatforms);
+  console.log("publishingPlatforms", publishingPlatforms);
+
   const handleUnpublishWithConfirm = async (
     accountId: number,
     platform: string
@@ -91,7 +94,6 @@ export default function PublishPublicationModal({
         platform
       );
       if (success) {
-        refreshNotifications();
         if (onSuccess) onSuccess();
       }
     } finally {
@@ -104,7 +106,6 @@ export default function PublishPublicationModal({
 
     const success = await handlePublish(publication);
     if (success) {
-      refreshNotifications();
       if (onSuccess) onSuccess();
       onClose(publication.id);
     }
@@ -261,25 +262,30 @@ export default function PublishPublicationModal({
                     const isSelected = selectedPlatforms.includes(account.id);
                     const isPublished = publishedPlatforms.includes(account.id);
                     const isFailed = failedPlatforms.includes(account.id);
-                    const isPublishing = publishingPlatforms.includes(account.id);
+
+                    console.log(account);
+                    console.log(publishingPlatforms);
+                    const isPublishing = publishingPlatforms.includes(
+                      account.id
+                    );
                     const isUnpublishing = unpublishing === account.id;
-                    const isBackgroundPublishing =
-                      publication?.status === "publishing";
 
                     return (
                       <div key={account.id} className="relative">
                         <button
                           onClick={() =>
                             !isPublished &&
-                            !isBackgroundPublishing &&
+                            !isPublishing &&
                             togglePlatform(account.id)
                           }
-                          disabled={isPublished || isBackgroundPublishing}
+                          disabled={isPublished || isPublishing}
                           className={`w-full flex items-center gap-3 p-4 rounded-lg border-2 transition-all ${
                             isPublished
                               ? "border-green-500 bg-green-50 dark:bg-green-900/20 cursor-default"
-                              : isBackgroundPublishing
+                              : isPublishing
                               ? "border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 cursor-default"
+                              : isFailed
+                              ? "border-red-500 bg-red-50 dark:bg-red-900/20 cursor-default"
                               : isSelected
                               ? "border-primary-500 bg-primary-50 dark:bg-primary-900/20"
                               : theme === "dark"
@@ -314,7 +320,7 @@ export default function PublishPublicationModal({
                               </span>
                             </div>
                           )}
-                          {isBackgroundPublishing && isSelected && (
+                          {isPublishing && (
                             <div className="flex items-center gap-2">
                               <span className="flex items-center gap-1 text-xs font-medium text-yellow-600 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-900/30 px-2 py-1 rounded-full">
                                 <div className="w-3 h-3 border-2 border-yellow-600 border-t-transparent rounded-full animate-spin" />
@@ -322,11 +328,18 @@ export default function PublishPublicationModal({
                               </span>
                             </div>
                           )}
-                          {isSelected &&
-                            !isPublished &&
-                            !isBackgroundPublishing && (
-                              <CheckCircle className="w-5 h-5 text-primary-500" />
-                            )}
+
+                          {isFailed && (
+                            <div className="flex items-center gap-2">
+                              <span className="flex items-center gap-1 text-xs font-medium text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900/30 px-2 py-1 rounded-full">
+                                <AlertCircle className="w-3 h-3" />
+                                {t("publications.modal.publish.failed")}
+                              </span>
+                            </div>
+                          )}
+                          {isSelected && !isPublished && !isPublishing && (
+                            <CheckCircle className="w-5 h-5 text-primary-500" />
+                          )}
                         </button>
 
                         {/* Unpublish button */}
@@ -440,11 +453,7 @@ export default function PublishPublicationModal({
               </button>
               <button
                 onClick={handlePublishWithNotifications}
-                disabled={
-                  publishing ||
-                  selectedPlatforms.length === 0 ||
-                  publication.status === "publishing"
-                }
+                disabled={publishing || selectedPlatforms.length === 0}
                 className="flex-1 px-4 py-3 rounded-lg font-medium bg-gradient-to-r from-primary-500 to-pink-500 hover:from-primary-600 hover:to-pink-600 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {publishing || publication.status === "publishing" ? (

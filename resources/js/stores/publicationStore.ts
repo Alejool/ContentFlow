@@ -128,6 +128,7 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
 
       const published = response.data.published_platforms ?? [];
       const failed = response.data.failed_platforms ?? [];
+      const publishing = response.data.publishing_platforms ?? [];
 
       set((state) => ({
         publishedPlatforms: {
@@ -138,11 +139,15 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
           ...state.failedPlatforms,
           [publicationId]: failed,
         },
+        publishingPlatforms: {
+          ...state.publishingPlatforms,
+          [publicationId]: publishing,
+        },
       }));
 
-      return { published, failed };
+      return { published, failed, publishing };
     } catch {
-      return { published: [], failed: [] };
+      return { published: [], failed: [], publishing: [] };
     }
   },
 
@@ -160,8 +165,7 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
         state.currentPublication?.id === id
           ? { ...state.currentPublication, ...updated }
           : state.currentPublication,
-    })
-  ),
+    })),
 
   removePublication: (id) =>
     set((state) => ({

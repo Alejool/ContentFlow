@@ -28,7 +28,7 @@ class PublishToSocialMedia implements ShouldQueue
   public function handle(PlatformPublishService $publishService): void
   {
     Log::info('Starting background publishing', [
-      'publication_id' => $this->publication->id
+      'publication' => $this->publication
     ]);
 
     try {
@@ -52,14 +52,16 @@ class PublishToSocialMedia implements ShouldQueue
       }
     } catch (\Throwable $e) {
 
+      Log::info('Publishing job crashed', [
+        'publication_id' => $this->publication->id,
+        'error' => $e->getMessage(),
+      ]);
+
       $this->publication->update([
         'status' => 'failed',
       ]);
 
-      Log::error('Publishing job crashed', [
-        'publication_id' => $this->publication->id,
-        'error' => $e->getMessage(),
-      ]);
+
     }
 
     event(new PublicationStatusUpdated(

@@ -40,6 +40,15 @@ class PublicationController extends Controller
         case 'published':
           $query->published();
           break;
+        case 'failed':
+          $query->failed();
+          break;
+        case 'deleted':
+          $query->deleted();
+          break;
+        case 'pending':
+          $query->pending();
+          break;
       }
     }
 
@@ -713,24 +722,20 @@ class PublicationController extends Controller
           $thumbPath = $thumbFile->storeAs('derivatives/youtube/thumbnails', $thumbFilename, 's3');
           $thumbUrl = Storage::disk('s3')->url($thumbPath);
 
-          // DELETE ALL existing thumbnails for this video (YouTube and generic)
           $existingThumbs = $mediaFile->derivatives()
             ->where('derivative_type', 'thumbnail')
             ->get();
 
           foreach ($existingThumbs as $existingThumb) {
-            // Delete file from storage
             try {
               $filePath = str_replace(Storage::disk('s3')->url(''), '', $existingThumb->file_path);
               Storage::disk('s3')->delete($filePath);
             } catch (\Exception $e) {
               Log::warning('Failed to delete old thumbnail file', ['error' => $e->getMessage()]);
             }
-            // Delete database record
             $existingThumb->delete();
           }
 
-          // Create new YouTube thumbnail (replaces all previous)
           MediaDerivative::create([
             'media_file_id' => $mediaFile->id,
             'derivative_type' => 'thumbnail',
@@ -738,7 +743,7 @@ class PublicationController extends Controller
             'file_name' => $thumbFilename,
             'mime_type' => $thumbFile->getClientMimeType(),
             'size' => $thumbFile->getSize(),
-            'platform' => 'all', // Works for YouTube and all other platforms (1-to-1)
+            'platform' => 'all',
           ]);
 
           Log::info('YouTube thumbnail persisted for publish', ['media_id' => $mediaFile->id, 'path' => $thumbUrl]);
@@ -748,10 +753,17 @@ class PublicationController extends Controller
       }
     }
 
-    // Set status to publishing to prevent concurrent edits
+    // Pre-initialize logs to Pending state for immediate UI feedback & uniqueness cleanup
+    try {
+      $publishService = app(PlatformPublishService::class);
+      $publishService->initializeLogs($publication, $socialAccounts, 'publishing'); // This updates status to 'publishing' immediately
+    } catch (\Exception $e) {
+      Log::error('Failed to pre-initialize logs in Controller', ['error' => $e->getMessage()]);
+      // We continue to dispatch; the Job will attempt to initialize again and handle errors if they persist.
+    }
+
     $publication->update(['status' => 'publishing']);
 
-    // Dispatch background job to 'publishing' queue for immediate priority
     PublishToSocialMedia::dispatch($publication, $socialAccounts)->onQueue('publishing');
 
     return response()->json([

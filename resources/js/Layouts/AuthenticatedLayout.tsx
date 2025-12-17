@@ -3,8 +3,10 @@ import GlobalAiAssistant from "@/Components/AiAssistant/GlobalAiAssistant";
 import MobileNavbar from "@/Components/Layout/MobileNavbar";
 import Sidebar from "@/Components/Layout/Sidebar";
 import { useTheme } from "@/Hooks/useTheme";
+import { initNotificationRealtime } from "@/Services/notificationRealtime";
+import { useNotificationStore } from "@/stores/notificationStore";
 import { usePage } from "@inertiajs/react";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 
 interface AuthenticatedLayoutProps {
   header?: ReactNode;
@@ -28,6 +30,14 @@ export default function AuthenticatedLayout({
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const { theme } = useTheme();
+
+  useEffect(() => {
+    if (user?.id) {
+      initNotificationRealtime(user.id);
+      // Fetch initial notifications
+      useNotificationStore.getState().fetchNotifications();
+    }
+  }, [user?.id]);
 
   return (
     <div

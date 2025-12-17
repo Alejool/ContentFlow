@@ -167,7 +167,7 @@ export default function LogsList({
                   }`}
                 >
                   <td className="px-6 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
-                    {format(new Date(log.created_at), "MMM d, yyyy HH:mm")}
+                    {format(new Date(log.updated_at), "MMM d, yyyy HH:mm")}
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">

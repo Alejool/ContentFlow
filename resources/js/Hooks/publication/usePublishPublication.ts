@@ -68,6 +68,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
     fetchPublishedPlatforms: fetchPublishedPlatformsFromStore,
     setPublishedPlatforms: setPublishedPlatformsInStore,
     setPublishingPlatforms: setPublishingPlatformsInStore,
+    setFailedPlatforms: setFailedPlatformsInStore,
   } = usePublicationStore();
 
   /* ----------------------------- Derived state ----------------------------- */
@@ -293,8 +294,6 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
         toast.error("Please select at least one platform");
         return false;
       }
-
-      setPublishing(true);
 
       try {
         const formData = new FormData();

@@ -17,6 +17,7 @@ class SocialPostLog extends Model
         'failed',
         'pending',
         'orphaned',
+        'publishing',
     ];
 
     protected $fillable = [
@@ -111,6 +112,14 @@ class SocialPostLog extends Model
     public function isPending(): bool
     {
         return $this->status === 'pending';
+    }
+    public function isPublishing(): bool
+    {
+        return $this->status === 'publishing';
+    }
+    public function isOrphaned(): bool
+    {
+        return $this->status === 'orphaned';
     }
 
 

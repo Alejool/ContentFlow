@@ -1,6 +1,5 @@
 import { ErrorBoundary } from "@/Components/common/ui/ErrorBoundary";
 import ThemedToaster from "@/Components/common/ui/ThemedToaster";
-import { NotificationProvider } from "@/Contexts/NotificationContext";
 import { ThemeProvider } from "@/Contexts/ThemeContext";
 import { ErrorInterceptor } from "@/Services/ErrorInterceptor";
 import { initPublicationsRealtime } from "@/Services/publicationRealtime";
@@ -28,7 +27,7 @@ createInertiaApp<PageProps>({
 
   setup({ el, App, props }) {
     const root = createRoot(el);
-    
+
     const user = props.initialPage.props.auth?.user;
     if (user?.id && !realtimeInitialized) {
       console.log("🚀 Init realtime for user", user.id);
@@ -46,10 +45,8 @@ createInertiaApp<PageProps>({
     root.render(
       <ErrorBoundary>
         <ThemeProvider>
-          <NotificationProvider user={props.initialPage.props.auth?.user}>
-            <App {...props} />
-            <ThemedToaster />
-          </NotificationProvider>
+          <App {...props} />
+          <ThemedToaster />
         </ThemeProvider>
       </ErrorBoundary>
     );

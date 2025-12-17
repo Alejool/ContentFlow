@@ -59,6 +59,12 @@ class SocialAccountController extends Controller
         $consumerKey = config('services.twitter.consumer_key');
         $consumerSecret = config('services.twitter.consumer_secret');
 
+        Log::info('Twitter Auth V1 Debug', [
+          'consumer_key' => $consumerKey,
+          'consumer_secret' => $consumerSecret,
+          'callback_url' => url('/auth/twitter/callback-v1')
+        ]);
+
         if (!$consumerKey || !$consumerSecret) {
           return response()->json([
             'success' => false,

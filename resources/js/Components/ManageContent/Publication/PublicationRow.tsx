@@ -49,7 +49,6 @@ export default function PublicationRow({
       }`}
     >
       <td className="px-2 py-4 text-center">
-        {/* Empty cell for alignment */}
       </td>
       <td className="px-6 py-4">
         <div className="flex items-center gap-4">
@@ -103,11 +102,7 @@ export default function PublicationRow({
         )}
       </td>
       <td className="px-6 py-4">
-        <CampaignTags
-          publication={item}
-          theme={theme}
-          t={t}
-        />
+        <CampaignTags publication={item} theme={theme} t={t} />
       </td>
       <td className="px-6 py-4">
         <SocialAccountsDisplay

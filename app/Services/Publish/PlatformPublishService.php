@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Artisan;
 use App\Models\YouTubePlaylistQueue;
+use App\Notifications\PublicationPostFailedNotification;
 
 class PlatformPublishService
 {
@@ -26,34 +27,101 @@ class PlatformPublishService
   ) {}
 
   /**
+   * Initialize logs for all platforms (Create or Update to Pending)
+   * Ensures uniqueness by removing stale logs for these accounts.
+   */
+  public function initializeLogs(Publication $publication, $socialAccounts, string $initialStatus = 'pending'): array
+  {
+    $preparedLogs = [];
+    $allLogIds = [];
+
+    foreach ($socialAccounts as $socialAccount) {
+      $accountLogs = [];
+
+      try {
+        if ($socialAccount->platform === 'youtube') {
+          $firstMediaFile = $publication->mediaFiles->first();
+          $log = $this->logService->createPendingLog(
+            $publication,
+            $socialAccount,
+            $firstMediaFile ? [$firstMediaFile->file_path] : [],
+            $this->buildDescription($publication),
+            $firstMediaFile ? $firstMediaFile->id : null,
+            $initialStatus
+          );
+          $accountLogs[] = ['type' => 'youtube', 'log' => $log, 'media' => null];
+          $allLogIds[] = $log->id;
+        } else {
+          if ($publication->mediaFiles->isNotEmpty()) {
+            foreach ($publication->mediaFiles as $mediaFile) {
+              $log = $this->logService->createPendingLog(
+                $publication,
+                $socialAccount,
+                [$mediaFile->file_path],
+                $this->buildCaption($publication),
+                $mediaFile->id,
+                $initialStatus
+              );
+              $accountLogs[] = ['type' => 'other', 'log' => $log, 'media' => $mediaFile];
+              $allLogIds[] = $log->id;
+            }
+          } else {
+            // Create a single log to record the failure of having no media
+            $log = $this->logService->createPendingLog(
+              $publication,
+              $socialAccount,
+              [],
+              $this->buildCaption($publication),
+              null,
+              $initialStatus
+            );
+            $accountLogs[] = ['type' => 'other', 'log' => $log, 'media' => null];
+            $allLogIds[] = $log->id;
+            Log::info('Created pending log (no media)', ['log_id' => $log->id]);
+          }
+        }
+
+        $preparedLogs[$socialAccount->id] = $accountLogs;
+      } catch (\Exception $e) {
+        Log::error('Failed to initialize logs for account', ['account_id' => $socialAccount->id, 'error' => $e->getMessage()]);
+        // We can't return logs for this account.
+      }
+    }
+
+    // CLEANUP STALE LOGS
+    // Remove any logs for these accounts/publication that are NOT in the new list
+    // This ensures that if media changed, old failed logs are removed
+    if (!empty($allLogIds)) {
+      SocialPostLog::where('publication_id', $publication->id)
+        ->whereIn('social_account_id', $socialAccounts->pluck('id'))
+        ->whereNotIn('id', $allLogIds)
+        ->delete();
+    }
+
+    return $preparedLogs;
+  }
+
+  /**
    * Publish to platform (only first video)
    */
   public function publishToPlatform(
     Publication $publication,
     SocialAccount $socialAccount,
-    $platformService
+    $platformService,
+    SocialPostLog $postLog
   ): array {
     $firstMediaFile = $publication->mediaFiles->first();
 
     if (!$firstMediaFile) {
+      $this->logService->markAsFailed($postLog, 'No media files found');
       return [
         'success' => false,
         'error' => 'No media files found',
-        'log' => null,
+        'log' => $postLog,
       ];
     }
 
-    // Create pending log
-    $postLog = $this->logService->createPendingLog(
-      $publication,
-      $socialAccount,
-      [$firstMediaFile->file_path],
-      $this->buildDescription($publication),
-      $firstMediaFile->id
-    );
-
     $uploadedPostId = null;
-
     try {
       // Step 1: Upload video to YouTube
       $videoAbsolutePath = $this->resolveFilePath($firstMediaFile->file_path);
@@ -96,6 +164,8 @@ class PlatformPublishService
       Log::info('Thumbnail path: ' . $postData['thumbnail_path']);
 
       // Upload video
+      Log::info('Uploading data 1------', ['postData' => $postData]);
+
       $response = $platformService->publishPost($postData);
       $uploadedPostId = $response['post_id'] ?? $response['id'] ?? null;
 
@@ -109,14 +179,14 @@ class PlatformPublishService
         'video_id' => $uploadedPostId,
         'publication_id' => $publication->id
       ]);
-    } catch (\Exception $e) {
+    } catch (\Throwable $e) {
       // Only mark as failed if the VIDEO UPLOAD failed
-      $this->logService->markAsFailed($postLog, $e->getMessage());
-
       Log::error('YouTube video upload failed', [
         'publication_id' => $publication->id,
         'error' => $e->getMessage()
       ]);
+      $this->logService->markAsFailed($postLog, $e->getMessage());
+
 
       return [
         'success' => false,
@@ -185,17 +255,9 @@ class PlatformPublishService
     Publication $publication,
     SocialAccount $socialAccount,
     $mediaFile,
-    $platformService
+    $platformService,
+    SocialPostLog $postLog
   ): array {
-    // Crear log pendiente
-    $postLog = $this->logService->createPendingLog(
-      $publication,
-      $socialAccount,
-      [$mediaFile->file_path],
-      $this->buildCaption($publication),
-      $mediaFile->id
-    );
-
     try {
       $postData = [
         'video_path' => $mediaFile->file_path,
@@ -204,6 +266,7 @@ class PlatformPublishService
         'description' => $publication->description,
         'hashtags' => $publication->hashtags,
       ];
+
 
       $response = $platformService->publishPost($postData);
 
@@ -218,8 +281,20 @@ class PlatformPublishService
         'log' => $postLog,
         'error' => null,
       ];
-    } catch (\Exception $e) {
+    } catch (\Throwable $e) {
       // Mark as failed
+      Log::error('esta ffaladno envio ', [
+        'post_log_id' => $postLog->id,
+        'platform' => $postLog->platform,
+        'publication_id' => $postLog->publication_id,
+        'error' => $e->getMessage()
+      ]);
+      Log::error('Post publication failed', [
+        'post_log_id' => $postLog->id,
+        'platform' => $postLog->platform,
+        'publication_id' => $postLog->publication_id,
+        'error' => $e->getMessage()
+      ]);
       $this->logService->markAsFailed($postLog, $e->getMessage());
 
       return [
@@ -238,55 +313,70 @@ class PlatformPublishService
     Publication $publication,
     $socialAccounts
   ): array {
+
+    Log::info('publishToAllPlatforms', ['publication' => $publication, 'socialAccounts' => $socialAccounts]);
     $allLogs = [];
     $allErrors = [];
     $platformResults = [];
 
+    // Initialize/Update logs for ALL accounts first (idempotent)
+    $preparedLogsMap = $this->initializeLogs($publication, $socialAccounts);
+
     foreach ($socialAccounts as $socialAccount) {
+      $platformLogs = [];
+      $platformErrors = [];
+
+      // Retrieve pre-created logs
+      if (!isset($preparedLogsMap[$socialAccount->id])) {
+        $msg = 'Failed to initialize logs for platform: ' . $socialAccount->platform;
+        $allErrors[$socialAccount->platform] = [['message' => $msg]];
+        Log::error($msg);
+        continue;
+      }
+
+      $pendingLogs = $preparedLogsMap[$socialAccount->id];
+
+      Log::info('Starting transaction for platform', ['platform' => $socialAccount->platform, 'pending_count' => count($pendingLogs)]);
       DB::beginTransaction();
 
       try {
-        $platformLogs = [];
-        $platformErrors = [];
-
         $platformService = $this->getPlatformService($socialAccount);
 
-        if ($socialAccount->platform === 'youtube') {
-          $result = $this->publishToPlatform($publication, $socialAccount, $platformService);
+        foreach ($pendingLogs as $item) {
+          $postLog = $item['log'];
+          Log::info('Processing log inside transaction', ['log_id' => $postLog->id]);
 
-          if ($result['success']) {
-            $platformLogs[] = $result['log'];
+          $result = null;
+
+          if ($item['type'] === 'youtube') {
+            $result = $this->publishToPlatform($publication, $socialAccount, $platformService, $postLog);
           } else {
+            $result = $this->publishToOtherPlatform(
+              $publication,
+              $socialAccount,
+              $item['media'],
+              $platformService,
+              $postLog
+            );
+          }
+
+          if (isset($result['log'])) {
+            $platformLogs[] = $result['log'];
+          }
+
+          if (!$result['success']) {
             $platformErrors[] = [
               'media_file' => $publication->mediaFiles->first()->file_name ?? 'Unknown',
               'message' => $result['error'],
             ];
           }
-        } else {
-          foreach ($publication->mediaFiles as $mediaFile) {
-            $result = $this->publishToOtherPlatform(
-              $publication,
-              $socialAccount,
-              $mediaFile,
-              $platformService
-            );
-
-            if ($result['success']) {
-              $platformLogs[] = $result['log'];
-            } else {
-              $platformErrors[] = [
-                'media_file' => $mediaFile->file_name ?? 'Unknown',
-                'message' => $result['error'],
-              ];
-            }
-          }
         }
 
         if (!empty($platformErrors)) {
-          DB::rollBack();
+          Log::info('Errors occurred, committing logs anyway', ['errors' => count($platformErrors)]);
+          DB::commit();
 
-          // Notify about failure
-          $publication->user->notify(new \App\Notifications\PublicationPostFailedNotification(
+          $publication->user->notify(new PublicationPostFailedNotification(
             $socialAccount->platform,
             $platformErrors[0]['message'] ?? 'Unknown error',
             $publication->title
@@ -294,14 +384,16 @@ class PlatformPublishService
 
           $platformResults[$socialAccount->platform] = [
             'success' => false,
-            'published' => 0,
+            'published' => count(array_filter($platformLogs, fn($l) => $l->status === 'published')),
             'failed' => count($platformErrors),
             'errors' => $platformErrors,
+            'logs' => $platformLogs,
           ];
 
           $allErrors[$socialAccount->platform] = $platformErrors;
+          $allLogs = array_merge($allLogs, $platformLogs);
         } else {
-          // If everything was successful, commit the transaction for this platform
+          Log::info('Success, committing transaction');
           DB::commit();
 
           $platformResults[$socialAccount->platform] = [
@@ -313,17 +405,71 @@ class PlatformPublishService
 
           $allLogs = array_merge($allLogs, $platformLogs);
         }
-      } catch (\Exception $e) {
+      } catch (\Throwable $e) {
+        Log::warning('Exception caught, rolling back transaction', ['error' => $e->getMessage()]);
         DB::rollBack();
 
-        Log::error('Platform publication error', [
+        Log::info('Transaction rolled back. Now marking pending logs as failed.');
+        Log::info('Transaction rolled back. Now marking pending logs as failed.');
+        foreach ($pendingLogs as $item) {
+          Log::info('Marking log failed', ['log_id' => $item['log']->id]);
+          try {
+            // Reload log to ensure we have the fresh instance not attached to rolled-back context if applicable
+            $logElement = $item['log']->fresh();
+
+            if ($logElement) {
+              $this->logService->markAsFailed($logElement, $e->getMessage());
+            } else {
+              Log::warning('Log element not found during rollback recovery (likely rolled back). Re-creating...', ['id' => $item['log']->id]);
+
+              // Re-create the log to ensure persistence
+              // We use the data from the in-memory $item['log'] object which still holds the attributes
+              $oldLog = $item['log'];
+
+              try {
+                $newLog = SocialPostLog::create([
+                  'user_id' => $oldLog->user_id,
+                  'social_account_id' => $oldLog->social_account_id,
+                  'publication_id' => $oldLog->publication_id,
+                  'media_file_id' => $oldLog->media_file_id,
+                  'platform' => $oldLog->platform,
+                  'account_name' => $oldLog->account_name,
+                  'content' => $oldLog->content,
+                  'media_urls' => $oldLog->media_urls,
+                  'status' => 'failed',
+                  'error_message' => substr($e->getMessage(), 0, 65000),
+                  'retry_count' => 0,
+                ]);
+                Log::info('Log re-created successfully after rollback', ['new_id' => $newLog->id]);
+              } catch (\Exception $createError) {
+                Log::error('Failed to re-create log after rollback', ['error' => $createError->getMessage()]);
+              }
+            }
+          } catch (\Throwable $logError) {
+            Log::emergency('Could not update log after rollback. Log might be lost.', [
+              'log_id' => $item['log']->id,
+              'original_error' => $e->getMessage(),
+              'log_error' => $logError->getMessage()
+            ]);
+          }
+        }
+
+        Log::error('Platform publication error (handled)', [
           'platform' => $socialAccount->platform,
           'campaign_id' => $publication->id,
           'error' => $e->getMessage(),
+          'trace' => $e->getTraceAsString(),
         ]);
 
+
+        // Mark all pending logs as failed since the transaction rolled back their 'success' state
+        // (but presumably they were created before transaction, so they exist)
+        foreach ($pendingLogs as $item) {
+          $this->logService->markAsFailed($item['log'], $e->getMessage());
+        }
+
         // Notify about failure
-        $publication->user->notify(new \App\Notifications\PublicationPostFailedNotification(
+        $publication->user->notify(new PublicationPostFailedNotification(
           $socialAccount->platform,
           $e->getMessage(),
           $publication->title
@@ -332,7 +478,7 @@ class PlatformPublishService
         $platformResults[$socialAccount->platform] = [
           'success' => false,
           'published' => 0,
-          'failed' => 1,
+          'failed' => count($pendingLogs),
           'errors' => [['message' => $e->getMessage()]],
         ];
 
@@ -386,6 +532,12 @@ class PlatformPublishService
       return $result;
     } catch (\Exception $e) {
       DB::rollBack();
+      Log::error('Post publication failed -----> rollback', [
+        'post_log_id' => $postLog->id,
+        'platform' => $postLog->platform,
+        'publication_id' => $postLog->publication_id,
+        'error' => $e->getMessage()
+      ]);
 
       $this->logService->markAsFailed($postLog, "Retry failed: {$e->getMessage()}");
 
@@ -401,13 +553,17 @@ class PlatformPublishService
     try {
       $mediaFile = $postLog->mediaFile ?? $publication->mediaFiles->first();
 
-      $response = $platformService->publishPost([
+      $postData = [
         'video_path' => $mediaFile->file_path,
         'title' => $publication->title,
         'content' => $this->buildDescription($publication),
         'tags' => $this->extractHashtags($publication->hashtags),
         'privacy' => 'public',
-      ]);
+      ];
+
+      Log::info('Uploading data 3------', ['postData' => $postData]);
+
+      $response = $platformService->publishPost($postData);
 
       $this->logService->markAsPublished($postLog, $response);
 
@@ -419,6 +575,12 @@ class PlatformPublishService
         'log' => $postLog->fresh(),
       ];
     } catch (\Exception $e) {
+      Log::error('Post publication failed -----> retry----3', [
+        'post_log_id' => $postLog->id,
+        'platform' => $postLog->platform,
+        'publication_id' => $postLog->publication_id,
+        'error' => $e->getMessage()
+      ]);
       $this->logService->markAsFailed($postLog, "Retry failed: {$e->getMessage()}");
 
       return [
@@ -437,13 +599,17 @@ class PlatformPublishService
         throw new \Exception('Media file not found');
       }
 
-      $response = $platformService->publishPost([
+      $postData = [
         'video_path' => $mediaFile->file_path,
         'caption' => $this->buildCaption($publication),
         'title' => $publication->title,
         'description' => $publication->description,
         'hashtags' => $publication->hashtags,
-      ]);
+      ];
+
+      Log::info('Uploading data 2------', ['postData' => $postData]);
+
+      $response = $platformService->publishPost($postData);
 
       $this->logService->markAsPublished($postLog, $response);
 
