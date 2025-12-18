@@ -533,16 +533,22 @@ export default function EditPublicationModal({
 
     submitData.append("scheduled_at", data.scheduled_at || "");
 
-    if (data.social_accounts && data.social_accounts.length > 0) {
-      data.social_accounts.forEach((id: number, index: number) => {
-        submitData.append(`social_accounts[${index}]`, id.toString());
-        if (accountSchedules[id]) {
-          submitData.append(
-            `social_account_schedules[${id}]`,
-            accountSchedules[id]
-          );
-        }
-      });
+    if (data.social_accounts) {
+      if (data.social_accounts.length === 0) {
+        // Send a marker to ensure the backend identifies this as "clear all"
+        submitData.append("social_accounts", "");
+        submitData.append("social_accounts_sync", "1");
+      } else {
+        data.social_accounts.forEach((id: number, index: number) => {
+          submitData.append(`social_accounts[${index}]`, id.toString());
+          if (accountSchedules[id]) {
+            submitData.append(
+              `social_account_schedules[${id}]`,
+              accountSchedules[id]
+            );
+          }
+        });
+      }
     }
 
     if (data.campaign_id) {

@@ -348,16 +348,21 @@ export default function AddPublicationModal({
 
       formData.append("scheduled_at", data.scheduled_at || "");
 
-      if (data.social_accounts && data.social_accounts.length > 0) {
-        data.social_accounts.forEach((id: number, index: number) => {
-          formData.append(`social_accounts[${index}]`, id.toString());
-          if (accountSchedules[id]) {
-            formData.append(
-              `social_account_schedules[${id}]`,
-              accountSchedules[id]
-            );
-          }
-        });
+      if (data.social_accounts) {
+        if (data.social_accounts.length === 0) {
+          formData.append("social_accounts", "");
+          formData.append("social_accounts_sync", "1");
+        } else {
+          data.social_accounts.forEach((id: number, index: number) => {
+            formData.append(`social_accounts[${index}]`, id.toString());
+            if (accountSchedules[id]) {
+              formData.append(
+                `social_account_schedules[${id}]`,
+                accountSchedules[id]
+              );
+            }
+          });
+        }
       }
 
       if (data.campaign_id) {
