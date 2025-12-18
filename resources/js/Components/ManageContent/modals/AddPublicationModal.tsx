@@ -579,7 +579,7 @@ export default function AddPublicationModal({
                   theme={theme}
                   variant="filled"
                   required
-                  size="md"
+                  size="lg"
                   hint={`${watched.title?.length || 0}/70 characters`}
                 />
 
@@ -595,6 +595,7 @@ export default function AddPublicationModal({
                   icon={FileText}
                   theme={theme}
                   variant="filled"
+                  size="lg"
                   rows={4}
                   maxLength={200}
                   required
@@ -614,7 +615,7 @@ export default function AddPublicationModal({
                   theme={theme}
                   variant="filled"
                   required
-                  size="md"
+                  size="lg"
                   hint={`${watched.goal?.length || 0}/200 characters`}
                 />
 
@@ -633,7 +634,7 @@ export default function AddPublicationModal({
                   theme={theme}
                   variant="filled"
                   required
-                  size="md"
+                  size="lg"
                   hint={`${
                     watched.hashtags
                       ? watched.hashtags
@@ -662,7 +663,7 @@ export default function AddPublicationModal({
                   icon={Target}
                   theme={theme}
                   variant="filled"
-                  size="md"
+                  size="lg"
                   clearable
                 />
               </div>

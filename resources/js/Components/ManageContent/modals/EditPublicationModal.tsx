@@ -446,11 +446,11 @@ export default function EditPublicationModal({
         const metadata = videoMetadata[newPreviews[index].tempId];
         if (metadata) {
           submitData.append(
-            `youtube_types[new_${index}]`,
+            `youtube_types_new[${index}]`,
             metadata.youtubeType
           );
           submitData.append(
-            `durations[new_${index}]`,
+            `durations_new[${index}]`,
             metadata.duration.toString()
           );
         }
