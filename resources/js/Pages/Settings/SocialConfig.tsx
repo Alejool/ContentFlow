@@ -36,17 +36,17 @@ const platforms = [
     buttonColor: "bg-blue-500 hover:bg-blue-600",
     ringColor: "ring-blue-200 dark:ring-blue-900/30",
   },
-  {
-    id: "instagram",
-    name: "Instagram",
-    icon: IconInstagram,
-    color: "text-pink-600",
-    bgColor: "bg-pink-50 dark:bg-pink-900/10",
-    borderColor: "border-pink-100 dark:border-pink-900/20",
-    buttonColor:
-      "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600",
-    ringColor: "ring-pink-200 dark:ring-pink-900/30",
-  },
+  // {
+  //   id: "instagram",
+  //   name: "Instagram",
+  //   icon: IconInstagram,
+  //   color: "text-pink-600",
+  //   bgColor: "bg-pink-50 dark:bg-pink-900/10",
+  //   borderColor: "border-pink-100 dark:border-pink-900/20",
+  //   buttonColor:
+  //     "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600",
+  //   ringColor: "ring-pink-200 dark:ring-pink-900/30",
+  // },
   {
     id: "twitter",
     name: "X (Twitter)",
@@ -66,7 +66,7 @@ const platforms = [
     bgColor: "bg-gray-100 dark:bg-neutral-800/30",
     borderColor: "border-gray-200 dark:border-neutral-700/30",
     buttonColor:
-      "bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 hover:from-cyan-500 hover:via-purple-600 hover:to-pink-600",
+      "bg-gradient-to-r from-gray-900 via-gray-800 to-pink-900 hover:from-gray-900 hover:via-gray-700 hover:to-pink-800",
     ringColor: "ring-gray-300 dark:ring-neutral-700/30",
   },
 ];
@@ -121,7 +121,7 @@ export default function SocialConfig({
   return (
     <AuthenticatedLayout
       header={
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+        <div className="flex flex-col mt-10 sm:flex-row sm:items-center justify-between gap-6">
           <div className="space-y-2">
             <div className="flex items-center gap-3">
               <div className="p-2.5 bg-primary-50 dark:bg-primary-500/10 rounded-xl">
@@ -276,8 +276,7 @@ export default function SocialConfig({
                     <div className="flex items-center gap-3">
                       <div
                         className={`
-                        p-2.5 rounded-lg ${platform.bgColor}
-                        border ${platform.borderColor}
+                        p-2.5 rounded-lg
                         transition-transform group-hover:scale-105
                       `}
                       >
