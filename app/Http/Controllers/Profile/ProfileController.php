@@ -31,6 +31,26 @@ class ProfileController extends Controller
         ]);
     }
 
+    public function socialSettings(Request $request): Response
+    {
+        return Inertia::render('Settings/SocialConfig', [
+            'settings' => $request->user()->global_platform_settings ?? [],
+        ]);
+    }
+
+    public function updateSocialSettings(Request $request)
+    {
+        $validated = $request->validate([
+            'settings' => 'required|array',
+        ]);
+
+        $user = $request->user();
+        $user->global_platform_settings = $validated['settings'];
+        $user->save();
+
+        return Redirect::back()->with('status', 'settings-updated');
+    }
+
     /**
      * Update the user's profile information.
      */
@@ -46,19 +66,19 @@ class ProfileController extends Controller
             }, ARRAY_FILTER_USE_BOTH);
 
             // if (!empty($changes)) {
-                $user->fill($changes);
+            $user->fill($changes);
 
-                if (isset($changes['email'])) {
-                    $user->email_verified_at = null;
-                }
+            if (isset($changes['email'])) {
+                $user->email_verified_at = null;
+            }
 
-                $user->save();
+            $user->save();
 
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Profile updated successfully',
-                    'user' => $user
-                ]);
+            return response()->json([
+                'success' => true,
+                'message' => 'Profile updated successfully',
+                'user' => $user
+            ]);
             // }
 
             return response()->json([
@@ -109,7 +129,6 @@ class ProfileController extends Controller
             'message' => 'Password updated successfully',
             'user' => $user
         ]);
-
     }
 
 

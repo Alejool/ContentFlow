@@ -34,6 +34,7 @@ class User extends Model implements Authenticatable, MustVerifyEmail, CanResetPa
         'email_verified_at',
         'locale',
         'theme',
+        'global_platform_settings',
         'remember_token',
     ];
 
@@ -45,6 +46,7 @@ class User extends Model implements Authenticatable, MustVerifyEmail, CanResetPa
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'global_platform_settings' => 'array',
     ];
 
     /**

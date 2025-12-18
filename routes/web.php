@@ -74,6 +74,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::delete('/', [ProfileController::class, 'destroy'])->name('destroy');
   });
 
+  Route::prefix('settings')->name('settings.')->group(function () {
+    Route::get('/social', [ProfileController::class, 'socialSettings'])->name('social');
+    Route::patch('/social', [ProfileController::class, 'updateSocialSettings'])->name('social.update');
+  });
+
   /*
     |----------------------------------------------------------------------
     | User Preferences
