@@ -14,6 +14,7 @@ interface ContentSectionProps {
   campaigns?: any[];
   publication?: any;
   onHashtagChange: (value: string) => void;
+  disabled?: boolean;
 }
 
 const ContentSection: React.FC<ContentSectionProps> = ({
@@ -25,9 +26,10 @@ const ContentSection: React.FC<ContentSectionProps> = ({
   campaigns,
   publication,
   onHashtagChange,
+  disabled,
 }) => {
   return (
-    <div className="space-y-6">
+    <div className={`space-y-6 ${disabled ? "opacity-75" : ""}`}>
       <Input
         id="title"
         label={t("publications.modal.edit.titleField")}
@@ -42,6 +44,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({
         size="lg"
         required
         hint={`${watched.title?.length || 0}/70 characters`}
+        disabled={disabled}
       />
 
       <Textarea
@@ -60,6 +63,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({
         maxLength={200}
         showCharCount
         hint="Maximum 200 characters"
+        disabled={disabled}
       />
 
       <Input
@@ -76,6 +80,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({
         size="lg"
         required
         hint={`${watched.goal?.length || 0}/200 characters`}
+        disabled={disabled}
       />
 
       <Input
@@ -98,6 +103,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({
                 .filter((tag: string) => tag.startsWith("#")).length
             : 0
         }/10 hashtags`}
+        disabled={disabled}
       />
 
       {(!publication?.scheduled_posts ||

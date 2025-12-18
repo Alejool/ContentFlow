@@ -225,105 +225,16 @@ export default function ManageContentPage() {
   }, []);
 
   const handleEditRequest = async (item: Publication | any) => {
-    if (item.status !== "published") {
+    // If it's a campaign, just open
+    if (activeTab === "campaigns") {
       openEditModal(item);
       return;
     }
 
-    let isLinkedAccountConnected = false;
-    let linkedAccountName = "Unknown";
-
-    const postLogs = item.social_post_logs || [];
-    const scheduledPosts = item.scheduled_posts || [];
-
-    let publishedPost = postLogs.find(
-      (l: any) => l.status === "published" || l.status === "success"
-    );
-
-    if (!publishedPost) {
-      publishedPost = scheduledPosts.find(
-        (p: any) => p.status === "posted" || p.status === "published"
-      );
-    }
-
-    if (!publishedPost && (postLogs.length > 0 || scheduledPosts.length > 0)) {
-      publishedPost = postLogs[0] || scheduledPosts[0];
-    }
-
-    if (
-      publishedPost &&
-      publishedPost.social_account_id &&
-      publishedPost.status !== "deleted"
-    ) {
-      const accountId = publishedPost.social_account_id;
-      const foundAccount = connectedAccounts.find(
-        (acc: any) => acc.id === accountId
-      );
-
-      if (foundAccount) {
-        isLinkedAccountConnected = true;
-        linkedAccountName = foundAccount.name || foundAccount.platform;
-      } else {
-        linkedAccountName =
-          publishedPost.social_account?.account_name ||
-          publishedPost.account_name ||
-          "Unknown Account";
-      }
-    } else {
-      isLinkedAccountConnected = false;
-    }
-
-    if (!isLinkedAccountConnected) {
-      const confirmed = await confirm({
-        title:
-          t("publications.modal.edit.accountMissingTitle") ||
-          "Account Disconnected",
-        message:
-          t("publications.modal.edit.accountMissingText", {
-            account: linkedAccountName,
-          }) ||
-          `This publication was posted on an account (${linkedAccountName}) that is no longer connected. Editing it will create a new version for your current account(s). Proceed?`,
-        confirmText: t("common.continue") || "Continue & Edit",
-        cancelText: t("common.cancel"),
-        type: "warning",
-      });
-
-      if (confirmed) {
-        openEditModal({
-          ...item,
-          status: "draft",
-          social_account_id: null,
-          scheduled_posts: [],
-        });
-      }
-      return;
-    }
-
-    const confirmed = await confirm({
-      title: t("publications.modal.publish.modal.title") || "Unpublish & Edit",
-      message: t("publications.modal.publish.modal.message") || "",
-      confirmText:
-        t("publications.modal.publish.modal.confirmText") || "Unpublish & Edit",
-      cancelText: t("publications.modal.publish.modal.cancelText") || "Cancel",
-      type: "warning",
-    });
-
-    if (confirmed) {
-      const toastId = toast.loading("Unpublishing...");
-      try {
-        const response = await axios.post(`/publications/${item.id}/unpublish`);
-        if (response.data.success) {
-          toast.success("Unpublished successfully", { id: toastId });
-          await fetchData(getPagination().current_page);
-          openEditModal({ ...item, status: "draft" });
-        }
-      } catch (error: any) {
-        toast.error(error.response?.data?.message || "Failed to unpublish", {
-          id: toastId,
-        });
-        console.error(error);
-      }
-    }
+    // For publications, we now always allow opening the modal.
+    // The EditPublicationModal component handles the partial locking
+    // of fields if the publication is live on any platform.
+    openEditModal(item);
   };
 
   const handleAddCampaign = async (success: boolean) => {
@@ -364,7 +275,6 @@ export default function ManageContentPage() {
             <p className={`text-lg ${subtitleColor} max-w-2xl mx-auto`}>
               {t("manageContent.subtitle")}
             </p>
-         
           </div>
 
           <div className="space-y-8">

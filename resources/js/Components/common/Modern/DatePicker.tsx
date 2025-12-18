@@ -2,13 +2,13 @@ import Label from "@/Components/common/Modern/Label";
 import { useTheme } from "@/Hooks/useTheme";
 import { enUS, es } from "date-fns/locale";
 import {
-  TriangleAlert,
+  ArrowLeft,
+  ArrowRight,
   Calendar,
   Check,
   Clock,
-  ChevronDown,
-  ArrowLeft,
-  ArrowRight,
+  TriangleAlert,
+  X,
 } from "lucide-react";
 import { ReactNode, forwardRef, useState } from "react";
 import DatePicker, { registerLocale } from "react-datepicker";
@@ -112,32 +112,32 @@ const DatePickerModern = <T extends FieldValues>({
 
     if (theme === "dark") {
       if (error) {
-        return `${base} bg-neutral-800 text-white border-primary-500 focus:ring-primary-500/30`;
+        return `${base} bg-neutral-800 text-white border-primary-500 focus:ring-primary-500/30 pl-11`;
       }
       if (success) {
-        return `${base} bg-neutral-800 text-white border-green-500 focus:ring-green-500/30`;
+        return `${base} bg-neutral-800 text-white border-green-500 focus:ring-green-500/30 pl-11`;
       }
       if (variant === "outlined") {
-        return `${base} bg-transparent text-white border-2 border-neutral-600 hover:border-neutral-500 focus:ring-purple-500/30`;
+        return `${base} bg-transparent text-white border-2 border-neutral-600 hover:border-neutral-500 focus:ring-purple-500/30 pl-11`;
       }
       if (variant === "filled") {
-        return `${base} bg-neutral-800 text-white border border-neutral-700 hover:border-neutral-600 focus:ring-purple-500/30`;
+        return `${base} bg-neutral-800 text-white border border-neutral-700 hover:border-neutral-600 focus:ring-purple-500/30 pl-11`;
       }
-      return `${base} bg-neutral-800/50 text-white border border-neutral-700/50 hover:border-neutral-600/70 focus:ring-purple-500/30`;
+      return `${base} bg-neutral-800/50 text-white border border-neutral-700/50 hover:border-neutral-600/70 focus:ring-purple-500/30 pl-11`;
     } else {
       if (error) {
-        return `${base} bg-white text-gray-900 border-primary-500 focus:ring-primary-500/20`;
+        return `${base} bg-white text-gray-900 border-primary-500 focus:ring-primary-500/20 pl-11`;
       }
       if (success) {
-        return `${base} bg-white text-gray-900 border-green-500 focus:ring-green-500/20`;
+        return `${base} bg-white text-gray-900 border-green-500 focus:ring-green-500/20 pl-11`;
       }
       if (variant === "outlined") {
-        return `${base} bg-transparent text-gray-900 border-2 border-gray-300 hover:border-gray-400 focus:ring-purple-500/20`;
+        return `${base} bg-transparent text-gray-900 border-2 border-gray-300 hover:border-gray-400 focus:ring-purple-500/20 pl-11`;
       }
       if (variant === "filled") {
-        return `${base} bg-gray-50 text-gray-900 border border-gray-300 hover:border-gray-400 focus:ring-purple-500/20`;
+        return `${base} bg-gray-50 text-gray-900 border border-gray-300 hover:border-gray-400 focus:ring-purple-500/20 pl-11`;
       }
-      return `${base} bg-white text-gray-900 border border-gray-300 hover:border-gray-400 focus:ring-purple-500/20`;
+      return `${base} bg-white text-gray-900 border border-gray-300 hover:border-gray-400 focus:ring-purple-500/20 pl-11`;
     }
   };
 
@@ -154,82 +154,82 @@ const DatePickerModern = <T extends FieldValues>({
       : `${base} text-green-600`;
   };
 
-  const CustomInput = forwardRef<HTMLButtonElement, any>(
-    ({ value, onClick, placeholder: inputPlaceholder }, ref) => (
-      <button
-        type="button"
-        onClick={(e) => {
-          if (!disabled) {
-            onClick(e);
-            setIsOpen(!isOpen);
+  const CustomInput = forwardRef<HTMLInputElement, any>(
+    ({ value, onClick, onChange, placeholder: inputPlaceholder }, ref) => (
+      <div className="relative flex items-center w-full">
+        <input
+          value={value}
+          onChange={onChange}
+          onClick={(e) => {
+            if (!disabled) {
+              onClick(e);
+              setIsOpen(true);
+            }
+          }}
+          ref={ref}
+          disabled={disabled}
+          placeholder={inputPlaceholder}
+          readOnly={false}
+          className={`${getInputStyles()} ${className} pr-10`}
+          {...register}
+          aria-invalid={!!error}
+          aria-describedby={
+            error
+              ? `${label?.toLowerCase()}-error`
+              : success
+              ? `${label?.toLowerCase()}-success`
+              : undefined
           }
-        }}
-        ref={ref}
-        disabled={disabled}
-        className={`${getInputStyles()} ${className} ${
-          disabled ? "cursor-not-allowed" : ""
-        }`}
-        {...register}
-        aria-invalid={!!error}
-        aria-describedby={
-          error
-            ? `${label?.toLowerCase()}-error`
-            : success
-            ? `${label?.toLowerCase()}-success`
-            : undefined
-        }
-      >
-        <div className="flex items-center gap-3 flex-1 text-left">
-          <div className="flex items-center gap-2">
-            {icon ||
-              (showTimeSelect ? (
-                <Clock
-                  className={`${currentSize.icon} ${
-                    theme === "dark"
-                      ? error
-                        ? "text-primary-400"
-                        : success
-                        ? "text-green-400"
-                        : "text-gray-400"
-                      : error
-                      ? "text-primary-500"
+        />
+        <div className="absolute left-4 flex items-center pointer-events-none">
+          {icon ||
+            (showTimeSelect ? (
+              <Clock
+                className={`${currentSize.icon} ${
+                  theme === "dark"
+                    ? error
+                      ? "text-primary-400"
                       : success
-                      ? "text-green-500"
-                      : "text-gray-500"
-                  }`}
-                />
-              ) : (
-                <Calendar
-                  className={`${currentSize.icon} ${
-                    theme === "dark"
-                      ? error
-                        ? "text-primary-400"
-                        : success
-                        ? "text-green-400"
-                        : "text-gray-400"
-                      : error
-                      ? "text-primary-500"
+                      ? "text-green-400"
+                      : "text-gray-400"
+                    : error
+                    ? "text-primary-500"
+                    : success
+                    ? "text-green-500"
+                    : "text-gray-500"
+                }`}
+              />
+            ) : (
+              <Calendar
+                className={`${currentSize.icon} ${
+                  theme === "dark"
+                    ? error
+                      ? "text-primary-400"
                       : success
-                      ? "text-green-500"
-                      : "text-gray-500"
-                  }`}
-                />
-              ))}
-            <span
-              className={`${
-                !value
-                  ? theme === "dark"
-                    ? "text-gray-500"
-                    : "text-gray-400"
-                  : ""
-              }`}
-            >
-              {value || inputPlaceholder}
-            </span>
-          </div>
+                      ? "text-green-400"
+                      : "text-gray-400"
+                    : error
+                    ? "text-primary-500"
+                    : success
+                    ? "text-green-500"
+                    : "text-gray-500"
+                }`}
+              />
+            ))}
         </div>
-
-      </button>
+        {isClearable && value && !disabled && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onChange({ target: { value: "" } });
+            }}
+            className="absolute right-3 p-1 hover:bg-gray-200 dark:hover:bg-neutral-700 rounded-full transition-colors z-10"
+          >
+            <X className="w-3.5 h-3.5 opacity-60" />
+          </button>
+        )}
+      </div>
     )
   );
 
@@ -463,10 +463,8 @@ const DatePickerModern = <T extends FieldValues>({
 
           .react-datepicker__close-icon {
             background-color: transparent;
-          }
-
-          .react-datepicker__close-icon::after {
-            background-color: ${theme === "dark" ? "#9ca3af" : "#6b7280"};
+            display:none
+            
           }
 
           /* Mejoras para mobile */
@@ -508,6 +506,7 @@ const DatePickerModern = <T extends FieldValues>({
           customInput={<CustomInput />}
           popperClassName="z-50"
           popperPlacement={popperPlacement}
+          timeIntervals={5}
           withPortal={withPortal}
           portalId="root-portal"
           disabled={disabled}
@@ -601,7 +600,6 @@ const DatePickerModern = <T extends FieldValues>({
           )}
         />
       </div>
-
       {error && (
         <div
           id={`${label?.toLowerCase().replace(/\s+/g, "-")}-error`}

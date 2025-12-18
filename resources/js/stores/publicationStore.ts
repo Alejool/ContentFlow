@@ -9,6 +9,7 @@ interface PublicationState {
   publishedPlatforms: Record<number, number[]>;
   failedPlatforms: Record<number, number[]>;
   publishingPlatforms: Record<number, number[]>;
+  scheduledPlatforms: Record<number, number[]>;
   removedPlatforms: Record<number, number[]>;
 
   isLoading: boolean;
@@ -23,9 +24,13 @@ interface PublicationState {
 
   fetchPublications: (filters?: any, page?: number) => Promise<void>;
   fetchPublicationById: (id: number) => Promise<Publication | null>;
-  fetchPublishedPlatforms: (
-    publicationId: number
-  ) => Promise<{ published: number[]; failed: number[] }>;
+  fetchPublishedPlatforms: (publicationId: number) => Promise<{
+    published: number[];
+    failed: number[];
+    publishing: number[];
+    scheduled: number[];
+    removed: number[];
+  }>;
 
   addPublication: (publication: Publication) => void;
   updatePublication: (id: number, publication: Partial<Publication>) => void;
@@ -37,11 +42,13 @@ interface PublicationState {
   getFailedPlatforms: (publicationId: number) => number[];
   getRemovedPlatforms: (publicationId: number) => number[];
   getPublishingPlatforms: (publicationId: number) => number[];
+  getScheduledPlatforms: (publicationId: number) => number[];
 
   setPublishedPlatforms: (publicationId: number, accountIds: number[]) => void;
   setFailedPlatforms: (publicationId: number, accountIds: number[]) => void;
   setRemovedPlatforms: (publicationId: number, accountIds: number[]) => void;
   setPublishingPlatforms: (publicationId: number, accountIds: number[]) => void;
+  setScheduledPlatforms: (publicationId: number, accountIds: number[]) => void;
 
   clearError: () => void;
   reset: () => void;
@@ -54,6 +61,7 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
   publishedPlatforms: {},
   failedPlatforms: {},
   publishingPlatforms: {},
+  scheduledPlatforms: {},
   removedPlatforms: {},
 
   isLoading: false,
@@ -134,6 +142,7 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
       const failed = response.data.failed_platforms ?? [];
       const publishing = response.data.publishing_platforms ?? [];
       const removed = response.data.removed_platforms ?? [];
+      const scheduled = response.data.scheduled_platforms ?? [];
 
       set((state) => ({
         publishedPlatforms: {
@@ -148,6 +157,10 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
           ...state.publishingPlatforms,
           [publicationId]: publishing,
         },
+        scheduledPlatforms: {
+          ...state.scheduledPlatforms,
+          [publicationId]: scheduled,
+        },
       }));
       set((state) => ({
         removedPlatforms: {
@@ -156,9 +169,15 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
         },
       }));
 
-      return { published, failed, publishing, removed };
+      return { published, failed, publishing, removed, scheduled };
     } catch {
-      return { published: [], failed: [], publishing: [], removed: [] };
+      return {
+        published: [],
+        failed: [],
+        publishing: [],
+        removed: [],
+        scheduled: [],
+      };
     }
   },
 
@@ -194,7 +213,11 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
 
   getFailedPlatforms: (id) => get().failedPlatforms[id] ?? [],
 
+  getRemovedPlatforms: (id) => get().removedPlatforms[id] ?? [],
+
   getPublishingPlatforms: (id) => get().publishingPlatforms[id] ?? [],
+
+  getScheduledPlatforms: (id) => get().scheduledPlatforms[id] ?? [],
 
   setPublishedPlatforms: (id, accounts) =>
     set((state) => ({
@@ -206,9 +229,19 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
       failedPlatforms: { ...state.failedPlatforms, [id]: accounts },
     })),
 
+  setRemovedPlatforms: (id, accounts) =>
+    set((state) => ({
+      removedPlatforms: { ...state.removedPlatforms, [id]: accounts },
+    })),
+
   setPublishingPlatforms: (id, accounts) =>
     set((state) => ({
       publishingPlatforms: { ...state.publishingPlatforms, [id]: accounts },
+    })),
+
+  setScheduledPlatforms: (id, accounts) =>
+    set((state) => ({
+      scheduledPlatforms: { ...state.scheduledPlatforms, [id]: accounts },
     })),
 
   clearError: () => set({ error: null }),
@@ -220,6 +253,7 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
       publishedPlatforms: {},
       failedPlatforms: {},
       publishingPlatforms: {},
+      scheduledPlatforms: {},
       isLoading: false,
       error: null,
     }),

@@ -17,6 +17,7 @@ export interface PublishPublicationState {
   publishing: boolean;
   failedPlatforms: number[];
   publishingPlatforms: number[];
+  scheduledPlatforms: number[];
   removedPlatforms: number[];
   unpublishing: number | null;
   youtubeThumbnails: Record<number, File | null>;
@@ -68,6 +69,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
     publishedPlatforms: publishedPlatformsCache,
     failedPlatforms: failedPlatformsCache,
     publishingPlatforms: publishingPlatformsCache,
+    scheduledPlatforms: scheduledPlatformsCache,
     removedPlatforms: removedPlatformsCache,
 
     fetchPublishedPlatforms: fetchPublishedPlatformsFromStore,
@@ -133,6 +135,12 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
       ? publishingPlatformsCache[currentPublicationId] || []
       : [];
   }, [publishingPlatformsCache, currentPublicationId]);
+
+  const scheduledPlatforms = useMemo(() => {
+    return currentPublicationId
+      ? scheduledPlatformsCache[currentPublicationId] || []
+      : [];
+  }, [scheduledPlatformsCache, currentPublicationId]);
 
   const removedPlatforms = useMemo(() => {
     return currentPublicationId
@@ -365,6 +373,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
     failedPlatforms,
     removedPlatforms,
     publishingPlatforms,
+    scheduledPlatforms,
     publishing,
     unpublishing,
     youtubeThumbnails,

@@ -178,11 +178,15 @@
     "title": "Publicaciones",
     "subtitle": "Gestionar tus publicaciones",
     "modal": {
+      "schedule": {
+        "title": "Fecha para todas las redes",
+        "description": "Define una fecha única para publicar en todas las redes sociales seleccionadas a la vez.",
+        "placeholder": "Seleccionar fecha y hora"
+      },
       "add": {
         "title": "Agregar Publicación",
         "titleField": "Título",
         "subtitle": "Crear una publicación",
-        "configureNetworks": "Configura tus redes sociales",
         "name": "Nombre",
         "description": "Descripción",
         "image": "Imagen",
@@ -327,7 +331,12 @@
         "button":{
           "save":"Actualizar",
           "cancel":"Cancelar"
-        }
+        },
+        "contentLocked": "Contenido Bloqueado",
+        "contentLockedHint": "Para editar el contenido (título, descripción o archivos), debes despublicar la publicación de todas las plataformas."
+      },
+      "manageContent": {
+        "configureNetworks": "Configura tus redes sociales"
       },
       "publish":{
         "title":"Publicar",
@@ -342,6 +351,7 @@
         "platforms":"Plataformas",
         "removed":"Removido",
         "failed":"Fallido",
+        "scheduled":"Programado",
         "youtube":{
           "youtubeThumbnails":"Thumbnails de YouTube"
         },

@@ -218,6 +218,11 @@
         }
 
       },
+      "schedule": {
+        "title": "Date for all networks",
+        "description": "Set a single date to publish on all selected social networks at once.",
+        "placeholder": "Select date and time"
+      },
       "edit": {
         "title": "Edit Publication",
         "titleField": "Title",
@@ -260,7 +265,12 @@
         "button":{
           "save":"Update",
           "cancel":"Cancel"
-        }
+        },
+        "contentLocked": "Content Locked",
+        "contentLockedHint": "To edit the content (title, description or files), you must unpublish the publication from all platforms."
+      },
+      "manageContent": {
+        "configureNetworks": "Configure Social Networks"
       },
       "platformSettings": {
         "title": "Platform Settings",
@@ -339,6 +349,7 @@
         "publishing":"Publishing...",
         "platforms":"Platforms",
         "failed":"Failed",
+        "scheduled": "scheduled",
         "removed":"Removed",
         "youtube":{
           "youtubeThumbnails":"YouTube Thumbnails"
@@ -1045,13 +1056,6 @@
         "createButton": "Create Campaign",
         "creating": "Creating...",
         "save": "Create"
-      },
-      "edit": {
-        "title": "Edit Campaign",
-        "subtitle": "Update your campaign with new information",
-        "saveButton": "Save Changes",
-        "saving": "Saving...",
-        "save": "Update"
       },
       "fields": {
         "title": "Campaign Title",

@@ -14,14 +14,16 @@ interface SocialAccountsSectionProps {
   socialAccounts: SocialAccount[];
   selectedAccounts: number[];
   accountSchedules: Record<number, string>;
-  theme: "dark" | "light";
-  t: (key: string) => string;
+  theme: any;
+  t: any;
   onAccountToggle: (accountId: number) => void;
   onScheduleChange: (accountId: number, schedule: string) => void;
   onScheduleRemove: (accountId: number) => void;
   onPlatformSettingsClick: (platform: string) => void;
   onPreviewClick: (platform: string) => void;
   globalSchedule?: string;
+  publishedAccountIds?: number[];
+  publishingAccountIds?: number[];
 }
 
 const SocialAccountsSection: React.FC<SocialAccountsSectionProps> = ({
@@ -36,6 +38,8 @@ const SocialAccountsSection: React.FC<SocialAccountsSectionProps> = ({
   onPlatformSettingsClick,
   onPreviewClick,
   globalSchedule,
+  publishedAccountIds,
+  publishingAccountIds,
 }) => {
   const [activePopover, setActivePopover] = useState<number | null>(null);
 
@@ -46,7 +50,7 @@ const SocialAccountsSection: React.FC<SocialAccountsSectionProps> = ({
     <div className="space-y-4">
       <label className="text-sm font-semibold mb-2 flex items-center gap-2">
         <Target className="w-4 h-4" />
-        {t("publications.modal.add.configureNetworks") ||
+        {t("publications.modal.manageContent.configureNetworks") ||
           "Configura tus redes sociales"}
       </label>
 
@@ -54,6 +58,8 @@ const SocialAccountsSection: React.FC<SocialAccountsSectionProps> = ({
         {socialAccounts.map((account) => {
           const isChecked = selectedAccounts.includes(account.id);
           const customSchedule = accountSchedules[account.id];
+          const isPublished = publishedAccountIds?.includes(account.id);
+          const isPublishing = publishingAccountIds?.includes(account.id);
 
           return (
             <SocialAccountItem
@@ -79,6 +85,8 @@ const SocialAccountsSection: React.FC<SocialAccountsSectionProps> = ({
               onPreviewClick={() => onPreviewClick(account.platform)}
               onPopoverClose={() => setActivePopover(null)}
               globalSchedule={globalSchedule}
+              isPublished={isPublished}
+              isPublishing={isPublishing}
             />
           );
         })}
@@ -87,12 +95,12 @@ const SocialAccountsSection: React.FC<SocialAccountsSectionProps> = ({
   );
 };
 
-const SocialAccountItem: React.FC<{
+interface SocialAccountItemProps {
   account: SocialAccount;
   isChecked: boolean;
   customSchedule?: string;
   activePopover: number | null;
-  theme: "dark" | "light";
+  theme: any;
   borderColor: string;
   onToggle: () => void;
   onScheduleClick: () => void;
@@ -101,9 +109,13 @@ const SocialAccountItem: React.FC<{
   onPlatformSettingsClick: () => void;
   onPreviewClick: () => void;
   onPopoverClose: () => void;
-  t: (key: string) => string;
+  t: any;
   globalSchedule?: string;
-}> = ({
+  isPublished?: boolean;
+  isPublishing?: boolean;
+}
+
+const SocialAccountItem: React.FC<SocialAccountItemProps> = ({
   account,
   isChecked,
   customSchedule,
@@ -119,40 +131,54 @@ const SocialAccountItem: React.FC<{
   onPopoverClose,
   t,
   globalSchedule,
+  isPublished,
+  isPublishing,
 }) => {
   const modalBg = theme === "dark" ? "bg-neutral-800" : "bg-white";
+  const isDisabled = isPublished || isPublishing;
+  const isCheckedActually = isChecked || isPublished || isPublishing;
 
   return (
     <div
-      onClick={onToggle}
-      className={`relative flex items-center p-3 rounded-lg border transition-all cursor-pointer ${
-        isChecked
+      onClick={() => !isDisabled && onToggle()}
+      className={`relative flex items-center p-3 rounded-lg border transition-all ${
+        isDisabled ? "opacity-80 cursor-default" : "cursor-pointer"
+      } ${
+        isCheckedActually
           ? `border-primary-500 bg-primary-50 dark:bg-primary-900/20 shadow-sm`
           : `${borderColor} hover:bg-gray-50 dark:hover:bg-neutral-700/50`
       }`}
     >
       <div className="flex items-center gap-3 flex-1">
         <VisualCheckbox
-          isChecked={isChecked}
-          theme={theme}
+          isChecked={!!isCheckedActually}
+          theme={theme as "dark" | "light"}
           onToggle={(e) => {
             e?.stopPropagation();
-            onToggle();
+            if (!isDisabled) onToggle();
           }}
         />
 
         <div className="flex flex-col flex-1">
           <div className="flex items-center gap-2">
             <span className="font-medium text-sm">{account.platform}</span>
-            {isChecked && (
+            {isCheckedActually && (
               <span
                 className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold uppercase ${
-                  customSchedule || globalSchedule
+                  isPublished
+                    ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300"
+                    : isPublishing
+                    ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300"
+                    : customSchedule || globalSchedule
                     ? "bg-primary-100 text-primary-700 dark:bg-primary-900/40 dark:text-primary-300"
                     : "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300"
                 }`}
               >
-                {customSchedule || globalSchedule
+                {isPublished
+                  ? t("publications.modal.publish.published")
+                  : isPublishing
+                  ? t("publications.modal.publish.publishing")
+                  : customSchedule || globalSchedule
                   ? t("publications.status.scheduled") || "Programado"
                   : t("publications.status.instant") || "Instantáneo"}
               </span>
@@ -237,10 +263,22 @@ const SocialAccountItem: React.FC<{
               </button>
             </div>
           )}
+          {isPublished && (
+            <div className="mt-1 flex items-center gap-1 text-[10px] font-medium text-green-600 dark:text-green-400">
+              <Check className="w-3 h-3" />
+              {t("publications.modal.publish.published")}
+            </div>
+          )}
+          {isPublishing && (
+            <div className="mt-1 flex items-center gap-1 text-[10px] font-medium text-yellow-600 dark:text-yellow-400">
+              <div className="w-3 h-3 border-2 border-yellow-600 border-t-transparent rounded-full animate-spin" />
+              {t("publications.modal.publish.publishing")}
+            </div>
+          )}
         </div>
       </div>
 
-      {isChecked && (
+      {isCheckedActually && !isDisabled && (
         <ScheduleButton
           account={account}
           customSchedule={customSchedule}
@@ -382,23 +420,14 @@ const SchedulePopoverContent: React.FC<{
         minDate={new Date()}
         withPortal
         popperPlacement="bottom-start"
+        isClearable
       />
 
-      <div className="flex justify-end gap-2 mt-2">
-        <button
-          type="button"
-          onClick={() => {
-            onScheduleRemove();
-            onClose();
-          }}
-          className="text-xs text-primary-500 hover:text-primary-700 font-medium px-2 py-1"
-        >
-          Clear
-        </button>
+      <div className="flex justify-end gap-2 mt-4">
         <button
           type="button"
           onClick={onClose}
-          className="text-xs bg-primary-600 text-white px-3 py-1.5 rounded hover:bg-primary-700"
+          className="text-xs bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors font-medium shadow-sm"
         >
           Done
         </button>

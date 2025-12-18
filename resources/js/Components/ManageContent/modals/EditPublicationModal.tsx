@@ -25,6 +25,7 @@ import PlatformPreviewModal from "@/Components/ManageContent/modals/common/Platf
 import PlatformSettingsModal from "@/Components/ManageContent/modals/common/PlatformSettingsModal";
 import ScheduleSection from "@/Components/ManageContent/modals/common/ScheduleSection";
 import YouTubeThumbnailUploader from "@/Components/common/ui/YouTubeThumbnailUploader";
+import { AlertCircle } from "lucide-react";
 
 type EditPublicationFormData = {
   title: string;
@@ -104,6 +105,37 @@ export default function EditPublicationModal({
     string | null
   >(null);
   const [removedMediaIds, setRemovedMediaIds] = useState<number[]>([]);
+
+  const hasPublishedPlatform = useMemo(() => {
+    if (!publication) return false;
+    return publication.social_post_logs?.some(
+      (log: any) => log.status === "published"
+    );
+  }, [publication]);
+
+  const publishedAccountIds = useMemo(() => {
+    return (
+      publication?.social_post_logs
+        ?.filter((log: any) => log.status === "published")
+        .map((log: any) => log.social_account_id) || []
+    );
+  }, [publication]);
+
+  const publishingAccountIds = useMemo(() => {
+    return (
+      publication?.social_post_logs
+        ?.filter((log: any) => log.status === "publishing")
+        .map((log: any) => log.social_account_id) || []
+    );
+  }, [publication]);
+
+  const allConnectedArePublished = useMemo(() => {
+    if (!publication || !publication.social_post_logs) return false;
+    // This is hard to check accurately without knowing connected accounts from here,
+    // but we can assume if there are any that are NOT published, it's not "all".
+    // For now, let's stick to the logic that if at least one is published, we lock main content.
+    return hasPublishedPlatform;
+  }, [publication, hasPublishedPlatform]);
 
   const schema = useMemo(() => publicationSchema(t), [t]);
 
@@ -374,20 +406,28 @@ export default function EditPublicationModal({
   };
 
   const handleAccountToggle = (accountId: number) => {
+    // Don't allow toggling off if already published or publishing
+    if (
+      publishedAccountIds.includes(accountId) ||
+      publishingAccountIds.includes(accountId)
+    ) {
+      return;
+    }
+
     const current = watched.social_accounts || [];
-    const id = Number(accountId);
-    const isChecked = current.includes(id);
+    const isChecked = current.includes(accountId);
 
     if (!isChecked) {
-      setValue("social_accounts", [...current, id]);
+      setValue("social_accounts", [...current, accountId]);
     } else {
       setValue(
         "social_accounts",
-        current.filter((x: number) => x !== id)
+        current.filter((id) => id !== accountId)
       );
-      const newScheds = { ...accountSchedules };
-      delete newScheds[id];
-      setAccountSchedules(newScheds);
+      // Also remove its individual schedule if it exists
+      const newSchedules = { ...accountSchedules };
+      delete newSchedules[accountId];
+      setAccountSchedules(newSchedules);
     }
   };
 
@@ -567,6 +607,22 @@ export default function EditPublicationModal({
           >
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <div className="space-y-6">
+                {hasPublishedPlatform && (
+                  <div className="p-4 mb-6 rounded-lg border border-blue-500 bg-blue-50/50 dark:bg-blue-900/20 flex gap-3 text-sm text-blue-700 dark:text-blue-300 animate-in fade-in slide-in-from-top-4">
+                    <AlertCircle className="w-5 h-5 shrink-0 text-blue-500" />
+                    <div>
+                      <p className="font-semibold mb-1">
+                        {t("publications.modal.edit.contentLocked") ||
+                          "Content Locked"}
+                      </p>
+                      <p className="opacity-80">
+                        {t("publications.modal.edit.contentLockedHint") ||
+                          "This publication is live on some platforms. While you can update schedules and thumbnails, core content (title/description) is locked. To edit everything, unpublish from all platforms."}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
                 <MediaUploadSection
                   mediaPreviews={mediaPreviews}
                   thumbnails={thumbnails}
@@ -582,6 +638,7 @@ export default function EditPublicationModal({
                   onDragOver={handleDragOver}
                   onDragLeave={handleDragLeave}
                   onDrop={handleDrop}
+                  disabled={hasPublishedPlatform}
                 />
 
                 <SocialAccountsSection
@@ -600,6 +657,8 @@ export default function EditPublicationModal({
                     setActivePlatformPreview(platform)
                   }
                   globalSchedule={watched.scheduled_at}
+                  publishedAccountIds={publishedAccountIds}
+                  publishingAccountIds={publishingAccountIds}
                 />
 
                 <ScheduleSection
@@ -639,6 +698,7 @@ export default function EditPublicationModal({
                   campaigns={campaigns}
                   publication={publication}
                   onHashtagChange={handleHashtagChange}
+                  disabled={hasPublishedPlatform}
                 />
               </div>
             </div>

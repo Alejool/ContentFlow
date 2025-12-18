@@ -1,7 +1,7 @@
 import DatePickerModern from "@/Components/common/Modern/DatePicker";
 import Label from "@/Components/common/Modern/Label";
 import { format } from "date-fns";
-import { Clock, X } from "lucide-react";
+import { Clock } from "lucide-react";
 import React from "react";
 
 interface ScheduleSectionProps {
@@ -19,14 +19,14 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
 }) => {
   return (
     <div>
-      <Label
-        htmlFor="scheduled_at"
-        icon={Clock}
-        size="lg"
-        tooltip={t("publications.modal.edit.optionalSchedule")}
-      >
-        {t("publications.modal.edit.schedulePublication")}
+      <Label htmlFor="scheduled_at" icon={Clock} size="lg">
+        {t("publications.modal.schedule.title") || "Date for all networks"}
       </Label>
+
+      <p className="text-xs text-gray-500 dark:text-gray-400 mb-3 ml-1">
+        {t("publications.modal.schedule.description") ||
+          "Set a single date to publish on all selected social networks at once."}
+      </p>
 
       <div className="relative">
         <DatePickerModern
@@ -36,25 +36,16 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
           }
           showTimeSelect
           placeholder={
-            t("publications.modal.edit.schedulePublication") ||
-            "Schedule Publication"
+            t("publications.modal.schedule.placeholder") ||
+            "Select date and time"
           }
           dateFormat="Pp"
           minDate={new Date()}
           withPortal
           popperPlacement="bottom-start"
           size="lg"
+          isClearable
         />
-        {scheduledAt && (
-          <button
-            type="button"
-            onClick={() => onScheduleChange("")}
-            className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-gray-400 hover:text-primary-500 transition-colors"
-            title={t("common.clear") || "Clear"}
-          >
-            <X className="w-4 h-4" />
-          </button>
-        )}
       </div>
     </div>
   );

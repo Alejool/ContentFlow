@@ -14,6 +14,7 @@ import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import {
   AlertCircle,
   CheckCircle,
+  Clock,
   Eye,
   Settings as SettingsIcon,
   Share2,
@@ -57,6 +58,7 @@ export default function PublishPublicationModal({
     failedPlatforms,
     removedPlatforms,
     publishingPlatforms,
+    scheduledPlatforms,
     publishing,
     unpublishing,
     existingThumbnails,
@@ -105,15 +107,22 @@ export default function PublishPublicationModal({
   ) => {
     if (!publication) return;
 
-    const confirmed = await confirm({
-      title: t("publications.modal.publish.modal.title", { platform }),
-      message: t("publications.modal.publish.modal.message", { platform }),
-      confirmText: t("publications.modal.publish.modal.confirmText"),
-      cancelText: t("publications.modal.publish.modal.cancelText"),
-      type: "warning",
-    });
+    // Check if ALL connected accounts are published
+    const allPublished = connectedAccounts.every((acc) =>
+      publishedPlatforms.includes(acc.id)
+    );
 
-    if (!confirmed) return;
+    if (allPublished) {
+      const confirmed = await confirm({
+        title: t("publications.modal.publish.modal.title", { platform }),
+        message: t("publications.modal.publish.modal.message", { platform }),
+        confirmText: t("publications.modal.publish.modal.confirmText"),
+        cancelText: t("publications.modal.publish.modal.cancelText"),
+        type: "warning",
+      });
+
+      if (!confirmed) return;
+    }
 
     setUnpublishing(accountId);
     try {
@@ -300,6 +309,7 @@ export default function PublishPublicationModal({
                     const isPublishing = publishingPlatforms.includes(
                       account.id
                     );
+                    const isScheduled = scheduledPlatforms.includes(account.id);
                     const isUnpublishing = unpublishing === account.id;
 
                     return (
@@ -308,9 +318,10 @@ export default function PublishPublicationModal({
                           onClick={() =>
                             !isPublished &&
                             !isPublishing &&
+                            !isScheduled &&
                             togglePlatform(account.id)
                           }
-                          disabled={isPublished || isPublishing}
+                          disabled={isPublished || isPublishing || isScheduled}
                           className={`w-full flex items-center gap-3 p-4 rounded-lg border-2 transition-all pt-6 ${
                             isPublished
                               ? "border-green-500 bg-green-50 dark:bg-green-900/20 cursor-default"
@@ -320,6 +331,8 @@ export default function PublishPublicationModal({
                               ? "border-red-500 bg-red-50 dark:bg-red-900/20 cursor-default"
                               : isSelected
                               ? "p-2 border-primary-500 bg-primary-50 dark:bg-primary-900/20 cursor-default"
+                              : isScheduled
+                              ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20 cursor-default"
                               : isRemovedPlatform
                               ? "border-gray-500 bg-gray-50 dark:bg-gray-900/20 cursor-default"
                               : theme === "dark"
@@ -359,6 +372,14 @@ export default function PublishPublicationModal({
                               <span className="flex items-center gap-1 text-xs font-medium text-yellow-600 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-900/30 px-2 py-1 rounded-full">
                                 <div className="w-3 h-3 border-2 border-yellow-600 border-t-transparent rounded-full animate-spin" />
                                 {t("publications.modal.publish.publishing")}
+                              </span>
+                            </div>
+                          )}
+                          {isScheduled && (
+                            <div className="flex items-center gap-2">
+                              <span className="flex items-center gap-1 text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30 px-2 py-1 rounded-full">
+                                <Clock className="w-3 h-3" />
+                                {t("publications.modal.publish.scheduled")}
                               </span>
                             </div>
                           )}

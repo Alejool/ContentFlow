@@ -22,6 +22,7 @@ interface MediaUploadSectionProps {
   onDragOver: (e: React.DragEvent<HTMLDivElement>) => void;
   onDragLeave: (e: React.DragEvent<HTMLDivElement>) => void;
   onDrop: (e: React.DragEvent<HTMLDivElement>) => void;
+  disabled?: boolean;
 }
 
 const MediaUploadSection: React.FC<MediaUploadSectionProps> = ({
@@ -37,10 +38,16 @@ const MediaUploadSection: React.FC<MediaUploadSectionProps> = ({
   onDragOver,
   onDragLeave,
   onDrop,
+  disabled,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const getUploadAreaStyles = () => {
+    if (disabled) {
+      return theme === "dark"
+        ? "bg-neutral-800/50 cursor-not-allowed opacity-60 border-neutral-700"
+        : "bg-gray-100 cursor-not-allowed opacity-60 border-gray-300";
+    }
     if (imageError) {
       return theme === "dark"
         ? "border-primary-500 bg-primary-900/20"
@@ -57,7 +64,11 @@ const MediaUploadSection: React.FC<MediaUploadSectionProps> = ({
   };
 
   return (
-    <div className="space-y-4">
+    <div
+      className={`space-y-4 ${
+        disabled ? "pointer-events-none select-none" : ""
+      }`}
+    >
       <Label
         htmlFor="media-upload"
         icon={FileImage}
@@ -69,17 +80,17 @@ const MediaUploadSection: React.FC<MediaUploadSectionProps> = ({
       </Label>
 
       <div
-        className={`relative group cursor-pointer transition-all duration-300 ${
-          isDragOver
+        className={`relative group transition-all duration-300 ${
+          isDragOver && !disabled
             ? `scale-[1.02] ring-2 ${
                 theme === "dark" ? "ring-primary-400" : "ring-primary-500"
               } ring-offset-2`
             : ""
-        }`}
-        onDrop={onDrop}
-        onDragOver={onDragOver}
-        onDragLeave={onDragLeave}
-        onClick={() => fileInputRef.current?.click()}
+        } ${disabled ? "cursor-not-allowed" : "cursor-pointer"}`}
+        onDrop={disabled ? undefined : onDrop}
+        onDragOver={disabled ? undefined : onDragOver}
+        onDragLeave={disabled ? undefined : onDragLeave}
+        onClick={() => !disabled && fileInputRef.current?.click()}
       >
         <div
           className={`min-h-[200px] rounded-lg border-2 border-dashed flex flex-col items-center justify-center p-6 text-center transition-colors overflow-hidden ${getUploadAreaStyles()}`}
@@ -97,22 +108,27 @@ const MediaUploadSection: React.FC<MediaUploadSectionProps> = ({
                     onSetThumbnail(preview.tempId, file)
                   }
                   theme={theme}
+                  disabled={disabled}
                 />
               ))}
-              <AddMoreButton onClick={() => fileInputRef.current?.click()} />
+              {!disabled && (
+                <AddMoreButton onClick={() => fileInputRef.current?.click()} />
+              )}
             </div>
           ) : (
             <EmptyUploadState theme={theme} t={t} />
           )}
         </div>
-        <input
-          ref={fileInputRef}
-          type="file"
-          className="hidden"
-          multiple
-          accept="image/*,video/*"
-          onChange={(e) => onFileChange(e.target.files)}
-        />
+        {!disabled && (
+          <input
+            ref={fileInputRef}
+            type="file"
+            className="hidden"
+            multiple
+            accept="image/*,video/*"
+            onChange={(e) => onFileChange(e.target.files)}
+          />
+        )}
       </div>
 
       {imageError && (
@@ -132,12 +148,23 @@ const MediaPreviewItem: React.FC<{
   onRemove: () => void;
   onSetThumbnail: (file: File) => void;
   theme: "dark" | "light";
-}> = ({ preview, index, thumbnail, onRemove, onSetThumbnail, theme }) => {
+  disabled?: boolean;
+}> = ({
+  preview,
+  index,
+  thumbnail,
+  onRemove,
+  onSetThumbnail,
+  theme,
+  disabled,
+}) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   return (
     <div
-      className="relative group/item aspect-video border rounded-lg overflow-hidden bg-gray-900"
+      className={`relative group/item aspect-video border rounded-lg overflow-hidden bg-gray-900 ${
+        disabled ? "opacity-90" : ""
+      }`}
       onClick={(e) => e.stopPropagation()}
     >
       {preview.type.includes("video") ? (
@@ -146,21 +173,24 @@ const MediaPreviewItem: React.FC<{
           thumbnail={thumbnail}
           onSetThumbnail={onSetThumbnail}
           fileInputRef={fileInputRef}
+          disabled={disabled}
         />
       ) : (
         <img src={preview.url} className="w-full h-full object-cover" />
       )}
 
-      <button
-        type="button"
-        onClick={(e) => {
-          e.stopPropagation();
-          onRemove();
-        }}
-        className="absolute top-2 right-2 p-1.5 bg-red-500/80 text-white rounded-full hover:bg-red-600 transition-colors opacity-0 group-hover/item:opacity-100 backdrop-blur-sm"
-      >
-        <X className="w-3 h-3" />
-      </button>
+      {!disabled && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onRemove();
+          }}
+          className="absolute top-2 right-2 p-1.5 bg-red-500/80 text-white rounded-full hover:bg-red-600 transition-colors opacity-0 group-hover/item:opacity-100 backdrop-blur-sm"
+        >
+          <X className="w-3 h-3" />
+        </button>
+      )}
     </div>
   );
 };
@@ -169,8 +199,9 @@ const VideoPreview: React.FC<{
   preview: any;
   thumbnail?: File;
   onSetThumbnail: (file: File) => void;
-  fileInputRef: React.RefObject<HTMLInputElement>;
-}> = ({ preview, thumbnail, onSetThumbnail, fileInputRef }) => (
+  fileInputRef: React.RefObject<HTMLInputElement | null>;
+  disabled?: boolean;
+}> = ({ preview, thumbnail, onSetThumbnail, fileInputRef, disabled }) => (
   <>
     <video
       src={preview.url}

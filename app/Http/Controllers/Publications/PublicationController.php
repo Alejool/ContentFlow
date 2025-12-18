@@ -606,33 +606,38 @@ class PublicationController extends Controller
 
 
 
-      if (!empty($validatedData['scheduled_at']) && !empty($validatedData['social_accounts'])) {
-        ScheduledPost::where('publication_id', $publication->id)
-          ->where('status', 'pending')
-          ->delete();
+      if (array_key_exists('scheduled_at', $validatedData)) {
+        if (empty($validatedData['scheduled_at'])) {
+          ScheduledPost::where('publication_id', $publication->id)
+            ->where('status', 'pending')
+            ->delete();
+        } else if (!empty($validatedData['social_accounts'])) {
+          ScheduledPost::where('publication_id', $publication->id)
+            ->where('status', 'pending')
+            ->delete();
 
-        $schedules = $request->input('social_account_schedules', []);
+          $schedules = $request->input('social_account_schedules', []);
+          $socialAccounts = SocialAccount::whereIn('id', $validatedData['social_accounts'])->get()->keyBy('id');
 
-        $socialAccounts = SocialAccount::whereIn('id', $validatedData['social_accounts'])->get()->keyBy('id');
+          foreach ($validatedData['social_accounts'] as $accountId) {
+            $scheduledAt = isset($schedules[$accountId]) ? $schedules[$accountId] : $validatedData['scheduled_at'];
+            $socialAccount = $socialAccounts[$accountId] ?? null;
 
-        foreach ($validatedData['social_accounts'] as $accountId) {
-          $scheduledAt = isset($schedules[$accountId]) ? $schedules[$accountId] : $validatedData['scheduled_at'];
-          $socialAccount = $socialAccounts[$accountId] ?? null;
-
-          ScheduledPost::create([
-            'user_id' => Auth::id(),
-            'social_account_id' => $accountId,
-            'publication_id' => $publication->id,
-            'scheduled_at' => $scheduledAt,
-            'status' => 'pending',
-            'account_name' => $socialAccount ? $socialAccount->account_name : 'Unknown',
-            'platform' => $socialAccount ? $socialAccount->platform : 'unknown',
-          ]);
+            ScheduledPost::create([
+              'user_id' => Auth::id(),
+              'social_account_id' => $accountId,
+              'publication_id' => $publication->id,
+              'scheduled_at' => $scheduledAt,
+              'status' => 'pending',
+              'account_name' => $socialAccount ? $socialAccount->account_name : 'Unknown',
+              'platform' => $socialAccount ? $socialAccount->platform : 'unknown',
+            ]);
+          }
+        } else {
+          ScheduledPost::where('publication_id', $publication->id)
+            ->where('status', 'pending')
+            ->update(['scheduled_at' => $validatedData['scheduled_at']]);
         }
-      } elseif (!empty($validatedData['scheduled_at'])) {
-        ScheduledPost::where('publication_id', $publication->id)
-          ->where('status', 'pending')
-          ->update(['scheduled_at' => $validatedData['scheduled_at']]);
       }
 
       DB::commit();
@@ -683,6 +688,20 @@ class PublicationController extends Controller
         'success' => false,
         'message' => "Social account for platform '{$platformIds}' not found for this publication.",
       ], 404);
+    }
+
+    // Check if any of these platforms are already scheduled for the future
+    $alreadyScheduled = ScheduledPost::where('publication_id', $publication->id)
+      ->whereIn('social_account_id', $socialAccounts->pluck('id'))
+      ->where('status', 'pending')
+      ->where('scheduled_at', '>', now())
+      ->exists();
+
+    if ($alreadyScheduled) {
+      return response()->json([
+        'success' => false,
+        'message' => "One or more selected platforms are already scheduled for a future publication. Please cancel the schedule first.",
+      ], 422);
     }
 
     if ($request->hasFile('thumbnails')) {
@@ -869,11 +888,20 @@ class PublicationController extends Controller
       ->values()
       ->toArray();
 
+    $scheduledAccountIds = ScheduledPost::where('publication_id', $publication->id)
+      ->where('status', 'pending')
+      ->where('scheduled_at', '>', now())
+      ->pluck('social_account_id')
+      ->unique()
+      ->values()
+      ->toArray();
+
     return response()->json([
       'published_platforms' => $publishedAccountIds,
       'failed_platforms' => $failedAccountIds,
       'publishing_platforms' => $publishingAccountIds,
-      'removed_platforms' => $removeOfPlatforms
+      'removed_platforms' => $removeOfPlatforms,
+      'scheduled_platforms' => $scheduledAccountIds
     ]);
   }
 
