@@ -22,7 +22,7 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
       <Label
         htmlFor="scheduled_at"
         icon={Clock}
-        size="md"
+        size="lg"
         tooltip={t("publications.modal.edit.optionalSchedule")}
       >
         {t("publications.modal.edit.schedulePublication")}
@@ -43,7 +43,7 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
           minDate={new Date()}
           withPortal
           popperPlacement="bottom-start"
-          size="md"
+          size="lg"
         />
         {scheduledAt && (
           <button

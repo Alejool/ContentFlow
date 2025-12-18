@@ -364,27 +364,7 @@ export default function ManageContentPage() {
             <p className={`text-lg ${subtitleColor} max-w-2xl mx-auto`}>
               {t("manageContent.subtitle")}
             </p>
-            {/* DEBUG BUTTON: REMOVE AFTER FIX */}
-            <button
-              onClick={() => {
-                const firstPub = publicationStore.publications[2];
-                if (firstPub) {
-                  console.log("Simulating update for:", firstPub.id);
-                  const newStatus =
-                    firstPub.status === "published" ? "draft" : "published";
-                  publicationStore.updatePublication(firstPub.id, {
-                    status: newStatus,
-                  });
-                  toast.success(`Test: Set ${firstPub.id} to ${newStatus}`);
-                } else {
-                  toast.error("No publications to test");
-                }
-              }}
-              className="mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-            >
-              DEBUG: Test Local Update
-            </button>
-            {/* END DEBUG BUTTON */}
+         
           </div>
 
           <div className="space-y-8">

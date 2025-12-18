@@ -1,8 +1,8 @@
-// hooks/usePublishPublication.ts
 import { useCampaignStore } from "@/stores/campaignStore";
 import { usePublicationStore } from "@/stores/publicationStore";
-import { SocialAccount, useAccountsStore } from "@/stores/socialAccountsStore";
+import { useAccountsStore } from "@/stores/socialAccountsStore";
 import { Publication } from "@/types/Publication";
+import { SocialAccount } from "@/types/SocialAccount";
 import axios from "axios";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "react-hot-toast";
@@ -17,6 +17,7 @@ export interface PublishPublicationState {
   publishing: boolean;
   failedPlatforms: number[];
   publishingPlatforms: number[];
+  removedPlatforms: number[];
   unpublishing: number | null;
   youtubeThumbnails: Record<number, File | null>;
   existingThumbnails: Record<number, { url: string; id: number }>;
@@ -36,7 +37,10 @@ export interface UsePublishPublicationReturn extends PublishPublicationState {
   selectAll: () => void;
   deselectAll: () => void;
   isYoutubeSelected: () => boolean;
-  handlePublish: (publication: Publication) => Promise<boolean>;
+  handlePublish: (
+    publication: Publication,
+    platformSettings?: Record<string, any>
+  ) => Promise<boolean>;
   setYoutubeThumbnails: React.Dispatch<
     React.SetStateAction<Record<number, File | null>>
   >;
@@ -64,11 +68,13 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
     publishedPlatforms: publishedPlatformsCache,
     failedPlatforms: failedPlatformsCache,
     publishingPlatforms: publishingPlatformsCache,
+    removedPlatforms: removedPlatformsCache,
 
     fetchPublishedPlatforms: fetchPublishedPlatformsFromStore,
     setPublishedPlatforms: setPublishedPlatformsInStore,
     setPublishingPlatforms: setPublishingPlatformsInStore,
     setFailedPlatforms: setFailedPlatformsInStore,
+    setRemovedPlatforms: setRemovedPlatformsInStore,
   } = usePublicationStore();
 
   /* ----------------------------- Derived state ----------------------------- */
@@ -128,6 +134,11 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
       : [];
   }, [publishingPlatformsCache, currentPublicationId]);
 
+  const removedPlatforms = useMemo(() => {
+    return currentPublicationId
+      ? removedPlatformsCache[currentPublicationId] || []
+      : [];
+  }, [removedPlatformsCache, currentPublicationId]);
 
   /* ------------------------------ Reset state ------------------------------- */
 
@@ -289,7 +300,10 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
   /* ------------------------------- Publish ---------------------------------- */
 
   const handlePublish = useCallback(
-    async (publication: Publication): Promise<boolean> => {
+    async (
+      publication: Publication,
+      platformSettings?: Record<string, any>
+    ): Promise<boolean> => {
       if (selectedPlatforms.length === 0) {
         toast.error("Please select at least one platform");
         return false;
@@ -308,6 +322,13 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
             formData.append("youtube_thumbnail_video_ids[]", videoId);
           }
         });
+
+        if (platformSettings && Object.keys(platformSettings).length > 0) {
+          formData.append(
+            "platform_settings",
+            JSON.stringify(platformSettings)
+          );
+        }
 
         const res = await axios.post(
           `/publications/${publication.id}/publish`,
@@ -342,6 +363,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
     selectedPlatforms,
     publishedPlatforms,
     failedPlatforms,
+    removedPlatforms,
     publishingPlatforms,
     publishing,
     unpublishing,

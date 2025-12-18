@@ -39,7 +39,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({
         icon={FileText}
         theme={theme}
         variant="filled"
-        size="md"
+        size="lg"
         required
         hint={`${watched.title?.length || 0}/70 characters`}
       />
@@ -54,7 +54,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({
         icon={FileText}
         theme={theme}
         variant="filled"
-        size="md"
+        size="lg"
         required
         rows={4}
         maxLength={200}
@@ -73,7 +73,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({
         icon={FileText}
         theme={theme}
         variant="filled"
-        size="md"
+        size="lg"
         required
         hint={`${watched.goal?.length || 0}/200 characters`}
       />
@@ -90,7 +90,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({
         icon={Hash}
         theme={theme}
         variant="filled"
-        size="md"
+        size="lg"
         hint={`${
           watched.hashtags
             ? watched.hashtags
@@ -116,7 +116,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({
           icon={Target}
           theme={theme}
           variant="filled"
-          size="md"
+          size="lg"
           clearable
         />
       )}

@@ -28,7 +28,7 @@ class SocialPostLogController extends Controller
       $query->whereBetween('created_at', [$request->date_start, $request->date_end]);
     }
 
-    $logs = $query->orderBy('updated_at', 'desc')->paginate(10);
+    $logs = $query->orderBy('updated_at', 'desc')->paginate(5);
 
     return response()->json([
       'success' => true,

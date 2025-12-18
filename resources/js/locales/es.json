@@ -340,6 +340,7 @@
         "loading":"Cargando...",
         "publishing":"Publicando...",
         "platforms":"Plataformas",
+        "removed":"Removido",
         "failed":"Fallido",
         "youtube":{
           "youtubeThumbnails":"Thumbnails de YouTube"
@@ -361,6 +362,11 @@
           "change":"Cambiar",
           "preview": "Vista Previa"
         }
+      },
+      "preview":{
+          "title":"Vista Previa",
+          "simulated": "Simulado",
+          "real": "Real"
       },
 
       "validation":{

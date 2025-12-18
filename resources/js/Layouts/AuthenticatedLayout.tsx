@@ -23,7 +23,7 @@ export default function AuthenticatedLayout({
   header,
   children,
 }: AuthenticatedLayoutProps) {
-  const user = usePage().props.auth.user as User;
+  const user = usePage().props?.auth?.user as User;
 
   const [showingNavigationDropdown, setShowingNavigationDropdown] =
     useState(false);
@@ -34,14 +34,13 @@ export default function AuthenticatedLayout({
   useEffect(() => {
     if (user?.id) {
       initNotificationRealtime(user.id);
-      // Fetch initial notifications
       useNotificationStore.getState().fetchNotifications();
     }
   }, [user?.id]);
 
   return (
     <div
-      className={`relative overflow-hidden scrollbar-y  `}
+      className={`relative overflow-hidden  scrollbar-y  `}
       style={{
         backgroundImage: `url(${Bg})`,
         backgroundSize: "cover",
@@ -68,7 +67,7 @@ export default function AuthenticatedLayout({
       />
 
       <main
-        className={`transition-all duration-500 ease-in-out relative z-10 ${
+        className={`transition-all duration-500 px-16 ease-in-out relative z-10 ${
           isSidebarOpen ? "lg:ml-80" : "lg:ml-20"
         }`}
       >
@@ -78,7 +77,7 @@ export default function AuthenticatedLayout({
           </header>
         )}
 
-        <div className="p-8 ">
+        <div className="">
           <div className="mx-auto max-w-7xl">{children}</div>
         </div>
       </main>

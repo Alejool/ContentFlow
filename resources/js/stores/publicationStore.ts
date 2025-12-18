@@ -9,6 +9,7 @@ interface PublicationState {
   publishedPlatforms: Record<number, number[]>;
   failedPlatforms: Record<number, number[]>;
   publishingPlatforms: Record<number, number[]>;
+  removedPlatforms: Record<number, number[]>;
 
   isLoading: boolean;
   error: string | null;
@@ -34,10 +35,12 @@ interface PublicationState {
   getPublicationById: (id: number) => Publication | undefined;
   getPublishedPlatforms: (publicationId: number) => number[];
   getFailedPlatforms: (publicationId: number) => number[];
+  getRemovedPlatforms: (publicationId: number) => number[];
   getPublishingPlatforms: (publicationId: number) => number[];
 
   setPublishedPlatforms: (publicationId: number, accountIds: number[]) => void;
   setFailedPlatforms: (publicationId: number, accountIds: number[]) => void;
+  setRemovedPlatforms: (publicationId: number, accountIds: number[]) => void;
   setPublishingPlatforms: (publicationId: number, accountIds: number[]) => void;
 
   clearError: () => void;
@@ -51,6 +54,7 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
   publishedPlatforms: {},
   failedPlatforms: {},
   publishingPlatforms: {},
+  removedPlatforms: {},
 
   isLoading: false,
   error: null,
@@ -129,6 +133,7 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
       const published = response.data.published_platforms ?? [];
       const failed = response.data.failed_platforms ?? [];
       const publishing = response.data.publishing_platforms ?? [];
+      const removed = response.data.removed_platforms ?? [];
 
       set((state) => ({
         publishedPlatforms: {
@@ -144,10 +149,16 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
           [publicationId]: publishing,
         },
       }));
+      set((state) => ({
+        removedPlatforms: {
+          ...state.removedPlatforms,
+          [publicationId]: removed,
+        },
+      }));
 
-      return { published, failed, publishing };
+      return { published, failed, publishing, removed };
     } catch {
-      return { published: [], failed: [], publishing: [] };
+      return { published: [], failed: [], publishing: [], removed: [] };
     }
   },
 

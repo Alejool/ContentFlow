@@ -2,7 +2,6 @@ import { ErrorBoundary } from "@/Components/common/ui/ErrorBoundary";
 import ThemedToaster from "@/Components/common/ui/ThemedToaster";
 import { ThemeProvider } from "@/Contexts/ThemeContext";
 import { ErrorInterceptor } from "@/Services/ErrorInterceptor";
-import { initPublicationsRealtime } from "@/Services/publicationRealtime";
 import { PageProps } from "@/types";
 import { createInertiaApp } from "@inertiajs/react";
 import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
@@ -27,13 +26,6 @@ createInertiaApp<PageProps>({
 
   setup({ el, App, props }) {
     const root = createRoot(el);
-
-    const user = props.initialPage.props.auth?.user;
-    if (user?.id && !realtimeInitialized) {
-      console.log("🚀 Init realtime for user", user.id);
-      initPublicationsRealtime(user.id);
-      realtimeInitialized = true;
-    }
 
     const userLocale = props.initialPage.props.auth?.user?.locale;
     if (userLocale) {

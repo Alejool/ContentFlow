@@ -55,9 +55,9 @@ class PublicationStatusUpdate extends Notification
         return [
             'type' => 'status_update',
             'publication_id' => $this->log->publication_id,
+            'status' => $this->statusData['status'],
             'log_id' => $this->log->id,
             'platform' => $this->log->platform,
-            'status' => $this->statusData['status'],
             'message' => trans('notifications.status_update', ['platform' => $this->log->platform], $locale),
             'description' => $this->statusData['message'] ?? 'Status update available',
             'details' => $this->statusData['details'] ?? [],

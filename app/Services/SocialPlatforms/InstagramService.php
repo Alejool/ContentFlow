@@ -24,7 +24,13 @@ class InstagramService extends BaseSocialService
     // Handle media type
     if (!empty($data['media_url'])) {
       if ($data['media_type'] === 'video') {
-        $containerData['media_type'] = 'VIDEO';
+        $instagramType = $data['platform_settings']['instagram']['type'] ?? 'reel';
+
+        if ($instagramType === 'reel') {
+          $containerData['media_type'] = 'REELS';
+        } else {
+          $containerData['media_type'] = 'VIDEO';
+        }
         $containerData['video_url'] = $data['media_url'];
       } else {
         $containerData['image_url'] = $data['media_url'];

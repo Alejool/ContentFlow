@@ -133,7 +133,7 @@ class PlatformPublishService
         'tags' => $this->extractHashtags($publication->hashtags),
         'privacy' => 'public',
         'type' => $firstMediaFile->youtube_type ?? 'regular', // Pass youtube_type from DB ('short' or 'regular')
-        'platform_settings' => $publication->platform_settings,
+        'platform_settings' => $postLog->platform_settings ?? $publication->platform_settings,
       ];
 
       // Search for Thumbnail Derivatives
@@ -173,8 +173,11 @@ class PlatformPublishService
       // Step 2: Mark as published IMMEDIATELY after upload
       $postLog = $this->logService->markAsPublished($postLog, $response);
 
+      // Verify the final status on YouTube after a few minutes (e.g., copyright, processing errors)
+      \App\Jobs\VerifyYouTubeVideoStatus::dispatch($postLog)->delay(now()->addMinutes(5));
+
       // Notify User
-      $publication->user->notify(new VideoUploadedNotification($postLog));
+      $publication->user->notify(new \App\Notifications\VideoUploadedNotification($postLog));
 
       Log::info('YouTube video uploaded successfully', [
         'video_id' => $uploadedPostId,
@@ -266,7 +269,7 @@ class PlatformPublishService
         'title' => $publication->title,
         'description' => $publication->description,
         'hashtags' => $publication->hashtags,
-        'platform_settings' => $publication->platform_settings,
+        'platform_settings' => $postLog->platform_settings ?? $publication->platform_settings,
       ];
 
 

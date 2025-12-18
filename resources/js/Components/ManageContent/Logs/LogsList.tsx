@@ -1,5 +1,6 @@
 import ExpandableText from "@/Components/ManageContent/common/ExpandableText";
 import Pagination from "@/Components/ManageContent/common/Pagination";
+import Loader from "@/Components/common/Loader";
 import { useTheme } from "@/Hooks/useTheme";
 import { SocialPostLog } from "@/types/Publication";
 import { format } from "date-fns";
@@ -8,13 +9,11 @@ import {
   CheckCircle,
   Clock,
   ExternalLink,
-  Filter,
   MessageCircle,
   RotateCcw,
 } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import Loader from "@/Components/common/Loader";
 
 interface LogsListProps {
   logs: SocialPostLog[];
@@ -145,9 +144,7 @@ export default function LogsList({
                   className="px-6 py-12 text-center space-y-6  text-gray-500"
                 >
                   <Loader />
-                  <span className="text-sm pt-8">
-                    {t("logs.loading")}
-                  </span>
+                  <span className="text-sm pt-8">{t("logs.loading")}</span>
                 </td>
               </tr>
             ) : filteredLogs.length === 0 ? (
@@ -177,6 +174,25 @@ export default function LogsList({
                       <span className="text-xs text-gray-400">
                         {log.account_name || log.social_account?.account_name}
                       </span>
+                      {log.publication?.platform_settings &&
+                        (log.publication.platform_settings as any)[log.platform]
+                          ?.type && (
+                          <span
+                            className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] uppercase font-bold border ${
+                              log.platform === "twitter"
+                                ? "bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-900/20 dark:text-sky-400 dark:border-sky-800"
+                                : log.platform === "youtube"
+                                ? "bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800"
+                                : "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800"
+                            }`}
+                          >
+                            {
+                              (log.publication.platform_settings as any)[
+                                log.platform
+                              ].type
+                            }
+                          </span>
+                        )}
                     </div>
                   </td>
                   <td className="px-6 py-4">

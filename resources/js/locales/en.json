@@ -339,6 +339,7 @@
         "publishing":"Publishing...",
         "platforms":"Platforms",
         "failed":"Failed",
+        "removed":"Removed",
         "youtube":{
           "youtubeThumbnails":"YouTube Thumbnails"
         },
@@ -358,6 +359,11 @@
           "cancel":"Cancel",
           "change":"Change"
         }
+      },
+      "preview":{
+          "title":"preview",
+          "simulated": "simulated",
+          "real": "Real"
       },
       "validation":{
         "descRequired":"Description is required",

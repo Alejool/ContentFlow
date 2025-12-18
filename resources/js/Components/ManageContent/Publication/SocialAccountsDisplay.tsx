@@ -26,7 +26,7 @@ export default function SocialAccountsDisplay({
 
   // Add logs (overwriting scheduled if same account)
   postLogs.forEach((l) => {
-    if (l.social_account_id && (l.status !== "deleted" && l.status !== "failed" ))
+    if (l.social_account_id && l.status === "published")
       combined.set(l.social_account_id, l);
   });
 

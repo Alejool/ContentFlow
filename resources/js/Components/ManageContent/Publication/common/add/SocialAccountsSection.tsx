@@ -1,12 +1,13 @@
 import DatePickerModern from "@/Components/common/Modern/DatePicker";
 import { format } from "date-fns";
-import { Check, Clock, Target, X } from "lucide-react";
+import { Check, Clock, Eye, Settings, Target, X } from "lucide-react";
 import React, { useState } from "react";
 
 interface SocialAccount {
   id: number;
   platform: string;
-  username?: string;
+  name: string;
+  account_name?: string;
 }
 
 interface SocialAccountsSectionProps {
@@ -18,6 +19,9 @@ interface SocialAccountsSectionProps {
   onAccountToggle: (accountId: number) => void;
   onScheduleChange: (accountId: number, schedule: string) => void;
   onScheduleRemove: (accountId: number) => void;
+  onPlatformSettingsClick: (platform: string) => void;
+  onPreviewClick: (platform: string) => void;
+  globalSchedule?: string;
 }
 
 const SocialAccountsSection: React.FC<SocialAccountsSectionProps> = ({
@@ -29,18 +33,21 @@ const SocialAccountsSection: React.FC<SocialAccountsSectionProps> = ({
   onAccountToggle,
   onScheduleChange,
   onScheduleRemove,
+  onPlatformSettingsClick,
+  onPreviewClick,
+  globalSchedule,
 }) => {
   const [activePopover, setActivePopover] = useState<number | null>(null);
 
   const borderColor =
     theme === "dark" ? "border-neutral-600" : "border-gray-200";
-  const modalBg = theme === "dark" ? "bg-neutral-800" : "bg-white";
 
   return (
     <div className="space-y-4">
       <label className="text-sm font-semibold mb-2 flex items-center gap-2">
         <Target className="w-4 h-4" />
-        {t("publications.modal.add.selectSocialAccounts")}
+        {t("publications.modal.add.configureNetworks") ||
+          "Configura tus redes sociales"}
       </label>
 
       <div className="grid  gap-3">
@@ -58,6 +65,7 @@ const SocialAccountsSection: React.FC<SocialAccountsSectionProps> = ({
               theme={theme}
               borderColor={borderColor}
               onToggle={() => onAccountToggle(account.id)}
+              t={t}
               onScheduleClick={() =>
                 setActivePopover(
                   activePopover === account.id ? null : account.id
@@ -65,7 +73,12 @@ const SocialAccountsSection: React.FC<SocialAccountsSectionProps> = ({
               }
               onScheduleChange={(date) => onScheduleChange(account.id, date)}
               onScheduleRemove={() => onScheduleRemove(account.id)}
+              onPlatformSettingsClick={() =>
+                onPlatformSettingsClick(account.platform)
+              }
+              onPreviewClick={() => onPreviewClick(account.platform)}
               onPopoverClose={() => setActivePopover(null)}
+              globalSchedule={globalSchedule}
             />
           );
         })}
@@ -85,7 +98,11 @@ const SocialAccountItem: React.FC<{
   onScheduleClick: () => void;
   onScheduleChange: (date: string) => void;
   onScheduleRemove: () => void;
+  onPlatformSettingsClick: () => void;
+  onPreviewClick: () => void;
   onPopoverClose: () => void;
+  t: (key: string) => string;
+  globalSchedule?: string;
 }> = ({
   account,
   isChecked,
@@ -97,40 +114,128 @@ const SocialAccountItem: React.FC<{
   onScheduleClick,
   onScheduleChange,
   onScheduleRemove,
+  onPlatformSettingsClick,
+  onPreviewClick,
   onPopoverClose,
+  t,
+  globalSchedule,
 }) => {
   const modalBg = theme === "dark" ? "bg-neutral-800" : "bg-white";
 
   return (
     <div
-      className={`relative flex items-center p-3 rounded-lg border transition-all ${
+      onClick={onToggle}
+      className={`relative flex items-center p-3 rounded-lg border transition-all cursor-pointer ${
         isChecked
-          ? `border-primary-500 bg-primary-50 dark:bg-primary-900/20`
-          : borderColor
+          ? `border-primary-500 bg-primary-50 dark:bg-primary-900/20 shadow-sm`
+          : `${borderColor} hover:bg-gray-50 dark:hover:bg-neutral-700/50`
       }`}
     >
       <div className="flex items-center gap-3 flex-1">
         <VisualCheckbox
           isChecked={isChecked}
           theme={theme}
-          onToggle={onToggle}
+          onToggle={(e) => {
+            e?.stopPropagation();
+            onToggle();
+          }}
         />
 
-        <div className="flex flex-col">
-          <span className="font-medium text-sm">{account.platform}</span>
-          {account.username && (
+        <div className="flex flex-col flex-1">
+          <div className="flex items-center gap-2">
+            <span className="font-medium text-sm">{account.platform}</span>
+            {isChecked && (
+              <span
+                className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold uppercase ${
+                  customSchedule || globalSchedule
+                    ? "bg-primary-100 text-primary-700 dark:bg-primary-900/40 dark:text-primary-300"
+                    : "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300"
+                }`}
+              >
+                {customSchedule || globalSchedule
+                  ? t("publications.status.scheduled") || "Programado"
+                  : t("publications.status.instant") || "Instantáneo"}
+              </span>
+            )}
+          </div>
+          {(account.account_name || account.name) && (
             <span className="text-xs text-gray-500 dark:text-gray-400">
-              @{account.username}
+              @{account.account_name || account.name}
             </span>
           )}
-          {customSchedule && isChecked && (
-            <span className="text-xs text-primary-600 dark:text-primary-400 flex items-center gap-1 mt-1">
-              <Clock className="w-3 h-3" />
-              {new Date(customSchedule).toLocaleString([], {
-                dateStyle: "short",
-                timeStyle: "short",
-              })}
-            </span>
+          {isChecked && (customSchedule || globalSchedule) && (
+            <div className="flex items-center gap-2 mt-1">
+              <span
+                className={`text-xs flex items-center gap-1 ${
+                  customSchedule
+                    ? "text-primary-600 dark:text-primary-400"
+                    : "text-gray-500 dark:text-gray-400"
+                }`}
+              >
+                <Clock className="w-3 h-3" />
+                {new Date(
+                  customSchedule || globalSchedule || ""
+                ).toLocaleString([], {
+                  dateStyle: "short",
+                  timeStyle: "short",
+                })}
+                {!customSchedule && globalSchedule && (
+                  <span className="text-[10px] opacity-70">(Global)</span>
+                )}
+              </span>
+              {customSchedule && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onScheduleRemove();
+                  }}
+                  className="p-1 rounded-full hover:bg-primary-100 dark:hover:bg-primary-900/40 text-primary-500 transition-colors"
+                  title={t("common.remove") || "Eliminar programación"}
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              )}
+            </div>
+          )}
+          {isChecked && (
+            <div className="flex items-center gap-1.5 pt-1">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onPreviewClick();
+                }}
+                className={`p-1.5 rounded-lg transition-all ${
+                  theme === "dark"
+                    ? "hover:bg-neutral-700 text-gray-400 hover:text-white"
+                    : "hover:bg-gray-100 text-gray-500 hover:text-primary-600"
+                }`}
+                title={
+                  t("publications.modal.preview.view") || "Ver vista previa"
+                }
+              >
+                <Eye className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onPlatformSettingsClick();
+                }}
+                className={`p-1.5 rounded-lg transition-all ${
+                  theme === "dark"
+                    ? "hover:bg-neutral-700 text-gray-400 hover:text-white"
+                    : "hover:bg-gray-100 text-gray-500 hover:text-primary-600"
+                }`}
+                title={
+                  t("publications.modal.platformSettings.configure") ||
+                  "Configurar red"
+                }
+              >
+                <Settings className="w-4 h-4" />
+              </button>
+            </div>
           )}
         </div>
       </div>
@@ -143,7 +248,10 @@ const SocialAccountItem: React.FC<{
           theme={theme}
           borderColor={borderColor}
           modalBg={modalBg}
-          onScheduleClick={onScheduleClick}
+          onScheduleClick={(e) => {
+            e.stopPropagation();
+            onScheduleClick();
+          }}
           onScheduleChange={onScheduleChange}
           onScheduleRemove={onScheduleRemove}
           onPopoverClose={onPopoverClose}
@@ -156,15 +264,20 @@ const SocialAccountItem: React.FC<{
 const VisualCheckbox: React.FC<{
   isChecked: boolean;
   theme: "dark" | "light";
-  onToggle: () => void;
+  onToggle: (e?: React.MouseEvent) => void;
 }> = ({ isChecked, theme, onToggle }) => (
   <div className="relative">
     <div
       className={`
         w-5 h-5 rounded border-2 flex items-center justify-center
-        transition-all duration-200 cursor-pointer
-        ${isChecked ? "bg-primary-500 border-primary-500" : "border-gray-300"}
-        ${theme === "dark" ? "bg-neutral-800" : "bg-white"}
+        transition-all duration-200
+        ${
+          isChecked
+            ? "bg-primary-500 border-primary-500"
+            : `border-gray-300 ${
+                theme === "dark" ? "bg-neutral-800" : "bg-white"
+              }`
+        }
       `}
       onClick={onToggle}
     >
@@ -180,7 +293,7 @@ const ScheduleButton: React.FC<{
   theme: "dark" | "light";
   borderColor: string;
   modalBg: string;
-  onScheduleClick: () => void;
+  onScheduleClick: (e: React.MouseEvent) => void;
   onScheduleChange: (date: string) => void;
   onScheduleRemove: () => void;
   onPopoverClose: () => void;
@@ -199,7 +312,7 @@ const ScheduleButton: React.FC<{
   const textSecondary = theme === "dark" ? "text-gray-400" : "text-gray-500";
 
   return (
-    <div className="ml-2 relative">
+    <div className="ml-2 relative" onClick={(e) => e.stopPropagation()}>
       <button
         type="button"
         onClick={onScheduleClick}

@@ -33,6 +33,7 @@ class SocialPostLogService
       $existingLog->status = $status;
       $existingLog->content = $content;
       $existingLog->media_urls = $mediaUrls;
+      $existingLog->platform_settings = $publication->platform_settings;
       $existingLog->error_message = null;
       $existingLog->updated_at = now();
       $existingLog->save();
@@ -57,6 +58,7 @@ class SocialPostLogService
       'media_urls' => $mediaUrls,
       'status' => $status,
       'retry_count' => 0,
+      'platform_settings' => $publication->platform_settings,
     ]);
   }
 

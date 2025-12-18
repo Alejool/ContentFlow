@@ -126,7 +126,9 @@ class PublicationController extends Controller
         'status' => $validatedData['status'] ?? 'draft',
         'publish_date' => ($validatedData['status'] ?? 'draft') === 'published' ? now() : null,
         'scheduled_at' => $validatedData['scheduled_at'] ?? null,
-        'platform_settings' => $request->has('platform_settings') ? json_decode($request->platform_settings, true) : null,
+        'platform_settings' => $request->has('platform_settings')
+          ? (is_string($request->platform_settings) ? json_decode($request->platform_settings, true) : $request->platform_settings)
+          : Auth::user()->global_platform_settings,
       ]);
 
       if ($request->has('campaign_id')) {
@@ -760,6 +762,15 @@ class PublicationController extends Controller
       }
     }
 
+    // Update platform settings if provided in the request
+    if ($request->has('platform_settings')) {
+      $settings = $request->input('platform_settings');
+      if (is_string($settings)) {
+        $settings = json_decode($settings, true);
+      }
+      $publication->update(['platform_settings' => $settings]);
+    }
+
     // Pre-initialize logs to Pending state for immediate UI feedback & uniqueness cleanup
     try {
       $publishService = app(PlatformPublishService::class);
@@ -851,10 +862,18 @@ class PublicationController extends Controller
       ->values()
       ->toArray();
 
+    $removeOfPlatforms = SocialPostLog::where('publication_id', $publication->id)
+      ->where('status', 'removed_on_platform')
+      ->pluck('social_account_id')
+      ->unique()
+      ->values()
+      ->toArray();
+
     return response()->json([
       'published_platforms' => $publishedAccountIds,
       'failed_platforms' => $failedAccountIds,
-      'publishing_platforms' => $publishingAccountIds
+      'publishing_platforms' => $publishingAccountIds,
+      'removed_platforms' => $removeOfPlatforms
     ]);
   }
 

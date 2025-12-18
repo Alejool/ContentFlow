@@ -701,25 +701,36 @@ class YouTubeService extends BaseSocialService
   {
     try {
       $this->ensureValidToken();
-      // YouTube API DELETE video
-      $this->client->delete('https://www.googleapis.com/youtube/v3/videos', [
+
+      Log::info('Attempting to delete YouTube video', ['video_id' => $postId]);
+
+      $response = $this->client->delete("https://www.googleapis.com/youtube/v3/videos", [
         'headers' => [
           'Authorization' => "Bearer {$this->accessToken}",
+          'Accept' => 'application/json',
         ],
         'query' => [
           'id' => $postId,
         ],
       ]);
 
-      // udpate status in database when change to post related to this
-      //  $post= SocialPostLog::where('platform_id', $postId)->first();
-      //  $post->status = 'deleted';
-      //  $post->save();
+      $statusCode = $response->getStatusCode();
+      Log::info('YouTube video deletion response', ['video_id' => $postId, 'status' => $statusCode]);
 
-      //   Log::info('Deleted YouTube video', ['video_id' => $postId]);
-      return true;
+      return $statusCode === 204 || $statusCode === 200;
+    } catch (ClientException $e) {
+      $responseBody = $e->getResponse()->getBody()->getContents();
+      Log::error('YouTube video deletion failed (ClientError)', [
+        'video_id' => $postId,
+        'status' => $e->getResponse()->getStatusCode(),
+        'response' => $responseBody
+      ]);
+      return false;
     } catch (\Exception $e) {
-      Log::error('Failed to delete YouTube video', ['video_id' => $postId, 'error' => $e->getMessage()]);
+      Log::error('Failed to delete YouTube video (GeneralError)', [
+        'video_id' => $postId,
+        'error' => $e->getMessage()
+      ]);
       return false;
     }
   }

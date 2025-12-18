@@ -18,6 +18,7 @@ import {
   Settings as SettingsIcon,
   Share2,
   X,
+  XCircle,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -54,6 +55,7 @@ export default function PublishPublicationModal({
     selectedPlatforms,
     publishedPlatforms,
     failedPlatforms,
+    removedPlatforms,
     publishingPlatforms,
     publishing,
     unpublishing,
@@ -95,6 +97,7 @@ export default function PublishPublicationModal({
   console.log("publishedPlatforms", publishedPlatforms);
   console.log("failedPlatforms", failedPlatforms);
   console.log("publishingPlatforms", publishingPlatforms);
+  console.log("removedPlatforms", removedPlatforms);
 
   const handleUnpublishWithConfirm = async (
     accountId: number,
@@ -288,6 +291,9 @@ export default function PublishPublicationModal({
                     const isSelected = selectedPlatforms.includes(account.id);
                     const isPublished = publishedPlatforms.includes(account.id);
                     const isFailed = failedPlatforms.includes(account.id);
+                    const isRemovedPlatform = removedPlatforms.includes(
+                      account.id
+                    );
 
                     console.log(account);
                     console.log(publishingPlatforms);
@@ -297,7 +303,7 @@ export default function PublishPublicationModal({
                     const isUnpublishing = unpublishing === account.id;
 
                     return (
-                      <div key={account.id} className="relative">
+                      <div key={account.id} className="relative ">
                         <button
                           onClick={() =>
                             !isPublished &&
@@ -305,7 +311,7 @@ export default function PublishPublicationModal({
                             togglePlatform(account.id)
                           }
                           disabled={isPublished || isPublishing}
-                          className={`w-full flex items-center gap-3 p-4 rounded-lg border-2 transition-all ${
+                          className={`w-full flex items-center gap-3 p-4 rounded-lg border-2 transition-all pt-6 ${
                             isPublished
                               ? "border-green-500 bg-green-50 dark:bg-green-900/20 cursor-default"
                               : isPublishing
@@ -313,14 +319,16 @@ export default function PublishPublicationModal({
                               : isFailed
                               ? "border-red-500 bg-red-50 dark:bg-red-900/20 cursor-default"
                               : isSelected
-                              ? "border-primary-500 bg-primary-50 dark:bg-primary-900/20"
+                              ? "p-2 border-primary-500 bg-primary-50 dark:bg-primary-900/20 cursor-default"
+                              : isRemovedPlatform
+                              ? "border-gray-500 bg-gray-50 dark:bg-gray-900/20 cursor-default"
                               : theme === "dark"
                               ? "border-neutral-700 hover:border-neutral-600 bg-neutral-900/30"
-                              : "border-gray-200 hover:border-gray-300 bg-white"
+                              : "border-primary-200 hover:border-primary-300 bg-white"
                           }`}
                         >
                           <div
-                            className={`w-12 h-12 rounded-lg  flex items-center justify-center flex-shrink-0`}
+                            className={`w-12 h-12 rounded-lg  flex items-center justify-center flex-shrink-0 `}
                           >
                             <img src={iconSrc} alt={account.platform} />
                           </div>
@@ -354,9 +362,17 @@ export default function PublishPublicationModal({
                               </span>
                             </div>
                           )}
+                          {isRemovedPlatform && (
+                            <div className="absolute top-1 left-1">
+                              <span className="flex items-center gap-1 text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-900/30 px-2 py-1 rounded-full">
+                                <XCircle className="w-3 h-3" />
+                                {t("publications.modal.publish.removed")}
+                              </span>
+                            </div>
+                          )}
 
                           {isFailed && (
-                            <div className="flex items-center gap-2">
+                            <div className="absolute top-1 left-1">
                               <span className="flex items-center gap-1 text-xs font-medium text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900/30 px-2 py-1 rounded-full">
                                 <AlertCircle className="w-3 h-3" />
                                 {t("publications.modal.publish.failed")}
