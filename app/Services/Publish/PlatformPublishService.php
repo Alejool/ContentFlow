@@ -133,6 +133,7 @@ class PlatformPublishService
         'tags' => $this->extractHashtags($publication->hashtags),
         'privacy' => 'public',
         'type' => $firstMediaFile->youtube_type ?? 'regular', // Pass youtube_type from DB ('short' or 'regular')
+        'platform_settings' => $publication->platform_settings,
       ];
 
       // Search for Thumbnail Derivatives
@@ -265,6 +266,7 @@ class PlatformPublishService
         'title' => $publication->title,
         'description' => $publication->description,
         'hashtags' => $publication->hashtags,
+        'platform_settings' => $publication->platform_settings,
       ];
 
 

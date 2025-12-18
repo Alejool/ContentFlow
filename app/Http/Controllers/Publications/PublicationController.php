@@ -108,6 +108,7 @@ class PublicationController extends Controller
       'scheduled_at' => 'nullable|date|after:now',
       'social_accounts' => 'nullable|array',
       'social_accounts.*' => 'exists:social_accounts,id',
+      'platform_settings' => 'nullable|string',
     ]);
 
     DB::beginTransaction();
@@ -125,6 +126,7 @@ class PublicationController extends Controller
         'status' => $validatedData['status'] ?? 'draft',
         'publish_date' => ($validatedData['status'] ?? 'draft') === 'published' ? now() : null,
         'scheduled_at' => $validatedData['scheduled_at'] ?? null,
+        'platform_settings' => $request->has('platform_settings') ? json_decode($request->platform_settings, true) : null,
       ]);
 
       if ($request->has('campaign_id')) {
@@ -315,6 +317,7 @@ class PublicationController extends Controller
       ],
       'social_accounts' => 'nullable|array',
       'social_accounts.*' => 'exists:social_accounts,id',
+      'platform_settings' => 'nullable|string',
     ]);
 
     DB::beginTransaction();
@@ -330,6 +333,10 @@ class PublicationController extends Controller
 
       if (array_key_exists('scheduled_at', $validatedData)) {
         $publication->scheduled_at = $validatedData['scheduled_at'];
+      }
+
+      if ($request->has('platform_settings')) {
+        $publication->platform_settings = json_decode($request->platform_settings, true);
       }
 
       if ($publication->isDirty('status') && $publication->status === 'published' && !$publication->publish_date) {

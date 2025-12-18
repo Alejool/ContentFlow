@@ -62,9 +62,56 @@ class TwitterService extends BaseSocialService
 
     $content = $data['content'] ?? $data['caption'] ?? '';
 
-    // Check length limit (280 chars) - basic check, though Twitter counts differently
+    // Handle Poll
+    $isPoll = isset($data['platform_settings']['twitter']['type']) && $data['platform_settings']['twitter']['type'] === 'poll';
+
+    if ($isPoll) {
+      $pollOptions = $data['platform_settings']['twitter']['poll_options'] ?? [];
+      $pollDuration = $data['platform_settings']['twitter']['poll_duration'] ?? 1440; // Default 24h
+
+      // Filter empty options
+      $pollOptions = array_filter($pollOptions, fn($opt) => !empty(trim($opt)));
+
+      if (count($pollOptions) >= 2) {
+        $tweetData = [
+          'text' => $content,
+          'poll' => [
+            'options' => array_values($pollOptions),
+            'duration_minutes' => (int)$pollDuration
+          ]
+        ];
+
+        // Polls cannot have media in API v2 generally (check docs, but usually mutually exclusive or limited)
+        // If media exists, we might need to ignore it or warn. For now, let's prioritizing Poll.
+        // "You cannot include media in a poll Tweet." - Twitter API docs.
+
+        try {
+          return $this->sendTweet($tweetData);
+        } catch (\Exception $e) {
+          Log::error('Twitter Poll Failed', ['error' => $e->getMessage()]);
+          throw $e;
+        }
+      }
+    }
+
+    // Handle Thread
+    $isThread = isset($data['platform_settings']['twitter']['type']) && $data['platform_settings']['twitter']['type'] === 'thread';
+
+    if ($isThread) {
+      $chunks = $this->splitText($content);
+
+      // Only treat as thread if we actually have multiple chunks
+      if (count($chunks) > 1) {
+        Log::info('Publishing Twitter Thread', ['chunks_count' => count($chunks)]);
+        return $this->publishThread($chunks, $mediaIds);
+      }
+    }
+
+    // Single Tweet Logic checks
     if (mb_strlen($content) > 280) {
-      // Optional: Truncate or warn? For now let API fail if too long or assume user handles it.
+      // If not a thread but too long, we could auto-thread or fail.
+      // For now, let's warn. If strict mode, maybe throw exception.
+      Log::warning('Tweet content exceeds 280 characters but thread mode not enabled. Twitter API may reject.', ['length' => mb_strlen($content)]);
     }
 
     $tweetData = ['text' => $content];
@@ -86,8 +133,6 @@ class TwitterService extends BaseSocialService
           return $this->sendTweet($tweetData);
         } catch (\Exception $refreshError) {
           Log::error('Retry failed after token refresh', ['error' => $refreshError->getMessage()]);
-          // Throw the original or new error? Usually the original 401 or the refresh error.
-          // Let's throw the refresh error if that failed, or the new API error if retry failed.
           throw $refreshError;
         }
       }
@@ -97,6 +142,110 @@ class TwitterService extends BaseSocialService
       Log::error('Twitter v2 Posting Error', ['error' => $e->getMessage(), 'response' => $responseBody]);
       throw new \Exception("Failed to post tweet: " . $e->getMessage() . " Details: " . $responseBody);
     }
+  }
+
+  /**
+   * Publish a thread of tweets
+   */
+  private function publishThread(array $chunks, array $mediaIds): array
+  {
+    $replyToId = null;
+    $firstPostResult = [];
+
+    foreach ($chunks as $index => $chunk) {
+      $tweetData = ['text' => $chunk];
+
+      // Attach media only to the first tweet
+      if ($index === 0 && !empty($mediaIds)) {
+        $tweetData['media'] = ['media_ids' => $mediaIds];
+      }
+
+      // If not the first tweet, reply to the previous one
+      if ($replyToId) {
+        $tweetData['reply'] = ['in_reply_to_tweet_id' => $replyToId];
+      }
+
+      try {
+        // We handle token refresh in sendTweet wrapper or here?
+        // sendTweet doesn't handle refresh internally, acts as low-level.
+        // But publishPost logic had the retry. We should duplicate retry logic or make sendTweet robust.
+        // For simplicity, let's assume valid token or let one-level retry happen if we refactored.
+        // Since we didn't refactor sendTweet to retry, let's wrap this call.
+
+        try {
+          $result = $this->sendTweet($tweetData);
+        } catch (ClientException $e) {
+          if ($e->getResponse()->getStatusCode() === 401) {
+            $this->refreshToken();
+            $result = $this->sendTweet($tweetData);
+          } else {
+            throw $e;
+          }
+        }
+
+        $replyToId = $result['post_id'];
+
+        if ($index === 0) {
+          $firstPostResult = $result;
+        }
+
+        // Add a small delay to avoid rate limits / ordering issues
+        usleep(500000); // 0.5s
+
+      } catch (\Exception $e) {
+        Log::error('Failed to publish thread segment', ['index' => $index, 'error' => $e->getMessage()]);
+        // If the first one failed, the whole thing fails.
+        // If a middle one fails, we have a partial thread.
+        throw new \Exception("Thread publication failed at segment " . ($index + 1) . ": " . $e->getMessage());
+      }
+    }
+
+    return $firstPostResult;
+  }
+
+  /**
+   * Split text into 280-char chunks (safe method)
+   */
+  private function splitText(string $text, int $maxLength = 280): array
+  {
+    $text = trim($text);
+    if (mb_strlen($text) <= $maxLength) {
+      return [$text];
+    }
+
+    $chunks = [];
+    $words = explode(' ', $text);
+    $currentChunk = '';
+
+    foreach ($words as $word) {
+      // Check if adding this word (plus space) exceeds limit
+      // +1 for space if chunk not empty
+      $space = $currentChunk === '' ? '' : ' ';
+
+      if (mb_strlen($currentChunk . $space . $word) <= $maxLength) {
+        $currentChunk .= $space . $word;
+      } else {
+        // If a single word is massive (longer than limit), force split?
+        // Twitter handles long URLs by shortening, but long plain words... rare.
+        // Let's simple push current chunk and start new.
+        if (!empty($currentChunk)) {
+          $chunks[] = $currentChunk;
+        }
+        $currentChunk = $word;
+
+        // Handle case where $word itself is > maxLength (unlikely but possible)
+        if (mb_strlen($currentChunk) > $maxLength) {
+          $chunks[] = mb_substr($currentChunk, 0, $maxLength);
+          $currentChunk = mb_substr($currentChunk, $maxLength); // Overflow to next
+        }
+      }
+    }
+
+    if (!empty($currentChunk)) {
+      $chunks[] = $currentChunk;
+    }
+
+    return $chunks;
   }
 
   /**
@@ -528,7 +677,9 @@ class TwitterService extends BaseSocialService
     if (str_starts_with($path, 'http')) {
       return $path;
     }
-    return Storage::disk('s3')->url($path);
+    /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
+    $disk = Storage::disk('s3');
+    return $disk->url($path);
   }
 
   /**

@@ -25,6 +25,12 @@ class YouTubeService extends BaseSocialService
     try {
       $videoFile = $this->downloadVideo($data['video_path']);
       $isShort = $this->determineIfShort($videoFile, $data);
+
+      // Override with platform settings if available
+      if (isset($data['platform_settings']['youtube']['type'])) {
+        $isShort = $data['platform_settings']['youtube']['type'] === 'short';
+      }
+
       $metadata = $this->buildMetadata($data, $isShort);
       $response = $this->uploadToYouTube($videoFile, $metadata);
 
@@ -705,12 +711,12 @@ class YouTubeService extends BaseSocialService
         ],
       ]);
 
-      // udpate status in database when change to post related to this   
-    //  $post= SocialPostLog::where('platform_id', $postId)->first();
-    //  $post->status = 'deleted';
-    //  $post->save();
+      // udpate status in database when change to post related to this
+      //  $post= SocialPostLog::where('platform_id', $postId)->first();
+      //  $post->status = 'deleted';
+      //  $post->save();
 
-    //   Log::info('Deleted YouTube video', ['video_id' => $postId]);
+      //   Log::info('Deleted YouTube video', ['video_id' => $postId]);
       return true;
     } catch (\Exception $e) {
       Log::error('Failed to delete YouTube video', ['video_id' => $postId, 'error' => $e->getMessage()]);

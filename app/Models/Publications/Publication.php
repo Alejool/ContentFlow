@@ -41,6 +41,7 @@ class Publication extends Model
     'hashtags',
     'description',
     'scheduled_at',
+    'platform_settings',
   ];
 
   protected $casts = [
@@ -48,6 +49,7 @@ class Publication extends Model
     'end_date' => 'date',
     'publish_date' => 'date',
     'scheduled_at' => 'datetime',
+    'platform_settings' => 'array',
   ];
 
   public function scopeDraft($query)
