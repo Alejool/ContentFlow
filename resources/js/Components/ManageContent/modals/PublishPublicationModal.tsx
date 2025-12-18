@@ -330,18 +330,18 @@ export default function PublishPublicationModal({
                               ? "cursor-pointer"
                               : "cursor-default"
                           } ${
-                            isPublished
-                              ? "border-green-500 bg-green-50 dark:bg-green-900/20"
-                              : isPublishing
+                            isPublishing
                               ? "border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20"
-                              : isFailed
-                              ? "border-red-500 bg-red-50 dark:bg-red-900/20"
-                              : isSelected
-                              ? "p-2 border-primary-500 bg-primary-50 dark:bg-primary-900/20"
+                              : isPublished
+                              ? "border-green-500 bg-green-50 dark:bg-green-900/20"
                               : isScheduled
                               ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
+                              : isFailed
+                              ? "border-red-500 bg-red-50 dark:bg-red-900/20"
                               : isRemovedPlatform
                               ? "border-gray-500 bg-gray-50 dark:bg-gray-900/20"
+                              : isSelected
+                              ? "p-2 border-primary-500 bg-primary-50 dark:bg-primary-900/20"
                               : theme === "dark"
                               ? "border-neutral-700 hover:border-neutral-600 bg-neutral-900/30"
                               : "border-primary-200 hover:border-primary-300 bg-white"
@@ -401,14 +401,17 @@ export default function PublishPublicationModal({
                             </div>
                           )}
 
-                          {isFailed && (
-                            <div className="absolute top-1 left-1">
-                              <span className="flex items-center gap-1 text-xs font-medium text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900/30 px-2 py-1 rounded-full">
-                                <AlertCircle className="w-3 h-3" />
-                                {t("publications.modal.publish.failed")}
-                              </span>
-                            </div>
-                          )}
+                          {isFailed &&
+                            !isScheduled &&
+                            !isPublished &&
+                            !isPublishing && (
+                              <div className="absolute top-1 left-1">
+                                <span className="flex items-center gap-1 text-xs font-medium text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900/30 px-2 py-1 rounded-full">
+                                  <AlertCircle className="w-3 h-3" />
+                                  {t("publications.modal.publish.failed")}
+                                </span>
+                              </div>
+                            )}
 
                           {/* Action Buttons */}
                           <div className="flex items-center gap-1 ml-auto">

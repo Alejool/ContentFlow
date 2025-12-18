@@ -360,7 +360,7 @@ class PublicationController extends Controller
       }
 
       // Sync Scheduled Posts
-      if ($request->has('social_accounts')) {
+      if ($request->has('social_accounts') || $request->has('social_accounts_sync')) {
         $currentAccountIds = $publication->scheduledPosts()->pluck('social_account_id')->toArray();
         $newAccountIds = $validatedData['social_accounts'] ?? [];
         $schedules = $request->input('social_account_schedules', []);
@@ -838,48 +838,63 @@ class PublicationController extends Controller
       return response()->json(['error' => 'Publication not found'], 404);
     }
 
-    $publishedAccountIds = SocialPostLog::where('publication_id', $publication->id)
-      ->where('status', 'published')
-      ->pluck('social_account_id')
-      ->unique()
-      ->values()
-      ->toArray();
-
-    $failedAccountIds = SocialPostLog::where('publication_id', $publication->id)
-      ->where('status', 'failed')
-      ->pluck('social_account_id')
-      ->unique()
-      ->values()
-      ->toArray();
-
-    $publishingAccountIds = SocialPostLog::where('publication_id', $publication->id)
-      ->where('status', 'publishing')
-      ->pluck('social_account_id')
-      ->unique()
-      ->values()
-      ->toArray();
-
-    $removeOfPlatforms = SocialPostLog::where('publication_id', $publication->id)
-      ->where('status', 'removed_on_platform')
-      ->pluck('social_account_id')
-      ->unique()
-      ->values()
-      ->toArray();
-
+    // 1. Get all pending future schedules
     $scheduledAccountIds = ScheduledPost::where('publication_id', $publication->id)
       ->where('status', 'pending')
       ->where('scheduled_at', '>', now())
       ->pluck('social_account_id')
       ->unique()
-      ->values()
       ->toArray();
 
+    // 2. Get all logs for this publication
+    $allLogs = SocialPostLog::where('publication_id', $publication->id)
+      ->orderBy('id', 'desc')
+      ->get()
+      ->groupBy('social_account_id');
+
+    $publishedAccountIds = [];
+    $failedAccountIds = [];
+    $publishingAccountIds = [];
+    $removedOfPlatforms = [];
+
+    // Determine latest status for each account from logs
+    foreach ($allLogs as $accountId => $logs) {
+      $latestStatus = $logs->first()->status;
+
+      // A schedule takes priority over past logs in terms of current "Pending action"
+      if (in_array($accountId, $scheduledAccountIds)) {
+        continue;
+      }
+
+      switch ($latestStatus) {
+        case 'published':
+          $publishedAccountIds[] = $accountId;
+          break;
+        case 'failed':
+          $failedAccountIds[] = $accountId;
+          break;
+        case 'publishing':
+          $publishingAccountIds[] = $accountId;
+          break;
+        case 'removed_on_platform':
+          $removedOfPlatforms[] = $accountId;
+          break;
+      }
+    }
+
+    // Ensure mutually exclusive lists by priority: Publishing > Published > Scheduled > Failed > Removed
+    $finalPublishing = array_values(array_unique($publishingAccountIds));
+    $finalPublished = array_values(array_diff(array_unique($publishedAccountIds), $finalPublishing));
+    $finalScheduled = array_values(array_diff($scheduledAccountIds, $finalPublishing, $finalPublished));
+    $finalFailed = array_values(array_diff(array_unique($failedAccountIds), $finalPublishing, $finalPublished, $finalScheduled));
+    $finalRemoved = array_values(array_diff(array_unique($removedOfPlatforms), $finalPublishing, $finalPublished, $finalScheduled, $finalFailed));
+
     return response()->json([
-      'published_platforms' => $publishedAccountIds,
-      'failed_platforms' => $failedAccountIds,
-      'publishing_platforms' => $publishingAccountIds,
-      'removed_platforms' => $removeOfPlatforms,
-      'scheduled_platforms' => $scheduledAccountIds
+      'published_platforms' => $finalPublished,
+      'failed_platforms' => $finalFailed,
+      'publishing_platforms' => $finalPublishing,
+      'removed_platforms' => $finalRemoved,
+      'scheduled_platforms' => $finalScheduled
     ]);
   }
 
