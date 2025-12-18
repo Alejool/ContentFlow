@@ -22,22 +22,29 @@
     "previous": "Previous",
     "showing": "Showing",
     "of": "of",
-     "results": "resultados",
-    "perPage": "por página",
-    "noResults": "No se encontraron resultados",
-    "search": "Buscar por nombre",
-    "noCreditCard": "No requiere tarjeta de crédito",
-    "unknown": "Desconocido",
-    "platform": "Plataforma",
-    "close": "Cerrar",
-    "created": "Creado",
-    "lastUpdated": "Última Actualización",
-    "startDate": "Fecha de Inicio",
-    "endDate": "Fecha de Fin"
+    "results": "Results",
+    "perPage": "Per page",
+    "noResults": "No results found",
+    "search": "Search by name",
+    "noCreditCard": "No credit card required",
+    "unknown": "Unknown",
+    "platform": "Platform",
+    "close": "Close",
+    "created": "Created",
+    "lastUpdated": "Last Updated",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "yes": "Yes",
+    "no": "No",
+    "configure": "Configure",
+    "noSettings": "No defaults configured",
+    "done": "Done",
+    "adjustOptions": "Adjust platform specific options"
   },
   "nav": {
     "dashboard": "Dashboard",
     "profile": "Profile",
+    "settings": "Settings",
     "manageContent": "Manage Content",
     "analytics": "Analytics",
     "aiChat": "AI Chat",
@@ -255,7 +262,72 @@
           "cancel":"Cancel"
         }
       },
-      "publish":{
+      "platformSettings": {
+        "title": "Platform Settings",
+        "subtitle": "Platform Settings",
+        "youtube": {
+          "title": "YouTube",
+          "type": "Video Type",
+          "video": "Video Normal",
+          "short": "Shorts",
+          "privacy": "Privacy",
+          "public": "Public",
+          "private": "Private",
+          "unlisted": "Unlisted",
+          "madeForKids": "Yes, it is children's content"
+        },
+        "facebook": {
+          "title": "Facebook",
+          "type": "Publication Type",
+          "feed": "Wall Publication",
+          "reel": "Reel"
+        },
+        "instagram": {
+          "title": "Instagram",
+          "type": "Publication Type",
+          "feed": "Feed Publication",
+          "reel": "Reel",
+          "story": "Story"
+        },
+        "tiktok": {
+          "title": "TikTok",
+          "privacy": "Privacy",
+          "public": "Public",
+          "friends": "Friends Only",
+          "private": "Private",
+          "interactions": "Interactions",
+          "comments": "Comments",
+          "duets": "Duet",
+          "stitchs": "Stitch"
+        },
+        "twitter": {
+          "title": "Twitter (X)",
+          "type": "Post Type",
+          "tweet": "Standard Tweet",
+          "thread": "Thread (Split text)",
+          "poll": "Poll",
+          "pollOptions": "Poll Options",
+          "optionPlaceholder": "Option {{index}}",
+          "optional": "(Optional)",
+          "pollDuration": "Duration (Minutes)",
+          "30m": "30 Minutes",
+          "1h": "1 Hour",
+          "24h": "24 Hours",
+          "3d": "3 Days",
+          "7d": "7 Days",
+          "subtitle": "Adjust platform-specific options"
+        },
+        "labels": {
+          "type": "Post Type",
+          "privacy": "Privacy",
+          "made_for_kids": "Made for Kids",
+          "disable_comment": "Disable Comments",
+          "disable_duet": "Disable Duet",
+          "disable_stitch": "Disable Stitch",
+          "poll_duration": "Poll Duration"
+        }
+      },
+      "publish": {
         "title":"Publish",
         "selectPlatforms":"Select Platforms",
         "selectAll":"Select All",
@@ -313,6 +385,16 @@
         "hashtagMax":"Hashtag must be at least 10 characters long"
       }
     },
+
+     "status":{
+      "draft":"Draft",
+      "published":"Published",
+      "scheduled":"Scheduled",
+      "failed":"Failed",
+      "instant":"Instant",
+      "deleted":"Deleted"
+    },
+
     "button":{
       "add":"Add Publication",
       "edit":"Edit Publication",
@@ -1052,5 +1134,14 @@
    "pagination": {
     "next": "Next",
     "previous": "Previous"
+  },
+  "settings": {
+    "social": {
+      "title": "Global Social Media Settings",
+      "subtitle": "Configure default settings that will be applied to all your new publications across different platforms.",
+      "save": "Save Global Configuration",
+      "success": "Global settings saved successfully",
+      "error": "Failed to save global settings"
+    }
   }
 }

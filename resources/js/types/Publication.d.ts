@@ -14,6 +14,7 @@ export type Publication = {
   scheduled_posts?: ScheduledPost[];
   social_post_logs?: SocialPostLog[];
   campaigns?: Array<{ id: number; name: string; title?: string }>;
+  platform_settings?: Record<string, any>;
 };
 
 export type ScheduledPost = {

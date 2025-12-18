@@ -15,6 +15,7 @@ import {
   FileText,
   Home,
   LogOut,
+  Settings,
   User,
 } from "lucide-react";
 import { useState } from "react";
@@ -51,6 +52,11 @@ const navigationItems = [
     href: "ai-chat.index",
     icon: Bot,
   },
+  {
+    nameKey: "nav.settings",
+    href: "settings.social",
+    icon: Settings,
+  },
 ];
 
 export default function Sidebar({
@@ -73,6 +79,7 @@ export default function Sidebar({
       "/ManageContent.index": ["/ManageContent"],
       "analytics.index": ["/analytics"],
       "ai-chat.index": ["/ai-chat"],
+      "settings.social": ["/settings", "/settings/social"],
     };
 
     const patterns = routePatterns[routeName] || [
@@ -92,6 +99,7 @@ export default function Sidebar({
       "/ManageContent.index": "/ManageContent",
       "analytics.index": "/analytics",
       "ai-chat.index": "/ai-chat",
+      "settings.social": "/settings/social",
       logout: "/logout",
     };
 
@@ -203,13 +211,13 @@ export default function Sidebar({
                   key={item.href}
                   href={getRouteUrl(item.href)}
                   active={isActive}
-                  className={`group w-full flex items-center 
-                        px-4 py-3 text-sm 
+                  className={`group w-full flex items-center
+                        px-4 py-3 text-sm
                         ${isSidebarOpen ? "" : "justify-center"}
-                        font-medium rounded-lg transition-all duration-300 
+                        font-medium rounded-lg transition-all duration-300
                         ${classes.hoverBg}
                         ${classes.textColor}
-                        hover:shadow-lg 
+                        hover:shadow-lg
                         ${
                           isActive
                             ? `${classes.activeGradient} text-white shadow-lg hover:text-white`
@@ -228,15 +236,15 @@ export default function Sidebar({
 
                   {!isSidebarOpen && (
                     <div
-                      className={`absolute left-full ml-2 px-3 py-2 
-                        ${classes.tooltipBg} text-sm rounded-lg 
-                        opacity-0 group-hover:opacity-100 transition-opacity 
-                        duration-200 pointer-events-none whitespace-nowrap 
+                      className={`absolute left-full ml-2 px-3 py-2
+                        ${classes.tooltipBg} text-sm rounded-lg
+                        opacity-0 group-hover:opacity-100 transition-opacity
+                        duration-200 pointer-events-none whitespace-nowrap
                         z-50`}
                     >
                       {t(item.nameKey)}
                       <div
-                        className={`absolute left-0 top-1/2 transform 
+                        className={`absolute left-0 top-1/2 transform
                         -translate-y-1/2 -translate-x-1 w-2 h-2
                         ${isDark ? "bg-neutral-800" : "bg-gray-900"} rotate-45`}
                       />
@@ -274,7 +282,7 @@ export default function Sidebar({
                 {/* Botón de notificaciones */}
                 <button
                   onClick={() => setShowNotifications(true)}
-                  className={`group relative p-2.5 rounded-lg transition-all duration-300 
+                  className={`group relative p-2.5 rounded-lg transition-all duration-300
                     ${classes.hoverBg} ${classes.textColor}
                     hover:text-primary-600 hover:shadow-md
                     flex items-center justify-center`}
@@ -285,7 +293,7 @@ export default function Sidebar({
                     {unreadCount > 0 && (
                       <>
                         <span
-                          className={`absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full 
+                          className={`absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full
                             bg-red-500 text-[10px] font-bold text-white shadow-md
                             border-2 ${
                               isDark ? "border-neutral-900" : "border-beige-200"
@@ -302,10 +310,10 @@ export default function Sidebar({
                   {/* Tooltip para sidebar colapsado */}
                   {!isSidebarOpen && (
                     <div
-                      className={`absolute left-full ml-3 px-3 py-2 
-                        ${classes.tooltipBg} text-sm rounded-lg 
-                        opacity-0 group-hover:opacity-100 transition-opacity 
-                        duration-200 pointer-events-none whitespace-nowrap 
+                      className={`absolute left-full ml-3 px-3 py-2
+                        ${classes.tooltipBg} text-sm rounded-lg
+                        opacity-0 group-hover:opacity-100 transition-opacity
+                        duration-200 pointer-events-none whitespace-nowrap
                         z-50 flex items-center gap-2`}
                     >
                       {t("nav.notifications")}
@@ -315,7 +323,7 @@ export default function Sidebar({
                         </span>
                       )}
                       <div
-                        className={`absolute left-0 top-1/2 transform 
+                        className={`absolute left-0 top-1/2 transform
                           -translate-y-1/2 -translate-x-1 w-2 h-2
                           ${
                             isDark ? "bg-neutral-800" : "bg-gray-900"
@@ -334,7 +342,7 @@ export default function Sidebar({
                 href={getRouteUrl("logout")}
                 method="post"
                 as="button"
-                className={`group w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300 
+                className={`group w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300
                   ${isSidebarOpen ? "" : "justify-center"}`}
               >
                 <div className="flex items-center justify-center">
@@ -347,15 +355,15 @@ export default function Sidebar({
 
                 {!isSidebarOpen && (
                   <div
-                    className={`absolute left-full ml-2 px-3 py-2 
-                      ${classes.tooltipBg} text-sm rounded-lg 
-                      opacity-0 group-hover:opacity-100 transition-opacity 
-                      duration-200 pointer-events-none whitespace-nowrap 
+                    className={`absolute left-full ml-2 px-3 py-2
+                      ${classes.tooltipBg} text-sm rounded-lg
+                      opacity-0 group-hover:opacity-100 transition-opacity
+                      duration-200 pointer-events-none whitespace-nowrap
                       z-50`}
                   >
                     {t("nav.logout")}
                     <div
-                      className={`absolute left-0 top-1/2 transform 
+                      className={`absolute left-0 top-1/2 transform
                         -translate-y-1/2 -translate-x-1 w-2 h-2
                         ${isDark ? "bg-neutral-800" : "bg-gray-900"} rotate-45`}
                     />

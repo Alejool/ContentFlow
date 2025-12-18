@@ -4,6 +4,7 @@ export interface User {
   email: string;
   email_verified_at: string;
   locale?: string;
+  global_platform_settings?: Record<string, any>;
 }
 
 export type PageProps<

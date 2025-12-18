@@ -14,6 +14,7 @@ import {
   FileText,
   Home,
   LogOut,
+  Settings,
   User,
 } from "lucide-react";
 import { useState } from "react";
@@ -118,6 +119,7 @@ const mobileNavigationItems = [
   },
   { nameKey: "nav.analytics", href: "analytics.index", lucideIcon: BarChart3 },
   { nameKey: "nav.aiChat", href: "ai-chat.index", lucideIcon: Bot },
+  { nameKey: "nav.settings", href: "settings.social", lucideIcon: Settings },
 ];
 
 export default function MobileNavbar({
@@ -153,6 +155,7 @@ export default function MobileNavbar({
       "/ManageContent.index": ["/manageContent"],
       "analytics.index": ["/analytics"],
       "ai-chat.index": ["/ai-chat"],
+      "settings.social": ["/settings", "/settings/social"],
     };
 
     const patterns = routePatterns[routeName] || [
@@ -282,7 +285,9 @@ export default function MobileNavbar({
                       >
                         <path
                           fillRule="evenodd"
-                          d="M5.293 7.293a1 1 0 0 1 1.414 0L10 10.586l3.293-3.293a1 1 0 1 1 1.414 1.414l-4 4a1 1 0 0 1-1.414 0l-4-4a1 1 0 0 1 0-1.414" clipRule="evenodd"/>
+                          d="M5.293 7.293a1 1 0 0 1 1.414 0L10 10.586l3.293-3.293a1 1 0 1 1 1.414 1.414l-4 4a1 1 0 0 1-1.414 0l-4-4a1 1 0 0 1 0-1.414"
+                          clipRule="evenodd"
+                        />
                       </svg>
                     </div>
                   </button>

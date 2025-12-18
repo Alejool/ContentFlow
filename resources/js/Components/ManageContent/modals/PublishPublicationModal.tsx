@@ -3,14 +3,23 @@ import IconInstagram from "@/../assets/Icons/instagram.svg";
 import IconTiktok from "@/../assets/Icons/tiktok.svg";
 import IconTwitter from "@/../assets/Icons/x.svg";
 import IconYoutube from "@/../assets/Icons/youtube.svg";
+import PlatformPreviewModal from "@/Components/ManageContent/modals/common/PlatformPreviewModal";
+import PlatformSettingsModal from "@/Components/ManageContent/modals/common/PlatformSettingsModal";
 import YouTubeThumbnailUploader from "@/Components/common/ui/YouTubeThumbnailUploader";
 import { usePublishPublication } from "@/Hooks/publication/usePublishPublication";
 import { useConfirm } from "@/Hooks/useConfirm";
 import { useTheme } from "@/Hooks/useTheme";
 import { Publication } from "@/types/Publication";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
-import { AlertCircle, CheckCircle, Share2, X } from "lucide-react";
-import { useEffect } from "react";
+import {
+  AlertCircle,
+  CheckCircle,
+  Eye,
+  Settings as SettingsIcon,
+  Share2,
+  X,
+} from "lucide-react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 interface PublishPublicationModalProps {
@@ -29,6 +38,16 @@ export default function PublishPublicationModal({
   const { theme } = useTheme();
   const { confirm, ConfirmDialog } = useConfirm();
   const { t } = useTranslation();
+
+  const [activePlatformSettings, setActivePlatformSettings] = useState<
+    string | null
+  >(null);
+  const [activePlatformPreview, setActivePlatformPreview] = useState<
+    string | null
+  >(null);
+  const [platformSettings, setPlatformSettings] = useState<Record<string, any>>(
+    {}
+  );
 
   const {
     connectedAccounts,
@@ -58,6 +77,13 @@ export default function PublishPublicationModal({
     if (isOpen && publication) {
       fetchPublishedPlatforms(publication.id);
       loadExistingThumbnails(publication);
+
+      // Load platform settings from publication
+      if (publication.platform_settings) {
+        setPlatformSettings(publication.platform_settings);
+      } else {
+        setPlatformSettings({});
+      }
     }
 
     if (!isOpen) {
@@ -104,7 +130,7 @@ export default function PublishPublicationModal({
   const handlePublishWithNotifications = async () => {
     if (!publication) return;
 
-    const success = await handlePublish(publication);
+    const success = await handlePublish(publication, platformSettings);
     if (success) {
       if (onSuccess) onSuccess();
       onClose(publication.id);
@@ -338,7 +364,37 @@ export default function PublishPublicationModal({
                             </div>
                           )}
                           {isSelected && !isPublished && !isPublishing && (
-                            <CheckCircle className="w-5 h-5 text-primary-500" />
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setActivePlatformPreview(account.platform);
+                                }}
+                                className={`p-1.5 rounded-lg transition-all ${
+                                  theme === "dark"
+                                    ? "hover:bg-neutral-700 text-gray-400"
+                                    : "hover:bg-gray-100 text-gray-500"
+                                }`}
+                              >
+                                <Eye className="w-4 h-4" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setActivePlatformSettings(account.platform);
+                                }}
+                                className={`p-1.5 rounded-lg transition-all ${
+                                  theme === "dark"
+                                    ? "hover:bg-neutral-700 text-gray-400"
+                                    : "hover:bg-gray-100 text-gray-500"
+                                }`}
+                              >
+                                <SettingsIcon className="w-4 h-4" />
+                              </button>
+                              <CheckCircle className="w-5 h-5 text-primary-500" />
+                            </div>
                           )}
                         </button>
 
@@ -440,8 +496,9 @@ export default function PublishPublicationModal({
               </div>
             )}
 
-            <div className="flex gap-3">
+            <div className="flex gap-3 mt-8">
               <button
+                type="button"
                 onClick={() => onClose(publication.id)}
                 className={`flex-1 px-4 py-3 rounded-lg font-medium transition-colors ${
                   theme === "dark"
@@ -452,9 +509,10 @@ export default function PublishPublicationModal({
                 {t("publications.modal.publish.button.cancel")}
               </button>
               <button
+                type="button"
                 onClick={handlePublishWithNotifications}
                 disabled={publishing || selectedPlatforms.length === 0}
-                className="flex-1 px-4 py-3 rounded-lg font-medium bg-gradient-to-r from-primary-500 to-pink-500 hover:from-primary-600 hover:to-pink-600 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="flex-[2] px-4 py-3 rounded-lg font-medium bg-gradient-to-r from-primary-500 to-pink-500 hover:from-primary-600 hover:to-pink-600 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {publishing || publication.status === "publishing" ? (
                   <>
@@ -471,6 +529,36 @@ export default function PublishPublicationModal({
                 )}
               </button>
             </div>
+
+            <PlatformSettingsModal
+              isOpen={!!activePlatformSettings}
+              onClose={() => setActivePlatformSettings(null)}
+              platform={activePlatformSettings || ""}
+              settings={
+                platformSettings[activePlatformSettings?.toLowerCase() || ""] ||
+                {}
+              }
+              onSettingsChange={(newSettings) => {
+                if (activePlatformSettings) {
+                  setPlatformSettings((prev) => ({
+                    ...prev,
+                    [activePlatformSettings.toLowerCase()]: newSettings,
+                  }));
+                }
+              }}
+            />
+
+            <PlatformPreviewModal
+              isOpen={!!activePlatformPreview}
+              onClose={() => setActivePlatformPreview(null)}
+              platform={activePlatformPreview || ""}
+              publication={publication}
+              settings={
+                platformSettings[activePlatformPreview?.toLowerCase() || ""] ||
+                {}
+              }
+              theme={theme}
+            />
           </DialogPanel>
         </div>
       </Dialog>

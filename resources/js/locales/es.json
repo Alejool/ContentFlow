@@ -24,6 +24,9 @@
     "perPage": "por página",
     "noResults": "No se encontraron resultados",
     "search": "Buscar por nombre",
+    "preview": "Vista Previa",
+    "settings": "Configuración",
+    "done": "Listo",
     "processing": "Procesando...",
     "noCreditCard": "No requiere tarjeta de crédito",
     "unknown": "Desconocido",
@@ -35,11 +38,17 @@
     "endDate": "Fecha de Fin",
     "filters": {
       "all": "Todos"
-    }
+    },
+    "yes": "Sí",
+    "no": "No",
+    "configure": "Configurar",
+    "noSettings": "Sin ajustes por defecto",
+    "adjustOptions": "Ajustar opciones específicas"
   },
   "nav": {
     "dashboard": "Panel",
     "profile": "Perfil",
+    "settings": "Configuración",
     "manageContent": "Gestionar Contenido",
     "analytics": "Analíticas",
     "aiChat": "Chat IA",
@@ -173,6 +182,7 @@
         "title": "Agregar Publicación",
         "titleField": "Título",
         "subtitle": "Crear una publicación",
+        "configureNetworks": "Configura tus redes sociales",
         "name": "Nombre",
         "description": "Descripción",
         "image": "Imagen",
@@ -209,7 +219,71 @@
           "save":"Guardar",
           "cancel":"Cancelar"
         }
-
+      },
+      "platformSettings": {
+        "title": "Configuraciones por Plataforma",
+        "subtitle": "Configuraciones por Plataforma",
+        "youtube": {
+          "title": "YouTube",
+          "type": "Tipo de Video",
+          "video": "Video Normal",
+          "short": "Shorts",
+          "privacy": "Privacidad",
+          "public": "Público",
+          "private": "Privado",
+          "unlisted": "Oculto",
+          "madeForKids": "SÍ, es contenido para niños"
+        },
+        "facebook": {
+          "title": "Facebook",
+          "type": "Tipo de Publicación",
+          "feed": "Publicación del Muro",
+          "reel": "Reel"
+        },
+        "instagram": {
+          "title": "Instagram",
+          "type": "Tipo de Publicación",
+          "feed": "Publicación del Feed",
+          "reel": "Reel",
+          "story": "Historia"
+        },
+        "tiktok": {
+          "title": "TikTok",
+          "privacy": "Privacidad",
+          "public": "Público",
+          "friends": "Solo Amigos",
+          "private": "Privado",
+          "interactions": "Interacciones",
+          "comments": "Comentarios",
+          "duets": "Dúo",
+          "stitchs": "Pegar"
+        },
+        "twitter": {
+          "title": "Twitter (X)",
+          "type": "Tipo de Post",
+          "tweet": "Tweet Estándar",
+          "thread": "Hilo (Dividir texto)",
+          "poll": "Encuesta",
+          "pollOptions": "Opciones de Encuesta",
+          "optionPlaceholder": "Opción {{index}}",
+          "optional": "(Opcional)",
+          "pollDuration": "Duración (Minutos)",
+          "30m": "30 Minutos",
+          "1h": "1 Hora",
+          "24h": "24 Horas",
+          "3d": "3 Días",
+          "7d": "7 Días",
+          "subtitle": "Ajustar opciones específicas de la plataforma"
+        },
+        "labels": {
+          "type": "Tipo de Publicación",
+          "privacy": "Privacidad",
+          "made_for_kids": "Contenido para Niños",
+          "disable_comment": "Desactivar Comentarios",
+          "disable_duet": "Desactivar Dúos",
+          "disable_stitch": "Desactivar Pegar",
+          "poll_duration": "Duración de Encuesta"
+        }
       },
       "edit": {
         "title": "Editar Publicación",
@@ -284,7 +358,8 @@
         "button":{
           "publish":"Publicar",
           "cancel":"Cancelar",
-          "change":"Cambiar"
+          "change":"Cambiar",
+          "preview": "Vista Previa"
         }
       },
 
@@ -317,6 +392,25 @@
         "hashtagValid":"Hashtag debe tener al menos 10 caracteres",
         "hashtagMax":"Hashtag debe tener menos de 10 caracteres"
       }
+    },
+    "status":{
+      "draft":"Borrador",
+      "published":"Publicado",
+      "scheduled":"Programado",
+      "failed":"Fallido",
+      "instant":"Instantáneo",
+      "deleted":"Eliminado"
+    },
+    "platformSettings":{
+
+      "title":"Configuración de Plataforma",
+      "subtitle":"Configuración de Plataforma",
+      "account":"Cuenta",
+      "accountDescription":"Cuenta",
+      "schedule":"Programación",
+      "scheduleDescription":"Programación",
+      "settings":"Configuración",
+      "settingsDescription":"Configuración"
     },
     "button": {
       "add": "Agregar publicación",
@@ -1058,5 +1152,14 @@
   "pagination": {
     "next": "Siguiente",
     "previous": "Anterior"
+  },
+  "settings": {
+    "social": {
+      "title": "Configuración Global de Redes Sociales",
+      "subtitle": "Configura los ajustes por defecto que se aplicarán a todas tus nuevas publicaciones en las diferentes plataformas.",
+      "save": "Guardar Configuración Global",
+      "success": "Configuración global guardada exitosamente",
+      "error": "Error al guardar la configuración global"
+    }
   }
 }

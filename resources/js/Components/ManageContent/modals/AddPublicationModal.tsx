@@ -2,24 +2,28 @@ import AddMoreButton from "@/Components/ManageContent/Publication/common/add/Add
 import ImagePreviewItem from "@/Components/ManageContent/Publication/common/add/ImagePreviewItem";
 import SocialAccountsSection from "@/Components/ManageContent/Publication/common/add/SocialAccountsSection";
 import VideoPreviewItem from "@/Components/ManageContent/Publication/common/add/VideoPreviewItem";
+import ModalFooter from "@/Components/ManageContent/modals/common/ModalFooter";
 import ModalHeader from "@/Components/ManageContent/modals/common/ModalHeader";
+import PlatformPreviewModal from "@/Components/ManageContent/modals/common/PlatformPreviewModal";
+import PlatformSettingsModal from "@/Components/ManageContent/modals/common/PlatformSettingsModal";
 import ScheduleSection from "@/Components/ManageContent/modals/common/ScheduleSection";
 import Input from "@/Components/common/Modern/Input";
 import Select from "@/Components/common/Modern/Select";
 import Textarea from "@/Components/common/Modern/Textarea";
+import { useCampaigns } from "@/Hooks/campaign/useCampaigns";
 import { useTheme } from "@/Hooks/useTheme";
 import { publicationSchema } from "@/schemas/publication";
 import { usePublicationStore } from "@/stores/publicationStore";
 import { useAccountsStore } from "@/stores/socialAccountsStore";
+import { PageProps } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FileText, Hash, Target, Upload } from "lucide-react";
+import { usePage } from "@inertiajs/react";
+import axios from "axios";
+import { AlertTriangle, FileText, Hash, Target, Upload } from "lucide-react";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
-import { useCampaigns } from "@/Hooks/campaign/useCampaigns";
-import ModalFooter from "@/Components/ManageContent/modals/common/ModalFooter";
-import { AlertTriangle } from "lucide-react";
 
 interface AddPublicationModalProps {
   isOpen: boolean;
@@ -59,6 +63,21 @@ export default function AddPublicationModal({
   const { accounts: socialAccounts, fetchAccounts: fetchSocialAccounts } =
     useAccountsStore();
   const { campaigns } = useCampaigns();
+
+  const { props } = usePage<PageProps>();
+  const user = props.auth.user;
+  const [platformSettings, setPlatformSettings] = useState<Record<string, any>>(
+    user?.global_platform_settings || {}
+  );
+  const [activePlatformSettings, setActivePlatformSettings] = useState<
+    string | null
+  >(null);
+  const [activePlatformPreview, setActivePlatformPreview] = useState<
+    string | null
+  >(null);
+  useEffect(() => {
+    if (!isOpen) setPlatformSettings(user?.global_platform_settings || {});
+  }, [isOpen, user?.global_platform_settings]);
 
   const [mediaFiles, setMediaFiles] = useState<File[]>([]);
   const [mediaPreviews, setMediaPreviews] = useState<string[]>([]);
@@ -108,20 +127,6 @@ export default function AddPublicationModal({
   }, [isOpen]);
 
   const modalBg = theme === "dark" ? "bg-neutral-800" : "bg-white";
-  const modalFooterBg =
-    theme === "dark"
-      ? "bg-neutral-900/50 border-neutral-700"
-      : "bg-gray-50 border-gray-100";
-  const borderColor =
-    theme === "dark" ? "border-neutral-600" : "border-gray-200";
-  const cancelButton =
-    theme === "dark"
-      ? "text-gray-300 hover:bg-neutral-700"
-      : "text-gray-700 hover:bg-gray-200";
-  const submitButton =
-    theme === "dark"
-      ? "bg-gradient-to-r from-primary-600 to-primary-800 hover:shadow-primary-500/20"
-      : "bg-gradient-to-r from-primary-600 to-primary-700 hover:shadow-primary-200";
 
   const getVideoDuration = (file: File): Promise<number> => {
     return new Promise((resolve, reject) => {
@@ -175,13 +180,31 @@ export default function AddPublicationModal({
         try {
           const duration = await getVideoDuration(file);
           const index = currentLength + i;
+          const youtubeType = duration <= 60 ? "short" : "video";
+
           setVideoMetadata((prev) => ({
             ...prev,
             [index]: {
               duration,
-              youtubeType: duration <= 60 ? "short" : "video",
+              youtubeType,
             },
           }));
+
+          // Auto-sync with platform settings if not already explicitly set by user
+          setPlatformSettings((prev) => {
+            const updated = { ...prev };
+
+            // YouTube sync
+            if (!updated.youtube) updated.youtube = {};
+            // Only override if it's the first video or if we want to be proactive
+            updated.youtube.type = youtubeType;
+
+            // Instagram sync - Default to Reels for videos if no global default
+            if (!updated.instagram) updated.instagram = {};
+            if (!updated.instagram.type) updated.instagram.type = "reel";
+
+            return updated;
+          });
         } catch (err) {
           console.error("Failed to get video duration:", err);
         }
@@ -251,10 +274,6 @@ export default function AddPublicationModal({
     setValue("hashtags", formatted, { shouldValidate: true });
   };
 
-  const toggleSchedulePopover = (accountId: number) => {
-    setActivePopover(activePopover === accountId ? null : accountId);
-  };
-
   const handleAccountToggle = (accountId: number) => {
     const current = watched.social_accounts || [];
     const id = Number(accountId);
@@ -317,9 +336,7 @@ export default function AddPublicationModal({
         }
       });
 
-      if (data.scheduled_at) {
-        formData.append("scheduled_at", data.scheduled_at);
-      }
+      formData.append("scheduled_at", data.scheduled_at || "");
 
       if (data.social_accounts && data.social_accounts.length > 0) {
         data.social_accounts.forEach((id: number, index: number) => {
@@ -335,6 +352,10 @@ export default function AddPublicationModal({
 
       if (data.campaign_id) {
         formData.append("campaign_id", data.campaign_id);
+      }
+
+      if (Object.keys(platformSettings).length > 0) {
+        formData.append("platform_settings", JSON.stringify(platformSettings));
       }
 
       const response = await axios.post("/publications", formData);
@@ -519,25 +540,30 @@ export default function AddPublicationModal({
                   )}
                 </div>
 
+                <SocialAccountsSection
+                  socialAccounts={socialAccounts}
+                  selectedAccounts={watched.social_accounts || []}
+                  accountSchedules={accountSchedules}
+                  theme={theme}
+                  t={t}
+                  onAccountToggle={handleAccountToggle}
+                  onScheduleChange={handleScheduleChange}
+                  onScheduleRemove={handleScheduleRemove}
+                  onPlatformSettingsClick={(platform) =>
+                    setActivePlatformSettings(platform)
+                  }
+                  onPreviewClick={(platform) =>
+                    setActivePlatformPreview(platform)
+                  }
+                  globalSchedule={watched.scheduled_at}
+                />
+
                 <ScheduleSection
                   scheduledAt={watched.scheduled_at}
                   theme={theme}
                   t={t}
                   onScheduleChange={(date) => setValue("scheduled_at", date)}
                 />
-
-                {watched.scheduled_at && (
-                  <SocialAccountsSection
-                    socialAccounts={socialAccounts}
-                    selectedAccounts={watched.social_accounts || []}
-                    accountSchedules={accountSchedules}
-                    theme={theme}
-                    t={t}
-                    onAccountToggle={handleAccountToggle}
-                    onScheduleChange={handleScheduleChange}
-                    onScheduleRemove={handleScheduleRemove}
-                  />
-                )}
               </div>
 
               <div className="space-y-6">
@@ -650,6 +676,40 @@ export default function AddPublicationModal({
             />
           </form>
         </main>
+
+        <PlatformSettingsModal
+          isOpen={!!activePlatformSettings}
+          onClose={() => setActivePlatformSettings(null)}
+          platform={activePlatformSettings || ""}
+          settings={
+            platformSettings[activePlatformSettings?.toLowerCase() || ""] || {}
+          }
+          onSettingsChange={(newSettings) => {
+            if (activePlatformSettings) {
+              setPlatformSettings((prev) => ({
+                ...prev,
+                [activePlatformSettings.toLowerCase()]: newSettings,
+              }));
+            }
+          }}
+        />
+
+        <PlatformPreviewModal
+          isOpen={!!activePlatformPreview}
+          onClose={() => setActivePlatformPreview(null)}
+          platform={activePlatformPreview || ""}
+          publication={{
+            ...watched,
+            media: mediaFiles.map((file, i) => ({
+              preview: mediaPreviews[i],
+              file_type: file.type.startsWith("video") ? "video" : "image",
+            })),
+          }}
+          settings={
+            platformSettings[activePlatformPreview?.toLowerCase() || ""] || {}
+          }
+          theme={theme}
+        />
       </div>
     </div>
   );

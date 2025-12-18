@@ -1,4 +1,6 @@
+import { PageProps } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { usePage } from "@inertiajs/react";
 import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -19,6 +21,8 @@ import ContentSection from "@/Components/ManageContent/Publication/common/edit/C
 import MediaUploadSection from "@/Components/ManageContent/Publication/common/edit/MediaUploadSection";
 import ModalFooter from "@/Components/ManageContent/modals/common/ModalFooter";
 import ModalHeader from "@/Components/ManageContent/modals/common/ModalHeader";
+import PlatformPreviewModal from "@/Components/ManageContent/modals/common/PlatformPreviewModal";
+import PlatformSettingsModal from "@/Components/ManageContent/modals/common/PlatformSettingsModal";
 import ScheduleSection from "@/Components/ManageContent/modals/common/ScheduleSection";
 import YouTubeThumbnailUploader from "@/Components/common/ui/YouTubeThumbnailUploader";
 
@@ -72,6 +76,8 @@ export default function EditPublicationModal({
   const { updatePublication } = usePublicationStore();
   const { campaigns } = useCampaignStore();
   const { accounts: socialAccounts } = useAccountsStore();
+  const { props } = usePage<PageProps>();
+  const user = props.auth.user;
 
   const [accountSchedules, setAccountSchedules] = useState<
     Record<number, string>
@@ -87,6 +93,17 @@ export default function EditPublicationModal({
     url: string;
     id: number;
   } | null>(null);
+
+  const [platformSettings, setPlatformSettings] = useState<Record<string, any>>(
+    {}
+  );
+  const [activePlatformSettings, setActivePlatformSettings] = useState<
+    string | null
+  >(null);
+  const [activePlatformPreview, setActivePlatformPreview] = useState<
+    string | null
+  >(null);
+  const [removedMediaIds, setRemovedMediaIds] = useState<number[]>([]);
 
   const schema = useMemo(() => publicationSchema(t), [t]);
 
@@ -111,10 +128,7 @@ export default function EditPublicationModal({
   });
 
   const watched = watch();
-
   const modalBg = theme === "dark" ? "bg-neutral-800" : "bg-white";
-  const borderColor =
-    theme === "dark" ? "border-neutral-600" : "border-gray-200";
 
   useEffect(() => {
     if (publication) {
@@ -147,10 +161,47 @@ export default function EditPublicationModal({
       campaign_id: pub.campaigns?.[0]?.id?.toString() || "",
     });
 
+    if (pub.platform_settings) {
+      let settings = pub.platform_settings;
+      if (typeof settings === "string") {
+        try {
+          settings = JSON.parse(settings);
+        } catch (e) {
+          settings = {};
+        }
+      }
+      setPlatformSettings(Array.isArray(settings) ? {} : settings);
+    } else {
+      setPlatformSettings(user?.global_platform_settings || {});
+    }
+
     const previews = initializeMediaPreviews(pub);
     setMediaPreviews(previews);
     setMediaFiles([]);
+    setRemovedMediaIds([]); // Reset removed media IDs on initialization
   };
+
+  const getVideoDuration = (file: File): Promise<number> => {
+    return new Promise((resolve, reject) => {
+      const video = document.createElement("video");
+      video.preload = "metadata";
+
+      video.onloadedmetadata = () => {
+        window.URL.revokeObjectURL(video.src);
+        resolve(Math.floor(video.duration));
+      };
+
+      video.onerror = () => {
+        reject(new Error("Failed to load video metadata"));
+      };
+
+      video.src = URL.createObjectURL(file);
+    });
+  };
+
+  const [videoMetadata, setVideoMetadata] = useState<
+    Record<string, { duration: number; youtubeType: "short" | "video" }>
+  >({});
 
   const initializeMediaPreviews = (pub: Publication) => {
     const previews: any[] = [];
@@ -207,7 +258,7 @@ export default function EditPublicationModal({
     return previews;
   };
 
-  const handleFileChange = (files: FileList | null) => {
+  const handleFileChange = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
 
     const newFiles = Array.from(files);
@@ -231,6 +282,38 @@ export default function EditPublicationModal({
         type: file.type,
         isNew: true,
       });
+
+      if (file.type.startsWith("video/")) {
+        try {
+          const duration = await getVideoDuration(file);
+          const youtubeType = duration <= 60 ? "short" : "video";
+
+          setVideoMetadata((prev) => ({
+            ...prev,
+            [tempId]: {
+              duration,
+              youtubeType,
+            },
+          }));
+
+          // Auto-sync with platform settings
+          setPlatformSettings((prev) => {
+            const updated = { ...prev };
+
+            // YouTube sync
+            if (!updated.youtube) updated.youtube = {};
+            updated.youtube.type = youtubeType;
+
+            // Instagram sync - Default to Reels for videos
+            if (!updated.instagram) updated.instagram = {};
+            if (!updated.instagram.type) updated.instagram.type = "reel";
+
+            return updated;
+          });
+        } catch (err) {
+          console.error("Failed to get video duration:", err);
+        }
+      }
     }
 
     if (error) {
@@ -251,6 +334,9 @@ export default function EditPublicationModal({
         if (mediaPreviews[i].isNew) newFileIndex++;
       }
       setMediaFiles((prev) => prev.filter((_, i) => i !== newFileIndex));
+    } else if (previewToRemove.id) {
+      // If it's an existing media file, add its ID to the removedMediaIds list
+      setRemovedMediaIds((prev) => [...prev, previewToRemove.id]);
     }
 
     if (thumbnails[previewToRemove.tempId]) {
@@ -353,6 +439,22 @@ export default function EditPublicationModal({
 
     mediaFiles.forEach((file, index) => {
       submitData.append(`media[${index}]`, file);
+
+      // Find the tempId for this new file to get its metadata
+      const newPreviews = mediaPreviews.filter((p) => p.isNew);
+      if (newPreviews[index]) {
+        const metadata = videoMetadata[newPreviews[index].tempId];
+        if (metadata) {
+          submitData.append(
+            `youtube_types[new_${index}]`,
+            metadata.youtubeType
+          );
+          submitData.append(
+            `durations[new_${index}]`,
+            metadata.duration.toString()
+          );
+        }
+      }
     });
 
     Object.entries(thumbnails).forEach(([tempId, file]) => {
@@ -374,7 +476,12 @@ export default function EditPublicationModal({
       submitData.append(`media_keep_ids[${index}]`, id.toString());
     });
 
-    if (data.scheduled_at) submitData.append("scheduled_at", data.scheduled_at);
+    // Add removed media IDs to the form data
+    removedMediaIds.forEach((id: number, index: number) => {
+      submitData.append(`media_remove_ids[${index}]`, id.toString());
+    });
+
+    submitData.append("scheduled_at", data.scheduled_at || "");
 
     if (data.social_accounts && data.social_accounts.length > 0) {
       data.social_accounts.forEach((id: number, index: number) => {
@@ -400,6 +507,10 @@ export default function EditPublicationModal({
       }
     }
 
+    if (Object.keys(platformSettings).length > 0) {
+      submitData.append("platform_settings", JSON.stringify(platformSettings));
+    }
+
     submitData.append("_method", "PUT");
     const response = await axios.post(`/publications/${pub.id}`, submitData);
 
@@ -412,6 +523,7 @@ export default function EditPublicationModal({
       reset();
       setMediaPreviews([]);
       setMediaFiles([]);
+      setRemovedMediaIds([]); // Clear removed media IDs after successful submission
       onClose();
     }
   };
@@ -472,25 +584,30 @@ export default function EditPublicationModal({
                   onDrop={handleDrop}
                 />
 
+                <SocialAccountsSection
+                  socialAccounts={socialAccounts}
+                  selectedAccounts={watched.social_accounts || []}
+                  accountSchedules={accountSchedules}
+                  theme={theme}
+                  t={t}
+                  onAccountToggle={handleAccountToggle}
+                  onScheduleChange={handleScheduleChange}
+                  onScheduleRemove={handleScheduleRemove}
+                  onPlatformSettingsClick={(platform) =>
+                    setActivePlatformSettings(platform)
+                  }
+                  onPreviewClick={(platform) =>
+                    setActivePlatformPreview(platform)
+                  }
+                  globalSchedule={watched.scheduled_at}
+                />
+
                 <ScheduleSection
                   scheduledAt={watched.scheduled_at}
                   theme={theme}
                   t={t}
                   onScheduleChange={(date) => setValue("scheduled_at", date)}
                 />
-
-                {watched.scheduled_at && (
-                  <SocialAccountsSection
-                    socialAccounts={socialAccounts}
-                    selectedAccounts={watched.social_accounts || []}
-                    accountSchedules={accountSchedules}
-                    theme={theme}
-                    t={t}
-                    onAccountToggle={handleAccountToggle}
-                    onScheduleChange={handleScheduleChange}
-                    onScheduleRemove={handleScheduleRemove}
-                  />
-                )}
 
                 {hasYouTubeAccount && (
                   <div className="mt-6">
@@ -507,7 +624,6 @@ export default function EditPublicationModal({
                         setExistingThumbnail(null);
                         setYoutubeThumbnail(null);
                       }}
-                      theme={theme}
                     />
                   </div>
                 )}
@@ -536,6 +652,51 @@ export default function EditPublicationModal({
             />
           </form>
         </div>
+
+        <PlatformSettingsModal
+          isOpen={!!activePlatformSettings}
+          onClose={() => setActivePlatformSettings(null)}
+          platform={activePlatformSettings || ""}
+          settings={
+            platformSettings[activePlatformSettings?.toLowerCase() || ""] || {}
+          }
+          onSettingsChange={(newSettings) => {
+            if (activePlatformSettings) {
+              setPlatformSettings((prev) => ({
+                ...prev,
+                [activePlatformSettings.toLowerCase()]: newSettings,
+              }));
+            }
+          }}
+        />
+
+        <PlatformPreviewModal
+          isOpen={!!activePlatformPreview}
+          onClose={() => setActivePlatformPreview(null)}
+          platform={activePlatformPreview || ""}
+          publication={{
+            ...publication,
+            ...watched,
+            media: mediaPreviews
+              .filter((p) => p.isNew)
+              .map((p) => ({
+                preview: p.url,
+                file_type: p.type.startsWith("video") ? "video" : "image",
+              }))
+              .concat(
+                (publication.media_files || [])
+                  .filter((m: any) => !removedMediaIds.includes(m.id))
+                  .map((m: any) => ({
+                    preview: m.file_path,
+                    file_type: m.file_type,
+                  }))
+              ),
+          }}
+          settings={
+            platformSettings[activePlatformPreview?.toLowerCase() || ""] || {}
+          }
+          theme={theme}
+        />
       </div>
     </div>
   );
