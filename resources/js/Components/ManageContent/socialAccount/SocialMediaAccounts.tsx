@@ -5,6 +5,7 @@ import IconYoutube from "@/../assets/Icons/youtube.svg";
 import DisconnectWarningModal from "@/Components/ManageContent/modals/DisconnectWarningModal";
 import { useSocialMediaAuth } from "@/Hooks/useSocialMediaAuth";
 import { useTheme } from "@/Hooks/useTheme";
+import { Link } from "@inertiajs/react";
 import axios from "axios";
 import {
   AlertCircle,
@@ -14,6 +15,7 @@ import {
   ChevronUp,
   ExternalLink,
   Loader2,
+  Settings,
   Shield,
   X,
   Zap,
@@ -316,35 +318,51 @@ export default function SocialMediaAccounts() {
                 theme === "dark" ? "text-gray-400" : "text-gray-600"
               }`}
             >
-              {connectedAccountsCount} {t("manageContent.socialMedia.of")} {accounts.length} {t("manageContent.socialMedia.accounts")}
+              {connectedAccountsCount} {t("manageContent.socialMedia.of")}{" "}
+              {accounts.length} {t("manageContent.socialMedia.accounts")}
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          {isExpanded ? (
-            <>
-              <span
-                className={`text-sm ${
-                  theme === "dark" ? "text-gray-400" : "text-gray-600"
-                }`}
-              >
-                {t("manageContent.socialMedia.hide")}
-              </span>
-              <ChevronUp className="w-5 h-5 text-gray-500" />
-            </>
-          ) : (
-            <>
-              <span
-                className={`text-sm ${
-                  theme === "dark" ? "text-gray-400" : "text-gray-600"
-                }`}
-              >
-                {t("manageContent.socialMedia.seeAccounts")}
-              </span>
-              <ChevronDown className="w-5 h-5 text-gray-500" />
-            </>
-          )}
+        <div className="flex items-center gap-4">
+          <Link
+            href={route("settings.social")}
+            onClick={(e) => e.stopPropagation()}
+            className={`p-2 rounded-lg transition-all ${
+              theme === "dark"
+                ? "bg-neutral-800 text-primary-400 hover:bg-neutral-700 hover:text-primary-300"
+                : "bg-primary-50 text-primary-600 hover:bg-primary-100 hover:text-primary-700"
+            }`}
+            title={t("publications.modal.platformSettings.title")}
+          >
+            <Settings className="w-5 h-5" />
+          </Link>
+
+          <div className="flex items-center gap-2">
+            {isExpanded ? (
+              <>
+                <span
+                  className={`text-sm ${
+                    theme === "dark" ? "text-gray-400" : "text-gray-600"
+                  }`}
+                >
+                  {t("manageContent.socialMedia.hide")}
+                </span>
+                <ChevronUp className="w-5 h-5 text-gray-500" />
+              </>
+            ) : (
+              <>
+                <span
+                  className={`text-sm ${
+                    theme === "dark" ? "text-gray-400" : "text-gray-600"
+                  }`}
+                >
+                  {t("manageContent.socialMedia.seeAccounts")}
+                </span>
+                <ChevronDown className="w-5 h-5 text-gray-500" />
+              </>
+            )}
+          </div>
         </div>
       </button>
 
@@ -592,50 +610,69 @@ export default function SocialMediaAccounts() {
                     )}
                   </div>
 
-                  <button
-                    onClick={() => handleConnectionToggle(account.id)}
-                    disabled={isLoading}
-                    className={`w-full py-3 px-4 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 
-                      transition-all duration-200 relative overflow-hidden group/btn
-                      ${
-                        isLoading
-                          ? theme === "dark"
-                            ? "bg-neutral-700/50 text-gray-400 cursor-not-allowed"
-                            : "bg-gray-100 text-gray-400 cursor-not-allowed"
-                          : account.isConnected
-                          ? theme === "dark"
-                            ? "bg-gradient-to-r from-primary-900/30 to-primary-800/30 text-primary-300 border border-primary-700/30 hover:from-primary-800/40 hover:to-primary-700/40"
-                            : "bg-gradient-to-r from-primary-50 to-primary-50 text-primary-600 border border-primary-200 hover:from-primary-50 hover:to-primary-50"
-                          : `bg-gradient-to-r ${account.gradient} text-white shadow-lg hover:shadow-xl hover:scale-[1.02]`
-                      }`}
-                  >
-                    <span className="relative z-10 flex items-center gap-2">
-                      {isLoading ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                          {t("manageContent.socialMedia.actions.processing")}
-                        </>
-                      ) : account.isConnected ? (
-                        <>
-                          <X className="w-4 h-4" />
-                          {t("manageContent.socialMedia.actions.disconnect")}
-                        </>
-                      ) : (
-                        <>
-                          <ExternalLink className="w-4 h-4" />
-                          {t("manageContent.socialMedia.actions.connect")}
-                        </>
+                  <div className="flex gap-2 w-full">
+                    <button
+                      onClick={() => handleConnectionToggle(account.id)}
+                      disabled={isLoading}
+                      className={`flex-1 py-3 px-4 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 
+                        transition-all duration-200 relative overflow-hidden group/btn
+                        ${
+                          isLoading
+                            ? theme === "dark"
+                              ? "bg-neutral-700/50 text-gray-400 cursor-not-allowed"
+                              : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                            : account.isConnected
+                            ? theme === "dark"
+                              ? "bg-gradient-to-r from-primary-900/10 to-primary-800/10 text-primary-400 border border-primary-900/30 hover:bg-primary-900/20"
+                              : "bg-gradient-to-r from-primary-50 to-primary-50 text-primary-600 border border-primary-200 hover:bg-primary-100"
+                            : `bg-gradient-to-r ${account.gradient} text-white shadow-lg hover:shadow-xl hover:scale-[1.02]`
+                        }`}
+                    >
+                      <span className="relative z-10 flex items-center gap-2">
+                        {isLoading ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            {t("manageContent.socialMedia.actions.processing")}
+                          </>
+                        ) : account.isConnected ? (
+                          <>
+                            <X className="w-4 h-4" />
+                            {t("manageContent.socialMedia.actions.disconnect")}
+                          </>
+                        ) : (
+                          <>
+                            <ExternalLink className="w-4 h-4" />
+                            {t("manageContent.socialMedia.actions.connect")}
+                          </>
+                        )}
+                      </span>
+                      {!isLoading && (
+                        <div
+                          className={`absolute inset-0 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700
+                          ${
+                            theme === "dark"
+                              ? "bg-gradient-to-r from-transparent via-white/5 to-transparent"
+                              : "bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                          }`}
+                        ></div>
                       )}
-                    </span>
-                    <div
-                      className={`absolute inset-0 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700
-                      ${
-                        theme === "dark"
-                          ? "bg-gradient-to-r from-transparent via-white/10 to-transparent"
-                          : "bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                      }`}
-                    ></div>
-                  </button>
+                    </button>
+
+                    {account.isConnected && (
+                      <Link
+                        href={route("settings.social")}
+                        className={`p-3 rounded-lg border transition-all flex items-center justify-center
+                          ${
+                            theme === "dark"
+                              ? "bg-neutral-800 border-neutral-700 text-primary-400 hover:bg-neutral-700 hover:border-neutral-600"
+                              : "bg-white border-gray-200 text-primary-600 hover:bg-gray-50 hover:border-gray-300 shadow-sm"
+                          }`}
+                        title={t("publications.modal.platformSettings.title")}
+                      >
+                        <Settings className="w-5 h-5" />
+                      </Link>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>

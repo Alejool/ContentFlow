@@ -15,7 +15,7 @@ import {
   FileText,
   Home,
   LogOut,
-  Settings,
+  Share2,
   User,
 } from "lucide-react";
 import { useState } from "react";
@@ -53,9 +53,9 @@ const navigationItems = [
     icon: Bot,
   },
   {
-    nameKey: "nav.settings",
+    nameKey: "nav.socialNetworks",
     href: "settings.social",
-    icon: Settings,
+    icon: Share2,
   },
 ];
 

@@ -16,13 +16,13 @@ import { useAccountsStore } from "@/stores/socialAccountsStore";
 import { publicationSchema } from "@/schemas/publication";
 import { Publication } from "@/types/Publication";
 // Componentes
+import PlatformSettingsModal from "@/Components/ConfigSocialMedia/PlatformSettingsModal";
 import SocialAccountsSection from "@/Components/ManageContent/Publication/common/add/SocialAccountsSection";
 import ContentSection from "@/Components/ManageContent/Publication/common/edit/ContentSection";
 import MediaUploadSection from "@/Components/ManageContent/Publication/common/edit/MediaUploadSection";
 import ModalFooter from "@/Components/ManageContent/modals/common/ModalFooter";
 import ModalHeader from "@/Components/ManageContent/modals/common/ModalHeader";
 import PlatformPreviewModal from "@/Components/ManageContent/modals/common/PlatformPreviewModal";
-import PlatformSettingsModal from "@/Components/ManageContent/modals/common/PlatformSettingsModal";
 import ScheduleSection from "@/Components/ManageContent/modals/common/ScheduleSection";
 import YouTubeThumbnailUploader from "@/Components/common/ui/YouTubeThumbnailUploader";
 import { AlertCircle } from "lucide-react";
@@ -446,6 +446,16 @@ export default function EditPublicationModal({
 
   const onFormSubmit = async (data: EditPublicationFormData) => {
     if (!publication) return;
+    if (data.social_accounts && data.social_accounts.length > 0) {
+      const hasSomeSchedule =
+        data.scheduled_at ||
+        data.social_accounts.some((id: number) => accountSchedules[id]);
+      if (!hasSomeSchedule) {
+        toast.error(t("publications.modal.validation.scheduleDateRequired"));
+        return;
+      }
+    }
+
     setIsSubmitting(true);
     try {
       await submitPublicationData(data, publication);

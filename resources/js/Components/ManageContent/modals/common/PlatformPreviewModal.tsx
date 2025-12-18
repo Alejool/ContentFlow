@@ -1,18 +1,22 @@
 import Modal from "@/Components/common/ui/Modal";
 import { format } from "date-fns";
 import {
+  AlertCircle,
   Clock,
+  ExternalLink,
   Eye,
   Facebook,
   Heart,
   Instagram,
+  Loader2,
   MessageCircle,
   MoreHorizontal,
+  Play,
   Share2,
   Twitter,
   Youtube,
 } from "lucide-react";
-import React from "react";
+import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 interface PlatformPreviewModalProps {
@@ -23,6 +27,49 @@ interface PlatformPreviewModalProps {
   settings?: Record<string, any>;
   theme: "dark" | "light";
 }
+
+const LiteYouTube: React.FC<{ videoId: string; title?: string }> = ({
+  videoId,
+  title,
+}) => {
+  const [isLoaded, setIsLoaded] = useState(false);
+  const thumbnailUrl = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+
+  if (isLoaded) {
+    return (
+      <div className="relative aspect-video w-full">
+        <iframe
+          width="100%"
+          height="100%"
+          src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
+          title={title || "YouTube video player"}
+          frameBorder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowFullScreen
+          className="absolute inset-0"
+        ></iframe>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className="relative aspect-video w-full bg-black cursor-pointer group"
+      onClick={() => setIsLoaded(true)}
+    >
+      <img
+        src={thumbnailUrl}
+        alt={title || "YouTube thumbnail"}
+        className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
+      />
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="w-16 h-12 bg-red-600 rounded-lg flex items-center justify-center group-hover:bg-red-700 transition-colors">
+          <Play className="w-8 h-8 text-white fill-white" />
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const PlatformPreviewModal: React.FC<PlatformPreviewModalProps> = ({
   isOpen,
@@ -56,13 +103,51 @@ const PlatformPreviewModal: React.FC<PlatformPreviewModalProps> = ({
     }
   };
 
+  const platformLogs = (publication.social_post_logs || []).filter(
+    (log: any) => log.platform.toLowerCase() === platform.toLowerCase()
+  );
+
+  const latestLog = [...platformLogs].sort(
+    (a: any, b: any) =>
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  )[0];
+
+  const isPublished =
+    latestLog?.status === "published" || latestLog?.status === "success";
+  const isPublishing = latestLog?.status === "publishing";
+  const isFailed = latestLog?.status === "failed";
+
+  const publishedLog = isPublished ? latestLog : null;
+
+  const getYouTubeId = (url: string) => {
+    if (!url) return null;
+    const regExp =
+      /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=|shorts\/)([^#&?]*).*/;
+    const match = url.match(regExp);
+    return match && match[2].length === 11 ? match[2] : null;
+  };
+
+  const getTwitterId = (url: string) => {
+    if (!url) return null;
+    const match = url.match(/status\/(\d+)/);
+    return match ? match[1] : null;
+  };
+
+  const postUrl = publishedLog?.post_url || publishedLog?.video_url;
+  const youTubeId =
+    platform.toLowerCase() === "youtube" ? getYouTubeId(postUrl) : null;
+  const twitterId =
+    platform.toLowerCase() === "twitter" || platform.toLowerCase() === "x"
+      ? getTwitterId(postUrl)
+      : null;
+
   const renderMedia = () => {
     const mediaFiles = publication.media || publication.media_files || [];
     if (mediaFiles.length === 0) return null;
 
     return (
       <div
-        className={`mt-3 rounded-xl overflow-hidden border ${
+        className={`mt-3 rounded-lg overflow-hidden border ${
           theme === "dark" ? "border-neutral-700" : "border-gray-200"
         }`}
       >
@@ -113,10 +198,52 @@ const PlatformPreviewModal: React.FC<PlatformPreviewModalProps> = ({
     const isThread = settings.twitter?.type === "thread";
     const isPoll = settings.twitter?.type === "poll";
 
+    if (twitterId) {
+      return (
+        <div className="space-y-4">
+          <div
+            className={`rounded-lg border border-dashed overflow-hidden ${
+              theme === "dark"
+                ? "bg-black border-primary-500/30"
+                : "bg-white border-primary-500/30"
+            }`}
+          >
+            <div className="p-2 bg-primary-500/10 flex items-center justify-between">
+              <span className="text-xs font-bold text-primary-500 flex items-center gap-1">
+                <Eye className="w-3 h-3" />{" "}
+                {t("publications.modal.preview.real")}
+              </span>
+              <a
+                href={postUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[10px] text-gray-400 hover:text-primary-500 flex items-center gap-1"
+              >
+                {t("common.viewOnPlatform")}{" "}
+                <ExternalLink className="w-3 h-3" />
+              </a>
+            </div>
+            <div
+              className={`w-full flex justify-center py-4 rounded-lg ${
+                theme === "dark" ? "bg-black" : "bg-white"
+              }`}
+            >
+              <iframe
+                frameBorder="0"
+                height="500"
+                width="100%"
+                src={`https://platform.twitter.com/embed/Tweet.html?id=${twitterId}&theme=${theme}`}
+              ></iframe>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="space-y-4">
         <div
-          className={`p-4 rounded-xl border ${
+          className={`p-4 rounded-lg border ${
             theme === "dark"
               ? "bg-black border-neutral-800"
               : "bg-white border-gray-100 shadow-sm"
@@ -160,7 +287,7 @@ const PlatformPreviewModal: React.FC<PlatformPreviewModalProps> = ({
                     .map((option: string, i: number) => (
                       <div
                         key={i}
-                        className={`p-2.5 rounded-xl border text-sm font-medium ${
+                        className={`p-2.5 rounded-lg border text-sm font-medium ${
                           theme === "dark"
                             ? "border-neutral-700 text-sky-400"
                             : "border-sky-100 text-sky-600 bg-sky-50/30"
@@ -200,7 +327,7 @@ const PlatformPreviewModal: React.FC<PlatformPreviewModalProps> = ({
   const renderInstagramPreview = () => {
     return (
       <div
-        className={`max-w-[400px] mx-auto rounded-xl border ${
+        className={`max-w-[400px] mx-auto rounded-lg border ${
           theme === "dark"
             ? "bg-black border-neutral-800"
             : "bg-white border-gray-100 shadow-sm"
@@ -279,7 +406,7 @@ const PlatformPreviewModal: React.FC<PlatformPreviewModalProps> = ({
   const renderFacebookPreview = () => {
     return (
       <div
-        className={`rounded-xl border ${
+        className={`rounded-lg border ${
           theme === "dark"
             ? "bg-[#242526] border-neutral-700"
             : "bg-white border-gray-200 shadow-sm"
@@ -358,9 +485,51 @@ const PlatformPreviewModal: React.FC<PlatformPreviewModalProps> = ({
   };
 
   const renderYouTubePreview = () => {
+    if (youTubeId) {
+      return (
+        <div
+          className={`rounded-lg border border-dashed overflow-hidden ${
+            theme === "dark"
+              ? "bg-[#0f0f0f] border-primary-500/30"
+              : "bg-white border-primary-500/30"
+          }`}
+        >
+          <div className="p-2 bg-primary-500/10 flex items-center justify-between">
+            <span className="text-xs font-bold text-primary-500 flex items-center gap-1">
+              <Eye className="w-3 h-3" /> {t("publications.modal.preview.real")}
+            </span>
+            <a
+              href={postUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[10px] text-gray-400 hover:text-primary-500 flex items-center gap-1"
+            >
+              {t("common.viewOnPlatform")} <ExternalLink className="w-3 h-3" />
+            </a>
+          </div>
+          <LiteYouTube videoId={youTubeId} title={publication.title} />
+          <div className="p-3 flex gap-3">
+            <div className="w-9 h-9 rounded-full bg-gray-200 flex-shrink-0" />
+            <div className="flex-1 space-y-1">
+              <h3
+                className={`font-bold line-clamp-2 leading-tight ${
+                  theme === "dark" ? "text-white" : "text-gray-900"
+                }`}
+              >
+                {publication.title}
+              </h3>
+              <div className="text-xs text-gray-500">
+                Channel Name · 0 views · Just now
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div
-        className={`rounded-xl border overflow-hidden ${
+        className={`rounded-lg border overflow-hidden ${
           theme === "dark"
             ? "bg-[#0f0f0f] border-neutral-800"
             : "bg-white border-gray-100 shadow-sm"
@@ -389,7 +558,7 @@ const PlatformPreviewModal: React.FC<PlatformPreviewModalProps> = ({
 
   const renderTikTokPreview = () => {
     return (
-      <div className="max-w-[300px] mx-auto aspect-[9/16] bg-black rounded-3xl overflow-hidden relative border-4 border-neutral-800 shadow-2xl">
+      <div className="max-w-[300px] mx-auto aspect-[9/16] bg-black rounded-lg overflow-hidden relative border-4 border-neutral-800 shadow-2xl">
         <div className="absolute inset-0 flex items-center justify-center">
           {renderMedia()}
         </div>
@@ -434,6 +603,48 @@ const PlatformPreviewModal: React.FC<PlatformPreviewModalProps> = ({
   };
 
   const renderContent = () => {
+    if (isPublishing) {
+      return (
+        <div className="flex flex-col items-center justify-center p-12 space-y-4">
+          <Loader2 className="w-12 h-12 text-primary-500 animate-spin" />
+          <p className="text-lg font-medium text-gray-400 uppercase tracking-wider">
+            {t("common.processing")}
+          </p>
+          <p className="text-sm text-gray-400 text-center">
+            Your post is being uploaded to {platform}. <br /> This may take a
+            few minutes.
+          </p>
+        </div>
+      );
+    }
+
+    if (isFailed) {
+      return (
+        <div
+          className={`p-6 rounded-lg border-2 border-red-500/20 bg-red-500/5 ${
+            theme === "dark" ? "bg-red-900/10" : ""
+          }`}
+        >
+          <div className="flex items-center gap-3 mb-4 text-red-500">
+            <AlertCircle className="w-6 h-6" />
+            <h3 className="font-bold text-lg">Publication Failed</h3>
+          </div>
+          <div
+            className={`p-4 rounded-lg bg-black/5 dark:bg-black/40 font-mono text-xs break-words whitespace-pre-wrap ${
+              theme === "dark" ? "text-red-400" : "text-red-600"
+            }`}
+          >
+            {latestLog?.error_message ||
+              "Unknown error occurred during publication."}
+          </div>
+          <p className="mt-4 text-[10px] text-gray-500 italic">
+            {latestLog?.created_at &&
+              format(new Date(latestLog.created_at), "PPP p")}
+          </p>
+        </div>
+      );
+    }
+
     switch (platform.toLowerCase()) {
       case "facebook":
         return renderFacebookPreview();
@@ -456,40 +667,56 @@ const PlatformPreviewModal: React.FC<PlatformPreviewModalProps> = ({
   };
 
   return (
-    <Modal
-      show={isOpen}
-      onClose={onClose}
-      maxWidth="lg"
-      title={`${t("publications.modal.preview.title")}: ${platform}`}
-    >
-      <div className="p-1">
-        <div
-          className={`mb-6 p-4 rounded-xl flex items-center gap-3 ${
-            theme === "dark" ? "bg-neutral-900/50" : "bg-gray-50"
-          }`}
-        >
-          <div
-            className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-              theme === "dark" ? "bg-neutral-800" : "bg-white shadow-sm"
+    <Modal show={isOpen} onClose={onClose} maxWidth="lg">
+      <div className="p-6">
+        <div className="custom-scrollbar max-h-[85vh] overflow-y-auto px-1 pb-4 pr-2">
+          <h2
+            className={`text-xl font-bold mb-4 ${
+              theme === "dark" ? "text-white" : "text-gray-900"
             }`}
           >
-            {getPlatformIcon()}
-          </div>
-          <div>
+            {`${t("publications.modal.preview.title")}: ${platform}`}
+          </h2>
+          <div
+            className={`mb-6 p-4 rounded-lg flex items-center gap-3 ${
+              theme === "dark" ? "bg-neutral-900/50" : "bg-gray-50"
+            }`}
+          >
             <div
-              className={`font-bold capitalize ${
-                theme === "dark" ? "text-white" : "text-gray-900"
+              className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                theme === "dark" ? "bg-neutral-800" : "bg-white shadow-sm"
               }`}
             >
-              {platform}
+              {getPlatformIcon()}
             </div>
-            <div className="text-xs text-gray-500">
-              {t("publications.modal.preview.simulated")}
+            <div>
+              <div
+                className={`font-bold capitalize ${
+                  theme === "dark" ? "text-white" : "text-gray-900"
+                }`}
+              >
+                {platform}
+              </div>
+              <div className="text-xs text-gray-500">
+                {publishedLog
+                  ? t("publications.modal.preview.realInfo")
+                  : t("publications.modal.preview.simulated")}
+              </div>
             </div>
+            {publishedLog && (
+              <div className="ml-auto">
+                <a
+                  href={postUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary-500 text-white text-xs font-bold hover:bg-primary-600 transition-colors shadow-lg shadow-primary-500/20"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  {t("common.viewOnPlatform")}
+                </a>
+              </div>
+            )}
           </div>
-        </div>
-
-        <div className="custom-scrollbar max-h-[60vh] overflow-y-auto px-1 pb-4">
           {renderContent()}
         </div>
 

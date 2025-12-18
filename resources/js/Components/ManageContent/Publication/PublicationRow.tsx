@@ -2,7 +2,7 @@ import CampaignTags from "@/Components/ManageContent/Publication/CampaignTags";
 import PublicationThumbnail from "@/Components/ManageContent/Publication/PublicationThumbnail";
 import SocialAccountsDisplay from "@/Components/ManageContent/Publication/SocialAccountsDisplay";
 import { Publication } from "@/types/Publication";
-import { Edit, Image, Rocket, Trash2, Video } from "lucide-react";
+import { Edit, Eye, Image, Rocket, Trash2, Video } from "lucide-react";
 
 interface PublicationRowProps {
   item: Publication;
@@ -166,10 +166,19 @@ export default function PublicationRow({
       </td>
       <td className="px-6 py-4 text-right">
         <div className="flex items-center justify-end gap-2">
+          {item.status === "published" && (
+            <button
+              onClick={() => onPublish(item)}
+              className="p-2 text-primary-500 hover:bg-primary-50 rounded-lg dark:hover:bg-primary-900/20"
+              title="View Real Status / Preview"
+            >
+              <Eye className="w-4 h-4" />
+            </button>
+          )}
           <button
             onClick={() => onPublish(item)}
             className="p-2 text-green-500 hover:bg-green-50 rounded-lg dark:hover:bg-green-900/20"
-            title="Publish"
+            title="Publish / Manage Platforms"
           >
             <Rocket className="w-4 h-4" />
           </button>

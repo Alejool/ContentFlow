@@ -377,11 +377,18 @@ class PublicationController extends Controller
 
         // 2. Update existing or Create new
         foreach ($newAccountIds as $accountId) {
-          $postSchedule = isset($schedules[$accountId]) ? $schedules[$accountId] : $baseSchedule;
+          $postSchedule = (isset($schedules[$accountId]) && !empty($schedules[$accountId])) ? $schedules[$accountId] : $baseSchedule;
 
           $existingPost = $publication->scheduledPosts()
             ->where('social_account_id', $accountId)
             ->first();
+
+          if (empty($postSchedule)) {
+            if ($existingPost && $existingPost->status === 'pending') {
+              $existingPost->delete();
+            }
+            continue;
+          }
 
           if ($existingPost) {
             // Only update if pending or user explicitly wants to overwrite?
@@ -393,12 +400,15 @@ class PublicationController extends Controller
             }
           } else {
             // Create new
+            $socialAccount = SocialAccount::find($accountId);
             ScheduledPost::create([
               'user_id' => Auth::id(),
               'social_account_id' => $accountId,
               'publication_id' => $publication->id,
               'scheduled_at' => $postSchedule,
               'status' => 'pending',
+              'account_name' => $socialAccount ? $socialAccount->account_name : 'Unknown',
+              'platform' => $socialAccount ? $socialAccount->platform : 'unknown',
             ]);
           }
         }
@@ -606,39 +616,7 @@ class PublicationController extends Controller
 
 
 
-      if (array_key_exists('scheduled_at', $validatedData)) {
-        if (empty($validatedData['scheduled_at'])) {
-          ScheduledPost::where('publication_id', $publication->id)
-            ->where('status', 'pending')
-            ->delete();
-        } else if (!empty($validatedData['social_accounts'])) {
-          ScheduledPost::where('publication_id', $publication->id)
-            ->where('status', 'pending')
-            ->delete();
-
-          $schedules = $request->input('social_account_schedules', []);
-          $socialAccounts = SocialAccount::whereIn('id', $validatedData['social_accounts'])->get()->keyBy('id');
-
-          foreach ($validatedData['social_accounts'] as $accountId) {
-            $scheduledAt = isset($schedules[$accountId]) ? $schedules[$accountId] : $validatedData['scheduled_at'];
-            $socialAccount = $socialAccounts[$accountId] ?? null;
-
-            ScheduledPost::create([
-              'user_id' => Auth::id(),
-              'social_account_id' => $accountId,
-              'publication_id' => $publication->id,
-              'scheduled_at' => $scheduledAt,
-              'status' => 'pending',
-              'account_name' => $socialAccount ? $socialAccount->account_name : 'Unknown',
-              'platform' => $socialAccount ? $socialAccount->platform : 'unknown',
-            ]);
-          }
-        } else {
-          ScheduledPost::where('publication_id', $publication->id)
-            ->where('status', 'pending')
-            ->update(['scheduled_at' => $validatedData['scheduled_at']]);
-        }
-      }
+      // Redundant block removed as it is handled by the sync block at the beginning.
 
       DB::commit();
 

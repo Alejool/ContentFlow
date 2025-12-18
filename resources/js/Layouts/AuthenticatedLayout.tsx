@@ -23,7 +23,9 @@ export default function AuthenticatedLayout({
   header,
   children,
 }: AuthenticatedLayoutProps) {
-  const user = usePage().props?.auth?.user as User;
+  const { props } = usePage();
+  const auth = props.auth as any;
+  const user = auth?.user as User;
 
   const [showingNavigationDropdown, setShowingNavigationDropdown] =
     useState(false);
@@ -39,50 +41,54 @@ export default function AuthenticatedLayout({
   }, [user?.id]);
 
   return (
-    <div
-      className={`relative overflow-hidden  scrollbar-y  `}
-      style={{
-        backgroundImage: `url(${Bg})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
-      }}
-    >
+    <div className="h-screen flex flex-col overflow-hidden">
       <div
-        className={`
-          absolute inset-0
-          ${theme === "dark" ? "bg-black/90" : "bg-white/90"}
-        `}
-      />
-
-      <Sidebar
-        isSidebarOpen={isSidebarOpen}
-        setIsSidebarOpen={setIsSidebarOpen}
-      />
-
-      <MobileNavbar
-        user={user}
-        showingNavigationDropdown={showingNavigationDropdown}
-        setShowingNavigationDropdown={setShowingNavigationDropdown}
-      />
-
-      <main
-        className={`transition-all duration-500 px-16 ease-in-out relative z-10 ${
-          isSidebarOpen ? "lg:ml-80" : "lg:ml-20"
-        }`}
+        className="relative flex-1 min-h-0 flex"
+        style={{
+          backgroundImage: `url(${Bg})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
       >
-        {header && (
-          <header className="border-b border-white/10 dark:border-neutral-800/50">
-            <div className="mx-auto max-w-7xl px-6 py-8">{header}</div>
-          </header>
-        )}
+        <div
+          className={`
+            absolute inset-0
+            ${theme === "dark" ? "bg-black/90" : "bg-white/90"}
+          `}
+        />
 
-        <div className="">
-          <div className="mx-auto max-w-7xl">{children}</div>
+        <Sidebar
+          isSidebarOpen={isSidebarOpen}
+          setIsSidebarOpen={setIsSidebarOpen}
+        />
+
+        <div className="flex-1 flex flex-col min-h-0 relative z-10">
+          <MobileNavbar
+            user={user}
+            showingNavigationDropdown={showingNavigationDropdown}
+            setShowingNavigationDropdown={setShowingNavigationDropdown}
+          />
+
+          <main
+            className={`flex-1 min-h-0 overflow-y-auto transition-all duration-500 px-16 ease-in-out ${
+              isSidebarOpen ? "lg:ml-80" : "lg:ml-20"
+            }`}
+          >
+            {header && (
+              <header className="border-b border-white/10 dark:border-neutral-800/50">
+                <div className="mx-auto max-w-7xl px-6 py-8">{header}</div>
+              </header>
+            )}
+
+            <div className="py-8">
+              <div className="mx-auto max-w-7xl">{children}</div>
+            </div>
+          </main>
         </div>
-      </main>
 
-      <GlobalAiAssistant />
+        <GlobalAiAssistant />
+      </div>
     </div>
   );
 }

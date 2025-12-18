@@ -3,7 +3,13 @@
     "welcome": "Welcome",
     "loading": "Loading...",
     "select": "Select",
+    "more": "more",
+    "new": "New",
+    "unsavedChanges": "Unsaved Changes",
+    "totalSettings": "Total settings",
+    "configured": "Configured",
     "refresh": "Refresh",
+    "allSaved": "All saved",
     "processing": "Processing...",
     "save": "Save",
     "cancel": "Cancel",
@@ -37,9 +43,10 @@
     "yes": "Yes",
     "no": "No",
     "configure": "Configure",
-    "noSettings": "No defaults configured",
+    "noSettings": "No default settings",
     "done": "Done",
-    "adjustOptions": "Adjust platform specific options"
+    "adjustOptions": "Adjust specific options",
+    "viewOnPlatform": "View on platform"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -48,6 +55,7 @@
     "manageContent": "Manage Content",
     "analytics": "Analytics",
     "aiChat": "AI Chat",
+    "socialNetworks": "Social Networks",
     "logout": "Log Out",
     "notifications": "Notifications"
   },
@@ -270,16 +278,22 @@
         "contentLockedHint": "To edit the content (title, description or files), you must unpublish the publication from all platforms."
       },
       "manageContent": {
-        "configureNetworks": "Configure Social Networks"
+        "configureNetworks": "Configure your scheduled publications"
       },
       "platformSettings": {
+        "status":"Status",
+        "save":"Save",
+        "configured":"Configure",
         "title": "Platform Settings",
         "subtitle": "Platform Settings",
         "youtube": {
           "title": "YouTube",
           "type": "Video Type",
           "video": "Video Normal",
+          "videoStandard": "Standard video",
+          "contentType": "Content Type",
           "short": "Shorts",
+          "shortVertical": "Video Vertical Shorts",
           "privacy": "Privacy",
           "public": "Public",
           "private": "Private",
@@ -290,14 +304,19 @@
           "title": "Facebook",
           "type": "Publication Type",
           "feed": "Wall Publication",
-          "reel": "Reel"
+          "feedDescription": "Wall Publication",
+          "reel": "Reel",
+          "reelDescription": "Vertical short video"
         },
         "instagram": {
           "title": "Instagram",
           "type": "Publication Type",
           "feed": "Feed Publication",
+          "feedDescription": "Feed Publication",
           "reel": "Reel",
-          "story": "Story"
+          "reelDescription": "Vertical short video",
+          "story": "Story",
+          "storyDescription": "Story"
         },
         "tiktok": {
           "title": "TikTok",
@@ -305,10 +324,17 @@
           "public": "Public",
           "friends": "Friends Only",
           "private": "Private",
+          "publicDescription": "Visible for all",
+          "friendsDescription": "Visible for followers",
+          "privateDescription": "Visible for you",
           "interactions": "Interactions",
+          "interactionsDescription": "Interactions",
           "comments": "Comments",
+          "commentsDescription": "Allowed comments",
           "duets": "Duet",
-          "stitchs": "Stitch"
+          "duetsDescription": "Allowed duets",
+          "stitchs": "Stitch",
+          "stitchsDescription": "Allowed stitches"
         },
         "twitter": {
           "title": "Twitter (X)",
@@ -372,9 +398,10 @@
         }
       },
       "preview":{
-          "title":"preview",
-          "simulated": "simulated",
-          "real": "Real"
+          "title":"Preview",
+          "simulated": "Simulated",
+          "real": "Real",
+          "realInfo": "Real Preview"
       },
       "validation":{
         "descRequired":"Description is required",
@@ -399,7 +426,8 @@
         "schedulePublicationLength":"Schedule Publication must be at least 10 characters long",
         "imageRequired":"Image is required",
         "hashtagValid":"Hashtag must be valid",
-        "hashtagMax":"Hashtag must be at least 10 characters long"
+        "hashtagMax":"Hashtag must be at least 10 characters long",
+        "scheduleDateRequired": "Please select a date to schedule on the selected networks or uncheck the schedule option"
       }
     },
 

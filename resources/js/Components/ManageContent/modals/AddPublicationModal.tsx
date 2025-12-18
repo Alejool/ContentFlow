@@ -1,3 +1,4 @@
+import PlatformSettingsModal from "@/Components/ConfigSocialMedia/PlatformSettingsModal";
 import AddMoreButton from "@/Components/ManageContent/Publication/common/add/AddMoreButton";
 import ImagePreviewItem from "@/Components/ManageContent/Publication/common/add/ImagePreviewItem";
 import SocialAccountsSection from "@/Components/ManageContent/Publication/common/add/SocialAccountsSection";
@@ -5,7 +6,6 @@ import VideoPreviewItem from "@/Components/ManageContent/Publication/common/add/
 import ModalFooter from "@/Components/ManageContent/modals/common/ModalFooter";
 import ModalHeader from "@/Components/ManageContent/modals/common/ModalHeader";
 import PlatformPreviewModal from "@/Components/ManageContent/modals/common/PlatformPreviewModal";
-import PlatformSettingsModal from "@/Components/ManageContent/modals/common/PlatformSettingsModal";
 import ScheduleSection from "@/Components/ManageContent/modals/common/ScheduleSection";
 import Input from "@/Components/common/Modern/Input";
 import Select from "@/Components/common/Modern/Select";
@@ -309,6 +309,16 @@ export default function AddPublicationModal({
     if (mediaFiles.length === 0) {
       setImageError(t("publications.modal.validation.imageRequired"));
       return;
+    }
+
+    if (data.social_accounts && data.social_accounts.length > 0) {
+      const hasSomeSchedule =
+        data.scheduled_at ||
+        data.social_accounts.some((id: number) => accountSchedules[id]);
+      if (!hasSomeSchedule) {
+        toast.error(t("publications.modal.validation.scheduleDateRequired"));
+        return;
+      }
     }
 
     setIsSubmitting(true);

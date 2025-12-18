@@ -3,12 +3,13 @@ import IconInstagram from "@/../assets/Icons/instagram.svg";
 import IconTiktok from "@/../assets/Icons/tiktok.svg";
 import IconTwitter from "@/../assets/Icons/x.svg";
 import IconYoutube from "@/../assets/Icons/youtube.svg";
+import PlatformSettingsModal from "@/Components/ConfigSocialMedia/PlatformSettingsModal";
 import PlatformPreviewModal from "@/Components/ManageContent/modals/common/PlatformPreviewModal";
-import PlatformSettingsModal from "@/Components/ManageContent/modals/common/PlatformSettingsModal";
 import YouTubeThumbnailUploader from "@/Components/common/ui/YouTubeThumbnailUploader";
 import { usePublishPublication } from "@/Hooks/publication/usePublishPublication";
 import { useConfirm } from "@/Hooks/useConfirm";
 import { useTheme } from "@/Hooks/useTheme";
+import { usePublicationStore } from "@/stores/publicationStore";
 import { Publication } from "@/types/Publication";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import {
@@ -77,9 +78,12 @@ export default function PublishPublicationModal({
     resetState,
   } = usePublishPublication();
 
+  const { fetchPublicationById } = usePublicationStore();
+
   useEffect(() => {
     if (isOpen && publication) {
       fetchPublishedPlatforms(publication.id);
+      fetchPublicationById(publication.id);
       loadExistingThumbnails(publication);
 
       // Load platform settings from publication
@@ -314,27 +318,30 @@ export default function PublishPublicationModal({
 
                     return (
                       <div key={account.id} className="relative ">
-                        <button
+                        <div
                           onClick={() =>
                             !isPublished &&
                             !isPublishing &&
                             !isScheduled &&
                             togglePlatform(account.id)
                           }
-                          disabled={isPublished || isPublishing || isScheduled}
-                          className={`w-full flex items-center gap-3 p-4 rounded-lg border-2 transition-all pt-6 ${
+                          className={`w-full flex items-center gap-3 p-4 rounded-lg border-2 transition-all pt-6 relative ${
+                            !isPublished && !isPublishing && !isScheduled
+                              ? "cursor-pointer"
+                              : "cursor-default"
+                          } ${
                             isPublished
-                              ? "border-green-500 bg-green-50 dark:bg-green-900/20 cursor-default"
+                              ? "border-green-500 bg-green-50 dark:bg-green-900/20"
                               : isPublishing
-                              ? "border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 cursor-default"
+                              ? "border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20"
                               : isFailed
-                              ? "border-red-500 bg-red-50 dark:bg-red-900/20 cursor-default"
+                              ? "border-red-500 bg-red-50 dark:bg-red-900/20"
                               : isSelected
-                              ? "p-2 border-primary-500 bg-primary-50 dark:bg-primary-900/20 cursor-default"
+                              ? "p-2 border-primary-500 bg-primary-50 dark:bg-primary-900/20"
                               : isScheduled
-                              ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20 cursor-default"
+                              ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
                               : isRemovedPlatform
-                              ? "border-gray-500 bg-gray-50 dark:bg-gray-900/20 cursor-default"
+                              ? "border-gray-500 bg-gray-50 dark:bg-gray-900/20"
                               : theme === "dark"
                               ? "border-neutral-700 hover:border-neutral-600 bg-neutral-900/30"
                               : "border-primary-200 hover:border-primary-300 bg-white"
@@ -359,6 +366,8 @@ export default function PublishPublicationModal({
                               {account.account_name || account.name}
                             </div>
                           </div>
+
+                          {/* Status Indicators */}
                           {isPublished && (
                             <div className="flex items-center gap-2">
                               <span className="flex items-center gap-1 text-xs font-medium text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/30 px-2 py-1 rounded-full">
@@ -400,15 +409,21 @@ export default function PublishPublicationModal({
                               </span>
                             </div>
                           )}
-                          {isSelected && !isPublished && !isPublishing && (
-                            <div className="flex items-center gap-2">
+
+                          {/* Action Buttons */}
+                          <div className="flex items-center gap-1 ml-auto">
+                            {/* Preview Eye - Always visible if there is something to show */}
+                            {(isSelected ||
+                              isPublished ||
+                              isFailed ||
+                              isPublishing) && (
                               <button
                                 type="button"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   setActivePlatformPreview(account.platform);
                                 }}
-                                className={`p-1.5 rounded-lg transition-all ${
+                                className={`p-1.5 rounded-lg transition-all z-10 ${
                                   theme === "dark"
                                     ? "hover:bg-neutral-700 text-gray-400"
                                     : "hover:bg-gray-100 text-gray-500"
@@ -416,13 +431,17 @@ export default function PublishPublicationModal({
                               >
                                 <Eye className="w-4 h-4" />
                               </button>
+                            )}
+
+                            {/* Settings - Only for non-published */}
+                            {!isPublished && !isPublishing && !isScheduled && (
                               <button
                                 type="button"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   setActivePlatformSettings(account.platform);
                                 }}
-                                className={`p-1.5 rounded-lg transition-all ${
+                                className={`p-1.5 rounded-lg transition-all z-10 ${
                                   theme === "dark"
                                     ? "hover:bg-neutral-700 text-gray-400"
                                     : "hover:bg-gray-100 text-gray-500"
@@ -430,10 +449,17 @@ export default function PublishPublicationModal({
                               >
                                 <SettingsIcon className="w-4 h-4" />
                               </button>
-                              <CheckCircle className="w-5 h-5 text-primary-500" />
-                            </div>
-                          )}
-                        </button>
+                            )}
+
+                            {/* Check - Selected indicator */}
+                            {isSelected &&
+                              !isPublished &&
+                              !isPublishing &&
+                              !isScheduled && (
+                                <CheckCircle className="w-5 h-5 text-primary-500" />
+                              )}
+                          </div>
+                        </div>
 
                         {/* Unpublish button */}
                         {isPublished && (

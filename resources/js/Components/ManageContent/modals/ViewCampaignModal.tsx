@@ -1,9 +1,11 @@
 import CampaignMediaCarousel from "@/Components/Campaigns/CampaignMediaCarousel";
+import PlatformPreviewModal from "@/Components/ManageContent/modals/common/PlatformPreviewModal";
 import { useTheme } from "@/Hooks/useTheme";
 import { Campaign } from "@/types/Campaign";
 import { Publication } from "@/types/Publication";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
-import { Calendar, FileText, Hash, Layers, Target, X } from "lucide-react";
+import { Calendar, Eye, FileText, Hash, Layers, Target, X } from "lucide-react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 interface ViewCampaignModalProps {
@@ -19,6 +21,10 @@ export default function ViewCampaignModal({
 }: ViewCampaignModalProps) {
   const { t } = useTranslation();
   const { theme } = useTheme();
+
+  const [previewPublication, setPreviewPublication] =
+    useState<Publication | null>(null);
+  const [activePlatform, setActivePlatform] = useState<string | null>(null);
 
   if (!item) return null;
 
@@ -177,6 +183,30 @@ export default function ViewCampaignModal({
                         >
                           {pub.title || pub.name || "Untitled"}
                         </span>
+
+                        {pub.status === "published" && (
+                          <div className="ml-auto flex gap-1">
+                            {/* If published, we might have multiple platforms. For simplicity in this list, we let the user pick in the modal */}
+                            <button
+                              onClick={() => {
+                                setPreviewPublication(pub);
+                                // Default to the first published platform found in logs
+                                const firstLog = pub.social_post_logs?.find(
+                                  (l: any) =>
+                                    l.status === "published" ||
+                                    l.status === "success"
+                                );
+                                setActivePlatform(
+                                  firstLog?.platform || "youtube"
+                                );
+                              }}
+                              className="p-1.5 text-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-colors"
+                              title="Preview"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </button>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -456,6 +486,17 @@ export default function ViewCampaignModal({
           </div>
         </DialogPanel>
       </div>
+
+      <PlatformPreviewModal
+        isOpen={!!previewPublication && !!activePlatform}
+        onClose={() => {
+          setPreviewPublication(null);
+          setActivePlatform(null);
+        }}
+        platform={activePlatform || ""}
+        publication={previewPublication}
+        theme={theme}
+      />
     </Dialog>
   );
 }

@@ -3,7 +3,9 @@ import IconTiktok from "@/../assets/Icons/tiktok.svg";
 import IconTwitter from "@/../assets/Icons/x.svg";
 import IconYoutube from "@/../assets/Icons/youtube.svg";
 import ModernCard from "@/Components/common/Modern/Card";
+import { Link } from "@inertiajs/react";
 import axios from "axios";
+import { Settings } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -146,7 +148,16 @@ export default function ConnectedAccounts({ className = "", header = true }) {
                 </p>
               </div>
               {account.isConnected && (
-                <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div>
+                <div className="flex items-center gap-2">
+                  <Link
+                    href={route("settings.social")}
+                    className="p-1.5 rounded-md hover:bg-purple-100 text-purple-600 transition-colors"
+                    title={t("publications.modal.platformSettings.title")}
+                  >
+                    <Settings className="w-4 h-4" />
+                  </Link>
+                  <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div>
+                </div>
               )}
             </div>
           ))}
