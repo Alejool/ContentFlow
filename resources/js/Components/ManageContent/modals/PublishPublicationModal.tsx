@@ -287,7 +287,8 @@ export default function PublishPublicationModal({
                   </p>
                 </div>
               ) : (
-                <div className="flex flex-col sm:flex-row  justify-between items-center gap-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  {" "}
                   {connectedAccounts.map((account) => {
                     const iconSrc = getPlatformIcon(account.platform);
                     const gradient = getPlatformGradient(account.platform);
@@ -343,11 +344,13 @@ export default function PublishPublicationModal({
                             <img src={iconSrc} alt={account.platform} />
                           </div>
                           <div className="flex-1 text-left">
-                            <div className={`font-medium capitalize text-sm ${
-                              theme === "dark"
-                                ? "text-primary-50"
-                                : "text-primary-600"
-                            }`}>
+                            <div
+                              className={`font-medium capitalize text-sm ${
+                                theme === "dark"
+                                  ? "text-primary-50"
+                                  : "text-primary-600"
+                              }`}
+                            >
                               {account.platform}
                             </div>
                             <div
