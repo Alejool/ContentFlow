@@ -11,6 +11,7 @@ import {
   ExternalLink,
   MessageCircle,
   RotateCcw,
+  Filter,
 } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -55,40 +56,67 @@ export default function LogsList({
     }
   };
 
-  const borderColor =
-    theme === "dark" ? "border-neutral-700" : "border-gray-200";
-  const inputBg = theme === "dark" ? "bg-neutral-700" : "bg-white";
-
-  const navigateToCampaign = (campaignId: number) => {
-    const campaignTab = document.querySelector('[data-tab="campaigns"]');
-    if (campaignTab) {
-      (campaignTab as HTMLElement).click();
-      setTimeout(() => {
-        const campaignRow = document.querySelector(
-          `[data-campaign-id="${campaignId}"]`
-        );
-        if (campaignRow) {
-          campaignRow.scrollIntoView({ behavior: "smooth", block: "center" });
-          const expandButton = campaignRow.querySelector("button[data-expand]");
-          if (expandButton && !expandButton.getAttribute("data-expanded")) {
-            (expandButton as HTMLElement).click();
-          }
-        }
-      }, 100);
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "published":
+      case "success":
+        return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300";
+      case "failed":
+        return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300";
+      case "pending":
+        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300";
+      default:
+        return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
     }
   };
 
+  const getPlatformColor = (platform: string) => {
+    switch (platform?.toLowerCase()) {
+      case "youtube":
+        return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300";
+      case "facebook":
+        return "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300";
+      case "instagram":
+        return "bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-300";
+      case "twitter":
+        return "bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-300";
+      case "tiktok":
+        return "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300";
+      default:
+        return "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300";
+    }
+  };
+
+  const borderColor =
+    theme === "dark" ? "border-neutral-700" : "border-gray-200";
+
   return (
     <div
-      className={`rounded-lg overflow-hidden shadow-lg border transition-all duration-300 backdrop-blur-lg ${
+      className={`rounded-lg shadow-lg border transition-all duration-300 backdrop-blur-lg ${
         theme === "dark"
           ? "bg-neutral-800/70 border-neutral-700/70 text-white"
           : "bg-white/70 border-gray-100/70 text-gray-900"
       }`}
     >
-      <div className="p-6 border-b border-gray-100 dark:border-neutral-700/50 flex justify-between items-center">
-        <h2 className="text-xl font-bold">{t("logs.title")}</h2>
-        <div className="flex gap-2">
+      {/* Header */}
+      <div className="p-4 sm:p-6 border-b border-gray-100 dark:border-neutral-700/50 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+        <div>
+          <h2 className="text-lg sm:text-xl font-bold">{t("logs.title")}</h2>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            {t("logs.subtitle") ||
+              "Registros de publicaciones en redes sociales"}
+          </p>
+        </div>
+        <div className="flex gap-2 self-end sm:self-auto">
+          {/* Mobile Filter Button */}
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className="sm:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-700 transition-colors"
+            title={t("logs.filter")}
+          >
+            <Filter className="w-4 h-4" />
+          </button>
+
           <button
             onClick={onRefresh}
             className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-700 transition-colors"
@@ -99,7 +127,58 @@ export default function LogsList({
         </div>
       </div>
 
-      <div className="overflow-x-auto">
+      {/* Filters - Mobile collapsed, desktop always visible */}
+      <div
+        className={`p-4 border-b ${borderColor} ${
+          showFilters ? "block" : "hidden sm:block"
+        }`}
+      >
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={() => setSelectedStatus("all")}
+            className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${
+              selectedStatus === "all"
+                ? "bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+            }`}
+          >
+            {t("logs.all")}
+          </button>
+          <button
+            onClick={() => setSelectedStatus("published")}
+            className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${
+              selectedStatus === "published"
+                ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+            }`}
+          >
+            {t("logs.status.published")}
+          </button>
+          <button
+            onClick={() => setSelectedStatus("failed")}
+            className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${
+              selectedStatus === "failed"
+                ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+            }`}
+          >
+            {t("logs.status.failed")}
+          </button>
+          <button
+            onClick={() => setSelectedStatus("pending")}
+            className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${
+              selectedStatus === "pending"
+                ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+            }`}
+          >
+            {t("logs.status.pending")}
+          </button>
+        </div>
+      </div>
+
+      {/* Desktop Table */}
+      <div className="hidden md:block overflow-x-auto">
         <table className="w-full text-left text-sm">
           <thead
             className={`${
@@ -109,25 +188,22 @@ export default function LogsList({
             } border-b`}
           >
             <tr>
-              <th className="px-6 py-4 font-semibold">
+              <th className="px-4 py-3 font-semibold text-xs sm:text-sm">
                 {t("logs.table.date")}
               </th>
-              <th className="px-6 py-4 font-semibold">
+              <th className="px-4 py-3 font-semibold text-xs sm:text-sm">
                 {t("logs.table.platform")}
               </th>
-              <th className="px-6 py-4 font-semibold">
+              <th className="px-4 py-3 font-semibold text-xs sm:text-sm">
                 {t("logs.table.source")}
               </th>
-              <th className="px-6 py-4 font-semibold">
+              <th className="px-4 py-3 font-semibold text-xs sm:text-sm">
                 {t("logs.table.status")}
               </th>
-              <th className="px-6 py-4 font-semibold">
+              <th className="px-4 py-3 font-semibold text-xs sm:text-sm">
                 {t("logs.table.description")}
               </th>
-              <th className="px-6 py-4 font-semibold">
-                {t("logs.table.error")}
-              </th>
-              <th className="px-6 py-4 font-semibold text-center">
+              <th className="px-4 py-3 font-semibold text-xs sm:text-sm text-center">
                 {t("logs.table.link")}
               </th>
             </tr>
@@ -141,15 +217,17 @@ export default function LogsList({
               <tr>
                 <td
                   colSpan={6}
-                  className="px-6 py-12 text-center space-y-6  text-gray-500"
+                  className="px-4 py-12 text-center space-y-4 text-gray-500"
                 >
-                  <Loader />
-                  <span className="text-sm pt-8">{t("logs.loading")}</span>
+                  <div className="flex justify-center">
+                    <Loader />
+                  </div>
+                  <span className="text-sm">{t("logs.loading")}</span>
                 </td>
               </tr>
             ) : filteredLogs.length === 0 ? (
               <tr>
-                <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
+                <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
                   {t("logs.empty")}
                 </td>
               </tr>
@@ -163,86 +241,61 @@ export default function LogsList({
                       : "hover:bg-gray-50/50"
                   }`}
                 >
-                  <td className="px-6 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
-                    {format(new Date(log.updated_at), "MMM d, yyyy HH:mm")}
+                  <td className="px-4 py-3 whitespace-nowrap text-gray-500 dark:text-gray-400 text-xs">
+                    {format(new Date(log.updated_at), "MMM d, HH:mm")}
                   </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
-                      <span className="capitalize font-medium">
-                        {log.social_account?.platform || log.platform}
-                      </span>
-                      <span className="text-xs text-gray-400">
-                        {log.account_name || log.social_account?.account_name}
-                      </span>
-                      {log.publication?.platform_settings &&
-                        (log.publication.platform_settings as any)[log.platform]
-                          ?.type && (
-                          <span
-                            className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] uppercase font-bold border ${
-                              log.platform === "twitter"
-                                ? "bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-900/20 dark:text-sky-400 dark:border-sky-800"
-                                : log.platform === "youtube"
-                                ? "bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800"
-                                : "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800"
-                            }`}
-                          >
-                            {
-                              (log.publication.platform_settings as any)[
-                                log.platform
-                              ].type
-                            }
-                          </span>
-                        )}
+                  <td className="px-4 py-3">
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${getPlatformColor(
+                            log.platform
+                          )}`}
+                        >
+                          {log.social_account?.platform || log.platform}
+                        </span>
+                      </div>
+                      {log.account_name && (
+                        <span className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[120px]">
+                          {log.account_name}
+                        </span>
+                      )}
                     </div>
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-4 py-3">
                     <div className="flex flex-col gap-1">
                       {log.campaign && (
-                        <button
-                          onClick={() => navigateToCampaign(log.campaign!.id)}
-                          className="text-xs text-blue-500 bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded w-fit hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
-                        >
-                          {t("logs.table.campaign")}: {log.campaign.name}
-                        </button>
+                        <span className="text-xs text-blue-600 dark:text-blue-400 font-medium">
+                          {log.campaign.name}
+                        </span>
                       )}
                       {log.publication && (
-                        <span className="text-xs text-purple-500 bg-purple-50 dark:bg-purple-900/20 px-2 py-1 rounded w-fit">
+                        <span className="text-xs text-gray-600 dark:text-gray-400 truncate max-w-[150px]">
                           {log.publication.title}
                         </span>
                       )}
                     </div>
                   </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2 text-xs">
+                  <td className="px-4 py-3">
+                    <div
+                      className={`inline-flex items-center gap-2 px-2 py-1 rounded text-xs font-medium ${getStatusColor(
+                        log.status
+                      )}`}
+                    >
                       {getStatusIcon(log.status)}
                       <span className="capitalize">
                         {t(`logs.status.${log.status}`) || log.status}
                       </span>
                     </div>
                   </td>
-                  <td className="px-6 py-4">
-                    <div className="group relative">
-                      <ExpandableText
-                        text={log.content || "-"}
-                        maxLength={50}
-                        className="text-[11px]"
-                      />
-                    </div>
+                  <td className="px-4 py-3 max-w-[200px]">
+                    <ExpandableText
+                      text={log.content || "-"}
+                      maxLength={80}
+                      className="text-xs"
+                    />
                   </td>
-                  <td className="px-6 py-4">
-                    {log.error_message ? (
-                      <div className="leading-tight">
-                        <ExpandableText
-                          text={log.error_message}
-                          maxLength={60}
-                          className="text-[11px] text-red-500"
-                        />
-                      </div>
-                    ) : (
-                      <span className="text-gray-400 text-xs">-</span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 text-center">
+                  <td className="px-4 py-3 text-center">
                     {((log.post_url && log.post_url !== "") ||
                       (log.video_url && log.video_url !== "")) &&
                       (log.status === "published" ||
@@ -252,8 +305,9 @@ export default function LogsList({
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-primary-700 hover:from-primary-600 hover:to-primary-800 transition-all shadow-md hover:shadow-lg"
+                          title={t("logs.viewPost")}
                         >
-                          <ExternalLink className="w-4 h-4 text-white" />
+                          <ExternalLink className="w-3 h-3 text-white" />
                         </a>
                       )}
                   </td>
@@ -264,13 +318,128 @@ export default function LogsList({
         </table>
       </div>
 
+      {/* Mobile Cards */}
+      <div className="md:hidden">
+        {isLoading ? (
+          <div className="p-8 text-center space-y-4 text-gray-500">
+            <div className="flex justify-center">
+              <Loader />
+            </div>
+            <span className="text-sm">{t("logs.loading")}</span>
+          </div>
+        ) : filteredLogs.length === 0 ? (
+          <div className="p-8 text-center text-gray-500">{t("logs.empty")}</div>
+        ) : (
+          <div className="divide-y divide-gray-100 dark:divide-neutral-700/50">
+            {filteredLogs.map((log) => (
+              <div
+                key={log.id}
+                className="p-4 hover:bg-gray-50/50 dark:hover:bg-neutral-700/30 transition-colors"
+              >
+                {/* Header with Date and Status */}
+                <div className="flex justify-between items-start mb-3">
+                  <div className="text-sm text-gray-500 dark:text-gray-400">
+                    {format(new Date(log.updated_at), "MMM d, HH:mm")}
+                  </div>
+                  <div
+                    className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium ${getStatusColor(
+                      log.status
+                    )}`}
+                  >
+                    {getStatusIcon(log.status)}
+                    <span className="capitalize">
+                      {t(`logs.status.${log.status}`) || log.status}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Platform and Account */}
+                <div className="flex items-center gap-2 mb-3">
+                  <span
+                    className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${getPlatformColor(
+                      log.platform
+                    )}`}
+                  >
+                    {log.social_account?.platform || log.platform}
+                  </span>
+                  {log.account_name && (
+                    <span className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                      • {log.account_name}
+                    </span>
+                  )}
+                </div>
+
+                {/* Content */}
+                <div className="mb-3">
+                  <ExpandableText
+                    text={log.content || "-"}
+                    maxLength={100}
+                    className="text-sm"
+                  />
+                </div>
+
+                {/* Source */}
+                <div className="mb-3">
+                  {log.campaign && (
+                    <div className="text-xs text-blue-600 dark:text-blue-400 font-medium">
+                      {t("logs.table.campaign")}: {log.campaign.name}
+                    </div>
+                  )}
+                  {log.publication && (
+                    <div className="text-xs text-gray-600 dark:text-gray-400 truncate">
+                      {log.publication.title}
+                    </div>
+                  )}
+                </div>
+
+                {/* Error Message (if any) */}
+                {log.error_message && (
+                  <div className="mb-3 p-2 bg-red-50 dark:bg-red-900/20 rounded-lg">
+                    <div className="text-xs text-red-600 dark:text-red-400 font-medium">
+                      {t("logs.table.error")}:
+                    </div>
+                    <div className="text-xs text-red-500 dark:text-red-300 mt-1">
+                      {log.error_message}
+                    </div>
+                  </div>
+                )}
+
+                {/* Actions */}
+                <div className="flex justify-between items-center mt-4 pt-3 border-t border-gray-100 dark:border-neutral-700/50">
+                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                    ID: {log.id}
+                  </div>
+                  {((log.post_url && log.post_url !== "") ||
+                    (log.video_url && log.video_url !== "")) &&
+                    (log.status === "published" ||
+                      log.status === "orphaned") && (
+                      <a
+                        href={log.post_url || log.video_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-gradient-to-br from-primary-500 to-primary-700 hover:from-primary-600 hover:to-primary-800 transition-all shadow-md hover:shadow-lg text-white text-xs"
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                        {t("logs.viewPost")}
+                      </a>
+                    )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Pagination */}
       {pagination && pagination.last_page > 1 && (
-        <Pagination
-          theme={theme}
-          pagination={pagination}
-          onPageChange={onPageChange || (() => {})}
-          t={t}
-        />
+        <div className="p-4 border-t border-gray-100 dark:border-neutral-700/50">
+          <Pagination
+            theme={theme}
+            pagination={pagination}
+            onPageChange={onPageChange || (() => {})}
+            t={t}
+          />
+        </div>
       )}
     </div>
   );

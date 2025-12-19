@@ -175,8 +175,8 @@ export default function MobileNavbar({
       className={`w-full lg:hidden shadow-lg sticky top-0 z-50 backdrop-blur-2xl
         ${theme === "dark" ? "bg-neutral-900/60" : "bg-beige-200/90"}`}
     >
-      <div className="mx-auto max-w-7xl px-4 sm:px-6">
-        <div className="flex h-16 justify-between items-center">
+      <div className=" w-full mx-auto max-w-7xl  ">
+        <div className="flex h-16  justify-between items-center">
           <button
             onClick={() =>
               setShowingNavigationDropdown(!showingNavigationDropdown)
@@ -214,11 +214,11 @@ export default function MobileNavbar({
             </svg>
           </button>
 
-          <div className="flex items-center space-x-3">
-            <img src={Logo} alt="Logo" className="w-56 h-24" />
+          <div className="flex items-center ">
+            <img src={Logo} alt="Logo" className="w-48 h-20" />
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center ">
             <button
               onClick={() => setShowNotifications(true)}
               className={`group relative p-2 rounded-lg transition-colors
@@ -240,7 +240,7 @@ export default function MobileNavbar({
             </button>
             <Dropdown>
               <Dropdown.Trigger>
-                <span className="inline-flex">
+                <span className="block">
                   <button
                     type="button"
                     className={`inline-flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 shadow-sm hover:shadow-md
@@ -250,7 +250,7 @@ export default function MobileNavbar({
                             : "text-gray-700 hover:bg-beige-300"
                         }`}
                   >
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center">
                       <div
                         className={`rounded-full ring-2 shadow-lg ${
                           theme === "dark"
@@ -305,7 +305,7 @@ export default function MobileNavbar({
                 <div
                   className={`p-3 border-b border-neutral-700/50 dark:border-gray-200/10 $`}
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center ">
                     <CustomAvatar
                       src={user.photo_url}
                       name={user.name}
@@ -416,7 +416,7 @@ export default function MobileNavbar({
               theme === "dark" ? "border-neutral-700/50" : "border-beige-300/50"
             }`}
           >
-            <div className="flex items-center gap-2">
+            <div className="flex items-center ">
               <ResponsiveNavLink
                 href={route("logout")}
                 method="post"
@@ -432,7 +432,7 @@ export default function MobileNavbar({
                 <span className="font-medium">{t("nav.logout")}</span>
               </ResponsiveNavLink>
 
-              <div className="flex items-center justify-center gap-2">
+              <div className="flex items-center justify-center ">
                 <ThemeSwitcher />
                 <LanguageSwitcher />
               </div>

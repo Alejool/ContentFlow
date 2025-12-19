@@ -71,7 +71,7 @@ export default function AuthenticatedLayout({
           />
 
           <main
-            className={`flex-1 min-h-0 overflow-y-auto transition-all duration-500 px-16 ease-in-out ${
+            className={`flex-1 min-h-0 overflow-y-auto transition-all duration-500  ease-in-out ${
               isSidebarOpen ? "lg:ml-80" : "lg:ml-20"
             }`}
           >
@@ -82,7 +82,7 @@ export default function AuthenticatedLayout({
             )}
 
             <div className="py-8">
-              <div className="mx-auto max-w-7xl">{children}</div>
+              <div className="mx-auto max-w-7xl md:px-6">{children}</div>
             </div>
           </main>
         </div>
