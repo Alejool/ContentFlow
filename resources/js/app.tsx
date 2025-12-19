@@ -11,7 +11,6 @@ import "./bootstrap";
 import "./i18n";
 
 ErrorInterceptor.initialize();
-let realtimeInitialized = false;
 
 const appName = import.meta.env.VITE_APP_NAME || "contentFlow";
 createInertiaApp<PageProps>({

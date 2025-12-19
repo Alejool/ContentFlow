@@ -5,6 +5,8 @@
     "select": "Seleccionar",
     "more": "Más",
     "new": "Nuevo",
+    "listView": "Vista de Lista",
+    "gridView": "Vista de Grilla",
     "totalSettings": "Total de Ajustes",
     "unsavedChanges": "Cambios no guardados",
     "configured":"Configurado",

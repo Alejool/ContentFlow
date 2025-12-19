@@ -212,7 +212,7 @@ export default function PublicationMobileRow({
                               onPublish(item);
                             }}
                             className="p-2 text-green-500 hover:bg-green-50 rounded-lg dark:hover:bg-green-900/20"
-                            title={t("publications.actions.publish")}
+                            title={t("publications.actions.publishNow")}
                           >
                             <Rocket className="w-4 h-4" />
                           </button>

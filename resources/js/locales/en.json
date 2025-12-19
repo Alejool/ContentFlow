@@ -5,6 +5,8 @@
     "select": "Select",
     "more": "more",
     "new": "New",
+    "listView": "List View",
+    "gridView": "Grid View",
     "unsavedChanges": "Unsaved Changes",
     "totalSettings": "Total settings",
     "configured": "Configured",
