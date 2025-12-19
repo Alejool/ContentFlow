@@ -85,8 +85,6 @@ export default function PublishPublicationModal({
       fetchPublishedPlatforms(publication.id);
       fetchPublicationById(publication.id);
       loadExistingThumbnails(publication);
-
-      // Load platform settings from publication
       if (publication.platform_settings) {
         setPlatformSettings(publication.platform_settings);
       } else {
@@ -104,8 +102,6 @@ export default function PublishPublicationModal({
     platform: string
   ) => {
     if (!publication) return;
-
-    // Check if ALL connected accounts are published
     const allPublished = connectedAccounts.every((acc) =>
       publishedPlatforms.includes(acc.id)
     );
@@ -291,7 +287,7 @@ export default function PublishPublicationModal({
                   </p>
                 </div>
               ) : (
-                <div className="flex justify-between items-center gap-2">
+                <div className="flex flex-col sm:flex-row  justify-between items-center gap-2">
                   {connectedAccounts.map((account) => {
                     const iconSrc = getPlatformIcon(account.platform);
                     const gradient = getPlatformGradient(account.platform);
@@ -308,7 +304,10 @@ export default function PublishPublicationModal({
                     const isUnpublishing = unpublishing === account.id;
 
                     return (
-                      <div key={account.id} className="relative flex-1 ">
+                      <div
+                        key={account.id}
+                        className="relative w-full sm:flex-1"
+                      >
                         <div
                           onClick={() =>
                             !isPublished &&
@@ -344,17 +343,21 @@ export default function PublishPublicationModal({
                             <img src={iconSrc} alt={account.platform} />
                           </div>
                           <div className="flex-1 text-left">
-                            <div className="font-medium capitalize text-sm">
+                            <div className={`font-medium capitalize text-sm ${
+                              theme === "dark"
+                                ? "text-primary-50"
+                                : "text-primary-600"
+                            }`}>
                               {account.platform}
                             </div>
                             <div
                               className={`text-xs ${
                                 theme === "dark"
-                                  ? "text-gray-400"
-                                  : "text-gray-500"
+                                  ? "text-primary-400"
+                                  : "text-primary-600"
                               }`}
                             >
-                              {account.account_name || account.name}
+                              @{account.account_name || account.name}
                             </div>
                           </div>
 
