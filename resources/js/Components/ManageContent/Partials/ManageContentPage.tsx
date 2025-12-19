@@ -387,7 +387,7 @@ export default function ManageContentPage() {
             onClose={() => {
               setIsEditModalOpen(false);
               setSelectedItem(null);
-              fetchData(getPagination().current_page);
+              // fetchData(getPagination().current_page);
             }}
             campaign={selectedItem as Campaign}
             onSubmit={handleUpdate}

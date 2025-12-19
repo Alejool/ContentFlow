@@ -103,8 +103,11 @@ const PlatformPreviewModal: React.FC<PlatformPreviewModalProps> = ({
     }
   };
 
-  const platformLogs = (publication.social_post_logs || []).filter(
-    (log: any) => log.platform.toLowerCase() === platform.toLowerCase()
+  const platformLogs = (publication?.social_post_logs || []).filter(
+    (log: any) =>
+      log?.platform &&
+      platform &&
+      log.platform.toLowerCase() === platform.toLowerCase()
   );
 
   const latestLog = [...platformLogs].sort(
@@ -142,7 +145,7 @@ const PlatformPreviewModal: React.FC<PlatformPreviewModalProps> = ({
       : null;
 
   const renderMedia = () => {
-    const mediaFiles = publication.media || publication.media_files || [];
+    const mediaFiles = publication?.media || publication?.media_files || [];
     if (mediaFiles.length === 0) return null;
 
     return (
@@ -275,7 +278,7 @@ const PlatformPreviewModal: React.FC<PlatformPreviewModalProps> = ({
                   theme === "dark" ? "text-neutral-200" : "text-gray-900"
                 }`}
               >
-                {publication.description}
+                {publication?.description}
               </div>
 
               {renderMedia()}
@@ -390,9 +393,9 @@ const PlatformPreviewModal: React.FC<PlatformPreviewModalProps> = ({
           >
             <span className="font-bold mr-2">username</span>
             <span className="whitespace-pre-wrap">
-              {publication.description}
+              {publication?.description}
             </span>
-            <div className="text-sky-600 mt-1">{publication.hashtags}</div>
+            <div className="text-sky-600 mt-1">{publication?.hashtags}</div>
           </div>
 
           <div className="text-[10px] text-gray-500 uppercase mt-1">
@@ -434,7 +437,7 @@ const PlatformPreviewModal: React.FC<PlatformPreviewModalProps> = ({
             theme === "dark" ? "text-neutral-200" : "text-gray-900"
           }`}
         >
-          {publication.description}
+          {publication?.description}
         </div>
 
         {renderMedia()}
@@ -507,7 +510,7 @@ const PlatformPreviewModal: React.FC<PlatformPreviewModalProps> = ({
               {t("common.viewOnPlatform")} <ExternalLink className="w-3 h-3" />
             </a>
           </div>
-          <LiteYouTube videoId={youTubeId} title={publication.title} />
+          <LiteYouTube videoId={youTubeId} title={publication?.title} />
           <div className="p-3 flex gap-3">
             <div className="w-9 h-9 rounded-full bg-gray-200 flex-shrink-0" />
             <div className="flex-1 space-y-1">
@@ -516,7 +519,7 @@ const PlatformPreviewModal: React.FC<PlatformPreviewModalProps> = ({
                   theme === "dark" ? "text-white" : "text-gray-900"
                 }`}
               >
-                {publication.title}
+                {publication?.title}
               </h3>
               <div className="text-xs text-gray-500">
                 Channel Name · 0 views · Just now
@@ -544,7 +547,7 @@ const PlatformPreviewModal: React.FC<PlatformPreviewModalProps> = ({
                 theme === "dark" ? "text-white" : "text-gray-900"
               }`}
             >
-              {publication.title}
+              {publication?.title}
             </h3>
             <div className="text-xs text-gray-500">
               Channel Name · 0 views · Just now
@@ -589,8 +592,8 @@ const PlatformPreviewModal: React.FC<PlatformPreviewModalProps> = ({
         <div className="absolute bottom-6 left-3 right-12 space-y-2">
           <div className="text-white font-bold text-sm">@username</div>
           <div className="text-white text-xs whitespace-pre-wrap line-clamp-3">
-            {publication.description}
-            <span className="font-bold ml-1">{publication.hashtags}</span>
+            {publication?.description}
+            <span className="font-bold ml-1">{publication?.hashtags}</span>
           </div>
           <div className="flex items-center gap-2 overflow-hidden">
             <div className="text-white text-[10px] animate-slide-left whitespace-nowrap">

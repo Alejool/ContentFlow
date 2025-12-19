@@ -520,6 +520,7 @@
   "campaigns": {
     "title": "Campañas",
     "subtitle": "Gestionar, rastrear y analizar tus campañas de redes sociales",
+    "noPublications": "No hay publicaciones asociadas",
     "modal": {
       "add": {
         "title": "Agregar Campaña",
@@ -659,7 +660,9 @@
       "delete":"Eliminar",
       "active":"Activa",
       "remove":"Eliminar",
-      "change":"Cambiar"
+      "change":"Cambiar",
+      "showPublications": "Ver publicaciones",
+      "hidePublications": "Ocultar publicaciones"
     },
     "headers": {
      "status": "Estado",

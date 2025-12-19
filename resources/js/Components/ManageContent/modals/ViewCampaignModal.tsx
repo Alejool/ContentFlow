@@ -159,56 +159,63 @@ export default function ViewCampaignModal({
                     <span className="font-bold">{publications.length}</span>)
                   </h3>
                   <div className="space-y-2">
-                    {publications.map((pub: any) => (
-                      <div
-                        key={pub.id}
-                        className={`flex items-center gap-3 p-2 rounded ${
-                          theme === "dark" ? "bg-neutral-800" : "bg-white"
-                        } shadow-sm`}
-                      >
-                        {pub.media_files?.[0] ? (
-                          <img
-                            src={pub.media_files[0].file_path}
-                            className="w-8 h-8 rounded object-cover"
-                          />
-                        ) : (
-                          <div className="w-8 h-8 rounded bg-gray-200 flex items-center justify-center">
-                            <FileText className="w-4 h-4 text-gray-400" />
-                          </div>
-                        )}
-                        <span
-                          className={`text-sm font-medium ${
-                            theme === "dark" ? "text-gray-200" : "text-gray-700"
-                          }`}
+                    {publications.map((pub: any) => {
+                      if (!pub) return null;
+                      return (
+                        <div
+                          key={pub.id}
+                          className={`flex items-center gap-3 p-2 rounded ${
+                            theme === "dark" ? "bg-neutral-800" : "bg-white"
+                          } shadow-sm`}
                         >
-                          {pub.title || pub.name || "Untitled"}
-                        </span>
+                          {pub.media_files?.[0] ? (
+                            <img
+                              src={pub.media_files[0].file_path}
+                              className="w-8 h-8 rounded object-cover"
+                            />
+                          ) : (
+                            <div className="w-8 h-8 rounded bg-gray-200 flex items-center justify-center">
+                              <FileText className="w-4 h-4 text-gray-400" />
+                            </div>
+                          )}
+                          <span
+                            className={`text-sm font-medium ${
+                              theme === "dark"
+                                ? "text-gray-200"
+                                : "text-gray-700"
+                            }`}
+                          >
+                            {pub.title || pub.name || "Untitled"}
+                          </span>
 
-                        {pub.status === "published" && (
-                          <div className="ml-auto flex gap-1">
-                            {/* If published, we might have multiple platforms. For simplicity in this list, we let the user pick in the modal */}
-                            <button
-                              onClick={() => {
-                                setPreviewPublication(pub);
-                                // Default to the first published platform found in logs
-                                const firstLog = pub.social_post_logs?.find(
-                                  (l: any) =>
-                                    l.status === "published" ||
-                                    l.status === "success"
-                                );
-                                setActivePlatform(
-                                  firstLog?.platform || "youtube"
-                                );
-                              }}
-                              className="p-1.5 text-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-colors"
-                              title="Preview"
-                            >
-                              <Eye className="w-4 h-4" />
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    ))}
+                          {pub.status === "published" && (
+                            <div className="ml-auto flex gap-1">
+                              {/* If published, we might have multiple platforms. For simplicity in this list, we let the user pick in the modal */}
+                              <button
+                                onClick={() => {
+                                  if (!pub) return;
+                                  setPreviewPublication(pub);
+                                  // Default to the first published platform found in logs
+                                  const logs = pub.social_post_logs || [];
+                                  const firstLog = logs.find(
+                                    (l: any) =>
+                                      l.status === "published" ||
+                                      l.status === "success"
+                                  );
+                                  setActivePlatform(
+                                    firstLog?.platform || "youtube"
+                                  );
+                                }}
+                                className="p-1.5 text-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-colors"
+                                title="Preview"
+                              >
+                                <Eye className="w-4 h-4" />
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               )}

@@ -3,10 +3,11 @@ import Select from "@/Components/common/Modern/Select";
 import Textarea from "@/Components/common/Modern/Textarea";
 import { FileText, Hash, Target } from "lucide-react";
 import React from "react";
-import { FieldErrors, UseFormRegister } from "react-hook-form";
+import { FieldErrors, UseFormRegister, UseFormSetValue } from "react-hook-form";
 
 interface ContentSectionProps {
   register: UseFormRegister<any>;
+  setValue: UseFormSetValue<any>;
   errors: FieldErrors<any>;
   watched: any;
   theme: "dark" | "light";
@@ -19,6 +20,7 @@ interface ContentSectionProps {
 
 const ContentSection: React.FC<ContentSectionProps> = ({
   register,
+  setValue,
   errors,
   watched,
   theme,
@@ -106,26 +108,28 @@ const ContentSection: React.FC<ContentSectionProps> = ({
         disabled={disabled}
       />
 
-      {(!publication?.scheduled_posts ||
-        publication.scheduled_posts.length === 0) && (
-        <Select
-          id="campaign_id"
-          label={t("publications.modal.edit.campaigns") || "Add to Campaign"}
-          options={(campaigns || []).map((campaign: any) => ({
-            value: campaign.id,
-            label: campaign.name || campaign.title || `Campaign ${campaign.id}`,
-          }))}
-          register={register}
-          name="campaign_id"
-          placeholder={t("common.select") || "Select a campaign..."}
-          error={errors.campaign_id?.message as string}
-          icon={Target}
-          theme={theme}
-          variant="filled"
-          size="lg"
-          clearable
-        />
-      )}
+      <Select
+        id="campaign_id"
+        label={t("publications.modal.edit.campaigns") || "Add to Campaign"}
+        options={(campaigns || []).map((campaign: any) => ({
+          value: campaign.id.toString(),
+          label: campaign.name || campaign.title || `Campaign ${campaign.id}`,
+        }))}
+        value={watched.campaign_id}
+        onChange={(val) => {
+          setValue("campaign_id", val.toString(), { shouldValidate: true });
+        }}
+        register={register}
+        name="campaign_id"
+        placeholder={t("common.select") || "Select a campaign..."}
+        error={errors.campaign_id?.message as string}
+        icon={Target}
+        theme={theme}
+        variant="filled"
+        size="lg"
+        clearable
+        disabled={disabled}
+      />
     </div>
   );
 };
