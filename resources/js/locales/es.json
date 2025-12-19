@@ -473,6 +473,7 @@
       "status": "Estado",
       "actions": "Acciones",
       "noCampaign": "Sin Campaña",
+      "noPlatforms": "Sin Plataformas",
       "loading": "Cargando...",
       "linkedAccount": "Cuentas Asociadas",
       "emptyState": {

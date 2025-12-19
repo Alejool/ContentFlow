@@ -40,7 +40,7 @@ export default function PublicationMobileGrid({
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 px-2">
       {items.map((item) => {
         const mediaCount = countMediaFiles(item);
 
@@ -51,10 +51,9 @@ export default function PublicationMobileGrid({
               theme === "dark"
                 ? "bg-neutral-800 border-neutral-700"
                 : "bg-white border-gray-200"
-            } hover:shadow-md transition-shadow`}
+            } hover:shadow-md transition-shadow h-[28rem] flex flex-col`}
           >
-            {/* Header with Thumbnail and Status */}
-            <div className="flex items-start gap-3 mb-3">
+            <div className="flex items-start gap-3 mb-3 shrink-0">
               <div className="flex-shrink-0">
                 <div
                   className={`w-12 h-12 rounded-lg border overflow-hidden flex items-center justify-center ${
@@ -80,124 +79,114 @@ export default function PublicationMobileGrid({
                       >
                         {item.status || "Draft"}
                       </span>
-                      <span className="text-xs text-gray-500 dark:text-gray-400">
-                        ID: {item.id}
-                      </span>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Description */}
-            {item.description && (
-              <p className="text-xs text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">
-                {item.description}
-              </p>
-            )}
-
-            {/* Platform Types */}
-            {item.platform_settings &&
-              Object.keys(item.platform_settings).length > 0 && (
-                <div className="flex flex-wrap gap-1 mb-3">
-                  {Object.entries(item.platform_settings).map(
-                    ([platform, settings]: [string, any]) => {
-                      if (!settings) return null;
-
-                      let typeText = "";
-                      let colorClass = "";
-
-                      if (platform === "twitter" && settings.type) {
-                        colorClass =
-                          "bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-400 border-sky-200 dark:border-sky-800";
-                        typeText = `Twitter: ${
-                          settings.type === "poll"
-                            ? "Poll"
-                            : settings.type === "thread"
-                            ? "Thread"
-                            : "Tweet"
-                        }`;
-                      } else if (platform === "youtube" && settings.type) {
-                        colorClass =
-                          "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 border-red-200 dark:border-red-800";
-                        typeText = `YouTube: ${
-                          settings.type === "short" ? "Short" : "Video"
-                        }`;
-                      } else if (platform === "facebook" && settings.type) {
-                        colorClass =
-                          "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400 border-blue-200 dark:border-blue-800";
-                        typeText = `FB: ${
-                          settings.type === "reel" ? "Reel" : "Post"
-                        }`;
-                      } else if (platform === "instagram" && settings.type) {
-                        colorClass =
-                          "bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-400 border-pink-200 dark:border-pink-800";
-                        typeText = `IG: ${
-                          settings.type === "reel"
-                            ? "Reel"
-                            : settings.type === "story"
-                            ? "Story"
-                            : "Post"
-                        }`;
-                      }
-
-                      if (!typeText) return null;
-
-                      return (
-                        <span
-                          key={platform}
-                          className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium border ${colorClass}`}
-                        >
-                          {typeText}
-                        </span>
-                      );
-                    }
-                  )}
-                </div>
+            <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar mb-3 pr-1 space-y-3">
+              {item.description && (
+                <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-2">
+                  {item.description}
+                </p>
               )}
 
-            {/* Media Info */}
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-1">
-                  <span className="text-xs text-gray-500 dark:text-gray-400">
-                    {mediaCount.total} files
-                  </span>
+              {item.platform_settings &&
+                Object.keys(item.platform_settings).length > 0 && (
+                  <div className="flex flex-wrap gap-1">
+                    {Object.entries(item.platform_settings).map(
+                      ([platform, settings]: [string, any]) => {
+                        if (!settings) return null;
+
+                        let typeText = "";
+                        let colorClass = "";
+
+                        if (platform === "twitter" && settings.type) {
+                          colorClass =
+                            "bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-400 border-sky-200 dark:border-sky-800";
+                          typeText = `Twitter: ${
+                            settings.type === "poll"
+                              ? "Poll"
+                              : settings.type === "thread"
+                              ? "Thread"
+                              : "Tweet"
+                          }`;
+                        } else if (platform === "youtube" && settings.type) {
+                          colorClass =
+                            "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 border-red-200 dark:border-red-800";
+                          typeText = `YouTube: ${
+                            settings.type === "short" ? "Short" : "Video"
+                          }`;
+                        } else if (platform === "facebook" && settings.type) {
+                          colorClass =
+                            "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400 border-blue-200 dark:border-blue-800";
+                          typeText = `FB: ${
+                            settings.type === "reel" ? "Reel" : "Post"
+                          }`;
+                        } else if (platform === "instagram" && settings.type) {
+                          colorClass =
+                            "bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-400 border-pink-200 dark:border-pink-800";
+                          typeText = `IG: ${
+                            settings.type === "reel"
+                              ? "Reel"
+                              : settings.type === "story"
+                              ? "Story"
+                              : "Post"
+                          }`;
+                        }
+
+                        if (!typeText) return null;
+
+                        return (
+                          <span
+                            key={platform}
+                            className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium border ${colorClass}`}
+                          >
+                            {typeText}
+                          </span>
+                        );
+                      }
+                    )}
+                  </div>
+                )}
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                      {mediaCount.total} files
+                    </span>
+                  </div>
+                  {mediaCount.images > 0 && (
+                    <div className="flex items-center gap-1">
+                      <Image className="w-3 h-3 text-blue-400" />
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        {mediaCount.images}
+                      </span>
+                    </div>
+                  )}
+                  {mediaCount.videos > 0 && (
+                    <div className="flex items-center gap-1">
+                      <Video className="w-3 h-3 text-purple-400" />
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        {mediaCount.videos}
+                      </span>
+                    </div>
+                  )}
                 </div>
-                {mediaCount.images > 0 && (
-                  <div className="flex items-center gap-1">
-                    <Image className="w-3 h-3 text-blue-400" />
-                    <span className="text-xs text-gray-500 dark:text-gray-400">
-                      {mediaCount.images}
-                    </span>
-                  </div>
-                )}
-                {mediaCount.videos > 0 && (
-                  <div className="flex items-center gap-1">
-                    <Video className="w-3 h-3 text-purple-400" />
-                    <span className="text-xs text-gray-500 dark:text-gray-400">
-                      {mediaCount.videos}
-                    </span>
-                  </div>
-                )}
+              </div>
+
+              <div>
+                <SocialAccountsDisplay
+                  publication={item}
+                  connectedAccounts={connectedAccounts}
+                  theme={theme}
+                />
               </div>
             </div>
 
-            <div>
-              
-            </div>
-
-            {/* Social Accounts */}
-            <div className="mb-4">
-              <SocialAccountsDisplay
-                publication={item}
-                connectedAccounts={connectedAccounts}
-                theme={theme}
-              />
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex gap-2 pt-3 border-t border-gray-100 dark:border-neutral-700">
+            <div className="flex gap-2 pt-3 border-t border-gray-100 dark:border-neutral-700 mt-auto shrink-0">
               <button
                 onClick={() => onPublish(item)}
                 className="flex-1 py-2 px-3 text-xs font-medium rounded-lg bg-green-50 text-green-600 hover:bg-green-100 dark:bg-green-900/20 dark:text-green-400 dark:hover:bg-green-900/30 transition-colors flex items-center justify-center gap-1"

@@ -1,4 +1,5 @@
 import { Publication } from "@/types/Publication";
+import { useTranslation } from "react-i18next";
 
 interface SocialAccountsDisplayProps {
   publication: Publication;
@@ -15,18 +16,16 @@ export default function SocialAccountsDisplay({
   compact = false,
   showCount = false,
 }: SocialAccountsDisplayProps) {
+  const { t } = useTranslation();
   const scheduledPosts = publication.scheduled_posts || [];
   const postLogs = publication.social_post_logs || [];
 
-  // Combine entries, preferring logs (actual status) over scheduled
   const combined = new Map<number, any>();
 
-  // Add scheduled first
   scheduledPosts.forEach((p) => {
     if (p.social_account_id) combined.set(p.social_account_id, p);
   });
 
-  // Add logs (overwriting scheduled if same account)
   postLogs.forEach((l) => {
     if (l.social_account_id && l.status === "published")
       combined.set(l.social_account_id, l);
@@ -41,13 +40,12 @@ export default function SocialAccountsDisplay({
     return (
       <div className="text-center py-2">
         <span className="text-xs text-gray-400 dark:text-gray-500">
-          No platforms configured
+          {t("publications.table.noPlatforms")}
         </span>
       </div>
     );
   }
 
-  // Si showCount es true, solo mostrar el conteo
   if (showCount) {
     return (
       <div className="flex items-center gap-1">
@@ -61,7 +59,6 @@ export default function SocialAccountsDisplay({
     );
   }
 
-  // Modo compacto - solo iconos de plataformas
   if (compact) {
     const uniquePlatforms = Array.from(
       new Set(
@@ -91,7 +88,6 @@ export default function SocialAccountsDisplay({
     );
   }
 
-  // Modo completo - información detallada
   return (
     <div className="flex flex-col gap-2">
       {displayItems.slice(0, 3).map((item) => {
@@ -164,7 +160,6 @@ export default function SocialAccountsDisplay({
   );
 }
 
-// Función auxiliar para colores de plataforma
 function getPlatformColor(platform: string): string {
   switch (platform.toLowerCase()) {
     case "youtube":

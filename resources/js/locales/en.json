@@ -459,6 +459,7 @@
       "status": "Status",
       "actions": "Actions",
       "noCampaign": "No Campaign",
+      "noPlatforms": "No platforms configured",
       "loading": "Loading...",
       "linkedAccount": "Linked Accounts",
       "emptyState": {

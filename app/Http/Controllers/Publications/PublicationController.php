@@ -70,7 +70,7 @@ class PublicationController extends Controller
     if ($request->query('simplified') === 'true') {
       $publications = $query->get();
     } else {
-      $perPage = $request->query('per_page', 7);
+      $perPage = $request->query('per_page', 6);
       $publications = $query->paginate($perPage);
     }
 
@@ -273,10 +273,6 @@ class PublicationController extends Controller
 
   public function destroy($id)
   {
-    // Publication::destroy($id);
-    // return response()->json([
-    //   'message' => 'Publication deleted successfully',
-    // ]);
   }
 
   public function update(Request $request, $id)
@@ -300,17 +296,12 @@ class PublicationController extends Controller
       'start_date' => 'nullable|date',
       'end_date' => 'nullable|date|after_or_equal:start_date',
       'status' => 'nullable|in:draft,published',
-      // Allow past dates if not changed, otherwise require future
       'scheduled_at' => [
         'nullable',
         'date',
         function ($attribute, $value, $fail) use ($publication) {
           $existing = $publication->scheduled_at;
-          // Compare timestamps to avoid format mismatch issues.
-          // If value is set, and it's in the past...
           if ($value && strtotime($value) < time()) {
-            // If it's effectively the same as existing (within tight tolerance), allow it.
-            // Otherwise, it's a new past date, which is invalid.
             if (!$existing || abs(strtotime($value) - strtotime($existing)) > 60) {
               $fail('The scheduled date must be in the future.');
             }
@@ -351,22 +342,18 @@ class PublicationController extends Controller
         if ($campaign) {
           $publication->campaigns()->sync([$campaign->id]);
         } else {
-          // If campaign_id is provided but null or invalid, define behavior.
-          // Assuming user wants to detach if they send 'null' or empty.
           if (empty($request->campaign_id)) {
             $publication->campaigns()->detach();
           }
         }
       }
 
-      // Sync Scheduled Posts
       if ($request->has('social_accounts') || $request->has('social_accounts_sync')) {
         $currentAccountIds = $publication->scheduledPosts()->pluck('social_account_id')->toArray();
         $newAccountIds = $validatedData['social_accounts'] ?? [];
         $schedules = $request->input('social_account_schedules', []);
         $baseSchedule = $publication->scheduled_at;
 
-        // 1. Delete removed accounts (only if pending)
         $toRemove = array_diff($currentAccountIds, $newAccountIds);
         if (!empty($toRemove)) {
           $publication->scheduledPosts()
@@ -375,7 +362,6 @@ class PublicationController extends Controller
             ->delete();
         }
 
-        // 2. Update existing or Create new
         foreach ($newAccountIds as $accountId) {
           $postSchedule = (isset($schedules[$accountId]) && !empty($schedules[$accountId])) ? $schedules[$accountId] : $baseSchedule;
 
@@ -391,15 +377,12 @@ class PublicationController extends Controller
           }
 
           if ($existingPost) {
-            // Only update if pending or user explicitly wants to overwrite?
-            // Assuming editing allows updating pending posts.
             if ($existingPost->status === 'pending') {
               $existingPost->update([
                 'scheduled_at' => $postSchedule,
               ]);
             }
           } else {
-            // Create new
             $socialAccount = SocialAccount::find($accountId);
             ScheduledPost::create([
               'user_id' => Auth::id(),
@@ -443,14 +426,12 @@ class PublicationController extends Controller
 
           $fileType = str_starts_with($file->getClientMimeType(), 'video/') ? 'video' : 'image';
 
-          // Get youtube_type and duration from request for NEW files
           $youtubeTypes = $request->input('youtube_types_new', []);
           $durations = $request->input('durations_new', []);
 
           $youtubeType = $youtubeTypes[$index] ?? null;
           $duration = isset($durations[$index]) ? (int)$durations[$index] : null;
 
-          // Validate: cannot mark video as 'short' if duration > 60 seconds
           if ($fileType === 'video' && $youtubeType === 'short' && $duration && $duration > 60) {
             throw new \Exception("Video '{$file->getClientOriginalName()}' is {$duration}s long and cannot be marked as a Short (max 60s)");
           }
@@ -477,13 +458,11 @@ class PublicationController extends Controller
             $publication->update(['image' => asset('storage/' . $path)]);
           }
 
-          // Handle Thumbnail for NEW media (key: new_{index})
           if ($request->hasFile("thumbnails.new_{$index}")) {
             $thumbFile = $request->file("thumbnails.new_{$index}");
             $thumbFilename = Str::uuid() . '_thumb.' . $thumbFile->getClientOriginalExtension();
             $thumbPath = $thumbFile->storeAs('derivatives/thumbnails', $thumbFilename, 's3');
 
-            // DELETE ALL existing thumbnails for this video first
             $existingThumbs = $mediaFile->derivatives()
               ->where('derivative_type', 'thumbnail')
               ->get();
@@ -498,7 +477,6 @@ class PublicationController extends Controller
               $existingThumb->delete();
             }
 
-            // Create new thumbnail for ALL platforms
             MediaDerivative::create([
               'media_file_id' => $mediaFile->id,
               'derivative_type' => 'thumbnail',
@@ -506,34 +484,27 @@ class PublicationController extends Controller
               'file_name' => $thumbFilename,
               'mime_type' => $thumbFile->getClientMimeType(),
               'size' => $thumbFile->getSize(),
-              'platform' => 'all', // Works for YouTube and all other platforms
               'resolution' => 'custom',
             ]);
           }
         }
       }
 
-      // Handle properties updates (like thumbnails) for EXISTING media
       if ($request->hasFile('thumbnails')) {
         foreach ($request->file('thumbnails') as $key => $thumbFile) {
-          // Check if key is a numeric ID (representing an existing media file)
           if (is_numeric($key)) {
-            // Get media file and verify it belongs to this publication
             $mediaFile = MediaFile::find($key);
 
-            // Check if this media file belongs to the publication through pivot table
             $belongsToPublication = \DB::table('publication_media')
               ->where('publication_id', $publication->id)
               ->where('media_file_id', $key)
               ->exists();
 
             if ($mediaFile && $belongsToPublication) {
-              // Upload new thumbnail
               $thumbFilename = Str::uuid() . '_thumb.' . $thumbFile->getClientOriginalExtension();
               $thumbPath = $thumbFile->storeAs('derivatives/thumbnails', $thumbFilename, 's3');
               $thumbUrl = Storage::disk('s3')->url($thumbPath);
 
-              // DELETE ALL existing thumbnails for this video first
               $existingThumbs = $mediaFile->derivatives()
                 ->where('derivative_type', 'thumbnail')
                 ->get();
@@ -548,14 +519,12 @@ class PublicationController extends Controller
                 $existingThumb->delete();
               }
 
-              // Create new thumbnail for ALL platforms
               $mediaFile->derivatives()->create([
                 'derivative_type' => 'thumbnail',
                 'file_path' => $thumbUrl,
                 'file_name' => $thumbFilename,
                 'mime_type' => $thumbFile->getClientMimeType(),
                 'size' => $thumbFile->getSize(),
-                'platform' => 'all', // Works for YouTube and all other platforms
                 'resolution' => 'custom',
               ]);
             }
@@ -563,14 +532,11 @@ class PublicationController extends Controller
         }
       }
 
-      // Handle YouTube Thumbnail
       if ($request->hasFile('youtube_thumbnail') && $request->has('youtube_thumbnail_video_id')) {
         $videoId = $request->input('youtube_thumbnail_video_id');
 
-        // Get media file and verify it belongs to this publication
         $mediaFile = MediaFile::find($videoId);
 
-        // Check if this media file belongs to the publication through pivot table
         $belongsToPublication = \DB::table('publication_media')
           ->where('publication_id', $publication->id)
           ->where('media_file_id', $videoId)
@@ -582,8 +548,6 @@ class PublicationController extends Controller
           $thumbPath = $thumbFile->storeAs('derivatives/youtube/thumbnails', $thumbFilename, 's3');
           $thumbUrl = Storage::disk('s3')->url($thumbPath);
 
-          // DELETE ALL existing thumbnails for this video (YouTube and generic)
-          // This ensures the new thumbnail takes priority
           $existingThumbs = $mediaFile->derivatives()
             ->where('derivative_type', 'thumbnail')
             ->get();
@@ -601,7 +565,6 @@ class PublicationController extends Controller
             }
           }
 
-          // Create new YouTube thumbnail (replaces all previous)
           MediaDerivative::create([
             'media_file_id' => $mediaFile->id,
             'derivative_type' => 'thumbnail',
@@ -609,14 +572,12 @@ class PublicationController extends Controller
             'file_name' => $thumbFilename,
             'mime_type' => $thumbFile->getClientMimeType(),
             'size' => $thumbFile->getSize(),
-            'platform' => 'all', // Works for YouTube and all other platforms (1-to-1)
           ]);
         }
       }
 
 
 
-      // Redundant block removed as it is handled by the sync block at the beginning.
 
       DB::commit();
 
@@ -668,7 +629,6 @@ class PublicationController extends Controller
       ], 404);
     }
 
-    // Check if any of these platforms are already scheduled for the future
     $alreadyScheduled = ScheduledPost::where('publication_id', $publication->id)
       ->whereIn('social_account_id', $socialAccounts->pluck('id'))
       ->where('status', 'pending')
@@ -759,7 +719,6 @@ class PublicationController extends Controller
       }
     }
 
-    // Update platform settings if provided in the request
     if ($request->has('platform_settings')) {
       $settings = $request->input('platform_settings');
       if (is_string($settings)) {
@@ -768,13 +727,10 @@ class PublicationController extends Controller
       $publication->update(['platform_settings' => $settings]);
     }
 
-    // Pre-initialize logs to Pending state for immediate UI feedback & uniqueness cleanup
     try {
       $publishService = app(PlatformPublishService::class);
-      $publishService->initializeLogs($publication, $socialAccounts, 'publishing'); // This updates status to 'publishing' immediately
     } catch (\Exception $e) {
       Log::error('Failed to pre-initialize logs in Controller', ['error' => $e->getMessage()]);
-      // We continue to dispatch; the Job will attempt to initialize again and handle errors if they persist.
     }
 
     $publication->update(['status' => 'publishing']);
@@ -804,7 +760,6 @@ class PublicationController extends Controller
     }
 
     if ($result['success']) {
-      // Solo cambiar a borrador si ya no queda ninguna plataforma publicada
       $remaining = $publication->socialPostLogs()
         ->where('status', 'published')
         ->count();
@@ -838,7 +793,6 @@ class PublicationController extends Controller
       return response()->json(['error' => 'Publication not found'], 404);
     }
 
-    // 1. Get all pending future schedules
     $scheduledAccountIds = ScheduledPost::where('publication_id', $publication->id)
       ->where('status', 'pending')
       ->where('scheduled_at', '>', now())
@@ -846,7 +800,6 @@ class PublicationController extends Controller
       ->unique()
       ->toArray();
 
-    // 2. Get all logs for this publication
     $allLogs = SocialPostLog::where('publication_id', $publication->id)
       ->orderBy('id', 'desc')
       ->get()
@@ -857,11 +810,9 @@ class PublicationController extends Controller
     $publishingAccountIds = [];
     $removedOfPlatforms = [];
 
-    // Determine latest status for each account from logs
     foreach ($allLogs as $accountId => $logs) {
       $latestStatus = $logs->first()->status;
 
-      // A schedule takes priority over past logs in terms of current "Pending action"
       if (in_array($accountId, $scheduledAccountIds)) {
         continue;
       }
@@ -882,7 +833,6 @@ class PublicationController extends Controller
       }
     }
 
-    // Ensure mutually exclusive lists by priority: Publishing > Published > Scheduled > Failed > Removed
     $finalPublishing = array_values(array_unique($publishingAccountIds));
     $finalPublished = array_values(array_diff(array_unique($publishedAccountIds), $finalPublishing));
     $finalScheduled = array_values(array_diff($scheduledAccountIds, $finalPublishing, $finalPublished));
