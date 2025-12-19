@@ -8,18 +8,16 @@ interface PublicationThumbnailProps {
 export default function PublicationThumbnail({
   publication,
 }: PublicationThumbnailProps) {
-  console.log('pub: ', publication);
   const getThumbnail = (pub: Publication) => {
     if (!pub.media_files || pub.media_files.length === 0) return null;
 
-    console.log('media_files: ', pub.media_files);
     const firstImage = pub.media_files.find((f) =>
       f.file_type.includes("image")
     );
 
     if (firstImage) {
       let url = firstImage.file_path;
-      if(!url) return null;
+      if (!url) return null;
       if (!url.startsWith("http") && !url.startsWith("/storage/")) {
         url = `/storage/${url}`;
       }
@@ -35,8 +33,6 @@ export default function PublicationThumbnail({
   };
 
   const thumbnail = getThumbnail(publication);
-
-  console.log('thumbnail: ', thumbnail);
 
   if (!thumbnail) {
     return <File className="w-6 h-6 text-gray-400" />;
