@@ -707,6 +707,7 @@ export default function EditPublicationModal({
               <div className="space-y-6">
                 <ContentSection
                   register={register}
+                  setValue={setValue}
                   errors={errors}
                   watched={watched}
                   theme={theme}

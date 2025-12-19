@@ -665,12 +665,18 @@ export default function AddPublicationModal({
                     t("publications.modal.edit.campaigns") || "Add to Campaign"
                   }
                   options={(campaigns || []).map((campaign: any) => ({
-                    value: campaign.id,
+                    value: campaign.id.toString(),
                     label:
                       campaign.name ||
                       campaign.title ||
                       `Campaign ${campaign.id}`,
                   }))}
+                  value={watched.campaign_id}
+                  onChange={(val) => {
+                    setValue("campaign_id", val.toString(), {
+                      shouldValidate: true,
+                    });
+                  }}
                   register={register}
                   name="campaign_id"
                   placeholder={t("common.select") || "Select a campaign..."}
