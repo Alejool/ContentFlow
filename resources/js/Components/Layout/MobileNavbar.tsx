@@ -250,7 +250,7 @@ export default function MobileNavbar({
                             : "text-gray-700 hover:bg-beige-300"
                         }`}
                   >
-                    <div className="flex items-center">
+                    <div className="flex items-center gap-2">
                       <div
                         className={`rounded-full ring-2 shadow-lg ${
                           theme === "dark"
