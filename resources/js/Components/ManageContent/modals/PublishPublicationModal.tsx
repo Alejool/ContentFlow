@@ -99,12 +99,6 @@ export default function PublishPublicationModal({
     }
   }, [isOpen, publication]);
 
-  console.log("publication", publication?.id);
-  console.log("publishedPlatforms", publishedPlatforms);
-  console.log("failedPlatforms", failedPlatforms);
-  console.log("publishingPlatforms", publishingPlatforms);
-  console.log("removedPlatforms", removedPlatforms);
-
   const handleUnpublishWithConfirm = async (
     accountId: number,
     platform: string
@@ -307,9 +301,6 @@ export default function PublishPublicationModal({
                     const isRemovedPlatform = removedPlatforms.includes(
                       account.id
                     );
-
-                    console.log(account);
-                    console.log(publishingPlatforms);
                     const isPublishing = publishingPlatforms.includes(
                       account.id
                     );
@@ -513,14 +504,6 @@ export default function PublishPublicationModal({
                     {videoFiles.map((video) => {
                       const videoId = video.id;
                       const existingThumbnail = existingThumbnails[videoId];
-
-                      console.log(`Video ${videoId}:`, {
-                        hasThumbnail: !!existingThumbnail,
-                        thumbnail: existingThumbnail,
-                        metadata: video.metadata,
-                      });
-
-                      // Get video preview URL
                       const videoPreviewUrl = video.file_path?.startsWith(
                         "http"
                       )
@@ -535,16 +518,9 @@ export default function PublishPublicationModal({
                           videoPreviewUrl={videoPreviewUrl}
                           existingThumbnail={existingThumbnail || null}
                           onThumbnailChange={(file: File | null) => {
-                            console.log(
-                              `Thumbnail changed for video ${videoId}:`,
-                              file
-                            );
                             handleThumbnailChange(videoId, file);
                           }}
                           onThumbnailDelete={() => {
-                            console.log(
-                              `Thumbnail deleted for video ${videoId}`
-                            );
                             handleThumbnailDelete(videoId);
                           }}
                         />
