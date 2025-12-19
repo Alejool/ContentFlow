@@ -38,7 +38,7 @@ export default function CampaignMobileTable({
 }: CampaignMobileTableProps) {
   return (
     <div className="lg:hidden">
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3 m-2">
         {items.map((item) => (
           <div
             key={item.id}
@@ -124,7 +124,7 @@ export default function CampaignMobileTable({
                     className={`p-2 text-blue-500 hover:bg-blue-50 rounded-lg dark:hover:bg-blue-900/20`}
                     title={t("common.edit")}
                   >
-                    <Edit className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                    <Edit className="w-4 h-4 text-blue-500 " />
                   </button>
                   <button
                     onClick={() => onDelete(item.id)}
