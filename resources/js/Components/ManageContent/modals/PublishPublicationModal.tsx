@@ -297,7 +297,7 @@ export default function PublishPublicationModal({
                   </p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="flex justify-between items-center gap-2">
                   {connectedAccounts.map((account) => {
                     const iconSrc = getPlatformIcon(account.platform);
                     const gradient = getPlatformGradient(account.platform);
@@ -317,7 +317,7 @@ export default function PublishPublicationModal({
                     const isUnpublishing = unpublishing === account.id;
 
                     return (
-                      <div key={account.id} className="relative ">
+                      <div key={account.id} className="relative flex-1 ">
                         <div
                           onClick={() =>
                             !isPublished &&
@@ -367,7 +367,6 @@ export default function PublishPublicationModal({
                             </div>
                           </div>
 
-                          {/* Status Indicators */}
                           {isPublished && (
                             <div className="flex items-center gap-2">
                               <span className="flex items-center gap-1 text-xs font-medium text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/30 px-2 py-1 rounded-full">
@@ -413,9 +412,7 @@ export default function PublishPublicationModal({
                               </div>
                             )}
 
-                          {/* Action Buttons */}
                           <div className="flex items-center gap-1 ml-auto">
-                            {/* Preview Eye - Always visible if there is something to show */}
                             {(isSelected ||
                               isPublished ||
                               isFailed ||
@@ -436,7 +433,6 @@ export default function PublishPublicationModal({
                               </button>
                             )}
 
-                            {/* Settings - Only for non-published */}
                             {!isPublished && !isPublishing && !isScheduled && (
                               <button
                                 type="button"
@@ -454,7 +450,6 @@ export default function PublishPublicationModal({
                               </button>
                             )}
 
-                            {/* Check - Selected indicator */}
                             {isSelected &&
                               !isPublished &&
                               !isPublishing &&
@@ -464,7 +459,6 @@ export default function PublishPublicationModal({
                           </div>
                         </div>
 
-                        {/* Unpublish button */}
                         {isPublished && (
                           <button
                             onClick={(e) => {
@@ -492,7 +486,6 @@ export default function PublishPublicationModal({
               )}
             </div>
 
-            {/* YouTube Thumbnail Section */}
             {isYoutubeSelected() && videoFiles.length > 0 && (
               <div className="mb-6">
                 <div className="flex items-center gap-2 mb-4">
