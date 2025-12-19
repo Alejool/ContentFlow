@@ -13,7 +13,14 @@ class OAuthController extends Controller
   public function redirect($provider)
   {
     $scopes = match ($provider) {
-      'facebook' => ['pages_show_list,pages_read_engagement ', 'pages_read_engagement'],
+      'facebook' => [
+        'public_profile',
+        'pages_show_list',
+        'pages_manage_posts',
+        'pages_manage_metadata',
+        'pages_read_engagement',
+        'read_insights'
+      ],
       'google' => ['https://www.googleapis.com/auth/youtube.upload'],
       'twitter' => ['tweet.read', 'tweet.write'],
       default => [],
