@@ -43,7 +43,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({
         icon={FileText}
         theme={theme}
         variant="filled"
-        size="lg"
+        sizeType="lg"
         required
         hint={`${watched.title?.length || 0}/70 characters`}
         disabled={disabled}
@@ -79,7 +79,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({
         icon={FileText}
         theme={theme}
         variant="filled"
-        size="lg"
+        sizeType="lg"
         required
         hint={`${watched.goal?.length || 0}/200 characters`}
         disabled={disabled}
@@ -97,7 +97,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({
         icon={Hash}
         theme={theme}
         variant="filled"
-        size="lg"
+        sizeType="lg"
         hint={`${
           watched.hashtags
             ? watched.hashtags

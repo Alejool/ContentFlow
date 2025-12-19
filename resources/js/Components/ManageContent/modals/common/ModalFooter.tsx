@@ -52,14 +52,16 @@ export default function ModalFooter({
      theme === "dark" ? "border-neutral-700" : "border-gray-100";
 
   return (
-    <div className={`${modalHeaderBg} ${modalHeaderBorder} p-6  border-t border-gray-200 sticky bottom-0  flex justify-end gap-3`}>
+    <div
+      className={`${modalHeaderBg} ${modalHeaderBorder} p-6  border-t border-gray-200 sticky bottom-0  flex justify-end gap-3`}
+    >
       {onClose && (
         <Button
           type="button"
           onClick={onClose}
           disabled={isSubmitting}
           variant={cancelVariant}
-          style={cancelStyle}
+          buttonStyle={cancelStyle}
           size="md"
           icon={cancelIcon}
         >
@@ -73,7 +75,7 @@ export default function ModalFooter({
         disabled={isSubmitting}
         loading={isSubmitting}
         variant={submitVariant}
-        style={submitStyle}
+        buttonStyle={submitStyle}
         size="md"
         icon={submitIcon}
       >

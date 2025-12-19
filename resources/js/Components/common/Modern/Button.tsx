@@ -1,5 +1,19 @@
 import { useTheme } from "@/Hooks/useTheme";
-import { ButtonHTMLAttributes, ReactNode, forwardRef } from "react";
+import {
+  ButtonHTMLAttributes,
+  ComponentType,
+  ReactNode,
+  forwardRef,
+} from "react";
+
+type IconType =
+  | ComponentType<{
+      size?: number | string;
+      className?: string;
+      strokeWidth?: number;
+    }>
+  | ReactNode;
+
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
   variant?:
@@ -9,16 +23,17 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     | "success"
     | "ghost"
     | "warning";
-  style?: "solid" | "outline" | "gradient" | "ghost";
+  buttonStyle?: "solid" | "outline" | "gradient" | "ghost";
   size?: "xs" | "sm" | "md" | "lg" | "xl";
   loading?: boolean;
   loadingText?: string;
   fullWidth?: boolean;
-  icon?: ReactNode;
   iconPosition?: "left" | "right";
   rounded?: "none" | "sm" | "md" | "lg" | "full";
   shadow?: "none" | "sm" | "md" | "lg" | "xl";
   animation?: "none" | "pulse" | "bounce";
+  theme?: "light" | "dark";
+  icon?: IconType;
 }
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
@@ -40,6 +55,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       rounded = "md",
       shadow = "md",
       animation = "none",
+      theme,
       ...props
     },
     ref
@@ -115,19 +131,20 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       },
       ghost: {
         bg: "bg-transparent",
-        hoverBg: "hover:bg-gray-100",
-        text: "text-gray-700",
-        border: "border-gray-300",
-        hoverText: "hover:text-gray-700",
+        hoverBg: "hover:bg-gray-100 dark:hover:bg-gray-800",
+        text: "text-gray-700 dark:text-gray-300",
+        border: "border-gray-300 dark:border-gray-700",
+        hoverText: "hover:text-gray-700 dark:hover:text-gray-300",
         focusRing: "focus:ring-gray-500",
         from: "from-transparent",
         to: "to-transparent",
-        hoverFrom: "hover:from-gray-100",
-        hoverTo: "hover:to-gray-100",
+        hoverFrom: "hover:from-gray-100 dark:hover:from-gray-800",
+        hoverTo: "hover:to-gray-100 dark:hover:to-gray-800",
       },
     };
 
-    const theme = useTheme();
+    const themeContext = useTheme();
+    const currentTheme = theme || themeContext.theme || "light";
 
     const colors = variantColors[variant] || variantColors.primary;
 
@@ -139,21 +156,32 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             bg-gradient-to-r ${colors.from} ${colors.to}
             hover:bg-gradient-to-r ${colors.hoverFrom} ${colors.hoverTo}
             border-0
+            ${currentTheme === "dark" && variant === "ghost" ? "dark" : ""}
           `;
         case "outline":
           return `
             bg-transparent
             border-2 ${colors.border}
-            hover:${colors.hoverBg.replace("bg-", "bg-opacity-10 ")}
-            hover:${colors.border.replace("border-", "border-")}
+            ${colors.text}
+            hover:bg-opacity-10 hover:${colors.hoverBg.replace("hover:", "")}
+            ${
+              currentTheme === "dark" && variant === "ghost"
+                ? "dark:border-gray-700 dark:text-gray-300"
+                : ""
+            }
           `;
         case "ghost":
           return `
             ${colors.text}
             bg-transparent
-            border border-gray-300
+            border border-gray-300 dark:border-gray-700
             hover:${colors.hoverBg}
             hover:${colors.hoverText}
+            ${
+              currentTheme === "dark"
+                ? "dark:hover:bg-gray-800 dark:hover:text-gray-300"
+                : ""
+            }
           `;
         case "solid":
         default:
@@ -201,10 +229,34 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       ${shadowClasses[shadow]}
       ${animationClasses[animation]}
       ${colors.focusRing}
+      ${
+        currentTheme === "dark"
+          ? "focus:ring-offset-gray-900"
+          : "focus:ring-offset-white"
+      }
     `;
 
     const isLoading = loading || disabled;
     const displayLoadingText = loadingText || "Processing...";
+
+    const renderIcon = (position: "left" | "right") => {
+      if (!icon || iconPosition !== position) return null;
+
+      if (typeof icon === "function") {
+        const IconComponent = icon as ComponentType<any>;
+        const iconSize = {
+          xs: 12,
+          sm: 14,
+          md: 16,
+          lg: 18,
+          xl: 20,
+        }[size];
+
+        return <IconComponent size={iconSize} className="flex-shrink-0" />;
+      }
+
+      return icon;
+    };
 
     return (
       <button
@@ -217,14 +269,14 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       >
         {isLoading ? (
           <>
-            <div className="w-5 h-5 border-1 border-current border-t-transparent rounded-full animate-spin" />
+            <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
             <span>{displayLoadingText}</span>
           </>
         ) : (
           <>
-            {icon && iconPosition === "left" && icon}
+            {renderIcon("left")}
             <span>{children}</span>
-            {icon && iconPosition === "right" && icon}
+            {renderIcon("right")}
           </>
         )}
       </button>

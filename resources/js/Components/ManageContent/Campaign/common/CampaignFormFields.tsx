@@ -43,7 +43,7 @@ const CampaignFormFields: React.FC<CampaignFormFieldsProps> = ({
             t("campaigns.modal.add.placeholders.name") ||
             "e.g. Summer Sale 2024"
           }
-          size="lg"
+          sizeType= "lg"
           variant="filled"
           theme={theme}
           error={errors.name?.message as string}
@@ -85,7 +85,7 @@ const CampaignFormFields: React.FC<CampaignFormFieldsProps> = ({
             icon={Target}
             theme={theme}
             variant="filled"
-            size="lg"
+            sizeType="lg"
             hint={`${watched.goal?.length || 0}/200 characters`}
           />
         </div>
@@ -106,7 +106,7 @@ const CampaignFormFields: React.FC<CampaignFormFieldsProps> = ({
             icon={Target}
             theme={theme}
             variant="filled"
-            size="lg"
+            sizeType="lg"
           />
         </div>
       </div>

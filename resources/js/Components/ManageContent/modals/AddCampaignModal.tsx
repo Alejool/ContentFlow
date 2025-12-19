@@ -152,7 +152,7 @@ export default function AddCampaignModal({
                   t("campaigns.modal.add.placeholders.name") ||
                   "e.g. Summer Sale 2024"
                 }
-                size="lg"
+                sizeType="lg"
                 variant="filled"
                 theme={theme}
                 error={errors.name?.message as string}
@@ -191,7 +191,7 @@ export default function AddCampaignModal({
                   icon={Target}
                   theme={theme}
                   variant="filled"
-                  size="lg"
+                  sizeType="lg"
                   hint={`${watchedFields.goal?.length || 0}/200 characters`}
                 />
               </div>
@@ -208,7 +208,7 @@ export default function AddCampaignModal({
                   icon={DollarSign}
                   theme={theme}
                   variant="filled"
-                  size="lg"
+                  sizeType="lg"
                 />
               </div>
             </div>

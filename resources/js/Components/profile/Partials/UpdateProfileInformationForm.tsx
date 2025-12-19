@@ -1,9 +1,9 @@
-import ModernButton from "@/Components/common/Modern/Button";
+import Button from "@/Components/common/Modern/Button";
 import ModernCard from "@/Components/common/Modern/Card";
-import ModernInput from "@/Components/common/Modern/Input";
+import Input from "@/Components/common/Modern/Input";
 import LanguageSwitcher from "@/Components/common/ui/LanguageSwitcher";
 import { useTheme } from "@/Hooks/useTheme";
-import { profileSchema } from "@/schemas/schemas";
+import { ProfileFormData, profileSchema } from "@/schemas/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, usePage } from "@inertiajs/react";
 import axios from "axios";
@@ -15,49 +15,117 @@ import {
   MailWarning,
   Save,
   Send,
-  User,
+  User as UserIcon,
 } from "lucide-react";
-import { useState } from "react";
-import { useForm as useHookForm } from "react-hook-form";
+import { useEffect, useState } from "react";
+import { SubmitHandler, useForm as useHookForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
 interface UpdateProfileInformationProps {
   mustVerifyEmail: boolean;
-  status: string;
+  status: string | null;
   className?: string;
 }
+
+interface AuthUser {
+  id: number;
+  name: string;
+  email: string;
+  email_verified_at: string | null;
+}
+
+interface PageProps {
+  auth: {
+    user: AuthUser;
+  };
+}
+
+interface ApiResponse {
+  success?: boolean;
+  warning?: boolean;
+  message?: string;
+  errors?: Record<string, string[]>;
+}
+
 export default function UpdateProfileInformation({
   mustVerifyEmail,
   status,
   className = "",
 }: UpdateProfileInformationProps) {
-  const user = usePage().props.auth.user;
+  const page = usePage<PageProps>();
+  const user = page.props.auth.user;
   const { t, i18n } = useTranslation();
   const { theme } = useTheme();
   const [isChangingLanguage, setIsChangingLanguage] = useState(false);
 
-  const {
-    register,
-    handleSubmit,
-    setError,
-    formState: { errors, isSubmitting, isDirty },
-  } = useHookForm({
-    resolver: zodResolver(profileSchema),
-    defaultValues: {
-      name: user?.name || "",
-      email: user?.email || "",
-    },
+  // Estado para manejar cambios manualmente
+  const [formData, setFormData] = useState({
+    name: user?.name || "",
+    email: user?.email || "",
   });
 
-  const submit = async (data) => {
+  const [initialData, setInitialData] = useState({
+    name: user?.name || "",
+    email: user?.email || "",
+  });
+
+  const [hasChanges, setHasChanges] = useState(false);
+
+  const {
+    handleSubmit,
+    setError,
+    register,
+    formState: { errors, isSubmitting },
+  } = useHookForm<ProfileFormData>({
+    resolver: zodResolver(profileSchema),
+    mode: "onChange",
+  });
+
+  // Actualizar formData cuando cambia el usuario
+  useEffect(() => {
+    if (user) {
+      const newData = {
+        name: user.name,
+        email: user.email,
+      };
+      setFormData(newData);
+      setInitialData(newData);
+      setHasChanges(false);
+    }
+  }, [user]);
+
+  // Verificar cambios cuando formData cambia
+  useEffect(() => {
+    const changes =
+      formData.name !== initialData.name ||
+      formData.email !== initialData.email;
+    setHasChanges(changes);
+  }, [formData, initialData]);
+
+  const handleInputChange =
+    (field: keyof typeof formData) =>
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setFormData((prev) => ({
+        ...prev,
+        [field]: e.target.value,
+      }));
+    };
+
+  const submit: SubmitHandler<ProfileFormData> = async () => {
     try {
-      const response = await axios.patch(route("profile.update"), data);
+      const response = await axios.patch<ApiResponse>(
+        route("profile.update"),
+        formData
+      );
 
       if (response.data.success) {
         toast.success(
           response.data.message || t("profile.toast.updateSuccess")
         );
+        // Actualizar datos iniciales después de guardar
+        setInitialData(formData);
+        setHasChanges(false);
       } else if (response.data.warning) {
         toast(response.data.message || t("profile.toast.noChanges"), {
           icon: "⚠️",
@@ -70,20 +138,24 @@ export default function UpdateProfileInformation({
         toast.error(response.data.message || t("profile.toast.errorUpdating"));
       }
     } catch (error) {
-      if (error.response?.data?.errors) {
-        Object.entries(error.response.data.errors).forEach(([key, value]) => {
-          setError(key, { message: value[0] });
-          toast.error(value[0]);
-        });
+      if (axios.isAxiosError(error) && error.response?.data?.errors) {
+        const errorData = error.response.data as ApiResponse;
+        if (errorData.errors) {
+          Object.entries(errorData.errors).forEach(([key, value]) => {
+            // Mostrar errores en toast
+            toast.error(value[0]);
+          });
+        }
       } else {
         toast.error(
-          error.response?.data?.message || t("profile.toast.errorUpdating")
+          (error as any).response?.data?.message ||
+            t("profile.toast.errorUpdating")
         );
       }
     }
   };
 
-  const handleLanguageChange = async (lang) => {
+  const handleLanguageChange = async (lang: string) => {
     try {
       setIsChangingLanguage(true);
       await i18n.changeLanguage(lang);
@@ -100,32 +172,44 @@ export default function UpdateProfileInformation({
     <ModernCard
       title={t("profile.information.title")}
       description={t("profile.information.description")}
-      icon={User}
+      icon={UserIcon}
       headerColor="green"
       className={className}
     >
       <form onSubmit={handleSubmit(submit)} className="space-y-6">
-        <ModernInput
+        {/* Campo Nombre - CONTROLADO MANUALMENTE */}
+        <Input
           id="name"
           label={t("profile.information.nameLabel")}
-          register={register}
-          error={errors.name?.message}
+          value={formData.name}
+          onChange={handleInputChange("name")}
           placeholder={t("profile.information.namePlaceholder")}
           theme={theme}
-          icon={User}
+          register={register}
+          error={errors.name?.message}
+          sizeType="lg"
+          variant="filled"
+          icon={UserIcon}
+          required
         />
 
+        {/* Campo Email - CONTROLADO MANUALMENTE */}
         <div className="relative">
-          <ModernInput
+          <Input
             id="email"
             label={t("profile.information.emailLabel")}
             type="email"
             register={register}
             error={errors.email?.message}
+            value={formData.email}
+            onChange={handleInputChange("email")}
             placeholder={t("profile.information.emailPlaceholder")}
             containerClassName="flex-1"
             theme={theme}
+            sizeType="lg"
+            variant="filled"
             icon={Mail}
+            required
           />
 
           {user.email_verified_at && (
@@ -265,44 +349,45 @@ export default function UpdateProfileInformation({
           </div>
         </div>
 
+        {/* Botón de guardar - AHORA FUNCIONARÁ CORRECTAMENTE */}
         <div
-          className={`flex items-center gap-4 pt-4 border-t transition-colors duration-300
+          className={`flex items-center justify-end gap-4 pt-4 border-t transition-colors duration-300
             ${theme === "dark" ? "border-neutral-700/50" : "border-gray-200"}`}
         >
-          <ModernButton
-            disabled={isSubmitting || !isDirty}
+          <Button
+            disabled={isSubmitting || !hasChanges}
             icon={Save}
             theme={theme}
             loading={isSubmitting}
-            className="min-w-[140px]"
+            loadingText={t("common.saving")}
+            className={`min-w-[140px] transition-all duration-300 ${
+              !hasChanges
+                ? "opacity-50 cursor-not-allowed"
+                : "hover:scale-[1.02]"
+            }`}
+            type="submit"
+            size="lg"
           >
-            {isSubmitting
-              ? t("common.saving")
-              : t("profile.actions.saveChanges")}
-          </ModernButton>
-
-          {isSubmitting && (
-            <div
-              className={`text-sm flex items-center gap-2
-                ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}
-            >
-              <div className="w-3 h-3 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
-              {t("common.processing")}
-            </div>
-          )}
+            {t("profile.actions.saveChanges")}
+          </Button>
         </div>
 
-        <div className="space-y-2">
-          {isDirty && !isSubmitting && (
+        {/* Mensaje de cambios no guardados */}
+        {hasChanges && !isSubmitting && (
+          <div className="space-y-2">
             <div
-              className={`flex items-center gap-2 text-sm
-                ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}
+              className={`flex items-center gap-2 text-sm p-3 rounded-lg
+                ${
+                  theme === "dark"
+                    ? "bg-yellow-900/10 text-yellow-400 border border-yellow-800/20"
+                    : "bg-yellow-50 text-yellow-700 border border-yellow-200"
+                }`}
             >
               <AlertTriangle className="w-4 h-4" />
               {t("profile.messages.unsavedChanges")}
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </form>
     </ModernCard>
   );

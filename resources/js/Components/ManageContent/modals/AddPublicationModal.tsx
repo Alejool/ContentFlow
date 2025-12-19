@@ -594,7 +594,7 @@ export default function AddPublicationModal({
                   theme={theme}
                   variant="filled"
                   required
-                  size="lg"
+                  sizeType="lg"
                   hint={`${watched.title?.length || 0}/70 characters`}
                 />
 
@@ -630,7 +630,7 @@ export default function AddPublicationModal({
                   theme={theme}
                   variant="filled"
                   required
-                  size="lg"
+                  sizeType="lg"
                   hint={`${watched.goal?.length || 0}/200 characters`}
                 />
 
@@ -649,7 +649,7 @@ export default function AddPublicationModal({
                   theme={theme}
                   variant="filled"
                   required
-                  size="lg"
+                  sizeType="lg"
                   hint={`${
                     watched.hashtags
                       ? watched.hashtags

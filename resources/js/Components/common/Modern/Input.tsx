@@ -27,7 +27,7 @@ interface InputProps<T extends FieldValues = FieldValues>
   prefix?: ReactNode;
   suffix?: ReactNode;
   variant?: "default" | "outlined" | "filled";
-  size?: "sm" | "md" | "lg";
+  sizeType?: "sm" | "md" | "lg";
   required?: boolean;
 }
 
@@ -50,7 +50,7 @@ export default function Input<T extends FieldValues>({
   prefix,
   suffix,
   variant = "default",
-  size = "md",
+  sizeType = "md",
   required = false,
   ...props
 }: InputProps<T>) {
@@ -67,7 +67,7 @@ export default function Input<T extends FieldValues>({
     lg: { input: "py-3 px-4 text-base", icon: "w-5 h-5", label: "text-base" },
   };
 
-  const currentSize = sizeConfig[size];
+  const currentSize = sizeConfig[sizeType];
 
   const getContainerStyles = () => {
     const baseStyles = "relative transition-all duration-200";
@@ -189,7 +189,7 @@ export default function Input<T extends FieldValues>({
           {label && (
             <Label
               htmlFor={id}
-              size={size === "md" ? "md" : size === "lg" ? "lg" : "sm"}
+              size={sizeType === "md" ? "md" : sizeType === "lg" ? "lg" : "sm"}
               required={required}
               error={error}
               success={success}
