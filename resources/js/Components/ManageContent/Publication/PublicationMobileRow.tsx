@@ -2,19 +2,19 @@ import PublicationThumbnail from "@/Components/ManageContent/Publication/Publica
 import SocialAccountsDisplay from "@/Components/ManageContent/Publication/SocialAccountsDisplay";
 import { Publication } from "@/types/Publication";
 import {
+  CheckCircle,
+  Clock,
   Edit,
+  Eye,
+  Folder,
   Image,
+  MoreVertical,
   Rocket,
   Trash2,
   Video,
-  Folder,
-  MoreVertical,
-  Eye,
-  CheckCircle,
   XCircle,
-  Clock,
 } from "lucide-react";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 
 interface PublicationMobileRowProps {
   items: Publication[];
@@ -110,7 +110,7 @@ export default function PublicationMobileRow({
                 const isExpanded = expandedRow === item.id;
 
                 return (
-                  <>
+                  <Fragment key={item.id}>
                     <tr
                       key={item.id}
                       onClick={(e) => handleRowClick(item, e)}
@@ -303,7 +303,6 @@ export default function PublicationMobileRow({
                                             <Video className="w-4 h-4 text-purple-500" />
                                             <span className="text-xs text-gray-600 dark:text-gray-400">
                                               {mediaCount.videos}{" "}
-                                             
                                             </span>
                                           </div>
                                         )}
@@ -403,7 +402,7 @@ export default function PublicationMobileRow({
                         </td>
                       </tr>
                     )}
-                  </>
+                  </Fragment>
                 );
               })}
             </tbody>
