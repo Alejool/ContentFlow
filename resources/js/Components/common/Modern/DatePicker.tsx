@@ -146,8 +146,8 @@ const DatePickerModern = <T extends FieldValues>({
 
     if (theme === "dark") {
       return type === "error"
-        ? `${base} text-primary-300`
-        : `${base} text-green-300`;
+        ? `${base} text-primary-500`
+        : `${base} text-green-500`;
     }
     return type === "error"
       ? `${base} text-primary-600`
@@ -464,7 +464,7 @@ const DatePickerModern = <T extends FieldValues>({
           .react-datepicker__close-icon {
             background-color: transparent;
             display:none
-            
+
           }
 
           /* Mejoras para mobile */
