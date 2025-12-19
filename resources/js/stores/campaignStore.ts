@@ -67,12 +67,10 @@ export const useCampaignStore = create<CampaignState>((set, get) => ({
           per_page: response.data.campaigns.per_page || 5,
         };
       } else if (Array.isArray(response.data?.campaigns)) {
-        // Fallback for flat array response
         campaignsData = response.data.campaigns;
         paginationData.total = campaignsData.length;
       } else if (Array.isArray(response.data?.data)) {
         campaignsData = response.data.data;
-        // Attempt to extract pagination if available at root
         if (response.data.current_page) {
           paginationData = {
             current_page: response.data.current_page,

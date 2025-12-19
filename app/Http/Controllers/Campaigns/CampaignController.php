@@ -15,7 +15,7 @@ class CampaignController extends Controller
     public function index(Request $request)
     {
         $query = Campaign::where('user_id', Auth::id())
-            ->with(['publications.socialPostLogs.socialAccount']);
+            ->with(['publications.socialPostLogs.socialAccount', 'publications.mediaFiles']);
 
         if ($request->has('status') && $request->status !== 'all') {
             $query->where('status', $request->status);

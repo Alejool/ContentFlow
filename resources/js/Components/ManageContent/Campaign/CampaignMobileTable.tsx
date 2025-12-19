@@ -36,6 +36,8 @@ export default function CampaignMobileTable({
   onViewDetails,
   getStatusColor,
 }: CampaignMobileTableProps) {
+
+  console.log('items: ', items);
   return (
     <div className="lg:hidden">
       <div className="flex flex-col gap-3 m-2">
