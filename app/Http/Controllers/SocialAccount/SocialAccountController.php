@@ -13,6 +13,7 @@ use App\Http\Controllers\Controller;
 use App\Notifications\SocialAccountConnectedNotification;
 use App\Notifications\SocialAccountDisconnectedNotification;
 use App\Models\SocialPostLog;
+use Abraham\TwitterOAuth\TwitterOAuth;
 
 class SocialAccountController extends Controller
 {
@@ -39,7 +40,14 @@ class SocialAccountController extends Controller
           'client_id' => config('services.facebook.client_id'),
           'redirect_uri' => url('/auth/facebook/callback'),
           'response_type' => 'code',
-          'scope' => 'pages_show_list,pages_read_engagement,pages_show_list,pages_read_engagement ,public_profile',
+          'scope' => implode(',', [
+            'public_profile',
+            'pages_show_list',
+            'pages_manage_posts',
+            'pages_manage_metadata',
+            'pages_read_engagement',
+            'read_insights'
+          ]),
           'state' => $state
         ]);
         break;
@@ -55,15 +63,8 @@ class SocialAccountController extends Controller
         break;
 
       case 'twitter':
-        // Start Step 1: OAuth 1.0a for Media Uploads
         $consumerKey = config('services.twitter.consumer_key');
         $consumerSecret = config('services.twitter.consumer_secret');
-
-        Log::info('Twitter Auth V1 Debug', [
-          'consumer_key' => $consumerKey,
-          'consumer_secret' => $consumerSecret,
-          'callback_url' => url('/auth/twitter/callback-v1')
-        ]);
 
         if (!$consumerKey || !$consumerSecret) {
           return response()->json([
@@ -72,34 +73,23 @@ class SocialAccountController extends Controller
           ], 500);
         }
 
-        // Debug Logging (Temporary)
-        Log::info('Twitter Auth V1 Debug', [
-          'consumer_key_masked' => substr($consumerKey, 0, 5) . '...',
-          'consumer_key_len' => strlen($consumerKey),
-          'generated_callback' => url('/auth/twitter/callback-v1')
-        ]);
-
-        $connection = new \Abraham\TwitterOAuth\TwitterOAuth($consumerKey, $consumerSecret);
+        $connection = new TwitterOAuth($consumerKey, $consumerSecret);
 
         try {
-          // Callback to our intermediate V1 handler
           $request_token = $connection->oauth('oauth/request_token', [
             'oauth_callback' => url('/auth/twitter/callback-v1')
           ]);
 
-          // Store temp tokens
           session([
             'oauth_token' => $request_token['oauth_token'],
             'oauth_token_secret' => $request_token['oauth_token_secret'],
             'social_auth_state' => $state
           ]);
 
-          // Redirect user to Twitter to approve V1
           $url = $connection->url('oauth/authorize', [
             'oauth_token' => $request_token['oauth_token']
           ]);
         } catch (\Throwable $e) {
-          Log::error('Twitter V1 Init Error: ' . $e->getMessage());
           return response()->json([
             'success' => false,
             'message' => 'Failed to initialize Twitter Login: ' . $e->getMessage()
@@ -184,23 +174,51 @@ class SocialAccountController extends Controller
         return $this->handleOAuthError('Could not obtain user information');
       }
 
-      $this->saveAccount([
-        'platform' => 'facebook',
-        'account_id' => $userData['id'],
-        'account_name' => $userData['name'] ?? null,
-        'account_metadata' => [
-          'avatar' => $userData['picture']['data']['url'] ?? null,
-        ],
-        'access_token' => $data['access_token'],
-        'refresh_token' => null,
-        'token_expires_at' => isset($data['expires_in'])
-          ? now()->addSeconds($data['expires_in'])
-          : null,
-      ]);
+      $pages1 = Http::withToken($data['access_token'])->get('https://graph.facebook.com/v24.0/me/accounts', ['fields' => 'id,name,access_token,picture,category,tasks'])->json();
+      $pages2 = Http::withToken($data['access_token'])->get('https://graph.facebook.com/v24.0/me', ['fields' => 'accounts{id,name,access_token,picture,category,tasks}'])->json();
+      $allPages = array_merge($pages1['data'] ?? [], $pages2['accounts']['data'] ?? []);
+      $uniquePages = [];
+      foreach ($allPages as $p) {
+        $uniquePages[$p['id']] = $p;
+      }
+      $pagesData = ['data' => array_values($uniquePages)];
+      $permsResponse = Http::withToken($data['access_token'])
+        ->get('https://graph.facebook.com/v24.0/me/permissions');
+      $permsData = $permsResponse->json();
+
+      if (count($uniquePages) === 0) {
+        return $this->handleOAuthError('No Facebook Pages found associated with this account. This happens if the user does not have any Pages or if the Facebook App is "Consumer" type instead of "Business".');
+      }
+
+      $savedPages = [];
+      foreach ($pagesData['data'] as $page) {
+        if (true) {
+          $this->saveAccount([
+            'platform' => 'facebook',
+            'account_id' => $page['id'],
+            'account_name' => $page['name'],
+            'account_metadata' => [
+              'avatar' => $page['picture']['data']['url'] ?? null,
+              'category' => $page['category'] ?? null,
+              'user_id' => $userData['id'],
+            ],
+            'access_token' => $page['access_token'],
+            'refresh_token' => null,
+            'token_expires_at' => isset($data['expires_in'])
+              ? now()->addSeconds($data['expires_in'])
+              : null,
+          ]);
+          $savedPages[] = $page['name'];
+        }
+      }
+
+      if (empty($savedPages)) {
+        return $this->handleOAuthError('You do not have sufficient permissions to publish on any of your Facebook Pages.');
+      }
 
       return $this->closeWindowWithMessage('success', [
         'platform' => 'facebook',
-        'account_name' => $userData['name'] ?? null,
+        'account_name' => count($savedPages) . ' Pages connected: ' . implode(', ', array_slice($savedPages, 0, 2)) . (count($savedPages) > 2 ? '...' : ''),
         'avatar' => $userData['picture']['data']['url'] ?? null,
       ]);
     } catch (\Exception $e) {
@@ -230,7 +248,6 @@ class SocialAccountController extends Controller
       $data = $response->json();
 
       if (!isset($data['access_token']) || !isset($data['user_id'])) {
-        Log::error('Instagram OAuth Error:', $data);
         return $this->handleOAuthError('Could not obtain access token: ' . json_encode($data));
       }
 
@@ -268,13 +285,12 @@ class SocialAccountController extends Controller
         'account_name' => $userData['username'] ?? null,
       ]);
     } catch (\Exception $e) {
-      Log::error('Instagram OAuth Exception:', ['message' => $e->getMessage()]);
       return $this->handleOAuthError('Error processing authentication: ' . $e->getMessage());
     }
   }
 
   /**
-   * Step 2: Handle V1 Callback and immediately redirect to V2
+   * Handle V1 Callback and immediately redirect to V2
    */
   public function handleTwitterV1Callback(Request $request)
   {
@@ -291,7 +307,7 @@ class SocialAccountController extends Controller
 
     try {
       // Exchange for permanent V1 tokens
-      $connection = new \Abraham\TwitterOAuth\TwitterOAuth(
+      $connection = new TwitterOAuth(
         config('services.twitter.consumer_key'),
         config('services.twitter.consumer_secret'),
         $cachedToken,
@@ -302,13 +318,12 @@ class SocialAccountController extends Controller
         'oauth_verifier' => $request->oauth_verifier
       ]);
 
-      // Store V1 credentials in session for the next step
       session(['twitter_v1_creds' => [
         'oauth_token' => $accessToken['oauth_token'],
         'oauth_token_secret' => $accessToken['oauth_token_secret']
       ]]);
 
-      // === Proceed to Step 3: Start OAuth 2.0 Flow ===
+      //Start OAuth 2.0 Flow ===
       $state = session('social_auth_state');
 
       $codeVerifier = Str::random(128);
@@ -331,7 +346,6 @@ class SocialAccountController extends Controller
 
       return redirect($v2Url);
     } catch (\Throwable $e) {
-      Log::error('Twitter V1 Callback Error', ['error' => $e->getMessage()]);
       return $this->handleOAuthError('Twitter V1 Auth Failed: ' . $e->getMessage());
     }
   }
@@ -389,7 +403,6 @@ class SocialAccountController extends Controller
         'avatar' => $userInfo['profile_image_url'] ?? null,
       ];
 
-      // Merge V1 tokens if they exist
       if ($v1Creds) {
         $metadata['oauth1_token'] = $v1Creds['oauth_token'];
         $metadata['secret'] = $v1Creds['oauth_token_secret'];
@@ -407,7 +420,6 @@ class SocialAccountController extends Controller
           : null,
       ]);
 
-      // Clear session data
       session()->forget(['twitter_v1_creds', 'twitter_code_verifier', 'social_auth_state', 'oauth_token', 'oauth_token_secret']);
 
       return $this->closeWindowWithMessage('success', [
