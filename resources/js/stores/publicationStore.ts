@@ -109,7 +109,7 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
     //   return cached;
     // }
 
-    set({ isLoading: true, error: null });
+    set({ error: null });
     try {
       const response = await axios.get(`/publications/${id}`);
       const publication = response.data.publication;
@@ -119,14 +119,12 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
           p.id === id ? publication : p
         ),
         currentPublication: publication,
-        isLoading: false,
       }));
 
       return publication;
     } catch (error: any) {
       set({
         error: error.message ?? "Failed to fetch publication",
-        isLoading: false,
       });
       return null;
     }

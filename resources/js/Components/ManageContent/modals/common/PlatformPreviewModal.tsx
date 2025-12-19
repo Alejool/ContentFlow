@@ -1,3 +1,8 @@
+import IconFacebook from "@/../assets/Icons/facebook.svg";
+import IconInstagram from "@/../assets/Icons/instagram.svg";
+import IconTiktok from "@/../assets/Icons/tiktok.svg";
+import IconTwitter from "@/../assets/Icons/x.svg";
+import IconYoutube from "@/../assets/Icons/youtube.svg";
 import Modal from "@/Components/common/ui/Modal";
 import { format } from "date-fns";
 import {
@@ -5,16 +10,12 @@ import {
   Clock,
   ExternalLink,
   Eye,
-  Facebook,
   Heart,
-  Instagram,
   Loader2,
   MessageCircle,
   MoreHorizontal,
   Play,
   Share2,
-  Twitter,
-  Youtube,
 } from "lucide-react";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -84,20 +85,16 @@ const PlatformPreviewModal: React.FC<PlatformPreviewModalProps> = ({
   const getPlatformIcon = () => {
     switch (platform.toLowerCase()) {
       case "facebook":
-        return <Facebook className="w-5 h-5 text-[#1877F2]" />;
+        return <img src={IconFacebook} alt="Facebook" className="w-5 h-5" />;
       case "instagram":
-        return <Instagram className="w-5 h-5 text-[#E4405F]" />;
+        return <img src={IconInstagram} alt="Instagram" className="w-5 h-5" />;
       case "twitter":
       case "x":
-        return <Twitter className="w-5 h-5 text-sky-500" />;
+        return <img src={IconTwitter} alt="X (Twitter)" className="w-5 h-5" />;
       case "youtube":
-        return <Youtube className="w-5 h-5 text-[#FF0000]" />;
+        return <img src={IconYoutube} alt="YouTube" className="w-5 h-5" />;
       case "tiktok":
-        return (
-          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-1.14-.32-2.4-.3-3.43.3-.74.41-1.3 1.09-1.49 1.92-.09.38-.13.77-.12 1.16.03.75.26 1.48.63 2.11.75 1.28 2.14 2.14 3.59 2.19 1.58.11 3.16-.67 3.92-2.06.35-.63.55-1.33.56-2.05.02-3.34-.01-6.69.01-10.03z" />
-          </svg>
-        );
+        return <img src={IconTiktok} alt="TikTok" className="w-5 h-5" />;
       default:
         return <Share2 className="w-5 h-5" />;
     }
