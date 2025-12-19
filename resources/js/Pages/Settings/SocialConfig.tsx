@@ -1,12 +1,11 @@
-import PlatformSettingsModal from "@/Components/ConfigSocialMedia/PlatformSettingsModal";
 import IconFacebook from "@/../assets/Icons/facebook.svg";
-import IconInstagram from "@/../assets/Icons/instagram.svg";
 import IconTiktok from "@/../assets/Icons/tiktok.svg";
 import IconTwitter from "@/../assets/Icons/x.svg";
 import IconYoutube from "@/../assets/Icons/youtube.svg";
+import PlatformSettingsModal from "@/Components/ConfigSocialMedia/PlatformSettingsModal";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, router } from "@inertiajs/react";
-import { Settings2, Save, CheckCircle, XCircle } from "lucide-react";
+import { CheckCircle, Save, Settings2, XCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
@@ -98,7 +97,7 @@ export default function SocialConfig({
   const handleSave = () => {
     setIsSaving(true);
     router.patch(
-      route("publications.modal.platformSettings.update"),
+      route("settings.social.update"),
       {
         settings: globalSettings,
       },
@@ -160,7 +159,9 @@ export default function SocialConfig({
           >
             <Save className={`w-5 h-5 ${isSaving ? "animate-spin" : ""}`} />
             <span className="whitespace-nowrap">
-              {isSaving ? t("common.processing") : t("publications.modal.platformSettings.save")}
+              {isSaving
+                ? t("common.processing")
+                : t("publications.modal.platformSettings.save")}
             </span>
             {hasChanges && (
               <span className="ml-2 px-2 py-1 text-xs font-bold bg-white/20 rounded-full">
@@ -316,7 +317,7 @@ export default function SocialConfig({
                     {hasSettings ? (
                       <div className="space-y-2">
                         {Object.entries(platformSettings)
-                          .slice(0, 2) 
+                          .slice(0, 2)
                           .map(([key, value]) => {
                             const label = t(
                               `publications.modal.modal.platformSettings.labels.${key}`,
@@ -368,7 +369,9 @@ export default function SocialConfig({
                           <XCircle className="w-5 h-5 text-gray-400" />
                         </div>
                         <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-                          {t("publications.modal.platformSettings.clickToConfigure")}
+                          {t(
+                            "publications.modal.platformSettings.clickToConfigure"
+                          )}
                         </p>
                       </div>
                     )}
@@ -393,8 +396,6 @@ export default function SocialConfig({
             );
           })}
         </div>
-
-
       </div>
 
       {activePlatform && (

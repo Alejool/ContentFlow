@@ -282,10 +282,13 @@
       },
       "platformSettings": {
         "status":"Status",
-        "save":"Save",
-        "configured":"Configure",
-        "title": "Platform Settings",
-        "subtitle": "Platform Settings",
+        "save":"Save Changes",
+        "configured":"Configured",
+        "success": "Configuration saved successfully",
+        "error": "Error saving configuration",
+        "title": "Global Platform Settings",
+        "subtitle": "Define default settings for each social network.",
+        "clickToConfigure": "Click to configure",
         "youtube": {
           "title": "YouTube",
           "type": "Video Type",

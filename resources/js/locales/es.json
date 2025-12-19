@@ -234,10 +234,13 @@
       },
       "platformSettings": {
         "status":"Estado",
-        "save":"Guardar",
-        "configured":"Configurar",
-        "title": "Configuraciones por Plataforma",
-        "subtitle": "Configuraciones por Plataforma",
+        "save":"Guardar Cambios",
+        "configured":"Configurado",
+        "success": "Configuración guardada exitosamente",
+        "error": "Error al guardar la configuración",
+        "title": "Configuraciones Globales de Plataforma",
+        "subtitle": "Define las configuraciones predeterminadas para cada red social.",
+        "clickToConfigure": "Haz clic para configurar",
         "youtube": {
           "title": "YouTube",
           "type": "Tipo de Video",
