@@ -1,8 +1,8 @@
-import React from "react";
 import Input from "@/Components/common/Modern/Input";
 import Textarea from "@/Components/common/Modern/Textarea";
 import { FileText, Target } from "lucide-react";
-import { UseFormRegister, FieldErrors } from "react-hook-form";
+import React from "react";
+import { FieldErrors, UseFormRegister } from "react-hook-form";
 
 interface CampaignFormFieldsProps {
   register: UseFormRegister<any>;
@@ -33,7 +33,6 @@ const CampaignFormFields: React.FC<CampaignFormFieldsProps> = ({
 
   return (
     <>
-      {/* Nombre */}
       <div className="form-group">
         <Input
           id="name"
@@ -44,11 +43,13 @@ const CampaignFormFields: React.FC<CampaignFormFieldsProps> = ({
             t("campaigns.modal.add.placeholders.name") ||
             "e.g. Summer Sale 2024"
           }
+          size="lg"
+          variant="filled"
+          theme={theme}
           error={errors.name?.message as string}
         />
       </div>
 
-      {/* Descripción */}
       <div className="form-group">
         <Textarea
           id="description"
@@ -61,13 +62,13 @@ const CampaignFormFields: React.FC<CampaignFormFieldsProps> = ({
           theme={theme}
           variant="filled"
           rows={4}
+          size="lg"
           maxLength={200}
           showCharCount
           hint="Maximum 200 characters"
         />
       </div>
 
-      {/* Objetivo y Presupuesto */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="form-group">
           <Input
@@ -83,8 +84,8 @@ const CampaignFormFields: React.FC<CampaignFormFieldsProps> = ({
             error={errors.goal?.message as string}
             icon={Target}
             theme={theme}
-            variant="outlined"
-            size="md"
+            variant="filled"
+            size="lg"
             hint={`${watched.goal?.length || 0}/200 characters`}
           />
         </div>
@@ -104,8 +105,8 @@ const CampaignFormFields: React.FC<CampaignFormFieldsProps> = ({
             error={errors.budget?.message as string}
             icon={Target}
             theme={theme}
-            variant="outlined"
-            size="md"
+            variant="filled"
+            size="lg"
           />
         </div>
       </div>

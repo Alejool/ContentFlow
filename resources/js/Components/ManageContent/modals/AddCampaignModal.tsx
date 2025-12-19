@@ -152,6 +152,9 @@ export default function AddCampaignModal({
                   t("campaigns.modal.add.placeholders.name") ||
                   "e.g. Summer Sale 2024"
                 }
+                size="lg"
+                variant="filled"
+                theme={theme}
                 error={errors.name?.message as string}
               />
             </div>
@@ -171,6 +174,7 @@ export default function AddCampaignModal({
                 maxLength={200}
                 showCharCount
                 hint="Maximum 200 characters"
+                size="lg"
               />
             </div>
 
@@ -186,8 +190,8 @@ export default function AddCampaignModal({
                   error={errors.goal?.message as string}
                   icon={Target}
                   theme={theme}
-                  variant="outlined"
-                  size="md"
+                  variant="filled"
+                  size="lg"
                   hint={`${watchedFields.goal?.length || 0}/200 characters`}
                 />
               </div>
@@ -203,8 +207,8 @@ export default function AddCampaignModal({
                   error={errors.budget?.message as string}
                   icon={DollarSign}
                   theme={theme}
-                  variant="outlined"
-                  size="md"
+                  variant="filled"
+                  size="lg"
                 />
               </div>
             </div>

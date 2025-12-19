@@ -40,6 +40,8 @@ const CampaignDateFields: React.FC<CampaignDateFieldsProps> = ({
             t("campaigns.modal.add.placeholders.startDate") ||
             "Select start date"
           }
+          size="lg"
+          variant="filled"
           withPortal
         />
       </div>
@@ -62,6 +64,8 @@ const CampaignDateFields: React.FC<CampaignDateFieldsProps> = ({
           minDate={
             watch("start_date") ? new Date(watch("start_date")!) : undefined
           }
+          size="lg"
+          variant="filled"
           withPortal
         />
       </div>
