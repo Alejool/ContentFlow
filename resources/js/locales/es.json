@@ -362,7 +362,7 @@
         "contentLockedHint": "Para editar el contenido (título, descripción o archivos), debes despublicar la publicación de todas las plataformas."
       },
       "manageContent": {
-        "configureNetworks": "Configura tus publicaciones programadas"
+        "configureNetworks": "Configura tus publicaciones programadas+"
       },
       "publish":{
         "title":"Publicar",
@@ -471,6 +471,7 @@
       "actions": "Acciones",
       "noCampaign": "Sin Campaña",
       "loading": "Cargando...",
+      "linkedAccount": "Cuentas Asociadas",
       "emptyState": {
         "title": "No se encontraron publicaciones",
         "description": "Crea una publicación para comenzar a publicar contenido.",
@@ -627,7 +628,7 @@
       "media": "Archivos",
       "status": "Estado",
       "actions": "Acciones",
-      "linkedAccount": "Cuentas Asociadas",
+
       "loading": "Cargando...",
       "emptyState": {
         "title": "No se encontraron campañas",

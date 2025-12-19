@@ -319,7 +319,7 @@ export default function ManageContentPage() {
                 })}
               </div>
 
-              <div className="">
+              <div className="block">
                 {activeTab === "logs" ? (
                   <LogsList
                     logs={getItems() as any}

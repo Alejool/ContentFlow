@@ -457,6 +457,7 @@
       "actions": "Actions",
       "noCampaign": "No Campaign",
       "loading": "Loading...",
+      "linkedAccount": "Linked Accounts",
       "emptyState": {
         "title": "No publications found",
         "description": "Create a publication to start publishing content.",

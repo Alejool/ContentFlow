@@ -4,17 +4,19 @@ interface SocialAccountsDisplayProps {
   publication: Publication;
   connectedAccounts: any[];
   theme: string;
+  compact?: boolean;
+  showCount?: boolean;
 }
 
 export default function SocialAccountsDisplay({
   publication,
   connectedAccounts,
   theme,
+  compact = false,
+  showCount = false,
 }: SocialAccountsDisplayProps) {
   const scheduledPosts = publication.scheduled_posts || [];
   const postLogs = publication.social_post_logs || [];
-
-  console.log(connectedAccounts);
 
   // Combine entries, preferring logs (actual status) over scheduled
   const combined = new Map<number, any>();
@@ -32,12 +34,67 @@ export default function SocialAccountsDisplay({
 
   const displayItems = Array.from(combined.values());
 
-  if (displayItems.length === 0)
-    return <span className="text-gray-400 text-xs">-</span>;
+  if (displayItems.length === 0) {
+    if (compact) {
+      return <span className="text-gray-400 text-xs">-</span>;
+    }
+    return (
+      <div className="text-center py-2">
+        <span className="text-xs text-gray-400 dark:text-gray-500">
+          No platforms configured
+        </span>
+      </div>
+    );
+  }
 
+  // Si showCount es true, solo mostrar el conteo
+  if (showCount) {
+    return (
+      <div className="flex items-center gap-1">
+        <span className="text-xs font-medium text-gray-900 dark:text-white">
+          {displayItems.length}
+        </span>
+        <span className="text-xs text-gray-500 dark:text-gray-400">
+          platform{displayItems.length !== 1 ? "s" : ""}
+        </span>
+      </div>
+    );
+  }
+
+  // Modo compacto - solo iconos de plataformas
+  if (compact) {
+    const uniquePlatforms = Array.from(
+      new Set(
+        displayItems.map((item) => {
+          const account = item.social_account;
+          return account?.platform || item.platform || "social";
+        })
+      )
+    );
+
+    return (
+      <div className="flex flex-wrap gap-1">
+        {uniquePlatforms.map((platform, index) => {
+          const platformColor = getPlatformColor(platform);
+
+          return (
+            <div
+              key={index}
+              className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium border ${platformColor}`}
+              title={platform.charAt(0).toUpperCase() + platform.slice(1)}
+            >
+              {platform.charAt(0).toUpperCase()}
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+
+  // Modo completo - información detallada
   return (
-    <div className="flex flex-col gap-3">
-      {displayItems.map((item) => {
+    <div className="flex flex-col gap-2">
+      {displayItems.slice(0, 3).map((item) => {
         const account = item.social_account;
         const accountName =
           account?.account_name || item.account_name || "Unknown";
@@ -50,8 +107,6 @@ export default function SocialAccountsDisplay({
           (acc) => acc.id === item.social_account_id
         );
 
-        console.log(connectedAccounts);
-
         return (
           <div
             key={`${item.id}-${platform}`}
@@ -63,26 +118,33 @@ export default function SocialAccountsDisplay({
               }`}
               title={isConnected ? "Connected" : "Disconnected"}
             />
-            <div className="flex flex-col">
-              <span
-                className={`text-sm font-medium leading-tight ${
-                  theme === "dark" ? "text-gray-200" : "text-gray-700"
-                }`}
-              >
-                {platform && (
-                  <span className="capitalize text-xs text-primary-500/80 mr-1.5 font-bold">
-                    {platform}
-                  </span>
-                )}
-                {accountName}
-              </span>
+
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2">
+                <span
+                  className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${getPlatformColor(
+                    platform
+                  )}`}
+                >
+                  {platform.charAt(0).toUpperCase() + platform.slice(1)}
+                </span>
+                <span
+                  className={`text-xs font-medium truncate ${
+                    theme === "dark" ? "text-gray-200" : "text-gray-700"
+                  }`}
+                >
+                  {accountName}
+                </span>
+              </div>
+
               {secondary && (
-                <span className="text-xs text-gray-400 font-mono mt-0.5">
+                <span className="text-xs text-gray-400 font-mono truncate block mt-0.5">
                   {secondary}
                 </span>
               )}
+
               {!isConnected && (
-                <span className="text-[10px] text-red-500 font-bold uppercase tracking-wider mt-0.5">
+                <span className="text-[10px] text-red-500 font-medium uppercase tracking-wider mt-0.5">
                   Disconnected
                 </span>
               )}
@@ -90,6 +152,34 @@ export default function SocialAccountsDisplay({
           </div>
         );
       })}
+
+      {displayItems.length > 3 && (
+        <div className="text-center pt-1">
+          <span className="text-xs text-gray-500 dark:text-gray-400">
+            +{displayItems.length - 3} more
+          </span>
+        </div>
+      )}
     </div>
   );
+}
+
+// Función auxiliar para colores de plataforma
+function getPlatformColor(platform: string): string {
+  switch (platform.toLowerCase()) {
+    case "youtube":
+      return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 border-red-200 dark:border-red-800";
+    case "facebook":
+      return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400 border-blue-200 dark:border-blue-800";
+    case "instagram":
+      return "bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-400 border-pink-200 dark:border-pink-800";
+    case "twitter":
+      return "bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-400 border-sky-200 dark:border-sky-800";
+    case "tiktok":
+      return "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400 border-gray-200 dark:border-gray-800";
+    case "linkedin":
+      return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400 border-blue-200 dark:border-blue-800";
+    default:
+      return "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400 border-gray-200 dark:border-gray-800";
+  }
 }
