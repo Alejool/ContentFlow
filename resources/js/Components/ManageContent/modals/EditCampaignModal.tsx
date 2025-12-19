@@ -1,21 +1,19 @@
-import React, { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useCampaignManagement } from "@/Hooks/useCampaignManagement";
+import { useTheme } from "@/Hooks/useTheme";
+import { Campaign } from "@/types/Campaign";
+import { AlertTriangle, Target } from "lucide-react";
+import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
-import { useTheme } from "@/Hooks/useTheme";
-import { useCampaignManagement } from "@/Hooks/useCampaignManagement";
-import { Campaign } from "@/types/Campaign";
-import { Save, Target, X, Loader2, AlertTriangle } from "lucide-react";
 
-// Componentes reutilizables
-import ModalHeader from "@/Components/ManageContent/modals/common/ModalHeader";
-import CampaignFormFields from "@/Components/ManageContent/Campaign/common/CampaignFormFields";
 import CampaignDateFields from "@/Components/ManageContent/Campaign/common/CampaignDateFields";
+import CampaignFormFields from "@/Components/ManageContent/Campaign/common/CampaignFormFields";
 import PublicationSelector from "@/Components/ManageContent/Campaign/common/PublicationSelector";
+import ModalHeader from "@/Components/ManageContent/modals/common/ModalHeader";
 
-// Hooks
 import { useEditCampaignForm } from "@/Hooks/campaign/useEditCampaignForm";
-import { usePublicationsForCampaignEdit } from "@/Hooks/campaign/usePublicationsForCampaignEdit";  
+import { usePublicationsForCampaignEdit } from "@/Hooks/campaign/usePublicationsForCampaignEdit";
+import ModalFooter from "./common/ModalFooter";
 
 interface EditCampaignModalProps {
   isOpen: boolean;
@@ -120,7 +118,6 @@ export default function EditCampaignModal({
 
   if (!isOpen || !campaign) return null;
 
-  // Estilos
   const modalBg = theme === "dark" ? "bg-neutral-800" : "bg-white";
   const borderColor =
     theme === "dark" ? "border-neutral-700" : "border-gray-200";
@@ -155,8 +152,7 @@ export default function EditCampaignModal({
         />
 
         <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
-          <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-6">
-            {/* Campos del formulario */}
+          <form id="edit-campaign-form" onSubmit={handleSubmit(onFormSubmit)} className="space-y-6">
             <CampaignFormFields
               register={register}
               errors={errors}
@@ -166,7 +162,6 @@ export default function EditCampaignModal({
               mode="edit"
             />
 
-            {/* Fechas */}
             <CampaignDateFields
               startDate={watchedFields.start_date}
               endDate={watchedFields.end_date}
@@ -177,7 +172,6 @@ export default function EditCampaignModal({
               t={t}
             />
 
-            {/* Mensaje de error para fecha fin */}
             {errors.end_date && (
               <div className="p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
                 <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-2">
@@ -187,7 +181,6 @@ export default function EditCampaignModal({
               </div>
             )}
 
-            {/* Selección de Publicaciones */}
             <div className="form-group">
               <label
                 className={`block text-sm font-semibold ${labelText} mb-2`}
@@ -212,40 +205,15 @@ export default function EditCampaignModal({
                 />
               </div>
             </div>
-
-            {/* Botones de acción */}
-            <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100 dark:border-neutral-700">
-              <button
-                type="button"
-                onClick={handleClose}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  theme === "dark"
-                    ? "text-gray-300 hover:bg-neutral-800"
-                    : "text-gray-700 hover:bg-gray-100"
-                }`}
-              >
-                {t("common.cancel") || "Cancel"}
-              </button>
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="px-6 py-2 rounded-lg text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 transition-colors shadow-lg shadow-primary-500/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    {t("common.saving") || "Saving..."}
-                  </>
-                ) : (
-                  <>
-                    <Save className="w-4 h-4" />
-                    {t("common.save") || "Save Changes"}
-                  </>
-                )}
-              </button>
-            </div>
           </form>
         </div>
+        <ModalFooter
+          theme={theme}
+          onClose={handleClose}
+          submitText={t("campaigns.button.edit") || "Edit Campaign"}
+          cancelText={t("common.cancel") || "Close"}
+          formId="edit-campaign-form"
+        />
       </div>
     </div>
   );

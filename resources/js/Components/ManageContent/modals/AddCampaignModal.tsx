@@ -1,27 +1,23 @@
-import React, { useState } from "react";
-import { useForm } from "react-hook-form";
-import axios from "axios";
-import { toast } from "react-hot-toast";
-import { useTranslation } from "react-i18next";
 import { useTheme } from "@/Hooks/useTheme";
 import { useCampaignStore } from "@/stores/campaignStore";
-import { Plus, Target, X } from "lucide-react";
+import axios from "axios";
+import { Target } from "lucide-react";
+import { useState } from "react";
+import { toast } from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
-// Componentes reutilizables
 import ModalHeader from "@/Components/ManageContent/modals/common/ModalHeader";
 import Input from "@/Components/common/Modern/Input";
 import Textarea from "@/Components/common/Modern/Textarea";
 
-// Componentes específicos para campaña
-import PublicationSelector from "@/Components/ManageContent/Campaign/common/PublicationSelector";
 import CampaignDateFields from "@/Components/ManageContent/Campaign/common/CampaignDateFields";
+import PublicationSelector from "@/Components/ManageContent/Campaign/common/PublicationSelector";
 
-// Hooks
 import { useAddCampaignForm } from "@/Hooks/campaign/useAddCampaignForm";
 import { usePublicationsForCampaign } from "@/Hooks/campaign/usePublicationsForCampaign";
 
-// Iconos
 import { DollarSign, FileText } from "lucide-react";
+import ModalFooter from "./common/ModalFooter";
 
 interface AddCampaignModalProps {
   isOpen: boolean;
@@ -106,7 +102,6 @@ export default function AddCampaignModal({
 
   if (!isOpen) return null;
 
-  // Estilos
   const modalBg = theme === "dark" ? "bg-neutral-800" : "bg-white";
   const borderColor =
     theme === "dark" ? "border-neutral-700" : "border-gray-200";
@@ -141,8 +136,11 @@ export default function AddCampaignModal({
         />
 
         <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
-          <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-6">
-            {/* Nombre de la campaña */}
+          <form
+            id="campaign-form"
+            onSubmit={handleSubmit(onFormSubmit)}
+            className="space-y-6"
+          >
             <div className="form-group">
               <Input
                 id="name"
@@ -158,7 +156,6 @@ export default function AddCampaignModal({
               />
             </div>
 
-            {/* Descripción */}
             <div className="form-group">
               <Textarea
                 id="description"
@@ -177,7 +174,6 @@ export default function AddCampaignModal({
               />
             </div>
 
-            {/* Objetivo y Presupuesto */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="form-group">
                 <Input
@@ -213,7 +209,6 @@ export default function AddCampaignModal({
               </div>
             </div>
 
-            {/* Fechas */}
             <CampaignDateFields
               startDate={watchedFields.start_date}
               endDate={watchedFields.end_date}
@@ -224,7 +219,6 @@ export default function AddCampaignModal({
               t={t}
             />
 
-            {/* Selección de Publicaciones */}
             <div className="form-group">
               <label
                 className={`block text-sm font-semibold ${labelText} mb-2`}
@@ -254,36 +248,15 @@ export default function AddCampaignModal({
               </p>
             </div>
 
-            {/* Botones de acción */}
-            <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100 dark:border-neutral-700">
-              <button
-                type="button"
-                onClick={handleClose}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  theme === "dark"
-                    ? "text-gray-300 hover:bg-neutral-800"
-                    : "text-gray-700 hover:bg-gray-100"
-                }`}
-              >
-                {t("common.cancel") || "Cancel"}
-              </button>
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="px-6 py-2 rounded-lg text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 transition-colors shadow-lg shadow-primary-500/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-              >
-                {isSubmitting ? (
-                  <>Processing...</>
-                ) : (
-                  <>
-                    <Plus className="w-4 h-4" />
-                    {t("campaigns.button.add") || "Create Campaign"}
-                  </>
-                )}
-              </button>
-            </div>
           </form>
         </div>
+        <ModalFooter
+          theme={theme}
+          onClose={handleClose}
+          submitText={t("campaigns.button.add") || "Create Campaign"}
+          cancelText={t("common.cancel") || "Cancel"}
+          formId="campaign-form"
+        />
       </div>
     </div>
   );

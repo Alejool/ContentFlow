@@ -365,7 +365,7 @@
         "contentLockedHint": "Para editar el contenido (título, descripción o archivos), debes despublicar la publicación de todas las plataformas."
       },
       "manageContent": {
-        "configureNetworks": "Configura tus publicaciones programadas+"
+        "configureNetworks": "Configura tus publicaciones programadas"
       },
       "publish":{
         "title":"Publicar",

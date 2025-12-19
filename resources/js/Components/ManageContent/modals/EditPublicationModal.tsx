@@ -615,13 +615,13 @@ export default function EditPublicationModal({
           subtitle="publications.modal.edit.subtitle"
         />
 
-        <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto  custom-scrollbar">
           <form
-            id="editPublicationForm"
+            id="edit-publication-form"
             onSubmit={handleSubmit(onFormSubmit)}
             className="space-y-8"
           >
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-8">
               <div className="space-y-6">
                 {hasPublishedPlatform && (
                   <div className="p-4 mb-6 rounded-lg border border-blue-500 bg-blue-50/50 dark:bg-blue-900/20 flex gap-3 text-sm text-blue-700 dark:text-blue-300 animate-in fade-in slide-in-from-top-4">
@@ -704,7 +704,7 @@ export default function EditPublicationModal({
                 )}
               </div>
 
-              <div className="space-y-6">
+              <div className="space-y-6 ">
                 <ContentSection
                   register={register}
                   setValue={setValue}
@@ -719,16 +719,16 @@ export default function EditPublicationModal({
                 />
               </div>
             </div>
-
-            <ModalFooter
-              isSubmitting={isSubmitting}
-              onClose={onClose}
-              submitText={t("publications.button.edit") || "Edit Campaign"}
-              cancelText={t("publications.button.close") || "Close"}
-              formId="editPublicationForm"
-            />
           </form>
         </div>
+        <ModalFooter
+          isSubmitting={isSubmitting}
+          onClose={onClose}
+          theme={theme}
+          submitText={t("publications.button.edit") || "Edit Campaign"}
+          cancelText={t("common.cancel") || "Close"}
+          formId="edit-publication-form"
+        />
 
         <PlatformSettingsModal
           isOpen={!!activePlatformSettings}

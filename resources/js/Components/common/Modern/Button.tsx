@@ -1,5 +1,5 @@
-import { ButtonHTMLAttributes, ReactNode, forwardRef } from "react";
 import { useTheme } from "@/Hooks/useTheme";
+import { ButtonHTMLAttributes, ReactNode, forwardRef } from "react";
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
   variant?:
@@ -217,7 +217,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       >
         {isLoading ? (
           <>
-            <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+            <div className="w-5 h-5 border-1 border-current border-t-transparent rounded-full animate-spin" />
             <span>{displayLoadingText}</span>
           </>
         ) : (

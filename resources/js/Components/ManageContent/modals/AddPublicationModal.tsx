@@ -689,15 +689,18 @@ export default function AddPublicationModal({
                 />
               </div>
             </div>
-            <ModalFooter
-              onClose={handleClose}
-              isSubmitting={isSubmitting}
-              formId="add-publication-form"
-              submitText={t("publications.button.add") || "Add publication"}
-              cancelText={t("publications.button.close") || "Close"}
-            />
           </form>
         </main>
+        <div>
+          <ModalFooter
+            onClose={handleClose}
+            theme={theme}
+            isSubmitting={isSubmitting}
+            formId="add-publication-form"
+            submitText={t("publications.button.add") || "Add publication"}
+            cancelText={t("common.cancel") || "Close"}
+          />
+        </div>
 
         <PlatformSettingsModal
           isOpen={!!activePlatformSettings}
