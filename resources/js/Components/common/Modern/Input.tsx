@@ -102,8 +102,8 @@ export default function Input<T extends FieldValues>({
               "border-primary-400  focus:ring-primary-500/30 focus:border-primary-400",
             success:
               "border-green-400  focus:ring-green-500/30 focus:border-green-400",
-            focused: "border-purple-400 focus:ring-purple-500/30",
-            idle: "hover:border-neutral-600/70 hover:bg-neutral-800/60 focus:ring-purple-500/30",
+            focused: "border-primary-400 focus:ring-primary-500/30",
+            idle: "hover:border-neutral-600/70 hover:bg-neutral-800/60 focus:ring-primary-500/30",
           },
         },
         outlined: {
@@ -111,8 +111,8 @@ export default function Input<T extends FieldValues>({
           states: {
             error: "border-primary-400 focus:ring-primary-500/30",
             success: "border-green-400 focus:ring-green-500/30",
-            focused: "border-purple-400 focus:ring-purple-500/30",
-            idle: "border-neutral-700 hover:border-neutral-600 focus:ring-purple-500/30",
+            focused: "border-primary-400 focus:ring-primary-500/30",
+            idle: "border-neutral-700 hover:border-neutral-600 focus:ring-primary-500/30",
           },
         },
         filled: {
@@ -120,8 +120,8 @@ export default function Input<T extends FieldValues>({
           states: {
             error: "border-primary-400 focus:ring-primary-500/30",
             success: "border-green-400 focus:ring-green-500/30",
-            focused: "border-purple-400 focus:ring-purple-500/30",
-            idle: "hover:bg-neutral-700/80 focus:ring-purple-500/30",
+            focused: "border-primary-400 focus:ring-primary-500/30",
+            idle: "hover:bg-neutral-700/80 focus:ring-primary-500/30",
           },
         },
       },
@@ -133,8 +133,8 @@ export default function Input<T extends FieldValues>({
               "border-primary-500 focus:ring-primary-500/20 focus:border-primary-500",
             success:
               "border-green-500 focus:ring-green-500/20 focus:border-green-500",
-            focused: "border-purple-500 focus:ring-purple-500/20",
-            idle: "hover:border-gray-400 focus:ring-purple-500/20",
+            focused: "border-primary-500 focus:ring-primary-500/20",
+            idle: "hover:border-gray-400 focus:ring-primary-500/20",
           },
         },
         outlined: {
@@ -142,8 +142,8 @@ export default function Input<T extends FieldValues>({
           states: {
             error: "border-primary-500 focus:ring-primary-500/20",
             success: "border-green-500 focus:ring-green-500/20",
-            focused: "border-purple-500 focus:ring-purple-500/20",
-            idle: "border-gray-300 hover:border-gray-400 focus:ring-purple-500/20",
+            focused: "border-primary-500 focus:ring-primary-500/20",
+            idle: "border-gray-300 hover:border-gray-400 focus:ring-primary-500/20",
           },
         },
         filled: {
@@ -151,8 +151,8 @@ export default function Input<T extends FieldValues>({
           states: {
             error: "border-primary-500 focus:ring-primary-500/20",
             success: "border-green-500 focus:ring-green-500/20",
-            focused: "border-purple-500 focus:ring-purple-500/20",
-            idle: "hover:bg-white focus:ring-purple-500/20",
+            focused: "border-primary-500 focus:ring-primary-500/20",
+            idle: "hover:bg-white focus:ring-primary-500/20",
           },
         },
       },

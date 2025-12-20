@@ -1,6 +1,5 @@
 import Button from "@/Components/common/Modern/Button";
 import ModernCard from "@/Components/common/Modern/Card";
-import CountryCodeSelector from "@/Components/common/Modern/CountryCodeSelector";
 import Input from "@/Components/common/Modern/Input";
 import Textarea from "@/Components/common/Modern/Textarea";
 import LanguageSwitcher from "@/Components/common/ui/LanguageSwitcher";
@@ -19,9 +18,39 @@ import {
   Send,
   ShieldCheck,
   Sparkles,
+  TriangleAlert,
   User as UserIcon,
 } from "lucide-react";
+import { Controller } from "react-hook-form";
 import { useTranslation } from "react-i18next";
+import PhoneInput from "react-phone-number-input";
+import "react-phone-number-input/style.css";
+
+// List of supported countries (LatAm + US)
+const SUPPORTED_COUNTRIES = [
+  "AR",
+  "BO",
+  "BR",
+  "CL",
+  "CO",
+  "CR",
+  "CU",
+  "DO",
+  "EC",
+  "SV",
+  "GT",
+  "HT",
+  "HN",
+  "MX",
+  "NI",
+  "PA",
+  "PY",
+  "PE",
+  "PR",
+  "UY",
+  "VE",
+  "US",
+];
 
 interface UpdateProfileInformationProps {
   mustVerifyEmail: boolean;
@@ -47,6 +76,7 @@ export default function UpdateProfileInformation({
     user,
     watchedValues,
     setValue,
+    control,
   } = useUser(null);
 
   const sectionHeaderClass = `flex items-center gap-2 pb-2 mb-6 border-b ${
@@ -54,7 +84,7 @@ export default function UpdateProfileInformation({
   }`;
 
   const sectionTitleClass = `text-lg font-bold tracking-tight ${
-    theme === "dark" ? "text-purple-400" : "text-purple-700"
+    theme === "dark" ? "text-primary-400" : "text-primary-700"
   }`;
 
   return (
@@ -62,26 +92,18 @@ export default function UpdateProfileInformation({
       title={t("profile.information.title")}
       description={t("profile.information.description")}
       icon={UserIcon}
-      headerColor="custom"
-      customGradient={
-        theme === "dark"
-          ? "from-purple-900 via-indigo-950 to-neutral-900"
-          : "from-purple-600 via-indigo-600 to-indigo-700"
-      }
-      className={`${className} shadow-2xl relative overflow-hidden`}
+      headerColor="orange" // Standard primary theme for the project
+      className={className}
     >
-      {/* Decorative background element */}
-      <div className="absolute top-0 right-0 -mt-20 -mr-20 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
-
-      <form onSubmit={handleSubmit} className="space-y-10 relative">
+      <form onSubmit={handleSubmit} className="space-y-10">
         {/* Sección: Información Personal */}
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
           <div className={sectionHeaderClass}>
             <div
               className={`p-2 rounded-lg ${
                 theme === "dark"
-                  ? "bg-purple-500/20 text-purple-400"
-                  : "bg-purple-100 text-purple-600"
+                  ? "bg-primary-500/20 text-primary-400"
+                  : "bg-primary-50 text-primary-600"
               }`}
             >
               <UserIcon className="w-5 h-5" />
@@ -103,7 +125,6 @@ export default function UpdateProfileInformation({
               variant="filled"
               icon={UserIcon}
               required
-              className="transition-all focus:scale-[1.01]"
             />
 
             <div className="relative">
@@ -120,7 +141,6 @@ export default function UpdateProfileInformation({
                 icon={Mail}
                 disabled
                 required
-                className="opacity-80"
               />
 
               {user?.email_verified_at && (
@@ -146,8 +166,8 @@ export default function UpdateProfileInformation({
             <div
               className={`p-2 rounded-lg ${
                 theme === "dark"
-                  ? "bg-blue-500/20 text-blue-400"
-                  : "bg-blue-100 text-blue-600"
+                  ? "bg-primary-500/20 text-primary-400"
+                  : "bg-primary-50 text-primary-600"
               }`}
             >
               <Phone className="w-5 h-5" />
@@ -158,26 +178,74 @@ export default function UpdateProfileInformation({
           </div>
 
           <div className="max-w-md">
-            <Input
-              id="phone"
-              label={t("profile.information.phoneLabel")}
-              placeholder={t("profile.information.phonePlaceholder")}
-              theme={theme}
-              register={register}
-              error={errors.phone?.message}
-              sizeType="lg"
-              variant="filled"
-              prefix={
-                <CountryCodeSelector
-                  value={watchedValues.country_code}
-                  onChange={(code) =>
-                    setValue("country_code", code, { shouldDirty: true })
-                  }
-                  disabled={isSubmitting}
-                />
+            <label
+              className={`block mb-2 text-sm font-medium ${
+                theme === "dark" ? "text-gray-300" : "text-gray-700"
+              }`}
+            >
+              {t("profile.information.phoneLabel")}
+            </label>
+            <div
+              className={`relative transition-all duration-200 rounded-lg border ${
+                theme === "dark"
+                  ? "bg-neutral-800/50 border-neutral-700/50 hover:border-neutral-600/70 focus-within:ring-2 focus-within:ring-primary-500/30 focus-within:border-primary-400"
+                  : "bg-gray-50 border-gray-300 hover:border-gray-400 focus-within:ring-2 focus-within:ring-primary-500/20 focus-within:border-primary-500"
+              } ${errors.phone ? "border-primary-500" : ""}`}
+            >
+              <Controller
+                name="phone"
+                control={control}
+                render={({ field }) => (
+                  <PhoneInput
+                    {...field}
+                    value={field.value || undefined}
+                    international
+                    defaultCountry="CO"
+                    countries={SUPPORTED_COUNTRIES as any}
+                    placeholder={t("profile.information.phonePlaceholder")}
+                    disabled={isSubmitting}
+                    className={`modern-phone-input p-3 ${
+                      theme === "dark" ? "dark-theme" : "light-theme"
+                    }`}
+                  />
+                )}
+              />
+            </div>
+            {errors.phone && (
+              <div className="mt-2 text-primary-600 text-sm flex items-center gap-2">
+                <TriangleAlert className="w-4 h-4 flex-shrink-0" />
+                <span>{errors.phone.message}</span>
+              </div>
+            )}
+
+            <style>{`
+              .modern-phone-input {
+                --PhoneInputCountryFlag-height: 1.25em;
+                --PhoneInputCountrySelect-marginRight: 0.5em;
+                --PhoneInputCountrySelectArrow-display: none;
+                --PhoneInputCountrySelect-width: 3em;
+                display: flex;
+                align-items: center;
               }
-              className="transition-all focus:scale-[1.01]"
-            />
+              .modern-phone-input input {
+                flex: 1;
+                background: transparent;
+                border: none;
+                outline: none;
+                color: inherit;
+                font-size: 1rem;
+                padding: 0 0.5rem;
+              }
+              .modern-phone-input.dark-theme input::placeholder { color: #9ca3af; }
+              .modern-phone-input.light-theme input::placeholder { color: #6b7280; }
+              .PhoneInputCountrySelect {
+                cursor: pointer;
+              }
+              .PhoneInputCountryIcon--border {
+                box-shadow: none;
+                border-radius: 2px;
+              }
+            `}</style>
           </div>
         </div>
 
@@ -187,8 +255,8 @@ export default function UpdateProfileInformation({
             <div
               className={`p-2 rounded-lg ${
                 theme === "dark"
-                  ? "bg-amber-500/20 text-amber-400"
-                  : "bg-amber-100 text-amber-600"
+                  ? "bg-primary-500/20 text-primary-400"
+                  : "bg-primary-50 text-primary-600"
               }`}
             >
               <MessageSquare className="w-5 h-5" />
@@ -208,13 +276,12 @@ export default function UpdateProfileInformation({
             error={errors.bio?.message}
             rows={5}
             variant="filled"
-            className="transition-all focus:scale-[1.01] resize-none"
           />
         </div>
 
         {mustVerifyEmail && user?.email_verified_at === null && (
           <div
-            className={`rounded-xl p-5 space-y-4 transition-all duration-500 shadow-inner
+            className={`rounded-xl p-5 space-y-4 shadow-inner
               ${
                 theme === "dark"
                   ? "bg-amber-900/10 border border-amber-800/30"
@@ -245,12 +312,7 @@ export default function UpdateProfileInformation({
                 href={route("verification.send")}
                 method="post"
                 as="button"
-                className={`px-5 py-2.5 text-sm font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 shadow-sm
-                  ${
-                    theme === "dark"
-                      ? "bg-amber-600 hover:bg-amber-500 text-white"
-                      : "bg-amber-500 hover:bg-amber-600 text-white"
-                  }`}
+                className="px-5 py-2.5 text-sm font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 shadow-sm bg-primary-600 hover:bg-primary-500 text-white border-0"
               >
                 <Send className="w-4 h-4" />
                 {t("profile.information.sendVerification")}
@@ -283,8 +345,8 @@ export default function UpdateProfileInformation({
             <div
               className={`p-2 rounded-lg ${
                 theme === "dark"
-                  ? "bg-emerald-500/20 text-emerald-400"
-                  : "bg-emerald-100 text-emerald-600"
+                  ? "bg-primary-500/20 text-primary-400"
+                  : "bg-primary-50 text-primary-600"
               }`}
             >
               <Globe className="w-5 h-5" />
@@ -295,11 +357,11 @@ export default function UpdateProfileInformation({
           </div>
 
           <div
-            className={`p-6 rounded-2xl border transition-all duration-300 group
+            className={`p-6 rounded-2xl border transition-all duration-300
               ${
                 theme === "dark"
-                  ? "bg-neutral-800/40 border-neutral-700/50 hover:bg-neutral-800/60"
-                  : "bg-white border-gray-200 hover:shadow-md"
+                  ? "bg-neutral-800/40 border-neutral-700/50"
+                  : "bg-white border-gray-200"
               }`}
           >
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
@@ -322,8 +384,8 @@ export default function UpdateProfileInformation({
 
               <div className="flex-shrink-0">
                 {isChangingLanguage ? (
-                  <div className="flex items-center gap-2 text-sm font-medium text-purple-500">
-                    <div className="w-5 h-5 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+                  <div className="flex items-center gap-2 text-sm font-medium text-primary-500">
+                    <div className="w-5 h-5 border-2 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
                     {t("common.changing")}
                   </div>
                 ) : (
@@ -358,7 +420,7 @@ export default function UpdateProfileInformation({
           <div className="hidden sm:block">
             {hasChanges && !isSubmitting && (
               <div
-                className={`flex items-center gap-2 text-sm font-medium animate-pulse
+                className={`flex items-center gap-2 text-sm font-medium
                   ${theme === "dark" ? "text-amber-400" : "text-amber-600"}`}
               >
                 <AlertTriangle className="w-4 h-4" />
@@ -373,10 +435,10 @@ export default function UpdateProfileInformation({
             theme={theme}
             loading={isSubmitting}
             loadingText={t("common.saving")}
-            className={`w-full sm:w-auto min-w-[180px] transition-all duration-300 rounded-xl shadow-lg hover:shadow-purple-500/20 ${
+            className={`w-full sm:w-auto min-w-[180px] transition-all duration-300 rounded-xl shadow-lg ${
               !hasChanges
                 ? "opacity-50 grayscale"
-                : "hover:scale-[1.02] active:scale-[0.98] bg-gradient-to-r from-purple-600 to-indigo-600 text-white border-0"
+                : "hover:scale-[1.02] active:scale-[0.98] bg-primary-600 hover:bg-primary-500 text-white border-0"
             }`}
             type="submit"
             size="lg"
@@ -384,24 +446,7 @@ export default function UpdateProfileInformation({
             {t("profile.actions.saveChanges")}
           </Button>
         </div>
-
-        {hasChanges && !isSubmitting && (
-          <div className="sm:hidden text-center">
-            <div
-              className={`inline-flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-full
-                  ${
-                    theme === "dark"
-                      ? "bg-amber-900/20 text-amber-400"
-                      : "bg-amber-50 text-amber-600"
-                  }`}
-            >
-              <AlertTriangle className="w-3.5 h-3.5" />
-              {t("profile.messages.unsavedChanges")}
-            </div>
-          </div>
-        )}
       </form>
     </ModernCard>
   );
-}
-鼓;
+};

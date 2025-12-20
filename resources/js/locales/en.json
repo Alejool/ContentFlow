@@ -5,6 +5,7 @@
     "select": "Select",
     "more": "more",
     "new": "New",
+    "saving": "saving...",
     "listView": "List View",
     "gridView": "Grid View",
     "unsavedChanges": "Unsaved Changes",

@@ -20,6 +20,7 @@ export const useUser = (initialUser: any) => {
     reset,
     formState: { errors, isSubmitting },
     setValue,
+    control,
   } = useHookForm<UserProfileFormData>({
     resolver: zodResolver(userProfileSchema),
     defaultValues: {
@@ -115,5 +116,6 @@ export const useUser = (initialUser: any) => {
     user: user || initialUser,
     watchedValues,
     setValue,
+    control,
   };
 };

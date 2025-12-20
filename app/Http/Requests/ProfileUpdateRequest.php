@@ -26,7 +26,49 @@ class ProfileUpdateRequest extends FormRequest
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
             'locale' => ['nullable', 'string', 'in:en,es'],
-            'phone' => ['nullable', 'string', 'max:10', 'regex:/^\d*$/'],
+            'phone' => [
+                'nullable',
+                'string',
+                'regex:/^\+[1-9]\d{1,14}$/',
+                function ($attribute, $value, $fail) {
+                    if (!$value) return;
+
+                    $supportedPrefixes = [
+                        '+54',
+                        '+591',
+                        '+55',
+                        '+56',
+                        '+57',
+                        '+506',
+                        '+53',
+                        '+1',
+                        '+593',
+                        '+503',
+                        '+502',
+                        '+509',
+                        '+504',
+                        '+52',
+                        '+505',
+                        '+507',
+                        '+595',
+                        '+51',
+                        '+598',
+                        '+58'
+                    ];
+
+                    $valid = false;
+                    foreach ($supportedPrefixes as $prefix) {
+                        if (str_starts_with($value, $prefix)) {
+                            $valid = true;
+                            break;
+                        }
+                    }
+
+                    if (!$valid) {
+                        $fail(__('The phone number must belong to a supported country (LatAm or USA).'));
+                    }
+                },
+            ],
             'country_code' => ['nullable', 'string', 'max:10'],
             'bio' => ['nullable', 'string', 'max:1000'],
         ];

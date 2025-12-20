@@ -1,23 +1,21 @@
+import { isValidPhoneNumber } from "libphonenumber-js";
 import { z } from "zod";
 
 export const userProfileSchema = z.object({
-  name: z
-    .string()
-    .min(1, "Name is required")
-    .max(255, "Name cannot exceed 255 characters"),
+  name: z.string().min(1, "Name is required").max(255, "Name is too long"),
   email: z
     .string()
-    .min(1, "Email is required")
     .email("Invalid email address")
-    .max(255, "Email cannot exceed 255 characters"),
-  country_code: z.string().optional().or(z.literal("")),
+    .max(255, "Email is too long"),
   phone: z
     .string()
-    .regex(/^\d*$/, "Phone must contain only digits")
-    .max(10, "Phone number cannot exceed 10 digits")
+    .refine((val) => !val || isValidPhoneNumber(val), {
+      message: "Invalid phone number format",
+    })
     .nullable()
     .optional()
     .or(z.literal("")),
+  country_code: z.string().optional().or(z.literal("")),
   bio: z
     .string()
     .max(1000, "Bio cannot exceed 1000 characters")
