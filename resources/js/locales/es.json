@@ -735,7 +735,17 @@
       "verificationSent": "Se ha enviado un nuevo enlace de verificación a tu dirección de correo electrónico.",
       "applicationLanguage": "Idioma de la Aplicación",
       "languageDescription": "Selecciona tu idioma preferido para la interfaz de la aplicación.",
-      "currentLanguage": "Idioma Actual"
+      "currentLanguage": "Idioma Actual",
+      "phoneLabel": "Teléfono",
+      "phonePlaceholder": "Tu número de teléfono",
+      "bioLabel": "Biografía",
+      "bioPlaceholder": "Háblanos un poco de ti...",
+      "sections": {
+        "personal": "Información Personal",
+        "contact": "Detalles de Contacto",
+        "bio": "Sobre Mí",
+        "language": "Idioma y Preferencias"
+      }
     },
     "statistics": {
       "title": "Estadísticas de la Cuenta",

@@ -282,9 +282,9 @@ export default function EditPublicationModal({
           theme={theme}
           isSubmitting={isSubmitting}
           formId="edit-publication-form"
-          submitText={t("publications.button.save") || "Guardar cambios"}
+          submitText={t("publications.button.edit") || "Edit Publication"}
           submitIcon={<Save className="w-4 h-4" />}
-          cancelText={t("common.cancel") || "Cerrar"}
+          cancelText={t("common.cancel") || "Close"}
         />
 
         <PlatformSettingsModal

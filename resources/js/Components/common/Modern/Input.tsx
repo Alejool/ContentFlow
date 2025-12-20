@@ -88,7 +88,7 @@ export default function Input<T extends FieldValues>({
       block w-full rounded-lg transition-all duration-200
       focus:outline-none focus:ring-2 focus:ring-offset-2
       ${disabled ? "cursor-not-allowed" : ""}
-      ${prefix ? "pl-10" : Icon ? "pl-10" : "pl-4"}
+      ${prefix ? "pl-24" : Icon ? "pl-10" : "pl-4"}
       ${suffix || showPasswordToggle ? "pr-10" : "pr-4"}
       ${currentSize.input}
     `;

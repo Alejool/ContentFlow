@@ -719,7 +719,17 @@
       "verificationSent": "A new verification link has been sent to your email address.",
       "applicationLanguage": "Application Language",
       "languageDescription": "Select your preferred language for the application interface.",
-      "currentLanguage": "Current Language"
+      "currentLanguage": "Current Language",
+      "phoneLabel": "Phone",
+      "phonePlaceholder": "Your phone number",
+      "bioLabel": "Bio",
+      "bioPlaceholder": "Tell us a bit about yourself...",
+      "sections": {
+        "personal": "Personal Information",
+        "contact": "Contact Details",
+        "bio": "About Me",
+        "language": "Language & Preferences"
+      }
     },
     "statistics": {
       "title": "Account Statistics",

@@ -1,97 +1,61 @@
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from 'react';
-import axios from 'axios';
-import { passwordSchema } from '@/schemas/schemas';
+import { PasswordFormData, passwordSchema } from "@/schemas/user";
+import { useUserStore } from "@/stores/userStore";
+import { zodResolver } from "@hookform/resolvers/zod";
+import axios from "axios";
+import { useState } from "react";
+import { useForm as useHookForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
 
-interface PasswordFormData {
-    current_password: string;
-    password: string;
-    password_confirmation: string;
-}
+export const useUpdatePassword = () => {
+  const [isSuccess, setIsSuccess] = useState(false);
+  const { updatePassword, isLoading } = useUserStore();
 
-interface UseUpdatePasswordReturn {
-    register: ReturnType<typeof useForm>['register'];
-    handleSubmit: ReturnType<typeof useForm>['handleSubmit'];
-    errors: ReturnType<typeof useForm>['formState']['errors'];
-    isSubmitting: boolean;
-    isSuccess: boolean;
-    updatePassword: (data: PasswordFormData) => Promise<void>;
-    resetForm: () => void;
-}
+  const {
+    register,
+    handleSubmit,
+    setError,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useHookForm<PasswordFormData>({
+    resolver: zodResolver(passwordSchema),
+    defaultValues: {
+      current_password: "",
+      password: "",
+      password_confirmation: "",
+    },
+  });
 
-export const useUpdatePassword = (): UseUpdatePasswordReturn => {
-    const [isSuccess, setIsSuccess] = useState(false);
-
-    const {
-        register,
-        handleSubmit,
-        setError,
-        reset,
-        formState: { errors, isSubmitting },
-    } = useForm<PasswordFormData>({
-        resolver: zodResolver(passwordSchema),
-        defaultValues: {
-            current_password: '',
-            password: '',
-            password_confirmation: '',
-        },
-    });
-
-    const updatePassword = async (data: PasswordFormData): Promise<void> => {
-        try {
-            setIsSuccess(false);
-            
-            const response = await axios.put(route('profile.changePassword'), data, {
-                preserveScroll: true,
-            });
-
-            if (response.data.success) {
-                reset();
-                setIsSuccess(true);
-            }
-            if(response.data.success === false){
-                setError('password', response.data);
-            }
-            // reset();
-            
-            // Hide success message after 3 seconds
-            setTimeout(() => {
-                setIsSuccess(false);
-            }, 3000);
-            
-        } catch (error: any) {
-            setIsSuccess(false);
-            
-            if (error.response?.data?.errors) {
-                Object.entries(error.response.data.errors).forEach(([key, messages]) => {
-                    if (Array.isArray(messages)) {
-                        setError(key as keyof PasswordFormData, { 
-                            message: messages[0] 
-                        });
-                    }
-                });
-            } else {
-                // Generic error handling
-                setError('current_password', {
-                    message: 'An error occurred while updating your password. Please try again.'
-                });
-            }
-        }
-    };
-
-    const resetForm = (): void => {
+  const handleUpdatePassword = async (data: PasswordFormData) => {
+    try {
+      setIsSuccess(false);
+      const result = await updatePassword(data);
+      if (result.success) {
         reset();
-        setIsSuccess(false);
-    };
+        setIsSuccess(true);
+        toast.success(result.message || "Password updated successfully");
+        setTimeout(() => setIsSuccess(false), 3000);
+      } else {
+        toast.error(result.message || "Failed to update password");
+      }
+    } catch (error: any) {
+      if (axios.isAxiosError(error) && error.response?.data?.errors) {
+        const serverErrors = error.response.data.errors;
+        Object.entries(serverErrors).forEach(([key, value]: [any, any]) => {
+          setError(key as keyof PasswordFormData, { message: value[0] });
+          toast.error(value[0]);
+        });
+      } else {
+        toast.error(error.message || "An error occurred");
+      }
+    }
+  };
 
-    return {
-        register,
-        handleSubmit,
-        errors,
-        isSubmitting,
-        isSuccess,
-        updatePassword,
-        resetForm,
-    };
+  return {
+    register,
+    handleSubmit: handleSubmit(handleUpdatePassword),
+    errors,
+    isSubmitting: isSubmitting || isLoading,
+    isSuccess,
+    resetForm: reset,
+  };
 };

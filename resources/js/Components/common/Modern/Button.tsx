@@ -4,6 +4,7 @@ import {
   ComponentType,
   ReactNode,
   forwardRef,
+  isValidElement,
 } from "react";
 
 type IconType =
@@ -236,21 +237,30 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       }
     `;
 
-    const isLoading = loading || disabled;
+    const isActuallyLoading = loading;
+    const isActuallyDisabled = disabled || loading;
     const displayLoadingText = loadingText || "Processing...";
 
     const renderIcon = (position: "left" | "right") => {
       if (!icon || iconPosition !== position) return null;
 
-      if (typeof icon === "function") {
+      const isComponent =
+        typeof icon === "function" ||
+        (typeof icon === "object" &&
+          icon !== null &&
+          "$$typeof" in (icon as any));
+
+      if (isComponent && !isValidElement(icon)) {
         const IconComponent = icon as ComponentType<any>;
-        const iconSize = {
-          xs: 12,
-          sm: 14,
-          md: 16,
-          lg: 18,
-          xl: 20,
-        }[size];
+        const iconSize = (
+          {
+            xs: 12,
+            sm: 14,
+            md: 16,
+            lg: 18,
+            xl: 20,
+          } as const
+        )[size];
 
         return <IconComponent size={iconSize} className="flex-shrink-0" />;
       }
@@ -262,12 +272,12 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       <button
         ref={ref}
         type={type}
-        disabled={isLoading}
+        disabled={isActuallyDisabled}
         onClick={onClick}
         className={`${baseStyles} ${className}`}
         {...props}
       >
-        {isLoading ? (
+        {isActuallyLoading ? (
           <>
             <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
             <span>{displayLoadingText}</span>

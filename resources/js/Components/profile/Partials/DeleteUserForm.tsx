@@ -2,14 +2,14 @@ import ModernButton from "@/Components/common/Modern/Button";
 import ModernCard from "@/Components/common/Modern/Card";
 import ModernInput from "@/Components/common/Modern/Input";
 import Modal from "@/Components/common/ui/Modal";
-import { deleteUserSchema } from "@/schemas/schemas";
+import { DeleteUserFormData, deleteUserSchema } from "@/schemas/user";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { useForm as useHookForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
-const TrashIcon = ({ className }) => (
+const TrashIcon = ({ className }: { className?: string }) => (
   <svg
     className={className}
     fill="none"
@@ -25,7 +25,7 @@ const TrashIcon = ({ className }) => (
   </svg>
 );
 
-const WarningIcon = ({ className }) => (
+const WarningIcon = ({ className }: { className?: string }) => (
   <svg
     className={className}
     fill="none"
@@ -41,10 +41,15 @@ const WarningIcon = ({ className }) => (
   </svg>
 );
 
-export default function DeleteUserForm({ className = "" }) {
+interface DeleteUserFormProps {
+  className?: string;
+}
+
+export default function DeleteUserForm({
+  className = "",
+}: DeleteUserFormProps) {
   const { t } = useTranslation();
   const [confirmingUserDeletion, setConfirmingUserDeletion] = useState(false);
-  const passwordInput = useRef();
 
   const {
     register,
@@ -52,7 +57,7 @@ export default function DeleteUserForm({ className = "" }) {
     setError,
     reset,
     formState: { errors, isSubmitting },
-  } = useHookForm({
+  } = useHookForm<DeleteUserFormData>({
     resolver: zodResolver(deleteUserSchema),
   });
 
@@ -60,22 +65,20 @@ export default function DeleteUserForm({ className = "" }) {
     setConfirmingUserDeletion(true);
   };
 
-  const deleteUser = async (data) => {
+  const deleteUser = async (data: DeleteUserFormData) => {
     try {
       await axios.delete(route("profile.destroy"), {
         data,
-        preserveScroll: true,
       });
-      // Redirect usually happens from backend or Inertia, but if axios is used manually:
       window.location.href = "/";
-    } catch (error) {
+    } catch (error: any) {
       if (error.response?.data?.errors) {
-        Object.entries(error.response.data.errors).forEach(([key, value]) => {
-          setError(key, { message: value[0] });
-        });
+        Object.entries(error.response.data.errors).forEach(
+          ([key, value]: [any, any]) => {
+            setError(key as keyof DeleteUserFormData, { message: value[0] });
+          }
+        );
       }
-      // Focus password input if error
-      // setTimeout(() => passwordInput.current?.focus(), 100);
     }
   };
 
@@ -88,7 +91,7 @@ export default function DeleteUserForm({ className = "" }) {
     <ModernCard
       title={t("profile.delete.title")}
       description={t("profile.delete.description")}
-      icon={TrashIcon}
+      icon={TrashIcon as any}
       headerColor="red"
       className={className}
     >
@@ -110,7 +113,7 @@ export default function DeleteUserForm({ className = "" }) {
         <ModernButton
           variant="danger"
           onClick={confirmUserDeletion}
-          icon={TrashIcon}
+          icon={TrashIcon as any}
         >
           {t("profile.delete.deleteButton")}
         </ModernButton>
@@ -156,6 +159,7 @@ export default function DeleteUserForm({ className = "" }) {
               variant="danger"
               disabled={isSubmitting}
               className="w-auto"
+              type="submit"
             >
               {t("profile.delete.deleteButton")}
             </ModernButton>

@@ -384,9 +384,9 @@ export default function AddPublicationModal({
             theme={theme}
             isSubmitting={isSubmitting}
             formId="add-publication-form"
-            submitText={t("publications.button.save") || "Guardar publicación"}
+            submitText={t("publications.button.add") || "Save Publication"}
             submitIcon={<Save className="w-4 h-4" />}
-            cancelText={t("common.cancel") || "Cerrar"}
+            cancelText={t("common.cancel") || "Close"}
           />
         </div>
 

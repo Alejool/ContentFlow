@@ -1,51 +1,32 @@
 import Button from "@/Components/common/Modern/Button";
 import ModernCard from "@/Components/common/Modern/Card";
+import CountryCodeSelector from "@/Components/common/Modern/CountryCodeSelector";
 import Input from "@/Components/common/Modern/Input";
+import Textarea from "@/Components/common/Modern/Textarea";
 import LanguageSwitcher from "@/Components/common/ui/LanguageSwitcher";
 import { useTheme } from "@/Hooks/useTheme";
-import { ProfileFormData, profileSchema } from "@/schemas/schemas";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Link, usePage } from "@inertiajs/react";
-import axios from "axios";
+import { useUser } from "@/Hooks/useUser";
+import { Link } from "@inertiajs/react";
 import {
   AlertTriangle,
   CheckCircle,
   Globe,
   Mail,
   MailWarning,
+  MessageSquare,
+  Phone,
   Save,
   Send,
+  ShieldCheck,
+  Sparkles,
   User as UserIcon,
 } from "lucide-react";
-import { useEffect, useState } from "react";
-import { SubmitHandler, useForm as useHookForm } from "react-hook-form";
-import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
 interface UpdateProfileInformationProps {
   mustVerifyEmail: boolean;
-  status: string | null;
+  status: string | null | undefined;
   className?: string;
-}
-
-interface AuthUser {
-  id: number;
-  name: string;
-  email: string;
-  email_verified_at: string | null;
-}
-
-interface PageProps {
-  auth: {
-    user: AuthUser;
-  };
-}
-
-interface ApiResponse {
-  success?: boolean;
-  warning?: boolean;
-  message?: string;
-  errors?: Record<string, string[]>;
 }
 
 export default function UpdateProfileInformation({
@@ -53,206 +34,210 @@ export default function UpdateProfileInformation({
   status,
   className = "",
 }: UpdateProfileInformationProps) {
-  const page = usePage<PageProps>();
-  const user = page.props.auth.user;
   const { t, i18n } = useTranslation();
   const { theme } = useTheme();
-  const [isChangingLanguage, setIsChangingLanguage] = useState(false);
-
-  // Estado para manejar cambios manualmente
-  const [formData, setFormData] = useState({
-    name: user?.name || "",
-    email: user?.email || "",
-  });
-
-  const [initialData, setInitialData] = useState({
-    name: user?.name || "",
-    email: user?.email || "",
-  });
-
-  const [hasChanges, setHasChanges] = useState(false);
 
   const {
-    handleSubmit,
-    setError,
     register,
-    formState: { errors, isSubmitting },
-  } = useHookForm<ProfileFormData>({
-    resolver: zodResolver(profileSchema),
-    mode: "onChange",
-  });
+    handleSubmit,
+    errors,
+    isSubmitting,
+    hasChanges,
+    isChangingLanguage,
+    user,
+    watchedValues,
+    setValue,
+  } = useUser(null);
 
-  // Actualizar formData cuando cambia el usuario
-  useEffect(() => {
-    if (user) {
-      const newData = {
-        name: user.name,
-        email: user.email,
-      };
-      setFormData(newData);
-      setInitialData(newData);
-      setHasChanges(false);
-    }
-  }, [user]);
+  const sectionHeaderClass = `flex items-center gap-2 pb-2 mb-6 border-b ${
+    theme === "dark" ? "border-neutral-700/50" : "border-gray-200"
+  }`;
 
-  // Verificar cambios cuando formData cambia
-  useEffect(() => {
-    const changes =
-      formData.name !== initialData.name ||
-      formData.email !== initialData.email;
-    setHasChanges(changes);
-  }, [formData, initialData]);
-
-  const handleInputChange =
-    (field: keyof typeof formData) =>
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setFormData((prev) => ({
-        ...prev,
-        [field]: e.target.value,
-      }));
-    };
-
-  const submit: SubmitHandler<ProfileFormData> = async () => {
-    try {
-      const response = await axios.patch<ApiResponse>(
-        route("profile.update"),
-        formData
-      );
-
-      if (response.data.success) {
-        toast.success(
-          response.data.message || t("profile.toast.updateSuccess")
-        );
-        // Actualizar datos iniciales después de guardar
-        setInitialData(formData);
-        setHasChanges(false);
-      } else if (response.data.warning) {
-        toast(response.data.message || t("profile.toast.noChanges"), {
-          icon: "⚠️",
-          style: {
-            background: theme === "dark" ? "#374151" : "#f3f4f6",
-            color: theme === "dark" ? "#f9fafb" : "#374151",
-          },
-        });
-      } else {
-        toast.error(response.data.message || t("profile.toast.errorUpdating"));
-      }
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.response?.data?.errors) {
-        const errorData = error.response.data as ApiResponse;
-        if (errorData.errors) {
-          Object.entries(errorData.errors).forEach(([key, value]) => {
-            // Mostrar errores en toast
-            toast.error(value[0]);
-          });
-        }
-      } else {
-        toast.error(
-          (error as any).response?.data?.message ||
-            t("profile.toast.errorUpdating")
-        );
-      }
-    }
-  };
-
-  const handleLanguageChange = async (lang: string) => {
-    try {
-      setIsChangingLanguage(true);
-      await i18n.changeLanguage(lang);
-      localStorage.setItem("i18nextLng", lang);
-      toast.success(t("profile.toast.languageChanged"));
-    } catch (error) {
-      toast.error(t("profile.toast.languageChangeError"));
-    } finally {
-      setIsChangingLanguage(false);
-    }
-  };
+  const sectionTitleClass = `text-lg font-bold tracking-tight ${
+    theme === "dark" ? "text-purple-400" : "text-purple-700"
+  }`;
 
   return (
     <ModernCard
       title={t("profile.information.title")}
       description={t("profile.information.description")}
       icon={UserIcon}
-      headerColor="green"
-      className={className}
+      headerColor="custom"
+      customGradient={
+        theme === "dark"
+          ? "from-purple-900 via-indigo-950 to-neutral-900"
+          : "from-purple-600 via-indigo-600 to-indigo-700"
+      }
+      className={`${className} shadow-2xl relative overflow-hidden`}
     >
-      <form onSubmit={handleSubmit(submit)} className="space-y-6">
-        {/* Campo Nombre - CONTROLADO MANUALMENTE */}
-        <Input
-          id="name"
-          label={t("profile.information.nameLabel")}
-          value={formData.name}
-          onChange={handleInputChange("name")}
-          placeholder={t("profile.information.namePlaceholder")}
-          theme={theme}
-          register={register}
-          error={errors.name?.message}
-          sizeType="lg"
-          variant="filled"
-          icon={UserIcon}
-          required
-        />
+      {/* Decorative background element */}
+      <div className="absolute top-0 right-0 -mt-20 -mr-20 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
 
-        {/* Campo Email - CONTROLADO MANUALMENTE */}
-        <div className="relative">
-          <Input
-            id="email"
-            label={t("profile.information.emailLabel")}
-            type="email"
-            register={register}
-            error={errors.email?.message}
-            value={formData.email}
-            onChange={handleInputChange("email")}
-            placeholder={t("profile.information.emailPlaceholder")}
-            containerClassName="flex-1"
-            theme={theme}
-            sizeType="lg"
-            variant="filled"
-            icon={Mail}
-            required
-          />
-
-          {user.email_verified_at && (
+      <form onSubmit={handleSubmit} className="space-y-10 relative">
+        {/* Sección: Información Personal */}
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className={sectionHeaderClass}>
             <div
-              className={`absolute right-0 top-6 flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium
-                ${
-                  theme === "dark"
-                    ? "bg-green-900/30 text-green-300 border border-green-800/50"
-                    : "bg-green-100 text-green-800 border border-green-200"
-                }`}
+              className={`p-2 rounded-lg ${
+                theme === "dark"
+                  ? "bg-purple-500/20 text-purple-400"
+                  : "bg-purple-100 text-purple-600"
+              }`}
             >
-              <CheckCircle className="w-3 h-3" />
-              {t("profile.statistics.verified")}
+              <UserIcon className="w-5 h-5" />
             </div>
-          )}
+            <h3 className={sectionTitleClass}>
+              {t("profile.information.sections.personal")}
+            </h3>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <Input
+              id="name"
+              label={t("profile.information.nameLabel")}
+              placeholder={t("profile.information.namePlaceholder")}
+              theme={theme}
+              register={register}
+              error={errors.name?.message}
+              sizeType="lg"
+              variant="filled"
+              icon={UserIcon}
+              required
+              className="transition-all focus:scale-[1.01]"
+            />
+
+            <div className="relative">
+              <Input
+                id="email"
+                label={t("profile.information.emailLabel")}
+                type="email"
+                register={register}
+                error={errors.email?.message}
+                placeholder={t("profile.information.emailPlaceholder")}
+                theme={theme}
+                sizeType="lg"
+                variant="filled"
+                icon={Mail}
+                disabled
+                required
+                className="opacity-80"
+              />
+
+              {user?.email_verified_at && (
+                <div
+                  className={`absolute right-0 top-6 flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider
+                    ${
+                      theme === "dark"
+                        ? "bg-green-500/10 text-green-400 border border-green-500/20"
+                        : "bg-green-100 text-green-700 border border-green-200"
+                    }`}
+                >
+                  <ShieldCheck className="w-3 h-3" />
+                  {t("profile.statistics.verified")}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
 
-        {mustVerifyEmail && user.email_verified_at === null && (
+        {/* Sección: Detalles de Contacto */}
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-150">
+          <div className={sectionHeaderClass}>
+            <div
+              className={`p-2 rounded-lg ${
+                theme === "dark"
+                  ? "bg-blue-500/20 text-blue-400"
+                  : "bg-blue-100 text-blue-600"
+              }`}
+            >
+              <Phone className="w-5 h-5" />
+            </div>
+            <h3 className={sectionTitleClass}>
+              {t("profile.information.sections.contact")}
+            </h3>
+          </div>
+
+          <div className="max-w-md">
+            <Input
+              id="phone"
+              label={t("profile.information.phoneLabel")}
+              placeholder={t("profile.information.phonePlaceholder")}
+              theme={theme}
+              register={register}
+              error={errors.phone?.message}
+              sizeType="lg"
+              variant="filled"
+              prefix={
+                <CountryCodeSelector
+                  value={watchedValues.country_code}
+                  onChange={(code) =>
+                    setValue("country_code", code, { shouldDirty: true })
+                  }
+                  disabled={isSubmitting}
+                />
+              }
+              className="transition-all focus:scale-[1.01]"
+            />
+          </div>
+        </div>
+
+        {/* Sección: Sobre Mí */}
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-300">
+          <div className={sectionHeaderClass}>
+            <div
+              className={`p-2 rounded-lg ${
+                theme === "dark"
+                  ? "bg-amber-500/20 text-amber-400"
+                  : "bg-amber-100 text-amber-600"
+              }`}
+            >
+              <MessageSquare className="w-5 h-5" />
+            </div>
+            <h3 className={sectionTitleClass}>
+              {t("profile.information.sections.bio")}
+            </h3>
+          </div>
+
+          <Textarea
+            id="bio"
+            label={t("profile.information.bioLabel")}
+            placeholder={t("profile.information.bioPlaceholder")}
+            theme={theme}
+            register={register}
+            name="bio"
+            error={errors.bio?.message}
+            rows={5}
+            variant="filled"
+            className="transition-all focus:scale-[1.01] resize-none"
+          />
+        </div>
+
+        {mustVerifyEmail && user?.email_verified_at === null && (
           <div
-            className={`rounded-lg p-4 space-y-3 transition-colors duration-300
+            className={`rounded-xl p-5 space-y-4 transition-all duration-500 shadow-inner
               ${
                 theme === "dark"
-                  ? "bg-yellow-900/20 border border-yellow-800/30"
-                  : "bg-yellow-50 border border-yellow-200"
+                  ? "bg-amber-900/10 border border-amber-800/30"
+                  : "bg-amber-50 border border-amber-200"
               }`}
           >
             <div
-              className={`flex items-center gap-2 font-medium
-                ${theme === "dark" ? "text-yellow-300" : "text-yellow-800"}`}
+              className={`flex items-center gap-3 font-semibold
+                ${theme === "dark" ? "text-amber-300" : "text-amber-800"}`}
             >
-              <MailWarning className="w-5 h-5" />
+              <div className="p-1.5 rounded-full bg-amber-500/20">
+                <MailWarning className="w-5 h-5" />
+              </div>
               <span>
                 {t("profile.statistics.emailStatus")}:{" "}
                 {t("profile.statistics.unverified")}
               </span>
             </div>
 
-            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <p
-                className={`text-sm flex-1
-                  ${
-                    theme === "dark" ? "text-yellow-400/80" : "text-yellow-700"
-                  }`}
+                className={`text-sm flex-1 leading-relaxed
+                  ${theme === "dark" ? "text-amber-200/70" : "text-amber-700"}`}
               >
                 {t("profile.information.emailUnverified")}
               </p>
@@ -260,11 +245,11 @@ export default function UpdateProfileInformation({
                 href={route("verification.send")}
                 method="post"
                 as="button"
-                className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-300 flex items-center justify-center gap-2 shadow-sm
+                className={`px-5 py-2.5 text-sm font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 shadow-sm
                   ${
                     theme === "dark"
-                      ? "bg-gradient-to-r from-yellow-700/30 to-yellow-800/30 text-yellow-300 border border-yellow-700/30 hover:from-yellow-700/40 hover:to-yellow-800/40 hover:border-yellow-600/50"
-                      : "bg-gradient-to-r from-yellow-100 to-yellow-200 text-yellow-800 border border-yellow-300 hover:from-yellow-200 hover:to-yellow-300"
+                      ? "bg-amber-600 hover:bg-amber-500 text-white"
+                      : "bg-amber-500 hover:bg-amber-600 text-white"
                   }`}
               >
                 <Send className="w-4 h-4" />
@@ -274,10 +259,10 @@ export default function UpdateProfileInformation({
 
             {status === "verification-link-sent" && (
               <div
-                className={`mt-2 text-sm font-medium flex items-center gap-2 p-3 rounded-lg
+                className={`mt-2 text-sm font-semibold flex items-center gap-2 p-3 rounded-lg
                   ${
                     theme === "dark"
-                      ? "bg-green-900/20 text-green-300 border border-green-800/30"
+                      ? "bg-green-500/10 text-green-400 border border-green-500/20"
                       : "bg-green-50 text-green-700 border border-green-200"
                   }`}
               >
@@ -288,82 +273,110 @@ export default function UpdateProfileInformation({
           </div>
         )}
 
+        {/* Sección: Idioma */}
         <div
-          className={`border-t pt-6 transition-colors duration-300
-            ${theme === "dark" ? "border-neutral-700/50" : "border-gray-200"}`}
+          className={`pt-10 border-t ${
+            theme === "dark" ? "border-neutral-700/50" : "border-gray-200"
+          }`}
         >
-          <div className="flex items-center gap-2 mb-4">
-            <Globe
-              className={`w-5 h-5 ${
-                theme === "dark" ? "text-gray-300" : "text-gray-700"
-              }`}
-            />
-            <h3
-              className={`text-lg font-medium ${
-                theme === "dark" ? "text-gray-200" : "text-gray-900"
+          <div className={sectionHeaderClass}>
+            <div
+              className={`p-2 rounded-lg ${
+                theme === "dark"
+                  ? "bg-emerald-500/20 text-emerald-400"
+                  : "bg-emerald-100 text-emerald-600"
               }`}
             >
-              {t("profile.information.applicationLanguage")}
+              <Globe className="w-5 h-5" />
+            </div>
+            <h3 className={sectionTitleClass}>
+              {t("profile.information.sections.language")}
             </h3>
           </div>
 
           <div
-            className={`p-4 rounded-lg border transition-colors duration-300
+            className={`p-6 rounded-2xl border transition-all duration-300 group
               ${
                 theme === "dark"
-                  ? "bg-neutral-800/30 border-neutral-700/50"
-                  : "bg-gray-50 border-gray-200"
+                  ? "bg-neutral-800/40 border-neutral-700/50 hover:bg-neutral-800/60"
+                  : "bg-white border-gray-200 hover:shadow-md"
               }`}
           >
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div
-                className={`text-sm ${
-                  theme === "dark" ? "text-gray-400" : "text-gray-600"
-                }`}
-              >
-                {t("profile.information.languageDescription")}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+              <div className="space-y-1">
+                <div
+                  className={`font-semibold ${
+                    theme === "dark" ? "text-gray-200" : "text-gray-800"
+                  }`}
+                >
+                  {t("profile.information.applicationLanguage")}
+                </div>
+                <div
+                  className={`text-sm ${
+                    theme === "dark" ? "text-gray-400" : "text-gray-600"
+                  }`}
+                >
+                  {t("profile.information.languageDescription")}
+                </div>
               </div>
 
               <div className="flex-shrink-0">
-                <div className="flex items-center gap-2">
-                  {isChangingLanguage ? (
-                    <div className="flex items-center gap-2 text-sm text-gray-500">
-                      <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
-                      {t("common.changing")}
-                    </div>
-                  ) : (
-                    <LanguageSwitcher />
-                  )}
-                </div>
+                {isChangingLanguage ? (
+                  <div className="flex items-center gap-2 text-sm font-medium text-purple-500">
+                    <div className="w-5 h-5 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+                    {t("common.changing")}
+                  </div>
+                ) : (
+                  <LanguageSwitcher />
+                )}
               </div>
             </div>
 
             <div
-              className={`mt-3 text-xs ${
-                theme === "dark" ? "text-gray-500" : "text-gray-400"
+              className={`mt-4 pt-4 border-t text-xs font-medium flex items-center gap-2 ${
+                theme === "dark"
+                  ? "border-neutral-700/30 text-gray-500"
+                  : "border-gray-100 text-gray-400"
               }`}
             >
+              <Sparkles className="w-3 h-3" />
               {t("profile.information.currentLanguage")}:{" "}
-              {i18n.language === "en" ? "English" : "Español"}
+              <span
+                className={theme === "dark" ? "text-gray-300" : "text-gray-600"}
+              >
+                {i18n.language === "en" ? "English" : "Español"}
+              </span>
             </div>
           </div>
         </div>
 
-        {/* Botón de guardar - AHORA FUNCIONARÁ CORRECTAMENTE */}
+        {/* Botón de Guardar */}
         <div
-          className={`flex items-center justify-end gap-4 pt-4 border-t transition-colors duration-300
+          className={`flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 border-t transition-all duration-300
             ${theme === "dark" ? "border-neutral-700/50" : "border-gray-200"}`}
         >
+          <div className="hidden sm:block">
+            {hasChanges && !isSubmitting && (
+              <div
+                className={`flex items-center gap-2 text-sm font-medium animate-pulse
+                  ${theme === "dark" ? "text-amber-400" : "text-amber-600"}`}
+              >
+                <AlertTriangle className="w-4 h-4" />
+                {t("profile.messages.unsavedChanges")}
+              </div>
+            )}
+          </div>
+
           <Button
             disabled={isSubmitting || !hasChanges}
             icon={Save}
             theme={theme}
             loading={isSubmitting}
             loadingText={t("common.saving")}
-            className={`min-w-[140px] transition-all duration-300 ${
+            className={`w-full sm:w-auto min-w-[180px] transition-all duration-300 rounded-xl shadow-lg hover:shadow-purple-500/20 ${
               !hasChanges
-                ? "opacity-50 cursor-not-allowed"
-                : "hover:scale-[1.02]"
+                ? "opacity-50 grayscale"
+                : "hover:scale-[1.02] active:scale-[0.98] bg-gradient-to-r from-purple-600 to-indigo-600 text-white border-0"
             }`}
             type="submit"
             size="lg"
@@ -372,18 +385,17 @@ export default function UpdateProfileInformation({
           </Button>
         </div>
 
-        {/* Mensaje de cambios no guardados */}
         {hasChanges && !isSubmitting && (
-          <div className="space-y-2">
+          <div className="sm:hidden text-center">
             <div
-              className={`flex items-center gap-2 text-sm p-3 rounded-lg
-                ${
-                  theme === "dark"
-                    ? "bg-yellow-900/10 text-yellow-400 border border-yellow-800/20"
-                    : "bg-yellow-50 text-yellow-700 border border-yellow-200"
-                }`}
+              className={`inline-flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-full
+                  ${
+                    theme === "dark"
+                      ? "bg-amber-900/20 text-amber-400"
+                      : "bg-amber-50 text-amber-600"
+                  }`}
             >
-              <AlertTriangle className="w-4 h-4" />
+              <AlertTriangle className="w-3.5 h-3.5" />
               {t("profile.messages.unsavedChanges")}
             </div>
           </div>
@@ -392,3 +404,4 @@ export default function UpdateProfileInformation({
     </ModernCard>
   );
 }
+鼓;

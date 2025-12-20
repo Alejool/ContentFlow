@@ -71,9 +71,19 @@ function CustomAvatar({ src, name, size = "md", className = "" }: AvatarProps) {
   );
 }
 
+import { useUserStore } from "@/stores/userStore";
+import { useEffect } from "react";
+
 export default function Edit({ mustVerifyEmail, status }: EditProps) {
-  const user = usePage().props.auth.user;
+  const user = usePage<any>().props.auth.user;
   const { theme } = useTheme();
+  const { setUser } = useUserStore();
+
+  useEffect(() => {
+    if (user) {
+      setUser(user);
+    }
+  }, [user, setUser]);
 
   const getAvatarColor = () => {
     if (theme === "dark") {
@@ -165,7 +175,7 @@ export default function Edit({ mustVerifyEmail, status }: EditProps) {
                 Miembro desde: {new Date(user.created_at).toLocaleDateString()}
               </div>
             </div>
-            <ConnectedAccounts header={false}/>
+            <ConnectedAccounts header={false} />
           </div>
         </div>
       }
@@ -186,7 +196,7 @@ export default function Edit({ mustVerifyEmail, status }: EditProps) {
                 className="h-auto"
               />
             </div>
-              <AccountStatistics status={status} />
+            <AccountStatistics status={status} />
 
             {user.provider === null && (
               <div className="space-y-3 col-span-2">

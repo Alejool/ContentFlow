@@ -26,6 +26,9 @@ class ProfileUpdateRequest extends FormRequest
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
             'locale' => ['nullable', 'string', 'in:en,es'],
+            'phone' => ['nullable', 'string', 'max:10', 'regex:/^\d*$/'],
+            'country_code' => ['nullable', 'string', 'max:10'],
+            'bio' => ['nullable', 'string', 'max:1000'],
         ];
     }
 }

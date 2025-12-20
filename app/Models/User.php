@@ -35,6 +35,9 @@ class User extends Model implements Authenticatable, MustVerifyEmail, CanResetPa
         'locale',
         'theme',
         'global_platform_settings',
+        'phone',
+        'country_code',
+        'bio',
         'remember_token',
     ];
 

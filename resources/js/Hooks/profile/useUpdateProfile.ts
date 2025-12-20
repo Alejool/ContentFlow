@@ -1,71 +1,12 @@
-import {
-  useForm as useHookForm,
-  UseFormRegister,
-  UseFormHandleSubmit,
-  FieldErrors,
-  UseFormSetError,
-} from "react-hook-form";
+import { UserProfileFormData, userProfileSchema } from "@/schemas/user";
+import { useUserStore } from "@/stores/userStore";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { profileSchema } from "@/schemas/schemas";
+import axios from "axios";
+import { useForm as useHookForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import { usePage } from "@inertiajs/react";
-import axios, { AxiosError } from "axios";
-import { z } from "zod";
 
-// Types
-type ProfileFormData = z.infer<typeof profileSchema>;
-
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  email_verified_at: string | null;
-}
-
-interface PageProps {
-  auth: {
-    user: User;
-  };
-}
-
-interface ApiResponse {
-  success?: boolean;
-  warning?: boolean;
-  message?: string;
-  errors?: Record<string, string[]>;
-}
-
-interface ApiError {
-  response?: {
-    data?: ApiResponse;
-  };
-}
-
-interface UpdateProfileResult {
-  success?: boolean;
-  warning?: boolean;
-  error?: boolean;
-}
-
-interface UseUpdateProfileReturn {
-  register: UseFormRegister<ProfileFormData>;
-  handleSubmit: UseFormHandleSubmit<ProfileFormData>;
-  errors: FieldErrors<ProfileFormData>;
-  isSubmitting: boolean;
-  watchedName: string;
-  watchedEmail: string;
-  updateProfile: (data: ProfileFormData) => Promise<UpdateProfileResult>;
-  user: User;
-}
-
-// Declare global route function
-declare global {
-  function route(name: string): string;
-}
-
-export const useUpdateProfile = (): UseUpdateProfileReturn => {
-  const { props } = usePage<PageProps>();
-  const user = props.auth.user;
+export const useUpdateProfile = () => {
+  const { user, updateProfile, isLoading } = useUserStore();
 
   const {
     register,
@@ -73,66 +14,47 @@ export const useUpdateProfile = (): UseUpdateProfileReturn => {
     setError,
     watch,
     formState: { errors, isSubmitting },
-  } = useHookForm<ProfileFormData>({
-    resolver: zodResolver(profileSchema),
+  } = useHookForm<UserProfileFormData>({
+    resolver: zodResolver(userProfileSchema),
     defaultValues: {
       name: user?.name || "",
       email: user?.email || "",
+      phone: user?.phone || "",
+      bio: user?.bio || "",
     },
   });
 
   const watchedName = watch("name");
   const watchedEmail = watch("email");
 
-  const updateProfile = async (
-    data: ProfileFormData
-  ): Promise<UpdateProfileResult> => {
+  const handleProfileUpdate = async (data: UserProfileFormData) => {
     try {
-      const response = await axios.patch<ApiResponse>(
-        route("profile.update"),
-        data
-      );
-
-      if (response.data.success) {
-        toast.success(response.data.message || "Profile updated successfully");
-        return { success: true };
-      } else if (response.data.warning) {
-        toast(response.data.message || "No changes were made", { icon: "⚠️" });
-        return { warning: true };
+      const result = await updateProfile(data);
+      if (result.success) {
+        toast.success(result.message || "Profile updated successfully");
       } else {
-        toast.error(
-          response.data.message || "An error occurred while updating profile"
-        );
-        return { error: true };
+        toast.error(result.message || "Failed to update profile");
       }
-    } catch (error) {
-      const axiosError = error as AxiosError<ApiResponse>;
-
-      if (axiosError.response?.data?.errors) {
-        Object.entries(axiosError.response.data.errors).forEach(
-          ([key, value]) => {
-            setError(key as keyof ProfileFormData, { message: value[0] });
-            toast.error(value[0]);
-          }
-        );
+    } catch (error: any) {
+      if (axios.isAxiosError(error) && error.response?.data?.errors) {
+        const serverErrors = error.response.data.errors;
+        Object.entries(serverErrors).forEach(([key, value]: [any, any]) => {
+          setError(key as keyof UserProfileFormData, { message: value[0] });
+          toast.error(value[0]);
+        });
       } else {
-        toast.error(
-          axiosError.response?.data?.message ||
-            "An error occurred while updating profile"
-        );
+        toast.error(error.message || "An error occurred");
       }
-      return { error: true };
     }
   };
 
   return {
     register,
-    handleSubmit,
+    handleSubmit: handleSubmit(handleProfileUpdate),
     errors,
-    isSubmitting,
+    isSubmitting: isSubmitting || isLoading,
     watchedName,
     watchedEmail,
-    updateProfile,
-    user,
+    user: user!,
   };
 };
