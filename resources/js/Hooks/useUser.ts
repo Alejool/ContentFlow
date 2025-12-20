@@ -29,6 +29,7 @@ export const useUser = (initialUser: any) => {
       phone: initialUser?.phone || "",
       country_code: initialUser?.country_code || "",
       bio: initialUser?.bio || "",
+      global_platform_settings: initialUser?.global_platform_settings || {},
     },
   });
 
@@ -48,6 +49,7 @@ export const useUser = (initialUser: any) => {
         phone: user.phone || "",
         country_code: user.country_code || "",
         bio: user.bio || "",
+        global_platform_settings: user.global_platform_settings || {},
       });
     }
   }, [user, reset]);
@@ -65,7 +67,9 @@ export const useUser = (initialUser: any) => {
       watchedValues.email !== user.email ||
       (watchedValues.phone || "") !== (user.phone || "") ||
       (watchedValues.country_code || "") !== (user.country_code || "") ||
-      (watchedValues.bio || "") !== (user.bio || "");
+      (watchedValues.bio || "") !== (user.bio || "") ||
+      JSON.stringify(watchedValues.global_platform_settings || {}) !==
+        JSON.stringify(user.global_platform_settings || {});
     setHasChanges(changed);
   }, [watchedValues, user]);
 

@@ -152,7 +152,7 @@ export default function ConnectedAccounts({ className = "", header = true }) {
                   <Link
                     href={route("settings.social")}
                     className="p-1.5 rounded-md hover:bg-purple-100 text-purple-600 transition-colors"
-                    title={t("publications.modal.platformSettings.title")}
+                    title={t("platformSettings.title")}
                   >
                     <Settings className="w-4 h-4" />
                   </Link>

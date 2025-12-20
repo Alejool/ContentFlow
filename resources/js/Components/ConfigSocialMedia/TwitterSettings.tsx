@@ -30,13 +30,11 @@ export default function TwitterSettings({
   return (
     <div className="space-y-6">
       <div className="space-y-4">
-        <SectionHeader
-          title={t("publications.modal.platformSettings.twitter.type")}
-        />
+        <SectionHeader title={t("platformSettings.twitter.type")} />
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <PlatformCard
             value="tweet"
-            label={t("publications.modal.platformSettings.twitter.tweet")}
+            label={t("platformSettings.twitter.tweet")}
             icon={Twitter}
             iconColor="text-sky-500"
             iconBgColor="bg-sky-100 dark:bg-sky-900/20"
@@ -45,7 +43,7 @@ export default function TwitterSettings({
           />
           <PlatformCard
             value="thread"
-            label={t("publications.modal.platformSettings.twitter.thread")}
+            label={t("platformSettings.twitter.thread")}
             icon={List}
             iconColor="text-sky-500"
             iconBgColor="bg-sky-100 dark:bg-sky-900/20"
@@ -54,7 +52,7 @@ export default function TwitterSettings({
           />
           <PlatformCard
             value="poll"
-            label={t("publications.modal.platformSettings.twitter.poll")}
+            label={t("platformSettings.twitter.poll")}
             icon={PieChart}
             iconColor="text-sky-500"
             iconBgColor="bg-sky-100 dark:bg-sky-900/20"

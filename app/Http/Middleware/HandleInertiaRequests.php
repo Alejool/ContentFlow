@@ -42,6 +42,10 @@ class HandleInertiaRequests extends Middleware
           'photo_url' => $request->user()->photo_url,
           'theme' => $request->user()->theme,
           'provider' => $request->user()->provider,
+          'phone' => $request->user()->phone,
+          'bio' => $request->user()->bio,
+          'country_code' => $request->user()->country_code,
+          'global_platform_settings' => $request->user()->global_platform_settings ?? [],
         ] : null,
       ],
       'flash' => [

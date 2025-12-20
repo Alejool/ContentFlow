@@ -21,13 +21,11 @@ export default function InstagramSettings({
   return (
     <div className="space-y-6">
       <div className="space-y-4">
-        <SectionHeader
-          title={t("publications.modal.platformSettings.instagram.type")}
-        />
+        <SectionHeader title={t("platformSettings.instagram.type")} />
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <PlatformCard
             value="feed"
-            label={t("publications.modal.platformSettings.instagram.feed")}
+            label={t("platformSettings.instagram.feed")}
             icon={Instagram}
             iconColor="text-pink-500"
             iconBgColor="bg-pink-100 dark:bg-pink-900/20"
@@ -36,7 +34,7 @@ export default function InstagramSettings({
           />
           <PlatformCard
             value="reel"
-            label={t("publications.modal.platformSettings.instagram.reel")}
+            label={t("platformSettings.instagram.reel")}
             icon={Video}
             iconColor="text-pink-500"
             iconBgColor="bg-pink-100 dark:bg-pink-900/20"
@@ -45,7 +43,7 @@ export default function InstagramSettings({
           />
           <PlatformCard
             value="story"
-            label={t("publications.modal.platformSettings.instagram.story")}
+            label={t("platformSettings.instagram.story")}
             icon={Instagram}
             iconColor="text-pink-500"
             iconBgColor="bg-pink-100 dark:bg-pink-900/20"

@@ -71,6 +71,7 @@ class ProfileUpdateRequest extends FormRequest
             ],
             'country_code' => ['nullable', 'string', 'max:10'],
             'bio' => ['nullable', 'string', 'max:1000'],
+            'global_platform_settings' => ['nullable', 'array'],
         ];
     }
 }

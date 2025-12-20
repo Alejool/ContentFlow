@@ -14,7 +14,6 @@ import {
   FileText,
   Home,
   LogOut,
-  Share2,
   User,
 } from "lucide-react";
 import { useState } from "react";
@@ -46,11 +45,6 @@ const navigationItems = [
     href: "analytics.index",
     icon: BarChart3,
   },
-  {
-    nameKey: "nav.socialNetworks",
-    href: "settings.social",
-    icon: Share2,
-  },
 ];
 
 export default function Sidebar({
@@ -72,7 +66,6 @@ export default function Sidebar({
       "profile.edit": ["/profile", "/profile/edit"],
       "/ManageContent.index": ["/ManageContent"],
       "analytics.index": ["/analytics"],
-      "settings.social": ["/settings", "/settings/social"],
     };
 
     const patterns = routePatterns[routeName] || [
@@ -91,7 +84,6 @@ export default function Sidebar({
       "profile.edit": "/profile",
       "/ManageContent.index": "/ManageContent",
       "analytics.index": "/analytics",
-      "settings.social": "/settings/social",
       logout: "/logout",
     };
 

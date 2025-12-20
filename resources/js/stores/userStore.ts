@@ -15,6 +15,7 @@ export interface User {
   provider?: string | null;
   locale?: string | null;
   country_code?: string | null;
+  global_platform_settings?: Record<string, any> | null;
 }
 
 interface UserState {

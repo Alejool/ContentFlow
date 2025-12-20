@@ -53,7 +53,7 @@ const SocialAccountsSection: React.FC<SocialAccountsSectionProps> = ({
       <div className="flex items-center justify-between">
         <label className="text-sm font-semibold flex items-center gap-2">
           <Target className="w-4 h-4" />
-          {t("publications.modal.manageContent.configureNetworks") ||
+          {t("manageContent.configureNetworks") ||
             "Configura tus redes sociales"}
         </label>
         {error && (
@@ -185,9 +185,9 @@ const SocialAccountItem: React.FC<SocialAccountItemProps> = ({
                 }`}
               >
                 {isPublished
-                  ? t("publications.modal.publish.published")
+                  ? t("publish.published")
                   : isPublishing
-                  ? t("publications.modal.publish.publishing")
+                  ? t("publish.publishing")
                   : (customSchedule || globalSchedule) &&
                     !isPublished &&
                     !isPublishing
@@ -253,9 +253,7 @@ const SocialAccountItem: React.FC<SocialAccountItemProps> = ({
                       ? "hover:bg-neutral-700 text-gray-400 hover:text-white"
                       : "hover:bg-gray-100 text-gray-500 hover:text-primary-600"
                   }`}
-                  title={
-                    t("publications.modal.preview.view") || "Ver vista previa"
-                  }
+                  title={t("preview.view") || "Ver vista previa"}
                 >
                   <Eye className="w-4 h-4" />
                 </button>
@@ -270,10 +268,7 @@ const SocialAccountItem: React.FC<SocialAccountItemProps> = ({
                       ? "hover:bg-neutral-700 text-gray-400 hover:text-white"
                       : "hover:bg-gray-100 text-gray-500 hover:text-primary-600"
                   }`}
-                  title={
-                    t("publications.modal.platformSettings.configure") ||
-                    "Configurar red"
-                  }
+                  title={t("platformSettings.configure") || "Configurar red"}
                 >
                   <Settings className="w-4 h-4" />
                 </button>
@@ -285,7 +280,7 @@ const SocialAccountItem: React.FC<SocialAccountItemProps> = ({
                 !isPublishing && (
                   <div className="flex items-center gap-1 text-[10px] text-primary-500 font-medium animate-in fade-in slide-in-from-left-1">
                     <Clock className="w-3 h-3" />
-                    {t("publications.modal.schedule.instantWarning") ||
+                    {t("schedule.instantWarning") ||
                       "Para publicar ahora, usa el botón Publicar después de guardar."}
                   </div>
                 )}
@@ -294,13 +289,13 @@ const SocialAccountItem: React.FC<SocialAccountItemProps> = ({
           {isPublished && (
             <div className="mt-1 flex items-center gap-1 text-[10px] font-medium text-green-600 dark:text-green-400">
               <Check className="w-3 h-3" />
-              {t("publications.modal.publish.published")}
+              {t("publish.published")}
             </div>
           )}
           {isPublishing && (
             <div className="mt-1 flex items-center gap-1 text-[10px] font-medium text-yellow-600 dark:text-yellow-400">
               <div className="w-3 h-3 border-2 border-yellow-600 border-t-transparent rounded-full animate-spin" />
-              {t("publications.modal.publish.publishing")}
+              {t("publish.publishing")}
             </div>
           )}
         </div>

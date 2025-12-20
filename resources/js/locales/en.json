@@ -11,6 +11,7 @@
     "unsavedChanges": "Unsaved Changes",
     "totalSettings": "Total settings",
     "configured": "Configured",
+    "notConfigured": "Not Configured",
     "refresh": "Refresh",
     "allSaved": "All saved",
     "processing": "Processing...",
@@ -289,96 +290,7 @@
       "manageContent": {
         "configureNetworks": "Configure your scheduled publications"
       },
-      "platformSettings": {
-        "status":"Status",
-        "save":"Save Changes",
-        "configured":"Configured",
-        "success": "Configuration saved successfully",
-        "error": "Error saving configuration",
-        "title": "Global Platform Settings",
-        "subtitle": "Define default settings for each social network.",
-        "clickToConfigure": "Click to configure",
-        "configure": "Configure Network",
-        "preview": {
-          "view": "View Preview"
-        },
-        "youtube": {
-          "title": "YouTube",
-          "type": "Video Type",
-          "video": "Video Normal",
-          "videoStandard": "Standard video",
-          "contentType": "Content Type",
-          "short": "Shorts",
-          "shortVertical": "Video Vertical Shorts",
-          "privacy": "Privacy",
-          "public": "Public",
-          "private": "Private",
-          "unlisted": "Unlisted",
-          "madeForKids": "Yes, it is children's content"
-        },
-        "facebook": {
-          "title": "Facebook",
-          "type": "Publication Type",
-          "feed": "Wall Publication",
-          "feedDescription": "Wall Publication",
-          "reel": "Reel",
-          "reelDescription": "Vertical short video"
-        },
-        "instagram": {
-          "title": "Instagram",
-          "type": "Publication Type",
-          "feed": "Feed Publication",
-          "feedDescription": "Feed Publication",
-          "reel": "Reel",
-          "reelDescription": "Vertical short video",
-          "story": "Story",
-          "storyDescription": "Story"
-        },
-        "tiktok": {
-          "title": "TikTok",
-          "privacy": "Privacy",
-          "public": "Public",
-          "friends": "Friends Only",
-          "private": "Private",
-          "publicDescription": "Visible for all",
-          "friendsDescription": "Visible for followers",
-          "privateDescription": "Visible for you",
-          "interactions": "Interactions",
-          "interactionsDescription": "Interactions",
-          "comments": "Comments",
-          "commentsDescription": "Allowed comments",
-          "duets": "Duet",
-          "duetsDescription": "Allowed duets",
-          "stitchs": "Stitch",
-          "stitchsDescription": "Allowed stitches"
-        },
-        "twitter": {
-          "title": "Twitter (X)",
-          "type": "Post Type",
-          "tweet": "Standard Tweet",
-          "thread": "Thread (Split text)",
-          "poll": "Poll",
-          "pollOptions": "Poll Options",
-          "optionPlaceholder": "Option {{index}}",
-          "optional": "(Optional)",
-          "pollDuration": "Duration (Minutes)",
-          "30m": "30 Minutes",
-          "1h": "1 Hour",
-          "24h": "24 Hours",
-          "3d": "3 Days",
-          "7d": "7 Days",
-          "subtitle": "Adjust platform-specific options"
-        },
-        "labels": {
-          "type": "Post Type",
-          "privacy": "Privacy",
-          "made_for_kids": "Made for Kids",
-          "disable_comment": "Disable Comments",
-          "disable_duet": "Disable Duet",
-          "disable_stitch": "Disable Stitch",
-          "poll_duration": "Poll Duration"
-        }
-      },
+      
       "publish": {
         "title":"Publish",
         "selectPlatforms":"Select Platforms",
@@ -690,6 +602,103 @@
     }
   },
 
+  "platformSettings": {
+    "status":"Status",
+    "save":"Save Changes",
+    "configured":"Configured",
+    "success": "Configuration saved successfully",
+    "error": "Error saving configuration",
+    "title": "Global Platform Settings",
+    "subtitle": "Define default settings for each social network.",
+    "clickToConfigure": "Click to configure",
+    "configure": "Configure Network",
+    "preview": {
+      "view": "View Preview"
+    },  
+    "messages": {
+      "success": "Configuration saved successfully ",
+      "error": "Error saving configuration "
+    },
+    "button": {
+      "save": "Save Changes"
+    },
+    "youtube": {
+      "title": "YouTube",
+      "type": "Video Type",
+      "video": "Video Normal",
+      "videoStandard": "Standard video",
+      "contentType": "Content Type",
+      "short": "Shorts",
+      "shortVertical": "Video Vertical Shorts",
+      "privacy": "Privacy",
+      "public": "Public",
+      "private": "Private",
+      "unlisted": "Unlisted",
+      "madeForKids": "Yes, it is children's content"
+    },
+    "facebook": {
+      "title": "Facebook",
+      "type": "Publication Type",
+      "feed": "Wall Publication",
+      "feedDescription": "Wall Publication",
+      "reel": "Reel",
+      "reelDescription": "Vertical short video"
+    },
+    "instagram": {
+      "title": "Instagram",
+      "type": "Publication Type",
+      "feed": "Feed Publication",
+      "feedDescription": "Feed Publication",
+      "reel": "Reel",
+      "reelDescription": "Vertical short video",
+      "story": "Story",
+      "storyDescription": "Story"
+    },
+    "tiktok": {
+      "title": "TikTok",
+      "privacy": "Privacy",
+      "public": "Public",
+      "friends": "Friends Only",
+      "private": "Private",
+      "publicDescription": "Visible for all",
+      "friendsDescription": "Visible for followers",
+      "privateDescription": "Visible for you",
+      "interactions": "Interactions",
+      "interactionsDescription": "Interactions",
+      "comments": "Comments",
+      "commentsDescription": "Allowed comments",
+      "duets": "Duet",
+      "duetsDescription": "Allowed duets",
+      "stitchs": "Stitch",
+      "stitchsDescription": "Allowed stitches"
+    },
+    "twitter": {
+      "title": "Twitter (X)",
+      "type": "Post Type",
+      "tweet": "Standard Tweet",
+      "thread": "Thread (Split text)",
+      "poll": "Poll",
+      "pollOptions": "Poll Options",
+      "optionPlaceholder": "Option {{index}}",
+      "optional": "(Optional)",
+      "pollDuration": "Duration (Minutes)",
+      "30m": "30 Minutes",
+      "1h": "1 Hour",
+      "24h": "24 Hours",
+      "3d": "3 Days",
+      "7d": "7 Days",
+      "subtitle": "Adjust platform-specific options"
+    },
+    "labels": {
+      "type": "Post Type",
+      "privacy": "Privacy",
+      "made_for_kids": "Made for Kids",
+      "disable_comment": "Disable Comments",
+      "disable_duet": "Disable Duet",
+      "disable_stitch": "Disable Stitch",
+      "poll_duration": "Poll Duration"
+    }
+  },
   "profile": {
     "title": "Profile",
     "editProfile": "Edit Profile",
@@ -1103,7 +1112,38 @@
         "cancelButton": "Keep connected",
         "confirmButton": "Disconnect "
       },
+      "validation": {
+        "facebook": {
+          "typeRequired": "You must select a post type for Facebook",
+          "typeInvalid": "Invalid post type for Facebook"
+        },
+        "instagram": {
+          "typeRequired": "You must select a post type for Instagram",
+          "typeInvalid": "Invalid post type for Instagram"
+        },
+        "twitter": {
+          "typeRequired": "You must select a post type for Twitter",
+          "pollOptionsMin": "Polls require at least 2 options",
+          "pollOptionEmpty": "Poll options cannot be empty"
+        },
+        "youtube": {
+          "typeRequired": "You must select a video type for YouTube",
+          "typeInvalid": "Invalid video type for YouTube"
+        },
+        "tiktok": {
+          "typeRequired": "Format required for TikTok",
+          "typeInvalid": "Invalid format"
+        }
+      },
       "messages": {
+        "settingsUpdated": {
+            "facebook": "Facebook settings updated successfully",
+            "instagram": "Instagram settings updated successfully",
+            "twitter": "Twitter settings updated successfully",
+            "tiktok": "TikTok settings updated successfully",
+            "youtube": "YouTube settings updated successfully",
+            "default": "Settings updated successfully"
+        },
         "connectSuccess": "Account connected successfully",
         "disconnectSuccess": "Account disconnected successfully",
         "authError": "Authentication error",
@@ -1114,59 +1154,6 @@
     }
   },
 
-    "modals": {
-      "add": {
-        "title": "New Campaign",
-        "subtitle": "Create an impactful and attractive campaign",
-        "createButton": "Create Campaign",
-        "creating": "Creating...",
-        "save": "Create"
-      },
-      "fields": {
-        "title": "Campaign Title",
-        "description": "Description",
-        "image": "Campaign Image",
-        "goal": "Campaign goal",
-        "hashtags": "Hashtags",
-        "optional": "(Optional)",
-        "selectSocialAccounts": "Select Social Networks",
-        "schedulePublication": "Schedule Publication (Optional)",
-        "optionalSchedule": "Leave empty to save as draft or publish immediately.",
-        "socialAccounts": "Select Social Networks",
-        "noConnectedAccounts": "No connected accounts found.",
-        "alreadyScheduled": "A publication has already been scheduled for this date.",
-        "placeholders": {
-          "title": "Eg: Summer Campaign 2024",
-          "description": "Describe your campaign in a detailed and attractive way...",
-          "goal": "Eg: Increase social media engagement",
-          "hashtags": "#marketing #campaign #summer2024"
-        },
-        "dragDrop": {
-          "title": "Drag your image here or click to select",
-          "subtitle": "JPG, PNG, or WebP • Maximum 5MB"
-        }
-      },
-      "validation": {
-        "titleRequired": "Title is required",
-        "titleLength": "Title cannot exceed 100 characters",
-        "descRequired": "Description is required",
-        "descMin": "Description must be at least 10 characters",
-        "descMax": "Description cannot exceed 200 characters",
-        "imageRequired": "Image is required",
-        "imageSize": "Image must be smaller than 5MB",
-        "imageType": "Only JPG, PNG, or WebP files are allowed",
-        "objRequired": "Objective is required",
-        "objMin": "Objective must be at least 5 characters",
-        "objMax": "Objective cannot exceed 200 characters",
-        "hashtagsRequired": "Hashtags are required",
-        "hashtagValid": "Must include at least one valid hashtag (#example)",
-        "hashtagMax": "Maximum 10 hashtags allowed",
-        "confirmDeleteSchedule": "Are you sure you want to delete this scheduled post? This action cannot be undone.",
-        "deleteScheduleTitle": "Delete Scheduled Post?",
-        "scheduleDeleted": "Scheduled post deleted successfully",
-        "scheduleDeleteError": "Failed to delete scheduled post"
-      }
-    },
   "notifications": {
     "title": "Notifications",
     "new": "new",

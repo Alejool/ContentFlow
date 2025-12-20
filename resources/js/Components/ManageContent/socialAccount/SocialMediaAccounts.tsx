@@ -2,10 +2,12 @@ import IconFacebook from "@/../assets/Icons/facebook.svg";
 import IconTiktok from "@/../assets/Icons/tiktok.svg";
 import IconTwitter from "@/../assets/Icons/x.svg";
 import IconYoutube from "@/../assets/Icons/youtube.svg";
+import PlatformSettingsModal from "@/Components/ConfigSocialMedia/PlatformSettingsModal";
 import DisconnectWarningModal from "@/Components/ManageContent/modals/DisconnectWarningModal";
 import { useSocialMediaAuth } from "@/Hooks/useSocialMediaAuth";
 import { useTheme } from "@/Hooks/useTheme";
-import { Link } from "@inertiajs/react";
+import { getPlatformSchema } from "@/schemas/platformSettings";
+import { Link, router, usePage } from "@inertiajs/react";
 import axios from "axios";
 import {
   AlertCircle,
@@ -40,8 +42,71 @@ export default function SocialMediaAccounts() {
   const { t } = useTranslation();
   const { theme } = useTheme();
   const { isLoading, connectAccount, disconnectAccount } = useSocialMediaAuth();
+  const user = usePage<any>().props.auth.user;
+  const [activePlatform, setActivePlatform] = useState<string | null>(null);
+  const [localSettings, setLocalSettings] = useState<any>({});
 
-  // Estado para controlar si está expandido o no
+  useEffect(() => {
+    if (user?.global_platform_settings) {
+      setLocalSettings(user.global_platform_settings);
+    }
+  }, [user?.global_platform_settings]);
+
+  const handleOpenSettings = (platform: string) => {
+    setActivePlatform(platform);
+  };
+
+  const handleCloseSettings = () => {
+    setActivePlatform(null);
+  };
+
+  const handleSettingsChange = (newSettings: any) => {
+    if (!activePlatform) return;
+    const updated = {
+      ...localSettings,
+      [activePlatform.toLowerCase()]: newSettings,
+    };
+    setLocalSettings(updated);
+  };
+
+  const saveSettings = () => {
+    if (!activePlatform) return;
+
+    const schema = getPlatformSchema(activePlatform);
+    const settingsToSave = localSettings[activePlatform.toLowerCase()] || {};
+    const result = schema.safeParse(settingsToSave);
+
+    if (!result.success) {
+      result.error.issues.forEach((issue: any) => {
+        toast.error(t(issue.message));
+      });
+      return;
+    }
+
+    router.patch(
+      route("settings.social.update"),
+      {
+        settings: localSettings,
+      },
+      {
+        preserveScroll: true,
+        onSuccess: () => {
+          const message = t(
+            `platformSettings.messages.success` +
+              " " +
+              activePlatform.toLowerCase()
+          );
+          console.log(message);
+          toast.success(message);
+          handleCloseSettings();
+        },
+        onError: () => {
+          toast.error(t("common.error") || "Error al guardar");
+        },
+      }
+    );
+  };
+
   const [isExpanded, setIsExpanded] = useState(false);
 
   const disconnectSocialMedia = (
@@ -326,14 +391,14 @@ export default function SocialMediaAccounts() {
 
         <div className="flex items-center gap-4">
           <Link
-            href={route("settings.social")}
+            href={route("profile.edit")}
             onClick={(e) => e.stopPropagation()}
             className={`p-2 rounded-lg transition-all ${
               theme === "dark"
                 ? "bg-neutral-800 text-primary-400 hover:bg-neutral-700 hover:text-primary-300"
                 : "bg-primary-50 text-primary-600 hover:bg-primary-100 hover:text-primary-700"
             }`}
-            title={t("publications.modal.platformSettings.title")}
+            title={t("nav.profile") || "Perfil"}
           >
             <Settings className="w-5 h-5" />
           </Link>
@@ -481,8 +546,8 @@ export default function SocialMediaAccounts() {
               {accounts.map((account) => (
                 <div
                   key={account.id}
-                  className={`group relative rounded-lg p-6 border transition-all duration-300 
-                    hover:shadow-xl 
+                  className={`group relative rounded-lg p-6 border transition-all duration-300
+                    hover:shadow-xl
                     ${
                       theme === "dark"
                         ? "bg-neutral-800/70 backdrop-blur-sm border-neutral-700/70 hover:border-neutral-600"
@@ -528,7 +593,7 @@ export default function SocialMediaAccounts() {
                   <div className="flex flex-col items-center text-center mb-6 pt-2">
                     <div className="relative mb-4">
                       <div
-                        className={`w-20 h-12 rounded-lg flex items-center justify-center pt-6 
+                        className={`w-20 h-12 rounded-lg flex items-center justify-center pt-6
                        `}
                       >
                         <div
@@ -614,7 +679,7 @@ export default function SocialMediaAccounts() {
                     <button
                       onClick={() => handleConnectionToggle(account.id)}
                       disabled={isLoading}
-                      className={`flex-1 py-3 px-4 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 
+                      className={`flex-1 py-3 px-4 rounded-lg font-semibold text-sm flex items-center justify-center gap-2
                         transition-all duration-200 relative overflow-hidden group/btn
                         ${
                           isLoading
@@ -659,18 +724,18 @@ export default function SocialMediaAccounts() {
                     </button>
 
                     {account.isConnected && (
-                      <Link
-                        href={route("settings.social")}
+                      <button
+                        onClick={() => handleOpenSettings(account.platform)}
                         className={`p-3 rounded-lg border transition-all flex items-center justify-center
                           ${
                             theme === "dark"
                               ? "bg-neutral-800 border-neutral-700 text-primary-400 hover:bg-neutral-700 hover:border-neutral-600"
                               : "bg-white border-gray-200 text-primary-600 hover:bg-gray-50 hover:border-gray-300 shadow-sm"
                           }`}
-                        title={t("publications.modal.platformSettings.title")}
+                        title={t("platformSettings.title")}
                       >
                         <Settings className="w-5 h-5" />
-                      </Link>
+                      </button>
                     )}
                   </div>
                 </div>
@@ -688,6 +753,17 @@ export default function SocialMediaAccounts() {
               accountName={blockerModalData.account.name}
               posts={blockerModalData.posts}
               isLoading={isLoading}
+            />
+          )}
+
+          {activePlatform && (
+            <PlatformSettingsModal
+              isOpen={!!activePlatform}
+              onClose={handleCloseSettings}
+              onSave={saveSettings}
+              platform={activePlatform}
+              settings={localSettings[activePlatform.toLowerCase()] || {}}
+              onSettingsChange={handleSettingsChange}
             />
           )}
         </div>

@@ -3,14 +3,24 @@ import InstagramSettings from "@/Components/ConfigSocialMedia/InstagramSettings"
 import TikTokSettings from "@/Components/ConfigSocialMedia/TikTokSettings";
 import TwitterSettings from "@/Components/ConfigSocialMedia/TwitterSettings";
 import YoutubeSettings from "@/Components/ConfigSocialMedia/YoutubeSettings";
+import Button from "@/Components/common/Modern/Button";
 import Modal from "@/Components/common/ui/Modal";
 import { useTheme } from "@/Hooks/useTheme";
-import { Facebook, Instagram, Twitter, Video, X, Youtube } from "lucide-react";
+import {
+  Facebook,
+  Instagram,
+  Settings2,
+  Twitter,
+  Video,
+  X,
+  Youtube,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 interface PlatformSettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSave?: () => void;
   platform: string;
   settings: any;
   onSettingsChange: (newSettings: any) => void;
@@ -19,6 +29,7 @@ interface PlatformSettingsModalProps {
 export default function PlatformSettingsModal({
   isOpen,
   onClose,
+  onSave,
   platform,
   settings,
   onSettingsChange,
@@ -75,68 +86,122 @@ export default function PlatformSettingsModal({
       case "facebook":
         return <Facebook className="w-6 h-6 text-blue-500" />;
       case "tiktok":
-        return <Video className="w-6 h-6 text-black dark:text-white" />;
+        return (
+          <Video className="w-6 h-6 text-neutral-950 dark:text-neutral-50" />
+        );
       case "twitter":
         return <Twitter className="w-6 h-6 text-sky-500" />;
       case "instagram":
         return <Instagram className="w-6 h-6 text-pink-500" />;
       default:
-        return null;
+        return <Settings2 className="w-6 h-6 text-primary-500" />;
     }
   };
 
   return (
     <Modal show={isOpen} onClose={onClose} maxWidth="2xl">
       <div
-        className={`p-6 ${
+        className={`relative overflow-hidden ${
           theme === "dark"
-            ? "bg-neutral-800 text-white"
-            : "bg-white text-gray-900"
+            ? "bg-neutral-900 text-white"
+            : "bg-white text-neutral-900"
         }`}
       >
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-4">
-            <div
-              className={`p-3 rounded-xl ${
-                theme === "dark" ? "bg-neutral-700" : "bg-gray-100"
+        <div className="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-primary-500/5 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="p-8">
+          <div className="flex items-start justify-between mb-8">
+            <div className="flex items-center gap-5">
+              <div
+                className={`p-4 rounded-2xl shadow-sm ${
+                  theme === "dark"
+                    ? "bg-neutral-800 border border-neutral-700/50"
+                    : "bg-neutral-50 border border-neutral-100"
+                }`}
+              >
+                {getPlatformIcon()}
+              </div>
+              <div>
+                <h2 className="text-2xl font-black tracking-tight uppercase">
+                  {platform && platform.trim()
+                    ? t(`platformSettings.${platform.toLowerCase()}.title`) ||
+                      `${platform} Defaults`
+                    : "Platform Defaults"}
+                </h2>
+                <p
+                  className={`text-sm mt-1 font-medium ${
+                    theme === "dark" ? "text-neutral-400" : "text-neutral-500"
+                  }`}
+                >
+                  {t("common.adjustOptions") ||
+                    "Personaliza las opciones predeterminadas"}
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={onClose}
+              className={`p-2 rounded-xl transition-all duration-200 ${
+                theme === "dark"
+                  ? "hover:bg-neutral-800 text-neutral-400"
+                  : "hover:bg-neutral-100 text-neutral-500"
               }`}
             >
-              {getPlatformIcon()}
-            </div>
-            <div>
-              <h2 className="text-xl font-bold">
-                {platform && platform.trim()
-                  ? t(
-                      `publications.modal.platformSettings.${platform.toLowerCase()}.title`
-                    ) || `${platform} Settings`
-                  : "Platform Settings"}
-              </h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                {t("common.adjustOptions")}
-              </p>
+              <X className="w-6 h-6" />
+            </button>
+          </div>
+
+          <div
+            className={`
+            max-h-[60vh] overflow-y-auto pr-4 custom-scrollbar
+            ${theme === "dark" ? "scrollbar-dark" : "scrollbar-light"}
+          `}
+          >
+            <div
+              className={`
+              space-y-8 py-2
+              animate-in fade-in slide-in-from-bottom-2 duration-300
+            `}
+            >
+              {renderContent()}
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-neutral-700 rounded-lg transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
 
-        <div className="max-h-[60vh] overflow-y-auto pr-2 scrollbar-thin">
-          <div className="py-4 space-y-6">{renderContent()}</div>
-        </div>
-
-        <div className="mt-8 flex justify-end border-t border-gray-200 dark:border-neutral-700 pt-6">
-          <button
-            onClick={onClose}
-            className="px-8 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-semibold transition-all active:scale-95 text-sm shadow-md hover:shadow-lg"
+          <div
+            className={`mt-8 flex justify-end pt-8 border-t ${
+              theme === "dark" ? "border-neutral-800" : "border-neutral-100"
+            }`}
           >
-            {t("common.done") || "Listo"}
-          </button>
+            <Button
+              onClick={onSave || onClose}
+              variant="primary"
+              fullWidth
+              size="lg"
+              id="save-button"
+              type="button"
+            >
+              {t("platformSettings.button.save") || "Guardar Cambios"}
+            </Button>
+          </div>
         </div>
       </div>
+
+      <style>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          border-radius: 10px;
+        }
+        .scrollbar-dark::-webkit-scrollbar-thumb {
+          background: #333;
+        }
+        .scrollbar-light::-webkit-scrollbar-thumb {
+          background: #e5e5e5;
+        }
+      `}</style>
     </Modal>
   );
 }

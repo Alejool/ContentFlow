@@ -7,6 +7,8 @@ interface OptionCardProps {
   icon: LucideIcon;
   selected?: boolean;
   onSelect: (value: string) => void;
+  iconColor?: string;
+  iconBgColor?: string;
 }
 
 export default function OptionCard({
@@ -16,12 +18,16 @@ export default function OptionCard({
   icon: Icon,
   selected = false,
   onSelect,
+  iconColor = "text-primary-500",
+  iconBgColor = "bg-primary-50 dark:bg-primary-900/20",
 }: OptionCardProps) {
   return (
     <label className="flex items-center justify-between p-4 border border-gray-200 dark:border-neutral-700 rounded-lg hover:border-primary-500 cursor-pointer transition-colors">
       <div className="flex items-center gap-3">
-        <div className="w-8 h-8 bg-primary-50 dark:bg-primary-900/20 rounded-lg flex items-center justify-center">
-          <Icon className="w-4 h-4 text-primary-500" />
+        <div
+          className={`w-8 h-8 ${iconBgColor} rounded-lg flex items-center justify-center`}
+        >
+          <Icon className={`w-4 h-4 ${iconColor}`} />
         </div>
         <div>
           <span className="font-medium text-gray-900 dark:text-white block">

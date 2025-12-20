@@ -22,13 +22,13 @@ export default function FacebookSettings({
     <div className="space-y-6">
       <div className="space-y-4">
         <SectionHeader
-          title={t("publications.modal.platformSettings.facebook.type")}
+          title={t("platformSettings.facebook.type")}
         />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <PlatformCard
             value="feed"
-            label={t("publications.modal.platformSettings.facebook.feed")}
-            description={t("publications.modal.platformSettings.facebook.feedDescription")}
+            label={t("platformSettings.facebook.feed")}
+            description={t("platformSettings.facebook.feedDescription")}
             icon={Facebook}
             iconColor="text-blue-500"
             iconBgColor="bg-blue-100 dark:bg-blue-900/20"
@@ -37,8 +37,8 @@ export default function FacebookSettings({
           />
           <PlatformCard
             value="reel"
-            label={t("publications.modal.platformSettings.facebook.reel")}
-            description={t("publications.modal.platformSettings.facebook.reelDescription")}
+            label={t("platformSettings.facebook.reel")}
+            description={t("platformSettings.facebook.reelDescription")}
             icon={Video}
             iconColor="text-blue-500"
             iconBgColor="bg-blue-100 dark:bg-blue-900/20"

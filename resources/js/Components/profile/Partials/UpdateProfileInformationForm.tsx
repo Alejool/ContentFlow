@@ -1,3 +1,8 @@
+import IconFacebook from "@/../assets/Icons/facebook.svg";
+import IconTiktok from "@/../assets/Icons/tiktok.svg";
+import IconTwitter from "@/../assets/Icons/x.svg";
+import IconYoutube from "@/../assets/Icons/youtube.svg";
+import PlatformSettingsModal from "@/Components/ConfigSocialMedia/PlatformSettingsModal";
 import Button from "@/Components/common/Modern/Button";
 import ModernCard from "@/Components/common/Modern/Card";
 import Input from "@/Components/common/Modern/Input";
@@ -21,6 +26,7 @@ import {
   TriangleAlert,
   User as UserIcon,
 } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Controller } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import PhoneInput from "react-phone-number-input";
@@ -78,6 +84,48 @@ export default function UpdateProfileInformation({
     setValue,
     control,
   } = useUser(null);
+
+  const [activePlatform, setActivePlatform] = useState<string | null>(null);
+
+  const platforms = [
+    { id: "youtube", name: "YouTube", icon: IconYoutube },
+    { id: "facebook", name: "Facebook", icon: IconFacebook },
+    { id: "twitter", name: "X (Twitter)", icon: IconTwitter },
+    { id: "tiktok", name: "TikTok", icon: IconTiktok },
+  ];
+
+  const handleOpenSettings = (platformId: string) => {
+    setActivePlatform(platformId);
+  };
+
+  const handleSettingsChange = (newSettings: any) => {
+    if (!activePlatform) return;
+    const currentSettings = watchedValues.global_platform_settings || {};
+    setValue("global_platform_settings", {
+      ...currentSettings,
+      [activePlatform.toLowerCase()]: newSettings,
+    });
+  };
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace("#", "").toLowerCase();
+      if (hash && platforms.some((p) => p.id === hash)) {
+        setActivePlatform(hash);
+        // Desplazamiento suave a la sección
+        setTimeout(() => {
+          const section = document.getElementById("platform-defaults-section");
+          if (section) {
+            section.scrollIntoView({ behavior: "smooth", block: "center" });
+          }
+        }, 300);
+      }
+    };
+
+    handleHashChange();
+    window.addEventListener("hashchange", handleHashChange);
+    return () => window.removeEventListener("hashchange", handleHashChange);
+  }, []);
 
   const sectionHeaderClass = `flex items-center gap-2 pb-2 mb-6 border-b ${
     theme === "dark" ? "border-neutral-700/50" : "border-gray-200"
@@ -279,6 +327,98 @@ export default function UpdateProfileInformation({
           />
         </div>
 
+        {/* Sección: Preferencias de Plataformas */}
+        <div
+          id="platform-defaults-section"
+          className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-400 relative"
+        >
+          {/* Decorative background for the section */}
+          <div className="absolute -top-10 -right-10 w-64 h-64 bg-primary-500/5 rounded-full blur-3xl pointer-events-none" />
+          <div className={sectionHeaderClass}>
+            <div
+              className={`p-2 rounded-lg ${
+                theme === "dark"
+                  ? "bg-primary-500/20 text-primary-400"
+                  : "bg-primary-50 text-primary-600"
+              }`}
+            >
+              <ShieldCheck className="w-5 h-5" />
+            </div>
+            <h3 className={sectionTitleClass}>
+              {t("platformSettings.title") ||
+                "Valores Predeterminados"}
+            </h3>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {platforms.map((platform) => {
+              const platformSettings =
+                watchedValues.global_platform_settings?.[
+                  platform.id.toLowerCase()
+                ] || {};
+              const hasSettings = Object.keys(platformSettings).length > 0;
+
+              return (
+                <div
+                  key={platform.id}
+                  onClick={() => handleOpenSettings(platform.id)}
+                  className={`
+                    group cursor-pointer p-6 rounded-2xl border transition-all duration-500
+                    ${
+                      theme === "dark"
+                        ? "bg-neutral-800/40 border-neutral-700/50 hover:border-primary-500/50 hover:bg-neutral-800/80"
+                        : "bg-white border-gray-100 hover:border-primary-500/50 hover:shadow-xl hover:shadow-primary-500/10"
+                    }
+                    ${hasSettings ? "ring-2 ring-primary-500/20" : ""}
+                    hover:-translate-y-1 relative overflow-hidden
+                  `}
+                >
+                  <div
+                    className={`absolute top-0 right-0 w-24 h-24 -mr-12 -mt-12 bg-primary-500/5 rounded-full blur-2xl group-hover:bg-primary-500/10 transition-colors pointer-events-none`}
+                  />
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-gray-50 dark:bg-neutral-800 rounded-lg group-hover:scale-110 transition-transform">
+                      <img
+                        src={platform.icon}
+                        alt={platform.name}
+                        className="w-5 h-5"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <div className="text-sm font-bold truncate">
+                        {platform.name}
+                      </div>
+                      <div
+                        className={`text-[10px] font-medium uppercase tracking-wider ${
+                          hasSettings ? "text-green-500" : "text-gray-500"
+                        }`}
+                      >
+                        {hasSettings
+                          ? t("common.configured")
+                          : t("common.notConfigured")}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {activePlatform && (
+          <PlatformSettingsModal
+            isOpen={!!activePlatform}
+            onClose={() => setActivePlatform(null)}
+            platform={activePlatform}
+            settings={
+              watchedValues.global_platform_settings?.[
+                activePlatform.toLowerCase()
+              ] || {}
+            }
+            onSettingsChange={handleSettingsChange}
+          />
+        )}
+
         {mustVerifyEmail && user?.email_verified_at === null && (
           <div
             className={`rounded-xl p-5 space-y-4 shadow-inner
@@ -449,4 +589,4 @@ export default function UpdateProfileInformation({
       </form>
     </ModernCard>
   );
-};
+}

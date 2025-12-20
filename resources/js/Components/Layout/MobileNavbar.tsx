@@ -7,15 +7,7 @@ import ThemeSwitcher from "@/Components/common/ui/ThemeSwitcher";
 import { useNotifications } from "@/Hooks/useNotifications";
 import { useTheme } from "@/Hooks/useTheme";
 import { usePage } from "@inertiajs/react";
-import {
-  BarChart3,
-  Bell,
-  FileText,
-  Home,
-  LogOut,
-  Settings,
-  User,
-} from "lucide-react";
+import { BarChart3, Bell, FileText, Home, LogOut, User } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -117,7 +109,6 @@ const mobileNavigationItems = [
     lucideIcon: FileText,
   },
   { nameKey: "nav.analytics", href: "analytics.index", lucideIcon: BarChart3 },
-  { nameKey: "nav.settings", href: "settings.social", lucideIcon: Settings },
 ];
 
 export default function MobileNavbar({
@@ -152,7 +143,6 @@ export default function MobileNavbar({
       "profile.edit": ["/profile", "/profile/edit"],
       "/ManageContent.index": ["/manageContent"],
       "analytics.index": ["/analytics"],
-      "settings.social": ["/settings", "/settings/social"],
     };
 
     const patterns = routePatterns[routeName] || [

@@ -103,11 +103,11 @@ export default function SocialConfig({
       },
       {
         onSuccess: () => {
-          toast.success(t("publications.modal.platformSettings.success"));
+          toast.success(t("platformSettings.success"));
           setIsSaving(false);
         },
         onError: () => {
-          toast.error(t("publications.modal.platformSettings.error"));
+          toast.error(t("platformSettings.error"));
           setIsSaving(false);
         },
       }
@@ -128,10 +128,10 @@ export default function SocialConfig({
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {t("publications.modal.platformSettings.title")}
+                  {t("platformSettings.title")}
                 </h1>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {t("publications.modal.platformSettings.subtitle")}
+                  {t("platformSettings.subtitle")}
                 </p>
               </div>
             </div>
@@ -139,7 +139,7 @@ export default function SocialConfig({
         </div>
       }
     >
-      <Head title={t("publications.modal.platformSettings.title")} />
+      <Head title={t("platformSettings.title")} />
 
       <div className="px-4 sm:px-6 mb-6">
         <div className="flex justify-end">
@@ -159,9 +159,7 @@ export default function SocialConfig({
           >
             <Save className={`w-5 h-5 ${isSaving ? "animate-spin" : ""}`} />
             <span className="whitespace-nowrap">
-              {isSaving
-                ? t("common.processing")
-                : t("publications.modal.platformSettings.save")}
+              {isSaving ? t("common.processing") : t("platformSettings.save")}
             </span>
             {hasChanges && (
               <span className="ml-2 px-2 py-1 text-xs font-bold bg-white/20 rounded-full">
@@ -181,7 +179,7 @@ export default function SocialConfig({
               </div>
               <div>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {t("publications.modal.platformSettings.configured")}
+                  {t("platformSettings.configured")}
                 </p>
                 <p className="text-lg font-bold text-gray-900 dark:text-white">
                   {
@@ -233,7 +231,7 @@ export default function SocialConfig({
               </div>
               <div>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {t("publications.modal.platformSettings.status")}
+                  {t("platformSettings.status")}
                 </p>
                 <p
                   className={`text-sm font-bold ${
@@ -320,7 +318,7 @@ export default function SocialConfig({
                           .slice(0, 2)
                           .map(([key, value]) => {
                             const label = t(
-                              `publications.modal.modal.platformSettings.labels.${key}`,
+                              `modal.platformSettings.labels.${key}`,
                               { defaultValue: key.replace(/_/g, " ") }
                             );
 
@@ -331,11 +329,11 @@ export default function SocialConfig({
                                 : t("common.no");
                             } else if (typeof value === "string") {
                               const platformTranslation = t(
-                                `publications.modal.modal.platformSettings.${platform.id}.${value}`
+                                `modal.platformSettings.${platform.id}.${value}`
                               );
                               if (
                                 platformTranslation !==
-                                `publications.modal.modal.platformSettings.${platform.id}.${value}`
+                                `modal.platformSettings.${platform.id}.${value}`
                               ) {
                                 displayValue = platformTranslation;
                               }
@@ -369,9 +367,7 @@ export default function SocialConfig({
                           <XCircle className="w-5 h-5 text-gray-400" />
                         </div>
                         <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-                          {t(
-                            "publications.modal.platformSettings.clickToConfigure"
-                          )}
+                          {t("platformSettings.clickToConfigure")}
                         </p>
                       </div>
                     )}

@@ -22,6 +22,7 @@ export const userProfileSchema = z.object({
     .nullable()
     .optional()
     .or(z.literal("")),
+  global_platform_settings: z.record(z.any()).optional().nullable(),
 });
 
 export type UserProfileFormData = z.infer<typeof userProfileSchema>;

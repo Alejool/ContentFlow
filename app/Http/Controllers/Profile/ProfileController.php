@@ -28,6 +28,7 @@ class ProfileController extends Controller
         return Inertia::render('Profile/Edit', [
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
             'status' => session('status'),
+            'globalPlatformSettings' => $request->user()->global_platform_settings ?? [],
         ]);
     }
 
