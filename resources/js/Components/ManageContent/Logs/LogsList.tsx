@@ -9,9 +9,9 @@ import {
   CheckCircle,
   Clock,
   ExternalLink,
+  Filter,
   MessageCircle,
   RotateCcw,
-  Filter,
 } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -22,6 +22,7 @@ interface LogsListProps {
   pagination?: any;
   onPageChange?: (page: number) => void;
   onRefresh?: () => void;
+  onFilterChange?: (filters: any) => void;
 }
 
 export default function LogsList({
@@ -30,6 +31,7 @@ export default function LogsList({
   pagination,
   onPageChange,
   onRefresh,
+  onFilterChange,
 }: LogsListProps) {
   const { t } = useTranslation();
   const { theme } = useTheme();
@@ -37,10 +39,12 @@ export default function LogsList({
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
   const [showFilters, setShowFilters] = useState(false);
 
-  const filteredLogs = logs.filter((log) => {
-    if (selectedStatus !== "all" && log.status !== selectedStatus) return false;
-    return true;
-  });
+  const handleStatusChange = (status: string) => {
+    setSelectedStatus(status);
+    if (onFilterChange) {
+      onFilterChange({ status });
+    }
+  };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -50,7 +54,11 @@ export default function LogsList({
       case "failed":
         return <AlertCircle className="w-4 h-4 text-red-500" />;
       case "pending":
+      case "publishing":
         return <Clock className="w-4 h-4 text-yellow-500" />;
+      case "deleted":
+      case "removed_on_platform":
+        return <AlertCircle className="w-4 h-4 text-gray-500" />;
       default:
         return <MessageCircle className="w-4 h-4 text-gray-500" />;
     }
@@ -64,7 +72,11 @@ export default function LogsList({
       case "failed":
         return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300";
       case "pending":
+      case "publishing":
         return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300";
+      case "deleted":
+      case "removed_on_platform":
+        return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
       default:
         return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
     }
@@ -89,6 +101,39 @@ export default function LogsList({
 
   const borderColor =
     theme === "dark" ? "border-neutral-700" : "border-gray-200";
+
+  const statusOptions = [
+    "all",
+    "published",
+    "success",
+    "failed",
+    "pending",
+    "publishing",
+    "orphaned",
+    "deleted",
+    "removed_on_platform",
+  ];
+
+  const getStatusButtonColor = (status: string) => {
+    if (selectedStatus !== status) {
+      return "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700";
+    }
+
+    switch (status) {
+      case "all":
+        return "bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300";
+      case "published":
+      case "success":
+        return "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300";
+      case "failed":
+        return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300";
+      case "pending":
+      case "publishing":
+        return "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300";
+      default:
+        return "bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200";
+    }
+  };
 
   return (
     <div
@@ -134,46 +179,17 @@ export default function LogsList({
         }`}
       >
         <div className="flex flex-wrap gap-2">
-          <button
-            onClick={() => setSelectedStatus("all")}
-            className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${
-              selectedStatus === "all"
-                ? "bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
-            }`}
-          >
-            {t("logs.all")}
-          </button>
-          <button
-            onClick={() => setSelectedStatus("published")}
-            className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${
-              selectedStatus === "published"
-                ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
-            }`}
-          >
-            {t("logs.status.published")}
-          </button>
-          <button
-            onClick={() => setSelectedStatus("failed")}
-            className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${
-              selectedStatus === "failed"
-                ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
-            }`}
-          >
-            {t("logs.status.failed")}
-          </button>
-          <button
-            onClick={() => setSelectedStatus("pending")}
-            className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${
-              selectedStatus === "pending"
-                ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
-            }`}
-          >
-            {t("logs.status.pending")}
-          </button>
+          {statusOptions.map((status) => (
+            <button
+              key={status}
+              onClick={() => handleStatusChange(status)}
+              className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${getStatusButtonColor(
+                status
+              )}`}
+            >
+              {t(`logs.status.${status}`)}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -225,14 +241,14 @@ export default function LogsList({
                   <span className="text-sm">{t("logs.loading")}</span>
                 </td>
               </tr>
-            ) : filteredLogs.length === 0 ? (
+            ) : logs.length === 0 ? (
               <tr>
                 <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
                   {t("logs.empty")}
                 </td>
               </tr>
             ) : (
-              filteredLogs.map((log) => (
+              logs.map((log) => (
                 <tr
                   key={log.id}
                   className={`group transition-colors ${
@@ -283,7 +299,7 @@ export default function LogsList({
                       )}`}
                     >
                       {getStatusIcon(log.status)}
-                      <span >
+                      <span>
                         {t(`logs.status.${log.status}`) || log.status}
                       </span>
                     </div>
@@ -327,11 +343,11 @@ export default function LogsList({
             </div>
             <span className="text-sm">{t("logs.loading")}</span>
           </div>
-        ) : filteredLogs.length === 0 ? (
+        ) : logs.length === 0 ? (
           <div className="p-8 text-center text-gray-500">{t("logs.empty")}</div>
         ) : (
           <div className="divide-y divide-gray-100 dark:divide-neutral-700/50">
-            {filteredLogs.map((log) => (
+            {logs.map((log) => (
               <div
                 key={log.id}
                 className="p-4 hover:bg-gray-50/50 dark:hover:bg-neutral-700/30 transition-colors"
@@ -347,9 +363,7 @@ export default function LogsList({
                     )}`}
                   >
                     {getStatusIcon(log.status)}
-                    <span >
-                      {t(`logs.status.${log.status}`) || log.status}
-                    </span>
+                    <span>{t(`logs.status.${log.status}`) || log.status}</span>
                   </div>
                 </div>
 

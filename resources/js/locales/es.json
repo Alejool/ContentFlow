@@ -795,6 +795,7 @@
   },
   "logs": {
     "title": "Registro de Actividad",
+    "subtitle": "Registros de actividad",
     "refresh": "Actualizar",
     "filters": {
       "campaign": "Filtrar por Campaña",
@@ -821,13 +822,15 @@
       "more": "Mas"
     },
     "status": {
+      "all": "Todos",
       "success": "Exitoso",
       "failed": "Fallido",
       "pending": "Pendiente",
       "published": "Publicado",
       "deleted": "Eliminado",
       "removed_on_platform": "Eliminado en Plataforma",
-      "orphaned": "huérfano"
+      "orphaned": "Huérfano",
+      "publishing": "Publicando"
     },
     "empty": "No se encontraron registros",
     "loading": "Cargando registros...",

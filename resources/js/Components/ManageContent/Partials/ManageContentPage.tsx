@@ -141,6 +141,7 @@ export default function ManageContentPage() {
                     pagination={pagination}
                     onPageChange={handlePageChange}
                     onRefresh={handleRefresh}
+                    onFilterChange={handleFilterChange}
                   />
                 ) : (
                   <CampaignList

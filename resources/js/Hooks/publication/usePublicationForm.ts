@@ -113,7 +113,7 @@ export const usePublicationForm = ({
           description: publication.description || "",
           goal: publication.goal || "",
           hashtags: publication.hashtags || "",
-          campaign_id: publication.campaigns?.[0]?.id || null,
+          campaign_id: publication.campaigns?.[0]?.id?.toString() || null,
           // Only include accounts with pending schedules, not published ones
           // Published accounts are managed separately and shouldn't be in social_accounts
           social_accounts: Array.from(

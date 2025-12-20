@@ -779,6 +779,7 @@
   },
   "logs": {
     "title": "Activity Logs",
+    "subtitle": "Activity Logs",
     "refresh": "Refresh",
     "filters": {
       "campaign": "Filter by Campaign",
@@ -803,6 +804,7 @@
       "more": "More"
     },
     "status": {
+      "all": "All",
       "success": "Success",
       "failed": "Failed",
       "pending": "Pending",
