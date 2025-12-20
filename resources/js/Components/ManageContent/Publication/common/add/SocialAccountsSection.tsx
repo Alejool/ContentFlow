@@ -24,6 +24,7 @@ interface SocialAccountsSectionProps {
   globalSchedule?: string;
   publishedAccountIds?: number[];
   publishingAccountIds?: number[];
+  error?: string;
 }
 
 const SocialAccountsSection: React.FC<SocialAccountsSectionProps> = ({
@@ -40,6 +41,7 @@ const SocialAccountsSection: React.FC<SocialAccountsSectionProps> = ({
   globalSchedule,
   publishedAccountIds,
   publishingAccountIds,
+  error,
 }) => {
   const [activePopover, setActivePopover] = useState<number | null>(null);
 
@@ -48,11 +50,18 @@ const SocialAccountsSection: React.FC<SocialAccountsSectionProps> = ({
 
   return (
     <div className="space-y-4">
-      <label className="text-sm font-semibold mb-2 flex items-center gap-2">
-        <Target className="w-4 h-4" />
-        {t("publications.modal.manageContent.configureNetworks") ||
-          "Configura tus redes sociales"}
-      </label>
+      <div className="flex items-center justify-between">
+        <label className="text-sm font-semibold flex items-center gap-2">
+          <Target className="w-4 h-4" />
+          {t("publications.modal.manageContent.configureNetworks") ||
+            "Configura tus redes sociales"}
+        </label>
+        {error && (
+          <span className="text-xs text-primary-500 font-medium animate-pulse">
+            {error}
+          </span>
+        )}
+      </div>
 
       <div className="grid  gap-3">
         {socialAccounts.map((account) => {
@@ -140,9 +149,8 @@ const SocialAccountItem: React.FC<SocialAccountItemProps> = ({
 
   return (
     <div
-      onClick={() => !isDisabled && onToggle()}
       className={`relative flex items-center p-3 rounded-lg border transition-all ${
-        isDisabled ? "opacity-80 cursor-default" : "cursor-pointer"
+        isDisabled ? "opacity-80 cursor-default" : ""
       } ${
         isCheckedActually
           ? `border-primary-500 bg-primary-50 dark:bg-primary-900/20 shadow-sm`
@@ -169,8 +177,10 @@ const SocialAccountItem: React.FC<SocialAccountItemProps> = ({
                     ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300"
                     : isPublishing
                     ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300"
-                    : customSchedule || globalSchedule
-                    ? "bg-primary-100 text-primary-700 dark:bg-primary-900/40 dark:text-primary-300"
+                    : (customSchedule || globalSchedule) &&
+                      !isPublished &&
+                      !isPublishing
+                    ? "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300"
                     : "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300"
                 }`}
               >
@@ -178,7 +188,9 @@ const SocialAccountItem: React.FC<SocialAccountItemProps> = ({
                   ? t("publications.modal.publish.published")
                   : isPublishing
                   ? t("publications.modal.publish.publishing")
-                  : customSchedule || globalSchedule
+                  : (customSchedule || globalSchedule) &&
+                    !isPublished &&
+                    !isPublishing
                   ? t("publications.status.scheduled") || "Programado"
                   : t("publications.status.instant") || "Instantáneo"}
               </span>
@@ -189,78 +201,94 @@ const SocialAccountItem: React.FC<SocialAccountItemProps> = ({
               @{account.account_name || account.name}
             </span>
           )}
-          {isChecked && (customSchedule || globalSchedule) && (
-            <div className="flex items-center gap-2 mt-1">
-              <span
-                className={`text-xs flex items-center gap-1 ${
-                  customSchedule
-                    ? "text-primary-600 dark:text-primary-400"
-                    : "text-gray-500 dark:text-gray-400"
-                }`}
-              >
-                <Clock className="w-3 h-3" />
-                {new Date(
-                  customSchedule || globalSchedule || ""
-                ).toLocaleString([], {
-                  dateStyle: "short",
-                  timeStyle: "short",
-                })}
-                {!customSchedule && globalSchedule && (
-                  <span className="text-[10px] opacity-70">(Global)</span>
+          {isChecked &&
+            (customSchedule || globalSchedule) &&
+            !isPublished &&
+            !isPublishing && (
+              <div className="flex items-center gap-2 mt-1">
+                <span
+                  className={`text-xs flex items-center gap-1 ${
+                    customSchedule
+                      ? "text-primary-600 dark:text-primary-400"
+                      : "text-gray-500 dark:text-gray-400"
+                  }`}
+                >
+                  <Clock className="w-3 h-3" />
+                  {new Date(
+                    customSchedule || globalSchedule || ""
+                  ).toLocaleString([], {
+                    dateStyle: "short",
+                    timeStyle: "short",
+                  })}
+                  {!customSchedule && globalSchedule && (
+                    <span className="text-[10px] opacity-70">(Global)</span>
+                  )}
+                </span>
+                {customSchedule && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onScheduleRemove();
+                    }}
+                    className="p-1 rounded-full hover:bg-primary-100 dark:hover:bg-primary-900/40 text-primary-500 transition-colors"
+                    title={t("common.remove") || "Eliminar programación"}
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
                 )}
-              </span>
-              {customSchedule && (
+              </div>
+            )}
+          {isPublished && (
+            <div className="flex flex-col gap-1.5 pt-1">
+              <div className="flex items-center gap-1.5">
                 <button
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
-                    onScheduleRemove();
+                    onPreviewClick();
                   }}
-                  className="p-1 rounded-full hover:bg-primary-100 dark:hover:bg-primary-900/40 text-primary-500 transition-colors"
-                  title={t("common.remove") || "Eliminar programación"}
+                  className={`p-1.5 rounded-lg transition-all ${
+                    theme === "dark"
+                      ? "hover:bg-neutral-700 text-gray-400 hover:text-white"
+                      : "hover:bg-gray-100 text-gray-500 hover:text-primary-600"
+                  }`}
+                  title={
+                    t("publications.modal.preview.view") || "Ver vista previa"
+                  }
                 >
-                  <X className="w-3 h-3" />
+                  <Eye className="w-4 h-4" />
                 </button>
-              )}
-            </div>
-          )}
-          {isChecked && (
-            <div className="flex items-center gap-1.5 pt-1">
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onPreviewClick();
-                }}
-                className={`p-1.5 rounded-lg transition-all ${
-                  theme === "dark"
-                    ? "hover:bg-neutral-700 text-gray-400 hover:text-white"
-                    : "hover:bg-gray-100 text-gray-500 hover:text-primary-600"
-                }`}
-                title={
-                  t("publications.modal.preview.view") || "Ver vista previa"
-                }
-              >
-                <Eye className="w-4 h-4" />
-              </button>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onPlatformSettingsClick();
-                }}
-                className={`p-1.5 rounded-lg transition-all ${
-                  theme === "dark"
-                    ? "hover:bg-neutral-700 text-gray-400 hover:text-white"
-                    : "hover:bg-gray-100 text-gray-500 hover:text-primary-600"
-                }`}
-                title={
-                  t("publications.modal.platformSettings.configure") ||
-                  "Configurar red"
-                }
-              >
-                <Settings className="w-4 h-4" />
-              </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onPlatformSettingsClick();
+                  }}
+                  className={`p-1.5 rounded-lg transition-all ${
+                    theme === "dark"
+                      ? "hover:bg-neutral-700 text-gray-400 hover:text-white"
+                      : "hover:bg-gray-100 text-gray-500 hover:text-primary-600"
+                  }`}
+                  title={
+                    t("publications.modal.platformSettings.configure") ||
+                    "Configurar red"
+                  }
+                >
+                  <Settings className="w-4 h-4" />
+                </button>
+              </div>
+
+              {!customSchedule &&
+                !globalSchedule &&
+                !isPublished &&
+                !isPublishing && (
+                  <div className="flex items-center gap-1 text-[10px] text-primary-500 font-medium animate-in fade-in slide-in-from-left-1">
+                    <Clock className="w-3 h-3" />
+                    {t("publications.modal.schedule.instantWarning") ||
+                      "Para publicar ahora, usa el botón Publicar después de guardar."}
+                  </div>
+                )}
             </div>
           )}
           {isPublished && (

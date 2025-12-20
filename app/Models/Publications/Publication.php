@@ -95,7 +95,7 @@ class Publication extends Model
     return $this->hasMany(CampaignAnalytics::class, 'publication_id');
   }
 
-  public function scheduledPosts(): HasMany
+  public function scheduled_posts(): HasMany
   {
     return $this->hasMany(ScheduledPost::class, 'publication_id');
   }

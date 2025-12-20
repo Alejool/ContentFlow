@@ -11,6 +11,16 @@ interface ModalFooterProps {
   formId?: string;
   submitIcon?: React.ReactNode;
   cancelIcon?: React.ReactNode;
+
+  // Secondary submit (e.g. Publish)
+  showSecondarySubmit?: boolean;
+  secondarySubmitText?: string;
+  secondarySubmitVariant?: ModalFooterProps["submitVariant"];
+  secondarySubmitStyle?: ModalFooterProps["submitStyle"];
+  secondarySubmitIcon?: React.ReactNode;
+  onSecondarySubmit?: () => void;
+  onPrimarySubmit?: () => void;
+
   submitVariant?:
     | "primary"
     | "danger"
@@ -38,18 +48,24 @@ export default function ModalFooter({
   formId,
   submitIcon = <Save className="w-4 h-4" />,
   cancelIcon = <X className="w-4 h-4" />,
+  showSecondarySubmit = false,
+  secondarySubmitText = "Secondary",
+  secondarySubmitVariant = "secondary",
+  secondarySubmitStyle = "outline",
+  secondarySubmitIcon,
+  onSecondarySubmit,
+  onPrimarySubmit,
   submitVariant = "primary",
   cancelVariant = "secondary",
   submitStyle = "gradient",
   cancelStyle = "outline",
 }: ModalFooterProps) {
-
-   const modalHeaderBg =
-     theme === "dark"
-       ? "bg-gradient-to-r from-neutral-900 to-neutral-800"
-       : "bg-gradient-to-r from-gray-50 to-white";
-   const modalHeaderBorder =
-     theme === "dark" ? "border-neutral-700" : "border-gray-100";
+  const modalHeaderBg =
+    theme === "dark"
+      ? "bg-gradient-to-r from-neutral-900 to-neutral-800"
+      : "bg-gradient-to-r from-gray-50 to-white";
+  const modalHeaderBorder =
+    theme === "dark" ? "border-neutral-700" : "border-gray-100";
 
   return (
     <div
@@ -69,9 +85,26 @@ export default function ModalFooter({
         </Button>
       )}
 
+      {showSecondarySubmit && (
+        <Button
+          type={onSecondarySubmit ? "button" : "submit"}
+          form={onSecondarySubmit ? undefined : formId}
+          onClick={onSecondarySubmit}
+          disabled={isSubmitting}
+          loading={isSubmitting}
+          variant={secondarySubmitVariant || "secondary"}
+          buttonStyle={secondarySubmitStyle || "outline"}
+          size="md"
+          icon={secondarySubmitIcon}
+        >
+          {secondarySubmitText}
+        </Button>
+      )}
+
       <Button
-        type={formId ? "submit" : "button"}
-        form={formId}
+        type={onPrimarySubmit ? "button" : formId ? "submit" : "button"}
+        form={onPrimarySubmit ? undefined : formId}
+        onClick={onPrimarySubmit}
         disabled={isSubmitting}
         loading={isSubmitting}
         variant={submitVariant}

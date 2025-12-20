@@ -48,7 +48,11 @@
     "noSettings": "No default settings",
     "done": "Done",
     "adjustOptions": "Adjust specific options",
-    "viewOnPlatform": "View on platform"
+    "viewOnPlatform": "View on platform",
+    "remove": "Remove",
+    "errors": {
+      "checkFormErrors": "Please check the form for errors"
+    }
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -194,6 +198,7 @@
         "image": "Image",
         "hashtags": "Hashtags",
         "schedulePublication": "Schedule Publication",
+        "scheduled_at": "Scheduled Date",
         "goal": "Goal",
         "status": "Status",
         "campaigns": "Campaigns",
@@ -231,7 +236,8 @@
       "schedule": {
         "title": "Date for all networks",
         "description": "Set a single date to publish on all selected social networks at once.",
-        "placeholder": "Select date and time"
+        "placeholder": "Select date and time",
+        "instantWarning": "To publish now, use the Publish button after saving."
       },
       "edit": {
         "title": "Edit Publication",
@@ -291,6 +297,10 @@
         "title": "Global Platform Settings",
         "subtitle": "Define default settings for each social network.",
         "clickToConfigure": "Click to configure",
+        "configure": "Configure Network",
+        "preview": {
+          "view": "View Preview"
+        },
         "youtube": {
           "title": "YouTube",
           "type": "Video Type",
@@ -406,7 +416,9 @@
           "title":"Preview",
           "simulated": "Simulated",
           "real": "Real",
-          "realInfo": "Real Preview"
+          "realInfo": "Real Preview",
+          "view": "View preview",
+          "notAvailable": "Preview not available for this platform"
       },
       "validation":{
         "descRequired":"Description is required",
@@ -414,6 +426,7 @@
         "descMin":"Description must be at least 10 characters long",
         "descMax":"Description cannot exceed 200 characters",
         "objMin":"Objective must be at least 5 characters long",
+        "objRequired":"Objective is required",
         "goalRequired":"Goal is required",
         "titleRequired":"Title is required",
         "titleLength":"Title must be at least 70 characters long",
@@ -432,7 +445,10 @@
         "imageRequired":"Image is required",
         "hashtagValid":"Hashtag must be valid",
         "hashtagMax":"Hashtag must be at least 10 characters long",
-        "scheduleDateRequired": "Please select a date to schedule on the selected networks or uncheck the schedule option"
+        "scheduleDateRequired": "Please select a date to schedule on the selected networks or uncheck the schedule option",
+        "scheduleRequired": "You must schedule a date for all selected networks or set a global date.",
+        "scheduledAtRequired": "Scheduled date is required when you select social networks",
+        "socialAccountsRequired": "Please select at least one social media account"
       }
     },
 
@@ -513,6 +529,7 @@
   "campaigns": {
     "title": "Campaigns",
     "subtitle": "Manage, track and analyze your social media campaigns",
+    "scheduledPosts": "Scheduled Posts",
     "modal": {
       "add": {
         "title": "Add Campaign",

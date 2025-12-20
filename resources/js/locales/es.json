@@ -52,7 +52,11 @@
     "configure": "Configurar",
     "noSettings": "Sin ajustes por defecto",
     "adjustOptions": "Ajustar opciones específicas",
-    "viewOnPlatform": "Ver en plataforma"
+    "viewOnPlatform": "Ver en plataforma",
+    "remove": "Eliminar",
+    "errors": {
+      "checkFormErrors": "Por favor, revisa los errores en el formulario"
+    }
   },
   "nav": {
     "dashboard": "Panel",
@@ -191,7 +195,8 @@
       "schedule": {
         "title": "Fecha para todas las redes",
         "description": "Define una fecha única para publicar en todas las redes sociales seleccionadas a la vez.",
-        "placeholder": "Seleccionar fecha y hora"
+        "placeholder": "Seleccionar fecha y hora",
+        "instantWarning": "Para publicar ahora, usa el botón Publicar después de guardar."
       },
       "add": {
         "title": "Agregar Publicación",
@@ -203,6 +208,7 @@
         "hashtags": "Hashtags",
         "campaigns": "Campañas",
         "schedulePublication": "Programar Publicación",
+        "scheduled_at": "Fecha Programada",
         "goal": "Objetivo",
         "status": "Estado",
         "budget": "Presupuesto",
@@ -243,6 +249,10 @@
         "title": "Configuraciones Globales de Plataforma",
         "subtitle": "Define las configuraciones predeterminadas para cada red social.",
         "clickToConfigure": "Haz clic para configurar",
+        "configure": "Configurar red",
+        "preview": {
+          "view": "Ver vista previa"
+        },
         "youtube": {
           "title": "YouTube",
           "type": "Tipo de Video",
@@ -408,7 +418,9 @@
           "title":"Vista Previa",
           "simulated": "Simulado",
           "real": "Real",
-          "realInfo": "Vista Previa Real"
+          "realInfo": "Vista Previa Real",
+          "view": "Ver vista previa",
+          "notAvailable": "Vista previa no disponible para esta plataforma"
       },
 
       "validation":{
@@ -439,7 +451,10 @@
         "imageRequired":"Imagen es requerida",
         "hashtagValid":"Hashtag debe tener al menos 10 caracteres",
         "hashtagMax":"Hashtag debe tener menos de 10 caracteres",
-        "scheduleDateRequired": "Por favor, selecciona una fecha para programar la publicación o desmarca la opción de programar"
+        "scheduleDateRequired": "Por favor, selecciona una fecha para programar la publicación o desmarca la opción de programar",
+        "scheduleRequired": "Debes programar una fecha para todas las redes seleccionadas o establecer una fecha global.",
+        "scheduledAtRequired": "La fecha programada es requerida cuando seleccionas redes sociales",
+        "socialAccountsRequired": "Por favor, selecciona al menos una red social"
       }
     },
     "status":{
@@ -464,7 +479,8 @@
       "add": "Agregar publicación",
       "edit": "Editar publicación",
       "delete": "Eliminar publicación",
-      "close": "Cerrar"
+      "close": "Cerrar",
+      "save": "Guardar cambios"
     },
     "table": {
       "name": "Nombre",
@@ -527,6 +543,7 @@
     "title": "Campañas",
     "subtitle": "Gestionar, rastrear y analizar tus campañas de redes sociales",
     "noPublications": "No hay publicaciones asociadas",
+    "scheduledPosts": "Publicaciones Programadas",
     "modal": {
       "add": {
         "title": "Agregar Campaña",

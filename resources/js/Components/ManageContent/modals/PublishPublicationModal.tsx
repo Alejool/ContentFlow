@@ -382,9 +382,28 @@ export default function PublishPublicationModal({
                           )}
                           {isScheduled && (
                             <div className="flex items-center gap-2">
-                              <span className="flex items-center gap-1 text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30 px-2 py-1 rounded-full">
-                                <Clock className="w-3 h-3" />
-                                {t("publications.modal.publish.scheduled")}
+                              <span className="flex flex-col items-end">
+                                <span className="flex items-center gap-1 text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30 px-2 py-1 rounded-full">
+                                  <Clock className="w-3 h-3" />
+                                  {t("publications.modal.publish.scheduled")}
+                                </span>
+                                {(() => {
+                                  const schedPost =
+                                    publication.scheduled_posts?.find(
+                                      (sp) =>
+                                        sp.social_account_id === account.id
+                                    );
+                                  return schedPost?.scheduled_at ? (
+                                    <span className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
+                                      {new Date(
+                                        schedPost.scheduled_at
+                                      ).toLocaleString([], {
+                                        dateStyle: "short",
+                                        timeStyle: "short",
+                                      })}
+                                    </span>
+                                  ) : null;
+                                })()}
                               </span>
                             </div>
                           )}

@@ -6,6 +6,7 @@ export type Publication = {
   created_at: string;
   updated_at: string;
   hashtags?: string;
+  goal?: string;
   slug?: string;
   scheduled_at?: string;
   status?: "draft" | "published" | "scheduled" | "publishing";
@@ -35,7 +36,7 @@ export type SocialPostLog = {
     | "failed"
     | "deleted"
     | "pending"
-    | "failed"
+    | "publishing"
     | "success"
     | "orphaned";
   social_account?: SocialAccount;

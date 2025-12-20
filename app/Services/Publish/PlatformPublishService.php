@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Artisan;
 use App\Models\YouTubePlaylistQueue;
 use App\Notifications\PublicationPostFailedNotification;
+use App\Jobs\VerifyYouTubeVideoStatus;
 
 class PlatformPublishService
 {
@@ -132,7 +133,7 @@ class PlatformPublishService
         'content' => $this->buildDescription($publication),
         'tags' => $this->extractHashtags($publication->hashtags),
         'privacy' => 'public',
-        'type' => $firstMediaFile->youtube_type ?? 'regular', // Pass youtube_type from DB ('short' or 'regular')
+        'type' => $firstMediaFile->youtube_type ?? 'regular',
         'platform_settings' => $postLog->platform_settings ?? $publication->platform_settings,
       ];
 
@@ -174,10 +175,10 @@ class PlatformPublishService
       $postLog = $this->logService->markAsPublished($postLog, $response);
 
       // Verify the final status on YouTube after a few minutes (e.g., copyright, processing errors)
-      \App\Jobs\VerifyYouTubeVideoStatus::dispatch($postLog)->delay(now()->addMinutes(5));
+      VerifyYouTubeVideoStatus::dispatch($postLog)->delay(now()->addMinutes(5));
 
       // Notify User
-      $publication->user->notify(new \App\Notifications\VideoUploadedNotification($postLog));
+      $publication->user->notify(new VideoUploadedNotification($postLog));
 
       Log::info('YouTube video uploaded successfully', [
         'video_id' => $uploadedPostId,
@@ -272,6 +273,13 @@ class PlatformPublishService
         'platform_settings' => $postLog->platform_settings ?? $publication->platform_settings,
       ];
 
+
+      Log::info('DEBUG DATA BEFORE FACEBOOK CALL', [
+        'keys' => array_keys($postData),
+        'content' => $postData['content'] ?? 'N/A',
+        'caption' => $postData['caption'] ?? 'N/A',
+        'platform' => $socialAccount->platform
+      ]);
 
       $response = $platformService->publishPost($postData);
 

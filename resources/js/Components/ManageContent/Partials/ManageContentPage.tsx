@@ -7,148 +7,50 @@ import EditPublicationModal from "@/Components/ManageContent/modals/EditPublicat
 import PublishPublicationModal from "@/Components/ManageContent/modals/PublishPublicationModal";
 import ViewCampaignModal from "@/Components/ManageContent/modals/ViewCampaignModal";
 import SocialMediaAccounts from "@/Components/ManageContent/socialAccount/SocialMediaAccounts";
-import { useConfirm } from "@/Hooks/useConfirm";
-import { useSocialMediaAuth } from "@/Hooks/useSocialMediaAuth";
+import { usePublishPublication } from "@/Hooks/publication/usePublishPublication";
 import { useTheme } from "@/Hooks/useTheme";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Campaign } from "@/types/Campaign";
 import { Publication } from "@/types/Publication";
-import { Head, usePage } from "@inertiajs/react";
-import axios from "axios";
+import { Head } from "@inertiajs/react";
 import { FileText, Folder, Target } from "lucide-react";
-import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import toast from "react-hot-toast";
-import { useTranslation } from "react-i18next";
 
-import { usePublishPublication } from "@/Hooks/publication/usePublishPublication";
-import { useRealtime } from "@/Hooks/publication/useRealtime";
-import { useCampaignStore } from "@/stores/campaignStore";
-import { usePublicationStore } from "@/stores/publicationStore";
+import { usePublications } from "@/Hooks/publication/usePublications";
 
 export default function ManageContentPage() {
-  const { t } = useTranslation();
-  const { props } = usePage();
-  const user = props.auth.user as any;
-
-  useRealtime(user?.id);
+  const {
+    t,
+    activeTab,
+    setActiveTab,
+    filters,
+    handleFilterChange,
+    selectedItem,
+    setSelectedItem,
+    items,
+    pagination,
+    isLoading,
+    handlePageChange,
+    handleRefresh,
+    isAddModalOpen,
+    isEditModalOpen,
+    isPublishModalOpen,
+    isViewDetailsModalOpen,
+    openAddModal,
+    closeAddModal,
+    openEditModal,
+    closeEditModal,
+    openPublishModal,
+    closePublishModal,
+    openViewDetailsModal,
+    closeViewDetailsModal,
+    handleDeleteItem,
+    handleEditRequest,
+    connectedAccounts,
+  } = usePublications();
 
   const { theme } = useTheme();
-  const { confirm, ConfirmDialog } = useConfirm();
-  const [activeTab, setActiveTab] = useState<
-    "publications" | "campaigns" | "logs"
-  >("publications");
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
-  const [isViewDetailsModalOpen, setIsViewDetailsModalOpen] = useState(false);
-
   const { fetchPublishedPlatforms } = usePublishPublication();
-
-  const [selectedItem, setSelectedItem] = useState<
-    Campaign | Publication | null
-  >(null);
-  const [filters, setFilters] = useState<any>({});
-
-  const [logs, setLogs] = useState<any[]>([]);
-  const [logsPagination, setLogsPagination] = useState({
-    current_page: 1,
-    last_page: 1,
-    total: 0,
-    per_page: 10,
-  });
-  const [isLogsLoading, setIsLogsLoading] = useState(false);
-
-  const publicationStore = usePublicationStore();
-  const { pagination: publicationPagination, isLoading: publicationIsLoading } =
-    publicationStore;
-  const campaignStore = useCampaignStore();
-  const { pagination: campaignPagination, isLoading: campaignIsLoading } =
-    campaignStore;
-
-  const getItems = () => {
-    switch (activeTab) {
-      case "publications":
-        return publicationStore.publications;
-      case "campaigns":
-        return campaignStore.campaigns;
-      case "logs":
-        return logs;
-      default:
-        return [];
-    }
-  };
-
-  const getPagination = () => {
-    switch (activeTab) {
-      case "publications":
-        return publicationPagination;
-      case "campaigns":
-        return campaignPagination;
-      case "logs":
-        return logsPagination;
-      default:
-        return { current_page: 1, last_page: 1, total: 0, per_page: 10 };
-    }
-  };
-
-  const getIsLoading = () => {
-    switch (activeTab) {
-      case "publications":
-        return publicationIsLoading;
-      case "campaigns":
-        return campaignIsLoading;
-      case "logs":
-        return isLogsLoading;
-      default:
-        return false;
-    }
-  };
-
-  const fetchData = async (page = 1) => {
-    switch (activeTab) {
-      case "publications":
-        await publicationStore.fetchPublications(filters, page);
-        break;
-      case "campaigns":
-        await campaignStore.fetchCampaigns(filters, page);
-        break;
-      case "logs":
-        setIsLogsLoading(true);
-        try {
-          const response = await axios.get("/logs", {
-            params: { page, ...filters },
-          });
-          if (response.data.success) {
-            setLogs(response.data.logs.data);
-            setLogsPagination({
-              current_page: response.data.logs.current_page,
-              last_page: response.data.logs.last_page,
-              total: response.data.logs.total,
-              per_page: response.data.logs.per_page,
-            });
-          }
-        } catch (error) {
-          console.error("Failed to fetch logs:", error);
-          toast.error(t("logs.error_fetching"));
-        } finally {
-          setIsLogsLoading(false);
-        }
-        break;
-    }
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, [filters, activeTab]);
-
-  const handlePageChange = (page: number) => {
-    fetchData(page);
-  };
-
-  const handleFilterChange = (newFilters: any) => {
-    setFilters(newFilters);
-  };
 
   const tabs = [
     {
@@ -168,96 +70,12 @@ export default function ManageContentPage() {
     },
   ];
 
-  const openEditModal = (item: Campaign | Publication) => {
-    setSelectedItem(item);
-    setIsEditModalOpen(true);
-  };
-
-  const openPublishModal = (item: any) => {
-    setSelectedItem(item);
-    setIsPublishModalOpen(true);
-  };
-
-  const openViewDetailsModal = (item: any) => {
-    setSelectedItem(item);
-    setIsViewDetailsModalOpen(true);
-  };
-
-  const { fetchAccounts, accounts: connectedAccounts } = useSocialMediaAuth();
-
-  const handleDeleteItem = async (id: number) => {
-    const isPublication = activeTab === "publications";
-    const itemType = isPublication ? "publication" : "campaign";
-    const confirmed = await confirm({
-      title: t(`${itemType}s.messages.confirmDelete.title`) || "Confirm Delete",
-      message:
-        t(`${itemType}s.messages.confirmDelete.text`) ||
-        "Are you sure you want to delete this item?",
-      confirmText:
-        t(`${itemType}s.messages.confirmDelete.confirmButton`) || "Delete",
-      cancelText: t(`common.cancel`) || "Cancel",
-      type: "danger",
-    });
-
-    if (confirmed) {
-      if (isPublication) {
-        try {
-          await axios.delete(`/publications/${id}`);
-          publicationStore.removePublication(id);
-          toast.success(t("publications.messages.deleteSuccess"));
-        } catch (e) {
-          toast.error(t("publications.messages.deleteError"));
-        }
-      } else {
-        try {
-          await axios.delete(`/campaigns/${id}`);
-          campaignStore.removeCampaign(id);
-          toast.success(t("campaigns.messages.deleteSuccess"));
-        } catch (e) {
-          toast.error(t("campaigns.messages.deleteError"));
-        }
-      }
-    }
-  };
-
-  useEffect(() => {
-    fetchAccounts();
-  }, []);
-
-  const handleEditRequest = async (item: Publication | any) => {
-    // If it's a campaign, just open
-    if (activeTab === "campaigns") {
-      openEditModal(item);
-      return;
-    }
-
-    // For publications, we now always allow opening the modal.
-    // The EditPublicationModal component handles the partial locking
-    // of fields if the publication is live on any platform.
-    openEditModal(item);
-  };
-
-  const handleAddCampaign = async (success: boolean) => {
-    if (success) {
-      setIsModalOpen(false);
-      await fetchData();
-    }
-  };
-
-  const handleUpdate = async (success: boolean) => {
-    if (success) {
-      await fetchData(getPagination().current_page);
-    }
-  };
-
   const titleGradient =
     theme === "dark"
       ? "from-gray-200 to-gray-400"
       : "from-gray-800 to-gray-600";
 
   const subtitleColor = theme === "dark" ? "text-gray-400" : "text-gray-600";
-
-  const tabBg = theme === "dark" ? "" : "bg-white/60";
 
   return (
     <AuthenticatedLayout>
@@ -288,11 +106,7 @@ export default function ManageContentPage() {
                   return (
                     <button
                       key={tab.id}
-                      onClick={() =>
-                        setActiveTab(
-                          tab.id as "publications" | "campaigns" | "logs"
-                        )
-                      }
+                      onClick={() => setActiveTab(tab.id as any)}
                       className={`group relative flex-1 px-4 py-2.5 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
                         isActive
                           ? "bg-white dark:bg-gray-900 shadow-sm text-primary-600 dark:text-primary-400"
@@ -322,27 +136,27 @@ export default function ManageContentPage() {
               <div className="block">
                 {activeTab === "logs" ? (
                   <LogsList
-                    logs={getItems() as any}
-                    isLoading={getIsLoading()}
-                    pagination={getPagination()}
+                    logs={items as any}
+                    isLoading={isLoading}
+                    pagination={pagination}
                     onPageChange={handlePageChange}
-                    onRefresh={() => fetchData(getPagination().current_page)}
+                    onRefresh={handleRefresh}
                   />
                 ) : (
                   <CampaignList
                     key={`campaigns-${connectedAccounts.length}`}
-                    items={getItems() as any}
-                    pagination={getPagination()}
+                    items={items as any}
+                    pagination={pagination}
                     onPageChange={handlePageChange}
                     mode={activeTab as "campaigns" | "publications"}
                     onEdit={openEditModal}
                     onDelete={handleDeleteItem}
-                    onAdd={() => setIsModalOpen(true)}
+                    onAdd={openAddModal}
                     onPublish={openPublishModal}
                     onViewDetails={openViewDetailsModal}
-                    isLoading={getIsLoading()}
+                    isLoading={isLoading}
                     onFilterChange={handleFilterChange}
-                    onRefresh={() => fetchData(getPagination().current_page)}
+                    onRefresh={handleRefresh}
                     onEditRequest={handleEditRequest}
                     connectedAccounts={connectedAccounts}
                   />
@@ -356,15 +170,15 @@ export default function ManageContentPage() {
       {createPortal(
         activeTab === "publications" ? (
           <AddPublicationModal
-            isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
-            onSubmit={handleAddCampaign}
+            isOpen={isAddModalOpen}
+            onClose={closeAddModal}
+            onSubmit={handleRefresh}
           />
         ) : (
           <AddCampaignModal
-            isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
-            onSubmit={handleAddCampaign}
+            isOpen={isAddModalOpen}
+            onClose={closeAddModal}
+            onSubmit={handleRefresh}
           />
         ),
         document.body
@@ -374,23 +188,16 @@ export default function ManageContentPage() {
         activeTab === "publications" ? (
           <EditPublicationModal
             isOpen={isEditModalOpen}
-            onClose={() => {
-              setIsEditModalOpen(false);
-              setSelectedItem(null);
-            }}
+            onClose={closeEditModal}
             publication={selectedItem as Publication}
-            onSubmit={handleUpdate}
+            onSubmit={handleRefresh}
           />
         ) : (
           <EditCampaignModal
             isOpen={isEditModalOpen}
-            onClose={() => {
-              setIsEditModalOpen(false);
-              setSelectedItem(null);
-              // fetchData(getPagination().current_page);
-            }}
+            onClose={closeEditModal}
             campaign={selectedItem as Campaign}
-            onSubmit={handleUpdate}
+            onSubmit={handleRefresh}
           />
         ),
         document.body
@@ -402,16 +209,13 @@ export default function ManageContentPage() {
             isOpen={isPublishModalOpen}
             onClose={(id?: number) => {
               const idToRefresh = id || selectedItem?.id;
-              setIsPublishModalOpen(false);
-              setSelectedItem(null);
-              // fetchData(getPagination().current_page);
-
+              closePublishModal();
               if (idToRefresh) {
                 fetchPublishedPlatforms(idToRefresh);
               }
             }}
             publication={selectedItem as Publication}
-            onSuccess={() => fetchData(getPagination().current_page)}
+            onSuccess={handleRefresh}
           />
         ),
         document.body
@@ -420,16 +224,11 @@ export default function ManageContentPage() {
       {createPortal(
         <ViewCampaignModal
           isOpen={isViewDetailsModalOpen}
-          onClose={() => {
-            setIsViewDetailsModalOpen(false);
-            setSelectedItem(null);
-          }}
+          onClose={closeViewDetailsModal}
           campaign={selectedItem as any}
         />,
         document.body
       )}
-
-      <ConfirmDialog />
     </AuthenticatedLayout>
   );
 }

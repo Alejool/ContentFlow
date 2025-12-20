@@ -3,23 +3,16 @@ import axios from "axios";
 import { toast } from "react-hot-toast";
 
 export const useSocialMediaAuth = () => {
-  const {
-    accounts,
-    isLoading,
-    error,
-    setAccounts,
-    setLoading,
-    setError,
-    removeAccount,
-    fetchAccounts,
-  } = useAccountsStore();
-
-  // Removing local fetchAccounts in favor of store's fetchAccounts
-  // Warning: ensure all consumers of useSocialMediaAuth are compatible with this change or update them.
-  // The store's fetchAccounts returns Promise<SocialAccount[]>, which matches the local signature.
+  const accounts = useAccountsStore((s) => s.accounts);
+  const isLoading = useAccountsStore((s) => s.isLoading);
+  const error = useAccountsStore((s) => s.error);
+  const setLoading = useAccountsStore((s) => s.setLoading);
+  const setError = useAccountsStore((s) => s.setError);
+  const removeAccount = useAccountsStore((s) => s.removeAccount);
+  const fetchAccounts = useAccountsStore((s) => s.fetchAccounts);
 
   const connectAccount = (platform: string): Promise<boolean> => {
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async (resolve) => {
       try {
         setLoading(true);
         setError(null);
@@ -57,8 +50,6 @@ export const useSocialMediaAuth = () => {
           }
 
           const handleMessage = async (event: MessageEvent) => {
-            console.log("event");
-            console.log(event.data);
             if (
               event.data === "social-auth-success" ||
               event.data?.type === "SOCIAL_AUTH_SUCCESS"

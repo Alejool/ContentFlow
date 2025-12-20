@@ -35,6 +35,22 @@ interface PublicationState {
   addPublication: (publication: Publication) => void;
   updatePublication: (id: number, publication: Partial<Publication>) => void;
   removePublication: (id: number) => void;
+
+  createPublication: (formData: FormData) => Promise<Publication | null>;
+  updatePublicationStore: (
+    id: number,
+    formData: FormData
+  ) => Promise<Publication | null>;
+  deletePublication: (id: number) => Promise<boolean>;
+
+  publishPublication: (
+    id: number,
+    formData: FormData
+  ) => Promise<{ success: boolean; data?: any }>;
+  unpublishPublication: (
+    id: number,
+    platformIds: number[]
+  ) => Promise<{ success: boolean; data?: any }>;
   setCurrentPublication: (publication: Publication | null) => void;
 
   getPublicationById: (id: number) => Publication | undefined;
@@ -201,6 +217,100 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
       currentPublication:
         state.currentPublication?.id === id ? null : state.currentPublication,
     })),
+
+  createPublication: async (formData) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await axios.post("/publications", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      const publication = response.data.publication;
+      if (publication) {
+        get().addPublication(publication);
+      }
+      set({ isLoading: false });
+      return publication;
+    } catch (error: any) {
+      set({
+        error: error.response?.data?.message ?? "Failed to create publication",
+        isLoading: false,
+      });
+      throw error;
+    }
+  },
+
+  updatePublicationStore: async (id, formData) => {
+    set({ isLoading: true, error: null });
+    try {
+      // Ensure _method is PUT for Laravel to handle multipart/form-data with PUT
+      if (!formData.has("_method")) {
+        formData.append("_method", "PUT");
+      }
+      const response = await axios.post(`/publications/${id}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      const publication = response.data.publication || response.data.data;
+      if (publication) {
+        get().updatePublication(id, publication);
+      }
+      set({ isLoading: false });
+      return publication;
+    } catch (error: any) {
+      set({
+        error: error.response?.data?.message ?? "Failed to update publication",
+        isLoading: false,
+      });
+      throw error;
+    }
+  },
+
+  deletePublication: async (id) => {
+    set({ isLoading: true, error: null });
+    try {
+      await axios.delete(`/publications/${id}`);
+      get().removePublication(id);
+      set({ isLoading: false });
+      return true;
+    } catch (error: any) {
+      set({
+        error: error.response?.data?.message ?? "Failed to delete publication",
+        isLoading: false,
+      });
+      return false;
+    }
+  },
+
+  publishPublication: async (id, formData) => {
+    try {
+      const response = await axios.post(
+        `/publications/${id}/publish`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+      return { success: response.data.success, data: response.data };
+    } catch (error: any) {
+      return {
+        success: false,
+        data: error.response?.data?.message ?? "Failed to publish",
+      };
+    }
+  },
+
+  unpublishPublication: async (id, platformIds) => {
+    try {
+      const response = await axios.post(`/publications/${id}/unpublish`, {
+        platform_ids: platformIds,
+      });
+      return { success: true, data: response.data };
+    } catch (error: any) {
+      return {
+        success: false,
+        data: error.response?.data?.message ?? "Failed to unpublish",
+      };
+    }
+  },
 
   setCurrentPublication: (publication) =>
     set({ currentPublication: publication }),

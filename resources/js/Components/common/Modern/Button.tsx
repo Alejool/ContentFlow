@@ -43,7 +43,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       type = "button",
       disabled = false,
       variant = "primary",
-      style = "gradient",
+      buttonStyle = "gradient",
       size = "md",
       className = "",
       onClick,
@@ -149,7 +149,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const colors = variantColors[variant] || variantColors.primary;
 
     const getStyleClasses = () => {
-      switch (style) {
+      switch (buttonStyle) {
         case "gradient":
           return `
             ${colors.text}

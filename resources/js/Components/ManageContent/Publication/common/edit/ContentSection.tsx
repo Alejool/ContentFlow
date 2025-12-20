@@ -92,6 +92,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({
         register={register}
         name="hashtags"
         placeholder={t("publications.modal.edit.placeholders.hashtags")}
+        required
         error={errors.hashtags?.message as string}
         onChange={(e) => onHashtagChange(e.target.value)}
         icon={Hash}
@@ -115,7 +116,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({
           value: campaign.id.toString(),
           label: campaign.name || campaign.title || `Campaign ${campaign.id}`,
         }))}
-        value={watched.campaign_id}
+        value={watched.campaign_id || ""}
         onChange={(val) => {
           setValue("campaign_id", val.toString(), { shouldValidate: true });
         }}

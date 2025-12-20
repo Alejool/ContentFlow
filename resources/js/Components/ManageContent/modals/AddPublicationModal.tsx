@@ -3,6 +3,7 @@ import AddMoreButton from "@/Components/ManageContent/Publication/common/add/Add
 import ImagePreviewItem from "@/Components/ManageContent/Publication/common/add/ImagePreviewItem";
 import SocialAccountsSection from "@/Components/ManageContent/Publication/common/add/SocialAccountsSection";
 import VideoPreviewItem from "@/Components/ManageContent/Publication/common/add/VideoPreviewItem";
+import MediaUploadSection from "@/Components/ManageContent/Publication/common/edit/MediaUploadSection";
 import ModalFooter from "@/Components/ManageContent/modals/common/ModalFooter";
 import ModalHeader from "@/Components/ManageContent/modals/common/ModalHeader";
 import PlatformPreviewModal from "@/Components/ManageContent/modals/common/PlatformPreviewModal";
@@ -11,19 +12,10 @@ import Input from "@/Components/common/Modern/Input";
 import Select from "@/Components/common/Modern/Select";
 import Textarea from "@/Components/common/Modern/Textarea";
 import { useCampaigns } from "@/Hooks/campaign/useCampaigns";
+import { usePublicationForm } from "@/Hooks/publication/usePublicationForm";
 import { useTheme } from "@/Hooks/useTheme";
-import { publicationSchema } from "@/schemas/publication";
-import { usePublicationStore } from "@/stores/publicationStore";
 import { useAccountsStore } from "@/stores/socialAccountsStore";
-import { PageProps } from "@/types";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { usePage } from "@inertiajs/react";
-import axios from "axios";
-import { AlertTriangle, FileText, Hash, Target, Upload } from "lucide-react";
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { useForm } from "react-hook-form";
-import { toast } from "react-hot-toast";
-import { useTranslation } from "react-i18next";
+import { AlertTriangle, FileText, Hash, Save, Target } from "lucide-react";
 
 interface AddPublicationModalProps {
   isOpen: boolean;
@@ -31,410 +23,80 @@ interface AddPublicationModalProps {
   onSubmit: (data: any) => void;
 }
 
-const validateFile = (file: File, t: any) => {
-  if (file.size > 50 * 1024 * 1024) {
-    return t("publications.modal.validation.imageSize");
-  }
-
-  const allowedTypes = [
-    "image/jpeg",
-    "image/png",
-    "image/webp",
-    "image/gif",
-    "video/mp4",
-    "video/quicktime",
-    "video/x-msvideo",
-  ];
-  if (!allowedTypes.includes(file.type)) {
-    return t("publications.modal.validation.imageType");
-  }
-
-  return null;
-};
-
 export default function AddPublicationModal({
   isOpen,
   onClose,
   onSubmit,
 }: AddPublicationModalProps) {
-  const { t } = useTranslation();
   const { theme } = useTheme();
-  const { addPublication } = usePublicationStore();
-  const { accounts: socialAccounts, fetchAccounts: fetchSocialAccounts } =
-    useAccountsStore();
   const { campaigns } = useCampaigns();
-
-  const { props } = usePage<PageProps>();
-  const user = props.auth.user;
-  const [platformSettings, setPlatformSettings] = useState<Record<string, any>>(
-    user?.global_platform_settings || {}
-  );
-  const [activePlatformSettings, setActivePlatformSettings] = useState<
-    string | null
-  >(null);
-  const [activePlatformPreview, setActivePlatformPreview] = useState<
-    string | null
-  >(null);
-  useEffect(() => {
-    if (!isOpen) setPlatformSettings(user?.global_platform_settings || {});
-  }, [isOpen, user?.global_platform_settings]);
-
-  const [mediaFiles, setMediaFiles] = useState<File[]>([]);
-  const [mediaPreviews, setMediaPreviews] = useState<string[]>([]);
-  const [thumbnails, setThumbnails] = useState<Record<number, File>>({});
-  const [videoMetadata, setVideoMetadata] = useState<
-    Record<number, { duration: number; youtubeType: "short" | "video" }>
-  >({});
-  const [imageError, setImageError] = useState<string | null>(null);
-  const [isDragOver, setIsDragOver] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [accountSchedules, setAccountSchedules] = useState<
-    Record<number, string>
-  >({});
-  const [activePopover, setActivePopover] = useState<number | null>(null);
-
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const schema = useMemo(() => publicationSchema(t), [t]);
+  const { accounts: socialAccounts } = useAccountsStore();
 
   const {
-    register,
+    t,
+    form,
+    watched,
+    errors,
+    isSubmitting,
+    isDragOver,
+    setIsDragOver,
+    mediaFiles,
+    imageError,
+    videoMetadata,
+    thumbnails,
+    setThumbnail,
+    clearThumbnail,
+    setVideoMetadata,
+    handleFileChange,
+    handleRemoveMedia,
+    handleHashtagChange,
+    handleAccountToggle,
+    handleClose,
     handleSubmit,
-    formState: { errors },
-    watch,
+    fileInputRef,
+    platformSettings,
+    setPlatformSettings,
+    activePlatformSettings,
+    setActivePlatformSettings,
+    activePlatformPreview,
+    setActivePlatformPreview,
+    accountSchedules,
+    setAccountSchedules,
     setValue,
-    reset,
-  } = useForm({
-    resolver: zodResolver(schema),
-    mode: "onChange",
-    defaultValues: {
-      title: "",
-      description: "",
-      goal: "",
-      hashtags: "",
-      scheduled_at: "",
-      social_accounts: [],
-      campaign_id: "",
-    },
+  } = usePublicationForm({
+    onClose,
+    onSubmitSuccess: onSubmit,
+    isOpen,
   });
 
-  const watched = watch();
-
-  useEffect(() => {
-    if (isOpen) {
-      fetchSocialAccounts();
-    }
-  }, [isOpen]);
-
+  const { register } = form;
   const modalBg = theme === "dark" ? "bg-neutral-800" : "bg-white";
 
-  const getVideoDuration = (file: File): Promise<number> => {
-    return new Promise((resolve, reject) => {
-      const video = document.createElement("video");
-      video.preload = "metadata";
-
-      video.onloadedmetadata = () => {
-        window.URL.revokeObjectURL(video.src);
-        resolve(Math.floor(video.duration));
-      };
-
-      video.onerror = () => {
-        reject(new Error("Failed to load video metadata"));
-      };
-
-      video.src = URL.createObjectURL(file);
-    });
-  };
-
-  const handleFileChange = async (files: FileList | null) => {
-    if (!files || files.length === 0) return;
-
-    const newFiles = Array.from(files);
-    const validFiles: File[] = [];
-    const newPreviews: string[] = [];
-    let error = null;
-
-    for (const file of newFiles) {
-      const validationError = validateFile(file, t);
-      if (validationError) {
-        error = validationError;
-        break;
-      }
-      validFiles.push(file);
-      newPreviews.push(URL.createObjectURL(file));
-    }
-
-    if (error) {
-      setImageError(error);
-      return;
-    }
-
-    setImageError(null);
-    const currentLength = mediaFiles.length;
-    setMediaFiles((prev) => [...prev, ...validFiles]);
-    setMediaPreviews((prev) => [...prev, ...newPreviews]);
-
-    for (let i = 0; i < validFiles.length; i++) {
-      const file = validFiles[i];
-      if (file.type.startsWith("video/")) {
-        try {
-          const duration = await getVideoDuration(file);
-          const index = currentLength + i;
-          const youtubeType = duration <= 60 ? "short" : "video";
-
-          setVideoMetadata((prev) => ({
-            ...prev,
-            [index]: {
-              duration,
-              youtubeType,
-            },
-          }));
-
-          // Auto-sync with platform settings if not already explicitly set by user
-          setPlatformSettings((prev) => {
-            const updated = { ...prev };
-
-            // YouTube sync
-            if (!updated.youtube) updated.youtube = {};
-            // Only override if it's the first video or if we want to be proactive
-            updated.youtube.type = youtubeType;
-
-            // Instagram sync - Default to Reels for videos if no global default
-            if (!updated.instagram) updated.instagram = {};
-            if (!updated.instagram.type) updated.instagram.type = "reel";
-
-            return updated;
-          });
-        } catch (err) {
-          console.error("Failed to get video duration:", err);
-        }
-      }
-    }
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(false);
-    const files = e.dataTransfer.files;
-    handleFileChange(files);
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(true);
-  };
-
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(false);
-  };
-
-  const removeMedia = (index: number) => {
-    setMediaFiles((prev) => prev.filter((_, i) => i !== index));
-    setMediaPreviews((prev) => prev.filter((_, i) => i !== index));
-
-    setVideoMetadata((prev) => {
-      const newMetadata = { ...prev };
-      delete newMetadata[index];
-      const reindexed: Record<
-        number,
-        { duration: number; youtubeType: "short" | "video" }
-      > = {};
-      Object.keys(newMetadata).forEach((key) => {
-        const oldIndex = parseInt(key);
-        if (oldIndex > index) {
-          reindexed[oldIndex - 1] = newMetadata[oldIndex];
-        } else {
-          reindexed[oldIndex] = newMetadata[oldIndex];
-        }
-      });
-      return reindexed;
-    });
-
-    if (mediaFiles.length === 1) {
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
-    }
-  };
-
-  const formatHashtags = (value: string) => {
-    if (!value.trim()) return "";
-
-    return value
-      .split(/\s+/)
-      .map((tag) => tag.trim())
-      .filter((tag) => tag.length > 0)
-      .map((tag) => (tag.startsWith("#") ? tag : `#${tag}`))
-      .join(" ");
-  };
-
-  const handleHashtagChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const formatted = formatHashtags(e.target.value);
-    setValue("hashtags", formatted, { shouldValidate: true });
-  };
-
-  const handleAccountToggle = (accountId: number) => {
-    const current = watched.social_accounts || [];
-    const id = Number(accountId);
-    const isChecked = current.includes(id);
-
-    if (!isChecked) {
-      setValue("social_accounts", [...current, id]);
-    } else {
-      setValue(
-        "social_accounts",
-        current.filter((x: number) => x !== id)
-      );
-      const newScheds = { ...accountSchedules };
-      delete newScheds[id];
-      setAccountSchedules(newScheds);
-    }
-  };
-
-  const handleScheduleChange = (accountId: number, schedule: string) => {
-    setAccountSchedules((prev) => ({
-      ...prev,
-      [accountId]: schedule,
-    }));
-  };
-
-  const handleScheduleRemove = (accountId: number) => {
-    const newSchedules = { ...accountSchedules };
-    delete newSchedules[accountId];
-    setAccountSchedules(newSchedules);
-  };
-
-  const onFormSubmit = async (data: any) => {
-    if (mediaFiles.length === 0) {
-      setImageError(t("publications.modal.validation.imageRequired"));
-      return;
-    }
-
-    if (data.social_accounts && data.social_accounts.length > 0) {
-      const hasSomeSchedule =
-        data.scheduled_at ||
-        data.social_accounts.some((id: number) => accountSchedules[id]);
-      if (!hasSomeSchedule) {
-        toast.error(t("publications.modal.validation.scheduleDateRequired"));
-        return;
-      }
-    }
-
-    setIsSubmitting(true);
-    try {
-      const formData = new FormData();
-      formData.append("title", data.title);
-      formData.append("description", data.description);
-      formData.append("goal", data.goal);
-      formData.append("hashtags", data.hashtags);
-
-      mediaFiles.forEach((file, index) => {
-        formData.append(`media[${index}]`, file);
-        if (thumbnails[index]) {
-          formData.append(`thumbnails[${index}]`, thumbnails[index]);
-        }
-        if (videoMetadata[index]) {
-          formData.append(
-            `youtube_types[${index}]`,
-            videoMetadata[index].youtubeType
-          );
-          formData.append(
-            `durations[${index}]`,
-            videoMetadata[index].duration.toString()
-          );
-        }
-      });
-
-      formData.append("scheduled_at", data.scheduled_at || "");
-
-      if (data.social_accounts) {
-        if (data.social_accounts.length === 0) {
-          formData.append("social_accounts", "");
-          formData.append("social_accounts_sync", "1");
-        } else {
-          data.social_accounts.forEach((id: number, index: number) => {
-            formData.append(`social_accounts[${index}]`, id.toString());
-            if (accountSchedules[id]) {
-              formData.append(
-                `social_account_schedules[${id}]`,
-                accountSchedules[id]
-              );
-            }
-          });
-        }
-      }
-
-      if (data.campaign_id) {
-        formData.append("campaign_id", data.campaign_id);
-      }
-
-      if (Object.keys(platformSettings).length > 0) {
-        formData.append("platform_settings", JSON.stringify(platformSettings));
-      }
-
-      const response = await axios.post("/publications", formData);
-
-      if (response.data && response.data.publication) {
-        addPublication(response.data.publication);
-        if (onSubmit) {
-          onSubmit(true);
-        }
-        handleClose();
-        toast.success(
-          t("publications.messages.createSuccess") ||
-            "Publication created successfully"
-        );
-      }
-    } catch (error: any) {
-      console.error("Error submitting form:", error);
-      toast.error(
-        error.response?.data?.message || t("publications.messages.createError")
-      );
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleClose = () => {
-    reset();
-    setMediaFiles([]);
-    setMediaPreviews([]);
-    setVideoMetadata({});
-    setImageError(null);
-    setIsSubmitting(false);
-    onClose();
-  };
-
-  if (!isOpen) return null;
-
   const renderMediaPreviews = () => {
-    if (mediaPreviews.length === 0) return null;
+    if (mediaFiles.length === 0) return null;
 
     return (
-      <div className="grid grid-cols-2 gap-4 w-full">
-        {mediaPreviews.map((preview, index) => {
-          const file = mediaFiles[index];
-          const isVideo = file.type.startsWith("video");
-
-          if (isVideo) {
+      <div className="grid grid-cols-2 gap-4 w-full p-4">
+        {mediaFiles.map((media, index) => {
+          if (media.type === "video") {
             return (
               <VideoPreviewItem
-                key={index}
-                preview={preview}
+                key={media.tempId}
+                preview={media.url}
                 index={index}
-                duration={videoMetadata[index]?.duration}
-                youtubeType={videoMetadata[index]?.youtubeType || "video"}
-                thumbnail={thumbnails[index]}
-                onRemove={() => removeMedia(index)}
-                onThumbnailChange={(file) =>
-                  setThumbnails((prev) => ({ ...prev, [index]: file }))
+                duration={videoMetadata[media.tempId]?.duration}
+                youtubeType={
+                  videoMetadata[media.tempId]?.youtubeType || "video"
                 }
+                thumbnail={thumbnails[media.tempId]}
+                thumbnailUrl={media.thumbnailUrl}
+                onRemove={() => handleRemoveMedia(index)}
+                onThumbnailChange={(file) => setThumbnail(media.tempId, file)}
                 onYoutubeTypeChange={(type) =>
-                  setVideoMetadata((prev) => ({
-                    ...prev,
-                    [index]: { ...prev[index], youtubeType: type },
-                  }))
+                  setVideoMetadata(media.tempId, {
+                    ...videoMetadata[media.tempId],
+                    youtubeType: type,
+                  })
                 }
               />
             );
@@ -442,10 +104,10 @@ export default function AddPublicationModal({
 
           return (
             <ImagePreviewItem
-              key={index}
-              preview={preview}
+              key={media.tempId}
+              preview={media.url}
               index={index}
-              onRemove={() => removeMedia(index)}
+              onRemove={() => handleRemoveMedia(index)}
             />
           );
         })}
@@ -453,6 +115,8 @@ export default function AddPublicationModal({
       </div>
     );
   };
+
+  if (!isOpen) return null;
 
   return (
     <div
@@ -477,10 +141,10 @@ export default function AddPublicationModal({
           title="publications.modal.add.title"
           subtitle="publications.modal.add.subtitle"
         />
-        <main className="flex-1  overflow-y-auto custom-scrollbar">
+        <main className="flex-1 overflow-y-auto custom-scrollbar">
           <form
             id="add-publication-form"
-            onSubmit={handleSubmit(onFormSubmit)}
+            onSubmit={handleSubmit}
             className="space-y-8 p-6"
           >
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -496,13 +160,23 @@ export default function AddPublicationModal({
                           } ring-offset-2`
                         : ""
                     }`}
-                    onDrop={handleDrop}
-                    onDragOver={handleDragOver}
-                    onDragLeave={handleDragLeave}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      setIsDragOver(false);
+                      handleFileChange(e.dataTransfer.files);
+                    }}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      setIsDragOver(true);
+                    }}
+                    onDragLeave={(e) => {
+                      e.preventDefault();
+                      setIsDragOver(false);
+                    }}
                     onClick={() => fileInputRef.current?.click()}
                   >
                     <div
-                      className={`min-h-[200px] rounded-lg border-2 border-dashed flex flex-col items-center justify-center  text-center transition-colors overflow-hidden ${
+                      className={`min-h-[200px] rounded-lg border-2 border-dashed flex flex-col items-center justify-center text-center transition-colors overflow-hidden ${
                         imageError
                           ? theme === "dark"
                             ? "border-primary-500 bg-primary-900/20"
@@ -517,25 +191,29 @@ export default function AddPublicationModal({
                       }`}
                     >
                       {renderMediaPreviews() || (
-                        <div className="space-y-4">
-                          <div
-                            className={`w-16 h-16 rounded-full ${
-                              theme === "dark"
-                                ? "bg-primary-900/30"
-                                : "bg-primary-100"
-                            } flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300`}
-                          >
-                            <Upload className="w-8 h-8 text-primary-500" />
-                          </div>
-                          <div>
-                            <p className="font-medium text-lg">
-                              {t("publications.modal.add.dragDrop.title")}
-                            </p>
-                            <p className="text-sm mt-1">
-                              {t("publications.modal.add.dragDrop.subtitle")}
-                            </p>
-                          </div>
-                        </div>
+                        <MediaUploadSection
+                          mediaPreviews={mediaFiles}
+                          thumbnails={thumbnails}
+                          imageError={imageError}
+                          isDragOver={isDragOver}
+                          theme={theme}
+                          t={t}
+                          onFileChange={handleFileChange}
+                          onRemoveMedia={handleRemoveMedia}
+                          onSetThumbnail={(tempId: string, file: File) =>
+                            setThumbnail(tempId, file)
+                          }
+                          onClearThumbnail={(tempId: string) =>
+                            clearThumbnail(tempId)
+                          }
+                          onDragOver={() => setIsDragOver(true)}
+                          onDragLeave={() => setIsDragOver(false)}
+                          onDrop={(e: React.DragEvent<HTMLDivElement>) => {
+                            e.preventDefault();
+                            setIsDragOver(false);
+                            handleFileChange(e.dataTransfer.files);
+                          }}
+                        />
                       )}
                     </div>
                     <input
@@ -562,19 +240,28 @@ export default function AddPublicationModal({
                   theme={theme}
                   t={t}
                   onAccountToggle={handleAccountToggle}
-                  onScheduleChange={handleScheduleChange}
-                  onScheduleRemove={handleScheduleRemove}
+                  onScheduleChange={(id, date) =>
+                    setAccountSchedules((prev) => ({ ...prev, [id]: date }))
+                  }
+                  onScheduleRemove={(id) =>
+                    setAccountSchedules((prev) => {
+                      const n = { ...prev };
+                      delete n[id];
+                      return n;
+                    })
+                  }
                   onPlatformSettingsClick={(platform) =>
                     setActivePlatformSettings(platform)
                   }
                   onPreviewClick={(platform) =>
                     setActivePlatformPreview(platform)
                   }
-                  globalSchedule={watched.scheduled_at}
+                  globalSchedule={watched.scheduled_at ?? undefined}
+                  error={errors.social_accounts?.message as string}
                 />
 
                 <ScheduleSection
-                  scheduledAt={watched.scheduled_at}
+                  scheduledAt={watched.scheduled_at ?? undefined}
                   theme={theme}
                   t={t}
                   onScheduleChange={(date) => setValue("scheduled_at", date)}
@@ -644,7 +331,7 @@ export default function AddPublicationModal({
                     "publications.modal.add.placeholders.hashtags"
                   )}
                   error={errors.hashtags?.message as string}
-                  onChange={handleHashtagChange}
+                  onChange={(e) => handleHashtagChange(e.target.value)}
                   icon={Hash}
                   theme={theme}
                   variant="filled"
@@ -671,7 +358,7 @@ export default function AddPublicationModal({
                       campaign.title ||
                       `Campaign ${campaign.id}`,
                   }))}
-                  value={watched.campaign_id}
+                  value={watched.campaign_id?.toString() ?? ""}
                   onChange={(val) => {
                     setValue("campaign_id", val.toString(), {
                       shouldValidate: true,
@@ -697,8 +384,9 @@ export default function AddPublicationModal({
             theme={theme}
             isSubmitting={isSubmitting}
             formId="add-publication-form"
-            submitText={t("publications.button.add") || "Add publication"}
-            cancelText={t("common.cancel") || "Close"}
+            submitText={t("publications.button.save") || "Guardar publicación"}
+            submitIcon={<Save className="w-4 h-4" />}
+            cancelText={t("common.cancel") || "Cerrar"}
           />
         </div>
 
@@ -725,9 +413,9 @@ export default function AddPublicationModal({
           platform={activePlatformPreview || ""}
           publication={{
             ...watched,
-            media: mediaFiles.map((file, i) => ({
-              preview: mediaPreviews[i],
-              file_type: file.type.startsWith("video") ? "video" : "image",
+            media: mediaFiles.map((m) => ({
+              preview: m.url,
+              file_type: m.type,
             })),
           }}
           settings={

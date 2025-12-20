@@ -29,7 +29,7 @@ class PublicationController extends Controller
   public function index(Request $request)
   {
     $query = Publication::where('user_id', Auth::id())
-      ->with(['mediaFiles.derivatives', 'scheduledPosts.socialAccount', 'socialPostLogs.socialAccount', 'campaigns'])
+      ->with(['mediaFiles.derivatives', 'scheduled_posts.socialAccount', 'socialPostLogs.socialAccount', 'campaigns'])
       ->orderBy('created_at', 'desc');
 
     if ($request->has('status') && $request->status !== 'all') {
@@ -214,13 +214,21 @@ class PublicationController extends Controller
         }
       }
 
-      if (!empty($validatedData['scheduled_at']) && !empty($validatedData['social_accounts'])) {
+      if (!empty($validatedData['social_accounts'])) {
         $schedules = $request->input('social_account_schedules', []);
+        $baseSchedule = $validatedData['scheduled_at'] ?? null;
 
         $socialAccounts = SocialAccount::whereIn('id', $validatedData['social_accounts'])->get()->keyBy('id');
 
         foreach ($validatedData['social_accounts'] as $accountId) {
-          $scheduledAt = isset($schedules[$accountId]) ? $schedules[$accountId] : $validatedData['scheduled_at'];
+          $scheduledAt = (isset($schedules[$accountId]) && !empty($schedules[$accountId]))
+            ? $schedules[$accountId]
+            : $baseSchedule;
+
+          if (!$scheduledAt) {
+            continue;
+          }
+
           $socialAccount = $socialAccounts[$accountId] ?? null;
 
           ScheduledPost::create([
@@ -255,7 +263,7 @@ class PublicationController extends Controller
   public function show(Request $request, $id)
   {
     if ($request->wantsJson()) {
-      $publication = Publication::with(['mediaFiles.derivatives', 'scheduledPosts.socialAccount', 'socialPostLogs.socialAccount', 'campaigns'])
+      $publication = Publication::with(['mediaFiles.derivatives', 'scheduled_posts.socialAccount', 'socialPostLogs.socialAccount', 'campaigns'])
         ->findOrFail($id);
 
       return response()->json([
@@ -271,9 +279,7 @@ class PublicationController extends Controller
     return view('publications.edit');
   }
 
-  public function destroy($id)
-  {
-  }
+  public function destroy($id) {}
 
   public function update(Request $request, $id)
   {
@@ -324,12 +330,12 @@ class PublicationController extends Controller
       $publication->end_date = $validatedData['end_date'] ?? $publication->end_date;
       $publication->status = $validatedData['status'] ?? $publication->status;
 
-      if (array_key_exists('scheduled_at', $validatedData)) {
-        $publication->scheduled_at = $validatedData['scheduled_at'];
+      if ($request->has('scheduled_at')) {
+        $publication->scheduled_at = $request->scheduled_at ?: null;
       }
 
       if ($request->has('platform_settings')) {
-        $publication->platform_settings = json_decode($request->platform_settings, true);
+        $publication->platform_settings = is_string($request->platform_settings) ? json_decode($request->platform_settings, true) : $request->platform_settings;
       }
 
       if ($publication->isDirty('status') && $publication->status === 'published' && !$publication->publish_date) {
@@ -349,39 +355,46 @@ class PublicationController extends Controller
       }
 
       if ($request->has('social_accounts') || $request->has('social_accounts_sync')) {
-        $currentAccountIds = $publication->scheduledPosts()->pluck('social_account_id')->toArray();
-        $newAccountIds = $validatedData['social_accounts'] ?? [];
+        $currentAccountIds = $publication->scheduled_posts()->where('status', 'pending')->pluck('social_account_id')->toArray();
+        $newAccountIds = $request->input('social_accounts', []);
+
+        if (is_string($newAccountIds)) {
+          $newAccountIds = explode(',', $newAccountIds);
+        }
+        $newAccountIds = array_filter(array_map('intval', (array)$newAccountIds));
+
         $schedules = $request->input('social_account_schedules', []);
         $baseSchedule = $publication->scheduled_at;
 
+        // Remove schedules no longer selected
         $toRemove = array_diff($currentAccountIds, $newAccountIds);
         if (!empty($toRemove)) {
-          $publication->scheduledPosts()
+          $publication->scheduled_posts()
             ->whereIn('social_account_id', $toRemove)
             ->where('status', 'pending')
             ->delete();
         }
 
+        // Add or update schedules
         foreach ($newAccountIds as $accountId) {
           $postSchedule = (isset($schedules[$accountId]) && !empty($schedules[$accountId])) ? $schedules[$accountId] : $baseSchedule;
 
-          $existingPost = $publication->scheduledPosts()
+          $existingPost = $publication->scheduled_posts()
             ->where('social_account_id', $accountId)
+            ->where('status', 'pending')
             ->first();
 
           if (empty($postSchedule)) {
-            if ($existingPost && $existingPost->status === 'pending') {
+            if ($existingPost) {
               $existingPost->delete();
             }
             continue;
           }
 
           if ($existingPost) {
-            if ($existingPost->status === 'pending') {
-              $existingPost->update([
-                'scheduled_at' => $postSchedule,
-              ]);
-            }
+            $existingPost->update([
+              'scheduled_at' => $postSchedule,
+            ]);
           } else {
             $socialAccount = SocialAccount::find($accountId);
             ScheduledPost::create([
@@ -394,6 +407,32 @@ class PublicationController extends Controller
               'platform' => $socialAccount ? $socialAccount->platform : 'unknown',
             ]);
           }
+        }
+
+        // Auto-revert to draft if no pending schedules and no global date
+        $hasPending = $publication->scheduled_posts()->where('status', 'pending')->exists();
+        if (!$hasPending && empty($publication->scheduled_at)) {
+          $publication->status = 'draft';
+          $publication->save();
+        }
+      }
+
+      if ($request->has('removed_thumbnail_ids')) {
+        $thumbMediaIds = $request->input('removed_thumbnail_ids');
+        $derivatives = MediaDerivative::whereIn('media_file_id', $thumbMediaIds)
+          ->where('derivative_type', 'thumbnail')
+          ->get();
+
+        foreach ($derivatives as $derivative) {
+          try {
+            $filePath = str_replace(Storage::disk('s3')->url(''), '', $derivative->file_path);
+            if (Storage::disk('s3')->exists($filePath)) {
+              Storage::disk('s3')->delete($filePath);
+            }
+          } catch (\Exception $e) {
+            Log::warning('Failed to delete thumbnail file from S3', ['error' => $e->getMessage()]);
+          }
+          $derivative->delete();
         }
       }
 
@@ -632,7 +671,6 @@ class PublicationController extends Controller
     $alreadyScheduled = ScheduledPost::where('publication_id', $publication->id)
       ->whereIn('social_account_id', $socialAccounts->pluck('id'))
       ->where('status', 'pending')
-      ->where('scheduled_at', '>', now())
       ->exists();
 
     if ($alreadyScheduled) {
@@ -735,6 +773,13 @@ class PublicationController extends Controller
 
     $publication->update(['status' => 'publishing']);
 
+    // Mark any pending scheduled posts for these platforms as 'posted'
+    // This prevents them from showing as "scheduled" in the edit modal after publishing
+    ScheduledPost::where('publication_id', $publication->id)
+      ->whereIn('social_account_id', $socialAccounts->pluck('id'))
+      ->where('status', 'pending')
+      ->update(['status' => 'posted']);
+
     PublishToSocialMedia::dispatch($publication, $socialAccounts)->onQueue('publishing');
 
     return response()->json([
@@ -795,7 +840,6 @@ class PublicationController extends Controller
 
     $scheduledAccountIds = ScheduledPost::where('publication_id', $publication->id)
       ->where('status', 'pending')
-      ->where('scheduled_at', '>', now())
       ->pluck('social_account_id')
       ->unique()
       ->toArray();

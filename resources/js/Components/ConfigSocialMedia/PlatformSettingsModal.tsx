@@ -105,9 +105,11 @@ export default function PlatformSettingsModal({
             </div>
             <div>
               <h2 className="text-xl font-bold">
-                {t(
-                  `publications.modal.platformSettings.${platform.toLowerCase()}.title`
-                ) || `${platform} Settings`}
+                {platform && platform.trim()
+                  ? t(
+                      `publications.modal.platformSettings.${platform.toLowerCase()}.title`
+                    ) || `${platform} Settings`
+                  : "Platform Settings"}
               </h2>
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 {t("common.adjustOptions")}

@@ -3,7 +3,6 @@ import { usePublicationStore } from "@/stores/publicationStore";
 import { useAccountsStore } from "@/stores/socialAccountsStore";
 import { Publication } from "@/types/Publication";
 import { SocialAccount } from "@/types/SocialAccount";
-import axios from "axios";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "react-hot-toast";
 
@@ -62,22 +61,33 @@ export interface UsePublishPublicationReturn extends PublishPublicationState {
 export const usePublishPublication = (): UsePublishPublicationReturn => {
   /* ----------------------------- Global stores ----------------------------- */
 
-  const { accounts } = useAccountsStore();
-  const { campaigns, fetchCampaigns } = useCampaignStore();
+  const accounts = useAccountsStore((s) => s.accounts);
+  const campaigns = useCampaignStore((s) => s.campaigns);
+  const isCampaignLoading = useCampaignStore((s) => s.isLoading);
+  const fetchCampaigns = useCampaignStore((s) => s.fetchCampaigns);
 
-  const {
-    publishedPlatforms: publishedPlatformsCache,
-    failedPlatforms: failedPlatformsCache,
-    publishingPlatforms: publishingPlatformsCache,
-    scheduledPlatforms: scheduledPlatformsCache,
-    removedPlatforms: removedPlatformsCache,
+  const publishedPlatformsCache = usePublicationStore(
+    (s) => s.publishedPlatforms
+  );
+  const failedPlatformsCache = usePublicationStore((s) => s.failedPlatforms);
+  const publishingPlatformsCache = usePublicationStore(
+    (s) => s.publishingPlatforms
+  );
+  const scheduledPlatformsCache = usePublicationStore(
+    (s) => s.scheduledPlatforms
+  );
+  const removedPlatformsCache = usePublicationStore((s) => s.removedPlatforms);
 
-    fetchPublishedPlatforms: fetchPublishedPlatformsFromStore,
-    setPublishedPlatforms: setPublishedPlatformsInStore,
-    setPublishingPlatforms: setPublishingPlatformsInStore,
-    setFailedPlatforms: setFailedPlatformsInStore,
-    setRemovedPlatforms: setRemovedPlatformsInStore,
-  } = usePublicationStore();
+  const fetchPublishedPlatformsFromStore = usePublicationStore(
+    (s) => s.fetchPublishedPlatforms
+  );
+  const setPublishedPlatformsInStore = usePublicationStore(
+    (s) => s.setPublishedPlatforms
+  );
+  const publishPublication = usePublicationStore((s) => s.publishPublication);
+  const unpublishPublication = usePublicationStore(
+    (s) => s.unpublishPublication
+  );
 
   /* ----------------------------- Derived state ----------------------------- */
 
@@ -107,14 +117,26 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
   const [currentPublicationId, setCurrentPublicationId] = useState<
     number | null
   >(null);
+  const [hasAtteptedInitialFetch, setHasAttemptedInitialFetch] =
+    useState(false);
 
   /* ------------------------------ Side effects ------------------------------ */
 
   useEffect(() => {
-    if (campaigns.length === 0) {
+    if (
+      campaigns.length === 0 &&
+      !isCampaignLoading &&
+      !hasAtteptedInitialFetch
+    ) {
+      setHasAttemptedInitialFetch(true);
       fetchCampaigns();
     }
-  }, [campaigns.length, fetchCampaigns]);
+  }, [
+    campaigns.length,
+    fetchCampaigns,
+    isCampaignLoading,
+    hasAtteptedInitialFetch,
+  ]);
 
   /* ----------------------------- Store selectors ---------------------------- */
 
@@ -249,11 +271,11 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
 
   const handleUnpublish = useCallback(
     async (publicationId: number, accountId: number, platform: string) => {
-      try {
-        await axios.post(`/publications/${publicationId}/unpublish`, {
-          platform_ids: [accountId],
-        });
+      const { success, data } = await unpublishPublication(publicationId, [
+        accountId,
+      ]);
 
+      if (success) {
         toast.success(`Unpublished from ${platform}`);
 
         const current = publishedPlatformsCache[publicationId] || [];
@@ -261,14 +283,17 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
           publicationId,
           current.filter((id) => id !== accountId)
         );
-
         return true;
-      } catch (error: any) {
-        toast.error(error.response?.data?.message || "Error unpublishing");
+      } else {
+        toast.error(data || "Error unpublishing");
         return false;
       }
     },
-    [publishedPlatformsCache, setPublishedPlatformsInStore]
+    [
+      unpublishPublication,
+      publishedPlatformsCache,
+      setPublishedPlatformsInStore,
+    ]
   );
 
   /* ---------------------------- Platform selection -------------------------- */
@@ -317,6 +342,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
         return false;
       }
 
+      setPublishing(true);
       try {
         const formData = new FormData();
 
@@ -338,14 +364,13 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
           );
         }
 
-        const res = await axios.post(
-          `/publications/${publication.id}/publish`,
-          formData,
-          { headers: { "Content-Type": "multipart/form-data" } }
+        const { success, data } = await publishPublication(
+          publication.id,
+          formData
         );
 
-        if (!res.data.success) {
-          toast.error("Publishing failed");
+        if (!success) {
+          toast.error(data || "Publishing failed");
           return false;
         }
 
@@ -359,7 +384,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
         setPublishing(false);
       }
     },
-    [selectedPlatforms, youtubeThumbnails]
+    [selectedPlatforms, youtubeThumbnails, publishPublication]
   );
 
   /* ------------------------------- RETURN ----------------------------------- */

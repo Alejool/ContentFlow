@@ -30,6 +30,7 @@ interface CampaignState {
   addCampaign: (campaign: Campaign) => void;
   updateCampaign: (id: number, campaign: Partial<Campaign>) => void;
   removeCampaign: (id: number) => void;
+  deleteCampaign: (id: number) => Promise<boolean>;
 }
 
 export const useCampaignStore = create<CampaignState>((set, get) => ({
@@ -117,5 +118,21 @@ export const useCampaignStore = create<CampaignState>((set, get) => ({
     set((state) => ({
       campaigns: state.campaigns.filter((campaign) => campaign.id !== id),
     }));
+  },
+
+  deleteCampaign: async (id) => {
+    set({ isLoading: true, error: null });
+    try {
+      await axios.delete(`/campaigns/${id}`);
+      get().removeCampaign(id);
+      set({ isLoading: false });
+      return true;
+    } catch (error: any) {
+      set({
+        error: error.response?.data?.message ?? "Failed to delete campaign",
+        isLoading: false,
+      });
+      return false;
+    }
   },
 }));

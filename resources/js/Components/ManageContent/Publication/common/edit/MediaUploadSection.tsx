@@ -19,6 +19,7 @@ interface MediaUploadSectionProps {
   onFileChange: (files: FileList | null) => void;
   onRemoveMedia: (index: number) => void;
   onSetThumbnail: (tempId: string, file: File) => void;
+  onClearThumbnail: (tempId: string) => void;
   onDragOver: (e: React.DragEvent<HTMLDivElement>) => void;
   onDragLeave: (e: React.DragEvent<HTMLDivElement>) => void;
   onDrop: (e: React.DragEvent<HTMLDivElement>) => void;
@@ -35,6 +36,7 @@ const MediaUploadSection: React.FC<MediaUploadSectionProps> = ({
   onFileChange,
   onRemoveMedia,
   onSetThumbnail,
+  onClearThumbnail,
   onDragOver,
   onDragLeave,
   onDrop,
@@ -107,6 +109,7 @@ const MediaUploadSection: React.FC<MediaUploadSectionProps> = ({
                   onSetThumbnail={(file) =>
                     onSetThumbnail(preview.tempId, file)
                   }
+                  onClearThumbnail={() => onClearThumbnail(preview.tempId)}
                   theme={theme}
                   disabled={disabled}
                 />
@@ -147,6 +150,7 @@ const MediaPreviewItem: React.FC<{
   thumbnail?: File;
   onRemove: () => void;
   onSetThumbnail: (file: File) => void;
+  onClearThumbnail: () => void;
   theme: "dark" | "light";
   disabled?: boolean;
 }> = ({
@@ -155,6 +159,7 @@ const MediaPreviewItem: React.FC<{
   thumbnail,
   onRemove,
   onSetThumbnail,
+  onClearThumbnail,
   theme,
   disabled,
 }) => {
@@ -172,6 +177,7 @@ const MediaPreviewItem: React.FC<{
           preview={preview}
           thumbnail={thumbnail}
           onSetThumbnail={onSetThumbnail}
+          onClearThumbnail={onClearThumbnail}
           fileInputRef={fileInputRef}
           disabled={disabled}
         />
@@ -199,9 +205,17 @@ const VideoPreview: React.FC<{
   preview: any;
   thumbnail?: File;
   onSetThumbnail: (file: File) => void;
+  onClearThumbnail: () => void;
   fileInputRef: React.RefObject<HTMLInputElement | null>;
   disabled?: boolean;
-}> = ({ preview, thumbnail, onSetThumbnail, fileInputRef, disabled }) => (
+}> = ({
+  preview,
+  thumbnail,
+  onSetThumbnail,
+  onClearThumbnail,
+  fileInputRef,
+  disabled,
+}) => (
   <>
     <video
       src={preview.url}
@@ -229,6 +243,19 @@ const VideoPreview: React.FC<{
           <FileImage className="w-3 h-3" />
           {thumbnail || preview.thumbnailUrl ? "Change Thumb" : "Set Thumb"}
         </label>
+        {(thumbnail || preview.thumbnailUrl) && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onClearThumbnail();
+            }}
+            className="bg-red-500/80 hover:bg-red-600 text-white p-1.5 rounded-full backdrop-blur-sm transition-colors border border-red-400/50 shadow-lg"
+            title="Remove Thumbnail"
+          >
+            <X className="w-3 h-3" />
+          </button>
+        )}
       </div>
     </div>
     {(thumbnail || preview.thumbnailUrl) && (

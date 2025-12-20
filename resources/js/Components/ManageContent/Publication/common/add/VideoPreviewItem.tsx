@@ -1,5 +1,5 @@
+import { AlertTriangle, FileImage, X } from "lucide-react";
 import React, { useState } from "react";
-import { FileImage, X, AlertTriangle } from "lucide-react";
 
 interface VideoPreviewItemProps {
   preview: string;
@@ -7,6 +7,7 @@ interface VideoPreviewItemProps {
   duration?: number;
   youtubeType: "short" | "video";
   thumbnail?: File;
+  thumbnailUrl?: string;
   onRemove: () => void;
   onThumbnailChange: (file: File) => void;
   onYoutubeTypeChange: (type: "short" | "video") => void;
@@ -18,6 +19,7 @@ const VideoPreviewItem: React.FC<VideoPreviewItemProps> = ({
   duration,
   youtubeType,
   thumbnail,
+  thumbnailUrl,
   onRemove,
   onThumbnailChange,
   onYoutubeTypeChange,
@@ -28,7 +30,7 @@ const VideoPreviewItem: React.FC<VideoPreviewItemProps> = ({
 
   const formatDuration = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
+    const secs = Math.floor(seconds % 60);
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
@@ -66,15 +68,15 @@ const VideoPreviewItem: React.FC<VideoPreviewItemProps> = ({
             onClick={(e) => e.stopPropagation()}
           >
             <FileImage className="w-3 h-3" />
-            {thumbnail ? "Change Thumb" : "Add Thumb"}
+            {thumbnail || thumbnailUrl ? "Change Thumb" : "Add Thumb"}
           </label>
         </div>
       </div>
 
-      {thumbnail && (
+      {(thumbnail || thumbnailUrl) && (
         <div className="absolute top-2 left-2 w-8 h-8 rounded border border-white/30 overflow-hidden shadow-lg z-10">
           <img
-            src={URL.createObjectURL(thumbnail)}
+            src={thumbnail ? URL.createObjectURL(thumbnail) : thumbnailUrl}
             className="w-full h-full object-cover"
           />
         </div>
