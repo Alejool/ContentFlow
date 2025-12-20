@@ -9,139 +9,102 @@ use League\OAuth1\Client\Credentials\TokenCredentials;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Storage;
 
+use App\DTOs\SocialPostDTO;
+use App\DTOs\PostResultDTO;
+
 class TwitterService extends BaseSocialService
 {
-  /**
-   * publish tweet
-   */
-  public function publishPost(array $data): array
+  public function publish(SocialPostDTO $post): PostResultDTO
   {
     $this->ensureValidToken();
-
     $mediaIds = [];
-    $rawPath = $data['media_url'] ?? $data['video_path'] ?? $data['image_path'] ?? null;
+    $rawPath = $post->mediaPaths[0] ?? null;
 
-    if (!empty($rawPath)) {
-      $resolvedUrl = $this->resolveUrl($rawPath);
-      $mediaPath = $this->downloadMedia($resolvedUrl);
-
-      try {
-        $mimeType = mime_content_type($mediaPath);
-        $mediaCategory = $this->getMediaCategory($mimeType);
-        $fileSize = filesize($mediaPath);
-
-        // normal images < 5MB, videos/large > 5MB used chunked
-        if ($mediaCategory === 'tweet_video' || $fileSize > 5 * 1024 * 1024) {
-          $mediaId = $this->uploadLargeMediaV2($mediaPath, $mimeType, $mediaCategory);
-          if ($mediaCategory === 'tweet_video') {
-            $this->checkMediaStatusV2($mediaId);
-          }
-        } else {
-          $mediaId = $this->uploadMediaV2($mediaPath, $mediaCategory);
-        }
-
-        $mediaIds[] = $mediaId;
-      } catch (ClientException $e) {
-        $response = $e->getResponse();
-        $responseBody = $response ? $response->getBody()->getContents() : '';
-
-        Log::error('Twitter v2 Upload Error', [
-          'error' => $e->getMessage(),
-          'response_body' => $responseBody,
-          'headers' => $response ? $response->getHeaders() : [],
-          'response' => $response,
-          'token' => $this->accessToken
-        ]);
-        throw new \Exception("Twitter Upload Failed: " . $e->getMessage() . " | Details: " . $responseBody);
-      } finally {
-        if (file_exists($mediaPath)) {
-          unlink($mediaPath);
-        }
-      }
-    }
-
-    $content = $data['content'] ?? $data['caption'] ?? '';
-
-    // Handle Poll
-    $isPoll = isset($data['platform_settings']['twitter']['type']) && $data['platform_settings']['twitter']['type'] === 'poll';
-
-    if ($isPoll) {
-      $pollOptions = $data['platform_settings']['twitter']['poll_options'] ?? [];
-      $pollDuration = $data['platform_settings']['twitter']['poll_duration'] ?? 1440; // Default 24h
-
-      // Filter empty options
-      $pollOptions = array_filter($pollOptions, fn($opt) => !empty(trim($opt)));
-
-      if (count($pollOptions) >= 2) {
-        $tweetData = [
-          'text' => $content,
-          'poll' => [
-            'options' => array_values($pollOptions),
-            'duration_minutes' => (int)$pollDuration
-          ]
-        ];
-
-        // Polls cannot have media in API v2 generally (check docs, but usually mutually exclusive or limited)
-        // If media exists, we might need to ignore it or warn. For now, let's prioritizing Poll.
-        // "You cannot include media in a poll Tweet." - Twitter API docs.
-
-        try {
-          return $this->sendTweet($tweetData);
-        } catch (\Exception $e) {
-          Log::error('Twitter Poll Failed', ['error' => $e->getMessage()]);
-          throw $e;
-        }
-      }
-    }
-
-    // Handle Thread
-    $isThread = isset($data['platform_settings']['twitter']['type']) && $data['platform_settings']['twitter']['type'] === 'thread';
-
-    if ($isThread) {
-      $chunks = $this->splitText($content);
-
-      // Only treat as thread if we actually have multiple chunks
-      if (count($chunks) > 1) {
-        Log::info('Publishing Twitter Thread', ['chunks_count' => count($chunks)]);
-        return $this->publishThread($chunks, $mediaIds);
-      }
-    }
-
-    // Single Tweet Logic checks
-    if (mb_strlen($content) > 280) {
-      // If not a thread but too long, we could auto-thread or fail.
-      // For now, let's warn. If strict mode, maybe throw exception.
-      Log::warning('Tweet content exceeds 280 characters but thread mode not enabled. Twitter API may reject.', ['length' => mb_strlen($content)]);
-    }
-
-    $tweetData = ['text' => $content];
-
-    if (!empty($mediaIds)) {
-      $tweetData['media'] = ['media_ids' => $mediaIds];
-    }
-
-    // Publicar tweet (API v2)
     try {
-      return $this->sendTweet($tweetData);
-    } catch (ClientException $e) {
-      // Retry on 401 (Unauthorized) - Token might be revoked or expired despite date check
-      if ($e->getResponse()->getStatusCode() === 401) {
-        Log::warning('Twitter API 401 (Unauthorized) - Attempting token refresh and retry');
+      if ($rawPath) {
+        $resolvedUrl = $this->resolveUrl($rawPath);
+        $mediaPath = $this->downloadMedia($resolvedUrl);
 
         try {
-          $this->refreshToken();
-          return $this->sendTweet($tweetData);
-        } catch (\Exception $refreshError) {
-          Log::error('Retry failed after token refresh', ['error' => $refreshError->getMessage()]);
-          throw $refreshError;
+          $mimeType = mime_content_type($mediaPath);
+          $mediaCategory = $this->getMediaCategory($mimeType);
+          $fileSize = filesize($mediaPath);
+
+          if ($mediaCategory === 'tweet_video' || $fileSize > 5 * 1024 * 1024) {
+            $mediaId = $this->uploadLargeMediaV2($mediaPath, $mimeType, $mediaCategory);
+            if ($mediaCategory === 'tweet_video') {
+              $this->checkMediaStatusV2($mediaId);
+            }
+          } else {
+            $mediaId = $this->uploadMediaV2($mediaPath, $mediaCategory);
+          }
+          $mediaIds[] = $mediaId;
+        } finally {
+          if (file_exists($mediaPath)) unlink($mediaPath);
         }
       }
 
-      $response = $e->getResponse();
-      $responseBody = $response ? $response->getBody()->getContents() : '';
-      Log::error('Twitter v2 Posting Error', ['error' => $e->getMessage(), 'response' => $responseBody]);
-      throw new \Exception("Failed to post tweet: " . $e->getMessage() . " Details: " . $responseBody);
+      $content = $post->content;
+      $platformSettings = $post->platformSettings['twitter'] ?? [];
+      $isPoll = ($platformSettings['type'] ?? '') === 'poll';
+
+      if ($isPoll) {
+        $pollResult = $this->handlePoll($content, $platformSettings);
+        if ($pollResult) return $pollResult;
+      }
+
+      $isThread = ($platformSettings['type'] ?? '') === 'thread';
+      if ($isThread) {
+        $chunks = $this->splitText($content);
+        if (count($chunks) > 1) {
+          $threadResult = $this->publishThread($chunks, $mediaIds);
+          return PostResultDTO::success($threadResult['post_id'], $threadResult['url']);
+        }
+      }
+
+      $tweetData = ['text' => mb_substr($content, 0, 280)];
+      if (!empty($mediaIds)) $tweetData['media'] = ['media_ids' => $mediaIds];
+
+      $result = $this->sendTweetWithRetry($tweetData);
+      return PostResultDTO::success($result['post_id'], $result['url']);
+    } catch (\Exception $e) {
+      return PostResultDTO::failure($e->getMessage());
     }
+  }
+
+  private function handlePoll(string $content, array $settings): ?PostResultDTO
+  {
+    $pollOptions = array_filter($settings['poll_options'] ?? [], fn($opt) => !empty(trim($opt)));
+    if (count($pollOptions) >= 2) {
+      $tweetData = [
+        'text' => $content,
+        'poll' => [
+          'options' => array_values($pollOptions),
+          'duration_minutes' => (int)($settings['poll_duration'] ?? 1440)
+        ]
+      ];
+      $result = $this->sendTweetWithRetry($tweetData);
+      return PostResultDTO::success($result['post_id'], $result['url']);
+    }
+    return null;
+  }
+
+  public function delete(string $postId): bool
+  {
+    $this->ensureValidToken();
+    try {
+      $response = $this->client->delete("https://api.twitter.com/2/tweets/{$postId}", [
+        'headers' => ['Authorization' => "Bearer {$this->accessToken}"]
+      ]);
+      return $response->getStatusCode() === 200;
+    } catch (\Exception $e) {
+      return false;
+    }
+  }
+
+  public function getMetrics(string $postId): array
+  {
+    return $this->getPostAnalytics($postId);
   }
 
   /**
@@ -172,16 +135,7 @@ class TwitterService extends BaseSocialService
         // For simplicity, let's assume valid token or let one-level retry happen if we refactored.
         // Since we didn't refactor sendTweet to retry, let's wrap this call.
 
-        try {
-          $result = $this->sendTweet($tweetData);
-        } catch (ClientException $e) {
-          if ($e->getResponse()->getStatusCode() === 401) {
-            $this->refreshToken();
-            $result = $this->sendTweet($tweetData);
-          } else {
-            throw $e;
-          }
-        }
+        $result = $this->sendTweetWithRetry($tweetData);
 
         $replyToId = $result['post_id'];
 
@@ -249,7 +203,24 @@ class TwitterService extends BaseSocialService
   }
 
   /**
-   * Helper to send tweet (for retry logic)
+   * Helper to send tweet with a single retry on 401
+   */
+  private function sendTweetWithRetry(array $tweetData): array
+  {
+    try {
+      return $this->sendTweet($tweetData);
+    } catch (ClientException $e) {
+      if ($e->getResponse()->getStatusCode() === 401) {
+        Log::info('Twitter token expired during sendTweet, refreshing...', ['account_id' => $this->socialAccount?->id]);
+        $this->refreshToken();
+        return $this->sendTweet($tweetData);
+      }
+      throw $e;
+    }
+  }
+
+  /**
+   * Helper to send tweet (low-level)
    */
   private function sendTweet(array $tweetData): array
   {
@@ -378,8 +349,7 @@ class TwitterService extends BaseSocialService
       ],
     ]);
 
-    Log::info('Twitter v2 Media Upload Response', ['response' => $response->getBody()]);
-    Log::info('Twitter v2 Media Upload Response', ['response' => $response]);
+    Log::info('Twitter v2 Media Upload Response', ['body' => (string)$response->getBody()]);
 
     $result = json_decode($response->getBody(), true);
 
@@ -699,8 +669,8 @@ class TwitterService extends BaseSocialService
   {
     $this->ensureValidToken();
 
-    try {
-      $response = $this->client->get('https://api.twitter.com/2/users/me', [
+    $request = function () {
+      return $this->client->get('https://api.twitter.com/2/users/me', [
         'headers' => [
           'Authorization' => "Bearer {$this->accessToken}",
         ],
@@ -708,18 +678,26 @@ class TwitterService extends BaseSocialService
           'user.fields' => 'id,name,username,public_metrics,profile_image_url',
         ],
       ]);
+    };
 
-      $data = json_decode($response->getBody(), true);
-
-      if (!isset($data['data'])) {
-        throw new \Exception('No user data returned: ' . json_encode($data));
+    try {
+      $response = $request();
+    } catch (ClientException $e) {
+      if ($e->getResponse()->getStatusCode() === 401) {
+        $this->refreshToken();
+        $response = $request();
+      } else {
+        throw $e;
       }
-
-      return $data['data'];
-    } catch (\Exception $e) {
-      Log::error('Twitter getAccountInfo error', ['error' => $e->getMessage()]);
-      throw $e;
     }
+
+    $data = json_decode($response->getBody(), true);
+
+    if (!isset($data['data'])) {
+      throw new \Exception('No user data returned: ' . json_encode($data));
+    }
+
+    return $data['data'];
   }
 
   /**
@@ -791,97 +769,33 @@ class TwitterService extends BaseSocialService
   {
     $this->ensureValidToken();
 
-    try {
-      $response = $this->client->delete("https://api.twitter.com/2/tweets/{$postId}", [
+    $request = function () use ($postId) {
+      return $this->client->delete("https://api.twitter.com/2/tweets/{$postId}", [
         'headers' => [
           'Authorization' => "Bearer {$this->accessToken}",
         ],
       ]);
-
-      $data = json_decode($response->getBody(), true);
-
-      return isset($data['data']['deleted']) && $data['data']['deleted'] === true;
-    } catch (\Exception $e) {
-      Log::error('Twitter deletePost error', ['post_id' => $postId, 'error' => $e->getMessage()]);
-      return false;
-    }
-  }
-
-  /**
-   * Ensure the access token is valid
-   */
-  private function ensureValidToken(): void
-  {
-    // Check for expiration and refresh if necessary
-    if ($this->socialAccount && $this->socialAccount->token_expires_at) {
-      // Refresh if expired or expiring soon (within 5 minutes)
-      if (now()->addMinutes(5)->gte($this->socialAccount->token_expires_at)) {
-        Log::info('Twitter Token expired or expiring soon, attempting refresh', ['account_id' => $this->socialAccount->id]);
-        try {
-          $this->refreshToken();
-        } catch (\Exception $e) {
-          Log::error('Twitter Token refresh failed', ['error' => $e->getMessage()]);
-          // If strictly expired, throw error
-          if (now()->gte($this->socialAccount->token_expires_at)) {
-            throw $e;
-          }
-        }
-      }
-    }
-  }
-
-  /**
-   * Refresh the access token
-   */
-  private function refreshToken(): void
-  {
-    if (!$this->socialAccount || !$this->socialAccount->refresh_token) {
-      throw new \Exception('Cannot refresh Twitter token: Missing refresh token');
-    }
+    };
 
     try {
-      $clientId = config('services.twitter.client_id');
-      $clientSecret = config('services.twitter.client_secret');
-
-      $client = new \GuzzleHttp\Client();
-      $response = $client->post('https://api.twitter.com/2/oauth2/token', [
-        'headers' => [
-          'Authorization' => 'Basic ' . base64_encode($clientId . ':' . $clientSecret),
-          'Content-Type' => 'application/x-www-form-urlencoded',
-        ],
-        'form_params' => [
-          'refresh_token' => $this->socialAccount->refresh_token,
-          'grant_type' => 'refresh_token',
-          'client_id' => $clientId,
-        ],
-      ]);
-
-      $data = json_decode($response->getBody(), true);
-
-      if (isset($data['access_token'])) {
-        $this->accessToken = $data['access_token'];
-
-        // Twitter ROTATES refresh tokens, so we MUST update it
-        $this->socialAccount->update([
-          'access_token' => $data['access_token'],
-          'refresh_token' => $data['refresh_token'] ?? $this->socialAccount->refresh_token,
-          'token_expires_at' => now()->addSeconds($data['expires_in']),
-        ]);
-
-        // Update client with new token
-        $this->client = new \GuzzleHttp\Client([
-          'base_uri' => 'https://api.twitter.com/2/',
-          'timeout' => 30,
-          'connect_timeout' => 10,
-        ]);
-
-        Log::info('Twitter Token refreshed successfully');
+      $response = $request();
+    } catch (ClientException $e) {
+      if ($e->getResponse()->getStatusCode() === 401) {
+        $this->refreshToken();
+        try {
+          $response = $request();
+        } catch (\Exception $retryError) {
+          Log::error('Twitter deletePost retry failed', ['post_id' => $postId, 'error' => $retryError->getMessage()]);
+          return false;
+        }
       } else {
-        throw new \Exception('Failed to refresh Twitter token: No access_token in response');
+        Log::error('Twitter deletePost error', ['post_id' => $postId, 'error' => $e->getMessage()]);
+        return false;
       }
-    } catch (\Exception $e) {
-      Log::error('Twitter refresh token request failed', ['error' => $e->getMessage()]);
-      throw $e;
     }
+
+    $data = json_decode($response->getBody(), true);
+
+    return isset($data['data']['deleted']) && $data['data']['deleted'] === true;
   }
 }

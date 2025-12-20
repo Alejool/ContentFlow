@@ -8,9 +8,9 @@ use Illuminate\Support\Facades\Log;
 
 class SocialTokenManager
 {
-  public function getValidToken(SocialAccount $account)
+  public function getValidToken(SocialAccount $account): string
   {
-    // Si el token no ha expirado o expira en más de 5 minutos
+    // If it doesn't expire or expires in more than 5 minutes
     if (
       !$account->token_expires_at ||
       $account->token_expires_at->gt(now()->addMinutes(5))
@@ -18,22 +18,25 @@ class SocialTokenManager
       return $account->access_token;
     }
 
-    // Si tiene refresh token, intentar renovar
+    // If it has a refresh token, try to renew
     if ($account->refresh_token) {
-      return $this->refreshToken($account);
+      $newToken = $this->refreshToken($account);
+      if ($newToken) {
+        return $newToken;
+      }
     }
 
-    // Marcar como inactiva para reconexión
+    // Mark as inactive for reconnection
     $account->update([
       'is_active' => false,
       'last_failed_at' => now(),
       'failure_count' => $account->failure_count + 1
     ]);
 
-    throw new \Exception("Token expirado, requiere reconexión");
+    throw new \Exception("Token expired for {$account->platform}, reconnection required.");
   }
 
-  private function refreshToken(SocialAccount $account)
+  public function refreshToken(SocialAccount $account): ?string
   {
     $client = new Client();
 
@@ -41,24 +44,25 @@ class SocialTokenManager
       $response = match ($account->platform) {
         'facebook' => $this->refreshFacebookToken($account, $client),
         'google', 'youtube' => $this->refreshGoogleToken($account, $client),
-        'twitter' => $this->refreshTwitterToken($account, $client),
+        'twitter', 'x' => $this->refreshTwitterToken($account, $client),
         'instagram' => $this->refreshInstagramToken($account, $client),
         'tiktok' => $this->refreshTikTokToken($account, $client),
         default => null,
       };
 
-      if ($response) {
+      if ($response && isset($response['access_token'])) {
         $account->update([
           'access_token' => $response['access_token'],
           'refresh_token' => $response['refresh_token'] ?? $account->refresh_token,
-          'token_expires_at' => now()->addSeconds($response['expires_in']),
+          'token_expires_at' => isset($response['expires_in']) ? now()->addSeconds($response['expires_in']) : $account->token_expires_at,
           'failure_count' => 0,
+          'is_active' => true,
         ]);
 
         return $response['access_token'];
       }
     } catch (\Exception $e) {
-      \Log::error("Error refreshing token: " . $e->getMessage());
+      Log::error("Error refreshing token for {$account->platform}: " . $e->getMessage());
     }
 
     return null;
@@ -95,16 +99,37 @@ class SocialTokenManager
 
   private function refreshTwitterToken($account, $client)
   {
-    $response = $client->post('https://api.twitter.com/2/oauth2/token', [
-      'form_params' => [
-        'client_id' => config('services.twitter.client_id'),
-        'client_secret' => config('services.twitter.client_secret'),
-        'refresh_token' => $account->refresh_token,
-        'grant_type' => 'refresh_token',
-      ]
-    ]);
+    try {
+      $response = $client->post('https://api.twitter.com/2/oauth2/token', [
+        'auth' => [
+          config('services.twitter.client_id'),
+          config('services.twitter.client_secret')
+        ],
+        'form_params' => [
+          'refresh_token' => $account->refresh_token,
+          'grant_type' => 'refresh_token',
+          'client_id' => config('services.twitter.client_id'),
+        ],
+        'http_errors' => false // Capture error body for logging
+      ]);
 
-    return json_decode($response->getBody(), true);
+      if ($response->getStatusCode() !== 200) {
+        $body = (string)$response->getBody();
+        Log::error("Twitter token refresh failed with status {$response->getStatusCode()}", [
+          'body' => $body,
+          'account_id' => $account->id
+        ]);
+        return null;
+      }
+
+      return json_decode($response->getBody(), true);
+    } catch (\Exception $e) {
+      Log::error("Twitter token refresh exception", [
+        'error' => $e->getMessage(),
+        'account_id' => $account->id
+      ]);
+      return null;
+    }
   }
 
   private function refreshInstagramToken($account, $client)

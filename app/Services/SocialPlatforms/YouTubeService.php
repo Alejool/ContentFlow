@@ -8,44 +8,64 @@ use Illuminate\Support\Facades\Log;
 use App\Models\Publication;
 use GuzzleHttp\Client;
 
+use App\DTOs\SocialPostDTO;
+use App\DTOs\PostResultDTO;
+
 class YouTubeService extends BaseSocialService
 {
-  public function publishPost(array $data): array
+  public function publish(SocialPostDTO $post): PostResultDTO
   {
-    $this->validateVideoData($data);
     $this->ensureValidToken();
+    $videoPath = $post->mediaPaths[0] ?? null;
 
-    Log::info('Starting YouTube video upload', [
-      'title' => $data['title'] ?? 'Untitled',
-      'video_url' => $data['video_path'],
-      'is_short' => $data['is_short'] ?? false,
-      'type' => $data['type'] ?? 'regular'
-    ]);
+    if (!$videoPath) {
+      return PostResultDTO::failure('YouTube requires a video file path');
+    }
 
     try {
-      $videoFile = $this->downloadVideo($data['video_path']);
-      $isShort = $this->determineIfShort($videoFile, $data);
+      $videoFile = $this->downloadVideo($videoPath);
 
-      // Override with platform settings if available
-      if (isset($data['platform_settings']['youtube']['type'])) {
-        $isShort = $data['platform_settings']['youtube']['type'] === 'short';
+      $publishData = [
+        'video_path' => $videoPath, // downloadVideo needs it actually, wait
+        'title' => $post->title,
+        'content' => $post->content,
+        'tags' => $post->hashtags,
+        'platform_settings' => $post->platformSettings,
+      ];
+
+      $isShort = $this->determineIfShort($videoFile, $publishData);
+      if (isset($post->platformSettings['youtube']['type'])) {
+        $isShort = $post->platformSettings['youtube']['type'] === 'short';
       }
 
-      $metadata = $this->buildMetadata($data, $isShort);
+      $metadata = $this->buildMetadata($publishData, $isShort);
       $response = $this->uploadToYouTube($videoFile, $metadata);
 
-      // Upload thumbnail if provided and not a Short
-      if (isset($data['thumbnail_path']) && !$isShort) {
-        $this->setThumbnail($response['id'], $data['thumbnail_path']);
+      $thumbnailPath = $post->metadata['thumbnail_path'] ?? null;
+      if ($thumbnailPath && !$isShort) {
+        $this->setThumbnail($response['id'], $thumbnailPath);
       }
 
-      return $this->formatSuccessResponse($response, $isShort);
-    } catch (ClientException $e) {
-      $this->handleApiError($e);
-    } catch (Exception $e) {
-      Log::error('YouTube upload failed', ['error' => $e->getMessage()]);
-      throw $e;
+      $formatted = $this->formatSuccessResponse($response, $isShort);
+
+      return PostResultDTO::success(
+        postId: $formatted['post_id'],
+        postUrl: $formatted['url'],
+        rawData: $formatted
+      );
+    } catch (\Exception $e) {
+      return PostResultDTO::failure($e->getMessage());
     }
+  }
+
+  public function delete(string $postId): bool
+  {
+    return $this->deletePost($postId);
+  }
+
+  public function getMetrics(string $postId): array
+  {
+    return $this->getPostAnalytics($postId);
   }
 
   public function setThumbnail(string $videoId, string $thumbnailPath): void
@@ -82,78 +102,6 @@ class YouTubeService extends BaseSocialService
       throw new \Exception('YouTube requires a video file');
     }
   }
-
-  private function ensureValidToken(): void
-  {
-    // Check for expiration and refresh if necessary
-    if ($this->socialAccount && $this->socialAccount->token_expires_at) {
-      // Refresh if expired or expiring soon (within 5 minutes)
-      if (now()->addMinutes(5)->gte($this->socialAccount->token_expires_at)) {
-        Log::info('Token expired or expiring soon, attempting refresh', ['account_id' => $this->socialAccount->id]);
-        try {
-          $this->refreshToken();
-        } catch (\Exception $e) {
-          Log::error('Token refresh failed', ['error' => $e->getMessage()]);
-          // Continue execution? Maybe token is still barely valid or we rely on catch later.
-          // But usually we should throw if we know it's expired.
-          if (now()->gte($this->socialAccount->token_expires_at)) {
-            throw $e;
-          }
-        }
-      }
-    }
-
-    if (empty($this->accessToken)) {
-      throw new \Exception('Access token is missing');
-    }
-
-    Log::info('Using access token', [
-      'token_preview' => substr($this->accessToken, 0, 20) . '...'
-    ]);
-  }
-
-  private function refreshToken(): void
-  {
-    if (!$this->socialAccount || !$this->socialAccount->refresh_token) {
-      throw new \Exception('Cannot refresh token: Missing refresh token');
-    }
-
-    try {
-      $client = new \GuzzleHttp\Client();
-      $response = $client->post('https://oauth2.googleapis.com/token', [
-        'form_params' => [
-          'client_id' => config('services.google.client_id'),
-          'client_secret' => config('services.google.client_secret'),
-          'refresh_token' => $this->socialAccount->refresh_token,
-          'grant_type' => 'refresh_token',
-        ],
-      ]);
-
-      $data = json_decode($response->getBody(), true);
-
-      if (isset($data['access_token'])) {
-        $this->accessToken = $data['access_token'];
-        $this->socialAccount->update([
-          'access_token' => $data['access_token'],
-          'token_expires_at' => now()->addSeconds($data['expires_in']),
-        ]);
-
-        // Update client with new token
-        $this->client = new \GuzzleHttp\Client([
-          'timeout' => 30,
-          'connect_timeout' => 10,
-        ]);
-
-        Log::info('Token refreshed successfully');
-      } else {
-        throw new \Exception('Failed to refresh token: No access_token in response');
-      }
-    } catch (\Exception $e) {
-      Log::error('Refresh token request failed', ['error' => $e->getMessage()]);
-      throw $e;
-    }
-  }
-
   private function downloadVideo(string $videoUrl): string
   {
     $tempFile = tempnam(sys_get_temp_dir(), 'youtube_upload_');

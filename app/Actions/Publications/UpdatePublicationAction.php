@@ -84,11 +84,11 @@ class UpdatePublicationAction
       }
 
       // Handle Schedules
-      if (isset($data['social_accounts'])) {
+      if (array_key_exists('social_accounts', $data)) {
         $this->schedulingService->syncSchedules(
           $publication,
-          $data['social_accounts'],
-          $data['social_account_schedules'] ?? []
+          $data['social_accounts'] ?? [],
+          $data['social_account_schedules'] ?? $data['account_schedules'] ?? []
         );
       }
 

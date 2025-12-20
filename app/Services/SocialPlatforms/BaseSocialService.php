@@ -3,29 +3,47 @@
 namespace App\Services\SocialPlatforms;
 
 use App\Models\SocialAccount;
+use App\Interfaces\SocialPlatformInterface;
+use App\Services\SocialTokenManager;
+use GuzzleHttp\Client;
 
-abstract class BaseSocialService
+abstract class BaseSocialService implements SocialPlatformInterface
 {
-  protected $accessToken;
-  protected $client;
+  protected string $accessToken;
+  protected Client $client;
   protected ?SocialAccount $socialAccount;
 
   public function __construct(string $accessToken, ?SocialAccount $socialAccount = null)
   {
     $this->accessToken = $accessToken;
     $this->socialAccount = $socialAccount;
-    $this->client = new \GuzzleHttp\Client([
+    $this->client = new Client([
       'timeout' => 30,
       'connect_timeout' => 10,
     ]);
   }
 
-  abstract public function publishPost(array $data): array;
-  abstract public function getAccountInfo(): array;
-  abstract public function getPostAnalytics(string $postId): array;
-  abstract public function validateCredentials(): bool;
-  public function deletePost(string $postId): bool
+  /**
+   * Ensures the access token is valid, refreshing it if necessary.
+   */
+  protected function ensureValidToken(): void
   {
-    return false;
+    if ($this->socialAccount) {
+      $tokenManager = app(SocialTokenManager::class);
+      $this->accessToken = $tokenManager->getValidToken($this->socialAccount);
+    }
   }
+
+  protected function refreshToken(): string
+  {
+    if ($this->socialAccount) {
+      $tokenManager = app(SocialTokenManager::class);
+      $this->accessToken = $tokenManager->refreshToken($this->socialAccount) ?? $this->accessToken;
+    }
+    return $this->accessToken;
+  }
+
+  abstract public function getAccountInfo(): array;
+
+  abstract public function validateCredentials(): bool;
 }

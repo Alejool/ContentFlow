@@ -5,53 +5,29 @@ namespace App\Services\SocialPlatforms;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Support\Facades\Log;
 
+use App\DTOs\SocialPostDTO;
+use App\DTOs\PostResultDTO;
+
 class FacebookService extends BaseSocialService
 {
   private const API_VERSION = 'v24.0';
 
-  /**
-   * Publishes a post to a Facebook Page.
-   * $this->accessToken should be a Page Access Token.
-   * $this->socialAccount->account_id should be the Page ID.
-   */
-  public function publishPost(array $data): array
+  public function publish(SocialPostDTO $post): PostResultDTO
   {
+    $this->ensureValidToken();
     $pageId = $this->socialAccount->account_id;
-    $content = $data['content'] ?? $data['caption'] ?? $data['message'] ?? $data['body'] ?? $data['description'] ?? '';
+    $content = $post->content;
 
-    // If everything above is empty, manually build from parts
-    if (empty($content)) {
-      $parts = [];
-      if (!empty($data['title'])) $parts[] = $data['title'];
-      if (!empty($data['description'])) $parts[] = $data['description'];
-      if (!empty($data['hashtags'])) $parts[] = $data['hashtags'];
-      $content = implode("\n\n", $parts);
-    }
-
-    // If hashtags are passed separately and not yet in caption, append them
-    if (isset($data['hashtags']) && !empty($data['hashtags']) && !empty($content) && !str_contains($content, $data['hashtags'])) {
-      $content .= "\n\n" . $data['hashtags'];
-    }
-
-    $mediaFiles = $data['media_files'] ?? [];
-    $link = $data['link'] ?? $data['url'] ?? null;
-    $rawPath = $data['video_path'] ?? $data['image_path'] ?? null;
-
-    if (!$rawPath && !empty($mediaFiles)) {
-      $rawPath = $mediaFiles[0]['file_path'] ?? null;
-    }
+    $mediaFiles = $post->mediaPaths;
+    $link = $post->metadata['link'] ?? null;
+    $rawPath = $post->mediaPaths[0] ?? null;
 
     try {
-
       if (!empty($rawPath)) {
         $isVideo = str_contains($rawPath, '.mp4') || str_contains($rawPath, '.mov') || str_contains($rawPath, '.avi') || str_contains($rawPath, '.m4v');
-        // Check mime type
-        if (isset($mediaFiles[0]['mime_type'])) {
-          $isVideo = str_contains($mediaFiles[0]['mime_type'], 'video');
-        }
 
         if ($isVideo) {
-          $postId = $this->uploadVideo($pageId, $rawPath, $content, $data['title'] ?? null);
+          $postId = $this->uploadVideo($pageId, $rawPath, $content, $post->title);
         } else {
           $postId = $this->uploadPhoto($pageId, $rawPath, $content);
         }
@@ -59,16 +35,37 @@ class FacebookService extends BaseSocialService
         $postId = $this->publishTextPost($pageId, $content, $link);
       }
 
-      return [
-        'success' => true,
-        'post_id' => $postId,
-        'platform' => 'facebook',
-        'url' => "https://facebook.com/{$postId}",
-        'status' => 'published'
-      ];
+      return PostResultDTO::success(
+        postId: $postId,
+        postUrl: "https://facebook.com/{$postId}",
+        rawData: ['platform' => 'facebook']
+      );
     } catch (\Exception $e) {
-      throw $e;
+      return PostResultDTO::failure($e->getMessage(), ['trace' => $e->getTraceAsString()]);
     }
+  }
+
+  public function delete(string $postId): bool
+  {
+    $this->ensureValidToken();
+    try {
+      $endpoint = "https://graph.facebook.com/" . self::API_VERSION . "/{$postId}";
+      $response = $this->client->delete($endpoint, [
+        'query' => ['access_token' => $this->accessToken]
+      ]);
+      $result = json_decode($response->getBody(), true);
+      return $result['success'] ?? false;
+    } catch (\Exception $e) {
+      if (str_contains($e->getMessage(), '404') || str_contains($e->getMessage(), 'not found')) {
+        return true;
+      }
+      return false;
+    }
+  }
+
+  public function getMetrics(string $postId): array
+  {
+    return $this->getPostAnalytics($postId);
   }
 
   private function publishTextPost($pageId, $content, $link = null)

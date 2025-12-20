@@ -5,52 +5,53 @@ namespace App\Services\SocialPlatforms;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Support\Facades\Log;
 
+use App\DTOs\SocialPostDTO;
+use App\DTOs\PostResultDTO;
+
 class TikTokService extends BaseSocialService
 {
-  /**
-   * Publish a video post to TikTok
-   *
-   * Flow:
-   * 1. Init upload (get upload_url)
-   * 2. Upload video file
-   * 3. Verify/Check status
-   */
-  public function publishPost(array $data): array
+  public function publish(SocialPostDTO $post): PostResultDTO
   {
     $this->ensureValidToken();
-    $this->validateVideoData($data);
+    $rawPath = $post->mediaPaths[0] ?? null;
 
-    Log::info('Starting TikTok video upload', [
-      'title' => $data['title'] ?? 'Untitled',
-      'video_path' => $data['video_path'],
-    ]);
+    if (!$rawPath || !file_exists($rawPath)) {
+      return PostResultDTO::failure('TikTok requires a valid local video file path');
+    }
 
     try {
       // Step 1: Initialize Upload
-      $uploadInfo = $this->initializeUpload($data);
+      $uploadParams = [
+        'content' => $post->content,
+        'video_path' => $rawPath,
+        'platform_settings' => $post->platformSettings,
+      ];
+      $uploadInfo = $this->initializeUpload($uploadParams);
       $publishId = $uploadInfo['publish_id'];
       $uploadUrl = $uploadInfo['upload_url'];
 
       // Step 2: Upload Video File
-      $this->uploadVideoFile($uploadUrl, $data['video_path']);
+      $this->uploadVideoFile($uploadUrl, $rawPath);
 
-      // Step 3: Return initial success state
-      // Note: TikTok processes asynchronously. We return the publish_id to track it later.
-      Log::info('TikTok video uploaded successfully', ['publish_id' => $publishId]);
-
-      return [
-        'success' => true,
-        'post_id' => $publishId,
-        'platform' => 'tiktok',
-        'url' => '', // TikTok doesn't give a public URL immediately
-        'status' => 'processing'
-      ];
-    } catch (ClientException $e) {
-      $this->handleApiError($e);
+      return PostResultDTO::success(
+        postId: $publishId,
+        postUrl: '', // TikTok async, no immediate URL
+        rawData: ['status' => 'processing', 'platform' => 'tiktok']
+      );
     } catch (\Exception $e) {
-      Log::error('TikTok upload failed', ['error' => $e->getMessage()]);
-      throw $e;
+      return PostResultDTO::failure($e->getMessage());
     }
+  }
+
+  public function delete(string $postId): bool
+  {
+    Log::warning('Delete post not supported by TikTok API', ['postId' => $postId]);
+    return false;
+  }
+
+  public function getMetrics(string $postId): array
+  {
+    return $this->getPostAnalytics($postId);
   }
 
   private function validateVideoData(array $data): void
@@ -245,52 +246,6 @@ class TikTokService extends BaseSocialService
       'unlisted' => 'FRIENDS_ONLY', // Closest match
       default => 'PUBLIC_TO_EVERYONE',
     };
-  }
-
-  private function ensureValidToken(): void
-  {
-    if ($this->socialAccount && $this->socialAccount->token_expires_at) {
-      if (now()->addMinutes(5)->gte($this->socialAccount->token_expires_at)) {
-        $this->refreshToken();
-      }
-    }
-  }
-
-  private function refreshToken(): void
-  {
-    if (!$this->socialAccount || !$this->socialAccount->refresh_token) {
-      throw new \Exception('No refresh token available');
-    }
-
-    try {
-      $client = new \GuzzleHttp\Client();
-      $response = $client->post('https://open.tiktokapis.com/v2/oauth/token/', [
-        'form_params' => [
-          'client_key' => config('services.tiktok.client_key'),
-          'client_secret' => config('services.tiktok.client_secret'),
-          'refresh_token' => $this->socialAccount->refresh_token,
-          'grant_type' => 'refresh_token',
-        ]
-      ]);
-
-      $data = json_decode($response->getBody(), true);
-
-      if (isset($data['access_token'])) {
-        $this->accessToken = $data['access_token'];
-        $this->socialAccount->update([
-          'access_token' => $data['access_token'],
-          'refresh_token' => $data['refresh_token'] ?? $this->socialAccount->refresh_token,
-          'token_expires_at' => now()->addSeconds($data['expires_in']),
-        ]);
-
-        // Re-init client with new token if needed, though BaseSocialService usually injects token in calls
-      } else {
-        throw new \Exception('Failed to refresh TikTok token');
-      }
-    } catch (\Exception $e) {
-      Log::error('TikTok Token Refresh Failed', ['error' => $e->getMessage()]);
-      throw $e;
-    }
   }
 
   private function handleApiError(ClientException $e): void

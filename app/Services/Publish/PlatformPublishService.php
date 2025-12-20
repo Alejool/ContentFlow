@@ -103,7 +103,7 @@ class PlatformPublishService
   }
 
   /**
-   * Publish to platform (only first video)
+   * Publish to platform using Strategy Pattern
    */
   public function publishToPlatform(
     Publication $publication,
@@ -111,210 +111,123 @@ class PlatformPublishService
     $platformService,
     SocialPostLog $postLog
   ): array {
-    $firstMediaFile = $publication->mediaFiles->first();
-
-    if (!$firstMediaFile) {
-      $this->logService->markAsFailed($postLog, 'No media files found');
-      return [
-        'success' => false,
-        'error' => 'No media files found',
-        'log' => $postLog,
-      ];
-    }
-
-    $uploadedPostId = null;
     try {
-      // Step 1: Upload video to YouTube
-      $videoAbsolutePath = $this->resolveFilePath($firstMediaFile->file_path);
+      $postDto = $this->buildSocialPostDTO($publication, $socialAccount, $postLog);
 
-      $postData = [
-        'video_path' => $videoAbsolutePath,
-        'title' => $publication->title,
-        'content' => $this->buildDescription($publication),
-        'tags' => $this->extractHashtags($publication->hashtags),
-        'privacy' => 'public',
-        'type' => $firstMediaFile->youtube_type ?? 'regular',
-        'platform_settings' => $postLog->platform_settings ?? $publication->platform_settings,
-      ];
+      /** @var \App\Interfaces\SocialPlatformInterface $platformService */
+      $result = $platformService->publish($postDto);
 
-      // Search for Thumbnail Derivatives
-      $thumbnail = $firstMediaFile->derivatives()
-        ->where('derivative_type', 'thumbnail')
-        ->where('platform', 'youtube')
-        ->first();
+      if ($result->success) {
+        $response = array_merge([
+          'post_id' => $result->postId,
+          'url' => $result->postUrl,
+          'status' => 'published',
+        ], $result->rawData);
 
-      if (!$thumbnail) {
-        $thumbnail = $firstMediaFile->derivatives()
-          ->where('derivative_type', 'thumbnail')
-          ->where('platform', 'all')
-          ->first();
-      }
+        $postLog = $this->logService->markAsPublished($postLog, $response);
 
-      // Fallback: Check if there is an explicit image uploaded in the publication
-      if (!$thumbnail) {
-        $customThumbnail = $publication->mediaFiles
-          ->where('file_type', 'image')
-          ->first();
-
-        if ($customThumbnail) {
-          $postData['thumbnail_path'] = $this->resolveFilePath($customThumbnail->file_path);
+        // YouTube Specific background tasks
+        if ($socialAccount->platform === 'youtube' && $result->postId) {
+          VerifyYouTubeVideoStatus::dispatch($postLog)->delay(now()->addMinutes(5));
+          $this->handleYouTubePlaylist($publication, $postLog, $result->postId);
         }
-      } elseif ($thumbnail) {
-        $postData['thumbnail_path'] = $this->resolveFilePath($thumbnail->file_path);
+
+        $publication->user->notify(new VideoUploadedNotification($postLog));
+
+        return [
+          'success' => true,
+          'log' => $postLog,
+          'error' => null,
+        ];
+      } else {
+        $this->logService->markAsFailed($postLog, $result->errorMessage);
+        return [
+          'success' => false,
+          'error' => $result->errorMessage,
+          'log' => $postLog->fresh(),
+        ];
       }
-
-      Log::info('Thumbnail path: ' . $postData['thumbnail_path']);
-
-      // Upload video
-      Log::info('Uploading data 1------', ['postData' => $postData]);
-
-      $response = $platformService->publishPost($postData);
-      $uploadedPostId = $response['post_id'] ?? $response['id'] ?? null;
-
-      // Step 2: Mark as published IMMEDIATELY after upload
-      $postLog = $this->logService->markAsPublished($postLog, $response);
-
-      // Verify the final status on YouTube after a few minutes (e.g., copyright, processing errors)
-      VerifyYouTubeVideoStatus::dispatch($postLog)->delay(now()->addMinutes(5));
-
-      // Notify User
-      $publication->user->notify(new VideoUploadedNotification($postLog));
-
-      Log::info('YouTube video uploaded successfully', [
-        'video_id' => $uploadedPostId,
-        'publication_id' => $publication->id
-      ]);
     } catch (\Throwable $e) {
-      // Only mark as failed if the VIDEO UPLOAD failed
-      Log::error('YouTube video upload failed', [
-        'publication_id' => $publication->id,
-        'error' => $e->getMessage()
-      ]);
+      Log::error('Publication failed', ['account' => $socialAccount->platform, 'error' => $e->getMessage()]);
       $this->logService->markAsFailed($postLog, $e->getMessage());
-
-
       return [
         'success' => false,
         'log' => $postLog->fresh(),
         'error' => $e->getMessage(),
       ];
     }
-
-    // Step 3: Handle playlist AFTER the video is published
-    // If it fails, it does NOT affect the video's state
-    $campaignGroup = $publication->campaigns->first();
-
-    if ($campaignGroup && $uploadedPostId) {
-      try {
-        // Create entry in the playlist queue for background processing
-        YouTubePlaylistQueue::create([
-          'social_post_log_id' => $postLog->id,
-          'campaign_id' => $campaignGroup->id,
-          'video_id' => $uploadedPostId,
-          'playlist_id' => $campaignGroup->youtube_playlist_id,
-          'playlist_name' => $campaignGroup->name,
-          'status' => 'pending',
-        ]);
-
-        Log::info('Playlist operation queued for background processing', [
-          'video_id' => $uploadedPostId,
-          'campaign' => $campaignGroup->name
-        ]);
-      } catch (\Exception $e) {
-        // Log the error but DO NOT fail the publication
-        Log::warning('Failed to queue playlist operation', [
-          'video_id' => $uploadedPostId,
-          'campaign' => $campaignGroup->name,
-          'error' => $e->getMessage()
-        ]);
-      }
-
-      // Trigger queue processing immediately in background
-      try {
-        Artisan::queue('youtube:process-playlist-queue');
-      } catch (\Exception $e) {
-        Log::warning('Could not trigger background playlist processing (Redis/Queue down?), trying sync', [
-          'error' => $e->getMessage()
-        ]);
-        // Fallback to synchronous execution if queue is down
-        try {
-          Artisan::call('youtube:process-playlist-queue');
-        } catch (\Exception $ex) {
-          Log::error('Synchronous playlist processing also failed', ['error' => $ex->getMessage()]);
-        }
-      }
-    }
-
-    // Return success because the video was uploaded successfully
-    return [
-      'success' => true,
-      'log' => $postLog,
-      'error' => null,
-    ];
   }
 
-  /**
-   * Publish to other platforms (multiple files)
-   */
-  public function publishToOtherPlatform(
-    Publication $publication,
-    SocialAccount $socialAccount,
-    $mediaFile,
-    $platformService,
-    SocialPostLog $postLog
-  ): array {
+  private function buildSocialPostDTO(Publication $publication, SocialAccount $socialAccount, SocialPostLog $postLog): \App\DTOs\SocialPostDTO
+  {
+    $mediaPaths = [];
+    if ($socialAccount->platform === 'youtube' || $socialAccount->platform === 'tiktok') {
+      $mediaFile = $publication->mediaFiles->first();
+      if ($mediaFile) {
+        $mediaPaths[] = $this->resolveFilePath($mediaFile->file_path);
+      }
+    } else {
+      $mediaFile = $postLog->mediaFile ?? $publication->mediaFiles->first();
+      if ($mediaFile) {
+        $mediaPaths[] = $this->resolveFilePath($mediaFile->file_path);
+      }
+    }
+
+    $metadata = [];
+    if ($socialAccount->platform === 'youtube') {
+      $metadata['thumbnail_path'] = $this->getYoutubeThumbnailPath($publication);
+    }
+    $pSettings = $postLog->platform_settings ?? $publication->platform_settings ?? [];
+
+    if (is_string($pSettings)) {
+      $pSettings = json_decode($pSettings, true) ?? [];
+    }
+
+    return new \App\DTOs\SocialPostDTO(
+      content: $this->buildCaption($publication),
+      mediaPaths: $mediaPaths,
+      title: $publication->title,
+      hashtags: $this->extractHashtags($publication->hashtags),
+      metadata: $metadata,
+      platformSettings: (array)$pSettings
+    );
+  }
+
+  private function getYoutubeThumbnailPath(Publication $publication): ?string
+  {
+    $firstMediaFile = $publication->mediaFiles->first();
+    if (!$firstMediaFile) return null;
+
+    $thumbnail = $firstMediaFile->derivatives()
+      ->where('derivative_type', 'thumbnail')
+      ->whereIn('platform', ['youtube', 'all'])
+      ->first();
+
+    if ($thumbnail) {
+      return $this->resolveFilePath($thumbnail->file_path);
+    }
+
+    $customThumbnail = $publication->mediaFiles->where('file_type', 'image')->first();
+    return $customThumbnail ? $this->resolveFilePath($customThumbnail->file_path) : null;
+  }
+
+  private function handleYouTubePlaylist(Publication $publication, SocialPostLog $postLog, string $uploadedPostId): void
+  {
+    $campaignGroup = $publication->campaigns->first();
+    if (!$campaignGroup) return;
+
     try {
-      $postData = [
-        'video_path' => $mediaFile->file_path,
-        'caption' => $this->buildCaption($publication),
-        'title' => $publication->title,
-        'description' => $publication->description,
-        'hashtags' => $publication->hashtags,
-        'platform_settings' => $postLog->platform_settings ?? $publication->platform_settings,
-      ];
-
-
-      Log::info('DEBUG DATA BEFORE FACEBOOK CALL', [
-        'keys' => array_keys($postData),
-        'content' => $postData['content'] ?? 'N/A',
-        'caption' => $postData['caption'] ?? 'N/A',
-        'platform' => $socialAccount->platform
+      YouTubePlaylistQueue::create([
+        'social_post_log_id' => $postLog->id,
+        'campaign_id' => $campaignGroup->id,
+        'video_id' => $uploadedPostId,
+        'playlist_id' => $campaignGroup->youtube_playlist_id,
+        'playlist_name' => $campaignGroup->name,
+        'status' => 'pending',
       ]);
-
-      $response = $platformService->publishPost($postData);
-
-      // Mark as published
-      $postLog = $this->logService->markAsPublished($postLog, $response);
-
-      // Notify User
-      $publication->user->notify(new VideoUploadedNotification($postLog));
-
-      return [
-        'success' => true,
-        'log' => $postLog,
-        'error' => null,
-      ];
-    } catch (\Throwable $e) {
-      // Mark as failed
-      Log::error('esta ffaladno envio ', [
-        'post_log_id' => $postLog->id,
-        'platform' => $postLog->platform,
-        'publication_id' => $postLog->publication_id,
-        'error' => $e->getMessage()
-      ]);
-      Log::error('Post publication failed', [
-        'post_log_id' => $postLog->id,
-        'platform' => $postLog->platform,
-        'publication_id' => $postLog->publication_id,
-        'error' => $e->getMessage()
-      ]);
-      $this->logService->markAsFailed($postLog, $e->getMessage());
-
-      return [
-        'success' => false,
-        'log' => $postLog->fresh(),
-        'error' => $e->getMessage(),
-      ];
+      Artisan::queue('youtube:process-playlist-queue');
+    } catch (\Exception $e) {
+      Log::warning('Failed to queue playlist operation', ['video_id' => $uploadedPostId, 'error' => $e->getMessage()]);
     }
   }
 
@@ -349,29 +262,15 @@ class PlatformPublishService
 
       $pendingLogs = $preparedLogsMap[$socialAccount->id];
 
-      Log::info('Starting transaction for platform', ['platform' => $socialAccount->platform, 'pending_count' => count($pendingLogs)]);
       DB::beginTransaction();
 
       try {
         $platformService = $this->getPlatformService($socialAccount);
-
         foreach ($pendingLogs as $item) {
           $postLog = $item['log'];
           Log::info('Processing log inside transaction', ['log_id' => $postLog->id]);
 
-          $result = null;
-
-          if ($item['type'] === 'youtube') {
-            $result = $this->publishToPlatform($publication, $socialAccount, $platformService, $postLog);
-          } else {
-            $result = $this->publishToOtherPlatform(
-              $publication,
-              $socialAccount,
-              $item['media'],
-              $platformService,
-              $postLog
-            );
-          }
+          $result = $this->publishToPlatform($publication, $socialAccount, $platformService, $postLog);
 
           if (isset($result['log'])) {
             $platformLogs[] = $result['log'];
@@ -475,12 +374,6 @@ class PlatformPublishService
         ]);
 
 
-        // Mark all pending logs as failed since the transaction rolled back their 'success' state
-        // (but presumably they were created before transaction, so they exist)
-        foreach ($pendingLogs as $item) {
-          $this->logService->markAsFailed($item['log'], $e->getMessage());
-        }
-
         // Notify about failure
         $publication->user->notify(new PublicationPostFailedNotification(
           $socialAccount->platform,
@@ -530,11 +423,7 @@ class PlatformPublishService
 
       $platformService = $this->getPlatformService($socialAccount);
 
-      if ($socialAccount->platform === 'youtube') {
-        $result = $this->retryYouTubePublication($postLog, $publication, $platformService);
-      } else {
-        $result = $this->retryOtherPlatformPublication($postLog, $publication, $platformService);
-      }
+      $result = $this->publishToPlatform($publication, $socialAccount, $platformService, $postLog);
 
       if ($result['success']) {
         DB::commit();
@@ -561,84 +450,6 @@ class PlatformPublishService
     }
   }
 
-  private function retryYouTubePublication($postLog, $publication, $platformService): array
-  {
-    try {
-      $mediaFile = $postLog->mediaFile ?? $publication->mediaFiles->first();
-
-      $postData = [
-        'video_path' => $mediaFile->file_path,
-        'title' => $publication->title,
-        'content' => $this->buildDescription($publication),
-        'tags' => $this->extractHashtags($publication->hashtags),
-        'privacy' => 'public',
-      ];
-
-      Log::info('Uploading data 3------', ['postData' => $postData]);
-
-      $response = $platformService->publishPost($postData);
-
-      $this->logService->markAsPublished($postLog, $response);
-
-      // Notify User
-      $publication->user->notify(new VideoUploadedNotification($postLog));
-
-      return [
-        'success' => true,
-        'log' => $postLog->fresh(),
-      ];
-    } catch (\Exception $e) {
-      Log::error('Post publication failed -----> retry----3', [
-        'post_log_id' => $postLog->id,
-        'platform' => $postLog->platform,
-        'publication_id' => $postLog->publication_id,
-        'error' => $e->getMessage()
-      ]);
-      $this->logService->markAsFailed($postLog, "Retry failed: {$e->getMessage()}");
-
-      return [
-        'success' => false,
-        'error' => $e->getMessage(),
-      ];
-    }
-  }
-
-  private function retryOtherPlatformPublication($postLog, $publication, $platformService): array
-  {
-    try {
-      $mediaFile = $postLog->mediaFile;
-
-      if (!$mediaFile) {
-        throw new \Exception('Media file not found');
-      }
-
-      $postData = [
-        'video_path' => $mediaFile->file_path,
-        'caption' => $this->buildCaption($publication),
-        'title' => $publication->title,
-        'description' => $publication->description,
-        'hashtags' => $publication->hashtags,
-      ];
-
-      Log::info('Uploading data 2------', ['postData' => $postData]);
-
-      $response = $platformService->publishPost($postData);
-
-      $this->logService->markAsPublished($postLog, $response);
-
-      return [
-        'success' => true,
-        'log' => $postLog->fresh(),
-      ];
-    } catch (\Exception $e) {
-      $this->logService->markAsFailed($postLog, "Retry failed: {$e->getMessage()}");
-
-      return [
-        'success' => false,
-        'error' => $e->getMessage(),
-      ];
-    }
-  }
 
   private function buildDescription(Publication $publication): string
   {

@@ -2,69 +2,78 @@
 
 namespace App\Services\SocialPlatforms;
 
+use App\DTOs\SocialPostDTO;
+use App\DTOs\PostResultDTO;
+
 class InstagramService extends BaseSocialService
 {
-  public function publishPost(array $data): array
+  public function publish(SocialPostDTO $post): PostResultDTO
   {
-    // Instagram requires creating a media container first, then publishing it
-    $accountId = $data['account_id'] ?? null;
+    $this->ensureValidToken();
+    $accountId = $this->socialAccount->account_id;
 
     if (!$accountId) {
-      throw new \Exception('Instagram account ID is required');
+      return PostResultDTO::failure('Instagram account ID is required');
     }
 
-    // Step 1: Create media container
-    $containerEndpoint = "https://graph.facebook.com/v18.0/{$accountId}/media";
-
-    $containerData = [
-      'caption' => $data['content'],
-      'access_token' => $this->accessToken,
-    ];
-
-    // Handle media type
-    if (!empty($data['media_url'])) {
-      if ($data['media_type'] === 'video') {
-        $instagramType = $data['platform_settings']['instagram']['type'] ?? 'reel';
-
-        if ($instagramType === 'reel') {
-          $containerData['media_type'] = 'REELS';
-        } else {
-          $containerData['media_type'] = 'VIDEO';
-        }
-        $containerData['video_url'] = $data['media_url'];
-      } else {
-        $containerData['image_url'] = $data['media_url'];
-      }
-    }
-
-    $containerResponse = $this->client->post($containerEndpoint, [
-      'form_params' => $containerData,
-    ]);
-
-    $containerResult = json_decode($containerResponse->getBody(), true);
-
-    if (!isset($containerResult['id'])) {
-      throw new \Exception('Failed to create Instagram media container');
-    }
-
-    // Step 2: Publish the container
-    $publishEndpoint = "https://graph.facebook.com/v18.0/{$accountId}/media_publish";
-
-    $publishResponse = $this->client->post($publishEndpoint, [
-      'form_params' => [
-        'creation_id' => $containerResult['id'],
+    try {
+      // Step 1: Create media container
+      $containerEndpoint = "https://graph.facebook.com/v18.0/{$accountId}/media";
+      $containerData = [
+        'caption' => $post->content,
         'access_token' => $this->accessToken,
-      ],
-    ]);
+      ];
 
-    $publishResult = json_decode($publishResponse->getBody(), true);
+      $rawPath = $post->mediaPaths[0] ?? null;
+      if ($rawPath) {
+        $isVideo = str_contains($rawPath, '.mp4') || str_contains($rawPath, '.mov') || str_contains($rawPath, '.avi') || str_contains($rawPath, '.m4v');
+        if ($isVideo) {
+          $instagramType = $post->platformSettings['instagram']['type'] ?? 'reel';
+          $containerData['media_type'] = (strtolower($instagramType) === 'reel') ? 'REELS' : 'VIDEO';
+          $containerData['video_url'] = $rawPath;
+        } else {
+          $containerData['image_url'] = $rawPath;
+        }
+      }
 
-    return [
-      'success' => true,
-      'post_id' => $publishResult['id'],
-      'platform' => 'instagram',
-      'url' => "https://www.instagram.com/p/{$publishResult['id']}",
-    ];
+      $containerResponse = $this->client->post($containerEndpoint, ['form_params' => $containerData]);
+      $containerResult = json_decode($containerResponse->getBody(), true);
+
+      if (!isset($containerResult['id'])) {
+        return PostResultDTO::failure('Failed to create Instagram media container');
+      }
+
+      // Step 2: Publish the container
+      $publishEndpoint = "https://graph.facebook.com/v18.0/{$accountId}/media_publish";
+      $publishResponse = $this->client->post($publishEndpoint, [
+        'form_params' => [
+          'creation_id' => $containerResult['id'],
+          'access_token' => $this->accessToken,
+        ],
+      ]);
+
+      $publishResult = json_decode($publishResponse->getBody(), true);
+      $postId = $publishResult['id'];
+
+      return PostResultDTO::success(
+        postId: $postId,
+        postUrl: "https://www.instagram.com/p/{$postId}",
+        rawData: ['platform' => 'instagram']
+      );
+    } catch (\Exception $e) {
+      return PostResultDTO::failure($e->getMessage());
+    }
+  }
+
+  public function delete(string $postId): bool
+  {
+    // Instagram Graph API doesn't support deleting media via API easily for all app types
+    return false;
+  }
+
+  public function getMetrics(string $postId): array
+  {
+    return $this->getPostAnalytics($postId);
   }
 
   public function getAccountInfo(): array
