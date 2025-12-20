@@ -201,12 +201,12 @@
     "subtitle": "Define las configuraciones predeterminadas para cada red social.",
     "clickToConfigure": "Haz clic para configurar",
     "configure": "Configurar red",
-    "preview": {
-      "view": "Ver vista previa"
-    },
     "messages": {
       "success": "Configuración guardada exitosamente ",
       "error": "Error al guardar la configuración "
+    },
+    "preview": {
+      "view": "Ver vista previa"
     },
     "button": {
       "save": "Guardar Cambios"

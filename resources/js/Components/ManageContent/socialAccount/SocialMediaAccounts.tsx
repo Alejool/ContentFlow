@@ -91,12 +91,10 @@ export default function SocialMediaAccounts() {
       {
         preserveScroll: true,
         onSuccess: () => {
-          const message = t(
-            `platformSettings.messages.success` +
-              " " +
-              activePlatform.toLowerCase()
-          );
-          console.log(message);
+          const message =
+            t("platformSettings.messages.success") +
+            " " +
+            activePlatform.toLowerCase();
           toast.success(message);
           handleCloseSettings();
         },

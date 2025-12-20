@@ -611,14 +611,14 @@
     "title": "Global Platform Settings",
     "subtitle": "Define default settings for each social network.",
     "clickToConfigure": "Click to configure",
-    "configure": "Configure Network",
-    "preview": {
-      "view": "View Preview"
-    },  
     "messages": {
       "success": "Configuration saved successfully ",
       "error": "Error saving configuration "
     },
+    "configure": "Configure Network",
+    "preview": {
+      "view": "View Preview"
+    },  
     "button": {
       "save": "Save Changes"
     },
