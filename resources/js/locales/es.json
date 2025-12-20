@@ -1035,7 +1035,7 @@
     }
   },
   "aiAssistant": {
-    "welcomeMessage": "¡Hola! Soy tu asistente de IA. Puedo ayudarte con ideas de campañas, mejora de contenido o análisis de tu rendimiento. ¿Cómo puedo ayudarte hoy?",
+    "welcomeMessage": "Estoy aquí para ayudarte con tus campañas de redes sociales. Puedes preguntarme sobre la creación de nuevas campañas, la mejora de las existentes o el análisis del rendimiento de tu contenido.",
     "error": "Lo siento, pero encontré un error al procesar tu solicitud. Por favor intenta de nuevo más tarde.",
     "suggestion": "Sugerencia",
     "thinking": "Pensando...",
@@ -1043,7 +1043,7 @@
     "buttonLabel": "Preguntar a la IA",
     "headerTitle": "Asistente IA",
     "tips": "Tips",
-    "subtitle": "Ask your AI assistant anything."
+    "subtitle": "Hazle cualquier pregunta a tu asistente de IA."
   },
   "analytics": {
     "title": "Analíticas y Estadísticas",

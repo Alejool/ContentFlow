@@ -9,7 +9,6 @@ import { Link } from "@inertiajs/react";
 import {
   BarChart3,
   Bell,
-  Bot,
   ChevronLeft,
   ChevronRight,
   FileText,
@@ -48,11 +47,6 @@ const navigationItems = [
     icon: BarChart3,
   },
   {
-    nameKey: "nav.aiChat",
-    href: "ai-chat.index",
-    icon: Bot,
-  },
-  {
     nameKey: "nav.socialNetworks",
     href: "settings.social",
     icon: Share2,
@@ -78,7 +72,6 @@ export default function Sidebar({
       "profile.edit": ["/profile", "/profile/edit"],
       "/ManageContent.index": ["/ManageContent"],
       "analytics.index": ["/analytics"],
-      "ai-chat.index": ["/ai-chat"],
       "settings.social": ["/settings", "/settings/social"],
     };
 
@@ -98,7 +91,6 @@ export default function Sidebar({
       "profile.edit": "/profile",
       "/ManageContent.index": "/ManageContent",
       "analytics.index": "/analytics",
-      "ai-chat.index": "/ai-chat",
       "settings.social": "/settings/social",
       logout: "/logout",
     };

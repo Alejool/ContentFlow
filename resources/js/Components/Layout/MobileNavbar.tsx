@@ -10,7 +10,6 @@ import { usePage } from "@inertiajs/react";
 import {
   BarChart3,
   Bell,
-  Bot,
   FileText,
   Home,
   LogOut,
@@ -118,7 +117,6 @@ const mobileNavigationItems = [
     lucideIcon: FileText,
   },
   { nameKey: "nav.analytics", href: "analytics.index", lucideIcon: BarChart3 },
-  { nameKey: "nav.aiChat", href: "ai-chat.index", lucideIcon: Bot },
   { nameKey: "nav.settings", href: "settings.social", lucideIcon: Settings },
 ];
 
@@ -154,7 +152,6 @@ export default function MobileNavbar({
       "profile.edit": ["/profile", "/profile/edit"],
       "/ManageContent.index": ["/manageContent"],
       "analytics.index": ["/analytics"],
-      "ai-chat.index": ["/ai-chat"],
       "settings.social": ["/settings", "/settings/social"],
     };
 

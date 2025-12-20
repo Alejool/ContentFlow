@@ -21,17 +21,6 @@ class AIChatController extends Controller
     }
 
     /**
-     * Display the AI chat interface
-     */
-    public function index(Request $request): Response
-    {
-        return Inertia::render('AIChat/Index', [
-            'availableModels' => $this->aiService->getAvailableModels(),
-            'providerStats' => $this->aiService->getProviderStats(),
-        ]);
-    }
-
-    /**
      * Process chat message
      */
     public function processMessage(Request $request)

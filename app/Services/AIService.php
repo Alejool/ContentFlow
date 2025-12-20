@@ -39,10 +39,9 @@ class AIService
             }
 
             throw new \Exception('No AI provider available or enabled');
-
         } catch (\Exception $e) {
             Log::error('AI Service Error: ' . $e->getMessage());
-            return $this->getDefaultResponse($context['message'] ?? '');
+            return $this->getDefaultResponse($context['message'] ?? '', $context);
         }
     }
 
@@ -51,7 +50,7 @@ class AIService
      */
     protected function isProviderEnabled(string $provider): bool
     {
-        return config("services.{$provider}.enabled", false) 
+        return config("services.{$provider}.enabled", false)
             && !empty(config("services.{$provider}.api_key"));
     }
 
@@ -61,7 +60,7 @@ class AIService
     protected function callProvider(string $provider, array $context): array
     {
         $method = "call" . ucfirst($provider);
-        
+
         if (!method_exists($this, $method)) {
             throw new \Exception("Provider method {$method} not found");
         }
@@ -75,7 +74,7 @@ class AIService
     protected function callDeepSeek(array $context): array
     {
         $apiKey = config('services.deepseek.api_key');
-        
+
         if (!$apiKey) {
             throw new \Exception('DeepSeek API key not configured');
         }
@@ -89,18 +88,18 @@ class AIService
             'Content-Type' => 'application/json',
             'Accept' => 'application/json',
         ])
-        ->timeout(config('services.deepseek.timeout', 60))
-        ->retry(3, 100)
-        ->post('https://api.deepseek.com/v1/chat/completions', [
-            'model' => config('services.deepseek.model', 'deepseek-chat'),
-            'messages' => $messages,
-            'temperature' => config('services.deepseek.temperature', 0.7),
-            'max_tokens' => config('services.deepseek.max_tokens', 2000),
-            'stream' => false,
-            'response_format' => [
-                'type' => 'json_object' // Force JSON response for easier parsing
-            ]
-        ]);
+            ->timeout(config('services.deepseek.timeout', 60))
+            ->retry(3, 100)
+            ->post('https://api.deepseek.com/v1/chat/completions', [
+                'model' => config('services.deepseek.model', 'deepseek-chat'),
+                'messages' => $messages,
+                'temperature' => config('services.deepseek.temperature', 0.7),
+                'max_tokens' => config('services.deepseek.max_tokens', 2000),
+                'stream' => false,
+                'response_format' => [
+                    'type' => 'json_object' // Force JSON response for easier parsing
+                ]
+            ]);
 
         if (!$response->successful()) {
             Log::error('DeepSeek API Error', [
@@ -111,13 +110,13 @@ class AIService
         }
 
         $responseData = $response->json();
-        
+
         if (!isset($responseData['choices'][0]['message']['content'])) {
             throw new \Exception('Invalid response format from DeepSeek');
         }
 
         $content = $responseData['choices'][0]['message']['content'];
-        
+
         return $this->parseAIResponse($content, 'deepseek', config('services.deepseek.model'));
     }
 
@@ -157,7 +156,7 @@ class AIService
         $systemMessage .= "3.  **PROFESSIONAL TONE**: Maintain a professional, helpful, and concise tone. Avoid robotic or overly enthusiastic greetings.\n";
         $systemMessage .= "4.  **DIRECTNESS**: Do NOT repeat the user's context back to them. Go straight to providing value.\n";
         $systemMessage .= "5.  **REALISM**: Act as a real human expert would. Be practical and realistic.\n";
-        
+
         // Add language instruction based on user locale
         $userLocale = $context['user_locale'] ?? 'en';
         $languageMap = [
@@ -169,7 +168,7 @@ class AIService
         ];
         $language = $languageMap[$userLocale] ?? 'English';
         $systemMessage .= "6.  **LANGUAGE**: ALWAYS respond in {$language}. This is critical - the user's interface language is {$userLocale}, so all your responses must be in {$language}.\n";
-        
+
         $systemMessage .= "7.  **APPLICATION AWARENESS**: If the user asks how to do something in the app, refer to the 'APPLICATION KNOWLEDGE BASE'.\n";
         $systemMessage .= "8.  **CLIENT DATA PRIORITY**: Use the provided client data (connected accounts, campaigns) to tailor your advice. For example, if they only have Instagram connected, focus on Instagram strategies.\n\n";
 
@@ -205,15 +204,15 @@ class AIService
 
         // Add response format instructions
         $systemMessage .= "\nIMPORTANT: Always respond in valid JSON format with this structure:\n" .
-                        "{\n" .
-                        "  \"message\": \"Your detailed response message here (NO asterisks, use newlines for spacing)\",\n" .
-                        "  \"suggestion\": {\n" .
-                        "    \"type\": \"suggestion_type\",\n" .
-                        "    \"data\": {}\n" .
-                        "  }\n" .
-                        "}\n\n" .
-                        "The 'suggestion' field can be null if no specific suggestion is needed.\n" .
-                        "Available suggestion types: new_campaign, improvement, content_idea, analytics_insight, scheduling";
+            "{\n" .
+            "  \"message\": \"Your detailed response message here (NO asterisks, use newlines for spacing)\",\n" .
+            "  \"suggestion\": {\n" .
+            "    \"type\": \"suggestion_type\",\n" .
+            "    \"data\": {}\n" .
+            "  }\n" .
+            "}\n\n" .
+            "The 'suggestion' field can be null if no specific suggestion is needed.\n" .
+            "Available suggestion types: new_campaign, improvement, content_idea, analytics_insight, scheduling";
 
         return $systemMessage;
     }
@@ -224,15 +223,12 @@ class AIService
     protected function callGemini(array $context): array
     {
         $apiKey = config('services.gemini.api_key');
-        
+
         if (!$apiKey) {
             throw new \Exception('Gemini API key not configured');
         }
 
         $response = Http::withoutVerifying()
-            ->withHeaders([
-                'Content-Type' => 'application/json',
-            ])
             ->timeout(60)
             ->post('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' . $apiKey, [
                 'contents' => [
@@ -252,12 +248,16 @@ class AIService
             ]);
 
         if (!$response->successful()) {
+            Log::error('Gemini API Error', [
+                'status' => $response->status(),
+                'body' => $response->body()
+            ]);
             throw new \Exception('Gemini API request failed');
         }
 
         $data = $response->json();
         $text = $data['candidates'][0]['content']['parts'][0]['text'] ?? '{}';
-        
+
         return $this->parseAIResponse($text, 'gemini');
     }
 
@@ -267,7 +267,7 @@ class AIService
     protected function callOpenAI(array $context): array
     {
         $apiKey = config('services.openai.api_key');
-        
+
         if (!$apiKey) {
             throw new \Exception('OpenAI API key not configured');
         }
@@ -276,30 +276,34 @@ class AIService
             'Authorization' => 'Bearer ' . $apiKey,
             'Content-Type' => 'application/json',
         ])
-        ->timeout(60)
-        ->post('https://api.openai.com/v1/chat/completions', [
-            'model' => config('services.openai.model', 'gpt-3.5-turbo'),
-            'messages' => [
-                [
-                    'role' => 'system',
-                    'content' => $this->getSystemPrompt($context)
+            ->timeout(60)
+            ->post('https://api.openai.com/v1/chat/completions', [
+                'model' => config('services.openai.model', 'gpt-3.5-turbo'),
+                'messages' => [
+                    [
+                        'role' => 'system',
+                        'content' => $this->getSystemPrompt($context)
+                    ],
+                    [
+                        'role' => 'user',
+                        'content' => $context['message']
+                    ]
                 ],
-                [
-                    'role' => 'user',
-                    'content' => $context['message']
-                ]
-            ],
-            'temperature' => 0.7,
-            'response_format' => ['type' => 'json_object']
-        ]);
+                'temperature' => 0.7,
+                'response_format' => ['type' => 'json_object']
+            ]);
 
         if (!$response->successful()) {
+            Log::error('OpenAI API Error', [
+                'status' => $response->status(),
+                'body' => $response->body()
+            ]);
             throw new \Exception('OpenAI API request failed');
         }
 
         $data = $response->json();
         $content = $data['choices'][0]['message']['content'] ?? '{}';
-        
+
         return $this->parseAIResponse($content, 'openai', config('services.openai.model'));
     }
 
@@ -311,9 +315,9 @@ class AIService
         // Remove markdown code blocks if present
         $cleanContent = preg_replace('/^```json\s*|\s*```$/', '', trim($content));
         $cleanContent = preg_replace('/^```\s*|\s*```$/', '', $cleanContent);
-        
+
         $parsed = json_decode($cleanContent, true);
-        
+
         // If JSON decode failed, try to find JSON object in text
         if (json_last_error() !== JSON_ERROR_NONE) {
             if (preg_match('/\{.*\}/s', $content, $matches)) {
@@ -333,7 +337,7 @@ class AIService
         $message = $parsed['message'] ?? '';
         $message = str_replace(['**', '*'], '', $message); // Remove asterisks
         $message = preg_replace('/\n{3,}/', "\n\n", $message); // Normalize newlines
-        
+
         return [
             'message' => trim($message),
             'suggestion' => $parsed['suggestion'] ?? null,
@@ -349,7 +353,7 @@ class AIService
     public function getAvailableModels(): array
     {
         $models = [];
-        
+
         foreach ($this->providers as $provider) {
             $models[$provider] = [
                 'name' => ucfirst($provider),
@@ -357,7 +361,7 @@ class AIService
                 'models' => $this->getProviderModels($provider)
             ];
         }
-        
+
         return $models;
     }
 
@@ -366,7 +370,7 @@ class AIService
      */
     protected function getProviderModels(string $provider): array
     {
-        return match($provider) {
+        return match ($provider) {
             'deepseek' => [
                 'deepseek-chat' => 'DeepSeek Chat (Latest)',
                 'deepseek-coder' => 'DeepSeek Coder',
@@ -390,7 +394,7 @@ class AIService
     public function getProviderStats(): array
     {
         $stats = [];
-        
+
         foreach ($this->providers as $provider) {
             $stats[$provider] = [
                 'enabled' => $this->isProviderEnabled($provider),
@@ -399,7 +403,7 @@ class AIService
                 'last_used' => Cache::get("ai_last_used_{$provider}"),
             ];
         }
-        
+
         return $stats;
     }
 
@@ -414,14 +418,13 @@ class AIService
                 'message' => 'Hello',
                 'project_type' => 'test'
             ];
-            
+
             // Temporarily set the API key
             config(["services.{$provider}.api_key" => $apiKey]);
-            
+
             $response = $this->callProvider($provider, $testContext);
-            
+
             return isset($response['message']) && !empty($response['message']);
-            
         } catch (\Exception $e) {
             return false;
         }
@@ -430,49 +433,19 @@ class AIService
     /**
      * Default response when all providers fail
      */
-    protected function getDefaultResponse(string $userMessage): array
+    protected function getDefaultResponse(string $userMessage, array $context = []): array
     {
-        $userMessage = strtolower($userMessage);
-        
-        if (strpos($userMessage, 'new campaign') !== false) {
-            return [
-                'message' => 'Based on your previous campaigns, I would recommend creating a campaign focused on Instagram engagement with weekly posts. Would you like me to help you structure it?',
-                'suggestion' => [
-                    'type' => 'new_campaign',
-                    'data' => [
-                        'name' => 'Instagram Engagement Campaign',
-                        'platform' => 'Instagram',
-                        'frequency' => 'weekly',
-                        'goal' => 'increase_engagement'
-                    ]
-                ],
-                'provider' => 'default',
-                'model' => 'default'
-            ];
-        } elseif (strpos($userMessage, 'improve') !== false) {
-            return [
-                'message' => 'I have analyzed your current campaigns and see opportunities for improvement in posting frequency and hashtag usage. Would you like me to provide specific recommendations?',
-                'suggestion' => [
-                    'type' => 'improvement',
-                    'data' => [
-                        'campaign_id' => 1,
-                        'improvements' => [
-                            'hashtags' => ['#ContentStrategy', '#SocialGrowth', '#DigitalMarketing'],
-                            'posting_frequency' => 'Increase to 3 times per week',
-                            'best_times' => ['Monday 10am', 'Wednesday 2pm', 'Friday 6pm']
-                        ]
-                    ]
-                ],
-                'provider' => 'default',
-                'model' => 'default'
-            ];
-        } else {
-            return [
-                'message' => 'I am here to help you with your social media campaigns. You can ask me about creating new campaigns, improving existing ones, or analyzing your content performance.',
-                'suggestion' => null,
-                'provider' => 'default',
-                'model' => 'default'
-            ];
-        }
+        $userLocale = $context['user_locale'] ?? 'en';
+
+        $message = $userLocale === 'es'
+            ? 'Lo sentimos, no pudimos conectar con el servicio de IA en este momento. Por favor, intenta de nuevo más tarde o contacta con el soporte técnico si el problema persiste.'
+            : 'We are sorry, we could not connect to the AI service at this time. Please try again later or contact technical support if the issue persists.';
+
+        return [
+            'message' => $message,
+            'suggestion' => null,
+            'provider' => 'default',
+            'model' => 'default'
+        ];
     }
 }
