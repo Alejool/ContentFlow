@@ -809,6 +809,7 @@
       "pending": "Pendiente",
       "published": "Publicado",
       "deleted": "Eliminado",
+      "removed_on_platform": "Eliminado en Plataforma",
       "orphaned": "huérfano"
     },
     "empty": "No se encontraron registros",

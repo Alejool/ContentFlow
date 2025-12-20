@@ -791,6 +791,7 @@
       "pending": "Pending",
       "published": "Published",
       "deleted": "Deleted",
+      "removed_on_platform": "Removed on Platform",
       "orphaned": "Orphaned"
     },
     "empty": "No logs found",

@@ -283,7 +283,7 @@ export default function LogsList({
                       )}`}
                     >
                       {getStatusIcon(log.status)}
-                      <span className="capitalize">
+                      <span >
                         {t(`logs.status.${log.status}`) || log.status}
                       </span>
                     </div>
@@ -347,7 +347,7 @@ export default function LogsList({
                     )}`}
                   >
                     {getStatusIcon(log.status)}
-                    <span className="capitalize">
+                    <span >
                       {t(`logs.status.${log.status}`) || log.status}
                     </span>
                   </div>
