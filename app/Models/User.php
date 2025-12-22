@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Notifications\VerifyEmailNotification;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Contracts\Translation\HasLocalePreference;
-use App\Models\Campaign;
+use App\Models\Publications\Publication;
 
 class User extends Model implements Authenticatable, MustVerifyEmail, CanResetPassword, HasLocalePreference
 {
@@ -60,6 +60,11 @@ class User extends Model implements Authenticatable, MustVerifyEmail, CanResetPa
         return $this->locale ?? app()->getLocale();
     }
 
+    public function publications(): HasMany
+    {
+        return $this->hasMany(Publication::class);
+    }
+
 
     public function sendEmailVerificationNotification()
     {
@@ -77,10 +82,6 @@ class User extends Model implements Authenticatable, MustVerifyEmail, CanResetPa
         return $this->hasMany(ScheduledPost::class);
     }
 
-    public function campaigns(): HasMany
-    {
-        return $this->hasMany(Campaign::class);
-    }
 
     public function socialPostLogs(): HasMany
     {
