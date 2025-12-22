@@ -35,10 +35,10 @@ services:
       - app
     networks:
       - laravel
-
   # MySQL
   mysql:
     image: mysql:8.0
+    command: --sort-buffer-size=5M
     container_name: laravel_mysql
     restart: unless-stopped
     ports:
@@ -86,7 +86,7 @@ services:
     container_name: laravel_queue
     restart: unless-stopped
     working_dir: /var/www/html
-    command: php artisan queue:work --tries=3 --timeout=90
+    command: php artisan queue:work --queue=publishing,publishing:notify,notifications,emails,high,default,low --tries=3 --timeout=90
     volumes:
       - ./:/var/www/html
     env_file:
