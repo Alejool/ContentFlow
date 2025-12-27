@@ -1,7 +1,6 @@
 import { useMemo } from "react";
 // Hooks
 import { usePublicationForm } from "@/Hooks/publication/usePublicationForm";
-import { useTheme } from "@/Hooks/useTheme";
 // Stores
 import { useCampaignStore } from "@/stores/campaignStore";
 import { useAccountsStore } from "@/stores/socialAccountsStore";
@@ -32,7 +31,6 @@ export default function EditPublicationModal({
   publication,
   onSubmit,
 }: EditPublicationModalProps) {
-  const { theme } = useTheme();
   const { campaigns } = useCampaignStore();
   const { accounts: socialAccounts } = useAccountsStore();
 
@@ -74,7 +72,6 @@ export default function EditPublicationModal({
   });
 
   const { register } = form;
-  const modalBg = theme === "dark" ? "bg-neutral-800" : "bg-white";
 
   const hasPublishedPlatform = useMemo(() => {
     return publication?.social_post_logs?.some(
@@ -107,22 +104,17 @@ export default function EditPublicationModal({
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center sm:p-6 ${
-        theme === "dark" ? "text-white" : "text-gray-900"
-      }`}
+      className="fixed inset-0 z-50 flex items-center justify-center sm:p-6 text-gray-900 dark:text-white"
     >
       <div
-        className={`absolute inset-0 ${
-          theme === "dark" ? "bg-black/70" : "bg-gray-900/60"
-        } backdrop-blur-sm`}
+        className="absolute inset-0 bg-gray-900/60 dark:bg-black/70 backdrop-blur-sm"
         onClick={handleClose}
       />
 
       <div
-        className={`relative w-full max-w-4xl ${modalBg} rounded-lg shadow-2xl flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300`}
+        className="relative w-full max-w-4xl bg-white dark:bg-neutral-800 rounded-lg shadow-2xl flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300"
       >
         <ModalHeader
-          theme={theme}
           t={t}
           onClose={handleClose}
           title="publications.modal.edit.title"
@@ -161,7 +153,6 @@ export default function EditPublicationModal({
                   thumbnails={thumbnails}
                   imageError={imageError}
                   isDragOver={isDragOver}
-                  theme={theme}
                   t={t}
                   onFileChange={handleFileChange}
                   onRemoveMedia={handleRemoveMedia}
@@ -181,7 +172,6 @@ export default function EditPublicationModal({
                   socialAccounts={socialAccounts}
                   selectedAccounts={watched.social_accounts || []}
                   accountSchedules={accountSchedules}
-                  theme={theme}
                   t={t}
                   onAccountToggle={handleAccountToggle}
                   onScheduleChange={(id, date) =>
@@ -208,7 +198,6 @@ export default function EditPublicationModal({
 
                 <ScheduleSection
                   scheduledAt={watched.scheduled_at ?? undefined}
-                  theme={theme}
                   t={t}
                   onScheduleChange={(date) => setValue("scheduled_at", date)}
                 />
@@ -266,7 +255,6 @@ export default function EditPublicationModal({
                   setValue={setValue}
                   errors={errors}
                   watched={watched}
-                  theme={theme}
                   t={t}
                   campaigns={campaigns}
                   publication={publication}
@@ -279,7 +267,6 @@ export default function EditPublicationModal({
         </div>
         <ModalFooter
           onClose={handleClose}
-          theme={theme}
           isSubmitting={isSubmitting}
           formId="edit-publication-form"
           submitText={t("publications.button.edit") || "Edit Publication"}
@@ -319,7 +306,6 @@ export default function EditPublicationModal({
           settings={
             platformSettings[activePlatformPreview?.toLowerCase() || ""] || {}
           }
-          theme={theme}
         />
       </div>
     </div>

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useTheme } from "@/Hooks/useTheme";
+
 
 interface ExpandableTextProps {
   text: string;
@@ -15,7 +15,6 @@ export default function ExpandableText({
 }: ExpandableTextProps) {
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const { t } = useTranslation();
-  const { theme } = useTheme();
 
   if (!text || text.trim() === "") {
     return <span className={`text-gray-400 italic ${className}`}>-</span>;
@@ -29,11 +28,10 @@ export default function ExpandableText({
   return (
     <button
       onClick={() => needsTruncation && setIsExpanded(!isExpanded)}
-      className={`text-left focus:outline-none focus:ring-2 rounded ${
-        needsTruncation
+      className={`text-left focus:outline-none focus:ring-2 rounded ${needsTruncation
           ? "cursor-pointer hover:opacity-80 transition-opacity"
           : "cursor-default"
-      } ${className} ${theme === "dark" ? "text-white" : "text-gray-700"}`}
+        } ${className} text-gray-700 dark:text-white`}
       aria-label={
         needsTruncation
           ? isExpanded

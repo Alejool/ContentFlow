@@ -59,15 +59,10 @@ export default function CampaignList({
 
   return (
     <div
-      className={`overflow-hidden shadow-lg border transition-all duration-300 backdrop-blur-lg ${
-        theme === "dark"
-          ? "bg-black/95 border-black/95 text-white"
-          : "bg-white/95 border-gray-100/95 text-gray-900"
-      }`}
+      className="overflow-hidden shadow-lg border transition-all duration-300 backdrop-blur-lg bg-white/95 border-gray-100/95 text-gray-900 dark:bg-black/95 dark:border-black/95 dark:text-white"
     >
       <HeaderSection
         mode={mode}
-        theme={theme}
         t={t}
         onAdd={onAdd}
         showFilters={showFilters}
@@ -78,7 +73,6 @@ export default function CampaignList({
       {showFilters && (
         <FilterSection
           mode={mode}
-          theme={theme}
           t={t}
           search={search}
           setSearch={setSearch}
@@ -94,7 +88,6 @@ export default function CampaignList({
         <CampaignTable
           items={items as any}
           key={items.length}
-          theme={theme}
           t={t}
           isLoading={isLoading}
           expandedCampaigns={expandedCampaigns}
@@ -107,7 +100,6 @@ export default function CampaignList({
       ) : (
         <PublicationTable
           items={items as any}
-          theme={theme}
           t={t}
           isLoading={isLoading}
           connectedAccounts={connectedAccounts}
@@ -121,7 +113,6 @@ export default function CampaignList({
       {pagination && pagination.last_page > 1 && (
         <Pagination
           pagination={pagination}
-          theme={theme}
           onPageChange={onPageChange}
           t={t}
         />

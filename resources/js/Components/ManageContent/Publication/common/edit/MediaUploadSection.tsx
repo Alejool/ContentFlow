@@ -14,7 +14,6 @@ interface MediaUploadSectionProps {
   thumbnails: Record<string, File>;
   imageError: string | null;
   isDragOver: boolean;
-  theme: "dark" | "light";
   t: (key: string) => string;
   onFileChange: (files: FileList | null) => void;
   onRemoveMedia: (index: number) => void;
@@ -31,7 +30,6 @@ const MediaUploadSection: React.FC<MediaUploadSectionProps> = ({
   thumbnails,
   imageError,
   isDragOver,
-  theme,
   t,
   onFileChange,
   onRemoveMedia,
@@ -46,30 +44,20 @@ const MediaUploadSection: React.FC<MediaUploadSectionProps> = ({
 
   const getUploadAreaStyles = () => {
     if (disabled) {
-      return theme === "dark"
-        ? "bg-neutral-800/50 cursor-not-allowed opacity-60 border-neutral-700"
-        : "bg-gray-100 cursor-not-allowed opacity-60 border-gray-300";
+      return "bg-gray-100 dark:bg-neutral-800/50 cursor-not-allowed opacity-60 border-gray-300 dark:border-neutral-700";
     }
     if (imageError) {
-      return theme === "dark"
-        ? "border-primary-500 bg-primary-900/20"
-        : "border-primary-300 bg-primary-50";
+      return "border-primary-300 dark:border-primary-500 bg-primary-50 dark:bg-primary-900/20";
     }
     if (isDragOver) {
-      return theme === "dark"
-        ? "bg-primary-900/20 border-primary-400"
-        : "bg-primary-50 border-primary-500";
+      return "bg-primary-50 dark:bg-primary-900/20 border-primary-500 dark:border-primary-400";
     }
-    return theme === "dark"
-      ? "border-neutral-600 hover:border-primary-400 bg-neutral-700"
-      : "border-gray-200 hover:border-primary-300 bg-gray-50";
+    return "border-gray-200 dark:border-neutral-600 hover:border-primary-300 dark:hover:border-primary-400 bg-gray-50 dark:bg-neutral-700";
   };
 
   return (
     <div
-      className={`space-y-4 ${
-        disabled ? "pointer-events-none select-none" : ""
-      }`}
+      className={`space-y-4 ${disabled ? "pointer-events-none select-none" : ""}`}
     >
       <Label
         htmlFor="media-upload"
@@ -82,13 +70,10 @@ const MediaUploadSection: React.FC<MediaUploadSectionProps> = ({
       </Label>
 
       <div
-        className={`relative group transition-all duration-300 ${
-          isDragOver && !disabled
-            ? `scale-[1.02] ring-2 ${
-                theme === "dark" ? "ring-primary-400" : "ring-primary-500"
-              } ring-offset-2`
-            : ""
-        } ${disabled ? "cursor-not-allowed" : "cursor-pointer"}`}
+        className={`relative group transition-all duration-300 ${isDragOver && !disabled
+          ? "scale-[1.02] ring-2 ring-primary-500 dark:ring-primary-400 ring-offset-2"
+          : ""
+          } ${disabled ? "cursor-not-allowed" : "cursor-pointer"}`}
         onDrop={disabled ? undefined : onDrop}
         onDragOver={disabled ? undefined : onDragOver}
         onDragLeave={disabled ? undefined : onDragLeave}
@@ -110,7 +95,6 @@ const MediaUploadSection: React.FC<MediaUploadSectionProps> = ({
                     onSetThumbnail(preview.tempId, file)
                   }
                   onClearThumbnail={() => onClearThumbnail(preview.tempId)}
-                  theme={theme}
                   disabled={disabled}
                 />
               ))}
@@ -119,7 +103,7 @@ const MediaUploadSection: React.FC<MediaUploadSectionProps> = ({
               )}
             </div>
           ) : (
-            <EmptyUploadState theme={theme} t={t} />
+            <EmptyUploadState t={t} />
           )}
         </div>
         {!disabled && (
@@ -151,7 +135,6 @@ const MediaPreviewItem: React.FC<{
   onRemove: () => void;
   onSetThumbnail: (file: File) => void;
   onClearThumbnail: () => void;
-  theme: "dark" | "light";
   disabled?: boolean;
 }> = ({
   preview,
@@ -160,46 +143,44 @@ const MediaPreviewItem: React.FC<{
   onRemove,
   onSetThumbnail,
   onClearThumbnail,
-  theme,
   disabled,
 }) => {
-  const fileInputRef = useRef<HTMLInputElement>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
-  return (
-    <div
-      className={`relative group/item aspect-video border rounded-lg overflow-hidden bg-gray-900 ${
-        disabled ? "opacity-90" : ""
-      }`}
-      onClick={(e) => e.stopPropagation()}
-    >
-      {preview.type.includes("video") ? (
-        <VideoPreview
-          preview={preview}
-          thumbnail={thumbnail}
-          onSetThumbnail={onSetThumbnail}
-          onClearThumbnail={onClearThumbnail}
-          fileInputRef={fileInputRef}
-          disabled={disabled}
-        />
-      ) : (
-        <img src={preview.url} className="w-full h-full object-cover" />
-      )}
+    return (
+      <div
+        className={`relative group/item aspect-video border rounded-lg overflow-hidden bg-gray-900 ${disabled ? "opacity-90" : ""
+          }`}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {preview.type.includes("video") ? (
+          <VideoPreview
+            preview={preview}
+            thumbnail={thumbnail}
+            onSetThumbnail={onSetThumbnail}
+            onClearThumbnail={onClearThumbnail}
+            fileInputRef={fileInputRef}
+            disabled={disabled}
+          />
+        ) : (
+          <img src={preview.url} className="w-full h-full object-cover" />
+        )}
 
-      {!disabled && (
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            onRemove();
-          }}
-          className="absolute top-2 right-2 p-1.5 bg-red-500/80 text-white rounded-full hover:bg-red-600 transition-colors opacity-0 group-hover/item:opacity-100 backdrop-blur-sm"
-        >
-          <X className="w-3 h-3" />
-        </button>
-      )}
-    </div>
-  );
-};
+        {!disabled && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onRemove();
+            }}
+            className="absolute top-2 right-2 p-1.5 bg-red-500/80 text-white rounded-full hover:bg-red-600 transition-colors opacity-0 group-hover/item:opacity-100 backdrop-blur-sm"
+          >
+            <X className="w-3 h-3" />
+          </button>
+        )}
+      </div>
+    );
+  };
 
 const VideoPreview: React.FC<{
   preview: any;
@@ -216,60 +197,60 @@ const VideoPreview: React.FC<{
   fileInputRef,
   disabled,
 }) => (
-  <>
-    <video
-      src={preview.url}
-      className="w-full h-full object-cover opacity-80"
-    />
-    <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
-      <span className="text-white/80 text-xs font-medium bg-black/50 px-2 py-1 rounded">
-        Video
-      </span>
-      <div className="relative" onClick={(e) => e.stopPropagation()}>
-        <input
-          type="file"
-          id={`edit-thumb-${preview.tempId}`}
-          className="hidden"
-          accept="image/*"
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (file) onSetThumbnail(file);
-          }}
-        />
-        <label
-          htmlFor={`edit-thumb-${preview.tempId}`}
-          className="cursor-pointer bg-white/10 hover:bg-white/20 text-white text-xs px-3 py-1.5 rounded-full backdrop-blur-sm transition-colors flex items-center gap-1 border border-white/20"
-        >
-          <FileImage className="w-3 h-3" />
-          {thumbnail || preview.thumbnailUrl ? "Change Thumb" : "Set Thumb"}
-        </label>
-        {(thumbnail || preview.thumbnailUrl) && (
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onClearThumbnail();
+    <>
+      <video
+        src={preview.url}
+        className="w-full h-full object-cover opacity-80"
+      />
+      <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+        <span className="text-white/80 text-xs font-medium bg-black/50 px-2 py-1 rounded">
+          Video
+        </span>
+        <div className="relative" onClick={(e) => e.stopPropagation()}>
+          <input
+            type="file"
+            id={`edit-thumb-${preview.tempId}`}
+            className="hidden"
+            accept="image/*"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) onSetThumbnail(file);
             }}
-            className="bg-red-500/80 hover:bg-red-600 text-white p-1.5 rounded-full backdrop-blur-sm transition-colors border border-red-400/50 shadow-lg"
-            title="Remove Thumbnail"
+          />
+          <label
+            htmlFor={`edit-thumb-${preview.tempId}`}
+            className="cursor-pointer bg-white/10 hover:bg-white/20 text-white text-xs px-3 py-1.5 rounded-full backdrop-blur-sm transition-colors flex items-center gap-1 border border-white/20"
           >
-            <X className="w-3 h-3" />
-          </button>
-        )}
+            <FileImage className="w-3 h-3" />
+            {thumbnail || preview.thumbnailUrl ? "Change Thumb" : "Set Thumb"}
+          </label>
+          {(thumbnail || preview.thumbnailUrl) && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onClearThumbnail();
+              }}
+              className="bg-red-500/80 hover:bg-red-600 text-white p-1.5 rounded-full backdrop-blur-sm transition-colors border border-red-400/50 shadow-lg"
+              title="Remove Thumbnail"
+            >
+              <X className="w-3 h-3" />
+            </button>
+          )}
+        </div>
       </div>
-    </div>
-    {(thumbnail || preview.thumbnailUrl) && (
-      <div className="absolute top-2 left-2 w-8 h-8 rounded border border-white/30 overflow-hidden shadow-lg z-10">
-        <img
-          src={
-            thumbnail ? URL.createObjectURL(thumbnail) : preview.thumbnailUrl
-          }
-          className="w-full h-full object-cover"
-        />
-      </div>
-    )}
-  </>
-);
+      {(thumbnail || preview.thumbnailUrl) && (
+        <div className="absolute top-2 left-2 w-8 h-8 rounded border border-white/30 overflow-hidden shadow-lg z-10">
+          <img
+            src={
+              thumbnail ? URL.createObjectURL(thumbnail) : preview.thumbnailUrl
+            }
+            className="w-full h-full object-cover"
+          />
+        </div>
+      )}
+    </>
+  );
 
 const AddMoreButton: React.FC<{ onClick: () => void }> = ({ onClick }) => (
   <div
@@ -284,14 +265,11 @@ const AddMoreButton: React.FC<{ onClick: () => void }> = ({ onClick }) => (
 );
 
 const EmptyUploadState: React.FC<{
-  theme: "dark" | "light";
   t: (key: string) => string;
-}> = ({ theme, t }) => (
+}> = ({ t }) => (
   <div className="space-y-4">
     <div
-      className={`w-16 h-16 rounded-full ${
-        theme === "dark" ? "bg-primary-900/30" : "bg-primary-100"
-      } flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300`}
+      className="w-16 h-16 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300"
     >
       <Upload className="w-8 h-8 text-primary-500" />
     </div>

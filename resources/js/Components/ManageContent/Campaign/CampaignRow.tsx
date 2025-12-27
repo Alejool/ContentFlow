@@ -10,7 +10,6 @@ import { Campaign } from "@/types/Campaign";
 
 interface CampaignRowProps {
   item: Campaign;
-  theme: string;
   expandedCampaigns: number[];
   toggleExpand: (id: number) => void;
   getStatusColor: (status?: string) => string;
@@ -22,7 +21,6 @@ interface CampaignRowProps {
 
 export default function CampaignRow({
   item,
-  theme,
   expandedCampaigns,
   toggleExpand,
   getStatusColor,
@@ -34,24 +32,15 @@ export default function CampaignRow({
   return (
     <tr
       data-campaign-id={item.id}
-      className={`group transition-colors ${
-        theme === "dark" ? "hover:bg-neutral-700/30" : "hover:bg-gray-50/50"
-      } ${
-        expandedCampaigns.includes(item.id)
-          ? theme === "dark"
-            ? "bg-neutral-800"
-            : "bg-gray-50"
-          : ""
-      }`}
+      className={`group transition-colors hover:bg-gray-50/50 dark:hover:bg-neutral-700/30 ${expandedCampaigns.includes(item.id) ? "bg-gray-50 dark:bg-neutral-800" : ""
+        }`}
     >
       <td className="px-2 py-4 text-center">
         <button
           data-expand="true"
           data-expanded={expandedCampaigns.includes(item.id) ? "true" : "false"}
           onClick={() => toggleExpand(item.id)}
-          className={`p-1 rounded-full transition-colors ${
-            theme === "dark" ? "hover:bg-white/10" : "hover:bg-black/5"
-          }`}
+          className="p-1 rounded-full transition-colors hover:bg-black/5 dark:hover:bg-white/10"
         >
           {expandedCampaigns.includes(item.id) ? (
             <ChevronDown className="w-4 h-4 text-gray-500" />
@@ -63,26 +52,18 @@ export default function CampaignRow({
       <td className="px-6 py-4">
         <div className="flex items-center gap-4">
           <div
-            className={`w-12 h-12 rounded-lg flex-shrink-0 border overflow-hidden flex items-center justify-center ${
-              theme === "dark"
-                ? "border-neutral-700 bg-neutral-800"
-                : "border-gray-200 bg-gray-100"
-            }`}
+            className="w-12 h-12 rounded-lg flex-shrink-0 border border-gray-200 bg-gray-100 dark:border-neutral-700 dark:bg-neutral-800 overflow-hidden flex items-center justify-center"
           >
             <Layers className="w-6 h-6 text-gray-400" />
           </div>
           <div>
             <h3
-              className={`font-medium text-sm ${
-                theme === "dark" ? "text-white" : "text-gray-900"
-              }`}
+              className="font-medium text-sm text-gray-900 dark:text-white"
             >
               {item.name}
             </h3>
             <p
-              className={`text-xs mt-0.5 line-clamp-1 ${
-                theme === "dark" ? "text-gray-400" : "text-gray-500"
-              }`}
+              className="text-xs mt-0.5 line-clamp-1 text-gray-500 dark:text-gray-400"
             >
               {item.description || "No description"}
             </p>

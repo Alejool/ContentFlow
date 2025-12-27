@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next";
 interface SocialAccountsDisplayProps {
   publication: Publication;
   connectedAccounts: any[];
-  theme: string;
   compact?: boolean;
   showCount?: boolean;
 }
@@ -12,7 +11,6 @@ interface SocialAccountsDisplayProps {
 export default function SocialAccountsDisplay({
   publication,
   connectedAccounts,
-  theme,
   compact = false,
   showCount = false,
 }: SocialAccountsDisplayProps) {
@@ -109,9 +107,8 @@ export default function SocialAccountsDisplay({
             className="flex items-start gap-2"
           >
             <div
-              className={`w-2 h-2 mt-1.5 rounded-full flex-shrink-0 ${
-                isConnected ? "bg-green-500" : "bg-red-500 animate-pulse"
-              }`}
+              className={`w-2 h-2 mt-1.5 rounded-full flex-shrink-0 ${isConnected ? "bg-green-500" : "bg-red-500 animate-pulse"
+                }`}
               title={isConnected ? "Connected" : "Disconnected"}
             />
 
@@ -125,9 +122,7 @@ export default function SocialAccountsDisplay({
                   {platform.charAt(0).toUpperCase() + platform.slice(1)}
                 </span>
                 <span
-                  className={`text-xs font-medium truncate ${
-                    theme === "dark" ? "text-gray-200" : "text-gray-700"
-                  }`}
+                  className="text-xs font-medium truncate text-gray-700 dark:text-gray-200"
                 >
                   {accountName}
                 </span>

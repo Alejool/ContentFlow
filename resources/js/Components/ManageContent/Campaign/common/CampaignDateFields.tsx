@@ -9,7 +9,6 @@ interface CampaignDateFieldsProps {
   errors: FieldErrors<any>;
   setValue: UseFormSetValue<any>;
   watch: (name?: string) => any;
-  theme: "dark" | "light";
   t: (key: string) => string;
 }
 
@@ -19,7 +18,6 @@ const CampaignDateFields: React.FC<CampaignDateFieldsProps> = ({
   errors,
   setValue,
   watch,
-  theme,
   t,
 }) => {
   return (

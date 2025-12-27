@@ -8,7 +8,6 @@ import PlatformPreviewModal from "@/Components/ManageContent/modals/common/Platf
 import YouTubeThumbnailUploader from "@/Components/common/ui/YouTubeThumbnailUploader";
 import { usePublishPublication } from "@/Hooks/publication/usePublishPublication";
 import { useConfirm } from "@/Hooks/useConfirm";
-import { useTheme } from "@/Hooks/useTheme";
 import { usePublicationStore } from "@/stores/publicationStore";
 import { Publication } from "@/types/Publication";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
@@ -38,7 +37,6 @@ export default function PublishPublicationModal({
   publication,
   onSuccess,
 }: PublishPublicationModalProps) {
-  const { theme } = useTheme();
   const { confirm, ConfirmDialog } = useConfirm();
   const { t } = useTranslation();
 
@@ -184,19 +182,11 @@ export default function PublishPublicationModal({
 
         <div className="fixed inset-0 flex items-center justify-center p-4">
           <DialogPanel
-            className={`w-full max-w-2xl rounded-lg p-8 shadow-2xl overflow-y-auto max-h-[90vh] custom-scrollbar
-            ${
-              theme === "dark"
-                ? "bg-neutral-800 border border-neutral-700"
-                : "bg-white"
-            }
-          `}
+            className="w-full max-w-2xl rounded-lg p-8 shadow-2xl overflow-y-auto max-h-[90vh] custom-scrollbar bg-white dark:bg-neutral-800 dark:border dark:border-neutral-700"
           >
             <div className="flex items-center justify-between mb-6">
               <DialogTitle
-                className={`text-2xl font-bold ${
-                  theme === "dark" ? "text-white" : "text-gray-900"
-                }`}
+                className="text-2xl font-bold text-gray-900 dark:text-white"
               >
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-gradient-to-r from-primary-500 to-pink-500 rounded-lg">
@@ -207,32 +197,22 @@ export default function PublishPublicationModal({
               </DialogTitle>
               <button
                 onClick={() => onClose(publication.id)}
-                className={`p-2 rounded-lg transition-colors ${
-                  theme === "dark"
-                    ? "hover:bg-neutral-700 text-gray-400"
-                    : "hover:bg-gray-100 text-gray-500"
-                }`}
+                className="p-2 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-neutral-700 text-gray-500 dark:text-gray-400"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <div
-              className={`mb-6 p-4 rounded-lg ${
-                theme === "dark" ? "bg-neutral-900/50" : "bg-gray-50"
-              }`}
+              className="mb-6 p-4 rounded-lg bg-gray-50 dark:bg-neutral-900/50"
             >
               <h3
-                className={`font-semibold mb-1 ${
-                  theme === "dark" ? "text-white" : "text-gray-900"
-                }`}
+                className="font-semibold mb-1 text-gray-900 dark:text-white"
               >
                 {publication.title}
               </h3>
               <p
-                className={`text-sm ${
-                  theme === "dark" ? "text-gray-400" : "text-gray-600"
-                }`}
+                className="text-sm text-gray-600 dark:text-gray-400"
               >
                 {publication.description}
               </p>
@@ -241,9 +221,7 @@ export default function PublishPublicationModal({
             <div className="mb-6">
               <div className="flex items-center justify-between mb-4">
                 <h4
-                  className={`font-semibold ${
-                    theme === "dark" ? "text-white" : "text-gray-900"
-                  }`}
+                  className="font-semibold text-gray-900 dark:text-white"
                 >
                   {t("publications.modal.publish.selectPlatforms")}
                 </h4>
@@ -255,9 +233,7 @@ export default function PublishPublicationModal({
                     {t("publications.modal.publish.selectAll")}
                   </button>
                   <span
-                    className={
-                      theme === "dark" ? "text-gray-600" : "text-gray-400"
-                    }
+                    className="text-gray-400 dark:text-gray-600"
                   >
                     |
                   </span>
@@ -272,14 +248,10 @@ export default function PublishPublicationModal({
 
               {connectedAccounts.length === 0 ? (
                 <div
-                  className={`text-center py-8 rounded-lg ${
-                    theme === "dark" ? "bg-neutral-900/50" : "bg-gray-50"
-                  }`}
+                  className="text-center py-8 rounded-lg bg-gray-50 dark:bg-neutral-900/50"
                 >
                   <p
-                    className={`text-sm ${
-                      theme === "dark" ? "text-gray-400" : "text-gray-600"
-                    }`}
+                    className="text-sm text-gray-600 dark:text-gray-400"
                   >
                     {t("publications.modal.publish.noConnectedAccounts")}
                     <br />
@@ -291,7 +263,6 @@ export default function PublishPublicationModal({
                   {" "}
                   {connectedAccounts.map((account) => {
                     const iconSrc = getPlatformIcon(account.platform);
-                    const gradient = getPlatformGradient(account.platform);
                     const isSelected = selectedPlatforms.includes(account.id);
                     const isPublished = publishedPlatforms.includes(account.id);
                     const isFailed = failedPlatforms.includes(account.id);
@@ -316,49 +287,37 @@ export default function PublishPublicationModal({
                             !isScheduled &&
                             togglePlatform(account.id)
                           }
-                          className={`w-full flex items-center gap-3 p-4 rounded-lg border-2 transition-all pt-6 relative ${
-                            !isPublished && !isPublishing && !isScheduled
+                          className={`w-full flex items-center gap-3 p-4 rounded-lg border-2 transition-all pt-6 relative ${!isPublished && !isPublishing && !isScheduled
                               ? "cursor-pointer"
                               : "cursor-default"
-                          } ${
-                            isPublishing
+                            } ${isPublishing
                               ? "border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20"
                               : isPublished
-                              ? "border-green-500 bg-green-50 dark:bg-green-900/20"
-                              : isScheduled
-                              ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
-                              : isFailed
-                              ? "border-red-500 bg-red-50 dark:bg-red-900/20"
-                              : isRemovedPlatform
-                              ? "border-gray-500 bg-gray-50 dark:bg-gray-900/20"
-                              : isSelected
-                              ? "p-2 border-primary-500 bg-primary-50 dark:bg-primary-900/20"
-                              : theme === "dark"
-                              ? "border-neutral-700 hover:border-neutral-600 bg-neutral-900/30"
-                              : "border-primary-200 hover:border-primary-300 bg-white"
-                          }`}
+                                ? "border-green-500 bg-green-50 dark:bg-green-900/20"
+                                : isScheduled
+                                  ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
+                                  : isFailed
+                                    ? "border-red-500 bg-red-50 dark:bg-red-900/20"
+                                    : isRemovedPlatform
+                                      ? "border-gray-500 bg-gray-50 dark:bg-gray-900/20"
+                                      : isSelected
+                                        ? "p-2 border-primary-500 bg-primary-50 dark:bg-primary-900/20"
+                                        : "bg-white dark:bg-neutral-900/30 border-primary-200 dark:border-neutral-700 hover:border-primary-300 dark:hover:border-neutral-600"
+                            }`}
                         >
                           <div
-                            className={`w-12 h-12 rounded-lg  flex items-center justify-center flex-shrink-0 `}
+                            className="w-12 h-12 rounded-lg  flex items-center justify-center flex-shrink-0 "
                           >
                             <img src={iconSrc} alt={account.platform} />
                           </div>
                           <div className="flex-1 text-left">
                             <div
-                              className={`font-medium capitalize text-sm ${
-                                theme === "dark"
-                                  ? "text-primary-50"
-                                  : "text-primary-600"
-                              }`}
+                              className="font-medium capitalize text-sm text-primary-600 dark:text-primary-50"
                             >
                               {account.platform}
                             </div>
                             <div
-                              className={`text-xs ${
-                                theme === "dark"
-                                  ? "text-primary-400"
-                                  : "text-primary-600"
-                              }`}
+                              className="text-xs text-primary-600 dark:text-primary-400"
                             >
                               @{account.account_name || account.name}
                             </div>
@@ -433,21 +392,17 @@ export default function PublishPublicationModal({
                               isPublished ||
                               isFailed ||
                               isPublishing) && (
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setActivePlatformPreview(account.platform);
-                                }}
-                                className={`p-1.5 rounded-lg transition-all z-10 ${
-                                  theme === "dark"
-                                    ? "hover:bg-neutral-700 text-gray-400"
-                                    : "hover:bg-gray-100 text-gray-500"
-                                }`}
-                              >
-                                <Eye className="w-4 h-4" />
-                              </button>
-                            )}
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setActivePlatformPreview(account.platform);
+                                  }}
+                                  className="p-1.5 rounded-lg transition-all z-10 hover:bg-gray-100 dark:hover:bg-neutral-700 text-gray-500 dark:text-gray-400"
+                                >
+                                  <Eye className="w-4 h-4" />
+                                </button>
+                              )}
 
                             {!isPublished && !isPublishing && !isScheduled && (
                               <button
@@ -456,11 +411,7 @@ export default function PublishPublicationModal({
                                   e.stopPropagation();
                                   setActivePlatformSettings(account.platform);
                                 }}
-                                className={`p-1.5 rounded-lg transition-all z-10 ${
-                                  theme === "dark"
-                                    ? "hover:bg-neutral-700 text-gray-400"
-                                    : "hover:bg-gray-100 text-gray-500"
-                                }`}
+                                className="p-1.5 rounded-lg transition-all z-10 hover:bg-gray-100 dark:hover:bg-neutral-700 text-gray-500 dark:text-gray-400"
                               >
                                 <SettingsIcon className="w-4 h-4" />
                               </button>
@@ -507,9 +458,7 @@ export default function PublishPublicationModal({
                 <div className="flex items-center gap-2 mb-4">
                   <img src={IconYoutube} className="w-5 h-5" alt="YouTube" />
                   <h4
-                    className={`font-semibold ${
-                      theme === "dark" ? "text-white" : "text-gray-900"
-                    }`}
+                    className="font-semibold text-gray-900 dark:text-white"
                   >
                     {t("publications.modal.publish.youtube.youtubeThumbnails")}
                     {isLoadingThumbnails && (
@@ -560,11 +509,7 @@ export default function PublishPublicationModal({
               <button
                 type="button"
                 onClick={() => onClose(publication.id)}
-                className={`flex-1 px-4 py-3 rounded-lg font-medium transition-colors ${
-                  theme === "dark"
-                    ? "bg-neutral-700 hover:bg-neutral-600 text-white"
-                    : "bg-gray-100 hover:bg-gray-200 text-gray-700"
-                }`}
+                className="flex-1 px-4 py-3 rounded-lg font-medium transition-colors bg-gray-100 dark:bg-neutral-700 hover:bg-gray-200 dark:hover:bg-neutral-600 text-gray-700 dark:text-white"
               >
                 {t("publications.modal.publish.button.cancel")}
               </button>
@@ -617,7 +562,6 @@ export default function PublishPublicationModal({
                 platformSettings[activePlatformPreview?.toLowerCase() || ""] ||
                 {}
               }
-              theme={theme}
             />
           </DialogPanel>
         </div>

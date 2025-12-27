@@ -8,7 +8,6 @@ interface CampaignFormFieldsProps {
   register: UseFormRegister<any>;
   errors: FieldErrors<any>;
   watched: any;
-  theme: "dark" | "light";
   t: (key: string) => string;
   mode?: "add" | "edit";
 }
@@ -17,7 +16,6 @@ const CampaignFormFields: React.FC<CampaignFormFieldsProps> = ({
   register,
   errors,
   watched,
-  theme,
   t,
   mode = "add",
 }) => {
@@ -43,9 +41,8 @@ const CampaignFormFields: React.FC<CampaignFormFieldsProps> = ({
             t("campaigns.modal.add.placeholders.name") ||
             "e.g. Summer Sale 2024"
           }
-          sizeType= "lg"
+          sizeType="lg"
           variant="filled"
-          theme={theme}
           error={errors.name?.message as string}
         />
       </div>
@@ -59,7 +56,6 @@ const CampaignFormFields: React.FC<CampaignFormFieldsProps> = ({
           placeholder={t("campaigns.modal.add.placeholders.description")}
           error={errors.description?.message as string}
           icon={FileText}
-          theme={theme}
           variant="filled"
           rows={4}
           size="lg"
@@ -83,7 +79,6 @@ const CampaignFormFields: React.FC<CampaignFormFieldsProps> = ({
             placeholder={goalPlaceholder}
             error={errors.goal?.message as string}
             icon={Target}
-            theme={theme}
             variant="filled"
             sizeType="lg"
             hint={`${watched.goal?.length || 0}/200 characters`}
@@ -104,7 +99,6 @@ const CampaignFormFields: React.FC<CampaignFormFieldsProps> = ({
             placeholder={budgetPlaceholder}
             error={errors.budget?.message as string}
             icon={Target}
-            theme={theme}
             variant="filled"
             sizeType="lg"
           />

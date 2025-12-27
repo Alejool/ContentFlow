@@ -10,7 +10,6 @@ interface ContentSectionProps {
   setValue: UseFormSetValue<any>;
   errors: FieldErrors<any>;
   watched: any;
-  theme: "dark" | "light";
   t: (key: string) => string;
   campaigns?: any[];
   publication?: any;
@@ -23,7 +22,6 @@ const ContentSection: React.FC<ContentSectionProps> = ({
   setValue,
   errors,
   watched,
-  theme,
   t,
   campaigns,
   publication,
@@ -41,7 +39,6 @@ const ContentSection: React.FC<ContentSectionProps> = ({
         placeholder={t("publications.modal.edit.placeholders.title")}
         error={errors.title?.message as string}
         icon={FileText}
-        theme={theme}
         variant="filled"
         sizeType="lg"
         required
@@ -57,7 +54,6 @@ const ContentSection: React.FC<ContentSectionProps> = ({
         placeholder={t("publications.modal.edit.placeholders.description")}
         error={errors.description?.message as string}
         icon={FileText}
-        theme={theme}
         variant="filled"
         size="lg"
         required
@@ -77,7 +73,6 @@ const ContentSection: React.FC<ContentSectionProps> = ({
         placeholder={t("publications.modal.edit.placeholders.goal")}
         error={errors.goal?.message as string}
         icon={FileText}
-        theme={theme}
         variant="filled"
         sizeType="lg"
         required
@@ -96,16 +91,14 @@ const ContentSection: React.FC<ContentSectionProps> = ({
         error={errors.hashtags?.message as string}
         onChange={(e) => onHashtagChange(e.target.value)}
         icon={Hash}
-        theme={theme}
         variant="filled"
         sizeType="lg"
-        hint={`${
-          watched.hashtags
-            ? watched.hashtags
-                .split(" ")
-                .filter((tag: string) => tag.startsWith("#")).length
-            : 0
-        }/10 hashtags`}
+        hint={`${watched.hashtags
+          ? watched.hashtags
+            .split(" ")
+            .filter((tag: string) => tag.startsWith("#")).length
+          : 0
+          }/10 hashtags`}
         disabled={disabled}
       />
 
@@ -125,7 +118,6 @@ const ContentSection: React.FC<ContentSectionProps> = ({
         placeholder={t("common.select") || "Select a campaign..."}
         error={errors.campaign_id?.message as string}
         icon={Target}
-        theme={theme}
         variant="filled"
         size="lg"
         clearable

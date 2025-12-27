@@ -8,7 +8,6 @@ import Loader from "@/Components/common/Loader";
 
 interface CampaignTableProps {
   items: Campaign[];
-  theme: string;
   t: (key: string) => string;
   expandedCampaigns: number[];
   toggleExpand: (id: number) => void;
@@ -21,7 +20,6 @@ interface CampaignTableProps {
 
 export default function CampaignTable({
   items,
-  theme,
   t,
   expandedCampaigns,
   toggleExpand,
@@ -53,26 +51,16 @@ export default function CampaignTable({
       <div className="hidden lg:block overflow-x-auto">
         <table className="w-full text-left border-collapse z-0">
           <thead
-            className={`${
-              theme === "dark"
-                ? "bg-neutral-800/90 border-neutral-700"
-                : "bg-gray-50/90 border-gray-100"
-            }`}
+            className="bg-gray-50/90 border-gray-100 dark:bg-neutral-800/90 dark:border-neutral-700"
           >
             <tr
-              className={`text-xs uppercase tracking-wider border-b ${
-                theme === "dark"
-                  ? "bg-neutral-800/50 border-neutral-700"
-                  : "bg-gray-50 border-gray-100"
-              }`}
+              className="text-xs uppercase tracking-wider border-b bg-gray-50 border-gray-100 dark:bg-neutral-800/50 dark:border-neutral-700"
             >
               <TableHeader mode="campaigns" t={t} />
             </tr>
           </thead>
           <tbody
-            className={`divide-y ${
-              theme === "dark" ? "divide-neutral-700/50" : "divide-gray-100"
-            }`}
+            className="divide-y divide-gray-100 dark:divide-neutral-700/50"
           >
             {isLoading ? (
               <tr>
@@ -91,7 +79,6 @@ export default function CampaignTable({
                 <Fragment key={item.id}>
                   <CampaignRow
                     item={item}
-                    theme={theme}
                     expandedCampaigns={expandedCampaigns}
                     toggleExpand={toggleExpand}
                     getStatusColor={getStatusColor}
@@ -104,7 +91,6 @@ export default function CampaignTable({
                   {expandedCampaigns.includes(item.id) && (
                     <CampaignPublications
                       campaign={item}
-                      theme={theme}
                       getStatusColor={getStatusColor}
                     />
                   )}
@@ -127,7 +113,6 @@ export default function CampaignTable({
       {!isLoading && items.length > 0 && (
         <CampaignMobileTable
           items={items}
-          theme={theme}
           t={t}
           expandedCampaigns={expandedCampaigns}
           toggleExpand={toggleExpand}

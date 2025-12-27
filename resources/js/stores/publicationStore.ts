@@ -66,6 +66,7 @@ interface PublicationState {
   setPublishingPlatforms: (publicationId: number, accountIds: number[]) => void;
   setScheduledPlatforms: (publicationId: number, accountIds: number[]) => void;
 
+  clearPageData: () => void;
   clearError: () => void;
   reset: () => void;
 }
@@ -92,6 +93,11 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
 
   fetchPublications: async (filters = {}, page = 1) => {
     set({ isLoading: true, error: null });
+
+    // CRITICAL: Clear previous page data to prevent memory bloat
+    // Only keep data for the current page being viewed
+    get().clearPageData();
+
     try {
       const response = await axios.get("/publications", {
         params: { ...filters, page },
@@ -350,6 +356,20 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
   setScheduledPlatforms: (id, accounts) =>
     set((state) => ({
       scheduledPlatforms: { ...state.scheduledPlatforms, [id]: accounts },
+    })),
+
+  clearPageData: () =>
+    set((state) => ({
+      // Clear publications array to free memory
+      publications: [],
+      // Clear all platform caches as they're page-specific
+      publishedPlatforms: {},
+      failedPlatforms: {},
+      publishingPlatforms: {},
+      scheduledPlatforms: {},
+      removedPlatforms: {},
+      // Keep currentPublication if user is editing something
+      // This prevents losing data if modal is open
     })),
 
   clearError: () => set({ error: null }),

@@ -2,7 +2,6 @@ import React from "react";
 import { Sparkles, X, LucideIcon } from "lucide-react";
 
 interface ModalHeaderProps {
-  theme: "dark" | "light";
   t: (key: string) => string;
   onClose: () => void;
   title: string;
@@ -13,7 +12,6 @@ interface ModalHeaderProps {
 }
 
 const ModalHeader: React.FC<ModalHeaderProps> = ({
-  theme,
   t,
   onClose,
   title,
@@ -22,16 +20,6 @@ const ModalHeader: React.FC<ModalHeaderProps> = ({
   iconColor = "text-primary-500",
   size = "lg",
 }) => {
-  const modalHeaderBg =
-    theme === "dark"
-      ? "bg-gradient-to-r from-neutral-900 to-neutral-800"
-      : "bg-gradient-to-r from-gray-50 to-white";
-  const modalHeaderBorder =
-    theme === "dark" ? "border-neutral-700" : "border-gray-100";
-  const textPrimary = theme === "dark" ? "text-gray-100" : "text-gray-900";
-  const textSecondary = theme === "dark" ? "text-gray-400" : "text-gray-500";
-  const textTertiary = theme === "dark" ? "text-gray-500" : "text-gray-400";
-
   const sizeClasses = {
     sm: { title: "text-lg", icon: "w-4 h-4" },
     md: { title: "text-xl", icon: "w-5 h-5" },
@@ -43,24 +31,22 @@ const ModalHeader: React.FC<ModalHeaderProps> = ({
 
   return (
     <div
-      className={`px-8 py-6 border-b ${modalHeaderBorder} ${modalHeaderBg} flex items-center justify-between sticky top-0 z-10`}
+      className="px-8 py-6 border-b border-gray-100 dark:border-neutral-700 bg-gradient-to-r from-gray-50 to-white dark:from-neutral-900 dark:to-neutral-800 flex items-center justify-between sticky top-0 z-10"
     >
       <div>
         <h2
-          className={`${currentSize.title} font-bold ${textPrimary} flex items-center gap-2`}
+          className={`${currentSize.title} font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2`}
         >
           <Icon className={`${currentSize.icon} ${iconColor}`} />
           {t(title) || title}
         </h2>
         {subtitle && (
-          <p className={`${textSecondary} mt-1`}>{t(subtitle) || subtitle}</p>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">{t(subtitle) || subtitle}</p>
         )}
       </div>
       <button
         onClick={onClose}
-        className={`p-2 hover:${
-          theme === "dark" ? "bg-neutral-700" : "bg-gray-100"
-        } rounded-full transition-colors ${textTertiary}`}
+        className="p-2 hover:bg-gray-100 dark:hover:bg-neutral-700 rounded-full transition-colors text-gray-400 dark:text-gray-500"
       >
         <X className="w-6 h-6" />
       </button>

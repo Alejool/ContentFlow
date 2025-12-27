@@ -6,14 +6,12 @@ import React from "react";
 
 interface ScheduleSectionProps {
   scheduledAt?: string;
-  theme: "dark" | "light";
   t: (key: string) => string;
   onScheduleChange: (date: string) => void;
 }
 
 const ScheduleSection: React.FC<ScheduleSectionProps> = ({
   scheduledAt,
-  theme,
   t,
   onScheduleChange,
 }) => {

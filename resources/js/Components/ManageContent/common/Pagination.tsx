@@ -3,14 +3,14 @@ interface PaginationProps {
     current_page: number;
     last_page: number;
   };
-  theme: string;
+
   onPageChange: (page: number) => void;
   t: (key: string) => string;
 }
 
 export default function Pagination({
   pagination,
-  theme,
+
   onPageChange,
   t,
 }: PaginationProps) {
@@ -19,15 +19,11 @@ export default function Pagination({
       <button
         disabled={pagination.current_page === 1}
         onClick={() => onPageChange(Math.max(1, pagination.current_page - 1))}
-        className={`px-3 py-1 rounded border disabled:opacity-50 transition-colors ${
-          theme === "dark"
-            ? "border-neutral-700 hover:bg-neutral-700 text-gray-300"
-            : "border-gray-200 hover:bg-gray-50 text-gray-700"
-        }`}
+        className="px-3 py-1 rounded border disabled:opacity-50 transition-colors border-gray-200 hover:bg-gray-50 text-gray-700 dark:border-neutral-700 dark:hover:bg-neutral-700 dark:text-gray-300"
       >
         {t("pagination.previous")}
       </button>
-      <span className={theme === "dark" ? "text-gray-400" : "text-gray-600"}>
+      <span className="text-gray-600 dark:text-gray-400">
         Page {pagination.current_page} of {pagination.last_page}
       </span>
       <button
@@ -37,11 +33,7 @@ export default function Pagination({
             Math.min(pagination.last_page, pagination.current_page + 1)
           )
         }
-        className={`px-3 py-1 rounded border disabled:opacity-50 transition-colors ${
-          theme === "dark"
-            ? "border-neutral-700 hover:bg-neutral-700 text-gray-300"
-            : "border-gray-200 hover:bg-gray-50 text-gray-700"
-        }`}
+        className="px-3 py-1 rounded border disabled:opacity-50 transition-colors border-gray-200 hover:bg-gray-50 text-gray-700 dark:border-neutral-700 dark:hover:bg-neutral-700 dark:text-gray-300"
       >
         {t("pagination.next")}
       </button>

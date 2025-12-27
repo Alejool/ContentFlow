@@ -2,13 +2,11 @@ import { Publication } from "@/types/Publication";
 
 interface CampaignTagsProps {
   publication: Publication;
-  theme: string;
   t: (key: string) => string;
 }
 
 export default function CampaignTags({
   publication,
-  theme,
   t,
 }: CampaignTagsProps) {
   const campaigns = publication.campaigns || [];
@@ -16,9 +14,7 @@ export default function CampaignTags({
   if (campaigns.length === 0) {
     return (
       <span
-        className={`text-xs italic ${
-          theme === "dark" ? "text-gray-500" : "text-gray-400"
-        }`}
+        className="text-xs italic text-gray-400 dark:text-gray-500"
       >
         {t("publications.table.noCampaign")}
       </span>
@@ -57,11 +53,7 @@ export default function CampaignTags({
         <button
           key={campaign.id}
           onClick={() => handleCampaignClick(campaign.id)}
-          className={`inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-medium transition-all ${
-            theme === "dark"
-              ? "bg-primary-900/30 text-primary-400 hover:bg-primary-900/50"
-              : "bg-primary-100 text-primary-800 hover:bg-primary-200"
-          }`}
+          className="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-medium transition-all bg-primary-100 text-primary-800 hover:bg-primary-200 dark:bg-primary-900/30 dark:text-primary-400 dark:hover:bg-primary-900/50"
           title={`Click to view ${campaign.name || campaign.title}`}
         >
           {campaign.name || campaign.title}

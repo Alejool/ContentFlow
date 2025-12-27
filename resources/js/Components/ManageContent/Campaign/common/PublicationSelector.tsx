@@ -5,7 +5,6 @@ interface PublicationSelectorProps {
   publications: any[];
   selectedIds: number[];
   loading: boolean;
-  theme: "dark" | "light";
   t: (key: string) => string;
   getThumbnail: (pub: any) => { url: string | null; type: string } | null;
   onTogglePublication: (id: number) => void;
@@ -16,16 +15,12 @@ const PublicationSelector: React.FC<PublicationSelectorProps> = ({
   publications,
   selectedIds,
   loading,
-  theme,
   t,
   getThumbnail,
   onTogglePublication,
   mode = "add",
 }) => {
-  const borderColor =
-    theme === "dark" ? "border-neutral-700" : "border-gray-200";
-  const textPrimary = theme === "dark" ? "text-gray-100" : "text-gray-900";
-  const textSecondary = theme === "dark" ? "text-gray-400" : "text-gray-500";
+
 
   if (loading) {
     return (
@@ -43,7 +38,7 @@ const PublicationSelector: React.FC<PublicationSelectorProps> = ({
         {mode === "edit"
           ? t("campaigns.modal.edit.noPublications") || "No publications found."
           : t("campaigns.modal.add.noPublications") ||
-            "No publications found. Create some first!"}
+          "No publications found. Create some first!"}
       </div>
     );
   }
@@ -58,20 +53,17 @@ const PublicationSelector: React.FC<PublicationSelectorProps> = ({
           <div
             key={pub.id}
             onClick={() => onTogglePublication(pub.id)}
-            className={`flex items-center gap-3 p-2 rounded cursor-pointer border transition-all ${
-              isSelected
+            className={`flex items-center gap-3 p-2 rounded cursor-pointer border transition-all ${isSelected
                 ? "border-primary-500 bg-primary-50 dark:bg-primary-900/20"
-                : `${borderColor} ${
-                    theme === "dark" ? "bg-neutral-800" : "bg-white"
-                  } hover:border-primary-300`
-            }`}
+                : "border-gray-200 bg-white hover:border-primary-300 dark:border-neutral-700 dark:bg-neutral-800"
+              }`}
           >
             <Checkbox isSelected={isSelected} />
 
             <PublicationThumbnail thumbnail={thumbnail} />
 
             <div className="flex-1 min-w-0">
-              <p className={`text-sm font-medium truncate ${textPrimary}`}>
+              <p className="text-sm font-medium truncate text-gray-900 dark:text-gray-100">
                 {pub.title || pub.name || "Untitled"}
               </p>
             </div>
@@ -85,9 +77,8 @@ const PublicationSelector: React.FC<PublicationSelectorProps> = ({
 // Componentes internos (sin cambios)
 const Checkbox: React.FC<{ isSelected: boolean }> = ({ isSelected }) => (
   <div
-    className={`w-4 h-4 rounded border flex items-center justify-center ${
-      isSelected ? "bg-primary-500 border-primary-500" : "border-gray-400"
-    }`}
+    className={`w-4 h-4 rounded border flex items-center justify-center ${isSelected ? "bg-primary-500 border-primary-500" : "border-gray-400"
+      }`}
   >
     {isSelected && <Check className="w-3 h-3 text-white" />}
   </div>

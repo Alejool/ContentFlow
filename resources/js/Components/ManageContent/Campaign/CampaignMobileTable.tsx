@@ -13,7 +13,6 @@ import PublicationThumbnail from "@/Components/ManageContent/Publication/Publica
 
 interface CampaignMobileTableProps {
   items: Campaign[];
-  theme: string;
   t: (key: string) => string;
   expandedCampaigns: number[];
   toggleExpand: (id: number) => void;
@@ -26,7 +25,6 @@ interface CampaignMobileTableProps {
 
 export default function CampaignMobileTable({
   items,
-  theme,
   t,
   expandedCampaigns,
   toggleExpand,
@@ -44,11 +42,7 @@ export default function CampaignMobileTable({
         {items.map((item) => (
           <div
             key={item.id}
-            className={`rounded-lg border ${
-              theme === "dark"
-                ? "bg-neutral-800 border-neutral-700"
-                : "bg-white border-gray-200"
-            }`}
+            className="rounded-lg border bg-white border-gray-200 dark:bg-neutral-800 dark:border-neutral-700"
           >
             <div className="p-4">
               <div className="flex justify-between items-start mb-2">
@@ -73,7 +67,7 @@ export default function CampaignMobileTable({
                 <div className="flex items-center gap-1">
                   <Calendar className="w-4 h-4" />
                   <span>
-                    {format(new Date(item.start_date), "MMM d, yyyy")}
+                    {item.start_date ? format(new Date(item.start_date), "MMM d, yyyy") : "N/A"}
                   </span>
                 </div>
                 {item.publications && item.publications.length > 0 && (
@@ -88,11 +82,10 @@ export default function CampaignMobileTable({
                 {(item.publications?.length || 0) > 0 ? (
                   <button
                     onClick={() => toggleExpand(item.id)}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full transition-colors ${
-                      expandedCampaigns.includes(item.id)
-                        ? "bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400"
-                        : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-neutral-700 dark:text-gray-300 dark:hover:bg-neutral-600"
-                    }`}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full transition-colors ${expandedCampaigns.includes(item.id)
+                      ? "bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400"
+                      : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-neutral-700 dark:text-gray-300 dark:hover:bg-neutral-600"
+                      }`}
                   >
                     {expandedCampaigns.includes(item.id) ? (
                       <>
@@ -143,9 +136,7 @@ export default function CampaignMobileTable({
               item.publications &&
               item.publications.length > 0 && (
                 <div
-                  className={`border-t ${
-                    theme === "dark" ? "border-neutral-700" : "border-gray-200"
-                  } p-4`}
+                  className="border-t border-gray-200 dark:border-neutral-700 p-4"
                 >
                   <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3 pl-2 border-l-2 border-primary-500">
                     {t("campaigns.modal.showCampaign.associatedPublications")}
@@ -154,18 +145,12 @@ export default function CampaignMobileTable({
                     {item.publications.map((pub) => (
                       <div
                         key={pub.id}
-                        className={`flex items-center justify-between p-3 rounded ${
-                          theme === "dark" ? "bg-neutral-700/50" : "bg-gray-50"
-                        }`}
+                        className="flex items-center justify-between p-3 rounded bg-gray-50 dark:bg-neutral-700/50"
                       >
                         <div className="flex items-center gap-3">
                           <div className="flex-shrink-0">
                             <div
-                              className={`w-8 h-8 rounded border overflow-hidden flex items-center justify-center ${
-                                theme === "dark"
-                                  ? "border-neutral-600 bg-neutral-800"
-                                  : "border-gray-200 bg-gray-100"
-                              }`}
+                              className="w-8 h-8 rounded border border-gray-200 bg-gray-100 dark:border-neutral-600 dark:bg-neutral-800 overflow-hidden flex items-center justify-center"
                             >
                               <PublicationThumbnail publication={pub} />
                             </div>
@@ -175,7 +160,7 @@ export default function CampaignMobileTable({
                               {pub.title}
                             </div>
                             <div className="text-xs text-gray-500">
-                              {format(new Date(pub.created_at), "MMM d, yyyy")}
+                              {pub.created_at ? format(new Date(pub.created_at), "MMM d, yyyy") : "N/A"}
                             </div>
                           </div>
                         </div>

@@ -6,7 +6,6 @@ import { Edit, Eye, Image, Rocket, Trash2, Video } from "lucide-react";
 
 interface PublicationRowProps {
   item: Publication;
-  theme: string;
   t: (key: string) => string;
   connectedAccounts: any[];
   getStatusColor: (status?: string) => string;
@@ -18,7 +17,6 @@ interface PublicationRowProps {
 
 export default function PublicationRow({
   item,
-  theme,
   t,
   connectedAccounts,
   getStatusColor,
@@ -44,34 +42,24 @@ export default function PublicationRow({
 
   return (
     <tr
-      className={`group transition-colors ${
-        theme === "dark" ? "hover:bg-neutral-700/30" : "hover:bg-gray-50/50"
-      }`}
+      className="group transition-colors hover:bg-gray-50/50 dark:hover:bg-neutral-700/30"
     >
       <td className="px-2 py-4 text-center"></td>
       <td className="px-6 py-4">
         <div className="flex items-center gap-4">
           <div
-            className={`w-12 h-12 rounded-lg flex-shrink-0 border overflow-hidden flex items-center justify-center ${
-              theme === "dark"
-                ? "border-neutral-700 bg-neutral-800"
-                : "border-gray-200 bg-gray-100"
-            }`}
+            className="w-12 h-12 rounded-lg flex-shrink-0 border border-gray-200 bg-gray-100 dark:border-neutral-700 dark:bg-neutral-800 overflow-hidden flex items-center justify-center"
           >
             <PublicationThumbnail publication={item} />
           </div>
           <div>
             <h3
-              className={`font-medium text-sm ${
-                theme === "dark" ? "text-white" : "text-gray-900"
-              }`}
+              className="font-medium text-sm text-gray-900 dark:text-white"
             >
               {item.title || "Untitled"}
             </h3>
             <p
-              className={`text-xs mt-0.5 line-clamp-1 ${
-                theme === "dark" ? "text-gray-400" : "text-gray-500"
-              }`}
+              className="text-xs mt-0.5 line-clamp-1 text-gray-500 dark:text-gray-400"
             >
               {item.description || "No description"}
             </p>
@@ -93,8 +81,8 @@ export default function PublicationRow({
                             {settings.type === "poll"
                               ? "Poll"
                               : settings.type === "thread"
-                              ? "Thread"
-                              : "Tweet"}
+                                ? "Thread"
+                                : "Tweet"}
                           </span>
                         );
                       }
@@ -155,13 +143,12 @@ export default function PublicationRow({
         )}
       </td>
       <td className="px-6 py-4">
-        <CampaignTags publication={item} theme={theme} t={t} />
+        <CampaignTags publication={item} t={t} />
       </td>
       <td className="px-6 py-4">
         <SocialAccountsDisplay
           publication={item}
           connectedAccounts={connectedAccounts}
-          theme={theme}
         />
       </td>
       <td className="px-6 py-4 text-right">
@@ -190,9 +177,8 @@ export default function PublicationRow({
                 onEdit(item);
               }
             }}
-            className={`p-2 ${
-              item.status === "published" ? "text-amber-500" : "text-blue-500"
-            } hover:bg-blue-50 rounded-lg dark:hover:bg-blue-900/20`}
+            className={`p-2 ${item.status === "published" ? "text-amber-500" : "text-blue-500"
+              } hover:bg-blue-50 rounded-lg dark:hover:bg-blue-900/20`}
             title={item.status === "published" ? "Unpublish to Edit" : "Edit"}
           >
             <Edit className="w-4 h-4" />

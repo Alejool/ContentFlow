@@ -5,7 +5,6 @@ import { Edit, Image, Rocket, Trash2, Video } from "lucide-react";
 
 interface PublicationMobileGridProps {
   items: Publication[];
-  theme: string;
   t: (key: string) => string;
   connectedAccounts: any[];
   getStatusColor: (status?: string) => string;
@@ -17,7 +16,6 @@ interface PublicationMobileGridProps {
 
 export default function PublicationMobileGrid({
   items,
-  theme,
   t,
   connectedAccounts,
   getStatusColor,
@@ -43,32 +41,21 @@ export default function PublicationMobileGrid({
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 px-2">
       {items.map((item) => {
         const mediaCount = countMediaFiles(item);
-
         return (
           <div
             key={item.id}
-            className={`rounded-lg border p-4 ${
-              theme === "dark"
-                ? "bg-neutral-800 border-neutral-700"
-                : "bg-white border-gray-200"
-            } hover:shadow-md transition-shadow h-[28rem] flex flex-col`}
+            className="rounded-lg border p-4 bg-white border-gray-200 dark:bg-neutral-800 dark:border-neutral-700 hover:shadow-md transition-shadow h-[28rem] flex flex-col"
           >
             <div className="flex items-start gap-3 mb-3 shrink-0">
               <div className="flex-shrink-0">
-                <div
-                  className={`w-12 h-12 rounded-lg border overflow-hidden flex items-center justify-center ${
-                    theme === "dark"
-                      ? "border-neutral-700 bg-neutral-800"
-                      : "border-gray-200 bg-gray-100"
-                  }`}
-                >
+                <div className="w-12 h-12 rounded-lg border border-gray-200 bg-gray-100 dark:border-neutral-700 dark:bg-neutral-800 overflow-hidden flex items-center justify-center">
                   <PublicationThumbnail publication={item} />
                 </div>
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h3 className="font-semibold text-gray-900 dark:text-white text-sm truncate">
+                    <h3 className="font-semibold text-gray-900 dark:text-white text-sm ">
                       {item.title || "Untitled"}
                     </h3>
                     <div className="flex items-center gap-2 mt-1">
@@ -105,35 +92,31 @@ export default function PublicationMobileGrid({
                         if (platform === "twitter" && settings.type) {
                           colorClass =
                             "bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-400 border-sky-200 dark:border-sky-800";
-                          typeText = `Twitter: ${
-                            settings.type === "poll"
-                              ? "Poll"
-                              : settings.type === "thread"
+                          typeText = `Twitter: ${settings.type === "poll"
+                            ? "Poll"
+                            : settings.type === "thread"
                               ? "Thread"
                               : "Tweet"
-                          }`;
+                            }`;
                         } else if (platform === "youtube" && settings.type) {
                           colorClass =
                             "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 border-red-200 dark:border-red-800";
-                          typeText = `YouTube: ${
-                            settings.type === "short" ? "Short" : "Video"
-                          }`;
+                          typeText = `YouTube: ${settings.type === "short" ? "Short" : "Video"
+                            }`;
                         } else if (platform === "facebook" && settings.type) {
                           colorClass =
                             "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400 border-blue-200 dark:border-blue-800";
-                          typeText = `FB: ${
-                            settings.type === "reel" ? "Reel" : "Post"
-                          }`;
+                          typeText = `FB: ${settings.type === "reel" ? "Reel" : "Post"
+                            }`;
                         } else if (platform === "instagram" && settings.type) {
                           colorClass =
                             "bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-400 border-pink-200 dark:border-pink-800";
-                          typeText = `IG: ${
-                            settings.type === "reel"
-                              ? "Reel"
-                              : settings.type === "story"
+                          typeText = `IG: ${settings.type === "reel"
+                            ? "Reel"
+                            : settings.type === "story"
                               ? "Story"
                               : "Post"
-                          }`;
+                            }`;
                         }
 
                         if (!typeText) return null;
@@ -181,7 +164,6 @@ export default function PublicationMobileGrid({
                 <SocialAccountsDisplay
                   publication={item}
                   connectedAccounts={connectedAccounts}
-                  theme={theme}
                 />
               </div>
             </div>
@@ -215,9 +197,9 @@ export default function PublicationMobileGrid({
                 Delete
               </button>
             </div>
-          </div>
+          </div >
         );
       })}
-    </div>
+    </div >
   );
 }

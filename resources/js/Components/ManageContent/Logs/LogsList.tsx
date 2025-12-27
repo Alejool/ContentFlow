@@ -34,7 +34,6 @@ export default function LogsList({
   onFilterChange,
 }: LogsListProps) {
   const { t } = useTranslation();
-  const { theme } = useTheme();
 
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
   const [showFilters, setShowFilters] = useState(false);
@@ -99,8 +98,7 @@ export default function LogsList({
     }
   };
 
-  const borderColor =
-    theme === "dark" ? "border-neutral-700" : "border-gray-200";
+
 
   const statusOptions = [
     "all",
@@ -137,11 +135,7 @@ export default function LogsList({
 
   return (
     <div
-      className={`rounded-lg shadow-lg border transition-all duration-300 backdrop-blur-lg ${
-        theme === "dark"
-          ? "bg-neutral-800/70 border-neutral-700/70 text-white"
-          : "bg-white/70 border-gray-100/70 text-gray-900"
-      }`}
+      className="rounded-lg shadow-lg border transition-all duration-300 backdrop-blur-lg bg-white/70 border-gray-100/70 text-gray-900 dark:bg-neutral-800/70 dark:border-neutral-700/70 dark:text-white"
     >
       {/* Header */}
       <div className="p-4 sm:p-6 border-b border-gray-100 dark:border-neutral-700/50 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
@@ -174,9 +168,8 @@ export default function LogsList({
 
       {/* Filters - Mobile collapsed, desktop always visible */}
       <div
-        className={`p-4 border-b ${borderColor} ${
-          showFilters ? "block" : "hidden sm:block"
-        }`}
+        className={`p-4 border-b border-gray-200 dark:border-neutral-700 ${showFilters ? "block" : "hidden sm:block"
+          }`}
       >
         <div className="flex flex-wrap gap-2">
           {statusOptions.map((status) => (
@@ -197,11 +190,7 @@ export default function LogsList({
       <div className="hidden md:block overflow-x-auto">
         <table className="w-full text-left text-sm">
           <thead
-            className={`${
-              theme === "dark"
-                ? "bg-neutral-800/90 border-neutral-700"
-                : "bg-gray-50/90 border-gray-100"
-            } border-b`}
+            className="bg-gray-50/90 border-gray-100 dark:bg-neutral-800/90 dark:border-neutral-700 border-b"
           >
             <tr>
               <th className="px-4 py-3 font-semibold text-xs sm:text-sm">
@@ -225,9 +214,7 @@ export default function LogsList({
             </tr>
           </thead>
           <tbody
-            className={`divide-y ${
-              theme === "dark" ? "divide-neutral-700/50" : "divide-gray-100"
-            }`}
+            className="divide-y divide-gray-100 dark:divide-neutral-700/50"
           >
             {isLoading ? (
               <tr>
@@ -251,11 +238,7 @@ export default function LogsList({
               logs.map((log) => (
                 <tr
                   key={log.id}
-                  className={`group transition-colors ${
-                    theme === "dark"
-                      ? "hover:bg-neutral-700/30"
-                      : "hover:bg-gray-50/50"
-                  }`}
+                  className="group transition-colors hover:bg-gray-50/50 dark:hover:bg-neutral-700/30"
                 >
                   <td className="px-4 py-3 whitespace-nowrap text-gray-500 dark:text-gray-400 text-xs">
                     {format(new Date(log.updated_at), "MMM d, HH:mm")}
@@ -448,9 +431,8 @@ export default function LogsList({
       {pagination && pagination.last_page > 1 && (
         <div className="p-4 border-t border-gray-100 dark:border-neutral-700/50">
           <Pagination
-            theme={theme}
             pagination={pagination}
-            onPageChange={onPageChange || (() => {})}
+            onPageChange={onPageChange || (() => { })}
             t={t}
           />
         </div>

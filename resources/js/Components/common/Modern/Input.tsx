@@ -1,4 +1,3 @@
-import { useTheme } from "@/Hooks/useTheme";
 import {
   CheckCircle,
   Eye,
@@ -22,7 +21,6 @@ interface InputProps<T extends FieldValues = FieldValues>
   showPasswordToggle?: boolean;
   containerClassName?: string;
   icon?: LucideIcon;
-  theme?: "dark" | "light";
   hint?: string;
   prefix?: ReactNode;
   suffix?: ReactNode;
@@ -45,7 +43,6 @@ export default function Input<T extends FieldValues>({
   className = "",
   containerClassName = "",
   icon: Icon,
-  theme: propTheme,
   hint,
   prefix,
   suffix,
@@ -54,8 +51,6 @@ export default function Input<T extends FieldValues>({
   required = false,
   ...props
 }: InputProps<T>) {
-  const { theme: themeFromHook } = useTheme();
-  const theme = propTheme || themeFromHook;
   const [showPassword, setShowPassword] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const inputType = type === "password" && showPassword ? "text" : type;
@@ -77,109 +72,41 @@ export default function Input<T extends FieldValues>({
     }
 
     if (error) {
-      return `${baseStyles} ${theme === "dark" ? "animate-pulse" : ""}`;
+      return `${baseStyles} dark:animate-pulse`;
     }
 
     return baseStyles;
   };
 
   const getInputStyles = () => {
-    const baseStyles = `
+    const base = `
       block w-full rounded-lg transition-all duration-200
       focus:outline-none focus:ring-2 focus:ring-offset-2
-      ${disabled ? "cursor-not-allowed" : ""}
+      ${disabled ? "cursor-not-allowed opacity-60" : ""}
       ${prefix ? "pl-24" : Icon ? "pl-10" : "pl-4"}
       ${suffix || showPasswordToggle ? "pr-10" : "pr-4"}
       ${currentSize.input}
     `;
 
-    const styles = {
-      dark: {
-        default: {
-          base: "bg-neutral-800/50 text-white border border-neutral-700/50",
-          states: {
-            error:
-              "border-primary-400  focus:ring-primary-500/30 focus:border-primary-400",
-            success:
-              "border-green-400  focus:ring-green-500/30 focus:border-green-400",
-            focused: "border-primary-400 focus:ring-primary-500/30",
-            idle: "hover:border-neutral-600/70 hover:bg-neutral-800/60 focus:ring-primary-500/30",
-          },
-        },
-        outlined: {
-          base: "bg-transparent text-white border-2",
-          states: {
-            error: "border-primary-400 focus:ring-primary-500/30",
-            success: "border-green-400 focus:ring-green-500/30",
-            focused: "border-primary-400 focus:ring-primary-500/30",
-            idle: "border-neutral-700 hover:border-neutral-600 focus:ring-primary-500/30",
-          },
-        },
-        filled: {
-          base: "bg-neutral-800 text-white border border-neutral-700",
-          states: {
-            error: "border-primary-400 focus:ring-primary-500/30",
-            success: "border-green-400 focus:ring-green-500/30",
-            focused: "border-primary-400 focus:ring-primary-500/30",
-            idle: "hover:bg-neutral-700/80 focus:ring-primary-500/30",
-          },
-        },
-      },
-      light: {
-        default: {
-          base: "bg-white text-gray-900 border border-gray-300",
-          states: {
-            error:
-              "border-primary-500 focus:ring-primary-500/20 focus:border-primary-500",
-            success:
-              "border-green-500 focus:ring-green-500/20 focus:border-green-500",
-            focused: "border-primary-500 focus:ring-primary-500/20",
-            idle: "hover:border-gray-400 focus:ring-primary-500/20",
-          },
-        },
-        outlined: {
-          base: "bg-transparent text-gray-900 border-2",
-          states: {
-            error: "border-primary-500 focus:ring-primary-500/20",
-            success: "border-green-500 focus:ring-green-500/20",
-            focused: "border-primary-500 focus:ring-primary-500/20",
-            idle: "border-gray-300 hover:border-gray-400 focus:ring-primary-500/20",
-          },
-        },
-        filled: {
-          base: "bg-gray-50 text-gray-900 border border-gray-300",
-          states: {
-            error: "border-primary-500 focus:ring-primary-500/20",
-            success: "border-green-500 focus:ring-green-500/20",
-            focused: "border-primary-500 focus:ring-primary-500/20",
-            idle: "hover:bg-white focus:ring-primary-500/20",
-          },
-        },
-      },
-    };
-
-    const themeStyles = styles[theme as keyof typeof styles];
-    const variantStyles = themeStyles[variant as keyof typeof themeStyles];
-
-    let stateStyles = variantStyles.states.idle;
-    if (error) stateStyles = variantStyles.states.error;
-    else if (success) stateStyles = variantStyles.states.success;
-    else if (isFocused) stateStyles = variantStyles.states.focused;
-
-    return `${baseStyles} ${variantStyles.base} ${stateStyles}`;
+    if (error) {
+      return `${base} border-primary-500 bg-white dark:bg-neutral-800 text-gray-900 dark:text-white focus:ring-primary-500/20 dark:focus:ring-primary-500/30`;
+    }
+    if (success) {
+      return `${base} border-green-500 bg-white dark:bg-neutral-800 text-gray-900 dark:text-white focus:ring-green-500/20 dark:focus:ring-green-500/30`;
+    }
+    if (variant === "outlined") {
+      return `${base} bg-transparent border-2 border-gray-300 dark:border-neutral-600 hover:border-gray-400 dark:hover:border-neutral-500 text-gray-900 dark:text-white focus:ring-primary-500/20 dark:focus:ring-primary-500/30`;
+    }
+    if (variant === "filled") {
+      return `${base} bg-gray-50 dark:bg-neutral-800 border border-gray-300 dark:border-neutral-700 hover:bg-white dark:hover:bg-neutral-700/80 text-gray-900 dark:text-white focus:ring-primary-500/20 dark:focus:ring-primary-500/30`;
+    }
+    return `${base} bg-white dark:bg-neutral-800/50 border border-gray-300 dark:border-neutral-700/50 hover:border-gray-400 dark:hover:border-neutral-600/70 text-gray-900 dark:text-white focus:ring-primary-500/20 dark:focus:ring-primary-500/30`;
   };
 
   const getMessageStyles = (type: "error" | "success") => {
-    const base = "flex items-start align-center gap-2  py-2 rounded-lg text-sm";
-
-    if (theme === "dark") {
-      return type === "error"
-        ? `${base} text-primary-600`
-        : `${base} text-green-600`;
-    }
     return type === "error"
-      ? `${base} text-primary-600`
-      : `${base} text-green-600`;
+      ? "flex items-start align-center gap-2 py-2 rounded-lg text-sm text-primary-600"
+      : "flex items-start align-center gap-2 py-2 rounded-lg text-sm text-green-600";
   };
 
   return (
@@ -202,9 +129,7 @@ export default function Input<T extends FieldValues>({
           )}
           {hint && !label && (
             <span
-              className={`text-xs ${
-                theme === "dark" ? "text-gray-400" : "text-gray-500"
-              } ml-auto`}
+              className="text-xs text-gray-500 dark:text-gray-400 ml-auto"
             >
               {hint}
             </span>
@@ -217,19 +142,12 @@ export default function Input<T extends FieldValues>({
           <div
             className={`
             absolute left-3 top-1/2 -translate-y-1/2 flex items-center
-            ${
-              theme === "dark"
-                ? error
-                  ? "text-primary-400"
-                  : success
-                  ? "text-green-400"
-                  : "text-gray-400"
-                : error
-                ? "text-primary-500"
+            ${error
+                ? "text-primary-500 dark:text-primary-400"
                 : success
-                ? "text-green-500"
-                : "text-gray-400"
-            }
+                  ? "text-green-500 dark:text-green-400"
+                  : "text-gray-400 dark:text-gray-400"
+              }
           `}
           >
             {Icon && (
@@ -263,14 +181,7 @@ export default function Input<T extends FieldValues>({
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className={`
-                  transition-colors rounded-lg p-1
-                  ${
-                    theme === "dark"
-                      ? "text-gray-400 hover:text-gray-300 hover:bg-neutral-700/50"
-                      : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
-                  }
-                `}
+                className="transition-colors rounded-lg p-1 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-700/50"
                 aria-label={
                   showPassword ? "Ocultar contraseña" : "Mostrar contraseña"
                 }

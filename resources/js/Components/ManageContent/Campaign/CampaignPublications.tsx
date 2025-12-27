@@ -5,13 +5,11 @@ import { useTranslation } from "react-i18next";
 
 interface CampaignPublicationsProps {
   campaign: Campaign;
-  theme: string;
   getStatusColor: (status?: string) => string;
 }
 
 export default function CampaignPublications({
   campaign,
-  theme,
   getStatusColor,
 }: CampaignPublicationsProps) {
   const { t } = useTranslation();
@@ -21,9 +19,7 @@ export default function CampaignPublications({
     <tr>
       <td
         colSpan={5}
-        className={`px-0 ${
-          theme === "dark" ? "bg-neutral-900/30" : "bg-gray-50/50"
-        }`}
+        className="px-0 bg-gray-50/50 dark:bg-neutral-900/30"
       >
         <div className="px-4 lg:px-12 py-4">
           <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3 pl-2 border-l-2 border-primary-500">
@@ -36,27 +32,17 @@ export default function CampaignPublications({
                 return (
                   <div
                     key={pub.id}
-                    className={`flex items-center gap-3 p-3 rounded-lg border ${
-                      theme === "dark"
-                        ? "bg-neutral-800 border-neutral-700"
-                        : "bg-white border-gray-200"
-                    }`}
+                    className="flex items-center gap-3 p-3 rounded-lg border bg-white border-gray-200 dark:bg-neutral-800 dark:border-neutral-700"
                   >
                     <div className="flex items-center gap-3 p-2">
                       <div
-                        className={`w-8 h-8 lg:w-10 lg:h-10 rounded flex-shrink-0 border overflow-hidden flex items-center justify-center ${
-                          theme === "dark"
-                            ? "border-neutral-700 bg-neutral-800"
-                            : "border-gray-200 bg-gray-100"
-                        }`}
+                        className="w-8 h-8 lg:w-10 lg:h-10 rounded flex-shrink-0 border border-gray-200 bg-gray-100 dark:border-neutral-700 dark:bg-neutral-800 overflow-hidden flex items-center justify-center"
                       >
                         <PublicationThumbnail publication={pub} />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div
-                          className={`text-sm font-medium truncate ${
-                            theme === "dark" ? "text-gray-200" : "text-gray-800"
-                          }`}
+                          className="text-sm font-medium truncate text-gray-800 dark:text-gray-200"
                         >
                           {pub.title}
                         </div>

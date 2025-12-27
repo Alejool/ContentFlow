@@ -1,6 +1,5 @@
 import CampaignMediaCarousel from "@/Components/Campaigns/CampaignMediaCarousel";
 import PlatformPreviewModal from "@/Components/ManageContent/modals/common/PlatformPreviewModal";
-import { useTheme } from "@/Hooks/useTheme";
 import { Campaign } from "@/types/Campaign";
 import { Publication } from "@/types/Publication";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
@@ -20,7 +19,6 @@ export default function ViewCampaignModal({
   campaign: item,
 }: ViewCampaignModalProps) {
   const { t } = useTranslation();
-  const { theme } = useTheme();
 
   const [previewPublication, setPreviewPublication] =
     useState<Publication | null>(null);
@@ -72,19 +70,11 @@ export default function ViewCampaignModal({
 
       <div className="fixed inset-0 flex items-center justify-center p-4">
         <DialogPanel
-          className={`w-full max-w-3xl max-h-[90vh] rounded-lg shadow-2xl flex flex-col
-            ${
-              theme === "dark"
-                ? "bg-neutral-800 border border-neutral-700"
-                : "bg-white"
-            }
-          `}
+          className="w-full max-w-3xl max-h-[90vh] rounded-lg shadow-2xl flex flex-col bg-white dark:bg-neutral-800 dark:border dark:border-neutral-700"
         >
           <div className="flex-shrink-0 flex items-center justify-between p-6 border-b border-gray-100 dark:border-neutral-700">
             <DialogTitle
-              className={`text-2xl font-bold ${
-                theme === "dark" ? "text-white" : "text-gray-900"
-              } flex items-center gap-2`}
+              className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2"
             >
               {publications.length > 0 ? (
                 <Layers className="w-6 h-6 text-primary-500" />
@@ -95,11 +85,7 @@ export default function ViewCampaignModal({
             </DialogTitle>
             <button
               onClick={onClose}
-              className={`p-2 rounded-lg transition-colors ${
-                theme === "dark"
-                  ? "hover:bg-neutral-700 text-gray-400"
-                  : "hover:bg-gray-100 text-gray-500"
-              }`}
+              className="p-2 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-neutral-700 text-gray-500 dark:text-gray-400"
             >
               <X className="w-5 h-5" />
             </button>
@@ -116,9 +102,7 @@ export default function ViewCampaignModal({
               <div>
                 <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 mb-2">
                   <h3
-                    className={`text-2xl font-bold ${
-                      theme === "dark" ? "text-white" : "text-gray-900"
-                    }`}
+                    className="text-2xl font-bold text-gray-900 dark:text-white"
                   >
                     {title}
                   </h3>
@@ -133,9 +117,7 @@ export default function ViewCampaignModal({
                   )}
                 </div>
                 <p
-                  className={`text-base leading-relaxed ${
-                    theme === "dark" ? "text-gray-300" : "text-gray-600"
-                  }`}
+                  className="text-base leading-relaxed text-gray-600 dark:text-gray-300"
                 >
                   {desc}
                 </p>
@@ -143,16 +125,10 @@ export default function ViewCampaignModal({
 
               {publications.length > 0 && (
                 <div
-                  className={`p-4 rounded-lg border ${
-                    theme === "dark"
-                      ? "bg-neutral-900/30 border-neutral-700"
-                      : "bg-gray-50 border-gray-200"
-                  }`}
+                  className="p-4 rounded-lg border bg-gray-50 border-gray-200 dark:bg-neutral-900/30 dark:border-neutral-700"
                 >
                   <h3
-                    className={`text-sm font-semibold mb-3 flex items-center gap-2 ${
-                      theme === "dark" ? "text-gray-300" : "text-gray-700"
-                    }`}
+                    className="text-sm font-semibold mb-3 flex items-center gap-2 text-gray-700 dark:text-gray-300"
                   >
                     <Layers className="w-4 h-4" />
                     {t("campaigns.modal.showCampaign.associatedPublications")} (
@@ -164,9 +140,7 @@ export default function ViewCampaignModal({
                       return (
                         <div
                           key={pub.id}
-                          className={`flex items-center gap-3 p-2 rounded ${
-                            theme === "dark" ? "bg-neutral-800" : "bg-white"
-                          } shadow-sm`}
+                          className="flex items-center gap-3 p-2 rounded bg-white dark:bg-neutral-800 shadow-sm"
                         >
                           {pub.media_files?.[0] ? (
                             <img
@@ -179,11 +153,7 @@ export default function ViewCampaignModal({
                             </div>
                           )}
                           <span
-                            className={`text-sm font-medium ${
-                              theme === "dark"
-                                ? "text-gray-200"
-                                : "text-gray-700"
-                            }`}
+                            className="text-sm font-medium text-gray-700 dark:text-gray-200"
                           >
                             {pub.title || pub.name || "Untitled"}
                           </span>
@@ -223,30 +193,20 @@ export default function ViewCampaignModal({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {(item as any).goal && (
                   <div
-                    className={`p-4 rounded-lg ${
-                      theme === "dark" ? "bg-neutral-900/50" : "bg-gray-50"
-                    }`}
+                    className="p-4 rounded-lg bg-gray-50 dark:bg-neutral-900/50"
                   >
                     <div className="flex items-center gap-2 mb-2">
                       <Target
-                        className={`w-4 h-4 ${
-                          theme === "dark"
-                            ? "text-primary-400"
-                            : "text-primary-600"
-                        }`}
+                        className="w-4 h-4 text-primary-600 dark:text-primary-400"
                       />
                       <span
-                        className={`text-sm font-semibold ${
-                          theme === "dark" ? "text-gray-400" : "text-gray-500"
-                        }`}
+                        className="text-sm font-semibold text-gray-500 dark:text-gray-400"
                       >
                         {t("campaigns.modal.showCampaign.goal")}
                       </span>
                     </div>
                     <p
-                      className={`text-sm ${
-                        theme === "dark" ? "text-white" : "text-gray-900"
-                      }`}
+                      className="text-sm text-gray-900 dark:text-white"
                     >
                       {(item as any).goal}
                     </p>
@@ -255,28 +215,20 @@ export default function ViewCampaignModal({
 
                 {(item as any).hashtags && (
                   <div
-                    className={`p-4 rounded-lg ${
-                      theme === "dark" ? "bg-neutral-900/50" : "bg-gray-50"
-                    }`}
+                    className="p-4 rounded-lg bg-gray-50 dark:bg-neutral-900/50"
                   >
                     <div className="flex items-center gap-2 mb-2">
                       <Hash
-                        className={`w-4 h-4 ${
-                          theme === "dark" ? "text-blue-400" : "text-blue-600"
-                        }`}
+                        className="w-4 h-4 text-blue-600 dark:text-blue-400"
                       />
                       <span
-                        className={`text-sm font-semibold ${
-                          theme === "dark" ? "text-gray-400" : "text-gray-500"
-                        }`}
+                        className="text-sm font-semibold text-gray-500 dark:text-gray-400"
                       >
                         {t("campaigns.modal.showCampaign.hashtags")}
                       </span>
                     </div>
                     <p
-                      className={`text-sm ${
-                        theme === "dark" ? "text-white" : "text-gray-900"
-                      }`}
+                      className="text-sm text-gray-900 dark:text-white"
                     >
                       {(item as any).hashtags}
                     </p>
@@ -285,28 +237,20 @@ export default function ViewCampaignModal({
 
                 {(item as any).start_date && (
                   <div
-                    className={`p-4 rounded-lg ${
-                      theme === "dark" ? "bg-neutral-900/50" : "bg-gray-50"
-                    }`}
+                    className="p-4 rounded-lg bg-gray-50 dark:bg-neutral-900/50"
                   >
                     <div className="flex items-center gap-2 mb-2">
                       <Calendar
-                        className={`w-4 h-4 ${
-                          theme === "dark" ? "text-green-400" : "text-green-600"
-                        }`}
+                        className="w-4 h-4 text-green-600 dark:text-green-400"
                       />
                       <span
-                        className={`text-sm font-semibold ${
-                          theme === "dark" ? "text-gray-400" : "text-gray-500"
-                        }`}
+                        className="text-sm font-semibold text-gray-500 dark:text-gray-400"
                       >
                         {t("campaigns.modal.showCampaign.startDate")}
                       </span>
                     </div>
                     <p
-                      className={`text-sm ${
-                        theme === "dark" ? "text-white" : "text-gray-900"
-                      }`}
+                      className="text-sm text-gray-900 dark:text-white"
                     >
                       {formatDate((item as any).start_date)}
                     </p>
@@ -315,30 +259,20 @@ export default function ViewCampaignModal({
 
                 {(item as any).end_date && (
                   <div
-                    className={`p-4 rounded-lg ${
-                      theme === "dark" ? "bg-neutral-900/50" : "bg-gray-50"
-                    }`}
+                    className="p-4 rounded-lg bg-gray-50 dark:bg-neutral-900/50"
                   >
                     <div className="flex items-center gap-2 mb-2">
                       <Calendar
-                        className={`w-4 h-4 ${
-                          theme === "dark"
-                            ? "text-primary-400"
-                            : "text-primary-600"
-                        }`}
+                        className="w-4 h-4 text-primary-600 dark:text-primary-400"
                       />
                       <span
-                        className={`text-sm font-semibold ${
-                          theme === "dark" ? "text-gray-400" : "text-gray-500"
-                        }`}
+                        className="text-sm font-semibold text-gray-500 dark:text-gray-400"
                       >
                         {t("campaigns.modal.showCampaign.endDate")}
                       </span>
                     </div>
                     <p
-                      className={`text-sm ${
-                        theme === "dark" ? "text-white" : "text-gray-900"
-                      }`}
+                      className="text-sm text-gray-900 dark:text-white"
                     >
                       {formatDate((item as any).end_date)}
                     </p>
@@ -348,41 +282,27 @@ export default function ViewCampaignModal({
                 {(item as any).scheduled_posts &&
                   (item as any).scheduled_posts.length > 0 && (
                     <div
-                      className={`p-4 rounded-lg md:col-span-2 ${
-                        theme === "dark" ? "bg-neutral-900/50" : "bg-gray-50"
-                      }`}
+                      className="p-4 rounded-lg md:col-span-2 bg-gray-50 dark:bg-neutral-900/50"
                     >
                       <div className="flex items-center gap-2 mb-2">
                         <Calendar
-                          className={`w-4 h-4 ${
-                            theme === "dark"
-                              ? "text-purple-400"
-                              : "text-purple-600"
-                          }`}
+                          className="w-4 h-4 text-purple-600 dark:text-purple-400"
                         />
                         <span
-                          className={`text-sm font-semibold ${
-                            theme === "dark" ? "text-gray-400" : "text-gray-500"
-                          }`}
+                          className="text-sm font-semibold text-gray-500 dark:text-gray-400"
                         >
                           {t("campaigns.scheduledPosts")}
                         </span>
                       </div>
 
                       <div
-                        className={`space-y-2 mt-2 ${
-                          theme === "dark" ? "text-white" : "text-gray-900"
-                        }`}
+                        className="space-y-2 mt-2 text-gray-900 dark:text-white"
                       >
                         {(item as any).scheduled_posts.map(
                           (post: any, index: number) => (
                             <div
                               key={post.id || index}
-                              className={`flex items-center justify-between p-2 rounded border ${
-                                theme === "dark"
-                                  ? "bg-neutral-800 border-neutral-700"
-                                  : "bg-white border-gray-200"
-                              }`}
+                              className="flex items-center justify-between p-2 rounded border bg-white dark:bg-neutral-800 border-gray-200 dark:border-neutral-700"
                             >
                               <div className="flex items-center gap-2 da">
                                 <span className="capitalize font-medium text-sm">
@@ -391,13 +311,12 @@ export default function ViewCampaignModal({
                                 </span>
                                 {post.status && (
                                   <span
-                                    className={`text-xs px-1.5 py-0.5 rounded capitalize ${
-                                      post.status === "posted"
+                                    className={`text-xs px-1.5 py-0.5 rounded capitalize ${post.status === "posted"
                                         ? "bg-green-100 text-green-700"
                                         : post.status === "failed"
-                                        ? "bg-primary-100 text-primary-700"
-                                        : "bg-yellow-100 text-yellow-700"
-                                    }`}
+                                          ? "bg-primary-100 text-primary-700"
+                                          : "bg-yellow-100 text-yellow-700"
+                                      }`}
                                   >
                                     {post.status}
                                   </span>
@@ -419,30 +338,20 @@ export default function ViewCampaignModal({
 
                 {(item as any).publish_date && (
                   <div
-                    className={`p-4 rounded-lg md:col-span-2 ${
-                      theme === "dark" ? "bg-neutral-900/50" : "bg-gray-50"
-                    }`}
+                    className="p-4 rounded-lg md:col-span-2 bg-gray-50 dark:bg-neutral-900/50"
                   >
                     <div className="flex items-center gap-2 mb-2">
                       <Calendar
-                        className={`w-4 h-4 ${
-                          theme === "dark"
-                            ? "text-purple-400"
-                            : "text-purple-600"
-                        }`}
+                        className="w-4 h-4 text-purple-600 dark:text-purple-400"
                       />
                       <span
-                        className={`text-sm font-semibold ${
-                          theme === "dark" ? "text-gray-400" : "text-gray-500"
-                        }`}
+                        className="text-sm font-semibold text-gray-500 dark:text-gray-400"
                       >
                         {t("campaigns.modal.showCampaign.publishedOn")}
                       </span>
                     </div>
                     <p
-                      className={`text-sm ${
-                        theme === "dark" ? "text-white" : "text-gray-900"
-                      }`}
+                      className="text-sm text-gray-900 dark:text-white"
                     >
                       {formatDate((item as any).publish_date)}
                     </p>
@@ -451,25 +360,17 @@ export default function ViewCampaignModal({
               </div>
 
               <div
-                className={`p-4 rounded-lg border ${
-                  theme === "dark"
-                    ? "bg-neutral-900/30 border-neutral-700"
-                    : "bg-gray-50 border-gray-200"
-                }`}
+                className="p-4 rounded-lg border bg-gray-50 border-gray-200 dark:bg-neutral-900/30 dark:border-neutral-700"
               >
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs">
                   <span
-                    className={
-                      theme === "dark" ? "text-gray-400" : "text-gray-500"
-                    }
+                    className="text-gray-500 dark:text-gray-400"
                   >
                     {t("campaigns.modal.showCampaign.created")}:{" "}
                     {formatDate((item as any).created_at)}
                   </span>
                   <span
-                    className={
-                      theme === "dark" ? "text-gray-400" : "text-gray-500"
-                    }
+                    className="text-gray-500 dark:text-gray-400"
                   >
                     {t("campaigns.modal.showCampaign.lastUpdated")}:{" "}
                     {formatDate((item as any).updated_at)}
@@ -482,11 +383,7 @@ export default function ViewCampaignModal({
           <div className="flex-shrink-0 flex justify-end gap-3 p-6 border-t border-gray-100 dark:border-neutral-700">
             <button
               onClick={onClose}
-              className={`px-6 py-2.5 rounded-lg font-medium transition-colors ${
-                theme === "dark"
-                  ? "bg-neutral-700 hover:bg-neutral-600 text-white"
-                  : "bg-gray-100 hover:bg-gray-200 text-gray-700"
-              }`}
+              className="px-6 py-2.5 rounded-lg font-medium transition-colors bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:text-white"
             >
               {t("common.close")}
             </button>

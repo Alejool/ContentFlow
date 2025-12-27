@@ -1,5 +1,4 @@
 import Label from "@/Components/common/Modern/Label";
-import { useTheme } from "@/Hooks/useTheme";
 import {
   AlertCircle,
   CheckCircle,
@@ -18,7 +17,6 @@ interface DropdownPortalProps {
   isOpen: boolean;
   selectRect: DOMRect | null;
   dropdownDirection: "up" | "down";
-  theme: "dark" | "light";
 }
 
 function DropdownPortal({
@@ -26,7 +24,6 @@ function DropdownPortal({
   isOpen,
   selectRect,
   dropdownDirection,
-  theme,
 }: DropdownPortalProps) {
   const [mounted, setMounted] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -92,12 +89,16 @@ function DropdownPortal({
     borderWidth: "1px",
     boxShadow:
       "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-    backgroundColor: theme === "dark" ? "#262626" : "#ffffff",
-    borderColor: theme === "dark" ? "#404040" : "#e5e5e5",
+    backgroundColor: "transparent", // Handled by Tailwind
+    borderColor: "transparent", // Handled by Tailwind
   };
 
   return createPortal(
-    <div ref={dropdownRef} style={portalStyles}>
+    <div
+      ref={dropdownRef}
+      style={portalStyles}
+      className="bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700"
+    >
       {children}
     </div>,
     document.body
@@ -124,7 +125,6 @@ interface SelectProps<T extends FieldValues = FieldValues> {
   className?: string;
   containerClassName?: string;
   icon?: LucideIcon;
-  theme?: "dark" | "light";
   hint?: string;
   size?: "sm" | "md" | "lg";
   variant?: "default" | "outlined" | "filled";
@@ -134,7 +134,7 @@ interface SelectProps<T extends FieldValues = FieldValues> {
   searchable?: boolean;
   clearable?: boolean;
   loading?: boolean;
-  dropdownPosition?: "down" | "up";
+  dropdownPosition?: "down" | "up" | "auto";
 }
 
 export default function Select<T extends FieldValues>({
@@ -150,7 +150,6 @@ export default function Select<T extends FieldValues>({
   className = "",
   containerClassName = "",
   icon: Icon,
-  theme: propTheme,
   hint,
   size = "md",
   variant = "default",
@@ -160,16 +159,14 @@ export default function Select<T extends FieldValues>({
   searchable = false,
   clearable = false,
   loading = false,
-  dropdownPosition = "down",
+  dropdownPosition = "auto",
   ...props
 }: SelectProps<T>) {
-  const { theme: themeFromHook } = useTheme();
-  const theme = propTheme || themeFromHook;
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedLabel, setSelectedLabel] = useState("");
   const [dropdownDirection, setDropdownDirection] = useState<"down" | "up">(
-    dropdownPosition
+    dropdownPosition === "auto" ? "down" : dropdownPosition
   );
   const [selectRect, setSelectRect] = useState<DOMRect | null>(null);
 
@@ -204,8 +201,8 @@ export default function Select<T extends FieldValues>({
 
   const filteredOptions = searchable
     ? options.filter((option) =>
-        option.label.toLowerCase().includes(searchTerm.toLowerCase())
-      )
+      option.label.toLowerCase().includes(searchTerm.toLowerCase())
+    )
     : options;
 
   useEffect(() => {
@@ -305,59 +302,35 @@ export default function Select<T extends FieldValues>({
       ${currentSize.select}
     `;
 
-    if (theme === "dark") {
-      if (error) {
-        return `${base} bg-neutral-800 text-white border-primary-500 focus:ring-primary-500/30`;
-      }
-      if (success) {
-        return `${base} bg-neutral-800 text-white border-green-500 focus:ring-green-500/30`;
-      }
-      if (variant === "outlined") {
-        return `${base} bg-transparent text-white border-neutral-600 hover:border-neutral-500 focus:ring-purple-500/30`;
-      }
-      if (variant === "filled") {
-        return `${base} bg-neutral-800 text-white border-neutral-700 hover:border-neutral-600 focus:ring-purple-500/30`;
-      }
-      return `${base} bg-neutral-900 text-white border-neutral-700 hover:border-neutral-600 focus:ring-purple-500/30`;
-    } else {
-      if (error) {
-        return `${base} bg-white text-gray-900 border-primary-500 focus:ring-primary-500/20`;
-      }
-      if (success) {
-        return `${base} bg-white text-gray-900 border-green-500 focus:ring-green-500/20`;
-      }
-      if (variant === "outlined") {
-        return `${base} bg-transparent text-gray-900 border-gray-300 hover:border-gray-400 focus:ring-purple-500/20`;
-      }
-      if (variant === "filled") {
-        return `${base} bg-gray-50 text-gray-900 border-gray-300 hover:border-gray-400 focus:ring-purple-500/20`;
-      }
-      return `${base} bg-white text-gray-900 border-gray-300 hover:border-gray-400 focus:ring-purple-500/20`;
+    if (error) {
+      return `${base} bg-white dark:bg-neutral-800 text-gray-900 dark:text-white border-primary-500 focus:ring-primary-500/20 dark:focus:ring-primary-500/30`;
     }
+    if (success) {
+      return `${base} bg-white dark:bg-neutral-800 text-gray-900 dark:text-white border-green-500 focus:ring-green-500/20 dark:focus:ring-green-500/30`;
+    }
+    if (variant === "outlined") {
+      return `${base} bg-transparent text-gray-900 dark:text-white border-gray-300 dark:border-neutral-600 hover:border-gray-400 dark:hover:border-neutral-500 focus:ring-purple-500/20 dark:focus:ring-purple-500/30`;
+    }
+    if (variant === "filled") {
+      return `${base} bg-gray-50 dark:bg-neutral-800 text-gray-900 dark:text-white border-gray-300 dark:border-neutral-700 hover:border-gray-400 dark:hover:border-neutral-600 focus:ring-purple-500/20 dark:focus:ring-purple-500/30`;
+    }
+    return `${base} bg-white dark:bg-neutral-900 text-gray-900 dark:text-white border-gray-300 dark:border-neutral-700 hover:border-gray-400 dark:hover:border-neutral-600 focus:ring-purple-500/20 dark:focus:ring-purple-500/30`;
   };
 
   const getOptionStyles = (isSelected: boolean, isDisabled: boolean) => {
     const base = `
       ${currentSize.option} transition-colors duration-150
       flex items-center gap-3 w-full text-left px-4
-      ${
-        isDisabled
-          ? "opacity-50 cursor-not-allowed"
-          : "cursor-pointer hover:bg-opacity-50"
+      ${isDisabled
+        ? "opacity-50 cursor-not-allowed"
+        : "cursor-pointer hover:bg-opacity-50"
       }
     `;
 
-    if (theme === "dark") {
-      if (isSelected) {
-        return `${base} bg-purple-600/20 text-purple-300`;
-      }
-      return `${base} text-gray-300 hover:bg-neutral-700/80`;
-    } else {
-      if (isSelected) {
-        return `${base} bg-purple-50 text-purple-700`;
-      }
-      return `${base} text-gray-700 hover:bg-gray-100`;
+    if (isSelected) {
+      return `${base} bg-purple-50 dark:bg-purple-600/20 text-purple-700 dark:text-purple-300`;
     }
+    return `${base} text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-700/80`;
   };
 
   const getSearchInputStyles = () => {
@@ -366,23 +339,15 @@ export default function Select<T extends FieldValues>({
       ${currentSize.search}
     `;
 
-    if (theme === "dark") {
-      return `${base} text-white placeholder-gray-500 border-b border-neutral-700 focus:border-purple-500`;
-    }
-    return `${base} text-gray-900 placeholder-gray-400 border-b border-gray-200 focus:border-purple-500`;
+    return `${base} text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 border-b border-gray-200 dark:border-neutral-700 focus:border-purple-500`;
   };
 
   const getMessageStyles = (type: "error" | "success") => {
     const base = "flex items-start gap-2 px-3 py-2 rounded-lg mt-1";
 
-    if (theme === "dark") {
-      return type === "error"
-        ? `${base} text-primary-300 bg-primary-900/30`
-        : `${base} text-green-300 bg-green-900/30`;
-    }
     return type === "error"
-      ? `${base} text-primary-600 bg-primary-50`
-      : `${base} text-green-600 bg-green-50`;
+      ? `${base} text-primary-600 dark:text-primary-300 bg-primary-50 dark:bg-primary-900/30`
+      : `${base} text-green-600 dark:text-green-300 bg-green-50 dark:bg-green-900/30`;
   };
 
   const fieldName = name || (id as Path<T>);
@@ -451,9 +416,7 @@ export default function Select<T extends FieldValues>({
             )}
             {hint && !label && (
               <span
-                className={`text-xs ${
-                  theme === "dark" ? "text-gray-400" : "text-gray-500"
-                } ml-auto`}
+                className="text-xs text-gray-500 dark:text-gray-400 ml-auto"
               >
                 {hint}
               </span>
@@ -465,10 +428,7 @@ export default function Select<T extends FieldValues>({
           <div className="relative">
             {Icon && (
               <div
-                className={`
-                absolute left-3 top-1/2 -translate-y-1/2 z-10
-                ${theme === "dark" ? "text-gray-400" : "text-gray-500"}
-              `}
+                className="absolute left-3 top-1/2 -translate-y-1/2 z-10 text-gray-500 dark:text-gray-400"
               >
                 <Icon className={currentSize.icon} />
               </div>
@@ -536,11 +496,10 @@ export default function Select<T extends FieldValues>({
 
                 <ChevronDown
                   className={`
-                    ${
-                      currentSize.icon
+                    ${currentSize.icon
                     } transition-transform duration-200 flex-shrink-0
                     ${isOpen ? "rotate-180" : ""}
-                    ${theme === "dark" ? "text-gray-400" : "text-gray-500"}
+                    text-gray-500 dark:text-gray-400
                   `}
                   aria-hidden="true"
                 />
@@ -577,7 +536,6 @@ export default function Select<T extends FieldValues>({
         isOpen={isOpen}
         selectRect={selectRect}
         dropdownDirection={dropdownDirection}
-        theme={theme}
       >
         <div
           id={`${id}-dropdown`}
@@ -590,9 +548,7 @@ export default function Select<T extends FieldValues>({
             <div className="sticky top-0 bg-inherit border-b border-inherit">
               <div className="relative">
                 <Search
-                  className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${
-                    theme === "dark" ? "text-gray-400" : "text-gray-500"
-                  }`}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 dark:text-gray-400"
                 />
                 <input
                   ref={inputRef}
@@ -611,9 +567,7 @@ export default function Select<T extends FieldValues>({
           <div className="py-1">
             {filteredOptions.length === 0 ? (
               <div
-                className={`${currentSize.option} px-4 py-3 text-center ${
-                  theme === "dark" ? "text-gray-400" : "text-gray-500"
-                }`}
+                className={`${currentSize.option} px-4 py-3 text-center text-gray-500 dark:text-gray-400`}
               >
                 No options found
               </div>
@@ -644,11 +598,7 @@ export default function Select<T extends FieldValues>({
                     </span>
                     {isSelected && (
                       <svg
-                        className={`w-4 h-4 flex-shrink-0 ${
-                          theme === "dark"
-                            ? "text-purple-400"
-                            : "text-purple-500"
-                        }`}
+                        className="w-4 h-4 flex-shrink-0 text-purple-500 dark:text-purple-400"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"

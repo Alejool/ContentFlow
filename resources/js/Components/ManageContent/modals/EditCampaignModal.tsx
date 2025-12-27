@@ -1,5 +1,4 @@
 import { useCampaignManagement } from "@/Hooks/useCampaignManagement";
-import { useTheme } from "@/Hooks/useTheme";
 import { Campaign } from "@/types/Campaign";
 import { AlertTriangle, Target } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -29,7 +28,6 @@ export default function EditCampaignModal({
   onSubmit,
 }: EditCampaignModalProps) {
   const { t } = useTranslation();
-  const { theme } = useTheme();
   const { updateCampaign } = useCampaignManagement();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -77,7 +75,7 @@ export default function EditCampaignModal({
       if (success) {
         toast.success(
           t("campaigns.messages.updateSuccess") ||
-            "Campaign updated successfully"
+          "Campaign updated successfully"
         );
         if (onSubmit) {
           onSubmit(true);
@@ -118,30 +116,19 @@ export default function EditCampaignModal({
 
   if (!isOpen || !campaign) return null;
 
-  const modalBg = theme === "dark" ? "bg-neutral-800" : "bg-white";
-  const borderColor =
-    theme === "dark" ? "border-neutral-700" : "border-gray-200";
-  const labelText = theme === "dark" ? "text-gray-300" : "text-gray-700";
-  const textSecondary = theme === "dark" ? "text-gray-400" : "text-gray-500";
-
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 ${
-        theme === "dark" ? "text-white" : "text-gray-900"
-      }`}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 text-gray-900 dark:text-white"
     >
       <div
-        className={`absolute inset-0 ${
-          theme === "dark" ? "bg-black/70" : "bg-gray-900/60"
-        } backdrop-blur-sm`}
+        className="absolute inset-0 bg-gray-900/60 dark:bg-black/70 backdrop-blur-sm"
         onClick={handleClose}
       />
 
       <div
-        className={`relative w-full max-w-2xl ${modalBg} rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300`}
+        className="relative w-full max-w-2xl bg-white dark:bg-neutral-800 rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300"
       >
         <ModalHeader
-          theme={theme}
           t={t}
           onClose={handleClose}
           title="campaigns.modal.edit.title"
@@ -157,7 +144,6 @@ export default function EditCampaignModal({
               register={register}
               errors={errors}
               watched={watchedFields}
-              theme={theme}
               t={t}
               mode="edit"
             />
@@ -168,7 +154,6 @@ export default function EditCampaignModal({
               errors={errors}
               setValue={setValue}
               watch={watch}
-              theme={theme}
               t={t}
             />
 
@@ -183,22 +168,19 @@ export default function EditCampaignModal({
 
             <div className="form-group">
               <label
-                className={`block text-sm font-semibold ${labelText} mb-2`}
+                className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2"
               >
                 {t("campaigns.modal.edit.associatedPublications") ||
                   "Associated Publications"}
               </label>
 
               <div
-                className={`border ${borderColor} rounded-lg max-h-48 overflow-y-auto p-2 ${
-                  theme === "dark" ? "bg-black/20" : "bg-gray-50"
-                }`}
+                className="border border-gray-200 dark:border-neutral-700 rounded-lg max-h-48 overflow-y-auto p-2 bg-gray-50 dark:bg-black/20"
               >
                 <PublicationSelector
                   publications={availablePublications}
                   selectedIds={watchedFields.publication_ids || []}
                   loading={loadingPubs}
-                  theme={theme}
                   t={t}
                   getThumbnail={getThumbnail}
                   onTogglePublication={togglePublication}
@@ -208,7 +190,6 @@ export default function EditCampaignModal({
           </form>
         </div>
         <ModalFooter
-          theme={theme}
           onClose={handleClose}
           submitText={t("campaigns.button.edit") || "Edit Campaign"}
           cancelText={t("common.cancel") || "Close"}

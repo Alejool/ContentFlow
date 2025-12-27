@@ -1,5 +1,4 @@
 import Label from "@/Components/common/Modern/Label";
-import { useTheme } from "@/Hooks/useTheme";
 import { TriangleAlert, CheckCircle, LucideIcon } from "lucide-react";
 import { TextareaHTMLAttributes, useState } from "react";
 import { FieldValues, Path, UseFormRegister } from "react-hook-form";
@@ -14,7 +13,6 @@ interface TextareaProps<T extends FieldValues = FieldValues>
   name: Path<T>;
   containerClassName?: string;
   icon?: LucideIcon;
-  theme?: "dark" | "light";
   hint?: string;
   size?: "sm" | "md" | "lg";
   variant?: "default" | "outlined" | "filled";
@@ -36,7 +34,6 @@ export default function Textarea<T extends FieldValues>({
   className = "",
   containerClassName = "",
   icon: Icon,
-  theme: propTheme,
   hint,
   size = "md",
   variant = "default",
@@ -46,8 +43,6 @@ export default function Textarea<T extends FieldValues>({
   rows = 4,
   ...props
 }: TextareaProps<T>) {
-  const { theme: themeFromHook } = useTheme();
-  const theme = propTheme || themeFromHook;
   const [charCount, setCharCount] = useState(0);
 
   const sizeConfig = {
@@ -60,16 +55,9 @@ export default function Textarea<T extends FieldValues>({
 
 
   const getMessageStyles = (type: "error" | "success") => {
-    const base = "flex items-start align-center gap-2  py-2 rounded-lg text-sm";
-
-    if (theme === "dark") {
-      return type === "error"
-        ? `${base} text-primary-600`
-        : `${base} text-green-600`;
-    }
     return type === "error"
-      ? `${base} text-primary-600`
-      : `${base} text-green-600`;
+      ? "flex items-start align-center gap-2 py-2 rounded-lg text-sm text-primary-600"
+      : "flex items-start align-center gap-2 py-2 rounded-lg text-sm text-green-600";
   };
 
 
@@ -83,23 +71,13 @@ export default function Textarea<T extends FieldValues>({
       ${currentSize.textarea}
     `;
 
-    if (theme === "dark") {
-      if (error) return `${base} border-primary-500 bg-neutral-800 text-white`;
-      if (success) return `${base} border-green-500 bg-neutral-800 text-white`;
-      if (variant === "outlined")
-        return `${base} border-2 border-neutral-600 bg-transparent text-white`;
-      if (variant === "filled")
-        return `${base} border-neutral-700 bg-neutral-800 text-white`;
-      return `${base} border-neutral-700/50 bg-neutral-800/50 text-white`;
-    } else {
-      if (error) return `${base} border-primary-500 bg-white text-gray-900`;
-      if (success) return `${base} border-green-500 bg-white text-gray-900`;
-      if (variant === "outlined")
-        return `${base} border-2 border-gray-300 bg-transparent text-gray-900`;
-      if (variant === "filled")
-        return `${base} border-gray-300 bg-gray-50 text-gray-900`;
-      return `${base} border-gray-300 bg-white text-gray-900`;
-    }
+    if (error) return `${base} border-primary-500 bg-white dark:bg-neutral-800 text-gray-900 dark:text-white`;
+    if (success) return `${base} border-green-500 bg-white dark:bg-neutral-800 text-gray-900 dark:text-white`;
+    if (variant === "outlined")
+      return `${base} border-2 border-gray-300 dark:border-neutral-600 bg-transparent text-gray-900 dark:text-white`;
+    if (variant === "filled")
+      return `${base} border-gray-300 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800 text-gray-900 dark:text-white`;
+    return `${base} border-gray-300/50 dark:border-neutral-700/50 bg-white dark:bg-neutral-800/50 text-gray-900 dark:text-white`;
   };
 
   const { onChange, ...registerRest } = register(name);
@@ -129,9 +107,7 @@ export default function Textarea<T extends FieldValues>({
         {Icon && (
           <div className="absolute left-3 top-3">
             <Icon
-              className={`${currentSize.icon} ${
-                theme === "dark" ? "text-gray-400" : "text-gray-500"
-              }`}
+              className={`${currentSize.icon} text-gray-500 dark:text-gray-400`}
             />
           </div>
         )}

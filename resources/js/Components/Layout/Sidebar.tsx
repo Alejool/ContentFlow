@@ -291,7 +291,6 @@ export default function Sidebar({
                     )}
                   </div>
 
-                  {/* Tooltip para sidebar colapsado */}
                   {!isSidebarOpen && (
                     <div
                       className={`absolute left-full ml-3 px-3 py-2

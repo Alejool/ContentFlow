@@ -70,12 +70,7 @@ export default function ManageContentPage() {
     },
   ];
 
-  const titleGradient =
-    theme === "dark"
-      ? "from-gray-200 to-gray-400"
-      : "from-gray-800 to-gray-600";
 
-  const subtitleColor = theme === "dark" ? "text-gray-400" : "text-gray-600";
 
   return (
     <AuthenticatedLayout>
@@ -84,13 +79,13 @@ export default function ManageContentPage() {
         <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-12 text-center">
             <h1
-              className={`text-4xl font-bold bg-gradient-to-r ${titleGradient} bg-clip-text text-transparent mb-4 flex items-center gap-2 justify-center`}
+              className="text-4xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 dark:from-gray-200 dark:to-gray-400 bg-clip-text text-transparent mb-4 flex items-center gap-2 justify-center"
             >
               <Folder className="w-8 h-8  text-primary-600 mr-2" />
               {t("manageContent.title")}
             </h1>
 
-            <p className={`text-lg ${subtitleColor} max-w-2xl mx-auto`}>
+            <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
               {t("manageContent.subtitle")}
             </p>
           </div>
@@ -107,22 +102,20 @@ export default function ManageContentPage() {
                     <button
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id as any)}
-                      className={`group relative flex-1 px-4 py-2.5 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
-                        isActive
+                      className={`group relative flex-1 px-4 py-2.5 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 ${isActive
                           ? "bg-white dark:bg-gray-900 shadow-sm text-primary-600 dark:text-primary-400"
                           : "text-gray-600 dark:text-gray-400 hover:text-primary-500 dark:hover:text-primary-300"
-                      }`}
+                        }`}
                     >
                       {isActive && (
                         <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-8 h-0.5 bg-primary-500 rounded-full"></div>
                       )}
 
                       <tab.icon
-                        className={`w-4 h-4 transition-colors duration-200 ${
-                          isActive
+                        className={`w-4 h-4 transition-colors duration-200 ${isActive
                             ? "text-primary-500"
                             : "group-hover:text-primary-400"
-                        }`}
+                          }`}
                       />
 
                       <span className="hidden sm:inline text-sm font-medium">

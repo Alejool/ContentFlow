@@ -1,4 +1,3 @@
-import Bg from "@/../assets/b-8.svg";
 import GlobalAiAssistant from "@/Components/AiAssistant/GlobalAiAssistant";
 import MobileNavbar from "@/Components/Layout/MobileNavbar";
 import Sidebar from "@/Components/Layout/Sidebar";
@@ -43,13 +42,7 @@ export default function AuthenticatedLayout({
   return (
     <div className="h-screen flex flex-col overflow-hidden">
       <div
-        className="relative flex-1 min-h-0 flex"
-        style={{
-          backgroundImage: `url(${Bg})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-        }}
+        className="relative flex-1 min-h-0 flex bg-url('/assets/b-8.svg') bg-cover bg-center bg-no-repeat"
       >
         <div
           className={`
@@ -71,9 +64,8 @@ export default function AuthenticatedLayout({
           />
 
           <main
-            className={`flex-1 min-h-0 overflow-y-auto transition-all duration-500  ease-in-out ${
-              isSidebarOpen ? "lg:ml-80" : "lg:ml-20"
-            }`}
+            className={`flex-1 min-h-0 overflow-y-auto transition-all duration-500  ease-in-out ${isSidebarOpen ? "lg:ml-80" : "lg:ml-20"
+              }`}
           >
             {header && (
               <header className="border-b border-white/10 dark:border-neutral-800/50">

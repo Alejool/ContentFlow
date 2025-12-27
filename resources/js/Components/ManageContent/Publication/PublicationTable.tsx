@@ -9,7 +9,6 @@ import { useState } from "react";
 
 interface PublicationTableProps {
   items: Publication[];
-  theme: string;
   t: (key: string) => string;
   connectedAccounts: any[];
   onEdit: (item: Publication) => void;
@@ -21,7 +20,6 @@ interface PublicationTableProps {
 
 export default function PublicationTable({
   items,
-  theme,
   t,
   connectedAccounts,
   onEdit,
@@ -56,26 +54,16 @@ export default function PublicationTable({
       <div className="min-w-full inline-block align-middle">
         <table className="w-full text-left border-collapse z-0">
           <thead
-            className={`${
-              theme === "dark"
-                ? "bg-neutral-800/90 border-neutral-700"
-                : "bg-gray-50/90 border-gray-100"
-            }`}
+            className="bg-gray-50/90 border-gray-100 dark:bg-neutral-800/90 dark:border-neutral-700"
           >
             <tr
-              className={`text-xs uppercase tracking-wider border-b ${
-                theme === "dark"
-                  ? "bg-neutral-800/50 border-neutral-700"
-                  : "bg-gray-50 border-gray-100"
-              }`}
+              className="text-xs uppercase tracking-wider border-b bg-gray-50 border-gray-100 dark:bg-neutral-800/50 dark:border-neutral-700"
             >
               <TableHeader mode="publications" t={t} />
             </tr>
           </thead>
           <tbody
-            className={`divide-y ${
-              theme === "dark" ? "divide-neutral-700/50" : "divide-gray-100"
-            }`}
+            className="divide-y divide-gray-100 dark:divide-neutral-700/50"
           >
             {isLoading ? (
               <tr>
@@ -97,7 +85,6 @@ export default function PublicationTable({
                   key={item.id}
                   item={item}
                   t={t}
-                  theme={theme}
                   connectedAccounts={connectedAccounts}
                   getStatusColor={getStatusColor}
                   onEdit={onEdit}
@@ -127,35 +114,6 @@ export default function PublicationTable({
       {renderDesktopTable()}
 
       <div className="lg:hidden">
-        <div className="flex justify-end mb-4">
-          <div className="flex items-center gap-2">
-            <div className="flex bg-gray-100 dark:bg-neutral-800 rounded-lg p-1">
-              <button
-                onClick={() => setMobileViewMode("table")}
-                className={`px-3 py-1 rounded text-sm transition-colors ${
-                  mobileViewMode === "table"
-                    ? "bg-white dark:bg-neutral-700 text-gray-900 dark:text-white shadow-sm"
-                    : "text-gray-600 dark:text-gray-400"
-                }`}
-                title={t("common.listView")}
-              >
-                <List className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => setMobileViewMode("grid")}
-                className={`px-3 py-1 rounded text-sm transition-colors ${
-                  mobileViewMode === "grid"
-                    ? "bg-white dark:bg-neutral-700 text-gray-900 dark:text-white shadow-sm"
-                    : "text-gray-600 dark:text-gray-400"
-                }`}
-                title={t("common.gridView")}
-              >
-                <Grid3x3 className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        </div>
-
         {isLoading ? (
           <div className="p-8 text-center space-y-4 text-gray-500">
             <div className="flex justify-center">
@@ -164,31 +122,16 @@ export default function PublicationTable({
             <span className="text-sm">{t("publications.table.loading")}</span>
           </div>
         ) : items.length > 0 ? (
-          mobileViewMode === "table" ? (
-            <PublicationMobileRow
-              items={items}
-              theme={theme}
-              t={t}
-              connectedAccounts={connectedAccounts}
-              getStatusColor={getStatusColor}
-              onEdit={onEdit}
-              onDelete={onDelete}
-              onPublish={onPublish}
-              onEditRequest={onEditRequest}
-            />
-          ) : (
-            <PublicationMobileGrid
-              items={items}
-              theme={theme}
-              t={t}
-              connectedAccounts={connectedAccounts}
-              getStatusColor={getStatusColor}
-              onEdit={onEdit}
-              onDelete={onDelete}
-              onPublish={onPublish}
-              onEditRequest={onEditRequest}
-            />
-          )
+          <PublicationMobileGrid
+            items={items}
+            t={t}
+            connectedAccounts={connectedAccounts}
+            getStatusColor={getStatusColor}
+            onEdit={onEdit}
+            onDelete={onDelete}
+            onPublish={onPublish}
+            onEditRequest={onEditRequest}
+          />
         ) : (
           <div className="p-8 text-center text-gray-500 rounded-lg border border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800">
             {t("publications.table.emptyState.title")}

@@ -1,4 +1,3 @@
-import { useTheme } from "@/Hooks/useTheme";
 import { useCampaignStore } from "@/stores/campaignStore";
 import axios from "axios";
 import { Target } from "lucide-react";
@@ -31,7 +30,6 @@ export default function AddCampaignModal({
   onSubmit,
 }: AddCampaignModalProps) {
   const { t } = useTranslation();
-  const { theme } = useTheme();
   const { addCampaign } = useCampaignStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -102,30 +100,19 @@ export default function AddCampaignModal({
 
   if (!isOpen) return null;
 
-  const modalBg = theme === "dark" ? "bg-neutral-800" : "bg-white";
-  const borderColor =
-    theme === "dark" ? "border-neutral-700" : "border-gray-200";
-  const labelText = theme === "dark" ? "text-gray-300" : "text-gray-700";
-  const textSecondary = theme === "dark" ? "text-gray-400" : "text-gray-500";
-
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 ${
-        theme === "dark" ? "text-white" : "text-gray-900"
-      }`}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 text-gray-900 dark:text-white"
     >
       <div
-        className={`absolute inset-0 ${
-          theme === "dark" ? "bg-black/70" : "bg-gray-900/60"
-        } backdrop-blur-sm`}
+        className="absolute inset-0 bg-gray-900/60 dark:bg-black/70 backdrop-blur-sm"
         onClick={handleClose}
       />
 
       <div
-        className={`relative w-full max-w-2xl ${modalBg} rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300`}
+        className="relative w-full max-w-2xl bg-white dark:bg-neutral-800 rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300"
       >
         <ModalHeader
-          theme={theme}
           t={t}
           onClose={handleClose}
           title="campaigns.modal.add.title"
@@ -154,7 +141,6 @@ export default function AddCampaignModal({
                 }
                 sizeType="lg"
                 variant="filled"
-                theme={theme}
                 error={errors.name?.message as string}
               />
             </div>
@@ -168,7 +154,6 @@ export default function AddCampaignModal({
                 placeholder={t("campaigns.modal.add.placeholders.description")}
                 error={errors.description?.message as string}
                 icon={FileText}
-                theme={theme}
                 variant="filled"
                 rows={4}
                 maxLength={200}
@@ -189,7 +174,6 @@ export default function AddCampaignModal({
                   placeholder={t("campaigns.modal.add.placeholders.goal")}
                   error={errors.goal?.message as string}
                   icon={Target}
-                  theme={theme}
                   variant="filled"
                   sizeType="lg"
                   hint={`${watchedFields.goal?.length || 0}/200 characters`}
@@ -206,7 +190,6 @@ export default function AddCampaignModal({
                   placeholder={t("campaigns.modal.add.placeholders.budget")}
                   error={errors.budget?.message as string}
                   icon={DollarSign}
-                  theme={theme}
                   variant="filled"
                   sizeType="lg"
                 />
@@ -219,34 +202,30 @@ export default function AddCampaignModal({
               errors={errors}
               setValue={setValue}
               watch={watch}
-              theme={theme}
               t={t}
             />
 
             <div className="form-group">
               <label
-                className={`block text-sm font-semibold ${labelText} mb-2`}
+                className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2"
               >
                 {t("campaigns.modal.add.publications") || "Publications"}
               </label>
 
               <div
-                className={`border ${borderColor} rounded-lg max-h-48 overflow-y-auto p-2 ${
-                  theme === "dark" ? "bg-black/20" : "bg-gray-50"
-                }`}
+                className="border border-gray-200 dark:border-neutral-700 rounded-lg max-h-48 overflow-y-auto p-2 bg-gray-50 dark:bg-black/20"
               >
                 <PublicationSelector
                   publications={availablePublications}
                   selectedIds={watchedFields.publication_ids || []}
                   loading={loadingPubs}
-                  theme={theme}
                   t={t}
                   getThumbnail={getThumbnail}
                   onTogglePublication={togglePublication}
                 />
               </div>
 
-              <p className={`text-xs mt-1.5 ${textSecondary}`}>
+              <p className="text-xs mt-1.5 text-gray-500 dark:text-gray-400">
                 {t("campaigns.modal.add.associatedPublicationsRequired") ||
                   "Associated Publications is required"}
               </p>
@@ -255,7 +234,6 @@ export default function AddCampaignModal({
           </form>
         </div>
         <ModalFooter
-          theme={theme}
           onClose={handleClose}
           submitText={t("campaigns.button.add") || "Create Campaign"}
           cancelText={t("common.cancel") || "Cancel"}

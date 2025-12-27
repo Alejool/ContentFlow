@@ -4,7 +4,6 @@ import { Filter } from "lucide-react";
 
 interface FilterSectionProps {
   mode: "campaigns" | "publications";
-  theme: string;
   t: (key: string) => string;
   search: string;
   setSearch: (value: string) => void;
@@ -17,7 +16,6 @@ interface FilterSectionProps {
 
 export default function FilterSection({
   mode,
-  theme,
   t,
   search,
   setSearch,
@@ -74,20 +72,14 @@ export default function FilterSection({
       <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
         <div className="flex items-center gap-2">
           <Filter
-            className={`w-4 h-4 ${
-              theme === "dark" ? "text-gray-400" : "text-gray-500"
-            }`}
+            className="w-4 h-4 text-gray-500 dark:text-gray-400"
           />
 
           {mode === "campaigns" && (
             <select
               value={statusFilter}
               onChange={(e) => handleFilterChange("status", e.target.value)}
-              className={`py-2 pl-3 pr-8 rounded-lg text-sm border focus:ring-2 focus:ring-primary-500 focus:border-transparent cursor-pointer ${
-                theme === "dark"
-                  ? "bg-neutral-800/70 border-neutral-700/70 text-white"
-                  : "bg-white/70 border-gray-200/70 text-gray-700"
-              }`}
+              className="py-2 pl-3 pr-8 rounded-lg text-sm border focus:ring-2 focus:ring-primary-500 focus:border-transparent cursor-pointer bg-white/70 border-gray-200/70 text-gray-700 dark:bg-neutral-800/70 dark:border-neutral-700/70 dark:text-white"
             >
               {statusCampaignsOptions.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -101,11 +93,7 @@ export default function FilterSection({
             <select
               value={statusFilter}
               onChange={(e) => handleFilterChange("status", e.target.value)}
-              className={`py-2 pl-3 pr-8 rounded-lg text-sm border focus:ring-2 focus:ring-primary-500 focus:border-transparent cursor-pointer ${
-                theme === "dark"
-                  ? "bg-neutral-800/70 border-neutral-700/70 text-white"
-                  : "bg-white/70 border-gray-200/70 text-gray-700"
-              }`}
+              className="py-2 pl-3 pr-8 rounded-lg text-sm border focus:ring-2 focus:ring-primary-500 focus:border-transparent cursor-pointer bg-white/70 border-gray-200/70 text-gray-700 dark:bg-neutral-800/70 dark:border-neutral-700/70 dark:text-white"
             >
               {statusPublicationsOptions.map((option) => (
                 <option key={option.value} value={option.value}>

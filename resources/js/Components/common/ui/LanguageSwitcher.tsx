@@ -1,6 +1,6 @@
 import { usePage } from "@inertiajs/react";
 import axios from "axios";
-import { Globe } from "lucide-react";
+import { Globe, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -10,8 +10,8 @@ export default function LanguageSwitcher() {
   const [isAnimating, setIsAnimating] = useState(false);
 
   const languages = [
-    { code: "en", flag: "🇺🇸" },
-    { code: "es", flag: "🇪🇸" },
+    { code: "en", name: "English", flag: "🇺🇸" },
+    { code: "es", name: "Español", flag: "🇪🇸" },
   ];
 
   const currentLanguage =
@@ -40,31 +40,29 @@ export default function LanguageSwitcher() {
     }
   };
 
+
   return (
     <button
       onClick={toggleLanguage}
-      className="relative p-2  rounded-lg hover:bg-gradient-to-br text-gray-500
-        hover:to-indigo-800 transition-all duration-500 group overflow-hidden"
-      aria-label="Toggle language"
-      title={`Switch to ${nextLanguage.code.toUpperCase()}`}
+      className="relative p-2 rounded-lg hover:bg-gray-50 transition-all duration-300
+        group overflow-hidden border border-gray-200 hover:border-indigo-300 min-w-[44px]"
+      aria-label={`Switch to ${nextLanguage.code.toUpperCase()}`}
     >
-      <div className="absolute inset-0  transition-all duration-700" />
+      <div className="relative w-8 h-8 flex items-center justify-center">
+        <span className="text-xl transition-all duration-300 group-hover:scale-110">
+          {currentLanguage.flag}
+        </span>
 
-      <div className="relative flex items-center gap-2 ">
-        <div
-          className="relative w-10 h-10  
-          flex items-center justify-center  transition-all duration-500"
-        >
-          <Globe className="w-7 h-7   transition-transform duration-500 group-hover:rotate-180" />
-          <div
-            className={`absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center text-sm rounded-full  
-              border border-gray-200 bg-secondary-20 shadow-sm transition-all duration-300 ${
-                isAnimating ? "scale-0 rotate-90" : "scale-100"
-              }`}
-          >
-            {nextLanguage.flag}
-          </div>
-        </div>
+        <span className={`absolute -bottom-1 -right-1 text-sm transition-all duration-300
+          bg-white rounded-full border border-gray-200 p-0.5
+          ${isAnimating ? "scale-0 opacity-0" : "scale-100 opacity-100"}`}>
+          {nextLanguage.flag}
+        </span>
+
+        <span className="absolute -top-1 -left-1 text-[10px] text-indigo-500 
+          opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          →
+        </span>
       </div>
     </button>
   );

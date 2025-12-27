@@ -2,7 +2,6 @@ import { Filter, Plus, RotateCcw } from "lucide-react";
 
 interface HeaderSectionProps {
   mode: "campaigns" | "publications";
-  theme: string;
   t: (key: string) => string;
   onAdd: () => void;
   showFilters: boolean;
@@ -12,7 +11,6 @@ interface HeaderSectionProps {
 
 export default function HeaderSection({
   mode,
-  theme,
   t,
   onAdd,
   showFilters,
@@ -24,18 +22,14 @@ export default function HeaderSection({
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
         <div>
           <h2
-            className={`text-2xl font-bold ${
-              theme === "dark" ? "text-white" : "text-gray-900"
-            }`}
+            className="text-2xl font-bold text-gray-900 dark:text-white"
           >
             {mode === "campaigns"
               ? t("campaigns.title") || "Campaign Groups"
               : t("publications.title") || "Your Publications"}
           </h2>
           <p
-            className={`text-sm mt-1 ${
-              theme === "dark" ? "text-gray-400" : "text-gray-500"
-            }`}
+            className="text-sm mt-1 text-gray-500 dark:text-gray-400"
           >
             {mode === "campaigns"
               ? t("campaigns.subtitle") || "Campaign Groups"
@@ -45,11 +39,10 @@ export default function HeaderSection({
         <div className="flex gap-2">
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className={`p-2 rounded-lg transition-colors ${
-              showFilters
+            className={`p-2 rounded-lg transition-colors ${showFilters
                 ? "bg-primary-500 text-white"
                 : "hover:bg-gray-100 dark:hover:bg-neutral-700"
-            }`}
+              }`}
             title={
               mode === "campaigns"
                 ? t("campaigns.filters.title") || "Campaign Filters"

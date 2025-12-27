@@ -29,7 +29,6 @@ interface PlatformPreviewModalProps {
   platform: string;
   publication: any;
   settings?: Record<string, any>;
-  theme: "dark" | "light";
 }
 
 interface MediaFile {
@@ -111,9 +110,9 @@ const PlatformPreviewModal: React.FC<PlatformPreviewModalProps> = ({
   platform,
   publication,
   settings = {},
-  theme,
 }) => {
   const { t } = useTranslation();
+  const { theme } = useTheme();
 
   const { latestLog, isPublished, isPublishing, isFailed } = useMemo(() => {
     const logs = (publication?.social_post_logs || []).filter(
@@ -195,9 +194,7 @@ const PlatformPreviewModal: React.FC<PlatformPreviewModalProps> = ({
 
     return (
       <div
-        className={`mt-3 overflow-hidden rounded-lg border ${
-          theme === "dark" ? "border-neutral-700" : "border-gray-200"
-        }`}
+        className="mt-3 overflow-hidden rounded-lg border border-gray-200 dark:border-neutral-700"
       >
         <div className="grid grid-cols-1 gap-1">
           {mediaFiles.map((m: MediaFile, idx: number) => {
@@ -243,7 +240,7 @@ const PlatformPreviewModal: React.FC<PlatformPreviewModalProps> = ({
         </div>
       </div>
     );
-  }, [mediaFiles, theme]);
+  }, [mediaFiles]);
 
   const renderTwitterPreview = useCallback(() => {
     const isThread = settings.twitter?.type === "thread";
@@ -253,11 +250,7 @@ const PlatformPreviewModal: React.FC<PlatformPreviewModalProps> = ({
       return (
         <div className="space-y-4">
           <div
-            className={`overflow-hidden rounded-lg border border-dashed ${
-              theme === "dark"
-                ? "border-primary-500/30 bg-black"
-                : "border-primary-500/30 bg-white"
-            }`}
+            className="overflow-hidden rounded-lg border border-dashed border-primary-500/30 bg-white dark:bg-black"
           >
             <div className="flex items-center justify-between bg-primary-500/10 p-2">
               <span className="flex items-center gap-1 text-xs font-bold text-primary-500">
@@ -275,9 +268,7 @@ const PlatformPreviewModal: React.FC<PlatformPreviewModalProps> = ({
               </a>
             </div>
             <div
-              className={`flex w-full justify-center rounded-lg py-4 ${
-                theme === "dark" ? "bg-black" : "bg-white"
-              }`}
+              className="flex w-full justify-center rounded-lg py-4 bg-white dark:bg-black"
             >
               <iframe
                 frameBorder="0"
@@ -296,11 +287,7 @@ const PlatformPreviewModal: React.FC<PlatformPreviewModalProps> = ({
     return (
       <div className="space-y-4">
         <div
-          className={`rounded-lg border p-4 ${
-            theme === "dark"
-              ? "border-neutral-800 bg-black"
-              : "border-gray-100 bg-white shadow-sm"
-          }`}
+          className="rounded-lg border p-4 border-gray-100 bg-white shadow-sm dark:border-neutral-800 dark:bg-black"
         >
           <div className="flex gap-3">
             <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-gray-200">
@@ -310,9 +297,7 @@ const PlatformPreviewModal: React.FC<PlatformPreviewModalProps> = ({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1">
                   <span
-                    className={`text-[15px] font-bold ${
-                      theme === "dark" ? "text-white" : "text-gray-900"
-                    }`}
+                    className="text-[15px] font-bold text-gray-900 dark:text-white"
                   >
                     User Name
                   </span>
@@ -324,9 +309,7 @@ const PlatformPreviewModal: React.FC<PlatformPreviewModalProps> = ({
               </div>
 
               <div
-                className={`whitespace-pre-wrap text-[15px] leading-normal ${
-                  theme === "dark" ? "text-neutral-200" : "text-gray-900"
-                }`}
+                className="whitespace-pre-wrap text-[15px] leading-normal text-gray-900 dark:text-neutral-200"
               >
                 {publication?.description}
               </div>
@@ -340,11 +323,7 @@ const PlatformPreviewModal: React.FC<PlatformPreviewModalProps> = ({
                     .map((option: string, i: number) => (
                       <div
                         key={`poll-${i}`}
-                        className={`rounded-lg border p-2.5 text-sm font-medium ${
-                          theme === "dark"
-                            ? "border-neutral-700 text-sky-400"
-                            : "border-sky-100 bg-sky-50/30 text-sky-600"
-                        }`}
+                        className="rounded-lg border p-2.5 text-sm font-medium border-sky-100 bg-sky-50/30 text-sky-600 dark:border-neutral-700 dark:text-sky-400"
                       >
                         {option}
                       </div>
@@ -382,27 +361,17 @@ const PlatformPreviewModal: React.FC<PlatformPreviewModalProps> = ({
   const renderInstagramPreview = useCallback(() => {
     return (
       <div
-        className={`mx-auto max-w-[400px] overflow-hidden rounded-lg border ${
-          theme === "dark"
-            ? "border-neutral-800 bg-black"
-            : "border-gray-100 bg-white shadow-sm"
-        }`}
+        className="mx-auto max-w-[400px] overflow-hidden rounded-lg border border-gray-100 bg-white shadow-sm dark:border-neutral-800 dark:bg-black"
       >
         <div className="flex items-center justify-between p-3">
           <div className="flex items-center gap-2">
             <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-600 p-[2px]">
               <div
-                className={`h-full w-full rounded-full border-2 ${
-                  theme === "dark"
-                    ? "border-black bg-black"
-                    : "border-white bg-white"
-                } flex items-center justify-center bg-gray-200`}
+                className="h-full w-full rounded-full border-2 border-white bg-white dark:border-black dark:bg-black flex items-center justify-center bg-gray-200"
               />
             </div>
             <span
-              className={`text-sm font-semibold ${
-                theme === "dark" ? "text-white" : "text-gray-900"
-              }`}
+              className="text-sm font-semibold text-gray-900 dark:text-white"
             >
               username
             </span>
@@ -418,23 +387,17 @@ const PlatformPreviewModal: React.FC<PlatformPreviewModalProps> = ({
               {[Heart, MessageCircle, Share2].map((Icon, index) => (
                 <Icon
                   key={`ig-action-${index}`}
-                  className={`h-6 w-6 ${
-                    theme === "dark" ? "text-white" : "text-gray-900"
-                  }`}
+                  className="h-6 w-6 text-gray-900 dark:text-white"
                 />
               ))}
             </div>
             <Share2
-              className={`h-6 w-6 ${
-                theme === "dark" ? "text-white" : "text-gray-900"
-              }`}
+              className="h-6 w-6 text-gray-900 dark:text-white"
             />
           </div>
 
           <div
-            className={`text-sm ${
-              theme === "dark" ? "text-white" : "text-gray-900"
-            }`}
+            className="text-sm text-gray-900 dark:text-white"
           >
             <span className="mr-2 font-bold">username</span>
             <span className="whitespace-pre-wrap">
@@ -449,24 +412,18 @@ const PlatformPreviewModal: React.FC<PlatformPreviewModalProps> = ({
         </div>
       </div>
     );
-  }, [theme, publication, renderMedia]);
+  }, [publication, renderMedia]);
 
   const renderFacebookPreview = useCallback(() => {
     return (
       <div
-        className={`overflow-hidden rounded-lg border ${
-          theme === "dark"
-            ? "border-neutral-700 bg-[#242526]"
-            : "border-gray-200 bg-white shadow-sm"
-        }`}
+        className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-neutral-700 dark:bg-[#242526]"
       >
         <div className="flex gap-3 p-3">
           <div className="h-10 w-10 flex-shrink-0 rounded-full bg-gray-200" />
           <div className="flex-1">
             <div
-              className={`font-semibold ${
-                theme === "dark" ? "text-white" : "text-gray-900"
-              }`}
+              className="font-semibold text-gray-900 dark:text-white"
             >
               User Name
             </div>
@@ -478,9 +435,7 @@ const PlatformPreviewModal: React.FC<PlatformPreviewModalProps> = ({
         </div>
 
         <div
-          className={`whitespace-pre-wrap px-3 pb-2 text-[15px] ${
-            theme === "dark" ? "text-neutral-200" : "text-gray-900"
-          }`}
+          className="whitespace-pre-wrap px-3 pb-2 text-[15px] text-gray-900 dark:text-neutral-200"
         >
           {publication?.description}
         </div>
@@ -509,11 +464,7 @@ const PlatformPreviewModal: React.FC<PlatformPreviewModalProps> = ({
             return (
               <button
                 key={`fb-action-${index}`}
-                className={`flex flex-1 items-center justify-center gap-2 rounded-md py-2 text-sm font-semibold transition-colors ${
-                  theme === "dark"
-                    ? "text-gray-400 hover:bg-neutral-700"
-                    : "text-gray-500 hover:bg-gray-100"
-                }`}
+                className="flex flex-1 items-center justify-center gap-2 rounded-md py-2 text-sm font-semibold transition-colors text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-neutral-700"
               >
                 <Icon className="h-4 w-4" /> {label}
               </button>
@@ -522,17 +473,13 @@ const PlatformPreviewModal: React.FC<PlatformPreviewModalProps> = ({
         </div>
       </div>
     );
-  }, [theme, publication, renderMedia]);
+  }, [publication, renderMedia]);
 
   const renderYouTubePreview = useCallback(() => {
     if (youTubeId) {
       return (
         <div
-          className={`overflow-hidden rounded-lg border border-dashed ${
-            theme === "dark"
-              ? "border-primary-500/30 bg-gray-800/10"
-              : "border-primary-500/30 bg-white/10"
-          }`}
+          className="overflow-hidden rounded-lg border border-dashed border-primary-500/30 bg-white/10 dark:bg-gray-800/10"
         >
           <div className="flex items-center justify-between bg-primary-500/10 p-2">
             <span className="flex items-center gap-1 text-xs font-bold text-primary-500">
@@ -568,11 +515,7 @@ const PlatformPreviewModal: React.FC<PlatformPreviewModalProps> = ({
     // Fallback preview when no YouTube ID
     return (
       <div
-        className={`rounded-lg border p-6 text-center ${
-          theme === "dark"
-            ? "border-neutral-700 bg-gray-900/70 backdrop-blur-sm"
-            : "border-gray-200 bg-white/70 backdrop-blur-sm"
-        }`}
+        className="rounded-lg border border-gray-200 bg-white/70 backdrop-blur-sm dark:border-neutral-700 dark:bg-gray-900/70"
       >
         <div className="aspect-video w-full overflow-hidden rounded-lg bg-black">
           <div className="flex h-full items-center justify-center">
@@ -583,9 +526,7 @@ const PlatformPreviewModal: React.FC<PlatformPreviewModalProps> = ({
                 className="mx-auto mb-4 h-12 w-12 opacity-50"
               />
               <p
-                className={`${
-                  theme === "dark" ? "text-neutral-400" : "text-gray-600"
-                }`}
+                className="text-gray-600 dark:text-neutral-400"
               >
                 YouTube preview will appear after publication
               </p>
@@ -594,7 +535,7 @@ const PlatformPreviewModal: React.FC<PlatformPreviewModalProps> = ({
         </div>
       </div>
     );
-  }, [theme, youTubeId, publication, postUrl, t]);
+  }, [youTubeId, publication, postUrl, t]);
 
   const renderTikTokPreview = useCallback(() => {
     return (
@@ -657,20 +598,14 @@ const PlatformPreviewModal: React.FC<PlatformPreviewModalProps> = ({
     if (isFailed) {
       return (
         <div
-          className={`rounded-lg border-2 border-red-500/20 bg-red-500/5 p-6 ${
-            theme === "dark" ? "bg-red-900/10" : ""
-          }`}
+          className="rounded-lg border-2 border-red-500/20 bg-red-500/5 p-6 dark:bg-red-900/10"
         >
           <div className="mb-4 flex items-center gap-3 text-red-500">
             <AlertCircle className="h-6 w-6" />
             <h3 className="text-lg font-bold">Publication Failed</h3>
           </div>
           <div
-            className={`break-words whitespace-pre-wrap rounded-lg p-4 font-mono text-xs ${
-              theme === "dark"
-                ? "bg-black/40 text-red-400"
-                : "bg-black/5 text-red-600"
-            }`}
+            className="break-words whitespace-pre-wrap rounded-lg p-4 font-mono text-xs bg-black/5 text-red-600 dark:bg-black/40 dark:text-red-400"
           >
             {latestLog?.error_message ||
               "Unknown error occurred during publication."}
@@ -704,7 +639,6 @@ const PlatformPreviewModal: React.FC<PlatformPreviewModalProps> = ({
   }, [
     isPublishing,
     isFailed,
-    theme,
     platform,
     latestLog,
     t,
@@ -727,17 +661,13 @@ const PlatformPreviewModal: React.FC<PlatformPreviewModalProps> = ({
       <div className="p-6">
         <div className="custom-scrollbar max-h-[85vh] overflow-y-auto px-1 pb-4 pr-2">
           <h2
-            className={`mb-4 text-xl font-bold ${
-              theme === "dark" ? "text-white" : "text-gray-900"
-            }`}
+            className="mb-4 text-xl font-bold text-gray-900 dark:text-white"
           >
             {`${t("publications.modal.preview.title")}: ${platform}`}
           </h2>
 
           <div
-            className={`mb-6 flex items-center gap-3 rounded-lg p-4 ${
-              theme === "dark" ? "bg-neutral-900/30" : "bg-gray-50"
-            }`}
+            className="mb-6 flex items-center gap-3 rounded-lg p-4 bg-gray-50 dark:bg-neutral-900/30"
           >
             <div
               className={`flex h-10 w-10 items-center justify-center rounded-lg `}
@@ -746,9 +676,7 @@ const PlatformPreviewModal: React.FC<PlatformPreviewModalProps> = ({
             </div>
             <div className="flex-1">
               <div
-                className={`font-bold capitalize ${
-                  theme === "dark" ? "text-white" : "text-gray-900"
-                }`}
+                className="font-bold capitalize text-gray-900 dark:text-white"
               >
                 {platform}
               </div>
@@ -776,11 +704,7 @@ const PlatformPreviewModal: React.FC<PlatformPreviewModalProps> = ({
         <div className="mt-8 flex justify-end">
           <button
             onClick={onClose}
-            className={`rounded-lg px-6 py-2 font-bold transition-all ${
-              theme === "dark"
-                ? "bg-neutral-700 text-white hover:bg-neutral-600"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-            }`}
+            className="rounded-lg px-6 py-2 font-bold transition-all bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-neutral-700 dark:text-white dark:hover:bg-neutral-600"
             aria-label={t("common.close") || "Close"}
           >
             {t("common.close") || "Close"}

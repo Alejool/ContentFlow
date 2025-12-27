@@ -1,56 +1,88 @@
 import { useTheme } from "@/Hooks/useTheme";
-import { Moon, Sun } from "lucide-react";
+import { Moon, Sun, ChevronRight } from "lucide-react";
 import { useState } from "react";
+import { flushSync } from "react-dom";
 
 export default function ThemeSwitcher() {
   const { theme, toggleTheme } = useTheme();
   const [isAnimating, setIsAnimating] = useState(false);
 
-  const handleToggle = () => {
+  const handleToggle = (e: React.MouseEvent) => {
     if (isAnimating) return;
+
+    const x = e.clientX;
+    const y = e.clientY;
+
     setIsAnimating(true);
-    setTimeout(() => {
+
+    const performToggle = () => {
       toggleTheme();
+      setTimeout(() => setIsAnimating(false), 300);
+    };
+
+    // Support for View Transitions API
+    if (!(document as any).startViewTransition) {
+      performToggle();
+      return;
+    }
+
+    // Set coordinates for the circular reveal
+    document.documentElement.style.setProperty("--x", `${x}px`);
+    document.documentElement.style.setProperty("--y", `${y}px`);
+
+    // Add temporary class for the transition
+    document.documentElement.setAttribute("data-theme-transition", "true");
+
+    const transition = (document as any).startViewTransition(async () => {
+      flushSync(() => {
+        toggleTheme();
+      });
+    });
+
+    transition.finished.finally(() => {
+      document.documentElement.removeAttribute("data-theme-transition");
       setIsAnimating(false);
-    }, 200);
+    });
   };
 
   const isDark = theme === "dark";
   const Icon = isDark ? Sun : Moon;
+  const NextIcon = isDark ? Moon : Sun;
   const nextTheme = isDark ? "Light" : "Dark";
 
   return (
     <button
       onClick={handleToggle}
-      className="relative p-2 rounded-lg hover:bg-gradient-to-br text-gray-600 dark:text-gray-300 hover:text-white
-       hover:from-indigo-600 hover:to-purple-800 transition-all duration-500 group overflow-hidden"
+      className="relative p-2 rounded-lg hover:bg-gradient-to-br text-gray-600 dark:text-gray-300
+       hover:from-indigo-600 hover:to-purple-800 transition-all duration-300 group overflow-hidden
+       border border-gray-200 dark:border-gray-700 hover:border-indigo-400"
       aria-label="Toggle theme"
       title={`Switch to ${nextTheme} mode`}
     >
-      <div className="absolute inset-0 transition-all duration-700" />
-
-      <div className="relative flex items-center gap-2">
-        <div className="relative w-10 h-10 flex items-center justify-center transition-all duration-500">
+      <div className="relative flex items-center justify-center">
+        <div className="relative w-10 h-10 flex items-center justify-center">
+          {/* Icono actual con animación */}
           <Icon
-            className={`w-7 h-7 transition-all duration-500 ${
-              isAnimating
-                ? "scale-0 rotate-180"
-                : "scale-100 group-hover:rotate-12"
-            }`}
+            className={`w-6 h-6 transition-all duration-300 ${isAnimating
+              ? "scale-0 rotate-180 opacity-0"
+              : "scale-100 group-hover:rotate-12 opacity-100"
+              }`}
           />
 
+          {/* Icono siguiente (pequeño) */}
           <div
-            className={`absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center text-xs rounded-full 
-              border border-gray-600 dar bg-gradient-to-br shadow-sm transition-all duration-300 ${
-                isAnimating ? "scale-0 rotate-90" : "scale-100"
+            className={`absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center rounded-full 
+              bg-gradient-to-br from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-900 
+              border border-gray-300 dark:border-gray-600 shadow-sm transition-all duration-300 ${isAnimating ? "scale-0 rotate-90 opacity-0" : "scale-100 opacity-100"
               }`}
           >
-            {isDark ? (
-              <Sun className="w-3 h-3 " />
-            ) : (
-              <Moon className="w-3 h-3 " />
-            )}
+            <NextIcon className="w-3 h-3 text-gray-700 dark:text-gray-300" />
           </div>
+
+          {/* Indicador hover (flecha) */}
+          <ChevronRight className={`absolute left-8 w-4 h-4 text-indigo-500 
+            opacity-0 group-hover:opacity-100 transition-all duration-300
+            ${isAnimating ? "scale-0" : "scale-100"}`} />
         </div>
       </div>
     </button>

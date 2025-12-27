@@ -7,7 +7,6 @@ interface ModalFooterProps {
   onClose?: () => void;
   submitText?: string;
   cancelText?: string;
-  theme: "dark" | "light";
   formId?: string;
   submitIcon?: React.ReactNode;
   cancelIcon?: React.ReactNode;
@@ -22,26 +21,25 @@ interface ModalFooterProps {
   onPrimarySubmit?: () => void;
 
   submitVariant?:
-    | "primary"
-    | "danger"
-    | "secondary"
-    | "success"
-    | "ghost"
-    | "warning";
+  | "primary"
+  | "danger"
+  | "secondary"
+  | "success"
+  | "ghost"
+  | "warning";
   cancelVariant?:
-    | "primary"
-    | "danger"
-    | "secondary"
-    | "success"
-    | "ghost"
-    | "warning";
+  | "primary"
+  | "danger"
+  | "secondary"
+  | "success"
+  | "ghost"
+  | "warning";
   submitStyle?: "solid" | "outline" | "gradient" | "ghost";
   cancelStyle?: "solid" | "outline" | "gradient" | "ghost";
 }
 
 export default function ModalFooter({
   isSubmitting = false,
-  theme,
   onClose,
   submitText = "Save",
   cancelText = "Cancel",
@@ -60,17 +58,11 @@ export default function ModalFooter({
   submitStyle = "gradient",
   cancelStyle = "outline",
 }: ModalFooterProps) {
-  const modalHeaderBg =
-    theme === "dark"
-      ? "bg-gradient-to-r from-neutral-900 to-neutral-800"
-      : "bg-gradient-to-r from-gray-50 to-white";
-  const modalHeaderBorder =
-    theme === "dark" ? "border-neutral-700" : "border-gray-100";
-
   return (
     <div
-      className={`${modalHeaderBg} ${modalHeaderBorder} p-6  border-t border-gray-200 sticky bottom-0  flex justify-end gap-3`}
+      className="bg-gradient-to-r from-gray-50 to-white dark:from-neutral-900 dark:to-neutral-800 border-t border-gray-100 dark:border-neutral-700 p-6 sticky bottom-0 flex justify-end gap-3"
     >
+
       {onClose && (
         <Button
           type="button"

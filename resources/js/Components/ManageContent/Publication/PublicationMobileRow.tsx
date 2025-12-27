@@ -8,6 +8,7 @@ import {
   Eye,
   Folder,
   Image,
+  Loader2,
   MoreVertical,
   Rocket,
   Trash2,
@@ -18,7 +19,6 @@ import { Fragment, useState } from "react";
 
 interface PublicationMobileRowProps {
   items: Publication[];
-  theme: string;
   t: (key: string) => string;
   connectedAccounts: any[];
   getStatusColor: (status?: string) => string;
@@ -30,7 +30,6 @@ interface PublicationMobileRowProps {
 
 export default function PublicationMobileRow({
   items,
-  theme,
   t,
   connectedAccounts,
   getStatusColor,
@@ -40,6 +39,7 @@ export default function PublicationMobileRow({
   onEditRequest,
 }: PublicationMobileRowProps) {
   const [expandedRow, setExpandedRow] = useState<number | null>(null);
+  const [loadingStates, setLoadingStates] = useState<Record<number, { publishing?: boolean; editing?: boolean; deleting?: boolean }>>({});
 
   const countMediaFiles = (pub: Publication) => {
     if (!pub.media_files || pub.media_files.length === 0) {
@@ -84,166 +84,157 @@ export default function PublicationMobileRow({
   };
 
   return (
-    <div className="relative w-full">
+    <div className="flex ">
       <div className="w-full overflow-x-auto scroll-smooth">
-        <div className="min-w-[400px]">
-          <table className="w-full">
-            <thead
-              className={`text-xs uppercase tracking-wider border-b ${
-                theme === "dark"
-                  ? "bg-neutral-800 border-neutral-700 text-gray-300"
-                  : "bg-gray-50 border-gray-200 text-gray-600"
-              }`}
-            >
-              <tr>
-                <th className="px-4 py-3 font-semibold text-left w-[70%]">
-                  {t("publications.table.name")}
-                </th>
-                <th className="px-3 py-3 font-semibold text-right w-[30%]">
-                  {t("publications.table.actions")}
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200 dark:divide-neutral-700">
-              {items.map((item) => {
-                const mediaCount = countMediaFiles(item);
-                const isExpanded = expandedRow === item.id;
+        <table className="w-full">
+          <thead className={`text-xs uppercase tracking-wider border-b`}>
+            <tr>
+              <th className="px-4 py-3 font-semibold text-left w-[70%]">
+                {t("publications.table.name")}
+              </th>
+              <th className="px-3 py-3 font-semibold text-right w-[30%]">
+                {t("publications.table.actions")}
+              </th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200 dark:divide-neutral-700">
+            {items.map((item) => {
+              const mediaCount = countMediaFiles(item);
+              const isExpanded = expandedRow === item.id;
 
-                return (
-                  <Fragment key={item.id}>
-                    <tr
-                      key={item.id}
-                      onClick={(e) => handleRowClick(item, e)}
-                      className={`cursor-pointer ${
-                        theme === "dark"
-                          ? "hover:bg-neutral-700/30"
-                          : "hover:bg-gray-50/50"
-                      } ${
-                        isExpanded
-                          ? theme === "dark"
-                            ? "bg-neutral-800/50"
-                            : "bg-gray-50"
-                          : ""
+              return (
+                <Fragment key={item.id}>
+                  <tr
+                    key={item.id}
+                    onClick={(e) => handleRowClick(item, e)}
+                    className={`cursor-pointer hover:bg-gray-50/50 dark:hover:bg-neutral-700/30 ${isExpanded
+                      ? "bg-gray-50 dark:bg-neutral-800/50"
+                      : ""
                       }`}
-                    >
-                      <td className="px-4 py-3 w-[70%]">
-                        <div className="flex items-center gap-3">
-                          <div
-                            className={`w-10 h-10 rounded-lg flex-shrink-0 border overflow-hidden flex items-center justify-center ${
-                              theme === "dark"
-                                ? "border-neutral-700 bg-neutral-800"
-                                : "border-gray-200 bg-gray-100"
-                            }`}
-                          >
-                            <PublicationThumbnail publication={item} />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-start justify-between">
-                              <div className="min-w-0">
-                                <h3
-                                  className={`font-medium text-sm truncate ${
-                                    theme === "dark"
-                                      ? "text-white"
-                                      : "text-gray-900"
-                                  }`}
-                                >
-                                  {item.title ||
-                                    t("publications.table.untitled")}
-                                </h3>
+                  >
+                    <td className="px-4 py-3 w-[70%]">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg flex-shrink-0 border border-gray-200 bg-gray-100 dark:border-neutral-700 dark:bg-neutral-800 overflow-hidden flex items-center justify-center">
+                          <PublicationThumbnail publication={item} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between">
+                            <div className="min-w-0">
+                              <h3
+                                className="font-medium text-sm truncate text-gray-900 dark:text-white"
+                              >
+                                {item.title ||
+                                  t("publications.table.untitled")}
+                              </h3>
 
-                                <div className="flex flex-wrap items-center gap-2 mt-1">
+                              <div className="flex flex-wrap items-center gap-2 mt-1">
+                                <div className="flex items-center gap-1">
+                                  {getStatusIcon(item.status || "draft")}
+                                  <span
+                                    className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                                      item.status
+                                    )}`}
+                                  >
+                                    {item.status ||
+                                      t("publications.status.draft")}
+                                  </span>
+                                </div>
+
+                                {mediaCount.total > 0 && (
                                   <div className="flex items-center gap-1">
-                                    {getStatusIcon(item.status || "draft")}
-                                    <span
-                                      className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                                        item.status
-                                      )}`}
-                                    >
-                                      {item.status ||
-                                        t("publications.status.draft")}
+                                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                                      {mediaCount.total}
                                     </span>
+                                    <div className="flex gap-0.5">
+                                      {mediaCount.images > 0 && (
+                                        <Image className="w-3 h-3 text-blue-500" />
+                                      )}
+                                      {mediaCount.videos > 0 && (
+                                        <Video className="w-3 h-3 text-purple-500" />
+                                      )}
+                                    </div>
                                   </div>
+                                )}
 
-                                  {mediaCount.total > 0 && (
+                                {item.campaigns &&
+                                  item.campaigns.length > 0 && (
                                     <div className="flex items-center gap-1">
+                                      <Folder className="w-3 h-3 text-purple-500" />
                                       <span className="text-xs text-gray-500 dark:text-gray-400">
-                                        {mediaCount.total}
+                                        {item.campaigns.length}
                                       </span>
-                                      <div className="flex gap-0.5">
-                                        {mediaCount.images > 0 && (
-                                          <Image className="w-3 h-3 text-blue-500" />
-                                        )}
-                                        {mediaCount.videos > 0 && (
-                                          <Video className="w-3 h-3 text-purple-500" />
-                                        )}
-                                      </div>
                                     </div>
                                   )}
-
-                                  {item.campaigns &&
-                                    item.campaigns.length > 0 && (
-                                      <div className="flex items-center gap-1">
-                                        <Folder className="w-3 h-3 text-purple-500" />
-                                        <span className="text-xs text-gray-500 dark:text-gray-400">
-                                          {item.campaigns.length}
-                                        </span>
-                                      </div>
-                                    )}
-                                </div>
-                              </div>
-
-                              <div
-                                className={`transition-transform duration-200 ${
-                                  isExpanded ? "rotate-90" : ""
-                                }`}
-                              >
-                                <MoreVertical className="w-4 h-4 text-gray-400" />
                               </div>
                             </div>
                           </div>
                         </div>
-                      </td>
+                      </div>
+                    </td>
 
-                      <td className="px-3 py-3 w-[30%]">
-                        <div className="flex items-center justify-end gap-1">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onPublish(item);
-                            }}
-                            className="p-2 text-green-500 hover:bg-green-50 rounded-lg dark:hover:bg-green-900/20"
-                            title={t("publications.actions.publishNow")}
-                          >
-                            <Rocket className="w-4 h-4" />
-                          </button>
-
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              if (onEditRequest) {
-                                onEditRequest(item);
-                              } else {
-                                onEdit(item);
-                              }
-                            }}
-                            className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg dark:hover:bg-blue-900/20"
-                            title={t("common.edit")}
-                          >
-                            <Edit className="w-4 h-4" />
-                          </button>
+                    <td className="px-3 py-3 w-[30%]">
+                      <div className="flex items-center justify-end gap-1">
+                        <div
+                          className={`transition-transform duration-200 ${isExpanded ? "rotate-90" : ""
+                            }`}
+                        >
+                          <MoreVertical className="w-4 h-4 text-gray-400" />
                         </div>
-                      </td>
-                    </tr>
+                        <button
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            setLoadingStates(prev => ({ ...prev, [item.id]: { ...prev[item.id], publishing: true } }));
+                            try {
+                              await onPublish(item);
+                            } finally {
+                              setLoadingStates(prev => ({ ...prev, [item.id]: { ...prev[item.id], publishing: false } }));
+                            }
+                          }}
+                          disabled={loadingStates[item.id]?.publishing || loadingStates[item.id]?.editing || loadingStates[item.id]?.deleting}
+                          className="p-2 text-green-500 hover:bg-green-50 rounded-lg dark:hover:bg-green-900/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                          title={t("publications.actions.publishNow")}
+                        >
+                          {loadingStates[item.id]?.publishing ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <Rocket className="w-4 h-4" />
+                          )}
+                        </button>
 
-                    {isExpanded && (
+                        <button
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            setLoadingStates(prev => ({ ...prev, [item.id]: { ...prev[item.id], editing: true } }));
+                            try {
+                              if (onEditRequest) {
+                                await onEditRequest(item);
+                              } else {
+                                await onEdit(item);
+                              }
+                            } finally {
+                              setLoadingStates(prev => ({ ...prev, [item.id]: { ...prev[item.id], editing: false } }));
+                            }
+                          }}
+                          disabled={loadingStates[item.id]?.publishing || loadingStates[item.id]?.editing || loadingStates[item.id]?.deleting}
+                          className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg dark:hover:bg-blue-900/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                          title={t("common.edit")}
+                        >
+                          {loadingStates[item.id]?.editing ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <Edit className="w-4 h-4" />
+                          )}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+
+                  {
+                    isExpanded && (
                       <tr>
                         <td colSpan={2} className="px-4 py-4">
                           <div
-                            className={`rounded-lg p-4 ${
-                              theme === "dark"
-                                ? "bg-neutral-800/50 border border-neutral-700"
-                                : "bg-gray-50 border border-gray-200"
-                            }`}
+                            className="rounded-lg p-4 bg-gray-50 border border-gray-200 dark:bg-neutral-800/50 dark:border-neutral-700"
                           >
                             <div className="space-y-4">
                               {item.description && (
@@ -348,7 +339,6 @@ export default function PublicationMobileRow({
                                       <SocialAccountsDisplay
                                         publication={item}
                                         connectedAccounts={connectedAccounts}
-                                        theme={theme}
                                         compact={false}
                                       />
                                     </div>
@@ -359,41 +349,87 @@ export default function PublicationMobileRow({
                               <div className="flex flex-wrap gap-2 pt-4 border-t border-gray-200 dark:border-neutral-700">
                                 {item.status === "published" && (
                                   <button
-                                    onClick={() => onPublish(item)}
-                                    className="px-4 py-2 text-sm font-medium rounded-lg bg-primary-50 text-primary-600 hover:bg-primary-100 dark:bg-primary-900/20 dark:text-primary-400 dark:hover:bg-primary-900/30 transition-colors flex items-center gap-2"
+                                    onClick={async () => {
+                                      setLoadingStates(prev => ({ ...prev, [item.id]: { ...prev[item.id], publishing: true } }));
+                                      try {
+                                        await onPublish(item);
+                                      } finally {
+                                        setLoadingStates(prev => ({ ...prev, [item.id]: { ...prev[item.id], publishing: false } }));
+                                      }
+                                    }}
+                                    disabled={loadingStates[item.id]?.publishing || loadingStates[item.id]?.editing || loadingStates[item.id]?.deleting}
+                                    className="px-4 py-2 text-sm font-medium rounded-lg bg-primary-50 text-primary-600 hover:bg-primary-100 dark:bg-primary-900/20 dark:text-primary-400 dark:hover:bg-primary-900/30 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                                   >
-                                    <Eye className="w-4 h-4" />
+                                    {loadingStates[item.id]?.publishing ? (
+                                      <Loader2 className="w-4 h-4 animate-spin" />
+                                    ) : (
+                                      <Eye className="w-4 h-4" />
+                                    )}
                                     {t("publications.actions.viewDetails")}
                                   </button>
                                 )}
 
                                 <button
-                                  onClick={() => onPublish(item)}
-                                  className="px-4 py-2 text-sm font-medium rounded-lg bg-green-50 text-green-600 hover:bg-green-100 dark:bg-green-900/20 dark:text-green-400 dark:hover:bg-green-900/30 transition-colors flex items-center gap-2"
+                                  onClick={async () => {
+                                    setLoadingStates(prev => ({ ...prev, [item.id]: { ...prev[item.id], publishing: true } }));
+                                    try {
+                                      await onPublish(item);
+                                    } finally {
+                                      setLoadingStates(prev => ({ ...prev, [item.id]: { ...prev[item.id], publishing: false } }));
+                                    }
+                                  }}
+                                  disabled={loadingStates[item.id]?.publishing || loadingStates[item.id]?.editing || loadingStates[item.id]?.deleting}
+                                  className="px-4 py-2 text-sm font-medium rounded-lg bg-green-50 text-green-600 hover:bg-green-100 dark:bg-green-900/20 dark:text-green-400 dark:hover:bg-green-900/30 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                  <Rocket className="w-4 h-4" />
+                                  {loadingStates[item.id]?.publishing ? (
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                  ) : (
+                                    <Rocket className="w-4 h-4" />
+                                  )}
                                   {t("publications.actions.publishNow")}
                                 </button>
 
                                 <button
-                                  onClick={() => {
-                                    if (onEditRequest) {
-                                      onEditRequest(item);
-                                    } else {
-                                      onEdit(item);
+                                  onClick={async () => {
+                                    setLoadingStates(prev => ({ ...prev, [item.id]: { ...prev[item.id], editing: true } }));
+                                    try {
+                                      if (onEditRequest) {
+                                        await onEditRequest(item);
+                                      } else {
+                                        await onEdit(item);
+                                      }
+                                    } finally {
+                                      setLoadingStates(prev => ({ ...prev, [item.id]: { ...prev[item.id], editing: false } }));
                                     }
                                   }}
-                                  className="px-4 py-2 text-sm font-medium rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/30 transition-colors flex items-center gap-2"
+                                  disabled={loadingStates[item.id]?.publishing || loadingStates[item.id]?.editing || loadingStates[item.id]?.deleting}
+                                  className="px-4 py-2 text-sm font-medium rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/30 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                  <Edit className="w-4 h-4" />
+                                  {loadingStates[item.id]?.editing ? (
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                  ) : (
+                                    <Edit className="w-4 h-4" />
+                                  )}
                                   {t("common.edit")}
                                 </button>
 
                                 <button
-                                  onClick={() => onDelete(item.id)}
-                                  className="px-4 py-2 text-sm font-medium rounded-lg bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/30 transition-colors flex items-center gap-2"
+                                  onClick={async () => {
+                                    setLoadingStates(prev => ({ ...prev, [item.id]: { ...prev[item.id], deleting: true } }));
+                                    try {
+                                      await onDelete(item.id);
+                                    } finally {
+                                      setLoadingStates(prev => ({ ...prev, [item.id]: { ...prev[item.id], deleting: false } }));
+                                    }
+                                  }}
+                                  disabled={loadingStates[item.id]?.publishing || loadingStates[item.id]?.editing || loadingStates[item.id]?.deleting}
+                                  className="px-4 py-2 text-sm font-medium rounded-lg bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/30 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                  <Trash2 className="w-4 h-4" />
+                                  {loadingStates[item.id]?.deleting ? (
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                  ) : (
+                                    <Trash2 className="w-4 h-4" />
+                                  )}
                                   {t("common.delete")}
                                 </button>
                               </div>
@@ -401,14 +437,14 @@ export default function PublicationMobileRow({
                           </div>
                         </td>
                       </tr>
-                    )}
-                  </Fragment>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+                    )
+                  }
+                </Fragment>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
-    </div>
+    </div >
   );
 }

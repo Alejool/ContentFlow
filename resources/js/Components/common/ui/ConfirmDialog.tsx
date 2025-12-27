@@ -1,4 +1,3 @@
-import { useTheme } from "@/Hooks/useTheme";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { AlertTriangle, X } from "lucide-react";
 
@@ -23,8 +22,6 @@ export default function ConfirmDialog({
   cancelText = "Cancel",
   type = "danger",
 }: ConfirmDialogProps) {
-  const { theme } = useTheme();
-
   const handleConfirm = () => {
     onConfirm();
     onClose();
@@ -64,13 +61,7 @@ export default function ConfirmDialog({
 
       <div className="fixed inset-0 flex items-center justify-center p-4">
         <DialogPanel
-          className={`w-full max-w-md rounded-lg p-6 shadow-2xl
-            ${
-              theme === "dark"
-                ? "bg-neutral-800 border border-neutral-700"
-                : "bg-white"
-            }
-          `}
+          className="w-full max-w-md rounded-lg p-6 shadow-2xl bg-white dark:bg-neutral-800 border border-transparent dark:border-neutral-700"
         >
           <div className="flex items-start gap-4">
             <div
@@ -81,16 +72,12 @@ export default function ConfirmDialog({
 
             <div className="flex-1">
               <DialogTitle
-                className={`text-lg font-bold mb-2 ${
-                  theme === "dark" ? "text-white" : "text-gray-900"
-                }`}
+                className="text-lg font-bold mb-2 text-gray-900 dark:text-white"
               >
                 {title}
               </DialogTitle>
               <p
-                className={`text-sm ${
-                  theme === "dark" ? "text-gray-400" : "text-gray-600"
-                }`}
+                className="text-sm text-gray-600 dark:text-gray-400"
               >
                 {message}
               </p>
@@ -98,11 +85,7 @@ export default function ConfirmDialog({
 
             <button
               onClick={onClose}
-              className={`flex-shrink-0 p-1 rounded-lg transition-colors ${
-                theme === "dark"
-                  ? "hover:bg-neutral-700 text-gray-400"
-                  : "hover:bg-gray-100 text-gray-500"
-              }`}
+              className="flex-shrink-0 p-1 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-neutral-700 text-gray-500 dark:text-gray-400"
             >
               <X className="w-5 h-5" />
             </button>
@@ -111,11 +94,7 @@ export default function ConfirmDialog({
           <div className="flex gap-3 mt-6">
             <button
               onClick={onClose}
-              className={`flex-1 px-4 py-2.5 rounded-lg font-medium transition-colors ${
-                theme === "dark"
-                  ? "bg-neutral-700 hover:bg-neutral-600 text-white"
-                  : "bg-gray-100 hover:bg-gray-200 text-gray-700"
-              }`}
+              className="flex-1 px-4 py-2.5 rounded-lg font-medium transition-colors bg-gray-100 dark:bg-neutral-700 hover:bg-gray-200 dark:hover:bg-neutral-600 text-gray-700 dark:text-white"
             >
               {cancelText}
             </button>

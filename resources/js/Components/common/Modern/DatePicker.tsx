@@ -1,5 +1,4 @@
 import Label from "@/Components/common/Modern/Label";
-import { useTheme } from "@/Hooks/useTheme";
 import { enUS, es } from "date-fns/locale";
 import {
   ArrowLeft,
@@ -75,7 +74,6 @@ const DatePickerModern = <T extends FieldValues>({
   variant = "default",
   containerClassName = "",
 }: DatePickerProps<T>) => {
-  const { theme } = useTheme();
   const { i18n } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -110,48 +108,27 @@ const DatePickerModern = <T extends FieldValues>({
       ${currentSize.input}
     `;
 
-    if (theme === "dark") {
-      if (error) {
-        return `${base} bg-neutral-800 text-white border-primary-500 focus:ring-primary-500/30 pl-11`;
-      }
-      if (success) {
-        return `${base} bg-neutral-800 text-white border-green-500 focus:ring-green-500/30 pl-11`;
-      }
-      if (variant === "outlined") {
-        return `${base} bg-transparent text-white border-2 border-neutral-600 hover:border-neutral-500 focus:ring-purple-500/30 pl-11`;
-      }
-      if (variant === "filled") {
-        return `${base} bg-neutral-800 text-white border border-neutral-700 hover:border-neutral-600 focus:ring-purple-500/30 pl-11`;
-      }
-      return `${base} bg-neutral-800/50 text-white border border-neutral-700/50 hover:border-neutral-600/70 focus:ring-purple-500/30 pl-11`;
-    } else {
-      if (error) {
-        return `${base} bg-white text-gray-900 border-primary-500 focus:ring-primary-500/20 pl-11`;
-      }
-      if (success) {
-        return `${base} bg-white text-gray-900 border-green-500 focus:ring-green-500/20 pl-11`;
-      }
-      if (variant === "outlined") {
-        return `${base} bg-transparent text-gray-900 border-2 border-gray-300 hover:border-gray-400 focus:ring-purple-500/20 pl-11`;
-      }
-      if (variant === "filled") {
-        return `${base} bg-gray-50 text-gray-900 border border-gray-300 hover:border-gray-400 focus:ring-purple-500/20 pl-11`;
-      }
-      return `${base} bg-white text-gray-900 border border-gray-300 hover:border-gray-400 focus:ring-purple-500/20 pl-11`;
+    if (error) {
+      return `${base} bg-white dark:bg-neutral-800 text-gray-900 dark:text-white border-primary-500 focus:ring-primary-500/20 dark:focus:ring-primary-500/30 pl-11`;
     }
+    if (success) {
+      return `${base} bg-white dark:bg-neutral-800 text-gray-900 dark:text-white border-green-500 focus:ring-green-500/20 dark:focus:ring-green-500/30 pl-11`;
+    }
+    if (variant === "outlined") {
+      return `${base} bg-transparent text-gray-900 dark:text-white border-2 border-gray-300 dark:border-neutral-600 hover:border-gray-400 dark:hover:border-neutral-500 focus:ring-purple-500/20 dark:focus:ring-purple-500/30 pl-11`;
+    }
+    if (variant === "filled") {
+      return `${base} bg-gray-50 dark:bg-neutral-800 text-gray-900 dark:text-white border border-gray-300 dark:border-neutral-700 hover:border-gray-400 dark:hover:border-neutral-600 focus:ring-purple-500/20 dark:focus:ring-purple-500/30 pl-11`;
+    }
+    return `${base} bg-white dark:bg-neutral-800/50 text-gray-900 dark:text-white border border-gray-300 dark:border-neutral-700/50 hover:border-gray-400 dark:hover:border-neutral-600/70 focus:ring-purple-500/20 dark:focus:ring-purple-500/30 pl-11`;
   };
 
   const getMessageStyles = (type: "error" | "success") => {
     const base = "flex items-start gap-2 px-3 py-2 rounded-lg text-sm";
 
-    if (theme === "dark") {
-      return type === "error"
-        ? `${base} text-primary-500`
-        : `${base} text-green-500`;
-    }
     return type === "error"
-      ? `${base} text-primary-600`
-      : `${base} text-green-600`;
+      ? `${base} text-primary-600 dark:text-primary-500`
+      : `${base} text-green-600 dark:text-green-500`;
   };
 
   const CustomInput = forwardRef<HTMLInputElement, any>(
@@ -177,43 +154,29 @@ const DatePickerModern = <T extends FieldValues>({
             error
               ? `${label?.toLowerCase()}-error`
               : success
-              ? `${label?.toLowerCase()}-success`
-              : undefined
+                ? `${label?.toLowerCase()}-success`
+                : undefined
           }
         />
         <div className="absolute left-4 flex items-center pointer-events-none">
           {icon ||
             (showTimeSelect ? (
               <Clock
-                className={`${currentSize.icon} ${
-                  theme === "dark"
-                    ? error
-                      ? "text-primary-400"
-                      : success
-                      ? "text-green-400"
-                      : "text-gray-400"
-                    : error
-                    ? "text-primary-500"
-                    : success
-                    ? "text-green-500"
-                    : "text-gray-500"
-                }`}
+                className={`${currentSize.icon} text-gray-500 dark:text-gray-400 ${error
+                  ? "text-primary-500 dark:text-primary-400"
+                  : success
+                    ? "text-green-500 dark:text-green-400"
+                    : ""
+                  }`}
               />
             ) : (
               <Calendar
-                className={`${currentSize.icon} ${
-                  theme === "dark"
-                    ? error
-                      ? "text-primary-400"
-                      : success
-                      ? "text-green-400"
-                      : "text-gray-400"
-                    : error
-                    ? "text-primary-500"
-                    : success
-                    ? "text-green-500"
-                    : "text-gray-500"
-                }`}
+                className={`${currentSize.icon} text-gray-500 dark:text-gray-400 ${error
+                  ? "text-primary-500 dark:text-primary-400"
+                  : success
+                    ? "text-green-500 dark:text-green-400"
+                    : ""
+                  }`}
               />
             ))}
         </div>
@@ -255,9 +218,7 @@ const DatePickerModern = <T extends FieldValues>({
           )}
           {hint && !label && (
             <span
-              className={`text-xs ${
-                theme === "dark" ? "text-gray-400" : "text-gray-500"
-              } ml-auto`}
+              className="text-xs text-gray-500 dark:text-gray-400 ml-auto"
             >
               {hint}
             </span>
@@ -273,23 +234,23 @@ const DatePickerModern = <T extends FieldValues>({
           .react-datepicker {
             font-family: inherit;
             border-radius: 0.5rem;
-            border: 1px solid ${theme === "dark" ? "#404040" : "#e5e7eb"};
-            background-color: ${
-              theme === "dark" ? "#262626 !important" : "#ffffff"
-            };
-            color: ${theme === "dark" ? "#e5e7eb" : "#374151"};
+            border: 1px solid #e5e7eb;
+            background-color: #ffffff;
+            color: #374151;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
             z-index: 9999 !important;
           }
 
+          .dark .react-datepicker {
+            border: 1px solid #404040;
+            background-color: #262626 !important;
+            color: #e5e7eb;
+          }
+
           /* Ajuste de altura del header para igualar con time header */
           .react-datepicker__header {
-            background-color: ${
-              theme === "dark" ? "#171717 !important" : "#f9fafb"
-            };
-            border-bottom: 1px solid ${
-              theme === "dark" ? "#404040" : "#e5e7eb"
-            };
+            background-color: #f9fafb;
+            border-bottom: 1px solid #e5e7eb;
             border-top-left-radius: 0.5rem;
             border-top-right-radius: 0.5rem;
             padding: 0.75rem 1rem;
@@ -297,6 +258,11 @@ const DatePickerModern = <T extends FieldValues>({
             display: flex;
             flex-direction: column;
             justify-content: center;
+          }
+
+          .dark .react-datepicker__header {
+            background-color: #171717 !important;
+            border-bottom: 1px solid #404040;
           }
 
           .react-datepicker__header--time {
@@ -309,12 +275,18 @@ const DatePickerModern = <T extends FieldValues>({
           .react-datepicker__current-month,
           .react-datepicker-time__header,
           .react-datepicker-year-header {
-            color: ${theme === "dark" ? "#e5e7eb !important" : "#111827"};
+            color: #111827;
             font-weight: 600;
             font-size: 0.875rem;
             line-height: 1.25rem;
             margin: 0;
             padding: 0.25rem 0;
+          }
+
+          .dark .react-datepicker__current-month,
+          .dark .react-datepicker-time__header,
+          .dark .react-datepicker-year-header {
+            color: #e5e7eb !important;
           }
 
           .react-datepicker-time__header {
@@ -330,11 +302,18 @@ const DatePickerModern = <T extends FieldValues>({
 
           .react-datepicker__month-dropdown,
           .react-datepicker__year-dropdown {
-            background-color: ${theme === "dark" ? "#262626" : "#ffffff"};
-            border: 1px solid ${theme === "dark" ? "#404040" : "#e5e7eb"};
+            background-color: #ffffff;
+            border: 1px solid #e5e7eb;
             border-radius: 0.375rem;
             padding: 0.25rem;
-            color: ${theme === "dark" ? "#e5e7eb" : "#374151"};
+            color: #374151;
+          }
+
+          .dark .react-datepicker__month-dropdown,
+          .dark .react-datepicker__year-dropdown {
+            background-color: #262626;
+            border: 1px solid #404040;
+            color: #e5e7eb;
           }
 
           .react-datepicker__month-dropdown option,
@@ -346,12 +325,17 @@ const DatePickerModern = <T extends FieldValues>({
 
           .react-datepicker__month-dropdown option:hover,
           .react-datepicker__year-dropdown option:hover {
-            background-color: ${theme === "dark" ? "#404040" : "#f3f4f6"};
+            background-color: #f3f4f6;
+          }
+
+          .dark .react-datepicker__month-dropdown option:hover,
+          .dark .react-datepicker__year-dropdown option:hover {
+            background-color: #404040;
           }
 
           .react-datepicker__month-dropdown option:checked,
           .react-datepicker__year-dropdown option:checked {
-            background-color: ${theme === "dark" ? "#ea580c" : "#ea580c"};
+            background-color: #ea580c;
             color: white;
           }
 
@@ -381,19 +365,30 @@ const DatePickerModern = <T extends FieldValues>({
           }
 
           .react-datepicker__day-name {
-            color: ${theme === "dark" ? "#9ca3af !important" : "#6b7280"};
+            color: #6b7280;
+          }
+
+          .dark .react-datepicker__day-name {
+            color: #9ca3af !important;
           }
 
           .react-datepicker__day {
-            color: ${theme === "dark" ? "#e5e7eb !important" : "#374151"};
+            color: #374151;
             border-radius: 0.375rem;
           }
 
+          .dark .react-datepicker__day {
+            color: #e5e7eb !important;
+          }
+
           .react-datepicker__day:hover {
-            background-color: ${
-              theme === "dark" ? "#404040 !important" : "#f3f4f6"
-            };
-            color: ${theme === "dark" ? "#ffffff !important" : "#111827"};
+            background-color: #f3f4f6;
+            color: #111827;
+          }
+
+          .dark .react-datepicker__day:hover {
+            background-color: #404040 !important;
+            color: #ffffff !important;
           }
 
           .react-datepicker__day--selected,
@@ -404,21 +399,27 @@ const DatePickerModern = <T extends FieldValues>({
 
           .react-datepicker__day--today {
             font-weight: bold;
-            color: ${theme === "dark" ? "#ea580c" : "#ea580c"};
+            color: #ea580c;
           }
 
           /* Ajustes para time container */
           .react-datepicker__time-container {
-            border-left: 1px solid ${theme === "dark" ? "#404040" : "#e5e7eb"};
+            border-left: 1px solid #e5e7eb;
             width: 110px !important;
           }
 
+          .dark .react-datepicker__time-container {
+            border-left: 1px solid #404040;
+          }
+
           .react-datepicker__time-container .react-datepicker__time {
-            background-color: ${
-              theme === "dark" ? "#262626 !important" : "#ffffff"
-            };
+            background-color: #ffffff;
             border-bottom-right-radius: 0.5rem;
             height: 100%;
+          }
+
+          .dark .react-datepicker__time-container .react-datepicker__time {
+            background-color: #262626 !important;
           }
 
           .react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box {
@@ -432,7 +433,7 @@ const DatePickerModern = <T extends FieldValues>({
           }
 
           .react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box ul.react-datepicker__time-list li.react-datepicker__time-list-item {
-            color: ${theme === "dark" ? "#e5e7eb !important" : "#374151"};
+            color: #374151;
             height: 2.5rem !important;
             display: flex;
             align-items: center;
@@ -441,11 +442,18 @@ const DatePickerModern = <T extends FieldValues>({
             margin: 0;
           }
 
+          .dark .react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box ul.react-datepicker__time-list li.react-datepicker__time-list-item {
+            color: #e5e7eb !important;
+          }
+
           .react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box ul.react-datepicker__time-list li.react-datepicker__time-list-item:hover {
-            background-color: ${
-              theme === "dark" ? "#404040 !important" : "#f3f4f6"
-            };
-            color: ${theme === "dark" ? "#ffffff !important" : "#111827"};
+            background-color: #f3f4f6;
+            color: #111827;
+          }
+
+          .dark .react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box ul.react-datepicker__time-list li.react-datepicker__time-list-item:hover {
+            background-color: #404040 !important;
+            color: #ffffff !important;
           }
 
           .react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box ul.react-datepicker__time-list li.react-datepicker__time-list-item--selected {
@@ -454,7 +462,11 @@ const DatePickerModern = <T extends FieldValues>({
           }
 
           .react-datepicker__navigation-icon::before {
-            border-color: ${theme === "dark" ? "#9ca3af" : "#6b7280"};
+            border-color: #6b7280;
+          }
+
+          .dark .react-datepicker__navigation-icon::before {
+            border-color: #9ca3af;
           }
 
           .react-datepicker-popper {
@@ -525,13 +537,8 @@ const DatePickerModern = <T extends FieldValues>({
               <button
                 onClick={decreaseMonth}
                 disabled={prevMonthButtonDisabled}
-                className={`p-1 rounded ${
-                  theme === "dark"
-                    ? "hover:bg-neutral-700 text-gray-300"
-                    : "hover:bg-gray-100 text-gray-700"
-                } ${
-                  prevMonthButtonDisabled ? "opacity-50 cursor-not-allowed" : ""
-                }`}
+                className={`p-1 rounded hover:bg-gray-100 dark:hover:bg-neutral-700 text-gray-700 dark:text-gray-300 ${prevMonthButtonDisabled ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
                 aria-label="Previous month"
               >
                 <ArrowLeft className="w-4 h-4" />
@@ -543,11 +550,7 @@ const DatePickerModern = <T extends FieldValues>({
                   onChange={({ target: { value } }) =>
                     changeMonth(parseInt(value, 10))
                   }
-                  className={`pr-7 pl-2 py-1 rounded text-sm ${
-                    theme === "dark"
-                      ? "bg-neutral-800 text-white border-neutral-600"
-                      : "bg-white text-gray-900 border-gray-300"
-                  } border`}
+                  className="pr-7 pl-2 py-1 rounded text-sm bg-white dark:bg-neutral-800 text-gray-900 dark:text-white border-gray-300 dark:border-neutral-600 border"
                 >
                   {Array.from({ length: 12 }, (_, i) => (
                     <option key={i} value={i}>
@@ -565,11 +568,7 @@ const DatePickerModern = <T extends FieldValues>({
                   onChange={({ target: { value } }) =>
                     changeYear(parseInt(value, 10))
                   }
-                  className={`pr-7 pl-2 py-1 rounded text-sm ${
-                    theme === "dark"
-                      ? "bg-neutral-800 text-white border-neutral-600"
-                      : "bg-white text-gray-900 border-gray-300"
-                  } border`}
+                  className="pr-7 pl-2 py-1 rounded text-sm bg-white dark:bg-neutral-800 text-gray-900 dark:text-white border-gray-300 dark:border-neutral-600 border"
                 >
                   {Array.from({ length: 21 }, (_, i) => {
                     const year = new Date().getFullYear() - 10 + i;
@@ -585,13 +584,8 @@ const DatePickerModern = <T extends FieldValues>({
               <button
                 onClick={increaseMonth}
                 disabled={nextMonthButtonDisabled}
-                className={`p-1 rounded ${
-                  theme === "dark"
-                    ? "hover:bg-neutral-700 text-gray-300"
-                    : "hover:bg-gray-100 text-gray-700"
-                } ${
-                  nextMonthButtonDisabled ? "opacity-50 cursor-not-allowed" : ""
-                }`}
+                className={`p-1 rounded hover:bg-gray-100 dark:hover:bg-neutral-700 text-gray-700 dark:text-gray-300 ${nextMonthButtonDisabled ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
                 aria-label="Next month"
               >
                 <ArrowRight className="w-4 h-4" />

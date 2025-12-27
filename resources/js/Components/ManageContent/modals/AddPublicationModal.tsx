@@ -13,7 +13,6 @@ import Select from "@/Components/common/Modern/Select";
 import Textarea from "@/Components/common/Modern/Textarea";
 import { useCampaigns } from "@/Hooks/campaign/useCampaigns";
 import { usePublicationForm } from "@/Hooks/publication/usePublicationForm";
-import { useTheme } from "@/Hooks/useTheme";
 import { useAccountsStore } from "@/stores/socialAccountsStore";
 import { AlertTriangle, FileText, Hash, Save, Target } from "lucide-react";
 
@@ -28,7 +27,6 @@ export default function AddPublicationModal({
   onClose,
   onSubmit,
 }: AddPublicationModalProps) {
-  const { theme } = useTheme();
   const { campaigns } = useCampaigns();
   const { accounts: socialAccounts } = useAccountsStore();
 
@@ -70,7 +68,6 @@ export default function AddPublicationModal({
   });
 
   const { register } = form;
-  const modalBg = theme === "dark" ? "bg-neutral-800" : "bg-white";
 
   const renderMediaPreviews = () => {
     if (mediaFiles.length === 0) return null;
@@ -120,22 +117,17 @@ export default function AddPublicationModal({
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center  ${
-        theme === "dark" ? "text-white" : "text-gray-900"
-      }`}
+      className="fixed inset-0 z-50 flex items-center justify-center text-gray-900 dark:text-white"
     >
       <div
-        className={`absolute inset-0 ${
-          theme === "dark" ? "bg-black/70" : "bg-gray-900/60"
-        } backdrop-blur-sm transition-opacity`}
+        className="absolute inset-0 bg-gray-900/60 dark:bg-black/70 backdrop-blur-sm transition-opacity"
         onClick={handleClose}
       />
 
       <div
-        className={`relative w-full max-w-4xl ${modalBg} rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300`}
+        className="relative w-full max-w-4xl bg-white dark:bg-neutral-800 rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300"
       >
         <ModalHeader
-          theme={theme}
           t={t}
           onClose={handleClose}
           title="publications.modal.add.title"
@@ -151,15 +143,10 @@ export default function AddPublicationModal({
               <div className="space-y-6">
                 <div className="form-group">
                   <div
-                    className={`relative group cursor-pointer transition-all duration-300 ${
-                      isDragOver
-                        ? `scale-[1.02] ring-2 ${
-                            theme === "dark"
-                              ? "ring-primary-400"
-                              : "ring-primary-500"
-                          } ring-offset-2`
+                    className={`relative group cursor-pointer transition-all duration-300 ${isDragOver
+                        ? "scale-[1.02] ring-2 ring-primary-500 dark:ring-primary-400 ring-offset-2"
                         : ""
-                    }`}
+                      }`}
                     onDrop={(e) => {
                       e.preventDefault();
                       setIsDragOver(false);
@@ -176,19 +163,12 @@ export default function AddPublicationModal({
                     onClick={() => fileInputRef.current?.click()}
                   >
                     <div
-                      className={`min-h-[200px] rounded-lg border-2 border-dashed flex flex-col items-center justify-center text-center transition-colors overflow-hidden ${
-                        imageError
-                          ? theme === "dark"
-                            ? "border-primary-500 bg-primary-900/20"
-                            : "border-primary-300 bg-primary-50"
+                      className={`min-h-[200px] rounded-lg border-2 border-dashed flex flex-col items-center justify-center text-center transition-colors overflow-hidden ${imageError
+                          ? "border-primary-300 bg-primary-50 dark:border-primary-50 dark:bg-primary-900/20"
                           : isDragOver
-                          ? theme === "dark"
-                            ? "bg-primary-900/20 border-primary-400"
-                            : "bg-primary-50 border-primary-500"
-                          : theme === "dark"
-                          ? "border-neutral-600 hover:border-primary-400 bg-neutral-700"
-                          : "border-gray-200 hover:border-primary-300 bg-gray-50"
-                      }`}
+                            ? "bg-primary-50 border-primary-500 dark:bg-primary-900/20 dark:border-primary-400"
+                            : "border-gray-200 hover:border-primary-300 bg-gray-50 dark:border-neutral-600 dark:hover:border-primary-400 dark:bg-neutral-700"
+                        }`}
                     >
                       {renderMediaPreviews() || (
                         <MediaUploadSection
@@ -196,7 +176,6 @@ export default function AddPublicationModal({
                           thumbnails={thumbnails}
                           imageError={imageError}
                           isDragOver={isDragOver}
-                          theme={theme}
                           t={t}
                           onFileChange={handleFileChange}
                           onRemoveMedia={handleRemoveMedia}
@@ -237,7 +216,6 @@ export default function AddPublicationModal({
                   socialAccounts={socialAccounts}
                   selectedAccounts={watched.social_accounts || []}
                   accountSchedules={accountSchedules}
-                  theme={theme}
                   t={t}
                   onAccountToggle={handleAccountToggle}
                   onScheduleChange={(id, date) =>
@@ -262,7 +240,6 @@ export default function AddPublicationModal({
 
                 <ScheduleSection
                   scheduledAt={watched.scheduled_at ?? undefined}
-                  theme={theme}
                   t={t}
                   onScheduleChange={(date) => setValue("scheduled_at", date)}
                 />
@@ -278,7 +255,6 @@ export default function AddPublicationModal({
                   placeholder={t("publications.modal.add.placeholders.title")}
                   error={errors.title?.message as string}
                   icon={FileText}
-                  theme={theme}
                   variant="filled"
                   required
                   sizeType="lg"
@@ -295,7 +271,6 @@ export default function AddPublicationModal({
                   )}
                   error={errors.description?.message as string}
                   icon={FileText}
-                  theme={theme}
                   variant="filled"
                   size="lg"
                   rows={4}
@@ -314,7 +289,6 @@ export default function AddPublicationModal({
                   placeholder={t("publications.modal.add.placeholders.goal")}
                   error={errors.goal?.message as string}
                   icon={Target}
-                  theme={theme}
                   variant="filled"
                   required
                   sizeType="lg"
@@ -333,17 +307,15 @@ export default function AddPublicationModal({
                   error={errors.hashtags?.message as string}
                   onChange={(e) => handleHashtagChange(e.target.value)}
                   icon={Hash}
-                  theme={theme}
                   variant="filled"
                   required
                   sizeType="lg"
-                  hint={`${
-                    watched.hashtags
+                  hint={`${watched.hashtags
                       ? watched.hashtags
-                          .split(" ")
-                          .filter((tag: string) => tag.startsWith("#")).length
+                        .split(" ")
+                        .filter((tag: string) => tag.startsWith("#")).length
                       : 0
-                  }/10 hashtags`}
+                    }/10 hashtags`}
                 />
 
                 <Select
@@ -369,7 +341,6 @@ export default function AddPublicationModal({
                   placeholder={t("common.select") || "Select a campaign..."}
                   error={errors.campaign_id?.message as string}
                   icon={Target}
-                  theme={theme}
                   variant="filled"
                   size="lg"
                   clearable
@@ -381,7 +352,6 @@ export default function AddPublicationModal({
         <div>
           <ModalFooter
             onClose={handleClose}
-            theme={theme}
             isSubmitting={isSubmitting}
             formId="add-publication-form"
             submitText={t("publications.button.add") || "Save Publication"}
@@ -421,7 +391,6 @@ export default function AddPublicationModal({
           settings={
             platformSettings[activePlatformPreview?.toLowerCase() || ""] || {}
           }
-          theme={theme}
         />
       </div>
     </div>
