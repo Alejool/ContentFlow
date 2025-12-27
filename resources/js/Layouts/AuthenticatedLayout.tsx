@@ -42,7 +42,7 @@ export default function AuthenticatedLayout({
   return (
     <div className="h-screen flex flex-col overflow-hidden">
       <div
-        className="relative flex-1 min-h-0 flex bg-url('/assets/b-8.svg') bg-cover bg-center bg-no-repeat"
+        className="relative flex-1 min-h-0 flex bg-[url('/resources/assets/b-8.svg')] bg-cover bg-center bg-no-repeat"
       >
         <div
           className={`
