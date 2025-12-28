@@ -3,7 +3,7 @@ import { Publication } from "./Publication";
 export type Campaign = {
   id: number;
   name: string;
-  title?: string; // Support legacy or alias
+  title?: string;
   description: string;
   goal?: string;
   budget?: number;
@@ -13,5 +13,11 @@ export type Campaign = {
   created_at: string;
   updated_at: string;
   publications?: Publication[];
+  user?: {
+    id: number;
+    name: string;
+    email: string;
+    photo_url: string;
+  };
   publications_count?: number;
 };

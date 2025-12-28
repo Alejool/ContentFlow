@@ -2,7 +2,7 @@ export type Publication = {
   id: number;
   title: string;
   description: string;
-  image?: string; // Optional helper for thumbnail
+  image?: string;
   created_at: string;
   updated_at: string;
   hashtags?: string;
@@ -15,6 +15,12 @@ export type Publication = {
   scheduled_posts?: ScheduledPost[];
   social_post_logs?: SocialPostLog[];
   campaigns?: Array<{ id: number; name: string; title?: string }>;
+  user?: {
+    id: number;
+    name: string;
+    email: string;
+    photo_url: string;
+  };
   platform_settings?: Record<string, any>;
 };
 
@@ -32,13 +38,13 @@ export type SocialPostLog = {
   id: number;
   social_account_id: number;
   status:
-    | "published"
-    | "failed"
-    | "deleted"
-    | "pending"
-    | "publishing"
-    | "success"
-    | "orphaned";
+  | "published"
+  | "failed"
+  | "deleted"
+  | "pending"
+  | "publishing"
+  | "success"
+  | "orphaned";
   social_account?: SocialAccount;
   platform: string;
   created_at: string;
@@ -49,8 +55,8 @@ export type SocialPostLog = {
   post_url?: string;
   video_url?: string;
   engagement_data?: any;
-  publication?: Publication; // For mapped logs
-  campaign?: { id: number; name: string }; // For mapped logs
+  publication?: Publication;
+  campaign?: { id: number; name: string }; 
 };
 
 export type SocialAccount = {
