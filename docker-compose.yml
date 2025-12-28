@@ -11,6 +11,7 @@ services:
     volumes:
       - ./:/var/www/html
       - ./storage:/var/www/html/storage
+      - ./docker/php/dev.ini:/usr/local/etc/php/conf.d/local.ini
     env_file:
       - .env.docker
     depends_on:
@@ -38,7 +39,7 @@ services:
   # MySQL
   mysql:
     image: mysql:8.0
-    command: --sort-buffer-size=5M
+    command: --sort-buffer-size=20M
     container_name: laravel_mysql
     restart: unless-stopped
     ports:
@@ -52,6 +53,7 @@ services:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
     volumes:
       - mysql_data:/var/lib/mysql
+      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
@@ -135,6 +137,21 @@ services:
       - .env.docker
     depends_on:
       - app
+    networks:
+      - laravel
+  
+  # vite
+  vite:
+    image: node:20-alpine
+    container_name: laravel_vite
+    working_dir: /var/www/html
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./:/var/www/html
+    environment:
+      - VITE_HMR_HOST=100.125.246.50
     networks:
       - laravel
 
