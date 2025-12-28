@@ -15,6 +15,8 @@
     "refresh": "Refresh",
     "allSaved": "All saved",
     "processing": "Processing...",
+    "creating": "Creating...",
+    "save_changes": "Save Changes",
     "save": "Save",
     "cancel": "Cancel",
     "continue": "Continue",
@@ -124,7 +126,7 @@
       "title": "AI Tools",
       "description": "Chat with AI to get answers to your questions"
     },
-     "tags": {
+    "tags": {
       "multimedia": "Multimedia",
       "organization": "Organization",
       "advanced_search": "Advanced Search",
@@ -186,8 +188,7 @@
       }
     }
   },
-
- "publications": {
+  "publications": {
     "title": "Publications",
     "subtitle": "Manage your publications",
     "modal": {
@@ -213,13 +214,12 @@
         "creating": "Creating",
         "optionalSchedule": "Optional Schedule",
         "selectSocialAccounts": "Select Accounts",
-        "associatedPublicationsRequired":"Associated Publications is required",
+        "associatedPublicationsRequired": "Associated Publications is required",
         "dragDrop": {
           "title": "Drag and drop to sort",
           "subtitle": "Upload your multimedia files here"
         },
-        "placeholders":
-        {
+        "placeholders": {
           "title": "Title",
           "description": "Description",
           "hashtags": "#marketing #publicidad #comunicación",
@@ -227,13 +227,11 @@
           "goal": "Goal",
           "startDate": "12/12/2025",
           "endDate": "12/12/2026"
-
         },
-        "button":{
-          "save":"Save",
-          "cancel":"Cancel"
+        "button": {
+          "save": "Save",
+          "cancel": "Cancel"
         }
-
       },
       "schedule": {
         "title": "Date for all networks",
@@ -270,8 +268,7 @@
           "title": "Drag and drop to sort",
           "subtitle": "Upload your multimedia files here"
         },
-        "placeholders":
-        {
+        "placeholders": {
           "title": "Title",
           "description": "Description",
           "hashtags": "Hashtags",
@@ -280,9 +277,9 @@
           "startDate": "12/12/2025",
           "endDate": "12/12/2026"
         },
-        "button":{
-          "save":"Update",
-          "cancel":"Cancel"
+        "button": {
+          "save": "Update",
+          "cancel": "Cancel"
         },
         "contentLocked": "Content Locked",
         "contentLockedHint": "To edit the content (title, description or files), you must unpublish the publication from all platforms."
@@ -290,97 +287,92 @@
       "manageContent": {
         "configureNetworks": "Configure your scheduled publications"
       },
-      
       "publish": {
-        "title":"Publish",
-        "selectPlatforms":"Select Platforms",
-        "selectAll":"Select All",
-        "deselectAll":"Deselect All",
-        "noConnectedAccounts":"No accounts found.",
-        "connectAccounts":"Please connect your accounts first.",
-        "published":"Published",
-        "loading":"Loading...",
-        "publishing":"Publishing...",
-        "platforms":"Platforms",
-        "failed":"Failed",
+        "title": "Publish",
+        "selectPlatforms": "Select Platforms",
+        "selectAll": "Select All",
+        "deselectAll": "Deselect All",
+        "noConnectedAccounts": "No accounts found.",
+        "connectAccounts": "Please connect your accounts first.",
+        "published": "Published",
+        "loading": "Loading...",
+        "publishing": "Publishing...",
+        "platforms": "Platforms",
+        "failed": "Failed",
         "scheduled": "scheduled",
-        "removed":"Removed",
-        "youtube":{
-          "youtubeThumbnails":"YouTube Thumbnails"
+        "removed": "Removed",
+        "youtube": {
+          "youtubeThumbnails": "YouTube Thumbnails"
         },
-        "dragDrop":{
-          "title":"Drag and drop to add",
-          "subtitle":"PNG, JPG, WebP (max 2MB)"
+        "dragDrop": {
+          "title": "Drag and drop to add",
+          "subtitle": "PNG, JPG, WebP (max 2MB)"
         },
-        "modal":
-        {
-          "title":"Unpublish ",
-          "message":"Are you sure you want to unpublish? This will remove the publication from this platform.",
-          "confirmText":"Unpublish",
-          "cancelText":"Cancel"
+        "modal": {
+          "title": "Unpublish ",
+          "message": "Are you sure you want to unpublish? This will remove the publication from this platform.",
+          "confirmText": "Unpublish",
+          "cancelText": "Cancel"
         },
-        "button":{
-          "publish":"Publish",
-          "cancel":"Cancel",
-          "change":"Change"
+        "button": {
+          "publish": "Publish",
+          "cancel": "Cancel",
+          "change": "Change"
         }
       },
-      "preview":{
-          "title":"Preview",
-          "simulated": "Simulated",
-          "real": "Real",
-          "realInfo": "Real Preview",
-          "view": "View preview",
-          "notAvailable": "Preview not available for this platform"
+      "preview": {
+        "title": "Preview",
+        "simulated": "Simulated",
+        "real": "Real",
+        "realInfo": "Real Preview",
+        "view": "View preview",
+        "notAvailable": "Preview not available for this platform"
       },
-      "validation":{
-        "descRequired":"Description is required",
-        "nameRequired":"Name is required",
-        "descMin":"Description must be at least 10 characters long",
-        "descMax":"Description cannot exceed 200 characters",
-        "objMin":"Objective must be at least 5 characters long",
-        "objRequired":"Objective is required",
-        "goalRequired":"Goal is required",
-        "titleRequired":"Title is required",
-        "titleLength":"Title must be at least 70 characters long",
-        "statusRequired":"Status is required",
-        "budgetRequired":"Budget is required",
-        "startDateRequired":"Start Date is required",
-        "endDateRequired":"End Date is required",
-        "publishDateRequired":"Publish Date is required",
-        "publishedOnRequired":"Published On is required",
-        "associatedPublicationsRequired":"Associated Publications is required",
-        "hashtagsRequired":"Hashtags is required",
-        "schedulePublicationRequired":"Schedule Publication is required",
-        "descriptionLength":"Description must be at least 10 characters long",
-        "hashtagsLength":"Hashtags must be at least 10 characters long",
-        "schedulePublicationLength":"Schedule Publication must be at least 10 characters long",
-        "imageRequired":"Image is required",
-        "hashtagValid":"Hashtag must be valid",
-        "hashtagMax":"Hashtag must be at least 10 characters long",
+      "validation": {
+        "descRequired": "Description is required",
+        "nameRequired": "Name is required",
+        "descMin": "Description must be at least 10 characters long",
+        "descMax": "Description cannot exceed 200 characters",
+        "objMin": "Objective must be at least 5 characters long",
+        "objRequired": "Objective is required",
+        "goalRequired": "Goal is required",
+        "titleRequired": "Title is required",
+        "titleLength": "Title must be at least 70 characters long",
+        "statusRequired": "Status is required",
+        "budgetRequired": "Budget is required",
+        "startDateRequired": "Start Date is required",
+        "endDateRequired": "End Date is required",
+        "publishDateRequired": "Publish Date is required",
+        "publishedOnRequired": "Published On is required",
+        "associatedPublicationsRequired": "Associated Publications is required",
+        "hashtagsRequired": "Hashtags is required",
+        "schedulePublicationRequired": "Schedule Publication is required",
+        "descriptionLength": "Description must be at least 10 characters long",
+        "hashtagsLength": "Hashtags must be at least 10 characters long",
+        "schedulePublicationLength": "Schedule Publication must be at least 10 characters long",
+        "imageRequired": "Image is required",
+        "hashtagValid": "Hashtag must be valid",
+        "hashtagMax": "Hashtag must be at least 10 characters long",
         "scheduleDateRequired": "Please select a date to schedule on the selected networks or uncheck the schedule option",
         "scheduleRequired": "You must schedule a date for all selected networks or set a global date.",
         "scheduledAtRequired": "Scheduled date is required when you select social networks",
         "socialAccountsRequired": "Please select at least one social media account"
       }
     },
-
-     "status":{
-      "draft":"Draft",
-      "published":"Published",
-      "scheduled":"Scheduled",
-      "failed":"Failed",
-      "instant":"Instant",
-      "deleted":"Deleted"
+    "status": {
+      "draft": "Draft",
+      "published": "Published",
+      "scheduled": "Scheduled",
+      "failed": "Failed",
+      "instant": "Instant",
+      "deleted": "Deleted"
     },
-
-    "button":{
-      "add":"Add Publication",
-      "edit":"Edit Publication",
-      "delete":"Delete Publication",
-      "close":"Close"
+    "button": {
+      "add": "Add Publication",
+      "edit": "Edit Publication",
+      "delete": "Delete Publication",
+      "close": "Close"
     },
-
     "table": {
       "name": "Name",
       "description": "Description",
@@ -414,31 +406,29 @@
         "cancelButton": "Cancel"
       }
     },
-    "actions":{
-      "viewCampaign":"View publication",
-      "edit":"Edit",
-      "publishNow":"Publish Now",
-      "viewDetails":"View Details",
-      "delete":"Delete",
-      "active":"Active",
-      "remove":"Remove",
-      "change":"Change"
+    "actions": {
+      "viewCampaign": "View publication",
+      "edit": "Edit",
+      "publishNow": "Publish Now",
+      "viewDetails": "View Details",
+      "delete": "Delete",
+      "active": "Active",
+      "remove": "Remove",
+      "change": "Change"
     },
     "headers": {
-     "status": "Status",
-     "duration": "Duration",
-     "mediaFiles": "Media Files",
-     "actions": "Actions"
+      "status": "Status",
+      "duration": "Duration",
+      "mediaFiles": "Media Files",
+      "actions": "Actions"
     },
-    "filters":
-    {
+    "filters": {
       "title": "Publications Filters",
       "all": "All",
       "published": "Published",
       "draft": "Draft"
     }
   },
-
   "campaigns": {
     "title": "Campaigns",
     "subtitle": "Manage, track and analyze your social media campaigns",
@@ -458,17 +448,16 @@
         "publishDate": "Publish Date",
         "publishedOn": "Published On",
         "publications": "Publications",
-         "associatedPublicationsRequired":"Associated Publications is required",
-         "loadingPublications":"Loading Publications...",
-         "placeholders":
-         {
+        "associatedPublicationsRequired": "Associated Publications is required",
+        "loadingPublications": "Loading Publications...",
+        "placeholders": {
           "budget": "0.00",
           "goal": "e.g.Increment brand awareness",
           "description": "e.g. Describe the campaign!",
           "name": "e.g. Summer Sale 2026",
           "startDate": "12/12/2025",
           "endDate": "12/12/2026"
-         }
+        }
       },
       "edit": {
         "title": "Edit Campaign",
@@ -489,19 +478,17 @@
         "publishDate": "Publish Date",
         "publishedOn": "Published On",
         "associatedPublications": "Associated Publications",
-        "loadingPublications":"Loading Publications...",
-        "placeholders":
-         {
+        "loadingPublications": "Loading Publications...",
+        "placeholders": {
           "budget": "0.00",
           "goal": "e.g.Increment brand awareness",
           "description": "e.g. Describe the campaign!",
           "name": "e.g. Summer Sale 2026",
           "startDate": "12/12/2025",
           "endDate": "12/12/2026"
-         }
+        }
       },
-       "showCampaign":
-      {
+      "showCampaign": {
         "title": "View Campaign",
         "subtitle": "Campaign Details",
         "name": "Name",
@@ -519,23 +506,23 @@
         "lastUpdated": "Last Updated",
         "associatedPublications": "Associated Publications"
       },
-      "validation":{
-        "descMin":"Description must have at least 10 characters",
-        "objRequired":"Objective is required",
-        "descRequired":"Description is required",
-        "nameRequired":"Name is required",
-        "goalRequired":"Objective is required",
-        "statusRequired":"Status is required",
-        "budgetRequired":"Budget is required",
-        "startDateRequired":"Start Date is required",
-        "endDateRequired":"End Date is required",
-        "publishDateRequired":"Publish Date is required",
-        "publishedOnRequired":"Published On is required",
-        "associatedPublicationsRequired":"Associated Publications is required",
-        "titleRequired":"Title is required",
-        "descriptionRequired":"Description is required",
-        "hashtagsRequired":"Hashtags is required",
-        "schedulePublicationRequired":"Schedule Publication is required"
+      "validation": {
+        "descMin": "Description must have at least 10 characters",
+        "objRequired": "Objective is required",
+        "descRequired": "Description is required",
+        "nameRequired": "Name is required",
+        "goalRequired": "Objective is required",
+        "statusRequired": "Status is required",
+        "budgetRequired": "Budget is required",
+        "startDateRequired": "Start Date is required",
+        "endDateRequired": "End Date is required",
+        "publishDateRequired": "Publish Date is required",
+        "publishedOnRequired": "Published On is required",
+        "associatedPublicationsRequired": "Associated Publications is required",
+        "titleRequired": "Title is required",
+        "descriptionRequired": "Description is required",
+        "hashtagsRequired": "Hashtags is required",
+        "schedulePublicationRequired": "Schedule Publication is required"
       }
     },
     "button": {
@@ -553,7 +540,7 @@
       "linkedAccount": "Linked Account",
       "actions": "Actions",
       "loading": "Loading...",
-       "emptyState": {
+      "emptyState": {
         "title": "No campaigns found",
         "description": "Create a campaign to start publishing content.",
         "button": "Add Campaign"
@@ -568,32 +555,31 @@
       "deleteError": "Error deleting campaign",
       "fetchError": "Error fetching campaigns",
       "confirmDelete": {
-        "title": "¿Estás seguro?",
-        "text": "¡No podrás recuperar esta campaña!",
-        "confirmButton": "Sí, eliminarla!",
-        "cancelButton": "Cancelar"
+        "title": "Are you sure?",
+        "text": "You won't be able to revert this!",
+        "confirmButton": "Yes, delete it!",
+        "cancelButton": "Cancel"
       }
     },
-    "actions":{
-      "viewCampaign":"View Campaign",
-      "edit":"Edit",
-      "publishNow":"Publish Now",
-      "viewDetails":"View Details",
-      "delete":"Delete",
-      "active":"Active",
-      "remove":"Remove",
-      "change":"Change"
+    "actions": {
+      "viewCampaign": "View Campaign",
+      "edit": "Edit",
+      "publishNow": "Publish Now",
+      "viewDetails": "View Details",
+      "delete": "Delete",
+      "active": "Active",
+      "remove": "Remove",
+      "change": "Change"
     },
     "headers": {
-     "status": "Status",
-     "duration": "Duration",
-     "mediaFiles": "Media Files",
-     "actions": "Actions"
+      "status": "Status",
+      "duration": "Duration",
+      "mediaFiles": "Media Files",
+      "actions": "Actions"
     },
-    "filters":
-    {
+    "filters": {
       "title": "Campaign Filters",
-     "all": "All",
+      "all": "All",
       "active": "Active",
       "inactive": "Inactive",
       "completed": "Completed",
@@ -601,11 +587,41 @@
       "paused": "Paused"
     }
   },
-
+  "workspace": {
+    "my_workspaces": "My Workspaces",
+    "create_new": "Create New Workspace",
+    "create_new_workspace": "Create a New Workspace",
+    "workspaces_one": "Workspace",
+    "workspaces_other": "Workspaces",
+    "workspaces": "Workspaces",
+    "select_workspace": "Select Workspace",
+    "settings": "Workspace Settings",
+    "settings_description": "Manage your workspace members and configurations.",
+    "no_description": "No description provided.",
+    "members": "Members",
+    "team_members": "Team Members",
+    "invite_member": "Invite Member",
+    "role_permissions": "Role & Permissions",
+    "permissions_preview": "Full Access",
+    "name": "Workspace Name",
+    "name_placeholder": "e.g. My Agency",
+    "description": "Description",
+    "description_placeholder": "What is this workspace for?",
+    "create": "Create Workspace",
+    "danger_zone": "Danger Zone",
+    "delete_workspace": "Delete Workspace",
+    "delete_description": "Once you delete a workspace, there is no going back. Please be certain.",
+    "general_settings": "General Settings",
+    "tabs": {
+      "general": "General",
+      "members": "Members",
+      "roles": "Roles"
+    }
+  },
   "platformSettings": {
-    "status":"Status",
-    "save":"Save Changes",
-    "configured":"Configured",
+    "status": "Status",
+    "save": "Save Changes",
+    "configured": "Configured",
     "success": "Configuration saved successfully",
     "error": "Error saving configuration",
     "title": "Global Platform Settings",
@@ -618,7 +634,7 @@
     "configure": "Configure Network",
     "preview": {
       "view": "View Preview"
-    },  
+    },
     "button": {
       "save": "Save Changes"
     },
@@ -710,10 +726,10 @@
     "confirmPassword": "Confirm Password",
     "updateProfile": "Update Profile",
     "deleteAccount": "Delete Account",
-    "actions":{
+    "actions": {
       "saveChanges": "Save changes"
     },
-    "messages":{
+    "messages": {
       "unsavedChanges": "You have unsaved changes. Do you want to continue?"
     },
     "information": {
@@ -792,7 +808,7 @@
       "passwordPlaceholder": "Enter your password to confirm",
       "cancel": "Cancel"
     },
-    "toast":{
+    "toast": {
       "languageChanged": "Language changed successfully.",
       "languageChangeError": "Error changing language."
     }
@@ -816,7 +832,8 @@
       "source": "Source",
       "campaign": "Campaign",
       "status": "Status",
-      "description": "Description",      "message": "Message",
+      "description": "Description",
+      "message": "Message",
       "error": "Error",
       "video": "Video",
       "copy": "Copy",
@@ -850,21 +867,21 @@
       "orContinueWith": "Or continue with",
       "noAccount": "Don't have an account?",
       "tags": {
-        "secureAccess":{
-          "title":"Secure Access",
-          "subtitle":"Make sure you enter the correct email address."
+        "secureAccess": {
+          "title": "Secure Access",
+          "subtitle": "Make sure you enter the correct email address."
         },
-        "endToEndEncryption":{
-          "title":"End-to-End Encryption",
-          "subtitle":"Your data is encrypted from end to end."
+        "endToEndEncryption": {
+          "title": "End-to-End Encryption",
+          "subtitle": "Your data is encrypted from end to end."
         },
-        "globalPlatform":{
-          "title":"Global Platform",
-          "subtitle":"Access your account from anywhere in the world."
+        "globalPlatform": {
+          "title": "Global Platform",
+          "subtitle": "Access your account from anywhere in the world."
         },
-        "mobileFriendly":{
-          "title":"Mobile Friendly",
-          "subtitle":"Responsive design"
+        "mobileFriendly": {
+          "title": "Mobile Friendly",
+          "subtitle": "Responsive design"
         },
         "secureProcess": "Secure Process",
         "privacyPolicy": "Privacy Policy"
@@ -897,19 +914,16 @@
       "orContinueWith": "Or continue with",
       "agreeWith": "I agree to the",
       "and": "and",
-       "tags": {
-        "freeForever":
-        {
+      "tags": {
+        "freeForever": {
           "title": "Free Forever",
           "subtitle": "No credit card required"
         },
-        "secureByDefault":
-        {
+        "secureByDefault": {
           "title": "Secure by Default",
           "subtitle": "Security of entreprise grade"
         },
-        "syncEverywhere":
-        {
+        "syncEverywhere": {
           "title": "Sync Everywhere",
           "subtitle": "Sync your data on all devices"
         }
@@ -935,7 +949,7 @@
         "confirmPassword": "••••••••"
       }
     },
-     "forgot-password": {
+    "forgot-password": {
       "welcome": "Welcome",
       "title": "Forgot Password",
       "enterEmail": "Enter your email",
@@ -944,17 +958,17 @@
       "secureProcess": "Secure Process",
       "privacyPolicy": "Privacy Policy",
       "tags": {
-        "1":{
-          "title":"Enter your email",
-          "subtitle":"Make sure you enter the correct email address."
+        "1": {
+          "title": "Enter your email",
+          "subtitle": "Make sure you enter the correct email address."
         },
-        "2":{
-          "title":"Check your email",
-          "subtitle":"Look for the email we just sent."
+        "2": {
+          "title": "Check your email",
+          "subtitle": "Look for the email we just sent."
         },
-        "3":{
-          "title":"Create a new password",
-          "subtitle":"Create a strong password you can remember easily."
+        "3": {
+          "title": "Create a new password",
+          "subtitle": "Create a strong password you can remember easily."
         },
         "secureProcess": "Secure Process",
         "privacyPolicy": "Privacy Policy"
@@ -970,9 +984,8 @@
       "placeholders": {
         "email": "prueba@email.com"
       },
-      "recomendations":
-      {
-        "receiveEmail":"Didn't receive the email?",
+      "recomendations": {
+        "receiveEmail": "Didn't receive the email?",
         "1": "Check your spam folder",
         "2": " Make sure you entered the correct emai",
         "3": "Wait a few minutes and try again"
@@ -1106,8 +1119,8 @@
         "warning": "Account has pending posts",
         "explanation": "This account has scheduled posts associated. To disconnect it, you must first delete these posts or force the disconnection.",
         "table": {
-            "date": "Date",
-            "publication": "Publication"
+          "date": "Date",
+          "publication": "Publication"
         },
         "cancelButton": "Keep connected",
         "confirmButton": "Disconnect "
@@ -1137,12 +1150,12 @@
       },
       "messages": {
         "settingsUpdated": {
-            "facebook": "Facebook settings updated successfully",
-            "instagram": "Instagram settings updated successfully",
-            "twitter": "Twitter settings updated successfully",
-            "tiktok": "TikTok settings updated successfully",
-            "youtube": "YouTube settings updated successfully",
-            "default": "Settings updated successfully"
+          "facebook": "Facebook settings updated successfully",
+          "instagram": "Instagram settings updated successfully",
+          "twitter": "Twitter settings updated successfully",
+          "tiktok": "TikTok settings updated successfully",
+          "youtube": "YouTube settings updated successfully",
+          "default": "Settings updated successfully"
         },
         "connectSuccess": "Account connected successfully",
         "disconnectSuccess": "Account disconnected successfully",
@@ -1153,7 +1166,6 @@
       }
     }
   },
-
   "notifications": {
     "title": "Notifications",
     "new": "new",
@@ -1193,7 +1205,7 @@
       }
     }
   },
-   "pagination": {
+  "pagination": {
     "next": "Next",
     "previous": "Previous"
   },
