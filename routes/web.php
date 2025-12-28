@@ -15,6 +15,7 @@ use App\Http\Controllers\NotificationsController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\SocialPostLogController;
+use App\Http\Controllers\WorkspaceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -98,6 +99,24 @@ Route::middleware(['auth:sanctum'])->group(function () {
   Route::delete('/notifications/{id}', [NotificationsController::class, 'destroy'])->name('notifications.destroy');
   Route::delete('/notifications/read', [NotificationsController::class, 'destroyRead'])->name('notifications.destroy-read');
   Route::get('/notifications/stats', [NotificationsController::class, 'stats'])->name('notifications.stats');
+
+  /*
+    |----------------------------------------------------------------------
+    | Workspaces
+    |----------------------------------------------------------------------
+    */
+  Route::prefix('workspaces')->name('workspaces.')->group(function () {
+    Route::get('/', [WorkspaceController::class, 'index'])->name('index');
+    Route::post('/', [WorkspaceController::class, 'store'])->name('store');
+    Route::post('/{workspace}/switch', [WorkspaceController::class, 'switch'])->name('switch');
+    Route::get('/{workspace}/settings', [WorkspaceController::class, 'settings'])->name('settings');
+
+    // Member management
+    Route::get('/{workspace}/members', [WorkspaceController::class, 'members'])->name('members');
+    Route::post('/{workspace}/invite', [WorkspaceController::class, 'invite'])->name('invite');
+    Route::put('/{workspace}/members/{user}/role', [WorkspaceController::class, 'updateMemberRole'])->name('members.update-role');
+    Route::delete('/{workspace}/members/{user}', [WorkspaceController::class, 'removeMember'])->name('members.remove');
+  });
 
   /*
     |----------------------------------------------------------------------
