@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Publications;
 
 use App\Http\Controllers\Controller;
+use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use App\Models\Publications\Publication;
 use App\Models\ScheduledPost;
@@ -17,6 +18,8 @@ use App\Actions\Publications\UnpublishPublicationAction;
 
 class PublicationController extends Controller
 {
+  use ApiResponse;
+
   public function index(Request $request)
   {
     // Cache key based on workspace, filters, and page
@@ -70,11 +73,7 @@ class PublicationController extends Controller
         ? $query->limit(50)->get()
         : $query->simplePaginate($request->query('per_page', 6));
 
-      return response()->json([
-        'success' => true,
-        'publications' => $publications,
-        'status' => 200
-      ]);
+      return $this->successResponse($publications);
     });
   }
 
@@ -86,17 +85,9 @@ class PublicationController extends Controller
       // Clear cache after creating publication
       $this->clearPublicationCache(Auth::user()->current_workspace_id);
 
-      return response()->json([
-        'success' => true,
-        'message' => 'Publication created successfully',
-        'publication' => $publication,
-      ]);
+      return $this->successResponse($publication, 'Publication created successfully', 201);
     } catch (\Exception $e) {
-      return response()->json([
-        'success' => false,
-        'message' => 'Creation failed: ' . $e->getMessage(),
-        'status' => 500
-      ], 500);
+      return $this->errorResponse('Creation failed: ' . $e->getMessage(), 500);
     }
   }
 

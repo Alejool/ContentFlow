@@ -14,12 +14,15 @@ use Inertia\Response;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Http\Controllers\Controller;
+use App\Traits\ApiResponse;
 
 
 use function Laravel\Prompts\warning;
 
 class ProfileController extends Controller
 {
+    use ApiResponse;
+
     /**
      * Display the user's profile form.
      */
@@ -49,6 +52,10 @@ class ProfileController extends Controller
         $user->global_platform_settings = $validated['settings'];
         $user->save();
 
+        if ($request->wantsJson() || $request->is('api/*')) {
+            return $this->successResponse($user->global_platform_settings, 'Settings updated successfully');
+        }
+
         return Redirect::back()->with('status', 'settings-updated');
     }
 
@@ -75,24 +82,17 @@ class ProfileController extends Controller
 
             $user->save();
 
+            if ($request->wantsJson() || $request->is('api/*')) {
+                return $this->successResponse($user, 'Profile updated successfully');
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => 'Profile updated successfully',
                 'user' => $user
             ]);
-            // }
-
-            return response()->json([
-                'success' => false,
-                'warning' => true,
-                'message' => 'No changes detected'
-            ]);
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error updating profile',
-                'error' => $e->getMessage()
-            ], 500);
+            return $this->errorResponse('Error updating profile: ' . $e->getMessage(), 500);
         }
     }
 
@@ -125,11 +125,8 @@ class ProfileController extends Controller
         }
         $user->password = Hash::make($data['password']);
         $user->save();
-        return response()->json([
-            'success' => true,
-            'message' => 'Password updated successfully',
-            'user' => $user
-        ]);
+
+        return $this->successResponse(null, 'Password updated successfully');
     }
 
 

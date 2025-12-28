@@ -6,15 +6,16 @@
 
 ---
 
-## 🏗️ Arquitectura del Sistema
-
-El proyecto sigue una arquitectura moderna de **Monolito Híbrido** utilizando Laravel como núcleo y React para una experiencia de usuario fluida a través de Inertia.js.
+El proyecto sigue una arquitectura de **Monolito Híbrido** avanzada:
+- **Inertia.js**: Para una experiencia de Single Page Application (SPA) fluida.
+- **RESTful API**: Una capa de API completa y estandarizada para integraciones externas y futura expansión móvil.
+- **Workspaces (Multi-tenancy)**: Gestión multinivel para equipos y agencias.
 
 ```mermaid
 graph TD
     User((Usuario)) <--> React[React + Tailwind Frontend]
-    React <--> Inertia[Inertia.js Bridge]
-    Inertia <--> Laravel[Laravel 11 Backend]
+    React <--> Hybrid[Inertia.js & REST API]
+    Hybrid <--> Laravel[Laravel 11 Backend]
     Laravel <--> MySQL[(MySQL 8.0)]
     Laravel <--> Reverb[Laravel Reverb - Realtime]
     Laravel <--> AI[AIService - DeepSeek/Gemini/OpenAI]
@@ -40,8 +41,9 @@ graph TD
 ContentFlow/
 ├── app/
 │   ├── Http/Controllers/    # Controladores de la aplicación e Inertia
-│   ├── Models/              # Modelos Eloquent (Users, Posts, Campaigns, etc.)
+│   ├── Models/              # Modelos Eloquent (Users, Workspaces, Publications, etc.)
 │   ├── Services/            # Lógica de negocio (IA, SocialPlatforms, Analytics)
+│   ├── Traits/              # Utilidades compartidas (ApiResponse standardization)
 │   └── Notifications/       # Sistema de notificaciones internas
 ├── config/                  # Configuraciones de Laravel y Servicios Social Media
 ├── database/
@@ -98,10 +100,20 @@ Un motor versátil que permite:
 - **Optimización**: Sugerencia de hashtags, títulos y mejores horas de publicación.
 - **Background Removal**: Herramientas integradas para edición rápida de media.
 
-### 📊 Campañas y Analíticas
+### 🏢 Workspaces & Multi-tenancy
+- Gestión de múltiples espacios de trabajo por usuario.
+- Sistema de roles (Owner, Member) y permisos granulares.
+- Aislamiento de contenido y analíticas por espacio.
+
+### 📊 Campañas y Estrategia
 - Organización de publicaciones por campañas temporales.
 - Dashboard unificado con métricas de engagement transversales.
 - Seguimiento de estados de publicación en tiempo real.
+
+### 🔌 API First Architecture
+- Respuestas estandarizadas vía `ApiResponse` trait.
+- Autenticación vía **Laravel Sanctum**.
+- Preparado para migración completa a frontend independiente.
 
 ---
 
@@ -156,16 +168,17 @@ npm run dev
 - [x] Sistema de autenticación OAuth2 modular.
 - [x] Motor de IA con soporte multi-modelo.
 
-### Fase 2: Social & Media (En Progreso)
+### Fase 2: Social & Workspaces (Completado)
+- [x] Gestión de Workspaces y Team Management.
 - [x] Integración avanzada con YouTube (Shorts/Playlists).
 - [x] Sistema de hilos y encuestas para Twitter.
-- [ ] Procesamiento de video en segundo plano (Transcoding).
-- [ ] Editor de imagen avanzado en el navegador.
+- [x] Arquitectura API Híbrida (Inertia + JSON).
 
-### Fase 3: Analytics & Scale (Futuro)
+### Fase 3: Analytics & Scale (En Progreso)
+- [ ] Procesamiento de video en segundo plano (Transcoding).
 - [ ] Dashboards interactivos con exportación de reportes.
-- [ ] Aplicación móvil (React Native) consumiendo la misma lógica.
-- [ ] Sistema de colaboración para equipos grandes (Roles avanzados).
+- [ ] Aplicación móvil (React Native) consumiendo la API.
+- [ ] Editor de imagen avanzado en el navegador.
 
 ---
 

@@ -4,11 +4,13 @@ namespace App\Http\Controllers\Campaigns;
 
 use App\Http\Controllers\Controller;
 use App\Models\Campaign;
+use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class CampaignController extends Controller
 {
+    use ApiResponse;
     /**
      * Display a listing of campaigns (grouping of publications)
      */
@@ -62,11 +64,7 @@ class CampaignController extends Controller
             // Using simplePaginate() to avoid COUNT(*) query - only loads current page data
             $campaigns = $query->orderBy('created_at', 'desc')->simplePaginate(5);
 
-            return response()->json([
-                'success' => true,
-                'campaigns' => $campaigns,
-                'status' => 200
-            ]);
+            return $this->successResponse($campaigns);
         });
     }
 
@@ -109,11 +107,7 @@ class CampaignController extends Controller
         // Clear cache after creating campaign
         $this->clearCampaignCache(Auth::user()->current_workspace_id);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Campaign created successfully',
-            'campaign' => $campaign->load('publications'),
-        ]);
+        return $this->successResponse($campaign->load('publications'), 'Campaign created successfully', 201);
     }
 
     /**

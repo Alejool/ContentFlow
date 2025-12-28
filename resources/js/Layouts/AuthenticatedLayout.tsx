@@ -46,7 +46,6 @@ export default function AuthenticatedLayout({
 
   return (
     <div className="h-screen flex flex-col overflow-hidden">
-      {/* Workspace Top Strip - Clickable to switch */}
       <Link
         href={route('workspaces.index')}
         className={`

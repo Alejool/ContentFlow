@@ -5,9 +5,12 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Traits\ApiResponse;
 
 class NotificationsController extends Controller
 {
+    use ApiResponse;
+
     public function index(Request $request)
     {
         $query = Auth::user()->notifications();
@@ -40,7 +43,7 @@ class NotificationsController extends Controller
 
         $notifications = $query->paginate($request->per_page ?? 50);
 
-        return response()->json([
+        return $this->successResponse([
             'notifications' => $notifications->items(),
             'unread_count' => Auth::user()->unreadNotifications->count(),
             'pagination' => [
@@ -58,13 +61,13 @@ class NotificationsController extends Controller
         if ($notification) {
             $notification->markAsRead();
         }
-        return response()->json(['success' => true]);
+        return $this->successResponse(null, 'Notification marked as read');
     }
 
     public function markAllAsRead()
     {
         Auth::user()->unreadNotifications->markAsRead();
-        return response()->json(['success' => true]);
+        return $this->successResponse(null, 'All notifications marked as read');
     }
 
     public function destroy($id)
@@ -86,7 +89,7 @@ class NotificationsController extends Controller
     {
         $user = Auth::user();
 
-        return response()->json([
+        return $this->successResponse([
             'total' => $user->notifications()->count(),
             'unread' => $user->unreadNotifications->count(),
             'by_category' => [

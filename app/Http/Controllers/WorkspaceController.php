@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Workspace;
 use App\Models\Role;
+use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -11,7 +12,9 @@ use Inertia\Inertia;
 
 class WorkspaceController extends Controller
 {
-    public function index()
+    use ApiResponse;
+
+    public function index(Request $request)
     {
         $user = Auth::user()->load([
             'workspaces' => function ($q) {
@@ -25,6 +28,13 @@ class WorkspaceController extends Controller
                     ]);
             }
         ]);
+
+        if ($request->wantsJson() || $request->is('api/*')) {
+            return $this->successResponse([
+                'workspaces' => $user->workspaces,
+                'roles' => Role::all(),
+            ]);
+        }
 
         return Inertia::render('Workspace/Index', [
             'workspaces' => $user->workspaces,
@@ -52,6 +62,10 @@ class WorkspaceController extends Controller
         // Auto-switch to new workspace
         Auth::user()->update(['current_workspace_id' => $workspace->id]);
 
+        if ($request->wantsJson() || $request->is('api/*')) {
+            return $this->successResponse($workspace, 'Workspace created successfully.', 201);
+        }
+
         return redirect()->back()->with('message', 'Workspace created successfully.');
     }
 
@@ -64,14 +78,25 @@ class WorkspaceController extends Controller
 
         Auth::user()->update(['current_workspace_id' => $workspace->id]);
 
+        if (request()->wantsJson() || request()->is('api/*')) {
+            return $this->successResponse(null, "Switched to {$workspace->name}");
+        }
+
         return redirect()->back()->with('message', "Switched to {$workspace->name}");
     }
 
-    public function settings(Workspace $workspace)
+    public function settings(Request $request, Workspace $workspace)
     {
         // Allow any member of the workspace to view settings
         if (!$workspace->users()->where('users.id', Auth::id())->exists()) {
             abort(403);
+        }
+
+        if ($request->wantsJson() || $request->is('api/*')) {
+            return $this->successResponse([
+                'workspace' => $workspace->load('users'),
+                'roles' => Role::with('permissions')->get(),
+            ]);
         }
 
         return Inertia::render('Workspace/Settings', [
@@ -93,6 +118,10 @@ class WorkspaceController extends Controller
         ]);
 
         $workspace->update($validated);
+
+        if ($request->wantsJson() || $request->is('api/*')) {
+            return $this->successResponse($workspace, 'Workspace updated successfully.');
+        }
 
         return redirect()->back()->with('message', 'Workspace updated successfully.');
     }
@@ -117,7 +146,7 @@ class WorkspaceController extends Controller
             return $group->count();
         });
 
-        return response()->json([
+        return $this->successResponse([
             'members' => $workspace->users,
             'member_count' => $workspace->users->count(),
             'role_distribution' => $roleDistribution,
