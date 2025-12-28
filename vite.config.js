@@ -19,7 +19,7 @@ export default defineConfig({
             ],
             ssr: 'resources/js/ssr.tsx',
             refresh: true,
-        }),   
+        }),
         react(),
         tsconfigPaths(),
     ],
@@ -27,22 +27,30 @@ export default defineConfig({
         include: ['@ffmpeg/ffmpeg'],
     },
     server: {
-    host: '0.0.0.0', 
-    port: 5173,
-    strictPort: true,
+        host: '0.0.0.0',
+        port: 5173,
+        strictPort: true,
 
-    hmr: {
-        host: 'localhost', 
-        clientPort: 5173,
-    },
+        hmr: {
+            host: process.env.VITE_HMR_HOST || 'localhost',
+            clientPort: 5173,
+            protocol: 'ws',
+            timeout: 60000,
+        },
 
-    cors: true,
+        watch: {
+            usePolling: true,
+            interval: 1000,
+        },
 
-    allowedHosts: [
-        'localhost',
-        '127.0.0.1',
-        '.ngrok-free.app',
-        '.trycloudflare.com',
-    ],
+        cors: true,
+
+        allowedHosts: [
+            'localhost',
+            'leviathan-port.tail4af8a1.ts.net',
+            '127.0.0.1',
+            '.ngrok-free.app',
+            '.trycloudflare.com',
+        ],
     },
 });
