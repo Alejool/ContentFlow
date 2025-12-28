@@ -3,6 +3,7 @@ import NotificationsModal from "@/Components/Notifications/NotificationsModal";
 import LanguageSwitcher from "@/Components/common/ui/LanguageSwitcher";
 import NavLink from "@/Components/common/ui/NavLink";
 import ThemeSwitcher from "@/Components/common/ui/ThemeSwitcher";
+import WorkspaceSwitcher from "@/Components/Workspace/WorkspaceSwitcher";
 import { useNotifications } from "@/Hooks/useNotifications";
 import { useTheme } from "@/Hooks/useTheme";
 import { Link } from "@inertiajs/react";
@@ -15,6 +16,7 @@ import {
   Home,
   LogOut,
   User,
+  Layers,
 } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -45,6 +47,11 @@ const navigationItems = [
     href: "analytics.index",
     icon: BarChart3,
   },
+  {
+    nameKey: "nav.workspaces",
+    href: "workspaces.index",
+    icon: Layers,
+  },
 ];
 
 export default function Sidebar({
@@ -66,6 +73,7 @@ export default function Sidebar({
       "profile.edit": ["/profile", "/profile/edit"],
       "/ManageContent.index": ["/ManageContent"],
       "analytics.index": ["/analytics"],
+      "workspaces.index": ["/workspaces"],
     };
 
     const patterns = routePatterns[routeName] || [
@@ -84,6 +92,7 @@ export default function Sidebar({
       "profile.edit": "/profile",
       "/ManageContent.index": "/ManageContent",
       "analytics.index": "/analytics",
+      "workspaces.index": "/workspaces",
       logout: "/logout",
     };
 
@@ -93,25 +102,25 @@ export default function Sidebar({
   const isDark = theme === "dark";
 
   const classes = {
-    sidebarBg: isDark ? "bg-neutral-900" : "bg-white/50",
-    borderColor: isDark ? "border-neutral-700/50" : "border-beige-300/50",
-    textColor: isDark ? "text-gray-300" : "text-gray-700",
-    hoverBg: isDark ? "hover:bg-neutral-800" : "hover:bg-beige-300",
+    sidebarBg: isDark ? "bg-neutral-900" : "bg-white",
+    borderColor: isDark ? "border-neutral-700/50" : "border-gray-200",
+    textColor: isDark ? "text-gray-300" : "text-gray-600",
+    hoverBg: isDark ? "hover:bg-neutral-800" : "hover:bg-gray-100",
     hoverText: isDark ? "hover:text-primary-400" : "hover:text-primary-600",
     activeGradient: isDark
       ? "bg-gradient-to-r from-primary-600 to-primary-800"
       : "bg-gradient-to-r from-primary-600 to-primary-700",
-    buttonHoverBg: isDark ? "hover:bg-neutral-800" : "hover:bg-beige-300",
+    buttonHoverBg: isDark ? "hover:bg-neutral-800" : "hover:bg-gray-100",
     logoGradient: isDark
       ? "from-primary-500 to-primary-700"
       : "from-primary-600 to-primary-800",
     titleGradient: isDark
       ? "from-gray-200 to-gray-400"
-      : "from-gray-800 to-gray-600",
+      : "from-gray-900 to-gray-700",
     subtitleColor: isDark ? "text-gray-400" : "text-gray-500",
     logoutHoverBg: isDark
       ? "hover:bg-primary-900/30 hover:text-primary-300"
-      : "hover:bg-primary-50 hover:text-primary-600",
+      : "hover:bg-red-50 hover:text-red-600",
     tooltipBg: isDark
       ? "bg-neutral-800 text-gray-100"
       : "bg-gray-900 text-white",
@@ -120,9 +129,8 @@ export default function Sidebar({
   return (
     <>
       <div
-        className={`hidden lg:block fixed inset-y-0 z-50 transition-all duration-500 ease-in-out ${
-          isSidebarOpen ? "w-80" : "w-32"
-        }`}
+        className={`hidden lg:block fixed inset-y-0 z-50 transition-all duration-500 ease-in-out ${isSidebarOpen ? "w-80" : "w-32"
+          }`}
       >
         <div
           className={`absolute inset-0 backdrop-blur-3xl border-r ${classes.borderColor} shadow-2xl opacity-90 ${classes.sidebarBg}`}
@@ -135,9 +143,8 @@ export default function Sidebar({
           >
             <Link
               href="/"
-              className={`flex items-center transition-all duration-300 ${
-                !isSidebarOpen && "justify-center"
-              }`}
+              className={`flex items-center transition-all duration-300 ${!isSidebarOpen && "justify-center"
+                }`}
             >
               <div
                 className={`w-12 h-12 bg-gradient-to-r rounded-lg flex items-center justify-center flex-shrink-0`}
@@ -168,23 +175,23 @@ export default function Sidebar({
             >
               {isSidebarOpen ? (
                 <ChevronLeft
-                  className={`h-5 w-5 transition-colors ${
-                    isDark
-                      ? "text-gray-400 hover:text-primary-400"
-                      : "text-gray-600 hover:text-primary-600"
-                  }`}
+                  className={`h-5 w-5 transition-colors ${isDark
+                    ? "text-gray-400 hover:text-primary-400"
+                    : "text-gray-600 hover:text-primary-600"
+                    }`}
                 />
               ) : (
                 <ChevronRight
-                  className={`h-5 w-5 transition-colors ${
-                    isDark
-                      ? "text-gray-400 hover:text-primary-400"
-                      : "text-gray-600 hover:text-primary-600"
-                  }`}
+                  className={`h-5 w-5 transition-colors ${isDark
+                    ? "text-gray-400 hover:text-primary-400"
+                    : "text-gray-600 hover:text-primary-600"
+                    }`}
                 />
               )}
             </button>
           </div>
+
+          <WorkspaceSwitcher isSidebarOpen={isSidebarOpen} />
 
           {/* Navegación principal */}
           <nav className="flex-1 px-4 py-6 space-y-2">
@@ -202,11 +209,10 @@ export default function Sidebar({
                         ${classes.hoverBg}
                         ${classes.textColor}
                         hover:shadow-lg
-                        ${
-                          isActive
-                            ? `${classes.activeGradient} text-white shadow-lg hover:text-white`
-                            : `${classes.textColor} ${classes.hoverText}`
-                        }`}
+                        ${isActive
+                      ? `${classes.activeGradient} text-white shadow-lg hover:text-white`
+                      : `${classes.textColor} ${classes.hoverText}`
+                    }`}
                 >
                   <div className="flex items-center justify-center rounded-full h-10">
                     <item.icon className="h-5 w-5" />
@@ -243,22 +249,19 @@ export default function Sidebar({
           <div className="mt-auto">
             {/* Sección de controles (Notificaciones, Theme, Language) */}
             <div
-              className={`p-4 border-t ${classes.borderColor} ${
-                isSidebarOpen
-                  ? "flex items-center justify-between"
-                  : "flex flex-col items-center gap-3"
-              }`}
+              className={`p-4 border-t ${classes.borderColor} ${isSidebarOpen
+                ? "flex items-center justify-between"
+                : "flex flex-col items-center gap-3"
+                }`}
             >
               <div
-                className={`flex items-center gap-3 ${
-                  isSidebarOpen ? "" : "flex-col"
-                }`}
+                className={`flex items-center gap-3 ${isSidebarOpen ? "" : "flex-col"
+                  }`}
               >
                 {/* Controles de tema e idioma */}
                 <div
-                  className={`flex items-center gap-2 ${
-                    isSidebarOpen ? "" : "flex-col"
-                  }`}
+                  className={`flex items-center gap-2 ${isSidebarOpen ? "" : "flex-col"
+                    }`}
                 >
                   <ThemeSwitcher />
                   <LanguageSwitcher />
@@ -279,8 +282,7 @@ export default function Sidebar({
                         <span
                           className={`absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full
                             bg-red-500 text-[10px] font-bold text-white shadow-md
-                            border-2 ${
-                              isDark ? "border-neutral-900" : "border-beige-200"
+                            border-2 ${isDark ? "border-neutral-900" : "border-beige-200"
                             }
                             `}
                         >
@@ -308,8 +310,7 @@ export default function Sidebar({
                       <div
                         className={`absolute left-0 top-1/2 transform
                           -translate-y-1/2 -translate-x-1 w-2 h-2
-                          ${
-                            isDark ? "bg-neutral-800" : "bg-gray-900"
+                          ${isDark ? "bg-neutral-800" : "bg-gray-900"
                           } rotate-45`}
                       />
                     </div>

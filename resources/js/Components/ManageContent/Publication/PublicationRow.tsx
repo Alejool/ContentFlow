@@ -86,8 +86,6 @@ export default function PublicationRow({
                           </span>
                         );
                       }
-
-                      // For YouTube Shorts
                       if (platform === "youtube" && settings.type) {
                         return (
                           <span

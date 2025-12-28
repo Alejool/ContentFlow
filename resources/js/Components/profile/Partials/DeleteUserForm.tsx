@@ -5,41 +5,10 @@ import Modal from "@/Components/common/ui/Modal";
 import { DeleteUserFormData, deleteUserSchema } from "@/schemas/user";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
+import { AlertTriangle, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { useForm as useHookForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-
-const TrashIcon = ({ className }: { className?: string }) => (
-  <svg
-    className={className}
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-    />
-  </svg>
-);
-
-const WarningIcon = ({ className }: { className?: string }) => (
-  <svg
-    className={className}
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-    />
-  </svg>
-);
 
 interface DeleteUserFormProps {
   className?: string;
@@ -91,20 +60,20 @@ export default function DeleteUserForm({
     <ModernCard
       title={t("profile.delete.title")}
       description={t("profile.delete.description")}
-      icon={TrashIcon as any}
+      icon={Trash2}
       headerColor="red"
       className={className}
     >
       <div className="space-y-6">
-        <div className="p-4 bg-primary-50 border border-primary-200 rounded-lg flex gap-4">
-          <div className="flex-shrink-0 text-primary-500">
-            <WarningIcon className="w-6 h-6" />
+        <div className="p-5 bg-primary-50 dark:bg-primary-900/10 border border-primary-200 dark:border-primary-800/30 rounded-2xl flex gap-4 shadow-inner">
+          <div className="flex-shrink-0 p-2 bg-primary-100 dark:bg-primary-800/40 rounded-xl h-fit">
+            <AlertTriangle className="w-6 h-6 text-primary-600 dark:text-primary-400" />
           </div>
           <div>
-            <h3 className="text-sm font-bold text-primary-800">
+            <h3 className="text-sm font-bold text-primary-800 dark:text-primary-300 uppercase tracking-wide">
               {t("profile.delete.warningTitle")}
             </h3>
-            <p className="mt-1 text-sm text-primary-700">
+            <p className="mt-1 text-sm text-primary-700 dark:text-primary-400 font-medium">
               {t("profile.delete.warningMessage")}
             </p>
           </div>
@@ -113,26 +82,29 @@ export default function DeleteUserForm({
         <ModernButton
           variant="danger"
           onClick={confirmUserDeletion}
-          icon={TrashIcon as any}
+          icon={Trash2}
+          className="font-bold uppercase tracking-wider rounded-xl shadow-lg shadow-primary-500/20 active:scale-95 transition-transform"
         >
           {t("profile.delete.deleteButton")}
         </ModernButton>
       </div>
 
       <Modal show={confirmingUserDeletion} onClose={closeModal}>
-        <form onSubmit={handleSubmit(deleteUser)} className="p-6">
-          <div className="flex items-center gap-3 mb-4 text-primary-600">
-            <WarningIcon className="w-8 h-8" />
-            <h2 className="text-xl font-bold text-gray-900">
+        <form onSubmit={handleSubmit(deleteUser)} className="p-8 dark:bg-neutral-900">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="p-3 bg-primary-50 dark:bg-primary-900/20 rounded-2xl">
+              <AlertTriangle className="w-8 h-8 text-primary-600 dark:text-primary-400" />
+            </div>
+            <h2 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight">
               {t("profile.delete.confirmTitle")}
             </h2>
           </div>
 
-          <p className="mt-1 text-sm text-gray-600 mb-6">
+          <p className="text-gray-600 dark:text-gray-400 mb-8 font-medium leading-relaxed">
             {t("profile.delete.confirmMessage")}
           </p>
 
-          <div className="mt-6">
+          <div className="mb-8">
             <ModernInput
               id="password"
               type="password"
@@ -142,15 +114,16 @@ export default function DeleteUserForm({
               placeholder={t("profile.delete.passwordPlaceholder")}
               showPasswordToggle
               autoFocus
+              variant="filled"
             />
           </div>
 
-          <div className="mt-6 flex justify-end gap-3">
+          <div className="flex flex-col sm:flex-row justify-end gap-4">
             <ModernButton
               type="button"
               variant="secondary"
               onClick={closeModal}
-              className="w-auto"
+              className="w-full sm:w-auto font-bold uppercase tracking-wider rounded-xl"
             >
               {t("profile.delete.cancel")}
             </ModernButton>
@@ -158,8 +131,10 @@ export default function DeleteUserForm({
             <ModernButton
               variant="danger"
               disabled={isSubmitting}
-              className="w-auto"
+              className={`w-full sm:w-auto font-bold uppercase tracking-wider rounded-xl shadow-lg shadow-primary-500/20 ${isSubmitting ? "opacity-50" : "active:scale-95 transition-transform"
+                }`}
               type="submit"
+              loading={isSubmitting}
             >
               {t("profile.delete.deleteButton")}
             </ModernButton>

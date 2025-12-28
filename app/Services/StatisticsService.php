@@ -15,28 +15,28 @@ class StatisticsService
     /**
      * Get comprehensive dashboard statistics
      */
-    public function getDashboardStats(int $userId, int $days = 30)
+    public function getDashboardStats(int $workspaceId, int $days = 30)
     {
         $startDate = now()->subDays($days);
         $endDate = now();
 
         return [
-            'overview' => $this->getOverviewStats($userId, $startDate, $endDate),
-            'campaigns' => $this->getTopCampaigns($userId, 5),
-            'social_media' => $this->getSocialMediaOverview($userId),
-            'engagement_trends' => $this->getEngagementTrends($userId, $startDate, $endDate),
-            'recent_activity' => $this->getRecentActivity($userId, 10),
+            'overview' => $this->getOverviewStats($workspaceId, $startDate, $endDate),
+            'campaigns' => $this->getTopCampaigns($workspaceId, 5),
+            'social_media' => $this->getSocialMediaOverview($workspaceId),
+            'engagement_trends' => $this->getEngagementTrends($workspaceId, $startDate, $endDate),
+            'recent_activity' => $this->getRecentActivity($workspaceId, 10),
         ];
     }
 
     /**
      * Get overview KPI statistics
      */
-    public function getOverviewStats(int $userId, $startDate, $endDate)
+    public function getOverviewStats(int $workspaceId, $startDate, $endDate)
     {
-        $campaigns = Publication::where('user_id', $userId)->pluck('id');
+        $publications = Publication::where('workspace_id', $workspaceId)->pluck('id');
 
-        $currentPeriod = CampaignAnalytics::whereIn('publication_id', $campaigns)
+        $currentPeriod = CampaignAnalytics::whereIn('publication_id', $publications)
             ->whereBetween('date', [$startDate, $endDate])
             ->selectRaw('
                 SUM(views) as total_views,
@@ -55,7 +55,7 @@ class StatisticsService
         $previousStart = Carbon::parse($startDate)->subDays($endDate->diffInDays($startDate));
         $previousEnd = Carbon::parse($startDate)->subDay();
 
-        $previousPeriod = CampaignAnalytics::whereIn('publication_id', $campaigns)
+        $previousPeriod = CampaignAnalytics::whereIn('publication_id', $publications)
             ->whereBetween('date', [$previousStart, $previousEnd])
             ->selectRaw('
                 SUM(views) as total_views,
@@ -89,11 +89,12 @@ class StatisticsService
     /**
      * Get top performing campaigns
      */
-    public function getTopCampaigns(int $userId, int $limit = 5)
+    public function getTopCampaigns(int $workspaceId, int $limit = 5)
     {
-        return Publication::where('user_id', $userId)
-            ->with(['analytics' => function ($query) {
-                $query->selectRaw('
+        return Publication::where('workspace_id', $workspaceId)
+            ->with([
+                'analytics' => function ($query) {
+                    $query->selectRaw('
                     publication_id,
                     SUM(views) as total_views,
                     SUM(clicks) as total_clicks,
@@ -101,8 +102,9 @@ class StatisticsService
                     SUM(likes + comments + shares + saves) as total_engagement,
                     AVG(engagement_rate) as avg_engagement_rate
                 ')
-                    ->groupBy('publication_id');
-            }])
+                        ->groupBy('publication_id');
+                }
+            ])
             ->get()
             ->map(function ($campaign) {
                 $analytics = $campaign->analytics->first();
@@ -126,9 +128,9 @@ class StatisticsService
     /**
      * Get social media overview
      */
-    public function getSocialMediaOverview(int $userId)
+    public function getSocialMediaOverview(int $workspaceId)
     {
-        $socialAccounts = SocialAccount::where('user_id', $userId)->get();
+        $socialAccounts = SocialAccount::where('workspace_id', $workspaceId)->get();
 
         return $socialAccounts->map(function ($account) {
             $latestMetrics = $account->getLatestMetrics();
@@ -149,11 +151,11 @@ class StatisticsService
     /**
      * Get engagement trends over time
      */
-    public function getEngagementTrends(int $userId, $startDate, $endDate)
+    public function getEngagementTrends(int $workspaceId, $startDate, $endDate)
     {
-        $campaigns = Publication::where('user_id', $userId)->pluck('id');
+        $publications = Publication::where('workspace_id', $workspaceId)->pluck('id');
 
-        return CampaignAnalytics::whereIn('publication_id', $campaigns)
+        return CampaignAnalytics::whereIn('publication_id', $publications)
             ->whereBetween('date', [$startDate, $endDate])
             ->selectRaw('
                 date,
@@ -231,9 +233,9 @@ class StatisticsService
     /**
      * Get recent activity
      */
-    public function getRecentActivity(int $userId, int $limit = 10)
+    public function getRecentActivity(int $workspaceId, int $limit = 10)
     {
-        $campaigns = Publication::where('user_id', $userId)
+        $publications = Publication::where('workspace_id', $workspaceId)
             ->latest()
             ->take($limit)
             ->get()
@@ -250,7 +252,7 @@ class StatisticsService
                 ];
             });
 
-        return $campaigns;
+        return $publications;
     }
 
     /**
@@ -268,9 +270,9 @@ class StatisticsService
     /**
      * Get platform comparison data
      */
-    public function getPlatformComparison(int $userId)
+    public function getPlatformComparison(int $workspaceId)
     {
-        $socialAccounts = SocialAccount::where('user_id', $userId)->get();
+        $socialAccounts = SocialAccount::where('workspace_id', $workspaceId)->get();
 
         return $socialAccounts->map(function ($account) {
             $metrics = $account->metrics()

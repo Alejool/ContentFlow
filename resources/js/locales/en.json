@@ -67,7 +67,8 @@
     "aiChat": "AI Chat",
     "socialNetworks": "Social Networks",
     "logout": "Log Out",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "workspaces": "Workspaces"
   },
   "welcome": {
     "title": "Manage your content",
@@ -590,14 +591,21 @@
   "workspace": {
     "my_workspaces": "My Workspaces",
     "create_new": "Create New Workspace",
+    "manage_workspaces": "Manage Workspaces",
     "create_new_workspace": "Create a New Workspace",
     "workspaces_one": "Workspace",
     "workspaces_other": "Workspaces",
     "workspaces": "Workspaces",
     "select_workspace": "Select Workspace",
     "settings": "Workspace Settings",
+    "active": "Active",
+    "switch": "Switch",
+    "switched_successfully": "Switched successfully",
+    "active_context": "Active Workspace",
+    "role": "Role",
     "settings_description": "Manage your workspace members and configurations.",
     "no_description": "No description provided.",
+    "member": "Member",
     "members": "Members",
     "team_members": "Team Members",
     "invite_member": "Invite Member",

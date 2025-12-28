@@ -9,6 +9,7 @@ export function TableHeader({ mode, t }: TableHeaderProps) {
       <>
         <th className="px-6 py-4 font-semibold w-8"></th>
         <th className="px-6 py-4 font-semibold">{t("campaigns.table.name")}</th>
+        <th className="px-6 py-4 font-semibold">Author</th>
         <th className="px-6 py-4 font-semibold">
           {t("campaigns.table.status")}
         </th>
@@ -26,6 +27,7 @@ export function TableHeader({ mode, t }: TableHeaderProps) {
     <>
       <th className="px-6 py-4 font-semibold w-8"></th>
       <th className="px-6 py-4 font-semibold">{t("publications.table.name")}</th>
+      <th className="px-6 py-4 font-semibold">Author</th>
       <th className="px-6 py-4 font-semibold">{t("publications.table.status")}</th>
       <th className="px-6 py-4 font-semibold">{t("publications.table.media")}</th>
       <th className="px-6 py-4 font-semibold">

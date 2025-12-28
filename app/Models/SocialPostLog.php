@@ -44,11 +44,13 @@ class SocialPostLog extends Model
     'engagement_data',
     'post_metadata',
     'platform_settings',
+    'workspace_id',
   ];
 
   protected $casts = [
     'id' => 'integer',
     'user_id' => 'integer',
+    'workspace_id' => 'integer',
     'social_account_id' => 'integer',
     'scheduled_post_id' => 'integer',
     'media_urls' => 'array',
@@ -63,6 +65,11 @@ class SocialPostLog extends Model
   public function user(): BelongsTo
   {
     return $this->belongsTo(User::class);
+  }
+
+  public function workspace(): BelongsTo
+  {
+    return $this->belongsTo(Workspace::class);
   }
 
   public function socialAccount(): BelongsTo

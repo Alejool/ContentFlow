@@ -137,6 +137,7 @@ class SocialPostService
   ): void {
     SocialPostLog::create([
       'user_id' => $account->user_id,
+      'workspace_id' => $account->workspace_id,
       'social_account_id' => $account->id,
       'platform' => $account->platform,
       'platform_post_id' => $result['post_id'] ?? null,

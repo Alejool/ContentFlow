@@ -13,7 +13,7 @@ class SocialPostLogController extends Controller
    */
   public function index(Request $request)
   {
-    $query = SocialPostLog::where('user_id', Auth::id())
+    $query = SocialPostLog::where('workspace_id', Auth::user()->current_workspace_id)
       ->with(['socialAccount', 'publication', 'mediaFile']);
 
     if ($request->has('status') && $request->status !== 'all') {

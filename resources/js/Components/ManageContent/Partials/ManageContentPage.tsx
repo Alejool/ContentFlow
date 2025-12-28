@@ -17,6 +17,7 @@ import { FileText, Folder, Target } from "lucide-react";
 import { createPortal } from "react-dom";
 
 import { usePublications } from "@/Hooks/publication/usePublications";
+import WorkspaceInfoBadge from "@/Components/Workspace/WorkspaceInfoBadge";
 
 export default function ManageContentPage() {
   const {
@@ -77,15 +78,18 @@ export default function ManageContentPage() {
       <Head title={t("manageContent.title")} />
       <div className={`min-h-screen transition-colors duration-300 mt-12`}>
         <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8 py-8">
-          <div className="mb-12 text-center">
-            <h1
-              className="text-4xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 dark:from-gray-200 dark:to-gray-400 bg-clip-text text-transparent mb-4 flex items-center gap-2 justify-center"
-            >
-              <Folder className="w-8 h-8  text-primary-600 mr-2" />
-              {t("manageContent.title")}
-            </h1>
+          <div className="mb-12">
+            <div className="flex items-center justify-between mb-4">
+              <h1
+                className="text-4xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 dark:from-gray-200 dark:to-gray-400 bg-clip-text text-transparent flex items-center gap-2"
+              >
+                <Folder className="w-8 h-8  text-primary-600 mr-2" />
+                {t("manageContent.title")}
+              </h1>
+              <WorkspaceInfoBadge variant="full" />
+            </div>
 
-            <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl">
               {t("manageContent.subtitle")}
             </p>
           </div>
@@ -103,8 +107,8 @@ export default function ManageContentPage() {
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id as any)}
                       className={`group relative flex-1 px-4 py-2.5 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 ${isActive
-                          ? "bg-white dark:bg-gray-900 shadow-sm text-primary-600 dark:text-primary-400"
-                          : "text-gray-600 dark:text-gray-400 hover:text-primary-500 dark:hover:text-primary-300"
+                        ? "bg-white dark:bg-gray-900 shadow-sm text-primary-600 dark:text-primary-400"
+                        : "text-gray-600 dark:text-gray-400 hover:text-primary-500 dark:hover:text-primary-300"
                         }`}
                     >
                       {isActive && (
@@ -113,8 +117,8 @@ export default function ManageContentPage() {
 
                       <tab.icon
                         className={`w-4 h-4 transition-colors duration-200 ${isActive
-                            ? "text-primary-500"
-                            : "group-hover:text-primary-400"
+                          ? "text-primary-500"
+                          : "group-hover:text-primary-400"
                           }`}
                       />
 

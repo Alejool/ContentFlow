@@ -22,11 +22,13 @@ class MediaFile extends Model
         'duration',
         'mime_type',
         'size',
+        'workspace_id',
     ];
 
     protected $casts = [
         'id' => 'integer',
         'user_id' => 'integer',
+        'workspace_id' => 'integer',
         'size' => 'integer',
         'duration' => 'integer',
     ];
@@ -34,6 +36,11 @@ class MediaFile extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function workspace(): BelongsTo
+    {
+        return $this->belongsTo(Workspace::class);
     }
 
     public function scheduledPosts(): HasMany

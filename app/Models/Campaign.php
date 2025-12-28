@@ -31,17 +31,24 @@ class Campaign extends Model
         'end_date',
         'goal',
         'budget',
+        'workspace_id',
     ];
 
     protected $casts = [
         'start_date' => 'date',
         'end_date' => 'date',
         'budget' => 'decimal:2',
+        'workspace_id' => 'integer',
     ];
 
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function workspace(): BelongsTo
+    {
+        return $this->belongsTo(Workspace::class);
     }
 
     public function publications(): BelongsToMany
@@ -55,23 +62,23 @@ class Campaign extends Model
     // Scopes
     public function scopeActive($query)
     {
-        return $query->where('status', SELF::$status[0]);
+        return $query->where('status', self::$status[0]);
     }
     public function scopeInactive($query)
     {
-        return $query->where('status', SELF::$status[1]);
+        return $query->where('status', self::$status[1]);
     }
     public function scopeCompleted($query)
     {
-        return $query->where('status', SELF::$status[2]);
+        return $query->where('status', self::$status[2]);
     }
     public function scopeDeleted($query)
     {
-        return $query->where('status', SELF::$status[3]);
+        return $query->where('status', self::$status[3]);
     }
     public function scopePaused($query)
     {
-        return $query->where('status', SELF::$status[4]);
+        return $query->where('status', self::$status[4]);
     }
 
 

@@ -24,6 +24,7 @@ class ScheduledPost extends Model
         'status',
         'account_name',
         'platform',
+        'workspace_id',
     ];
 
     protected $casts = [
@@ -31,12 +32,18 @@ class ScheduledPost extends Model
         'user_id' => 'integer',
         'social_account_id' => 'integer',
         'campaign_id' => 'integer',
+        'workspace_id' => 'integer',
         'scheduled_at' => 'datetime',
     ];
 
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function workspace(): BelongsTo
+    {
+        return $this->belongsTo(Workspace::class);
     }
 
     public function socialAccount(): BelongsTo

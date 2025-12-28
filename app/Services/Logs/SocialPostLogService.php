@@ -49,6 +49,7 @@ class SocialPostLogService
 
     return SocialPostLog::create([
       'user_id' => $publication->user_id,
+      'workspace_id' => $publication->workspace_id,
       'social_account_id' => $socialAccount->id,
       'publication_id' => $publication->id,
       'media_file_id' => $mediaFileId,

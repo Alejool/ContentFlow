@@ -15,7 +15,8 @@ class CreatePublicationAction
   public function __construct(
     protected MediaProcessingService $mediaService,
     protected SchedulingService $schedulingService
-  ) {}
+  ) {
+  }
 
   public function execute(array $data, array $files = []): Publication
   {
@@ -27,6 +28,7 @@ class CreatePublicationAction
         'goal' => $data['goal'] ?? '',
         'slug' => Str::slug($data['title']),
         'user_id' => Auth::id(),
+        'workspace_id' => Auth::user()->current_workspace_id,
         'start_date' => $data['start_date'] ?? null,
         'end_date' => $data['end_date'] ?? null,
         'status' => $data['status'] ?? 'draft',

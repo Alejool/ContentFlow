@@ -71,6 +71,24 @@ export default function CampaignRow({
         </div>
       </td>
       <td className="px-6 py-4">
+        {item.user && (
+          <div className="flex items-center">
+            <div className="h-8 w-8 rounded-full bg-gray-200 dark:bg-neutral-700 overflow-hidden flex-shrink-0">
+              {item.user.photo_url ? (
+                <img src={item.user.photo_url} alt={item.user.name} className="h-full w-full object-cover" />
+              ) : (
+                <div className="h-full w-full flex items-center justify-center text-xs font-medium text-gray-500 uppercase">
+                  {item.user.name.charAt(0)}
+                </div>
+              )}
+            </div>
+            <div className="ml-3">
+              <p className="text-sm font-medium text-gray-900 dark:text-white">{item.user.name}</p>
+            </div>
+          </div>
+        )}
+      </td>
+      <td className="px-6 py-4">
         <span
           className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${getStatusColor(
             item.status

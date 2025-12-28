@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use App\Models\MediaFile;
 use App\Models\SocialPostLog;
+use App\Models\Workspace;
 
 class Publication extends Model
 {
@@ -42,6 +43,7 @@ class Publication extends Model
     'description',
     'scheduled_at',
     'platform_settings',
+    'workspace_id',
   ];
 
   protected $casts = [
@@ -50,6 +52,7 @@ class Publication extends Model
     'publish_date' => 'date',
     'scheduled_at' => 'datetime',
     'platform_settings' => 'array',
+    'workspace_id' => 'integer',
   ];
 
   public function scopeDraft($query)
@@ -80,6 +83,11 @@ class Publication extends Model
   public function user(): BelongsTo
   {
     return $this->belongsTo(User::class);
+  }
+
+  public function workspace(): BelongsTo
+  {
+    return $this->belongsTo(Workspace::class);
   }
 
   public function mediaFiles(): BelongsToMany

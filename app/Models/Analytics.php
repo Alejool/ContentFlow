@@ -20,18 +20,24 @@ class Analytics extends Model
         'reference_id',
         'reference_type',
         'metadata',
+        'workspace_id',
     ];
 
     protected $casts = [
         'metric_value' => 'decimal:2',
         'metric_date' => 'date',
         'metadata' => 'array',
+        'workspace_id' => 'integer',
     ];
 
     // Relationships
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+    public function workspace(): BelongsTo
+    {
+        return $this->belongsTo(Workspace::class);
     }
 
     // Scopes

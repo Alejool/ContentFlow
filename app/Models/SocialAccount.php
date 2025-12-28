@@ -23,11 +23,13 @@ class SocialAccount extends Model
         'last_failed_at',
         'failure_count',
         'account_metadata',
+        'workspace_id',
     ];
 
     protected $casts = [
         'id' => 'integer',
         'user_id' => 'integer',
+        'workspace_id' => 'integer',
         'token_expires_at' => 'datetime',
         'is_active' => 'boolean',
         'last_failed_at' => 'timestamp',
@@ -38,6 +40,11 @@ class SocialAccount extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function workspace(): BelongsTo
+    {
+        return $this->belongsTo(Workspace::class);
     }
 
     public function scheduledPosts(): HasMany

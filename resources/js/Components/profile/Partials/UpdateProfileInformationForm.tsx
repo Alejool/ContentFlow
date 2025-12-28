@@ -127,36 +127,22 @@ export default function UpdateProfileInformation({
     return () => window.removeEventListener("hashchange", handleHashChange);
   }, []);
 
-  const sectionHeaderClass = `flex items-center gap-2 pb-2 mb-6 border-b ${
-    theme === "dark" ? "border-neutral-700/50" : "border-gray-200"
-  }`;
-
-  const sectionTitleClass = `text-lg font-bold tracking-tight ${
-    theme === "dark" ? "text-primary-400" : "text-primary-700"
-  }`;
-
   return (
     <ModernCard
       title={t("profile.information.title")}
       description={t("profile.information.description")}
       icon={UserIcon}
-      headerColor="orange" // Standard primary theme for the project
+      headerColor="orange"
       className={className}
     >
-      <form onSubmit={handleSubmit} className="space-y-10">
+      <form onSubmit={handleSubmit} className="space-y-12">
         {/* Sección: Información Personal */}
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <div className={sectionHeaderClass}>
-            <div
-              className={`p-2 rounded-lg ${
-                theme === "dark"
-                  ? "bg-primary-500/20 text-primary-400"
-                  : "bg-primary-50 text-primary-600"
-              }`}
-            >
+          <div className="flex items-center gap-3 pb-3 mb-8 border-b border-gray-100 dark:border-neutral-800/50">
+            <div className="p-2.5 rounded-xl bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400">
               <UserIcon className="w-5 h-5" />
             </div>
-            <h3 className={sectionTitleClass}>
+            <h3 className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">
               {t("profile.information.sections.personal")}
             </h3>
           </div>
@@ -166,7 +152,6 @@ export default function UpdateProfileInformation({
               id="name"
               label={t("profile.information.nameLabel")}
               placeholder={t("profile.information.namePlaceholder")}
-              theme={theme}
               register={register}
               error={errors.name?.message}
               sizeType="lg"
@@ -183,7 +168,6 @@ export default function UpdateProfileInformation({
                 register={register}
                 error={errors.email?.message}
                 placeholder={t("profile.information.emailPlaceholder")}
-                theme={theme}
                 sizeType="lg"
                 variant="filled"
                 icon={Mail}
@@ -192,15 +176,8 @@ export default function UpdateProfileInformation({
               />
 
               {user?.email_verified_at && (
-                <div
-                  className={`absolute right-0 top-6 flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider
-                    ${
-                      theme === "dark"
-                        ? "bg-green-500/10 text-green-400 border border-green-500/20"
-                        : "bg-green-100 text-green-700 border border-green-200"
-                    }`}
-                >
-                  <ShieldCheck className="w-3 h-3" />
+                <div className="absolute right-0 top-6 flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800/50">
+                  <ShieldCheck className="w-3.5 h-3.5" />
                   {t("profile.statistics.verified")}
                 </div>
               )}
@@ -208,37 +185,23 @@ export default function UpdateProfileInformation({
           </div>
         </div>
 
-        {/* Sección: Detalles de Contacto */}
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-150">
-          <div className={sectionHeaderClass}>
-            <div
-              className={`p-2 rounded-lg ${
-                theme === "dark"
-                  ? "bg-primary-500/20 text-primary-400"
-                  : "bg-primary-50 text-primary-600"
-              }`}
-            >
+          <div className="flex items-center gap-3 pb-3 mb-8 border-b border-gray-100 dark:border-neutral-800/50">
+            <div className="p-2.5 rounded-xl bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400">
               <Phone className="w-5 h-5" />
             </div>
-            <h3 className={sectionTitleClass}>
+            <h3 className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">
               {t("profile.information.sections.contact")}
             </h3>
           </div>
 
           <div className="max-w-md">
-            <label
-              className={`block mb-2 text-sm font-medium ${
-                theme === "dark" ? "text-gray-300" : "text-gray-700"
-              }`}
-            >
+            <label className="block mb-2 text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
               {t("profile.information.phoneLabel")}
             </label>
             <div
-              className={`relative transition-all duration-200 rounded-lg border ${
-                theme === "dark"
-                  ? "bg-neutral-800/50 border-neutral-700/50 hover:border-neutral-600/70 focus-within:ring-2 focus-within:ring-primary-500/30 focus-within:border-primary-400"
-                  : "bg-gray-50 border-gray-300 hover:border-gray-400 focus-within:ring-2 focus-within:ring-primary-500/20 focus-within:border-primary-500"
-              } ${errors.phone ? "border-primary-500" : ""}`}
+              className={`relative transition-all duration-300 rounded-xl border bg-gray-50 dark:bg-neutral-800/50 border-gray-200 dark:border-neutral-700/50 hover:border-primary-400/50 dark:hover:border-primary-600/50 focus-within:ring-4 focus-within:ring-primary-500/10 focus-within:border-primary-500 ${errors.phone ? "border-primary-500" : ""
+                }`}
             >
               <Controller
                 name="phone"
@@ -252,9 +215,7 @@ export default function UpdateProfileInformation({
                     countries={SUPPORTED_COUNTRIES as any}
                     placeholder={t("profile.information.phonePlaceholder")}
                     disabled={isSubmitting}
-                    className={`modern-phone-input p-3 ${
-                      theme === "dark" ? "dark-theme" : "light-theme"
-                    }`}
+                    className="modern-phone-input p-3 dark:text-white"
                   />
                 )}
               />
@@ -286,6 +247,8 @@ export default function UpdateProfileInformation({
               }
               .modern-phone-input.dark-theme input::placeholder { color: #9ca3af; }
               .modern-phone-input.light-theme input::placeholder { color: #6b7280; }
+              .dark .modern-phone-input input::placeholder { color: #525252; }
+              .modern-phone-input input::placeholder { color: #a3a3a3; }
               .PhoneInputCountrySelect {
                 cursor: pointer;
               }
@@ -297,19 +260,12 @@ export default function UpdateProfileInformation({
           </div>
         </div>
 
-        {/* Sección: Sobre Mí */}
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-300">
-          <div className={sectionHeaderClass}>
-            <div
-              className={`p-2 rounded-lg ${
-                theme === "dark"
-                  ? "bg-primary-500/20 text-primary-400"
-                  : "bg-primary-50 text-primary-600"
-              }`}
-            >
+          <div className="flex items-center gap-3 pb-3 mb-8 border-b border-gray-100 dark:border-neutral-800/50">
+            <div className="p-2.5 rounded-xl bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400">
               <MessageSquare className="w-5 h-5" />
             </div>
-            <h3 className={sectionTitleClass}>
+            <h3 className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">
               {t("profile.information.sections.bio")}
             </h3>
           </div>
@@ -318,7 +274,6 @@ export default function UpdateProfileInformation({
             id="bio"
             label={t("profile.information.bioLabel")}
             placeholder={t("profile.information.bioPlaceholder")}
-            theme={theme}
             register={register}
             name="bio"
             error={errors.bio?.message}
@@ -334,19 +289,12 @@ export default function UpdateProfileInformation({
         >
           {/* Decorative background for the section */}
           <div className="absolute -top-10 -right-10 w-64 h-64 bg-primary-500/5 rounded-full blur-3xl pointer-events-none" />
-          <div className={sectionHeaderClass}>
-            <div
-              className={`p-2 rounded-lg ${
-                theme === "dark"
-                  ? "bg-primary-500/20 text-primary-400"
-                  : "bg-primary-50 text-primary-600"
-              }`}
-            >
+          <div className="flex items-center gap-3 pb-3 mb-8 border-b border-gray-100 dark:border-neutral-800/50">
+            <div className="p-2.5 rounded-xl bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400">
               <ShieldCheck className="w-5 h-5" />
             </div>
-            <h3 className={sectionTitleClass}>
-              {t("platformSettings.title") ||
-                "Valores Predeterminados"}
+            <h3 className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">
+              {t("platformSettings.title") || "Valores Predeterminados"}
             </h3>
           </div>
 
@@ -354,7 +302,7 @@ export default function UpdateProfileInformation({
             {platforms.map((platform) => {
               const platformSettings =
                 watchedValues.global_platform_settings?.[
-                  platform.id.toLowerCase()
+                platform.id.toLowerCase()
                 ] || {};
               const hasSettings = Object.keys(platformSettings).length > 0;
 
@@ -364,11 +312,7 @@ export default function UpdateProfileInformation({
                   onClick={() => handleOpenSettings(platform.id)}
                   className={`
                     group cursor-pointer p-6 rounded-2xl border transition-all duration-500
-                    ${
-                      theme === "dark"
-                        ? "bg-neutral-800/40 border-neutral-700/50 hover:border-primary-500/50 hover:bg-neutral-800/80"
-                        : "bg-white border-gray-100 hover:border-primary-500/50 hover:shadow-xl hover:shadow-primary-500/10"
-                    }
+                    bg-white dark:bg-neutral-800/40 border-gray-100 dark:border-neutral-700/50 hover:border-primary-500/50 hover:bg-neutral-50 dark:hover:bg-neutral-800/80 hover:shadow-xl dark:shadow-none hover:shadow-primary-500/10
                     ${hasSettings ? "ring-2 ring-primary-500/20" : ""}
                     hover:-translate-y-1 relative overflow-hidden
                   `}
@@ -389,9 +333,8 @@ export default function UpdateProfileInformation({
                         {platform.name}
                       </div>
                       <div
-                        className={`text-[10px] font-medium uppercase tracking-wider ${
-                          hasSettings ? "text-green-500" : "text-gray-500"
-                        }`}
+                        className={`text-[10px] font-medium uppercase tracking-wider ${hasSettings ? "text-green-500" : "text-gray-500"
+                          }`}
                       >
                         {hasSettings
                           ? t("common.configured")
@@ -412,7 +355,7 @@ export default function UpdateProfileInformation({
             platform={activePlatform}
             settings={
               watchedValues.global_platform_settings?.[
-                activePlatform.toLowerCase()
+              activePlatform.toLowerCase()
               ] || {}
             }
             onSettingsChange={handleSettingsChange}
@@ -420,39 +363,26 @@ export default function UpdateProfileInformation({
         )}
 
         {mustVerifyEmail && user?.email_verified_at === null && (
-          <div
-            className={`rounded-xl p-5 space-y-4 shadow-inner
-              ${
-                theme === "dark"
-                  ? "bg-amber-900/10 border border-amber-800/30"
-                  : "bg-amber-50 border border-amber-200"
-              }`}
-          >
-            <div
-              className={`flex items-center gap-3 font-semibold
-                ${theme === "dark" ? "text-amber-300" : "text-amber-800"}`}
-            >
-              <div className="p-1.5 rounded-full bg-amber-500/20">
-                <MailWarning className="w-5 h-5" />
+          <div className="rounded-2xl p-6 space-y-4 shadow-inner bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800/30">
+            <div className="flex items-center gap-3 font-bold text-amber-800 dark:text-amber-300">
+              <div className="p-2 rounded-xl bg-amber-500/20">
+                <MailWarning className="w-5 h-5 text-amber-600 dark:text-amber-400" />
               </div>
-              <span>
+              <span className="text-lg">
                 {t("profile.statistics.emailStatus")}:{" "}
                 {t("profile.statistics.unverified")}
               </span>
             </div>
 
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <p
-                className={`text-sm flex-1 leading-relaxed
-                  ${theme === "dark" ? "text-amber-200/70" : "text-amber-700"}`}
-              >
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+              <p className="text-sm flex-1 leading-relaxed text-amber-700 dark:text-amber-200/70 font-medium">
                 {t("profile.information.emailUnverified")}
               </p>
               <Link
                 href={route("verification.send")}
                 method="post"
                 as="button"
-                className="px-5 py-2.5 text-sm font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 shadow-sm bg-primary-600 hover:bg-primary-500 text-white border-0"
+                className="px-6 py-3 text-sm font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-primary-500/20 bg-primary-600 hover:bg-primary-500 text-white border-0"
               >
                 <Send className="w-4 h-4" />
                 {t("profile.information.sendVerification")}
@@ -460,64 +390,31 @@ export default function UpdateProfileInformation({
             </div>
 
             {status === "verification-link-sent" && (
-              <div
-                className={`mt-2 text-sm font-semibold flex items-center gap-2 p-3 rounded-lg
-                  ${
-                    theme === "dark"
-                      ? "bg-green-500/10 text-green-400 border border-green-500/20"
-                      : "bg-green-50 text-green-700 border border-green-200"
-                  }`}
-              >
-                <CheckCircle className="w-4 h-4" />
+              <div className="mt-4 text-sm font-bold flex items-center gap-2 p-4 rounded-xl bg-green-50 dark:bg-green-900/10 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800/30">
+                <CheckCircle className="w-5 h-5" />
                 {t("profile.information.verificationSent")}
               </div>
             )}
           </div>
         )}
 
-        {/* Sección: Idioma */}
-        <div
-          className={`pt-10 border-t ${
-            theme === "dark" ? "border-neutral-700/50" : "border-gray-200"
-          }`}
-        >
-          <div className={sectionHeaderClass}>
-            <div
-              className={`p-2 rounded-lg ${
-                theme === "dark"
-                  ? "bg-primary-500/20 text-primary-400"
-                  : "bg-primary-50 text-primary-600"
-              }`}
-            >
+        <div className="pt-10 border-t border-gray-100 dark:border-neutral-800/50">
+          <div className="flex items-center gap-3 pb-3 mb-8 border-b border-gray-100 dark:border-neutral-800/50">
+            <div className="p-2.5 rounded-xl bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400">
               <Globe className="w-5 h-5" />
             </div>
-            <h3 className={sectionTitleClass}>
+            <h3 className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">
               {t("profile.information.sections.language")}
             </h3>
           </div>
 
-          <div
-            className={`p-6 rounded-2xl border transition-all duration-300
-              ${
-                theme === "dark"
-                  ? "bg-neutral-800/40 border-neutral-700/50"
-                  : "bg-white border-gray-200"
-              }`}
-          >
+          <div className="p-8 rounded-2xl border bg-white dark:bg-neutral-800/40 border-gray-200 dark:border-neutral-700/50 transition-all duration-300 shadow-sm">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
               <div className="space-y-1">
-                <div
-                  className={`font-semibold ${
-                    theme === "dark" ? "text-gray-200" : "text-gray-800"
-                  }`}
-                >
+                <div className="font-bold text-lg text-gray-900 dark:text-gray-100">
                   {t("profile.information.applicationLanguage")}
                 </div>
-                <div
-                  className={`text-sm ${
-                    theme === "dark" ? "text-gray-400" : "text-gray-600"
-                  }`}
-                >
+                <div className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed max-w-md">
                   {t("profile.information.languageDescription")}
                 </div>
               </div>
@@ -534,18 +431,10 @@ export default function UpdateProfileInformation({
               </div>
             </div>
 
-            <div
-              className={`mt-4 pt-4 border-t text-xs font-medium flex items-center gap-2 ${
-                theme === "dark"
-                  ? "border-neutral-700/30 text-gray-500"
-                  : "border-gray-100 text-gray-400"
-              }`}
-            >
-              <Sparkles className="w-3 h-3" />
+            <div className="mt-6 pt-6 border-t border-gray-100 dark:border-neutral-700/30 text-xs font-bold uppercase tracking-widest flex items-center gap-2 text-gray-400 dark:text-gray-500">
+              <Sparkles className="w-3.5 h-3.5" />
               {t("profile.information.currentLanguage")}:{" "}
-              <span
-                className={theme === "dark" ? "text-gray-300" : "text-gray-600"}
-              >
+              <span className="text-gray-800 dark:text-gray-200">
                 {i18n.language === "en" ? "English" : "Español"}
               </span>
             </div>
@@ -553,16 +442,10 @@ export default function UpdateProfileInformation({
         </div>
 
         {/* Botón de Guardar */}
-        <div
-          className={`flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 border-t transition-all duration-300
-            ${theme === "dark" ? "border-neutral-700/50" : "border-gray-200"}`}
-        >
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-6 pt-10 border-t border-gray-100 dark:border-neutral-800/50 transition-all duration-300">
           <div className="hidden sm:block">
             {hasChanges && !isSubmitting && (
-              <div
-                className={`flex items-center gap-2 text-sm font-medium
-                  ${theme === "dark" ? "text-amber-400" : "text-amber-600"}`}
-              >
+              <div className="flex items-center gap-3 text-sm font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 px-4 py-2 rounded-xl border border-amber-200 dark:border-amber-800/50">
                 <AlertTriangle className="w-4 h-4" />
                 {t("profile.messages.unsavedChanges")}
               </div>
@@ -572,14 +455,12 @@ export default function UpdateProfileInformation({
           <Button
             disabled={isSubmitting || !hasChanges}
             icon={Save}
-            theme={theme}
             loading={isSubmitting}
             loadingText={t("common.saving")}
-            className={`w-full sm:w-auto min-w-[180px] transition-all duration-300 rounded-xl shadow-lg ${
-              !hasChanges
+            className={`w-full sm:w-auto min-w-[200px] transition-all duration-300 rounded-xl shadow-xl font-bold uppercase tracking-wider ${!hasChanges
                 ? "opacity-50 grayscale"
-                : "hover:scale-[1.02] active:scale-[0.98] bg-primary-600 hover:bg-primary-500 text-white border-0"
-            }`}
+                : "hover:scale-[1.05] active:scale-[0.95] bg-primary-600 hover:bg-primary-500 text-white border-0 shadow-primary-500/25"
+              }`}
             type="submit"
             size="lg"
           >

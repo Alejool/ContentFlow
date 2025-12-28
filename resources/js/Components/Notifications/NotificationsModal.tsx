@@ -23,7 +23,7 @@ import {
 } from "lucide-react";
 import { Fragment, useState } from "react";
 import { useTranslation } from "react-i18next";
-import NotificationItem from "./NotificationItem";
+import NotificationItem from "@/Components/Notifications/NotificationItem";
 
 interface NotificationsModalProps {
   isOpen: boolean;

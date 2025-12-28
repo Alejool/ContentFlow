@@ -23,17 +23,29 @@ class AnalyticsController extends Controller
     /**
      * Display the dashboard with statistics
      */
-    public function dashboard(): Response
+    public function dashboard(): Response|\Illuminate\Http\RedirectResponse
     {
         $user = Auth::user();
+        $workspaceId = $user->current_workspace_id;
+
+        if (!$workspaceId) {
+            $workspace = $user->workspaces()->first();
+            if ($workspace) {
+                $user->update(['current_workspace_id' => $workspace->id]);
+                $workspaceId = $workspace->id;
+            } else {
+                return redirect()->route('workspaces.index');
+            }
+        }
+
         $startDate = now()->subDays(30);
         $endDate = now();
 
         // Get overview stats
-        $overview = $this->statisticsService->getOverviewStats($user->id, $startDate, $endDate);
-        $campaigns = $this->statisticsService->getTopCampaigns($user->id, 10);
-        $socialMedia = $this->statisticsService->getSocialMediaOverview($user->id);
-        $engagementTrends = $this->statisticsService->getEngagementTrends($user->id, $startDate, $endDate);
+        $overview = $this->statisticsService->getOverviewStats($workspaceId, $startDate, $endDate);
+        $campaigns = $this->statisticsService->getTopCampaigns($workspaceId, 10);
+        $socialMedia = $this->statisticsService->getSocialMediaOverview($workspaceId);
+        $engagementTrends = $this->statisticsService->getEngagementTrends($workspaceId, $startDate, $endDate);
 
         // Format data for frontend
         $stats = [
@@ -43,7 +55,7 @@ class AnalyticsController extends Controller
             'totalReach' => $overview['total_reach'] ?? 0,
             'totalEngagement' => $overview['total_engagement'] ?? 0,
             'avgEngagementRate' => $overview['avg_engagement_rate'] ?? 0,
-            'campaigns' => $campaigns->map(function($campaign) {
+            'campaigns' => $campaigns->map(function ($campaign) {
                 return [
                     'id' => $campaign['id'],
                     'title' => $campaign['title'],
@@ -52,7 +64,7 @@ class AnalyticsController extends Controller
                     'engagement' => $campaign['total_engagement'],
                 ];
             })->toArray(),
-            'engagementTrends' => $engagementTrends->map(function($trend) {
+            'engagementTrends' => $engagementTrends->map(function ($trend) {
                 return [
                     'date' => Carbon::parse($trend['date'])->format('M d'),
                     'views' => $trend['views'],
@@ -60,7 +72,7 @@ class AnalyticsController extends Controller
                     'engagement' => $trend['total_engagement'],
                 ];
             })->toArray(),
-            'platformData' => $socialMedia->map(function($platform) {
+            'platformData' => $socialMedia->map(function ($platform) {
                 return [
                     'name' => ucfirst($platform['platform']),
                     'value' => $platform['followers'],
@@ -76,12 +88,24 @@ class AnalyticsController extends Controller
     /**
      * Display the main analytics page
      */
-    public function index(Request $request): Response
+    public function index(Request $request): Response|\Illuminate\Http\RedirectResponse
     {
         $user = Auth::user();
+        $workspaceId = $user->current_workspace_id;
+
+        if (!$workspaceId) {
+            $workspace = $user->workspaces()->first();
+            if ($workspace) {
+                $user->update(['current_workspace_id' => $workspace->id]);
+                $workspaceId = $workspace->id;
+            } else {
+                return redirect()->route('workspaces.index');
+            }
+        }
+
         $days = $request->input('days', 30);
-        
-        $stats = $this->statisticsService->getDashboardStats($user->id, $days);
+
+        $stats = $this->statisticsService->getDashboardStats($workspaceId, $days);
 
         return Inertia::render('Analytics/Index', [
             'stats' => $stats,
@@ -95,15 +119,16 @@ class AnalyticsController extends Controller
     public function getDashboardStats(Request $request)
     {
         $user = Auth::user();
+        $workspaceId = $user->current_workspace_id;
         $days = $request->input('days', 7);
 
         $startDate = now()->subDays($days);
         $endDate = now();
 
-        $overview = $this->statisticsService->getOverviewStats($user->id, $startDate, $endDate);
-        $topCampaigns = $this->statisticsService->getTopCampaigns($user->id, 3);
-        $socialMedia = $this->statisticsService->getSocialMediaOverview($user->id);
-        $engagementTrends = $this->statisticsService->getEngagementTrends($user->id, $startDate, $endDate);
+        $overview = $this->statisticsService->getOverviewStats($workspaceId, $startDate, $endDate);
+        $topCampaigns = $this->statisticsService->getTopCampaigns($workspaceId, 3);
+        $socialMedia = $this->statisticsService->getSocialMediaOverview($workspaceId);
+        $engagementTrends = $this->statisticsService->getEngagementTrends($workspaceId, $startDate, $endDate);
 
         return response()->json([
             'overview' => $overview,
@@ -132,14 +157,15 @@ class AnalyticsController extends Controller
     public function getSocialMediaMetrics(Request $request)
     {
         $user = Auth::user();
+        $workspaceId = $user->current_workspace_id;
         $platform = $request->input('platform');
         $days = $request->input('days', 30);
 
         $startDate = now()->subDays($days);
         $endDate = now();
 
-        $socialAccounts = \App\Models\SocialAccount::where('user_id', $user->id);
-        
+        $socialAccounts = \App\Models\SocialAccount::where('workspace_id', $workspaceId);
+
         if ($platform) {
             $socialAccounts->where('platform', $platform);
         }
@@ -160,12 +186,13 @@ class AnalyticsController extends Controller
     public function getEngagementData(Request $request)
     {
         $user = Auth::user();
+        $workspaceId = $user->current_workspace_id;
         $days = $request->input('days', 30);
 
         $startDate = now()->subDays($days);
         $endDate = now();
 
-        $trends = $this->statisticsService->getEngagementTrends($user->id, $startDate, $endDate);
+        $trends = $this->statisticsService->getEngagementTrends($workspaceId, $startDate, $endDate);
 
         return response()->json($trends);
     }
@@ -176,8 +203,9 @@ class AnalyticsController extends Controller
     public function getPlatformComparison(Request $request)
     {
         $user = Auth::user();
-        
-        $comparison = $this->statisticsService->getPlatformComparison($user->id);
+        $workspaceId = $user->current_workspace_id;
+
+        $comparison = $this->statisticsService->getPlatformComparison($workspaceId);
 
         return response()->json($comparison);
     }
@@ -200,8 +228,10 @@ class AnalyticsController extends Controller
 
         $analytics = Analytics::create([
             'user_id' => Auth::id(),
+            'workspace_id' => Auth::user()->current_workspace_id,
             ...$validated,
         ]);
+
 
         return response()->json($analytics, 201);
     }
@@ -212,10 +242,11 @@ class AnalyticsController extends Controller
     public function exportData(Request $request)
     {
         $user = Auth::user();
+        $workspaceId = $user->current_workspace_id;
         $format = $request->input('format', 'json'); // json, csv
         $days = $request->input('days', 30);
 
-        $stats = $this->statisticsService->getDashboardStats($user->id, $days);
+        $stats = $this->statisticsService->getDashboardStats($workspaceId, $days);
 
         if ($format === 'csv') {
             // Implement CSV export
@@ -231,18 +262,18 @@ class AnalyticsController extends Controller
     private function exportToCsv($data)
     {
         $filename = 'analytics_' . now()->format('Y-m-d') . '.csv';
-        
+
         $headers = [
             'Content-Type' => 'text/csv',
             'Content-Disposition' => "attachment; filename=\"$filename\"",
         ];
 
-        $callback = function() use ($data) {
+        $callback = function () use ($data) {
             $file = fopen('php://output', 'w');
-            
+
             // Add headers
             fputcsv($file, ['Metric', 'Value']);
-            
+
             // Add overview data
             foreach ($data['overview'] as $key => $value) {
                 if (!is_array($value)) {

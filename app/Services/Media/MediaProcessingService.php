@@ -53,6 +53,7 @@ class MediaProcessingService
 
     return MediaFile::create([
       'user_id' => Auth::id(),
+      'workspace_id' => Auth::user()->current_workspace_id,
       'publication_id' => $publication->id,
       'file_name' => $file->getClientOriginalName(),
       'file_path' => $path,
@@ -87,7 +88,8 @@ class MediaProcessingService
   public function handleExistingThumbnails(Publication $publication, array $thumbnails): void
   {
     foreach ($thumbnails as $mediaId => $thumbFile) {
-      if (!is_numeric($mediaId)) continue;
+      if (!is_numeric($mediaId))
+        continue;
 
       $mediaFile = $publication->mediaFiles()->find($mediaId);
       if ($mediaFile) {

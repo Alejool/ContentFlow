@@ -17,7 +17,8 @@ class SocialPostLogController extends Controller
   public function __construct(
     private SocialPostLogService $logService,
     private PlatformPublishService $publishService
-  ) {}
+  ) {
+  }
 
   /**
    * Obtener publicaciones de una campaña
@@ -48,8 +49,10 @@ class SocialPostLogController extends Controller
    */
   public function show($id)
   {
-    $log = SocialPostLog::with(['socialAccount', 'user'])
-      ->findOrFail($id);
+    $log = SocialPostLog::with([
+      'socialAccount' => fn($q) => $q->select('id', 'platform', 'account_name'),
+      'user' => fn($q) => $q->select('id', 'name', 'email')
+    ])->findOrFail($id);
 
     // Verificar que el log pertenece al usuario
     if ($log->user_id !== auth()->id()) {
@@ -84,7 +87,9 @@ class SocialPostLogController extends Controller
    */
   public function retry($id)
   {
-    $log = SocialPostLog::with(['socialAccount'])->findOrFail($id);
+    $log = SocialPostLog::with([
+      'socialAccount' => fn($q) => $q->select('id', 'platform', 'account_name', 'access_token', 'refresh_token')
+    ])->findOrFail($id);
 
     // Verificar permisos
     if ($log->user_id !== auth()->id()) {
@@ -126,7 +131,9 @@ class SocialPostLogController extends Controller
    */
   public function retryAllFailed($campaignId)
   {
-    $campaign = Campaign::with('mediaFiles')->findOrFail($campaignId);
+    $campaign = Campaign::with([
+      'mediaFiles' => fn($q) => $q->select('media_files.id', 'media_files.file_path', 'media_files.file_type', 'media_files.file_name')
+    ])->findOrFail($campaignId);
 
     if ($campaign->user_id !== auth()->id()) {
       return response()->json([
@@ -137,7 +144,9 @@ class SocialPostLogController extends Controller
 
     $failedLogs = SocialPostLog::where('user_id', auth()->id())
       ->where('status', 'failed')
-      ->with(['socialAccount'])
+      ->with([
+        'socialAccount' => fn($q) => $q->select('id', 'platform', 'account_name', 'access_token', 'refresh_token')
+      ])
       ->get();
 
     if ($failedLogs->isEmpty()) {

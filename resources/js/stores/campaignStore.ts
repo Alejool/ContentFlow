@@ -31,6 +31,7 @@ interface CampaignState {
   updateCampaign: (id: number, campaign: Partial<Campaign>) => void;
   removeCampaign: (id: number) => void;
   deleteCampaign: (id: number) => Promise<boolean>;
+  clearPageData: () => void;
 }
 
 export const useCampaignStore = create<CampaignState>((set, get) => ({
@@ -47,6 +48,8 @@ export const useCampaignStore = create<CampaignState>((set, get) => ({
 
   fetchCampaigns: async (filters = {}, page = 1) => {
     set({ isLoading: true, error: null });
+    get().clearPageData();
+
     try {
       const params = { ...filters, page };
       const response = await axios.get("/campaigns", { params });
@@ -135,4 +138,9 @@ export const useCampaignStore = create<CampaignState>((set, get) => ({
       return false;
     }
   },
+
+  clearPageData: () =>
+    set({
+      campaigns: [],
+    }),
 }));

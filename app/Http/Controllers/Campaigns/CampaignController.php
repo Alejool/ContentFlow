@@ -14,43 +14,60 @@ class CampaignController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Campaign::where('user_id', Auth::id())
-            ->with(['publications.socialPostLogs.socialAccount', 'publications.mediaFiles']);
+        // Cache key based on workspace, filters, and page
+        $cacheKey = sprintf(
+            'campaigns:%d:%s:%d',
+            Auth::user()->current_workspace_id,
+            md5(json_encode($request->all())),
+            $request->query('page', 1)
+        );
 
-        if ($request->has('status') && $request->status !== 'all') {
-            $query->where('status', $request->status);
-        }
-        if ($request->has('status') && $request->status !== 'all') {
-            switch ($request->status) {
-                case 'active':
-                    $query->active();
-                    break;
-                case 'inactive':
-                    $query->inactive();
-                    break;
-                case 'completed':
-                    $query->completed();
-                    break;
-                case 'deleted':
-                    $query->deleted();
-                    break;
-                case 'paused':
-                    $query->paused();
-                    break;
+        return cache()->remember($cacheKey, 10, function () use ($request) {
+            $query = Campaign::where('workspace_id', Auth::user()->current_workspace_id)
+                ->with([
+                    'user' => fn($q) => $q->select('id', 'name', 'email', 'photo_url'),
+                    'publications' => fn($q) => $q->select('publications.id', 'publications.title', 'publications.status', 'publications.created_at'),
+                    'publications.socialPostLogs' => fn($q) => $q->select('id', 'publication_id', 'social_account_id', 'status', 'published_at'),
+                    'publications.socialPostLogs.socialAccount' => fn($q) => $q->select('id', 'platform', 'account_name'),
+                    'publications.mediaFiles' => fn($q) => $q->select('media_files.id', 'media_files.file_path', 'media_files.file_type', 'media_files.file_name')
+                ]);
+
+            if ($request->has('status') && $request->status !== 'all') {
+                $query->where('status', $request->status);
             }
-        }
+            if ($request->has('status') && $request->status !== 'all') {
+                switch ($request->status) {
+                    case 'active':
+                        $query->active();
+                        break;
+                    case 'inactive':
+                        $query->inactive();
+                        break;
+                    case 'completed':
+                        $query->completed();
+                        break;
+                    case 'deleted':
+                        $query->deleted();
+                        break;
+                    case 'paused':
+                        $query->paused();
+                        break;
+                }
+            }
 
-        if ($request->has('date_start') && $request->has('date_end')) {
-            $query->byDateRange($request->date_start, $request->date_end);
-        }
+            if ($request->has('date_start') && $request->has('date_end')) {
+                $query->byDateRange($request->date_start, $request->date_end);
+            }
 
-        $campaigns = $query->orderBy('created_at', 'desc')->paginate(5);
+            // Using simplePaginate() to avoid COUNT(*) query - only loads current page data
+            $campaigns = $query->orderBy('created_at', 'desc')->simplePaginate(5);
 
-        return response()->json([
-            'success' => true,
-            'campaigns' => $campaigns,
-            'status' => 200
-        ]);
+            return response()->json([
+                'success' => true,
+                'campaigns' => $campaigns,
+                'status' => 200
+            ]);
+        });
     }
 
     /**
@@ -72,6 +89,7 @@ class CampaignController extends Controller
 
         $campaign = Campaign::create([
             'user_id' => Auth::id(),
+            'workspace_id' => Auth::user()->current_workspace_id,
             'name' => $validatedData['name'],
             'description' => $validatedData['description'] ?? null,
             'status' => $validatedData['status'] ?? 'active',
@@ -88,6 +106,9 @@ class CampaignController extends Controller
             }
         }
 
+        // Clear cache after creating campaign
+        $this->clearCampaignCache(Auth::user()->current_workspace_id);
+
         return response()->json([
             'success' => true,
             'message' => 'Campaign created successfully',
@@ -100,7 +121,13 @@ class CampaignController extends Controller
      */
     public function show($id)
     {
-        $campaign = Campaign::with(['publications.mediaFiles', 'publications.socialPostLogs.socialAccount'])->findOrFail($id);
+        $campaign = Campaign::with([
+            'publications' => fn($q) => $q->select('publications.id', 'publications.title', 'publications.status', 'publications.created_at'),
+            'publications.mediaFiles' => fn($q) => $q->select('media_files.id', 'media_files.file_path', 'media_files.file_type', 'media_files.file_name'),
+            'publications.socialPostLogs' => fn($q) => $q->select('id', 'publication_id', 'social_account_id', 'status', 'published_at'),
+            'publications.socialPostLogs.socialAccount' => fn($q) => $q->select('id', 'platform', 'account_name')
+        ])->where('workspace_id', Auth::user()->current_workspace_id)
+            ->findOrFail($id);
 
         return response()->json([
             'success' => true,
@@ -113,7 +140,7 @@ class CampaignController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $campaign = Campaign::findOrFail($id);
+        $campaign = Campaign::where('workspace_id', Auth::user()->current_workspace_id)->findOrFail($id);
 
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
@@ -153,6 +180,9 @@ class CampaignController extends Controller
             $campaign->publications()->sync($syncData);
         }
 
+        // Clear cache after updating campaign
+        $this->clearCampaignCache(Auth::user()->current_workspace_id);
+
         return response()->json([
             'success' => true,
             'message' => 'Campaign updated successfully',
@@ -165,8 +195,11 @@ class CampaignController extends Controller
      */
     public function destroy($id)
     {
-        $campaign = Campaign::findOrFail($id);
+        $campaign = Campaign::where('workspace_id', Auth::user()->current_workspace_id)->findOrFail($id);
         $campaign->delete();
+
+        // Clear cache after deleting campaign
+        $this->clearCampaignCache(Auth::user()->current_workspace_id);
 
         return response()->json([
             'success' => true,
@@ -179,7 +212,7 @@ class CampaignController extends Controller
      */
     public function addPublications(Request $request, $id)
     {
-        $campaign = Campaign::findOrFail($id);
+        $campaign = Campaign::where('workspace_id', Auth::user()->current_workspace_id)->findOrFail($id);
 
         $validatedData = $request->validate([
             'publication_ids' => 'required|array',
@@ -206,7 +239,7 @@ class CampaignController extends Controller
      */
     public function removePublications(Request $request, $id)
     {
-        $campaign = Campaign::findOrFail($id);
+        $campaign = Campaign::where('workspace_id', Auth::user()->current_workspace_id)->findOrFail($id);
 
         $validatedData = $request->validate([
             'publication_ids' => 'required|array',
@@ -220,5 +253,23 @@ class CampaignController extends Controller
             'message' => 'Publications removed from campaign',
             'campaign' => $campaign->load('publications'),
         ]);
+    }
+
+    /**
+     * Clear campaign caches for a workspace
+     */
+    private function clearCampaignCache($workspaceId)
+    {
+        // Clear all cached campaign queries for this workspace
+        $pattern = "campaigns:{$workspaceId}:*";
+
+        $keys = cache()->getRedis()->keys($pattern);
+
+        if (!empty($keys)) {
+            foreach ($keys as $key) {
+                $cleanKey = str_replace(config('database.redis.options.prefix'), '', $key);
+                cache()->forget($cleanKey);
+            }
+        }
     }
 }

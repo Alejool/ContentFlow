@@ -33,7 +33,6 @@ function DropdownPortal({
     return () => setMounted(false);
   }, []);
 
-  // Calcular posición cuando se abre
   useEffect(() => {
     if (isOpen && selectRect && dropdownRef.current) {
       const dropdown = dropdownRef.current;
@@ -89,8 +88,8 @@ function DropdownPortal({
     borderWidth: "1px",
     boxShadow:
       "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-    backgroundColor: "transparent", // Handled by Tailwind
-    borderColor: "transparent", // Handled by Tailwind
+    backgroundColor: "transparent",
+    borderColor: "transparent", 
   };
 
   return createPortal(

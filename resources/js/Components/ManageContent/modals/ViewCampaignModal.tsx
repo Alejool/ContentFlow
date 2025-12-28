@@ -304,7 +304,7 @@ export default function ViewCampaignModal({
                               key={post.id || index}
                               className="flex items-center justify-between p-2 rounded border bg-white dark:bg-neutral-800 border-gray-200 dark:border-neutral-700"
                             >
-                              <div className="flex items-center gap-2 da">
+                              <div className="flex items-center gap-2">
                                 <span className="capitalize font-medium text-sm">
                                   {post?.social_account?.platform ||
                                     t("common.platform")}
@@ -312,10 +312,10 @@ export default function ViewCampaignModal({
                                 {post.status && (
                                   <span
                                     className={`text-xs px-1.5 py-0.5 rounded capitalize ${post.status === "posted"
-                                        ? "bg-green-100 text-green-700"
-                                        : post.status === "failed"
-                                          ? "bg-primary-100 text-primary-700"
-                                          : "bg-yellow-100 text-yellow-700"
+                                      ? "bg-green-100 text-green-700"
+                                      : post.status === "failed"
+                                        ? "bg-primary-100 text-primary-700"
+                                        : "bg-yellow-100 text-yellow-700"
                                       }`}
                                   >
                                     {post.status}
@@ -399,7 +399,6 @@ export default function ViewCampaignModal({
         }}
         platform={activePlatform || ""}
         publication={previewPublication}
-        theme={theme}
       />
     </Dialog>
   );

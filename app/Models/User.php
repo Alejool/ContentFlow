@@ -16,6 +16,7 @@ use App\Notifications\VerifyEmailNotification;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 use App\Models\Publications\Publication;
+use App\Models\WorkspaceUser;
 
 class User extends Model implements Authenticatable, MustVerifyEmail, CanResetPassword, HasLocalePreference
 {
@@ -39,6 +40,7 @@ class User extends Model implements Authenticatable, MustVerifyEmail, CanResetPa
         'country_code',
         'bio',
         'remember_token',
+        'current_workspace_id',
     ];
 
     protected $hidden = [
@@ -91,5 +93,42 @@ class User extends Model implements Authenticatable, MustVerifyEmail, CanResetPa
     public function mediaFiles(): HasMany
     {
         return $this->hasMany(MediaFile::class);
+    }
+
+    // Workspace Relationships
+    public function workspaces()
+    {
+        return $this->belongsToMany(Workspace::class, 'workspace_user')
+            ->using(WorkspaceUser::class)
+            ->withPivot('role_id')
+            ->withTimestamps();
+    }
+
+    public function currentWorkspace()
+    {
+        return $this->belongsTo(Workspace::class, 'current_workspace_id');
+    }
+
+    public function hasPermission($permissionSlug, $workspaceId = null)
+    {
+        $workspaceId = $workspaceId ?: $this->current_workspace_id;
+
+        if (!$workspaceId) {
+            return false;
+        }
+
+        $workspace = $this->workspaces()->where('workspaces.id', $workspaceId)->first();
+
+        if (!$workspace) {
+            return false;
+        }
+
+        $role = Role::find($workspace->pivot->role_id);
+
+        if (!$role) {
+            return false;
+        }
+
+        return $role->permissions()->where('slug', $permissionSlug)->exists();
     }
 }

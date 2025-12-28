@@ -24,10 +24,9 @@ const CheckIcon = ({ className = "w-5 h-5" }: IconProps) => (
 interface SuccessAlertProps {
   show: boolean;
   t: (key: string) => string;
-  theme: "dark" | "light";
 }
 
-const SuccessAlert = ({ show, t, theme }: SuccessAlertProps) => (
+const SuccessAlert = ({ show, t }: SuccessAlertProps) => (
   <Transition
     show={show}
     enter="transform transition duration-300 ease-out"
@@ -37,37 +36,15 @@ const SuccessAlert = ({ show, t, theme }: SuccessAlertProps) => (
     leaveFrom="translate-y-0 opacity-100"
     leaveTo="translate-y-2 opacity-0"
   >
-    <div
-      className={`flex items-center gap-3 p-4 rounded-lg mb-6 ${
-        theme === "dark"
-          ? "bg-green-900/20 border border-green-800/30"
-          : "bg-green-50 border border-green-200"
-      }`}
-    >
-      <div
-        className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
-          theme === "dark" ? "bg-green-800/40" : "bg-green-100"
-        }`}
-      >
-        <CheckIcon
-          className={`w-5 h-5 ${
-            theme === "dark" ? "text-green-400" : "text-green-600"
-          }`}
-        />
+    <div className="flex items-center gap-4 p-5 rounded-2xl mb-8 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800/50 shadow-sm">
+      <div className="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center bg-green-100 dark:bg-green-800/40">
+        <CheckIcon className="w-6 h-6 text-green-600 dark:text-green-400" />
       </div>
       <div>
-        <p
-          className={`text-sm font-medium ${
-            theme === "dark" ? "text-green-300" : "text-green-800"
-          }`}
-        >
+        <p className="text-sm font-bold text-green-800 dark:text-green-300 uppercase tracking-wide">
           {t("profile.password.successTitle")}
         </p>
-        <p
-          className={`text-xs ${
-            theme === "dark" ? "text-green-400/80" : "text-green-600"
-          }`}
-        >
+        <p className="text-sm text-green-600 dark:text-green-400/80 font-medium">
           {t("profile.password.successMessage")}
         </p>
       </div>
@@ -77,7 +54,6 @@ const SuccessAlert = ({ show, t, theme }: SuccessAlertProps) => (
 
 const UpdatePasswordForm = ({ className = "" }: UpdatePasswordFormProps) => {
   const { t } = useTranslation();
-  const { theme } = useTheme();
 
   const {
     register,
@@ -85,7 +61,6 @@ const UpdatePasswordForm = ({ className = "" }: UpdatePasswordFormProps) => {
     errors,
     isSubmitting,
     isSuccess,
-    updatePassword,
   } = useUpdatePassword();
 
   return (
@@ -96,39 +71,17 @@ const UpdatePasswordForm = ({ className = "" }: UpdatePasswordFormProps) => {
       headerColor="orange"
       className={className}
     >
-      {Object.keys(errors).length > 0 && (
-        <div
-          className={`p-4 mb-6 rounded-lg ${
-            theme === "dark"
-              ? "bg-primary-900/20 border border-primary-800/30"
-              : "bg-primary-50 border border-primary-100"
-          }`}
-        >
-          <div className="flex items-center gap-3 mb-2">
-            <div
-              className={`w-6 h-6 rounded-full flex items-center justify-center ${
-                theme === "dark" ? "bg-primary-800/40" : "bg-primary-100"
-              }`}
-            >
-              <AlertTriangle
-                className={`w-4 h-4 ${
-                  theme === "dark" ? "text-primary-400" : "text-primary-600"
-                }`}
-              />
+      {errors && Object.keys(errors).length > 0 && (
+        <div className="p-5 mb-8 rounded-2xl bg-primary-50 dark:bg-primary-900/20 border border-primary-100 dark:border-primary-800/30 shadow-sm animate-in fade-in slide-in-from-top-2 duration-300">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-primary-100 dark:bg-primary-800/40">
+              <AlertTriangle className="w-5 h-5 text-primary-600 dark:text-primary-400" />
             </div>
-            <h3
-              className={`font-semibold text-sm ${
-                theme === "dark" ? "text-primary-300" : "text-primary-800"
-              }`}
-            >
+            <h3 className="font-bold text-sm text-primary-800 dark:text-primary-300 uppercase tracking-wide">
               {t("profile.password.errorTitle")}
             </h3>
           </div>
-          <ul
-            className={`space-y-1 text-sm ml-9 list-disc ${
-              theme === "dark" ? "text-primary-400" : "text-primary-700"
-            }`}
-          >
+          <ul className="space-y-1.5 text-sm ml-11 list-disc text-primary-700 dark:text-primary-400 font-medium leading-relaxed">
             {Object.entries(errors).map(([field, error]: [string, any]) => (
               <li key={field}>{error.message}</li>
             ))}
@@ -136,9 +89,9 @@ const UpdatePasswordForm = ({ className = "" }: UpdatePasswordFormProps) => {
         </div>
       )}
 
-      <SuccessAlert show={isSuccess} t={t} theme={theme} />
+      <SuccessAlert show={isSuccess} t={t} />
 
-      <form onSubmit={handleSubmit(updatePassword)} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6">
         <ModernInput
           id="current_password"
           label={t("profile.password.currentPassword")}
@@ -147,7 +100,6 @@ const UpdatePasswordForm = ({ className = "" }: UpdatePasswordFormProps) => {
           register={register}
           error={errors.current_password?.message}
           showPasswordToggle
-          theme={theme}
           icon={Key}
         />
 
@@ -159,7 +111,6 @@ const UpdatePasswordForm = ({ className = "" }: UpdatePasswordFormProps) => {
           register={register}
           error={errors.password?.message}
           showPasswordToggle
-          theme={theme}
           icon={Lock}
         />
 
@@ -171,18 +122,16 @@ const UpdatePasswordForm = ({ className = "" }: UpdatePasswordFormProps) => {
           register={register}
           error={errors.password_confirmation?.message}
           showPasswordToggle
-          theme={theme}
           icon={Lock}
         />
 
-        <div className="pt-4">
+        <div className="pt-6">
           <ModernButton
             disabled={isSubmitting}
             variant="danger"
-            icon={LockIcon}
-            theme={theme}
+            icon={Key}
             loading={isSubmitting}
-            className="min-w-[140px]"
+            className="w-full sm:w-auto min-w-[200px] font-bold uppercase tracking-wider rounded-xl shadow-lg shadow-primary-500/20 active:scale-95 transition-transform"
           >
             {isSubmitting
               ? t("common.updating")
@@ -190,64 +139,38 @@ const UpdatePasswordForm = ({ className = "" }: UpdatePasswordFormProps) => {
           </ModernButton>
 
           {isSubmitting && (
-            <div
-              className={`mt-2 text-sm flex items-center gap-2 ${
-                theme === "dark" ? "text-gray-400" : "text-gray-500"
-              }`}
-            >
-              <div
-                className={`w-3 h-3 border-2 rounded-full animate-spin ${
-                  theme === "dark"
-                    ? "border-gray-400 border-t-transparent"
-                    : "border-gray-500 border-t-transparent"
-                }`}
-              ></div>
+            <div className="mt-4 text-sm font-bold flex items-center gap-3 text-gray-500 dark:text-gray-400">
+              <div className="w-5 h-5 border-2 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
               {t("common.processing")}
             </div>
           )}
         </div>
       </form>
 
-      <div
-        className={`mt-8 p-4 rounded-lg border ${
-          theme === "dark"
-            ? "bg-primary-900/10 border-primary-800/30"
-            : "bg-primary-50 border-primary-100"
-        }`}
-      >
-        <div className="flex items-center gap-2 mb-3">
-          <Shield
-            className={`w-5 h-5 ${
-              theme === "dark" ? "text-primary-400" : "text-primary-700"
-            }`}
-          />
-          <h4
-            className={`text-sm font-semibold ${
-              theme === "dark" ? "text-primary-300" : "text-primary-900"
-            }`}
-          >
+      <div className="mt-10 p-6 rounded-2xl border bg-primary-50/30 dark:bg-primary-900/10 border-primary-100 dark:border-primary-800/30">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="p-2 rounded-lg bg-primary-100 dark:bg-primary-900/40">
+            <Shield className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+          </div>
+          <h4 className="text-sm font-bold text-primary-900 dark:text-primary-300 uppercase tracking-widest">
             {t("profile.password.securityTips")}
           </h4>
         </div>
-        <ul
-          className={`text-xs space-y-2 ${
-            theme === "dark" ? "text-primary-400/80" : "text-primary-800"
-          }`}
-        >
-          <li className="flex items-start gap-2">
-            <span className="mt-0.5">•</span>
+        <ul className="text-sm space-y-3 text-primary-800 dark:text-primary-400 font-medium">
+          <li className="flex items-start gap-3">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary-400 dark:bg-primary-600 mt-1.5 flex-shrink-0" />
             <span>{t("profile.password.tip1")}</span>
           </li>
-          <li className="flex items-start gap-2">
-            <span className="mt-0.5">•</span>
+          <li className="flex items-start gap-3">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary-400 dark:bg-primary-600 mt-1.5 flex-shrink-0" />
             <span>{t("profile.password.tip2")}</span>
           </li>
-          <li className="flex items-start gap-2">
-            <span className="mt-0.5">•</span>
+          <li className="flex items-start gap-3">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary-400 dark:bg-primary-600 mt-1.5 flex-shrink-0" />
             <span>{t("profile.password.tip3")}</span>
           </li>
-          <li className="flex items-start gap-2">
-            <span className="mt-0.5">•</span>
+          <li className="flex items-start gap-3">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary-400 dark:bg-primary-600 mt-1.5 flex-shrink-0" />
             <span>
               {t("profile.password.tip4") ||
                 "Evita usar información personal como fechas de nacimiento o nombres"}

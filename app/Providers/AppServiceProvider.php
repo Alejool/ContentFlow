@@ -24,11 +24,17 @@ class AppServiceProvider extends ServiceProvider
   public function boot(): void
   {
     Vite::prefetch(concurrency: 3);
-    if ($this->app->environment('local') && request()->header('X-Forwarded-Proto') === 'https') {
+    if (config('app.url')) {
+      URL::forceRootUrl(config('app.url'));
+    }
+    if (request()->header('X-Forwarded-Proto') === 'https') {
+      URL::forceScheme('https');
+    }
+    if (request()->header('X-Forwarded-Proto') === 'https') {
       URL::forceScheme('https');
     }
 
-    // Register Notification Observer
     DatabaseNotification::observe(\App\Observers\NotificationObserver::class);
+    \App\Models\User::observe(\App\Observers\UserObserver::class);
   }
 }

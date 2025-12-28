@@ -25,7 +25,8 @@ class PlatformPublishService
 {
   public function __construct(
     private SocialPostLogService $logService
-  ) {}
+  ) {
+  }
 
   /**
    * Initialize logs for all platforms (Create or Update to Pending)
@@ -189,14 +190,15 @@ class PlatformPublishService
       title: $publication->title,
       hashtags: $this->extractHashtags($publication->hashtags),
       metadata: $metadata,
-      platformSettings: (array)$pSettings
+      platformSettings: (array) $pSettings
     );
   }
 
   private function getYoutubeThumbnailPath(Publication $publication): ?string
   {
     $firstMediaFile = $publication->mediaFiles->first();
-    if (!$firstMediaFile) return null;
+    if (!$firstMediaFile)
+      return null;
 
     $thumbnail = $firstMediaFile->derivatives()
       ->where('derivative_type', 'thumbnail')
@@ -214,7 +216,8 @@ class PlatformPublishService
   private function handleYouTubePlaylist(Publication $publication, SocialPostLog $postLog, string $uploadedPostId): void
   {
     $campaignGroup = $publication->campaigns->first();
-    if (!$campaignGroup) return;
+    if (!$campaignGroup)
+      return;
 
     try {
       YouTubePlaylistQueue::create([
@@ -341,6 +344,7 @@ class PlatformPublishService
               try {
                 $newLog = SocialPostLog::create([
                   'user_id' => $oldLog->user_id,
+                  'workspace_id' => $oldLog->workspace_id,
                   'social_account_id' => $oldLog->social_account_id,
                   'publication_id' => $oldLog->publication_id,
                   'media_file_id' => $oldLog->media_file_id,

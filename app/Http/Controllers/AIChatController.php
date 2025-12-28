@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Campaign;
+use App\Models\SocialAccount;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -47,14 +48,14 @@ class AIChatController extends Controller
             if ($includeContext) {
                 $campaigns = $request->input('context.campaigns', []);
                 if (empty($campaigns)) {
-                    $campaigns = Campaign::where('user_id', $user->id)
+                    $campaigns = Campaign::where('workspace_id', $user->current_workspace_id)
                         ->select('id', 'name as title', 'description', 'status', 'start_date', 'end_date')
                         ->get()
                         ->toArray();
                 }
 
                 // Fetch connected social accounts
-                $socialAccounts = $user->socialAccounts()
+                $socialAccounts = SocialAccount::where('workspace_id', $user->current_workspace_id)
                     ->select('platform', 'account_id', 'created_at')
                     ->get()
                     ->toArray();
@@ -80,7 +81,11 @@ class AIChatController extends Controller
 
             // Get AI response
             $provider = $request->input('provider');
+
+            $startTime = microtime(true);
             $aiResponse = $this->aiService->chat($context, $provider);
+            $endTime = microtime(true);
+            $duration = $endTime - $startTime;
 
             // Log successful request
             Log::info('AI Chat Request Processed', [
@@ -88,7 +93,8 @@ class AIChatController extends Controller
                 'provider' => $aiResponse['provider'] ?? 'unknown',
                 'message_length' => strlen($request->input('message')),
                 'has_context' => $includeContext,
-                'campaign_count' => count($campaigns)
+                'campaign_count' => count($campaigns),
+                'processing_time_seconds' => round($duration, 4)
             ]);
 
             return response()->json([
@@ -98,7 +104,8 @@ class AIChatController extends Controller
                 'provider' => $aiResponse['provider'] ?? 'default',
                 'model' => $aiResponse['model'] ?? 'default',
                 'usage' => $aiResponse['usage'] ?? null,
-                'timestamp' => now()->toISOString()
+                'timestamp' => now()->toISOString(),
+                'server_processing_time' => round($duration, 4)
             ]);
         } catch (\Exception $e) {
             Log::error('AI Chat Processing Error', [
@@ -121,7 +128,7 @@ class AIChatController extends Controller
     public function getCampaigns()
     {
         try {
-            $campaigns = Campaign::where('user_id', Auth::id())
+            $campaigns = Campaign::where('workspace_id', Auth::user()->current_workspace_id)
                 ->select('id', 'name as title', 'description', 'status', 'start_date', 'end_date')
                 ->orderBy('created_at', 'desc')
                 ->get();

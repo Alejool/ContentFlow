@@ -44,7 +44,6 @@ export default function AccountStatistics({
   status = null,
 }: AccountStatisticsProps) {
   const { t, i18n } = useTranslation();
-  const { theme } = useTheme();
   const page = usePage<PageProps>();
   const user = page.props.auth.user;
   const [recentlySent, setRecentlySent] = useState<boolean>(false);
@@ -74,16 +73,13 @@ export default function AccountStatistics({
     }
   };
 
-  const statisticsItems: StatItem[] = [
+  const statisticsItems = [
     {
       icon: Calendar,
       title: t("profile.statistics.memberSince"),
       value: formatDate(user?.created_at || null),
-      color: theme === "dark" ? "text-blue-400" : "text-blue-600",
-      bgColor:
-        theme === "dark"
-          ? "bg-gradient-to-r from-blue-900/20 to-blue-800/20 border border-blue-800/30"
-          : "bg-gradient-to-r from-blue-50 to-blue-100/50 border border-blue-100",
+      iconColor: "text-blue-500 dark:text-blue-400",
+      bgClasses: "from-blue-50 to-white dark:from-blue-900/20 dark:to-neutral-900 border-blue-100 dark:border-blue-800/30",
     },
     {
       icon: Clock,
@@ -91,24 +87,18 @@ export default function AccountStatistics({
       value: `${getDaysSinceJoining(user?.created_at || null)} ${t(
         "profile.statistics.days"
       )}`,
-      color: theme === "dark" ? "text-primary-400" : "text-primary-600",
-      bgColor:
-        theme === "dark"
-          ? "bg-gradient-to-r from-primary-900/20 to-primary-800/20 border border-primary-800/30"
-          : "bg-gradient-to-r from-primary-50 to-primary-100/50 border border-primary-100",
+      iconColor: "text-primary-500 dark:text-primary-400",
+      bgClasses: "from-primary-50 to-white dark:from-primary-900/20 dark:to-neutral-900 border-primary-100 dark:border-primary-800/30",
     },
     {
       icon: Shield,
       title: t("profile.statistics.accountStatus"),
       value: t("profile.statistics.active"),
       iconElement: (
-        <div className="w-2 h-2 rounded-full bg-green-500 mr-2 animate-pulse"></div>
+        <div className="w-2 h-2 rounded-full bg-green-500 mr-2 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.5)]"></div>
       ),
-      color: theme === "dark" ? "text-green-400" : "text-green-600",
-      bgColor:
-        theme === "dark"
-          ? "bg-gradient-to-r from-green-900/20 to-green-800/20 border border-green-800/30"
-          : "bg-gradient-to-r from-green-50 to-green-100/50 border border-green-100",
+      iconColor: "text-green-500 dark:text-green-400",
+      bgClasses: "from-green-50 to-white dark:from-green-900/20 dark:to-neutral-900 border-green-100 dark:border-green-800/30",
     },
   ];
 
@@ -125,31 +115,19 @@ export default function AccountStatistics({
           {statisticsItems.map((item, index) => (
             <div
               key={index}
-              className={`p-4 rounded-lg transition-all duration-300 hover:scale-[1.02] ${item.bgColor}`}
+              className={`group p-5 rounded-xl border bg-gradient-to-br transition-all duration-300 hover:shadow-lg hover:scale-[1.02] ${item.bgClasses}`}
             >
-              <div className="flex items-center gap-3 mb-2">
-                <div
-                  className={`p-2 rounded-lg ${
-                    theme === "dark" ? "bg-white/10" : "bg-white/80"
-                  }`}
-                >
-                  <item.icon className={`w-5 h-5 ${item.color}`} />
+              <div className="flex items-center gap-4 mb-3">
+                <div className="p-2.5 rounded-xl bg-white dark:bg-neutral-800 shadow-sm group-hover:shadow-md transition-shadow">
+                  <item.icon className={`w-5 h-5 ${item.iconColor}`} />
                 </div>
-                <p
-                  className={`text-sm font-medium ${
-                    theme === "dark" ? "text-gray-400" : "text-gray-500"
-                  }`}
-                >
+                <p className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   {item.title}
                 </p>
               </div>
-              <div className="flex items-center">
+              <div className="flex items-center mt-auto">
                 {item.iconElement}
-                <p
-                  className={`text-lg font-bold ${
-                    theme === "dark" ? "text-gray-100" : "text-gray-800"
-                  }`}
-                >
+                <p className="text-xl font-bold text-gray-900 dark:text-white">
                   {item.value}
                 </p>
               </div>
@@ -157,51 +135,24 @@ export default function AccountStatistics({
           ))}
         </div>
 
-        <div
-          className={`p-4 rounded-lg border transition-colors duration-300
-          ${
-            theme === "dark"
-              ? "bg-gradient-to-r from-yellow-900/10 to-primary-900/10 border-yellow-800/30"
-              : "bg-gradient-to-r from-yellow-50 to-primary-50/50 border-yellow-200"
-          }`}
-        >
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <MailWarning
-                className={`w-5 h-5 ${
-                  theme === "dark" ? "text-yellow-400" : "text-yellow-600"
-                }`}
-              />
-              <p
-                className={`font-medium ${
-                  theme === "dark" ? "text-gray-300" : "text-gray-700"
-                }`}
-              >
+        <div className="p-5 rounded-xl border bg-gradient-to-br from-yellow-50 via-white to-primary-50 dark:from-yellow-900/10 dark:via-neutral-900 dark:to-primary-900/10 border-yellow-200 dark:border-yellow-800/30 shadow-sm">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-yellow-100 dark:bg-yellow-900/30">
+                <MailWarning className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
+              </div>
+              <p className="font-bold text-gray-800 dark:text-gray-200">
                 {t("profile.statistics.emailStatus")}
               </p>
             </div>
 
             {user?.email_verified_at ? (
-              <div
-                className={`flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium
-                ${
-                  theme === "dark"
-                    ? "bg-green-900/30 text-green-300 border border-green-800/50"
-                    : "bg-green-100 text-green-800 border border-green-200"
-                }`}
-              >
+              <div className="flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-bold bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800/50">
                 <CheckCircle className="w-4 h-4" />
                 {t("profile.statistics.verified")}
               </div>
             ) : (
-              <div
-                className={`flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium
-                ${
-                  theme === "dark"
-                    ? "bg-yellow-900/30 text-yellow-300 border border-yellow-800/50"
-                    : "bg-yellow-100 text-yellow-800 border border-yellow-200"
-                }`}
-              >
+              <div className="flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-bold bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800/50">
                 <MailWarning className="w-4 h-4" />
                 {t("profile.statistics.unverified")}
               </div>
@@ -209,41 +160,25 @@ export default function AccountStatistics({
           </div>
 
           {!user?.email_verified_at && (
-            <div className="space-y-3">
-              <p
-                className={`text-sm ${
-                  theme === "dark" ? "text-yellow-400/80" : "text-yellow-700"
-                }`}
-              >
+            <div className="space-y-4">
+              <p className="text-sm text-yellow-700 dark:text-yellow-400 font-medium leading-relaxed">
                 {t("profile.information.emailUnverified")}
               </p>
 
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+              <div className="flex flex-col sm:flex-row items-center gap-4">
                 <Link
                   href={route("verification.send")}
                   method="post"
                   as="button"
                   onClick={() => setRecentlySent(true)}
-                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-300 flex items-center justify-center gap-2 w-full sm:w-auto
-                    ${
-                      theme === "dark"
-                        ? "bg-gradient-to-r from-yellow-700/30 to-yellow-800/30 text-yellow-300 border border-yellow-700/30 hover:from-yellow-700/40 hover:to-yellow-800/40 hover:border-yellow-600/50"
-                        : "bg-gradient-to-r from-yellow-100 to-yellow-200 text-yellow-800 border border-yellow-300 hover:from-yellow-200 hover:to-yellow-300"
-                    }`}
+                  className="px-6 py-2.5 text-sm font-bold text-white bg-primary-600 hover:bg-primary-700 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 w-full sm:w-auto shadow-lg shadow-primary-500/20"
                 >
                   <Send className="w-4 h-4" />
                   {t("profile.information.sendVerification")}
                 </Link>
 
                 {(status === "verification-link-sent" || recentlySent) && (
-                  <div
-                    className={`text-sm font-medium flex items-center gap-2 px-3 py-1.5 rounded-lg
-                    ${
-                      theme === "dark"
-                        ? "bg-green-900/20 text-green-300 border border-green-800/30"
-                        : "bg-green-50 text-green-700 border border-green-200"
-                    }`}
-                  >
+                  <div className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border border-green-100 dark:border-green-800/30">
                     <CheckCircle className="w-4 h-4" />
                     {t("profile.information.verificationSent")}
                   </div>

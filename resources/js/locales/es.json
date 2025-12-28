@@ -71,7 +71,8 @@
     "aiChat": "Chat IA",
     "socialNetworks": "Redes Sociales",
     "logout": "Cerrar Sesión",
-    "notifications": "Notificaciones"
+    "notifications": "Notificaciones",
+    "workspaces": "Espacios"
   },
   "welcome": {
     "title": "Gestiona tu contenido",
@@ -697,14 +698,21 @@
   "workspace": {
     "my_workspaces": "Mis Espacios de Trabajo",
     "create_new": "Crear Nuevo Espacio",
+    "manage_workspaces": "Gestionar Espacios",
     "create_new_workspace": "Crear un Nuevo Espacio de Trabajo",
     "workspaces_one": "Espacio",
     "workspaces_other": "Espacios",
     "workspaces": "Espacios",
     "select_workspace": "Seleccionar Espacio",
     "settings": "Ajustes del Espacio",
+    "active": "Activo",
+    "switch": "Cambiar",
+    "switched_successfully": "Cambiado exitosamente",
+    "active_context": "Espacio Activo",
+    "role": "Rol",
     "settings_description": "Gestiona los miembros y configuraciones de tu espacio.",
     "no_description": "Sin descripción proporcionada.",
+    "member": "Miembro",
     "members": "Miembros",
     "team_members": "Miembros del Equipo",
     "invite_member": "Invitar Miembro",

@@ -46,7 +46,66 @@ class HandleInertiaRequests extends Middleware
           'bio' => $request->user()->bio,
           'country_code' => $request->user()->country_code,
           'global_platform_settings' => $request->user()->global_platform_settings ?? [],
+          'current_workspace_id' => $request->user()->current_workspace_id,
         ] : null,
+        'workspaces' => $request->user() ? $request->user()->workspaces()
+          ->withCount('users')
+          ->with([
+            'users' => function ($query) {
+              $query->select('users.id', 'users.name', 'users.email', 'users.photo_url')
+                ->withPivot('role_id');
+            }
+          ])
+          ->get() : [],
+        'roles' => \App\Models\Role::all(), // Shared globally
+        'current_workspace' => function () use ($request) {
+          $user = $request->user();
+          if (!$user)
+            return null;
+
+          $currentWorkspace = null;
+          if ($user->current_workspace_id) {
+            $currentWorkspace = $user->workspaces()
+              ->where('workspaces.id', $user->current_workspace_id)
+              ->withCount('users')
+              ->with([
+                'users' => function ($query) {
+                  $query->select('users.id', 'users.name', 'users.email', 'users.photo_url')
+                    ->withPivot('role_id', 'created_at');
+                },
+                'creator:id,name,email'
+              ])
+              ->first();
+          }
+
+          if (!$currentWorkspace) {
+            $firstWorkspace = $user->workspaces()
+              ->withCount('users')
+              ->with([
+                'users' => function ($query) {
+                  $query->select('users.id', 'users.name', 'users.email', 'users.photo_url')
+                    ->withPivot('role_id', 'created_at');
+                },
+                'creator:id,name,email'
+              ])
+              ->first();
+
+            if ($firstWorkspace) {
+              $currentWorkspace = $firstWorkspace;
+              $user->update(['current_workspace_id' => $firstWorkspace->id]);
+            }
+          }
+
+          if ($currentWorkspace) {
+            $roles = \App\Models\Role::all();
+            $currentUser = $currentWorkspace->users->where('id', $user->id)->first();
+            $roleId = $currentUser ? $currentUser->pivot->role_id : null;
+            $role = $roles->find($roleId);
+            $currentWorkspace->user_role = $role ? $role->name : 'Member';
+          }
+
+          return $currentWorkspace;
+        },
       ],
       'flash' => [
         'message' => fn() => $request->session()->get('message')

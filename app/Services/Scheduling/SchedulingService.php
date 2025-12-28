@@ -31,6 +31,7 @@ class SchedulingService
         ],
         [
           'user_id' => Auth::id(),
+          'workspace_id' => Auth::user()->current_workspace_id,
           'scheduled_at' => $scheduledAt,
           'account_name' => $socialAccount ? $socialAccount->account_name : 'Unknown',
           'platform' => $socialAccount ? $socialAccount->platform : 'unknown',

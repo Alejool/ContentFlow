@@ -19,7 +19,7 @@ class SocialAccountController extends Controller
 {
   public function index()
   {
-    $accounts = SocialAccount::where('user_id', Auth::id())->get();
+    $accounts = SocialAccount::where('workspace_id', Auth::user()->current_workspace_id)->get();
 
     return response()->json([
       'success' => true,
@@ -318,10 +318,12 @@ class SocialAccountController extends Controller
         'oauth_verifier' => $request->oauth_verifier
       ]);
 
-      session(['twitter_v1_creds' => [
-        'oauth_token' => $accessToken['oauth_token'],
-        'oauth_token_secret' => $accessToken['oauth_token_secret']
-      ]]);
+      session([
+        'twitter_v1_creds' => [
+          'oauth_token' => $accessToken['oauth_token'],
+          'oauth_token_secret' => $accessToken['oauth_token_secret']
+        ]
+      ]);
 
       //Start OAuth 2.0 Flow ===
       $state = session('social_auth_state');
@@ -370,11 +372,11 @@ class SocialAccountController extends Controller
         config('services.twitter.client_id'),
         config('services.twitter.client_secret')
       )->asForm()->post('https://api.twitter.com/2/oauth2/token', [
-        'redirect_uri' => url('/auth/twitter/callback'),
-        'code' => $request->code,
-        'grant_type' => 'authorization_code',
-        'code_verifier' => $codeVerifier,
-      ]);
+            'redirect_uri' => url('/auth/twitter/callback'),
+            'code' => $request->code,
+            'grant_type' => 'authorization_code',
+            'code_verifier' => $codeVerifier,
+          ]);
 
       $data = $response->json();
 
@@ -557,8 +559,8 @@ class SocialAccountController extends Controller
       $userResponse = Http::withHeaders([
         'Authorization' => 'Bearer ' . $accessToken,
       ])->post('https://open.tiktokapis.com/v2/user/info/', [
-        'fields' => 'open_id,union_id,avatar_url,display_name'
-      ]);
+            'fields' => 'open_id,union_id,avatar_url,display_name'
+          ]);
 
       $userData = $userResponse->json();
 
@@ -589,8 +591,9 @@ class SocialAccountController extends Controller
 
   private function saveAccount($data)
   {
+    $workspaceId = Auth::user()->current_workspace_id;
     $existingAccount = SocialAccount::withTrashed()
-      ->where('user_id', Auth::id())
+      ->where('workspace_id', $workspaceId)
       ->where('platform', $data['platform'])
       ->where('account_id', $data['account_id'])
       ->first();
@@ -630,6 +633,7 @@ class SocialAccountController extends Controller
       $account = $existingAccount;
     } else {
       $accountData['user_id'] = Auth::id();
+      $accountData['workspace_id'] = $workspaceId;
       $accountData['platform'] = $data['platform'];
       $account = SocialAccount::create($accountData);
       $isNewConnection = true;
@@ -712,7 +716,7 @@ class SocialAccountController extends Controller
   {
     try {
       $account = SocialAccount::where('id', $id)
-        ->where('user_id', Auth::id())
+        ->where('workspace_id', Auth::user()->current_workspace_id)
         ->first();
 
       if (!$account) {
@@ -740,16 +744,18 @@ class SocialAccountController extends Controller
           'platform' => $account->platform,
           'posts' => $uniqueActivePosts->map(function ($log) {
             $date = $log->published_at instanceof \DateTimeInterface ? $log->published_at : null;
-            if (!$date && $log->created_at instanceof \DateTimeInterface) $date = $log->created_at;
+            if (!$date && $log->created_at instanceof \DateTimeInterface)
+              $date = $log->created_at;
 
-            if ($date && $date->format('Y') < 2000) $date = null;
+            if ($date && $date->format('Y') < 2000)
+              $date = null;
 
             return [
               'id' => $log->publication_id,
               'title' => optional($log->publication)->title ?? 'Untitled',
               'platform_post_id' => $log->platform_post_id,
               'status' => $log->status,
-              'published_at' => $date ? $date->toIso8601String() : null,
+              'published_at' => $date ? \Carbon\Carbon::instance($date)->toIso8601String() : null,
             ];
           })->values(),
           'message' => trans('notifications.try_account_disconnected', ['account_name' => $account->account_name, 'uniqueActivePosts' => $uniqueActivePosts->count(), 'platform' => $account->platform], $account->user->preferredLocale())
@@ -771,14 +777,16 @@ class SocialAccountController extends Controller
             'message' => 'Cannot disconnect account. It has ' . $uniquePendingPosts->count() . ' scheduled post(s). Please remove them from campaigns first.',
             'posts' => $uniquePendingPosts->map(function ($post) {
               $date = $post->scheduled_at instanceof \DateTimeInterface ? $post->scheduled_at : null;
-              if (!$date && $post->created_at instanceof \DateTimeInterface) $date = $post->created_at;
+              if (!$date && $post->created_at instanceof \DateTimeInterface)
+                $date = $post->created_at;
 
-              if ($date && $date->format('Y') < 2000) $date = null;
+              if ($date && $date->format('Y') < 2000)
+                $date = null;
 
               return [
                 'id' => $post->id,
                 'title' => optional($post->publication)->title ?? optional($post->campaign)->title ?? 'Untitled',
-                'scheduled_at' => $date ? $date->toIso8601String() : null,
+                'scheduled_at' => $date ? \Carbon\Carbon::instance($date)->toIso8601String() : null,
                 'status' => $post->status,
               ];
             })->values()
