@@ -23,18 +23,18 @@ export default function WorkspaceInfoBadge({
             href={route('workspaces.index')}
             className={`
                 group inline-flex items-center gap-3 px-3 py-2 rounded-xl transition-all duration-300
-                bg-white/50 hover:bg-white dark:bg-neutral-800/50 dark:hover:bg-neutral-800 
-                border border-gray-200 dark:border-neutral-700
-                hover:shadow-lg hover:shadow-primary-600/10 hover:border-primary-500/50
-                backdrop-blur-md
+                bg-white/90 hover:bg-white dark:bg-neutral-900/95 dark:hover:bg-neutral-900 
+                border border-gray-200 dark:border-neutral-700/50
+                shadow-md hover:shadow-xl hover:shadow-primary-600/15 hover:border-primary-500/60
+                backdrop-blur-xl
             `}
         >
-            <div className="flex items-center gap-2">
-                <div className="h-7 w-7 rounded-lg bg-gradient-to-br from-primary-500 to-primary-700 text-white flex items-center justify-center text-xs font-bold shadow-md group-hover:scale-110 transition-transform duration-300">
+            <div className="flex items-center gap-2 min-w-0">
+                <div className="h-7 w-7 rounded-lg bg-gradient-to-br from-primary-500 to-primary-700 text-white flex items-center justify-center text-xs font-bold shadow-md group-hover:scale-110 transition-transform duration-300 flex-shrink-0">
                     {current_workspace.name.charAt(0).toUpperCase()}
                 </div>
                 {variant === "full" && (
-                    <span className="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                    <span className="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors truncate max-w-[100px] sm:max-w-[200px]">
                         {current_workspace.name}
                     </span>
                 )}
@@ -47,7 +47,7 @@ export default function WorkspaceInfoBadge({
                 <span className="font-medium">{memberCount}</span>
             </div>
 
-            <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 font-bold uppercase tracking-wider border border-primary-100 dark:border-primary-800">
+            <span className="text-[10px] px-2.5 py-1 rounded-full bg-primary-100 dark:bg-primary-500/20 text-primary-700 dark:text-primary-300 font-bold uppercase tracking-wider border border-primary-200 dark:border-primary-500/30">
                 {userRole}
             </span>
         </Link>

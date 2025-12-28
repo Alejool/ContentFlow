@@ -128,21 +128,25 @@ export default function UpdateProfileInformation({
   }, []);
 
   return (
-    <ModernCard
-      title={t("profile.information.title")}
-      description={t("profile.information.description")}
-      icon={UserIcon}
-      headerColor="orange"
-      className={className}
-    >
-      <form onSubmit={handleSubmit} className="space-y-12">
+    <div className={className}>
+      <form onSubmit={handleSubmit} className="">
         {/* Sección: Información Personal */}
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <div className="flex items-center gap-3 pb-3 mb-8 border-b border-gray-100 dark:border-neutral-800/50">
-            <div className="p-2.5 rounded-xl bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400">
-              <UserIcon className="w-5 h-5" />
+          <header className="mb-6 md:mb-8 border-b border-gray-100 dark:border-neutral-800 pb-4">
+            <div className="flex items-center gap-3 mb-1">
+              <div className="p-2 rounded-lg bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400">
+                <UserIcon className="w-5 h-5" />
+              </div>
+              <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
+                {t("profile.information.title")}
+              </h2>
             </div>
-            <h3 className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">
+            <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 pl-11">
+              {t("profile.information.description")}
+            </p>
+          </header>
+          <div className="flex items-center gap-3 pb-2 ">
+            <h3 className="text-sm font-bold uppercase tracking-widest text-primary-600 dark:text-primary-400">
               {t("profile.information.sections.personal")}
             </h3>
           </div>
@@ -186,11 +190,8 @@ export default function UpdateProfileInformation({
         </div>
 
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-150">
-          <div className="flex items-center gap-3 pb-3 mb-8 border-b border-gray-100 dark:border-neutral-800/50">
-            <div className="p-2.5 rounded-xl bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400">
-              <Phone className="w-5 h-5" />
-            </div>
-            <h3 className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">
+          <div className="flex items-center gap-3 pb-2 border-t border-gray-50 dark:border-neutral-800/50 pt-8 md:pt-10">
+            <h3 className="text-[10px] md:text-sm font-bold uppercase tracking-widest text-primary-600 dark:text-primary-400">
               {t("profile.information.sections.contact")}
             </h3>
           </div>
@@ -260,12 +261,9 @@ export default function UpdateProfileInformation({
           </div>
         </div>
 
-        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-300">
-          <div className="flex items-center gap-3 pb-3 mb-8 border-b border-gray-100 dark:border-neutral-800/50">
-            <div className="p-2.5 rounded-xl bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400">
-              <MessageSquare className="w-5 h-5" />
-            </div>
-            <h3 className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-300 border-t border-gray-50 dark:border-neutral-800/50 pt-8 md:pt-10">
+          <div className="flex items-center gap-3 pb-2">
+            <h3 className="text-[10px] md:text-sm font-bold uppercase tracking-widest text-primary-600 dark:text-primary-400">
               {t("profile.information.sections.bio")}
             </h3>
           </div>
@@ -285,20 +283,17 @@ export default function UpdateProfileInformation({
         {/* Sección: Preferencias de Plataformas */}
         <div
           id="platform-defaults-section"
-          className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-400 relative"
+          className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-400 relative border-t border-gray-50 dark:border-neutral-800/50 pt-8 md:pt-10"
         >
           {/* Decorative background for the section */}
           <div className="absolute -top-10 -right-10 w-64 h-64 bg-primary-500/5 rounded-full blur-3xl pointer-events-none" />
-          <div className="flex items-center gap-3 pb-3 mb-8 border-b border-gray-100 dark:border-neutral-800/50">
-            <div className="p-2.5 rounded-xl bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400">
-              <ShieldCheck className="w-5 h-5" />
-            </div>
-            <h3 className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">
-              {t("platformSettings.title") || "Valores Predeterminados"}
+          <div className="flex items-center gap-3 pb-2">
+            <h3 className="text-[10px] md:text-sm font-bold uppercase tracking-widest text-primary-600 dark:text-primary-400">
+              {t("platformSettings.title") || "Ajustes de Publicación Predeterminados"}
             </h3>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
             {platforms.map((platform) => {
               const platformSettings =
                 watchedValues.global_platform_settings?.[
@@ -311,7 +306,7 @@ export default function UpdateProfileInformation({
                   key={platform.id}
                   onClick={() => handleOpenSettings(platform.id)}
                   className={`
-                    group cursor-pointer p-6 rounded-2xl border transition-all duration-500
+                    group cursor-pointer p-4 md:p-6 rounded-2xl border transition-all duration-500
                     bg-white dark:bg-neutral-800/40 border-gray-100 dark:border-neutral-700/50 hover:border-primary-500/50 hover:bg-neutral-50 dark:hover:bg-neutral-800/80 hover:shadow-xl dark:shadow-none hover:shadow-primary-500/10
                     ${hasSettings ? "ring-2 ring-primary-500/20" : ""}
                     hover:-translate-y-1 relative overflow-hidden
@@ -320,20 +315,20 @@ export default function UpdateProfileInformation({
                   <div
                     className={`absolute top-0 right-0 w-24 h-24 -mr-12 -mt-12 bg-primary-500/5 rounded-full blur-2xl group-hover:bg-primary-500/10 transition-colors pointer-events-none`}
                   />
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-gray-50 dark:bg-neutral-800 rounded-lg group-hover:scale-110 transition-transform">
+                  <div className="flex flex-col sm:flex-row items-center sm:items-start lg:items-center gap-2 md:gap-3 text-center sm:text-left">
+                    <div className="p-2 bg-gray-50 dark:bg-neutral-800 rounded-lg group-hover:scale-110 transition-transform flex-shrink-0">
                       <img
                         src={platform.icon}
                         alt={platform.name}
-                        className="w-5 h-5"
+                        className="w-4 h-4 md:w-5 md:h-5"
                       />
                     </div>
-                    <div className="flex-1">
-                      <div className="text-sm font-bold truncate">
+                    <div className="flex-1 min-w-0">
+                      <div className="text-[11px] md:text-sm font-bold truncate">
                         {platform.name}
                       </div>
                       <div
-                        className={`text-[10px] font-medium uppercase tracking-wider ${hasSettings ? "text-green-500" : "text-gray-500"
+                        className={`text-[9px] md:text-[10px] font-medium uppercase tracking-wider ${hasSettings ? "text-green-500" : "text-gray-500"
                           }`}
                       >
                         {hasSettings
@@ -363,7 +358,7 @@ export default function UpdateProfileInformation({
         )}
 
         {mustVerifyEmail && user?.email_verified_at === null && (
-          <div className="rounded-2xl p-6 space-y-4 shadow-inner bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800/30">
+          <div className="rounded-2xl p-6 shadow-inner bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800/30">
             <div className="flex items-center gap-3 font-bold text-amber-800 dark:text-amber-300">
               <div className="p-2 rounded-xl bg-amber-500/20">
                 <MailWarning className="w-5 h-5 text-amber-600 dark:text-amber-400" />
@@ -398,17 +393,14 @@ export default function UpdateProfileInformation({
           </div>
         )}
 
-        <div className="pt-10 border-t border-gray-100 dark:border-neutral-800/50">
-          <div className="flex items-center gap-3 pb-3 mb-8 border-b border-gray-100 dark:border-neutral-800/50">
-            <div className="p-2.5 rounded-xl bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400">
-              <Globe className="w-5 h-5" />
-            </div>
-            <h3 className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">
+        <div className="pt-8 md:pt-10 border-t border-gray-100 dark:border-neutral-800/50">
+          <div className="flex items-center gap-3 pb-3 mb-6">
+            <h3 className="text-[10px] md:text-sm font-bold uppercase tracking-widest text-primary-600 dark:text-primary-400">
               {t("profile.information.sections.language")}
             </h3>
           </div>
 
-          <div className="p-8 rounded-2xl border bg-white dark:bg-neutral-800/40 border-gray-200 dark:border-neutral-700/50 transition-all duration-300 shadow-sm">
+          <div className="p-5 sm:p-8 rounded-3xl border bg-white/50 dark:bg-neutral-800/20 border-gray-200 dark:border-neutral-700/50 transition-all duration-300 shadow-sm">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
               <div className="space-y-1">
                 <div className="font-bold text-lg text-gray-900 dark:text-gray-100">
@@ -431,7 +423,7 @@ export default function UpdateProfileInformation({
               </div>
             </div>
 
-            <div className="mt-6 pt-6 border-t border-gray-100 dark:border-neutral-700/30 text-xs font-bold uppercase tracking-widest flex items-center gap-2 text-gray-400 dark:text-gray-500">
+            <div className="mt-6 pt-6 border-t border-gray-100 dark:border-neutral-700/30 text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 text-gray-400 dark:text-gray-500">
               <Sparkles className="w-3.5 h-3.5" />
               {t("profile.information.currentLanguage")}:{" "}
               <span className="text-gray-800 dark:text-gray-200">
@@ -458,8 +450,8 @@ export default function UpdateProfileInformation({
             loading={isSubmitting}
             loadingText={t("common.saving")}
             className={`w-full sm:w-auto min-w-[200px] transition-all duration-300 rounded-xl shadow-xl font-bold uppercase tracking-wider ${!hasChanges
-                ? "opacity-50 grayscale"
-                : "hover:scale-[1.05] active:scale-[0.95] bg-primary-600 hover:bg-primary-500 text-white border-0 shadow-primary-500/25"
+              ? "opacity-50 grayscale"
+              : "hover:scale-[1.05] active:scale-[0.95] bg-primary-600 hover:bg-primary-500 text-white border-0 shadow-primary-500/25"
               }`}
             type="submit"
             size="lg"
@@ -468,6 +460,6 @@ export default function UpdateProfileInformation({
           </Button>
         </div>
       </form>
-    </ModernCard>
+    </div>
   );
 }

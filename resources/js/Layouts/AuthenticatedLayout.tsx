@@ -50,8 +50,8 @@ export default function AuthenticatedLayout({
       <Link
         href={route('workspaces.index')}
         className={`
-          relative z-[60] h-7 flex items-center px-4 text-[10px] font-bold uppercase tracking-widest
-          ${theme === 'dark' ? 'bg-primary-900/40 text-primary-300 hover:bg-primary-900/60' : 'bg-primary-600 text-white hover:bg-primary-700'}
+          relative z-[100] h-7 flex items-center px-4 text-[10px] font-bold uppercase tracking-widest
+          ${theme === 'dark' ? 'bg-primary-900/90 text-primary-200 hover:bg-primary-900' : 'bg-primary-600 text-white hover:bg-primary-700'}
           backdrop-blur-sm border-b border-primary-500/20 transition-all duration-300 cursor-pointer group
         `}
       >
@@ -66,8 +66,8 @@ export default function AuthenticatedLayout({
           <div className="flex items-center gap-2 ml-2 flex-shrink-0">
             <span className="opacity-70 hidden sm:inline">{t('workspace.role')}:</span>
             <span className={`
-               px-2 py-1 rounded-md bg-white/15 border border-white/10
-               ${theme === 'dark' ? 'text-primary-200' : 'text-white'}
+               px-2 py-0.5 rounded-md border font-bold
+               ${theme === 'dark' ? 'bg-primary-500/20 border-primary-500/30 text-primary-200' : 'bg-white/20 border-white/20 text-white'}
             `}>
               {auth.current_workspace?.user_role || t('workspace.member')}
             </span>
@@ -100,22 +100,24 @@ export default function AuthenticatedLayout({
           />
 
           <main
-            className={`flex-1 min-h-0 overflow-y-auto transition-all duration-500  ease-in-out ${isSidebarOpen ? "lg:ml-80" : "lg:ml-32"
+            className={`flex-1 min-h-0 overflow-y-auto overflow-x-hidden transition-all duration-500  ease-in-out ${isSidebarOpen ? "lg:ml-80" : "lg:ml-32"
               }`}
           >
-            <header className="border-b border-gray-200/50 dark:border-neutral-800/50 sticky top-0 bg-white/50 dark:bg-black/50 backdrop-blur-md z-40">
-              <div className="mx-auto max-w-7xl px-6 py-4 flex justify-between items-center">
-                <div className="flex-1">
+            <header className="border-b border-gray-200/50 dark:border-neutral-800/50 bg-white/80 dark:bg-black/80 backdrop-blur-xl z-40">
+              <div className="mx-auto max-w-7xl px-4 md:px-6 py-3 md:py-4 flex justify-between items-center gap-4">
+                <div className="flex-1 min-w-0">
                   {header ? header : (
-                    <div className="h-8" /> // Placeholder to maintain height
+                    <div className="h-8" /> 
                   )}
                 </div>
-                <WorkspaceInfoBadge variant="full" />
+                <div className="flex-shrink-0">
+                  <WorkspaceInfoBadge variant="compact" />
+                </div>
               </div>
             </header>
 
-            <div className="py-8">
-              <div className="mx-auto max-w-7xl md:px-6">{children}</div>
+            <div className="py-2 md:py-8">
+              <div className="mx-auto max-w-7xl px-0 md:px-6">{children}</div>
             </div>
           </main>
         </div>

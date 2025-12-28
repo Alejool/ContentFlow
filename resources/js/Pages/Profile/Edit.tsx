@@ -4,7 +4,9 @@ import UpdatePasswordForm from "@/Components/profile/Partials/UpdatePasswordForm
 import UpdateProfileInformationForm from "@/Components/profile/Partials/UpdateProfileInformationForm";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, usePage } from "@inertiajs/react";
-import { Mail, Shield, User } from "lucide-react";
+import { Mail, Shield, User, Lock, Key, Settings, Share2, BarChart3 } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { useState, useEffect } from "react";
 
 interface EditProps {
   mustVerifyEmail: boolean;
@@ -70,12 +72,14 @@ function CustomAvatar({ src, name, size = "md", className = "" }: AvatarProps) {
 }
 
 import { useUserStore } from "@/stores/userStore";
-import { useEffect } from "react";
 
 export default function Edit({ mustVerifyEmail, status }: EditProps) {
+  const { t } = useTranslation();
   const user = usePage<any>().props.auth.user;
   const setUser = useUserStore((state) => state.setUser);
   const storedUser = useUserStore((state) => state.user);
+
+  const [activeTab, setActiveTab] = useState('profile');
 
   useEffect(() => {
     // Only update store if user is different to prevent loops
@@ -84,93 +88,102 @@ export default function Edit({ mustVerifyEmail, status }: EditProps) {
     }
   }, [user, setUser, storedUser]);
 
+  const tabs = [
+    { id: 'profile', name: t('profile.tabs.general') || 'General', icon: User },
+    { id: 'password', name: t('profile.tabs.security') || 'Seguridad', icon: Lock, hidden: user.provider !== null },
+    { id: 'accounts', name: t('profile.tabs.accounts') || 'Conexiones', icon: Share2 },
+  ];
+
   return (
     <AuthenticatedLayout
       header={
-        <div className="flex flex-col items-center justify-center py-10">
-          <div className="relative group">
-            <div className="absolute inset-0 bg-gradient-to-tr from-primary-500 to-purple-600 rounded-full blur-md opacity-20 group-hover:opacity-40 transition-opacity duration-500" />
-            <div className="relative p-1 rounded-full bg-gradient-to-tr from-primary-500 to-purple-600">
-              <div className="p-1 bg-white dark:bg-neutral-900 rounded-full">
-                <CustomAvatar
-                  src={user.photo_url || user.avatar}
-                  name={user.name}
-                  size="2xl"
-                  className="ring-4 ring-transparent"
-                />
-              </div>
-            </div>
-
-            <div className="absolute bottom-1 right-1">
-              <div className="w-5 h-5 rounded-full border-4 border-white dark:border-neutral-900 bg-green-500 shadow-sm animate-pulse" />
-            </div>
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="p-2 rounded-lg bg-primary-100 dark:bg-primary-900/30 flex-shrink-0">
+            <User className="w-5 h-5 text-primary-600 dark:text-primary-400" />
           </div>
-
-          <div className="mt-6 text-center">
-            <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
-              {user.name}
+          <div className="min-w-0">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white leading-tight truncate">
+              {t('nav.profile')}
             </h2>
-
-            <div className="flex items-center justify-center gap-2 mt-2">
-              <div className="p-1.5 rounded-lg bg-gray-100 dark:bg-neutral-800">
-                <Mail className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-              </div>
-              <p className="font-medium text-gray-600 dark:text-gray-400">
-                {user.email}
-              </p>
-            </div>
-
-            <div className="flex items-center justify-center gap-4 mt-5">
-              <div className={`
-                flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider border
-                ${user.email_verified_at
-                  ? "bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800/50"
-                  : "bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800/50"
-                }
-              `}>
-                <Shield className="w-3.5 h-3.5" />
-                {user.email_verified_at ? "Verificado" : "Sin verificar"}
-              </div>
-
-              <div className="flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400 border border-purple-200 dark:border-purple-800/50">
-                <User className="w-3.5 h-3.5" />
-                Miembro desde: {new Date(user.created_at).toLocaleDateString()}
-              </div>
-            </div>
-
-            <div className="mt-6">
-              <ConnectedAccounts header={false} />
-            </div>
+            <p className="text-xs text-gray-500 dark:text-neutral-500 font-medium truncate max-w-[150px] sm:max-w-none">
+              {t('profile.settings_description')}
+            </p>
           </div>
         </div>
       }
     >
       <Head title="Profile" />
 
-      <div
-        className={` transition-colors duration-300
-
-      `}
-      >
-        <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-            <div className="space-y-3">
-              <UpdateProfileInformationForm
-                mustVerifyEmail={mustVerifyEmail}
-                status={status}
-                className="h-auto"
-              />
-            </div>
-            <AccountStatistics status={status} />
-
-            {user.provider === null && (
-              <div className="space-y-3 col-span-2">
-                {/* <ConnectedAccounts /> */}
-                <div className="space-y-3">
-                  <UpdatePasswordForm className="w-full" />
-                </div>
+      <div className="py-4">
+        <div className="flex flex-col lg:grid lg:grid-cols-12 gap-8">
+          {/* Lateral Menu - Left Sidebar */}
+          <div className="lg:col-span-3 xl:col-span-2 space-y-4">
+            <div className="bg-white/80 dark:bg-neutral-900/80 rounded-none md:rounded-xl p-3 md:p-4 border-y md:border border-white/50 dark:border-neutral-800/50 backdrop-blur-xl shadow-lg shadow-black/5 sticky top-0 lg:top-24 z-30 transition-all duration-300">
+              <div className="hidden lg:block text-[10px] font-bold uppercase tracking-widest text-gray-500 dark:text-neutral-500 mb-4 px-2">
+                {t('profile.menu_title') || 'Configuración'}
               </div>
-            )}
+              <nav className="flex flex-row lg:flex-col gap-1 overflow-x-auto lg:overflow-x-visible scrollbar-hide">
+                {tabs.filter(tab => !tab.hidden).map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`
+                                flex items-center justify-center lg:justify-start gap-2 lg:gap-3 px-3 lg:px-4 py-2.5 lg:py-3 rounded-xl text-xs lg:text-sm font-bold transition-all duration-300 whitespace-nowrap w-auto lg:w-full
+                                ${activeTab === tab.id
+                        ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/25 scale-[1.02]'
+                        : 'text-gray-600 dark:text-neutral-400 hover:bg-white/50 dark:hover:bg-neutral-800/50 hover:text-gray-900 dark:hover:text-white'}
+                            `}
+                  >
+                    <tab.icon className={`w-4 h-4 ${activeTab === tab.id ? 'text-white' : 'text-primary-500 opacity-70'}`} />
+                    <span>{tab.name}</span>
+                  </button>
+                ))}
+              </nav>
+            </div>
+          </div>
+
+          <div className="lg:col-span-9 xl:col-span-7 space-y-6 md:space-y-8">
+            <div className="bg-white/40 dark:bg-neutral-900/40 rounded-none md:rounded-xl p-4 sm:p-8 md:p-10 border-y md:border border-white/50 dark:border-neutral-800/50 backdrop-blur-sm shadow-sm transition-all duration-300 min-h-[400px]">
+              {activeTab === 'profile' && (
+                <div className="animate-in fade-in slide-in-from-right-4 duration-500">
+                  <UpdateProfileInformationForm
+                    mustVerifyEmail={mustVerifyEmail}
+                    status={status}
+                  />
+                </div>
+              )}
+
+              {activeTab === 'password' && (
+                <div className="animate-in fade-in slide-in-from-right-4 duration-500">
+                  <UpdatePasswordForm />
+                </div>
+              )}
+
+              {activeTab === 'accounts' && (
+                <div className="animate-in fade-in slide-in-from-right-4 duration-500">
+                  <header className="mb-10 border-b border-gray-100 dark:border-neutral-800 pb-4">
+                    <div className="flex items-center gap-3 mb-1">
+                      <div className="p-2 rounded-lg bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400">
+                        <Share2 className="w-5 h-5" />
+                      </div>
+                      <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                        {t('connectedAccounts.title') || 'Cuentas Conectadas'}
+                      </h2>
+                    </div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 pl-11">
+                      {t('connectedAccounts.description') || 'Gestiona tus conexiones con redes sociales y servicios externos.'}
+                    </p>
+                  </header>
+                  <ConnectedAccounts />
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="lg:col-span-12 xl:col-span-3">
+            <div className="bg-white/40 dark:bg-neutral-900/40 rounded-none md:rounded-3xl p-5 md:p-6 border-y md:border border-white/50 dark:border-neutral-800/50 backdrop-blur-sm shadow-sm sticky top-0 xl:top-24 mt-4 lg:mt-0 lg:mb-8">
+              <AccountStatistics status={status} />
+            </div>
           </div>
         </div>
       </div>

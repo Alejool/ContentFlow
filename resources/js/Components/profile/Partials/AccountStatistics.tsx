@@ -103,39 +103,46 @@ export default function AccountStatistics({
   ];
 
   return (
-    <ModernCard
-      title={t("profile.statistics.title")}
-      description={t("profile.statistics.description")}
-      icon={BarChart3}
-      headerColor="blue"
-      className={className}
-    >
+    <div className={className}>
+      <header className="mb-6 border-b border-gray-100 dark:border-neutral-800 pb-3">
+        <div className="flex items-center gap-3 mb-1">
+          <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
+            <BarChart3 className="w-5 h-5" />
+          </div>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+            {t("profile.statistics.title")}
+          </h2>
+        </div>
+      </header>
+
       <div className="space-y-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="flex flex-col gap-4">
           {statisticsItems.map((item, index) => (
             <div
               key={index}
-              className={`group p-5 rounded-xl border bg-gradient-to-br transition-all duration-300 hover:shadow-lg hover:scale-[1.02] ${item.bgClasses}`}
+              className={`group p-4 rounded-2xl border transition-all duration-300 ${item.bgClasses.replace('from-blue-50 to-white', 'bg-white/40 dark:bg-neutral-800/40').replace('from-primary-50 to-white', 'bg-white/40 dark:bg-neutral-800/40').replace('from-green-50 to-white', 'bg-white/40 dark:bg-neutral-800/40')}`}
             >
-              <div className="flex items-center gap-4 mb-3">
-                <div className="p-2.5 rounded-xl bg-white dark:bg-neutral-800 shadow-sm group-hover:shadow-md transition-shadow">
+              <div className="flex items-center gap-4">
+                <div className="p-2.5 rounded-xl bg-white dark:bg-neutral-800 shadow-sm border border-gray-100 dark:border-neutral-700">
                   <item.icon className={`w-5 h-5 ${item.iconColor}`} />
                 </div>
-                <p className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  {item.title}
-                </p>
-              </div>
-              <div className="flex items-center mt-auto">
-                {item.iconElement}
-                <p className="text-xl font-bold text-gray-900 dark:text-white">
-                  {item.value}
-                </p>
+                <div>
+                  <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">
+                    {item.title}
+                  </p>
+                  <div className="flex items-center">
+                    {item.iconElement}
+                    <p className="text-lg font-bold text-gray-900 dark:text-white">
+                      {item.value}
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           ))}
         </div>
 
-        <div className="p-5 rounded-xl border bg-gradient-to-br from-yellow-50 via-white to-primary-50 dark:from-yellow-900/10 dark:via-neutral-900 dark:to-primary-900/10 border-yellow-200 dark:border-yellow-800/30 shadow-sm">
+        <div className="p-6 rounded-2xl border border-yellow-200 dark:border-yellow-800/30 bg-yellow-50/30 dark:bg-yellow-900/10">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-yellow-100 dark:bg-yellow-900/30">
@@ -188,6 +195,6 @@ export default function AccountStatistics({
           )}
         </div>
       </div>
-    </ModernCard>
+    </div>
   );
 }

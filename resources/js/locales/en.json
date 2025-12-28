@@ -724,7 +724,14 @@
     }
   },
   "profile": {
+    "menu_title": "Settings",
+    "tabs": {
+      "general": "General",
+      "security": "Security",
+      "accounts": "Connections"
+    },
     "title": "Profile",
+    "settings_description": "Update your personal information and security settings.",
     "editProfile": "Edit Profile",
     "changePassword": "Change Password",
     "name": "Name",
