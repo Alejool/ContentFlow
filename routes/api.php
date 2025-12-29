@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\CalendarController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\AIChatController;
 use App\Http\Controllers\Analytics\AnalyticsController;
@@ -53,6 +54,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/{workspace}/invite', [WorkspaceController::class, 'invite'])->name('invite');
         Route::put('/{workspace}/members/{user}/role', [WorkspaceController::class, 'updateMemberRole'])->name('members.update-role');
         Route::delete('/{workspace}/members/{user}', [WorkspaceController::class, 'removeMember'])->name('members.remove');
+
+        // Enterprise: Webhook testing & Activity
+        Route::post('/{workspace}/webhooks/test', [WorkspaceController::class, 'testWebhook'])->name('webhooks.test');
+        Route::get('/{workspace}/activity', [WorkspaceController::class, 'activity'])->name('activity');
     });
 
     /*
@@ -62,11 +67,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
     */
     Route::prefix('publications')->name('api.publications.')->group(function () {
         Route::get('/', [PublicationController::class, 'index'])->name('index');
+        Route::get('/stats', [PublicationController::class, 'stats'])->name('stats');
         Route::post('/', [PublicationController::class, 'store'])->name('store');
         Route::get('/{publication}', [PublicationController::class, 'show'])->name('show');
         Route::put('/{publication}', [PublicationController::class, 'update'])->name('update');
         Route::delete('/{publication}', [PublicationController::class, 'destroy'])->name('destroy');
         Route::post('/{publication}/duplicate', [PublicationController::class, 'duplicate'])->name('duplicate');
+        Route::post('/{publication}/request-review', [PublicationController::class, 'requestReview'])->name('request-review');
+        Route::post('/{publication}/approve', [PublicationController::class, 'approve'])->name('approve');
         Route::get('/{id}/published-platforms', [PublicationController::class, 'getPublishedPlatforms'])->name('published-platforms');
         Route::post('/{id}/publish', [PublicationController::class, 'publish'])->name('publish');
         Route::post('/{id}/unpublish', [PublicationController::class, 'unpublish'])->name('unpublish');
@@ -154,6 +162,16 @@ Route::middleware(['auth:sanctum'])->group(function () {
     */
     Route::patch('/locale', [LocaleController::class, 'update'])->name('api.locale.update');
     Route::patch('/theme', [ThemeController::class, 'update'])->name('api.theme.update');
+
+    /*
+    |----------------------------------------------------------------------
+    | Calendar API
+    |----------------------------------------------------------------------
+    |*/
+    Route::prefix('calendar')->name('api.calendar.')->group(function () {
+        Route::get('/', [CalendarController::class, 'index'])->name('index');
+        Route::patch('/{id}', [CalendarController::class, 'update'])->name('update');
+    });
 
     /*
     |----------------------------------------------------------------------

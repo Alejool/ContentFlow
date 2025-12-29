@@ -18,6 +18,8 @@ class Workspace extends Model
         'slug',
         'description',
         'created_by',
+        'slack_webhook_url',
+        'discord_webhook_url',
     ];
 
     public static function boot()

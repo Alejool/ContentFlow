@@ -1,0 +1,137 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Models\Publications\Publication;
+use App\Traits\ApiResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
+
+class CalendarController extends Controller
+{
+    use ApiResponse;
+
+    /**
+     * Get publications for calendar view
+     */
+    public function index(Request $request)
+    {
+        $start = $request->input('start'); // ISO date
+        $end = $request->input('end');     // ISO date
+
+        $workspaceId = Auth::user()->current_workspace_id;
+        $query = Publication::where('workspace_id', $workspaceId)
+            ->with(['mediaFiles' => fn($q) => $q->select('media_files.id', 'media_files.file_path', 'media_files.file_type')]);
+
+        if ($start && $end) {
+            $query->whereBetween('scheduled_at', [$start, $end]);
+        } else {
+            // Default to current month
+            $query->whereMonth('scheduled_at', now()->month)
+                ->whereYear('scheduled_at', now()->year);
+        }
+
+        $publications = $query->get();
+
+        // 1. Format Publications as Events
+        $events = $publications->map(function ($pub) {
+            return [
+                'id' => "pub_{$pub->id}",
+                'resourceId' => $pub->id,
+                'type' => 'publication',
+                'title' => "[PUB] {$pub->title}",
+                'start' => $pub->scheduled_at ? $pub->scheduled_at->toIso8601String() : null,
+                'status' => $pub->status,
+                'color' => $this->getStatusColor($pub->status),
+                'extendedProps' => [
+                    'slug' => $pub->slug,
+                    'thumbnail' => $pub->mediaFiles->first()?->file_path,
+                ]
+            ];
+        });
+
+        // 2. Format Scheduled Posts as separate events for more granular view
+        $posts = \App\Models\ScheduledPost::whereHas('publication', function ($q) use ($workspaceId) {
+            $q->where('workspace_id', $workspaceId);
+        })
+            ->with(['socialAccount:id,platform,account_name'])
+            ->whereBetween('scheduled_at', [$start ?? now()->startOfMonth(), $end ?? now()->endOfMonth()])
+            ->get();
+
+        $postEvents = $posts->map(function ($post) {
+            return [
+                'id' => "post_{$post->id}",
+                'resourceId' => $post->id,
+                'type' => 'post',
+                'title' => "({$post->socialAccount->platform}) {$post->socialAccount->account_name}",
+                'start' => $post->scheduled_at->toIso8601String(),
+                'status' => $post->status,
+                'color' => $this->getStatusColor($post->status, true),
+                'extendedProps' => [
+                    'publication_id' => $post->publication_id,
+                    'platform' => $post->socialAccount->platform,
+                ]
+            ];
+        });
+
+        return $this->successResponse($events->concat($postEvents));
+    }
+
+    /**
+     * Update publication schedule (drag and drop)
+     */
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'scheduled_at' => 'required|date',
+            'type' => 'nullable|in:publication,post'
+        ]);
+
+        $type = $request->input('type', 'publication');
+        $newDate = Carbon::parse($request->scheduled_at);
+
+        if ($type === 'publication') {
+            $model = Publication::where('workspace_id', Auth::user()->current_workspace_id)->findOrFail($id);
+        } else {
+            $model = \App\Models\ScheduledPost::whereHas('publication', function ($q) {
+                $q->where('workspace_id', Auth::user()->current_workspace_id);
+            })->findOrFail($id);
+        }
+
+        // Check if user has permission
+        if (!Auth::user()->hasPermission('manage-content', Auth::user()->current_workspace_id)) {
+            return $this->errorResponse('Unauthorized', 403);
+        }
+
+        $model->update([
+            'scheduled_at' => $newDate,
+        ]);
+
+        // If it's a publication, we might want to also shift its posts relatively
+        // but for now, we'll just update the main publication date.
+
+        return $this->successResponse($model, ucfirst($type) . ' rescheduled successfully.');
+    }
+
+    private function getStatusColor($status, $isPost = false)
+    {
+        $colors = [
+            'published' => '#10B981', // green
+            'failed' => '#EF4444',    // red
+            'publishing' => '#3B82F6', // blue
+            'pending_review' => '#F59E0B', // amber
+            'approved' => '#8B5CF6',   // violet
+            'pending' => '#6366F1',    // indigo (for posts)
+            'draft' => '#6B7280',     // gray
+        ];
+
+        $color = $colors[$status] ?? $colors['draft'];
+
+        // If it's a post, maybe make it slightly different (e.g., more transparent or secondary variant)
+        // For now, same color is fine as the title distinguishes them.
+
+        return $color;
+    }
+}

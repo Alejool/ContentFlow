@@ -11,11 +11,18 @@ trait ApiResponse
      */
     protected function successResponse($data, string $message = null, int $code = 200): JsonResponse
     {
-        return response()->json([
+        $response = [
             'success' => true,
             'message' => $message,
-            'data' => $data,
-        ], $code);
+        ];
+
+        if (is_array($data) && count($data) > 0 && !array_is_list($data)) {
+            $response = array_merge($response, $data);
+        } else {
+            $response['data'] = $data;
+        }
+
+        return response()->json($response, $code);
     }
 
     /**

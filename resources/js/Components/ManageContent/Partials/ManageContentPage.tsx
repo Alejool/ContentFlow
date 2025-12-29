@@ -18,21 +18,30 @@ import { createPortal } from "react-dom";
 
 import { usePublications } from "@/Hooks/publication/usePublications";
 import WorkspaceInfoBadge from "@/Components/Workspace/WorkspaceInfoBadge";
+import EditorialCalendar from "@/Components/ManageContent/Partials/EditorialCalendar";
+import { Calendar as CalendarLucide } from "lucide-react";
+import { useManageContentUIStore } from "@/stores/manageContentUIStore";
+import { useShallow } from "zustand/react/shallow";
 
 export default function ManageContentPage() {
   const {
     t,
-    activeTab,
-    setActiveTab,
     filters,
     handleFilterChange,
-    selectedItem,
-    setSelectedItem,
     items,
     pagination,
     isLoading,
     handlePageChange,
     handleRefresh,
+    handleDeleteItem,
+    handleEditRequest,
+    connectedAccounts,
+  } = usePublications();
+
+  const {
+    activeTab,
+    setActiveTab,
+    selectedItem,
     isAddModalOpen,
     isEditModalOpen,
     isPublishModalOpen,
@@ -45,10 +54,23 @@ export default function ManageContentPage() {
     closePublishModal,
     openViewDetailsModal,
     closeViewDetailsModal,
-    handleDeleteItem,
-    handleEditRequest,
-    connectedAccounts,
-  } = usePublications();
+  } = useManageContentUIStore(useShallow((s) => ({
+    activeTab: s.activeTab,
+    setActiveTab: s.setActiveTab,
+    selectedItem: s.selectedItem,
+    isAddModalOpen: s.isAddModalOpen,
+    isEditModalOpen: s.isEditModalOpen,
+    isPublishModalOpen: s.isPublishModalOpen,
+    isViewDetailsModalOpen: s.isViewDetailsModalOpen,
+    openAddModal: s.openAddModal,
+    closeAddModal: s.closeAddModal,
+    openEditModal: s.openEditModal,
+    closeEditModal: s.closeEditModal,
+    openPublishModal: s.openPublishModal,
+    closePublishModal: s.closePublishModal,
+    openViewDetailsModal: s.openViewDetailsModal,
+    closeViewDetailsModal: s.closeViewDetailsModal,
+  })));
 
   const { theme } = useTheme();
   const { fetchPublishedPlatforms } = usePublishPublication();
@@ -68,6 +90,11 @@ export default function ManageContentPage() {
       id: "logs",
       icon: FileText,
       label: t("manageContent.logs"),
+    },
+    {
+      id: "calendar",
+      icon: CalendarLucide,
+      label: "Calendar",
     },
   ];
 
@@ -140,13 +167,15 @@ export default function ManageContentPage() {
                     onRefresh={handleRefresh}
                     onFilterChange={handleFilterChange}
                   />
+                ) : activeTab === "calendar" ? (
+                  <EditorialCalendar />
                 ) : (
                   <CampaignList
                     key={`campaigns-${connectedAccounts.length}`}
                     items={items as any}
                     pagination={pagination}
                     onPageChange={handlePageChange}
-                    mode={activeTab as "campaigns" | "publications"}
+                    mode={activeTab as any}
                     onEdit={openEditModal}
                     onDelete={handleDeleteItem}
                     onAdd={openAddModal}
@@ -166,14 +195,14 @@ export default function ManageContentPage() {
       </div>
 
       {createPortal(
-        activeTab === "publications" ? (
-          <AddPublicationModal
+        (activeTab === "campaigns") ? (
+          <AddCampaignModal
             isOpen={isAddModalOpen}
             onClose={closeAddModal}
             onSubmit={handleRefresh}
           />
         ) : (
-          <AddCampaignModal
+          <AddPublicationModal
             isOpen={isAddModalOpen}
             onClose={closeAddModal}
             onSubmit={handleRefresh}
@@ -183,18 +212,18 @@ export default function ManageContentPage() {
       )}
 
       {createPortal(
-        activeTab === "publications" ? (
-          <EditPublicationModal
-            isOpen={isEditModalOpen}
-            onClose={closeEditModal}
-            publication={selectedItem as Publication}
-            onSubmit={handleRefresh}
-          />
-        ) : (
+        (selectedItem && ((selectedItem as any).__type === 'campaign' || ('name' in selectedItem && !('title' in selectedItem)))) || (activeTab === "campaigns" && !selectedItem) ? (
           <EditCampaignModal
             isOpen={isEditModalOpen}
             onClose={closeEditModal}
             campaign={selectedItem as Campaign}
+            onSubmit={handleRefresh}
+          />
+        ) : (
+          <EditPublicationModal
+            isOpen={isEditModalOpen}
+            onClose={closeEditModal}
+            publication={selectedItem as Publication}
             onSubmit={handleRefresh}
           />
         ),

@@ -120,7 +120,7 @@ class WorkspaceController extends Controller
         $workspace->update($validated);
 
         if ($request->wantsJson() || $request->is('api/*')) {
-            return $this->successResponse($workspace, 'Workspace updated successfully.');
+            return $this->successResponse(['workspace' => $workspace], 'Workspace updated successfully.');
         }
 
         return redirect()->back()->with('message', 'Workspace updated successfully.');
@@ -178,7 +178,7 @@ class WorkspaceController extends Controller
             'role_id' => $validated['role_id']
         ]);
 
-        return response()->json(['success' => true]);
+        return $this->successResponse(null, 'Member role updated successfully');
     }
 
     public function removeMember($workspaceId, $userId)
@@ -241,5 +241,89 @@ class WorkspaceController extends Controller
         $workspace->users()->attach($user->id, ['role_id' => $validated['role_id']]);
 
         return response()->json(['success' => true, 'message' => 'Member added successfully']);
+    }
+
+    /**
+     * Test Slack/Discord webhook connections for a workspace
+     */
+    public function testWebhook(Request $request, Workspace $workspace)
+    {
+        if (!Auth::user()->hasPermission('manage-team', $workspace->id)) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'type' => 'required|in:slack,discord',
+            'url' => 'nullable|url'
+        ]);
+
+        $url = $validated['url'] ?? ($validated['type'] === 'slack' ? $workspace->slack_webhook_url : $workspace->discord_webhook_url);
+
+        if (!$url) {
+            return $this->errorResponse("No {$validated['type']} webhook URL configured for this workspace.", 422);
+        }
+
+        try {
+            if ($validated['type'] === 'slack') {
+                $payload = [
+                    'text' => "🚀 Test notification from ContentFlow for workspace: {$workspace->name}",
+                ];
+            } else {
+                $payload = [
+                    'content' => "🚀 Test notification from ContentFlow for workspace: {$workspace->name}",
+                ];
+            }
+
+            \Illuminate\Support\Facades\Log::info("Testing {$validated['type']} webhook", ['url' => $url, 'payload' => $payload]);
+
+            // More robust HTTP call for testing
+            $response = \Illuminate\Support\Facades\Http::timeout(10)
+                ->withoutVerifying()
+                ->post($url, $payload);
+
+            \Illuminate\Support\Facades\Log::info("Webhook response", ['status' => $response->status(), 'body' => $response->body()]);
+
+            // Log the attempt
+            \App\Models\WebhookLog::create([
+                'workspace_id' => $workspace->id,
+                'channel' => $validated['type'],
+                'event_type' => 'test_connection',
+                'payload' => $payload,
+                'response' => $response->body(),
+                'status_code' => $response->status(),
+                'success' => $response->successful(),
+            ]);
+
+            if ($response->successful()) {
+                return $this->successResponse(null, "Test message sent to {$validated['type']} successfully.");
+            }
+
+            $errorMsg = "Failed to send test message to {$validated['type']}. Status: " . $response->status();
+            $body = $response->body();
+            if ($body) {
+                $errorMsg .= " - Details: " . substr($body, 0, 100);
+            }
+
+            return $this->errorResponse($errorMsg, 400);
+        } catch (\Exception $e) {
+            return $this->errorResponse("Error testing webhook: " . $e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Get recent workspace activity (webhook logs)
+     */
+    public function activity(Workspace $workspace)
+    {
+        if (!Auth::user()->workspaces()->where('workspaces.id', $workspace->id)->exists()) {
+            abort(403);
+        }
+
+        $logs = \App\Models\WebhookLog::where('workspace_id', $workspace->id)
+            ->orderBy('created_at', 'desc')
+            ->limit(50)
+            ->get();
+
+        return $this->successResponse($logs);
     }
 }

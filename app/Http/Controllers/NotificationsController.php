@@ -76,13 +76,13 @@ class NotificationsController extends Controller
         if ($notification) {
             $notification->delete();
         }
-        return response()->json(['success' => true]);
+        return $this->successResponse(null, 'Notification deleted successfully');
     }
 
     public function destroyRead()
     {
         Auth::user()->readNotifications()->delete();
-        return response()->json(['success' => true]);
+        return $this->successResponse(null, 'Read notifications deleted successfully');
     }
 
     public function stats()

@@ -4,6 +4,7 @@ import { useSocialMediaAuth } from "@/Hooks/useSocialMediaAuth";
 import { useCampaignStore } from "@/stores/campaignStore";
 import { useLogStore } from "@/stores/logStore";
 import { usePublicationStore } from "@/stores/publicationStore";
+import { useManageContentUIStore } from "@/stores/manageContentUIStore";
 import { PageProps } from "@/types";
 import { Campaign } from "@/types/Campaign";
 import { Publication } from "@/types/Publication";
@@ -12,7 +13,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useShallow } from "zustand/react/shallow";
 
-export type ManageContentTab = "publications" | "campaigns" | "logs";
+export type ManageContentTab = "publications" | "campaigns" | "logs" | "calendar";
 
 export const usePublications = () => {
   const { t } = useTranslation();
@@ -67,17 +68,27 @@ export const usePublications = () => {
   // Realtime updates
   useRealtime(user?.id);
 
-  const [activeTab, setActiveTab] = useState<ManageContentTab>("publications");
-  const [filters, setFilters] = useState<any>({});
-  const [selectedItem, setSelectedItem] = useState<
-    Campaign | Publication | null
-  >(null);
+  // Shared UI store for modals and tabs
+  const {
+    activeTab,
+    setActiveTab,
+    selectedItem,
+    setSelectedItem,
+    isAddModalOpen,
+    isEditModalOpen,
+    isPublishModalOpen,
+    isViewDetailsModalOpen,
+    openAddModal,
+    closeAddModal,
+    openEditModal,
+    closeEditModal,
+    openPublishModal,
+    closePublishModal,
+    openViewDetailsModal,
+    closeViewDetailsModal,
+  } = useManageContentUIStore();
 
-  // Modal States
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
-  const [isViewDetailsModalOpen, setIsViewDetailsModalOpen] = useState(false);
+  const [filters, setFilters] = useState<any>({});
 
   // Use a ref to prevent loops from effect triggers
   const lastFetchRef = useRef<string>("");
@@ -166,36 +177,6 @@ export const usePublications = () => {
     fetchData(pagination.current_page);
   };
 
-  const openAddModal = () => setIsAddModalOpen(true);
-  const closeAddModal = () => setIsAddModalOpen(false);
-
-  const openEditModal = (item: Campaign | Publication) => {
-    setSelectedItem(item);
-    setIsEditModalOpen(true);
-  };
-  const closeEditModal = () => {
-    setSelectedItem(null);
-    setIsEditModalOpen(false);
-  };
-
-  const openPublishModal = (item: Publication) => {
-    setSelectedItem(item);
-    setIsPublishModalOpen(true);
-  };
-  const closePublishModal = () => {
-    setSelectedItem(null);
-    setIsPublishModalOpen(false);
-  };
-
-  const openViewDetailsModal = (item: Campaign | Publication) => {
-    setSelectedItem(item);
-    setIsViewDetailsModalOpen(true);
-  };
-  const closeViewDetailsModal = () => {
-    setSelectedItem(null);
-    setIsViewDetailsModalOpen(false);
-  };
-
   const handleDeleteItem = async (id: number) => {
     const isCampaign = activeTab === "campaigns";
     const confirmed = await confirm({
@@ -222,8 +203,7 @@ export const usePublications = () => {
   };
 
   const handleEditRequest = (item: Publication) => {
-    setSelectedItem(item);
-    setIsEditModalOpen(true);
+    openEditModal(item);
   };
 
   return {

@@ -13,10 +13,15 @@ class PublishPublicationAction
 {
   public function __construct(
     protected MediaProcessingService $mediaService
-  ) {}
+  ) {
+  }
 
   public function execute(Publication $publication, array $platformIds, array $options = []): void
   {
+    if (!$publication->isApproved()) {
+      throw new \Exception("Publication must be approved before publishing.");
+    }
+
     if (is_string($platformIds)) {
       $platformIds = explode(',', $platformIds);
     }

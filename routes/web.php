@@ -13,9 +13,11 @@ use App\Http\Controllers\Locale\LocaleController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\NotificationsController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Broadcast;
 use Inertia\Inertia;
 use App\Http\Controllers\SocialPostLogController;
 use App\Http\Controllers\WorkspaceController;
+use App\Http\Controllers\Api\CalendarController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,7 +25,7 @@ use App\Http\Controllers\WorkspaceController;
 |--------------------------------------------------------------------------
 */
 
-Illuminate\Support\Facades\Broadcast::routes();
+Broadcast::routes();
 
 Route::get('/', function () {
   return Inertia::render('Welcome', [
@@ -140,6 +142,16 @@ Route::middleware(['auth:sanctum'])->group(function () {
     |----------------------------------------------------------------------
     */
   Route::post('/ai-chat/process', [AIChatController::class, 'processMessage'])->name('ai-chat.process');
+
+  /*
+    |----------------------------------------------------------------------
+    | Calendar API
+    |----------------------------------------------------------------------
+    */
+  Route::prefix('calendar')->name('calendar.')->group(function () {
+    Route::get('/', [CalendarController::class, 'index'])->name('index');
+    Route::patch('/{id}', [CalendarController::class, 'update'])->name('update');
+  });
 
   /*
     |----------------------------------------------------------------------

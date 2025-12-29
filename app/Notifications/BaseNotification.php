@@ -7,6 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 use App\Channels\EnhancedDatabaseChannel;
+use Illuminate\Support\Facades\Http;
 
 abstract class BaseNotification extends Notification implements ShouldQueue
 {
@@ -61,7 +62,80 @@ abstract class BaseNotification extends Notification implements ShouldQueue
    */
   public function via($notifiable): array
   {
-    return [EnhancedDatabaseChannel::class, 'broadcast'];
+    $channels = [EnhancedDatabaseChannel::class, 'broadcast'];
+
+    // If the notifiable (usually User) has a current workspace with webhooks
+    if (isset($notifiable->currentWorkspace)) {
+      if ($notifiable->currentWorkspace->slack_webhook_url) {
+        $channels[] = 'slack';
+      }
+      if ($notifiable->currentWorkspace->discord_webhook_url) {
+        $channels[] = 'discord'; // Custom logic for Discord
+      }
+    }
+
+    return $channels;
+  }
+
+  /**
+   * Route for Slack
+   */
+  public function routeNotificationForSlack($notification)
+  {
+    return $this->currentWorkspace->slack_webhook_url ?? null;
+  }
+
+  /**
+   * Discord handling (usually requires custom channel or just a hook)
+   */
+  public function toDiscord($notifiable)
+  {
+    $data = $this->toArray($notifiable);
+    $message = "*" . ($data['title'] ?? 'Notification') . "*\n" . ($data['message'] ?? '');
+
+    if (isset($notifiable->currentWorkspace->discord_webhook_url)) {
+      $response = Http::post($notifiable->currentWorkspace->discord_webhook_url, [
+        'content' => $message,
+        'username' => 'ContentFlow Bot',
+      ]);
+
+      // Log the attempt
+      \App\Models\WebhookLog::create([
+        'workspace_id' => $notifiable->current_workspace_id,
+        'channel' => 'discord',
+        'event_type' => class_basename($this),
+        'payload' => ['content' => $message],
+        'response' => $response->body(),
+        'status_code' => $response->status(),
+        'success' => $response->successful(),
+      ]);
+    }
+  }
+
+  /**
+   * Slack handling via webhook
+   */
+  public function toSlack($notifiable)
+  {
+    $data = $this->toArray($notifiable);
+    $message = "*" . ($data['title'] ?? 'Notification') . "*\n" . ($data['message'] ?? '');
+
+    if (isset($notifiable->currentWorkspace->slack_webhook_url)) {
+      $response = Http::post($notifiable->currentWorkspace->slack_webhook_url, [
+        'text' => $message,
+      ]);
+
+      // Log the attempt
+      \App\Models\WebhookLog::create([
+        'workspace_id' => $notifiable->current_workspace_id,
+        'channel' => 'slack',
+        'event_type' => class_basename($this),
+        'payload' => ['text' => $message],
+        'response' => $response->body(),
+        'status_code' => $response->status(),
+        'success' => $response->successful(),
+      ]);
+    }
   }
 
   /**

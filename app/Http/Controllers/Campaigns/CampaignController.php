@@ -64,7 +64,7 @@ class CampaignController extends Controller
             // Using simplePaginate() to avoid COUNT(*) query - only loads current page data
             $campaigns = $query->orderBy('created_at', 'desc')->simplePaginate(5);
 
-            return $this->successResponse($campaigns);
+            return $this->successResponse(['campaigns' => $campaigns]);
         });
     }
 
@@ -107,7 +107,7 @@ class CampaignController extends Controller
         // Clear cache after creating campaign
         $this->clearCampaignCache(Auth::user()->current_workspace_id);
 
-        return $this->successResponse($campaign->load('publications'), 'Campaign created successfully', 201);
+        return $this->successResponse(['campaign' => $campaign->load('publications')], 'Campaign created successfully', 201);
     }
 
     /**
@@ -123,10 +123,7 @@ class CampaignController extends Controller
         ])->where('workspace_id', Auth::user()->current_workspace_id)
             ->findOrFail($id);
 
-        return response()->json([
-            'success' => true,
-            'campaign' => $campaign,
-        ]);
+        return $this->successResponse(['campaign' => $campaign]);
     }
 
     /**
@@ -177,11 +174,7 @@ class CampaignController extends Controller
         // Clear cache after updating campaign
         $this->clearCampaignCache(Auth::user()->current_workspace_id);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Campaign updated successfully',
-            'campaign' => $campaign->load('publications'),
-        ]);
+        return $this->successResponse(['campaign' => $campaign->load('publications')], 'Campaign updated successfully');
     }
 
     /**
@@ -221,11 +214,7 @@ class CampaignController extends Controller
             ]);
         }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Publications added to campaign',
-            'campaign' => $campaign->load('publications'),
-        ]);
+        return $this->successResponse(['campaign' => $campaign->load('publications')], 'Publications added to campaign');
     }
 
     /**
@@ -242,11 +231,7 @@ class CampaignController extends Controller
 
         $campaign->publications()->detach($validatedData['publication_ids']);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Publications removed from campaign',
-            'campaign' => $campaign->load('publications'),
-        ]);
+        return $this->successResponse(['campaign' => $campaign->load('publications')], 'Publications removed from campaign');
     }
 
     /**

@@ -1,8 +1,5 @@
 import PlatformSettingsModal from "@/Components/ConfigSocialMedia/PlatformSettingsModal";
-import AddMoreButton from "@/Components/ManageContent/Publication/common/add/AddMoreButton";
-import ImagePreviewItem from "@/Components/ManageContent/Publication/common/add/ImagePreviewItem";
 import SocialAccountsSection from "@/Components/ManageContent/Publication/common/add/SocialAccountsSection";
-import VideoPreviewItem from "@/Components/ManageContent/Publication/common/add/VideoPreviewItem";
 import MediaUploadSection from "@/Components/ManageContent/Publication/common/edit/MediaUploadSection";
 import ModalFooter from "@/Components/ManageContent/modals/common/ModalFooter";
 import ModalHeader from "@/Components/ManageContent/modals/common/ModalHeader";
@@ -51,7 +48,6 @@ export default function AddPublicationModal({
     handleAccountToggle,
     handleClose,
     handleSubmit,
-    fileInputRef,
     platformSettings,
     setPlatformSettings,
     activePlatformSettings,
@@ -69,49 +65,6 @@ export default function AddPublicationModal({
 
   const { register } = form;
 
-  const renderMediaPreviews = () => {
-    if (mediaFiles.length === 0) return null;
-
-    return (
-      <div className="grid grid-cols-2 gap-4 w-full p-4">
-        {mediaFiles.map((media, index) => {
-          if (media.type === "video") {
-            return (
-              <VideoPreviewItem
-                key={media.tempId}
-                preview={media.url}
-                index={index}
-                duration={videoMetadata[media.tempId]?.duration}
-                youtubeType={
-                  videoMetadata[media.tempId]?.youtubeType || "video"
-                }
-                thumbnail={thumbnails[media.tempId]}
-                thumbnailUrl={media.thumbnailUrl}
-                onRemove={() => handleRemoveMedia(index)}
-                onThumbnailChange={(file) => setThumbnail(media.tempId, file)}
-                onYoutubeTypeChange={(type) =>
-                  setVideoMetadata(media.tempId, {
-                    ...videoMetadata[media.tempId],
-                    youtubeType: type,
-                  })
-                }
-              />
-            );
-          }
-
-          return (
-            <ImagePreviewItem
-              key={media.tempId}
-              preview={media.url}
-              index={index}
-              onRemove={() => handleRemoveMedia(index)}
-            />
-          );
-        })}
-        <AddMoreButton onClick={() => fileInputRef.current?.click()} />
-      </div>
-    );
-  };
 
   if (!isOpen) return null;
 
@@ -141,76 +94,24 @@ export default function AddPublicationModal({
           >
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <div className="space-y-6">
-                <div className="form-group">
-                  <div
-                    className={`relative group cursor-pointer transition-all duration-300 ${isDragOver
-                        ? "scale-[1.02] ring-2 ring-primary-500 dark:ring-primary-400 ring-offset-2"
-                        : ""
-                      }`}
-                    onDrop={(e) => {
-                      e.preventDefault();
-                      setIsDragOver(false);
-                      handleFileChange(e.dataTransfer.files);
-                    }}
-                    onDragOver={(e) => {
-                      e.preventDefault();
-                      setIsDragOver(true);
-                    }}
-                    onDragLeave={(e) => {
-                      e.preventDefault();
-                      setIsDragOver(false);
-                    }}
-                    onClick={() => fileInputRef.current?.click()}
-                  >
-                    <div
-                      className={`min-h-[200px] rounded-lg border-2 border-dashed flex flex-col items-center justify-center text-center transition-colors overflow-hidden ${imageError
-                          ? "border-primary-300 bg-primary-50 dark:border-primary-50 dark:bg-primary-900/20"
-                          : isDragOver
-                            ? "bg-primary-50 border-primary-500 dark:bg-primary-900/20 dark:border-primary-400"
-                            : "border-gray-200 hover:border-primary-300 bg-gray-50 dark:border-neutral-600 dark:hover:border-primary-400 dark:bg-neutral-700"
-                        }`}
-                    >
-                      {renderMediaPreviews() || (
-                        <MediaUploadSection
-                          mediaPreviews={mediaFiles}
-                          thumbnails={thumbnails}
-                          imageError={imageError}
-                          isDragOver={isDragOver}
-                          t={t}
-                          onFileChange={handleFileChange}
-                          onRemoveMedia={handleRemoveMedia}
-                          onSetThumbnail={(tempId: string, file: File) =>
-                            setThumbnail(tempId, file)
-                          }
-                          onClearThumbnail={(tempId: string) =>
-                            clearThumbnail(tempId)
-                          }
-                          onDragOver={() => setIsDragOver(true)}
-                          onDragLeave={() => setIsDragOver(false)}
-                          onDrop={(e: React.DragEvent<HTMLDivElement>) => {
-                            e.preventDefault();
-                            setIsDragOver(false);
-                            handleFileChange(e.dataTransfer.files);
-                          }}
-                        />
-                      )}
-                    </div>
-                    <input
-                      type="file"
-                      ref={fileInputRef}
-                      className="hidden"
-                      multiple
-                      accept="image/*,video/*"
-                      onChange={(e) => handleFileChange(e.target.files)}
-                    />
-                  </div>
-                  {imageError && (
-                    <p className="mt-2 text-sm text-primary-500 flex items-center gap-1 animate-in slide-in-from-left-1">
-                      <AlertTriangle className="w-4 h-4" />
-                      {imageError}
-                    </p>
-                  )}
-                </div>
+                <MediaUploadSection
+                  mediaPreviews={mediaFiles}
+                  thumbnails={thumbnails}
+                  imageError={imageError}
+                  isDragOver={isDragOver}
+                  t={t}
+                  onFileChange={handleFileChange}
+                  onRemoveMedia={handleRemoveMedia}
+                  onSetThumbnail={(tempId, file) => setThumbnail(tempId, file)}
+                  onClearThumbnail={(tempId) => clearThumbnail(tempId)}
+                  onDragOver={() => setIsDragOver(true)}
+                  onDragLeave={() => setIsDragOver(false)}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setIsDragOver(false);
+                    handleFileChange(e.dataTransfer.files);
+                  }}
+                />
 
                 <SocialAccountsSection
                   socialAccounts={socialAccounts}
@@ -311,10 +212,10 @@ export default function AddPublicationModal({
                   required
                   sizeType="lg"
                   hint={`${watched.hashtags
-                      ? watched.hashtags
-                        .split(" ")
-                        .filter((tag: string) => tag.startsWith("#")).length
-                      : 0
+                    ? watched.hashtags
+                      .split(" ")
+                      .filter((tag: string) => tag.startsWith("#")).length
+                    : 0
                     }/10 hashtags`}
                 />
 

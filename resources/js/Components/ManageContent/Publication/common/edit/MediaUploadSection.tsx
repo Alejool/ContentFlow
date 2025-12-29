@@ -77,7 +77,11 @@ const MediaUploadSection: React.FC<MediaUploadSectionProps> = ({
         onDrop={disabled ? undefined : onDrop}
         onDragOver={disabled ? undefined : onDragOver}
         onDragLeave={disabled ? undefined : onDragLeave}
-        onClick={() => !disabled && fileInputRef.current?.click()}
+        onClick={(e) => {
+          if (!disabled && mediaPreviews.length === 0) {
+            fileInputRef.current?.click();
+          }
+        }}
       >
         <div
           className={`min-h-[200px] rounded-lg border-2 border-dashed flex flex-col items-center justify-center p-6 text-center transition-colors overflow-hidden ${getUploadAreaStyles()}`}
@@ -99,7 +103,10 @@ const MediaUploadSection: React.FC<MediaUploadSectionProps> = ({
                 />
               ))}
               {!disabled && (
-                <AddMoreButton onClick={() => fileInputRef.current?.click()} />
+                <AddMoreButton onClick={(e) => {
+                  e.stopPropagation();
+                  fileInputRef.current?.click();
+                }} />
               )}
             </div>
           ) : (
@@ -252,7 +259,7 @@ const VideoPreview: React.FC<{
     </>
   );
 
-const AddMoreButton: React.FC<{ onClick: () => void }> = ({ onClick }) => (
+const AddMoreButton: React.FC<{ onClick: (e: React.MouseEvent) => void }> = ({ onClick }) => (
   <div
     className="flex items-center justify-center aspect-video border-2 border-dashed border-gray-300 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
     onClick={onClick}

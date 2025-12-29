@@ -14,10 +14,23 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use App\Models\MediaFile;
 use App\Models\SocialPostLog;
 use App\Models\Workspace;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 
 class Publication extends Model
 {
   use HasFactory;
+
+  protected static function boot()
+  {
+    parent::boot();
+
+    static::addGlobalScope('workspace', function (Builder $builder) {
+      if (Auth::check() && Auth::user()->current_workspace_id) {
+        $builder->where('workspace_id', Auth::user()->current_workspace_id);
+      }
+    });
+  }
 
   protected $table = 'publications';
   protected $status = [
@@ -25,6 +38,8 @@ class Publication extends Model
     'published',
     'publishing',
     'failed',
+    'pending_review',
+    'approved',
   ];
 
   protected $fillable = [
@@ -44,6 +59,8 @@ class Publication extends Model
     'scheduled_at',
     'platform_settings',
     'workspace_id',
+    'approved_by',
+    'approved_at',
   ];
 
   protected $casts = [
@@ -53,6 +70,8 @@ class Publication extends Model
     'scheduled_at' => 'datetime',
     'platform_settings' => 'array',
     'workspace_id' => 'integer',
+    'approved_by' => 'integer',
+    'approved_at' => 'datetime',
   ];
 
   public function scopeDraft($query)
@@ -73,6 +92,26 @@ class Publication extends Model
   public function scopeFailed($query)
   {
     return $query->where('status', $this->status[3]);
+  }
+
+  public function scopePendingReview($query)
+  {
+    return $query->where('status', $this->status[4]);
+  }
+
+  public function scopeApproved($query)
+  {
+    return $query->where('status', $this->status[5]);
+  }
+
+  public function isApproved(): bool
+  {
+    return $this->status === 'approved' || $this->status === 'published';
+  }
+
+  public function approver(): BelongsTo
+  {
+    return $this->belongsTo(User::class, 'approved_by');
   }
 
   public function media(): HasMany

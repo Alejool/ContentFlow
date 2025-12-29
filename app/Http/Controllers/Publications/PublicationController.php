@@ -15,6 +15,8 @@ use App\Actions\Publications\CreatePublicationAction;
 use App\Actions\Publications\UpdatePublicationAction;
 use App\Actions\Publications\PublishPublicationAction;
 use App\Actions\Publications\UnpublishPublicationAction;
+use App\Notifications\PublicationAwaitingApprovalNotification;
+use App\Notifications\PublicationApprovedNotification;
 
 class PublicationController extends Controller
 {
@@ -25,15 +27,21 @@ class PublicationController extends Controller
     // Cache key based on workspace, filters, and page
     $cacheKey = sprintf(
       'publications:%d:%s:%d',
-      Auth::user()->current_workspace_id,
+      Auth::user()->current_workspace_id ?? Auth::user()->workspaces()->first()?->id ?? 0,
       md5(json_encode($request->all())),
       $request->query('page', 1)
     );
 
-    return cache()->remember($cacheKey, 10, function () use ($request) {
+    $workspaceId = Auth::user()->current_workspace_id ?? Auth::user()->workspaces()->first()?->id;
+
+    if (!$workspaceId) {
+      return $this->errorResponse('No active workspace found.', 404);
+    }
+
+    return cache()->remember($cacheKey, 10, function () use ($request, $workspaceId) {
       // Optimized eager loading: select only necessary columns to reduce memory usage
       // This prevents loading hundreds of models with all columns when paginating
-      $query = Publication::where('workspace_id', Auth::user()->current_workspace_id)
+      $query = Publication::where('workspace_id', $workspaceId)
         ->with([
           'mediaFiles' => fn($q) => $q->select('media_files.id', 'media_files.file_path', 'media_files.file_type', 'media_files.file_name', 'media_files.size', 'media_files.mime_type'),
           'mediaFiles.derivatives' => fn($q) => $q->select('id', 'media_file_id', 'file_path', 'file_name', 'derivative_type', 'size', 'width', 'height'),
@@ -73,7 +81,7 @@ class PublicationController extends Controller
         ? $query->limit(50)->get()
         : $query->simplePaginate($request->query('per_page', 6));
 
-      return $this->successResponse($publications);
+      return $this->successResponse(['publications' => $publications]);
     });
   }
 
@@ -85,7 +93,7 @@ class PublicationController extends Controller
       // Clear cache after creating publication
       $this->clearPublicationCache(Auth::user()->current_workspace_id);
 
-      return $this->successResponse($publication, 'Publication created successfully', 201);
+      return $this->successResponse(['publication' => $publication], 'Publication created successfully', 201);
     } catch (\Exception $e) {
       return $this->errorResponse('Creation failed: ' . $e->getMessage(), 500);
     }
@@ -106,7 +114,7 @@ class PublicationController extends Controller
       ->findOrFail($id);
 
     return $request->wantsJson()
-      ? response()->json(['success' => true, 'publication' => $publication])
+      ? $this->successResponse(['publication' => $publication])
       : view('publications.show');
   }
 
@@ -119,12 +127,7 @@ class PublicationController extends Controller
       // Clear cache after updating publication
       $this->clearPublicationCache(Auth::user()->current_workspace_id);
 
-      return response()->json([
-        'success' => true,
-        'message' => 'Publication updated successfully',
-        'publication' => $publication,
-        'status' => 200
-      ]);
+      return $this->successResponse(['publication' => $publication], 'Publication updated successfully');
     } catch (\Exception $e) {
       return response()->json([
         'success' => false,
@@ -147,11 +150,9 @@ class PublicationController extends Controller
       // Clear cache after publishing
       $this->clearPublicationCache(Auth::user()->current_workspace_id);
 
-      return response()->json([
-        'success' => true,
-        'message' => 'Publishing started in background.',
+      return $this->successResponse([
         'status' => 'publishing'
-      ]);
+      ], 'Publishing started in background.');
     } catch (\Exception $e) {
       return response()->json(['success' => false, 'message' => $e->getMessage()], 422);
     }
@@ -162,11 +163,52 @@ class PublicationController extends Controller
     $publication = Publication::where('workspace_id', Auth::user()->current_workspace_id)->findOrFail($id);
     $result = $action->execute($publication, $request->input('platform_ids'));
 
-    return response()->json([
-      'success' => $result['success'],
-      'message' => $result['success'] ? 'Unpublished successfully' : 'Failed to unpublish',
-      'details' => $result
-    ], $result['success'] ? 200 : 500);
+    return $result['success']
+      ? $this->successResponse(['details' => $result], 'Unpublished successfully')
+      : $this->errorResponse('Failed to unpublish', 500, $result);
+  }
+
+  public function requestReview(Request $request, $id)
+  {
+    $publication = Publication::where('workspace_id', Auth::user()->current_workspace_id)->findOrFail($id);
+
+    if (!in_array($publication->status, ['draft', 'failed'])) {
+      return $this->errorResponse('Only draft or failed publications can be sent for review.', 422);
+    }
+
+    $publication->update(['status' => 'pending_review']);
+    $this->clearPublicationCache(Auth::user()->current_workspace_id);
+
+    // Notify workspace owner/admin
+    $owner = $publication->workspace ? $publication->workspace->creator : null;
+    if ($owner) {
+      $owner->notify(new PublicationAwaitingApprovalNotification($publication, Auth::user()));
+    }
+
+    return $this->successResponse(['publication' => $publication], 'Publication sent for review.');
+  }
+
+  public function approve(Request $request, $id)
+  {
+    $publication = Publication::where('workspace_id', Auth::user()->current_workspace_id)->findOrFail($id);
+
+    // Check if user has permission to approve (Owner or admin in workspace)
+    if (!Auth::user()->hasPermission('manage-content', $publication->workspace_id)) {
+      return $this->errorResponse('You do not have permission to approve publications.', 403);
+    }
+
+    $publication->update([
+      'status' => 'approved',
+      'approved_by' => Auth::id(),
+      'approved_at' => now(),
+    ]);
+
+    $this->clearPublicationCache(Auth::user()->current_workspace_id);
+
+    // Notify the redactor (publication owner)
+    $publication->user->notify(new PublicationApprovedNotification($publication, Auth::user()));
+
+    return $this->successResponse(['publication' => $publication], 'Publication approved successfully.');
   }
 
   public function getPublishedPlatforms($id)
@@ -220,23 +262,60 @@ class PublicationController extends Controller
   }
 
   /**
+   * Get publication statistics for the current workspace
+   */
+  public function stats()
+  {
+    $workspaceId = Auth::user()->current_workspace_id;
+
+    $stats = Publication::where('workspace_id', $workspaceId)
+      ->selectRaw('status, count(*) as count')
+      ->groupBy('status')
+      ->get()
+      ->pluck('count', 'status')
+      ->toArray();
+
+    // Ensure all statuses are present
+    $allStatuses = ['draft', 'published', 'publishing', 'failed', 'pending_review', 'approved'];
+    foreach ($allStatuses as $status) {
+      if (!isset($stats[$status])) {
+        $stats[$status] = 0;
+      }
+    }
+
+    $stats['total'] = array_sum($stats);
+
+    return $this->successResponse($stats);
+  }
+
+  /**
    * Clear publication caches for a workspace
    */
   private function clearPublicationCache($workspaceId)
   {
-    // Clear all cached publication queries for this workspace
+    if (!$workspaceId)
+      return;
+
     // Pattern: publications:{workspace_id}:*
     $pattern = "publications:{$workspaceId}:*";
 
-    // Get all cache keys matching the pattern
-    $keys = cache()->getRedis()->keys($pattern);
-
-    if (!empty($keys)) {
-      foreach ($keys as $key) {
-        // Remove the Redis prefix if present
-        $cleanKey = str_replace(config('database.redis.options.prefix'), '', $key);
-        cache()->forget($cleanKey);
+    if (config('cache.default') === 'redis') {
+      try {
+        $keys = cache()->getRedis()->keys(config('cache.prefix') . $pattern);
+        if (!empty($keys)) {
+          foreach ($keys as $key) {
+            $cleanKey = str_replace(config('cache.prefix'), '', $key);
+            cache()->forget($cleanKey);
+          }
+        }
+      } catch (\Exception $e) {
+        \Log::warning("Could not clear Redis cache keys: " . $e->getMessage());
       }
+    } else {
+      // Fallback for non-redis drivers or if redis fails
+      // Note: For simple drivers like 'file', we can't easily clear by pattern
+      // In those cases, we might need a versioning system or just clearing everything (drastic)
+      // For now, we rely on the 10 minute TTL if not on Redis
     }
   }
 }
