@@ -109,8 +109,13 @@ class CalendarController extends Controller
             'scheduled_at' => $newDate,
         ]);
 
-        // If it's a publication, we might want to also shift its posts relatively
-        // but for now, we'll just update the main publication date.
+        // Clear publication cache to reflect the change in the list view
+        $workspaceId = Auth::user()->current_workspace_id;
+        try {
+            cache()->increment("publications:{$workspaceId}:version");
+        } catch (\Exception $e) {
+            cache()->put("publications:{$workspaceId}:version", time(), now()->addDays(7));
+        }
 
         return $this->successResponse($model, ucfirst($type) . ' rescheduled successfully.');
     }

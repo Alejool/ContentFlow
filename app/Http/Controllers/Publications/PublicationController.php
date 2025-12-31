@@ -24,31 +24,34 @@ class PublicationController extends Controller
 
   public function index(Request $request)
   {
-    // Cache key based on workspace, filters, and page
-    $cacheKey = sprintf(
-      'publications:%d:%s:%d',
-      Auth::user()->current_workspace_id ?? Auth::user()->workspaces()->first()?->id ?? 0,
-      md5(json_encode($request->all())),
-      $request->query('page', 1)
-    );
-
     $workspaceId = Auth::user()->current_workspace_id ?? Auth::user()->workspaces()->first()?->id;
 
     if (!$workspaceId) {
       return $this->errorResponse('No active workspace found.', 404);
     }
 
+    // Get cache version for the workspace to allow instant invalidation on any driver
+    $cacheVersion = cache()->get("publications:{$workspaceId}:version", 1);
+
+    // Cache key based on workspace, version, filters, and page
+    $cacheKey = sprintf(
+      'publications:%d:v%d:%s:%d',
+      $workspaceId,
+      $cacheVersion,
+      md5(json_encode($request->all())),
+      $request->query('page', 1)
+    );
+
     return cache()->remember($cacheKey, 10, function () use ($request, $workspaceId) {
       // Optimized eager loading: select only necessary columns to reduce memory usage
-      // This prevents loading hundreds of models with all columns when paginating
+      // We avoid loading deep derivatives and all logs for every item in the list view
+      // to prevent massive JSON payloads that freeze the frontend.
       $query = Publication::where('workspace_id', $workspaceId)
         ->with([
           'mediaFiles' => fn($q) => $q->select('media_files.id', 'media_files.file_path', 'media_files.file_type', 'media_files.file_name', 'media_files.size', 'media_files.mime_type'),
-          'mediaFiles.derivatives' => fn($q) => $q->select('id', 'media_file_id', 'file_path', 'file_name', 'derivative_type', 'size', 'width', 'height'),
           'scheduled_posts' => fn($q) => $q->select('id', 'publication_id', 'social_account_id', 'status', 'scheduled_at'),
           'scheduled_posts.socialAccount' => fn($q) => $q->select('id', 'platform', 'account_name'),
-          'socialPostLogs' => fn($q) => $q->select('id', 'publication_id', 'social_account_id', 'status', 'published_at', 'error_message'),
-          'socialPostLogs.socialAccount' => fn($q) => $q->select('id', 'platform', 'account_name'),
+          'socialPostLogs' => fn($q) => $q->select('id', 'publication_id', 'social_account_id', 'status'),
           'campaigns' => fn($q) => $q->select('campaigns.id', 'campaigns.name', 'campaigns.status'),
           'user' => fn($q) => $q->select('users.id', 'users.name', 'users.email', 'users.photo_url')
         ])
@@ -296,11 +299,18 @@ class PublicationController extends Controller
     if (!$workspaceId)
       return;
 
-    // Pattern: publications:{workspace_id}:*
-    $pattern = "publications:{$workspaceId}:*";
+    // Increment version to effectively clear all workspace cache keys across any driver
+    try {
+      cache()->increment("publications:{$workspaceId}:version");
+    } catch (\Exception $e) {
+      // If increment fails (version doesn't exist), set it
+      cache()->put("publications:{$workspaceId}:version", time(), now()->addDays(7));
+    }
 
+    // Still try Redis pattern clear if using Redis for extra cleanliness
     if (config('cache.default') === 'redis') {
       try {
+        $pattern = "publications:{$workspaceId}:*";
         $keys = cache()->getRedis()->keys(config('cache.prefix') . $pattern);
         if (!empty($keys)) {
           foreach ($keys as $key) {
@@ -309,13 +319,8 @@ class PublicationController extends Controller
           }
         }
       } catch (\Exception $e) {
-        \Log::warning("Could not clear Redis cache keys: " . $e->getMessage());
+        // Silently fail Redis specific clearing
       }
-    } else {
-      // Fallback for non-redis drivers or if redis fails
-      // Note: For simple drivers like 'file', we can't easily clear by pattern
-      // In those cases, we might need a versioning system or just clearing everything (drastic)
-      // For now, we rely on the 10 minute TTL if not on Redis
     }
   }
 }

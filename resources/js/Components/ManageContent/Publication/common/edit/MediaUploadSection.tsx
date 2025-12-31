@@ -1,6 +1,6 @@
 import Label from "@/Components/common/Modern/Label";
 import { AlertTriangle, FileImage, Upload, X } from "lucide-react";
-import React, { useRef } from "react";
+import React, { memo, useRef } from "react";
 
 interface MediaUploadSectionProps {
   mediaPreviews: {
@@ -25,7 +25,7 @@ interface MediaUploadSectionProps {
   disabled?: boolean;
 }
 
-const MediaUploadSection: React.FC<MediaUploadSectionProps> = ({
+const MediaUploadSection = memo(({
   mediaPreviews,
   thumbnails,
   imageError,
@@ -39,7 +39,7 @@ const MediaUploadSection: React.FC<MediaUploadSectionProps> = ({
   onDragLeave,
   onDrop,
   disabled,
-}) => {
+}: MediaUploadSectionProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const getUploadAreaStyles = () => {
@@ -103,7 +103,7 @@ const MediaUploadSection: React.FC<MediaUploadSectionProps> = ({
                 />
               ))}
               {!disabled && (
-                <AddMoreButton onClick={(e) => {
+                <AddMoreButton onClick={(e: any) => {
                   e.stopPropagation();
                   fileInputRef.current?.click();
                 }} />
@@ -133,17 +133,9 @@ const MediaUploadSection: React.FC<MediaUploadSectionProps> = ({
       )}
     </div>
   );
-};
+});
 
-const MediaPreviewItem: React.FC<{
-  preview: any;
-  index: number;
-  thumbnail?: File;
-  onRemove: () => void;
-  onSetThumbnail: (file: File) => void;
-  onClearThumbnail: () => void;
-  disabled?: boolean;
-}> = ({
+const MediaPreviewItem = memo(({
   preview,
   index,
   thumbnail,
@@ -151,115 +143,123 @@ const MediaPreviewItem: React.FC<{
   onSetThumbnail,
   onClearThumbnail,
   disabled,
-}) => {
-    const fileInputRef = useRef<HTMLInputElement>(null);
-
-    return (
-      <div
-        className={`relative group/item aspect-video border rounded-lg overflow-hidden bg-gray-900 ${disabled ? "opacity-90" : ""
-          }`}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {preview.type.includes("video") ? (
-          <VideoPreview
-            preview={preview}
-            thumbnail={thumbnail}
-            onSetThumbnail={onSetThumbnail}
-            onClearThumbnail={onClearThumbnail}
-            fileInputRef={fileInputRef}
-            disabled={disabled}
-          />
-        ) : (
-          <img src={preview.url} className="w-full h-full object-cover" />
-        )}
-
-        {!disabled && (
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onRemove();
-            }}
-            className="absolute top-2 right-2 p-1.5 bg-red-500/80 text-white rounded-full hover:bg-red-600 transition-colors opacity-0 group-hover/item:opacity-100 backdrop-blur-sm"
-          >
-            <X className="w-3 h-3" />
-          </button>
-        )}
-      </div>
-    );
-  };
-
-const VideoPreview: React.FC<{
+}: {
   preview: any;
+  index: number;
   thumbnail?: File;
+  onRemove: () => void;
   onSetThumbnail: (file: File) => void;
   onClearThumbnail: () => void;
-  fileInputRef: React.RefObject<HTMLInputElement | null>;
   disabled?: boolean;
-}> = ({
+}) => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  return (
+    <div
+      className={`relative group/item aspect-video border rounded-lg overflow-hidden bg-gray-900 ${disabled ? "opacity-90" : ""
+        }`}
+      onClick={(e) => e.stopPropagation()}
+    >
+      {preview.type.includes("video") ? (
+        <VideoPreview
+          preview={preview}
+          thumbnail={thumbnail}
+          onSetThumbnail={onSetThumbnail}
+          onClearThumbnail={onClearThumbnail}
+          fileInputRef={fileInputRef}
+          disabled={disabled}
+        />
+      ) : (
+        <img src={preview.url} className="w-full h-full object-cover" />
+      )}
+
+      {!disabled && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onRemove();
+          }}
+          className="absolute top-2 right-2 p-1.5 bg-red-500/80 text-white rounded-full hover:bg-red-600 transition-colors opacity-0 group-hover/item:opacity-100 backdrop-blur-sm"
+        >
+          <X className="w-3 h-3" />
+        </button>
+      )}
+    </div>
+  );
+});
+
+const VideoPreview = memo(({
   preview,
   thumbnail,
   onSetThumbnail,
   onClearThumbnail,
   fileInputRef,
   disabled,
+}: {
+  preview: any;
+  thumbnail?: File;
+  onSetThumbnail: (file: File) => void;
+  onClearThumbnail: () => void;
+  fileInputRef: React.RefObject<HTMLInputElement | null>;
+  disabled?: boolean;
 }) => (
-    <>
-      <video
-        src={preview.url}
-        className="w-full h-full object-cover opacity-80"
-      />
-      <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
-        <span className="text-white/80 text-xs font-medium bg-black/50 px-2 py-1 rounded">
-          Video
-        </span>
-        <div className="relative" onClick={(e) => e.stopPropagation()}>
-          <input
-            type="file"
-            id={`edit-thumb-${preview.tempId}`}
-            className="hidden"
-            accept="image/*"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) onSetThumbnail(file);
+  <>
+    <video
+      src={preview.url}
+      className="w-full h-full object-cover opacity-80"
+    />
+    <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+      <span className="text-white/80 text-xs font-medium bg-black/50 px-2 py-1 rounded">
+        Video
+      </span>
+      <div className="relative" onClick={(e) => e.stopPropagation()}>
+        <input
+          type="file"
+          id={`edit-thumb-${preview.tempId}`}
+          className="hidden"
+          accept="image/*"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) onSetThumbnail(file);
+          }}
+        />
+        <label
+          htmlFor={`edit-thumb-${preview.tempId}`}
+          className="cursor-pointer bg-white/10 hover:bg-white/20 text-white text-xs px-3 py-1.5 rounded-full backdrop-blur-sm transition-colors flex items-center gap-1 border border-white/20"
+        >
+          <FileImage className="w-3 h-3" />
+          {thumbnail || preview.thumbnailUrl ? "Change Thumb" : "Set Thumb"}
+        </label>
+        {(thumbnail || preview.thumbnailUrl) && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onClearThumbnail();
             }}
-          />
-          <label
-            htmlFor={`edit-thumb-${preview.tempId}`}
-            className="cursor-pointer bg-white/10 hover:bg-white/20 text-white text-xs px-3 py-1.5 rounded-full backdrop-blur-sm transition-colors flex items-center gap-1 border border-white/20"
+            className="bg-red-500/80 hover:bg-red-600 text-white p-1.5 rounded-full backdrop-blur-sm transition-colors border border-red-400/50 shadow-lg"
+            title="Remove Thumbnail"
           >
-            <FileImage className="w-3 h-3" />
-            {thumbnail || preview.thumbnailUrl ? "Change Thumb" : "Set Thumb"}
-          </label>
-          {(thumbnail || preview.thumbnailUrl) && (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onClearThumbnail();
-              }}
-              className="bg-red-500/80 hover:bg-red-600 text-white p-1.5 rounded-full backdrop-blur-sm transition-colors border border-red-400/50 shadow-lg"
-              title="Remove Thumbnail"
-            >
-              <X className="w-3 h-3" />
-            </button>
-          )}
-        </div>
+            <X className="w-3 h-3" />
+          </button>
+        )}
       </div>
-      {(thumbnail || preview.thumbnailUrl) && (
-        <div className="absolute top-2 left-2 w-8 h-8 rounded border border-white/30 overflow-hidden shadow-lg z-10">
-          <img
-            src={
-              thumbnail ? URL.createObjectURL(thumbnail) : preview.thumbnailUrl
-            }
-            className="w-full h-full object-cover"
-          />
-        </div>
-      )}
-    </>
-  );
+    </div>
+    {(thumbnail || preview.thumbnailUrl) && (
+      <div className="absolute top-2 left-2 w-8 h-8 rounded border border-white/30 overflow-hidden shadow-lg z-10">
+        <img
+          src={
+            thumbnail ? URL.createObjectURL(thumbnail) : preview.thumbnailUrl
+          }
+          className="w-full h-full object-cover"
+        />
+      </div>
+    )}
+  </>
+));
 
-const AddMoreButton: React.FC<{ onClick: (e: React.MouseEvent) => void }> = ({ onClick }) => (
+const AddMoreButton = memo(({ onClick }: { onClick: (e: React.MouseEvent) => void }) => (
   <div
     className="flex items-center justify-center aspect-video border-2 border-dashed border-gray-300 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
     onClick={onClick}
@@ -269,11 +269,11 @@ const AddMoreButton: React.FC<{ onClick: (e: React.MouseEvent) => void }> = ({ o
       <span className="text-xs text-gray-500">Add more</span>
     </div>
   </div>
-);
+));
 
-const EmptyUploadState: React.FC<{
+const EmptyUploadState = memo(({ t }: {
   t: (key: string) => string;
-}> = ({ t }) => (
+}) => (
   <div className="space-y-4">
     <div
       className="w-16 h-16 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300"
@@ -289,6 +289,6 @@ const EmptyUploadState: React.FC<{
       </p>
     </div>
   </div>
-);
+));
 
 export default MediaUploadSection;

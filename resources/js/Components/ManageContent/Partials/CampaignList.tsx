@@ -1,3 +1,4 @@
+import React, { memo, useState } from "react";
 import CampaignTable from "@/Components/ManageContent/Campaign/CampaignTable";
 import PublicationTable from "@/Components/ManageContent/Publication/PublicationTable";
 import FilterSection from "@/Components/ManageContent/common/FilterSection";
@@ -5,10 +6,9 @@ import HeaderSection from "@/Components/ManageContent/common/HeaderSection";
 import Pagination from "@/Components/ManageContent/common/Pagination";
 import { useTheme } from "@/Hooks/useTheme";
 import { CampaignListProps } from "@/types/CampaignListProps";
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-export default function CampaignList({
+const CampaignList = memo(({
   items,
   mode,
   onEdit,
@@ -23,7 +23,7 @@ export default function CampaignList({
   onPageChange,
   onEditRequest,
   connectedAccounts = [],
-}: CampaignListProps) {
+}: CampaignListProps) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
 
@@ -119,4 +119,6 @@ export default function CampaignList({
       )}
     </div>
   );
-}
+});
+
+export default CampaignList;

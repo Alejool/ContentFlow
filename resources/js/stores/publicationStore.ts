@@ -1,6 +1,7 @@
 import { Publication } from "@/types/Publication";
 import axios from "axios";
 import { create } from "zustand";
+import { useCalendarStore } from "./calendarStore";
 
 interface PublicationState {
   publications: Publication[];
@@ -235,6 +236,8 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
         get().addPublication(publication);
       }
       set({ isLoading: false });
+      // Refresh calendar store to reflect changes
+      useCalendarStore.getState().fetchEvents();
       return publication;
     } catch (error: any) {
       set({
@@ -260,6 +263,8 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
         get().updatePublication(id, publication);
       }
       set({ isLoading: false });
+      // Refresh calendar store to reflect updated publication
+      useCalendarStore.getState().fetchEvents();
       return publication;
     } catch (error: any) {
       set({
@@ -276,6 +281,8 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
       await axios.delete(`/publications/${id}`);
       get().removePublication(id);
       set({ isLoading: false });
+      // Refresh calendar store
+      useCalendarStore.getState().fetchEvents();
       return true;
     } catch (error: any) {
       set({

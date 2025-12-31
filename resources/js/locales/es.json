@@ -298,7 +298,8 @@
         "title": "Fecha para todas las redes",
         "description": "Define una fecha única para publicar en todas las redes sociales seleccionadas a la vez.",
         "placeholder": "Seleccionar fecha y hora",
-        "instantWarning": "Para publicar ahora, usa el botón Publicar después de guardar."
+        "instantWarning": "Para publicar ahora, usa el botón Publicar después de guardar.",
+        "useGlobal": "Programación Global"
       },
       "add": {
         "title": "Agregar Publicación",
@@ -461,7 +462,8 @@
         "scheduleDateRequired": "Por favor, selecciona una fecha para programar la publicación o desmarca la opción de programar",
         "scheduleRequired": "Debes programar una fecha para todas las redes seleccionadas o establecer una fecha global.",
         "scheduledAtRequired": "La fecha programada es requerida cuando seleccionas redes sociales",
-        "socialAccountsRequired": "Por favor, selecciona al menos una red social"
+        "socialAccountsRequired": "Por favor, selecciona al menos una red social",
+        "allSchedulesRequired": "Todas las redes deben tener una fecha o activa la fecha global"
       }
     },
     "status": {

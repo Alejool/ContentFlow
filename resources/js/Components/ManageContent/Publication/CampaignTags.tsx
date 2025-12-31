@@ -1,3 +1,4 @@
+import React, { memo } from "react";
 import { Publication } from "@/types/Publication";
 
 interface CampaignTagsProps {
@@ -5,10 +6,10 @@ interface CampaignTagsProps {
   t: (key: string) => string;
 }
 
-export default function CampaignTags({
+const CampaignTags = memo(({
   publication,
   t,
-}: CampaignTagsProps) {
+}: CampaignTagsProps) => {
   const campaigns = publication.campaigns || [];
 
   if (campaigns.length === 0) {
@@ -61,4 +62,6 @@ export default function CampaignTags({
       ))}
     </div>
   );
-}
+});
+
+export default CampaignTags;

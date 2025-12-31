@@ -1,3 +1,4 @@
+import React, { memo, useState } from "react";
 import PublicationDesktopRow from "@/Components/ManageContent/Publication/PublicationDesktopRow";
 import PublicationMobileGrid from "@/Components/ManageContent/Publication/PublicationMobileGrid";
 import PublicationMobileRow from "@/Components/ManageContent/Publication/PublicationMobileRow";
@@ -5,7 +6,6 @@ import { TableHeader } from "@/Components/ManageContent/Publication/TableHeader"
 import Loader from "@/Components/common/Loader";
 import { Publication } from "@/types/Publication";
 import { Grid3x3, List } from "lucide-react";
-import { useState } from "react";
 
 interface PublicationTableProps {
   items: Publication[];
@@ -18,7 +18,7 @@ interface PublicationTableProps {
   isLoading?: boolean;
 }
 
-export default function PublicationTable({
+const PublicationTable = memo(({
   items,
   t,
   connectedAccounts,
@@ -27,7 +27,7 @@ export default function PublicationTable({
   onPublish,
   onEditRequest,
   isLoading,
-}: PublicationTableProps) {
+}: PublicationTableProps) => {
   const [mobileViewMode, setMobileViewMode] = useState<"table" | "grid">(
     "table"
   );
@@ -50,36 +50,16 @@ export default function PublicationTable({
   };
 
   const renderDesktopTable = () => (
-    <div className="hidden lg:block overflow-x-auto">
+    <div className="hidden lg:block overflow-x-auto relative">
       <div className="min-w-full inline-block align-middle">
         <table className="w-full text-left border-collapse z-0">
-          <thead
-            className="bg-gray-50/90 border-gray-100 dark:bg-neutral-800/90 dark:border-neutral-700"
-          >
-            <tr
-              className="text-xs uppercase tracking-wider border-b bg-gray-50 border-gray-100 dark:bg-neutral-800/50 dark:border-neutral-700"
-            >
+          <thead className="bg-gray-50/90 border-gray-100 dark:bg-neutral-800/90 dark:border-neutral-700">
+            <tr className="text-xs uppercase tracking-wider border-b bg-gray-50 border-gray-100 dark:bg-neutral-800/50 dark:border-neutral-700">
               <TableHeader mode="publications" t={t} />
             </tr>
           </thead>
-          <tbody
-            className="divide-y divide-gray-100 dark:divide-neutral-700/50"
-          >
-            {isLoading ? (
-              <tr>
-                <td
-                  colSpan={7}
-                  className="px-6 py-12 text-center space-y-4 text-gray-500"
-                >
-                  <div className="flex justify-center">
-                    <Loader />
-                  </div>
-                  <span className="text-sm pt-4">
-                    {t("publications.table.loading")}
-                  </span>
-                </td>
-              </tr>
-            ) : items.length > 0 ? (
+          <tbody className="divide-y divide-gray-100 dark:divide-neutral-700/50">
+            {items.length > 0 ? (
               items.map((item) => (
                 <PublicationDesktopRow
                   key={item.id}
@@ -95,10 +75,7 @@ export default function PublicationTable({
               ))
             ) : (
               <tr>
-                <td
-                  colSpan={7}
-                  className="px-6 py-12 text-center text-gray-500"
-                >
+                <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
                   {t("publications.table.emptyState.title")}
                 </td>
               </tr>
@@ -110,30 +87,45 @@ export default function PublicationTable({
   );
 
   return (
-    <div>
-      {renderDesktopTable()}
-
-      <div className="lg:hidden">
-        {isLoading ? (
-          <div className="p-8 text-center space-y-4 text-gray-500">
-            <div className="flex justify-center">
-              <Loader />
-            </div>
-            <span className="text-sm">{t("publications.table.loading")}</span>
+    <div className="relative min-h-[200px]">
+      {isLoading && (
+        <div className="absolute inset-0 bg-white/50 dark:bg-black/50 backdrop-blur-[1px] z-10 flex items-center justify-center rounded-lg transition-all duration-300">
+          <div className="flex flex-col items-center space-y-3">
+            <Loader />
+            <span className="text-sm text-gray-500 font-medium animate-pulse">
+              {t("publications.table.loading")}
+            </span>
           </div>
-        ) : items.length > 0 ? (
-          <PublicationMobileGrid
-            items={items}
-            t={t}
-            connectedAccounts={connectedAccounts}
-            getStatusColor={getStatusColor}
-            onEdit={onEdit}
-            onDelete={onDelete}
-            onPublish={onPublish}
-            onEditRequest={onEditRequest}
-          />
-        ) : (
-          <div className="p-8 text-center text-gray-500 rounded-lg border border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800">
+        </div>
+      )}
+
+      <div className={isLoading ? "opacity-50 pointer-events-none transition-opacity duration-300" : "transition-opacity duration-300"}>
+        {renderDesktopTable()}
+
+        <div className="lg:hidden">
+          {items.length > 0 ? (
+            <PublicationMobileGrid
+              items={items}
+              t={t}
+              connectedAccounts={connectedAccounts}
+              getStatusColor={getStatusColor}
+              onEdit={onEdit}
+              onDelete={onDelete}
+              onPublish={onPublish}
+              onEditRequest={onEditRequest}
+            />
+          ) : (
+            <div className="p-8 text-center text-gray-500 rounded-lg border border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800">
+              {t("publications.table.emptyState.title")}
+              <p className="text-sm text-gray-400 dark:text-gray-500 mt-2">
+                {t("publications.table.emptyState.description")}
+              </p>
+            </div>
+          )}
+        </div>
+
+        {!isLoading && items.length === 0 && (
+          <div className="hidden lg:block p-8 text-center text-gray-500 rounded-lg border border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800">
             {t("publications.table.emptyState.title")}
             <p className="text-sm text-gray-400 dark:text-gray-500 mt-2">
               {t("publications.table.emptyState.description")}
@@ -141,15 +133,8 @@ export default function PublicationTable({
           </div>
         )}
       </div>
-
-      {!isLoading && items.length === 0 && (
-        <div className="hidden lg:block p-8 text-center text-gray-500 rounded-lg border border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800">
-          {t("publications.table.emptyState.title")}
-          <p className="text-sm text-gray-400 dark:text-gray-500 mt-2">
-            {t("publications.table.emptyState.description")}
-          </p>
-        </div>
-      )}
     </div>
   );
-}
+});
+
+export default PublicationTable;

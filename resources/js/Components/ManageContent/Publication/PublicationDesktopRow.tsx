@@ -1,9 +1,9 @@
+import React, { memo, useState } from "react";
 import CampaignTags from "@/Components/ManageContent/Publication/CampaignTags";
 import PublicationThumbnail from "@/Components/ManageContent/Publication/PublicationThumbnail";
 import SocialAccountsDisplay from "@/Components/ManageContent/Publication/SocialAccountsDisplay";
 import { Publication } from "@/types/Publication";
 import { Edit, Eye, Image, Loader2, Rocket, Trash2, Video } from "lucide-react";
-import { useState } from "react";
 
 interface PublicationRowProps {
   item: Publication;
@@ -16,7 +16,7 @@ interface PublicationRowProps {
   onEditRequest?: (item: Publication) => void;
 }
 
-export default function PublicationRow({
+const PublicationRow = memo(({
   item,
   t,
   connectedAccounts,
@@ -25,7 +25,7 @@ export default function PublicationRow({
   onDelete,
   onPublish,
   onEditRequest,
-}: PublicationRowProps) {
+}: PublicationRowProps) => {
   const [isPublishing, setIsPublishing] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -48,12 +48,13 @@ export default function PublicationRow({
   return (
     <tr
       className="group transition-colors hover:bg-gray-50/50 dark:hover:bg-neutral-700/30"
+      style={{ contentVisibility: "auto", containIntrinsicSize: "1px 80px" }}
     >
       <td className="px-2 py-4 text-center"></td>
       <td className="px-6 py-4">
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 rounded-lg flex-shrink-0 border border-gray-200 bg-gray-100 dark:border-neutral-700 dark:bg-neutral-800 overflow-hidden flex items-center justify-center">
-            <PublicationThumbnail publication={item} />
+            <PublicationThumbnail publication={item} t={t} />
           </div>
           <div>
             <h3
@@ -170,6 +171,7 @@ export default function PublicationRow({
         <SocialAccountsDisplay
           publication={item}
           connectedAccounts={connectedAccounts}
+          t={t}
         />
       </td>
       <td className="px-6 py-4 text-right">
@@ -258,6 +260,8 @@ export default function PublicationRow({
           </button>
         </div>
       </td>
-    </tr >
+    </tr>
   );
-}
+});
+
+export default PublicationRow;

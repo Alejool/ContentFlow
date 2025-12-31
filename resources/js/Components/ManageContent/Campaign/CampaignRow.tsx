@@ -1,3 +1,4 @@
+import React, { memo } from "react";
 import {
   ChevronDown,
   ChevronRight,
@@ -19,7 +20,7 @@ interface CampaignRowProps {
   onViewDetails: (item: Campaign) => void;
 }
 
-export default function CampaignRow({
+const CampaignRow = memo(({
   item,
   expandedCampaigns,
   toggleExpand,
@@ -28,7 +29,7 @@ export default function CampaignRow({
   onDelete,
   onEditRequest,
   onViewDetails,
-}: CampaignRowProps) {
+}: CampaignRowProps) => {
   return (
     <tr
       data-campaign-id={item.id}
@@ -134,4 +135,6 @@ export default function CampaignRow({
       </td>
     </tr>
   );
-}
+});
+
+export default CampaignRow;

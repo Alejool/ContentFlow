@@ -1,13 +1,15 @@
+import React, { memo } from "react";
 import { Publication } from "@/types/Publication";
 import { File } from "lucide-react";
 
 interface PublicationThumbnailProps {
   publication: Publication;
+  t?: (key: string) => string;
 }
 
-export default function PublicationThumbnail({
+const PublicationThumbnail = memo(({
   publication,
-}: PublicationThumbnailProps) {
+}: PublicationThumbnailProps) => {
   const getThumbnail = (pub: Publication) => {
     if (!pub.media_files || pub.media_files.length === 0) return null;
 
@@ -59,4 +61,6 @@ export default function PublicationThumbnail({
       </svg>
     </div>
   );
-}
+});
+
+export default PublicationThumbnail;

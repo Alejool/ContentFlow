@@ -1,3 +1,4 @@
+import React, { memo, useEffect, useState } from "react";
 import IconFacebook from "@/../assets/Icons/facebook.svg";
 import IconTiktok from "@/../assets/Icons/tiktok.svg";
 import IconTwitter from "@/../assets/Icons/x.svg";
@@ -5,7 +6,6 @@ import IconYoutube from "@/../assets/Icons/youtube.svg";
 import PlatformSettingsModal from "@/Components/ConfigSocialMedia/PlatformSettingsModal";
 import DisconnectWarningModal from "@/Components/ManageContent/modals/DisconnectWarningModal";
 import { useSocialMediaAuth } from "@/Hooks/useSocialMediaAuth";
-import { useTheme } from "@/Hooks/useTheme";
 import { getPlatformSchema } from "@/schemas/platformSettings";
 import { Link, router, usePage } from "@inertiajs/react";
 import axios from "axios";
@@ -22,7 +22,6 @@ import {
   X,
   Zap,
 } from "lucide-react";
-import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
@@ -38,7 +37,7 @@ interface Account {
   gradient: string;
 }
 
-export default function SocialMediaAccounts() {
+const SocialMediaAccounts = memo(() => {
   const { t } = useTranslation();
   const { isLoading, connectAccount, disconnectAccount } = useSocialMediaAuth();
   const user = usePage<any>().props.auth.user;
@@ -614,4 +613,6 @@ export default function SocialMediaAccounts() {
       </div>
     </div>
   );
-}
+});
+
+export default SocialMediaAccounts;

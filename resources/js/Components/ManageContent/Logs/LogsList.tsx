@@ -1,3 +1,4 @@
+import React, { memo, useState } from "react";
 import ExpandableText from "@/Components/ManageContent/common/ExpandableText";
 import Pagination from "@/Components/ManageContent/common/Pagination";
 import Loader from "@/Components/common/Loader";
@@ -13,7 +14,6 @@ import {
   MessageCircle,
   RotateCcw,
 } from "lucide-react";
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 interface LogsListProps {
@@ -25,14 +25,14 @@ interface LogsListProps {
   onFilterChange?: (filters: any) => void;
 }
 
-export default function LogsList({
+const LogsList = memo(({
   logs = [],
   isLoading,
   pagination,
   onPageChange,
   onRefresh,
   onFilterChange,
-}: LogsListProps) {
+}: LogsListProps) => {
   const { t } = useTranslation();
 
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
@@ -439,4 +439,6 @@ export default function LogsList({
       )}
     </div>
   );
-}
+});
+
+export default LogsList;

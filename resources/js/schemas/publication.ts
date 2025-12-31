@@ -35,17 +35,12 @@ export const publicationSchema = (t: any) =>
       status: z.enum(["draft", "published"]).optional().default("draft"),
       campaign_id: z.any().optional().nullable(),
       lock_content: z.boolean().optional(),
+      use_global_schedule: z.boolean().optional().default(false),
     })
     .refine(
       (data) => {
-        // If social accounts are selected, a scheduled date is mandatory.
-        // Filter out null/undefined IDs to be sure.
-        const activeAccounts = (data.social_accounts || []).filter(
-          (id) => !!id
-        );
-        const hasAccounts = activeAccounts.length > 0;
-
-        if (hasAccounts) {
+        // If "use_global_schedule" is checked, we require a date.
+        if (data.use_global_schedule) {
           return !!data.scheduled_at;
         }
         return true;
@@ -53,7 +48,7 @@ export const publicationSchema = (t: any) =>
       {
         message:
           t("publications.modal.validation.scheduledAtRequired") ||
-          "Schedule date is required if social accounts are selected",
+          "Schedule date is required if global schedule is enabled",
         path: ["scheduled_at"],
       }
     );

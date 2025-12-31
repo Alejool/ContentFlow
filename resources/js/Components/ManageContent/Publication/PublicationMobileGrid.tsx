@@ -1,3 +1,4 @@
+import React, { memo } from "react";
 import PublicationThumbnail from "@/Components/ManageContent/Publication/PublicationThumbnail";
 import SocialAccountsDisplay from "@/Components/ManageContent/Publication/SocialAccountsDisplay";
 import { Publication } from "@/types/Publication";
@@ -14,7 +15,7 @@ interface PublicationMobileGridProps {
   onEditRequest?: (item: Publication) => void;
 }
 
-export default function PublicationMobileGrid({
+const PublicationMobileGrid = memo(({
   items,
   t,
   connectedAccounts,
@@ -23,7 +24,7 @@ export default function PublicationMobileGrid({
   onDelete,
   onPublish,
   onEditRequest,
-}: PublicationMobileGridProps) {
+}: PublicationMobileGridProps) => {
   const countMediaFiles = (pub: Publication) => {
     if (!pub.media_files || pub.media_files.length === 0) {
       return { images: 0, videos: 0, total: 0 };
@@ -49,7 +50,7 @@ export default function PublicationMobileGrid({
             <div className="flex items-start gap-3 mb-3 shrink-0">
               <div className="flex-shrink-0">
                 <div className="w-12 h-12 rounded-lg border border-gray-200 bg-gray-100 dark:border-neutral-700 dark:bg-neutral-800 overflow-hidden flex items-center justify-center">
-                  <PublicationThumbnail publication={item} />
+                  <PublicationThumbnail publication={item} t={t} />
                 </div>
               </div>
               <div className="flex-1 min-w-0">
@@ -164,6 +165,7 @@ export default function PublicationMobileGrid({
                 <SocialAccountsDisplay
                   publication={item}
                   connectedAccounts={connectedAccounts}
+                  t={t}
                 />
               </div>
             </div>
@@ -202,4 +204,6 @@ export default function PublicationMobileGrid({
       })}
     </div >
   );
-}
+});
+
+export default PublicationMobileGrid;

@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import PlatformSettingsModal from "@/Components/ConfigSocialMedia/PlatformSettingsModal";
 import SocialAccountsSection from "@/Components/ManageContent/Publication/common/add/SocialAccountsSection";
 import MediaUploadSection from "@/Components/ManageContent/Publication/common/edit/MediaUploadSection";
@@ -12,6 +13,7 @@ import { useCampaigns } from "@/Hooks/campaign/useCampaigns";
 import { usePublicationForm } from "@/Hooks/publication/usePublicationForm";
 import { useAccountsStore } from "@/stores/socialAccountsStore";
 import { AlertTriangle, FileText, Hash, Save, Target } from "lucide-react";
+import { useWatch } from "react-hook-form";
 
 interface AddPublicationModalProps {
   isOpen: boolean;
@@ -30,7 +32,6 @@ export default function AddPublicationModal({
   const {
     t,
     form,
-    watched,
     errors,
     isSubmitting,
     isDragOver,
@@ -57,6 +58,7 @@ export default function AddPublicationModal({
     accountSchedules,
     setAccountSchedules,
     setValue,
+    control,
   } = usePublicationForm({
     onClose,
     onSubmitSuccess: onSubmit,
@@ -64,6 +66,32 @@ export default function AddPublicationModal({
   });
 
   const { register } = form;
+
+  // Use individual watchers to prevent unnecessary re-renders
+  const selectedSocialAccounts = useWatch({ control, name: "social_accounts" }) || [];
+  const scheduledAt = useWatch({ control, name: "scheduled_at" });
+  const useGlobalSchedule = useWatch({ control, name: "use_global_schedule" });
+  const title = useWatch({ control, name: "title" });
+  const goal = useWatch({ control, name: "goal" });
+  const hashtags = useWatch({ control, name: "hashtags" });
+  const campaign_id = useWatch({ control, name: "campaign_id" });
+
+  const watched = useMemo(() => ({
+    social_accounts: selectedSocialAccounts,
+    scheduled_at: scheduledAt,
+    use_global_schedule: useGlobalSchedule,
+    title,
+    goal,
+    hashtags,
+    campaign_id
+  }), [selectedSocialAccounts, scheduledAt, useGlobalSchedule, title, goal, hashtags, campaign_id]);
+
+  const stabilizedMediaPreviews = useMemo(() => {
+    return mediaFiles.map((m) => ({
+      ...m,
+      url: m.url,
+    }));
+  }, [mediaFiles]);
 
 
   if (!isOpen) return null;
@@ -95,7 +123,7 @@ export default function AddPublicationModal({
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <div className="space-y-6">
                 <MediaUploadSection
-                  mediaPreviews={mediaFiles}
+                  mediaPreviews={stabilizedMediaPreviews}
                   thumbnails={thumbnails}
                   imageError={imageError}
                   isDragOver={isDragOver}
@@ -143,6 +171,9 @@ export default function AddPublicationModal({
                   scheduledAt={watched.scheduled_at ?? undefined}
                   t={t}
                   onScheduleChange={(date) => setValue("scheduled_at", date)}
+                  useGlobalSchedule={watched.use_global_schedule}
+                  onGlobalScheduleToggle={(val) => setValue("use_global_schedule", val)}
+                  error={errors.scheduled_at?.message as string}
                 />
               </div>
 

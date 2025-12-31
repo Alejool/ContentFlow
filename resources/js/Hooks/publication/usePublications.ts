@@ -9,7 +9,7 @@ import { PageProps } from "@/types";
 import { Campaign } from "@/types/Campaign";
 import { Publication } from "@/types/Publication";
 import { usePage } from "@inertiajs/react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useShallow } from "zustand/react/shallow";
 
@@ -68,7 +68,7 @@ export const usePublications = () => {
   // Realtime updates
   useRealtime(user?.id);
 
-  // Shared UI store for modals and tabs
+  // Shared UI store for modals and tabs with shallow comparison to prevent unnecessary re-renders
   const {
     activeTab,
     setActiveTab,
@@ -86,7 +86,26 @@ export const usePublications = () => {
     closePublishModal,
     openViewDetailsModal,
     closeViewDetailsModal,
-  } = useManageContentUIStore();
+  } = useManageContentUIStore(
+    useShallow((s) => ({
+      activeTab: s.activeTab,
+      setActiveTab: s.setActiveTab,
+      selectedItem: s.selectedItem,
+      setSelectedItem: s.setSelectedItem,
+      isAddModalOpen: s.isAddModalOpen,
+      isEditModalOpen: s.isEditModalOpen,
+      isPublishModalOpen: s.isPublishModalOpen,
+      isViewDetailsModalOpen: s.isViewDetailsModalOpen,
+      openAddModal: s.openAddModal,
+      closeAddModal: s.closeAddModal,
+      openEditModal: s.openEditModal,
+      closeEditModal: s.closeEditModal,
+      openPublishModal: s.openPublishModal,
+      closePublishModal: s.closePublishModal,
+      openViewDetailsModal: s.openViewDetailsModal,
+      closeViewDetailsModal: s.closeViewDetailsModal,
+    }))
+  );
 
   const [filters, setFilters] = useState<any>({});
 
@@ -165,19 +184,19 @@ export const usePublications = () => {
 
   const isLoading = isPubLoading || isCampLoading || isLogsLoading;
 
-  const handlePageChange = (page: number) => {
+  const handlePageChange = useCallback((page: number) => {
     fetchData(page);
-  };
+  }, [fetchData]);
 
-  const handleFilterChange = (newFilters: any) => {
+  const handleFilterChange = useCallback((newFilters: any) => {
     setFilters(newFilters);
-  };
+  }, []);
 
-  const handleRefresh = () => {
+  const handleRefresh = useCallback(() => {
     fetchData(pagination.current_page);
-  };
+  }, [fetchData, pagination.current_page]);
 
-  const handleDeleteItem = async (id: number) => {
+  const handleDeleteItem = useCallback(async (id: number) => {
     const isCampaign = activeTab === "campaigns";
     const confirmed = await confirm({
       title: isCampaign ? "Campaign" : "Publication",
@@ -200,13 +219,13 @@ export const usePublications = () => {
         fetchData(pagination.current_page);
       }
     }
-  };
+  }, [activeTab, confirm, deleteCampaignAction, deletePublicationAction, fetchData, pagination.current_page]);
 
-  const handleEditRequest = (item: Publication) => {
+  const handleEditRequest = useCallback((item: Publication) => {
     openEditModal(item);
-  };
+  }, [openEditModal]);
 
-  return {
+  return useMemo(() => ({
     t,
     activeTab,
     setActiveTab,
@@ -234,5 +253,51 @@ export const usePublications = () => {
     handleDeleteItem,
     handleEditRequest,
     connectedAccounts,
-  };
+    publications,
+    campaigns,
+    logs,
+    isPubLoading,
+    isCampLoading,
+    isLogsLoading,
+    pubPagination,
+    campPagination,
+    logPagination,
+  }), [
+    t,
+    activeTab,
+    setActiveTab,
+    filters,
+    handleFilterChange,
+    selectedItem,
+    setSelectedItem,
+    items,
+    pagination,
+    isLoading,
+    handlePageChange,
+    handleRefresh,
+    isAddModalOpen,
+    isEditModalOpen,
+    isPublishModalOpen,
+    isViewDetailsModalOpen,
+    openAddModal,
+    closeAddModal,
+    openEditModal,
+    closeEditModal,
+    openPublishModal,
+    closePublishModal,
+    openViewDetailsModal,
+    closeViewDetailsModal,
+    handleDeleteItem,
+    handleEditRequest,
+    connectedAccounts,
+    publications,
+    campaigns,
+    logs,
+    isPubLoading,
+    isCampLoading,
+    isLogsLoading,
+    pubPagination,
+    campPagination,
+    logPagination,
+  ]);
 };

@@ -1,20 +1,11 @@
 import LogsList from "@/Components/ManageContent/Logs/LogsList";
 import CampaignList from "@/Components/ManageContent/Partials/CampaignList";
-import AddCampaignModal from "@/Components/ManageContent/modals/AddCampaignModal";
-import AddPublicationModal from "@/Components/ManageContent/modals/AddPublicationModal";
-import EditCampaignModal from "@/Components/ManageContent/modals/EditCampaignModal";
-import EditPublicationModal from "@/Components/ManageContent/modals/EditPublicationModal";
-import PublishPublicationModal from "@/Components/ManageContent/modals/PublishPublicationModal";
-import ViewCampaignModal from "@/Components/ManageContent/modals/ViewCampaignModal";
+import ModalManager from "@/Components/ManageContent/ModalManager";
 import SocialMediaAccounts from "@/Components/ManageContent/socialAccount/SocialMediaAccounts";
-import { usePublishPublication } from "@/Hooks/publication/usePublishPublication";
 import { useTheme } from "@/Hooks/useTheme";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Campaign } from "@/types/Campaign";
-import { Publication } from "@/types/Publication";
 import { Head } from "@inertiajs/react";
 import { FileText, Folder, Target } from "lucide-react";
-import { createPortal } from "react-dom";
 
 import { usePublications } from "@/Hooks/publication/usePublications";
 import WorkspaceInfoBadge from "@/Components/Workspace/WorkspaceInfoBadge";
@@ -36,44 +27,39 @@ export default function ManageContentPage() {
     handleDeleteItem,
     handleEditRequest,
     connectedAccounts,
+    publications,
+    campaigns,
+    logs,
+    isPubLoading,
+    isCampLoading,
+    isLogsLoading,
+    pubPagination,
+    campPagination,
+    logPagination,
   } = usePublications();
 
+  // Optimized subscription: ONLY subscribe to activeTab and Actions.
+  // We explicitly DO NOT subscribe to isModalOpen or selectedItem.
+  // This prevents the heavy list from re-rendering when modals open/close.
   const {
     activeTab,
     setActiveTab,
-    selectedItem,
-    isAddModalOpen,
-    isEditModalOpen,
-    isPublishModalOpen,
-    isViewDetailsModalOpen,
     openAddModal,
-    closeAddModal,
     openEditModal,
-    closeEditModal,
     openPublishModal,
-    closePublishModal,
     openViewDetailsModal,
-    closeViewDetailsModal,
-  } = useManageContentUIStore(useShallow((s) => ({
-    activeTab: s.activeTab,
-    setActiveTab: s.setActiveTab,
-    selectedItem: s.selectedItem,
-    isAddModalOpen: s.isAddModalOpen,
-    isEditModalOpen: s.isEditModalOpen,
-    isPublishModalOpen: s.isPublishModalOpen,
-    isViewDetailsModalOpen: s.isViewDetailsModalOpen,
-    openAddModal: s.openAddModal,
-    closeAddModal: s.closeAddModal,
-    openEditModal: s.openEditModal,
-    closeEditModal: s.closeEditModal,
-    openPublishModal: s.openPublishModal,
-    closePublishModal: s.closePublishModal,
-    openViewDetailsModal: s.openViewDetailsModal,
-    closeViewDetailsModal: s.closeViewDetailsModal,
-  })));
+  } = useManageContentUIStore(
+    useShallow((s) => ({
+      activeTab: s.activeTab,
+      setActiveTab: s.setActiveTab,
+      openAddModal: s.openAddModal,
+      openEditModal: s.openEditModal,
+      openPublishModal: s.openPublishModal,
+      openViewDetailsModal: s.openViewDetailsModal,
+    }))
+  );
 
-  const { theme } = useTheme();
-  const { fetchPublishedPlatforms } = usePublishPublication();
+
 
   const tabs = [
     {
@@ -158,104 +144,72 @@ export default function ManageContentPage() {
               </div>
 
               <div className="block">
-                {activeTab === "logs" ? (
+                {/* Persistent Logs Tab */}
+                <div className={activeTab === "logs" ? "block" : "hidden"}>
                   <LogsList
-                    logs={items as any}
-                    isLoading={isLoading}
-                    pagination={pagination}
+                    logs={logs as any}
+                    isLoading={isLogsLoading}
+                    pagination={logPagination}
                     onPageChange={handlePageChange}
                     onRefresh={handleRefresh}
                     onFilterChange={handleFilterChange}
                   />
-                ) : activeTab === "calendar" ? (
+                </div>
+
+                {/* Persistent Calendar Tab */}
+                <div className={activeTab === "calendar" ? "block" : "hidden"}>
                   <EditorialCalendar />
-                ) : (
+                </div>
+
+                {/* Persistent Campaigns Tab */}
+                <div className={activeTab === "campaigns" ? "block" : "hidden"}>
                   <CampaignList
-                    key={`campaigns-${connectedAccounts.length}`}
-                    items={items as any}
-                    pagination={pagination}
+                    key={`campaigns-list-${connectedAccounts.length}`}
+                    items={campaigns as any}
+                    pagination={campPagination}
                     onPageChange={handlePageChange}
-                    mode={activeTab as any}
+                    mode="campaigns"
                     onEdit={openEditModal}
                     onDelete={handleDeleteItem}
                     onAdd={openAddModal}
                     onPublish={openPublishModal}
                     onViewDetails={openViewDetailsModal}
-                    isLoading={isLoading}
+                    isLoading={isCampLoading}
                     onFilterChange={handleFilterChange}
                     onRefresh={handleRefresh}
                     onEditRequest={handleEditRequest}
                     connectedAccounts={connectedAccounts}
                   />
-                )}
+                </div>
+
+                {/* Persistent Publications Tab */}
+                <div className={activeTab === "publications" ? "block" : "hidden"}>
+                  <CampaignList
+                    key={`publications-list-${connectedAccounts.length}`}
+                    items={publications as any}
+                    pagination={pubPagination}
+                    onPageChange={handlePageChange}
+                    mode="publications"
+                    onEdit={openEditModal}
+                    onDelete={handleDeleteItem}
+                    onAdd={openAddModal}
+                    onPublish={openPublishModal}
+                    onViewDetails={openViewDetailsModal}
+                    isLoading={isPubLoading}
+                    onFilterChange={handleFilterChange}
+                    onRefresh={handleRefresh}
+                    onEditRequest={handleEditRequest}
+                    connectedAccounts={connectedAccounts}
+                  />
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {createPortal(
-        (activeTab === "campaigns") ? (
-          <AddCampaignModal
-            isOpen={isAddModalOpen}
-            onClose={closeAddModal}
-            onSubmit={handleRefresh}
-          />
-        ) : (
-          <AddPublicationModal
-            isOpen={isAddModalOpen}
-            onClose={closeAddModal}
-            onSubmit={handleRefresh}
-          />
-        ),
-        document.body
-      )}
-
-      {createPortal(
-        (selectedItem && ((selectedItem as any).__type === 'campaign' || ('name' in selectedItem && !('title' in selectedItem)))) || (activeTab === "campaigns" && !selectedItem) ? (
-          <EditCampaignModal
-            isOpen={isEditModalOpen}
-            onClose={closeEditModal}
-            campaign={selectedItem as Campaign}
-            onSubmit={handleRefresh}
-          />
-        ) : (
-          <EditPublicationModal
-            isOpen={isEditModalOpen}
-            onClose={closeEditModal}
-            publication={selectedItem as Publication}
-            onSubmit={handleRefresh}
-          />
-        ),
-        document.body
-      )}
-
-      {createPortal(
-        activeTab === "publications" && (
-          <PublishPublicationModal
-            isOpen={isPublishModalOpen}
-            onClose={(id?: number) => {
-              const idToRefresh = id || selectedItem?.id;
-              closePublishModal();
-              if (idToRefresh) {
-                fetchPublishedPlatforms(idToRefresh);
-              }
-            }}
-            publication={selectedItem as Publication}
-            onSuccess={handleRefresh}
-          />
-        ),
-        document.body
-      )}
-
-      {createPortal(
-        <ViewCampaignModal
-          isOpen={isViewDetailsModalOpen}
-          onClose={closeViewDetailsModal}
-          campaign={selectedItem as any}
-        />,
-        document.body
-      )}
+      {/* Modal Manager handles all modal rendering independently */}
+      <ModalManager onRefresh={handleRefresh} />
     </AuthenticatedLayout>
   );
 }

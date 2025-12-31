@@ -2,7 +2,7 @@ import Input from "@/Components/common/Modern/Input";
 import Select from "@/Components/common/Modern/Select";
 import Textarea from "@/Components/common/Modern/Textarea";
 import { FileText, Hash, Target } from "lucide-react";
-import React from "react";
+import React, { memo } from "react";
 import { FieldErrors, UseFormRegister, UseFormSetValue } from "react-hook-form";
 
 interface ContentSectionProps {
@@ -17,7 +17,7 @@ interface ContentSectionProps {
   disabled?: boolean;
 }
 
-const ContentSection: React.FC<ContentSectionProps> = ({
+const ContentSection = memo(({
   register,
   setValue,
   errors,
@@ -27,7 +27,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({
   publication,
   onHashtagChange,
   disabled,
-}) => {
+}: ContentSectionProps) => {
   return (
     <div className={`space-y-6 ${disabled ? "opacity-75" : ""}`}>
       <Input
@@ -125,6 +125,6 @@ const ContentSection: React.FC<ContentSectionProps> = ({
       />
     </div>
   );
-};
+});
 
 export default ContentSection;

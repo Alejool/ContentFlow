@@ -1,3 +1,4 @@
+import React, { memo, useMemo } from "react";
 import { Publication } from "@/types/Publication";
 import { useTranslation } from "react-i18next";
 
@@ -6,30 +7,35 @@ interface SocialAccountsDisplayProps {
   connectedAccounts: any[];
   compact?: boolean;
   showCount?: boolean;
+  t?: any;
 }
 
-export default function SocialAccountsDisplay({
+const SocialAccountsDisplay = memo(({
   publication,
   connectedAccounts,
   compact = false,
   showCount = false,
-}: SocialAccountsDisplayProps) {
-  const { t } = useTranslation();
-  const scheduledPosts = publication.scheduled_posts || [];
-  const postLogs = publication.social_post_logs || [];
+  t: propsT,
+}: SocialAccountsDisplayProps) => {
+  const { t: hookT } = useTranslation();
+  const t = propsT || hookT;
 
-  const combined = new Map<number, any>();
+  const displayItems = useMemo(() => {
+    const scheduledPosts = publication.scheduled_posts || [];
+    const postLogs = publication.social_post_logs || [];
+    const combined = new Map<number, any>();
 
-  scheduledPosts.forEach((p) => {
-    if (p.social_account_id) combined.set(p.social_account_id, p);
-  });
+    scheduledPosts.forEach((p) => {
+      if (p.social_account_id) combined.set(p.social_account_id, p);
+    });
 
-  postLogs.forEach((l) => {
-    if (l.social_account_id && l.status === "published")
-      combined.set(l.social_account_id, l);
-  });
+    postLogs.forEach((l) => {
+      if (l.social_account_id && l.status === "published")
+        combined.set(l.social_account_id, l);
+    });
 
-  const displayItems = Array.from(combined.values());
+    return Array.from(combined.values());
+  }, [publication.scheduled_posts, publication.social_post_logs]);
 
   if (displayItems.length === 0) {
     if (compact) {
@@ -153,7 +159,7 @@ export default function SocialAccountsDisplay({
       )}
     </div>
   );
-}
+});
 
 function getPlatformColor(platform: string): string {
   switch (platform.toLowerCase()) {
@@ -173,3 +179,5 @@ function getPlatformColor(platform: string): string {
       return "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400 border-gray-200 dark:border-gray-800";
   }
 }
+
+export default SocialAccountsDisplay;

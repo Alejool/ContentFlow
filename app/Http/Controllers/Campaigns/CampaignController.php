@@ -16,10 +16,14 @@ class CampaignController extends Controller
      */
     public function index(Request $request)
     {
-        // Cache key based on workspace, filters, and page
+        $workspaceId = Auth::user()->current_workspace_id;
+        $cacheVersion = cache()->get("campaigns:{$workspaceId}:version", 1);
+
+        // Cache key based on workspace, version, filters, and page
         $cacheKey = sprintf(
-            'campaigns:%d:%s:%d',
-            Auth::user()->current_workspace_id,
+            'campaigns:%d:v%d:%s:%d',
+            $workspaceId,
+            $cacheVersion,
             md5(json_encode($request->all())),
             $request->query('page', 1)
         );
@@ -239,15 +243,36 @@ class CampaignController extends Controller
      */
     private function clearCampaignCache($workspaceId)
     {
-        // Clear all cached campaign queries for this workspace
-        $pattern = "campaigns:{$workspaceId}:*";
+        if (!$workspaceId)
+            return;
 
-        $keys = cache()->getRedis()->keys($pattern);
+        // Increment version to effectively clear all workspace cache keys across any driver
+        try {
+            cache()->increment("campaigns:{$workspaceId}:version");
+        } catch (\Exception $e) {
+            cache()->put("campaigns:{$workspaceId}:version", time(), now()->addDays(7));
+        }
 
-        if (!empty($keys)) {
-            foreach ($keys as $key) {
-                $cleanKey = str_replace(config('database.redis.options.prefix'), '', $key);
-                cache()->forget($cleanKey);
+        // Also invalidate publications as they are often viewed in context of campaigns
+        try {
+            cache()->increment("publications:{$workspaceId}:version");
+        } catch (\Exception $e) {
+            cache()->put("publications:{$workspaceId}:version", time(), now()->addDays(7));
+        }
+
+        // Still try Redis pattern clear if using Redis for extra cleanliness
+        if (config('cache.default') === 'redis') {
+            try {
+                $pattern = "campaigns:{$workspaceId}:*";
+                $keys = cache()->getRedis()->keys(config('cache.prefix') . $pattern);
+                if (!empty($keys)) {
+                    foreach ($keys as $key) {
+                        $cleanKey = str_replace(config('cache.prefix'), '', $key);
+                        cache()->forget($cleanKey);
+                    }
+                }
+            } catch (\Exception $e) {
+                // Silently fail
             }
         }
     }

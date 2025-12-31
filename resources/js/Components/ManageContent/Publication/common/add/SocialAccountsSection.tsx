@@ -1,7 +1,7 @@
 import DatePickerModern from "@/Components/common/Modern/DatePicker";
 import { format } from "date-fns";
 import { Check, Clock, Eye, Settings, Target, X } from "lucide-react";
-import React, { useState } from "react";
+import React, { memo, useState } from "react";
 
 interface SocialAccount {
   id: number;
@@ -26,10 +26,10 @@ interface SocialAccountsSectionProps {
   error?: string;
 }
 
-const VisualCheckbox: React.FC<{
+const VisualCheckbox = memo(({ isChecked, onToggle }: {
   isChecked: boolean;
   onToggle: (e?: React.MouseEvent) => void;
-}> = ({ isChecked, onToggle }) => (
+}) => (
   <div className="relative">
     <div
       className={`
@@ -45,68 +45,60 @@ const VisualCheckbox: React.FC<{
       {isChecked && <Check className="w-3 h-3 text-white stroke-[3]" />}
     </div>
   </div>
-);
+));
 
-const SchedulePopoverContent: React.FC<{
-  account: SocialAccount;
-  customSchedule?: string;
-  onScheduleChange: (date: string) => void;
-  onScheduleRemove: () => void;
-  onClose: () => void;
-}> = ({
+const SchedulePopoverContent = memo(({
   account,
   customSchedule,
   onScheduleChange,
   onScheduleRemove,
   onClose,
-}) => {
-    return (
-      <>
-        <div className="flex justify-between items-center mb-3">
-          <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-            Schedule for {account.platform}
-          </h4>
-          <button type="button" onClick={onClose}>
-            <X className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-          </button>
-        </div>
-
-        <DatePickerModern
-          selected={customSchedule ? new Date(customSchedule) : null}
-          onChange={(date: Date | null) => {
-            onScheduleChange(date ? format(date, "yyyy-MM-dd'T'HH:mm") : "");
-          }}
-          showTimeSelect
-          placeholder="Select date & time"
-          dateFormat="Pp"
-          minDate={new Date()}
-          withPortal
-          popperPlacement="bottom-start"
-          isClearable
-        />
-
-        <div className="flex justify-end gap-2 mt-4">
-          <button
-            type="button"
-            onClick={onClose}
-            className="text-xs bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors font-medium shadow-sm"
-          >
-            Done
-          </button>
-        </div>
-      </>
-    );
-  };
-
-const ScheduleButton: React.FC<{
+}: {
   account: SocialAccount;
   customSchedule?: string;
-  activePopover: number | null;
-  onScheduleClick: (e: React.MouseEvent) => void;
   onScheduleChange: (date: string) => void;
   onScheduleRemove: () => void;
-  onPopoverClose: () => void;
-}> = ({
+  onClose: () => void;
+}) => {
+  return (
+    <>
+      <div className="flex justify-between items-center mb-3">
+        <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+          Schedule for {account.platform}
+        </h4>
+        <button type="button" onClick={onClose}>
+          <X className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+        </button>
+      </div>
+
+      <DatePickerModern
+        selected={customSchedule ? new Date(customSchedule) : null}
+        onChange={(date: Date | null) => {
+          onScheduleChange(date ? format(date, "yyyy-MM-dd'T'HH:mm") : "");
+        }}
+        showTimeSelect
+        placeholder="Select date & time"
+        dateFormat="Pp"
+        minDate={new Date()}
+        withPortal
+        popperPlacement="bottom-start"
+        isClearable
+      />
+
+      <div className="flex justify-end gap-2 mt-4">
+        <button
+          type="button"
+          onClick={onClose}
+          className="text-xs bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors font-medium shadow-sm"
+        >
+          Done
+        </button>
+      </div>
+    </>
+  );
+});
+
+const ScheduleButton = memo(({
   account,
   customSchedule,
   activePopover,
@@ -114,33 +106,41 @@ const ScheduleButton: React.FC<{
   onScheduleChange,
   onScheduleRemove,
   onPopoverClose,
+}: {
+  account: SocialAccount;
+  customSchedule?: string;
+  activePopover: number | null;
+  onScheduleClick: (e: React.MouseEvent) => void;
+  onScheduleChange: (date: string) => void;
+  onScheduleRemove: () => void;
+  onPopoverClose: () => void;
 }) => {
-    return (
-      <div className="ml-2 relative" onClick={(e) => e.stopPropagation()}>
-        <button
-          type="button"
-          onClick={onScheduleClick}
-          className={`p-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 ${customSchedule ? "text-primary-500" : "text-gray-500 dark:text-gray-400"
-            }`}
-          title="Set individual time"
-        >
-          <Clock className="w-4 h-4" />
-        </button>
+  return (
+    <div className="ml-2 relative" onClick={(e) => e.stopPropagation()}>
+      <button
+        type="button"
+        onClick={onScheduleClick}
+        className={`p-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 ${customSchedule ? "text-primary-500" : "text-gray-500 dark:text-gray-400"
+          }`}
+        title="Set individual time"
+      >
+        <Clock className="w-4 h-4" />
+      </button>
 
-        {activePopover === account.id && (
-          <div className="absolute right-0 top-full mt-2 z-50 p-4 rounded-lg shadow-xl border w-64 bg-white dark:bg-neutral-800 border-gray-200 dark:border-neutral-600 animate-in fade-in zoom-in-95">
-            <SchedulePopoverContent
-              account={account}
-              customSchedule={customSchedule}
-              onScheduleChange={onScheduleChange}
-              onScheduleRemove={onScheduleRemove}
-              onClose={onPopoverClose}
-            />
-          </div>
-        )}
-      </div>
-    );
-  };
+      {activePopover === account.id && (
+        <div className="absolute right-0 top-full mt-2 z-50 p-4 rounded-lg shadow-xl border w-64 bg-white dark:bg-neutral-800 border-gray-200 dark:border-neutral-600 animate-in fade-in zoom-in-95">
+          <SchedulePopoverContent
+            account={account}
+            customSchedule={customSchedule}
+            onScheduleChange={onScheduleChange}
+            onScheduleRemove={onScheduleRemove}
+            onClose={onPopoverClose}
+          />
+        </div>
+      )}
+    </div>
+  );
+});
 
 interface SocialAccountItemProps {
   account: SocialAccount;
@@ -160,7 +160,7 @@ interface SocialAccountItemProps {
   isPublishing?: boolean;
 }
 
-const SocialAccountItem: React.FC<SocialAccountItemProps> = ({
+const SocialAccountItem = memo(({
   account,
   isChecked,
   customSchedule,
@@ -176,7 +176,7 @@ const SocialAccountItem: React.FC<SocialAccountItemProps> = ({
   globalSchedule,
   isPublished,
   isPublishing,
-}) => {
+}: SocialAccountItemProps) => {
   const isDisabled = isPublished || isPublishing;
   const isCheckedActually = isChecked || isPublished || isPublishing;
 
@@ -337,9 +337,9 @@ const SocialAccountItem: React.FC<SocialAccountItemProps> = ({
       )}
     </div>
   );
-};
+});
 
-const SocialAccountsSection: React.FC<SocialAccountsSectionProps> = ({
+const SocialAccountsSection = memo(({
   socialAccounts,
   selectedAccounts,
   accountSchedules,
@@ -353,7 +353,7 @@ const SocialAccountsSection: React.FC<SocialAccountsSectionProps> = ({
   publishedAccountIds,
   publishingAccountIds,
   error,
-}) => {
+}: SocialAccountsSectionProps) => {
   const [activePopover, setActivePopover] = useState<number | null>(null);
 
   return (
@@ -408,6 +408,6 @@ const SocialAccountsSection: React.FC<SocialAccountsSectionProps> = ({
       </div>
     </div>
   );
-};
+});
 
 export default SocialAccountsSection;

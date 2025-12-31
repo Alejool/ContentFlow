@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, memo } from "react";
 // Hooks
 import { usePublicationForm } from "@/Hooks/publication/usePublicationForm";
 // Stores
@@ -16,7 +16,9 @@ import ModalHeader from "@/Components/ManageContent/modals/common/ModalHeader";
 import PlatformPreviewModal from "@/Components/ManageContent/modals/common/PlatformPreviewModal";
 import ScheduleSection from "@/Components/ManageContent/modals/common/ScheduleSection";
 import YouTubeThumbnailUploader from "@/Components/common/ui/YouTubeThumbnailUploader";
+import MediaUploadSkeleton from "@/Components/ManageContent/Publication/common/edit/MediaUploadSkeleton";
 import { AlertCircle, Save } from "lucide-react";
+import { useWatch } from "react-hook-form";
 
 interface EditPublicationModalProps {
   isOpen: boolean;
@@ -25,19 +27,18 @@ interface EditPublicationModalProps {
   onSubmit: (success: boolean) => void;
 }
 
-export default function EditPublicationModal({
+const EditPublicationModal = ({
   isOpen,
   onClose,
   publication,
   onSubmit,
-}: EditPublicationModalProps) {
+}: EditPublicationModalProps) => {
   const { campaigns } = useCampaignStore();
   const { accounts: socialAccounts } = useAccountsStore();
 
   const {
     t,
     form,
-    watched,
     errors,
     isSubmitting,
     isDragOver,
@@ -64,6 +65,8 @@ export default function EditPublicationModal({
     accountSchedules,
     setAccountSchedules,
     setValue,
+    control,
+    isDataReady,
   } = usePublicationForm({
     publication,
     onClose,
@@ -72,6 +75,32 @@ export default function EditPublicationModal({
   });
 
   const { register } = form;
+
+  // Use individual watchers to prevent unnecessary re-renders
+  const selectedSocialAccounts = useWatch({ control, name: "social_accounts" }) || [];
+  const scheduledAt = useWatch({ control, name: "scheduled_at" });
+  const useGlobalSchedule = useWatch({ control, name: "use_global_schedule" });
+  const title = useWatch({ control, name: "title" });
+  const goal = useWatch({ control, name: "goal" });
+  const hashtags = useWatch({ control, name: "hashtags" });
+  const campaign_id = useWatch({ control, name: "campaign_id" });
+
+  const watched = useMemo(() => ({
+    social_accounts: selectedSocialAccounts,
+    scheduled_at: scheduledAt,
+    use_global_schedule: useGlobalSchedule,
+    title,
+    goal,
+    hashtags,
+    campaign_id
+  }), [selectedSocialAccounts, scheduledAt, useGlobalSchedule, title, goal, hashtags, campaign_id]);
+
+  const stabilizedMediaPreviews = useMemo(() => {
+    return mediaFiles.map((m) => ({
+      ...m,
+      url: m.url,
+    }));
+  }, [mediaFiles]);
 
   const hasPublishedPlatform = useMemo(() => {
     return publication?.social_post_logs?.some(
@@ -95,16 +124,14 @@ export default function EditPublicationModal({
     );
   }, [publication]);
 
-  if (!isOpen || !publication) return null;
-
-  const hasYouTubeAccount = watched.social_accounts?.some((id: number) => {
+  const hasYouTubeAccount = selectedSocialAccounts.some((id: number) => {
     const account = socialAccounts.find((a) => a.id === id);
     return account?.platform?.toLowerCase() === "youtube";
   });
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center sm:p-6 text-gray-900 dark:text-white"
+      className={`fixed inset-0 z-50 flex items-center justify-center sm:p-6 text-gray-900 dark:text-white transition-opacity duration-200 ${isOpen ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"}`}
     >
       <div
         className="absolute inset-0 bg-gray-900/60 dark:bg-black/70 backdrop-blur-sm"
@@ -145,28 +172,29 @@ export default function EditPublicationModal({
                   </div>
                 )}
 
-                <MediaUploadSection
-                  mediaPreviews={mediaFiles.map((m) => ({
-                    ...m,
-                    url: m.url,
-                  }))}
-                  thumbnails={thumbnails}
-                  imageError={imageError}
-                  isDragOver={isDragOver}
-                  t={t}
-                  onFileChange={handleFileChange}
-                  onRemoveMedia={handleRemoveMedia}
-                  onSetThumbnail={(tempId, file) => setThumbnail(tempId, file)}
-                  onClearThumbnail={(tempId) => clearThumbnail(tempId)}
-                  onDragOver={() => setIsDragOver(true)}
-                  onDragLeave={() => setIsDragOver(false)}
-                  onDrop={(e) => {
-                    e.preventDefault();
-                    setIsDragOver(false);
-                    handleFileChange(e.dataTransfer.files);
-                  }}
-                  disabled={hasPublishedPlatform}
-                />
+                {!isDataReady ? (
+                  <MediaUploadSkeleton />
+                ) : (
+                  <MediaUploadSection
+                    mediaPreviews={stabilizedMediaPreviews}
+                    thumbnails={thumbnails}
+                    imageError={imageError}
+                    isDragOver={isDragOver}
+                    t={t}
+                    onFileChange={handleFileChange}
+                    onRemoveMedia={handleRemoveMedia}
+                    onSetThumbnail={(tempId, file) => setThumbnail(tempId, file)}
+                    onClearThumbnail={(tempId) => clearThumbnail(tempId)}
+                    onDragOver={() => setIsDragOver(true)}
+                    onDragLeave={() => setIsDragOver(false)}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      setIsDragOver(false);
+                      handleFileChange(e.dataTransfer.files);
+                    }}
+                    disabled={hasPublishedPlatform}
+                  />
+                )}
 
                 <SocialAccountsSection
                   socialAccounts={socialAccounts}
@@ -200,6 +228,9 @@ export default function EditPublicationModal({
                   scheduledAt={watched.scheduled_at ?? undefined}
                   t={t}
                   onScheduleChange={(date) => setValue("scheduled_at", date)}
+                  useGlobalSchedule={watched.use_global_schedule}
+                  onGlobalScheduleToggle={(val) => setValue("use_global_schedule", val)}
+                  error={errors.scheduled_at?.message as string}
                 />
 
                 {hasYouTubeAccount && (
@@ -212,7 +243,7 @@ export default function EditPublicationModal({
                         mediaFiles.find((m) => m.type === "video")?.url
                       }
                       videoFileName={
-                        publication.media_files?.find(
+                        publication?.media_files?.find(
                           (m) =>
                             m.file_type === "video" ||
                             m.mime_type?.startsWith("video/")
@@ -311,3 +342,5 @@ export default function EditPublicationModal({
     </div>
   );
 }
+
+export default memo(EditPublicationModal);

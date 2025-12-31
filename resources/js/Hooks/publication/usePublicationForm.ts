@@ -5,7 +5,7 @@ import { PageProps } from "@/types";
 import { Publication } from "@/types/Publication";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { usePage } from "@inertiajs/react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, startTransition } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
@@ -53,6 +53,7 @@ export const usePublicationForm = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [removedMediaIds, setRemovedMediaIds] = useState<number[]>([]);
   const [isDragOver, setIsDragOver] = useState(false);
+  const [isDataReady, setIsDataReady] = useState(false);
 
   // Platform settings and previews
   const [platformSettings, setPlatformSettings] = useState<Record<string, any>>(
@@ -94,6 +95,7 @@ export const usePublicationForm = ({
     formState: { errors },
     trigger,
     getValues,
+    control,
   } = form;
   const watched = watch();
 
@@ -104,30 +106,24 @@ export const usePublicationForm = ({
     }
   }, [errors]);
 
-  // Load initial data
+  // Phase 1: Load critical data IMMEDIATELY for instant modal display
   useEffect(() => {
     if (isOpen) {
+      setIsDataReady(false);
       if (publication) {
+        // Load basic form fields synchronously
         reset({
           title: publication.title || "",
           description: publication.description || "",
           goal: publication.goal || "",
           hashtags: publication.hashtags || "",
           campaign_id: publication.campaigns?.[0]?.id?.toString() || null,
-          // Only include accounts with pending schedules, not published ones
-          // Published accounts are managed separately and shouldn't be in social_accounts
-          social_accounts: Array.from(
-            new Set(
-              publication.scheduled_posts
-                ?.filter((sp) => sp.status === "pending")
-                .map((sp) => sp.social_account_id) || []
-            )
-          ),
+          social_accounts: [],
           scheduled_at: publication.scheduled_at || null,
           status:
             publication.status === "published" ||
-            publication.status === "scheduled" ||
-            publication.status === "publishing"
+              publication.status === "scheduled" ||
+              publication.status === "publishing"
               ? "published"
               : "draft",
           lock_content: !!publication.social_post_logs?.some(
@@ -136,8 +132,29 @@ export const usePublicationForm = ({
         });
 
         setPlatformSettings(publication.platform_settings || {});
+      } else {
+        reset({
+          title: "",
+          description: "",
+          goal: "",
+          hashtags: "",
+          campaign_id: null,
+          social_accounts: [],
+          scheduled_at: null,
+          lock_content: false,
+        });
+        setPlatformSettings(user?.global_platform_settings || {});
+        clearMedia();
+        setIsDataReady(true);
+      }
+    }
+  }, [isOpen, publication?.id]);
 
-        // Get published and publishing account IDs to exclude from schedules
+  // Phase 2: Defer HEAVY processing using startTransition
+  useEffect(() => {
+    if (isOpen && publication) {
+      startTransition(() => {
+        // Process scheduled posts and social accounts
         const publishedAccountIds = new Set(
           publication.social_post_logs
             ?.filter(
@@ -146,12 +163,22 @@ export const usePublicationForm = ({
             .map((l) => l.social_account_id) || []
         );
 
+        const pendingSocialAccounts = Array.from(
+          new Set(
+            publication.scheduled_posts
+              ?.filter((sp) => sp.status === "pending")
+              .map((sp) => sp.social_account_id) || []
+          )
+        );
+
+        setValue("social_accounts", pendingSocialAccounts, { shouldValidate: false });
+
+        // Process account schedules
         const initialAccountSchedules: Record<number, string> = {};
         const scheds =
           publication.scheduled_posts || (publication as any).scheduledPosts;
         if (scheds) {
           scheds.forEach((sp: any) => {
-            // Only load schedule if account is NOT published or publishing
             if (
               sp.social_account_id &&
               sp.scheduled_at &&
@@ -163,6 +190,7 @@ export const usePublicationForm = ({
         }
         setAccountSchedules(initialAccountSchedules);
 
+        // Process media files
         const existingMedia: any[] =
           publication.media_files?.map((media: any) => {
             const isVideo =
@@ -236,29 +264,10 @@ export const usePublicationForm = ({
 
         setMediaFiles(existingMedia);
         setImageError(null);
-      } else {
-        reset({
-          title: "",
-          description: "",
-          goal: "",
-          hashtags: "",
-          campaign_id: null,
-          social_accounts: [],
-          scheduled_at: null,
-          lock_content: false,
-        });
-        setPlatformSettings(user?.global_platform_settings || {});
-        clearMedia();
-      }
+        setIsDataReady(true);
+      });
     }
-  }, [
-    isOpen,
-    publication,
-    reset,
-    setMediaFiles,
-    clearMedia,
-    user?.global_platform_settings,
-  ]);
+  }, [isOpen, publication?.id, publication?.media_files, publication?.scheduled_posts, publication?.social_post_logs, publication?.image]);
 
   const handleFileChange = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
@@ -374,7 +383,7 @@ export const usePublicationForm = ({
       if (!allAccountsHaveSchedule && !data.scheduled_at) {
         toast.error(
           t("publications.modal.validation.scheduleRequired") ||
-            "Debes programar una fecha para todas las redes seleccionadas o establecer una fecha global."
+          "Debes programar una fecha para todas las redes seleccionadas o establecer una fecha global."
         );
         return;
       }
@@ -521,8 +530,7 @@ export const usePublicationForm = ({
       .join(", ");
 
     toast.error(
-      `${t("common.errors.checkFormErrors")}${
-        errorFields ? `: ${errorFields}` : ""
+      `${t("common.errors.checkFormErrors")}${errorFields ? `: ${errorFields}` : ""
       }`
     );
 
@@ -567,5 +575,9 @@ export const usePublicationForm = ({
 
     setValue,
     trigger,
+    control,
+
+    // Data loading state
+    isDataReady,
   };
 };
