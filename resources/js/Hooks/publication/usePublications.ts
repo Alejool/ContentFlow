@@ -225,6 +225,15 @@ export const usePublications = () => {
     openEditModal(item);
   }, [openEditModal]);
 
+  const stableOpenAddModal = useCallback(() => openAddModal(), [openAddModal]);
+  const stableCloseAddModal = useCallback(() => closeAddModal(), [closeAddModal]);
+  const stableOpenEditModal = useCallback((item: any) => openEditModal(item), [openEditModal]);
+  const stableCloseEditModal = useCallback(() => closeEditModal(), [closeEditModal]);
+  const stableOpenPublishModal = useCallback((item: any) => openPublishModal(item), [openPublishModal]);
+  const stableClosePublishModal = useCallback(() => closePublishModal(), [closePublishModal]);
+  const stableOpenViewDetailsModal = useCallback((item: any) => openViewDetailsModal(item), [openViewDetailsModal]);
+  const stableCloseViewDetailsModal = useCallback(() => closeViewDetailsModal(), [closeViewDetailsModal]);
+
   return useMemo(() => ({
     t,
     activeTab,
@@ -242,14 +251,14 @@ export const usePublications = () => {
     isEditModalOpen,
     isPublishModalOpen,
     isViewDetailsModalOpen,
-    openAddModal,
-    closeAddModal,
-    openEditModal,
-    closeEditModal,
-    openPublishModal,
-    closePublishModal,
-    openViewDetailsModal,
-    closeViewDetailsModal,
+    openAddModal: stableOpenAddModal,
+    closeAddModal: stableCloseAddModal,
+    openEditModal: stableOpenEditModal,
+    closeEditModal: stableCloseEditModal,
+    openPublishModal: stableOpenPublishModal,
+    closePublishModal: stableClosePublishModal,
+    openViewDetailsModal: stableOpenViewDetailsModal,
+    closeViewDetailsModal: stableCloseViewDetailsModal,
     handleDeleteItem,
     handleEditRequest,
     connectedAccounts,
@@ -263,6 +272,7 @@ export const usePublications = () => {
     campPagination,
     logPagination,
   }), [
+
     t,
     activeTab,
     setActiveTab,

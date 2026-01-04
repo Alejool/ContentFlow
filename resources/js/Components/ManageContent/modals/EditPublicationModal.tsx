@@ -1,6 +1,34 @@
 import { useMemo, memo } from "react";
+
+// Utils
+const parseUserAgent = (userAgent?: string): string => {
+  if (!userAgent) return 'Unknown Device';
+  let browser = 'Unknown Browser';
+  if (userAgent.includes('Firefox')) browser = 'Firefox';
+  else if (userAgent.includes('Edg')) browser = 'Edge';
+  else if (userAgent.includes('Chrome')) browser = 'Chrome';
+  else if (userAgent.includes('Safari') && !userAgent.includes('Chrome')) browser = 'Safari';
+  else if (userAgent.includes('Opera') || userAgent.includes('OPR')) browser = 'Opera';
+
+  let os = '';
+  if (userAgent.includes('Windows')) os = 'Windows';
+  else if (userAgent.includes('Mac')) os = 'macOS';
+  else if (userAgent.includes('Linux')) os = 'Linux';
+  else if (userAgent.includes('Android')) os = 'Android';
+  else if (userAgent.includes('iOS') || userAgent.includes('iPhone') || userAgent.includes('iPad')) os = 'iOS';
+
+  return os ? `${browser} on ${os}` : browser;
+};
+
+const maskIpAddress = (ip?: string): string => {
+  if (!ip) return '';
+  const parts = ip.split('.');
+  if (parts.length === 4) return `${parts[0]}.${parts[1]}.x.x`;
+  return ip.split(':')[0] + ':...';
+};
 // Hooks
 import { usePublicationForm } from "@/Hooks/publication/usePublicationForm";
+import { usePublicationLock } from "@/Hooks/usePublicationLock";
 // Stores
 import { useCampaignStore } from "@/stores/campaignStore";
 import { useAccountsStore } from "@/stores/socialAccountsStore";
@@ -35,6 +63,8 @@ const EditPublicationModal = ({
 }: EditPublicationModalProps) => {
   const { campaigns } = useCampaignStore();
   const { accounts: socialAccounts } = useAccountsStore();
+
+  const { isLockedByOther, lockInfo } = usePublicationLock(publication?.id ?? null, isOpen);
 
   const {
     t,
@@ -156,6 +186,46 @@ const EditPublicationModal = ({
           >
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-8">
               <div className="space-y-6">
+                {isLockedByOther && (
+                  <div className="p-4 mb-6 rounded-lg border border-amber-500 bg-amber-50 dark:bg-amber-900/20 flex gap-3 text-sm text-amber-700 dark:text-amber-300 animate-in shake duration-500">
+                    <AlertCircle className="w-5 h-5 shrink-0 text-amber-500" />
+                    <div>
+                      <p className="font-semibold mb-1">
+                        {lockInfo?.locked_by === 'session'
+                          ? (t("publications.modal.edit.lockedBySession") || "Sesión Duplicada")
+                          : (t("publications.modal.edit.lockedByOther") || "Publicación Bloqueada")
+                        }
+                      </p>
+                      <p className="opacity-80">
+                        {lockInfo?.locked_by === 'session' ? (
+                          <>
+                            Tienes esta publicación abierta en{' '}
+                            <span className="font-medium">
+                              {parseUserAgent(lockInfo?.user_agent)}
+                            </span>
+                            {lockInfo?.ip_address && (
+                              <span className="text-xs opacity-70">
+                                {' '}({maskIpAddress(lockInfo.ip_address)})
+                              </span>
+                            )}
+                            . Cierra la otra sesión para editar aquí.
+                          </>
+                        ) : (
+                          <>
+                            {lockInfo?.user_name} está editando esta publicación
+                            {lockInfo?.user_agent && (
+                              <span className="font-medium">
+                                {' '}desde {parseUserAgent(lockInfo.user_agent)}
+                              </span>
+                            )}
+                            . Tus cambios no podrán ser guardados para evitar conflictos.
+                          </>
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
                 {hasPublishedPlatform && (
                   <div className="p-4 mb-6 rounded-lg border border-blue-500 bg-blue-50/50 dark:bg-blue-900/20 flex gap-3 text-sm text-blue-700 dark:text-blue-300 animate-in fade-in slide-in-from-top-4">
                     <AlertCircle className="w-5 h-5 shrink-0 text-blue-500" />
@@ -192,7 +262,7 @@ const EditPublicationModal = ({
                       setIsDragOver(false);
                       handleFileChange(e.dataTransfer.files);
                     }}
-                    disabled={hasPublishedPlatform}
+                    disabled={hasPublishedPlatform || isLockedByOther}
                   />
                 )}
 
@@ -222,6 +292,7 @@ const EditPublicationModal = ({
                   publishedAccountIds={publishedAccountIds}
                   publishingAccountIds={publishingAccountIds}
                   error={errors.social_accounts?.message as string}
+                  disabled={isLockedByOther}
                 />
 
                 <ScheduleSection
@@ -231,6 +302,7 @@ const EditPublicationModal = ({
                   useGlobalSchedule={watched.use_global_schedule}
                   onGlobalScheduleToggle={(val) => setValue("use_global_schedule", val)}
                   error={errors.scheduled_at?.message as string}
+                  disabled={isLockedByOther}
                 />
 
                 {hasYouTubeAccount && (
@@ -290,7 +362,7 @@ const EditPublicationModal = ({
                   campaigns={campaigns}
                   publication={publication}
                   onHashtagChange={handleHashtagChange}
-                  disabled={hasPublishedPlatform}
+                  disabled={hasPublishedPlatform || isLockedByOther}
                 />
               </div>
             </div>
@@ -298,7 +370,7 @@ const EditPublicationModal = ({
         </div>
         <ModalFooter
           onClose={handleClose}
-          isSubmitting={isSubmitting}
+          isSubmitting={isSubmitting || isLockedByOther}
           formId="edit-publication-form"
           submitText={t("publications.button.edit") || "Edit Publication"}
           submitIcon={<Save className="w-4 h-4" />}

@@ -18,7 +18,13 @@ return [
 
     'allowed_methods' => ['*'],  // Allows all HTTP methods
 
-    'allowed_origins' => ['http://localhost:5173', 'http://127.0.0.1:5173', 'http://100.125.246.50:5173'],  // Add your frontend URLs
+    'allowed_origins' => [
+        'http://localhost:5173',
+        'http://127.0.0.1:5173',
+        'http://100.125.246.50:5173',
+        'http://leviathan-port.tail4af8a1.ts.net',
+        'https://leviathan-port.tail4af8a1.ts.net',
+    ],  // Add your frontend URLs
 
     'allowed_origins_patterns' => [],  // Not necessary, but you can add patterns here
 

@@ -12,7 +12,6 @@ class ErrorInterceptorClass {
   private maxRetries = 2;
 
   initialize() {
-    // Response interceptor
     axios.interceptors.response.use(
       (response) => response,
       async (error: AxiosError<ErrorResponse>) => {
@@ -67,19 +66,19 @@ class ErrorInterceptorClass {
     ToastService.error(message);
   }
 
-  // private handle401() {
-  //   ToastService.error("Your session has expired. Please log in again.");
-  //   setTimeout(() => {
-  //     router.visit("/login");
-  //   }, 1500);
-  // }
+  private handle401() {
+    if (window.location.pathname === '/login') return;
+
+    ToastService.error("Your session has expired. Please log in again.");
+    setTimeout(() => {
+      window.location.href = "/login";
+    }, 60000);
+  }
 
   private handle403(data?: ErrorResponse) {
     const message =
       data?.message || "You don't have permission to perform this action.";
     ToastService.error(message);
-
-    // Log for debugging
     console.error("403 Forbidden:", data);
   }
 

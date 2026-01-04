@@ -105,7 +105,7 @@ const mobileNavigationItems = [
   { nameKey: "nav.profile", href: "profile.edit", lucideIcon: User },
   {
     nameKey: "nav.manageContent",
-    href: "/ManageContent.index",
+    href: "manage-content.index",
     lucideIcon: FileText,
   },
   { nameKey: "nav.analytics", href: "analytics.index", lucideIcon: BarChart3 },
@@ -124,13 +124,13 @@ export default function MobileNavbar({
   const { unreadCount } = useNotifications();
 
   const colorNoActive = `${theme === "dark"
-      ? "text-white hover:text-orange-600 hover:bg-neutral-600/40"
-      : "text-gray-700 hover:text-orange-600 hover:bg-gray-200/40"
+    ? "text-white hover:text-orange-600 hover:bg-neutral-600/40"
+    : "text-gray-700 hover:text-orange-600 hover:bg-gray-200/40"
     }`;
 
   const colorActive = `${theme === "dark"
-      ? "bg-primary-900/30 text-primary-300"
-      : "bg-primary-100 text-primary-700"
+    ? "bg-primary-900/30 text-primary-300"
+    : "bg-primary-100 text-primary-700"
     }`;
 
   const isActiveRoute = (routeName: string) => {
@@ -140,7 +140,7 @@ export default function MobileNavbar({
     const routePatterns: Record<string, string[]> = {
       dashboard: ["/dashboard"],
       "profile.edit": ["/profile", "/profile/edit"],
-      "/ManageContent.index": ["/manageContent"],
+      "manage-content.index": ["/ManageContent"],
       "analytics.index": ["/analytics"],
       "workspaces.index": ["/workspaces"],
     };
@@ -200,8 +200,8 @@ export default function MobileNavbar({
             </svg>
           </button>
 
-          <div className="flex items-center ">
-            <img src={Logo} alt="Logo" className="w-48 h-20" />
+          <div className="flex items-center justify-center flex-1 px-2 min-w-0">
+            <img src={Logo} alt="Logo" className="h-10 w-auto object-contain max-w-[140px] sm:max-w-none" />
           </div>
 
           <div className="flex items-center ">
@@ -237,8 +237,8 @@ export default function MobileNavbar({
                     <div className="flex items-center gap-2">
                       <div
                         className={`rounded-full ring-2 shadow-lg ${theme === "dark"
-                            ? "ring-purple-900/50"
-                            : "ring-green-200"
+                          ? "ring-purple-900/50"
+                          : "ring-green-200"
                           } ${isProfileActive
                             ? theme === "dark"
                               ? "ring-primary-500"
@@ -310,10 +310,10 @@ export default function MobileNavbar({
                 >
                   <User
                     className={`h-4 w-4 ${isProfileActive
-                        ? theme === "dark"
-                          ? "text-primary-400"
-                          : "text-primary-600"
-                        : ""
+                      ? theme === "dark"
+                        ? "text-primary-400"
+                        : "text-primary-600"
+                      : ""
                       }`}
                   />
                   <span

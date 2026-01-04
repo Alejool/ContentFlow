@@ -18,6 +18,7 @@ use Inertia\Inertia;
 use App\Http\Controllers\SocialPostLogController;
 use App\Http\Controllers\WorkspaceController;
 use App\Http\Controllers\Api\CalendarController;
+use App\Http\Controllers\Calendar\CalendarViewController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,6 +34,25 @@ Route::get('/', function () {
     'canRegister' => Route::has('register'),
   ]);
 })->middleware('guest')->name('welcome');
+
+// Temporary route to clear cache
+Route::get('/clear-cache', function () {
+  \Illuminate\Support\Facades\Artisan::call('config:clear');
+  \Illuminate\Support\Facades\Artisan::call('route:clear');
+  \Illuminate\Support\Facades\Artisan::call('view:clear');
+  return "Cache cleared successfully! You can go back now.";
+});
+
+Route::get('/debug-auth', function () {
+  return [
+    'host' => request()->getHost(),
+    'stateful_config' => config('sanctum.stateful'),
+    'session_id' => session()->getId(),
+    'cookies' => request()->cookies->all(),
+    'user' => auth()->user(),
+    'is_sanctum_stateful' => \Laravel\Sanctum\Sanctum::currentRequestHost(),
+  ];
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -126,7 +146,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     | Content Management (Inertia Views)
     |----------------------------------------------------------------------
     */
-  Route::get('/ManageContent', [ManageContentController::class, 'index'])->name('/ManageContent.index');
+  Route::get('/ManageContent', [ManageContentController::class, 'index'])->name('manage-content.index');
   Route::get('/posts', [PostsController::class, 'index'])->name('posts.index');
 
   /*
@@ -148,9 +168,16 @@ Route::middleware(['auth:sanctum'])->group(function () {
     | Calendar API
     |----------------------------------------------------------------------
     */
-  Route::prefix('calendar')->name('calendar.')->group(function () {
-    Route::get('/', [CalendarController::class, 'index'])->name('index');
-    Route::patch('/{id}', [CalendarController::class, 'update'])->name('update');
+  /*
+    |----------------------------------------------------------------------
+    | Calendar
+    |----------------------------------------------------------------------
+    */
+  Route::get('/calendar', [CalendarViewController::class, 'index'])->name('calendar.index');
+
+  Route::prefix('api/calendar')->name('api.calendar.')->group(function () {
+    Route::get('/events', [CalendarController::class, 'index'])->name('events');
+    Route::patch('/events/{id}', [CalendarController::class, 'update'])->name('update');
   });
 
   /*

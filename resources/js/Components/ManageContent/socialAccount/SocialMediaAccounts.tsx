@@ -1,8 +1,5 @@
 import React, { memo, useEffect, useState } from "react";
-import IconFacebook from "@/../assets/Icons/facebook.svg";
-import IconTiktok from "@/../assets/Icons/tiktok.svg";
-import IconTwitter from "@/../assets/Icons/x.svg";
-import IconYoutube from "@/../assets/Icons/youtube.svg";
+import { SOCIAL_PLATFORMS } from "@/Constants/socialPlatforms";
 import PlatformSettingsModal from "@/Components/ConfigSocialMedia/PlatformSettingsModal";
 import DisconnectWarningModal from "@/Components/ManageContent/modals/DisconnectWarningModal";
 import { useSocialMediaAuth } from "@/Hooks/useSocialMediaAuth";
@@ -114,48 +111,18 @@ const SocialMediaAccounts = memo(() => {
     return disconnectAccount(id, force);
   };
 
-  const [accounts, setAccounts] = useState<Account[]>([
-    {
-      id: 1,
-      platform: "facebook",
-      name: "Facebook",
-      logo: IconFacebook,
+  const [accounts, setAccounts] = useState<Account[]>(
+    Object.entries(SOCIAL_PLATFORMS).map(([key, config]) => ({
+      id: config.id,
+      platform: key,
+      name: config.name,
+      logo: config.logo,
       isConnected: false,
       accountId: null,
-      color: "bg-blue-600 dark:bg-blue-700",
-      gradient: "from-blue-500 to-blue-700",
-    },
-    {
-      id: 3,
-      platform: "tiktok",
-      name: "TikTok",
-      logo: IconTiktok,
-      isConnected: false,
-      accountId: null,
-      color: "bg-black dark:bg-neutral-900",
-      gradient: "from-neutral-900 via-neutral-800 to-rose-900",
-    },
-    {
-      id: 4,
-      platform: "twitter",
-      name: "Twitter",
-      logo: IconTwitter,
-      isConnected: false,
-      accountId: null,
-      color: "bg-gray-900 dark:bg-neutral-800",
-      gradient: "from-neutral-800 to-neutral-900",
-    },
-    {
-      id: 5,
-      platform: "youtube",
-      name: "YouTube",
-      logo: IconYoutube,
-      isConnected: false,
-      accountId: null,
-      color: "bg-primary-600 dark:bg-primary-700",
-      gradient: "from-primary-600 to-primary-800",
-    },
-  ]);
+      color: config.color,
+      gradient: config.gradient,
+    }))
+  );
 
   const [loading, setLoading] = useState(true);
   const [connectedAccountsCount, setConnectedAccountsCount] = useState(0);
@@ -383,14 +350,14 @@ const SocialMediaAccounts = memo(() => {
           }`}
       >
         <div className="space-y-8">
-          <div className="rounded-lg p-8 border transition-colors duration-300 bg-gradient-to-br from-primary-50/80 to-pink-50/80 border-primary-100 dark:from-neutral-900/80 dark:to-neutral-800/80 dark:border-neutral-700/50">
+          <div className="rounded-lg p-4 sm:p-8 border transition-colors duration-300 bg-gradient-to-br from-primary-50/80 to-pink-50/80 border-primary-100 dark:from-neutral-900/80 dark:to-neutral-800/80 dark:border-neutral-700/50">
             <div className="flex items-start gap-4">
               <div>
                 <h3 className="text-lg font-bold mb-3 text-primary-900 dark:text-gray-100">
                   {t("manageContent.socialMedia.whyConnect")}
                 </h3>
 
-                <div className="grid sm:grid-cols-3 gap-6 mb-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
                   {[
                     {
                       icon: Zap,
@@ -412,59 +379,59 @@ const SocialMediaAccounts = memo(() => {
                   ].map((item, i) => (
                     <div
                       key={i}
-                      className="flex flex-col lg:flex-row items-center gap-3 p-4 rounded-lg bg-white/60 border border-primary-100 dark:bg-neutral-800/30 dark:border-neutral-700/30"
+                      className="flex items-center gap-3 p-3.5 rounded-xl bg-white/60 border border-primary-100 dark:bg-neutral-800/30 dark:border-neutral-700/30 transition-transform hover:scale-[1.02]"
                     >
-                      <div className="p-2 rounded-lg bg-white dark:bg-neutral-800">
-                        <item.icon className={`w-5 h-5 ${item.color}`} />
+                      <div className="p-2 rounded-lg bg-white dark:bg-neutral-800 shadow-sm flex-shrink-0">
+                        <item.icon className={`w-4 h-4 sm:w-5 sm:h-5 ${item.color}`} />
                       </div>
-                      <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      <p className="text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 leading-tight">
                         {item.title}
                       </p>
                     </div>
                   ))}
                 </div>
 
-                <div className="text-sm p-4 rounded-lg inline-block bg-white/60 text-primary-600/80 border border-primary-100 dark:bg-neutral-800/40 dark:text-gray-400 dark:border-neutral-700/40">
-                  <div className="flex items-center gap-2 mb-2">
-                    <AlertCircle className="w-4 h-4" />
-                    <span className="font-semibold">{t("common.note")}:</span>
+                <div className="text-[10px] sm:text-xs p-3 rounded-xl inline-flex bg-white/60 text-primary-600/80 border border-primary-100 dark:bg-neutral-800/40 dark:text-gray-400 dark:border-neutral-700/40 group">
+                  <div className="flex items-center gap-2">
+                    <AlertCircle className="w-3.5 h-3.5 opacity-70 group-hover:opacity-100 transition-opacity" />
+                    <span className="font-bold uppercase tracking-wider">{t("common.note")}:</span>
+                    <span className="font-medium">{t("manageContent.socialMedia.disclaimer")}</span>
                   </div>
-                  {t("manageContent.socialMedia.disclaimer")}
                 </div>
               </div>
             </div>
           </div>
 
           {loading ? (
-            <div className="flex flex-col items-center justify-center py-12 rounded-lg border transition-colors duration-300 bg-white border-gray-100 dark:bg-neutral-800/50 dark:border-neutral-700/50">
+            <div className="flex flex-col items-center justify-center py-12 rounded-2xl border transition-colors duration-300 bg-white border-gray-100 dark:bg-neutral-800/50 dark:border-neutral-700/50">
               <Loader2 className="w-10 h-10 animate-spin mb-4 text-primary-600 dark:text-primary-400" />
-              <p className="font-medium text-gray-500 dark:text-gray-400">
+              <p className="font-bold text-gray-500 dark:text-gray-400 uppercase text-xs tracking-widest">
                 {t("common.loading")}
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {accounts.map((account) => (
                 <div
                   key={account.id}
-                  className={`group relative rounded-lg p-6 border transition-all duration-300
-                    hover:shadow-xl bg-white/70 backdrop-blur-sm border-gray-100/70 hover:border-gray-200 dark:bg-neutral-800/70 dark:backdrop-blur-sm dark:border-neutral-700/70 dark:hover:border-neutral-600
+                  className={`group relative rounded-2xl p-4 sm:p-5 border transition-all duration-300
+                    hover:shadow-xl bg-white dark:bg-neutral-900 border-gray-100 dark:border-neutral-800 hover:border-primary-100 dark:hover:border-primary-900/30
                     ${account.isConnected
-                      ? "ring-1 ring-green-100 dark:ring-green-500/20"
-                      : ""
+                      ? "ring-1 ring-emerald-500/10 dark:ring-emerald-500/5"
+                      : "opacity-90 hover:opacity-100"
                     }`}
                 >
                   <div className="absolute top-4 right-4 z-10">
                     <div
-                      className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-colors border
+                      className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-tight transition-colors border
                         ${account.isConnected
-                          ? "bg-green-50 text-green-700 border-green-100 dark:bg-green-900/30 dark:text-green-400 dark:border-green-900/80"
+                          ? "bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-900/80"
                           : "bg-gray-50 text-gray-500 border-gray-100 dark:bg-neutral-800 dark:text-gray-400 dark:border-neutral-700"
                         }`}
                     >
                       {account.isConnected ? (
                         <>
-                          <div className="w-1.5 h-1.5 rounded-full bg-green-600 animate-pulse" />
+                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                           {t("manageContent.socialMedia.status.connected")}
                         </>
                       ) : (
@@ -476,60 +443,52 @@ const SocialMediaAccounts = memo(() => {
                     </div>
                   </div>
 
-                  <div className="flex flex-col items-center text-center mb-6 pt-2">
-                    <div className="relative mb-4">
-                      <div className="w-20 h-12 rounded-lg flex items-center justify-center pt-6">
-                        <div
-                          className={`w-12 h-12 rounded-lg overflow-hidden
-                          ${account.isConnected &&
-                              account.accountDetails?.account_metadata?.avatar
-                              ? ""
-                              : "p-2"
+                  <div className="flex flex-col items-center text-center mb-5 pt-3">
+                    <div className="relative mb-4 group-hover:scale-110 transition-transform duration-300">
+                      <div className="w-16 h-16 rounded-2xl flex items-center justify-center p-0.5 border border-gray-100 dark:border-neutral-800 bg-gray-50 dark:bg-neutral-800 overflow-hidden shadow-inner">
+                        {account.isConnected &&
+                          account.accountDetails?.account_metadata?.avatar ? (
+                          <img
+                            src={
+                              account.accountDetails.account_metadata.avatar
                             }
-                          `}
-                        >
-                          {account.isConnected &&
-                            account.accountDetails?.account_metadata?.avatar ? (
-                            <img
-                              src={
-                                account.accountDetails.account_metadata.avatar
-                              }
-                              alt={
-                                account.accountDetails.account_name ||
-                                account.name
-                              }
-                              className="w-full h-full object-cover rounded-lg"
-                            />
-                          ) : (
+                            alt={
+                              account.accountDetails.account_name ||
+                              account.name
+                            }
+                            className="w-full h-full object-cover rounded-xl"
+                          />
+                        ) : (
+                          <div className="p-3 w-full h-full">
                             <img
                               src={account.logo}
                               alt={`${account.name} Logo`}
-                              className="w-full h-full object-contain transition-all duration-300"
+                              className="w-full h-full object-contain"
                             />
-                          )}
-                        </div>
+                          </div>
+                        )}
                       </div>
 
                       {account.isConnected && (
-                        <div className="absolute -bottom-2 -right-2 p-1 rounded-full border-2 shadow-lg bg-gradient-to-r from-green-500 to-green-600 border-white dark:bg-gradient-to-r dark:from-green-600 dark:to-green-800 dark:border-neutral-800">
-                          <Check className="w-3 h-3 text-white" />
+                        <div className="absolute -bottom-1 -right-1 p-1 rounded-full border-2 shadow-lg bg-emerald-500 border-white dark:border-neutral-900">
+                          <Check className="w-2.5 h-2.5 text-white" />
                         </div>
                       )}
                     </div>
-                    <h3 className="text-xl font-bold mb-1 text-gray-900 dark:text-gray-100">
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 truncate w-full px-2 leading-tight">
                       {account.isConnected &&
                         account.accountDetails?.account_name
                         ? account.accountDetails.account_name
                         : account.name}
                     </h3>
                     {account.isConnected && account.accountDetails ? (
-                      <p className="text-xs font-mono font-bold px-2 py-1 rounded bg-gray-50 text-gray-500 dark:bg-neutral-800 dark:text-gray-400">
+                      <p className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-gray-50 text-gray-500 dark:bg-neutral-800 dark:text-gray-400 mt-1.5 border border-gray-100 dark:border-neutral-700/50">
                         {account.accountDetails.account_metadata?.username
                           ? `@${account.accountDetails.account_metadata.username}`
                           : `ID: ${account.accountDetails.account_id}`}
                       </p>
                     ) : (
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                         {t("manageContent.socialMedia.status.connectToShare")}
                       </p>
                     )}

@@ -1,10 +1,12 @@
-import { Fragment } from "react";
+import { Fragment, memo } from "react";
 import { Campaign } from "@/types/Campaign";
 import CampaignRow from "@/Components/ManageContent/Campaign/CampaignRow";
 import CampaignPublications from "@/Components/ManageContent/Campaign/CampaignPublications";
 import CampaignMobileTable from "@/Components/ManageContent/Campaign/CampaignMobileTable";
 import { TableHeader } from "@/Components/ManageContent/Publication/TableHeader";
 import Loader from "@/Components/common/Loader";
+import { Eye, ChevronDown, Edit, Trash2 } from "lucide-react";
+import PublicationThumbnail from "@/Components/ManageContent/Publication/PublicationThumbnail";
 
 interface CampaignTableProps {
   items: Campaign[];
@@ -18,7 +20,7 @@ interface CampaignTableProps {
   isLoading?: boolean;
 }
 
-export default function CampaignTable({
+const CampaignTable = memo(({
   items,
   t,
   expandedCampaigns,
@@ -28,7 +30,7 @@ export default function CampaignTable({
   onEditRequest,
   onViewDetails,
   isLoading,
-}: CampaignTableProps) {
+}: CampaignTableProps) => {
   const getStatusColor = (status?: string) => {
     switch (status) {
       case "active":
@@ -47,14 +49,14 @@ export default function CampaignTable({
   };
 
   return (
-    <div>
-      <div className="hidden lg:block overflow-x-auto">
-        <table className="w-full text-left border-collapse z-0">
+    <div className="w-full overflow-hidden">
+      <div className="hidden lg:block overflow-x-auto scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-gray-700">
+        <table className="w-full text-left border-collapse z-0 whitespace-nowrap">
           <thead
             className="bg-gray-50/90 border-gray-100 dark:bg-neutral-800/90 dark:border-neutral-700"
           >
             <tr
-              className="text-xs uppercase tracking-wider border-b bg-gray-50 border-gray-100 dark:bg-neutral-800/50 dark:border-neutral-700"
+              className="text-[10px] uppercase tracking-wider border-b bg-gray-50 border-gray-100 dark:bg-neutral-800/50 dark:border-neutral-700"
             >
               <TableHeader mode="campaigns" t={t} />
             </tr>
@@ -111,17 +113,19 @@ export default function CampaignTable({
       </div>
 
       {!isLoading && items.length > 0 && (
-        <CampaignMobileTable
-          items={items}
-          t={t}
-          expandedCampaigns={expandedCampaigns}
-          toggleExpand={toggleExpand}
-          onEdit={onEdit}
-          onDelete={onDelete}
-          onEditRequest={onEditRequest}
-          onViewDetails={onViewDetails}
-          getStatusColor={getStatusColor}
-        />
+        <div className="lg:hidden animate-in fade-in duration-300 px-1 py-1">
+          <CampaignMobileTable
+            items={items}
+            t={t}
+            expandedCampaigns={expandedCampaigns}
+            toggleExpand={toggleExpand}
+            onEdit={onEdit}
+            onDelete={onDelete}
+            onEditRequest={onEditRequest}
+            onViewDetails={onViewDetails}
+            getStatusColor={getStatusColor}
+          />
+        </div>
       )}
 
       {isLoading && (
@@ -134,10 +138,12 @@ export default function CampaignTable({
       )}
 
       {!isLoading && items.length === 0 && (
-        <div className="lg:hidden p-8 text-center text-gray-500 rounded-lg border border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800">
+        <div className="lg:hidden p-8 text-center text-gray-500 rounded-xl border border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800 mx-1">
           {t("campaigns.table.emptyState.title")}
         </div>
       )}
     </div>
   );
-}
+});
+
+export default CampaignTable;

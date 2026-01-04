@@ -1,5 +1,16 @@
 import Echo from "laravel-echo";
 import Pusher from "pusher-js";
+import axios from "axios";
+
+// Configure Axios for Laravel Sanctum SPA authentication
+axios.defaults.withCredentials = true;
+axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+
+// Header removed to rely on Sanctum's automatic cookie-based CSRF protection
+// const token = document.head.querySelector('meta[name="csrf-token"]');
+// if (token) {
+//   axios.defaults.headers.common['X-CSRF-TOKEN'] = token.getAttribute('content');
+// }
 
 declare global {
   interface Window {

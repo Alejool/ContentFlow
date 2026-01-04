@@ -4,6 +4,7 @@
     "loading": "Loading...",
     "select": "Select",
     "more": "more",
+    "viewAll": "View all",
     "new": "New",
     "saving": "saving...",
     "listView": "List View",
@@ -60,6 +61,7 @@
   },
   "nav": {
     "dashboard": "Dashboard",
+    "calendar": "Calendar",
     "profile": "Profile",
     "settings": "Settings",
     "manageContent": "Manage Content",
@@ -238,7 +240,8 @@
         "title": "Date for all networks",
         "description": "Set a single date to publish on all selected social networks at once.",
         "placeholder": "Select date and time",
-        "instantWarning": "To publish now, use the Publish button after saving."
+        "instantWarning": "To publish now, use the Publish button after saving.",
+        "useGlobal": "Use global schedule settings"
       },
       "edit": {
         "title": "Edit Publication",
@@ -283,10 +286,8 @@
           "cancel": "Cancel"
         },
         "contentLocked": "Content Locked",
-        "contentLockedHint": "To edit the content (title, description or files), you must unpublish the publication from all platforms."
-      },
-      "manageContent": {
-        "configureNetworks": "Configure your scheduled publications"
+        "contentLockedHint": "To edit the content (title, description or files), you must unpublish the post from all platforms.",
+        "lockedByOther": "Post locked by another user"
       },
       "publish": {
         "title": "Publish",
@@ -335,6 +336,7 @@
         "descMin": "Description must be at least 10 characters long",
         "descMax": "Description cannot exceed 200 characters",
         "objMin": "Objective must be at least 5 characters long",
+        "objMax": "Objective cannot exceed 200 characters",
         "objRequired": "Objective is required",
         "goalRequired": "Goal is required",
         "titleRequired": "Title is required",
@@ -390,7 +392,8 @@
         "title": "No publications found",
         "description": "Create a publication to start publishing content.",
         "button": "Add Publication"
-      }
+      },
+      "lockedBy": "Editing:"
     },
     "messages": {
       "addSuccess": "Publication added successfully!",
@@ -1099,6 +1102,7 @@
     }
   },
   "manageContent": {
+    "configureNetworks": "Configure your scheduled publications",
     "title": "Content Management",
     "subtitle": "Organize and manage your multimedia content elegantly and efficiently",
     "publications": "Publications",

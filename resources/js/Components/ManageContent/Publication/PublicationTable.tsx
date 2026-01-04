@@ -1,11 +1,12 @@
-import React, { memo, useState } from "react";
+import React, { memo, useState, useCallback, useMemo } from "react";
 import PublicationDesktopRow from "@/Components/ManageContent/Publication/PublicationDesktopRow";
 import PublicationMobileGrid from "@/Components/ManageContent/Publication/PublicationMobileGrid";
 import PublicationMobileRow from "@/Components/ManageContent/Publication/PublicationMobileRow";
 import { TableHeader } from "@/Components/ManageContent/Publication/TableHeader";
 import Loader from "@/Components/common/Loader";
 import { Publication } from "@/types/Publication";
-import { Grid3x3, List } from "lucide-react";
+import { Folder, Grid3x3, List } from "lucide-react";
+import { useWorkspaceLocks } from "@/Hooks/usePublicationLock";
 
 interface PublicationTableProps {
   items: Publication[];
@@ -32,7 +33,9 @@ const PublicationTable = memo(({
     "table"
   );
 
-  const getStatusColor = (status?: string) => {
+  const { remoteLocks } = useWorkspaceLocks();
+
+  const getStatusColor = useCallback((status?: string) => {
     switch (status) {
       case "published":
         return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400";
@@ -47,44 +50,33 @@ const PublicationTable = memo(({
       default:
         return "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300";
     }
-  };
+  }, []);
 
-  const renderDesktopTable = () => (
-    <div className="hidden lg:block overflow-x-auto relative">
-      <div className="min-w-full inline-block align-middle">
-        <table className="w-full text-left border-collapse z-0">
-          <thead className="bg-gray-50/90 border-gray-100 dark:bg-neutral-800/90 dark:border-neutral-700">
-            <tr className="text-xs uppercase tracking-wider border-b bg-gray-50 border-gray-100 dark:bg-neutral-800/50 dark:border-neutral-700">
-              <TableHeader mode="publications" t={t} />
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100 dark:divide-neutral-700/50">
-            {items.length > 0 ? (
-              items.map((item) => (
-                <PublicationDesktopRow
-                  key={item.id}
-                  item={item}
-                  t={t}
-                  connectedAccounts={connectedAccounts}
-                  getStatusColor={getStatusColor}
-                  onEdit={onEdit}
-                  onDelete={onDelete}
-                  onPublish={onPublish}
-                  onEditRequest={onEditRequest}
-                />
-              ))
-            ) : (
-              <tr>
-                <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
-                  {t("publications.table.emptyState.title")}
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
+  const desktopRows = useMemo(() => {
+    if (items.length === 0) {
+      return (
+        <tr>
+          <td colSpan={10} className="px-6 py-12 text-center text-gray-500">
+            {t("publications.table.emptyState.title")}
+          </td>
+        </tr>
+      );
+    }
+    return items.map((item) => (
+      <PublicationDesktopRow
+        key={item.id}
+        item={item}
+        t={t}
+        connectedAccounts={connectedAccounts}
+        getStatusColor={getStatusColor}
+        onEdit={onEdit}
+        onDelete={onDelete}
+        onPublish={onPublish}
+        onEditRequest={onEditRequest}
+        remoteLock={remoteLocks[item.id]}
+      />
+    ));
+  }, [items, t, connectedAccounts, getStatusColor, onEdit, onDelete, onPublish, onEditRequest]);
 
   return (
     <div className="relative min-h-[200px]">
@@ -100,24 +92,43 @@ const PublicationTable = memo(({
       )}
 
       <div className={isLoading ? "opacity-50 pointer-events-none transition-opacity duration-300" : "transition-opacity duration-300"}>
-        {renderDesktopTable()}
+        <div className="hidden lg:block overflow-x-auto relative">
+          <div className="min-w-full inline-block align-middle">
+            <table className="w-full text-left border-collapse z-0">
+              <thead className="bg-gray-50/90 border-gray-100 dark:bg-neutral-800/90 dark:border-neutral-700">
+                <tr className="text-xs uppercase tracking-wider border-b bg-gray-50 border-gray-100 dark:bg-neutral-800/50 dark:border-neutral-700">
+                  <TableHeader mode="publications" t={t} />
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100 dark:divide-neutral-700/50">
+                {desktopRows}
+              </tbody>
+            </table>
+          </div>
+        </div>
 
         <div className="lg:hidden">
           {items.length > 0 ? (
-            <PublicationMobileGrid
-              items={items}
-              t={t}
-              connectedAccounts={connectedAccounts}
-              getStatusColor={getStatusColor}
-              onEdit={onEdit}
-              onDelete={onDelete}
-              onPublish={onPublish}
-              onEditRequest={onEditRequest}
-            />
+            <div className="animate-in fade-in duration-500">
+              <PublicationMobileRow
+                items={items}
+                t={t}
+                connectedAccounts={connectedAccounts}
+                getStatusColor={getStatusColor}
+                onEdit={onEdit}
+                onDelete={onDelete}
+                onPublish={onPublish}
+                onEditRequest={onEditRequest}
+                remoteLocks={remoteLocks}
+              />
+            </div>
           ) : (
-            <div className="p-8 text-center text-gray-500 rounded-lg border border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800">
-              {t("publications.table.emptyState.title")}
-              <p className="text-sm text-gray-400 dark:text-gray-500 mt-2">
+            <div className="p-8 text-center text-gray-500 rounded-2xl border border-gray-200 dark:border-neutral-800 bg-gray-50 dark:bg-neutral-900/50">
+              <div className="w-16 h-16 bg-gray-100 dark:bg-neutral-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Folder className="w-8 h-8 text-gray-400" />
+              </div>
+              <h3 className="font-bold text-gray-900 dark:text-white">{t("publications.table.emptyState.title")}</h3>
+              <p className="text-sm text-gray-400 dark:text-gray-500 mt-2 mx-auto max-w-[200px]">
                 {t("publications.table.emptyState.description")}
               </p>
             </div>
@@ -125,8 +136,9 @@ const PublicationTable = memo(({
         </div>
 
         {!isLoading && items.length === 0 && (
-          <div className="hidden lg:block p-8 text-center text-gray-500 rounded-lg border border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800">
-            {t("publications.table.emptyState.title")}
+          <div className="hidden lg:block p-12 text-center text-gray-500 rounded-2xl border border-dashed border-gray-200 dark:border-neutral-800 bg-gray-50/50 dark:bg-neutral-900/20 mt-4">
+            <Folder className="w-12 h-12 text-gray-300 dark:text-neutral-700 mx-auto mb-4" />
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white uppercase tracking-wider">{t("publications.table.emptyState.title")}</h3>
             <p className="text-sm text-gray-400 dark:text-gray-500 mt-2">
               {t("publications.table.emptyState.description")}
             </p>

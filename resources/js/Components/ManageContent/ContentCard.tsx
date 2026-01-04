@@ -1,139 +1,121 @@
-import { Calendar, Edit2, Image, Trash2 } from "lucide-react";
-import { useState } from "react";
-import { useTranslation } from "react-i18next";
 
-interface Content {
-  id: number;
-  title: string;
-  description: string;
-  image?: string;
-  hashtags?: string;
-  created_at: string;
-}
+import React from 'react';
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
+import { Edit, Trash2, Globe, Eye, MoreVertical, Calendar, CheckCircle, AlertCircle, Clock, Rocket } from 'lucide-react';
 
 interface ContentCardProps {
-  content: Content;
-  onEdit: () => void;
-  onDelete: () => void;
+  item: any;
+  onEdit: (item: any) => void;
+  onDelete: (id: number) => void;
+  onViewDetails?: (item: any) => void;
+  onPublish?: (item: any) => void;
+  type: 'publication' | 'campaign';
 }
 
-export default function ContentCard({ content, onEdit, onDelete }: ContentCardProps) {
-  const { t, i18n } = useTranslation();
-  const [isHovered, setIsHovered] = useState(false);
+export default function ContentCard({ item, onEdit, onDelete, onViewDetails, onPublish, type }: ContentCardProps) {
+  const statusColors = {
+    published: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+    draft: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400',
+    scheduled: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+    failed: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+  };
+
+  const statusKey = (item.status || 'draft') as keyof typeof statusColors;
+  const StatusIcon = {
+    published: CheckCircle,
+    draft: Edit,
+    scheduled: Calendar,
+    failed: AlertCircle,
+  }[statusKey] || Edit;
+
+  // Determine thumbnail
+  const thumbnail = item.media_files?.[0]?.file_path || item.thumbnail;
 
   return (
-    <div
-      className="rounded-lg overflow-hidden transition-all duration-300 hover:shadow-xl  group border bg-white border-gray-100 hover:border-gray-200 dark:bg-neutral-800/50 dark:border-neutral-700/50 dark:hover:border-neutral-600"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      {/* Image Section */}
-      <div className="relative h-48 overflow-hidden ">
-        {content.image ? (
+    <div className="group bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100 dark:border-gray-700 overflow-hidden flex flex-col h-full">
+      {/* Image / Thumbnail Section */}
+      <div className="relative h-40 bg-gray-100 dark:bg-gray-700 overflow-hidden">
+        {thumbnail ? (
           <img
-            src={content.image}
-            alt={content.title}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+            src={thumbnail}
+            alt={item.title}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            loading="lazy"
           />
         ) : (
-          <div
-            className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 dark:from-neutral-700 dark:to-neutral-800"
-          >
-            <Image
-              className="w-16 h-16 text-gray-400 dark:text-neutral-500"
-            />
+          <div className="w-full h-full flex items-center justify-center text-gray-400">
+            {type === 'campaign' ? <Globe className="w-12 h-12 opacity-20" /> : <Eye className="w-12 h-12 opacity-20" />}
           </div>
         )}
 
-        {/* Overlay with Actions */}
-        <div
-          className={`absolute inset-0 flex items-center justify-center space-x-3 transition-opacity duration-300 ${isHovered ? "opacity-100" : "opacity-0"
-            } bg-black/40 dark:bg-black/50`}
-        >
-          <button
-            onClick={onEdit}
-            className="px-4 py-2 rounded-lg transition-colors duration-200 font-medium flex items-center space-x-2 shadow-lg bg-white text-gray-900 hover:bg-gray-100 dark:bg-neutral-700 dark:text-gray-200 dark:hover:bg-neutral-600"
-          >
-            <Edit2 className="w-4 h-4" />
-            <span>{t("manageContent.campaigns.edit")}</span>
-          </button>
-
-          <button
-            onClick={onDelete}
-            className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors duration-200 font-medium flex items-center space-x-2 shadow-lg"
-          >
-            <Trash2 className="w-4 h-4" />
-            <span>{t("manageContent.campaigns.delete")}</span>
-          </button>
+        {/* Overlay Badge */}
+        <div className="absolute top-3 right-3">
+          <span className={`px-2.5 py-1 rounded-full text-xs font-medium flex items-center gap-1.5 shadow-sm backdrop-blur-md ${statusColors[statusKey] || statusColors.draft}`}>
+            {/* @ts-ignore */}
+            <StatusIcon className="w-3.5 h-3.5" />
+            <span className="capitalize">{item.status}</span>
+          </span>
         </div>
       </div>
 
       {/* Content Section */}
-      <div className="p-6">
-        {/* Title */}
-        <h3
-          className="text-xl font-bold mb-3 line-clamp-2 text-gray-900 dark:text-gray-200"
-        >
-          {content.title}
-        </h3>
+      <div className="p-4 flex-1 flex flex-col">
+        <div className="flex-1">
+          <h3 className="font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            {item.title || "Untitled"}
+          </h3>
 
-        {/* Description */}
-        <p
-          className="text-sm leading-relaxed mb-4 line-clamp-3 text-gray-600 dark:text-gray-400"
-        >
-          {content.description}
-        </p>
-
-        {/* Hashtags */}
-        <div className="mb-4">
-          <div className="flex flex-wrap gap-2">
-            {(() => {
-              const tags = content.hashtags?.split(" ").filter(t => t.trim()) || [];
-              return (
-                <>
-                  {tags.slice(0, 3).map((tag, index) => (
-                    <span
-                      key={index}
-                      className="px-3 py-1 text-xs font-medium rounded-full bg-primary-50 text-primary-600 dark:bg-primary-900/30 dark:text-primary-300"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                  {tags.length > 3 && (
-                    <span
-                      className="px-3 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-500 dark:bg-neutral-700 dark:text-gray-400"
-                    >
-                      +{tags.length - 3}
-                    </span>
-                  )}
-                </>
-              );
-            })()}
+          <div className="grid grid-cols-2 gap-2 text-xs text-gray-500 dark:text-gray-400 mb-4">
+            {item.scheduled_at && (
+              <div className="flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5" />
+                <span>{format(new Date(item.scheduled_at), 'd MMM, HH:mm', { locale: es })}</span>
+              </div>
+            )}
+            <div className="flex items-center gap-1.5">
+              {/* Platform icons could go here */}
+              {type === 'campaign' && <span>{item.publications_count || 0} Pubs</span>}
+            </div>
           </div>
         </div>
 
-        {/* Footer */}
-        <div
-          className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-neutral-700"
-        >
-          <div
-            className="flex items-center space-x-2 text-xs text-gray-500 dark:text-gray-400"
-          >
-            <Calendar className="w-4 h-4" />
-            <span>
-              {new Date(content.created_at).toLocaleDateString(i18n.language)}
-            </span>
+        {/* Actions Footer */}
+        <div className="pt-4 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between gap-1 mt-auto">
+          <div className="flex items-center gap-1 flex-1">
+            {type === 'publication' && (
+              <button
+                onClick={() => onPublish?.(item)}
+                className="flex items-center justify-center gap-2 p-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 rounded-lg transition-all font-bold text-sm flex-1"
+                title="Publicar Ahora"
+              >
+                <Rocket className="w-4 h-4" />
+                Publicar
+              </button>
+            )}
+            <button
+              onClick={() => onEdit(item)}
+              className="p-2 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-lg transition-colors font-bold text-sm px-3"
+            >
+              Editar
+            </button>
           </div>
 
-          <div className="flex items-center space-x-1">
-            <div
-              className="w-2 h-2 rounded-full bg-green-400 dark:bg-green-500"
-            ></div>
-            <span
-              className="text-xs text-gray-500 dark:text-gray-400"
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => onViewDetails?.(item)}
+              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-gray-500 transition-colors"
+              title="Ver Detalles"
             >
-              {t("manageContent.campaigns.active")}
-            </span>
+              <Eye className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => onDelete(item.id)}
+              className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg transition-colors"
+              title="Eliminar"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
           </div>
         </div>
       </div>

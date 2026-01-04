@@ -1,8 +1,4 @@
-import IconFacebook from "@/../assets/Icons/facebook.svg";
-import IconInstagram from "@/../assets/Icons/instagram.svg";
-import IconTiktok from "@/../assets/Icons/tiktok.svg";
-import IconTwitter from "@/../assets/Icons/x.svg";
-import IconYoutube from "@/../assets/Icons/youtube.svg";
+import { getPlatformConfig } from "@/Constants/socialPlatforms";
 import PlatformSettingsModal from "@/Components/ConfigSocialMedia/PlatformSettingsModal";
 import PlatformPreviewModal from "@/Components/ManageContent/modals/common/PlatformPreviewModal";
 import YouTubeThumbnailUploader from "@/Components/common/ui/YouTubeThumbnailUploader";
@@ -142,25 +138,11 @@ export default function PublishPublicationModal({
   };
 
   const getPlatformIcon = (platform: string) => {
-    const icons: any = {
-      facebook: IconFacebook,
-      twitter: IconTwitter,
-      instagram: IconInstagram,
-      tiktok: IconTiktok,
-      youtube: IconYoutube,
-    };
-    return icons[platform.toLowerCase()];
+    return getPlatformConfig(platform).logo;
   };
 
   const getPlatformGradient = (platform: string) => {
-    const gradients: any = {
-      facebook: "from-blue-500 to-blue-700",
-      twitter: "from-neutral-800 to-neutral-900",
-      instagram: "from-pink-500 to-purple-700",
-      tiktok: "from-neutral-900 via-neutral-800 to-rose-900",
-      youtube: "from-primary-600 to-primary-800",
-    };
-    return gradients[platform.toLowerCase()] || "from-gray-500 to-gray-700";
+    return getPlatformConfig(platform).gradient;
   };
 
   if (!publication) return null;
@@ -288,8 +270,8 @@ export default function PublishPublicationModal({
                             togglePlatform(account.id)
                           }
                           className={`w-full flex items-center gap-3 p-4 rounded-lg border-2 transition-all pt-6 relative ${!isPublished && !isPublishing && !isScheduled
-                              ? "cursor-pointer"
-                              : "cursor-default"
+                            ? "cursor-pointer"
+                            : "cursor-default"
                             } ${isPublishing
                               ? "border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20"
                               : isPublished
@@ -456,7 +438,7 @@ export default function PublishPublicationModal({
             {isYoutubeSelected() && videoFiles.length > 0 && (
               <div className="mb-6">
                 <div className="flex items-center gap-2 mb-4">
-                  <img src={IconYoutube} className="w-5 h-5" alt="YouTube" />
+                  <img src={getPlatformConfig('youtube').logo} className="w-5 h-5" alt="YouTube" />
                   <h4
                     className="font-semibold text-gray-900 dark:text-white"
                   >

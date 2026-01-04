@@ -14,6 +14,7 @@ interface PublicationRowProps {
   onDelete: (id: number) => void;
   onPublish: (item: Publication) => void;
   onEditRequest?: (item: Publication) => void;
+  remoteLock?: { user_id: number; user_name: string; expires_at: string } | null;
 }
 
 const PublicationRow = memo(({
@@ -25,30 +26,33 @@ const PublicationRow = memo(({
   onDelete,
   onPublish,
   onEditRequest,
+  remoteLock,
 }: PublicationRowProps) => {
   const [isPublishing, setIsPublishing] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const countMediaFiles = (pub: Publication) => {
-    if (!pub.media_files || pub.media_files.length === 0) {
+  // Memoize counts to avoid recalculation on every render
+  const mediaCount = React.useMemo(() => {
+    if (!item.media_files || item.media_files.length === 0) {
       return { images: 0, videos: 0, total: 0 };
     }
-    const images = pub.media_files.filter((f) =>
-      f.file_type.includes("image")
+    const images = item.media_files.filter((f) =>
+      f && f.file_type && f.file_type.includes("image")
     ).length;
-    const videos = pub.media_files.filter((f) =>
-      f.file_type.includes("video")
+    const videos = item.media_files.filter((f) =>
+      f && f.file_type && f.file_type.includes("video")
     ).length;
-    return { images, videos, total: pub.media_files.length };
-  };
-
-  const mediaCount = countMediaFiles(item);
+    return { images, videos, total: item.media_files.length };
+  }, [item.media_files]);
 
   return (
     <tr
-      className="group transition-colors hover:bg-gray-50/50 dark:hover:bg-neutral-700/30"
-      style={{ contentVisibility: "auto", containIntrinsicSize: "1px 80px" }}
+      className="group transition-colors hover:bg-gray-50/50 dark:hover:bg-neutral-700/30 border-b border-gray-50 dark:border-neutral-800"
+      style={{
+        contentVisibility: "auto",
+        containIntrinsicSize: "0 80px", // Suggest typical row height
+      }}
     >
       <td className="px-2 py-4 text-center"></td>
       <td className="px-6 py-4">
@@ -56,71 +60,45 @@ const PublicationRow = memo(({
           <div className="w-12 h-12 rounded-lg flex-shrink-0 border border-gray-200 bg-gray-100 dark:border-neutral-700 dark:bg-neutral-800 overflow-hidden flex items-center justify-center">
             <PublicationThumbnail publication={item} t={t} />
           </div>
-          <div>
+          <div className="min-w-0 max-w-md">
             <h3
-              className="font-medium text-sm text-gray-900 dark:text-white"
+              className="font-medium text-sm text-gray-900 dark:text-white truncate"
+              title={item.title || "Untitled"}
             >
               {item.title || "Untitled"}
             </h3>
             <p
-              className="text-xs mt-0.5 line-clamp-1 text-gray-500 dark:text-gray-400"
+              className="text-xs mt-0.5 truncate text-gray-500 dark:text-gray-400"
             >
               {item.description || "No description"}
             </p>
             {item.platform_settings &&
               Object.keys(item.platform_settings).length > 0 && (
                 <div className="flex flex-wrap gap-1 mt-1">
-                  {Object.entries(item.platform_settings).map(
+                  {Object.entries(item.platform_settings).slice(0, 2).map(
                     ([platform, settings]: [string, any]) => {
-                      if (!settings) return null;
+                      if (!settings || !settings.type) return null;
 
-                      // For Twitter polls/threads
-                      if (platform === "twitter" && settings.type) {
-                        return (
-                          <span
-                            key={platform}
-                            className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-400 border border-sky-200 dark:border-sky-800"
-                          >
-                            Twitter:{" "}
-                            {settings.type === "poll"
-                              ? "Poll"
-                              : settings.type === "thread"
-                                ? "Thread"
-                                : "Tweet"}
-                          </span>
-                        );
-                      }
+                      const typeLabel = settings.type === "poll" ? "Poll" : settings.type === "thread" ? "Thread" : settings.type === "reel" ? "Reel" : settings.type === "short" ? "Short" : "Post";
+                      const colorClass = platform === "twitter" ? "bg-sky-50 text-sky-800 dark:bg-sky-900/20 dark:text-sky-400" : platform === "youtube" ? "bg-red-50 text-red-800 dark:bg-red-900/20 dark:text-red-400" : "bg-blue-50 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400";
 
-                      // For YouTube Shorts
-                      if (platform === "youtube" && settings.type) {
-                        return (
-                          <span
-                            key={platform}
-                            className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 border border-red-200 dark:border-red-800"
-                          >
-                            YouTube:{" "}
-                            {settings.type === "short" ? "Short" : "Video"}
-                          </span>
-                        );
-                      }
-
-                      // For Facebook Reels
-                      if (platform === "facebook" && settings.type) {
-                        return (
-                          <span
-                            key={platform}
-                            className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400 border border-blue-200 dark:border-blue-800"
-                          >
-                            FB: {settings.type === "reel" ? "Reel" : "Post"}
-                          </span>
-                        );
-                      }
-
-                      return null;
+                      return (
+                        <span key={platform} className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium border border-gray-100 dark:border-white/5 ${colorClass}`}>
+                          {platform.slice(0, 2).toUpperCase()}: {typeLabel}
+                        </span>
+                      );
                     }
                   )}
                 </div>
               )}
+            {remoteLock && (
+              <div className="flex items-center gap-1.5 mt-1 animate-pulse">
+                <span className="flex-shrink-0 w-2 h-2 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]"></span>
+                <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-tight">
+                  {t("publications.table.lockedBy")} {remoteLock.user_name}
+                </span>
+              </div>
+            )}
           </div>
         </div>
       </td>
@@ -129,15 +107,15 @@ const PublicationRow = memo(({
           <div className="flex items-center">
             <div className="h-8 w-8 rounded-full bg-gray-200 dark:bg-neutral-700 overflow-hidden flex-shrink-0">
               {item.user.photo_url ? (
-                <img src={item.user.photo_url} alt={item.user.name} className="h-full w-full object-cover" />
+                <img src={item.user.photo_url} alt={item.user.name} className="h-full w-full object-cover" loading="lazy" />
               ) : (
                 <div className="h-full w-full flex items-center justify-center text-xs font-medium text-gray-500 uppercase">
                   {item.user.name.charAt(0)}
                 </div>
               )}
             </div>
-            <div className="ml-3">
-              <p className="text-sm font-medium text-gray-900 dark:text-white">{item.user.name}</p>
+            <div className="ml-3 hidden xl:block">
+              <p className="text-sm font-medium text-gray-900 dark:text-white truncate max-w-[100px]">{item.user.name}</p>
             </div>
           </div>
         )}
@@ -152,51 +130,41 @@ const PublicationRow = memo(({
         </span>
       </td>
       <td className="px-6 py-4 text-sm text-gray-500">
-        <span>{mediaCount.total} files</span>
-        {mediaCount.images > 0 && (
-          <span className="text-xs ml-2 flex items-center">
-            <Image className="w-3 h-3 mr-1" /> {mediaCount.images}
-          </span>
-        )}
-        {mediaCount.videos > 0 && (
-          <span className="text-xs ml-2 flex items-center">
-            <Video className="w-3 h-3 mr-1" /> {mediaCount.videos}
-          </span>
+        <div className="flex items-center gap-2">
+          {mediaCount.images > 0 && (
+            <span className="text-[10px] flex items-center bg-gray-50 dark:bg-white/5 px-1.5 py-0.5 rounded border border-gray-100 dark:border-white/5">
+              <Image className="w-3 h-3 mr-1 text-blue-500" /> {mediaCount.images}
+            </span>
+          )}
+          {mediaCount.videos > 0 && (
+            <span className="text-[10px] flex items-center bg-gray-50 dark:bg-white/5 px-1.5 py-0.5 rounded border border-gray-100 dark:border-white/5">
+              <Video className="w-3 h-3 mr-1 text-purple-500" /> {mediaCount.videos}
+            </span>
+          )}
+          {mediaCount.total === 0 && <span className="text-[10px] text-gray-400">No media</span>}
+        </div>
+      </td>
+      <td className="px-6 py-4 max-w-[120px]">
+        {item.campaigns && item.campaigns.length > 0 ? (
+          <div className="flex flex-wrap gap-1">
+            <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-800">
+              {item.campaigns.length} {item.campaigns.length === 1 ? "Campaign" : "Campaigns"}
+            </span>
+          </div>
+        ) : (
+          <span className="text-[10px] italic text-gray-400">None</span>
         )}
       </td>
-      <td className="px-6 py-4">
-        <CampaignTags publication={item} t={t} />
-      </td>
-      <td className="px-6 py-4">
+      <td className="px-6 py-4 max-w-[180px]">
         <SocialAccountsDisplay
           publication={item}
           connectedAccounts={connectedAccounts}
           t={t}
+          compact={true}
         />
       </td>
       <td className="px-6 py-4 text-right">
-        <div className="flex items-center justify-end gap-2">
-          {item.status === "published" && (
-            <button
-              onClick={async () => {
-                setIsPublishing(true);
-                try {
-                  await onPublish(item);
-                } finally {
-                  setIsPublishing(false);
-                }
-              }}
-              disabled={isPublishing || isEditing || isDeleting}
-              className="p-2 text-primary-500 hover:bg-primary-50 rounded-lg dark:hover:bg-primary-900/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-              title="View Real Status / Preview"
-            >
-              {isPublishing ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <Eye className="w-4 h-4" />
-              )}
-            </button>
-          )}
+        <div className="flex items-center justify-end gap-1">
           <button
             onClick={async () => {
               setIsPublishing(true);
@@ -207,8 +175,8 @@ const PublicationRow = memo(({
               }
             }}
             disabled={isPublishing || isEditing || isDeleting}
-            className="p-2 text-green-500 hover:bg-green-50 rounded-lg dark:hover:bg-green-900/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-            title="Publish / Manage Platforms"
+            className="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg dark:hover:bg-emerald-900/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            title="Publicar / Gestionar"
           >
             {isPublishing ? (
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -216,6 +184,15 @@ const PublicationRow = memo(({
               <Rocket className="w-4 h-4" />
             )}
           </button>
+          {item.status === "published" && (
+            <button
+              onClick={() => onPublish(item)}
+              className="p-1.5 text-primary-500 hover:bg-primary-50 rounded-lg dark:hover:bg-primary-900/20 transition-all font-bold"
+              title="Ver Detalles"
+            >
+              <Eye className="w-4 h-4" />
+            </button>
+          )}
           <button
             onClick={async () => {
               setIsEditing(true);
@@ -229,10 +206,10 @@ const PublicationRow = memo(({
                 setIsEditing(false);
               }
             }}
-            disabled={isPublishing || isEditing || isDeleting}
-            className={`p-2 ${item.status === "published" ? "text-amber-500" : "text-blue-500"
+            disabled={isPublishing || isEditing || isDeleting || !!remoteLock}
+            className={`p-1.5 ${item.status === "published" ? "text-amber-500" : (remoteLock ? "text-gray-400" : "text-blue-500")
               } hover:bg-blue-50 rounded-lg dark:hover:bg-blue-900/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all`}
-            title={item.status === "published" ? "Unpublish to Edit" : "Edit"}
+            title={remoteLock ? `${t("publications.table.lockedBy")} ${remoteLock.user_name}` : (item.status === "published" ? "Editar (Despublicar primero)" : "Editar")}
           >
             {isEditing ? (
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -250,7 +227,7 @@ const PublicationRow = memo(({
               }
             }}
             disabled={isPublishing || isEditing || isDeleting}
-            className="p-2 text-red-500 hover:bg-red-50 rounded-lg dark:hover:bg-red-900/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg dark:hover:bg-red-900/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
           >
             {isDeleting ? (
               <Loader2 className="w-4 h-4 animate-spin" />

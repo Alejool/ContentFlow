@@ -1,27 +1,24 @@
+
+import React, { useState, useCallback, useMemo } from "react";
 import LogsList from "@/Components/ManageContent/Logs/LogsList";
-import CampaignList from "@/Components/ManageContent/Partials/CampaignList";
 import ModalManager from "@/Components/ManageContent/ModalManager";
+import { usePublicationStore } from "@/stores/publicationStore";
 import SocialMediaAccounts from "@/Components/ManageContent/socialAccount/SocialMediaAccounts";
-import { useTheme } from "@/Hooks/useTheme";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head } from "@inertiajs/react";
-import { FileText, Folder, Target } from "lucide-react";
+import { Copy, Plus, Folder, Filter, Calendar as CalendarIcon, FileClock, CheckCircle, Edit3, Target, FileText } from "lucide-react";
 
 import { usePublications } from "@/Hooks/publication/usePublications";
 import WorkspaceInfoBadge from "@/Components/Workspace/WorkspaceInfoBadge";
-import EditorialCalendar from "@/Components/ManageContent/Partials/EditorialCalendar";
-import { Calendar as CalendarLucide } from "lucide-react";
+import ModernCalendar from "@/Components/ManageContent/Partials/ModernCalendar";
 import { useManageContentUIStore } from "@/stores/manageContentUIStore";
 import { useShallow } from "zustand/react/shallow";
+import ContentList from "@/Components/ManageContent/ContentList";
 
 export default function ManageContentPage() {
   const {
     t,
-    filters,
     handleFilterChange,
-    items,
-    pagination,
-    isLoading,
     handlePageChange,
     handleRefresh,
     handleDeleteItem,
@@ -36,22 +33,20 @@ export default function ManageContentPage() {
     pubPagination,
     campPagination,
     logPagination,
+    filters,
+    // We'll filter on the client side for "tabs" or use the hook's filter functionality if available
+    // For this refactor, let's assume valid data is passed and we filter visually or triggers API calls via handleFilterChange
   } = usePublications();
 
-  // Optimized subscription: ONLY subscribe to activeTab and Actions.
-  // We explicitly DO NOT subscribe to isModalOpen or selectedItem.
-  // This prevents the heavy list from re-rendering when modals open/close.
+  const fetchPublicationById = usePublicationStore(s => s.fetchPublicationById);
+
   const {
-    activeTab,
-    setActiveTab,
     openAddModal,
     openEditModal,
     openPublishModal,
     openViewDetailsModal,
   } = useManageContentUIStore(
     useShallow((s) => ({
-      activeTab: s.activeTab,
-      setActiveTab: s.setActiveTab,
       openAddModal: s.openAddModal,
       openEditModal: s.openEditModal,
       openPublishModal: s.openPublishModal,
@@ -59,156 +54,213 @@ export default function ManageContentPage() {
     }))
   );
 
+  // New Tab State for "Context" (Publications vs Campaigns vs Calendar vs Logs)
+  // We keep the original "activeTab" name from store if possible, or local state.
+  // The user wants "Status Tabs" (Draft, Scheduled, Published).
+  // So we need TWO levels of navigation:
+  // 1. Context: Publications | Campaigns | Calendar
+  // 2. Status: All | Drafts | Scheduled | Published (Only for Pubs/Campaigns)
 
+  // Read tab from query param if available
+  const queryParams = new URLSearchParams(window.location.search);
+  const initialTab = (queryParams.get('tab') as 'publications' | 'campaigns' | 'calendar' | 'logs') || 'publications';
 
-  const tabs = [
-    {
-      id: "publications",
-      icon: FileText,
-      label: t("manageContent.publications"),
-    },
-    {
-      id: "campaigns",
-      icon: Target,
-      label: t("manageContent.campaigns"),
-    },
-    {
-      id: "logs",
-      icon: FileText,
-      label: t("manageContent.logs"),
-    },
-    {
-      id: "calendar",
-      icon: CalendarLucide,
-      label: "Calendar",
-    },
-  ];
+  const [contextTab, setContextTab] = useState<'publications' | 'campaigns' | 'calendar' | 'logs'>(initialTab);
 
+  // Sync state with URL changes (e.g. backward/forward navigation)
+  React.useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get('tab') as 'publications' | 'campaigns' | 'calendar' | 'logs';
+    if (tab && ['publications', 'campaigns', 'calendar', 'logs'].includes(tab)) {
+      setContextTab(tab);
+    }
+
+    // Handle actions (e.g. open create modal from command palette)
+    if (params.get('action') === 'create') {
+      openAddModal();
+      // Optional: Clean up URL
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.delete('action');
+      window.history.replaceState({}, '', newUrl.toString());
+    }
+  }, [window.location.search]);
+
+  const [statusTab, setStatusTab] = useState('all');
+
+  const statusTabs = useMemo(() => [
+    { id: 'all', label: 'Todos', icon: Folder },
+    { id: 'draft', label: 'Borradores', icon: Edit3 },
+    { id: 'scheduled', label: 'Programados', icon: CalendarIcon },
+    { id: 'published', label: 'Publicados', icon: CheckCircle },
+  ], []);
+
+  const [isTabPending, startTransition] = React.useTransition();
+
+  const handleStatusTabChange = useCallback((status: string) => {
+    startTransition(() => {
+      setStatusTab(status);
+      handleFilterChange({ ...filters, status });
+    });
+  }, [filters, handleFilterChange]);
+
+  const [expandedCampaigns, setExpandedCampaigns] = useState<number[]>([]);
+  const toggleExpand = useCallback((id: number) => {
+    setExpandedCampaigns((prev) =>
+      prev.includes(id) ? prev.filter((cId) => cId !== id) : [...prev, id]
+    );
+  }, []);
+
+  const handleEventClick = useCallback(async (id: any) => {
+    if (typeof id === 'number') {
+      const existingPub = publications.find(p => p.id === id);
+      if (existingPub) {
+        openEditModal(existingPub);
+      } else {
+        const pub = await fetchPublicationById(id);
+        if (pub) {
+          openEditModal(pub);
+        }
+      }
+    }
+  }, [publications, openEditModal, fetchPublicationById]);
 
 
   return (
     <AuthenticatedLayout>
       <Head title={t("manageContent.title")} />
-      <div className={`min-h-screen transition-colors duration-300 mt-12`}>
-        <div className="mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-8 py-8">
-          <div className="mb-12">
-            <div className="flex items-center justify-between mb-4">
-              <h1
-                className="text-4xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 dark:from-gray-200 dark:to-gray-400 bg-clip-text text-transparent flex items-center gap-2"
-              >
-                <Folder className="w-8 h-8  text-primary-600 mr-2" />
-                {t("manageContent.title")}
+
+      <div className="w-full max-w-full overflow-x-hidden min-w-0">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-5 sm:py-8 min-w-0">
+
+          {/* Header Section */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 min-w-0">
+            <div className="min-w-0 flex-1 pr-2">
+              <h1 className="text-xl sm:text-3xl font-extrabold text-gray-900 dark:text-white truncate tracking-tight">
+                Gestionar Contenido
               </h1>
-              <WorkspaceInfoBadge variant="full" />
+              <p className="text-gray-500 dark:text-gray-400 mt-0.5 sm:mt-2 text-xs sm:text-base lg:text-lg truncate">
+                Organiza, planifica y publica tu contenido en redes sociales.
+              </p>
             </div>
 
-            <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl">
-              {t("manageContent.subtitle")}
-            </p>
+            {/* Primary Action */}
+            <button
+              onClick={() => openAddModal()}
+              className="w-full sm:w-auto group relative inline-flex h-11 sm:h-12 items-center justify-center overflow-hidden rounded-2xl sm:rounded-full bg-primary-600 px-6 sm:px-8 font-bold text-white transition-all duration-300 hover:bg-primary-700 hover:scale-[1.02] active:scale-95 hover:shadow-lg focus:outline-none ring-offset-2 ring-primary-500/20 shadow-xl shadow-primary-500/10"
+            >
+              <Plus className="mr-2 h-5 w-5" />
+              <span className="relative">Crear Nuevo</span>
+            </button>
           </div>
 
-          <div className="space-y-8">
+          {/* Social Accounts Widget (Collapsed or simplified if needed) */}
+          <div className="mb-8">
             <SocialMediaAccounts />
+          </div>
 
-            <div className={` rounded-lg `}>
-              <div className="flex items-center justify-center gap-0.5 p-1 rounded-lg max-w-md mx-auto pt-6">
-                {tabs.map((tab) => {
-                  const isActive = activeTab === tab.id;
+          {/* Context Navigation (Tabs) */}
+          <div className="mb-8 border-b border-gray-200 dark:border-gray-700 w-full overflow-x-auto scrollbar-none snap-x h-fit">
+            <div className="flex items-center gap-1 sm:gap-2 min-w-max px-1">
+              <button
+                onClick={() => startTransition(() => setContextTab('publications'))}
+                className={`flex items-center justify-center gap-2 py-3 px-4 sm:px-6 font-bold text-xs sm:text-sm transition-all border-b-2 snap-start ${contextTab === 'publications' ? 'border-primary-500 text-primary-600 dark:text-primary-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+              >
+                <Folder className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span>Publicaciones</span>
+              </button>
+              <button
+                onClick={() => startTransition(() => setContextTab('campaigns'))}
+                className={`flex items-center justify-center gap-2 py-3 px-4 sm:px-6 font-bold text-xs sm:text-sm transition-all border-b-2 snap-start ${contextTab === 'campaigns' ? 'border-primary-500 text-primary-600 dark:text-primary-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+              >
+                <Target className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span>Campañas</span>
+              </button>
+              <button
+                onClick={() => startTransition(() => setContextTab('calendar'))}
+                className={`flex items-center justify-center gap-2 py-3 px-4 sm:px-6 font-bold text-xs sm:text-sm transition-all border-b-2 snap-start ${contextTab === 'calendar' ? 'border-primary-500 text-primary-600 dark:text-primary-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+              >
+                <CalendarIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span>Calendario</span>
+              </button>
+              <button
+                onClick={() => startTransition(() => setContextTab('logs'))}
+                className={`flex items-center justify-center gap-2 py-3 px-4 sm:px-6 font-bold text-xs sm:text-sm transition-all border-b-2 snap-start ${contextTab === 'logs' ? 'border-primary-500 text-primary-600 dark:text-primary-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+              >
+                <FileText className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span>Logs</span>
+              </button>
+            </div>
+          </div>
 
-                  return (
+          {/* Main Content Area */}
+          <div className="min-h-[500px]">
+
+            {/* Calendar View */}
+            {contextTab === 'calendar' && (
+              <div className="animate-in fade-in zoom-in duration-300">
+                <ModernCalendar onEventClick={handleEventClick} />
+              </div>
+            )}
+
+            {/* Logs View */}
+            {contextTab === 'logs' && (
+              <div className="animate-in fade-in zoom-in duration-300">
+                <LogsList
+                  logs={logs as any}
+                  isLoading={isLogsLoading}
+                  pagination={logPagination}
+                  onPageChange={handlePageChange}
+                  onRefresh={handleRefresh}
+                  onFilterChange={handleFilterChange}
+                />
+              </div>
+            )}
+
+            {/* Publications & Campaigns Views (With Status Tabs) */}
+            {(contextTab === 'publications' || contextTab === 'campaigns') && (
+              <div className="animate-in fade-in zoom-in duration-300">
+                <div className="flex items-center gap-3 mb-6 bg-gray-50 dark:bg-gray-800/50 p-2 rounded-xl border border-gray-100 dark:border-gray-700 w-full sm:w-fit overflow-x-auto scrollbar-none">
+                  {statusTabs.map((tab: { id: string, label: string, icon: any }) => (
                     <button
                       key={tab.id}
-                      onClick={() => setActiveTab(tab.id as any)}
-                      className={`group relative flex-1 px-4 py-2.5 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 ${isActive
-                        ? "bg-white dark:bg-gray-900 shadow-sm text-primary-600 dark:text-primary-400"
-                        : "text-gray-600 dark:text-gray-400 hover:text-primary-500 dark:hover:text-primary-300"
-                        }`}
+                      onClick={() => handleStatusTabChange(tab.id)}
+                      className={`
+                                    flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap
+                                    ${statusTab === tab.id
+                          ? 'bg-white dark:bg-gray-700 text-primary-600 dark:text-primary-300 shadow-sm ring-1 ring-black/5'
+                          : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700/50'}
+                                `}
                     >
-                      {isActive && (
-                        <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-8 h-0.5 bg-primary-500 rounded-full"></div>
-                      )}
-
-                      <tab.icon
-                        className={`w-4 h-4 transition-colors duration-200 ${isActive
-                          ? "text-primary-500"
-                          : "group-hover:text-primary-400"
-                          }`}
-                      />
-
-                      <span className="hidden sm:inline text-sm font-medium">
-                        {tab.label}
-                      </span>
+                      <tab.icon className={`w-4 h-4 ${statusTab === tab.id ? 'text-primary-500' : 'opacity-70'}`} />
+                      {tab.label}
                     </button>
-                  );
-                })}
+                  ))}
+                </div>
+
+                {/* Content List Component */}
+                <ContentList
+                  items={contextTab === 'publications' ? publications : campaigns}
+                  isLoading={contextTab === 'publications' ? isPubLoading : isCampLoading}
+                  mode={contextTab === 'publications' ? 'publications' : 'campaigns'}
+                  pagination={contextTab === 'publications' ? pubPagination : campPagination}
+                  onPageChange={handlePageChange}
+                  onEdit={openEditModal}
+                  onDelete={handleDeleteItem}
+                  onViewDetails={openViewDetailsModal}
+                  onPublish={openPublishModal}
+                  onEditRequest={handleEditRequest}
+                  connectedAccounts={connectedAccounts}
+                  expandedCampaigns={expandedCampaigns}
+                  toggleExpand={toggleExpand}
+                />
               </div>
+            )}
 
-              <div className="block">
-                {/* Persistent Logs Tab */}
-                <div className={activeTab === "logs" ? "block" : "hidden"}>
-                  <LogsList
-                    logs={logs as any}
-                    isLoading={isLogsLoading}
-                    pagination={logPagination}
-                    onPageChange={handlePageChange}
-                    onRefresh={handleRefresh}
-                    onFilterChange={handleFilterChange}
-                  />
-                </div>
-
-                {/* Persistent Calendar Tab */}
-                <div className={activeTab === "calendar" ? "block" : "hidden"}>
-                  <EditorialCalendar />
-                </div>
-
-                {/* Persistent Campaigns Tab */}
-                <div className={activeTab === "campaigns" ? "block" : "hidden"}>
-                  <CampaignList
-                    key={`campaigns-list-${connectedAccounts.length}`}
-                    items={campaigns as any}
-                    pagination={campPagination}
-                    onPageChange={handlePageChange}
-                    mode="campaigns"
-                    onEdit={openEditModal}
-                    onDelete={handleDeleteItem}
-                    onAdd={openAddModal}
-                    onPublish={openPublishModal}
-                    onViewDetails={openViewDetailsModal}
-                    isLoading={isCampLoading}
-                    onFilterChange={handleFilterChange}
-                    onRefresh={handleRefresh}
-                    onEditRequest={handleEditRequest}
-                    connectedAccounts={connectedAccounts}
-                  />
-                </div>
-
-                {/* Persistent Publications Tab */}
-                <div className={activeTab === "publications" ? "block" : "hidden"}>
-                  <CampaignList
-                    key={`publications-list-${connectedAccounts.length}`}
-                    items={publications as any}
-                    pagination={pubPagination}
-                    onPageChange={handlePageChange}
-                    mode="publications"
-                    onEdit={openEditModal}
-                    onDelete={handleDeleteItem}
-                    onAdd={openAddModal}
-                    onPublish={openPublishModal}
-                    onViewDetails={openViewDetailsModal}
-                    isLoading={isPubLoading}
-                    onFilterChange={handleFilterChange}
-                    onRefresh={handleRefresh}
-                    onEditRequest={handleEditRequest}
-                    connectedAccounts={connectedAccounts}
-                  />
-                </div>
-              </div>
-            </div>
           </div>
+
         </div>
       </div>
 
-      {/* Modal Manager handles all modal rendering independently */}
       <ModalManager onRefresh={handleRefresh} />
     </AuthenticatedLayout>
   );

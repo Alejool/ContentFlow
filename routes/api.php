@@ -15,6 +15,7 @@ use App\Http\Controllers\Profile\ProfileController;
 use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\Locale\LocaleController;
 use App\Http\Controllers\Theme\ThemeController;
+use App\Http\Controllers\Publications\PublicationLockController;
 
 /*
 |--------------------------------------------------------------------------
@@ -78,6 +79,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/{id}/published-platforms', [PublicationController::class, 'getPublishedPlatforms'])->name('published-platforms');
         Route::post('/{id}/publish', [PublicationController::class, 'publish'])->name('publish');
         Route::post('/{id}/unpublish', [PublicationController::class, 'unpublish'])->name('unpublish');
+
+        // Locking API
+        Route::post('/{publication}/lock', [PublicationLockController::class, 'lock'])->name('lock');
+        Route::post('/{publication}/unlock', [PublicationLockController::class, 'unlock'])->name('unlock');
     });
 
     /*

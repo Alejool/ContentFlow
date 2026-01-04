@@ -70,6 +70,9 @@ interface PublicationState {
   clearPageData: () => void;
   clearError: () => void;
   reset: () => void;
+
+  acquireLock: (id: number) => Promise<{ success: boolean; data?: any }>;
+  releaseLock: (id: number) => Promise<{ success: boolean; data?: any }>;
 }
 
 export const usePublicationStore = create<PublicationState>((set, get) => ({
@@ -392,4 +395,30 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
       isLoading: false,
       error: null,
     }),
+
+  acquireLock: async (id) => {
+    try {
+      const response = await axios.post(`/api/publications/${id}/lock`);
+      return { success: response.data.success, data: response.data };
+    } catch (error: any) {
+      // Don't set global store error for locks as it's often background/ephemeral
+      // Just return the error state so the hook can handle it (e.g. 423 Locked)
+      return {
+        success: false,
+        data: error.response?.data ?? { message: "Failed to acquire lock" },
+      };
+    }
+  },
+
+  releaseLock: async (id) => {
+    try {
+      const response = await axios.post(`/api/publications/${id}/unlock`);
+      return { success: true, data: response.data };
+    } catch (error: any) {
+      return {
+        success: false,
+        data: error.response?.data ?? { message: "Failed to release lock" },
+      };
+    }
+  },
 }));

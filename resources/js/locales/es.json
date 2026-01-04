@@ -4,6 +4,7 @@
     "loading": "Cargando...",
     "select": "Seleccionar",
     "more": "Más",
+    "viewAll": "Ver todo",
     "new": "Nuevo",
     "saving": "Guardando...",
     "listView": "Vista de Lista",
@@ -64,6 +65,7 @@
   },
   "nav": {
     "dashboard": "Panel",
+    "calendar": "Calendario",
     "profile": "Perfil",
     "settings": "Configuración",
     "manageContent": "Gestionar Contenido",
@@ -384,7 +386,8 @@
           "cancel": "Cancelar"
         },
         "contentLocked": "Contenido Bloqueado",
-        "contentLockedHint": "Para editar el contenido (título, descripción o archivos), debes despublicar la publicación de todas las plataformas."
+        "contentLockedHint": "Para editar el contenido (título, descripción o archivos), debes despublicar la publicación de todas las plataformas.",
+        "lockedByOther": "Publicación bloqueada por otro usuario"
       },
       "manageContent": {
         "configureNetworks": "Configura tus publicaciones programadas"
@@ -497,7 +500,8 @@
         "title": "No se encontraron publicaciones",
         "description": "Crea una publicación para comenzar a publicar contenido.",
         "button": "Agregar Publicación"
-      }
+      },
+      "lockedBy": "Editando:"
     },
     "messages": {
       "addSuccess": "¡Publicación agregada exitosamente!",
@@ -1111,6 +1115,8 @@
     }
   },
   "manageContent": {
+    "configureNetworks": "Configura tus publicaciones programadas",
+    "index": "Gestión de Contenido",
     "title": "Gestión de Contenido",
     "subtitle": "Organiza y gestiona tu contenido multimedia de forma elegante y eficiente",
     "publications": "Publicaciones",

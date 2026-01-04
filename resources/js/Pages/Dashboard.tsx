@@ -58,6 +58,11 @@ export default function Dashboard({ auth, stats, status }: DashboardProps) {
     if (!stats.publicationStats) {
       axios.get(route('api.publications.stats'))
         .then(res => setPubStats(res.data.data || {}))
+        .catch(error => {
+          if (error.response?.status !== 401) {
+            console.error("Failed to fetch publication stats", error);
+          }
+        })
         .finally(() => setLoadingPubStats(false));
     }
   }, []);

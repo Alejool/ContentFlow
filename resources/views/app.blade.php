@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="overflow-x-hidden">
 
 <head>
     <meta charset="utf-8">
@@ -9,7 +9,7 @@
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="icon" href="{{ asset('favicon.svg') }}?v={{ time() }}" type="image/svg+xml"> 
+    <link rel="icon" href="{{ asset('favicon.svg') }}?v={{ time() }}" type="image/svg/xml">
 
     @routes
     @viteReactRefresh
@@ -17,7 +17,7 @@
     @inertiaHead
 </head>
 
-<body class="font-poppins antialiased min:h-screen">
+<body class="font-poppins antialiased min-h-screen w-full max-w-full overflow-x-hidden">
     @inertia
 </body>
 

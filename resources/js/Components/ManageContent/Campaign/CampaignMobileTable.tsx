@@ -78,58 +78,61 @@ export default function CampaignMobileTable({
                 )}
               </div>
 
-              <div className="flex items-center justify-between">
-                {(item.publications?.length || 0) > 0 ? (
-                  <button
-                    onClick={() => toggleExpand(item.id)}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full transition-colors ${expandedCampaigns.includes(item.id)
-                      ? "bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400"
-                      : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-neutral-700 dark:text-gray-300 dark:hover:bg-neutral-600"
-                      }`}
-                  >
-                    {expandedCampaigns.includes(item.id) ? (
-                      <>
-                        <ChevronDown className="w-3.5 h-3.5" />
-                        {t("campaigns.actions.hidePublications")}
-                      </>
-                    ) : (
-                      <>
-                        <ChevronRight className="w-3.5 h-3.5" />
-                        {t("campaigns.actions.showPublications")}
-                        <span className="ml-0.5 opacity-75">
-                          ({item.publications?.length})
-                        </span>
-                      </>
-                    )}
-                  </button>
-                ) : (
-                  <div />
-                )}
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-gray-100 dark:border-neutral-700/50 mt-2">
+                <div className="flex-1 min-w-[140px]">
+                  {(item.publications?.length || 0) > 0 ? (
+                    <button
+                      onClick={() => toggleExpand(item.id)}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold uppercase rounded-xl transition-all active:scale-95 ${expandedCampaigns.includes(item.id)
+                        ? "bg-primary-50 text-primary-700 dark:bg-primary-900/40 dark:text-primary-400 ring-1 ring-primary-200 dark:ring-primary-800"
+                        : "bg-gray-50 text-gray-600 hover:bg-gray-100 dark:bg-neutral-800 dark:text-gray-300 dark:hover:bg-neutral-700 ring-1 ring-gray-100 dark:ring-neutral-700"
+                        }`}
+                    >
+                      {expandedCampaigns.includes(item.id) ? (
+                        <>
+                          <ChevronDown className="w-3 h-3" />
+                          {t("campaigns.actions.hidePublications")}
+                        </>
+                      ) : (
+                        <>
+                          <ChevronRight className="w-3 h-3" />
+                          {t("campaigns.actions.showPublications")}
+                          <span className="ml-0.5 opacity-60">
+                            ({item.publications?.length})
+                          </span>
+                        </>
+                      )}
+                    </button>
+                  ) : (
+                    <div className="h-8" />
+                  )}
+                </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 bg-gray-50/50 dark:bg-neutral-800/30 p-1 rounded-xl border border-gray-100 dark:border-neutral-700/50">
                   <button
                     onClick={() => onViewDetails(item)}
-                    className="p-1.5 hover:bg-gray-100 dark:hover:bg-neutral-700 rounded"
+                    className="p-2 text-gray-500 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-white dark:hover:bg-neutral-800 rounded-lg transition-all"
                     title={t("common.view")}
                   >
-                    <Eye className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                    <Eye className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => onEdit(item)}
-                    className={`p-2 text-blue-500 hover:bg-blue-50 rounded-lg dark:hover:bg-blue-900/20`}
+                    className="p-2 text-blue-500 hover:bg-white dark:hover:bg-neutral-800 rounded-lg transition-all"
                     title={t("common.edit")}
                   >
-                    <Edit className="w-4 h-4 text-blue-500 " />
+                    <Edit className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => onDelete(item.id)}
-                    className="p-1.5 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"
+                    className="p-2 text-rose-500 hover:bg-white dark:hover:bg-neutral-800 rounded-lg transition-all"
                     title={t("common.delete")}
                   >
-                    <Trash2 className="w-4 h-4 text-red-600 dark:text-red-400" />
+                    <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
               </div>
+
             </div>
 
             {expandedCampaigns.includes(item.id) &&

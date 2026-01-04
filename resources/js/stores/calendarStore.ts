@@ -41,7 +41,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
             const start = startOfWeek(startOfMonth(currentMonth));
             const end = endOfWeek(endOfMonth(currentMonth));
 
-            const response = await axios.get(route('calendar.index'), {
+            const response = await axios.get('/api/calendar/events', {
                 params: {
                     start: format(start, 'yyyy-MM-dd'),
                     end: format(end, 'yyyy-MM-dd')
@@ -64,7 +64,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
         set({ isLoading: true, error: null });
         try {
             const resourceId = id.split('_')[1];
-            await axios.patch(route('calendar.update', resourceId), {
+            await axios.patch(`/api/calendar/events/${resourceId}`, {
                 scheduled_at: newDate,
                 type: type
             });

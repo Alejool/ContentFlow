@@ -10,6 +10,7 @@ import { ReactNode, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "@inertiajs/react";
 import { ChevronRight } from "lucide-react";
+import CommandPalette from "@/Components/CommandPalette/CommandPalette";
 
 interface AuthenticatedLayoutProps {
   header?: ReactNode;
@@ -45,7 +46,7 @@ export default function AuthenticatedLayout({
   }, [user?.id]);
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden">
+    <div className="h-screen flex flex-col overflow-hidden w-full max-w-full">
       <Link
         href={route('workspaces.index')}
         className={`
@@ -54,15 +55,15 @@ export default function AuthenticatedLayout({
           backdrop-blur-sm border-b border-primary-500/20 transition-all duration-300 cursor-pointer group
         `}
       >
-        <div className="flex items-center gap-2 max-w-7xl mx-auto w-full overflow-hidden">
+        <div className="flex items-center gap-2 max-w-7xl mx-auto w-full overflow-hidden min-w-0">
           <span className="opacity-70 flex-shrink-0">{t('workspace.active_context')}:</span>
-          <span className="flex items-center gap-1.5 truncate">
+          <span className="flex items-center gap-1.5 truncate min-w-0">
             <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse flex-shrink-0" />
-            <span className="truncate max-w-[160px] sm:max-w-md">{auth.current_workspace?.name || '...'}</span>
+            <span className="truncate max-w-[160px] sm:max-w-md min-w-0">{auth.current_workspace?.name || '...'}</span>
           </span>
-          <div className="flex-1" />
+          <div className="flex-1 min-w-0" />
 
-          <div className="flex items-center gap-2 ml-2 flex-shrink-0">
+          <div className="flex items-center gap-2 ml-2 flex-shrink-0 min-w-0">
             <span className="opacity-70 hidden sm:inline">{t('workspace.role')}:</span>
             <span className={`
                px-2 py-0.5 rounded-md border font-bold
@@ -77,7 +78,7 @@ export default function AuthenticatedLayout({
       </Link>
 
       <div
-        className="relative flex-1 min-h-0 flex bg-[url('/resources/assets/b-3.jpg')] bg-cover bg-center bg-no-repeat"
+        className="relative flex-1 min-h-0 flex bg-[url('/resources/assets/b-3.jpg')] bg-cover bg-center bg-no-repeat w-full max-w-full min-w-0 overflow-x-hidden"
       >
         <div
           className={`
@@ -91,7 +92,7 @@ export default function AuthenticatedLayout({
           setIsSidebarOpen={setIsSidebarOpen}
         />
 
-        <div className="flex-1 flex flex-col min-h-0 relative z-10">
+        <div className="flex-1 flex flex-col min-h-0 min-w-0 max-w-full relative z-10">
           <MobileNavbar
             user={user}
             showingNavigationDropdown={showingNavigationDropdown}
@@ -99,29 +100,30 @@ export default function AuthenticatedLayout({
           />
 
           <main
-            className={`flex-1 min-h-0 overflow-y-auto overflow-x-hidden transition-all duration-500  ease-in-out ${isSidebarOpen ? "lg:ml-80" : "lg:ml-32"
+            className={`flex-1 min-w-0 max-w-full overflow-y-auto overflow-x-hidden transition-all duration-500  ease-in-out ${isSidebarOpen ? "lg:ml-80" : "lg:ml-32"
               }`}
           >
-            <header className="border-b border-gray-200/50 dark:border-neutral-800/50 bg-white/80 dark:bg-black/80 backdrop-blur-xl z-40">
-              <div className="mx-auto max-w-7xl px-4 md:px-6 py-3 md:py-4 flex justify-between items-center gap-4">
+            <header className="border-b border-gray-200/50 dark:border-neutral-800/50 bg-white/80 dark:bg-black/80 backdrop-blur-xl z-40 min-w-0">
+              <div className="mx-auto max-w-7xl px-4 md:px-6 py-3 md:py-4 flex justify-between items-center gap-4 min-w-0">
                 <div className="flex-1 min-w-0">
                   {header ? header : (
-                    <div className="h-8" /> 
+                    <div className="h-8 min-w-0" />
                   )}
                 </div>
-                <div className="flex-shrink-0">
+                <div className="flex-shrink-0 min-w-0">
                   <WorkspaceInfoBadge variant="compact" />
                 </div>
               </div>
             </header>
 
-            <div className="py-2 md:py-8">
-              <div className="mx-auto max-w-7xl px-0 md:px-6">{children}</div>
+            <div className="flex-1 min-h-0 min-w-0">
+              <div className="h-full min-w-0">{children}</div>
             </div>
           </main>
         </div>
 
         <GlobalAiAssistant />
+        <CommandPalette />
       </div>
     </div>
   );
