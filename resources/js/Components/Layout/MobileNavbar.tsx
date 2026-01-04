@@ -201,7 +201,8 @@ export default function MobileNavbar({
           </button>
 
           <div className="flex items-center justify-center flex-1 px-2 min-w-0">
-            <img src={Logo} alt="Logo" className="h-10 w-auto object-contain max-w-[140px] sm:max-w-none" />
+            <img src={Logo} alt="Logo" 
+            className="h-20 w-auto object-contain max-w-[140px] sm:max-w-none" />
           </div>
 
           <div className="flex items-center ">

@@ -129,15 +129,14 @@ export default function Sidebar({
   return (
     <>
       <div
-        className={`hidden lg:block fixed inset-y-0 z-50 transition-all duration-500 ease-in-out ${isSidebarOpen ? "w-80" : "w-32"
+        className={`hidden lg:block fixed  h-full z-50 pb-10 transition-all duration-500 ease-in-out ${isSidebarOpen ? "w-80" : "w-32"
           }`}
       >
         <div
           className={`absolute inset-0 backdrop-blur-3xl border-r ${classes.borderColor} shadow-2xl opacity-90 ${classes.sidebarBg}`}
         />
 
-        <div className="relative h-full flex flex-col">
-          {/* Header */}
+        <div className="mt-3 relative h-full flex flex-col">
           <div
             className={`flex items-center justify-between p-6 border-b ${classes.borderColor}`}
           >

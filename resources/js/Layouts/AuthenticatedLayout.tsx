@@ -50,8 +50,8 @@ export default function AuthenticatedLayout({
       <Link
         href={route('workspaces.index')}
         className={`
-          relative z-[100] h-7 flex items-center px-4 text-[10px] font-bold uppercase tracking-widest
-          ${theme === 'dark' ? 'bg-primary-900/90 text-primary-200 hover:bg-primary-900' : 'bg-primary-600 text-white hover:bg-primary-700'}
+          relative z-[200] h-8 flex items-center px-4 text-[10px] font-bold uppercase tracking-widest
+          ${theme === 'dark' ? 'bg-primary-900/95 text-primary-200 hover:bg-primary-900' : 'bg-primary-600/95 text-white hover:bg-primary-700'}
           backdrop-blur-sm border-b border-primary-500/20 transition-all duration-300 cursor-pointer group
         `}
       >
@@ -103,7 +103,9 @@ export default function AuthenticatedLayout({
             className={`flex-1 min-w-0 max-w-full overflow-y-auto overflow-x-hidden transition-all duration-500  ease-in-out ${isSidebarOpen ? "lg:ml-80" : "lg:ml-32"
               }`}
           >
-            <header className="border-b border-gray-200/50 dark:border-neutral-800/50 bg-white/80 dark:bg-black/80 backdrop-blur-xl z-40 min-w-0">
+            <header className="border-b border-gray-200/50 
+                dark:border-neutral-800/50 bg-white/80 dark:bg-black/80 
+                backdrop-blur-xl z-40 min-w-0">
               <div className="mx-auto max-w-7xl px-4 md:px-6 py-3 md:py-4 flex justify-between items-center gap-4 min-w-0">
                 <div className="flex-1 min-w-0">
                   {header ? header : (
