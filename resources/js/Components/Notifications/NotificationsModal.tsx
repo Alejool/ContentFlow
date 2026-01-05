@@ -139,14 +139,14 @@ export default function NotificationsModal({
                 <DialogPanel
                   className={`pointer-events-auto w-screen max-w-md ${colors.bg} flex flex-col h-screen max-h-screen`}
                 >
-                  <div className="flex flex-col h-full shadow-xl">
+                  <div className="flex flex-col h-full shadow-xl mt-6">
                     <div
                       className={`px-4 py-6 sm:px-6 shadow-sm border-b ${colors.border} shrink-0`}
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex items-center gap-2">
                           <DialogTitle
-                            className={`text-lg font-semibold leading-6 ${colors.text}`}
+                            className={`text-lg font-semibold leading-6  ${colors.text}`}
                           >
                             {t("notifications.title")}
                           </DialogTitle>
@@ -170,7 +170,7 @@ export default function NotificationsModal({
                       </div>
 
                       {unreadCount > 0 && (
-                        <div className="mt-4 flex justify-end">
+                        <div className="mt-8 flex justify-end">
                           <button
                             type="button"
                             onClick={markAllAsRead}
@@ -231,11 +231,10 @@ export default function NotificationsModal({
                                     ))}
                                   {notifications.length > 100 && (
                                     <div
-                                      className={`p-4 text-center ${
-                                        theme === "dark"
-                                          ? "text-gray-500"
-                                          : "text-gray-400"
-                                      }`}
+                                      className={`p-4 text-center ${theme === "dark"
+                                        ? "text-gray-500"
+                                        : "text-gray-400"
+                                        }`}
                                     >
                                       <p className="text-sm">
                                         Showing 100 of {notifications.length}{" "}
@@ -265,51 +264,48 @@ export default function NotificationsModal({
                               >
                                 <button
                                   onClick={() => setSelectedPriority(null)}
-                                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                                    selectedPriority === null
-                                      ? "bg-gray-800 text-white"
-                                      : isDark
+                                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${selectedPriority === null
+                                    ? "bg-gray-800 text-white"
+                                    : isDark
                                       ? "bg-neutral-800 text-gray-400 hover:bg-neutral-700"
                                       : "bg-gray-100 text-black hover:bg-gray-200"
-                                  }`}
+                                    }`}
                                 >
                                   <Layers className="h-3.5 w-3.5" />
                                   {t("notifications.all")}
                                 </button>
                                 <button
                                   onClick={() => setSelectedPriority("high")}
-                                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                                    selectedPriority === "high"
-                                      ? "bg-orange-800 text-white"
-                                      : isDark
+                                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${selectedPriority === "high"
+                                    ? "bg-orange-800 text-white"
+                                    : isDark
                                       ? "bg-neutral-800 text-gray-400 hover:bg-neutral-700"
                                       : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                                  }`}
+                                    }`}
                                 >
                                   <AlertCircle className="h-3.5 w-3.5" />
                                   {t("notifications.high_priority")}
                                   {filterByPriority("high").filter(
                                     (n) => n.data.category === "application"
                                   ).length > 0 && (
-                                    <span className="ml-1 px-1.5 py-0.5 rounded-full bg-white/20 text-xs">
-                                      {
-                                        filterByPriority("high").filter(
-                                          (n) =>
-                                            n.data.category === "application"
-                                        ).length
-                                      }
-                                    </span>
-                                  )}
+                                      <span className="ml-1 px-1.5 py-0.5 rounded-full bg-white/20 text-xs">
+                                        {
+                                          filterByPriority("high").filter(
+                                            (n) =>
+                                              n.data.category === "application"
+                                          ).length
+                                        }
+                                      </span>
+                                    )}
                                 </button>
                                 <button
                                   onClick={() => setSelectedPriority("normal")}
-                                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                                    selectedPriority === "normal"
-                                      ? "bg-blue-500 text-white"
-                                      : isDark
+                                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${selectedPriority === "normal"
+                                    ? "bg-blue-500 text-white"
+                                    : isDark
                                       ? "bg-neutral-800 text-gray-400 hover:bg-neutral-700"
                                       : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                                  }`}
+                                    }`}
                                 >
                                   <Info className="h-3.5 w-3.5" />
                                   {t("notifications.normal_priority")}
@@ -320,10 +316,10 @@ export default function NotificationsModal({
                                 {(() => {
                                   const filteredNotifications = selectedPriority
                                     ? applicationNotifications.filter((n) => {
-                                        const priority =
-                                          n.data.priority || "normal";
-                                        return priority === selectedPriority;
-                                      })
+                                      const priority =
+                                        n.data.priority || "normal";
+                                      return priority === selectedPriority;
+                                    })
                                     : applicationNotifications;
 
                                   return filteredNotifications.length > 0 ? (
@@ -341,11 +337,10 @@ export default function NotificationsModal({
                                         ))}
                                       {filteredNotifications.length > 100 && (
                                         <div
-                                          className={`p-4 text-center ${
-                                            theme === "dark"
-                                              ? "text-gray-500"
-                                              : "text-gray-400"
-                                          }`}
+                                          className={`p-4 text-center ${theme === "dark"
+                                            ? "text-gray-500"
+                                            : "text-gray-400"
+                                            }`}
                                         >
                                           <p className="text-sm">
                                             Showing 100 of{" "}
@@ -408,11 +403,10 @@ export default function NotificationsModal({
                                     ))}
                                   {systemNotifications.length > 100 && (
                                     <div
-                                      className={`p-4 text-center ${
-                                        theme === "dark"
-                                          ? "text-gray-500"
-                                          : "text-gray-400"
-                                      }`}
+                                      className={`p-4 text-center ${theme === "dark"
+                                        ? "text-gray-500"
+                                        : "text-gray-400"
+                                        }`}
                                     >
                                       <p className="text-sm">
                                         Showing 100 of{" "}

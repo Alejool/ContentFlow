@@ -47,13 +47,7 @@ const PublicationRow = memo(({
   }, [item.media_files]);
 
   return (
-    <tr
-      className="group transition-colors hover:bg-gray-50/50 dark:hover:bg-neutral-700/30 border-b border-gray-50 dark:border-neutral-800"
-      style={{
-        contentVisibility: "auto",
-        containIntrinsicSize: "0 80px", // Suggest typical row height
-      }}
-    >
+    <>
       <td className="px-2 py-4 text-center"></td>
       <td className="px-6 py-4">
         <div className="flex items-center gap-4">
@@ -237,7 +231,7 @@ const PublicationRow = memo(({
           </button>
         </div>
       </td>
-    </tr>
+    </>
   );
 });
 
