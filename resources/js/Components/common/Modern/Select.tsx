@@ -11,7 +11,6 @@ import { ReactNode, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { FieldValues, Path, UseFormRegister } from "react-hook-form";
 
-// Componente Portal para el dropdown
 interface DropdownPortalProps {
   children: React.ReactNode;
   isOpen: boolean;
@@ -39,31 +38,26 @@ function DropdownPortal({
       const viewportHeight = window.innerHeight;
       const dropdownHeight = Math.min(dropdown.scrollHeight, 240);
 
-      // Posición horizontal (mismo ancho que el select)
-      dropdown.style.width = `${selectRect.width}px`;
+      dropdown.style.minWidth = `${selectRect.width}px`;
+      dropdown.style.width = 'auto';
       dropdown.style.left = `${selectRect.left}px`;
 
-      // Posición vertical basada en dirección
       if (dropdownDirection === "up") {
         const topPosition = selectRect.top - dropdownHeight - 4;
-        // Verificar si cabe hacia arriba
         if (topPosition > 0) {
           dropdown.style.top = `${topPosition}px`;
           dropdown.style.bottom = "auto";
         } else {
-          // Si no cabe arriba, mostrar hacia abajo
           dropdown.style.top = `${selectRect.bottom + 4}px`;
           dropdown.style.bottom = "auto";
         }
       } else {
         const bottomPosition =
           viewportHeight - (selectRect.bottom + 4 + dropdownHeight);
-        // Verificar si cabe hacia abajo
         if (bottomPosition > 0) {
           dropdown.style.top = `${selectRect.bottom + 4}px`;
           dropdown.style.bottom = "auto";
         } else {
-          // Si no cabe abajo, mostrar hacia arriba
           dropdown.style.top = `${selectRect.top - dropdownHeight - 4}px`;
           dropdown.style.bottom = "auto";
         }
@@ -73,7 +67,6 @@ function DropdownPortal({
 
   if (!mounted || !isOpen || !selectRect) return null;
 
-  // Estilos base para el dropdown portal
   const portalStyles: React.CSSProperties = {
     position: "fixed",
     zIndex: 9999,
@@ -88,8 +81,6 @@ function DropdownPortal({
     borderWidth: "1px",
     boxShadow:
       "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-    backgroundColor: "transparent",
-    borderColor: "transparent", 
   };
 
   return createPortal(
@@ -248,7 +239,6 @@ export default function Select<T extends FieldValues>({
 
     if (isOpen) {
       document.addEventListener("mousedown", handleClickOutside);
-      // Prevenir scroll del body cuando el dropdown está abierto
       document.body.style.overflow = "hidden";
     }
 
@@ -530,7 +520,6 @@ export default function Select<T extends FieldValues>({
         )}
       </div>
 
-      {/* Dropdown via Portal */}
       <DropdownPortal
         isOpen={isOpen}
         selectRect={selectRect}
@@ -592,7 +581,7 @@ export default function Select<T extends FieldValues>({
                     {option.icon && (
                       <span className="flex-shrink-0">{option.icon}</span>
                     )}
-                    <span className="flex-1 truncate text-left">
+                    <span className="flex-1 text-left whitespace-nowrap">
                       {option.label}
                     </span>
                     {isSelected && (
