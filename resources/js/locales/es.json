@@ -368,6 +368,7 @@
         "accountMissingTitle": "Cuenta Desconectada",
         "accountMissingText": "Esta publicación se publicó en una cuenta ({{account}}) que ya no está conectada. Al editarla se creará una nueva versión para tu cuenta actual. ¿Continuar?",
         "selectSocialAccounts": "Seleccionar Cuentas",
+        "lockedBySession": "Bloqueado por Sesión",
         "dragDrop": {
           "title": "Arrastra y suelta para ordenar",
           "subtitle": "Sube tus archivos multimedia aquí"
