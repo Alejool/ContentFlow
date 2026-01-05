@@ -88,10 +88,10 @@ export default function ManageContentPage() {
   const [statusTab, setStatusTab] = useState('all');
 
   const statusTabs = useMemo(() => [
-    { id: 'all', label: 'Todos', icon: Folder },
-    { id: 'draft', label: 'Borradores', icon: Edit3 },
-    { id: 'scheduled', label: 'Programados', icon: CalendarIcon },
-    { id: 'published', label: 'Publicados', icon: CheckCircle },
+    { id: 'all', label: t('manageContent.status.all'), icon: Folder },
+    { id: 'draft', label: t('manageContent.status.draft'), icon: Edit3 },
+    { id: 'scheduled', label: t('manageContent.status.scheduled'), icon: CalendarIcon },
+    { id: 'published', label: t('manageContent.status.published'), icon: CheckCircle },
   ], []);
 
   const [isTabPending, startTransition] = React.useTransition();
@@ -131,34 +131,28 @@ export default function ManageContentPage() {
 
       <div className="w-full max-w-full overflow-x-hidden min-w-0">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-5 sm:py-8 min-w-0">
-
-          {/* Header Section */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 min-w-0">
             <div className="min-w-0 flex-1 pr-2">
               <h1 className="text-xl sm:text-3xl font-extrabold text-gray-900 dark:text-white truncate tracking-tight">
-                Gestionar Contenido
+                {t('manageContent.title')}
               </h1>
               <p className="text-gray-500 dark:text-gray-400 mt-0.5 sm:mt-2 text-xs sm:text-base lg:text-lg truncate">
-                Organiza, planifica y publica tu contenido en redes sociales.
+                {t('manageContent.subtitle')}
               </p>
             </div>
 
-            {/* Primary Action */}
             <button
               onClick={() => openAddModal()}
               className="w-full sm:w-auto group relative inline-flex h-11 sm:h-12 items-center justify-center overflow-hidden rounded-2xl sm:rounded-full bg-primary-600 px-6 sm:px-8 font-bold text-white transition-all duration-300 hover:bg-primary-700 hover:scale-[1.02] active:scale-95 hover:shadow-lg focus:outline-none ring-offset-2 ring-primary-500/20 shadow-xl shadow-primary-500/10"
             >
               <Plus className="mr-2 h-5 w-5" />
-              <span className="relative">Crear Nuevo</span>
+              <span className="relative">{t('manageContent.createNew')}</span>
             </button>
           </div>
 
-          {/* Social Accounts Widget (Collapsed or simplified if needed) */}
           <div className="mb-8">
             <SocialMediaAccounts />
           </div>
-
-          {/* Context Navigation (Tabs) */}
           <div className="mb-8 border-b border-gray-200 dark:border-gray-700 w-full overflow-x-auto scrollbar-none snap-x h-fit">
             <div className="flex items-center gap-1 sm:gap-2 min-w-max px-1">
               <button
@@ -166,28 +160,28 @@ export default function ManageContentPage() {
                 className={`flex items-center justify-center gap-2 py-3 px-4 sm:px-6 font-bold text-xs sm:text-sm transition-all border-b-2 snap-start ${contextTab === 'publications' ? 'border-primary-500 text-primary-600 dark:text-primary-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
               >
                 <Folder className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span>Publicaciones</span>
+                <span>{t('manageContent.tabs.publications')}</span>
               </button>
               <button
                 onClick={() => startTransition(() => setContextTab('campaigns'))}
                 className={`flex items-center justify-center gap-2 py-3 px-4 sm:px-6 font-bold text-xs sm:text-sm transition-all border-b-2 snap-start ${contextTab === 'campaigns' ? 'border-primary-500 text-primary-600 dark:text-primary-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
               >
                 <Target className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span>Campañas</span>
+                <span>{t('manageContent.tabs.campaigns')}</span>
               </button>
               <button
                 onClick={() => startTransition(() => setContextTab('calendar'))}
                 className={`flex items-center justify-center gap-2 py-3 px-4 sm:px-6 font-bold text-xs sm:text-sm transition-all border-b-2 snap-start ${contextTab === 'calendar' ? 'border-primary-500 text-primary-600 dark:text-primary-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
               >
                 <CalendarIcon className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span>Calendario</span>
+                <span>{t('manageContent.tabs.calendar')}</span>
               </button>
               <button
                 onClick={() => startTransition(() => setContextTab('logs'))}
                 className={`flex items-center justify-center gap-2 py-3 px-4 sm:px-6 font-bold text-xs sm:text-sm transition-all border-b-2 snap-start ${contextTab === 'logs' ? 'border-primary-500 text-primary-600 dark:text-primary-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
               >
                 <FileText className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span>Logs</span>
+                <span>{t('manageContent.tabs.logs')}</span>
               </button>
             </div>
           </div>

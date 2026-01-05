@@ -83,6 +83,11 @@ const PublicationRow = memo(({
                       );
                     }
                   )}
+                  {Object.keys(item.platform_settings).length > 2 && (
+                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-300 border border-gray-200 dark:border-white/5">
+                      +{Object.keys(item.platform_settings).length - 2}
+                    </span>
+                  )}
                 </div>
               )}
             {remoteLock && (

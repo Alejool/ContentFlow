@@ -1,4 +1,5 @@
 import { useMemo, memo } from "react";
+import { Trans } from "react-i18next";
 
 // Utils
 const parseUserAgent = (userAgent?: string): string => {
@@ -195,26 +196,27 @@ const EditPublicationModal = ({
                       <p className="opacity-80">
                         {lockInfo?.locked_by === 'session' ? (
                           <>
-                            Tienes esta publicación abierta en{' '}
-                            <span className="font-medium">
-                              {parseUserAgent(lockInfo?.user_agent)}
-                            </span>
+                            <Trans
+                              i18nKey="publications.modal.edit.locking.sessionMessage"
+                              values={{ browser: parseUserAgent(lockInfo?.user_agent) }}
+                              components={{ 1: <span className="font-medium" /> }}
+                            />
                             {lockInfo?.ip_address && (
                               <span className="text-xs opacity-70">
                                 {' '}({maskIpAddress(lockInfo.ip_address)})
                               </span>
                             )}
-                            . Cierra la otra sesión para editar aquí.
                           </>
                         ) : (
                           <>
-                            {lockInfo?.user_name} está editando esta publicación
-                            {lockInfo?.user_agent && (
-                              <span className="font-medium">
-                                {' '}desde {parseUserAgent(lockInfo.user_agent)}
-                              </span>
-                            )}
-                            . Tus cambios no podrán ser guardados para evitar conflictos.
+                            <Trans
+                              i18nKey="publications.modal.edit.locking.userMessage"
+                              values={{
+                                user: lockInfo?.user_name,
+                                browser: parseUserAgent(lockInfo?.user_agent)
+                              }}
+                              components={{ 1: <span className="font-medium" /> }}
+                            />
                           </>
                         )}
                       </p>

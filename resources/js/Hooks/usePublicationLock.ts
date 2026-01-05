@@ -98,7 +98,7 @@ export const usePublicationLock = (publicationId: number | null, isEditing: bool
                     setTimeout(() => {
                         // If still locked by them, try to acquire (maybe they disconnected abruptly)
                         if (lockInfoRef.current && lockInfoRef.current.user_id === user.id) {
-                            toast('El usuario con el bloqueo ha salido. Verificando disponibilidad...');
+                            toast.success('El bloqueo ha sido liberado. Intentando adquirir...');
                             acquireLock();
                         }
                     }, 1500);

@@ -387,7 +387,11 @@
         },
         "contentLocked": "Contenido Bloqueado",
         "contentLockedHint": "Para editar el contenido (título, descripción o archivos), debes despublicar la publicación de todas las plataformas.",
-        "lockedByOther": "Publicación bloqueada por otro usuario"
+        "lockedByOther": "Publicación bloqueada por otro usuario",
+        "locking": {
+          "sessionMessage": "Tienes esta publicación abierta en <1>{{browser}}</1>. Cierra la otra sesión para editar aquí.",
+          "userMessage": "{{user}} está editando esta publicación <1>desde {{browser}}</1>. Tus cambios no podrán ser guardados para evitar conflictos."
+        }
       },
       "manageContent": {
         "configureNetworks": "Configura tus publicaciones programadas"
@@ -501,7 +505,7 @@
         "description": "Crea una publicación para comenzar a publicar contenido.",
         "button": "Agregar Publicación"
       },
-      "lockedBy": "Editando:"
+      "lockedBy": "Bloqueado por:"
     },
     "messages": {
       "addSuccess": "¡Publicación agregada exitosamente!",
@@ -1119,6 +1123,19 @@
     "index": "Gestión de Contenido",
     "title": "Gestión de Contenido",
     "subtitle": "Organiza y gestiona tu contenido multimedia de forma elegante y eficiente",
+    "createNew": "Crear Nuevo",
+    "tabs": {
+      "publications": "Publicaciones",
+      "campaigns": "Campañas",
+      "calendar": "Calendario",
+      "logs": "Registros"
+    },
+    "status": {
+      "all": "Todos",
+      "draft": "Borradores",
+      "scheduled": "Programados",
+      "published": "Publicados"
+    },
     "publications": "Publicaciones",
     "campaigns": "Campañas",
     "logs": "Registros",

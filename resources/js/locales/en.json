@@ -287,7 +287,11 @@
         },
         "contentLocked": "Content Locked",
         "contentLockedHint": "To edit the content (title, description or files), you must unpublish the post from all platforms.",
-        "lockedByOther": "Post locked by another user"
+        "lockedByOther": "Post locked by another user",
+        "locking": {
+          "sessionMessage": "You have this publication open on <1>{{browser}}</1>. Close the other session to edit here.",
+          "userMessage": "{{user}} is editing this publication <1>from {{browser}}</1>. Your changes cannot be saved to avoid conflicts."
+        }
       },
       "publish": {
         "title": "Publish",
@@ -393,7 +397,7 @@
         "description": "Create a publication to start publishing content.",
         "button": "Add Publication"
       },
-      "lockedBy": "Editing:"
+      "lockedBy": "Locked by:"
     },
     "messages": {
       "addSuccess": "Publication added successfully!",
@@ -1105,6 +1109,19 @@
     "configureNetworks": "Configure your scheduled publications",
     "title": "Content Management",
     "subtitle": "Organize and manage your multimedia content elegantly and efficiently",
+    "createNew": "Create New",
+    "tabs": {
+      "publications": "Publications",
+      "campaigns": "Campaigns",
+      "calendar": "Calendar",
+      "logs": "Logs"
+    },
+    "status": {
+      "all": "All",
+      "draft": "Drafts",
+      "scheduled": "Scheduled",
+      "published": "Published"
+    },
     "publications": "Publications",
     "campaigns": "Campaigns",
     "logs": "Logs",
