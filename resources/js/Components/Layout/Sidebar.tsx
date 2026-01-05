@@ -1,24 +1,18 @@
 import Logo from "@/../assets/logo.png";
-import NotificationsModal from "@/Components/Notifications/NotificationsModal";
 import LanguageSwitcher from "@/Components/common/ui/LanguageSwitcher";
 import NavLink from "@/Components/common/ui/NavLink";
 import ThemeSwitcher from "@/Components/common/ui/ThemeSwitcher";
 import WorkspaceSwitcher from "@/Components/Workspace/WorkspaceSwitcher";
-import { useNotifications } from "@/Hooks/useNotifications";
 import { useTheme } from "@/Hooks/useTheme";
 import { Link } from "@inertiajs/react";
 import {
   BarChart3,
-  Bell,
   ChevronLeft,
   ChevronRight,
   FileText,
   Home,
-  LogOut,
-  User,
   Layers,
 } from "lucide-react";
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 interface SidebarProps {
@@ -33,13 +27,9 @@ const navigationItems = [
     icon: Home,
   },
   {
-    nameKey: "nav.profile",
-    href: "profile.edit",
-    icon: User,
-  },
-  {
     nameKey: "nav.manageContent",
     href: "/ManageContent.index",
+    hrefPattern: "/ManageContent",
     icon: FileText,
   },
   {
@@ -60,8 +50,6 @@ export default function Sidebar({
 }: SidebarProps) {
   const { t } = useTranslation();
   const { theme } = useTheme();
-  const [showNotifications, setShowNotifications] = useState(false);
-  const { unreadCount } = useNotifications();
 
   const isRouteActive = (routeName: string): boolean => {
     if (typeof window === "undefined") return false;
@@ -70,7 +58,6 @@ export default function Sidebar({
 
     const routePatterns: Record<string, string[]> = {
       dashboard: ["/dashboard"],
-      "profile.edit": ["/profile", "/profile/edit"],
       "/ManageContent.index": ["/ManageContent"],
       "analytics.index": ["/analytics"],
       "workspaces.index": ["/workspaces"],
@@ -89,11 +76,9 @@ export default function Sidebar({
   const getRouteUrl = (routeName: string): string => {
     const routeUrls: Record<string, string> = {
       dashboard: "/dashboard",
-      "profile.edit": "/profile",
       "/ManageContent.index": "/ManageContent",
       "analytics.index": "/analytics",
       "workspaces.index": "/workspaces",
-      logout: "/logout",
     };
 
     return routeUrls[routeName] || `/${routeName.replace(".", "/")}`;
@@ -246,7 +231,7 @@ export default function Sidebar({
 
           {/* Footer */}
           <div className="mt-auto">
-            {/* Sección de controles (Notificaciones, Theme, Language) */}
+            {/* Sección de controles (Theme, Language) */}
             <div
               className={`p-4 border-t ${classes.borderColor} ${isSidebarOpen
                 ? "flex items-center justify-between"
@@ -254,115 +239,16 @@ export default function Sidebar({
                 }`}
             >
               <div
-                className={`flex items-center gap-3 ${isSidebarOpen ? "" : "flex-col"
+                className={`flex items-center justify-center gap-2 w-full ${isSidebarOpen ? "flex-row" : "flex-col"
                   }`}
               >
-                {/* Controles de tema e idioma */}
-                <div
-                  className={`flex items-center gap-2 ${isSidebarOpen ? "" : "flex-col"
-                    }`}
-                >
-                  <ThemeSwitcher />
-                  <LanguageSwitcher />
-                </div>
-                {/* Botón de notificaciones */}
-                <button
-                  onClick={() => setShowNotifications(true)}
-                  className={`group relative p-2.5 rounded-lg transition-all duration-300
-                    ${classes.hoverBg} ${classes.textColor}
-                    hover:text-primary-600 hover:shadow-md
-                    flex items-center justify-center`}
-                  aria-label={t("nav.notifications")}
-                >
-                  <div className="relative">
-                    <Bell className="h-6 w-6" />
-                    {unreadCount > 0 && (
-                      <>
-                        <span
-                          className={`absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full
-                            bg-red-500 text-[10px] font-bold text-white shadow-md
-                            border-2 ${isDark ? "border-neutral-900" : "border-beige-200"
-                            }
-                            `}
-                        >
-                          {unreadCount > 9 ? "9+" : unreadCount}
-                        </span>
-                        <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5  rounded-full bg-red-400 opacity-0" />
-                      </>
-                    )}
-                  </div>
-
-                  {!isSidebarOpen && (
-                    <div
-                      className={`absolute left-full ml-3 px-3 py-2
-                        ${classes.tooltipBg} text-sm rounded-lg
-                        opacity-0 group-hover:opacity-100 transition-opacity
-                        duration-200 pointer-events-none whitespace-nowrap
-                        z-50 flex items-center gap-2`}
-                    >
-                      {t("nav.notifications")}
-                      {unreadCount > 0 && (
-                        <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full font-bold">
-                          {unreadCount > 9 ? "9+" : unreadCount}
-                        </span>
-                      )}
-                      <div
-                        className={`absolute left-0 top-1/2 transform
-                          -translate-y-1/2 -translate-x-1 w-2 h-2
-                          ${isDark ? "bg-neutral-800" : "bg-gray-900"
-                          } rotate-45`}
-                      />
-                    </div>
-                  )}
-                </button>
+                <ThemeSwitcher />
+                <LanguageSwitcher />
               </div>
-            </div>
-
-            <div
-              className={`p-4 border-t ${classes.borderColor} ${classes.textColor} ${classes.logoutHoverBg}`}
-            >
-              <NavLink
-                href={getRouteUrl("logout")}
-                method="post"
-                as="button"
-                className={`group w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300
-                  ${isSidebarOpen ? "" : "justify-center"}`}
-              >
-                <div className="flex items-center justify-center">
-                  <LogOut className="h-5 w-5" />
-                </div>
-
-                {isSidebarOpen && (
-                  <span className="font-medium">{t("nav.logout")}</span>
-                )}
-
-                {!isSidebarOpen && (
-                  <div
-                    className={`absolute left-full ml-2 px-3 py-2
-                      ${classes.tooltipBg} text-sm rounded-lg
-                      opacity-0 group-hover:opacity-100 transition-opacity
-                      duration-200 pointer-events-none whitespace-nowrap
-                      z-50`}
-                  >
-                    {t("nav.logout")}
-                    <div
-                      className={`absolute left-0 top-1/2 transform
-                        -translate-y-1/2 -translate-x-1 w-2 h-2
-                        ${isDark ? "bg-neutral-800" : "bg-gray-900"} rotate-45`}
-                    />
-                  </div>
-                )}
-              </NavLink>
             </div>
           </div>
         </div>
       </div>
-
-      {/* Modal de notificaciones */}
-      <NotificationsModal
-        isOpen={showNotifications}
-        onClose={() => setShowNotifications(false)}
-      />
     </>
   );
 }

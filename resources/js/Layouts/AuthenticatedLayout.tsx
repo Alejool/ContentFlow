@@ -1,16 +1,20 @@
 import GlobalAiAssistant from "@/Components/AiAssistant/GlobalAiAssistant";
-import WorkspaceInfoBadge from "@/Components/Workspace/WorkspaceInfoBadge";
+import CommandPalette from "@/Components/CommandPalette/CommandPalette";
+import ActiveWorkspace from "@/Components/Layout/ActiveWorkspace";
+import NotificationButton from "@/Components/Layout/NotificationButton";
 import MobileNavbar from "@/Components/Layout/MobileNavbar";
+import ProfileDropdown from "@/Components/Layout/ProfileDropdown";
+import SearchButton from "@/Components/Layout/SearchButton";
 import Sidebar from "@/Components/Layout/Sidebar";
+import WorkspaceInfoBadge from "@/Components/Workspace/WorkspaceInfoBadge";
+import { useNotifications } from "@/Hooks/useNotifications";
 import { useTheme } from "@/Hooks/useTheme";
 import { initNotificationRealtime } from "@/Services/notificationRealtime";
 import { useNotificationStore } from "@/stores/notificationStore";
 import { usePage } from "@inertiajs/react";
+import { ChevronRight } from "lucide-react";
 import { ReactNode, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link } from "@inertiajs/react";
-import { ChevronRight } from "lucide-react";
-import CommandPalette from "@/Components/CommandPalette/CommandPalette";
 
 interface AuthenticatedLayoutProps {
   header?: ReactNode;
@@ -47,36 +51,6 @@ export default function AuthenticatedLayout({
 
   return (
     <div className="h-screen flex flex-col overflow-hidden w-full max-w-full">
-      <Link
-        href={route('workspaces.index')}
-        className={`
-          relative z-[200] h-8 flex items-center px-4 text-[10px] font-bold uppercase tracking-widest
-          ${theme === 'dark' ? 'bg-primary-900/95 text-primary-200 hover:bg-primary-900' : 'bg-primary-600/95 text-white hover:bg-primary-700'}
-          backdrop-blur-sm border-b border-primary-500/20 transition-all duration-300 cursor-pointer group
-        `}
-      >
-        <div className="flex items-center gap-2 max-w-7xl mx-auto w-full overflow-hidden min-w-0">
-          <span className="opacity-70 flex-shrink-0">{t('workspace.active_context')}:</span>
-          <span className="flex items-center gap-1.5 truncate min-w-0">
-            <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse flex-shrink-0" />
-            <span className="truncate max-w-[160px] sm:max-w-md min-w-0">{auth.current_workspace?.name || '...'}</span>
-          </span>
-          <div className="flex-1 min-w-0" />
-
-          <div className="flex items-center gap-2 ml-2 flex-shrink-0 min-w-0">
-            <span className="opacity-70 hidden sm:inline">{t('workspace.role')}:</span>
-            <span className={`
-               px-2 py-0.5 rounded-md border font-bold
-               ${theme === 'dark' ? 'bg-primary-500/20 border-primary-500/30 text-primary-200' : 'bg-white/20 border-white/20 text-white'}
-            `}>
-              {auth.current_workspace?.user_role || t('workspace.member')}
-            </span>
-          </div>
-
-          <ChevronRight className="h-3 w-3 opacity-50 group-hover:translate-x-0.5 transition-transform" />
-        </div>
-      </Link>
-
       <div
         className="relative flex-1 min-h-0 flex bg-[url('/resources/assets/b-3.jpg')] bg-cover bg-center bg-no-repeat w-full max-w-full min-w-0 overflow-x-hidden"
       >
@@ -105,17 +79,34 @@ export default function AuthenticatedLayout({
           >
             <header className="border-b border-gray-200/50 
                 dark:border-neutral-800/50 bg-white/80 dark:bg-black/80 
-                backdrop-blur-xl z-40 min-w-0">
-              <div className="mx-auto max-w-7xl px-4 md:px-6 py-3 md:py-4 flex justify-between items-center gap-4 min-w-0">
-                <div className="flex-1 min-w-0">
-                  {header ? header : (
-                    <div className="h-8 min-w-0" />
-                  )}
+                backdrop-blur-xl z-40 min-w-0 sticky top-0 flex flex-col">
+              {!route().current("workspaces.*") && (
+                <div className="w-full">
+                  <ActiveWorkspace />
                 </div>
-                <div className="flex-shrink-0 min-w-0">
-                  <WorkspaceInfoBadge variant="compact" />
+              )}
+
+              <div className="hidden lg:flex mx-auto w-full max-w-7xl px-4 md:px-6 py-3 md:py-4 justify-between items-center gap-4 min-w-0">
+                <div className="flex-1 min-w-0 flex items-center gap-4">
+                  <div className="hidden lg:block">
+                    <SearchButton />
+                  </div>
+                </div>
+                <div className="flex-shrink-0 min-w-0 flex items-center gap-3">
+                  <div className="hidden md:flex items-center gap-2">
+                    <NotificationButton />
+                    <div className="h-6 w-px bg-gray-200 dark:bg-neutral-800 mx-1"></div>
+                    <ProfileDropdown user={user} />
+                  </div>
                 </div>
               </div>
+
+              {/* Dedicated Page Header Row */}
+              {header && (
+                <div className="mx-auto w-full max-w-7xl px-4 md:px-6 py-4 border-t border-gray-100 dark:border-neutral-800/50">
+                  <div className="min-w-0">{header}</div>
+                </div>
+              )}
             </header>
 
             <div className="flex-1 min-h-0 min-w-0">

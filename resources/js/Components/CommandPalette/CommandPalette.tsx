@@ -8,7 +8,7 @@ export default function CommandPalette() {
     const [isOpen, setIsOpen] = useState(false);
     const [query, setQuery] = useState('');
 
-    // Toggle with Cmd+K or Ctrl+K
+    // Toggle with Cmd+K or Ctrl+K or custom event
     useEffect(() => {
         const onKeydown = (event: KeyboardEvent) => {
             if (event.key === 'k' && (event.metaKey || event.ctrlKey)) {
@@ -16,8 +16,16 @@ export default function CommandPalette() {
                 setIsOpen(!isOpen);
             }
         };
+
+        const onOpenEvent = () => setIsOpen(true);
+
         window.addEventListener('keydown', onKeydown);
-        return () => window.removeEventListener('keydown', onKeydown);
+        window.addEventListener('open-command-palette', onOpenEvent);
+
+        return () => {
+            window.removeEventListener('keydown', onKeydown);
+            window.removeEventListener('open-command-palette', onOpenEvent);
+        };
     }, [isOpen]);
 
     const navigation = [
