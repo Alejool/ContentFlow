@@ -26,15 +26,11 @@ const maskIpAddress = (ip?: string): string => {
   if (parts.length === 4) return `${parts[0]}.${parts[1]}.x.x`;
   return ip.split(':')[0] + ':...';
 };
-// Hooks
 import { usePublicationForm } from "@/Hooks/publication/usePublicationForm";
 import { usePublicationLock } from "@/Hooks/usePublicationLock";
-// Stores
 import { useCampaignStore } from "@/stores/campaignStore";
 import { useAccountsStore } from "@/stores/socialAccountsStore";
-// Type
 import { Publication } from "@/types/Publication";
-// Componentes
 import PlatformSettingsModal from "@/Components/ConfigSocialMedia/PlatformSettingsModal";
 import SocialAccountsSection from "@/Components/ManageContent/Publication/common/add/SocialAccountsSection";
 import ContentSection from "@/Components/ManageContent/Publication/common/edit/ContentSection";

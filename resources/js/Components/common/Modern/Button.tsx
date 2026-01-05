@@ -9,21 +9,21 @@ import {
 
 type IconType =
   | ComponentType<{
-      size?: number | string;
-      className?: string;
-      strokeWidth?: number;
-    }>
+    size?: number | string;
+    className?: string;
+    strokeWidth?: number;
+  }>
   | ReactNode;
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
   variant?:
-    | "primary"
-    | "danger"
-    | "secondary"
-    | "success"
-    | "ghost"
-    | "warning";
+  | "primary"
+  | "danger"
+  | "secondary"
+  | "success"
+  | "ghost"
+  | "warning";
   buttonStyle?: "solid" | "outline" | "gradient" | "ghost";
   size?: "xs" | "sm" | "md" | "lg" | "xl";
   loading?: boolean;
@@ -85,7 +85,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       danger: {
         bg: "bg-red-600",
         hoverBg: "hover:bg-red-700",
-        text: "text-white",
+        text: "text-black dark:text-white",
         border: "border-red-600",
         hoverText: "hover:text-white",
         focusRing: "focus:ring-red-500",
@@ -97,7 +97,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       secondary: {
         bg: "bg-gray-300",
         hoverBg: "hover:bg-gray-400",
-        text: "text-gray-800",
+        text: "text-black dark:text-white",
         border: "border-gray-300",
         hoverText: "hover:text-gray-800",
         focusRing: "focus:ring-gray-500",
@@ -109,7 +109,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       success: {
         bg: "bg-green-600",
         hoverBg: "hover:bg-green-700",
-        text: "text-white",
+        text: "text-black dark:text-white",
         border: "border-green-600",
         hoverText: "hover:text-white",
         focusRing: "focus:ring-green-500",
@@ -121,7 +121,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       warning: {
         bg: "bg-yellow-600",
         hoverBg: "hover:bg-yellow-700",
-        text: "text-white",
+        text: "text-black dark:text-white",
         border: "border-yellow-600",
         hoverText: "hover:text-white",
         focusRing: "focus:ring-yellow-500",
@@ -133,7 +133,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       ghost: {
         bg: "bg-transparent",
         hoverBg: "hover:bg-gray-100 dark:hover:bg-gray-800",
-        text: "text-gray-700 dark:text-gray-300",
+        text: "text-black dark:text-white",
         border: "border-gray-300 dark:border-gray-700",
         hoverText: "hover:text-gray-700 dark:hover:text-gray-300",
         focusRing: "focus:ring-gray-500",
@@ -165,23 +165,21 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             border-2 ${colors.border}
             ${colors.text}
             hover:bg-opacity-10 hover:${colors.hoverBg.replace("hover:", "")}
-            ${
-              currentTheme === "dark" && variant === "ghost"
-                ? "dark:border-gray-700 dark:text-gray-300"
-                : ""
+            ${currentTheme === "dark" && variant === "ghost"
+              ? "dark:border-gray-700 dark:text-gray-300"
+              : ""
             }
           `;
         case "ghost":
-          return `
+          return `  
             ${colors.text}
             bg-transparent
             border border-gray-300 dark:border-gray-700
             hover:${colors.hoverBg}
             hover:${colors.hoverText}
-            ${
-              currentTheme === "dark"
-                ? "dark:hover:bg-gray-800 dark:hover:text-gray-300"
-                : ""
+            ${currentTheme === "dark"
+              ? "dark:hover:bg-gray-800 dark:hover:text-gray-300"
+              : ""
             }
           `;
         case "solid":
@@ -230,10 +228,9 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       ${shadowClasses[shadow]}
       ${animationClasses[animation]}
       ${colors.focusRing}
-      ${
-        currentTheme === "dark"
-          ? "focus:ring-offset-gray-900"
-          : "focus:ring-offset-white"
+      ${currentTheme === "dark"
+        ? "focus:ring-offset-gray-900"
+        : "focus:ring-offset-white"
       }
     `;
 

@@ -51,6 +51,7 @@ export default function ModalFooter({
   secondarySubmitVariant = "secondary",
   secondarySubmitStyle = "outline",
   secondarySubmitIcon,
+
   onSecondarySubmit,
   onPrimarySubmit,
   submitVariant = "primary",
