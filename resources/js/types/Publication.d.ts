@@ -9,7 +9,7 @@ export type Publication = {
   goal?: string;
   slug?: string;
   scheduled_at?: string;
-  status?: "draft" | "published" | "scheduled" | "publishing";
+  status?: "draft" | "published" | "scheduled" | "publishing" | "pending_review" | "approved" | "rejected";
   is_active?: boolean;
   media_files?: MediaFile[];
   scheduled_posts?: ScheduledPost[];
@@ -22,6 +22,22 @@ export type Publication = {
     photo_url: string;
   };
   platform_settings?: Record<string, any>;
+  approved_by?: number;
+  approved_at?: string;
+  published_by?: number;
+  published_at?: string;
+  rejected_by?: number;
+  rejected_at?: string;
+  publisher?: {
+    id: number;
+    name: string;
+    photo_url: string;
+  };
+  rejector?: {
+    id: number;
+    name: string;
+    photo_url: string;
+  };
 };
 
 export type ScheduledPost = {
@@ -56,7 +72,7 @@ export type SocialPostLog = {
   video_url?: string;
   engagement_data?: any;
   publication?: Publication;
-  campaign?: { id: number; name: string }; 
+  campaign?: { id: number; name: string };
 };
 
 export type SocialAccount = {

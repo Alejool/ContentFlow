@@ -31,14 +31,40 @@
   background: #6b7280;
 }
 
-/* Firefox scrollbar */
-.custom-scrollbar {
+/* Subtle Scrollbar Utility */
+.scrollbar-subtle {
   scrollbar-width: thin;
-  scrollbar-color: #d1d5db transparent;
+  scrollbar-color: rgba(156, 163, 175, 0.4) transparent;
 }
 
-.dark .custom-scrollbar {
-  scrollbar-color: #4b5563 transparent;
+.dark .scrollbar-subtle {
+  scrollbar-color: rgba(75, 85, 99, 0.4) transparent;
+}
+
+.scrollbar-subtle::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+.scrollbar-subtle::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-subtle::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.4);
+  border-radius: 10px;
+}
+
+.scrollbar-subtle::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 163, 175, 0.6);
+}
+
+.dark .scrollbar-subtle::-webkit-scrollbar-thumb {
+  background: rgba(75, 85, 99, 0.4);
+}
+
+.dark .scrollbar-subtle::-webkit-scrollbar-thumb:hover {
+  background: rgba(75, 85, 99, 0.6);
 }
 
 @layer base {

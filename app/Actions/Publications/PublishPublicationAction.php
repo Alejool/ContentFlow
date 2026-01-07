@@ -19,7 +19,24 @@ class PublishPublicationAction
   public function execute(Publication $publication, array $platformIds, array $options = []): void
   {
     if (!$publication->isApproved()) {
-      throw new \Exception("Publication must be approved before publishing.");
+      // Check if user is authorized to approve (Owner/Admin)
+      $user = auth()->user();
+      if ($user && $user->hasPermission('approve', $publication->workspace_id)) {
+        // Auto-approve
+        $publication->forceFill([
+          'status' => 'approved',
+          'approved_by' => $user->id,
+          'approved_at' => now(),
+          'approved_retries_remaining' => 3, // Set retries on auto-approve too
+        ])->save();
+      } else {
+        throw new \Exception("Publication must be approved before publishing.");
+      }
+    } else {
+      // If it's already approved but failed, and we are retrying, decrement retries
+      if ($publication->status === 'failed' && $publication->approved_retries_remaining > 0) {
+        $publication->decrement('approved_retries_remaining');
+      }
     }
 
     if (is_string($platformIds)) {
@@ -50,7 +67,11 @@ class PublishPublicationAction
       $publication->update(['platform_settings' => $options['platform_settings']]);
     }
 
-    $publication->update(['status' => 'publishing']);
+    $publication->update([
+      'status' => 'publishing',
+      'published_by' => auth()->id(),
+      'published_at' => now(),
+    ]);
 
     // Mark any pending scheduled posts for these platforms as 'posted'
     ScheduledPost::where('publication_id', $publication->id)

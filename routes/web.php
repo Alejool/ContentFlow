@@ -192,9 +192,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/{publication}', [PublicationController::class, 'update'])->name('update');
     Route::delete('/{publication}', [PublicationController::class, 'destroy'])->name('destroy');
     Route::post('/{publication}/duplicate', [PublicationController::class, 'duplicate'])->name('duplicate');
-    Route::get('/{id}/published-platforms', [PublicationController::class, 'getPublishedPlatforms'])->name('published-platforms');
-    Route::post('/{id}/publish', [PublicationController::class, 'publish'])->name('publish');
-    Route::post('/{id}/unpublish', [PublicationController::class, 'unpublish'])->name('unpublish');
+    Route::get('/{publication}/published-platforms', [PublicationController::class, 'getPublishedPlatforms'])->name('published-platforms');
+    Route::post('/{publication}/publish', [PublicationController::class, 'publish'])->name('publish');
+    Route::post('/{publication}/unpublish', [PublicationController::class, 'unpublish'])->name('unpublish');
+    Route::post('/{publication}/request-review', [PublicationController::class, 'requestReview'])->name('request-review');
+    Route::post('/{publication}/approve', [PublicationController::class, 'approve'])->name('approve');
+    Route::post('/{publication}/reject', [PublicationController::class, 'reject'])->name('reject');
+    Route::get('/stats/all', [PublicationController::class, 'stats'])->name('stats');
   });
 
   /*

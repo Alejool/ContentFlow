@@ -28,7 +28,7 @@ export const useAccountsStore = create<AccountsStore>((set) => ({
     set({
       accounts: accounts.map((acc) => ({
         ...acc,
-        account_name: acc.account_name || acc.name,
+        account_name: acc.account_name,
       })),
       lastUpdated: new Date(),
       error: null,
@@ -40,7 +40,7 @@ export const useAccountsStore = create<AccountsStore>((set) => ({
         ...state.accounts,
         {
           ...account,
-          account_name: account.account_name || account.name,
+          account_name: account.account_name,
         },
       ],
       lastUpdated: new Date(),
@@ -57,11 +57,11 @@ export const useAccountsStore = create<AccountsStore>((set) => ({
       accounts: state.accounts.map((account) =>
         account.id === accountId
           ? {
-              ...account,
-              ...updates,
-              account_name:
-                updates.account_name || account.account_name || account.name,
-            }
+            ...account,
+            ...updates,
+            account_name:
+              updates.account_name || account.account_name,
+          }
           : account
       ),
       lastUpdated: new Date(),
@@ -79,7 +79,7 @@ export const useAccountsStore = create<AccountsStore>((set) => ({
 
       const processedAccounts = accounts.map((acc: SocialAccount) => ({
         ...acc,
-        account_name: acc.account_name || acc.name,
+        account_name: acc.account_name,
       }));
 
       set({

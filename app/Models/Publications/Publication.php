@@ -61,6 +61,11 @@ class Publication extends Model
     'workspace_id',
     'approved_by',
     'approved_at',
+    'approved_retries_remaining',
+    'published_by',
+    'published_at',
+    'rejected_by',
+    'rejected_at',
   ];
 
   protected $casts = [
@@ -72,6 +77,11 @@ class Publication extends Model
     'workspace_id' => 'integer',
     'approved_by' => 'integer',
     'approved_at' => 'datetime',
+    'approved_retries_remaining' => 'integer',
+    'published_by' => 'integer',
+    'published_at' => 'datetime',
+    'rejected_by' => 'integer',
+    'rejected_at' => 'datetime',
   ];
 
   public function scopeDraft($query)
@@ -106,12 +116,30 @@ class Publication extends Model
 
   public function isApproved(): bool
   {
-    return $this->status === 'approved' || $this->status === 'published';
+    if ($this->status === 'approved' || $this->status === 'published') {
+      return true;
+    }
+
+    if ($this->status === 'failed' && $this->approved_retries_remaining > 0) {
+      return true;
+    }
+
+    return false;
   }
 
   public function approver(): BelongsTo
   {
     return $this->belongsTo(User::class, 'approved_by');
+  }
+
+  public function publisher(): BelongsTo
+  {
+    return $this->belongsTo(User::class, 'published_by');
+  }
+
+  public function rejector(): BelongsTo
+  {
+    return $this->belongsTo(User::class, 'rejected_by');
   }
 
   public function media(): HasMany

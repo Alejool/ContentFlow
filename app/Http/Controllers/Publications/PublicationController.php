@@ -53,7 +53,9 @@ class PublicationController extends Controller
           'scheduled_posts.socialAccount' => fn($q) => $q->select('id', 'platform', 'account_name'),
           'socialPostLogs' => fn($q) => $q->select('id', 'publication_id', 'social_account_id', 'status'),
           'campaigns' => fn($q) => $q->select('campaigns.id', 'campaigns.name', 'campaigns.status'),
-          'user' => fn($q) => $q->select('users.id', 'users.name', 'users.email', 'users.photo_url')
+          'user' => fn($q) => $q->select('users.id', 'users.name', 'users.email', 'users.photo_url'),
+          'publisher' => fn($q) => $q->select('users.id', 'users.name', 'users.photo_url'),
+          'rejector' => fn($q) => $q->select('users.id', 'users.name', 'users.photo_url')
         ])
         ->orderBy('created_at', 'desc');
 
@@ -102,29 +104,28 @@ class PublicationController extends Controller
     }
   }
 
-  public function show(Request $request, $id)
+  public function show(Request $request, Publication $publication)
   {
-    // Optimized eager loading with column selection
-    $publication = Publication::with([
+    $publication->load([
       'mediaFiles' => fn($q) => $q->select('media_files.id', 'media_files.file_path', 'media_files.file_type', 'media_files.file_name', 'media_files.size', 'media_files.mime_type'),
       'mediaFiles.derivatives' => fn($q) => $q->select('id', 'media_file_id', 'file_path', 'file_name', 'derivative_type', 'size', 'width', 'height'),
       'scheduled_posts' => fn($q) => $q->select('id', 'publication_id', 'social_account_id', 'status', 'scheduled_at'),
       'scheduled_posts.socialAccount' => fn($q) => $q->select('id', 'platform', 'account_name'),
       'socialPostLogs' => fn($q) => $q->select('id', 'publication_id', 'social_account_id', 'status', 'published_at', 'error_message'),
       'socialPostLogs.socialAccount' => fn($q) => $q->select('id', 'platform', 'account_name'),
-      'campaigns' => fn($q) => $q->select('campaigns.id', 'campaigns.name', 'campaigns.status')
-    ])->where('workspace_id', Auth::user()->current_workspace_id)
-      ->findOrFail($id);
+      'campaigns' => fn($q) => $q->select('campaigns.id', 'campaigns.name', 'campaigns.status'),
+      'publisher' => fn($q) => $q->select('users.id', 'users.name', 'users.photo_url'),
+      'rejector' => fn($q) => $q->select('users.id', 'users.name', 'users.photo_url')
+    ]);
 
     return $request->wantsJson()
       ? $this->successResponse(['publication' => $publication])
-      : view('publications.show');
+      : redirect()->route('manage-content.index', ['tab' => 'publications', 'id' => $publication->id]);
   }
 
-  public function update(UpdatePublicationRequest $request, $id, UpdatePublicationAction $action)
+  public function update(UpdatePublicationRequest $request, Publication $publication, UpdatePublicationAction $action)
   {
     try {
-      $publication = Publication::where('workspace_id', Auth::user()->current_workspace_id)->findOrFail($id);
       $publication = $action->execute($publication, $request->validated(), $request->file('media', []));
 
       // Clear cache after updating publication
@@ -140,11 +141,9 @@ class PublicationController extends Controller
     }
   }
 
-  public function publish(Request $request, $id, PublishPublicationAction $action)
+  public function publish(Request $request, Publication $publication, PublishPublicationAction $action)
   {
     try {
-      $publication = Publication::where('workspace_id', Auth::user()->current_workspace_id)->findOrFail($id);
-
       $action->execute($publication, $request->input('platforms'), [
         'thumbnails' => $request->file('thumbnails', []),
         'platform_settings' => $request->input('platform_settings')
@@ -161,9 +160,8 @@ class PublicationController extends Controller
     }
   }
 
-  public function unpublish(Request $request, $id, UnpublishPublicationAction $action)
+  public function unpublish(Request $request, Publication $publication, UnpublishPublicationAction $action)
   {
-    $publication = Publication::where('workspace_id', Auth::user()->current_workspace_id)->findOrFail($id);
     $result = $action->execute($publication, $request->input('platform_ids'));
 
     return $result['success']
@@ -171,32 +169,38 @@ class PublicationController extends Controller
       : $this->errorResponse('Failed to unpublish', 500, $result);
   }
 
-  public function requestReview(Request $request, $id)
+  public function requestReview(Request $request, Publication $publication)
   {
-    $publication = Publication::where('workspace_id', Auth::user()->current_workspace_id)->findOrFail($id);
-
-    if (!in_array($publication->status, ['draft', 'failed'])) {
-      return $this->errorResponse('Only draft or failed publications can be sent for review.', 422);
+    $allowedStatuses = ['draft', 'failed', 'rejected'];
+    if (!in_array($publication->status, $allowedStatuses)) {
+      return $this->errorResponse('Only draft, rejected or failed publications can be sent for review.', 422);
     }
 
     $publication->update(['status' => 'pending_review']);
     $this->clearPublicationCache(Auth::user()->current_workspace_id);
 
-    // Notify workspace owner/admin
-    $owner = $publication->workspace ? $publication->workspace->creator : null;
-    if ($owner) {
-      $owner->notify(new PublicationAwaitingApprovalNotification($publication, Auth::user()));
+    // Notify all users in the workspace who have the 'approve' permission
+    // First, find the roles that have the 'approve' permission
+    $approverRoleIds = \App\Models\Role::whereHas('permissions', function ($q) {
+      $q->where('slug', 'approve');
+    })->pluck('id');
+
+    // Then find users in this workspace with those roles
+    $approvers = $publication->workspace->users()
+      ->wherePivotIn('role_id', $approverRoleIds)
+      ->get();
+
+    foreach ($approvers as $approver) {
+      $approver->notify(new PublicationAwaitingApprovalNotification($publication, Auth::user()));
     }
 
     return $this->successResponse(['publication' => $publication], 'Publication sent for review.');
   }
 
-  public function approve(Request $request, $id)
+  public function approve(Request $request, Publication $publication)
   {
-    $publication = Publication::where('workspace_id', Auth::user()->current_workspace_id)->findOrFail($id);
-
     // Check if user has permission to approve (Owner or admin in workspace)
-    if (!Auth::user()->hasPermission('manage-content', $publication->workspace_id)) {
+    if (!Auth::user()->hasPermission('approve', $publication->workspace_id)) {
       return $this->errorResponse('You do not have permission to approve publications.', 403);
     }
 
@@ -204,6 +208,7 @@ class PublicationController extends Controller
       'status' => 'approved',
       'approved_by' => Auth::id(),
       'approved_at' => now(),
+      'approved_retries_remaining' => 3, // Set the retry limit
     ]);
 
     $this->clearPublicationCache(Auth::user()->current_workspace_id);
@@ -214,8 +219,25 @@ class PublicationController extends Controller
     return $this->successResponse(['publication' => $publication], 'Publication approved successfully.');
   }
 
-  public function getPublishedPlatforms($id)
+  public function reject(Request $request, Publication $publication)
   {
+    if (!Auth::user()->hasPermission('approve', $publication->workspace_id)) {
+      return $this->errorResponse('You do not have permission to reject publications.', 403);
+    }
+
+    $publication->update([
+      'status' => 'rejected',
+      'rejected_by' => Auth::id(),
+      'rejected_at' => now(),
+    ]);
+    $this->clearPublicationCache(Auth::user()->current_workspace_id);
+
+    return $this->successResponse(['publication' => $publication], 'Publication rejected and moved to draft.');
+  }
+
+  public function getPublishedPlatforms(Publication $publication)
+  {
+    $id = $publication->id;
     // Cache for 30 seconds to prevent repeated queries when opening publish modal
     // This dramatically improves performance when user clicks publish multiple times
     return cache()->remember("publication_{$id}_platforms", 30, function () use ($id) {

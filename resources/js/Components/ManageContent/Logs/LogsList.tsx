@@ -171,12 +171,12 @@ const LogsList = memo(({
         className={`p-4 border-b border-gray-200 dark:border-neutral-700 ${showFilters ? "block" : "hidden sm:block"
           }`}
       >
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 overflow-x-auto scrollbar-subtle pb-2">
           {statusOptions.map((status) => (
             <button
               key={status}
               onClick={() => handleStatusChange(status)}
-              className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${getStatusButtonColor(
+              className={`px-3 py-1.5 text-sm rounded-lg transition-colors whitespace-nowrap ${getStatusButtonColor(
                 status
               )}`}
             >
@@ -187,7 +187,7 @@ const LogsList = memo(({
       </div>
 
       {/* Desktop Table */}
-      <div className="hidden md:block overflow-x-auto">
+      <div className="hidden md:block overflow-x-auto scrollbar-subtle">
         <table className="w-full text-left text-sm">
           <thead
             className="bg-gray-50/90 border-gray-100 dark:bg-neutral-800/90 dark:border-neutral-700 border-b"
@@ -263,9 +263,9 @@ const LogsList = memo(({
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex flex-col gap-1">
-                      {log.campaign && (
+                      {(log.campaign || log.publication?.campaigns?.[0]) && (
                         <span className="text-xs text-blue-600 dark:text-blue-400 font-medium">
-                          {log.campaign.name}
+                          {log.campaign?.name || log.publication?.campaigns?.[0]?.name}
                         </span>
                       )}
                       {log.publication && (
@@ -377,9 +377,9 @@ const LogsList = memo(({
 
                 {/* Source */}
                 <div className="mb-3">
-                  {log.campaign && (
+                  {(log.campaign || log.publication?.campaigns?.[0]) && (
                     <div className="text-xs text-blue-600 dark:text-blue-400 font-medium">
-                      {t("logs.table.campaign")}: {log.campaign.name}
+                      {t("logs.table.campaign")}: {log.campaign?.name || log.publication?.campaigns?.[0]?.name}
                     </div>
                   )}
                   {log.publication && (

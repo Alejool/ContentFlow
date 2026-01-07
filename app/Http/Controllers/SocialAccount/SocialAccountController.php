@@ -19,7 +19,8 @@ class SocialAccountController extends Controller
 {
   public function index()
   {
-    $accounts = SocialAccount::where('workspace_id', Auth::user()->current_workspace_id)->get();
+    $workspaceId = Auth::user()->current_workspace_id;
+    $accounts = SocialAccount::where('workspace_id', $workspaceId)->with('user:id,name')->get();
 
     return response()->json([
       'success' => true,

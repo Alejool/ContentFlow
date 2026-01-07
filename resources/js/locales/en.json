@@ -54,16 +54,37 @@
     "done": "Done",
     "adjustOptions": "Adjust specific options",
     "viewOnPlatform": "View on platform",
+    "viewDirectly": "View full screen",
+    "creator": "Creator",
     "remove": "Remove",
     "errors": {
       "checkFormErrors": "Please check the form for errors"
     }
+  },
+  "approvals": {
+    "approve": "Approve",
+    "reject": "Reject",
+    "approvedSuccess": "Publication approved successfully",
+    "rejectedSuccess": "Publication rejected successfully",
+    "noPending": "No pending approvals",
+    "noPendingDesc": "Great! All publications are up to date."
   },
   "nav": {
     "dashboard": "Dashboard",
     "calendar": "Calendar",
     "profile": "Profile",
     "settings": "Settings",
+    "approvals": {
+      "noPending": "No pending approvals",
+      "noPendingDesc": "Great! All publications are up to date.",
+      "approve": "Approve",
+      "approvedSuccess": "Publication approved successfully",
+      "title": "Approvals",
+      "date": "Date",
+      "user": "User",
+      "publication": "Publication",
+      "actions": "Actions"
+    },
     "manageContent": "Manage Content",
     "analytics": "Analytics",
     "aiChat": "AI Chat",
@@ -195,6 +216,9 @@
     "title": "Publications",
     "subtitle": "Manage your publications",
     "modal": {
+      "view": {
+        "title": "Detailed View"
+      },
       "add": {
         "title": "Add Publication",
         "titleField": "Title",
@@ -323,8 +347,20 @@
         },
         "button": {
           "publish": "Publish",
+          "requestApproval": "Request Approval",
+          "pendingReview": "Pending Approval",
+          "approve": "Approve",
+          "reject": "Reject",
           "cancel": "Cancel",
           "change": "Change"
+        },
+        "pendingReviewBanner": {
+          "title": "Publication Under Review",
+          "message": "This publication has already been sent for review. An administrator must approve it before it can be published."
+        },
+        "rejectedBanner": {
+          "title": "Publication Rejected",
+          "message": "This publication was rejected by {{name}}. Please make the necessary adjustments and resubmit for approval."
         }
       },
       "preview": {
@@ -398,7 +434,9 @@
         "description": "Create a publication to start publishing content.",
         "button": "Add Publication"
       },
-      "lockedBy": "Locked by:"
+      "lockedBy": "Locked by:",
+      "publishingBy": "Publishing by",
+      "rejectedBy": "Rejected by"
     },
     "messages": {
       "addSuccess": "Publication added successfully!",
@@ -840,6 +878,8 @@
     "title": "Activity Logs",
     "subtitle": "Activity Logs",
     "refresh": "Refresh",
+    "viewPost": "View Post",
+    "filter": "Filter",
     "filters": {
       "campaign": "Filter by Campaign",
       "dateRange": "Date Range",
@@ -859,6 +899,7 @@
       "message": "Message",
       "error": "Error",
       "video": "Video",
+      "link": "Link",
       "copy": "Copy",
       "less": "Less",
       "more": "More"
@@ -1115,12 +1156,15 @@
       "publications": "Publications",
       "campaigns": "Campaigns",
       "calendar": "Calendar",
-      "logs": "Logs"
+      "logs": "Logs",
+      "approvals": "Approvals"
     },
     "status": {
       "all": "All",
       "draft": "Drafts",
       "scheduled": "Scheduled",
+      "pending_review": "Pending Review",
+      "rejected": "Rejected",
       "published": "Published"
     },
     "publications": "Publications",
@@ -1144,7 +1188,8 @@
       "status": {
         "connected": "Connected",
         "notConnected": "Not Connected",
-        "connectToShare": "Connect to start sharing"
+        "connectToShare": "Connect to start sharing",
+        "connectedBy": "Connected by"
       },
       "actions": {
         "connect": "Connect",

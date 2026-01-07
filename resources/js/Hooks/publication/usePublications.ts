@@ -13,7 +13,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useShallow } from "zustand/react/shallow";
 
-export type ManageContentTab = "publications" | "campaigns" | "logs" | "calendar";
+export type ManageContentTab = "publications" | "campaigns" | "logs" | "calendar" | "approvals";
 
 export const usePublications = () => {
   const { t } = useTranslation();

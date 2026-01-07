@@ -134,7 +134,7 @@ export default function ModernCalendar({ onEventClick }: { onEventClick?: (id: n
 
                     <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto justify-center sm:justify-end">
                         {/* Platform Filter */}
-                        <div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-lg p-1 overflow-x-auto scrollbar-none max-w-full sm:max-w-none">
+                        <div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-lg p-1 overflow-x-auto scrollbar-subtle max-w-full sm:max-w-none">
                             {platforms.map(p => (
                                 <button
                                     key={p}

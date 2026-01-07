@@ -23,15 +23,16 @@ import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
 interface Account {
-  id: number;
+  id: number; // For connected accounts, this is the DB ID. For unconnected, it might be platform index.
   platform: string;
   name: string;
   logo: any;
   isConnected: boolean;
-  accountId: number | null;
+  accountId: number | string | null;
   accountDetails?: any;
   color: string;
   gradient: string;
+  connectedBy?: string;
 }
 
 const SocialMediaAccounts = memo(() => {
@@ -111,19 +112,7 @@ const SocialMediaAccounts = memo(() => {
     return disconnectAccount(id, force);
   };
 
-  const [accounts, setAccounts] = useState<Account[]>(
-    Object.entries(SOCIAL_PLATFORMS).map(([key, config]) => ({
-      id: config.id,
-      platform: key,
-      name: config.name,
-      logo: config.logo,
-      isConnected: false,
-      accountId: null,
-      color: config.color,
-      gradient: config.gradient,
-    }))
-  );
-
+  const [accounts, setAccounts] = useState<Account[]>([]);
   const [loading, setLoading] = useState(true);
   const [connectedAccountsCount, setConnectedAccountsCount] = useState(0);
 
@@ -144,8 +133,6 @@ const SocialMediaAccounts = memo(() => {
       window.removeEventListener("message", handleAuthMessage);
     };
   }, []);
-
-
 
   const fetchConnectedAccounts = async () => {
     try {
@@ -180,32 +167,61 @@ const SocialMediaAccounts = memo(() => {
     const count = connectedAccounts?.length || 0;
     setConnectedAccountsCount(count);
 
-    if (!connectedAccounts || connectedAccounts.length === 0) {
-      setAccounts((prevAccounts) =>
-        prevAccounts.map((account) => ({
-          ...account,
+    const platformCards: Account[] = [];
+
+    Object.entries(SOCIAL_PLATFORMS).forEach(([key, config]) => {
+      const filtered = connectedAccounts.filter(
+        (ca) => ca.platform.toLowerCase() === key.toLowerCase()
+      );
+
+      if (filtered.length === 0) {
+        // Not connected: Add one placeholder card
+        platformCards.push({
+          id: config.id, // Using config ID as a stable key for placeholder
+          platform: key,
+          name: config.name,
+          logo: config.logo,
           isConnected: false,
           accountId: null,
-          accountDetails: null,
-        }))
-      );
-      return;
-    }
+          color: config.color,
+          gradient: config.gradient,
+        });
+      } else {
+        // Connected: Add a card for each connected account
+        filtered.forEach((ca) => {
+          platformCards.push({
+            id: ca.id, // Real DB ID
+            platform: key,
+            name: config.name,
+            logo: config.logo,
+            isConnected: true,
+            accountId: ca.id,
+            accountDetails: ca,
+            color: config.color,
+            gradient: config.gradient,
+            connectedBy: ca.user?.name,
+          });
+        });
 
-    setAccounts((prevAccounts) =>
-      prevAccounts.map((account) => {
-        const connectedAccount = connectedAccounts.find(
-          (ca) => ca.platform.toLowerCase() === account.platform.toLowerCase()
-        );
+        // Add an extra card to "Add another" for this platform? 
+        // Or just let them click a button inside?
+        // Let's add an "Add another" placeholder if already connected?
+        // User said: "si hay dos... que me meustre las dos"
+        // I'll add an "Add another" card for that platform to facilitate multiples
+        platformCards.push({
+          id: -config.id, // Using negative config ID to differentiate
+          platform: key,
+          name: `${t("manageContent.socialMedia.actions.connect")} ${config.name}`,
+          logo: config.logo,
+          isConnected: false,
+          accountId: null,
+          color: config.color,
+          gradient: config.gradient,
+        });
+      }
+    });
 
-        return {
-          ...account,
-          isConnected: !!connectedAccount,
-          accountId: connectedAccount ? connectedAccount.id : null,
-          accountDetails: connectedAccount || null,
-        };
-      })
-    );
+    setAccounts(platformCards);
   };
 
   const [blockerModalData, setBlockerModalData] = useState<{
@@ -213,12 +229,8 @@ const SocialMediaAccounts = memo(() => {
     posts: any[];
   } | null>(null);
 
-  const handleConnectionToggle = async (accountId: number) => {
-    const account = accounts.find((acc) => acc.id === accountId);
-
-    if (!account) return;
-
-    if (blockerModalData?.account?.id === accountId) {
+  const handleConnectionToggle = async (account: Account) => {
+    if (blockerModalData?.account?.id === account.id) {
       setBlockerModalData(null);
     }
 
@@ -226,22 +238,11 @@ const SocialMediaAccounts = memo(() => {
       try {
         const result: any = await disconnectSocialMedia(
           account.platform,
-          account.accountId
+          account.accountId as number
         );
 
         if (result && result.success) {
-          setAccounts((prevAccounts) =>
-            prevAccounts.map((acc) =>
-              acc.id === accountId
-                ? {
-                  ...acc,
-                  isConnected: false,
-                  accountId: null,
-                  accountDetails: null,
-                }
-                : acc
-            )
-          );
+          fetchConnectedAccounts(); // Refresh to regroup
           setConnectedAccountsCount((prev) => prev - 1);
         } else if (result && !result.success && result.posts) {
           setBlockerModalData({
@@ -261,29 +262,15 @@ const SocialMediaAccounts = memo(() => {
     }
   };
 
-  const handleForceDisconnect = async (accountId: number) => {
-    const account = accounts.find((acc) => acc.id === accountId);
-    if (!account) return;
-
+  const handleForceDisconnect = async (account: Account) => {
     const result = await disconnectSocialMedia(
       account.platform,
-      account.accountId,
+      account.accountId as number,
       true
     );
 
     if (result && result.success) {
-      setAccounts((prevAccounts) =>
-        prevAccounts.map((acc) =>
-          acc.id === accountId
-            ? {
-              ...acc,
-              isConnected: false,
-              accountId: null,
-              accountDetails: null,
-            }
-            : acc
-        )
-      );
+      fetchConnectedAccounts(); // Refresh
       setConnectedAccountsCount((prev) => prev - 1);
       setBlockerModalData(null);
       toast.success(
@@ -309,8 +296,7 @@ const SocialMediaAccounts = memo(() => {
               {t("manageContent.socialMedia.title")}
             </h3>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              {connectedAccountsCount} {t("manageContent.socialMedia.of")}{" "}
-              {accounts.length} {t("manageContent.socialMedia.accounts")}
+              {connectedAccountsCount} {t("manageContent.socialMedia.accounts")} {t("manageContent.socialMedia.connected")}
             </p>
           </div>
         </div>
@@ -413,7 +399,7 @@ const SocialMediaAccounts = memo(() => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {accounts.map((account) => (
                 <div
-                  key={account.id}
+                  key={`${account.platform}-${account.id}`}
                   className={`group relative rounded-2xl p-4 sm:p-5 border transition-all duration-300
                     hover:shadow-xl bg-white dark:bg-neutral-900 border-gray-100 dark:border-neutral-800 hover:border-primary-100 dark:hover:border-primary-900/30
                     ${account.isConnected
@@ -481,12 +467,20 @@ const SocialMediaAccounts = memo(() => {
                         ? account.accountDetails.account_name
                         : account.name}
                     </h3>
+
                     {account.isConnected && account.accountDetails ? (
-                      <p className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-gray-50 text-gray-500 dark:bg-neutral-800 dark:text-gray-400 mt-1.5 border border-gray-100 dark:border-neutral-700/50">
-                        {account.accountDetails.account_metadata?.username
-                          ? `@${account.accountDetails.account_metadata.username}`
-                          : `ID: ${account.accountDetails.account_id}`}
-                      </p>
+                      <div className="flex flex-col gap-1 items-center mt-1.5">
+                        <p className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-gray-50 text-gray-500 dark:bg-neutral-800 dark:text-gray-400 border border-gray-100 dark:border-neutral-700/50">
+                          {account.accountDetails.account_metadata?.username
+                            ? `@${account.accountDetails.account_metadata.username}`
+                            : `ID: ${account.accountDetails.account_id}`}
+                        </p>
+                        {account.connectedBy && (
+                          <p className="text-[9px] text-primary-500 font-bold uppercase tracking-wider">
+                            {t('manageContent.socialMedia.connectedBy') || 'Conectado por'}: {account.connectedBy}
+                          </p>
+                        )}
+                      </div>
                     ) : (
                       <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                         {t("manageContent.socialMedia.status.connectToShare")}
@@ -496,7 +490,7 @@ const SocialMediaAccounts = memo(() => {
 
                   <div className="flex gap-2 w-full">
                     <button
-                      onClick={() => handleConnectionToggle(account.id)}
+                      onClick={() => handleConnectionToggle(account)}
                       disabled={isLoading}
                       className={`flex-1 py-3 px-4 rounded-lg font-semibold text-sm flex items-center justify-center gap-2
                         transition-all duration-200 relative overflow-hidden group/btn

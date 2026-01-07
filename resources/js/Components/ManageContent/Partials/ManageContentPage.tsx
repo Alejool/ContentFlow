@@ -1,21 +1,24 @@
-
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback, useMemo, useEffect, useTransition } from "react";
+import { usePage, Head } from "@inertiajs/react";
 import LogsList from "@/Components/ManageContent/Logs/LogsList";
 import ModalManager from "@/Components/ManageContent/ModalManager";
 import { usePublicationStore } from "@/stores/publicationStore";
 import SocialMediaAccounts from "@/Components/ManageContent/socialAccount/SocialMediaAccounts";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head } from "@inertiajs/react";
 import { Copy, Plus, Folder, Filter, Calendar as CalendarIcon, FileClock, CheckCircle, Edit3, Target, FileText } from "lucide-react";
 
-import { usePublications } from "@/Hooks/publication/usePublications";
+import { usePublications, ManageContentTab } from "@/Hooks/publication/usePublications";
 import WorkspaceInfoBadge from "@/Components/Workspace/WorkspaceInfoBadge";
 import ModernCalendar from "@/Components/ManageContent/Partials/ModernCalendar";
 import { useManageContentUIStore } from "@/stores/manageContentUIStore";
 import { useShallow } from "zustand/react/shallow";
 import ContentList from "@/Components/ManageContent/ContentList";
+import ApprovalList from "@/Components/ManageContent/ApprovalList";
 
 export default function ManageContentPage() {
+  const { auth } = usePage<any>().props;
+  const permissions = auth.current_workspace?.permissions || [];
+
   const {
     t,
     handleFilterChange,
@@ -34,19 +37,21 @@ export default function ManageContentPage() {
     campPagination,
     logPagination,
     filters,
-    // We'll filter on the client side for "tabs" or use the hook's filter functionality if available
-    // For this refactor, let's assume valid data is passed and we filter visually or triggers API calls via handleFilterChange
   } = usePublications();
 
   const fetchPublicationById = usePublicationStore(s => s.fetchPublicationById);
 
   const {
+    activeTab,
+    setActiveTab,
     openAddModal,
     openEditModal,
     openPublishModal,
     openViewDetailsModal,
   } = useManageContentUIStore(
     useShallow((s) => ({
+      activeTab: s.activeTab,
+      setActiveTab: s.setActiveTab,
       openAddModal: s.openAddModal,
       openEditModal: s.openEditModal,
       openPublishModal: s.openPublishModal,
@@ -54,26 +59,24 @@ export default function ManageContentPage() {
     }))
   );
 
-  // New Tab State for "Context" (Publications vs Campaigns vs Calendar vs Logs)
-  // We keep the original "activeTab" name from store if possible, or local state.
-  // The user wants "Status Tabs" (Draft, Scheduled, Published).
-  // So we need TWO levels of navigation:
-  // 1. Context: Publications | Campaigns | Calendar
-  // 2. Status: All | Drafts | Scheduled | Published (Only for Pubs/Campaigns)
+  const handleTabChange = useCallback((tab: ManageContentTab) => {
+    startTransition(() => {
+      setActiveTab(tab);
+      // Clear filters when switching tabs to avoid cross-tab filter pollution
+      handleFilterChange({});
+      // Also reset status tab for publications if needed
+      if (tab === 'publications') setStatusTab('all');
+    });
+  }, [setActiveTab, handleFilterChange]);
 
-  // Read tab from query param if available
-  const queryParams = new URLSearchParams(window.location.search);
-  const initialTab = (queryParams.get('tab') as 'publications' | 'campaigns' | 'calendar' | 'logs') || 'publications';
-
-  const [contextTab, setContextTab] = useState<'publications' | 'campaigns' | 'calendar' | 'logs'>(initialTab);
-
-  // Sync state with URL changes (e.g. backward/forward navigation)
-  React.useEffect(() => {
+  // Sync state with URL changes (This is still useful for deep linking)
+  useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const tab = params.get('tab') as 'publications' | 'campaigns' | 'calendar' | 'logs';
-    if (tab && ['publications', 'campaigns', 'calendar', 'logs'].includes(tab)) {
-      setContextTab(tab);
+    const tab = params.get('tab') as ManageContentTab;
+    if (tab && ['publications', 'campaigns', 'calendar', 'logs', 'approvals'].includes(tab)) {
+      setActiveTab(tab);
     }
+    // ... rest of effect ...
 
     // Handle actions (e.g. open create modal from command palette)
     if (params.get('action') === 'create') {
@@ -83,7 +86,25 @@ export default function ManageContentPage() {
       newUrl.searchParams.delete('action');
       window.history.replaceState({}, '', newUrl.toString());
     }
-  }, [window.location.search]);
+
+    // Handle Deep Linking by ID (e.g. from approval links)
+    const id = params.get('id');
+    if (id) {
+      const pubId = parseInt(id);
+      if (!isNaN(pubId)) {
+        startTransition(async () => {
+          const pub = await fetchPublicationById(pubId);
+          if (pub) {
+            openViewDetailsModal(pub);
+            // Optional: Clean up ID from URL to avoid re-opening on manual refresh if desired
+            // const newUrl = new URL(window.location.href);
+            // newUrl.searchParams.delete('id');
+            // window.history.replaceState({}, '', newUrl.toString());
+          }
+        });
+      }
+    }
+  }, [window.location.search, fetchPublicationById, openViewDetailsModal, openAddModal, setActiveTab]);
 
   const [statusTab, setStatusTab] = useState('all');
 
@@ -94,7 +115,7 @@ export default function ManageContentPage() {
     { id: 'published', label: t('manageContent.status.published'), icon: CheckCircle },
   ], []);
 
-  const [isTabPending, startTransition] = React.useTransition();
+  const [isTabPending, startTransition] = useTransition();
 
   const handleStatusTabChange = useCallback((status: string) => {
     startTransition(() => {
@@ -153,36 +174,45 @@ export default function ManageContentPage() {
           <div className="mb-8">
             <SocialMediaAccounts />
           </div>
-          <div className="mb-8 border-b border-gray-200 dark:border-gray-700 w-full overflow-x-auto scrollbar-none snap-x h-fit">
+          <div className="mb-8 border-b border-gray-200 dark:border-gray-700 w-full overflow-x-auto scrollbar-subtle snap-x h-fit">
             <div className="flex items-center gap-1 sm:gap-2 min-w-max px-1">
               <button
-                onClick={() => startTransition(() => setContextTab('publications'))}
-                className={`flex items-center justify-center gap-2 py-3 px-4 sm:px-6 font-bold text-xs sm:text-sm transition-all border-b-2 snap-start ${contextTab === 'publications' ? 'border-primary-500 text-primary-600 dark:text-primary-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+                onClick={() => handleTabChange('publications')}
+                className={`flex items-center justify-center gap-2 py-3 px-4 sm:px-6 font-bold text-xs sm:text-sm transition-all border-b-2 snap-start ${activeTab === 'publications' ? 'border-primary-500 text-primary-600 dark:text-primary-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
               >
                 <Folder className="w-4 h-4 sm:w-5 sm:h-5" />
                 <span>{t('manageContent.tabs.publications')}</span>
               </button>
               <button
-                onClick={() => startTransition(() => setContextTab('campaigns'))}
-                className={`flex items-center justify-center gap-2 py-3 px-4 sm:px-6 font-bold text-xs sm:text-sm transition-all border-b-2 snap-start ${contextTab === 'campaigns' ? 'border-primary-500 text-primary-600 dark:text-primary-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+                onClick={() => handleTabChange('campaigns')}
+                className={`flex items-center justify-center gap-2 py-3 px-4 sm:px-6 font-bold text-xs sm:text-sm transition-all border-b-2 snap-start ${activeTab === 'campaigns' ? 'border-primary-500 text-primary-600 dark:text-primary-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
               >
                 <Target className="w-4 h-4 sm:w-5 sm:h-5" />
                 <span>{t('manageContent.tabs.campaigns')}</span>
               </button>
               <button
-                onClick={() => startTransition(() => setContextTab('calendar'))}
-                className={`flex items-center justify-center gap-2 py-3 px-4 sm:px-6 font-bold text-xs sm:text-sm transition-all border-b-2 snap-start ${contextTab === 'calendar' ? 'border-primary-500 text-primary-600 dark:text-primary-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+                onClick={() => handleTabChange('calendar')}
+                className={`flex items-center justify-center gap-2 py-3 px-4 sm:px-6 font-bold text-xs sm:text-sm transition-all border-b-2 snap-start ${activeTab === 'calendar' ? 'border-primary-500 text-primary-600 dark:text-primary-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
               >
                 <CalendarIcon className="w-4 h-4 sm:w-5 sm:h-5" />
                 <span>{t('manageContent.tabs.calendar')}</span>
               </button>
               <button
-                onClick={() => startTransition(() => setContextTab('logs'))}
-                className={`flex items-center justify-center gap-2 py-3 px-4 sm:px-6 font-bold text-xs sm:text-sm transition-all border-b-2 snap-start ${contextTab === 'logs' ? 'border-primary-500 text-primary-600 dark:text-primary-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+                onClick={() => handleTabChange('logs')}
+                className={`flex items-center justify-center gap-2 py-3 px-4 sm:px-6 font-bold text-xs sm:text-sm transition-all border-b-2 snap-start ${activeTab === 'logs' ? 'border-primary-500 text-primary-600 dark:text-primary-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
               >
                 <FileText className="w-4 h-4 sm:w-5 sm:h-5" />
                 <span>{t('manageContent.tabs.logs')}</span>
               </button>
+              {permissions.includes('approve') && (
+                <button
+                  onClick={() => handleTabChange('approvals')}
+                  className={`flex items-center justify-center gap-2 py-3 px-4 sm:px-6 font-bold text-xs sm:text-sm transition-all border-b-2 snap-start ${activeTab === 'approvals' ? 'border-primary-500 text-primary-600 dark:text-primary-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+                >
+                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span>{t('manageContent.tabs.approvals')}</span>
+                </button>
+              )}
             </div>
           </div>
 
@@ -190,14 +220,26 @@ export default function ManageContentPage() {
           <div className="min-h-[500px]">
 
             {/* Calendar View */}
-            {contextTab === 'calendar' && (
+            {activeTab === 'calendar' && (
               <div className="animate-in fade-in zoom-in duration-300">
                 <ModernCalendar onEventClick={handleEventClick} />
               </div>
             )}
 
+            {/* Approvals View */}
+            {activeTab === 'approvals' && (
+              <div className="animate-in fade-in zoom-in duration-300">
+                <ApprovalList
+                  publications={publications.filter(p => p.status === 'pending_review')}
+                  isLoading={isPubLoading}
+                  onRefresh={handleRefresh}
+                  onViewDetail={openViewDetailsModal}
+                />
+              </div>
+            )}
+
             {/* Logs View */}
-            {contextTab === 'logs' && (
+            {activeTab === 'logs' && (
               <div className="animate-in fade-in zoom-in duration-300">
                 <LogsList
                   logs={logs as any}
@@ -211,32 +253,34 @@ export default function ManageContentPage() {
             )}
 
             {/* Publications & Campaigns Views (With Status Tabs) */}
-            {(contextTab === 'publications' || contextTab === 'campaigns') && (
+            {(activeTab === 'publications' || activeTab === 'campaigns') && (
               <div className="animate-in fade-in zoom-in duration-300">
-                <div className="flex items-center gap-3 mb-6 bg-gray-50 dark:bg-gray-800/50 p-2 rounded-xl border border-gray-100 dark:border-gray-700 w-full sm:w-fit overflow-x-auto scrollbar-none">
-                  {statusTabs.map((tab: { id: string, label: string, icon: any }) => (
-                    <button
-                      key={tab.id}
-                      onClick={() => handleStatusTabChange(tab.id)}
-                      className={`
+                {activeTab === 'publications' && (
+                  <div className="flex items-center gap-3 mb-6 bg-gray-50 dark:bg-gray-800/50 p-2 rounded-xl border border-gray-100 dark:border-gray-700 w-full sm:w-fit overflow-x-auto scrollbar-subtle">
+                    {statusTabs.map((tab: { id: string, label: string, icon: any }) => (
+                      <button
+                        key={tab.id}
+                        onClick={() => handleStatusTabChange(tab.id)}
+                        className={`
                                     flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap
                                     ${statusTab === tab.id
-                          ? 'bg-white dark:bg-gray-700 text-primary-600 dark:text-primary-300 shadow-sm ring-1 ring-black/5'
-                          : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700/50'}
+                            ? 'bg-white dark:bg-gray-700 text-primary-600 dark:text-primary-300 shadow-sm ring-1 ring-black/5'
+                            : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700/50'}
                                 `}
-                    >
-                      <tab.icon className={`w-4 h-4 ${statusTab === tab.id ? 'text-primary-500' : 'opacity-70'}`} />
-                      {tab.label}
-                    </button>
-                  ))}
-                </div>
+                      >
+                        <tab.icon className={`w-4 h-4 ${statusTab === tab.id ? 'text-primary-500' : 'opacity-70'}`} />
+                        {tab.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
 
                 {/* Content List Component */}
                 <ContentList
-                  items={contextTab === 'publications' ? publications : campaigns}
-                  isLoading={contextTab === 'publications' ? isPubLoading : isCampLoading}
-                  mode={contextTab === 'publications' ? 'publications' : 'campaigns'}
-                  pagination={contextTab === 'publications' ? pubPagination : campPagination}
+                  items={activeTab === 'publications' ? publications : campaigns}
+                  isLoading={activeTab === 'publications' ? isPubLoading : isCampLoading}
+                  mode={activeTab === 'publications' ? 'publications' : 'campaigns'}
+                  pagination={activeTab === 'publications' ? pubPagination : campPagination}
                   onPageChange={handlePageChange}
                   onEdit={openEditModal}
                   onDelete={handleDeleteItem}

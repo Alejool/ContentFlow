@@ -98,6 +98,22 @@ const PublicationRow = memo(({
                 </span>
               </div>
             )}
+            {item.status === 'publishing' && item.publisher && (
+              <div className="flex items-center gap-1.5 mt-1">
+                <span className="flex-shrink-0 w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-tight">
+                  {t("publications.table.publishingBy") || "Publishing by"} {item.publisher.name}
+                </span>
+              </div>
+            )}
+            {item.status === 'rejected' && item.rejector && (
+              <div className="flex items-center gap-1.5 mt-1">
+                <span className="flex-shrink-0 w-2 h-2 rounded-full bg-rose-500"></span>
+                <span className="text-[10px] font-bold text-rose-600 dark:text-rose-400 uppercase tracking-tight">
+                  {t("publications.table.rejectedBy") || "Rejected by"} {item.rejector.name}
+                </span>
+              </div>
+            )}
           </div>
         </div>
       </td>

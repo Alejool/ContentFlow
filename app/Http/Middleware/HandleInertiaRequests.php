@@ -102,6 +102,7 @@ class HandleInertiaRequests extends Middleware
             $roleId = $currentUser ? $currentUser->pivot->role_id : null;
             $role = $roles->find($roleId);
             $currentWorkspace->user_role = $role ? $role->name : 'Member';
+            $currentWorkspace->permissions = $role ? $role->permissions->pluck('slug')->toArray() : [];
           }
 
           return $currentWorkspace;

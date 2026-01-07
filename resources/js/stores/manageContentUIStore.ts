@@ -5,7 +5,7 @@ import { Publication } from "@/types/Publication";
 type SelectedItem = Campaign | Publication | null;
 
 interface ManageContentUIState {
-    activeTab: "publications" | "campaigns" | "logs" | "calendar";
+    activeTab: "publications" | "campaigns" | "logs" | "calendar" | "approvals";
     selectedItem: SelectedItem;
 
     // Modal States
@@ -15,7 +15,7 @@ interface ManageContentUIState {
     isViewDetailsModalOpen: boolean;
 
     // Actions
-    setActiveTab: (tab: "publications" | "campaigns" | "logs" | "calendar") => void;
+    setActiveTab: (tab: "publications" | "campaigns" | "logs" | "calendar" | "approvals") => void;
     setSelectedItem: (item: SelectedItem) => void;
 
     openAddModal: () => void;

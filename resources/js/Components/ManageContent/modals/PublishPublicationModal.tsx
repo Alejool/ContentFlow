@@ -17,6 +17,7 @@ import {
   X,
   XCircle,
 } from "lucide-react";
+import { usePage } from "@inertiajs/react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -68,9 +69,51 @@ export default function PublishPublicationModal({
     handlePublish,
     handleThumbnailChange,
     handleThumbnailDelete,
+    handleRequestReview,
+    handleApprove,
+    handleReject,
     setUnpublishing,
     resetState,
   } = usePublishPublication();
+
+  const { auth } = usePage<any>().props;
+  const currentWorkspace = auth.current_workspace;
+  const permissions = currentWorkspace?.permissions || [];
+  const hasPublishPermission = permissions.includes('publish');
+  const isApproved = publication?.status === 'approved' || publication?.status === 'published';
+  const canPublishDirectly = hasPublishPermission || isApproved;
+  const isPendingReview = publication?.status === 'pending_review';
+
+  const handleRequestApproval = async () => {
+    if (!publication) return;
+    const success = await handleRequestReview(publication.id);
+    if (success) {
+      if (onSuccess) onSuccess();
+      onClose(publication.id);
+    }
+  };
+
+  const handleApproveRequest = async () => {
+    if (!publication) return;
+    const success = await handleApprove(publication.id);
+    if (success) {
+      if (onSuccess) onSuccess();
+      // Don't close, let them publish now that it's approved?
+      // Or just close and let them refresh. 
+      // User said "ahora acepto la solicitud... pero no me deja subir"
+      // If I don't close, the status in the parent might not update immediately unless I fetch.
+      onClose(publication.id);
+    }
+  };
+
+  const handleRejectRequest = async () => {
+    if (!publication) return;
+    const success = await handleReject(publication.id);
+    if (success) {
+      if (onSuccess) onSuccess();
+      onClose(publication.id);
+    }
+  };
 
   const { fetchPublicationById } = usePublicationStore();
 
@@ -184,6 +227,34 @@ export default function PublishPublicationModal({
                 <X className="w-5 h-5" />
               </button>
             </div>
+
+            {isPendingReview && (
+              <div className="mb-6 p-4 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 flex items-start gap-3">
+                <Clock className="w-5 h-5 text-yellow-600 dark:text-yellow-400 mt-0.5" />
+                <div>
+                  <h4 className="text-sm font-bold text-yellow-800 dark:text-yellow-200">
+                    {t("publications.modal.publish.pendingReviewBanner.title") || "Publicación en Revisión"}
+                  </h4>
+                  <p className="text-xs text-yellow-700 dark:text-yellow-300">
+                    {t("publications.modal.publish.pendingReviewBanner.message") || "Esta publicación ya ha sido enviada para revisión. Un administrador debe aprobarla antes de que pueda ser publicada."}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {publication.status === 'rejected' && (
+              <div className="mb-6 p-4 rounded-lg bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 flex items-start gap-3">
+                <XCircle className="w-5 h-5 text-rose-600 dark:text-rose-400 mt-0.5" />
+                <div>
+                  <h4 className="text-sm font-bold text-rose-800 dark:text-rose-200">
+                    {t("publications.modal.publish.rejectedBanner.title") || "Publicación Rechazada"}
+                  </h4>
+                  <p className="text-xs text-rose-700 dark:text-rose-300">
+                    {t("publications.modal.publish.rejectedBanner.message", { name: publication.rejector?.name }) || `Esta publicación fue rechazada por ${publication.rejector?.name || 'un administrador'}. Por favor, realiza los ajustes necesarios y vuelve a solicitar aprobación.`}
+                  </p>
+                </div>
+              </div>
+            )}
 
             <div
               className="mb-6 p-4 rounded-lg bg-gray-50 dark:bg-neutral-900/50"
@@ -301,8 +372,13 @@ export default function PublishPublicationModal({
                             <div
                               className="text-xs text-primary-600 dark:text-primary-400"
                             >
-                              @{account.account_name || account.name}
+                              @{account.account_name}
                             </div>
+                            {account.user?.name && (
+                              <div className="text-[10px] text-primary-500 font-bold uppercase tracking-wider mt-1">
+                                {t('manageContent.socialMedia.status.connectedBy') || 'Conectado por'}: {account.user.name}
+                              </div>
+                            )}
                           </div>
 
                           {isPublished && (
@@ -495,26 +571,64 @@ export default function PublishPublicationModal({
               >
                 {t("publications.modal.publish.button.cancel")}
               </button>
-              <button
-                type="button"
-                onClick={handlePublishWithNotifications}
-                disabled={publishing || selectedPlatforms.length === 0}
-                className="flex-[2] px-4 py-3 rounded-lg font-medium bg-gradient-to-r from-primary-500 to-pink-500 hover:from-primary-600 hover:to-pink-600 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-              >
-                {publishing || publication.status === "publishing" ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    {t("publications.modal.publish.publishing")}
-                  </>
-                ) : (
-                  <>
-                    <Share2 className="w-4 h-4" />
-                    {t("publications.modal.publish.button.publish")}{" "}
-                    {selectedPlatforms.length}{" "}
-                    {t("publications.modal.publish.platforms")}
-                  </>
-                )}
-              </button>
+              {canPublishDirectly ? (
+                <div className="flex-[2] flex gap-3">
+                  {isPendingReview && (
+                    <button
+                      type="button"
+                      onClick={handleRejectRequest}
+                      className="flex-1 px-4 py-3 rounded-lg font-medium bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors flex items-center justify-center gap-2"
+                    >
+                      <XCircle className="w-4 h-4" />
+                      {t("publications.modal.publish.button.reject") || "Rechazar"}
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={isPendingReview ? handleApproveRequest : handlePublishWithNotifications}
+                    disabled={publishing || (!isPendingReview && selectedPlatforms.length === 0)}
+                    className="flex-[2] px-4 py-3 rounded-lg font-medium bg-gradient-to-r from-primary-500 to-pink-500 hover:from-primary-600 hover:to-pink-600 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    {publishing || publication.status === "publishing" ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                        {t("publications.modal.publish.publishing")}
+                      </>
+                    ) : isPendingReview ? (
+                      <>
+                        <CheckCircle className="w-4 h-4" />
+                        {t("publications.modal.publish.button.approve") || "Aprobar"}
+                      </>
+                    ) : (
+                      <>
+                        <Share2 className="w-4 h-4" />
+                        {t("publications.modal.publish.button.publish")}{" "}
+                        {selectedPlatforms.length}{" "}
+                        {t("publications.modal.publish.platforms")}
+                      </>
+                    )}
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleRequestApproval}
+                  disabled={publishing || isPendingReview}
+                  className="flex-[2] px-4 py-3 rounded-lg font-medium bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {isPendingReview ? (
+                    <>
+                      <Clock className="w-4 h-4" />
+                      {t("publications.modal.publish.button.pendingReview")}
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle className="w-4 h-4" />
+                      {t("publications.modal.publish.button.requestApproval")}
+                    </>
+                  )}
+                </button>
+              )}
             </div>
 
             <PlatformSettingsModal

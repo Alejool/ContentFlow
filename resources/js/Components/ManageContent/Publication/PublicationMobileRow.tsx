@@ -126,6 +126,18 @@ const PublicationMobileRow = memo(({
                         <span className="text-[10px] font-bold text-amber-500 uppercase">{remoteLocks[item.id].user_name.split(' ')[0]}</span>
                       </span>
                     )}
+                    {item.status === 'publishing' && item.publisher && (
+                      <span className="flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span className="text-[10px] font-bold text-emerald-500 uppercase">{item.publisher.name.split(' ')[0]}</span>
+                      </span>
+                    )}
+                    {item.status === 'rejected' && item.rejector && (
+                      <span className="flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                        <span className="text-[10px] font-bold text-rose-500 uppercase">{item.rejector.name.split(' ')[0]}</span>
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>

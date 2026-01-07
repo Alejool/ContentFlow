@@ -46,9 +46,12 @@
     "platform": "Plataforma",
     "close": "Cerrar",
     "created": "Creado",
+    "creator": "Creador",
     "lastUpdated": "Última Actualización",
     "startDate": "Fecha de Inicio",
     "endDate": "Fecha de Fin",
+    "viewOnPlatform": "Ver en plataforma",
+    "viewDirectly": "Ver pantalla completa",
     "filters": {
       "all": "Todos"
     },
@@ -57,11 +60,18 @@
     "configure": "Configurar",
     "noSettings": "Sin ajustes por defecto",
     "adjustOptions": "Ajustar opciones específicas",
-    "viewOnPlatform": "Ver en plataforma",
     "remove": "Eliminar",
     "errors": {
       "checkFormErrors": "Por favor, revisa los errores en el formulario"
     }
+  },
+  "approvals": {
+    "approve": "Aprobar",
+    "reject": "Rechazar",
+    "approvedSuccess": "Publicación aprobada con éxito",
+    "rejectedSuccess": "Publicación rechazada con éxito",
+    "noPending": "Sin aprobaciones pendientes",
+    "noPendingDesc": "¡Genial! Todas las publicaciones están al día."
   },
   "nav": {
     "dashboard": "Panel",
@@ -296,6 +306,9 @@
     "title": "Publicaciones",
     "subtitle": "Gestionar tus publicaciones",
     "modal": {
+      "view": {
+        "title": "Vista Detallada"
+      },
       "schedule": {
         "title": "Fecha para todas las redes",
         "description": "Define una fecha única para publicar en todas las redes sociales seleccionadas a la vez.",
@@ -394,6 +407,17 @@
           "userMessage": "{{user}} está editando esta publicación <1>desde {{browser}}</1>. Tus cambios no podrán ser guardados para evitar conflictos."
         }
       },
+      "approvals": {
+        "noPending": "Sin aprobaciones pendientes",
+        "noPendingDesc": "¡Genial! Todas las publicaciones están al día.",
+        "approve": "Aprobar",
+        "approvedSuccess": "Publicación aprobada con éxito",
+        "title": "Aprobaciones",
+        "date": "Fecha",
+        "user": "Usuario",
+        "publication": "Publicación",
+        "actions": "Acciones"
+      },
       "manageContent": {
         "configureNetworks": "Configura tus publicaciones programadas"
       },
@@ -407,7 +431,7 @@
         "published": "Publicado",
         "loading": "Cargando...",
         "publishing": "Publicando...",
-        "platforms": "Plataformas",
+        "platforms": "plataformas",
         "removed": "Removido",
         "failed": "Fallido",
         "scheduled": "Programado",
@@ -426,9 +450,21 @@
         },
         "button": {
           "publish": "Publicar",
+          "requestApproval": "Solicitar Aprobación",
+          "pendingReview": "Pendiente de Revisión",
+          "approve": "Aprobar",
+          "reject": "Rechazar",
           "cancel": "Cancelar",
           "change": "Cambiar",
           "preview": "Vista Previa"
+        },
+        "pendingReviewBanner": {
+          "title": "Publicación en Revisión",
+          "message": "Esta publicación ya ha sido enviada para revisión. Un administrador debe aprobarla antes de que pueda ser publicada."
+        },
+        "rejectedBanner": {
+          "title": "Publicación Rechazada",
+          "message": "Esta publicación fue rechazada por {{name}}. Por favor, realiza los ajustes necesarios y vuelve a solicitar aprobación."
         }
       },
       "preview": {
@@ -506,7 +542,9 @@
         "description": "Crea una publicación para comenzar a publicar contenido.",
         "button": "Agregar Publicación"
       },
-      "lockedBy": "Bloqueado por:"
+      "lockedBy": "Bloqueado por:",
+      "publishingBy": "Publicando por",
+      "rejectedBy": "Rechazado por"
     },
     "messages": {
       "addSuccess": "¡Publicación agregada exitosamente!",
@@ -853,6 +891,8 @@
     "title": "Registro de Actividad",
     "subtitle": "Registros de actividad",
     "refresh": "Actualizar",
+    "viewPost": "Ver publicación",
+    "filter": "Filtrar",
     "filters": {
       "campaign": "Filtrar por Campaña",
       "dateRange": "Rango de Fechas",
@@ -1129,12 +1169,15 @@
       "publications": "Publicaciones",
       "campaigns": "Campañas",
       "calendar": "Calendario",
-      "logs": "Registros"
+      "logs": "Registros",
+      "approvals": "Aprobaciones"
     },
     "status": {
       "all": "Todos",
       "draft": "Borradores",
       "scheduled": "Programados",
+      "pending_review": "Pendiente de Revisión",
+      "rejected": "Rechazados",
       "published": "Publicados"
     },
     "publications": "Publicaciones",
@@ -1159,7 +1202,8 @@
       "status": {
         "connected": "Conectado",
         "notConnected": "No Conectado",
-        "connectToShare": "Conecta para comenzar a compartir"
+        "connectToShare": "Conecta para comenzar a compartir",
+        "connectedBy": "Conectado por"
       },
       "actions": {
         "connect": "Conectar",

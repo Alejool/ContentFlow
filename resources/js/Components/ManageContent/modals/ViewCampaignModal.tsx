@@ -3,7 +3,8 @@ import PlatformPreviewModal from "@/Components/ManageContent/modals/common/Platf
 import { Campaign } from "@/types/Campaign";
 import { Publication } from "@/types/Publication";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
-import { Calendar, Eye, FileText, Hash, Layers, Target, X } from "lucide-react";
+import { Calendar, Eye, FileText, Hash, Layers, Target, X, ExternalLink, User } from "lucide-react";
+import { Link } from "@inertiajs/react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -27,8 +28,10 @@ export default function ViewCampaignModal({
   if (!item) return null;
 
   const isPublication = (i: any): i is Publication => {
-    return !!i.media_files || !!i.scheduled_posts || i.type === "publication";
+    return !!i.title && !i.name;
   };
+
+  const isActuallyPublication = isPublication(item);
 
   const title = (item as any).title || (item as any).name || "Untitled";
   const desc = item.description || "No description provided.";
@@ -76,12 +79,14 @@ export default function ViewCampaignModal({
             <DialogTitle
               className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2"
             >
-              {publications.length > 0 ? (
-                <Layers className="w-6 h-6 text-primary-500" />
-              ) : (
+              {isActuallyPublication ? (
                 <FileText className="w-6 h-6 text-primary-500" />
+              ) : (
+                <Layers className="w-6 h-6 text-primary-500" />
               )}
-              {t("campaigns.modal.showCampaign.title")}
+              {isActuallyPublication
+                ? t("publications.modal.view.title") || "Ver Publicación"
+                : t("campaigns.modal.showCampaign.title")}
             </DialogTitle>
             <button
               onClick={onClose}
@@ -186,6 +191,23 @@ export default function ViewCampaignModal({
                         </div>
                       );
                     })}
+                  </div>
+                </div>
+              )}
+              {(item as any).user && (
+                <div className="flex items-center gap-3 p-4 rounded-lg bg-gray-50 dark:bg-neutral-900/50">
+                  <div className="flex-shrink-0">
+                    {(item as any).user.photo_url ? (
+                      <img src={(item as any).user.photo_url} className="w-10 h-10 rounded-full border-2 border-white dark:border-neutral-700 shadow-sm" alt="" />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400">
+                        <User className="w-5 h-5" />
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-gray-900 dark:text-white">{(item as any).user.name}</h4>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{t("common.creator") || "Creador"}</p>
                   </div>
                 </div>
               )}
@@ -381,6 +403,15 @@ export default function ViewCampaignModal({
           </div>
 
           <div className="flex-shrink-0 flex justify-end gap-3 p-6 border-t border-gray-100 dark:border-neutral-700">
+            {isActuallyPublication && (
+              <Link
+                href={route('publications.show', item.id)}
+                className="px-6 py-2.5 rounded-lg font-bold transition-all bg-primary-600 hover:bg-primary-700 text-white flex items-center gap-2 shadow-lg shadow-primary-500/20 active:scale-95"
+              >
+                <ExternalLink className="w-4 h-4" />
+                {t("common.viewDirectly") || "Ver pantalla completa"}
+              </Link>
+            )}
             <button
               onClick={onClose}
               className="px-6 py-2.5 rounded-lg font-medium transition-colors bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:text-white"

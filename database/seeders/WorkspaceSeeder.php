@@ -23,6 +23,8 @@ class WorkspaceSeeder extends Seeder
             ['name' => 'View Analytics', 'slug' => 'view-analytics', 'description' => 'Allow viewing workspace analytics'],
             ['name' => 'Manage Accounts', 'slug' => 'manage-accounts', 'description' => 'Allow adding/removing social accounts'],
             ['name' => 'Manage Team', 'slug' => 'manage-team', 'description' => 'Allow inviting/removing members'],
+            ['name' => 'Manage Content', 'slug' => 'manage-content', 'description' => 'Allow creating and editing publications'],
+            ['name' => 'Manage Campaigns', 'slug' => 'manage-campaigns', 'description' => 'Allow creating and editing campaigns'],
         ];
 
         foreach ($permissions as $p) {
@@ -31,9 +33,9 @@ class WorkspaceSeeder extends Seeder
 
         // 2. Create Roles
         $roles = [
-            'Owner' => ['publish', 'approve', 'view-analytics', 'manage-accounts', 'manage-team'],
-            'Admin' => ['publish', 'approve', 'view-analytics', 'manage-accounts'],
-            'Editor' => ['publish', 'approve', 'view-analytics'],
+            'Owner' => ['publish', 'approve', 'view-analytics', 'manage-accounts', 'manage-team', 'manage-content', 'manage-campaigns'],
+            'Admin' => ['publish', 'approve', 'view-analytics', 'manage-accounts', 'manage-content', 'manage-campaigns'],
+            'Editor' => ['view-analytics', 'manage-content', 'manage-campaigns'],
             'Viewer' => ['view-analytics'],
         ];
 

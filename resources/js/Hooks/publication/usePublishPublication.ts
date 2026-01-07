@@ -1,3 +1,4 @@
+import axios from "axios";
 import { useCampaignStore } from "@/stores/campaignStore";
 import { usePublicationStore } from "@/stores/publicationStore";
 import { useAccountsStore } from "@/stores/socialAccountsStore";
@@ -52,6 +53,7 @@ export interface UsePublishPublicationReturn extends PublishPublicationState {
   activeAccounts: SocialAccount[];
   handleThumbnailChange: (videoId: number, file: File | null) => void;
   handleThumbnailDelete: (videoId: number) => void;
+  handleRequestReview: (publicationId: number) => Promise<boolean>;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -97,7 +99,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
         .filter((account) => account.is_active)
         .map((account) => ({
           ...account,
-          account_name: account.account_name || account.name,
+          account_name: account.account_name,
         })),
     [accounts]
   );
@@ -387,6 +389,50 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
     [selectedPlatforms, youtubeThumbnails, publishPublication]
   );
 
+  /* --------------------------- Review Handling ---------------------------- */
+
+  const handleRequestReview = useCallback(async (publicationId: number) => {
+    try {
+      const response = await axios.post(route('publications.request-review', publicationId));
+      if (response.data.success) {
+        toast.success("Publication sent for review");
+        return true;
+      }
+      return false;
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Failed to request review");
+      return false;
+    }
+  }, []);
+
+  const handleApprove = useCallback(async (publicationId: number) => {
+    try {
+      const response = await axios.post(route('publications.approve', publicationId));
+      if (response.data.success) {
+        toast.success("Publication approved");
+        return true;
+      }
+      return false;
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Failed to approve");
+      return false;
+    }
+  }, []);
+
+  const handleReject = useCallback(async (publicationId: number) => {
+    try {
+      const response = await axios.post(route('publications.reject', publicationId));
+      if (response.data.success) {
+        toast.success("Publication rejected and moved to draft");
+        return true;
+      }
+      return false;
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Failed to reject");
+      return false;
+    }
+  }, []);
+
   /* ------------------------------- RETURN ----------------------------------- */
 
   return {
@@ -413,6 +459,9 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
     deselectAll,
     isYoutubeSelected,
     handlePublish,
+    handleRequestReview,
+    handleApprove,
+    handleReject,
 
     handleThumbnailChange,
     handleThumbnailDelete,
@@ -424,3 +473,36 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
     resetState,
   };
 };
+
+export interface UsePublishPublicationReturn extends PublishPublicationState {
+  connectedAccounts: SocialAccount[];
+  activeAccounts: SocialAccount[];
+  fetchPublishedPlatforms: (publicationId: number) => Promise<void>;
+  loadExistingThumbnails: (publication: Publication) => Promise<void>;
+  handleUnpublish: (
+    publicationId: number,
+    accountId: number,
+    platform: string
+  ) => Promise<boolean>;
+  togglePlatform: (accountId: number) => void;
+  selectAll: () => void;
+  deselectAll: () => void;
+  isYoutubeSelected: () => boolean;
+  handlePublish: (
+    publication: Publication,
+    platformSettings?: Record<string, any>
+  ) => Promise<boolean>;
+  handleRequestReview: (publicationId: number) => Promise<boolean>;
+  handleApprove: (publicationId: number) => Promise<boolean>;
+  handleReject: (publicationId: number) => Promise<boolean>;
+  handleThumbnailChange: (videoId: number, file: File | null) => void;
+  handleThumbnailDelete: (videoId: number) => void;
+  setYoutubeThumbnails: React.Dispatch<
+    React.SetStateAction<Record<number, File | null>>
+  >;
+  setExistingThumbnails: React.Dispatch<
+    React.SetStateAction<Record<number, { url: string; id: number }>>
+  >;
+  setUnpublishing: React.Dispatch<React.SetStateAction<number | null>>;
+  resetState: () => void;
+}

@@ -108,15 +108,15 @@ export default function MobileNavbar({
                 />
               </svg>
             </button>
+          </div>
             <div className="flex items-center justify-center flex-1 px-2 min-w-0">
               <img src={Logo} alt="Logo"
-                className="h-10 w-auto object-contain max-w-[140px] sm:max-w-none" />
+                className="h-12 w-auto object-contain max-w-[140px] sm:max-w-none" />
             </div>
-          </div>
 
           <div className="flex items-center gap-2">
             <SearchButton variant="compact" />
-            <div className="h-6 w-px bg-gray-200 dark:bg-neutral-800"></div>
+            <div className="h-6 w-px "></div>
             <NotificationButton />
             <ProfileDropdown user={user} isProfileActive={isProfileActive} />
           </div>
