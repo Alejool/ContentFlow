@@ -7,11 +7,19 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
+use \Illuminate\Database\Eloquent\Relations\HasOne;
 
 class MediaFile extends Model
 {
     use HasFactory;
     protected $appends = [];
+    protected $with = [];
+
+    public function thumbnail(): HasOne
+    {
+        return $this->hasOne(MediaDerivative::class)->where('derivative_type', 'thumbnail');
+    }
+
 
     protected $fillable = [
         'user_id',

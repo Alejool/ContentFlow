@@ -3,7 +3,7 @@ import PlatformPreviewModal from "@/Components/ManageContent/modals/common/Platf
 import { Campaign } from "@/types/Campaign";
 import { Publication } from "@/types/Publication";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
-import { Calendar, Eye, FileText, Hash, Layers, Target, X, ExternalLink, User } from "lucide-react";
+import { Calendar, Eye, FileText, Hash, Layers, Target, X, User, Edit } from "lucide-react";
 import { Link } from "@inertiajs/react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -12,13 +12,17 @@ interface ViewCampaignModalProps {
   isOpen: boolean;
   onClose: () => void;
   campaign: Campaign | Publication | null;
+  onEdit?: (item: Campaign | Publication) => void;
 }
+
 
 export default function ViewCampaignModal({
   isOpen,
   onClose,
   campaign: item,
+  onEdit,
 }: ViewCampaignModalProps) {
+
   const { t } = useTranslation();
 
   const [previewPublication, setPreviewPublication] =
@@ -403,16 +407,21 @@ export default function ViewCampaignModal({
           </div>
 
           <div className="flex-shrink-0 flex justify-end gap-3 p-6 border-t border-gray-100 dark:border-neutral-700">
-            {isActuallyPublication && (
-              <Link
-                href={route('publications.show', item.id)}
+            {onEdit && (
+              <button
+                onClick={() => {
+                  onClose();
+                  onEdit(item);
+                }}
                 className="px-6 py-2.5 rounded-lg font-bold transition-all bg-primary-600 hover:bg-primary-700 text-white flex items-center gap-2 shadow-lg shadow-primary-500/20 active:scale-95"
               >
-                <ExternalLink className="w-4 h-4" />
-                {t("common.viewDirectly") || "Ver pantalla completa"}
-              </Link>
+                <Edit className="w-4 h-4" />
+                {t("common.editInPanel") || "Editar en el panel"}
+              </button>
             )}
             <button
+
+
               onClick={onClose}
               className="px-6 py-2.5 rounded-lg font-medium transition-colors bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:text-white"
             >

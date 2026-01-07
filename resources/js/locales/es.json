@@ -52,6 +52,7 @@
     "endDate": "Fecha de Fin",
     "viewOnPlatform": "Ver en plataforma",
     "viewDirectly": "Ver pantalla completa",
+    "editInPanel": "Editar en el panel",
     "filters": {
       "all": "Todos"
     },
@@ -71,7 +72,21 @@
     "approvedSuccess": "Publicación aprobada con éxito",
     "rejectedSuccess": "Publicación rechazada con éxito",
     "noPending": "Sin aprobaciones pendientes",
-    "noPendingDesc": "¡Genial! Todas las publicaciones están al día."
+    "noPendingDesc": "¡Genial! Todas las publicaciones están al día.",
+    "rejectPublication": "Rechazar Publicación",
+    "rejectionReason": "Razón del Rechazo",
+    "rejectionReasonDescription": "Proporciona una razón detallada para el rechazo de",
+    "rejectionReasonPlaceholder": "Ej. El contenido no cumple con las políticas de la empresa...",
+    "rejectionReasonTooShort": "La razón debe tener al menos 10 caracteres",
+    "rejectionReasonTooLong": "La razón no puede exceder 500 caracteres",
+    "approvalSuccess": "¡Publicación Aprobada!",
+    "approvalSuccessMessage": "La publicación ha sido aprobada exitosamente y está lista para ser publicada.",
+    "approvedBy": "Aprobado por",
+    "rejectedBy": "Rechazado por",
+    "publicationRejected": "Publicación Rechazada",
+    "rejectionMessage": "Tu publicación ha sido rechazada. Por favor, revisa los comentarios y realiza los ajustes necesarios.",
+    "noReasonProvided": "No se proporcionó una razón.",
+    "editPublication": "Editar Publicación"
   },
   "nav": {
     "dashboard": "Panel",
@@ -846,8 +861,8 @@
     "connectedAccounts": {
       "title": "Cuentas Sociales Conectadas",
       "description": "Administra tus perfiles de redes sociales conectados para publicación de contenido.",
-      "connected": "Conectado",
-      "notConnected": "No Conectado",
+      "connected": "Conectadas",
+      "notConnected": "No Conectadas",
       "manageLink": "Administrar conexiones en el Gestor de Contenido"
     },
     "password": {

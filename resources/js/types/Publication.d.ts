@@ -28,6 +28,7 @@ export type Publication = {
   published_at?: string;
   rejected_by?: number;
   rejected_at?: string;
+  rejection_reason?: string;
   publisher?: {
     id: number;
     name: string;
@@ -38,7 +39,13 @@ export type Publication = {
     name: string;
     photo_url: string;
   };
+  approver?: {
+    id: number;
+    name: string;
+    photo_url: string;
+  };
 };
+
 
 export type ScheduledPost = {
   id: number;
@@ -115,9 +122,16 @@ export type MediaFile = {
     mime_type?: string;
     [key: string]: any;
   }>;
+  thumbnail?: {
+    id: number;
+    file_path: string;
+    file_name: string;
+    derivative_type: string;
+  };
   pivot?: {
     publication_id: number;
     media_file_id: number;
     order: number;
   };
 };
+

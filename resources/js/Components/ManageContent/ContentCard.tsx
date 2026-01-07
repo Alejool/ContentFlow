@@ -29,25 +29,37 @@ export default function ContentCard({ item, onEdit, onDelete, onViewDetails, onP
     failed: AlertCircle,
   }[statusKey] || Edit;
 
-  // Determine thumbnail
-  const thumbnail = item.media_files?.[0]?.file_path || item.thumbnail;
+  // Determine thumbnail and if it's a video
+  const mediaFile = item.media_files?.[0];
+  const isVideo = mediaFile?.file_type?.includes('video');
+  const thumbnail = mediaFile?.thumbnail?.file_path || mediaFile?.file_path || item.thumbnail;
 
   return (
     <div className="group bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100 dark:border-gray-700 overflow-hidden flex flex-col h-full">
       {/* Image / Thumbnail Section */}
       <div className="relative h-40 bg-gray-100 dark:bg-gray-700 overflow-hidden">
         {thumbnail ? (
-          <img
-            src={thumbnail}
-            alt={item.title}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-            loading="lazy"
-          />
+          <div className="relative w-full h-full">
+            <img
+              src={thumbnail}
+              alt={item.title}
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              loading="lazy"
+            />
+            {isVideo && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/10 group-hover:bg-black/20 transition-colors">
+                <div className="bg-white/90 dark:bg-gray-900/90 p-2.5 rounded-full shadow-lg backdrop-blur-sm transform group-hover:scale-110 transition-transform">
+                  <Rocket className="w-5 h-5 text-primary-600 fill-primary-600" />
+                </div>
+              </div>
+            )}
+          </div>
         ) : (
           <div className="w-full h-full flex items-center justify-center text-gray-400">
             {type === 'campaign' ? <Globe className="w-12 h-12 opacity-20" /> : <Eye className="w-12 h-12 opacity-20" />}
           </div>
         )}
+
 
         {/* Overlay Badge */}
         <div className="absolute top-3 right-3">

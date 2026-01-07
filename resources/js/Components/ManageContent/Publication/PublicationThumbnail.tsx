@@ -30,13 +30,12 @@ const PublicationThumbnail = memo(({
     );
   }
 
-  // Optimize: Check specifically for image first, without mapping entire array if possible
-  const firstImage = mediaFiles.find((f) => f && f.file_type && f.file_type.includes("image"));
+  // Optimize: Check specifically for image or video thumbnail
+  const firstMedia = mediaFiles[0];
+  const thumbnailFile = firstMedia?.thumbnail?.file_path || (firstMedia?.file_type?.includes("image") ? firstMedia.file_path : null);
 
-  if (firstImage) {
-    let url = firstImage.file_path;
-    if (!url) return <File className="w-6 h-6 text-gray-400" />;
-
+  if (thumbnailFile) {
+    let url = thumbnailFile;
     if (!url.startsWith("http") && !url.startsWith("/storage/")) {
       url = `/storage/${url}`;
     }
@@ -52,7 +51,7 @@ const PublicationThumbnail = memo(({
     );
   }
 
-  // If no image but has video, return video placeholder
+  // If no thumbnail but has video, return video placeholder
   const hasVideo = mediaFiles.some((f) => f && f.file_type && f.file_type.includes("video"));
   if (hasVideo) {
     return (
@@ -64,6 +63,7 @@ const PublicationThumbnail = memo(({
       </div>
     );
   }
+
 
   return <File className="w-6 h-6 text-gray-400" />;
 });

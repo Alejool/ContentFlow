@@ -25,11 +25,13 @@ const ModalManager = memo(({ onRefresh }: ModalManagerProps) => {
         isEditModalOpen,
         isPublishModalOpen,
         isViewDetailsModalOpen,
+        openEditModal,
         closeAddModal,
         closeEditModal,
         closePublishModal,
         closeViewDetailsModal,
     } = useManageContentUIStore();
+
 
     const { fetchPublishedPlatforms } = usePublishPublication();
 
@@ -114,7 +116,9 @@ const ModalManager = memo(({ onRefresh }: ModalManagerProps) => {
                         isOpen={isViewDetailsModalOpen}
                         onClose={closeViewDetailsModal}
                         campaign={selectedItem as any}
+                        onEdit={openEditModal}
                     />,
+
                     document.body
                 )}
         </>

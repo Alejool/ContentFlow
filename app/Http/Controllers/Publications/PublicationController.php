@@ -17,6 +17,7 @@ use App\Actions\Publications\PublishPublicationAction;
 use App\Actions\Publications\UnpublishPublicationAction;
 use App\Notifications\PublicationAwaitingApprovalNotification;
 use App\Notifications\PublicationApprovedNotification;
+use App\Notifications\PublicationRejectedNotification;
 
 class PublicationController extends Controller
 {
@@ -49,6 +50,7 @@ class PublicationController extends Controller
       $query = Publication::where('workspace_id', $workspaceId)
         ->with([
           'mediaFiles' => fn($q) => $q->select('media_files.id', 'media_files.file_path', 'media_files.file_type', 'media_files.file_name', 'media_files.size', 'media_files.mime_type'),
+          'mediaFiles.thumbnail' => fn($q) => $q->select('id', 'media_file_id', 'file_path', 'file_name', 'derivative_type'),
           'scheduled_posts' => fn($q) => $q->select('id', 'publication_id', 'social_account_id', 'status', 'scheduled_at'),
           'scheduled_posts.socialAccount' => fn($q) => $q->select('id', 'platform', 'account_name'),
           'socialPostLogs' => fn($q) => $q->select('id', 'publication_id', 'social_account_id', 'status'),
@@ -108,6 +110,7 @@ class PublicationController extends Controller
   {
     $publication->load([
       'mediaFiles' => fn($q) => $q->select('media_files.id', 'media_files.file_path', 'media_files.file_type', 'media_files.file_name', 'media_files.size', 'media_files.mime_type'),
+      'mediaFiles.thumbnail' => fn($q) => $q->select('id', 'media_file_id', 'file_path', 'file_name', 'derivative_type'),
       'mediaFiles.derivatives' => fn($q) => $q->select('id', 'media_file_id', 'file_path', 'file_name', 'derivative_type', 'size', 'width', 'height'),
       'scheduled_posts' => fn($q) => $q->select('id', 'publication_id', 'social_account_id', 'status', 'scheduled_at'),
       'scheduled_posts.socialAccount' => fn($q) => $q->select('id', 'platform', 'account_name'),
@@ -209,6 +212,10 @@ class PublicationController extends Controller
       'approved_by' => Auth::id(),
       'approved_at' => now(),
       'approved_retries_remaining' => 3, // Set the retry limit
+      // Clear rejection fields if previously rejected
+      'rejected_by' => null,
+      'rejected_at' => null,
+      'rejection_reason' => null,
     ]);
 
     $this->clearPublicationCache(Auth::user()->current_workspace_id);
@@ -216,7 +223,17 @@ class PublicationController extends Controller
     // Notify the redactor (publication owner)
     $publication->user->notify(new PublicationApprovedNotification($publication, Auth::user()));
 
-    return $this->successResponse(['publication' => $publication], 'Publication approved successfully.');
+    // Load approver relationship for response
+    $publication->load('approvedBy:id,name,email');
+
+    return $this->successResponse([
+      'publication' => $publication,
+      'approver' => [
+        'id' => Auth::id(),
+        'name' => Auth::user()->name,
+        'approved_at' => $publication->approved_at,
+      ]
+    ], 'Publication approved successfully.');
   }
 
   public function reject(Request $request, Publication $publication)
@@ -225,14 +242,36 @@ class PublicationController extends Controller
       return $this->errorResponse('You do not have permission to reject publications.', 403);
     }
 
+    $request->validate([
+      'rejection_reason' => 'required|string|min:10|max:500',
+    ]);
+
     $publication->update([
       'status' => 'rejected',
       'rejected_by' => Auth::id(),
       'rejected_at' => now(),
+      'rejection_reason' => $request->input('rejection_reason'),
+      // Clear approval fields if previously approved
+      'approved_by' => null,
+      'approved_at' => null,
     ]);
     $this->clearPublicationCache(Auth::user()->current_workspace_id);
 
-    return $this->successResponse(['publication' => $publication], 'Publication rejected and moved to draft.');
+    // Notify the publication owner
+    $publication->user->notify(new PublicationRejectedNotification($publication, Auth::user()));
+
+    // Load rejector relationship for response
+    $publication->load('rejectedBy:id,name,email');
+
+    return $this->successResponse([
+      'publication' => $publication,
+      'rejector' => [
+        'id' => Auth::id(),
+        'name' => Auth::user()->name,
+        'rejected_at' => $publication->rejected_at,
+        'rejection_reason' => $publication->rejection_reason,
+      ]
+    ], 'Publication rejected successfully.');
   }
 
   public function getPublishedPlatforms(Publication $publication)

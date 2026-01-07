@@ -66,7 +66,9 @@ class Publication extends Model
     'published_at',
     'rejected_by',
     'rejected_at',
+    'rejection_reason',
   ];
+
 
   protected $casts = [
     'start_date' => 'date',
