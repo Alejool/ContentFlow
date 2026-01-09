@@ -9,6 +9,7 @@ RUN apk add --no-cache \
     icu-dev \
     libzip-dev \
     oniguruma-dev \
+    libxslt-dev \
     mysql-client \
     nodejs \
     npm \
@@ -21,20 +22,19 @@ RUN apk add --no-cache \
         intl \
         zip \
         opcache \
-        pcntl
+        pcntl \
+        xsl
 
-# Traer Composer
+
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
-# Copiar el proyecto
 COPY . .
 
 # Instalar dependencias de PHP
 RUN composer install --no-dev --optimize-autoloader
 
-# --- IMPORTANTE PARA INERTIA ---
 # Instalar dependencias de JS y compilar (Vite)
 RUN npm install && npm run build
 # -------------------------------
