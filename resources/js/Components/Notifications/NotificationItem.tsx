@@ -58,7 +58,7 @@ export default function NotificationItem({
 
   return (
     <div
-      className={`p-3 border-b border-color border-gray-200 transition-all duration-200 cursor-pointer relative group  ${theme === "dark"
+      className={`p-3 sm:p-4 border-b border-color border-gray-200 transition-all duration-200 cursor-pointer relative group  ${theme === "dark"
         ? "border-neutral-800 hover:bg-neutral-800/50"
         : "border-gray-100 hover:bg-gray-50"
         } ${!isRead
@@ -69,7 +69,7 @@ export default function NotificationItem({
         }`}
       onClick={() => onMarkAsRead(notification.id)}
     >
-      <div className="flex gap-3 items-start">
+      <div className="flex gap-2 sm:gap-3 items-start">
         <div className="mt-0.5 flex-shrink-0">{getIcon()}</div>
 
         <div className="flex-1 min-w-0">
@@ -80,7 +80,7 @@ export default function NotificationItem({
             }}
           >
             <p
-              className={`text-sm mb-1 ${isExpanded ? "" : "line-clamp-2"} ${theme === "dark" ? "text-gray-200" : "text-gray-800"
+              className={`text-sm mb-1 break-words ${isExpanded ? "" : "line-clamp-2"} ${theme === "dark" ? "text-gray-200" : "text-gray-800"
                 }`}
             >
               {data.message || data.title}
@@ -102,7 +102,7 @@ export default function NotificationItem({
             )}
           </div>
 
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-2 flex-wrap mt-1">
             {data.description && (
               <p
                 className={`text-xs mb-1.5 ${theme === "dark" ? "text-gray-400" : "text-gray-500"
@@ -215,7 +215,7 @@ export default function NotificationItem({
 
         {data.thumbnail_url && !imageError && (
           <div
-            className={`w-16 h-16 rounded-md overflow-hidden flex-shrink-0 ${theme === "dark" ? "bg-neutral-800" : "bg-gray-100"
+            className={`w-12 h-12 sm:w-16 sm:h-16 rounded-md overflow-hidden flex-shrink-0 ${theme === "dark" ? "bg-neutral-800" : "bg-gray-100"
               }`}
           >
             <img
@@ -230,7 +230,7 @@ export default function NotificationItem({
 
         {data.thumbnail_url && imageError && (
           <div
-            className={`w-16 h-16 rounded-md flex items-center justify-center flex-shrink-0 ${theme === "dark" ? "bg-neutral-800" : "bg-gray-100"
+            className={`w-12 h-12 sm:w-16 sm:h-16 rounded-md flex items-center justify-center flex-shrink-0 ${theme === "dark" ? "bg-neutral-800" : "bg-gray-100"
               }`}
           >
             <ImageOff
