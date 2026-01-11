@@ -1,12 +1,13 @@
-import { Fragment, memo } from "react";
+import React, { Fragment, memo } from "react";
+import { Folder, Eye, ChevronDown, Edit, Trash2 } from "lucide-react";
 import { Campaign } from "@/types/Campaign";
 import CampaignRow from "@/Components/ManageContent/Campaign/CampaignRow";
 import CampaignPublications from "@/Components/ManageContent/Campaign/CampaignPublications";
 import CampaignMobileTable from "@/Components/ManageContent/Campaign/CampaignMobileTable";
 import { TableHeader } from "@/Components/ManageContent/Publication/TableHeader";
-import Loader from "@/Components/common/Loader";
-import { Eye, ChevronDown, Edit, Trash2 } from "lucide-react";
 import PublicationThumbnail from "@/Components/ManageContent/Publication/PublicationThumbnail";
+import CampaignRowSkeleton from "@/Components/ManageContent/Campaign/CampaignRowSkeleton";
+import CampaignMobileRowSkeleton from "@/Components/ManageContent/Campaign/CampaignMobileRowSkeleton";
 
 interface CampaignTableProps {
   items: Campaign[];
@@ -31,6 +32,18 @@ const CampaignTable = memo(({
   onViewDetails,
   isLoading,
 }: CampaignTableProps) => {
+  const [smoothLoading, setSmoothLoading] = React.useState(isLoading);
+
+  React.useEffect(() => {
+    if (isLoading) {
+      setSmoothLoading(true);
+    } else {
+      const timer = setTimeout(() => {
+        setSmoothLoading(false);
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading]);
   const getStatusColor = (status?: string) => {
     switch (status) {
       case "active":
@@ -51,97 +64,96 @@ const CampaignTable = memo(({
   return (
     <div className="w-full overflow-hidden">
       <div className="hidden lg:block overflow-x-auto scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-gray-700">
-        <table className="w-full text-left border-collapse z-0 whitespace-nowrap">
-          <thead
-            className="bg-gray-50/90 border-gray-100 dark:bg-neutral-800/90 dark:border-neutral-700"
-          >
-            <tr
-              className="text-[10px] uppercase tracking-wider border-b bg-gray-50 border-gray-100 dark:bg-neutral-800/50 dark:border-neutral-700"
-            >
-              <TableHeader mode="campaigns" t={t} />
-            </tr>
-          </thead>
-          <tbody
-            className="divide-y divide-gray-100 dark:divide-neutral-700/50"
-          >
-            {isLoading ? (
-              <tr>
-                <td
-                  colSpan={6}
-                  className="px-6 py-12 text-center space-y-6  text-gray-500"
-                >
-                  <Loader />
-                  <span className="text-sm pt-8">
-                    {t("campaigns.table.loading")}
-                  </span>
-                </td>
-              </tr>
-            ) : items.length > 0 ? (
-              items.map((item) => (
-                <Fragment key={item.id}>
-                  <CampaignRow
-                    item={item}
-                    expandedCampaigns={expandedCampaigns}
-                    toggleExpand={toggleExpand}
-                    getStatusColor={getStatusColor}
-                    onEdit={onEdit}
-                    onDelete={onDelete}
-                    onEditRequest={onEditRequest}
-                    onViewDetails={onViewDetails}
-                  />
+        {!smoothLoading && items.length === 0 ? (
+          <div className="p-12 text-center text-gray-500 rounded-2xl border border-dashed border-gray-200 dark:border-neutral-800 bg-gray-50/50 dark:bg-neutral-900/20 mt-4 flex flex-col items-center justify-center animate-in fade-in duration-500">
+            <Folder className="w-12 h-12 text-gray-300 dark:text-neutral-700 mx-auto mb-4" />
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">{t("campaigns.table.emptyState.title")}</h3>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 grid-rows-1">
+            {/* Data Table */}
+            <div className={`col-start-1 row-start-1 transition-all duration-500 ${smoothLoading ? 'invisible opacity-0' : 'visible opacity-100'}`}>
+              <table className="w-full text-left border-collapse z-0 whitespace-nowrap">
+                <thead className="bg-gray-50/90 border-gray-100 dark:bg-neutral-800/90 dark:border-neutral-700">
+                  <tr className="text-[10px] uppercase tracking-wider border-b text-gray-500 dark:text-gray-400">
+                    <TableHeader mode="campaigns" t={t} />
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100 dark:divide-neutral-700/50">
+                  {items.map((item) => (
+                    <Fragment key={item.id}>
+                      <CampaignRow
+                        item={item}
+                        expandedCampaigns={expandedCampaigns}
+                        toggleExpand={toggleExpand}
+                        getStatusColor={getStatusColor}
+                        onEdit={onEdit}
+                        onDelete={onDelete}
+                        onEditRequest={onEditRequest}
+                        onViewDetails={onViewDetails}
+                      />
+                      {expandedCampaigns.includes(item.id) && (
+                        <CampaignPublications
+                          campaign={item}
+                          getStatusColor={getStatusColor}
+                        />
+                      )}
+                    </Fragment>
+                  ))}
+                </tbody>
+              </table>
+            </div>
 
-                  {expandedCampaigns.includes(item.id) && (
-                    <CampaignPublications
-                      campaign={item}
-                      getStatusColor={getStatusColor}
-                    />
-                  )}
-                </Fragment>
-              ))
-            ) : (
-              <tr>
-                <td
-                  colSpan={5}
-                  className="px-6 py-12 text-center text-gray-500"
-                >
-                  {t("campaigns.table.emptyState.title")}
-                </td>
-              </tr>
+            {/* Skeleton Layer */}
+            {smoothLoading && (
+              <div className="col-start-1 row-start-1 bg-white dark:bg-neutral-900 animate-out fade-out duration-500 fill-mode-forwards z-20">
+                <table className="w-full text-left border-collapse whitespace-nowrap">
+                  <thead className="bg-gray-50/90 border-gray-100 dark:bg-neutral-800/90 dark:border-neutral-700">
+                    <tr className="text-[10px] uppercase tracking-wider border-b">
+                      <TableHeader mode="campaigns" t={t} />
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[...Array(5)].map((_, i) => <CampaignRowSkeleton key={i} />)}
+                  </tbody>
+                </table>
+              </div>
             )}
-          </tbody>
-        </table>
+          </div>
+        )}
       </div>
 
-      {!isLoading && items.length > 0 && (
-        <div className="lg:hidden animate-in fade-in duration-300 px-1 py-1">
-          <CampaignMobileTable
-            items={items}
-            t={t}
-            expandedCampaigns={expandedCampaigns}
-            toggleExpand={toggleExpand}
-            onEdit={onEdit}
-            onDelete={onDelete}
-            onEditRequest={onEditRequest}
-            onViewDetails={onViewDetails}
-            getStatusColor={getStatusColor}
-          />
-        </div>
-      )}
-
-      {isLoading && (
-        <div className="lg:hidden p-8 text-center space-y-4 text-gray-500">
-          <div className="flex justify-center">
-            <Loader />
+      <div className="lg:hidden relative">
+        {!smoothLoading && items.length === 0 ? (
+          <div className="p-8 text-center text-gray-500 rounded-xl border border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800 mx-1 animate-in fade-in duration-500">
+            {t("campaigns.table.emptyState.title")}
           </div>
-          <span className="text-sm">{t("campaigns.table.loading")}</span>
-        </div>
-      )}
+        ) : (
+          <div className="grid grid-cols-1 grid-rows-1">
+            {/* Data Layer */}
+            <div className={`col-start-1 row-start-1 transition-all duration-500 ${smoothLoading ? 'invisible opacity-0' : 'visible opacity-100'}`}>
+              <CampaignMobileTable
+                items={items}
+                t={t}
+                expandedCampaigns={expandedCampaigns}
+                toggleExpand={toggleExpand}
+                onEdit={onEdit}
+                onDelete={onDelete}
+                onEditRequest={onEditRequest}
+                onViewDetails={onViewDetails}
+                getStatusColor={getStatusColor}
+              />
+            </div>
 
-      {!isLoading && items.length === 0 && (
-        <div className="lg:hidden p-8 text-center text-gray-500 rounded-xl border border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800 mx-1">
-          {t("campaigns.table.emptyState.title")}
-        </div>
-      )}
+            {/* Skeleton Layer */}
+            {smoothLoading && (
+              <div className="col-start-1 row-start-1 bg-white dark:bg-neutral-900 animate-out fade-out duration-500 fill-mode-forwards space-y-3 z-20">
+                {[...Array(3)].map((_, i) => <CampaignMobileRowSkeleton key={i} />)}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 });

@@ -25,8 +25,8 @@ export default {
         warning: theme.colors.warning,
         info: theme.colors.info,
         white: theme.colors.white,
-        
-        red: theme.colors.primary, 
+
+        red: theme.colors.primary,
         orange: theme.colors.primary,
         blue: theme.colors.accent.blue,
         purple: theme.colors.accent.purple,
@@ -34,16 +34,16 @@ export default {
         yellow: theme.colors.accent.yellow,
         pink: theme.colors.accent.pink,
         gray: theme.colors.gray,
-        
+
         beige: {
           50: theme.colors.secondary[50],
           100: theme.colors.secondary[100],
-          200: theme.colors.secondary[200], 
-          300: theme.colors.secondary[300], 
+          200: theme.colors.secondary[200],
+          300: theme.colors.secondary[300],
           400: theme.colors.secondary[400],
           500: theme.colors.secondary[500],
         },
-        
+
         accent: {
           blue: theme.colors.accent.blue,
           purple: theme.colors.accent.purple,
@@ -52,7 +52,7 @@ export default {
           pink: theme.colors.accent.pink,
         },
       },
-      
+
       backgroundImage: {
         'gradient-primary': theme.gradients.primary,
         'gradient-secondary': theme.gradients.secondary,
@@ -62,7 +62,7 @@ export default {
         'gradient-warm': theme.gradients.warm,
         'gradient-cool': theme.gradients.cool,
       },
-      
+
       fontFamily: {
         heading: ["Poppins", ...defaultTheme.fontFamily.sans],
         sans: ["Inter", ...defaultTheme.fontFamily.sans],
@@ -71,9 +71,17 @@ export default {
         display: ["Poppins", ...defaultTheme.fontFamily.sans],
         mono: ["JetBrains Mono", ...defaultTheme.fontFamily.mono],
       },
-      
+
       spacing: theme.spacing,
       borderRadius: theme.borderRadius,
+      keyframes: {
+        shimmer: {
+          '100%': { transform: 'translateX(100%)' },
+        },
+      },
+      animation: {
+        shimmer: 'shimmer 2s infinite',
+      },
     },
   },
 
