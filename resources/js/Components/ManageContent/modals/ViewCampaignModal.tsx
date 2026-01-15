@@ -1,5 +1,4 @@
 import CampaignMediaCarousel from "@/Components/Campaigns/CampaignMediaCarousel";
-import PlatformPreviewModal from "@/Components/ManageContent/modals/common/PlatformPreviewModal";
 import { Campaign } from "@/types/Campaign";
 import { Publication } from "@/types/Publication";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
@@ -25,9 +24,6 @@ export default function ViewCampaignModal({
 
   const { t } = useTranslation();
 
-  const [previewPublication, setPreviewPublication] =
-    useState<Publication | null>(null);
-  const [activePlatform, setActivePlatform] = useState<string | null>(null);
 
   if (!item) return null;
 
@@ -169,27 +165,6 @@ export default function ViewCampaignModal({
 
                           {pub.status === "published" && (
                             <div className="ml-auto flex gap-1">
-                              {/* If published, we might have multiple platforms. For simplicity in this list, we let the user pick in the modal */}
-                              <button
-                                onClick={() => {
-                                  if (!pub) return;
-                                  setPreviewPublication(pub);
-                                  // Default to the first published platform found in logs
-                                  const logs = pub.social_post_logs || [];
-                                  const firstLog = logs.find(
-                                    (l: any) =>
-                                      l.status === "published" ||
-                                      l.status === "success"
-                                  );
-                                  setActivePlatform(
-                                    firstLog?.platform || "youtube"
-                                  );
-                                }}
-                                className="p-1.5 text-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-colors"
-                                title="Preview"
-                              >
-                                <Eye className="w-4 h-4" />
-                              </button>
                             </div>
                           )}
                         </div>
@@ -431,15 +406,6 @@ export default function ViewCampaignModal({
         </DialogPanel>
       </div>
 
-      <PlatformPreviewModal
-        isOpen={!!previewPublication && !!activePlatform}
-        onClose={() => {
-          setPreviewPublication(null);
-          setActivePlatform(null);
-        }}
-        platform={activePlatform || ""}
-        publication={previewPublication}
-      />
     </Dialog>
   );
 }

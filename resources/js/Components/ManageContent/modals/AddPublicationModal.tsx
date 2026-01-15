@@ -4,7 +4,6 @@ import SocialAccountsSection from "@/Components/ManageContent/Publication/common
 import MediaUploadSection from "@/Components/ManageContent/Publication/common/edit/MediaUploadSection";
 import ModalFooter from "@/Components/ManageContent/modals/common/ModalFooter";
 import ModalHeader from "@/Components/ManageContent/modals/common/ModalHeader";
-import PlatformPreviewModal from "@/Components/ManageContent/modals/common/PlatformPreviewModal";
 import ScheduleSection from "@/Components/ManageContent/modals/common/ScheduleSection";
 import Input from "@/Components/common/Modern/Input";
 import Select from "@/Components/common/Modern/Select";
@@ -53,8 +52,6 @@ export default function AddPublicationModal({
     setPlatformSettings,
     activePlatformSettings,
     setActivePlatformSettings,
-    activePlatformPreview,
-    setActivePlatformPreview,
     accountSchedules,
     setAccountSchedules,
     setValue,
@@ -142,7 +139,7 @@ export default function AddPublicationModal({
                 />
 
                 <SocialAccountsSection
-                  socialAccounts={socialAccounts}
+                  socialAccounts={socialAccounts as any}
                   selectedAccounts={watched.social_accounts || []}
                   accountSchedules={accountSchedules}
                   t={t}
@@ -159,9 +156,6 @@ export default function AddPublicationModal({
                   }
                   onPlatformSettingsClick={(platform) =>
                     setActivePlatformSettings(platform)
-                  }
-                  onPreviewClick={(platform) =>
-                    setActivePlatformPreview(platform)
                   }
                   globalSchedule={watched.scheduled_at ?? undefined}
                   error={errors.social_accounts?.message as string}
@@ -309,21 +303,6 @@ export default function AddPublicationModal({
           }}
         />
 
-        <PlatformPreviewModal
-          isOpen={!!activePlatformPreview}
-          onClose={() => setActivePlatformPreview(null)}
-          platform={activePlatformPreview || ""}
-          publication={{
-            ...watched,
-            media: mediaFiles.map((m) => ({
-              preview: m.url,
-              file_type: m.type,
-            })),
-          }}
-          settings={
-            platformSettings[activePlatformPreview?.toLowerCase() || ""] || {}
-          }
-        />
       </div>
     </div>
   );

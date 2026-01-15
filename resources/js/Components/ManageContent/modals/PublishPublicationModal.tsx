@@ -1,6 +1,5 @@
 import { getPlatformConfig } from "@/Constants/socialPlatforms";
 import PlatformSettingsModal from "@/Components/ConfigSocialMedia/PlatformSettingsModal";
-import PlatformPreviewModal from "@/Components/ManageContent/modals/common/PlatformPreviewModal";
 import YouTubeThumbnailUploader from "@/Components/common/ui/YouTubeThumbnailUploader";
 import { usePublishPublication } from "@/Hooks/publication/usePublishPublication";
 import { useConfirm } from "@/Hooks/useConfirm";
@@ -38,9 +37,6 @@ export default function PublishPublicationModal({
   const { t } = useTranslation();
 
   const [activePlatformSettings, setActivePlatformSettings] = useState<
-    string | null
-  >(null);
-  const [activePlatformPreview, setActivePlatformPreview] = useState<
     string | null
   >(null);
   const [platformSettings, setPlatformSettings] = useState<Record<string, any>>(
@@ -273,11 +269,7 @@ export default function PublishPublicationModal({
 
             <div className="mb-6">
               <div className="flex items-center justify-between mb-4">
-                <h4
-                  className="font-semibold text-gray-900 dark:text-white"
-                >
-                  {t("publications.modal.publish.selectPlatforms")}
-                </h4>
+
                 <div className="flex gap-2">
                   <button
                     onClick={selectAll}
@@ -445,23 +437,8 @@ export default function PublishPublicationModal({
                               </div>
                             )}
 
-                          <div className="flex items-center gap-1 ml-auto">
-                            {(isSelected ||
-                              isPublished ||
-                              isFailed ||
-                              isPublishing) && (
-                                <button
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setActivePlatformPreview(account.platform);
-                                  }}
-                                  className="p-1.5 rounded-lg transition-all z-10 hover:bg-gray-100 dark:hover:bg-neutral-700 text-gray-500 dark:text-gray-400"
-                                >
-                                  <Eye className="w-4 h-4" />
-                                </button>
-                              )}
 
+                          <div className="flex items-center gap-1 ml-auto">
                             {!isPublished && !isPublishing && !isScheduled && (
                               <button
                                 type="button"
@@ -649,16 +626,6 @@ export default function PublishPublicationModal({
               }}
             />
 
-            <PlatformPreviewModal
-              isOpen={!!activePlatformPreview}
-              onClose={() => setActivePlatformPreview(null)}
-              platform={activePlatformPreview || ""}
-              publication={publication}
-              settings={
-                platformSettings[activePlatformPreview?.toLowerCase() || ""] ||
-                {}
-              }
-            />
           </DialogPanel>
         </div>
       </Dialog>

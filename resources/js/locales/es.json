@@ -1091,7 +1091,7 @@
         "successMessage": "¡Se ha enviado un nuevo enlace de verificación a tu dirección de correo electrónico!"
       }
     },
-    "returnToLogin": "Volver a Iniciar Sesión"
+    "returnToLogin": "Volver"
   },
   "aiChat": {
     "title": "Asistente IA",

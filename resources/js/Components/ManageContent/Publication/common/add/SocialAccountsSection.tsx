@@ -19,7 +19,6 @@ interface SocialAccountsSectionProps {
   onScheduleChange: (accountId: number, schedule: string) => void;
   onScheduleRemove: (accountId: number) => void;
   onPlatformSettingsClick: (platform: string) => void;
-  onPreviewClick: (platform: string) => void;
   globalSchedule?: string;
   publishedAccountIds?: number[];
   publishingAccountIds?: number[];
@@ -152,7 +151,6 @@ interface SocialAccountItemProps {
   onScheduleChange: (date: string) => void;
   onScheduleRemove: () => void;
   onPlatformSettingsClick: () => void;
-  onPreviewClick: () => void;
   onPopoverClose: () => void;
   t: any;
   globalSchedule?: string;
@@ -170,7 +168,6 @@ const SocialAccountItem = memo(({
   onScheduleChange,
   onScheduleRemove,
   onPlatformSettingsClick,
-  onPreviewClick,
   onPopoverClose,
   t,
   globalSchedule,
@@ -274,17 +271,6 @@ const SocialAccountItem = memo(({
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
-                    onPreviewClick();
-                  }}
-                  className="p-1.5 rounded-lg transition-all hover:bg-gray-100 text-gray-500 hover:text-primary-600 dark:hover:bg-neutral-700 dark:text-gray-400 dark:hover:text-white"
-                  title={t("preview.view") || "Ver vista previa"}
-                >
-                  <Eye className="w-4 h-4" />
-                </button>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
                     onPlatformSettingsClick();
                   }}
                   className="p-1.5 rounded-lg transition-all hover:bg-gray-100 text-gray-500 hover:text-primary-600 dark:hover:bg-neutral-700 dark:text-gray-400 dark:hover:text-white"
@@ -348,7 +334,6 @@ const SocialAccountsSection = memo(({
   onScheduleChange,
   onScheduleRemove,
   onPlatformSettingsClick,
-  onPreviewClick,
   globalSchedule,
   publishedAccountIds,
   publishingAccountIds,
@@ -397,7 +382,6 @@ const SocialAccountsSection = memo(({
               onPlatformSettingsClick={() =>
                 onPlatformSettingsClick(account.platform)
               }
-              onPreviewClick={() => onPreviewClick(account.platform)}
               onPopoverClose={() => setActivePopover(null)}
               globalSchedule={globalSchedule}
               isPublished={isPublished}

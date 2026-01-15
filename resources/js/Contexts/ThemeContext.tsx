@@ -16,15 +16,26 @@ export const ThemeContext = createContext<ThemeContextType | undefined>(
 interface ThemeProviderProps {
   children: ReactNode;
   initialTheme?: Theme; // Prop opcional para el tema inicial
+  isAuthenticated?: boolean;
 }
 
-export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
+export function ThemeProvider({
+  children,
+  initialTheme,
+  isAuthenticated = false,
+}: ThemeProviderProps) {
   const [theme, setThemeState] = useState<Theme>(initialTheme || "light");
 
   // Inicializar el tema solo en el cliente
   useEffect(() => {
     const initializeTheme = () => {
-      // Priority: 1. localStorage, 2. initialTheme prop
+      // Priority if authenticated: 1. initialTheme (from DB), 2. localStorage, 3. system preference
+      if (isAuthenticated && initialTheme) {
+        setThemeState(initialTheme);
+        return;
+      }
+
+      // Priority if guest: 1. localStorage, 2. initialTheme prop, 3. system preference
       const stored = localStorage.getItem("theme") as Theme | null;
       if (stored === "light" || stored === "dark") {
         setThemeState(stored);
@@ -47,7 +58,7 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
     };
 
     initializeTheme();
-  }, [initialTheme]);
+  }, [initialTheme, isAuthenticated]);
 
   // Apply theme to document
   useEffect(() => {
@@ -79,11 +90,13 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
   const setTheme = async (newTheme: Theme) => {
     setThemeState(newTheme);
 
-    // Debe estar en el middleware autenticado
-    try {
-      await axios.patch("/theme", { theme: newTheme });
-    } catch (error) {
-      console.error("Failed to save theme preference:", error);
+    // Solo sincronizar con el backend si está autenticado
+    if (isAuthenticated) {
+      try {
+        await axios.patch("/theme", { theme: newTheme });
+      } catch (error) {
+        console.error("Failed to save theme preference:", error);
+      }
     }
   };
 

@@ -26,7 +26,8 @@ createInertiaApp<PageProps>({
   setup({ el, App, props }) {
     const root = createRoot(el);
 
-    const userLocale = props.initialPage.props.auth?.user?.locale;
+    const user = props.initialPage.props.auth?.user;
+    const userLocale = user?.locale;
     if (userLocale) {
       import("./i18n").then(({ default: i18n }) => {
         i18n.changeLanguage(userLocale);
@@ -35,7 +36,10 @@ createInertiaApp<PageProps>({
 
     root.render(
       <ErrorBoundary>
-        <ThemeProvider>
+        <ThemeProvider
+          isAuthenticated={!!user}
+          initialTheme={user?.theme as "light" | "dark" | undefined}
+        >
           <App {...props} />
           <ThemedToaster />
         </ThemeProvider>
