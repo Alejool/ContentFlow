@@ -44,6 +44,12 @@ RUN composer install --no-dev --optimize-autoloader
 # 5. Instalar dependencias de JS y compilar (Vite)
 # Usamos --include=dev para que encuentre 'vite'
 ENV NODE_ENV=production
+ARG VITE_REVERB_APP_KEY
+ARG VITE_REVERB_HOST
+
+ENV VITE_REVERB_APP_KEY=$VITE_REVERB_APP_KEY
+ENV VITE_REVERB_HOST=$VITE_REVERB_HOST
+
 RUN npm install --include=dev
 RUN npm run build
 

@@ -1,8 +1,12 @@
 app = "contenflow"
-primary_region = "gru" 
+primary_region = "gru"
 
 [build]
   dockerfile = "Dockerfile"
+
+  [build.args]
+    VITE_REVERB_APP_KEY = "contenflow-key"
+    VITE_REVERB_HOST = "contenflow.fly.dev"
 
 [[services]]
   protocol = "tcp"

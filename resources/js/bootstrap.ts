@@ -1,17 +1,20 @@
 import axios from "axios";
 import Echo from "laravel-echo";
+import Pusher from "pusher-js";
 
-// Axios + Sanctum
 axios.defaults.withCredentials = true;
 axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
 
 declare global {
   interface Window {
-    Echo: Echo;
+    Pusher: typeof Pusher;
+    Echo: Echo<"reverb">;
   }
 }
 
-window.Echo = new Echo({
+window.Pusher = Pusher;
+
+window.Echo = new Echo<"reverb">({
   broadcaster: "reverb",
   key: import.meta.env.VITE_REVERB_APP_KEY as string,
 
