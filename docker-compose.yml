@@ -5,7 +5,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: production
-    container_name: laravel_app
+    container_name: contentflow_app
     restart: unless-stopped
     working_dir: /var/www/html
     volumes:
@@ -25,7 +25,7 @@ services:
   # Nginx
   nginx:
     image: nginx:alpine
-    container_name: laravel_nginx
+    container_name: contentflow_nginx
     restart: unless-stopped
     ports:
       - "80:80"
@@ -39,7 +39,7 @@ services:
   # PostgreSQL
   pgsql:
     image: postgres:15-alpine
-    container_name: laravel_pgsql
+    container_name: contentflow_pgsql
     restart: unless-stopped
     ports:
       - "5432:5432"
@@ -62,7 +62,7 @@ services:
   # Redis
   redis:
     image: redis:7-alpine
-    container_name: laravel_redis
+    container_name: contentflow_redis
     restart: unless-stopped
     ports:
       - "6379:6379"
@@ -82,7 +82,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: production
-    container_name: laravel_queue
+    container_name: contentflow_queue
     restart: unless-stopped
     working_dir: /var/www/html
     command: php artisan queue:work --queue=publishing,publishing:notify,notifications,emails,high,default,low --tries=3 --timeout=90
@@ -102,7 +102,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: production
-    container_name: laravel_reverb
+    container_name: contentflow_reverb
     restart: unless-stopped
     working_dir: /var/www/html
     command: php artisan reverb:start --host=0.0.0.0 --port=8080
@@ -124,7 +124,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: production
-    container_name: laravel_scheduler
+    container_name: contentflow_scheduler
     restart: unless-stopped
     working_dir: /var/www/html
     command: sh -c "while true; do php artisan schedule:run --no-interaction; sleep 60; done"
@@ -140,7 +140,7 @@ services:
   # vite
   vite:
     image: node:20-alpine
-    container_name: laravel_vite
+    container_name: contentflow_vite
     working_dir: /var/www/html
     command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
     ports:

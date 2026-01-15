@@ -18,8 +18,7 @@ return new class extends Migration {
 
     private function addIndexIfMissing(string $table, array $columns, string $indexName): void
     {
-        $indexes = DB::select("SHOW INDEX FROM {$table} WHERE Key_name = ?", [$indexName]);
-        if (empty($indexes)) {
+        if (!Schema::hasIndex($table, $indexName)) {
             Schema::table($table, function (Blueprint $table) use ($columns, $indexName) {
                 $table->index($columns, $indexName);
             });
