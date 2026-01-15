@@ -14,9 +14,9 @@ return [
     |
     */
 
-    'paths' => ['api/*', 'sanctum/csrf-cookie', '*'],  // You can customize the paths here
+    'paths' => ['api/*', 'sanctum/csrf-cookie', '*'],
 
-    'allowed_methods' => ['*'],  // Allows all HTTP methods
+    'allowed_methods' => ['*'],
 
     'allowed_origins' => [
         'http://localhost:5173',
@@ -24,16 +24,17 @@ return [
         'http://100.125.246.50:5173',
         'http://leviathan-port.tail4af8a1.ts.net',
         'https://leviathan-port.tail4af8a1.ts.net',
-    ],  // Add your frontend URLs
+        'https://contenflow.fly.dev',
+    ],
 
-    'allowed_origins_patterns' => [],  // Not necessary, but you can add patterns here
+    'allowed_origins_patterns' => [],
 
-    'allowed_headers' => ['*'],  // Allows all request headers
+    'allowed_headers' => ['*'],
 
-    'exposed_headers' => [],  // Allows exposing headers if necessary (empty by default)
+    'exposed_headers' => [],
 
-    'max_age' => 0,  // The time the browser can cache CORS responses, in seconds.
+    'max_age' => 0,
 
-    'supports_credentials' => true,  // Change to true if you want to send credentials (cookies, etc.)
+    'supports_credentials' => true,
 
 ];
