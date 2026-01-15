@@ -15,7 +15,7 @@ services:
     env_file:
       - .env.docker
     depends_on:
-      mysql:
+      pgsql:
         condition: service_healthy
       redis:
         condition: service_healthy
@@ -36,26 +36,23 @@ services:
       - app
     networks:
       - laravel
-  # MySQL
-  mysql:
-    image: mysql:8.0
-    command: --sort-buffer-size=20M
-    container_name: laravel_mysql
+  # PostgreSQL
+  pgsql:
+    image: postgres:15-alpine
+    container_name: laravel_pgsql
     restart: unless-stopped
     ports:
-      - "3307:3306"
+      - "5432:5432"
     env_file:
       - .env.docker
     environment:
-      MYSQL_DATABASE: ${DB_DATABASE}
-      MYSQL_USER: ${DB_USERNAME}
-      MYSQL_PASSWORD: ${DB_PASSWORD}
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
-      - mysql_data:/var/lib/mysql
-      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+      - pgsql_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -139,7 +136,7 @@ services:
       - app
     networks:
       - laravel
-  
+
   # vite
   vite:
     image: node:20-alpine
@@ -160,5 +157,5 @@ networks:
     driver: bridge
 
 volumes:
-  mysql_data:
+  pgsql_data:
   redis_data:
