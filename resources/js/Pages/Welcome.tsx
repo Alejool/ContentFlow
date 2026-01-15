@@ -289,21 +289,21 @@ export default function Welcome({ auth, canLogin, canRegister }: WelcomeProps) {
 
                 <div className="flex items-center space-x-6">
                   <Link
-                    href="/privacy"
+                    href={route("privacy")}
                     className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors flex items-center gap-1"
                   >
                     <Shield className="w-4 h-4" />
                     {t("welcome.privacy") || "Privacidad"}
                   </Link>
                   <Link
-                    href="/terms"
+                    href={route("terms")}
                     className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors flex items-center gap-1"
                   >
                     <Globe className="w-4 h-4" />
                     {t("welcome.terms") || "Términos"}
                   </Link>
                   <Link
-                    href="/contact"
+                    href={route("contact")}
                     className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors flex items-center gap-1"
                   >
                     <Mail className="w-4 h-4" />

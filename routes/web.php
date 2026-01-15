@@ -19,6 +19,7 @@ use App\Http\Controllers\SocialPostLogController;
 use App\Http\Controllers\WorkspaceController;
 use App\Http\Controllers\Api\CalendarController;
 use App\Http\Controllers\Calendar\CalendarViewController;
+use \Illuminate\Support\Facades\Artisan;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,11 +38,25 @@ Route::get('/', function () {
 
 // Temporary route to clear cache
 Route::get('/clear-cache', function () {
-  \Illuminate\Support\Facades\Artisan::call('config:clear');
-  \Illuminate\Support\Facades\Artisan::call('route:clear');
-  \Illuminate\Support\Facades\Artisan::call('view:clear');
+  Artisan::call('config:clear');
+  Artisan::call('route:clear');
+  Artisan::call('view:clear');
   return "Cache cleared successfully! You can go back now.";
 });
+
+Route::get('/privacy', function () {
+  return Inertia::render('PrivacyPolicy');
+})->name('privacy');
+
+Route::get('/terms', function () {
+  return Inertia::render('TermsOfService');
+})->name('terms');
+
+Route::get('/contact', function () {
+  return Inertia::render('Contact');
+})->name('contact');
+
+
 
 Route::get('/debug-auth', function () {
   return [
