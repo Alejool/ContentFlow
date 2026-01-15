@@ -1,39 +1,29 @@
-import Echo from "laravel-echo";
-import Pusher from "pusher-js";
 import axios from "axios";
+import Echo from "laravel-echo";
 
-// Configure Axios for Laravel Sanctum SPA authentication
+// Axios + Sanctum
 axios.defaults.withCredentials = true;
-axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-
-// Header removed to rely on Sanctum's automatic cookie-based CSRF protection
-// const token = document.head.querySelector('meta[name="csrf-token"]');
-// if (token) {
-//   axios.defaults.headers.common['X-CSRF-TOKEN'] = token.getAttribute('content');
-// }
+axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
 
 declare global {
   interface Window {
-    Pusher: typeof Pusher;
-    Echo: any;
+    Echo: Echo;
   }
 }
 
-window.Pusher = Pusher;
-
 window.Echo = new Echo({
   broadcaster: "reverb",
-  key: import.meta.env.VITE_REVERB_APP_KEY,
-  wsHost: window.location.hostname,
-  wsPort: 8080,
+  key: import.meta.env.VITE_REVERB_APP_KEY as string,
+
+  wsHost:
+    (import.meta.env.VITE_REVERB_HOST as string) ?? window.location.hostname,
+
+  wsPort: 443,
   wssPort: 443,
-  //   forceTLS: (import.meta.env.VITE_REVERB_SCHEME ?? "https") === "https",
-  forceTLS: false,
-  enabledTransports: ["ws"],
-  disableStats: true,
-  cluster: "mt1",
+
+  forceTLS: true,
+  enabledTransports: ["ws", "wss"],
+
   authEndpoint: "/broadcasting/auth",
   autoConnect: true,
-  logToConsole: true,
 });
-
