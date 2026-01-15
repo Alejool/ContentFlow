@@ -18,7 +18,9 @@ return new class extends Migration
 
         // Fix status enum issue (enum 'success','failed' vs 'pending','published','failed')
         // Convert to string to be safe
-        DB::statement("ALTER TABLE social_post_logs MODIFY COLUMN status VARCHAR(255) DEFAULT 'pending'");
+        Schema::table('social_post_logs', function (Blueprint $table) {
+            $table->string('status')->default('pending')->change();
+        });
     }
 
     /**
