@@ -1,6 +1,6 @@
 FROM php:8.3-fpm-alpine AS production
 
-# Instalar dependencias del sistema (usando apk para Alpine)
+# 1. Instalar dependencias del sistema
 RUN apk add --no-cache \
     bash \
     curl \
@@ -25,27 +25,37 @@ RUN apk add --no-cache \
         pcntl \
         xsl
 
-
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
+# 2. Copiar archivos del proyecto
 COPY . .
 
-# Instalar dependencias de PHP
+# 3. LIMPIEZA TOTAL antes de cualquier build
+# Borramos lo que viene de tu PC (Tailscale, builds viejos, etc)
+RUN rm -rf public/build public/hot node_modules vendor
+
+# 4. Instalar dependencias de PHP
 RUN composer install --no-dev --optimize-autoloader
 
-# Instalar dependencias de JS y compilar (Vite)
-RUN npm install && npm run build
-# -------------------------------
+# 5. Instalar dependencias de JS y compilar (Vite)
+# Usamos --include=dev para que encuentre 'vite'
+ENV NODE_ENV=production
+RUN npm install --include=dev
+RUN npm run build
 
-# Permisos correctos para Laravel
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+# 6. Permisos correctos para Laravel
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/public/build
+RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Configuración de PHP
+# 7. Configuración de PHP
 RUN echo "upload_max_filesize=100M" > /usr/local/etc/php/conf.d/uploads.ini \
  && echo "post_max_size=100M" >> /usr/local/etc/php/conf.d/uploads.ini \
  && echo "max_execution_time=300" >> /usr/local/etc/php/conf.d/uploads.ini \
  && echo "memory_limit=512M" >> /usr/local/etc/php/conf.d/uploads.ini
 
-EXPOSE 9000
+EXPOSE 8080
+
+# 8. Comando de arranque limpio
+CMD ["sh", "-c", "php artisan config:clear && php artisan view:clear && php artisan route:clear && php -S 0.0.0.0:8080 -t public"]

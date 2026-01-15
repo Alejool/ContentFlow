@@ -6,6 +6,7 @@ import tsconfigPaths from "vite-tsconfig-paths";
 const host = 'localhost';
 const certPath = './localhost.pem';
 const keyPath = './localhost-key.pem';
+const isProduction = process.env.NODE_ENV === 'production';
 
 const isUsingTunnel = process.env.VITE_TUNNEL_URL !== undefined;
 
@@ -26,7 +27,7 @@ export default defineConfig({
     optimizeDeps: {
         include: ['@ffmpeg/ffmpeg'],
     },
-    server: {
+    server: isProduction ? {} : {
         host: '0.0.0.0',
         port: 5173,
         strictPort: true,

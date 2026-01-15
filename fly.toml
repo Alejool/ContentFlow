@@ -18,7 +18,13 @@ primary_region = "gru"
     handlers = ["tls", "http"]
 
   [[services.http_checks]]
-    interval = "10s"
+    interval = "30s"
     method = "get"
-    path = "/"
-    timeout = "2s"
+    path = "/favicon.ico"
+    timeout = "5s"
+    grace_period = "1200s"
+
+[[vm]]
+  memory = "512mb"
+  cpu_kind = "shared"
+  cpus = 1
