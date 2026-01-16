@@ -23,7 +23,7 @@ class AnalyticsController extends Controller
     /**
      * Display the dashboard with statistics
      */
-    public function dashboard(): Response|\Illuminate\Http\RedirectResponse
+    public function dashboard(Request $request): Response|\Illuminate\Http\RedirectResponse
     {
         $user = Auth::user();
         $workspaceId = $user->current_workspace_id;
@@ -38,7 +38,8 @@ class AnalyticsController extends Controller
             }
         }
 
-        $startDate = now()->subDays(30);
+        $days = (int) $request->input('days', 30);
+        $startDate = now()->subDays($days);
         $endDate = now();
 
         // Get overview stats
@@ -62,6 +63,7 @@ class AnalyticsController extends Controller
                     'views' => $campaign['total_views'],
                     'clicks' => $campaign['total_clicks'],
                     'engagement' => $campaign['total_engagement'],
+                    'publications' => $campaign['publications'] ?? [], // Pass through nested publications
                 ];
             })->toArray(),
             'engagementTrends' => $engagementTrends->map(function ($trend) {
@@ -82,6 +84,7 @@ class AnalyticsController extends Controller
 
         return Inertia::render('Dashboard', [
             'stats' => $stats,
+            'period' => $days,
         ]);
     }
 
@@ -103,7 +106,7 @@ class AnalyticsController extends Controller
             }
         }
 
-        $days = $request->input('days', 30);
+        $days = (int) $request->input('days', 30);
 
         $stats = $this->statisticsService->getDashboardStats($workspaceId, $days);
 

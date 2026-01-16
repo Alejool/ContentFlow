@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Campaign;
 use App\Models\Analytics;
 use App\Models\CampaignAnalytics;
 use App\Models\SocialMediaMetrics;
@@ -87,39 +88,125 @@ class StatisticsService
     }
 
     /**
-     * Get top performing campaigns
+     * Get performing campaigns with aggregated stats and nested publications
      */
     public function getTopCampaigns(int $workspaceId, int $limit = 5)
     {
-        return Publication::where('workspace_id', $workspaceId)
-            ->with([
-                'analytics' => function ($query) {
-                    $query->selectRaw('
-                    publication_id,
-                    SUM(views) as total_views,
-                    SUM(clicks) as total_clicks,
-                    SUM(conversions) as total_conversions,
-                    SUM(likes + comments + shares + saves) as total_engagement,
-                    AVG(engagement_rate) as avg_engagement_rate
-                ')
-                        ->groupBy('publication_id');
-                }
-            ])
-            ->get()
-            ->map(function ($campaign) {
-                $analytics = $campaign->analytics->first();
-                return [
-                    'id' => $campaign->id,
-                    'title' => $campaign->title,
-                    'status' => $campaign->status,
-                    'image' => $campaign->image,
-                    'total_views' => $analytics->total_views ?? 0,
-                    'total_clicks' => $analytics->total_clicks ?? 0,
-                    'total_conversions' => $analytics->total_conversions ?? 0,
-                    'total_engagement' => $analytics->total_engagement ?? 0,
-                    'avg_engagement_rate' => round($analytics->avg_engagement_rate ?? 0, 2),
+        // 1. Get all campaigns for the workspace with their publications and analytics
+        $campaigns = Campaign::where('workspace_id', $workspaceId)
+            ->with(['publications.analytics'])
+            ->get();
+
+        $performanceData = $campaigns->map(function ($campaign) {
+            $totalViews = 0;
+            $totalClicks = 0;
+            $totalConversions = 0;
+            $totalEngagement = 0;
+            $publicationStats = [];
+
+            foreach ($campaign->publications as $publication) {
+                // Aggregate analytics for this publication
+                $pubAnalytics = $publication->analytics()
+                    ->selectRaw('
+                        SUM(views) as total_views,
+                        SUM(clicks) as total_clicks,
+                        SUM(conversions) as total_conversions,
+                        SUM(likes + comments + shares + saves) as total_engagement,
+                        AVG(engagement_rate) as avg_engagement_rate
+                    ')
+                    ->first();
+
+                $views = intval($pubAnalytics->total_views ?? 0);
+                $clicks = intval($pubAnalytics->total_clicks ?? 0);
+                $conversions = intval($pubAnalytics->total_conversions ?? 0);
+                $engagement = intval($pubAnalytics->total_engagement ?? 0);
+
+                $totalViews += $views;
+                $totalClicks += $clicks;
+                $totalConversions += $conversions;
+                $totalEngagement += $engagement;
+
+                $publicationStats[] = [
+                    'id' => $publication->id,
+                    'title' => $publication->title,
+                    'views' => $views,
+                    'clicks' => $clicks,
+                    'conversions' => $conversions,
+                    'engagement' => $engagement,
+                    'avg_engagement_rate' => round($pubAnalytics->avg_engagement_rate ?? 0, 2),
                 ];
-            })
+            }
+
+            return [
+                'id' => $campaign->id,
+                'title' => $campaign->name,
+                'status' => $campaign->status,
+                'total_views' => $totalViews,
+                'total_clicks' => $totalClicks,
+                'total_conversions' => $totalConversions,
+                'total_engagement' => $totalEngagement,
+                'publications' => $publicationStats,
+            ];
+        });
+
+        // 2. Handle standalone publications (those not in any campaign)
+        $standalonePublications = Publication::where('workspace_id', $workspaceId)
+            ->whereDoesntHave('campaigns')
+            ->with('analytics')
+            ->get();
+
+        if ($standalonePublications->isNotEmpty()) {
+            $standaloneStats = [];
+            $sViews = 0;
+            $sClicks = 0;
+            $sConv = 0;
+            $sEng = 0;
+
+            foreach ($standalonePublications as $pub) {
+                $pubAnalytics = $pub->analytics()
+                    ->selectRaw('
+                        SUM(views) as total_views,
+                        SUM(clicks) as total_clicks,
+                        SUM(conversions) as total_conversions,
+                        SUM(likes + comments + shares + saves) as total_engagement,
+                        AVG(engagement_rate) as avg_engagement_rate
+                    ')
+                    ->first();
+
+                $views = intval($pubAnalytics->total_views ?? 0);
+                $clicks = intval($pubAnalytics->total_clicks ?? 0);
+                $conversions = intval($pubAnalytics->total_conversions ?? 0);
+                $engagement = intval($pubAnalytics->total_engagement ?? 0);
+
+                $sViews += $views;
+                $sClicks += $clicks;
+                $sConv += $conversions;
+                $sEng += $engagement;
+
+                $standaloneStats[] = [
+                    'id' => $pub->id,
+                    'title' => $pub->title,
+                    'views' => $views,
+                    'clicks' => $clicks,
+                    'conversions' => $conversions,
+                    'engagement' => $engagement,
+                    'avg_engagement_rate' => round($pubAnalytics->avg_engagement_rate ?? 0, 2),
+                ];
+            }
+
+            $performanceData->push([
+                'id' => 0, // Virtual ID for standalone
+                'title' => 'Standalone Publications',
+                'status' => 'active',
+                'total_views' => $sViews,
+                'total_clicks' => $sClicks,
+                'total_conversions' => $sConv,
+                'total_engagement' => $sEng,
+                'publications' => $standaloneStats,
+            ]);
+        }
+
+        return $performanceData
             ->sortByDesc('total_engagement')
             ->take($limit)
             ->values();
