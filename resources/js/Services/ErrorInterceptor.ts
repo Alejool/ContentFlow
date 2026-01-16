@@ -1,4 +1,3 @@
-import { router } from "@inertiajs/react";
 import axios, { AxiosError } from "axios";
 import { ToastService } from "./ToastService";
 
@@ -36,7 +35,7 @@ class ErrorInterceptorClass {
         this.handle400(data);
         break;
       case 401:
-        this.handle401();
+        this.handle401(error);
         break;
       case 403:
         this.handle403(data);
@@ -66,13 +65,21 @@ class ErrorInterceptorClass {
     ToastService.error(message);
   }
 
-  private handle401() {
-    if (window.location.pathname === '/login') return;
+  private handle401(error: AxiosError) {
+    if (window.location.pathname === "/login") return;
 
-    ToastService.error("Your session has expired. Please log in again.");
-    setTimeout(() => {
-      window.location.href = "/login";
-    }, 60000);
+    const url = error.config?.url || "unknown URL";
+    console.group("Session/Authentication Issue (401)");
+    console.warn(`Unauthorized request detected at: ${url}`);
+    console.error("Response data:", error.response?.data);
+    console.error("Config:", error.config);
+    console.groupEnd();
+
+    // Instead of redirecting automatically (which can cause loops if the session is actually valid
+    // but a specific request fails), we just show a warning message.
+    ToastService.warning(
+      "Unauthenticated request detected. If you are having issues, please try logging in again."
+    );
   }
 
   private handle403(data?: ErrorResponse) {
