@@ -3,7 +3,7 @@ import PieChart from "@/Components/Statistics/PieChart";
 import StatCard from "@/Components/Statistics/StatCard";
 import { useTheme } from "@/Hooks/useTheme";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head } from "@inertiajs/react";
+import { Head, router } from "@inertiajs/react";
 import { Eye, Heart, MousePointerClick, TrendingUp, Users } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -64,7 +64,6 @@ interface AnalyticsProps {
 export default function Index({ stats, period }: AnalyticsProps) {
   const { t } = useTranslation();
   const { theme } = useTheme();
-  const [selectedPeriod, setSelectedPeriod] = useState(period || 30);
   const [loading, setLoading] = useState(false);
 
   const overview = stats?.overview || {};
@@ -73,7 +72,17 @@ export default function Index({ stats, period }: AnalyticsProps) {
   const engagementTrends = stats?.engagement_trends || [];
 
   const handlePeriodChange = (days: number) => {
-    setSelectedPeriod(days);
+    setLoading(true);
+    router.get(
+      route("analytics.index"),
+      { days },
+      {
+        preserveState: true,
+        preserveScroll: true,
+        only: ["stats", "period"],
+        onFinish: () => setLoading(false),
+      }
+    );
   };
 
   return (
@@ -84,21 +93,36 @@ export default function Index({ stats, period }: AnalyticsProps) {
         className={`py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto transition-colors duration-300
                 ${theme === "dark" ? "text-gray-100" : "text-gray-900"}`}
       >
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold">{t("analytics.title")}</h1>
-          <p
-            className={`mt-2 ${
-              theme === "dark" ? "text-gray-400" : "text-gray-600"
-            }`}
-          >
-            {t("analytics.subtitle")}
-          </p>
-        </div>
+        <div
+          className={`rounded-lg p-8 mb-8 shadow-sm transition-colors duration-300 flex flex-col md:flex-row items-center justify-between gap-6 ${
+            theme === "dark"
+              ? "bg-gradient-to-r from-neutral-800/50 to-purple-900/90 border border-neutral-700/50"
+              : "bg-gradient-to-r from-white to-gray-50 border border-gray-100"
+          }`}
+        >
+          <div>
+            <h1
+              className={`text-3xl font-bold mb-2 ${
+                theme === "dark" ? "text-white" : "text-gray-900"
+              }`}
+            >
+              {t("analytics.title")}
+            </h1>
+            <p
+              className={`text-lg ${
+                theme === "dark" ? "text-gray-400" : "text-gray-600"
+              }`}
+            >
+              {t("analytics.subtitle")}
+            </p>
+          </div>
 
-        <PeriodSelector
-          selectedPeriod={selectedPeriod}
-          onPeriodChange={handlePeriodChange}
-        />
+          <PeriodSelector
+            selectedPeriod={Number(period)}
+            onPeriodChange={handlePeriodChange}
+            theme={theme}
+          />
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatCard
@@ -180,7 +204,7 @@ export default function Index({ stats, period }: AnalyticsProps) {
             >
               {t("analytics.charts.engagementTrends")}
             </h2>
-            <EngagementChart data={engagementTrends} theme={theme} />
+            <EngagementChart data={engagementTrends} />
           </div>
 
           <div
@@ -212,7 +236,7 @@ export default function Index({ stats, period }: AnalyticsProps) {
               />
             ) : (
               <div
-                className={`flex items-center justify-center h-[300px] 
+                className={`flex items-center justify-center h-[300px]
                                 ${
                                   theme === "dark"
                                     ? "text-gray-400"
