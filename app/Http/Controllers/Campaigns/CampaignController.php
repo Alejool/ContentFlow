@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Campaigns;
 
 use App\Http\Controllers\Controller;
+use App\Services\StatisticsService;
 use App\Models\Campaign;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
@@ -11,12 +12,21 @@ use Illuminate\Support\Facades\Auth;
 class CampaignController extends Controller
 {
     use ApiResponse;
+
+    protected $statisticsService;
+
+    public function __construct(StatisticsService $statisticsService)
+    {
+        $this->statisticsService = $statisticsService;
+    }
+
     /**
      * Display a listing of campaigns (grouping of publications)
      */
     public function index(Request $request)
     {
         $workspaceId = Auth::user()->current_workspace_id;
+        $performanceData = $this->statisticsService->getTopCampaigns($workspaceId, 100);
         $cacheVersion = cache()->get("campaigns:{$workspaceId}:version", 1);
 
         // Cache key based on workspace, version, filters, and page
@@ -28,11 +38,12 @@ class CampaignController extends Controller
             $request->query('page', 1)
         );
 
-        return cache()->remember($cacheKey, 10, function () use ($request) {
+        $campaigns = cache()->remember($cacheKey, 10, function () use ($request) {
             $query = Campaign::where('workspace_id', Auth::user()->current_workspace_id)
                 ->with([
                     'user' => fn($q) => $q->select('id', 'name', 'email', 'photo_url'),
                     'publications' => fn($q) => $q->select('publications.id', 'publications.title', 'publications.status', 'publications.created_at'),
+                    'publications.analytics', // Eager load analytics for calculation
                     'publications.socialPostLogs' => fn($q) => $q->select('id', 'publication_id', 'social_account_id', 'status', 'published_at'),
                     'publications.socialPostLogs.socialAccount' => fn($q) => $q->select('id', 'platform', 'account_name'),
                     'publications.mediaFiles' => fn($q) => $q->select('media_files.id', 'media_files.file_path', 'media_files.file_type', 'media_files.file_name')
@@ -68,8 +79,24 @@ class CampaignController extends Controller
             // Using simplePaginate() to avoid COUNT(*) query - only loads current page data
             $campaigns = $query->orderBy('created_at', 'desc')->simplePaginate(5);
 
-            return $this->successResponse(['campaigns' => $campaigns]);
+            // Calculate aggregate stats for each campaign
+            $campaigns->getCollection()->transform(function ($campaign) {
+                $campaign->stats = [
+                    'views' => $campaign->publications->flatMap->analytics->sum('views'),
+                    'clicks' => $campaign->publications->flatMap->analytics->sum('clicks'),
+                    'engagement' => $campaign->publications->flatMap->analytics->sum('total_engagement') // Assuming logic or separate columns
+                        ?? ($campaign->publications->flatMap->analytics->sum('likes') + $campaign->publications->flatMap->analytics->sum('comments'))
+                ];
+                return $campaign;
+            });
+
+            return $campaigns;
         });
+
+        return \Inertia\Inertia::render('Campaigns/Index', [
+            'campaigns' => $campaigns,
+            'performanceData' => $performanceData
+        ]);
     }
 
     /**
