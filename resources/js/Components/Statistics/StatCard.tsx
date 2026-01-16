@@ -191,8 +191,7 @@ const StatCard: React.FC<StatCardProps> = ({
   return (
     <div className={getCardStyles()}>
       <div
-        className={`bg-gradient-to-r ${colors.gradient} ${compact ? "p-3" : "p-4"
-          }`}
+        className={`bg-gradient-to-r ${colors.gradient} ${compact ? "p-3" : "p-4"}`}
       >
         <div className="flex items-center justify-between text-white">
           {isLoading ? (
@@ -224,10 +223,8 @@ const StatCard: React.FC<StatCardProps> = ({
         </div>
       </div>
 
-      {/* Contenido */}
       <div className={compact ? "p-4" : "p-6"}>
         <div className="flex flex-col">
-          {/* Valor principal */}
           {isLoading ? (
             <Skeleton className={`mb-2 ${compact ? "h-8 w-20" : "h-10 w-24"}`} />
           ) : (
@@ -239,7 +236,6 @@ const StatCard: React.FC<StatCardProps> = ({
             </p>
           )}
 
-          {/* Trend indicator */}
           {isLoading ? (
             <Skeleton className="h-8 w-full rounded-lg" />
           ) : (
@@ -262,7 +258,6 @@ const StatCard: React.FC<StatCardProps> = ({
           )}
         </div>
 
-        {/* Indicador visual de la métrica */}
         <div className="mt-4 flex items-center">
           {isLoading ? (
             <Skeleton className="h-1.5 flex-1 rounded-full" />
@@ -282,7 +277,6 @@ const StatCard: React.FC<StatCardProps> = ({
             <div
               className={`ml-2 text-xs px-2 py-1 rounded ${colors.bg} ${colors.text} font-medium`}
             >
-              {color.toUpperCase()}
             </div>
           )}
         </div>

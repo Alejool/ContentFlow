@@ -15,21 +15,16 @@ export default function PeriodSelector({
   const periods = [7, 30, 90];
 
   return (
-    <div className="mb-6 flex gap-2">
+    <div className="flex bg-neutral-100 dark:bg-neutral-800 p-1 rounded-lg w-fit mb-6">
       {periods.map((days) => (
         <button
           key={days}
           onClick={() => onPeriodChange(days)}
-          className={`px-4 py-2 rounded-lg font-medium transition-all duration-300
-                        ${
-                          selectedPeriod === days
-                            ? theme === "dark"
-                              ? "bg-gradient-to-r from-primary-600 to-primary-800 text-white shadow-lg"
-                              : "bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-lg"
-                            : theme === "dark"
-                            ? "bg-neutral-800 text-gray-300 hover:bg-neutral-700 hover:text-gray-100 border border-neutral-700"
-                            : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200"
-                        }`}
+          className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+            selectedPeriod === days
+              ? "bg-white dark:bg-neutral-700 shadow-sm text-gray-900 dark:text-white"
+              : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+          }`}
         >
           {days} {t("analytics.days")}
         </button>
