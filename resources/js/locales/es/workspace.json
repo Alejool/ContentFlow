@@ -20,6 +20,7 @@
     "members": "Miembros",
     "team_members": "Miembros del Equipo",
     "invite_member": "Invitar Miembro",
+    "invite": "Invitar",
     "role_permissions": "Roles y Permisos",
     "permissions_preview": "Acceso Total",
     "name": "Nombre del Espacio",
@@ -31,10 +32,75 @@
     "delete_workspace": "Eliminar Espacio",
     "delete_description": "Una vez que elimines un espacio, no hay vuelta atrás. Por favor, asegúrate.",
     "general_settings": "Ajustes Generales",
+    "manage_workspace": "Gestionar espacio {{name}}",
+    "loading": "Cargando miembros...",
+    "total_members": "Miembros Totales",
+    "owners": "Propietarios",
+    "admins": "Administradores",
+    "workspace_members": "Miembros del Espacio",
+    "you": "Tú",
+    "remove_member": "Eliminar Miembro",
+    "remove_confirm": "¿Estás seguro de que deseas eliminar a este miembro del espacio de trabajo?",
+    "invite_modal": {
+      "title": "Invitar Miembro",
+      "subtitle": "Añadir un miembro a {{name}}",
+      "email_label": "Dirección de Correo",
+      "email_placeholder": "colega@ejemplo.com",
+      "role_label": "Rol",
+      "role_placeholder": "Selecciona un rol",
+      "cancel": "Cancelar",
+      "submit": "Invitar Miembro",
+      "validation": {
+        "email": "Por favor introduce un correo válido",
+        "role": "Por favor selecciona un rol",
+        "nameRequired": "El nombre del espacio es obligatorio"
+      },
+      "messages": {
+        "success": "Miembro invitado exitosamente",
+        "error": "Error al invitar miembro",
+        "missing_info": "Falta información del espacio de trabajo"
+      }
+    },
+    "integrations": {
+      "title": "Integraciones",
+      "webhooks_title": "Integraciones de Webhook",
+      "webhooks_description": "Configura webhooks de Slack o Discord para recibir notificaciones en tiempo real sobre fallos de publicación, solicitudes de aprobación y más.",
+      "slack_webhook": "URL de Webhook de Slack",
+      "discord_webhook": "URL de Webhook de Discord",
+      "test_slack": "Probar Slack",
+      "test_discord": "Probar Discord",
+      "save_integrations": "Guardar Ajustes de Integración",
+      "owner_note": "Nota: Los ajustes de integración solo pueden ser gestionados completamente por los propietarios del espacio de trabajo.",
+      "messages": {
+        "success": "Integraciones actualizadas exitosamente",
+        "test_success": "Conexión probada exitosamente",
+        "test_error": "Error al probar la conexión",
+        "enter_url": "Por favor ingresa una URL de webhook de {{type}} primero."
+      }
+    },
+    "activity": {
+      "title": "Actividad de Notificaciones",
+      "time": "Hora",
+      "channel": "Canal",
+      "event": "Evento",
+      "status": "Estado",
+      "sent": "Enviado",
+      "failed": "Fallido",
+      "empty": "No se encontró actividad de notificación reciente."
+    },
     "tabs": {
       "general": "General",
       "members": "Miembros",
-      "roles": "Roles"
+      "roles": "Roles",
+      "integrations": "Integraciones"
+    },
+    "roles_management": {
+      "title": "Roles y Permisos",
+      "description": "Resumen de roles disponibles y sus permisos asociados en ContentFlow.",
+      "no_permissions": "No hay permisos asignados."
+    },
+    "messages": {
+      "update_success": "Espacio de trabajo actualizado exitosamente"
     }
   }
 }

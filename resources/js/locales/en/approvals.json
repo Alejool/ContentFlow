@@ -1,1 +1,24 @@
-﻿{}"
+﻿{
+  "approvals": {
+    "approve": "Approve",
+    "reject": "Reject",
+    "approvedSuccess": "Publication successfully approved",
+    "rejectedSuccess": "Publication successfully rejected",
+    "noPending": "No pending approvals",
+    "noPendingDesc": "Great! All publications are up to date.",
+    "rejectPublication": "Reject Publication",
+    "rejectionReason": "Rejection Reason",
+    "rejectionReasonDescription": "Provide a detailed reason for the rejection of",
+    "rejectionReasonPlaceholder": "e.g. Content does not meet company policies...",
+    "rejectionReasonTooShort": "The reason must have at least 10 characters",
+    "rejectionReasonTooLong": "The reason cannot exceed 500 characters",
+    "approvalSuccess": "Publication Approved!",
+    "approvalSuccessMessage": "The publication has been successfully approved and is ready to be published.",
+    "approvedBy": "Approved by",
+    "rejectedBy": "Rejected by",
+    "publicationRejected": "Publication Rejected",
+    "rejectionMessage": "Your publication has been rejected. Please review the comments and make the necessary adjustments.",
+    "noReasonProvided": "No reason provided.",
+    "editPublication": "Edit Publication"
+  }
+}

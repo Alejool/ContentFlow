@@ -20,6 +20,7 @@
     "members": "Members",
     "team_members": "Team Members",
     "invite_member": "Invite Member",
+    "invite": "Invite",
     "role_permissions": "Role & Permissions",
     "permissions_preview": "Full Access",
     "name": "Workspace Name",
@@ -31,10 +32,75 @@
     "delete_workspace": "Delete Workspace",
     "delete_description": "Once you delete a workspace, there is no going back. Please be certain.",
     "general_settings": "General Settings",
+    "manage_workspace": "Manage {{name}} workspace",
+    "loading": "Loading members...",
+    "total_members": "Total Members",
+    "owners": "Owners",
+    "admins": "Admins",
+    "workspace_members": "Workspace Members",
+    "you": "You",
+    "remove_member": "Remove Member",
+    "remove_confirm": "Are you sure you want to remove this member from the workspace?",
+    "invite_modal": {
+      "title": "Invite Member",
+      "subtitle": "Add a member to {{name}}",
+      "email_label": "Email Address",
+      "email_placeholder": "colleague@example.com",
+      "role_label": "Role",
+      "role_placeholder": "Select a role",
+      "cancel": "Cancel",
+      "submit": "Invite Member",
+      "validation": {
+        "email": "Please enter a valid email address",
+        "role": "Please select a role",
+        "nameRequired": "Workspace name is required"
+      },
+      "messages": {
+        "success": "Member invited successfully",
+        "error": "Failed to invite member",
+        "missing_info": "Workspace information is missing"
+      }
+    },
+    "integrations": {
+      "title": "Integrations",
+      "webhooks_title": "Webhook Integrations",
+      "webhooks_description": "Configure Slack or Discord webhooks to receive real-time notifications about publication failures, approval requests, and more.",
+      "slack_webhook": "Slack Webhook URL",
+      "discord_webhook": "Discord Webhook URL",
+      "test_slack": "Test Slack",
+      "test_discord": "Test Discord",
+      "save_integrations": "Save Integration Settings",
+      "owner_note": "Note: Integration settings can only be fully managed by workspace owners.",
+      "messages": {
+        "success": "Integrations updated successfully",
+        "test_success": "Connection tested successfully",
+        "test_error": "Failed to test connection",
+        "enter_url": "Please enter a {{type}} webhook URL first."
+      }
+    },
+    "activity": {
+      "title": "Notification Activity",
+      "time": "Time",
+      "channel": "Channel",
+      "event": "Event",
+      "status": "Status",
+      "sent": "Sent",
+      "failed": "Failed",
+      "empty": "No recent notification activity found."
+    },
     "tabs": {
       "general": "General",
       "members": "Members",
-      "roles": "Roles"
+      "roles": "Roles",
+      "integrations": "Integrations"
+    },
+    "roles_management": {
+      "title": "Roles & Permissions",
+      "description": "Overview of available roles and their associated permissions in ContentFlow.",
+      "no_permissions": "No permissions assigned."
+    },
+    "messages": {
+      "update_success": "Workspace updated successfully"
     }
   }
 }

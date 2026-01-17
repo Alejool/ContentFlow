@@ -1,44 +1,65 @@
 {
-  "title": "Performance Summary",
-  "subtitle": "Analyze the impact and performance of your campaigns and publications.",
-  "noPublications": "No associated publications",
-  "scheduledPosts": "Scheduled Posts",
-  "create": "Create Campaign",
-  "table": {
-    "name": "Name",
-    "description": "Description",
-    "publications": "Publications",
-    "media": "Media",
-    "status": "Status",
-    "actions": "Actions",
-    "loading": "Loading...",
-    "timeline": "Timeline",
-    "performance": "Performance",
-    "emptyState": {
-      "title": "No campaigns found",
-      "description": "Create a campaign to start publishing content.",
-      "button": "Add Campaign"
+  "campaigns": {
+    "title": "Performance Summary",
+    "subtitle": "Analyze the impact and performance of your campaigns and publications.",
+    "noPublications": "No associated publications",
+    "scheduledPosts": "Scheduled Posts",
+    "create": "Create Campaign",
+    "table": {
+      "name": "Name",
+      "description": "Description",
+      "publications": "Publications",
+      "media": "Media",
+      "status": "Status",
+      "actions": "Actions",
+      "loading": "Loading...",
+      "timeline": "Timeline",
+      "performance": "Performance",
+      "emptyState": {
+        "title": "No campaigns found",
+        "description": "Create a campaign to start publishing content.",
+        "button": "Add Campaign"
+      }
+    },
+    "filters": {
+      "title": "Campaign Filters",
+      "all": "All",
+      "active": "Active",
+      "inactive": "Inactive",
+      "completed": "Completed",
+      "deleted": "Deleted",
+      "paused": "Paused"
+    },
+    "actions": {
+      "viewCampaign": "View Campaign",
+      "edit": "Edit",
+      "publishNow": "Publish Now",
+      "viewDetails": "View Details",
+      "delete": "Delete",
+      "active": "Active",
+      "remove": "Remove",
+      "change": "Change",
+      "showPublications": "Show publications",
+      "hidePublications": "Hide publications"
+    },
+    "messages": {
+      "fetchError": "Error fetching campaigns",
+      "addSuccess": "Campaign created successfully",
+      "addError": "Error creating campaign",
+      "updateSuccess": "Campaign updated successfully",
+      "updateError": "Error updating campaign",
+      "deleteSuccess": "Campaign deleted successfully",
+      "deleteError": "Error deleting campaign",
+      "success": "Success",
+      "error": "Error"
+    },
+    "modal": {
+      "add": {
+        "name": "Campaign Name",
+        "placeholders": {
+          "name": "e.g. Summer Campaign"
+        }
+      }
     }
-  },
-  "filters": {
-    "title": "Campaign Filters",
-    "all": "All",
-    "active": "Active",
-    "inactive": "Inactive",
-    "completed": "Completed",
-    "deleted": "Deleted",
-    "paused": "Paused"
-  },
-  "actions": {
-    "viewCampaign": "View Campaign",
-    "edit": "Edit",
-    "publishNow": "Publish Now",
-    "viewDetails": "View Details",
-    "delete": "Delete",
-    "active": "Active",
-    "remove": "Remove",
-    "change": "Change",
-    "showPublications": "Show publications",
-    "hidePublications": "Hide publications"
   }
 }
