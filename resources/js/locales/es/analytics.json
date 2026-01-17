@@ -6,6 +6,16 @@
     "vistas": "Vistas",
     "clics": "Clics",
     "engagement": "Engagement",
+    "platform": {
+      "engagement": "Engagement Total",
+      "growth": "Crecimiento"
+    },
+    "trends": {
+      "likes": "Me gusta",
+      "comments": "Comentarios",
+      "shares": "Compartidos",
+      "saves": "Guardados"
+    },
     "stats": {
       "totalViews": "Total de Vistas",
       "totalClicks": "Total de Clics",
