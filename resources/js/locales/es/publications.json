@@ -209,9 +209,13 @@
     },
     "status": {
       "draft": "Borrador",
+      "publishing": "Publicando",
       "published": "Publicado",
+      "publis": "Publicado",
       "scheduled": "Programado",
       "failed": "Fallido",
+      "pending_review": "En Revisión",
+      "approved": "Aprobado",
       "instant": "Instantáneo",
       "deleted": "Eliminado"
     },
@@ -245,6 +249,7 @@
     },
     "messages": {
       "addSuccess": "¡Publicación agregada exitosamente!",
+      "createSuccess": "¡Publicación creada exitosamente!",
       "addError": "Error al agregar publicación",
       "updateSuccess": "¡Publicación actualizada exitosamente!",
       "updateError": "Error al actualizar publicación",

@@ -192,9 +192,12 @@
     },
     "status": {
       "draft": "Draft",
+      "publishing": "Publishing",
       "published": "Published",
       "scheduled": "Scheduled",
       "failed": "Failed",
+      "pending_review": "Pending Review",
+      "approved": "Approved",
       "instant": "Instant",
       "deleted": "Deleted"
     },
@@ -227,6 +230,7 @@
     },
     "messages": {
       "addSuccess": "Publication added successfully!",
+      "createSuccess": "Publication created successfully!",
       "addError": "Error adding publication",
       "updateSuccess": "Publication updated successfully!",
       "updateError": "Error updating publication",
