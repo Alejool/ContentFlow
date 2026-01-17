@@ -330,24 +330,78 @@ class PublicationController extends Controller
    */
   public function stats()
   {
-    $workspaceId = Auth::user()->current_workspace_id;
+    $workspaceId = Auth::user()->current_workspace_id ?? Auth::user()->workspaces()->first()?->id;
 
-    $stats = Publication::where('workspace_id', $workspaceId)
-      ->selectRaw('status, count(*) as count')
-      ->groupBy('status')
-      ->get()
-      ->pluck('count', 'status')
-      ->toArray();
+    if (!$workspaceId) {
+      return $this->successResponse([
+        'draft' => 0,
+        'published' => 0,
+        'publishing' => 0,
+        'failed' => 0,
+        'pending_review' => 0,
+        'approved' => 0,
+        'scheduled' => 0,
+        'total' => 0
+      ]);
+    }
 
-    // Ensure all statuses are present
-    $allStatuses = ['draft', 'published', 'publishing', 'failed', 'pending_review', 'approved'];
-    foreach ($allStatuses as $status) {
-      if (!isset($stats[$status])) {
-        $stats[$status] = 0;
+    \Illuminate\Support\Facades\Log::info("Stats requested. Workspace: {$workspaceId}");
+    $publications = Publication::withoutGlobalScopes()->where('workspace_id', $workspaceId)
+      ->withCount(['scheduled_posts as pending_schedules_count' => function ($q) {
+        $q->where('status', 'pending');
+      }])
+      ->get();
+
+    \Illuminate\Support\Facades\Log::info("Stats found " . $publications->count() . " publications.");
+
+    $stats = [
+      'draft' => 0,
+      'published' => 0,
+      'publishing' => 0,
+      'failed' => 0,
+      'pending_review' => 0,
+      'approved' => 0,
+      'scheduled' => 0,
+    ];
+
+    foreach ($publications as $pub) {
+      $status = $pub->status;
+      // \Illuminate\Support\Facades\Log::info("Publication ID {$pub->id} raw status: '{$status}'");
+
+      // Logic to determine display status
+      // Publishing, Published and Failed have priority
+      if ($status === 'publishing' || $status === 'publishi') {
+        $stats['publishing']++;
+        if ($status === 'publishi') $pub->update(['status' => 'publishing']);
+      } elseif ($status === 'published' || $status === 'publis') {
+        $stats['published']++;
+
+        // Auto-fix truncated status if encountered
+        if ($status === 'publis') {
+          $pub->update(['status' => 'published']);
+        }
+      } elseif ($status === 'failed') {
+        $stats['failed']++;
+      } elseif (!empty($pub->scheduled_at) || $pub->pending_schedules_count > 0) {
+        // Should check scheduled first if status is draft, but scheduled_at exists
+        // If status is 'scheduled' explicitly, it falls here (if we add check)
+        $stats['scheduled']++;
+      } else {
+        // Fallback to the database status
+        if (isset($stats[$status])) {
+          $stats[$status]++;
+        } else {
+          // Log unknown status falling to draft only if it's truly weird
+          if ($status !== 'draft') {
+            \Illuminate\Support\Facades\Log::warning("Unknown status falling to draft: '{$status}'");
+          }
+          $stats['draft']++;
+        }
       }
     }
 
-    $stats['total'] = array_sum($stats);
+    $stats['total'] = count($publications);
+    \Illuminate\Support\Facades\Log::info("Returning stats:", $stats);
 
     return $this->successResponse($stats);
   }

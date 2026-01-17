@@ -103,6 +103,9 @@ class HandleInertiaRequests extends Middleware
             $role = $roles->find($roleId);
             $currentWorkspace->user_role = $role ? $role->name : 'Member';
             $currentWorkspace->permissions = $role ? $role->permissions->pluck('slug')->toArray() : [];
+
+            // Debug Logging
+            \Illuminate\Support\Facades\Log::info("Inertia Shared - Workspace: {$currentWorkspace->name}, Role: {$currentWorkspace->user_role}, Permissions: " . implode(',', $currentWorkspace->permissions));
           }
 
           return $currentWorkspace;

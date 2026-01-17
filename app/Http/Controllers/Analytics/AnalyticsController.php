@@ -56,30 +56,21 @@ class AnalyticsController extends Controller
             'totalReach' => $overview['total_reach'] ?? 0,
             'totalEngagement' => $overview['total_engagement'] ?? 0,
             'avgEngagementRate' => $overview['avg_engagement_rate'] ?? 0,
-            'campaigns' => $campaigns->map(function ($campaign) {
-                return [
-                    'id' => $campaign['id'],
-                    'title' => $campaign['title'],
-                    'views' => $campaign['total_views'],
-                    'clicks' => $campaign['total_clicks'],
-                    'engagement' => $campaign['total_engagement'],
-                    'publications' => $campaign['publications'] ?? [], // Pass through nested publications
-                ];
-            })->toArray(),
+            'campaigns' => $campaigns, // Keep the raw structure from StatisticsService
             'engagementTrends' => $engagementTrends->map(function ($trend) {
                 return [
                     'date' => Carbon::parse($trend['date'])->format('M d'),
                     'views' => $trend['views'],
                     'clicks' => $trend['clicks'],
                     'engagement' => $trend['total_engagement'],
+                    'likes' => $trend['likes'],
+                    'comments' => $trend['comments'],
+                    'shares' => $trend['shares'],
+                    'saves' => $trend['saves'],
                 ];
             })->toArray(),
-            'platformData' => $socialMedia->map(function ($platform) {
-                return [
-                    'name' => ucfirst($platform['platform']),
-                    'value' => $platform['followers'],
-                ];
-            })->toArray(),
+            'platformData' => $socialMedia, // Keep the raw structure from StatisticsService
+            'platformComparison' => $this->statisticsService->getPlatformComparison($workspaceId),
         ];
 
         return Inertia::render('Dashboard', [
@@ -107,11 +98,31 @@ class AnalyticsController extends Controller
         }
 
         $days = (int) $request->input('days', 30);
+        $startDate = now()->subDays($days);
+        $endDate = now();
 
         $stats = $this->statisticsService->getDashboardStats($workspaceId, $days);
 
+        // Format trends consistently with Dashboard
+        if (isset($stats['engagement_trends'])) {
+            $stats['engagement_trends'] = collect($stats['engagement_trends'])->map(function ($trend) {
+                return [
+                    'date' => Carbon::parse($trend['date'])->format('M d'),
+                    'views' => $trend['views'],
+                    'clicks' => $trend['clicks'],
+                    'engagement' => $trend['total_engagement'],
+                    'likes' => $trend['likes'] ?? 0,
+                    'comments' => $trend['comments'] ?? 0,
+                    'shares' => $trend['shares'] ?? 0,
+                    'saves' => $trend['saves'] ?? 0,
+                ];
+            })->toArray();
+        }
+
         return Inertia::render('Analytics/Index', [
-            'stats' => $stats,
+            'stats' => array_merge($stats, [
+                'platformComparison' => $this->statisticsService->getPlatformComparison($workspaceId)
+            ]),
             'period' => $days,
         ]);
     }

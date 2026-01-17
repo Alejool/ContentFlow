@@ -1,14 +1,14 @@
 import EngagementChart from "@/Components/Statistics/EngagementChart";
-import PieChart from "@/Components/Statistics/PieChart";
 import StatCard from "@/Components/Statistics/StatCard";
 import { useTheme } from "@/Hooks/useTheme";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, router } from "@inertiajs/react";
-import { Eye, Heart, MousePointerClick, TrendingUp, Users } from "lucide-react";
+import { Eye, Heart, MousePointer2, TrendingUp, Users } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import CampaignPerformance from "../../Components/Analytics/CampaignPerformance";
 import EmptyState from "../../Components/Analytics/EmptyState";
+import { CampaignStat } from "../../Components/Analytics/PerformanceTable";
 import PeriodSelector from "../../Components/Analytics/PeriodSelector";
 import SocialMediaAccounts from "../../Components/Analytics/SocialMediaAccounts";
 
@@ -29,13 +29,6 @@ interface OverviewStats {
   };
 }
 
-interface Campaign {
-  title: string;
-  total_engagement: number;
-  total_views: number;
-  total_clicks: number;
-}
-
 interface SocialMediaAccount {
   platform: string;
   followers: number;
@@ -54,7 +47,7 @@ interface EngagementTrend {
 interface AnalyticsProps {
   stats: {
     overview: OverviewStats;
-    campaigns: Campaign[];
+    campaigns: CampaignStat[];
     social_media: SocialMediaAccount[];
     engagement_trends: EngagementTrend[];
   };
@@ -136,7 +129,7 @@ export default function Index({ stats, period }: AnalyticsProps) {
             title={t("analytics.stats.totalClicks")}
             value={overview.total_clicks || 0}
             change={overview.changes?.clicks}
-            icon={<MousePointerClick className="w-6 h-6" />}
+            icon={<MousePointer2 className="w-6 h-6" />}
             theme={theme}
           />
           <StatCard
@@ -166,7 +159,7 @@ export default function Index({ stats, period }: AnalyticsProps) {
           <StatCard
             title={t("analytics.stats.avgCtr")}
             value={overview.avg_ctr || 0}
-            icon={<MousePointerClick className="w-6 h-6" />}
+            icon={<MousePointer2 className="w-6 h-6" />}
             format="percentage"
             theme={theme}
           />
@@ -185,7 +178,7 @@ export default function Index({ stats, period }: AnalyticsProps) {
           />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 gap-6 mb-8">
           <div
             className={`rounded-lg p-6 transition-colors duration-300
                         ${
@@ -204,48 +197,7 @@ export default function Index({ stats, period }: AnalyticsProps) {
             >
               {t("analytics.charts.engagementTrends")}
             </h2>
-            <EngagementChart data={engagementTrends} />
-          </div>
-
-          <div
-            className={`rounded-lg p-6 transition-colors duration-300
-                        ${
-                          theme === "dark"
-                            ? "bg-neutral-800/50 backdrop-blur-sm border border-neutral-700/50"
-                            : "bg-white shadow-lg border border-gray-100"
-                        }`}
-          >
-            <h2
-              className={`text-xl font-bold mb-4
-                            ${
-                              theme === "dark"
-                                ? "text-gray-100"
-                                : "text-gray-900"
-                            }`}
-            >
-              {t("analytics.charts.followersByPlatform")}
-            </h2>
-            {socialMedia.length > 0 ? (
-              <PieChart
-                data={socialMedia.map((sm) => ({
-                  name:
-                    sm.platform.charAt(0).toUpperCase() + sm.platform.slice(1),
-                  value: sm.followers,
-                }))}
-                theme={theme}
-              />
-            ) : (
-              <div
-                className={`flex items-center justify-center h-[300px]
-                                ${
-                                  theme === "dark"
-                                    ? "text-gray-400"
-                                    : "text-gray-500"
-                                }`}
-              >
-                {t("analytics.charts.noSocialMedia")}
-              </div>
-            )}
+            <EngagementChart data={engagementTrends} theme={theme as any} />
           </div>
         </div>
 
@@ -254,7 +206,13 @@ export default function Index({ stats, period }: AnalyticsProps) {
         )}
 
         {socialMedia.length > 0 && (
-          <SocialMediaAccounts accounts={socialMedia} theme={theme} />
+          <div className="mb-8">
+            <SocialMediaAccounts
+              accounts={socialMedia}
+              theme={theme}
+              showChart={true}
+            />
+          </div>
         )}
 
         {campaigns.length === 0 && socialMedia.length === 0 && (

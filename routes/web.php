@@ -44,6 +44,36 @@ Route::get('/clear-cache', function () {
   return "Cache cleared successfully! You can go back now.";
 });
 
+Route::get('/fix-db', function () {
+  try {
+    // 1. Drop Constraint
+    \Illuminate\Support\Facades\DB::statement("ALTER TABLE publications DROP CONSTRAINT IF EXISTS publications_status_check");
+    \Illuminate\Support\Facades\Schema::table('publications', function (\Illuminate\Database\Schema\Blueprint $table) {
+      $table->string('status', 50)->change();
+    });
+
+    // 2. Check and Fix Permissions
+    $ownerRole = \App\Models\Role::where('slug', 'owner')->first();
+    $permissions = $ownerRole ? $ownerRole->permissions->pluck('slug')->toArray() : 'Role not found';
+
+    if (is_array($permissions) && empty($permissions)) {
+      $perms = [
+        ['name' => 'Publish', 'slug' => 'publish', 'description' => 'Allow publishing content to social media'],
+        ['name' => 'Approve', 'slug' => 'approve', 'description' => 'Allow approving content for publication'],
+      ];
+      foreach ($perms as $p) {
+        $perm = \App\Models\Permission::firstOrCreate(['slug' => $p['slug']], $p);
+        $ownerRole->permissions()->syncWithoutDetaching([$perm->id]);
+      }
+      return "Database fixed! Owner permissions were missing and have been re-added: " . implode(', ', $ownerRole->refresh()->permissions->pluck('slug')->toArray());
+    }
+
+    return "Database fixed! Owner Permissions: " . (is_array($permissions) ? implode(', ', $permissions) : $permissions);
+  } catch (\Exception $e) {
+    return "Error: " . $e->getMessage();
+  }
+});
+
 Route::get('/privacy', function () {
   return Inertia::render('PrivacyPolicy');
 })->name('privacy');

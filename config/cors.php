@@ -1,7 +1,7 @@
 <?php
 return [
 
-    /*
+  /*
     |--------------------------------------------------------------------------
     | Cross-Origin Resource Sharing (CORS) Configuration
     |--------------------------------------------------------------------------
@@ -14,27 +14,28 @@ return [
     |
     */
 
-    'paths' => ['api/*', 'sanctum/csrf-cookie', '*'],
+  'paths' => ['api/*', 'sanctum/csrf-cookie', '*'],
 
-    'allowed_methods' => ['*'],
+  'allowed_methods' => ['*'],
 
-    'allowed_origins' => [
-        'http://localhost:5173',
-        'http://127.0.0.1:5173',
-        'http://100.125.246.50:5173',
-        'http://leviathan-port.tail4af8a1.ts.net',
-        'https://leviathan-port.tail4af8a1.ts.net',
-        'https://contenflow.fly.dev',
-    ],
+  'allowed_origins' => [
+    'http://localhost:5173',
+    'http://localhost',
+    'http://127.0.0.1:5173',
+    'http://100.125.246.50:5173',
+    'http://leviathan-port.tail4af8a1.ts.net',
+    'https://leviathan-port.tail4af8a1.ts.net',
+    'https://contenflow.fly.dev',
+  ],
 
-    'allowed_origins_patterns' => [],
+  'allowed_origins_patterns' => [],
 
-    'allowed_headers' => ['*'],
+  'allowed_headers' => ['*'],
 
-    'exposed_headers' => [],
+  'exposed_headers' => [],
 
-    'max_age' => 0,
+  'max_age' => 0,
 
-    'supports_credentials' => true,
+  'supports_credentials' => true,
 
 ];

@@ -1,3 +1,4 @@
+import PieChart from "@/Components/Statistics/PieChart";
 import { useTranslation } from "react-i18next";
 
 interface SocialMediaAccount {
@@ -11,11 +12,13 @@ interface SocialMediaAccount {
 interface SocialMediaAccountsProps {
   accounts: SocialMediaAccount[];
   theme?: "light" | "dark";
+  showChart?: boolean;
 }
 
 export default function SocialMediaAccounts({
   accounts,
   theme = "light",
+  showChart = true,
 }: SocialMediaAccountsProps) {
   const { t } = useTranslation();
 
@@ -28,12 +31,43 @@ export default function SocialMediaAccounts({
                 : "bg-white shadow-lg border border-gray-100"
             }`}
     >
-      <h2
-        className={`text-xl font-bold mb-6
-                ${theme === "dark" ? "text-gray-100" : "text-gray-900"}`}
-      >
-        {t("analytics.socialMedia.title")}
-      </h2>
+      <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
+        <h2
+          className={`text-xl font-bold
+                  ${theme === "dark" ? "text-gray-100" : "text-gray-900"}`}
+        >
+          {t("analytics.socialMedia.title")}
+        </h2>
+      </div>
+
+      {showChart && accounts.length > 0 && (
+        <div className="mb-10">
+          <h3
+            className={`text-sm font-semibold mb-4 uppercase tracking-wider
+                    ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}
+          >
+            {t("analytics.charts.followersByPlatform")}
+          </h3>
+          <div
+            className={`rounded-xl p-4 transition-colors duration-300
+                    ${
+                      theme === "dark"
+                        ? "bg-neutral-800/30 border border-neutral-700/30"
+                        : "bg-gray-50/50 border border-gray-100"
+                    }`}
+          >
+            <PieChart
+              data={accounts.map((acc) => ({
+                name:
+                  acc.platform.charAt(0).toUpperCase() + acc.platform.slice(1),
+                value: acc.followers,
+              }))}
+              theme={theme}
+            />
+          </div>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {accounts.map((account) => (
           <div

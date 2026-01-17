@@ -3,7 +3,7 @@ import laravel from 'laravel-vite-plugin';
 import { defineConfig } from 'vite';
 import tsconfigPaths from "vite-tsconfig-paths";
 
-const host = 'localhost';
+const host = process.env.VITE_HMR_HOST || 'leviathan.tail4af8a1.ts.net';
 const certPath = './localhost.pem';
 const keyPath = './localhost-key.pem';
 const isProduction = process.env.NODE_ENV === 'production';
@@ -20,6 +20,9 @@ export default defineConfig({
             ],
             ssr: 'resources/js/ssr.tsx',
             refresh: true,
+            devServer: {
+                host: '0.0.0.0',
+            },
         }),
         react(),
         tsconfigPaths(),
@@ -33,7 +36,7 @@ export default defineConfig({
         strictPort: true,
 
         hmr: {
-            host: process.env.VITE_HMR_HOST || 'localhost',
+            host: host,
             clientPort: 5173,
             protocol: 'ws',
             timeout: 60000,
@@ -49,6 +52,8 @@ export default defineConfig({
         allowedHosts: [
             'localhost',
             'leviathan-port.tail4af8a1.ts.net',
+            'leviathan.tail4af8a1.ts.net',
+            '100.125.246.50',
             '127.0.0.1',
             '.ngrok-free.app',
             '.trycloudflare.com',

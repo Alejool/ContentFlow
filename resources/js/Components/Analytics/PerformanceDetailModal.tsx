@@ -20,7 +20,7 @@ export default function PerformanceDetailModal({
       isOpen={isOpen}
       onClose={onClose}
       title={t("analytics.drilldown.title") || "Detalle de Rendimiento"}
-      size="4xl"
+      size="5xl"
     >
       <PerformanceTable campaigns={campaigns} />
     </DynamicModal>

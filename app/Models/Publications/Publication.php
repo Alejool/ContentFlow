@@ -40,6 +40,8 @@ class Publication extends Model
     'failed',
     'pending_review',
     'approved',
+    'scheduled',
+    'rejected',
   ];
 
   protected $fillable = [
@@ -114,6 +116,16 @@ class Publication extends Model
   public function scopeApproved($query)
   {
     return $query->where('status', $this->status[5]);
+  }
+
+  public function scopeScheduled($query)
+  {
+    return $query->where('status', $this->status[6]);
+  }
+
+  public function scopeRejected($query)
+  {
+    return $query->where('status', $this->status[7]);
   }
 
   public function isApproved(): bool

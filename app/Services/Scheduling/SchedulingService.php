@@ -54,6 +54,9 @@ class SchedulingService
     $hasPending = $publication->scheduled_posts()->where('status', 'pending')->exists();
     if (!$hasPending && empty($publication->scheduled_at)) {
       $publication->update(['status' => 'draft']);
+    } elseif (($hasPending || !empty($publication->scheduled_at)) && $publication->status === 'draft') {
+      // If it has schedules and it's currently a draft, mark it as scheduled
+      $publication->update(['status' => 'scheduled']);
     }
   }
 }

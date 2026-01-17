@@ -1,20 +1,20 @@
-import BarChart from "@/Components/Statistics/BarChart";
-import LineChart from "@/Components/Statistics/LineChart";
-import PieChart from "@/Components/Statistics/PieChart";
+import { CampaignStat } from "@/Components/Analytics/PerformanceTable";
+import PlatformPerformance from "@/Components/Analytics/PlatformPerformance";
+import SocialMediaAccounts from "@/Components/Analytics/SocialMediaAccounts";
+import EngagementChart from "@/Components/Statistics/EngagementChart";
 import StatCard from "@/Components/Statistics/StatCard";
 import { useTheme } from "@/Hooks/useTheme";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link, router } from "@inertiajs/react";
 import axios from "axios";
 import {
-  ArrowRight,
   BarChart3,
   Calendar,
   Eye,
   FileText,
   Heart,
   Mail,
-  MousePointerClick,
+  MousePointer2,
   Sparkles,
   Target,
   TrendingUp,
@@ -37,9 +37,10 @@ interface DashboardProps {
     totalEngagement: number;
     avgEngagementRate: number;
     publicationStats?: Record<string, number>;
-    campaigns: any[];
+    campaigns: CampaignStat[];
     engagementTrends: any[];
-    platformData: any[];
+    platformData: any[]; // This is SocialMediaAccount[]
+    platformComparison: any[];
   };
   period: number;
 }
@@ -53,16 +54,18 @@ export default function Dashboard({
   const { t } = useTranslation();
   const { theme } = useTheme();
   const [pubStats, setPubStats] = useState<Record<string, number>>(
-    stats.publicationStats || {}
+    stats.publicationStats || {},
   );
   const [loadingPubStats, setLoadingPubStats] = useState(
-    !stats.publicationStats
+    !stats.publicationStats,
   );
   const [showBanner, setShowBanner] = useState(true);
   const [sending, setSending] = useState(false);
   const [successMessage, setSuccessMessage] = useState(
-    status === "verification-link-sent"
+    status === "verification-link-sent",
   );
+
+  console.log(pubStats);
 
   const handlePeriodChange = (days: number) => {
     router.get(
@@ -72,7 +75,7 @@ export default function Dashboard({
         preserveState: true,
         preserveScroll: true,
         only: ["stats", "period"],
-      }
+      },
     );
   };
 
@@ -80,7 +83,7 @@ export default function Dashboard({
     if (!stats.publicationStats) {
       axios
         .get(route("api.publications.stats"))
-        .then((res) => setPubStats(res.data.data || {}))
+        .then((res) => setPubStats(res.data || {}))
         .catch((error) => {
           if (error.response?.status !== 401) {
             console.error("Failed to fetch publication stats", error);
@@ -89,6 +92,30 @@ export default function Dashboard({
         .finally(() => setLoadingPubStats(false));
     }
   }, []);
+
+  useEffect(() => {
+    if (!auth.user?.id) return;
+
+    const channel = window.Echo.private(`users.${auth.user.id}`);
+
+    const refreshStats = () => {
+      axios
+        .get(route("api.publications.stats"))
+        .then((res) => setPubStats(res.data || {})) // Use res.data directly
+        .catch((error) => {
+          if (error.response?.status !== 401) {
+            console.error("Failed to refresh publication stats", error);
+          }
+        });
+    };
+
+    channel.listen(".PublicationStatusUpdated", refreshStats);
+
+    return () => {
+      // Echo.private returns the channel, but stopListening is called on it
+      channel.stopListening(".PublicationStatusUpdated");
+    };
+  }, [auth.user.id]);
 
   const handleResendVerification = () => {
     setSending(true);
@@ -106,13 +133,6 @@ export default function Dashboard({
       });
   };
 
-  const campaignChartData = stats.campaigns.map((c) => ({
-    name: c.title.length > 15 ? c.title.substring(0, 15) + "..." : c.title,
-    views: c.views,
-    clicks: c.clicks,
-    engagement: c.engagement,
-  }));
-
   const getContainerBg = () => {
     return theme === "dark" ? "bg-neutral-900" : "bg-gray-50";
   };
@@ -124,7 +144,7 @@ export default function Dashboard({
   };
 
   const getTextColor = (
-    type: "primary" | "secondary" | "title" = "primary"
+    type: "primary" | "secondary" | "title" = "primary",
   ) => {
     if (theme === "dark") {
       switch (type) {
@@ -226,7 +246,7 @@ export default function Dashboard({
                 <div className="flex-1">
                   <h3
                     className={`text-lg font-semibold mb-1 ${getTextColor(
-                      "title"
+                      "title",
                     )}`}
                   >
                     {t("auth.verification.banner.title")}
@@ -290,7 +310,7 @@ export default function Dashboard({
           <StatCard
             title={t("dashboard.totalClicks")}
             value={stats.totalClicks}
-            icon={<MousePointerClick className="w-6 h-6" />}
+            icon={<MousePointer2 className="w-6 h-6" />}
             color="teal"
             theme={theme}
           />
@@ -328,35 +348,39 @@ export default function Dashboard({
           />
         </div>
 
-        {/* Publication Status Summary */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2 sm:gap-3 mb-8">
           {[
-            { key: "draft", label: "Drafts", color: "gray", icon: FileText },
+            {
+              key: "draft",
+              color: "gray",
+              icon: FileText,
+            },
             {
               key: "pending_review",
-              label: "Pending Review",
               color: "orange",
               icon: Eye,
             },
             {
               key: "approved",
-              label: "Approved",
               color: "purple",
               icon: Sparkles,
             },
             {
+              key: "scheduled",
+              color: "sky",
+              icon: Calendar,
+            },
+            {
               key: "publishing",
-              label: "Publishing",
               color: "blue",
               icon: TrendingUp,
             },
             {
               key: "published",
-              label: "Published",
               color: "green",
               icon: Target,
             },
-            { key: "failed", label: "Failed", color: "red", icon: X },
+            { key: "failed", color: "red", icon: X },
           ].map((status) => (
             <div
               key={status.key}
@@ -378,7 +402,7 @@ export default function Dashboard({
                 />
               </div>
               <p className="text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1">
-                {status.label}
+                {t(`publications.status.${status.key}`)}
               </p>
               <p
                 className={`text-lg sm:text-xl font-bold ${
@@ -391,14 +415,14 @@ export default function Dashboard({
           ))}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 gap-6 mb-8">
           {stats.engagementTrends.length > 0 && (
             <div
               className={`rounded-lg p-6 shadow-sm transition-colors duration-300 ${getCardBg()}`}
             >
               <h2
                 className={`text-xl font-bold mb-4 flex items-center gap-2 ${getTextColor(
-                  "title"
+                  "title",
                 )}`}
               >
                 <div
@@ -414,120 +438,29 @@ export default function Dashboard({
                 </div>
                 {t("dashboard.engagementTrends")}
               </h2>
-              <LineChart
+              <EngagementChart
                 data={stats.engagementTrends}
-                lines={[
-                  {
-                    dataKey: "views",
-                    name: t("dashboard.views"),
-                    color: theme === "dark" ? "#60a5fa" : "#3b82f6",
-                  },
-                  {
-                    dataKey: "clicks",
-                    name: t("dashboard.clicks"),
-                    color: theme === "dark" ? "#34d399" : "#10b981",
-                  },
-                  {
-                    dataKey: "engagement",
-                    name: t("dashboard.engagement"),
-                    color: theme === "dark" ? "#a78bfa" : "#8b5cf6",
-                  },
-                ]}
-                xAxisKey="date"
-                height={300}
-              />
-            </div>
-          )}
-
-          {stats.platformData.length > 0 && (
-            <div
-              className={`rounded-lg p-6 shadow-sm transition-colors duration-300 ${getCardBg()}`}
-            >
-              <h2
-                className={`text-xl font-bold mb-4 flex items-center gap-2 ${getTextColor(
-                  "title"
-                )}`}
-              >
-                <div
-                  className={`p-2 rounded-lg ${
-                    theme === "dark" ? "bg-primary-900/20" : "bg-primary-100"
-                  }`}
-                >
-                  <Target
-                    className={`w-5 h-5 ${
-                      theme === "dark" ? "text-primary-400" : "text-primary-600"
-                    }`}
-                  />
-                </div>
-                {t("dashboard.followersByPlatform")}
-              </h2>
-              <PieChart
-                data={stats.platformData}
-                innerRadius={60}
-                height={300}
-                theme={theme}
+                theme={theme as any}
               />
             </div>
           )}
         </div>
 
-        {campaignChartData.length > 0 && (
-          <div
-            className={`rounded-lg p-6 shadow-sm transition-colors duration-300 mb-8 ${getCardBg()}`}
-          >
-            <div className="flex items-center justify-between mb-4">
-              <h2
-                className={`text-xl font-bold ${getTextColor(
-                  "title"
-                )} flex items-center gap-2`}
-              >
-                <div
-                  className={`p-2 rounded-lg ${
-                    theme === "dark" ? "bg-blue-900/20" : "bg-blue-100"
-                  }`}
-                >
-                  <BarChart3
-                    className={`w-5 h-5 ${
-                      theme === "dark" ? "text-blue-400" : "text-blue-600"
-                    }`}
-                  />
-                </div>
-                {t("dashboard.campaignPerformance")}
-              </h2>
-              <Link
-                href="/campaigns"
-                className={`text-sm font-medium flex items-center gap-1 transition-colors ${
-                  theme === "dark"
-                    ? "text-blue-400 hover:text-blue-300"
-                    : "text-blue-600 hover:text-blue-700"
-                }`}
-              >
-                {t("common.viewAll")}
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-            <BarChart
-              data={campaignChartData}
-              bars={[
-                {
-                  dataKey: "views",
-                  name: t("dashboard.views"),
-                  color: theme === "dark" ? "#60a5fa" : "#3b82f6",
-                },
-                {
-                  dataKey: "clicks",
-                  name: t("dashboard.clicks"),
-                  color: theme === "dark" ? "#34d399" : "#10b981",
-                },
-                {
-                  dataKey: "engagement",
-                  name: t("dashboard.engagement"),
-                  color: theme === "dark" ? "#a78bfa" : "#8b5cf6",
-                },
-              ]}
-              xAxisKey="name"
-              height={350}
-              theme={theme}
+        {stats.platformComparison.length > 0 && (
+          <div className="mb-8">
+            <PlatformPerformance
+              data={stats.platformComparison}
+              theme={theme as any}
+            />
+          </div>
+        )}
+
+        {stats.platformData.length > 0 && (
+          <div className="mb-8">
+            <SocialMediaAccounts
+              accounts={stats.platformData}
+              theme={theme as any}
+              showChart={true}
             />
           </div>
         )}
@@ -678,7 +611,7 @@ export default function Dashboard({
               </div>
               <h3
                 className={`text-xl font-semibold mb-2 ${getTextColor(
-                  "title"
+                  "title",
                 )}`}
               >
                 {t("dashboard.emptyState.title")}

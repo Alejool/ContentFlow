@@ -58,7 +58,7 @@ export const useUser = (initialUser: any) => {
     if (user?.locale && user.locale !== i18n.language) {
       i18n.changeLanguage(user.locale);
     }
-  }, [user?.locale, i18n]);
+  }, [user?.locale]);
 
   useEffect(() => {
     if (!user) return;

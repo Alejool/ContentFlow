@@ -1,6 +1,5 @@
 import { usePage } from "@inertiajs/react";
 import axios from "axios";
-import { Globe, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -14,11 +13,14 @@ export default function LanguageSwitcher() {
     { code: "es", name: "Español", flag: "🇪🇸" },
   ];
 
+  const getBaseLang = (lang: string) => lang.split("-")[0];
+  const currentLangCode = getBaseLang(i18n.resolvedLanguage || i18n.language);
+
   const currentLanguage =
-    languages.find((lang) => lang.code === i18n.language) || languages[0];
+    languages.find((lang) => lang.code === currentLangCode) || languages[0];
 
   const nextLanguage =
-    languages.find((lang) => lang.code !== i18n.language) || languages[1];
+    languages.find((lang) => lang.code !== currentLangCode) || languages[1];
 
   const toggleLanguage = async () => {
     if (isAnimating) return;
@@ -40,7 +42,6 @@ export default function LanguageSwitcher() {
     }
   };
 
-
   return (
     <button
       onClick={toggleLanguage}
@@ -53,14 +54,18 @@ export default function LanguageSwitcher() {
           {currentLanguage.flag}
         </span>
 
-        <span className={`absolute -bottom-1 -right-1 text-sm transition-all duration-300
+        <span
+          className={`absolute -bottom-1 -right-1 text-sm transition-all duration-300
           bg-white rounded-full border border-gray-200 p-0.5
-          ${isAnimating ? "scale-0 opacity-0" : "scale-100 opacity-100"}`}>
+          ${isAnimating ? "scale-0 opacity-0" : "scale-100 opacity-100"}`}
+        >
           {nextLanguage.flag}
         </span>
 
-        <span className="absolute -top-1 -left-1 text-[10px] text-indigo-500 
-          opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <span
+          className="absolute -top-1 -left-1 text-[10px] text-indigo-500
+          opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        >
           →
         </span>
       </div>

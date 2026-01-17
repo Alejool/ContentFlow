@@ -32,7 +32,19 @@ export const publicationSchema = (t: any) =>
         }, t("publications.modal.validation.hashtagMax")),
       scheduled_at: z.string().optional().nullable(),
       social_accounts: z.array(z.number()).optional().default([]),
-      status: z.enum(["draft", "published"]).optional().default("draft"),
+      status: z
+        .enum([
+          "draft",
+          "published",
+          "scheduled",
+          "publishing",
+          "failed",
+          "pending_review",
+          "approved",
+          "rejected",
+        ])
+        .optional()
+        .default("draft"),
       campaign_id: z.any().optional().nullable(),
       lock_content: z.boolean().optional(),
       use_global_schedule: z.boolean().optional().default(false),
@@ -50,7 +62,7 @@ export const publicationSchema = (t: any) =>
           t("publications.modal.validation.scheduledAtRequired") ||
           "Schedule date is required if global schedule is enabled",
         path: ["scheduled_at"],
-      }
+      },
     );
 
 export type PublicationFormData = z.infer<ReturnType<typeof publicationSchema>>;

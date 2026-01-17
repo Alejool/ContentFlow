@@ -36,7 +36,7 @@ Route::get('/webhooks/youtube', [\App\Http\Controllers\Webhooks\YouTubeWebhookCo
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth:sanctum'])->group(function () {
+Route::middleware(['auth:web'])->group(function () {
 
     /*
     |----------------------------------------------------------------------

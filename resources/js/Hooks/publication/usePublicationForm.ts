@@ -5,7 +5,7 @@ import { PageProps } from "@/types";
 import { Publication } from "@/types/Publication";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { usePage } from "@inertiajs/react";
-import { useEffect, useMemo, useRef, useState, startTransition } from "react";
+import { startTransition, useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
@@ -32,7 +32,7 @@ export const usePublicationForm = ({
   // Selectors for Publication Store
   const createPublication = usePublicationStore((s) => s.createPublication);
   const updatePublicationStore = usePublicationStore(
-    (s) => s.updatePublicationStore
+    (s) => s.updatePublicationStore,
   );
 
   // Selectors for Media Store
@@ -57,7 +57,7 @@ export const usePublicationForm = ({
 
   // Platform settings and previews
   const [platformSettings, setPlatformSettings] = useState<Record<string, any>>(
-    {}
+    {},
   );
   const [activePlatformSettings, setActivePlatformSettings] = useState<
     string | null
@@ -118,17 +118,20 @@ export const usePublicationForm = ({
           goal: publication.goal || "",
           hashtags: publication.hashtags || "",
           campaign_id: publication.campaigns?.[0]?.id?.toString() || null,
-          social_accounts: [],
+          social_accounts: [] as number[],
           scheduled_at: publication.scheduled_at || null,
           status:
             publication.status === "published" ||
-              publication.status === "scheduled" ||
-              publication.status === "publishing"
-              ? "published"
+            publication.status === "scheduled" ||
+            publication.status === "publishing" ||
+            publication.status === "approved" ||
+            publication.status === "pending_review"
+              ? publication.status
               : "draft",
           lock_content: !!publication.social_post_logs?.some(
-            (l) => l.status === "published" || l.status === "publishing"
+            (l) => l.status === "published" || l.status === "publishing",
           ),
+          use_global_schedule: !!publication.scheduled_at,
         });
 
         setPlatformSettings(publication.platform_settings || {});
@@ -139,8 +142,10 @@ export const usePublicationForm = ({
           goal: "",
           hashtags: "",
           campaign_id: null,
-          social_accounts: [],
+          social_accounts: [] as number[],
           scheduled_at: null,
+          status: "draft",
+          use_global_schedule: false,
           lock_content: false,
         });
         setPlatformSettings(user?.global_platform_settings || {});
@@ -158,20 +163,22 @@ export const usePublicationForm = ({
         const publishedAccountIds = new Set(
           publication.social_post_logs
             ?.filter(
-              (l) => l.status === "published" || l.status === "publishing"
+              (l) => l.status === "published" || l.status === "publishing",
             )
-            .map((l) => l.social_account_id) || []
+            .map((l) => l.social_account_id) || [],
         );
 
         const pendingSocialAccounts = Array.from(
           new Set(
             publication.scheduled_posts
               ?.filter((sp) => sp.status === "pending")
-              .map((sp) => sp.social_account_id) || []
-          )
+              .map((sp) => sp.social_account_id) || [],
+          ),
         );
 
-        setValue("social_accounts", pendingSocialAccounts, { shouldValidate: false });
+        setValue("social_accounts", pendingSocialAccounts, {
+          shouldValidate: false,
+        });
 
         // Process account schedules
         const initialAccountSchedules: Record<number, string> = {};
@@ -213,7 +220,7 @@ export const usePublicationForm = ({
             const thumbDerivative = media.derivatives?.find(
               (d: any) =>
                 d.derivative_type === "thumbnail" ||
-                d.derivative_type === "thumb"
+                d.derivative_type === "thumb",
             );
             let thumbnailUrl = thumbDerivative?.file_path;
             if (
@@ -267,7 +274,14 @@ export const usePublicationForm = ({
         setIsDataReady(true);
       });
     }
-  }, [isOpen, publication?.id, publication?.media_files, publication?.scheduled_posts, publication?.social_post_logs, publication?.image]);
+  }, [
+    isOpen,
+    publication?.id,
+    publication?.media_files,
+    publication?.scheduled_posts,
+    publication?.social_post_logs,
+    publication?.image,
+  ]);
 
   const handleFileChange = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
@@ -377,13 +391,13 @@ export const usePublicationForm = ({
     if (data.social_accounts && data.social_accounts.length > 0) {
       const hasGlobalSchedule = !!data.scheduled_at;
       const allAccountsHaveSchedule = data.social_accounts.every(
-        (id) => accountSchedules[id] || hasGlobalSchedule
+        (id) => accountSchedules[id] || hasGlobalSchedule,
       );
 
       if (!allAccountsHaveSchedule && !data.scheduled_at) {
         toast.error(
           t("publications.modal.validation.scheduleRequired") ||
-          "Debes programar una fecha para todas las redes seleccionadas o establecer una fecha global."
+            "Debes programar una fecha para todas las redes seleccionadas o establecer una fecha global.",
         );
         return;
       }
@@ -425,7 +439,7 @@ export const usePublicationForm = ({
         if (id && accountSchedules[id]) {
           formData.append(
             `social_account_schedules[${id}]`,
-            accountSchedules[id]
+            accountSchedules[id],
           );
         }
       });
@@ -439,11 +453,11 @@ export const usePublicationForm = ({
           if (videoMetadata[media.tempId]) {
             formData.append(
               `youtube_types_new[${index}]`,
-              videoMetadata[media.tempId].youtubeType
+              videoMetadata[media.tempId].youtubeType,
             );
             formData.append(
               `durations_new[${index}]`,
-              videoMetadata[media.tempId].duration.toString()
+              videoMetadata[media.tempId].duration.toString(),
             );
           }
 
@@ -469,7 +483,7 @@ export const usePublicationForm = ({
               formData.append("youtube_thumbnail", hasNewThumbnail);
               formData.append(
                 "youtube_thumbnail_video_id",
-                media.id.toString()
+                media.id.toString(),
               );
             }
           }
@@ -478,13 +492,13 @@ export const usePublicationForm = ({
 
       if (removedMediaIds && removedMediaIds.length > 0) {
         removedMediaIds.forEach((id) =>
-          formData.append("removed_media_ids[]", id.toString())
+          formData.append("removed_media_ids[]", id.toString()),
         );
       }
 
       if (removedThumbnailIds && removedThumbnailIds.length > 0) {
         removedThumbnailIds.forEach((id) =>
-          formData.append("removed_thumbnail_ids[]", id.toString())
+          formData.append("removed_thumbnail_ids[]", id.toString()),
         );
       }
 
@@ -503,7 +517,7 @@ export const usePublicationForm = ({
         toast.success(
           publication
             ? t("publications.messages.updateSuccess")
-            : t("publications.messages.createSuccess")
+            : t("publications.messages.createSuccess"),
         );
         onSubmitSuccess?.(true);
         handleClose();
@@ -511,10 +525,10 @@ export const usePublicationForm = ({
     } catch (error: any) {
       console.error(
         "Submission error details:",
-        error.response?.data || error.message
+        error.response?.data || error.message,
       );
       toast.error(
-        error.response?.data?.message || t("publications.messages.error")
+        error.response?.data?.message || t("publications.messages.error"),
       );
     } finally {
       setIsSubmitting(false);
@@ -530,8 +544,9 @@ export const usePublicationForm = ({
       .join(", ");
 
     toast.error(
-      `${t("common.errors.checkFormErrors")}${errorFields ? `: ${errorFields}` : ""
-      }`
+      `${t("common.errors.checkFormErrors")}${
+        errorFields ? `: ${errorFields}` : ""
+      }`,
     );
 
     if (mediaFiles.length === 0) {
