@@ -1,0 +1,284 @@
+﻿{
+  "publications": {
+    "title": "Publicaciones",
+    "subtitle": "Gestionar tus publicaciones",
+    "modal": {
+      "view": {
+        "title": "Vista Detallada"
+      },
+      "schedule": {
+        "title": "Fecha para todas las redes",
+        "description": "Define una fecha única para publicar en todas las redes sociales seleccionadas a la vez.",
+        "placeholder": "Seleccionar fecha y hora",
+        "instantWarning": "Para publicar ahora, usa el botón Publicar después de guardar.",
+        "useGlobal": "Programación Global"
+      },
+      "add": {
+        "title": "Agregar Publicación",
+        "titleField": "Título",
+        "subtitle": "Crear una publicación",
+        "name": "Nombre",
+        "description": "Descripción",
+        "image": "Imagen",
+        "hashtags": "Hashtags",
+        "campaigns": "Campañas",
+        "schedulePublication": "Programar Publicación",
+        "scheduled_at": "Fecha Programada",
+        "goal": "Objetivo",
+        "status": "Estado",
+        "budget": "Presupuesto",
+        "startDate": "Fecha de Inicio",
+        "endDate": "Fecha de Fin",
+        "publishDate": "Fecha de Publicación",
+        "publishedOn": "Publicado el",
+        "publications": "Publicaciones",
+        "creating": "Creando",
+        "optionalSchedule": "Programación Opcional",
+        "selectSocialAccounts": "Seleccionar Cuentas",
+        "dragDrop": {
+          "title": "Arrastra y suelta para ordenar",
+          "subtitle": "Sube tus archivos multimedia aquí"
+        },
+        "placeholders": {
+          "title": "Título",
+          "description": "Descripción",
+          "hashtags": "#marketing #publicidad #comunicación",
+          "schedulePublication": "Programar Publicación",
+          "goal": "Objetivo",
+          "startDate": "12/12/2025",
+          "endDate": "12/12/2026"
+        },
+        "button": {
+          "save": "Guardar",
+          "cancel": "Cancelar"
+        }
+      },
+      "edit": {
+        "title": "Editar Publicación",
+        "titleField": "Título",
+        "subtitle": "Actualizar la publicación existente",
+        "description": "Descripción",
+        "hashtags": "Hashtags",
+        "schedulePublication": "Programar Publicación",
+        "addCampaign": "Agregar Campaña",
+        "editCampaign": "Editar Campaña",
+        "deleteCampaign": "Eliminar Campaña",
+        "campaignTitle": "Campaign Title",
+        "name": "Nombre",
+        "image": "Imagen",
+        "goal": "Objetivo",
+        "campaigns": "Campañas",
+        "status": "Estado",
+        "budget": "Presupuesto",
+        "startDate": "Fecha de Inicio",
+        "endDate": "Fecha de Fin",
+        "publishDate": "Fecha de Publicación",
+        "publishedOn": "Publicado el",
+        "associatedPublications": "Publicaciones Asociadas",
+        "accountMissingTitle": "Cuenta Desconectada",
+        "accountMissingText": "Esta publicación se publicó en una cuenta ({{account}}) que ya no está conectada. Al editarla se creará una nueva versión para tu cuenta actual. ¿Continuar?",
+        "selectSocialAccounts": "Seleccionar Cuentas",
+        "lockedBySession": "Bloqueado por Sesión",
+        "dragDrop": {
+          "title": "Arrastra y suelta para ordenar",
+          "subtitle": "Sube tus archivos multimedia aquí"
+        },
+        "placeholders": {
+          "title": "Arrastra y suelta para ordenar",
+          "description": "Descripción",
+          "hashtags": "Hashtags",
+          "schedulePublication": "Programar Publicación",
+          "goal": "Objetivo",
+          "startDate": "12/12/2025",
+          "endDate": "12/12/2026"
+        },
+        "button": {
+          "save": "Actualizar",
+          "cancel": "Cancelar"
+        },
+        "contentLocked": "Contenido Bloqueado",
+        "contentLockedHint": "Para editar el contenido (título, descripción o archivos), debes despublicar la publicación de todas las plataformas.",
+        "lockedByOther": "Publicación bloqueada por otro usuario",
+        "locking": {
+          "sessionMessage": "Tienes esta publicación abierta en <1>{{browser}}</1>. Cierra la otra sesión para editar aquí.",
+          "userMessage": "{{user}} está editando esta publicación <1>desde {{browser}}</1>. Tus cambios no podrán ser guardados para evitar conflictos."
+        }
+      },
+      "approvals": {
+        "noPending": "Sin aprobaciones pendientes",
+        "noPendingDesc": "¡Genial! Todas las publicaciones están al día.",
+        "approve": "Aprobar",
+        "approvedSuccess": "Publicación aprobada con éxito",
+        "title": "Aprobaciones",
+        "date": "Fecha",
+        "user": "Usuario",
+        "publication": "Publicación",
+        "actions": "Acciones"
+      },
+      "manageContent": {
+        "configureNetworks": "Configura tus publicaciones programadas"
+      },
+      "publish": {
+        "title": "Publicar",
+        "selectPlatforms": "Seleccionar Plataformas",
+        "selectAll": "Seleccionar Todo",
+        "deselectAll": "Deseleccionar Todo",
+        "noConnectedAccounts": "No se encontraron cuentas sociales conectadas.",
+        "connectAccounts": "Por favor, conecta tus cuentas primero.",
+        "published": "Publicado",
+        "loading": "Cargando...",
+        "publishing": "Publicando...",
+        "platforms": "plataformas",
+        "removed": "Removido",
+        "failed": "Fallido",
+        "scheduled": "Programado",
+        "youtube": {
+          "youtubeThumbnails": "Thumbnails de YouTube"
+        },
+        "dragDrop": {
+          "title": "Arrastra y suelta para agregar",
+          "subtitle": "PNG, JPG, WebP (max 2MB)"
+        },
+        "modal": {
+          "title": "Despublicar",
+          "message": "¿Estás seguro de despublicar? Esto eliminará la publicación de esta plataforma.",
+          "confirmText": "Despublicar",
+          "cancelText": "Cancelar"
+        },
+        "button": {
+          "publish": "Publicar",
+          "requestApproval": "Solicitar Aprobación",
+          "pendingReview": "Pendiente de Revisión",
+          "approve": "Aprobar",
+          "reject": "Rechazar",
+          "cancel": "Cancelar",
+          "change": "Cambiar",
+          "preview": "Vista Previa"
+        },
+        "pendingReviewBanner": {
+          "title": "Publicación en Revisión",
+          "message": "Esta publicación ya ha sido enviada para revisión. Un administrador debe aprobarla antes de que pueda ser publicada."
+        },
+        "rejectedBanner": {
+          "title": "Publicación Rechazada",
+          "message": "Esta publicación fue rechazada por {{name}}. Por favor, realiza los ajustes necesarios y vuelve a solicitar aprobación."
+        }
+      },
+      "preview": {
+        "title": "Vista Previa",
+        "simulated": "Simulado",
+        "real": "Real",
+        "realInfo": "Vista Previa Real",
+        "view": "Ver vista previa",
+        "notAvailable": "Vista previa no disponible para esta plataforma"
+      },
+      "validation": {
+        "descMin": "Descripción debe tener al menos 10 caracteres",
+        "descMax": "Descripción debe tener menos de 200 caracteres",
+        "objMin": "Objetivo debe tener al menos 5 caracteres",
+        "objMax": "Objetivo debe tener menos de 200 caracteres",
+        "objRequired": "Objetivo es requerido",
+        "descRequired": "Descripción es requerida",
+        "titleRequired": "Título es requerido",
+        "titleLength": "Título debe tener menos de 70 caracteres",
+        "nameRequired": "Nombre es requerido",
+        "goalRequired": "Objetivo es requerido",
+        "statusRequired": "Estado es requerido",
+        "budgetRequired": "Presupuesto es requerido",
+        "startDateRequired": "Fecha de Inicio es requerida",
+        "endDateRequired": "Fecha de Fin es requerida",
+        "publishDateRequired": "Fecha de Publicación es requerida",
+        "publishedOnRequired": "Publicado el es requerido",
+        "associatedPublicationsRequired": "Publicaciones Asociadas es requerida",
+        "descriptionRequired": "Descripción es requerida",
+        "hashtagsRequired": "Hashtags es requerido",
+        "schedulePublicationRequired": "Programar Publicación es requerido",
+        "nameLength": "Nombre debe tener al menos 10 caracteres",
+        "descriptionLength": "Descripción debe tener al menos 10 caracteres",
+        "hashtagsLength": "Hashtags debe tener al menos 10 caracteres",
+        "schedulePublicationLength": "Programar Publicación debe tener al menos 10 caracteres",
+        "imageRequired": "Imagen es requerida",
+        "hashtagValid": "Hashtag debe tener al menos 10 caracteres",
+        "hashtagMax": "Hashtag debe tener menos de 10 caracteres",
+        "scheduleDateRequired": "Por favor, selecciona una fecha para programar la publicación o desmarca la opción de programar",
+        "scheduleRequired": "Debes programar una fecha para todas las redes seleccionadas o establecer una fecha global.",
+        "scheduledAtRequired": "La fecha programada es requerida cuando seleccionas redes sociales",
+        "socialAccountsRequired": "Por favor, selecciona al menos una red social",
+        "allSchedulesRequired": "Todas las redes deben tener una fecha o activa la fecha global"
+      }
+    },
+    "status": {
+      "draft": "Borrador",
+      "published": "Publicado",
+      "scheduled": "Programado",
+      "failed": "Fallido",
+      "instant": "Instantáneo",
+      "deleted": "Eliminado"
+    },
+    "button": {
+      "add": "Agregar publicación",
+      "edit": "Editar publicación",
+      "delete": "Eliminar publicación",
+      "close": "Cerrar",
+      "save": "Guardar cambios"
+    },
+    "table": {
+      "name": "Nombre",
+      "description": "Descripción",
+      "publications": "Publicaciones",
+      "media": "Archivos",
+      "campaign": "Campaña",
+      "status": "Estado",
+      "actions": "Acciones",
+      "noCampaign": "Sin Campaña",
+      "noPlatforms": "Sin Plataformas",
+      "loading": "Cargando...",
+      "linkedAccount": "Cuentas Asociadas",
+      "emptyState": {
+        "title": "No se encontraron publicaciones",
+        "description": "Crea una publicación para comenzar a publicar contenido.",
+        "button": "Agregar Publicación"
+      },
+      "lockedBy": "Bloqueado por:",
+      "publishingBy": "Publicando por",
+      "rejectedBy": "Rechazado por"
+    },
+    "messages": {
+      "addSuccess": "¡Publicación agregada exitosamente!",
+      "addError": "Error al agregar publicación",
+      "updateSuccess": "¡Publicación actualizada exitosamente!",
+      "updateError": "Error al actualizar publicación",
+      "deleteSuccess": "¡Publicación eliminada exitosamente!",
+      "deleteError": "Error al eliminar publicación",
+      "fetchError": "Error al cargar campañas",
+      "confirmDelete": {
+        "title": "¿Estás seguro?",
+        "text": "¡No podrás recuperar esta campaña!",
+        "confirmButton": "Sí, eliminarla!",
+        "cancelButton": "Cancelar"
+      }
+    },
+    "actions": {
+      "viewCampaign": "Ver Campaña",
+      "edit": "Editar",
+      "publishNow": "Publicar Ahora",
+      "viewDetails": "Ver Detalles",
+      "delete": "Eliminar",
+      "active": "Activa",
+      "remove": "Eliminar",
+      "change": "Cambiar"
+    },
+    "headers": {
+      "status": "Estado",
+      "duration": "Duración",
+      "mediaFiles": "Archivos",
+      "actions": "Acciones"
+    },
+    "filters": {
+      "title": "Filtros de publicación",
+      "all": "Todo",
+      "published": "Publicadas",
+      "draft": "Borrador"
+    }
+  }
+}

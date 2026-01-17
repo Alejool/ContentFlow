@@ -1,0 +1,40 @@
+﻿{
+  "workspace": {
+    "my_workspaces": "My Workspaces",
+    "create_new": "Create New Workspace",
+    "manage_workspaces": "Manage Workspaces",
+    "create_new_workspace": "Create a New Workspace",
+    "workspaces_one": "Workspace",
+    "workspaces_other": "Workspaces",
+    "workspaces": "Workspaces",
+    "select_workspace": "Select Workspace",
+    "settings": "Workspace Settings",
+    "active": "Active",
+    "switch": "Switch",
+    "switched_successfully": "Switched successfully",
+    "active_context": "Active Workspace",
+    "role": "Role",
+    "settings_description": "Manage your workspace members and configurations.",
+    "no_description": "No description provided.",
+    "member": "Member",
+    "members": "Members",
+    "team_members": "Team Members",
+    "invite_member": "Invite Member",
+    "role_permissions": "Role & Permissions",
+    "permissions_preview": "Full Access",
+    "name": "Workspace Name",
+    "name_placeholder": "e.g. My Agency",
+    "description": "Description",
+    "description_placeholder": "What is this workspace for?",
+    "create": "Create Workspace",
+    "danger_zone": "Danger Zone",
+    "delete_workspace": "Delete Workspace",
+    "delete_description": "Once you delete a workspace, there is no going back. Please be certain.",
+    "general_settings": "General Settings",
+    "tabs": {
+      "general": "General",
+      "members": "Members",
+      "roles": "Roles"
+    }
+  }
+}

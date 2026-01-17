@@ -1,0 +1,40 @@
+{
+  "title": "Analytics",
+  "subtitle": "Visualize the performance of your campaigns and publications",
+  "days": "days",
+  "vistas": "Views",
+  "clics": "Clicks",
+  "engagement": "Engagement",
+  "stats": {
+    "totalViews": "Total Views",
+    "totalClicks": "Total Clicks",
+    "conversions": "Conversions",
+    "totalReach": "Total Reach",
+    "avgEngagementRate": "Average Engagement Rate",
+    "avgCtr": "Average CTR",
+    "avgConversionRate": "Average Conversion Rate",
+    "totalEngagement": "Total Engagement"
+  },
+  "charts": {
+    "engagementTrends": "Engagement Trends",
+    "followersByPlatform": "Followers by Platform",
+    "topCampaignPerformance": "Top Campaign Performance",
+    "views": "Views",
+    "clicks": "Clicks",
+    "engagement": "Engagement"
+  },
+  "socialMedia": {
+    "title": "Social Media",
+    "followers": "Followers",
+    "engagementRate": "Engagement Rate",
+    "reach": "Reach"
+  },
+  "drilldown": {
+    "standalone": "Standalone Publications",
+    "title": "Performance Detail"
+  },
+  "emptyState": {
+    "title": "No Data Available",
+    "description": "Start creating campaigns and connecting social media accounts to see your analytics here."
+  }
+}

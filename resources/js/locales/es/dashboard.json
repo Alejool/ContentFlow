@@ -1,0 +1,38 @@
+{
+  "dashboard": {
+    "title": "Panel",
+    "welcomeMessage": "Bienvenido, {{name}}!",
+    "systemStats": "Estadísticas generales del sistema",
+    "totalViews": "Total Vistas",
+    "totalClicks": "Total Clicks",
+    "conversions": "Conversiones",
+    "totalReach": "Alcance Total",
+    "totalEngagement": "Engagement Total",
+    "avgEngagementRate": "Tasa de Engagement Promedio",
+    "engagementTrends": "Tendencia de Engagement (Últimos 30 días)",
+    "followersByPlatform": "Seguidores por Plataforma",
+    "campaignPerformance": "Rendimiento de Campañas",
+    "views": "Vistas",
+    "clicks": "Clicks",
+    "engagement": "Engagement",
+    "emptyState": {
+      "title": "Sin Datos",
+      "message": "Ejecuta el comando para generar datos de prueba:",
+      "command": "php artisan statistics:seed"
+    },
+    "quickActions": {
+      "campaigns": {
+        "title": "Campañas",
+        "description": "Crear y gestionar campañas de marketing"
+      },
+      "analytics": {
+        "title": "Analytics",
+        "description": "Ver estadísticas detalladas"
+      },
+      "content": {
+        "title": "Contenido",
+        "description": "Gestionar medios y publicaciones"
+      }
+    }
+  }
+}

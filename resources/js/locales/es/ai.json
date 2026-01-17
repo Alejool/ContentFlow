@@ -1,0 +1,49 @@
+{
+  "aiChat": {
+    "title": "Asistente IA",
+    "subtitle": "Recomendaciones inteligentes para tus campañas",
+    "campaignsAvailable": "campañas disponibles",
+    "chatTitle": "Chat ContentFlow",
+    "online": "En línea",
+    "thinking": "Pensando...",
+    "welcomeMessage": "¡Hola! Soy tu asistente de IA. ¿Cómo puedo ayudarte hoy?",
+    "inputPlaceholder": "Escribe tu mensaje...",
+    "enterToSend": "Enter para enviar",
+    "send": "Enviar",
+    "ideas": {
+      "title": "Ideas",
+      "panelTitle": "Ideas de Campaña",
+      "visualMarketing": {
+        "title": "Marketing Visual",
+        "description": "El contenido visual genera un 40% más de engagement"
+      },
+      "sustainability": {
+        "title": "Sostenibilidad",
+        "description": "Las marcas ecológicas retienen un 25% más de clientes"
+      },
+      "microInfluencers": {
+        "title": "Micro-Influencers",
+        "description": "Mayor conversión que las celebridades"
+      },
+      "ugcContent": {
+        "title": "Contenido UGC",
+        "description": "Aumenta la autenticidad y reduce costos"
+      }
+    },
+    "stats": {
+      "active": "Activas",
+      "total": "Total"
+    }
+  },
+  "aiAssistant": {
+    "welcomeMessage": "Estoy aquí para ayudarte con tus campañas de redes sociales. Puedes preguntarme sobre la creación de nuevas campañas, la mejora de las existentes o el análisis del rendimiento de tu contenido.",
+    "error": "Lo siento, pero encontré un error al procesar tu solicitud. Por favor intenta de nuevo más tarde.",
+    "suggestion": "Sugerencia",
+    "thinking": "Pensando...",
+    "askPlaceholder": "Pregunta sobre tus campañas...",
+    "buttonLabel": "Preguntar a la IA",
+    "headerTitle": "Asistente IA",
+    "tips": "Tips",
+    "subtitle": "Hazle cualquier pregunta a tu asistente de IA."
+  }
+}

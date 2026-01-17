@@ -1,0 +1,36 @@
+{
+  "welcome": "Welcome",
+  "loading": "Loading...",
+  "select": "Select",
+  "more": "More",
+  "viewAll": "View all",
+  "new": "New",
+  "saving": "Saving...",
+  "save": "Save",
+  "cancel": "Cancel",
+  "continue": "Continue",
+  "delete": "Delete",
+  "edit": "Edit",
+  "close": "Close",
+  "yes": "Yes",
+  "no": "No",
+  "item": "Item",
+  "publications": "Publications",
+  "vistas": "Views",
+  "clics": "Clicks",
+  "engagement": "Engagement",
+  "viewAllPerformance": "View all performance",
+  "status": {
+    "active": "Active",
+    "inactive": "Inactive",
+    "completed": "Completed",
+    "paused": "Paused",
+    "draft": "Draft"
+  },
+  "filters": {
+    "all": "All"
+  },
+  "errors": {
+    "checkFormErrors": "Please check the form for errors"
+  }
+}

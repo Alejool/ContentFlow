@@ -1,0 +1,52 @@
+{
+  "logs": {
+    "title": "Registro de Actividad",
+    "subtitle": "Registros de actividad",
+    "refresh": "Actualizar",
+    "viewPost": "Ver publicación",
+    "filter": "Filtrar",
+    "filters": {
+      "campaign": "Filtrar por Campaña",
+      "dateRange": "Rango de Fechas",
+      "allCampaigns": "Todas las Campañas",
+      "from": "Desde",
+      "to": "Hasta",
+      "apply": "Aplicar Filtros",
+      "clear": "Limpiar"
+    },
+    "table": {
+      "date": "Fecha",
+      "platform": "Plataforma",
+      "source": "Origen",
+      "description": "Descripción",
+      "campaign": "Campaña",
+      "status": "Estado",
+      "message": "Mensaje",
+      "error": "Error",
+      "video": "Video",
+      "link": "Enlace",
+      "copy": "Copiar",
+      "less": "Menos",
+      "more": "Mas"
+    },
+    "status": {
+      "all": "Todos",
+      "success": "Exitoso",
+      "failed": "Fallido",
+      "pending": "Pendiente",
+      "published": "Publicado",
+      "deleted": "Eliminado",
+      "removed_on_platform": "Eliminado en Plataforma",
+      "orphaned": "Huérfano",
+      "publishing": "Publicando"
+    },
+    "empty": "No se encontraron registros",
+    "loading": "Cargando registros...",
+    "pagination": {
+      "previous": "Anterior",
+      "next": "Siguiente",
+      "page": "Página",
+      "of": "de"
+    }
+  }
+}

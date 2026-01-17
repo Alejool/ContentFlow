@@ -1,0 +1,44 @@
+{
+  "title": "Resumen de Rendimiento",
+  "subtitle": "Analiza el impacto y rendimiento de tus campañas y publicaciones.",
+  "noPublications": "No hay publicaciones asociadas",
+  "scheduledPosts": "Publicaciones Programadas",
+  "create": "Crear Campaña",
+  "table": {
+    "name": "Nombre",
+    "description": "Descripción",
+    "publications": "Publicaciones",
+    "media": "Archivos",
+    "status": "Estado",
+    "actions": "Acciones",
+    "loading": "Cargando...",
+    "timeline": "Línea de Tiempo",
+    "performance": "Rendimiento",
+    "emptyState": {
+      "title": "No se encontraron campañas",
+      "description": "Crea una campaña para comenzar a publicar contenido.",
+      "button": "Agregar Campaña"
+    }
+  },
+  "filters": {
+    "title": "Filtros de campaña",
+    "all": "Todo",
+    "active": "Activa",
+    "inactive": "Inactiva",
+    "completed": "Completada",
+    "deleted": "Eliminada",
+    "paused": "Pausada"
+  },
+  "actions": {
+    "viewCampaign": "Ver Campaña",
+    "edit": "Editar",
+    "publishNow": "Publicar Ahora",
+    "viewDetails": "Ver Detalles",
+    "delete": "Eliminar",
+    "active": "Activa",
+    "remove": "Eliminar",
+    "change": "Cambiar",
+    "showPublications": "Ver publicaciones",
+    "hidePublications": "Ocultar publicaciones"
+  }
+}

@@ -1,0 +1,24 @@
+﻿{
+  "approvals": {
+    "approve": "Aprobar",
+    "reject": "Rechazar",
+    "approvedSuccess": "Publicación aprobada con éxito",
+    "rejectedSuccess": "Publicación rechazada con éxito",
+    "noPending": "Sin aprobaciones pendientes",
+    "noPendingDesc": "¡Genial! Todas las publicaciones están al día.",
+    "rejectPublication": "Rechazar Publicación",
+    "rejectionReason": "Razón del Rechazo",
+    "rejectionReasonDescription": "Proporciona una razón detallada para el rechazo de",
+    "rejectionReasonPlaceholder": "Ej. El contenido no cumple con las políticas de la empresa...",
+    "rejectionReasonTooShort": "La razón debe tener al menos 10 caracteres",
+    "rejectionReasonTooLong": "La razón no puede exceder 500 caracteres",
+    "approvalSuccess": "¡Publicación Aprobada!",
+    "approvalSuccessMessage": "La publicación ha sido aprobada exitosamente y está lista para ser publicada.",
+    "approvedBy": "Aprobado por",
+    "rejectedBy": "Rechazado por",
+    "publicationRejected": "Publicación Rechazada",
+    "rejectionMessage": "Tu publicación ha sido rechazada. Por favor, revisa los comentarios y realiza los ajustes necesarios.",
+    "noReasonProvided": "No se proporcionó una razón.",
+    "editPublication": "Editar Publicación"
+  }
+}

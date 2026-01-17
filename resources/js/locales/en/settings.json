@@ -1,0 +1,11 @@
+﻿{
+  ""settings"": {
+    ""social"": {
+      ""title"": ""Global Social Media Settings"",
+      ""subtitle"": ""Configure default settings that will be applied to all your new publications across different platforms."",
+      ""save"": ""Save Global Configuration"",
+      ""success"": ""Global settings saved successfully"",
+      ""error"": ""Failed to save global settings""
+    }
+  }
+}"

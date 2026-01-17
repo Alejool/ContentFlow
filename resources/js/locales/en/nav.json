@@ -1,0 +1,15 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "calendar": "Calendar",
+    "profile": "Profile",
+    "settings": "Settings",
+    "manageContent": "Manage Content",
+    "analytics": "Analytics",
+    "aiChat": "AI Chat",
+    "socialNetworks": "Social Networks",
+    "logout": "Log Out",
+    "notifications": "Notifications",
+    "workspaces": "Workspaces"
+  }
+}

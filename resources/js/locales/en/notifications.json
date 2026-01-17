@@ -1,0 +1,41 @@
+{
+  "notifications": {
+    "title": "Notifications",
+    "new": "new",
+    "mark_all_read": "Mark all as read",
+    "new_content": "New content available",
+    "content_ready": "Your content has been processed and is ready to publish.",
+    "analytics_ready": "Analytics report",
+    "report_generated": "Monthly performance report is available.",
+    "scheduled_post": "Scheduled post",
+    "post_scheduled": "Your post has been successfully scheduled.",
+    "warning": "System warning",
+    "api_limit": "You are approaching your monthly API limit.",
+    "high_priority": "High priority",
+    "normal_priority": "Normal priority",
+    "low_priority": "Low priority",
+    "all": "All",
+    "modal": {
+      "title": "Notifications",
+      "new": "new",
+      "mark_all_read": "Mark all as read",
+      "new_content": "New content available",
+      "content_ready": "Your content has been processed and is ready to publish.",
+      "analytics_ready": "Analytics report",
+      "report_generated": "Monthly performance report is available.",
+      "scheduled_post": "Scheduled post",
+      "post_scheduled": "Your post has been successfully scheduled.",
+      "warning": "System warning",
+      "api_limit": "You are approaching your monthly API limit.",
+      "no_notifications": "You have no pending notifications",
+      "empty_description": "System has no notifications to show",
+      "categories": {
+        "all": "All",
+        "application": "Application",
+        "content": "Content",
+        "system": "System",
+        "analytics": "Analytics"
+      }
+    }
+  }
+}

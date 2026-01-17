@@ -17,16 +17,11 @@ window.Pusher = Pusher;
 window.Echo = new Echo<"reverb">({
   broadcaster: "reverb",
   key: import.meta.env.VITE_REVERB_APP_KEY as string,
-
-  wsHost:
-    (import.meta.env.VITE_REVERB_HOST as string) ?? window.location.hostname,
-
-  wsPort: 443,
-  wssPort: 443,
-
-  forceTLS: true,
+  wsHost: import.meta.env.VITE_REVERB_HOST ?? window.location.hostname,
+  wsPort: import.meta.env.VITE_REVERB_PORT ?? 80,
+  wssPort: import.meta.env.VITE_REVERB_PORT ?? 443,
+  forceTLS: (import.meta.env.VITE_REVERB_SCHEME ?? "https") === "https",
   enabledTransports: ["ws", "wss"],
-
   authEndpoint: "/broadcasting/auth",
   autoConnect: true,
 });
