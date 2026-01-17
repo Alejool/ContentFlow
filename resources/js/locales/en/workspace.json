@@ -51,20 +51,20 @@
       "cancel": "Cancel",
       "submit": "Invite Member",
       "validation": {
-        "email": "Please enter a valid email address",
+        "email": "Please enter a valid email",
         "role": "Please select a role",
         "nameRequired": "Workspace name is required"
       },
       "messages": {
         "success": "Member invited successfully",
-        "error": "Failed to invite member",
-        "missing_info": "Workspace information is missing"
+        "error": "Error inviting member",
+        "missing_info": "Missing workspace information"
       }
     },
     "integrations": {
       "title": "Integrations",
       "webhooks_title": "Webhook Integrations",
-      "webhooks_description": "Configure Slack or Discord webhooks to receive real-time notifications about publication failures, approval requests, and more.",
+      "webhooks_description": "Configure Slack or Discord webhooks to receive real-time notifications about publishing failures, approval requests, and more.",
       "slack_webhook": "Slack Webhook URL",
       "discord_webhook": "Discord Webhook URL",
       "test_slack": "Test Slack",
@@ -74,7 +74,7 @@
       "messages": {
         "success": "Integrations updated successfully",
         "test_success": "Connection tested successfully",
-        "test_error": "Failed to test connection",
+        "test_error": "Error testing connection",
         "enter_url": "Please enter a {{type}} webhook URL first."
       }
     },
@@ -96,11 +96,91 @@
     },
     "roles_management": {
       "title": "Roles & Permissions",
-      "description": "Overview of available roles and their associated permissions in ContentFlow.",
+      "description": "Summary of available roles and their associated permissions in ContentFlow.",
       "no_permissions": "No permissions assigned."
     },
     "messages": {
       "update_success": "Workspace updated successfully"
-    }
+    },
+    "subtitle": "Manage and switch between your workspaces",
+    "create_button_subtitle": "Get Started",
+    "create_card": {
+      "subtitle": "Collaborate with a new team or project"
+    },
+    "no_description_italic": "No description",
+    "members_count": "{{count}} members",
+    "projects_count": "{{count}} projects",
+    "status": {
+      "current": "Current",
+      "switch": "Switch",
+      "open": "Abrir Espacio",
+      "settings": "Ajustes",
+      "invite": "Invitar Miembros"
+    },
+    "tooltips": {
+      "public": "Public Workspace",
+      "private": "Private Workspace",
+      "manage": "Manage Workspace",
+      "view": "View Details"
+    },
+    "modal": {
+      "subtitle": "Set up a new space for your team to collaborate",
+      "name_label": "Workspace Name",
+      "description_hint": "A good description helps members understand the purpose of the space"
+    },
+    "settings_title": "Workspace Settings",
+    "manage_general_settings": "Configure your workspace's basic information and visibility",
+    "visibility": "Workspace Visibility",
+    "public": "Public Workspace",
+    "private": "Private Workspace",
+    "public_description": "Visible to anyone with the link",
+    "private_description": "Only invited members can access",
+    "public_invites": "Public Invites",
+    "public_invites_description": "Allow anyone to join with invitation link",
+    "workspace_id": "Workspace ID",
+    "id_copied": "Workspace ID copied!",
+    "id_description": "Use this ID for API integrations and support requests",
+    "save_changes": "Save Changes",
+    "saving": "Saving Changes...",
+    "active_integrations": "Active Integrations",
+    "total_notifications": "Total Notifications",
+    "communication": "Communication Integrations",
+    "communication_description": "Connect your workspace to external communication platforms",
+    "slack_description": "Receive notifications in your Slack channels",
+    "discord_description": "Send updates to your Discord server",
+    "webhook_security": "Webhook Security",
+    "webhook_security_description": "Configure security settings for incoming webhooks",
+    "webhook_secret": "Webhook Secret",
+    "secret_generated": "New secret generated!",
+    "secret_description": "This secret will be used to verify incoming webhook requests",
+    "activity_log": "Notification Activity Log",
+    "recent_webhook_activity": "Recent webhook delivery attempts",
+    "time": "Time",
+    "channel": "Channel",
+    "event": "Event",
+    "response": "Response",
+    "no_activity": "No activity yet",
+    "activity_will_appear": "Notifications will appear here once sent",
+    "showing_activities": "Showing {{count}} recent activities",
+    "your_role": "Your Role",
+    "key_permissions": "Key Permissions",
+    "more": "more",
+    "permissions_required": "Permissions Required",
+    "owner_admin_required": "You need owner or admin permissions to modify role settings",
+    "quick_actions": "Quick Actions",
+    "invite_members_action": "Invite Members",
+    "invite_members_description": "Add new members to workspace",
+    "share_workspace": "Share Workspace",
+    "share_workspace_description": "Generate invitation link",
+    "configure_workspace": "Configure workspace",
+    "connect_apps": "Connect apps & services",
+    "feature_coming_soon": "Feature coming soon!",
+    "recent_activity": "Recent Activity",
+    "workspace_updated_by": "Workspace updated by {{name}}",
+    "workspace_age": "Workspace Age",
+    "show_advanced": "Show Advanced",
+    "hide_advanced": "Hide Advanced",
+    "generate": "Generate",
+    "refresh": "Refresh"
   }
 }

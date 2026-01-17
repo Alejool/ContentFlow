@@ -6,6 +6,12 @@
     "vistas": "Views",
     "clics": "Clicks",
     "engagement": "Engagement",
+    "trends": {
+      "likes": "Likes",
+      "comments": "Comments",
+      "shares": "Shares",
+      "saves": "Saves"
+    },
     "stats": {
       "totalViews": "Total Views",
       "totalClicks": "Total Clicks",
