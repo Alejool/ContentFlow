@@ -22,11 +22,11 @@ primary_region = "gru"
     handlers = ["tls", "http"]
 
   [[services.http_checks]]
-    interval = "30s"
+    interval = "15s"
     method = "get"
-    path = "/favicon.ico"
+    path = "/"
     timeout = "5s"
-    grace_period = "1200s"
+    grace_period = "120s"
 
 [[vm]]
   memory = "512mb"
