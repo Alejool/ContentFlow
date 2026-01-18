@@ -3,15 +3,38 @@
 namespace App\Observers;
 
 use App\Models\User;
+use App\Models\Workspace;
+use App\Models\Role;
 
 class UserObserver
 {
-    /**
-     * Handle the User "created" event.
-     */
     public function created(User $user): void
     {
-        //
+        if ($user->workspaces()->count() > 0) {
+            return;
+        }
+        
+        $workspaceName = $user->name . "'s Workspace";
+        if ($user->locale === 'es') {
+            $workspaceName = "Mi Espacio";
+        }
+
+        $workspace = Workspace::create([
+            'name' => $workspaceName,
+            'created_by' => $user->id,
+            'description' => $user->locale === 'es'
+                ? 'Tu espacio personal para empezar a crear contenido.'
+                : 'Your personal workspace to start creating content.',
+        ]);
+        $ownerRole = Role::where('slug', 'owner')->first();
+
+        if ($ownerRole) {
+            $user->workspaces()->attach($workspace->id, [
+                'role_id' => $ownerRole->id
+            ]);
+        }
+
+        $user->update(['current_workspace_id' => $workspace->id]);
     }
 
     /**
