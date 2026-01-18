@@ -88,7 +88,7 @@ class PublicationController extends Controller
       // Using simplePaginate() to avoid COUNT(*) query - only loads current page data
       $publications = ($request->query('simplified') === 'true')
         ? $query->limit(50)->get()
-        : $query->simplePaginate($request->query('per_page', 6));
+        : $query->paginate($request->query('per_page', 12));
 
       return $this->successResponse(['publications' => $publications]);
     });

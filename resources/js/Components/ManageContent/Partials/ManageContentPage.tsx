@@ -42,6 +42,7 @@ export default function ManageContentPage() {
     t,
     handleFilterChange,
     handlePageChange,
+    handlePerPageChange,
     handleRefresh,
     handleDeleteItem,
     handleEditRequest,
@@ -353,6 +354,7 @@ export default function ManageContentPage() {
                   isLoading={isLogsLoading}
                   pagination={logPagination}
                   onPageChange={handlePageChange}
+                  onPerPageChange={handlePerPageChange}
                   onRefresh={handleRefresh}
                   onFilterChange={handleFilterChange}
                 />

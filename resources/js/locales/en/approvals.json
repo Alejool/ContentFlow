@@ -6,6 +6,8 @@
     "rejectedSuccess": "Publication successfully rejected",
     "noPending": "No pending approvals",
     "noPendingDesc": "Great! All publications are up to date.",
+    "historyTitle": "Approval History",
+    "historySubtitle": "Logs of status changes and reviews",
     "rejectPublication": "Reject Publication",
     "rejectionReason": "Rejection Reason",
     "rejectionReasonDescription": "Provide a detailed reason for the rejection of",

@@ -112,6 +112,7 @@ export const usePublications = () => {
   );
 
   const [filters, setFilters] = useState<any>({});
+  const [itemsPerPage, setItemsPerPage] = useState(15);
 
   // Use a ref to prevent loops from effect triggers
   const lastFetchRef = useRef<string>("");
@@ -130,22 +131,23 @@ export const usePublications = () => {
 
       switch (activeTab) {
         case "publications":
-          await fetchPublications(filters, page);
+          await fetchPublications({ ...filters, per_page: itemsPerPage }, page);
           break;
         case "campaigns":
-          await fetchCampaigns(filters, page);
+          await fetchCampaigns({ ...filters, per_page: itemsPerPage }, page);
           break;
         case "logs":
-          await fetchLogs(filters, page);
+          await fetchLogs({ ...filters, per_page: itemsPerPage }, page);
           break;
         case "approvals":
-          await fetchPublications(filters, page);
+          await fetchPublications({ ...filters, per_page: itemsPerPage }, page);
           break;
       }
     },
     [
       activeTab,
       filters,
+      itemsPerPage,
       fetchPublications,
       fetchCampaigns,
       fetchLogs,
@@ -155,9 +157,17 @@ export const usePublications = () => {
     ],
   );
 
+  const handlePerPageChange = useCallback(
+    (val: number) => {
+      setItemsPerPage(val);
+      fetchData(1);
+    },
+    [fetchData],
+  );
+
   useEffect(() => {
     fetchData();
-  }, [activeTab, filters]); // Only run when tab or filters change
+  }, [activeTab, filters, itemsPerPage]); // Run when tab, filters or perPage change
 
   useEffect(() => {
     fetchAccounts();

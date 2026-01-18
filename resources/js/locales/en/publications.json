@@ -146,6 +146,19 @@
           "userMessage": "{{user}} is editing this publication <1>from {{browser}}</1>. Your changes cannot be saved to avoid conflicts."
         }
       },
+      "approvals": {
+        "noPending": "No pending approvals",
+        "noPendingDesc": "Great! All publications are up to date.",
+        "approve": "Approve",
+        "approvedSuccess": "Publication approved successfully",
+        "title": "Approvals",
+        "historyTitle": "Approval History",
+        "historySubtitle": "Logs of status changes and reviews",
+        "date": "Date",
+        "user": "User",
+        "publication": "Publication",
+        "actions": "Actions"
+      },
       "publish": {
         "title": "Publish",
         "selectPlatforms": "Select Platforms",
@@ -240,6 +253,7 @@
       "failed": "Failed",
       "pending_review": "Pending Review",
       "approved": "Approved",
+      "rejected": "Rejected",
       "instant": "Instant",
       "deleted": "Deleted"
     },

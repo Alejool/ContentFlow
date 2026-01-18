@@ -85,6 +85,11 @@
     "errors": {
       "checkFormErrors": "Por favor, revisa los errores en el formulario"
     },
-    "vsLastPeriod": "vs periodo anterior"
+    "vsLastPeriod": "vs periodo anterior",
+    "pagination": {
+      "show": "Mostrar",
+      "entries": "entradas",
+      "info": "Mostrando {{from}} a {{to}} de {{total}} resultados"
+    }
   }
 }

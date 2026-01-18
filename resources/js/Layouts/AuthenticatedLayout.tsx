@@ -1,18 +1,15 @@
 import GlobalAiAssistant from "@/Components/AiAssistant/GlobalAiAssistant";
 import CommandPalette from "@/Components/CommandPalette/CommandPalette";
 import ActiveWorkspace from "@/Components/Layout/ActiveWorkspace";
-import NotificationButton from "@/Components/Layout/NotificationButton";
 import MobileNavbar from "@/Components/Layout/MobileNavbar";
+import NotificationButton from "@/Components/Layout/NotificationButton";
 import ProfileDropdown from "@/Components/Layout/ProfileDropdown";
 import SearchButton from "@/Components/Layout/SearchButton";
 import Sidebar from "@/Components/Layout/Sidebar";
-import WorkspaceInfoBadge from "@/Components/Workspace/WorkspaceInfoBadge";
-import { useNotifications } from "@/Hooks/useNotifications";
 import { useTheme } from "@/Hooks/useTheme";
 import { initNotificationRealtime } from "@/Services/notificationRealtime";
 import { useNotificationStore } from "@/stores/notificationStore";
 import { usePage } from "@inertiajs/react";
-import { ChevronRight } from "lucide-react";
 import { ReactNode, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -51,9 +48,7 @@ export default function AuthenticatedLayout({
 
   return (
     <div className="h-screen flex flex-col overflow-hidden w-full max-w-full">
-      <div
-        className="relative flex-1 min-h-0 flex bg-[url('/resources/assets/b-3.jpg')] bg-cover bg-center bg-no-repeat w-full max-w-full min-w-0 overflow-x-hidden"
-      >
+      <div className="relative flex-1 min-h-0 flex bg-[url('/resources/assets/bg.jpg')] bg-cover bg-center bg-no-repeat w-full max-w-full min-w-0 overflow-x-hidden">
         <div
           className={`
             absolute inset-0
@@ -74,12 +69,15 @@ export default function AuthenticatedLayout({
           />
 
           <main
-            className={`flex-1 min-w-0 max-w-full overflow-y-auto overflow-x-hidden transition-all duration-500  ease-in-out ${isSidebarOpen ? "lg:ml-80" : "lg:ml-32"
-              }`}
+            className={`flex-1 min-w-0 max-w-full overflow-y-auto overflow-x-hidden transition-all duration-500  ease-in-out ${
+              isSidebarOpen ? "lg:ml-80" : "lg:ml-32"
+            }`}
           >
-            <header className="border-b border-gray-200/50 
-                dark:border-neutral-800/50 bg-white/80 dark:bg-black/80 
-                backdrop-blur-xl z-40 min-w-0 sticky top-0 flex flex-col">
+            <header
+              className="border-b border-gray-200/50
+                dark:border-neutral-800/50 bg-white/80 dark:bg-black/80
+                backdrop-blur-xl z-40 min-w-0 sticky top-0 flex flex-col"
+            >
               {!route().current("workspaces.*") && (
                 <div className="w-full">
                   <ActiveWorkspace />

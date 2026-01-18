@@ -1,0 +1,23 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle/Blob -->
+  <circle cx="100" cy="100" r="80" fill="#FF6D1F" fill-opacity="0.05"/>
+  <circle cx="100" cy="100" r="60" fill="#FF6D1F" fill-opacity="0.1"/>
+
+  <!-- Folder Icon -->
+  <path d="M40 70C40 64.4772 44.4772 60 50 60H80C82.6522 60 85.1957 61.0536 87.0711 62.9289L97.0711 72.9289C98.9464 74.8043 101.49 75.8579 104.142 75.8579H150C155.523 75.8579 160 80.335 160 85.8579V130C160 135.523 155.523 140 150 140H50C44.4772 140 40 135.523 40 130V70Z"
+        fill="white"
+        stroke="#FF6D1F"
+        stroke-width="2"/>
+
+  <!-- Magnifying Glass -->
+  <circle cx="120" cy="110" r="25" fill="white" stroke="#FF6D1F" stroke-width="3"/>
+  <path d="M138 128L155 145" stroke="#FF6D1F" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- Internal Elements in Glass -->
+  <path d="M110 110H130" stroke="#FF6D1F" stroke-width="2" stroke-linecap="round" stroke-opacity="0.3"/>
+
+  <!-- Floating Elements -->
+  <circle cx="150" cy="60" r="4" fill="#FF6D1F" fill-opacity="0.4"/>
+  <circle cx="50" cy="150" r="6" fill="#FF6D1F" fill-opacity="0.3"/>
+  <circle cx="30" cy="90" r="3" fill="#FF6D1F" fill-opacity="0.2"/>
+</svg>

@@ -77,7 +77,8 @@ class CampaignController extends Controller
             }
 
             // Using simplePaginate() to avoid COUNT(*) query - only loads current page data
-            $campaigns = $query->orderBy('created_at', 'desc')->simplePaginate(5);
+            $perPage = $request->query('per_page', 5);
+            $campaigns = $query->orderBy('created_at', 'desc')->paginate($perPage);
 
             // Calculate aggregate stats for each campaign
             $campaigns->getCollection()->transform(function ($campaign) {
@@ -92,6 +93,13 @@ class CampaignController extends Controller
 
             return $campaigns;
         });
+
+        if ($request->wantsJson()) {
+            return $this->successResponse([
+                'campaigns' => $campaigns,
+                'performanceData' => $performanceData
+            ]);
+        }
 
         return \Inertia\Inertia::render('Campaigns/Index', [
             'campaigns' => $campaigns,

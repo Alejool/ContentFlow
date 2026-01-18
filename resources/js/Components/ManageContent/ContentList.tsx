@@ -6,6 +6,7 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import ContentCard from "./ContentCard";
 import ContentCardSkeleton from "./ContentCardSkeleton";
+// import emptyStateImg from "/empty-state.svg";
 
 interface ContentListProps {
   items: any[];
@@ -55,8 +56,23 @@ export default function ContentList(props: ContentListProps) {
 
   if (!smoothLoading && (!items || items.length === 0)) {
     return (
-      <div className="text-center py-20 text-gray-400 animate-in fade-in duration-500">
-        No content found.
+      <div className="flex flex-col items-center justify-center py-20 px-4 text-center animate-in fade-in zoom-in duration-500">
+        <div className="relative mb-6">
+          <div className="absolute inset-0 bg-primary-100 dark:bg-primary-900/20 rounded-full blur-2xl opacity-50 scale-150 animate-pulse" />
+          <div className="relative">
+            <img
+              src="/assets/empty-state.svg"
+              alt="No Content"
+              className="w-48 h-auto object-contain drop-shadow-xl"
+            />
+          </div>
+        </div>
+        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+          {t(`${mode}.table.emptyState.title`)}
+        </h3>
+        <p className="text-gray-500 dark:text-gray-400 max-w-xs mx-auto">
+          {t(`${mode}.table.emptyState.description`)}
+        </p>
       </div>
     );
   }

@@ -6,6 +6,8 @@
     "rejectedSuccess": "Publicación rechazada con éxito",
     "noPending": "Sin aprobaciones pendientes",
     "noPendingDesc": "¡Genial! Todas las publicaciones están al día.",
+    "historyTitle": "Historial de Aprobaciones",
+    "historySubtitle": "Registros de estados y revisiones",
     "rejectPublication": "Rechazar Publicación",
     "rejectionReason": "Razón del Rechazo",
     "rejectionReasonDescription": "Proporciona una razón detallada para el rechazo de",

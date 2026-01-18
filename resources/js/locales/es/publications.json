@@ -151,6 +151,8 @@
         "approve": "Aprobar",
         "approvedSuccess": "Publicación aprobada con éxito",
         "title": "Aprobaciones",
+        "historyTitle": "Historial de Aprobaciones",
+        "historySubtitle": "Registros de estados y revisiones",
         "date": "Fecha",
         "user": "Usuario",
         "publication": "Publicación",
@@ -259,6 +261,7 @@
       "pending_review": "En Revisión",
       "approved": "Aprobado",
       "instant": "Instantáneo",
+      "rejected": "Rechazado",
       "deleted": "Eliminado"
     },
     "button": {

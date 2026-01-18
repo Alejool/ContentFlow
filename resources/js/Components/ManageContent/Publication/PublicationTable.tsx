@@ -3,6 +3,8 @@ import PublicationMobileRow from "@/Components/ManageContent/Publication/Publica
 import PublicationMobileRowSkeleton from "@/Components/ManageContent/Publication/PublicationMobileRowSkeleton";
 import PublicationRowSkeleton from "@/Components/ManageContent/Publication/PublicationRowSkeleton";
 import { TableHeader } from "@/Components/ManageContent/Publication/TableHeader";
+import AdvancedPagination from "@/Components/common/ui/AdvancedPagination";
+import TableContainer from "@/Components/common/ui/TableContainer";
 import { useWorkspaceLocks } from "@/Hooks/usePublicationLock";
 import { Publication } from "@/types/Publication";
 import { Folder } from "lucide-react";
@@ -19,6 +21,9 @@ interface PublicationTableProps {
   onEditRequest?: (item: Publication) => void;
   isLoading?: boolean;
   permissions?: string[];
+  pagination?: any;
+  onPageChange?: (page: number) => void;
+  onPerPageChange?: (perPage: number) => void;
 }
 
 const PublicationTable = memo(
@@ -32,6 +37,9 @@ const PublicationTable = memo(
     onEditRequest,
     isLoading,
     permissions,
+    pagination,
+    onPageChange,
+    onPerPageChange,
   }: PublicationTableProps) => {
     const { remoteLocks } = useWorkspaceLocks();
     const [scrollContainer, setScrollContainer] = useState<
@@ -109,11 +117,13 @@ const PublicationTable = memo(
     );
 
     return (
-      <div className="relative">
-        {/*
-          Removed fixed height to allow table to adjust to content height.
-          We use customScrollParent to link with the main layout scroller.
-      */}
+      <TableContainer
+        title={t("publications.title") || "Publicaciones"}
+        subtitle={
+          t("publications.subtitle") ||
+          "Gestiona tu contenido en redes sociales"
+        }
+      >
         <div className="transition-opacity duration-300">
           <div className="hidden lg:block">
             {!smoothLoading && items.length === 0 ? (
@@ -122,45 +132,40 @@ const PublicationTable = memo(
                 <h3 className="text-lg font-bold text-gray-900 dark:text-white uppercase tracking-wider">
                   {t("publications.table.emptyState.title")}
                 </h3>
-                <p className="text-sm text-gray-400 dark:text-gray-500 mt-2">
-                  {t("publications.table.emptyState.description")}
-                </p>
               </div>
             ) : (
               <div className="grid grid-cols-1 grid-rows-1">
-                {/* Data Layer */}
                 <div
                   className={`col-start-1 row-start-1 transition-all duration-500 ${smoothLoading ? "invisible opacity-0" : "visible opacity-100"}`}
                 >
                   <TableVirtuoso
                     data={items}
                     context={context}
-                    customScrollParent={scrollContainer}
+                    useWindowScroll
                     className="w-full"
                     components={{
                       Table: (props) => (
                         <table
                           {...props}
                           className="w-full text-left border-collapse z-0"
-                          style={{ borderCollapse: "collapse" }}
                         />
                       ),
                       TableHead: React.forwardRef((props, ref) => (
                         <thead
                           {...props}
                           ref={ref}
-                          className="bg-gray-50 border-gray-100 dark:bg-neutral-900 dark:border-neutral-800 sticky top-0 z-10"
+                          className="bg-gray-50/50 border-gray-100 dark:bg-neutral-900/50 dark:border-neutral-800 sticky top-0 z-10"
                         />
                       )),
                       TableRow: (props) => (
                         <tr
                           {...props}
-                          className="border-b border-gray-50 dark:border-neutral-800 hover:bg-gray-50/50 dark:hover:bg-neutral-800/50"
+                          className="border-b border-gray-50 dark:border-neutral-800 hover:bg-gray-50/30 dark:hover:bg-neutral-800/30"
                         />
                       ),
                     }}
                     fixedHeaderContent={() => (
-                      <tr className="text-xs uppercase tracking-wider border-b bg-gray-50 border-gray-100 dark:bg-neutral-900 dark:border-neutral-800 text-gray-500 dark:text-gray-400">
+                      <tr className="text-xs uppercase tracking-wider border-b bg-gray-50/80 dark:bg-neutral-900/80 text-gray-500 dark:text-gray-400">
                         <TableHeader mode="publications" t={t} />
                       </tr>
                     )}
@@ -181,17 +186,16 @@ const PublicationTable = memo(
                   />
                 </div>
 
-                {/* Skeleton Layer */}
                 {smoothLoading && (
-                  <div className="col-start-1 row-start-1 bg-white dark:bg-neutral-900 animate-out fade-out duration-500 fill-mode-forwards z-20">
+                  <div className="col-start-1 row-start-1 bg-white/50 dark:bg-neutral-900/50 animate-out fade-out duration-500 fill-mode-forwards z-20">
                     <table className="w-full text-left border-collapse">
-                      <thead className="bg-gray-50 border-gray-100 dark:bg-neutral-900 dark:border-neutral-800">
+                      <thead>
                         <tr className="text-xs uppercase tracking-wider border-b text-gray-500 dark:text-gray-400">
                           <TableHeader mode="publications" t={t} />
                         </tr>
                       </thead>
                       <tbody>
-                        {[...Array(8)].map((_, i) => (
+                        {[...Array(items.length || 8)].map((_, i) => (
                           <PublicationRowSkeleton key={i} />
                         ))}
                       </tbody>
@@ -205,19 +209,13 @@ const PublicationTable = memo(
           <div className="lg:hidden">
             {!smoothLoading && items.length === 0 ? (
               <div className="p-8 text-center text-gray-500 rounded-2xl border border-gray-200 dark:border-neutral-800 bg-gray-50 dark:bg-neutral-900/50 animate-in fade-in duration-500">
-                <div className="w-16 h-16 bg-gray-100 dark:bg-neutral-800 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Folder className="w-8 h-8 text-gray-400" />
-                </div>
+                <Folder className="w-8 h-8 text-gray-400 mx-auto mb-4" />
                 <h3 className="font-bold text-gray-900 dark:text-white">
                   {t("publications.table.emptyState.title")}
                 </h3>
-                <p className="text-sm text-gray-400 dark:text-gray-500 mt-2 mx-auto max-w-[200px]">
-                  {t("publications.table.emptyState.description")}
-                </p>
               </div>
             ) : (
               <div className="grid grid-cols-1 grid-rows-1">
-                {/* Data Layer */}
                 <div
                   className={`col-start-1 row-start-1 transition-all duration-500 ${smoothLoading ? "invisible opacity-0" : "visible opacity-100"}`}
                 >
@@ -236,7 +234,6 @@ const PublicationTable = memo(
                   />
                 </div>
 
-                {/* Skeleton Layer */}
                 {smoothLoading && (
                   <div className="col-start-1 row-start-1 bg-white dark:bg-neutral-900 animate-out fade-out duration-500 fill-mode-forwards z-20">
                     <PublicationMobileRowSkeleton />
@@ -246,7 +243,20 @@ const PublicationTable = memo(
             )}
           </div>
         </div>
-      </div>
+
+        {pagination && pagination.last_page > 1 && (
+          <AdvancedPagination
+            currentPage={pagination.current_page}
+            lastPage={pagination.last_page}
+            total={pagination.total}
+            perPage={pagination.per_page || 12}
+            onPageChange={onPageChange || (() => {})}
+            onPerPageChange={onPerPageChange || (() => {})}
+            t={t}
+            isLoading={isLoading}
+          />
+        )}
+      </TableContainer>
     );
   },
 );
