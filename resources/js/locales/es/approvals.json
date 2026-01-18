@@ -19,6 +19,33 @@
     "publicationRejected": "Publicación Rechazada",
     "rejectionMessage": "Tu publicación ha sido rechazada. Por favor, revisa los comentarios y realiza los ajustes necesarios.",
     "noReasonProvided": "No se proporcionó una razón.",
-    "editPublication": "Editar Publicación"
+    "editPublication": "Editar Publicación",
+    "searchPlaceholder": "Buscar por título de publicación...",
+    "noHistory": "No se encontró historial de aprobaciones",
+    "stats": {
+      "pendingRequests": "Solicitudes Pendientes",
+      "approvedToday": "Aprobadas Hoy",
+      "rejectedToday": "Rechazadas Hoy",
+      "avgApprovalTime": "Tiempo Promedio de Aprobación"
+    },
+    "historyTable": {
+      "publication": "Publicación",
+      "requestedBy": "Solicitado por",
+      "requestedAt": "Fecha Solicitud",
+      "reviewedBy": "Revisado por",
+      "reviewedAt": "Fecha Revisión",
+      "action": "Acción",
+      "reason": "Razón"
+    },
+    "filters": {
+      "all": "Todas",
+      "approved": "Aprobadas",
+      "rejected": "Rechazadas",
+      "dateRange": "Rango de Fechas"
+    },
+    "tabs": {
+      "pending": "Pendientes",
+      "history": "Historial"
+    }
   }
 }

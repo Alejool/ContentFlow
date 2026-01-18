@@ -1,9 +1,9 @@
-import axios from "axios";
 import { useCampaignStore } from "@/stores/campaignStore";
 import { usePublicationStore } from "@/stores/publicationStore";
 import { useAccountsStore } from "@/stores/socialAccountsStore";
 import { Publication } from "@/types/Publication";
 import { SocialAccount } from "@/types/SocialAccount";
+import axios from "axios";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "react-hot-toast";
 
@@ -32,7 +32,7 @@ export interface UsePublishPublicationReturn extends PublishPublicationState {
   handleUnpublish: (
     publicationId: number,
     accountId: number,
-    platform: string
+    platform: string,
   ) => Promise<boolean>;
   togglePlatform: (accountId: number) => void;
   selectAll: () => void;
@@ -40,7 +40,7 @@ export interface UsePublishPublicationReturn extends PublishPublicationState {
   isYoutubeSelected: () => boolean;
   handlePublish: (
     publication: Publication,
-    platformSettings?: Record<string, any>
+    platformSettings?: Record<string, any>,
   ) => Promise<boolean>;
   setYoutubeThumbnails: React.Dispatch<
     React.SetStateAction<Record<number, File | null>>
@@ -53,7 +53,12 @@ export interface UsePublishPublicationReturn extends PublishPublicationState {
   activeAccounts: SocialAccount[];
   handleThumbnailChange: (videoId: number, file: File | null) => void;
   handleThumbnailDelete: (videoId: number) => void;
-  handleRequestReview: (publicationId: number) => Promise<boolean>;
+  handleRequestReview: (
+    publicationId: number,
+    settings?: any,
+  ) => Promise<boolean>;
+  handleApprove: (publicationId: number) => Promise<any>;
+  handleReject: (publicationId: number) => Promise<boolean>;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -69,26 +74,26 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
   const fetchCampaigns = useCampaignStore((s) => s.fetchCampaigns);
 
   const publishedPlatformsCache = usePublicationStore(
-    (s) => s.publishedPlatforms
+    (s) => s.publishedPlatforms,
   );
   const failedPlatformsCache = usePublicationStore((s) => s.failedPlatforms);
   const publishingPlatformsCache = usePublicationStore(
-    (s) => s.publishingPlatforms
+    (s) => s.publishingPlatforms,
   );
   const scheduledPlatformsCache = usePublicationStore(
-    (s) => s.scheduledPlatforms
+    (s) => s.scheduledPlatforms,
   );
   const removedPlatformsCache = usePublicationStore((s) => s.removedPlatforms);
 
   const fetchPublishedPlatformsFromStore = usePublicationStore(
-    (s) => s.fetchPublishedPlatforms
+    (s) => s.fetchPublishedPlatforms,
   );
   const setPublishedPlatformsInStore = usePublicationStore(
-    (s) => s.setPublishedPlatforms
+    (s) => s.setPublishedPlatforms,
   );
   const publishPublication = usePublicationStore((s) => s.publishPublication);
   const unpublishPublication = usePublicationStore(
-    (s) => s.unpublishPublication
+    (s) => s.unpublishPublication,
   );
 
   /* ----------------------------- Derived state ----------------------------- */
@@ -101,7 +106,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
           ...account,
           account_name: account.account_name,
         })),
-    [accounts]
+    [accounts],
   );
 
   /* ------------------------------- Local state ------------------------------ */
@@ -196,7 +201,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
         const thumbnails: Record<number, { url: string; id: number }> = {};
 
         const videoFiles = publication.media_files.filter((m) =>
-          m.file_type?.includes("video")
+          m.file_type?.includes("video"),
         );
 
         for (const video of videoFiles) {
@@ -208,7 +213,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
           } else if (Array.isArray(video.derivatives)) {
             const thumbnail = video.derivatives.find(
               (d: any) =>
-                d.derivative_type === "thumbnail" || d.file_type === "image"
+                d.derivative_type === "thumbnail" || d.file_type === "image",
             );
 
             if (thumbnail?.file_path) {
@@ -227,7 +232,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
         setIsLoadingThumbnails(false);
       }
     },
-    []
+    [],
   );
 
   const handleThumbnailChange = useCallback(
@@ -242,7 +247,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
         });
       }
     },
-    []
+    [],
   );
 
   const handleThumbnailDelete = useCallback((videoId: number) => {
@@ -266,7 +271,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
       setCurrentPublicationId(publicationId);
       await fetchPublishedPlatformsFromStore(publicationId);
     },
-    [fetchPublishedPlatformsFromStore]
+    [fetchPublishedPlatformsFromStore],
   );
 
   /* ------------------------------- Unpublish -------------------------------- */
@@ -283,7 +288,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
         const current = publishedPlatformsCache[publicationId] || [];
         setPublishedPlatformsInStore(
           publicationId,
-          current.filter((id) => id !== accountId)
+          current.filter((id) => id !== accountId),
         );
         return true;
       } else {
@@ -295,7 +300,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
       unpublishPublication,
       publishedPlatformsCache,
       setPublishedPlatformsInStore,
-    ]
+    ],
   );
 
   /* ---------------------------- Platform selection -------------------------- */
@@ -304,7 +309,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
     setSelectedPlatforms((prev) =>
       prev.includes(accountId)
         ? prev.filter((id) => id !== accountId)
-        : [...prev, accountId]
+        : [...prev, accountId],
     );
   }, []);
 
@@ -316,7 +321,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
     setSelectedPlatforms(
       activeAccounts
         .filter((acc) => !published.includes(acc.id))
-        .map((acc) => acc.id)
+        .map((acc) => acc.id),
     );
   }, [activeAccounts, currentPublicationId, publishedPlatformsCache]);
 
@@ -328,7 +333,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
     return activeAccounts.some(
       (acc) =>
         acc.platform.toLowerCase() === "youtube" &&
-        selectedPlatforms.includes(acc.id)
+        selectedPlatforms.includes(acc.id),
     );
   }, [activeAccounts, selectedPlatforms]);
 
@@ -337,7 +342,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
   const handlePublish = useCallback(
     async (
       publication: Publication,
-      platformSettings?: Record<string, any>
+      platformSettings?: Record<string, any>,
     ): Promise<boolean> => {
       if (selectedPlatforms.length === 0) {
         toast.error("Please select at least one platform");
@@ -349,7 +354,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
         const formData = new FormData();
 
         selectedPlatforms.forEach((id) =>
-          formData.append("platforms[]", id.toString())
+          formData.append("platforms[]", id.toString()),
         );
 
         Object.entries(youtubeThumbnails).forEach(([videoId, file]) => {
@@ -362,13 +367,13 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
         if (platformSettings && Object.keys(platformSettings).length > 0) {
           formData.append(
             "platform_settings",
-            JSON.stringify(platformSettings)
+            JSON.stringify(platformSettings),
           );
         }
 
         const { success, data } = await publishPublication(
           publication.id,
-          formData
+          formData,
         );
 
         if (!success) {
@@ -386,42 +391,56 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
         setPublishing(false);
       }
     },
-    [selectedPlatforms, youtubeThumbnails, publishPublication]
+    [selectedPlatforms, youtubeThumbnails, publishPublication],
   );
 
   /* --------------------------- Review Handling ---------------------------- */
 
-  const handleRequestReview = useCallback(async (publicationId: number) => {
-    try {
-      const response = await axios.post(route('publications.request-review', publicationId));
-      if (response.data.success) {
-        toast.success("Publication sent for review");
-        return true;
+  const handleRequestReview = useCallback(
+    async (publicationId: number, settings?: any) => {
+      try {
+        const response = await axios.post(
+          route("publications.request-review", publicationId),
+          {
+            platform_settings: settings,
+          },
+        );
+        if (response.data.success) {
+          toast.success("Publication sent for review");
+          return true;
+        }
+        return false;
+      } catch (error: any) {
+        toast.error(
+          error.response?.data?.message || "Failed to request review",
+        );
+        return false;
       }
-      return false;
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to request review");
-      return false;
-    }
-  }, []);
+    },
+    [],
+  );
 
   const handleApprove = useCallback(async (publicationId: number) => {
     try {
-      const response = await axios.post(route('publications.approve', publicationId));
+      const response = await axios.post(
+        route("publications.approve", publicationId),
+      );
       if (response.data.success) {
         toast.success("Publication approved");
-        return true;
+        return response.data.data; // Return the whole updated data
       }
-      return false;
+      return null;
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to approve");
-      return false;
+      return null;
     }
   }, []);
 
   const handleReject = useCallback(async (publicationId: number) => {
     try {
-      const response = await axios.post(route('publications.reject', publicationId));
+      const response = await axios.post(
+        route("publications.reject", publicationId),
+      );
       if (response.data.success) {
         toast.success("Publication rejected and moved to draft");
         return true;
@@ -482,7 +501,7 @@ export interface UsePublishPublicationReturn extends PublishPublicationState {
   handleUnpublish: (
     publicationId: number,
     accountId: number,
-    platform: string
+    platform: string,
   ) => Promise<boolean>;
   togglePlatform: (accountId: number) => void;
   selectAll: () => void;
@@ -490,13 +509,15 @@ export interface UsePublishPublicationReturn extends PublishPublicationState {
   isYoutubeSelected: () => boolean;
   handlePublish: (
     publication: Publication,
-    platformSettings?: Record<string, any>
+    platformSettings?: Record<string, any>,
   ) => Promise<boolean>;
-  handleRequestReview: (publicationId: number) => Promise<boolean>;
-  handleApprove: (publicationId: number) => Promise<boolean>;
-  handleReject: (publicationId: number) => Promise<boolean>;
-  handleThumbnailChange: (videoId: number, file: File | null) => void;
   handleThumbnailDelete: (videoId: number) => void;
+  handleRequestReview: (
+    publicationId: number,
+    settings?: any,
+  ) => Promise<boolean>;
+  handleApprove: (publicationId: number) => Promise<any>;
+  handleReject: (publicationId: number) => Promise<boolean>;
   setYoutubeThumbnails: React.Dispatch<
     React.SetStateAction<Record<number, File | null>>
   >;

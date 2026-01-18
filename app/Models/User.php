@@ -123,10 +123,19 @@ class User extends Model implements Authenticatable, MustVerifyEmail, CanResetPa
             return false;
         }
 
+        // Owner/Creator bypass
+        if ($workspace->created_by === $this->id) {
+            return true;
+        }
+
         $role = Role::find($workspace->pivot->role_id);
 
         if (!$role) {
             return false;
+        }
+
+        if ($role->slug === 'owner') {
+            return true;
         }
 
         return $role->permissions()->where('slug', $permissionSlug)->exists();

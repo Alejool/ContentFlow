@@ -1,4 +1,5 @@
 import { Campaign } from "@/types/Campaign";
+import { usePage } from "@inertiajs/react";
 import { format } from "date-fns";
 import {
   Calendar,
@@ -34,8 +35,11 @@ export default function CampaignMobileTable({
   onViewDetails,
   getStatusColor,
 }: CampaignMobileTableProps) {
+  const { auth } = usePage<any>().props;
+  const canManageContent =
+    auth.current_workspace?.permissions?.includes("manage-content");
 
-  console.log('items: ', items);
+  console.log("items: ", items);
   return (
     <div className="lg:hidden">
       <div className="flex flex-col gap-3 m-2">
@@ -56,7 +60,7 @@ export default function CampaignMobileTable({
                 </div>
                 <div
                   className={`text-xs px-2 py-1 rounded-full ${getStatusColor(
-                    item.status
+                    item.status,
                   )}`}
                 >
                   {item.status}
@@ -67,7 +71,9 @@ export default function CampaignMobileTable({
                 <div className="flex items-center gap-1">
                   <Calendar className="w-4 h-4" />
                   <span>
-                    {item.start_date ? format(new Date(item.start_date), "MMM d, yyyy") : "N/A"}
+                    {item.start_date
+                      ? format(new Date(item.start_date), "MMM d, yyyy")
+                      : "N/A"}
                   </span>
                 </div>
                 {item.publications && item.publications.length > 0 && (
@@ -83,10 +89,11 @@ export default function CampaignMobileTable({
                   {(item.publications?.length || 0) > 0 ? (
                     <button
                       onClick={() => toggleExpand(item.id)}
-                      className={`flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold uppercase rounded-xl transition-all active:scale-95 ${expandedCampaigns.includes(item.id)
-                        ? "bg-primary-50 text-primary-700 dark:bg-primary-900/40 dark:text-primary-400 ring-1 ring-primary-200 dark:ring-primary-800"
-                        : "bg-gray-50 text-gray-600 hover:bg-gray-100 dark:bg-neutral-800 dark:text-gray-300 dark:hover:bg-neutral-700 ring-1 ring-gray-100 dark:ring-neutral-700"
-                        }`}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold uppercase rounded-xl transition-all active:scale-95 ${
+                        expandedCampaigns.includes(item.id)
+                          ? "bg-primary-50 text-primary-700 dark:bg-primary-900/40 dark:text-primary-400 ring-1 ring-primary-200 dark:ring-primary-800"
+                          : "bg-gray-50 text-gray-600 hover:bg-gray-100 dark:bg-neutral-800 dark:text-gray-300 dark:hover:bg-neutral-700 ring-1 ring-gray-100 dark:ring-neutral-700"
+                      }`}
                     >
                       {expandedCampaigns.includes(item.id) ? (
                         <>
@@ -116,31 +123,32 @@ export default function CampaignMobileTable({
                   >
                     <Eye className="w-4 h-4" />
                   </button>
-                  <button
-                    onClick={() => onEdit(item)}
-                    className="p-2 text-blue-500 hover:bg-white dark:hover:bg-neutral-800 rounded-lg transition-all"
-                    title={t("common.edit")}
-                  >
-                    <Edit className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => onDelete(item.id)}
-                    className="p-2 text-rose-500 hover:bg-white dark:hover:bg-neutral-800 rounded-lg transition-all"
-                    title={t("common.delete")}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                  {canManageContent && (
+                    <>
+                      <button
+                        onClick={() => onEdit(item)}
+                        className="p-2 text-blue-500 hover:bg-white dark:hover:bg-neutral-800 rounded-lg transition-all"
+                        title={t("common.edit")}
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => onDelete(item.id)}
+                        className="p-2 text-rose-500 hover:bg-white dark:hover:bg-neutral-800 rounded-lg transition-all"
+                        title={t("common.delete")}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
-
             </div>
 
             {expandedCampaigns.includes(item.id) &&
               item.publications &&
               item.publications.length > 0 && (
-                <div
-                  className="border-t border-gray-200 dark:border-neutral-700 p-4"
-                >
+                <div className="border-t border-gray-200 dark:border-neutral-700 p-4">
                   <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3 pl-2 border-l-2 border-primary-500">
                     {t("campaigns.modal.showCampaign.associatedPublications")}
                   </div>
@@ -152,9 +160,7 @@ export default function CampaignMobileTable({
                       >
                         <div className="flex items-center gap-3">
                           <div className="flex-shrink-0">
-                            <div
-                              className="w-8 h-8 rounded border border-gray-200 bg-gray-100 dark:border-neutral-600 dark:bg-neutral-800 overflow-hidden flex items-center justify-center"
-                            >
+                            <div className="w-8 h-8 rounded border border-gray-200 bg-gray-100 dark:border-neutral-600 dark:bg-neutral-800 overflow-hidden flex items-center justify-center">
                               <PublicationThumbnail publication={pub} />
                             </div>
                           </div>
@@ -163,13 +169,18 @@ export default function CampaignMobileTable({
                               {pub.title}
                             </div>
                             <div className="text-xs text-gray-500">
-                              {pub.created_at ? format(new Date(pub.created_at), "MMM d, yyyy") : "N/A"}
+                              {pub.created_at
+                                ? format(
+                                    new Date(pub.created_at),
+                                    "MMM d, yyyy",
+                                  )
+                                : "N/A"}
                             </div>
                           </div>
                         </div>
                         <div
                           className={`text-xs px-2 py-1 rounded-full flex-shrink-0 ${getStatusColor(
-                            pub.status
+                            pub.status,
                           )}`}
                         >
                           {pub.status}

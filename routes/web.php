@@ -19,7 +19,7 @@ use App\Http\Controllers\SocialPostLogController;
 use App\Http\Controllers\WorkspaceController;
 use App\Http\Controllers\Api\CalendarController;
 use App\Http\Controllers\Calendar\CalendarViewController;
-use \Illuminate\Support\Facades\Artisan;
+use \Laravel\Sanctum\Sanctum;
 
 /*
 |--------------------------------------------------------------------------
@@ -36,39 +36,51 @@ Route::get('/', function () {
   ]);
 })->middleware('guest')->name('welcome');
 
-// Temporary route to clear cache
-Route::get('/clear-cache', function () {
-  Artisan::call('config:clear');
-  Artisan::call('route:clear');
-  Artisan::call('view:clear');
-  return "Cache cleared successfully! You can go back now.";
-});
 
 Route::get('/fix-db', function () {
   try {
-    // 1. Drop Constraint
     \Illuminate\Support\Facades\DB::statement("ALTER TABLE publications DROP CONSTRAINT IF EXISTS publications_status_check");
     \Illuminate\Support\Facades\Schema::table('publications', function (\Illuminate\Database\Schema\Blueprint $table) {
       $table->string('status', 50)->change();
     });
 
-    // 2. Check and Fix Permissions
-    $ownerRole = \App\Models\Role::where('slug', 'owner')->first();
-    $permissions = $ownerRole ? $ownerRole->permissions->pluck('slug')->toArray() : 'Role not found';
+    // 1. Create Permissions
+    $permissions = [
+      ['name' => 'Publish', 'slug' => 'publish', 'description' => 'Allow publishing content to social media'],
+      ['name' => 'Approve', 'slug' => 'approve', 'description' => 'Allow approving content for publication'],
+      ['name' => 'View Analytics', 'slug' => 'view-analytics', 'description' => 'Allow viewing workspace analytics'],
+      ['name' => 'Manage Accounts', 'slug' => 'manage-accounts', 'description' => 'Allow adding/removing social accounts'],
+      ['name' => 'Manage Team', 'slug' => 'manage-team', 'description' => 'Allow inviting/removing members'],
+      ['name' => 'Manage Content', 'slug' => 'manage-content', 'description' => 'Allow creating and editing publications'],
+      ['name' => 'Manage Campaigns', 'slug' => 'manage-campaigns', 'description' => 'Allow creating and editing campaigns'],
+    ];
 
-    if (is_array($permissions) && empty($permissions)) {
-      $perms = [
-        ['name' => 'Publish', 'slug' => 'publish', 'description' => 'Allow publishing content to social media'],
-        ['name' => 'Approve', 'slug' => 'approve', 'description' => 'Allow approving content for publication'],
-      ];
-      foreach ($perms as $p) {
-        $perm = \App\Models\Permission::firstOrCreate(['slug' => $p['slug']], $p);
-        $ownerRole->permissions()->syncWithoutDetaching([$perm->id]);
-      }
-      return "Database fixed! Owner permissions were missing and have been re-added: " . implode(', ', $ownerRole->refresh()->permissions->pluck('slug')->toArray());
+    foreach ($permissions as $p) {
+      \App\Models\Permission::firstOrCreate(['slug' => $p['slug']], $p);
     }
 
-    return "Database fixed! Owner Permissions: " . (is_array($permissions) ? implode(', ', $permissions) : $permissions);
+    // 2. Create Roles and Sync
+    $roles = [
+      'Owner' => ['publish', 'approve', 'view-analytics', 'manage-accounts', 'manage-team', 'manage-content', 'manage-campaigns'],
+      'Admin' => ['publish', 'approve', 'view-analytics', 'manage-accounts', 'manage-content', 'manage-campaigns'],
+      'Editor' => ['view-analytics', 'manage-content', 'manage-campaigns'],
+      'Viewer' => ['view-analytics'],
+    ];
+
+    foreach ($roles as $name => $permSlugs) {
+      $role = \App\Models\Role::firstOrCreate(
+        ['slug' => \Illuminate\Support\Str::slug($name)],
+        ['name' => $name, 'description' => "Default $name role"]
+      );
+
+      $ids = \App\Models\Permission::whereIn('slug', $permSlugs)->pluck('id');
+      $role->permissions()->sync($ids);
+    }
+
+    $ownerRole = \App\Models\Role::where('slug', 'owner')->first();
+    $ownerPerms = $ownerRole ? $ownerRole->permissions->pluck('slug')->toArray() : [];
+
+    return "Database fixed! Owner Permissions: " . implode(', ', $ownerPerms);
   } catch (\Exception $e) {
     return "Error: " . $e->getMessage();
   }
@@ -95,7 +107,7 @@ Route::get('/debug-auth', function () {
     'session_id' => session()->getId(),
     'cookies' => request()->cookies->all(),
     'user' => auth()->user(),
-    'is_sanctum_stateful' => \Laravel\Sanctum\Sanctum::currentRequestHost(),
+    'is_sanctum_stateful' => Sanctum::currentRequestHost(),
   ];
 });
 
@@ -106,15 +118,12 @@ Route::get('/debug-auth', function () {
 */
 
 Route::prefix('auth')->name('auth.')->group(function () {
-  // Social Media OAuth Callbacks
   Route::get('/facebook/callback', [SocialAccountController::class, 'handleFacebookCallback'])->name('facebook.callback');
   Route::get('/instagram/callback', [SocialAccountController::class, 'handleInstagramCallback'])->name('instagram.callback');
   Route::get('/twitter/callback', [SocialAccountController::class, 'handleTwitterCallback'])->name('twitter.callback');
   Route::get('/twitter/callback-v1', [SocialAccountController::class, 'handleTwitterV1Callback'])->name('twitter.callback.v1');
   Route::get('/youtube/callback', [SocialAccountController::class, 'handleYoutubeCallback'])->name('youtube.callback');
   Route::get('/tiktok/callback', [SocialAccountController::class, 'handleTiktokCallback'])->name('tiktok.callback');
-
-  // Google Authentication
   Route::get('/google/redirect', [AuthController::class, 'redirectToGoogle'])->name('google.redirect');
   Route::get('/google/callback', [AuthController::class, 'handleGoogleCallback'])->name('google.callback');
 });
@@ -178,12 +187,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/{workspace}/switch', [WorkspaceController::class, 'switch'])->name('switch');
     Route::get('/{workspace}/settings', [WorkspaceController::class, 'settings'])->name('settings');
     Route::put('/{workspace}', [WorkspaceController::class, 'update'])->name('update');
-
-    // Member management
     Route::get('/{workspace}/members', [WorkspaceController::class, 'members'])->name('members');
     Route::post('/{workspace}/invite', [WorkspaceController::class, 'invite'])->name('invite');
     Route::put('/{workspace}/members/{user}/role', [WorkspaceController::class, 'updateMemberRole'])->name('members.update-role');
     Route::delete('/{workspace}/members/{user}', [WorkspaceController::class, 'removeMember'])->name('members.remove');
+    Route::get('/{workspace}', [WorkspaceController::class, 'show'])->name('show');
   });
 
   /*
@@ -244,6 +252,17 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/{publication}/approve', [PublicationController::class, 'approve'])->name('approve');
     Route::post('/{publication}/reject', [PublicationController::class, 'reject'])->name('reject');
     Route::get('/stats/all', [PublicationController::class, 'stats'])->name('stats');
+  });
+
+  /*
+    |----------------------------------------------------------------------
+    | Approvals API
+    |----------------------------------------------------------------------
+    */
+  Route::prefix('approvals')->name('approvals.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\ApprovalController::class, 'index'])->name('index');
+    Route::get('/history', [\App\Http\Controllers\ApprovalController::class, 'history'])->name('history');
+    Route::get('/stats', [\App\Http\Controllers\ApprovalController::class, 'stats'])->name('stats');
   });
 
   /*

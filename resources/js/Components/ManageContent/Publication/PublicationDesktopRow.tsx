@@ -1,7 +1,16 @@
 import PublicationThumbnail from "@/Components/ManageContent/Publication/PublicationThumbnail";
 import SocialAccountsDisplay from "@/Components/ManageContent/Publication/SocialAccountsDisplay";
 import { Publication } from "@/types/Publication";
-import { Edit, Eye, Image, Loader2, Rocket, Trash2, Video } from "lucide-react";
+import {
+  Clock,
+  Edit,
+  Eye,
+  Image,
+  Loader2,
+  Rocket,
+  Trash2,
+  Video,
+} from "lucide-react";
 import React, { memo, useState } from "react";
 
 interface PublicationRowProps {
@@ -18,6 +27,7 @@ interface PublicationRowProps {
     user_name: string;
     expires_at: string;
   } | null;
+  permissions?: string[];
 }
 
 const PublicationRow = memo(
@@ -31,6 +41,7 @@ const PublicationRow = memo(
     onPublish,
     onEditRequest,
     remoteLock,
+    permissions,
   }: PublicationRowProps) => {
     const [isPublishing, setIsPublishing] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
@@ -213,26 +224,46 @@ const PublicationRow = memo(
         </td>
         <td className="px-6 py-4 text-right">
           <div className="flex items-center justify-end gap-1">
-            <button
-              onClick={async () => {
-                setIsPublishing(true);
-                try {
-                  await onPublish(item);
-                } finally {
-                  setIsPublishing(false);
+            {(permissions?.includes("publish") || item.status === "approved") &&
+            permissions?.includes("manage-content") ? (
+              <button
+                onClick={async () => {
+                  setIsPublishing(true);
+                  try {
+                    await onPublish(item);
+                  } finally {
+                    setIsPublishing(false);
+                  }
+                }}
+                disabled={isPublishing || isEditing || isDeleting}
+                className="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg dark:hover:bg-emerald-900/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                title={
+                  item.status === "approved"
+                    ? "Publicar"
+                    : "Publicar / Gestionar"
                 }
-              }}
-              disabled={isPublishing || isEditing || isDeleting}
-              className="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg dark:hover:bg-emerald-900/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-              title="Publicar / Gestionar"
-            >
-              {isPublishing ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <Rocket className="w-4 h-4" />
-              )}
-            </button>
-            {item.status === "published" && (
+              >
+                {isPublishing ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Rocket className="w-4 h-4" />
+                )}
+              </button>
+            ) : permissions?.includes("manage-content") &&
+              !permissions?.includes("publish") &&
+              ["draft", "failed", "rejected"].includes(
+                item.status || "draft",
+              ) ? (
+              <button
+                onClick={() => onPublish(item)} // This modal handles status updates/request review
+                className="p-1.5 text-amber-600 hover:bg-amber-50 rounded-lg dark:hover:bg-amber-900/20 transition-all"
+                title="Solicitar Aprobación"
+              >
+                <Clock className="w-4 h-4" />
+              </button>
+            ) : null}
+            {/* View Details button - Always visible for all users */}
+            {!permissions?.includes("manage-content") && (
               <button
                 onClick={() => onPublish(item)}
                 className="p-1.5 text-primary-500 hover:bg-primary-50 rounded-lg dark:hover:bg-primary-900/20 transition-all font-bold"
@@ -241,59 +272,78 @@ const PublicationRow = memo(
                 <Eye className="w-4 h-4" />
               </button>
             )}
-            <button
-              onClick={async () => {
-                setIsEditing(true);
-                try {
-                  if (onEditRequest) {
-                    await onEditRequest(item);
-                  } else {
-                    await onEdit(item);
+            {item.status === "published" &&
+              permissions?.includes("manage-content") && (
+                <button
+                  onClick={() => onPublish(item)}
+                  className="p-1.5 text-primary-500 hover:bg-primary-50 rounded-lg dark:hover:bg-primary-900/20 transition-all font-bold"
+                  title="Ver Detalles"
+                >
+                  <Eye className="w-4 h-4" />
+                </button>
+              )}
+            {permissions?.includes("manage-content") && (
+              <button
+                onClick={async () => {
+                  setIsEditing(true);
+                  try {
+                    if (onEditRequest) {
+                      await onEditRequest(item);
+                    } else {
+                      await onEdit(item);
+                    }
+                  } finally {
+                    setIsEditing(false);
                   }
-                } finally {
-                  setIsEditing(false);
+                }}
+                disabled={
+                  isPublishing || isEditing || isDeleting || !!remoteLock
                 }
-              }}
-              disabled={isPublishing || isEditing || isDeleting || !!remoteLock}
-              className={`p-1.5 ${
-                item.status === "published"
-                  ? "text-amber-500"
-                  : remoteLock
-                    ? "text-gray-400"
-                    : "text-blue-500"
-              } hover:bg-blue-50 rounded-lg dark:hover:bg-blue-900/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all`}
-              title={
-                remoteLock
-                  ? `${t("publications.table.lockedBy")} ${remoteLock.user_name}`
-                  : item.status === "published"
-                    ? "Editar (Despublicar primero)"
-                    : "Editar"
-              }
-            >
-              {isEditing ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <Edit className="w-4 h-4" />
-              )}
-            </button>
-            <button
-              onClick={async () => {
-                setIsDeleting(true);
-                try {
-                  await onDelete(item.id);
-                } finally {
-                  setIsDeleting(false);
+                className={`p-1.5 ${
+                  item.status === "published"
+                    ? "text-amber-500"
+                    : remoteLock
+                      ? "text-gray-400"
+                      : "text-blue-500"
+                } hover:bg-blue-50 rounded-lg dark:hover:bg-blue-900/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all`}
+                title={
+                  remoteLock
+                    ? `${t("publications.table.lockedBy")} ${remoteLock.user_name}`
+                    : item.status === "published"
+                      ? "Editar (Despublicar primero)"
+                      : "Editar"
                 }
-              }}
-              disabled={isPublishing || isEditing || isDeleting}
-              className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg dark:hover:bg-red-900/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-            >
-              {isDeleting ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <Trash2 className="w-4 h-4" />
+              >
+                {isEditing ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Edit className="w-4 h-4" />
+                )}
+              </button>
+            )}
+            {/* Delete button - Only for Owner/Admin (users with publish permission) */}
+            {permissions?.includes("publish") &&
+              permissions?.includes("manage-content") && (
+                <button
+                  onClick={async () => {
+                    setIsDeleting(true);
+                    try {
+                      await onDelete(item.id);
+                    } finally {
+                      setIsDeleting(false);
+                    }
+                  }}
+                  disabled={isPublishing || isEditing || isDeleting}
+                  className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg dark:hover:bg-red-900/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                  title="Eliminar"
+                >
+                  {isDeleting ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Trash2 className="w-4 h-4" />
+                  )}
+                </button>
               )}
-            </button>
           </div>
         </td>
       </>

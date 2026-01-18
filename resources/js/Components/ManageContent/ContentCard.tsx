@@ -1,8 +1,16 @@
-
-import React from 'react';
-import { format } from 'date-fns';
-import { es } from 'date-fns/locale';
-import { Edit, Trash2, Globe, Eye, MoreVertical, Calendar, CheckCircle, AlertCircle, Clock, Rocket } from 'lucide-react';
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
+import {
+  AlertCircle,
+  Calendar,
+  CheckCircle,
+  Clock,
+  Edit,
+  Eye,
+  Globe,
+  Rocket,
+  Trash2,
+} from "lucide-react";
 
 interface ContentCardProps {
   item: any;
@@ -10,29 +18,45 @@ interface ContentCardProps {
   onDelete: (id: number) => void;
   onViewDetails?: (item: any) => void;
   onPublish?: (item: any) => void;
-  type: 'publication' | 'campaign';
+  type: "publication" | "campaign";
+  permissions?: string[];
 }
 
-export default function ContentCard({ item, onEdit, onDelete, onViewDetails, onPublish, type }: ContentCardProps) {
+export default function ContentCard({
+  item,
+  onEdit,
+  onDelete,
+  onViewDetails,
+  onPublish,
+  type,
+  permissions,
+}: ContentCardProps) {
+  const canManageContent = permissions?.includes("manage-content");
+  const canPublish = permissions?.includes("publish");
+
   const statusColors = {
-    published: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-    draft: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400',
-    scheduled: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-    failed: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+    published:
+      "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
+    draft: "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400",
+    scheduled:
+      "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
+    failed: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
   };
 
-  const statusKey = (item.status || 'draft') as keyof typeof statusColors;
-  const StatusIcon = {
-    published: CheckCircle,
-    draft: Edit,
-    scheduled: Calendar,
-    failed: AlertCircle,
-  }[statusKey] || Edit;
+  const statusKey = (item.status || "draft") as keyof typeof statusColors;
+  const StatusIcon =
+    {
+      published: CheckCircle,
+      draft: Edit,
+      scheduled: Calendar,
+      failed: AlertCircle,
+    }[statusKey] || Edit;
 
   // Determine thumbnail and if it's a video
   const mediaFile = item.media_files?.[0];
-  const isVideo = mediaFile?.file_type?.includes('video');
-  const thumbnail = mediaFile?.thumbnail?.file_path || mediaFile?.file_path || item.thumbnail;
+  const isVideo = mediaFile?.file_type?.includes("video");
+  const thumbnail =
+    mediaFile?.thumbnail?.file_path || mediaFile?.file_path || item.thumbnail;
 
   return (
     <div className="group bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100 dark:border-gray-700 overflow-hidden flex flex-col h-full">
@@ -56,14 +80,19 @@ export default function ContentCard({ item, onEdit, onDelete, onViewDetails, onP
           </div>
         ) : (
           <div className="w-full h-full flex items-center justify-center text-gray-400">
-            {type === 'campaign' ? <Globe className="w-12 h-12 opacity-20" /> : <Eye className="w-12 h-12 opacity-20" />}
+            {type === "campaign" ? (
+              <Globe className="w-12 h-12 opacity-20" />
+            ) : (
+              <Eye className="w-12 h-12 opacity-20" />
+            )}
           </div>
         )}
 
-
         {/* Overlay Badge */}
         <div className="absolute top-3 right-3">
-          <span className={`px-2.5 py-1 rounded-full text-xs font-medium flex items-center gap-1.5 shadow-sm backdrop-blur-md ${statusColors[statusKey] || statusColors.draft}`}>
+          <span
+            className={`px-2.5 py-1 rounded-full text-xs font-medium flex items-center gap-1.5 shadow-sm backdrop-blur-md ${statusColors[statusKey] || statusColors.draft}`}
+          >
             {/* @ts-ignore */}
             <StatusIcon className="w-3.5 h-3.5" />
             <span className="capitalize">{item.status}</span>
@@ -82,12 +111,18 @@ export default function ContentCard({ item, onEdit, onDelete, onViewDetails, onP
             {item.scheduled_at && (
               <div className="flex items-center gap-1.5">
                 <Clock className="w-3.5 h-3.5" />
-                <span>{format(new Date(item.scheduled_at), 'd MMM, HH:mm', { locale: es })}</span>
+                <span>
+                  {format(new Date(item.scheduled_at), "d MMM, HH:mm", {
+                    locale: es,
+                  })}
+                </span>
               </div>
             )}
             <div className="flex items-center gap-1.5">
               {/* Platform icons could go here */}
-              {type === 'campaign' && <span>{item.publications_count || 0} Pubs</span>}
+              {type === "campaign" && (
+                <span>{item.publications_count || 0} Pubs</span>
+              )}
             </div>
           </div>
         </div>
@@ -95,39 +130,77 @@ export default function ContentCard({ item, onEdit, onDelete, onViewDetails, onP
         {/* Actions Footer */}
         <div className="pt-4 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between gap-1 mt-auto">
           <div className="flex items-center gap-1 flex-1">
-            {type === 'publication' && (
+            {type === "publication" &&
+              canManageContent &&
+              (canPublish || item.status === "approved" ? (
+                <button
+                  onClick={() => onPublish?.(item)}
+                  className="flex items-center justify-center gap-2 p-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 rounded-lg transition-all font-bold text-sm flex-1"
+                  title={
+                    item.status === "approved"
+                      ? "Publicar"
+                      : "Publicar / Gestionar"
+                  }
+                >
+                  <Rocket className="w-4 h-4" />
+                  Publicar
+                </button>
+              ) : !canPublish &&
+                ["draft", "failed", "rejected"].includes(
+                  item.status || "draft",
+                ) ? (
+                <button
+                  onClick={() => onPublish?.(item)}
+                  className="flex items-center justify-center gap-2 p-2 bg-amber-50 text-amber-600 hover:bg-amber-100 dark:bg-amber-900/20 dark:text-amber-400 rounded-lg transition-all font-bold text-sm flex-1"
+                  title="Solicitar Aprobación"
+                >
+                  <Clock className="w-4 h-4" />
+                  Solicitar
+                </button>
+              ) : item.status === "published" ? (
+                <button
+                  onClick={() => onViewDetails?.(item)}
+                  className="flex items-center justify-center gap-2 p-2 bg-gray-50 text-gray-600 hover:bg-gray-100 dark:bg-neutral-800 dark:text-neutral-400 rounded-lg transition-all font-bold text-sm flex-1"
+                  title="Ver Detalles"
+                >
+                  <Eye className="w-4 h-4" />
+                  Ver
+                </button>
+              ) : null)}
+            {/* View Details button for Viewers (no manage-content permission) */}
+            {!canManageContent &&
+              (type === "publication" || type === "campaign") && (
+                <button
+                  onClick={() => onViewDetails?.(item)}
+                  className="flex items-center justify-center gap-2 p-2 bg-gray-50 text-gray-600 hover:bg-gray-100 dark:bg-neutral-800 dark:text-neutral-400 rounded-lg transition-all font-bold text-sm flex-1"
+                  title="Ver Detalles"
+                >
+                  <Eye className="w-4 h-4" />
+                  Ver Detalles
+                </button>
+              )}
+            {canManageContent && (
               <button
-                onClick={() => onPublish?.(item)}
-                className="flex items-center justify-center gap-2 p-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 rounded-lg transition-all font-bold text-sm flex-1"
-                title="Publicar Ahora"
+                onClick={() => onEdit(item)}
+                className="p-2 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-lg transition-colors font-bold text-sm px-3"
+                title="Editar"
               >
-                <Rocket className="w-4 h-4" />
-                Publicar
+                Editar
               </button>
             )}
-            <button
-              onClick={() => onEdit(item)}
-              className="p-2 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-lg transition-colors font-bold text-sm px-3"
-            >
-              Editar
-            </button>
           </div>
 
+          {/* Delete button - Only for Owner/Admin */}
           <div className="flex items-center gap-1">
-            <button
-              onClick={() => onViewDetails?.(item)}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-gray-500 transition-colors"
-              title="Ver Detalles"
-            >
-              <Eye className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => onDelete(item.id)}
-              className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg transition-colors"
-              title="Eliminar"
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
+            {canPublish && canManageContent && (
+              <button
+                onClick={() => onDelete(item.id)}
+                className="p-2 bg-red-50 hover:bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg transition-colors font-bold text-sm"
+                title="Eliminar"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            )}
           </div>
         </div>
       </div>

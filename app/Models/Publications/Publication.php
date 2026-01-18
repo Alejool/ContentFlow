@@ -156,6 +156,16 @@ class Publication extends Model
     return $this->belongsTo(User::class, 'rejected_by');
   }
 
+  public function rejectedBy(): BelongsTo
+  {
+    return $this->rejector();
+  }
+
+  public function approvedBy(): BelongsTo
+  {
+    return $this->belongsTo(User::class, 'approved_by');
+  }
+
   public function media(): HasMany
   {
     return $this->hasMany(PublicationMedia::class)->orderBy('order');
@@ -250,6 +260,11 @@ class Publication extends Model
     return $this->belongsToMany(Campaign::class, 'campaign_publication')
       ->withPivot('order')
       ->withTimestamps();
+  }
+
+  public function approvalLogs(): HasMany
+  {
+    return $this->hasMany(\App\Models\ApprovalLog::class)->orderBy('requested_at', 'desc');
   }
 
   // Accessors

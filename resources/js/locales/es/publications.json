@@ -202,7 +202,8 @@
         },
         "rejectedBanner": {
           "title": "Publicación Rechazada",
-          "message": "Esta publicación fue rechazada por {{name}}. Por favor, realiza los ajustes necesarios y vuelve a solicitar aprobación."
+          "message": "Esta publicación ha sido rechazada por {{name}}.",
+          "footer": "Realiza los ajustes necesarios y vuelve a solicitar revisión para continuar."
         }
       },
       "preview": {

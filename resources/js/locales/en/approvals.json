@@ -19,6 +19,33 @@
     "publicationRejected": "Publication Rejected",
     "rejectionMessage": "Your publication has been rejected. Please review the comments and make the necessary adjustments.",
     "noReasonProvided": "No reason provided.",
-    "editPublication": "Edit Publication"
+    "editPublication": "Edit Publication",
+    "searchPlaceholder": "Search by publication title...",
+    "noHistory": "No approval history found",
+    "stats": {
+      "pendingRequests": "Pending Requests",
+      "approvedToday": "Approved Today",
+      "rejectedToday": "Rejected Today",
+      "avgApprovalTime": "Avg. Approval Time"
+    },
+    "historyTable": {
+      "publication": "Publication",
+      "requestedBy": "Requested by",
+      "requestedAt": "Request Date",
+      "reviewedBy": "Reviewed by",
+      "reviewedAt": "Review Date",
+      "action": "Action",
+      "reason": "Reason"
+    },
+    "filters": {
+      "all": "All",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "dateRange": "Date Range"
+    },
+    "tabs": {
+      "pending": "Pending",
+      "history": "History"
+    }
   }
 }

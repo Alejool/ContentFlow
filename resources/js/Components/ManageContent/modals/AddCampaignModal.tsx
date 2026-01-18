@@ -64,7 +64,7 @@ export default function AddCampaignModal({
         addCampaign(response.data.campaign);
         handleClose();
         toast.success(
-          t("campaigns.messages.success") || "Campaign created successfully"
+          t("campaigns.messages.success") || "Campaign created successfully",
         );
         if (onSubmit) {
           onSubmit(true);
@@ -73,7 +73,7 @@ export default function AddCampaignModal({
     } catch (error: any) {
       console.error("Error submitting campaign:", error);
       toast.error(
-        error.response?.data?.message || t("campaigns.messages.error")
+        error.response?.data?.message || t("campaigns.messages.error"),
       );
     } finally {
       setIsSubmitting(false);
@@ -91,7 +91,7 @@ export default function AddCampaignModal({
     if (current.includes(id)) {
       setValue(
         "publication_ids",
-        current.filter((pid: number) => pid !== id)
+        current.filter((pid: number) => pid !== id),
       );
     } else {
       setValue("publication_ids", [...current, id]);
@@ -101,17 +101,13 @@ export default function AddCampaignModal({
   if (!isOpen) return null;
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 text-gray-900 dark:text-white"
-    >
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 text-gray-900 dark:text-white">
       <div
         className="absolute inset-0 bg-gray-900/60 dark:bg-black/70 backdrop-blur-sm"
         onClick={handleClose}
       />
 
-      <div
-        className="relative w-full max-w-2xl bg-white dark:bg-neutral-800 rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300"
-      >
+      <div className="relative w-full max-w-2xl bg-white dark:bg-neutral-800 rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300">
         <ModalHeader
           t={t}
           onClose={handleClose}
@@ -158,7 +154,10 @@ export default function AddCampaignModal({
                 rows={4}
                 maxLength={200}
                 showCharCount
-                hint="Maximum 200 characters"
+                hint={
+                  t("campaigns.modal.add.placeholders.description_hint") ||
+                  "Maximum 200 characters"
+                }
                 size="lg"
               />
             </div>
@@ -206,15 +205,11 @@ export default function AddCampaignModal({
             />
 
             <div className="form-group">
-              <label
-                className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2"
-              >
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                 {t("campaigns.modal.add.publications") || "Publications"}
               </label>
 
-              <div
-                className="border border-gray-200 dark:border-neutral-700 rounded-lg max-h-48 overflow-y-auto p-2 bg-gray-50 dark:bg-black/20"
-              >
+              <div className="border border-gray-200 dark:border-neutral-700 rounded-lg max-h-48 overflow-y-auto p-2 bg-gray-50 dark:bg-black/20">
                 <PublicationSelector
                   publications={availablePublications}
                   selectedIds={watchedFields.publication_ids || []}
@@ -230,13 +225,12 @@ export default function AddCampaignModal({
                   "Associated Publications is required"}
               </p>
             </div>
-
           </form>
         </div>
         <ModalFooter
           onClose={handleClose}
-          submitText={t("campaigns.button.add") || "Create Campaign"}
-          cancelText={t("common.cancel") || "Cancel"}
+          submitText={t("campaigns.button.add")}
+          cancelText={t("common.cancel")}
           formId="campaign-form"
         />
       </div>

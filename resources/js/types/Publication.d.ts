@@ -9,7 +9,14 @@ export type Publication = {
   goal?: string;
   slug?: string;
   scheduled_at?: string;
-  status?: "draft" | "published" | "scheduled" | "publishing" | "pending_review" | "approved" | "rejected";
+  status?:
+    | "draft"
+    | "published"
+    | "scheduled"
+    | "publishing"
+    | "pending_review"
+    | "approved"
+    | "rejected";
   is_active?: boolean;
   media_files?: MediaFile[];
   scheduled_posts?: ScheduledPost[];
@@ -44,8 +51,29 @@ export type Publication = {
     name: string;
     photo_url: string;
   };
+  approval_logs?: ApprovalLog[];
 };
 
+export type ApprovalLog = {
+  id: number;
+  publication_id: number;
+  requested_by: number;
+  requested_at: string;
+  reviewed_by: number | null;
+  reviewed_at: string | null;
+  action: "approved" | "rejected" | null;
+  rejection_reason: string | null;
+  requester?: {
+    id: number;
+    name: string;
+    photo_url?: string;
+  };
+  reviewer?: {
+    id: number;
+    name: string;
+    photo_url?: string;
+  };
+};
 
 export type ScheduledPost = {
   id: number;
@@ -61,13 +89,13 @@ export type SocialPostLog = {
   id: number;
   social_account_id: number;
   status:
-  | "published"
-  | "failed"
-  | "deleted"
-  | "pending"
-  | "publishing"
-  | "success"
-  | "orphaned";
+    | "published"
+    | "failed"
+    | "deleted"
+    | "pending"
+    | "publishing"
+    | "success"
+    | "orphaned";
   social_account?: SocialAccount;
   platform: string;
   created_at: string;
@@ -134,4 +162,3 @@ export type MediaFile = {
     order: number;
   };
 };
-

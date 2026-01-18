@@ -188,7 +188,8 @@
         },
         "rejectedBanner": {
           "title": "Publication Rejected",
-          "message": "This publication was rejected by {{name}}. Please make the necessary adjustments and resubmit for approval."
+          "message": "This publication has been rejected by {{name}}.",
+          "footer": "Please make the necessary adjustments and resubmit for review."
         }
       },
       "preview": {

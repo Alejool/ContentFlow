@@ -18,6 +18,7 @@ interface PublicationTableProps {
   onPublish: (item: Publication) => void;
   onEditRequest?: (item: Publication) => void;
   isLoading?: boolean;
+  permissions?: string[];
 }
 
 const PublicationTable = memo(
@@ -30,6 +31,7 @@ const PublicationTable = memo(
     onPublish,
     onEditRequest,
     isLoading,
+    permissions,
   }: PublicationTableProps) => {
     const { remoteLocks } = useWorkspaceLocks();
     const [scrollContainer, setScrollContainer] = useState<
@@ -91,6 +93,7 @@ const PublicationTable = memo(
         onPublish,
         onEditRequest,
         remoteLocks,
+        permissions: permissions || [],
       }),
       [
         t,
@@ -101,6 +104,7 @@ const PublicationTable = memo(
         onPublish,
         onEditRequest,
         remoteLocks,
+        permissions,
       ],
     );
 
@@ -171,6 +175,7 @@ const PublicationTable = memo(
                         onPublish={ctx.onPublish}
                         onEditRequest={ctx.onEditRequest}
                         remoteLock={ctx.remoteLocks[item.id]}
+                        permissions={ctx.permissions}
                       />
                     )}
                   />
@@ -225,7 +230,9 @@ const PublicationTable = memo(
                     onDelete={onDelete}
                     onPublish={onPublish}
                     onEditRequest={onEditRequest}
+                    onViewDetails={onPublish}
                     remoteLocks={remoteLocks}
+                    permissions={permissions}
                   />
                 </div>
 

@@ -101,8 +101,15 @@ class HandleInertiaRequests extends Middleware
             $currentUser = $currentWorkspace->users->where('id', $user->id)->first();
             $roleId = $currentUser ? $currentUser->pivot->role_id : null;
             $role = $roles->find($roleId);
-            $currentWorkspace->user_role = $role ? $role->name : 'Member';
-            $currentWorkspace->permissions = $role ? $role->permissions->pluck('slug')->toArray() : [];
+            $isOwner = ((int)$currentWorkspace->created_by === (int)$user->id) || ($role && $role->slug === 'owner');
+            $currentWorkspace->user_role = $isOwner ? 'Owner' : ($role ? $role->name : 'Member');
+            $currentWorkspace->user_role_slug = $isOwner ? 'owner' : ($role ? $role->slug : 'member');
+
+            if ($isOwner) {
+              $currentWorkspace->permissions = \App\Models\Permission::pluck('slug')->toArray();
+            } else {
+              $currentWorkspace->permissions = $role ? $role->permissions->pluck('slug')->toArray() : [];
+            }
 
             // Debug Logging
             \Illuminate\Support\Facades\Log::info("Inertia Shared - Workspace: {$currentWorkspace->name}, Role: {$currentWorkspace->user_role}, Permissions: " . implode(',', $currentWorkspace->permissions));

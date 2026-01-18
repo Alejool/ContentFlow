@@ -3,17 +3,21 @@ import { useConfirm } from "@/Hooks/useConfirm";
 import { useSocialMediaAuth } from "@/Hooks/useSocialMediaAuth";
 import { useCampaignStore } from "@/stores/campaignStore";
 import { useLogStore } from "@/stores/logStore";
-import { usePublicationStore } from "@/stores/publicationStore";
 import { useManageContentUIStore } from "@/stores/manageContentUIStore";
+import { usePublicationStore } from "@/stores/publicationStore";
 import { PageProps } from "@/types";
-import { Campaign } from "@/types/Campaign";
 import { Publication } from "@/types/Publication";
 import { usePage } from "@inertiajs/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useShallow } from "zustand/react/shallow";
 
-export type ManageContentTab = "publications" | "campaigns" | "logs" | "calendar" | "approvals";
+export type ManageContentTab =
+  | "publications"
+  | "campaigns"
+  | "logs"
+  | "calendar"
+  | "approvals";
 
 export const usePublications = () => {
   const { t } = useTranslation();
@@ -35,7 +39,7 @@ export const usePublications = () => {
       isPubLoading: s.isLoading,
       fetchPublications: s.fetchPublications,
       deletePublicationAction: s.deletePublication,
-    }))
+    })),
   );
 
   const {
@@ -51,7 +55,7 @@ export const usePublications = () => {
       isCampLoading: s.isLoading,
       fetchCampaigns: s.fetchCampaigns,
       deleteCampaignAction: s.deleteCampaign,
-    }))
+    })),
   );
 
   const { logs, logPagination, isLogsLoading, fetchLogs } = useLogStore(
@@ -60,7 +64,7 @@ export const usePublications = () => {
       logPagination: s.pagination,
       isLogsLoading: s.isLoading,
       fetchLogs: s.fetchLogs,
-    }))
+    })),
   );
 
   const { fetchAccounts, accounts: connectedAccounts } = useSocialMediaAuth();
@@ -104,7 +108,7 @@ export const usePublications = () => {
       closePublishModal: s.closePublishModal,
       openViewDetailsModal: s.openViewDetailsModal,
       closeViewDetailsModal: s.closeViewDetailsModal,
-    }))
+    })),
   );
 
   const [filters, setFilters] = useState<any>({});
@@ -134,6 +138,9 @@ export const usePublications = () => {
         case "logs":
           await fetchLogs(filters, page);
           break;
+        case "approvals":
+          await fetchPublications(filters, page);
+          break;
       }
     },
     [
@@ -145,7 +152,7 @@ export const usePublications = () => {
       isPubLoading,
       isCampLoading,
       isLogsLoading,
-    ]
+    ],
   );
 
   useEffect(() => {
@@ -184,130 +191,184 @@ export const usePublications = () => {
 
   const isLoading = isPubLoading || isCampLoading || isLogsLoading;
 
-  const handlePageChange = useCallback((page: number) => {
-    fetchData(page);
-  }, [fetchData]);
+  const handlePageChange = useCallback(
+    (page: number) => {
+      fetchData(page);
+    },
+    [fetchData],
+  );
 
   const handleFilterChange = useCallback((newFilters: any) => {
     setFilters(newFilters);
   }, []);
 
-  const handleRefresh = useCallback(() => {
-    fetchData(pagination.current_page);
-  }, [fetchData, pagination.current_page]);
-
-  const handleDeleteItem = useCallback(async (id: number) => {
-    const isCampaign = activeTab === "campaigns";
-    const confirmed = await confirm({
-      title: isCampaign ? "Campaign" : "Publication",
-      message: isCampaign
-        ? "Are you sure you want to delete this campaign? All associated publications will be unlinked"
-        : "Are you sure you want to delete this publication?",
-      confirmText: "Delete",
-      type: "danger",
-    });
-
-    if (confirmed) {
-      let success = false;
-      if (isCampaign) {
-        success = await deleteCampaignAction(id);
-      } else {
-        success = await deletePublicationAction(id);
-      }
-
-      if (success) {
-        fetchData(pagination.current_page);
+  const handleRefresh = useCallback(async () => {
+    await fetchData(pagination.current_page);
+    // If there is a selected item, refresh it from the new publications list
+    if (selectedItem && activeTab === "approvals") {
+      const updated = usePublicationStore
+        .getState()
+        .publications.find((p) => p.id === selectedItem.id);
+      if (updated) {
+        setSelectedItem(updated);
       }
     }
-  }, [activeTab, confirm, deleteCampaignAction, deletePublicationAction, fetchData, pagination.current_page]);
+  }, [
+    fetchData,
+    pagination.current_page,
+    selectedItem,
+    activeTab,
+    setSelectedItem,
+  ]);
 
-  const handleEditRequest = useCallback((item: Publication) => {
-    openEditModal(item);
-  }, [openEditModal]);
+  const handleDeleteItem = useCallback(
+    async (id: number) => {
+      const isCampaign = activeTab === "campaigns";
+      const confirmed = await confirm({
+        title: isCampaign ? "Campaign" : "Publication",
+        message: isCampaign
+          ? "Are you sure you want to delete this campaign? All associated publications will be unlinked"
+          : "Are you sure you want to delete this publication?",
+        confirmText: "Delete",
+        type: "danger",
+      });
+
+      if (confirmed) {
+        let success = false;
+        if (isCampaign) {
+          success = await deleteCampaignAction(id);
+        } else {
+          success = await deletePublicationAction(id);
+        }
+
+        if (success) {
+          fetchData(pagination.current_page);
+        }
+      }
+    },
+    [
+      activeTab,
+      confirm,
+      deleteCampaignAction,
+      deletePublicationAction,
+      fetchData,
+      pagination.current_page,
+    ],
+  );
+
+  const handleEditRequest = useCallback(
+    (item: Publication) => {
+      openEditModal(item);
+    },
+    [openEditModal],
+  );
 
   const stableOpenAddModal = useCallback(() => openAddModal(), [openAddModal]);
-  const stableCloseAddModal = useCallback(() => closeAddModal(), [closeAddModal]);
-  const stableOpenEditModal = useCallback((item: any) => openEditModal(item), [openEditModal]);
-  const stableCloseEditModal = useCallback(() => closeEditModal(), [closeEditModal]);
-  const stableOpenPublishModal = useCallback((item: any) => openPublishModal(item), [openPublishModal]);
-  const stableClosePublishModal = useCallback(() => closePublishModal(), [closePublishModal]);
-  const stableOpenViewDetailsModal = useCallback((item: any) => openViewDetailsModal(item), [openViewDetailsModal]);
-  const stableCloseViewDetailsModal = useCallback(() => closeViewDetailsModal(), [closeViewDetailsModal]);
+  const stableCloseAddModal = useCallback(
+    () => closeAddModal(),
+    [closeAddModal],
+  );
+  const stableOpenEditModal = useCallback(
+    (item: any) => openEditModal(item),
+    [openEditModal],
+  );
+  const stableCloseEditModal = useCallback(
+    () => closeEditModal(),
+    [closeEditModal],
+  );
+  const stableOpenPublishModal = useCallback(
+    (item: any) => openPublishModal(item),
+    [openPublishModal],
+  );
+  const stableClosePublishModal = useCallback(
+    () => closePublishModal(),
+    [closePublishModal],
+  );
+  const stableOpenViewDetailsModal = useCallback(
+    (item: any) => openViewDetailsModal(item),
+    [openViewDetailsModal],
+  );
+  const stableCloseViewDetailsModal = useCallback(
+    () => closeViewDetailsModal(),
+    [closeViewDetailsModal],
+  );
 
-  return useMemo(() => ({
-    t,
-    activeTab,
-    setActiveTab,
-    filters,
-    handleFilterChange,
-    selectedItem,
-    setSelectedItem,
-    items,
-    pagination,
-    isLoading,
-    handlePageChange,
-    handleRefresh,
-    isAddModalOpen,
-    isEditModalOpen,
-    isPublishModalOpen,
-    isViewDetailsModalOpen,
-    openAddModal: stableOpenAddModal,
-    closeAddModal: stableCloseAddModal,
-    openEditModal: stableOpenEditModal,
-    closeEditModal: stableCloseEditModal,
-    openPublishModal: stableOpenPublishModal,
-    closePublishModal: stableClosePublishModal,
-    openViewDetailsModal: stableOpenViewDetailsModal,
-    closeViewDetailsModal: stableCloseViewDetailsModal,
-    handleDeleteItem,
-    handleEditRequest,
-    connectedAccounts,
-    publications,
-    campaigns,
-    logs,
-    isPubLoading,
-    isCampLoading,
-    isLogsLoading,
-    pubPagination,
-    campPagination,
-    logPagination,
-  }), [
-
-    t,
-    activeTab,
-    setActiveTab,
-    filters,
-    handleFilterChange,
-    selectedItem,
-    setSelectedItem,
-    items,
-    pagination,
-    isLoading,
-    handlePageChange,
-    handleRefresh,
-    isAddModalOpen,
-    isEditModalOpen,
-    isPublishModalOpen,
-    isViewDetailsModalOpen,
-    openAddModal,
-    closeAddModal,
-    openEditModal,
-    closeEditModal,
-    openPublishModal,
-    closePublishModal,
-    openViewDetailsModal,
-    closeViewDetailsModal,
-    handleDeleteItem,
-    handleEditRequest,
-    connectedAccounts,
-    publications,
-    campaigns,
-    logs,
-    isPubLoading,
-    isCampLoading,
-    isLogsLoading,
-    pubPagination,
-    campPagination,
-    logPagination,
-  ]);
+  return useMemo(
+    () => ({
+      t,
+      activeTab,
+      setActiveTab,
+      filters,
+      handleFilterChange,
+      selectedItem,
+      setSelectedItem,
+      items,
+      pagination,
+      isLoading,
+      handlePageChange,
+      handleRefresh,
+      isAddModalOpen,
+      isEditModalOpen,
+      isPublishModalOpen,
+      isViewDetailsModalOpen,
+      openAddModal: stableOpenAddModal,
+      closeAddModal: stableCloseAddModal,
+      openEditModal: stableOpenEditModal,
+      closeEditModal: stableCloseEditModal,
+      openPublishModal: stableOpenPublishModal,
+      closePublishModal: stableClosePublishModal,
+      openViewDetailsModal: stableOpenViewDetailsModal,
+      closeViewDetailsModal: stableCloseViewDetailsModal,
+      handleDeleteItem,
+      handleEditRequest,
+      connectedAccounts,
+      publications,
+      campaigns,
+      logs,
+      isPubLoading,
+      isCampLoading,
+      isLogsLoading,
+      pubPagination,
+      campPagination,
+      logPagination,
+    }),
+    [
+      t,
+      activeTab,
+      setActiveTab,
+      filters,
+      handleFilterChange,
+      selectedItem,
+      setSelectedItem,
+      items,
+      pagination,
+      isLoading,
+      handlePageChange,
+      handleRefresh,
+      isAddModalOpen,
+      isEditModalOpen,
+      isPublishModalOpen,
+      isViewDetailsModalOpen,
+      openAddModal,
+      closeAddModal,
+      openEditModal,
+      closeEditModal,
+      openPublishModal,
+      closePublishModal,
+      openViewDetailsModal,
+      closeViewDetailsModal,
+      handleDeleteItem,
+      handleEditRequest,
+      connectedAccounts,
+      publications,
+      campaigns,
+      logs,
+      isPubLoading,
+      isCampLoading,
+      isLogsLoading,
+      pubPagination,
+      campPagination,
+      logPagination,
+    ],
+  );
 };

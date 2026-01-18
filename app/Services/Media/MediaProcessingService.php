@@ -137,9 +137,36 @@ class MediaProcessingService
 
   public function deleteMediaFile(MediaFile $mediaFile): void
   {
-    if (Storage::disk('s3')->exists($mediaFile->file_path)) {
-      Storage::disk('s3')->delete($mediaFile->file_path);
+    // 1. Delete all derivatives (physical files + database records)
+    // Deleting database records is handled by DB cascade if foreign keys are set up,
+    // but we need to delete physical files manually from storage.
+    $mediaFile->derivatives->each(function ($derivative) {
+      try {
+        $path = $derivative->getRawOriginal('file_path');
+        if (Storage::disk('s3')->exists($path)) {
+          Storage::disk('s3')->delete($path);
+        }
+      } catch (\Exception $e) {
+        Log::warning('Failed to delete media derivative file during media file deletion', [
+          'error' => $e->getMessage(),
+          'path' => $derivative->getRawOriginal('file_path')
+        ]);
+      }
+    });
+
+    // 2. Delete main file from storage
+    try {
+      if (Storage::disk('s3')->exists($mediaFile->file_path)) {
+        Storage::disk('s3')->delete($mediaFile->file_path);
+      }
+    } catch (\Exception $e) {
+      Log::warning('Failed to delete main media file', [
+        'error' => $e->getMessage(),
+        'path' => $mediaFile->file_path
+      ]);
     }
+
+    // 3. Delete database record
     $mediaFile->delete();
   }
 }

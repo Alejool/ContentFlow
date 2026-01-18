@@ -5,6 +5,7 @@ import {
   CheckCircle,
   Clock,
   Edit,
+  Eye,
   Image,
   Loader2,
   MoreVertical,
@@ -24,10 +25,12 @@ interface PublicationMobileRowProps {
   onDelete: (id: number) => void;
   onPublish: (item: Publication) => void;
   onEditRequest?: (item: Publication) => void;
+  onViewDetails?: (item: Publication) => void;
   remoteLocks?: Record<
     number,
     { user_id: number; user_name: string; expires_at: string }
   >;
+  permissions?: string[];
 }
 
 const PublicationMobileRow = memo(
@@ -40,7 +43,9 @@ const PublicationMobileRow = memo(
     onDelete,
     onPublish,
     onEditRequest,
+    onViewDetails,
     remoteLocks = {},
+    permissions,
   }: PublicationMobileRowProps) => {
     const [expandedRow, setExpandedRow] = useState<number | null>(null);
     const [loadingStates, setLoadingStates] = useState<
@@ -171,35 +176,72 @@ const PublicationMobileRow = memo(
                 </div>
 
                 <div className="flex items-center gap-1 shrink-0">
-                  <button
-                    onClick={async (e) => {
-                      e.stopPropagation();
-                      setLoadingStates((prev) => ({
-                        ...prev,
-                        [item.id]: { ...prev[item.id], publishing: true },
-                      }));
-                      try {
-                        await onPublish(item);
-                      } finally {
+                  {(permissions?.includes("publish") ||
+                    item.status === "approved") &&
+                  permissions?.includes("manage-content") ? (
+                    <button
+                      onClick={async (e) => {
+                        e.stopPropagation();
                         setLoadingStates((prev) => ({
                           ...prev,
-                          [item.id]: { ...prev[item.id], publishing: false },
+                          [item.id]: { ...prev[item.id], publishing: true },
                         }));
+                        try {
+                          await onPublish(item);
+                        } finally {
+                          setLoadingStates((prev) => ({
+                            ...prev,
+                            [item.id]: { ...prev[item.id], publishing: false },
+                          }));
+                        }
+                      }}
+                      disabled={
+                        isLoading?.publishing ||
+                        isLoading?.editing ||
+                        isLoading?.deleting
                       }
-                    }}
-                    disabled={
-                      isLoading?.publishing ||
-                      isLoading?.editing ||
-                      isLoading?.deleting
-                    }
-                    className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-xl dark:hover:bg-emerald-900/20 disabled:opacity-50 transition-colors"
-                  >
-                    {isLoading?.publishing ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <Rocket className="w-4 h-4" />
-                    )}
-                  </button>
+                      className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-xl dark:hover:bg-emerald-900/20 disabled:opacity-50 transition-colors"
+                      title={
+                        item.status === "approved"
+                          ? "Publicar"
+                          : "Publicar / Gestionar"
+                      }
+                    >
+                      {isLoading?.publishing ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Rocket className="w-4 h-4" />
+                      )}
+                    </button>
+                  ) : permissions?.includes("manage-content") &&
+                    !permissions?.includes("publish") &&
+                    ["draft", "failed", "rejected"].includes(
+                      item.status || "draft",
+                    ) ? (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onPublish?.(item);
+                      }}
+                      className="p-2 text-amber-600 hover:bg-amber-50 rounded-xl dark:hover:bg-amber-900/20 transition-colors"
+                      title="Solicitar Aprobación"
+                    >
+                      <Clock className="w-4 h-4" />
+                    </button>
+                  ) : null}
+                  {/* View Details button for Viewers */}
+                  {!permissions?.includes("manage-content") && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onViewDetails?.(item);
+                      }}
+                      className="p-2 text-primary-600 hover:bg-primary-50 rounded-xl dark:hover:bg-primary-900/20 transition-colors"
+                      title="Ver Detalles"
+                    >
+                      <Eye className="w-4 h-4" />
+                    </button>
+                  )}
                   <div
                     className={`p-1.5 transition-transform duration-300 ${isExpanded ? "rotate-180" : ""}`}
                   >
@@ -243,68 +285,78 @@ const PublicationMobileRow = memo(
                     </div>
 
                     <div className="flex items-center gap-2">
-                      <button
-                        onClick={async (e) => {
-                          e.stopPropagation();
-                          setLoadingStates((prev) => ({
-                            ...prev,
-                            [item.id]: { ...prev[item.id], editing: true },
-                          }));
-                          try {
-                            onEditRequest
-                              ? await onEditRequest(item)
-                              : await onEdit(item);
-                          } finally {
+                      {permissions?.includes("manage-content") && (
+                        <button
+                          onClick={async (e) => {
+                            e.stopPropagation();
                             setLoadingStates((prev) => ({
                               ...prev,
-                              [item.id]: { ...prev[item.id], editing: false },
+                              [item.id]: { ...prev[item.id], editing: true },
                             }));
+                            try {
+                              onEditRequest
+                                ? await onEditRequest(item)
+                                : await onEdit(item);
+                            } finally {
+                              setLoadingStates((prev) => ({
+                                ...prev,
+                                [item.id]: { ...prev[item.id], editing: false },
+                              }));
+                            }
+                          }}
+                          disabled={
+                            isLoading?.publishing ||
+                            isLoading?.editing ||
+                            isLoading?.deleting ||
+                            !!remoteLocks[item.id]
                           }
-                        }}
-                        disabled={
-                          isLoading?.publishing ||
-                          isLoading?.editing ||
-                          isLoading?.deleting ||
-                          !!remoteLocks[item.id]
-                        }
-                        className="flex-1 py-2.5 rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400 font-bold text-xs flex items-center justify-center gap-2 border border-blue-100 dark:border-blue-900/30 transition-all active:scale-95 disabled:opacity-50"
-                      >
-                        {isLoading?.editing ? (
-                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                        ) : (
-                          <Edit className="w-3.5 h-3.5" />
+                          className="flex-1 py-2.5 rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400 font-bold text-xs flex items-center justify-center gap-2 border border-blue-100 dark:border-blue-900/30 transition-all active:scale-95 disabled:opacity-50"
+                        >
+                          {isLoading?.editing ? (
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          ) : (
+                            <Edit className="w-3.5 h-3.5" />
+                          )}
+                          {t("common.edit")}
+                        </button>
+                      )}
+                      {/* Delete button - Only for Owner/Admin (users with publish permission) */}
+                      {permissions?.includes("publish") &&
+                        permissions?.includes("manage-content") && (
+                          <button
+                            onClick={async (e) => {
+                              e.stopPropagation();
+                              setLoadingStates((prev) => ({
+                                ...prev,
+                                [item.id]: { ...prev[item.id], deleting: true },
+                              }));
+                              try {
+                                await onDelete(item.id);
+                              } finally {
+                                setLoadingStates((prev) => ({
+                                  ...prev,
+                                  [item.id]: {
+                                    ...prev[item.id],
+                                    deleting: false,
+                                  },
+                                }));
+                              }
+                            }}
+                            disabled={
+                              isLoading?.publishing ||
+                              isLoading?.editing ||
+                              isLoading?.deleting
+                            }
+                            className="p-2.5 rounded-xl bg-rose-50 text-rose-600 dark:bg-rose-900/20 dark:text-rose-400 border border-rose-100 dark:border-rose-900/30 transition-all active:scale-95"
+                            title="Eliminar"
+                          >
+                            {isLoading?.deleting ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <Trash2 className="w-4 h-4" />
+                            )}
+                          </button>
                         )}
-                        {t("common.edit")}
-                      </button>
-                      <button
-                        onClick={async (e) => {
-                          e.stopPropagation();
-                          setLoadingStates((prev) => ({
-                            ...prev,
-                            [item.id]: { ...prev[item.id], deleting: true },
-                          }));
-                          try {
-                            await onDelete(item.id);
-                          } finally {
-                            setLoadingStates((prev) => ({
-                              ...prev,
-                              [item.id]: { ...prev[item.id], deleting: false },
-                            }));
-                          }
-                        }}
-                        disabled={
-                          isLoading?.publishing ||
-                          isLoading?.editing ||
-                          isLoading?.deleting
-                        }
-                        className="p-2.5 rounded-xl bg-rose-50 text-rose-600 dark:bg-rose-900/20 dark:text-rose-400 border border-rose-100 dark:border-rose-900/30 transition-all active:scale-95"
-                      >
-                        {isLoading?.deleting ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : (
-                          <Trash2 className="w-4 h-4" />
-                        )}
-                      </button>
                     </div>
                   </div>
                 </div>

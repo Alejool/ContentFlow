@@ -15,6 +15,7 @@ use App\Actions\Publications\CreatePublicationAction;
 use App\Actions\Publications\UpdatePublicationAction;
 use App\Actions\Publications\PublishPublicationAction;
 use App\Actions\Publications\UnpublishPublicationAction;
+use App\Actions\Publications\DeletePublicationAction;
 use App\Notifications\PublicationAwaitingApprovalNotification;
 use App\Notifications\PublicationApprovedNotification;
 use App\Notifications\PublicationRejectedNotification;
@@ -57,7 +58,8 @@ class PublicationController extends Controller
           'campaigns' => fn($q) => $q->select('campaigns.id', 'campaigns.name', 'campaigns.status'),
           'user' => fn($q) => $q->select('users.id', 'users.name', 'users.email', 'users.photo_url'),
           'publisher' => fn($q) => $q->select('users.id', 'users.name', 'users.photo_url'),
-          'rejector' => fn($q) => $q->select('users.id', 'users.name', 'users.photo_url')
+          'rejector' => fn($q) => $q->select('users.id', 'users.name', 'users.photo_url'),
+          'approvalLogs' => fn($q) => $q->latest('requested_at')->with(['requester:id,name,photo_url', 'reviewer:id,name,photo_url'])
         ])
         ->orderBy('created_at', 'desc');
 
@@ -94,6 +96,10 @@ class PublicationController extends Controller
 
   public function store(StorePublicationRequest $request, CreatePublicationAction $action)
   {
+    if (!Auth::user()->hasPermission('manage-content')) {
+      return $this->errorResponse('You do not have permission to create publications.', 403);
+    }
+
     try {
       $publication = $action->execute($request->validated(), $request->file('media', []));
 
@@ -118,7 +124,8 @@ class PublicationController extends Controller
       'socialPostLogs.socialAccount' => fn($q) => $q->select('id', 'platform', 'account_name'),
       'campaigns' => fn($q) => $q->select('campaigns.id', 'campaigns.name', 'campaigns.status'),
       'publisher' => fn($q) => $q->select('users.id', 'users.name', 'users.photo_url'),
-      'rejector' => fn($q) => $q->select('users.id', 'users.name', 'users.photo_url')
+      'rejector' => fn($q) => $q->select('users.id', 'users.name', 'users.photo_url'),
+      'approvalLogs' => fn($q) => $q->latest('requested_at')->with(['requester:id,name,photo_url', 'reviewer:id,name,photo_url'])
     ]);
 
     return $request->wantsJson()
@@ -128,6 +135,10 @@ class PublicationController extends Controller
 
   public function update(UpdatePublicationRequest $request, Publication $publication, UpdatePublicationAction $action)
   {
+    if (!Auth::user()->hasPermission('manage-content', $publication->workspace_id)) {
+      return $this->errorResponse('You do not have permission to update this publication.', 403);
+    }
+
     try {
       $publication = $action->execute($publication, $request->validated(), $request->file('media', []));
 
@@ -146,6 +157,14 @@ class PublicationController extends Controller
 
   public function publish(Request $request, Publication $publication, PublishPublicationAction $action)
   {
+    // Allow if has publish permission OR if it's already approved
+    $canPublish = (Auth::user()->hasPermission('publish', $publication->workspace_id) || $publication->isApproved()) &&
+      Auth::user()->hasPermission('manage-content', $publication->workspace_id);
+
+    if (!$canPublish) {
+      return $this->errorResponse('You do not have permission to publish this content.', 403);
+    }
+
     try {
       $action->execute($publication, $request->input('platforms'), [
         'thumbnails' => $request->file('thumbnails', []),
@@ -172,14 +191,50 @@ class PublicationController extends Controller
       : $this->errorResponse('Failed to unpublish', 500, $result);
   }
 
+  public function destroy(Publication $publication, DeletePublicationAction $action)
+  {
+    $workspaceId = $publication->workspace_id;
+
+    if (!Auth::user()->hasPermission('publish', $workspaceId) || !Auth::user()->hasPermission('manage-content', $workspaceId)) {
+      return $this->errorResponse('You do not have permission to delete this publication.', 403);
+    }
+
+    try {
+      $action->execute($publication);
+
+      $this->clearPublicationCache($workspaceId);
+
+      return $this->successResponse(null, 'Publication deleted successfully');
+    } catch (\Exception $e) {
+      return $this->errorResponse('Deletion failed: ' . $e->getMessage(), 500);
+    }
+  }
+
   public function requestReview(Request $request, Publication $publication)
   {
+    if (!Auth::user()->hasPermission('manage-content', $publication->workspace_id)) {
+      return $this->errorResponse('You do not have permission to request review.', 403);
+    }
+
     $allowedStatuses = ['draft', 'failed', 'rejected'];
     if (!in_array($publication->status, $allowedStatuses)) {
       return $this->errorResponse('Only draft, rejected or failed publications can be sent for review.', 422);
     }
 
-    $publication->update(['status' => 'pending_review']);
+    $updateData = ['status' => 'pending_review'];
+    if ($request->has('platform_settings')) {
+      $updateData['platform_settings'] = $request->platform_settings;
+    }
+
+    $publication->update($updateData);
+
+    // Create approval log entry
+    \App\Models\ApprovalLog::create([
+      'publication_id' => $publication->id,
+      'requested_by' => Auth::id(),
+      'requested_at' => now(),
+    ]);
+
     $this->clearPublicationCache(Auth::user()->current_workspace_id);
 
     // Notify all users in the workspace who have the 'approve' permission
@@ -218,23 +273,34 @@ class PublicationController extends Controller
       'rejection_reason' => null,
     ]);
 
+    // Update the most recent approval log
+    $latestLog = $publication->approvalLogs()
+      ->whereNull('reviewed_at')
+      ->latest('requested_at')
+      ->first();
+
+    if ($latestLog) {
+      $latestLog->update([
+        'reviewed_by' => Auth::id(),
+        'reviewed_at' => now(),
+        'action' => 'approved',
+      ]);
+    }
+
     $this->clearPublicationCache(Auth::user()->current_workspace_id);
 
     // Notify the redactor (publication owner)
     $publication->user->notify(new PublicationApprovedNotification($publication, Auth::user()));
 
-    // Load approver relationship for response
-    $publication->load('approvedBy:id,name,email');
+    // Load approver relationship and logs for response
+    $publication->load(['approvedBy:id,name,email', 'approvalLogs' => fn($q) => $q->latest('requested_at')->with(['requester:id,name,photo_url', 'reviewer:id,name,photo_url'])]);
 
     return $this->successResponse([
       'publication' => $publication,
-      'approver' => [
-        'id' => Auth::id(),
-        'name' => Auth::user()->name,
-        'approved_at' => $publication->approved_at,
-      ]
     ], 'Publication approved successfully.');
   }
+
+  /** @var \App\Models\User $user */
 
   public function reject(Request $request, Publication $publication)
   {
@@ -243,7 +309,7 @@ class PublicationController extends Controller
     }
 
     $request->validate([
-      'rejection_reason' => 'required|string|min:10|max:500',
+      'rejection_reason' => 'nullable|string|max:500',
     ]);
 
     $publication->update([
@@ -255,22 +321,32 @@ class PublicationController extends Controller
       'approved_by' => null,
       'approved_at' => null,
     ]);
+
+    // Update the most recent approval log
+    $latestLog = $publication->approvalLogs()
+      ->whereNull('reviewed_at')
+      ->latest('requested_at')
+      ->first();
+
+    if ($latestLog) {
+      $latestLog->update([
+        'reviewed_by' => Auth::id(),
+        'reviewed_at' => now(),
+        'action' => 'rejected',
+        'rejection_reason' => $request->input('rejection_reason'),
+      ]);
+    }
+
     $this->clearPublicationCache(Auth::user()->current_workspace_id);
 
     // Notify the publication owner
     $publication->user->notify(new PublicationRejectedNotification($publication, Auth::user()));
 
     // Load rejector relationship for response
-    $publication->load('rejectedBy:id,name,email');
+    $publication->load(['rejectedBy:id,name,email', 'approvalLogs' => fn($q) => $q->latest('requested_at')->with(['requester:id,name,photo_url', 'reviewer:id,name,photo_url'])]);
 
     return $this->successResponse([
       'publication' => $publication,
-      'rejector' => [
-        'id' => Auth::id(),
-        'name' => Auth::user()->name,
-        'rejected_at' => $publication->rejected_at,
-        'rejection_reason' => $publication->rejection_reason,
-      ]
     ], 'Publication rejected successfully.');
   }
 

@@ -12,6 +12,7 @@ import ModalHeader from "@/Components/ManageContent/modals/common/ModalHeader";
 
 import { useEditCampaignForm } from "@/Hooks/campaign/useEditCampaignForm";
 import { usePublicationsForCampaignEdit } from "@/Hooks/campaign/usePublicationsForCampaignEdit";
+import { usePage } from "@inertiajs/react";
 import ModalFooter from "./common/ModalFooter";
 
 interface EditCampaignModalProps {
@@ -30,6 +31,10 @@ export default function EditCampaignModal({
   const { t } = useTranslation();
   const { updateCampaign } = useCampaignManagement();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { auth } = usePage<any>().props;
+  const canManage =
+    auth.current_workspace?.permissions?.includes("manage-content");
+  const isDisabled = !canManage;
 
   const { register, handleSubmit, setValue, watch, reset, errors } =
     useEditCampaignForm(t, campaign);
@@ -48,7 +53,7 @@ export default function EditCampaignModal({
         name: campaign.name || campaign.title || "",
         description: campaign.description || "",
         goal: campaign.goal || "",
-        budget: campaign.budget || "",
+        budget: campaign.budget ? campaign.budget.toString() : "",
         start_date: campaign.start_date || "",
         end_date: campaign.end_date || "",
         publication_ids: campaign.publications?.map((p: any) => p.id) || [],
@@ -75,7 +80,7 @@ export default function EditCampaignModal({
       if (success) {
         toast.success(
           t("campaigns.messages.updateSuccess") ||
-          "Campaign updated successfully"
+            "Campaign updated successfully",
         );
         if (onSubmit) {
           onSubmit(true);
@@ -83,13 +88,13 @@ export default function EditCampaignModal({
         handleClose();
       } else {
         toast.error(
-          t("campaigns.messages.updateError") || "Failed to update campaign"
+          t("campaigns.messages.updateError") || "Failed to update campaign",
         );
       }
     } catch (error) {
       console.error("Error updating campaign:", error);
       toast.error(
-        t("campaigns.messages.updateError") || "Failed to update campaign"
+        t("campaigns.messages.updateError") || "Failed to update campaign",
       );
     } finally {
       setIsSubmitting(false);
@@ -107,7 +112,7 @@ export default function EditCampaignModal({
     if (current.includes(id)) {
       setValue(
         "publication_ids",
-        current.filter((pid: number) => pid !== id)
+        current.filter((pid: number) => pid !== id),
       );
     } else {
       setValue("publication_ids", [...current, id]);
@@ -117,35 +122,44 @@ export default function EditCampaignModal({
   if (!isOpen || !campaign) return null;
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 text-gray-900 dark:text-white"
-    >
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 text-gray-900 dark:text-white">
       <div
         className="absolute inset-0 bg-gray-900/60 dark:bg-black/70 backdrop-blur-sm"
         onClick={handleClose}
       />
 
-      <div
-        className="relative w-full max-w-2xl bg-white dark:bg-neutral-800 rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300"
-      >
+      <div className="relative w-full max-w-2xl bg-white dark:bg-neutral-800 rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300">
         <ModalHeader
           t={t}
           onClose={handleClose}
-          title="campaigns.modal.edit.title"
-          subtitle="campaigns.modal.edit.subtitle"
+          title={
+            canManage
+              ? "campaigns.modal.edit.title"
+              : "campaigns.modal.view.title"
+          }
+          subtitle={
+            canManage
+              ? "campaigns.modal.edit.subtitle"
+              : "campaigns.modal.view.subtitle"
+          }
           icon={Target}
           iconColor="text-primary-500"
           size="xl"
         />
 
         <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
-          <form id="edit-campaign-form" onSubmit={handleSubmit(onFormSubmit)} className="space-y-6">
+          <form
+            id="edit-campaign-form"
+            onSubmit={handleSubmit(onFormSubmit)}
+            className="space-y-6"
+          >
             <CampaignFormFields
               register={register}
               errors={errors}
               watched={watchedFields}
               t={t}
               mode="edit"
+              disabled={isDisabled}
             />
 
             <CampaignDateFields
@@ -155,6 +169,7 @@ export default function EditCampaignModal({
               setValue={setValue}
               watch={watch}
               t={t}
+              disabled={isDisabled}
             />
 
             {errors.end_date && (
@@ -167,16 +182,11 @@ export default function EditCampaignModal({
             )}
 
             <div className="form-group">
-              <label
-                className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2"
-              >
-                {t("campaigns.modal.edit.associatedPublications") ||
-                  "Associated Publications"}
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                {t("campaigns.modal.edit.associatedPublications")}
               </label>
 
-              <div
-                className="border border-gray-200 dark:border-neutral-700 rounded-lg max-h-48 overflow-y-auto p-2 bg-gray-50 dark:bg-black/20"
-              >
+              <div className="border border-gray-200 dark:border-neutral-700 rounded-lg max-h-48 overflow-y-auto p-2 bg-gray-50 dark:bg-black/20">
                 <PublicationSelector
                   publications={availablePublications}
                   selectedIds={watchedFields.publication_ids || []}
@@ -184,6 +194,7 @@ export default function EditCampaignModal({
                   t={t}
                   getThumbnail={getThumbnail}
                   onTogglePublication={togglePublication}
+                  disabled={isDisabled}
                 />
               </div>
             </div>
@@ -191,9 +202,11 @@ export default function EditCampaignModal({
         </div>
         <ModalFooter
           onClose={handleClose}
-          submitText={t("campaigns.button.edit") || "Edit Campaign"}
-          cancelText={t("common.cancel") || "Close"}
+          submitText={t("campaigns.button.edit")}
+          cancelText={t("common.cancel")}
           formId="edit-campaign-form"
+          hideSubmit={!canManage}
+          isSubmitting={isSubmitting || isDisabled}
         />
       </div>
     </div>

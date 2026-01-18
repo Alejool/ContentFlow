@@ -1,48 +1,57 @@
-import { useMemo, memo } from "react";
-import { Trans } from "react-i18next";
-
-// Utils
-const parseUserAgent = (userAgent?: string): string => {
-  if (!userAgent) return 'Unknown Device';
-  let browser = 'Unknown Browser';
-  if (userAgent.includes('Firefox')) browser = 'Firefox';
-  else if (userAgent.includes('Edg')) browser = 'Edge';
-  else if (userAgent.includes('Chrome')) browser = 'Chrome';
-  else if (userAgent.includes('Safari') && !userAgent.includes('Chrome')) browser = 'Safari';
-  else if (userAgent.includes('Opera') || userAgent.includes('OPR')) browser = 'Opera';
-
-  let os = '';
-  if (userAgent.includes('Windows')) os = 'Windows';
-  else if (userAgent.includes('Mac')) os = 'macOS';
-  else if (userAgent.includes('Linux')) os = 'Linux';
-  else if (userAgent.includes('Android')) os = 'Android';
-  else if (userAgent.includes('iOS') || userAgent.includes('iPhone') || userAgent.includes('iPad')) os = 'iOS';
-
-  return os ? `${browser} on ${os}` : browser;
-};
-
-const maskIpAddress = (ip?: string): string => {
-  if (!ip) return '';
-  const parts = ip.split('.');
-  if (parts.length === 4) return `${parts[0]}.${parts[1]}.x.x`;
-  return ip.split(':')[0] + ':...';
-};
+import PlatformSettingsModal from "@/Components/ConfigSocialMedia/PlatformSettingsModal";
+import SocialAccountsSection from "@/Components/ManageContent/Publication/common/add/SocialAccountsSection";
+import ApprovalHistorySection from "@/Components/ManageContent/Publication/common/edit/ApprovalHistorySection";
+import ContentSection from "@/Components/ManageContent/Publication/common/edit/ContentSection";
+import MediaUploadSection from "@/Components/ManageContent/Publication/common/edit/MediaUploadSection";
+import MediaUploadSkeleton from "@/Components/ManageContent/Publication/common/edit/MediaUploadSkeleton";
+import ModalFooter from "@/Components/ManageContent/modals/common/ModalFooter";
+import ModalHeader from "@/Components/ManageContent/modals/common/ModalHeader";
+import ScheduleSection from "@/Components/ManageContent/modals/common/ScheduleSection";
+import YouTubeThumbnailUploader from "@/Components/common/ui/YouTubeThumbnailUploader";
 import { usePublicationForm } from "@/Hooks/publication/usePublicationForm";
 import { usePublicationLock } from "@/Hooks/usePublicationLock";
 import { useCampaignStore } from "@/stores/campaignStore";
 import { useAccountsStore } from "@/stores/socialAccountsStore";
 import { Publication } from "@/types/Publication";
-import PlatformSettingsModal from "@/Components/ConfigSocialMedia/PlatformSettingsModal";
-import SocialAccountsSection from "@/Components/ManageContent/Publication/common/add/SocialAccountsSection";
-import ContentSection from "@/Components/ManageContent/Publication/common/edit/ContentSection";
-import MediaUploadSection from "@/Components/ManageContent/Publication/common/edit/MediaUploadSection";
-import ModalFooter from "@/Components/ManageContent/modals/common/ModalFooter";
-import ModalHeader from "@/Components/ManageContent/modals/common/ModalHeader";
-import ScheduleSection from "@/Components/ManageContent/modals/common/ScheduleSection";
-import YouTubeThumbnailUploader from "@/Components/common/ui/YouTubeThumbnailUploader";
-import MediaUploadSkeleton from "@/Components/ManageContent/Publication/common/edit/MediaUploadSkeleton";
+import { usePage } from "@inertiajs/react";
 import { AlertCircle, Save } from "lucide-react";
+import { memo, useMemo } from "react";
 import { useWatch } from "react-hook-form";
+import { Trans } from "react-i18next";
+
+// Utils
+const parseUserAgent = (userAgent?: string): string => {
+  if (!userAgent) return "Unknown Device";
+  let browser = "Unknown Browser";
+  if (userAgent.includes("Firefox")) browser = "Firefox";
+  else if (userAgent.includes("Edg")) browser = "Edge";
+  else if (userAgent.includes("Chrome")) browser = "Chrome";
+  else if (userAgent.includes("Safari") && !userAgent.includes("Chrome"))
+    browser = "Safari";
+  else if (userAgent.includes("Opera") || userAgent.includes("OPR"))
+    browser = "Opera";
+
+  let os = "";
+  if (userAgent.includes("Windows")) os = "Windows";
+  else if (userAgent.includes("Mac")) os = "macOS";
+  else if (userAgent.includes("Linux")) os = "Linux";
+  else if (userAgent.includes("Android")) os = "Android";
+  else if (
+    userAgent.includes("iOS") ||
+    userAgent.includes("iPhone") ||
+    userAgent.includes("iPad")
+  )
+    os = "iOS";
+
+  return os ? `${browser} on ${os}` : browser;
+};
+
+const maskIpAddress = (ip?: string): string => {
+  if (!ip) return "";
+  const parts = ip.split(".");
+  if (parts.length === 4) return `${parts[0]}.${parts[1]}.x.x`;
+  return ip.split(":")[0] + ":...";
+};
 
 interface EditPublicationModalProps {
   isOpen: boolean;
@@ -60,7 +69,10 @@ const EditPublicationModal = ({
   const { campaigns } = useCampaignStore();
   const { accounts: socialAccounts } = useAccountsStore();
 
-  const { isLockedByOther, lockInfo } = usePublicationLock(publication?.id ?? null, isOpen);
+  const { isLockedByOther, lockInfo } = usePublicationLock(
+    publication?.id ?? null,
+    isOpen,
+  );
 
   const {
     t,
@@ -101,7 +113,8 @@ const EditPublicationModal = ({
   const { register } = form;
 
   // Use individual watchers to prevent unnecessary re-renders
-  const selectedSocialAccounts = useWatch({ control, name: "social_accounts" }) || [];
+  const selectedSocialAccounts =
+    useWatch({ control, name: "social_accounts" }) || [];
   const scheduledAt = useWatch({ control, name: "scheduled_at" });
   const useGlobalSchedule = useWatch({ control, name: "use_global_schedule" });
   const title = useWatch({ control, name: "title" });
@@ -109,15 +122,26 @@ const EditPublicationModal = ({
   const hashtags = useWatch({ control, name: "hashtags" });
   const campaign_id = useWatch({ control, name: "campaign_id" });
 
-  const watched = useMemo(() => ({
-    social_accounts: selectedSocialAccounts,
-    scheduled_at: scheduledAt,
-    use_global_schedule: useGlobalSchedule,
-    title,
-    goal,
-    hashtags,
-    campaign_id
-  }), [selectedSocialAccounts, scheduledAt, useGlobalSchedule, title, goal, hashtags, campaign_id]);
+  const watched = useMemo(
+    () => ({
+      social_accounts: selectedSocialAccounts,
+      scheduled_at: scheduledAt,
+      use_global_schedule: useGlobalSchedule,
+      title,
+      goal,
+      hashtags,
+      campaign_id,
+    }),
+    [
+      selectedSocialAccounts,
+      scheduledAt,
+      useGlobalSchedule,
+      title,
+      goal,
+      hashtags,
+      campaign_id,
+    ],
+  );
 
   const stabilizedMediaPreviews = useMemo(() => {
     return mediaFiles.map((m) => ({
@@ -128,7 +152,7 @@ const EditPublicationModal = ({
 
   const hasPublishedPlatform = useMemo(() => {
     return publication?.social_post_logs?.some(
-      (log: any) => log.status === "published"
+      (log: any) => log.status === "published",
     );
   }, [publication]);
 
@@ -153,6 +177,11 @@ const EditPublicationModal = ({
     return account?.platform?.toLowerCase() === "youtube";
   });
 
+  const { auth } = usePage<any>().props;
+  const canManage =
+    auth.current_workspace?.permissions?.includes("manage-content");
+  const isDisabled = isLockedByOther || !canManage; // Disable if locked or if viewer
+
   return (
     <div
       className={`fixed inset-0 z-50 flex items-center justify-center sm:p-6 text-gray-900 dark:text-white transition-opacity duration-200 ${isOpen ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"}`}
@@ -162,14 +191,20 @@ const EditPublicationModal = ({
         onClick={handleClose}
       />
 
-      <div
-        className="relative w-full max-w-4xl bg-white dark:bg-neutral-800 rounded-lg shadow-2xl flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300"
-      >
+      <div className="relative w-full max-w-4xl bg-white dark:bg-neutral-800 rounded-lg shadow-2xl flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300">
         <ModalHeader
           t={t}
           onClose={handleClose}
-          title="publications.modal.edit.title"
-          subtitle="publications.modal.edit.subtitle"
+          title={
+            canManage
+              ? "publications.modal.edit.title"
+              : "publications.modal.show.title"
+          }
+          subtitle={
+            canManage
+              ? "publications.modal.edit.subtitle"
+              : "publications.modal.show.subtitle"
+          }
         />
 
         <div className="flex-1 overflow-y-auto custom-scrollbar">
@@ -185,22 +220,28 @@ const EditPublicationModal = ({
                     <AlertCircle className="w-5 h-5 shrink-0 text-amber-500" />
                     <div>
                       <p className="font-semibold mb-1">
-                        {lockInfo?.locked_by === 'session'
-                          ? (t("publications.modal.edit.lockedBySession") || "Sesión Duplicada")
-                          : (t("publications.modal.edit.lockedByOther") || "Publicación Bloqueada")
-                        }
+                        {lockInfo?.locked_by === "session"
+                          ? t("publications.modal.edit.lockedBySession") ||
+                            "Sesión Duplicada"
+                          : t("publications.modal.edit.lockedByOther") ||
+                            "Publicación Bloqueada"}
                       </p>
                       <p className="opacity-80">
-                        {lockInfo?.locked_by === 'session' ? (
+                        {lockInfo?.locked_by === "session" ? (
                           <>
                             <Trans
                               i18nKey="publications.modal.edit.locking.sessionMessage"
-                              values={{ browser: parseUserAgent(lockInfo?.user_agent) }}
-                              components={{ 1: <span className="font-medium" /> }}
+                              values={{
+                                browser: parseUserAgent(lockInfo?.user_agent),
+                              }}
+                              components={{
+                                1: <span className="font-medium" />,
+                              }}
                             />
                             {lockInfo?.ip_address && (
                               <span className="text-xs opacity-70">
-                                {' '}({maskIpAddress(lockInfo.ip_address)})
+                                {" "}
+                                ({maskIpAddress(lockInfo.ip_address)})
                               </span>
                             )}
                           </>
@@ -210,9 +251,11 @@ const EditPublicationModal = ({
                               i18nKey="publications.modal.edit.locking.userMessage"
                               values={{
                                 user: lockInfo?.user_name,
-                                browser: parseUserAgent(lockInfo?.user_agent)
+                                browser: parseUserAgent(lockInfo?.user_agent),
                               }}
-                              components={{ 1: <span className="font-medium" /> }}
+                              components={{
+                                1: <span className="font-medium" />,
+                              }}
                             />
                           </>
                         )}
@@ -248,7 +291,9 @@ const EditPublicationModal = ({
                     t={t}
                     onFileChange={handleFileChange}
                     onRemoveMedia={handleRemoveMedia}
-                    onSetThumbnail={(tempId, file) => setThumbnail(tempId, file)}
+                    onSetThumbnail={(tempId, file) =>
+                      setThumbnail(tempId, file)
+                    }
                     onClearThumbnail={(tempId) => clearThumbnail(tempId)}
                     onDragOver={() => setIsDragOver(true)}
                     onDragLeave={() => setIsDragOver(false)}
@@ -257,7 +302,7 @@ const EditPublicationModal = ({
                       setIsDragOver(false);
                       handleFileChange(e.dataTransfer.files);
                     }}
-                    disabled={hasPublishedPlatform || isLockedByOther}
+                    disabled={hasPublishedPlatform || isDisabled}
                   />
                 )}
 
@@ -284,7 +329,7 @@ const EditPublicationModal = ({
                   publishedAccountIds={publishedAccountIds}
                   publishingAccountIds={publishingAccountIds}
                   error={errors.social_accounts?.message as string}
-                  disabled={isLockedByOther}
+                  disabled={isDisabled}
                 />
 
                 <ScheduleSection
@@ -292,9 +337,11 @@ const EditPublicationModal = ({
                   t={t}
                   onScheduleChange={(date) => setValue("scheduled_at", date)}
                   useGlobalSchedule={watched.use_global_schedule}
-                  onGlobalScheduleToggle={(val) => setValue("use_global_schedule", val)}
+                  onGlobalScheduleToggle={(val) =>
+                    setValue("use_global_schedule", val)
+                  }
                   error={errors.scheduled_at?.message as string}
-                  disabled={isLockedByOther}
+                  disabled={isDisabled}
                 />
 
                 {hasYouTubeAccount && (
@@ -310,12 +357,12 @@ const EditPublicationModal = ({
                         publication?.media_files?.find(
                           (m) =>
                             m.file_type === "video" ||
-                            m.mime_type?.startsWith("video/")
+                            m.mime_type?.startsWith("video/"),
                         )?.file_name
                       }
                       existingThumbnail={(() => {
                         const video = mediaFiles.find(
-                          (m) => m.type === "video"
+                          (m) => m.type === "video",
                         );
                         return video?.thumbnailUrl
                           ? { url: video.thumbnailUrl, id: video.id || 0 }
@@ -323,7 +370,7 @@ const EditPublicationModal = ({
                       })()}
                       onThumbnailChange={(file: File | null) => {
                         const video = mediaFiles.find(
-                          (m) => m.type === "video"
+                          (m) => m.type === "video",
                         );
                         if (video) {
                           if (file) {
@@ -335,7 +382,7 @@ const EditPublicationModal = ({
                       }}
                       onThumbnailDelete={() => {
                         const video = mediaFiles.find(
-                          (m) => m.type === "video"
+                          (m) => m.type === "video",
                         );
                         if (video) clearThumbnail(video.tempId);
                       }}
@@ -354,19 +401,25 @@ const EditPublicationModal = ({
                   campaigns={campaigns}
                   publication={publication}
                   onHashtagChange={handleHashtagChange}
-                  disabled={hasPublishedPlatform || isLockedByOther}
+                  disabled={hasPublishedPlatform || isDisabled}
                 />
+
+                {publication?.approval_logs &&
+                  publication.approval_logs.length > 0 && (
+                    <ApprovalHistorySection logs={publication.approval_logs} />
+                  )}
               </div>
             </div>
           </form>
         </div>
         <ModalFooter
           onClose={handleClose}
-          isSubmitting={isSubmitting || isLockedByOther}
+          isSubmitting={isSubmitting || isDisabled}
           formId="edit-publication-form"
           submitText={t("publications.button.edit") || "Edit Publication"}
           submitIcon={<Save className="w-4 h-4" />}
           cancelText={t("common.cancel") || "Close"}
+          hideSubmit={!canManage}
         />
 
         <PlatformSettingsModal
@@ -385,10 +438,9 @@ const EditPublicationModal = ({
             }
           }}
         />
-
       </div>
     </div>
   );
-}
+};
 
 export default memo(EditPublicationModal);

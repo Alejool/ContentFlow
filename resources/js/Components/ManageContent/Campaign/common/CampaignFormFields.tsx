@@ -10,6 +10,7 @@ interface CampaignFormFieldsProps {
   watched: any;
   t: (key: string) => string;
   mode?: "add" | "edit";
+  disabled?: boolean;
 }
 
 const CampaignFormFields: React.FC<CampaignFormFieldsProps> = ({
@@ -18,16 +19,17 @@ const CampaignFormFields: React.FC<CampaignFormFieldsProps> = ({
   watched,
   t,
   mode = "add",
+  disabled = false,
 }) => {
   const goalPlaceholder =
     mode === "edit"
-      ? t("campaigns.modal.edit.placeholders.goal") || "e.g. $1000.00"
-      : t("campaigns.modal.add.placeholders.goal") || "Campaign goal";
+      ? t("campaigns.modal.edit.placeholders.goal")
+      : t("campaigns.modal.add.placeholders.goal");
 
   const budgetPlaceholder =
     mode === "edit"
-      ? t("campaigns.modal.edit.placeholders.budget") || "e.g. $1000.00"
-      : t("campaigns.modal.add.placeholders.budget") || "Campaign budget";
+      ? t("campaigns.modal.edit.placeholders.budget")
+      : t("campaigns.modal.add.placeholders.budget");
 
   return (
     <>
@@ -37,13 +39,11 @@ const CampaignFormFields: React.FC<CampaignFormFieldsProps> = ({
           label={t("campaigns.modal.add.name") || "Campaign Name"}
           register={register}
           name="name"
-          placeholder={
-            t("campaigns.modal.add.placeholders.name") ||
-            "e.g. Summer Sale 2024"
-          }
+          placeholder={t("campaigns.modal.add.placeholders.name")}
           sizeType="lg"
           variant="filled"
           error={errors.name?.message as string}
+          disabled={disabled}
         />
       </div>
 
@@ -61,7 +61,8 @@ const CampaignFormFields: React.FC<CampaignFormFieldsProps> = ({
           size="lg"
           maxLength={200}
           showCharCount
-          hint="Maximum 200 characters"
+          hint={t("campaigns.modal.add.placeholders.description_hint")}
+          disabled={disabled}
         />
       </div>
 
@@ -71,8 +72,8 @@ const CampaignFormFields: React.FC<CampaignFormFieldsProps> = ({
             id="goal"
             label={
               mode === "edit"
-                ? t("campaigns.modal.edit.goal") || "Goal"
-                : t("campaigns.modal.add.goal") || "Goal"
+                ? t("campaigns.modal.edit.goal")
+                : t("campaigns.modal.add.goal")
             }
             register={register}
             name="goal"
@@ -82,6 +83,7 @@ const CampaignFormFields: React.FC<CampaignFormFieldsProps> = ({
             variant="filled"
             sizeType="lg"
             hint={`${watched.goal?.length || 0}/200 characters`}
+            disabled={disabled}
           />
         </div>
 
@@ -90,8 +92,8 @@ const CampaignFormFields: React.FC<CampaignFormFieldsProps> = ({
             id="budget"
             label={
               mode === "edit"
-                ? t("campaigns.modal.edit.budget") || "Budget"
-                : t("campaigns.modal.add.budget") || "Budget"
+                ? t("campaigns.modal.edit.budget")
+                : t("campaigns.modal.add.budget")
             }
             type="number"
             register={register}
@@ -101,6 +103,7 @@ const CampaignFormFields: React.FC<CampaignFormFieldsProps> = ({
             icon={Target}
             variant="filled"
             sizeType="lg"
+            disabled={disabled}
           />
         </div>
       </div>

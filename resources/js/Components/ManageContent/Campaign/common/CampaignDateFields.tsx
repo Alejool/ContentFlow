@@ -10,6 +10,7 @@ interface CampaignDateFieldsProps {
   setValue: UseFormSetValue<any>;
   watch: (name?: string) => any;
   t: (key: string) => string;
+  disabled?: boolean;
 }
 
 const CampaignDateFields: React.FC<CampaignDateFieldsProps> = ({
@@ -19,6 +20,7 @@ const CampaignDateFields: React.FC<CampaignDateFieldsProps> = ({
   setValue,
   watch,
   t,
+  disabled = false,
 }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -27,17 +29,14 @@ const CampaignDateFields: React.FC<CampaignDateFieldsProps> = ({
           register={undefined}
           name="start_date"
           error={errors.start_date?.message as string}
-          label={t("campaigns.modal.add.startDate") || "Start Date"}
+          label={t("campaigns.modal.add.startDate")}
           selected={startDate ? new Date(startDate) : null}
           onChange={(date: Date | null) =>
             setValue("start_date", date ? format(date, "yyyy-MM-dd") : "", {
               shouldValidate: true,
             })
           }
-          placeholder={
-            t("campaigns.modal.add.placeholders.startDate") ||
-            "Select start date"
-          }
+          placeholder={t("campaigns.modal.add.placeholders.startDate")}
           size="lg"
           variant="filled"
           withPortal
@@ -49,16 +48,14 @@ const CampaignDateFields: React.FC<CampaignDateFieldsProps> = ({
           register={undefined}
           name="end_date"
           error={errors.end_date?.message as string}
-          label={t("campaigns.modal.add.endDate") || "End Date"}
+          label={t("campaigns.modal.add.endDate")}
           selected={endDate ? new Date(endDate) : null}
           onChange={(date: Date | null) =>
             setValue("end_date", date ? format(date, "yyyy-MM-dd") : "", {
               shouldValidate: true,
             })
           }
-          placeholder={
-            t("campaigns.modal.add.placeholders.endDate") || "End Date"
-          }
+          placeholder={t("campaigns.modal.add.placeholders.endDate")}
           minDate={
             watch("start_date") ? new Date(watch("start_date")!) : undefined
           }
