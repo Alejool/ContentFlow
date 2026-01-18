@@ -3,8 +3,49 @@
     "title": "Publications",
     "subtitle": "Manage your publications",
     "modal": {
-      "view": {
-        "title": "Detailed View"
+      "show": {
+        "title": "Detailed View",
+        "subtitle": "View the campaign details",
+        "goal": "Goal",
+        "status": "Status",
+        "campaigns": "Campaigns",
+        "budget": "Budget",
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "publishDate": "Publish Date",
+        "publishedOn": "Published On",
+        "publications": "Publications",
+        "associatedPublications": "Associated Publications",
+        "accountMissingTitle": "Account Disconnected",
+        "accountMissingText": "This publication was posted on an account ({{account}}) that is no longer connected. Editing it will create a new version for your current account(s). Proceed?",
+        "created": "Created",
+        "lastUpdated": "Last Updated",
+        "selectSocialAccounts": "Select Accounts",
+        "lockedBySession": "Locked by Session",
+        "dragDrop": {
+          "title": "Drag and drop to sort",
+          "subtitle": "Upload your multimedia files here"
+        },
+        "placeholders": {
+          "title": "Title",
+          "description": "Description",
+          "hashtags": "Hashtags",
+          "schedulePublication": "Schedule Publication",
+          "goal": "Goal",
+          "startDate": "12/12/2025",
+          "endDate": "12/12/2026"
+        },
+        "button": {
+          "save": "Update",
+          "cancel": "Cancel"
+        },
+        "contentLocked": "Content Locked",
+        "contentLockedHint": "To edit the content (title, description or files), you must unpublish the post from all platforms.",
+        "lockedByOther": "Post locked by another user",
+        "locking": {
+          "sessionMessage": "You have this publication open on <1>{{browser}}</1>. Close the other session to edit here.",
+          "userMessage": "{{user}} is editing this publication <1>from {{browser}}</1>. Your changes cannot be saved to avoid conflicts."
+        }
       },
       "add": {
         "title": "Add Publication",

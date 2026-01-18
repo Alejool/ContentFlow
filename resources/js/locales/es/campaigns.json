@@ -55,11 +55,71 @@
     },
     "modal": {
       "add": {
-        "name": "Nombre de la Campaña",
+        "title": "Crear Campaña",
+        "subtitle": "Puedes crear una campaña para organizar y publicar tu contenido.",
+        "name": "Nombre de la campaña",
+        "description": "Descripción",
+        "goal": "Objetivo",
+        "budget": "Presupuesto",
+        "startDate": "Fecha de Inicio",
+        "endDate": "Fecha de Fin",
+        "publications": "Publicaciones",
+        "loadingPublications": "Cargando publicaciones...",
+        "noPublications": "No se encontraron publicaciones. ¡Crea algunas primero!",
+        "associatedPublicationsRequired": "Se requiere asociar al menos una publicación",
+        "status": "Estado",
+        "media": "Archivos",
         "placeholders": {
-          "name": "Ej: Campaña de Verano"
+          "name": "Ej: Campaña de Verano",
+          "description": "Breve descripción de la campaña",
+          "description_hint": "Máximo 200 caracteres",
+          "goal": "Ej: Aumentar el alcance en redes sociales",
+          "budget": "Ej: 1000.00",
+          "startDate": "Seleccionar fecha de inicio",
+          "endDate": "Seleccionar fecha de fin"
         }
+      },
+      "edit": {
+        "title": "Editar Campaña",
+        "subtitle": "Actualiza la información de tu campaña.",
+        "name": "Nombre de la campaña",
+        "description": "Descripción",
+        "goal": "Objetivo",
+        "budget": "Presupuesto",
+        "startDate": "Fecha de Inicio",
+        "endDate": "Fecha de Fin",
+        "associatedPublications": "Publicaciones Asociadas",
+        "noPublications": "No se encontraron publicaciones.",
+        "placeholders": {
+          "goal": "Ej: $1000.00",
+          "budget": "Ej: $1000.00"
+        }
+      },
+      "view": {
+        "title": "Ver Campaña",
+        "associatedPublications": "Publicaciones Asociadas",
+        "goal": "Objetivo",
+        "hashtags": "Hashtags",
+        "startDate": "Fecha de Inicio",
+        "endDate": "Fecha de Fin",
+        "publishedOn": "Publicado el",
+        "created": "Creado",
+        "lastUpdated": "Última Actualización"
+      },
+      "validation": {
+        "nameRequired": "El nombre es requerido",
+        "nameLength": "El nombre debe tener menos de 100 caracteres",
+        "descriptionRequired": "La descripción es requerida",
+        "descriptionLength": "La descripción debe tener menos de 255 caracteres",
+        "goalRequired": "El objetivo es requerido",
+        "budgetRequired": "El presupuesto es requerido",
+        "startDateRequired": "La fecha de inicio es requerida",
+        "endDateRequired": "La fecha de fin es requerida"
       }
+    },
+    "button": {
+      "add": "Crear Campaña",
+      "edit": "Guardar Cambios"
     }
   }
 }

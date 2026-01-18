@@ -55,11 +55,71 @@
     },
     "modal": {
       "add": {
+        "title": "Create Campaign",
+        "subtitle": "You can create a campaign to organize and publish your content.",
         "name": "Campaign Name",
+        "description": "Description",
+        "goal": "Goal",
+        "budget": "Budget",
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "publications": "Publications",
+        "loadingPublications": "Loading publications...",
+        "noPublications": "No publications found. Create some first!",
+        "associatedPublicationsRequired": "Associated Publications is required",
+        "status": "Status",
+        "media": "Media",
         "placeholders": {
-          "name": "e.g. Summer Campaign"
+          "name": "e.g. Summer Campaign",
+          "description": "Brief campaign description",
+          "description_hint": "Maximum 200 characters",
+          "goal": "e.g. Increase social media reach",
+          "budget": "e.g. 1000.00",
+          "startDate": "Select start date",
+          "endDate": "Select end date"
         }
+      },
+      "edit": {
+        "title": "Edit Campaign",
+        "subtitle": "Update your campaign information.",
+        "name": "Campaign Name",
+        "description": "Description",
+        "goal": "Goal",
+        "budget": "Budget",
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "associatedPublications": "Associated Publications",
+        "noPublications": "No publications found.",
+        "placeholders": {
+          "goal": "e.g. $1000.00",
+          "budget": "e.g. $1000.00"
+        }
+      },
+      "view": {
+        "title": "View Campaign",
+        "associatedPublications": "Associated Publications",
+        "goal": "Goal",
+        "hashtags": "Hashtags",
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "publishedOn": "Published On",
+        "created": "Created",
+        "lastUpdated": "Last Updated"
+      },
+      "validation": {
+        "nameRequired": "Name is required",
+        "nameLength": "Name must be less than 100 characters",
+        "descriptionRequired": "Description is required",
+        "descriptionLength": "Description must be less than 255 characters",
+        "goalRequired": "Goal is required",
+        "budgetRequired": "Budget is required",
+        "startDateRequired": "Start date is required",
+        "endDateRequired": "End date is required"
       }
+    },
+    "button": {
+      "add": "Create Campaign",
+      "edit": "Save Changes"
     }
   }
 }
