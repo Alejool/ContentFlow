@@ -1,19 +1,18 @@
-import React, { useState, useCallback, useMemo, useEffect, useTransition } from "react";
-import { usePage, Head } from "@inertiajs/react";
 import LogsList from "@/Components/ManageContent/Logs/LogsList";
 import ModalManager from "@/Components/ManageContent/ModalManager";
-import { usePublicationStore } from "@/stores/publicationStore";
 import SocialMediaAccounts from "@/Components/ManageContent/socialAccount/SocialMediaAccounts";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Copy, Plus, Folder, Filter, Calendar as CalendarIcon, FileClock, CheckCircle, Edit3, Target, FileText } from "lucide-react";
+import { usePublicationStore } from "@/stores/publicationStore";
+import { Head, usePage } from "@inertiajs/react";
+import { Calendar as CalendarIcon, CheckCircle, Edit3, FileText, Folder, Plus, Target } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
 
-import { usePublications, ManageContentTab } from "@/Hooks/publication/usePublications";
-import WorkspaceInfoBadge from "@/Components/Workspace/WorkspaceInfoBadge";
+import ApprovalList from "@/Components/ManageContent/ApprovalList";
+import ContentList from "@/Components/ManageContent/ContentList";
 import ModernCalendar from "@/Components/ManageContent/Partials/ModernCalendar";
+import { ManageContentTab, usePublications } from "@/Hooks/publication/usePublications";
 import { useManageContentUIStore } from "@/stores/manageContentUIStore";
 import { useShallow } from "zustand/react/shallow";
-import ContentList from "@/Components/ManageContent/ContentList";
-import ApprovalList from "@/Components/ManageContent/ApprovalList";
 
 export default function ManageContentPage() {
   const { auth } = usePage<any>().props;

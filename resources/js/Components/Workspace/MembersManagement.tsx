@@ -31,7 +31,7 @@ export default function MembersManagement({
     try {
       setIsLoading(true);
       const response = await axios.get(
-        route("workspaces.members", current_workspace.id)
+        route("workspaces.members", current_workspace.id),
       );
       setMembers(response.data.members || []);
     } catch (error) {
@@ -57,7 +57,7 @@ export default function MembersManagement({
   }, {});
 
   const currentUser = members.find(
-    (u: any) => Number(u.id) === Number(auth.user.id)
+    (u: any) => Number(u.id) === Number(auth.user.id),
   );
   const userRoleSlug =
     currentUser?.pivot?.role?.slug || currentUser?.role?.slug;
@@ -75,7 +75,7 @@ export default function MembersManagement({
         }),
         {
           role_id: newRoleId,
-        }
+        },
       );
       toast.success(t("workspace.invite_modal.messages.success"));
       fetchMembers();
@@ -94,7 +94,7 @@ export default function MembersManagement({
         route("workspaces.members.remove", {
           workspace: current_workspace.id,
           user: userId,
-        })
+        }),
       );
       toast.success(t("workspace.invite_modal.messages.success"));
       fetchMembers();
@@ -106,7 +106,7 @@ export default function MembersManagement({
 
   const stats = [
     {
-      label: t("workspace.total_members"),
+      label: t("workspace.stats.total_members"),
       value: members.length,
       icon: Users,
       color: "text-primary-600",

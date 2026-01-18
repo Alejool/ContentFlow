@@ -592,45 +592,6 @@ export default function Dashboard({
             ></div>
           </Link>
         </div>
-
-        {stats.campaigns.length === 0 && (
-          <div
-            className={`rounded-lg p-12 text-center transition-colors duration-300 ${getCardBg()}`}
-          >
-            <div className="max-w-md mx-auto">
-              <div
-                className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${
-                  theme === "dark" ? "bg-blue-900/30" : "bg-blue-100"
-                }`}
-              >
-                <TrendingUp
-                  className={`w-8 h-8 ${
-                    theme === "dark" ? "text-blue-400" : "text-blue-600"
-                  }`}
-                />
-              </div>
-              <h3
-                className={`text-xl font-semibold mb-2 ${getTextColor(
-                  "title",
-                )}`}
-              >
-                {t("dashboard.emptyState.title")}
-              </h3>
-              <p className={`mb-6 ${getTextColor("secondary")}`}>
-                {t("dashboard.emptyState.message")}
-              </p>
-              <code
-                className={`px-4 py-2 rounded text-sm font-mono ${
-                  theme === "dark"
-                    ? "bg-neutral-800 text-gray-300"
-                    : "bg-gray-100 text-gray-700"
-                }`}
-              >
-                {t("dashboard.emptyState.command")}
-              </code>
-            </div>
-          </div>
-        )}
       </div>
     </AuthenticatedLayout>
   );

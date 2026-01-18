@@ -113,6 +113,7 @@ export default function Index({
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hoveredWorkspace, setHoveredWorkspace] = useState<number | null>(null);
+  const [openMenuId, setOpenMenuId] = useState<number | null>(null);
 
   const {
     register,
@@ -188,9 +189,13 @@ export default function Index({
           return (
             <div
               key={workspace.id}
-              className="group relative bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900/50 dark:to-neutral-900 border border-gray-200 dark:border-neutral-800 rounded-2xl p-6 transition-all duration-300 hover:border-primary-300 dark:hover:border-primary-500/30 hover:shadow-2xl hover:shadow-primary-600/10 hover:-translate-y-1"
+              className={`group relative bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900/50 dark:to-neutral-900 border border-gray-200 dark:border-neutral-800 rounded-2xl p-6 transition-all duration-300 hover:border-primary-300 dark:hover:border-primary-500/30 hover:shadow-2xl hover:shadow-primary-600/10 hover:-translate-y-1 ${
+                openMenuId === workspace.id ? "z-50 shadow-2xl" : "z-0"
+              }`}
               onMouseEnter={() => setHoveredWorkspace(workspace.id)}
-              onMouseLeave={() => setHoveredWorkspace(null)}
+              onMouseLeave={() => {
+                setHoveredWorkspace(null);
+              }}
             >
               {isActive && (
                 <div className="absolute -top-2 -right-2 px-3 py-1 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-xs font-bold rounded-full shadow-lg flex items-center gap-1.5">
@@ -283,8 +288,13 @@ export default function Index({
                   )}
 
                   <div className="relative">
-                    <Link
-                      href={route("workspaces.settings", workspace.id)}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setOpenMenuId(
+                          openMenuId === workspace.id ? null : workspace.id,
+                        );
+                      }}
                       className={`p-2.5 rounded-xl transition-all duration-200 ${
                         ["owner", "admin"].includes(userRole?.slug)
                           ? "text-gray-600 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gradient-to-r hover:from-primary-50 hover:to-primary-100 dark:hover:from-primary-900/20 dark:hover:to-primary-900/10 hover:shadow-sm"
@@ -301,42 +311,51 @@ export default function Index({
                       ) : (
                         <Info className="h-5 w-5" />
                       )}
-                    </Link>
+                    </button>
 
-                    {hoveredWorkspace === workspace.id && (
-                      <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 rounded-xl shadow-2xl z-10 py-2">
-                        <Link
-                          href={route("workspaces.show", workspace.id)}
-                          className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-neutral-800 text-gray-700 dark:text-neutral-300 transition-colors"
-                        >
-                          <ExternalLink className="h-4 w-4" />
-                          <span className="text-sm font-medium">
-                            {t("workspace.status.open")}
-                          </span>
-                        </Link>
-                        {["owner", "admin"].includes(userRole?.slug) && (
-                          <>
-                            <Link
-                              href={route("workspaces.settings", workspace.id)}
-                              className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-neutral-800 text-gray-700 dark:text-neutral-300 transition-colors"
-                            >
-                              <SettingsIcon className="h-4 w-4" />
-                              <span className="text-sm font-medium">
-                                {t("workspace.status.settings")}
-                              </span>
-                            </Link>
-                            <Link
-                              href={route("workspaces.members", workspace.id)}
-                              className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-neutral-800 text-gray-700 dark:text-neutral-300 transition-colors"
-                            >
-                              <UserPlus className="h-4 w-4" />
-                              <span className="text-sm font-medium">
-                                {t("workspace.status.invite")}
-                              </span>
-                            </Link>
-                          </>
-                        )}
-                      </div>
+                    {openMenuId === workspace.id && (
+                      <>
+                        <div
+                          className="fixed inset-0 z-40 bg-transparent"
+                          onClick={() => setOpenMenuId(null)}
+                        />
+                        <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 rounded-xl shadow-2xl z-50 py-2">
+                          <Link
+                            href={route("workspaces.show", workspace.id)}
+                            className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-neutral-800 text-gray-700 dark:text-neutral-300 transition-colors"
+                          >
+                            <ExternalLink className="h-4 w-4" />
+                            <span className="text-sm font-medium">
+                              {t("workspace.status.open")}
+                            </span>
+                          </Link>
+                          {["owner", "admin"].includes(userRole?.slug) && (
+                            <>
+                              <Link
+                                href={route(
+                                  "workspaces.settings",
+                                  workspace.id,
+                                )}
+                                className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-neutral-800 text-gray-700 dark:text-neutral-300 transition-colors"
+                              >
+                                <SettingsIcon className="h-4 w-4" />
+                                <span className="text-sm font-medium">
+                                  {t("workspace.status.settings")}
+                                </span>
+                              </Link>
+                              <Link
+                                href={`${route("workspaces.settings", workspace.id)}?tab=members`}
+                                className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-neutral-800 text-gray-700 dark:text-neutral-300 transition-colors"
+                              >
+                                <UserPlus className="h-4 w-4" />
+                                <span className="text-sm font-medium">
+                                  {t("workspace.status.invite")}
+                                </span>
+                              </Link>
+                            </>
+                          )}
+                        </div>
+                      </>
                     )}
                   </div>
                 </div>
