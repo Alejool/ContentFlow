@@ -198,16 +198,26 @@ class WorkspaceController extends Controller
       ], 422);
     }
 
+    // Send notification before detaching
+    $removedUser = \App\Models\User::find($userId);
+    if ($removedUser) {
+      $removedUser->notify(new \App\Notifications\WorkspaceRemovedNotification($workspace->name));
+    }
+
     $workspace->users()->detach($userId);
 
     // If removed user was using this workspace, switch them to another
-    $removedUser = \App\Models\User::find($userId);
-    if ($removedUser && $removedUser->current_workspace_id === $workspaceId) {
+    if ($removedUser && $removedUser->current_workspace_id === (int)$workspaceId) {
       $firstWorkspace = $removedUser->workspaces()->first();
       $removedUser->update(['current_workspace_id' => $firstWorkspace ? $firstWorkspace->id : null]);
     }
 
-    return response()->json(['success' => true]);
+    return response()->json([
+      'success' => true,
+      'message' => 'Member removed successfully',
+      'members' => $workspace->users()->select('users.id', 'users.name', 'users.email', 'users.photo_url', 'users.created_at')
+        ->withPivot('role_id', 'created_at')->get()
+    ]);
   }
 
   public function invite(Request $request, $workspaceId)

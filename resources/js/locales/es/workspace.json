@@ -19,6 +19,7 @@
     "settings_description": "Gestiona los miembros y configuraciones de tu espacio.",
     "no_description": "Sin descripción proporcionada.",
     "member": "Miembro",
+    "workspace_members": "Miembros del Espacio",
     "members": "Miembros",
     "members_one": "miembro",
     "members_other": "miembros",

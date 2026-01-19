@@ -1,5 +1,7 @@
 import InviteMemberModal from "@/Components/Workspace/InviteMemberModal";
+import Button from "@/Components/common/Modern/Button";
 import Select from "@/Components/common/Modern/Select";
+import ConfirmDialog from "@/Components/common/ui/ConfirmDialog";
 import { usePage } from "@inertiajs/react";
 import axios from "axios";
 import { Shield, Trash2, UserCog, UserPlus, Users } from "lucide-react";
@@ -24,6 +26,8 @@ export default function MembersManagement({
   const [members, setMembers] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
+  const [userToRemove, setUserToRemove] = useState<number | null>(null);
 
   const fetchMembers = async () => {
     if (!current_workspace?.id) return;
@@ -85,22 +89,32 @@ export default function MembersManagement({
     }
   };
 
-  const handleRemoveMember = async (userId: number) => {
-    if (!canManageMembers) return;
-    if (!confirm(t("workspace.remove_confirm"))) return;
+  const initiateRemoveMember = (userId: number) => {
+    setUserToRemove(userId);
+    setIsConfirmDialogOpen(true);
+  };
+
+  const handleRemoveMember = async () => {
+    if (!canManageMembers || !userToRemove) return;
 
     try {
-      await axios.delete(
+      const response = await axios.delete(
         route("workspaces.members.remove", {
           workspace: current_workspace.id,
-          user: userId,
+          user: userToRemove,
         }),
       );
       toast.success(t("workspace.invite_modal.messages.success"));
-      fetchMembers();
+      if (response.data.members) {
+        setMembers(response.data.members);
+      } else {
+        fetchMembers();
+      }
     } catch (error) {
       console.error("Failed to remove member", error);
       toast.error(t("workspace.invite_modal.messages.error"));
+    } finally {
+      setUserToRemove(null);
     }
   };
 
@@ -173,16 +187,16 @@ export default function MembersManagement({
             {t("workspace.workspace_members")}
           </h3>
           {canManageMembers && (
-            <button
+            <Button
               onClick={() => setIsInviteModalOpen(true)}
-              className="flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-xs md:text-sm font-bold shadow-sm"
+              size="sm"
+              icon={UserPlus}
             >
-              <UserPlus className="w-3 h-3 md:w-4 md:h-4" />
               <span className="hidden md:inline">
                 {t("workspace.invite_member")}
               </span>
               <span className="md:hidden">{t("workspace.invite")}</span>
-            </button>
+            </Button>
           )}
         </div>
 
@@ -259,13 +273,15 @@ export default function MembersManagement({
                   )}
 
                   {canManageMembers && !isMe && !isCreator && (
-                    <button
-                      onClick={() => handleRemoveMember(member.id)}
+                    <Button
+                      onClick={() => initiateRemoveMember(member.id)}
+                      variant="ghost"
+                      size="xs"
                       className="p-2 text-gray-400 hover:text-red-600 transition-colors rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 flex-shrink-0"
                       title={t("workspace.remove_member")}
                     >
                       <Trash2 className="h-4 w-4" />
-                    </button>
+                    </Button>
                   )}
                 </div>
               </div>
@@ -286,6 +302,17 @@ export default function MembersManagement({
         onSuccess={fetchMembers}
         roles={roles}
         workspace={current_workspace}
+      />
+
+      <ConfirmDialog
+        isOpen={isConfirmDialogOpen}
+        onClose={() => setIsConfirmDialogOpen(false)}
+        onConfirm={handleRemoveMember}
+        title={t("workspace.remove_member")}
+        message={t("workspace.remove_confirm")}
+        confirmText={t("common.confirm")}
+        cancelText={t("common.cancel")}
+        type="danger"
       />
     </div>
   );

@@ -20,4 +20,6 @@ return [
   'view_account' => 'Ver Cuenta',
   'try_account_disconnected' => 'Esta cuenta :account_name tiene :uniqueActivePosts publicaciones activas. Si la desconecta, no podrá eliminarlas automáticamente de :platform.',
   'account_not_found' => 'Cuenta no encontrada',
+  'workspace_removed' => 'Eliminado del espacio de trabajo',
+  'workspace_removed_description' => 'Has sido eliminado del espacio de trabajo ":workspace_name".',
 ];

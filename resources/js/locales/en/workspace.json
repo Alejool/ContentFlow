@@ -19,6 +19,7 @@
     "settings_description": "Manage your workspace members and configurations.",
     "no_description": "No description provided.",
     "member": "Member",
+    "workspace_members": "Workspace Members",
     "members": "Members",
     "members_one": "member",
     "members_other": "members",
