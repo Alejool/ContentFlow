@@ -17,7 +17,7 @@ interface DropDownContextType {
 }
 
 const DropDownContext = createContext<DropDownContextType | undefined>(
-  undefined
+  undefined,
 );
 
 interface DropdownProps {
@@ -106,11 +106,11 @@ const Content = ({
       leaveTo="opacity-0 scale-95"
     >
       <div
-        className={`absolute z-50 rounded-md shadow-xl ${alignmentClasses} ${widthClasses}`}
+        className={`absolute z-50 mt-2 rounded-xl shadow-2xl border border-gray-100 dark:border-neutral-700 ${alignmentClasses} ${widthClasses}`}
         onClick={() => setOpen(false)}
       >
         <div
-          className={`rounded-md ring-1 ring-black ring-opacity-5
+          className={`rounded-xl ring-1 ring-black ring-opacity-5 overflow-hidden
                         ${contentClasses}`}
         >
           {children}
