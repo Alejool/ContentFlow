@@ -110,7 +110,7 @@ export default function SocialConfig({
           toast.error(t("platformSettings.error"));
           setIsSaving(false);
         },
-      }
+      },
     );
   };
 
@@ -148,7 +148,7 @@ export default function SocialConfig({
             disabled={isSaving || !hasChanges}
             className={`
               inline-flex items-center gap-3 px-6 py-3
-              rounded-xl font-semibold transition-all
+              rounded-lg font-semibold transition-all
               ${
                 hasChanges
                   ? "bg-primary-600 hover:bg-primary-700 text-white shadow-lg shadow-primary-500/30 hover:shadow-xl"
@@ -172,7 +172,7 @@ export default function SocialConfig({
 
       <div className="px-4 sm:px-6">
         <div className="mb-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="bg-white dark:bg-neutral-900 p-4 rounded-xl border border-gray-200 dark:border-neutral-800">
+          <div className="bg-white dark:bg-neutral-900 p-4 rounded-lg border border-gray-200 dark:border-neutral-800">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-green-50 dark:bg-green-900/10 rounded-lg">
                 <CheckCircle className="w-5 h-5 text-green-500" />
@@ -186,7 +186,7 @@ export default function SocialConfig({
                     platforms.filter(
                       (p) =>
                         Object.keys(globalSettings[p.id.toLowerCase()] || {})
-                          .length > 0
+                          .length > 0,
                     ).length
                   }
                   <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
@@ -197,7 +197,7 @@ export default function SocialConfig({
             </div>
           </div>
 
-          <div className="bg-white dark:bg-neutral-900 p-4 rounded-xl border border-gray-200 dark:border-neutral-800">
+          <div className="bg-white dark:bg-neutral-900 p-4 rounded-lg border border-gray-200 dark:border-neutral-800">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-yellow-50 dark:bg-yellow-900/10 rounded-lg">
                 <Settings2 className="w-5 h-5 text-yellow-500" />
@@ -209,14 +209,14 @@ export default function SocialConfig({
                 <p className="text-lg font-bold text-gray-900 dark:text-white">
                   {Object.values(globalSettings).reduce(
                     (acc, settings) => acc + Object.keys(settings || {}).length,
-                    0
+                    0,
                   )}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white dark:bg-neutral-900 p-4 rounded-xl border border-gray-200 dark:border-neutral-800">
+          <div className="bg-white dark:bg-neutral-900 p-4 rounded-lg border border-gray-200 dark:border-neutral-800">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-blue-50 dark:bg-blue-900/10 rounded-lg">
                 <div className="w-5 h-5 flex items-center justify-center">
@@ -263,7 +263,7 @@ export default function SocialConfig({
                 <div
                   className={`
                   bg-white dark:bg-neutral-900
-                  rounded-xl border ${platform.borderColor}
+                  rounded-lg border ${platform.borderColor}
                   p-5 transition-all duration-200
                   hover:shadow-lg hover:-translate-y-0.5
                   hover:border-opacity-50 dark:hover:border-opacity-50
@@ -319,7 +319,7 @@ export default function SocialConfig({
                           .map(([key, value]) => {
                             const label = t(
                               `modal.platformSettings.labels.${key}`,
-                              { defaultValue: key.replace(/_/g, " ") }
+                              { defaultValue: key.replace(/_/g, " ") },
                             );
 
                             let displayValue = String(value);
@@ -329,7 +329,7 @@ export default function SocialConfig({
                                 : t("common.no");
                             } else if (typeof value === "string") {
                               const platformTranslation = t(
-                                `modal.platformSettings.${platform.id}.${value}`
+                                `modal.platformSettings.${platform.id}.${value}`,
                               );
                               if (
                                 platformTranslation !==

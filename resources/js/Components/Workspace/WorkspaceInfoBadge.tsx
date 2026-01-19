@@ -26,7 +26,7 @@ export default function WorkspaceInfoBadge({
     <Link
       href={route("workspaces.index")}
       className={`
-                group inline-flex items-center gap-3 px-3 py-2 rounded-xl transition-all duration-300
+                group inline-flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-300
                 bg-white/90 hover:bg-white dark:bg-neutral-900/95 dark:hover:bg-neutral-900
                 border border-gray-200 dark:border-neutral-700/50
                 shadow-md hover:shadow-xl hover:shadow-primary-600/15 hover:border-primary-500/60

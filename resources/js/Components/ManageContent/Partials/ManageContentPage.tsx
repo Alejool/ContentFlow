@@ -267,7 +267,7 @@ export default function ManageContentPage() {
                 </span>
               </button>
             ) : (
-              <div className="flex items-center gap-2 px-4 py-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 rounded-xl animate-in fade-in slide-in-from-right-4">
+              <div className="flex items-center gap-2 px-4 py-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 rounded-lg animate-in fade-in slide-in-from-right-4">
                 <AlertCircle className="w-4 h-4 text-amber-500" />
                 <span className="text-xs font-bold text-amber-700 dark:text-amber-400">
                   Tu rol solo permite ver el contenido
@@ -283,7 +283,7 @@ export default function ManageContentPage() {
             <div className="inline-flex items-center p-1.5 rounded-2xl bg-gray-100/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 gap-1 overflow-x-auto max-w-full scrollbar-hide">
               <button
                 onClick={() => handleTabChange("publications")}
-                className={`flex items-center justify-center gap-2 py-2.5 px-5 rounded-xl text-sm font-bold transition-all duration-200 whitespace-nowrap ${
+                className={`flex items-center justify-center gap-2 py-2.5 px-5 rounded-lg text-sm font-bold transition-all duration-200 whitespace-nowrap ${
                   activeTab === "publications"
                     ? "bg-white dark:bg-neutral-800 text-primary-600 dark:text-primary-400 shadow-sm shadow-gray-200/50 dark:shadow-none ring-1 ring-black/5 dark:ring-white/10"
                     : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-200/50 dark:hover:bg-gray-700/50"
@@ -296,7 +296,7 @@ export default function ManageContentPage() {
               </button>
               <button
                 onClick={() => handleTabChange("campaigns")}
-                className={`flex items-center justify-center gap-2 py-2.5 px-5 rounded-xl text-sm font-bold transition-all duration-200 whitespace-nowrap ${
+                className={`flex items-center justify-center gap-2 py-2.5 px-5 rounded-lg text-sm font-bold transition-all duration-200 whitespace-nowrap ${
                   activeTab === "campaigns"
                     ? "bg-white dark:bg-neutral-800 text-primary-600 dark:text-primary-400 shadow-sm shadow-gray-200/50 dark:shadow-none ring-1 ring-black/5 dark:ring-white/10"
                     : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-200/50 dark:hover:bg-gray-700/50"
@@ -309,7 +309,7 @@ export default function ManageContentPage() {
               </button>
               <button
                 onClick={() => handleTabChange("calendar")}
-                className={`flex items-center justify-center gap-2 py-2.5 px-5 rounded-xl text-sm font-bold transition-all duration-200 whitespace-nowrap ${
+                className={`flex items-center justify-center gap-2 py-2.5 px-5 rounded-lg text-sm font-bold transition-all duration-200 whitespace-nowrap ${
                   activeTab === "calendar"
                     ? "bg-white dark:bg-neutral-800 text-primary-600 dark:text-primary-400 shadow-sm shadow-gray-200/50 dark:shadow-none ring-1 ring-black/5 dark:ring-white/10"
                     : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-200/50 dark:hover:bg-gray-700/50"
@@ -322,7 +322,7 @@ export default function ManageContentPage() {
               </button>
               <button
                 onClick={() => handleTabChange("logs")}
-                className={`flex items-center justify-center gap-2 py-2.5 px-5 rounded-xl text-sm font-bold transition-all duration-200 whitespace-nowrap ${
+                className={`flex items-center justify-center gap-2 py-2.5 px-5 rounded-lg text-sm font-bold transition-all duration-200 whitespace-nowrap ${
                   activeTab === "logs"
                     ? "bg-white dark:bg-neutral-800 text-primary-600 dark:text-primary-400 shadow-sm shadow-gray-200/50 dark:shadow-none ring-1 ring-black/5 dark:ring-white/10"
                     : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-200/50 dark:hover:bg-gray-700/50"
@@ -336,7 +336,7 @@ export default function ManageContentPage() {
               {permissions.includes("approve") && (
                 <button
                   onClick={() => handleTabChange("approvals")}
-                  className={`flex items-center justify-center gap-2 py-2.5 px-5 rounded-xl text-sm font-bold transition-all duration-200 whitespace-nowrap ${
+                  className={`flex items-center justify-center gap-2 py-2.5 px-5 rounded-lg text-sm font-bold transition-all duration-200 whitespace-nowrap ${
                     activeTab === "approvals"
                       ? "bg-white dark:bg-neutral-800 text-primary-600 dark:text-primary-400 shadow-sm shadow-gray-200/50 dark:shadow-none ring-1 ring-black/5 dark:ring-white/10"
                       : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-200/50 dark:hover:bg-gray-700/50"
@@ -365,7 +365,7 @@ export default function ManageContentPage() {
               <div className="animate-in fade-in zoom-in duration-300">
                 <ApprovalStats refreshTrigger={refreshTrigger} />
 
-                <div className="bg-white dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 overflow-hidden">
+                <div className="bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 overflow-hidden">
                   {/* Tabs */}
                   <div className="border-b border-gray-200 dark:border-neutral-700">
                     <div className="flex">
@@ -430,7 +430,7 @@ export default function ManageContentPage() {
             {(activeTab === "publications" || activeTab === "campaigns") && (
               <div className="animate-in fade-in zoom-in duration-300">
                 {activeTab === "publications" && (
-                  <div className="flex items-center gap-3 mb-6 bg-gray-50 dark:bg-gray-800/50 p-2 rounded-xl border border-gray-100 dark:border-gray-700 w-full sm:w-fit overflow-x-auto scrollbar-subtle">
+                  <div className="flex items-center gap-3 mb-6 bg-gray-50 dark:bg-gray-800/50 p-2 rounded-lg border border-gray-100 dark:border-gray-700 w-full sm:w-fit overflow-x-auto scrollbar-subtle">
                     {statusTabs.map(
                       (tab: { id: string; label: string; icon: any }) => (
                         <button

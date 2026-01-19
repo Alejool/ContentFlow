@@ -154,7 +154,7 @@ export default function IntegrationsSettingsTab({
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-4">
             <div
-              className={`h-12 w-12 rounded-xl bg-gradient-to-br ${color} flex items-center justify-center`}
+              className={`h-12 w-12 rounded-lg bg-gradient-to-br ${color} flex items-center justify-center`}
             >
               <Icon className="h-6 w-6 text-white" />
             </div>

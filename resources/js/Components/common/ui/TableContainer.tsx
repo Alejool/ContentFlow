@@ -17,7 +17,7 @@ export default function TableContainer({
 }: TableContainerProps) {
   return (
     <div
-      className={`rounded-xl shadow-lg border transition-all duration-300 backdrop-blur-lg bg-white/70 border-gray-100/70 text-gray-900 dark:bg-neutral-800/70 dark:border-neutral-700/70 dark:text-white ${className}`}
+      className={`rounded-lg shadow-lg border transition-all duration-300 backdrop-blur-lg bg-white/70 border-gray-100/70 text-gray-900 dark:bg-neutral-800/70 dark:border-neutral-700/70 dark:text-white ${className}`}
     >
       {(title || subtitle || actions) && (
         <div className="p-4 sm:p-6 border-b border-gray-100 dark:border-neutral-700/50 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">

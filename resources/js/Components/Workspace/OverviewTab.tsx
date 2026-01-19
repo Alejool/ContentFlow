@@ -111,7 +111,7 @@ export default function OverviewTab({
               key={action.label}
               onClick={action.action}
               disabled={loading}
-              className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-950 border border-gray-200 dark:border-neutral-800 rounded-xl p-5 text-left transition-all duration-300 hover:border-primary-300 dark:hover:border-primary-700 hover:shadow-lg hover:-translate-y-1 group disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-950 border border-gray-200 dark:border-neutral-800 rounded-lg p-5 text-left transition-all duration-300 hover:border-primary-300 dark:hover:border-primary-700 hover:shadow-lg hover:-translate-y-1 group disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <div
                 className={`h-12 w-12 rounded-lg ${action.color} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}

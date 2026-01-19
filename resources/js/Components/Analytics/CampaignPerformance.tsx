@@ -35,7 +35,7 @@ export default function CampaignPerformance({
 
       // Check if any publication matches the search term
       const matchesPublications = campaign.publications.some((pub) =>
-        pub.title.toLowerCase().includes(term)
+        pub.title.toLowerCase().includes(term),
       );
 
       return matchesCampaign || matchesPublications;
@@ -98,7 +98,7 @@ export default function CampaignPerformance({
 
   return (
     <div
-      className={`rounded-xl p-6 mb-8 transition-colors duration-300
+      className={`rounded-lg p-6 mb-8 transition-colors duration-300
             ${
               theme === "dark"
                 ? "bg-neutral-800/50 backdrop-blur-sm border border-neutral-700/50"

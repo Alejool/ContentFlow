@@ -21,7 +21,7 @@ export default function StatCard({
   color = "blue",
 }: StatCardProps) {
   return (
-    <div className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-950 border border-gray-200 dark:border-neutral-800 rounded-xl p-4 transition-all duration-300 hover:shadow-lg hover:border-gray-300 dark:hover:border-neutral-700">
+    <div className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-950 border border-gray-200 dark:border-neutral-800 rounded-lg p-4 transition-all duration-300 hover:shadow-lg hover:border-gray-300 dark:hover:border-neutral-700">
       <div className="flex items-start justify-between">
         <div>
           <div

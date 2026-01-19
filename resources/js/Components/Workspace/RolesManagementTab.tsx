@@ -20,7 +20,7 @@ export default function RolesManagementTab({
     <div className="space-y-6">
       <div className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-950 border border-gray-200 dark:border-neutral-800 rounded-2xl p-6">
         <div className="flex items-center gap-3 mb-6">
-          <div className="h-12 w-12 bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl flex items-center justify-center">
+          <div className="h-12 w-12 bg-gradient-to-br from-amber-500 to-orange-500 rounded-lg flex items-center justify-center">
             <Shield className="h-6 w-6 text-white" />
           </div>
           <div>
@@ -43,7 +43,7 @@ export default function RolesManagementTab({
             return (
               <div
                 key={role.id}
-                className={`border rounded-xl p-5 transition-all duration-300 hover:shadow-lg ${
+                className={`border rounded-lg p-5 transition-all duration-300 hover:shadow-lg ${
                   isCurrentRole
                     ? "border-primary-300 dark:border-primary-700 bg-gradient-to-br from-primary-50 to-white dark:from-primary-900/10 dark:to-neutral-950"
                     : "border-gray-200 dark:border-neutral-800 bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-950"

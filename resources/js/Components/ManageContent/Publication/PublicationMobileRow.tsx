@@ -165,7 +165,7 @@ const PublicationMobileRow = memo(
                 {/* Thumbnail with media preview */}
                 <div className="relative flex-shrink-0">
                   {hasMedia(item) && mediaUrl ? (
-                    <div className="w-16 h-16 rounded-xl border border-gray-200 dark:border-neutral-700 bg-gray-100 dark:bg-neutral-800 overflow-hidden shadow-sm">
+                    <div className="w-16 h-16 rounded-lg border border-gray-200 dark:border-neutral-700 bg-gray-100 dark:bg-neutral-800 overflow-hidden shadow-sm">
                       <img
                         src={mediaUrl}
                         alt={item.title || "Preview"}
@@ -200,7 +200,7 @@ const PublicationMobileRow = memo(
                       )}
                     </div>
                   ) : (
-                    <div className="w-16 h-16 rounded-xl border border-dashed border-gray-300 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-900/30 flex items-center justify-center shadow-sm">
+                    <div className="w-16 h-16 rounded-lg border border-dashed border-gray-300 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-900/30 flex items-center justify-center shadow-sm">
                       <div className="text-center">
                         <ImageIcon className="w-6 h-6 text-gray-300 dark:text-neutral-700 mx-auto" />
                       </div>
@@ -289,7 +289,7 @@ const PublicationMobileRow = memo(
                     e.stopPropagation();
                     onViewDetails?.(item);
                   }}
-                  className="flex-1 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 font-medium text-xs flex items-center justify-center gap-2 transition-colors"
+                  className="flex-1 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 font-medium text-xs flex items-center justify-center gap-2 transition-colors"
                   title="Ver detalles"
                 >
                   <Eye className="w-4 h-4" />
@@ -321,7 +321,7 @@ const PublicationMobileRow = memo(
                       isLoading?.editing ||
                       isLoading?.deleting
                     }
-                    className="flex-1 py-2 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-medium text-xs flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm"
+                    className="flex-1 py-2 rounded-lg bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-medium text-xs flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm"
                     title="Publicar"
                   >
                     {isLoading?.publishing ? (
@@ -341,7 +341,7 @@ const PublicationMobileRow = memo(
                       e.stopPropagation();
                       onPublish?.(item);
                     }}
-                    className="flex-1 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-medium text-xs flex items-center justify-center gap-2 transition-colors shadow-sm"
+                    className="flex-1 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-medium text-xs flex items-center justify-center gap-2 transition-colors shadow-sm"
                     title="Solicitar aprobación"
                   >
                     <Clock className="w-4 h-4" />
@@ -468,7 +468,7 @@ const PublicationMobileRow = memo(
                             isLoading?.deleting ||
                             !!remoteLocks[item.id]
                           }
-                          className={`flex-1 py-2.5 rounded-xl font-medium text-xs flex items-center justify-center gap-2 transition-colors active:scale-95 ${
+                          className={`flex-1 py-2.5 rounded-lg font-medium text-xs flex items-center justify-center gap-2 transition-colors active:scale-95 ${
                             remoteLocks[item.id]
                               ? "bg-gray-200 text-gray-400 dark:bg-gray-800 dark:text-gray-500 cursor-not-allowed"
                               : "bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/30"
@@ -518,7 +518,7 @@ const PublicationMobileRow = memo(
                               isLoading?.editing ||
                               isLoading?.deleting
                             }
-                            className="flex-1 py-2.5 rounded-xl bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/30 font-medium text-xs flex items-center justify-center gap-2 transition-colors active:scale-95 disabled:opacity-50"
+                            className="flex-1 py-2.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/30 font-medium text-xs flex items-center justify-center gap-2 transition-colors active:scale-95 disabled:opacity-50"
                             title="Eliminar"
                           >
                             {isLoading?.deleting ? (

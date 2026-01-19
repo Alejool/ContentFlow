@@ -1,8 +1,6 @@
 import ModernButton from "@/Components/common/Modern/Button.js";
-import ModernCard from "@/Components/common/Modern/Card.js";
 import ModernInput from "@/Components/common/Modern/Input.js";
 import { useUpdatePassword } from "@/Hooks/profile/useUpdatePassword.js";
-import { useTheme } from "@/Hooks/useTheme";
 import { Transition } from "@headlessui/react";
 import { AlertTriangle, Check, Key, Lock, Shield } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -37,7 +35,7 @@ const SuccessAlert = ({ show, t }: SuccessAlertProps) => (
     leaveTo="translate-y-2 opacity-0"
   >
     <div className="flex items-center gap-4 p-5 rounded-2xl mb-8 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800/50 shadow-sm">
-      <div className="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center bg-green-100 dark:bg-green-800/40">
+      <div className="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center bg-green-100 dark:bg-green-800/40">
         <CheckIcon className="w-6 h-6 text-green-600 dark:text-green-400" />
       </div>
       <div>
@@ -55,13 +53,8 @@ const SuccessAlert = ({ show, t }: SuccessAlertProps) => (
 const UpdatePasswordForm = ({ className = "" }: UpdatePasswordFormProps) => {
   const { t } = useTranslation();
 
-  const {
-    register,
-    handleSubmit,
-    errors,
-    isSubmitting,
-    isSuccess,
-  } = useUpdatePassword();
+  const { register, handleSubmit, errors, isSubmitting, isSuccess } =
+    useUpdatePassword();
 
   return (
     <div className={className}>
@@ -83,7 +76,7 @@ const UpdatePasswordForm = ({ className = "" }: UpdatePasswordFormProps) => {
         {errors && Object.keys(errors).length > 0 && (
           <div className="p-5 mb-8 rounded-2xl bg-primary-50 dark:bg-primary-900/20 border border-primary-100 dark:border-primary-800/30 shadow-sm animate-in fade-in slide-in-from-top-2 duration-300">
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-primary-100 dark:bg-primary-800/40">
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-primary-100 dark:bg-primary-800/40">
                 <AlertTriangle className="w-5 h-5 text-primary-600 dark:text-primary-400" />
               </div>
               <h3 className="font-bold text-sm text-primary-800 dark:text-primary-300 uppercase tracking-wide">
@@ -140,7 +133,7 @@ const UpdatePasswordForm = ({ className = "" }: UpdatePasswordFormProps) => {
               variant="danger"
               icon={Key}
               loading={isSubmitting}
-              className="w-full sm:w-auto min-w-[200px] font-bold uppercase tracking-wider rounded-xl shadow-lg shadow-primary-500/20 active:scale-95 transition-transform"
+              className="w-full sm:w-auto min-w-[200px] font-bold uppercase tracking-wider rounded-lg shadow-lg shadow-primary-500/20 active:scale-95 transition-transform"
             >
               {isSubmitting
                 ? t("common.updating")

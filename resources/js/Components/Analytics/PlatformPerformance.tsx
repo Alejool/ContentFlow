@@ -53,12 +53,12 @@ export default function PlatformPerformance({
 
   return (
     <div
-      className={`rounded-xl p-6 transition-all duration-300 ${getCardBg()}`}
+      className={`rounded-lg p-6 transition-all duration-300 ${getCardBg()}`}
     >
       <div className="flex items-center justify-between mb-6">
         <h2
           className={`text-xl font-bold flex items-center gap-2 ${getTextColor(
-            "title"
+            "title",
           )}`}
         >
           <div

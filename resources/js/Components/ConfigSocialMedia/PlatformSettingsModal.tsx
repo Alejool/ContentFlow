@@ -140,7 +140,7 @@ export default function PlatformSettingsModal({
             </div>
             <button
               onClick={onClose}
-              className={`p-2 rounded-xl transition-all duration-200 ${
+              className={`p-2 rounded-lg transition-all duration-200 ${
                 theme === "dark"
                   ? "hover:bg-neutral-800 text-neutral-400"
                   : "hover:bg-neutral-100 text-neutral-500"

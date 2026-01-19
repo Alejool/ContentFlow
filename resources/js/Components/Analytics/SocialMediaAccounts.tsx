@@ -49,7 +49,7 @@ export default function SocialMediaAccounts({
             {t("analytics.charts.followersByPlatform")}
           </h3>
           <div
-            className={`rounded-xl p-4 transition-colors duration-300
+            className={`rounded-lg p-4 transition-colors duration-300
                     ${
                       theme === "dark"
                         ? "bg-neutral-800/30 border border-neutral-700/30"
@@ -98,8 +98,8 @@ export default function SocialMediaAccounts({
                                       ? "bg-green-900/30 text-green-300"
                                       : "bg-green-100 text-green-800"
                                     : theme === "dark"
-                                    ? "bg-primary-900/30 text-primary-300"
-                                    : "bg-primary-100 text-primary-800"
+                                      ? "bg-primary-900/30 text-primary-300"
+                                      : "bg-primary-100 text-primary-800"
                                 }`}
               >
                 {account.follower_growth_30d > 0 ? "+" : ""}

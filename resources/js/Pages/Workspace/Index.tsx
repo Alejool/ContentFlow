@@ -169,7 +169,7 @@ export default function Index({
           </div>
           <button
             onClick={() => setShowCreateModal(true)}
-            className="group flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white rounded-xl transition-all duration-300 shadow-lg shadow-primary-600/25 hover:shadow-xl hover:shadow-primary-600/40 active:scale-[0.98]"
+            className="group flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white rounded-lg transition-all duration-300 shadow-lg shadow-primary-600/25 hover:shadow-xl hover:shadow-primary-600/40 active:scale-[0.98]"
           >
             <div className="h-8 w-8 bg-white/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
               <Plus className="h-5 w-5" />
@@ -206,7 +206,7 @@ export default function Index({
 
               <div className="flex items-start justify-between mb-6">
                 <div className="relative">
-                  <div className="h-14 w-14 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center text-white font-bold text-2xl group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                  <div className="h-14 w-14 bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg flex items-center justify-center text-white font-bold text-2xl group-hover:scale-110 transition-transform duration-300 shadow-lg">
                     {workspace.name.charAt(0).toUpperCase()}
                   </div>
                   {userRole?.slug === "owner" && (
@@ -295,7 +295,7 @@ export default function Index({
                           openMenuId === workspace.id ? null : workspace.id,
                         );
                       }}
-                      className={`p-2.5 rounded-xl transition-all duration-200 ${
+                      className={`p-2.5 rounded-lg transition-all duration-200 ${
                         ["owner", "admin"].includes(userRole?.slug)
                           ? "text-gray-600 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gradient-to-r hover:from-primary-50 hover:to-primary-100 dark:hover:from-primary-900/20 dark:hover:to-primary-900/10 hover:shadow-sm"
                           : "text-gray-400 dark:text-neutral-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-800"
@@ -319,7 +319,7 @@ export default function Index({
                           className="fixed inset-0 z-40 bg-transparent"
                           onClick={() => setOpenMenuId(null)}
                         />
-                        <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 rounded-xl shadow-2xl z-50 py-2">
+                        <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 rounded-lg shadow-2xl z-50 py-2">
                           <Link
                             href={route("workspaces.show", workspace.id)}
                             className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-neutral-800 text-gray-700 dark:text-neutral-300 transition-colors"
@@ -395,7 +395,7 @@ export default function Index({
           <div className="relative w-full max-w-lg bg-gradient-to-b from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-950 border border-gray-200 dark:border-neutral-800 rounded-2xl shadow-2xl p-8 animate-in zoom-in-95 duration-300">
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center gap-4">
-                <div className="h-12 w-12 bg-gradient-to-br from-primary-600 to-primary-700 rounded-xl flex items-center justify-center shadow-lg">
+                <div className="h-12 w-12 bg-gradient-to-br from-primary-600 to-primary-700 rounded-lg flex items-center justify-center shadow-lg">
                   <Building2 className="h-6 w-6 text-white" />
                 </div>
                 <div>
@@ -426,7 +426,7 @@ export default function Index({
                 <input
                   {...register("name")}
                   autoFocus
-                  className="w-full px-4 py-3 bg-white dark:bg-neutral-800 border border-gray-300 dark:border-neutral-700 rounded-xl text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 bg-white dark:bg-neutral-800 border border-gray-300 dark:border-neutral-700 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                   placeholder={t("workspace.name_placeholder")}
                 />
                 {errors.name && (
@@ -445,7 +445,7 @@ export default function Index({
                 </label>
                 <textarea
                   {...register("description")}
-                  className="w-full px-4 py-3 bg-white dark:bg-neutral-800 border border-gray-300 dark:border-neutral-700 rounded-xl text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all min-h-[120px] resize-none"
+                  className="w-full px-4 py-3 bg-white dark:bg-neutral-800 border border-gray-300 dark:border-neutral-700 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all min-h-[120px] resize-none"
                   placeholder={t("workspace.description_placeholder")}
                 />
                 <p className="text-xs text-gray-500 dark:text-neutral-500 mt-1">
@@ -457,7 +457,7 @@ export default function Index({
                 <button
                   type="button"
                   onClick={() => setShowCreateModal(false)}
-                  className="px-6 py-3 text-gray-700 dark:text-neutral-300 hover:bg-gray-100 dark:hover:bg-neutral-800 rounded-xl border border-gray-300 dark:border-neutral-700 transition-colors font-medium hover:border-gray-400 dark:hover:border-neutral-600"
+                  className="px-6 py-3 text-gray-700 dark:text-neutral-300 hover:bg-gray-100 dark:hover:bg-neutral-800 rounded-lg border border-gray-300 dark:border-neutral-700 transition-colors font-medium hover:border-gray-400 dark:hover:border-neutral-600"
                 >
                   {t("common.cancel")}
                 </button>

@@ -50,7 +50,7 @@ export default function Contact() {
                     Tu feedback es fundamental para nosotros; revisamos cada
                     mensaje para seguir mejorando la experiencia de ContentFlow.
                   </p>
-                  <div className="inline-block bg-white dark:bg-gray-800 px-6 py-4 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm transition-transform hover:scale-105">
+                  <div className="inline-block bg-white dark:bg-gray-800 px-6 py-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm transition-transform hover:scale-105">
                     <span className="block text-sm text-gray-500 dark:text-gray-400 mb-1">
                       Escríbenos a
                     </span>

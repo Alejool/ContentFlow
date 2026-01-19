@@ -1,14 +1,14 @@
+import { useTheme } from "@/Hooks/useTheme";
 import { Dialog, DialogPanel } from "@headlessui/react";
 import {
   ChevronLeft,
   ChevronRight,
-  X,
-  Play,
-  Image as ImageIcon,
   Film,
+  Image as ImageIcon,
+  Play,
+  X,
 } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
-import { useTheme } from "@/Hooks/useTheme";
+import { useEffect, useRef, useState } from "react";
 
 interface MediaFile {
   id: number;
@@ -51,14 +51,14 @@ export default function CampaignMediaCarousel({
     (file) =>
       file.file_type.startsWith("image/") ||
       file.file_type === "image" ||
-      file.file_path?.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i)
+      file.file_path?.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i),
   );
 
   const videos = mediaFiles.filter(
     (file) =>
       file.file_type.startsWith("video/") ||
       file.file_type === "video" ||
-      file.file_path?.match(/\.(mp4|avi|mov|wmv|flv|webm)$/i)
+      file.file_path?.match(/\.(mp4|avi|mov|wmv|flv|webm)$/i),
   );
 
   const otherFiles = mediaFiles.filter(
@@ -66,8 +66,8 @@ export default function CampaignMediaCarousel({
       !file.file_type.startsWith("image/") &&
       !file.file_type.startsWith("video/") &&
       !file.file_path?.match(
-        /\.(jpg|jpeg|png|gif|webp|svg|mp4|avi|mov|wmv|flv|webm)$/i
-      )
+        /\.(jpg|jpeg|png|gif|webp|svg|mp4|avi|mov|wmv|flv|webm)$/i,
+      ),
   );
 
   if (mediaFiles.length === 1) {
@@ -82,7 +82,7 @@ export default function CampaignMediaCarousel({
     return (
       <div className="mb-6">
         <div
-          className="relative rounded-xl overflow-hidden cursor-pointer group"
+          className="relative rounded-lg overflow-hidden cursor-pointer group"
           onClick={() => openLightbox(0)}
         >
           {isImage ? (
@@ -100,7 +100,7 @@ export default function CampaignMediaCarousel({
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </div>
           ) : isVideo ? (
-            <div className="relative aspect-video bg-gray-800 dark:bg-gray-900 rounded-xl overflow-hidden">
+            <div className="relative aspect-video bg-gray-800 dark:bg-gray-900 rounded-lg overflow-hidden">
               <video
                 src={media.file_path}
                 className="w-full h-full object-cover"
@@ -113,7 +113,7 @@ export default function CampaignMediaCarousel({
               </div>
             </div>
           ) : (
-            <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 rounded-xl flex flex-col items-center justify-center p-8">
+            <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 rounded-lg flex flex-col items-center justify-center p-8">
               <File className="w-16 h-16 text-gray-400 dark:text-gray-600 mb-4" />
               <span className="text-gray-600 dark:text-gray-400 font-medium">
                 {media.file_name || "Archivo adjunto"}
@@ -248,7 +248,7 @@ function ImageGridItem({
 
   return (
     <div
-      className={`relative rounded-xl overflow-hidden cursor-pointer group ${
+      className={`relative rounded-lg overflow-hidden cursor-pointer group ${
         isLarge ? "row-span-2" : ""
       }`}
       onClick={onClick}
@@ -290,7 +290,7 @@ function ModernCarousel({
   const totalSlides = Math.ceil(mediaFiles.length / slidesToShow);
   const visibleSlides = mediaFiles.slice(
     currentIndex,
-    currentIndex + slidesToShow
+    currentIndex + slidesToShow,
   );
 
   const nextSlide = () => {
@@ -330,12 +330,12 @@ function ModernCarousel({
                 slidesToShow === 2
                   ? "lg:w-1/2"
                   : slidesToShow === 3
-                  ? "lg:w-1/3"
-                  : ""
+                    ? "lg:w-1/3"
+                    : ""
               }`}
               onClick={() => onItemClick(actualIndex)}
             >
-              <div className="relative rounded-xl overflow-hidden cursor-pointer group/card">
+              <div className="relative rounded-lg overflow-hidden cursor-pointer group/card">
                 {isImage ? (
                   <div className="relative aspect-video">
                     <img
@@ -350,7 +350,7 @@ function ModernCarousel({
                     <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-300" />
                   </div>
                 ) : isVideo ? (
-                  <div className="relative aspect-video bg-gray-800 dark:bg-gray-900 rounded-xl overflow-hidden">
+                  <div className="relative aspect-video bg-gray-800 dark:bg-gray-900 rounded-lg overflow-hidden">
                     <video
                       src={media.file_path}
                       className="w-full h-full object-cover"
@@ -368,7 +368,7 @@ function ModernCarousel({
                     </div>
                   </div>
                 ) : (
-                  <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 rounded-xl flex flex-col items-center justify-center p-6">
+                  <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 rounded-lg flex flex-col items-center justify-center p-6">
                     <File className="w-12 h-12 text-gray-400 dark:text-gray-600 mb-3" />
                     <span className="text-gray-600 dark:text-gray-400 font-medium text-sm text-center truncate max-w-full">
                       {media.file_name || "Archivo"}
@@ -502,7 +502,7 @@ function Lightbox({
                 <img
                   src={currentMedia.file_path}
                   alt={`Media ${selectedIndex + 1}`}
-                  className="max-h-[70vh] w-auto max-w-full rounded-xl object-contain"
+                  className="max-h-[70vh] w-auto max-w-full rounded-lg object-contain"
                   onError={(e) => {
                     e.currentTarget.src =
                       "https://images.unsplash.com/photo-1579546929662-711aa81148cf?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80";

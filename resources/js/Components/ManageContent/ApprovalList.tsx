@@ -125,7 +125,7 @@ export default function ApprovalList({
         {publications.map((pub) => (
           <div
             key={pub.id}
-            className="bg-white dark:bg-neutral-800 rounded-xl p-4 border border-gray-200 dark:border-neutral-700 shadow-sm hover:shadow-md transition-shadow"
+            className="bg-white dark:bg-neutral-800 rounded-lg p-4 border border-gray-200 dark:border-neutral-700 shadow-sm hover:shadow-md transition-shadow"
           >
             <div className="flex flex-col sm:flex-row justify-between gap-4">
               <div className="flex-1 min-w-0">

@@ -97,7 +97,7 @@ export default function PerformanceTable({
 
         // Filter publications that match the search term
         const matchingPublications = campaign.publications.filter((pub) =>
-          pub.title.toLowerCase().includes(term)
+          pub.title.toLowerCase().includes(term),
         );
 
         // If campaign matches OR any publication matches, keep the campaign
@@ -165,7 +165,7 @@ export default function PerformanceTable({
         </div>
       )}
 
-      <div className="overflow-x-auto rounded-xl border border-gray-100 dark:border-neutral-800 shadow-sm">
+      <div className="overflow-x-auto rounded-lg border border-gray-100 dark:border-neutral-800 shadow-sm">
         <table className="min-w-full divide-y divide-gray-200 dark:divide-neutral-800">
           <thead
             className={theme === "dark" ? "bg-neutral-900/50" : "bg-gray-50"}

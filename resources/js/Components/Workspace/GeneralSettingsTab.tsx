@@ -89,7 +89,7 @@ export default function GeneralSettingsTab({
     <div className="space-y-6">
       <div className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-950 border border-gray-200 dark:border-neutral-800 rounded-2xl shadow-sm p-6">
         <div className="flex items-center gap-3 mb-8">
-          <div className="h-12 w-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center">
+          <div className="h-12 w-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg flex items-center justify-center">
             <SettingsIcon className="h-6 w-6 text-white" />
           </div>
           <div>
@@ -123,7 +123,7 @@ export default function GeneralSettingsTab({
                 <textarea
                   {...register("description")}
                   disabled={!canManageWorkspace}
-                  className="mt-1 block w-full rounded-xl border border-gray-300 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm transition-colors px-4 py-3 min-h-[120px] disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="mt-1 block w-full rounded-lg border border-gray-300 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm transition-colors px-4 py-3 min-h-[120px] disabled:opacity-50 disabled:cursor-not-allowed"
                   rows={4}
                   placeholder={t("workspace.description_placeholder")}
                 />
@@ -136,7 +136,7 @@ export default function GeneralSettingsTab({
             </div>
 
             <div className="space-y-6">
-              <div className="bg-gradient-to-br from-gray-50 to-white dark:from-neutral-900 dark:to-neutral-950 border border-gray-200 dark:border-neutral-800 rounded-xl p-5">
+              <div className="bg-gradient-to-br from-gray-50 to-white dark:from-neutral-900 dark:to-neutral-950 border border-gray-200 dark:border-neutral-800 rounded-lg p-5">
                 <h4 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                   <Shield className="h-5 w-5 text-primary-500" />
                   {t("workspace.visibility")}
@@ -211,7 +211,7 @@ export default function GeneralSettingsTab({
                 </div>
               </div>
 
-              <div className="bg-gradient-to-br from-blue-50 to-white dark:from-blue-900/10 dark:to-neutral-950 border border-blue-100 dark:border-blue-800/30 rounded-xl p-5">
+              <div className="bg-gradient-to-br from-blue-50 to-white dark:from-blue-900/10 dark:to-neutral-950 border border-blue-100 dark:border-blue-800/30 rounded-lg p-5">
                 <div className="flex items-center gap-3 mb-3">
                   <Info className="h-5 w-5 text-blue-500" />
                   <h4 className="font-semibold text-gray-900 dark:text-white">

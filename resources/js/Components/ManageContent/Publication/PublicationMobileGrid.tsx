@@ -119,7 +119,7 @@ const PublicationMobileGrid = memo(
                       e.stopPropagation();
                       onViewDetails?.(item);
                     }}
-                    className="w-full py-2.5 rounded-xl bg-gray-100 dark:bg-neutral-800 text-gray-700 dark:text-gray-300 font-bold text-xs flex items-center justify-center gap-2 border border-gray-200 dark:border-neutral-700 hover:bg-gray-200 dark:hover:bg-neutral-700 transition-all active:scale-95"
+                    className="w-full py-2.5 rounded-lg bg-gray-100 dark:bg-neutral-800 text-gray-700 dark:text-gray-300 font-bold text-xs flex items-center justify-center gap-2 border border-gray-200 dark:border-neutral-700 hover:bg-gray-200 dark:hover:bg-neutral-700 transition-all active:scale-95"
                   >
                     <Eye className="w-3.5 h-3.5" />
                     {t("common.viewDetails") || "View Details"}
@@ -131,7 +131,7 @@ const PublicationMobileGrid = memo(
                         e.stopPropagation();
                         onPublish(item);
                       }}
-                      className="flex-[2] py-2.5 rounded-xl bg-emerald-600 dark:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 hover:bg-emerald-700 dark:hover:bg-emerald-600 transition-all active:scale-95"
+                      className="flex-[2] py-2.5 rounded-lg bg-emerald-600 dark:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 hover:bg-emerald-700 dark:hover:bg-emerald-600 transition-all active:scale-95"
                     >
                       <Rocket className="w-3.5 h-3.5" />
                       {t("publications.button.publish") || "Publish"}
@@ -141,7 +141,7 @@ const PublicationMobileGrid = memo(
                         e.stopPropagation();
                         onEditRequest ? onEditRequest(item) : onEdit(item);
                       }}
-                      className="flex-1 py-2.5 rounded-xl bg-white dark:bg-neutral-800 text-gray-700 dark:text-gray-300 font-bold text-xs flex items-center justify-center gap-2 border border-gray-200 dark:border-neutral-700 hover:bg-gray-50 dark:hover:bg-neutral-700 transition-all active:scale-95"
+                      className="flex-1 py-2.5 rounded-lg bg-white dark:bg-neutral-800 text-gray-700 dark:text-gray-300 font-bold text-xs flex items-center justify-center gap-2 border border-gray-200 dark:border-neutral-700 hover:bg-gray-50 dark:hover:bg-neutral-700 transition-all active:scale-95"
                     >
                       <Edit className="w-3.5 h-3.5" />
                       {t("common.edit")}
@@ -151,7 +151,7 @@ const PublicationMobileGrid = memo(
                         e.stopPropagation();
                         onDelete(item.id);
                       }}
-                      className="p-2.5 rounded-xl bg-rose-50 text-rose-500 dark:bg-rose-900/20 dark:text-rose-400 border border-rose-100 dark:border-rose-900/30 hover:bg-rose-100 transition-all active:scale-90"
+                      className="p-2.5 rounded-lg bg-rose-50 text-rose-500 dark:bg-rose-900/20 dark:text-rose-400 border border-rose-100 dark:border-rose-900/30 hover:bg-rose-100 transition-all active:scale-90"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>

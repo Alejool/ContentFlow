@@ -76,7 +76,8 @@ export default function ConnectedAccounts({ className = "", header = true }) {
     setAccounts((prevAccounts) =>
       prevAccounts.map((account) => {
         const connectedAccount = connectedAccounts.find(
-          (ca: any) => ca.platform.toLowerCase() === account.platform.toLowerCase()
+          (ca: any) =>
+            ca.platform.toLowerCase() === account.platform.toLowerCase(),
         );
 
         return {
@@ -84,7 +85,7 @@ export default function ConnectedAccounts({ className = "", header = true }) {
           isConnected: !!connectedAccount,
           details: connectedAccount || null,
         };
-      })
+      }),
     );
   };
 
@@ -107,10 +108,11 @@ export default function ConnectedAccounts({ className = "", header = true }) {
             <div
               key={account.id}
               className={`
-                group relative flex items-center p-4 rounded-xl border transition-all duration-300
-                ${account.isConnected
-                  ? "bg-purple-50/50 dark:bg-purple-900/10 border-purple-100 dark:border-purple-800/30 shadow-sm"
-                  : "bg-gray-50/50 dark:bg-neutral-800/40 border-gray-100 dark:border-neutral-700/50 opacity-60 grayscale hover:grayscale-0 hover:opacity-100 dark:opacity-40 dark:hover:opacity-100"
+                group relative flex items-center p-4 rounded-lg border transition-all duration-300
+                ${
+                  account.isConnected
+                    ? "bg-purple-50/50 dark:bg-purple-900/10 border-purple-100 dark:border-purple-800/30 shadow-sm"
+                    : "bg-gray-50/50 dark:bg-neutral-800/40 border-gray-100 dark:border-neutral-700/50 opacity-60 grayscale hover:grayscale-0 hover:opacity-100 dark:opacity-40 dark:hover:opacity-100"
                 }
                 hover:shadow-md hover:scale-[1.02]
               `}
@@ -127,8 +129,13 @@ export default function ConnectedAccounts({ className = "", header = true }) {
                 <h4 className="font-bold text-gray-900 dark:text-gray-100 text-sm truncate uppercase tracking-tight">
                   {account.name}
                 </h4>
-                <p className={`text-[10px] font-bold uppercase tracking-wider ${account.isConnected ? "text-green-600 dark:text-green-400" : "text-gray-500 dark:text-gray-500"
-                  }`}>
+                <p
+                  className={`text-[10px] font-bold uppercase tracking-wider ${
+                    account.isConnected
+                      ? "text-green-600 dark:text-green-400"
+                      : "text-gray-500 dark:text-gray-500"
+                  }`}
+                >
                   {account.isConnected
                     ? t("profile.connectedAccounts.connected")
                     : t("profile.connectedAccounts.notConnected")}
@@ -158,7 +165,9 @@ export default function ConnectedAccounts({ className = "", header = true }) {
           className="group flex items-center gap-2 text-sm font-bold text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors uppercase tracking-widest"
         >
           {t("profile.connectedAccounts.manageLink")}
-          <span className="group-hover:translate-x-1 transition-transform">&rarr;</span>
+          <span className="group-hover:translate-x-1 transition-transform">
+            &rarr;
+          </span>
         </a>
       </div>
     </ModernCard>

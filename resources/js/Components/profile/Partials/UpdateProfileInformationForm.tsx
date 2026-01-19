@@ -4,7 +4,6 @@ import IconTwitter from "@/../assets/Icons/x.svg";
 import IconYoutube from "@/../assets/Icons/youtube.svg";
 import PlatformSettingsModal from "@/Components/ConfigSocialMedia/PlatformSettingsModal";
 import Button from "@/Components/common/Modern/Button";
-import ModernCard from "@/Components/common/Modern/Card";
 import Input from "@/Components/common/Modern/Input";
 import Textarea from "@/Components/common/Modern/Textarea";
 import LanguageSwitcher from "@/Components/common/ui/LanguageSwitcher";
@@ -14,11 +13,8 @@ import { Link } from "@inertiajs/react";
 import {
   AlertTriangle,
   CheckCircle,
-  Globe,
   Mail,
   MailWarning,
-  MessageSquare,
-  Phone,
   Save,
   Send,
   ShieldCheck,
@@ -201,8 +197,9 @@ export default function UpdateProfileInformation({
               {t("profile.information.phoneLabel")}
             </label>
             <div
-              className={`relative transition-all duration-300 rounded-xl border bg-gray-50 dark:bg-neutral-800/50 border-gray-200 dark:border-neutral-700/50 hover:border-primary-400/50 dark:hover:border-primary-600/50 focus-within:ring-4 focus-within:ring-primary-500/10 focus-within:border-primary-500 ${errors.phone ? "border-primary-500" : ""
-                }`}
+              className={`relative transition-all duration-300 rounded-lg border bg-gray-50 dark:bg-neutral-800/50 border-gray-200 dark:border-neutral-700/50 hover:border-primary-400/50 dark:hover:border-primary-600/50 focus-within:ring-4 focus-within:ring-primary-500/10 focus-within:border-primary-500 ${
+                errors.phone ? "border-primary-500" : ""
+              }`}
             >
               <Controller
                 name="phone"
@@ -289,7 +286,8 @@ export default function UpdateProfileInformation({
           <div className="absolute -top-10 -right-10 w-64 h-64 bg-primary-500/5 rounded-full blur-3xl pointer-events-none" />
           <div className="flex items-center gap-3 pb-2">
             <h3 className="text-[10px] md:text-sm font-bold uppercase tracking-widest text-primary-600 dark:text-primary-400">
-              {t("platformSettings.title") || "Ajustes de Publicación Predeterminados"}
+              {t("platformSettings.title") ||
+                "Ajustes de Publicación Predeterminados"}
             </h3>
           </div>
 
@@ -297,7 +295,7 @@ export default function UpdateProfileInformation({
             {platforms.map((platform) => {
               const platformSettings =
                 watchedValues.global_platform_settings?.[
-                platform.id.toLowerCase()
+                  platform.id.toLowerCase()
                 ] || {};
               const hasSettings = Object.keys(platformSettings).length > 0;
 
@@ -328,8 +326,9 @@ export default function UpdateProfileInformation({
                         {platform.name}
                       </div>
                       <div
-                        className={`text-[9px] md:text-[10px] font-medium uppercase tracking-wider ${hasSettings ? "text-green-500" : "text-gray-500"
-                          }`}
+                        className={`text-[9px] md:text-[10px] font-medium uppercase tracking-wider ${
+                          hasSettings ? "text-green-500" : "text-gray-500"
+                        }`}
                       >
                         {hasSettings
                           ? t("common.configured")
@@ -350,7 +349,7 @@ export default function UpdateProfileInformation({
             platform={activePlatform}
             settings={
               watchedValues.global_platform_settings?.[
-              activePlatform.toLowerCase()
+                activePlatform.toLowerCase()
               ] || {}
             }
             onSettingsChange={handleSettingsChange}
@@ -360,7 +359,7 @@ export default function UpdateProfileInformation({
         {mustVerifyEmail && user?.email_verified_at === null && (
           <div className="rounded-2xl p-6 shadow-inner bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800/30">
             <div className="flex items-center gap-3 font-bold text-amber-800 dark:text-amber-300">
-              <div className="p-2 rounded-xl bg-amber-500/20">
+              <div className="p-2 rounded-lg bg-amber-500/20">
                 <MailWarning className="w-5 h-5 text-amber-600 dark:text-amber-400" />
               </div>
               <span className="text-lg">
@@ -377,7 +376,7 @@ export default function UpdateProfileInformation({
                 href={route("verification.send")}
                 method="post"
                 as="button"
-                className="px-6 py-3 text-sm font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-primary-500/20 bg-primary-600 hover:bg-primary-500 text-white border-0"
+                className="px-6 py-3 text-sm font-bold rounded-lg transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-primary-500/20 bg-primary-600 hover:bg-primary-500 text-white border-0"
               >
                 <Send className="w-4 h-4" />
                 {t("profile.information.sendVerification")}
@@ -385,7 +384,7 @@ export default function UpdateProfileInformation({
             </div>
 
             {status === "verification-link-sent" && (
-              <div className="mt-4 text-sm font-bold flex items-center gap-2 p-4 rounded-xl bg-green-50 dark:bg-green-900/10 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800/30">
+              <div className="mt-4 text-sm font-bold flex items-center gap-2 p-4 rounded-lg bg-green-50 dark:bg-green-900/10 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800/30">
                 <CheckCircle className="w-5 h-5" />
                 {t("profile.information.verificationSent")}
               </div>
@@ -437,7 +436,7 @@ export default function UpdateProfileInformation({
         <div className="flex flex-col sm:flex-row items-center justify-between gap-6 pt-10 border-t border-gray-100 dark:border-neutral-800/50 transition-all duration-300">
           <div className="hidden sm:block">
             {hasChanges && !isSubmitting && (
-              <div className="flex items-center gap-3 text-sm font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 px-4 py-2 rounded-xl border border-amber-200 dark:border-amber-800/50">
+              <div className="flex items-center gap-3 text-sm font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 px-4 py-2 rounded-lg border border-amber-200 dark:border-amber-800/50">
                 <AlertTriangle className="w-4 h-4" />
                 {t("profile.messages.unsavedChanges")}
               </div>
@@ -449,10 +448,11 @@ export default function UpdateProfileInformation({
             icon={Save}
             loading={isSubmitting}
             loadingText={t("common.saving")}
-            className={`w-full sm:w-auto min-w-[200px] transition-all duration-300 rounded-xl shadow-xl font-bold uppercase tracking-wider ${!hasChanges
-              ? "opacity-50 grayscale"
-              : "hover:scale-[1.05] active:scale-[0.95] bg-primary-600 hover:bg-primary-500 text-white border-0 shadow-primary-500/25"
-              }`}
+            className={`w-full sm:w-auto min-w-[200px] transition-all duration-300 rounded-lg shadow-xl font-bold uppercase tracking-wider ${
+              !hasChanges
+                ? "opacity-50 grayscale"
+                : "hover:scale-[1.05] active:scale-[0.95] bg-primary-600 hover:bg-primary-500 text-white border-0 shadow-primary-500/25"
+            }`}
             type="submit"
             size="lg"
           >

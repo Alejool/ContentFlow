@@ -38,14 +38,14 @@ export default function ApprovalSuccessModal({
             </DialogTitle>
             <button
               onClick={onClose}
-              className="p-2 rounded-xl transition-all hover:bg-gray-100 dark:hover:bg-neutral-700 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
+              className="p-2 rounded-lg transition-all hover:bg-gray-100 dark:hover:bg-neutral-700 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
           <div className="p-6">
-            <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-4 mb-6">
+            <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mb-6">
               <p className="text-sm text-green-800 dark:text-green-300 leading-relaxed font-medium">
                 {t("approvals.approvalSuccessMessage") ||
                   "La publicación ha sido aprobada exitosamente y está lista para ser publicada."}
@@ -62,7 +62,7 @@ export default function ApprovalSuccessModal({
                 </p>
               </div>
 
-              <div className="flex items-center gap-4 p-4 rounded-xl bg-gray-50 dark:bg-neutral-900/50 border border-gray-100 dark:border-neutral-700/30">
+              <div className="flex items-center gap-4 p-4 rounded-lg bg-gray-50 dark:bg-neutral-900/50 border border-gray-100 dark:border-neutral-700/30">
                 <div className="flex-shrink-0">
                   <div className="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600 dark:text-green-400 border border-green-200/50 dark:border-green-800/50">
                     <User className="w-6 h-6" />

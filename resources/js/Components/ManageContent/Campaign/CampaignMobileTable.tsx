@@ -122,7 +122,7 @@ export default function CampaignMobileTable({
                   {(item.publications?.length || 0) > 0 ? (
                     <button
                       onClick={() => toggleExpand(item.id)}
-                      className={`flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold uppercase rounded-xl transition-all active:scale-95 ${
+                      className={`flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold uppercase rounded-lg transition-all active:scale-95 ${
                         expandedCampaigns.includes(item.id)
                           ? "bg-primary-50 text-primary-700 dark:bg-primary-900/40 dark:text-primary-400 ring-1 ring-primary-200 dark:ring-primary-800"
                           : "bg-gray-50 text-gray-600 hover:bg-gray-100 dark:bg-neutral-800 dark:text-gray-300 dark:hover:bg-neutral-700 ring-1 ring-gray-100 dark:ring-neutral-700"
@@ -148,7 +148,7 @@ export default function CampaignMobileTable({
                   )}
                 </div>
 
-                <div className="flex items-center gap-1.5 bg-gray-50/50 dark:bg-neutral-800/30 p-1 rounded-xl border border-gray-100 dark:border-neutral-700/50">
+                <div className="flex items-center gap-1.5 bg-gray-50/50 dark:bg-neutral-800/30 p-1 rounded-lg border border-gray-100 dark:border-neutral-700/50">
                   <button
                     onClick={() => onViewDetails(item)}
                     className="p-2 text-gray-500 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-white dark:hover:bg-neutral-800 rounded-lg transition-all"

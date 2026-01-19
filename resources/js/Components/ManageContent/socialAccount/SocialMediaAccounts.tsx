@@ -351,7 +351,7 @@ const SocialMediaAccounts = memo(() => {
                   ].map((item, i) => (
                     <div
                       key={i}
-                      className="flex items-center gap-3 p-3.5 rounded-xl bg-white/60 border border-primary-100 dark:bg-neutral-800/30 dark:border-neutral-700/30 transition-transform hover:scale-[1.02]"
+                      className="flex items-center gap-3 p-3.5 rounded-lg bg-white/60 border border-primary-100 dark:bg-neutral-800/30 dark:border-neutral-700/30 transition-transform hover:scale-[1.02]"
                     >
                       <div className="p-2 rounded-lg bg-white dark:bg-neutral-800 shadow-sm flex-shrink-0">
                         <item.icon
@@ -365,7 +365,7 @@ const SocialMediaAccounts = memo(() => {
                   ))}
                 </div>
 
-                <div className="text-[10px] sm:text-xs p-3 rounded-xl inline-flex bg-white/60 text-primary-600/80 border border-primary-100 dark:bg-neutral-800/40 dark:text-gray-400 dark:border-neutral-700/40 group">
+                <div className="text-[10px] sm:text-xs p-3 rounded-lg inline-flex bg-white/60 text-primary-600/80 border border-primary-100 dark:bg-neutral-800/40 dark:text-gray-400 dark:border-neutral-700/40 group">
                   <div className="flex items-center gap-2">
                     <AlertCircle className="w-3.5 h-3.5 opacity-70 group-hover:opacity-100 transition-opacity" />
                     <span className="font-bold uppercase tracking-wider">

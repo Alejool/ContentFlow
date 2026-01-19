@@ -45,7 +45,7 @@ export default function DeleteUserForm({
         Object.entries(error.response.data.errors).forEach(
           ([key, value]: [any, any]) => {
             setError(key as keyof DeleteUserFormData, { message: value[0] });
-          }
+          },
         );
       }
     }
@@ -66,7 +66,7 @@ export default function DeleteUserForm({
     >
       <div className="space-y-6">
         <div className="p-5 bg-primary-50 dark:bg-primary-900/10 border border-primary-200 dark:border-primary-800/30 rounded-2xl flex gap-4 shadow-inner">
-          <div className="flex-shrink-0 p-2 bg-primary-100 dark:bg-primary-800/40 rounded-xl h-fit">
+          <div className="flex-shrink-0 p-2 bg-primary-100 dark:bg-primary-800/40 rounded-lg h-fit">
             <AlertTriangle className="w-6 h-6 text-primary-600 dark:text-primary-400" />
           </div>
           <div>
@@ -83,14 +83,17 @@ export default function DeleteUserForm({
           variant="danger"
           onClick={confirmUserDeletion}
           icon={Trash2}
-          className="font-bold uppercase tracking-wider rounded-xl shadow-lg shadow-primary-500/20 active:scale-95 transition-transform"
+          className="font-bold uppercase tracking-wider rounded-lg shadow-lg shadow-primary-500/20 active:scale-95 transition-transform"
         >
           {t("profile.delete.deleteButton")}
         </ModernButton>
       </div>
 
       <Modal show={confirmingUserDeletion} onClose={closeModal}>
-        <form onSubmit={handleSubmit(deleteUser)} className="p-8 dark:bg-neutral-900">
+        <form
+          onSubmit={handleSubmit(deleteUser)}
+          className="p-8 dark:bg-neutral-900"
+        >
           <div className="flex items-center gap-4 mb-6">
             <div className="p-3 bg-primary-50 dark:bg-primary-900/20 rounded-2xl">
               <AlertTriangle className="w-8 h-8 text-primary-600 dark:text-primary-400" />
@@ -131,8 +134,11 @@ export default function DeleteUserForm({
             <ModernButton
               variant="danger"
               disabled={isSubmitting}
-              className={`w-full sm:w-auto font-bold uppercase tracking-wider rounded-xl shadow-lg shadow-primary-500/20 ${isSubmitting ? "opacity-50" : "active:scale-95 transition-transform"
-                }`}
+              className={`w-full sm:w-auto font-bold uppercase tracking-wider rounded-lg shadow-lg shadow-primary-500/20 ${
+                isSubmitting
+                  ? "opacity-50"
+                  : "active:scale-95 transition-transform"
+              }`}
               type="submit"
               loading={isSubmitting}
             >

@@ -62,7 +62,7 @@ const StatCard = ({ icon: Icon, label, value, trend, color = "blue" }: any) => {
   };
 
   return (
-    <div className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-950 border border-gray-200 dark:border-neutral-800 rounded-xl p-4 transition-all duration-300 hover:shadow-lg hover:border-gray-300 dark:hover:border-neutral-700">
+    <div className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-950 border border-gray-200 dark:border-neutral-800 rounded-lg p-4 transition-all duration-300 hover:shadow-lg hover:border-gray-300 dark:hover:border-neutral-700">
       <div className="flex items-start justify-between">
         <div>
           <div
@@ -159,7 +159,7 @@ export default function WorkspaceSettings({
       <div className="space-y-6">
         <div className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-950 border border-gray-200 dark:border-neutral-800 rounded-2xl shadow-sm p-6">
           <div className="flex items-center gap-3 mb-8">
-            <div className="h-12 w-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center">
+            <div className="h-12 w-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg flex items-center justify-center">
               <SettingsIcon className="h-6 w-6 text-white" />
             </div>
             <div>
@@ -191,7 +191,7 @@ export default function WorkspaceSettings({
                   </label>
                   <textarea
                     {...register("description")}
-                    className="mt-1 block w-full rounded-xl border border-gray-300 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm transition-colors px-4 py-3 min-h-[120px]"
+                    className="mt-1 block w-full rounded-lg border border-gray-300 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm transition-colors px-4 py-3 min-h-[120px]"
                     rows={4}
                     placeholder={t("workspace.description_placeholder")}
                   />
@@ -204,7 +204,7 @@ export default function WorkspaceSettings({
               </div>
 
               <div className="space-y-6">
-                <div className="bg-gradient-to-br from-gray-50 to-white dark:from-neutral-900 dark:to-neutral-950 border border-gray-200 dark:border-neutral-800 rounded-xl p-5">
+                <div className="bg-gradient-to-br from-gray-50 to-white dark:from-neutral-900 dark:to-neutral-950 border border-gray-200 dark:border-neutral-800 rounded-lg p-5">
                   <h4 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                     <Shield className="h-5 w-5 text-primary-500" />
                     {t("workspace.visibility")}
@@ -243,7 +243,7 @@ export default function WorkspaceSettings({
                   </div>
                 </div>
 
-                <div className="bg-gradient-to-br from-blue-50 to-white dark:from-blue-900/10 dark:to-neutral-950 border border-blue-100 dark:border-blue-800/30 rounded-xl p-5">
+                <div className="bg-gradient-to-br from-blue-50 to-white dark:from-blue-900/10 dark:to-neutral-950 border border-blue-100 dark:border-blue-800/30 rounded-lg p-5">
                   <div className="flex items-center gap-3 mb-3">
                     <Info className="h-5 w-5 text-blue-500" />
                     <h4 className="font-semibold text-gray-900 dark:text-white">
@@ -400,7 +400,7 @@ export default function WorkspaceSettings({
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-center gap-4">
               <div
-                className={`h-12 w-12 rounded-xl bg-gradient-to-br ${color} flex items-center justify-center`}
+                className={`h-12 w-12 rounded-lg bg-gradient-to-br ${color} flex items-center justify-center`}
               >
                 <Icon className="h-6 w-6 text-white" />
               </div>
@@ -769,7 +769,7 @@ export default function WorkspaceSettings({
     <div className="space-y-6">
       <div className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-950 border border-gray-200 dark:border-neutral-800 rounded-2xl p-6">
         <div className="flex items-center gap-3 mb-6">
-          <div className="h-12 w-12 bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl flex items-center justify-center">
+          <div className="h-12 w-12 bg-gradient-to-br from-amber-500 to-orange-500 rounded-lg flex items-center justify-center">
             <Shield className="h-6 w-6 text-white" />
           </div>
           <div>
@@ -793,7 +793,7 @@ export default function WorkspaceSettings({
             return (
               <div
                 key={role.id}
-                className={`border rounded-xl p-5 transition-all duration-300 hover:shadow-lg ${
+                className={`border rounded-lg p-5 transition-all duration-300 hover:shadow-lg ${
                   isCurrentRole
                     ? "border-primary-300 dark:border-primary-700 bg-gradient-to-br from-primary-50 to-white dark:from-primary-900/10 dark:to-neutral-950"
                     : "border-gray-200 dark:border-neutral-800 bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-950"
@@ -885,7 +885,7 @@ export default function WorkspaceSettings({
   const TabButton = ({ id, label, icon: Icon, active }: any) => (
     <button
       onClick={() => setActiveTab(id)}
-      className={`flex items-center gap-3 px-5 py-3.5 rounded-xl transition-all duration-300 ${
+      className={`flex items-center gap-3 px-5 py-3.5 rounded-lg transition-all duration-300 ${
         active === id
           ? "bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-lg shadow-primary-600/25"
           : "bg-white dark:bg-neutral-900 text-gray-700 dark:text-neutral-300 hover:bg-gray-50 dark:hover:bg-neutral-800 border border-gray-200 dark:border-neutral-800 hover:border-gray-300 dark:hover:border-neutral-700"
@@ -908,7 +908,7 @@ export default function WorkspaceSettings({
           <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-6">
             <div className="flex-1">
               <div className="flex items-center gap-4 mb-4">
-                <div className="h-14 w-14 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center text-white font-bold text-2xl shadow-lg">
+                <div className="h-14 w-14 bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg flex items-center justify-center text-white font-bold text-2xl shadow-lg">
                   {current_workspace.name.charAt(0).toUpperCase()}
                 </div>
                 <div>

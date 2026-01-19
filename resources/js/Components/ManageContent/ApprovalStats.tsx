@@ -29,7 +29,8 @@ export default function ApprovalStats({ refreshTrigger }: ApprovalStatsProps) {
       const response = await axios.get(route("approvals.stats"));
       const json = response.data;
       if (json.success) {
-        const stats = json.pending_requests !== undefined ? json : json.data || {};
+        const stats =
+          json.pending_requests !== undefined ? json : json.data || {};
         setStats(stats);
       }
     } catch (error) {
@@ -45,7 +46,7 @@ export default function ApprovalStats({ refreshTrigger }: ApprovalStatsProps) {
         {[1, 2, 3, 4].map((i) => (
           <div
             key={i}
-            className="bg-white dark:bg-neutral-800 rounded-xl p-6 border border-gray-200 dark:border-neutral-700 animate-pulse"
+            className="bg-white dark:bg-neutral-800 rounded-lg p-6 border border-gray-200 dark:border-neutral-700 animate-pulse"
           >
             <div className="h-4 bg-gray-200 dark:bg-neutral-700 rounded w-1/2 mb-4"></div>
             <div className="h-8 bg-gray-200 dark:bg-neutral-700 rounded w-1/3"></div>

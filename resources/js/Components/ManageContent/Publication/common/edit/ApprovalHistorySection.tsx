@@ -69,7 +69,7 @@ export default function ApprovalHistorySection({
         {logs.map((log) => (
           <div
             key={log.id}
-            className={`p-4 rounded-xl border transition-all ${getStatusStyle(log.action)}`}
+            className={`p-4 rounded-lg border transition-all ${getStatusStyle(log.action)}`}
           >
             <div className="flex items-start gap-4">
               <div className="mt-0.5">{getStatusIcon(log.action)}</div>

@@ -16,7 +16,7 @@ export default function WorkspaceSettingsHeader({
       <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-6">
         <div className="flex-1">
           <div className="flex items-center gap-4 mb-4">
-            <div className="h-14 w-14 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center text-white font-bold text-2xl shadow-lg">
+            <div className="h-14 w-14 bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg flex items-center justify-center text-white font-bold text-2xl shadow-lg">
               {workspace.name.charAt(0).toUpperCase()}
             </div>
             <div>

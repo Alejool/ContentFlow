@@ -18,7 +18,7 @@ export default function SettingsTabs({
   const TabButton = ({ id, label, icon: Icon }: Tab) => (
     <button
       onClick={() => onTabChange(id)}
-      className={`flex items-center gap-3 px-5 py-3.5 rounded-xl transition-all duration-300 ${
+      className={`flex items-center gap-3 px-5 py-3.5 rounded-lg transition-all duration-300 ${
         activeTab === id
           ? "bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-lg shadow-primary-600/25"
           : "bg-white dark:bg-neutral-900 text-gray-700 dark:text-neutral-300 hover:bg-gray-50 dark:hover:bg-neutral-800 border border-gray-200 dark:border-neutral-800 hover:border-gray-300 dark:hover:border-neutral-700"

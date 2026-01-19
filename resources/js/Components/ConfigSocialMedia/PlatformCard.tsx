@@ -22,7 +22,7 @@ export default function PlatformCard({
   onSelect,
 }: PlatformCardProps) {
   return (
-    <label className="flex flex-col items-center p-5 border-2 border-gray-200 dark:border-neutral-700 rounded-xl hover:border-primary-500 cursor-pointer transition-all">
+    <label className="flex flex-col items-center p-5 border-2 border-gray-200 dark:border-neutral-700 rounded-lg hover:border-primary-500 cursor-pointer transition-all">
       <div
         className={`w-10 h-10 ${iconBgColor} rounded-lg flex items-center justify-center mb-3`}
       >

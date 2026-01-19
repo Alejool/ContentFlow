@@ -101,7 +101,7 @@ export default function ContentCard({
   };
 
   return (
-    <div className="group bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100 dark:border-gray-700 overflow-hidden flex flex-col h-full">
+    <div className="group bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100 dark:border-gray-700 overflow-hidden flex flex-col h-full">
       {hasMedia && mediaUrl && (
         <div className="relative h-40 bg-gray-100 dark:bg-gray-700 overflow-hidden">
           <div className="relative w-full h-full">
