@@ -132,6 +132,12 @@ const PublicationMobileRow = memo(
       }
     };
 
+    const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({});
+
+    const handleImageError = (id: number) => {
+      setImageErrors((prev) => ({ ...prev, [id]: true }));
+    };
+
     return (
       <div className="w-full space-y-3 px-1">
         {items.map((item) => {
@@ -142,6 +148,7 @@ const PublicationMobileRow = memo(
           const isVideo = firstMedia?.file_type?.includes("video");
           const mediaUrl =
             firstMedia?.thumbnail?.file_path || firstMedia?.file_path;
+          const hasImageError = imageErrors[item.id];
 
           return (
             <div
@@ -166,28 +173,23 @@ const PublicationMobileRow = memo(
                 <div className="relative flex-shrink-0">
                   {hasMedia(item) && mediaUrl ? (
                     <div className="w-16 h-16 rounded-lg border border-gray-200 dark:border-neutral-700 bg-gray-100 dark:bg-neutral-800 overflow-hidden shadow-sm">
-                      <img
-                        src={mediaUrl}
-                        alt={item.title || "Preview"}
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.style.display = "none";
-                          const parent = target.parentElement;
-                          if (parent) {
-                            parent.innerHTML = `
-                              <div class="w-full h-full flex items-center justify-center bg-gray-100 dark:bg-neutral-800">
-                                ${
-                                  isVideo
-                                    ? '<svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>'
-                                    : '<svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>'
-                                }
-                              </div>
-                            `;
-                          }
-                        }}
-                      />
+                      {!hasImageError ? (
+                        <img
+                          src={mediaUrl}
+                          alt={item.title || "Preview"}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                          onError={() => handleImageError(item.id)}
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gray-100 dark:bg-neutral-800 text-gray-400">
+                          {isVideo ? (
+                            <Video className="w-6 h-6" />
+                          ) : (
+                            <ImageIcon className="w-6 h-6" />
+                          )}
+                        </div>
+                      )}
                       {isVideo && (
                         <div className="absolute inset-0 flex items-center justify-center bg-black/20">
                           <Video className="w-5 h-5 text-white" />

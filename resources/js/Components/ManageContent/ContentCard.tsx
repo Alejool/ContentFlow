@@ -13,6 +13,7 @@ import {
   Users,
   Video,
 } from "lucide-react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 interface ContentCardProps {
@@ -100,38 +101,37 @@ export default function ContentCard({
     );
   };
 
+  const [imageError, setImageError] = useState(false);
+
   return (
     <div className="group bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100 dark:border-gray-700 overflow-hidden flex flex-col h-full">
       {hasMedia && mediaUrl && (
         <div className="relative h-40 bg-gray-100 dark:bg-gray-700 overflow-hidden">
           <div className="relative w-full h-full">
-            <img
-              src={mediaUrl}
-              alt={item.title || "Media"}
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-              loading="lazy"
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.style.display = "none";
-                const parent = target.parentElement;
-                if (parent) {
-                  parent.innerHTML = `
-                    <div class="w-full h-full flex items-center justify-center bg-gray-200 dark:bg-gray-700">
-                      <div class="text-center">
-                        <div class="p-3 rounded-full bg-gray-300 dark:bg-gray-600 mb-2 mx-auto w-12 h-12 flex items-center justify-center">
-                          ${
-                            isVideo
-                              ? '<svg class="w-6 h-6 text-gray-500" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>'
-                              : '<svg class="w-6 h-6 text-gray-500" fill="currentColor" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>'
-                          }
-                        </div>
-                        <span class="text-xs text-gray-500 dark:text-gray-400">${isVideo ? "Video" : "Imagen"}</span>
-                      </div>
-                    </div>
-                  `;
-                }
-              }}
-            />
+            {!imageError ? (
+              <img
+                src={mediaUrl}
+                alt={item.title || "Media"}
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                loading="lazy"
+                onError={() => setImageError(true)}
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-gray-200 dark:bg-gray-700">
+                <div className="text-center">
+                  <div className="p-3 rounded-full bg-gray-300 dark:bg-gray-600 mb-2 mx-auto w-12 h-12 flex items-center justify-center text-gray-500">
+                    {isVideo ? (
+                      <Video className="w-6 h-6" />
+                    ) : (
+                      <ImageIcon className="w-6 h-6" />
+                    )}
+                  </div>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                    {isVideo ? "Video" : "Imagen"}
+                  </span>
+                </div>
+              </div>
+            )}
             {isVideo && (
               <div className="absolute inset-0 flex items-center justify-center bg-black/10 group-hover:bg-black/20 transition-colors">
                 <div className="bg-white/90 dark:bg-gray-900/90 p-2.5 rounded-full shadow-lg backdrop-blur-sm">

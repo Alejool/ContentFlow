@@ -3,12 +3,13 @@ import { Dialog, DialogPanel } from "@headlessui/react";
 import {
   ChevronLeft,
   ChevronRight,
+  File,
   Film,
   Image as ImageIcon,
   Play,
   X,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 interface MediaFile {
   id: number;
@@ -433,7 +434,7 @@ function Lightbox({
   onClose: () => void;
   mediaFiles: MediaFile[];
   selectedIndex: number;
-  setSelectedIndex: (index: number) => void;
+  setSelectedIndex: React.Dispatch<React.SetStateAction<number>>;
 }) {
   const currentMedia = mediaFiles[selectedIndex];
   const isImage =
@@ -441,11 +442,15 @@ function Lightbox({
     currentMedia?.file_path?.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i);
 
   const nextSlide = () => {
-    setSelectedIndex((prev) => (prev === mediaFiles.length - 1 ? 0 : prev + 1));
+    setSelectedIndex((prev: number) =>
+      prev === mediaFiles.length - 1 ? 0 : prev + 1,
+    );
   };
 
   const prevSlide = () => {
-    setSelectedIndex((prev) => (prev === 0 ? mediaFiles.length - 1 : prev - 1));
+    setSelectedIndex((prev: number) =>
+      prev === 0 ? mediaFiles.length - 1 : prev - 1,
+    );
   };
 
   useEffect(() => {
@@ -571,23 +576,5 @@ function Lightbox({
         </DialogPanel>
       </div>
     </Dialog>
-  );
-}
-
-function File({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-      />
-    </svg>
   );
 }

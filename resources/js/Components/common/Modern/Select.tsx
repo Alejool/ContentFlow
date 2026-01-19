@@ -1,6 +1,7 @@
 import Label from "@/Components/common/Modern/Label";
 import {
   AlertCircle,
+  Check,
   CheckCircle,
   ChevronDown,
   LucideIcon,
@@ -39,7 +40,7 @@ function DropdownPortal({
       const dropdownHeight = Math.min(dropdown.scrollHeight, 240);
 
       dropdown.style.minWidth = `${selectRect.width}px`;
-      dropdown.style.width = 'auto';
+      dropdown.style.width = "auto";
       dropdown.style.left = `${selectRect.left}px`;
 
       if (dropdownDirection === "up") {
@@ -91,7 +92,7 @@ function DropdownPortal({
     >
       {children}
     </div>,
-    document.body
+    document.body,
   );
 }
 
@@ -156,7 +157,7 @@ export default function Select<T extends FieldValues>({
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedLabel, setSelectedLabel] = useState("");
   const [dropdownDirection, setDropdownDirection] = useState<"down" | "up">(
-    dropdownPosition === "auto" ? "down" : dropdownPosition
+    dropdownPosition === "auto" ? "down" : dropdownPosition,
   );
   const [selectRect, setSelectRect] = useState<DOMRect | null>(null);
 
@@ -191,8 +192,8 @@ export default function Select<T extends FieldValues>({
 
   const filteredOptions = searchable
     ? options.filter((option) =>
-      option.label.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+        option.label.toLowerCase().includes(searchTerm.toLowerCase()),
+      )
     : options;
 
   useEffect(() => {
@@ -214,7 +215,7 @@ export default function Select<T extends FieldValues>({
 
       if (dropdownPosition === "auto") {
         setDropdownDirection(
-          spaceBelow >= 240 || spaceBelow >= spaceAbove ? "down" : "up"
+          spaceBelow >= 240 || spaceBelow >= spaceAbove ? "down" : "up",
         );
       } else {
         setDropdownDirection(dropdownPosition);
@@ -310,9 +311,10 @@ export default function Select<T extends FieldValues>({
     const base = `
       ${currentSize.option} transition-colors duration-150
       flex items-center gap-3 w-full text-left px-4
-      ${isDisabled
-        ? "opacity-50 cursor-not-allowed"
-        : "cursor-pointer hover:bg-opacity-50"
+      ${
+        isDisabled
+          ? "opacity-50 cursor-not-allowed"
+          : "cursor-pointer hover:bg-opacity-50"
       }
     `;
 
@@ -404,9 +406,7 @@ export default function Select<T extends FieldValues>({
               </Label>
             )}
             {hint && !label && (
-              <span
-                className="text-xs text-gray-500 dark:text-gray-400 ml-auto"
-              >
+              <span className="text-xs text-gray-500 dark:text-gray-400 ml-auto">
                 {hint}
               </span>
             )}
@@ -416,9 +416,7 @@ export default function Select<T extends FieldValues>({
         <div className={getContainerStyles()}>
           <div className="relative">
             {Icon && (
-              <div
-                className="absolute left-3 top-1/2 -translate-y-1/2 z-10 text-gray-500 dark:text-gray-400"
-              >
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 z-10 text-gray-500 dark:text-gray-400">
                 <Icon className={currentSize.icon} />
               </div>
             )}
@@ -485,7 +483,8 @@ export default function Select<T extends FieldValues>({
 
                 <ChevronDown
                   className={`
-                    ${currentSize.icon
+                    ${
+                      currentSize.icon
                     } transition-transform duration-200 flex-shrink-0
                     ${isOpen ? "rotate-180" : ""}
                     text-gray-500 dark:text-gray-400
@@ -535,9 +534,7 @@ export default function Select<T extends FieldValues>({
           {searchable && (
             <div className="sticky top-0 bg-inherit border-b border-inherit">
               <div className="relative">
-                <Search
-                  className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 dark:text-gray-400"
-                />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 dark:text-gray-400" />
                 <input
                   ref={inputRef}
                   type="text"
@@ -572,7 +569,7 @@ export default function Select<T extends FieldValues>({
                     disabled={option.disabled}
                     className={`${getOptionStyles(
                       isSelected,
-                      !!option.disabled
+                      !!option.disabled,
                     )} ${option.disabled ? "cursor-not-allowed" : ""}`}
                     role="option"
                     aria-selected={isSelected}
@@ -585,20 +582,7 @@ export default function Select<T extends FieldValues>({
                       {option.label}
                     </span>
                     {isSelected && (
-                      <svg
-                        className="w-4 h-4 flex-shrink-0 text-purple-500 dark:text-purple-400"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        aria-hidden="true"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M5 13l4 4L19 7"
-                        />
-                      </svg>
+                      <Check className="w-4 h-4 flex-shrink-0 text-purple-500 dark:text-purple-400" />
                     )}
                   </button>
                 );

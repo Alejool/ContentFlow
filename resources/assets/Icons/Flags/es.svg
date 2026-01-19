@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 750 500">
+  <path fill="#c60b1e" d="M0 0h750v500H0z" />
+  <path fill="#ffc400" d="M0 125h750v250H0z" />
+  <g transform="translate(180, 175) scale(0.6)">
+    <path fill="#ffc400" stroke="#000" strokeWidth="2" d="M0 0h80v120H0z" />
+    <circle cx="40" cy="40" r="20" fill="#c60b1e" />
+  </g>
+</svg>

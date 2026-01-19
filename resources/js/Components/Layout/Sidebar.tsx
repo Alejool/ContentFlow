@@ -233,9 +233,7 @@ export default function Sidebar({
             })}
           </nav>
 
-          {/* Footer */}
           <div className="mt-auto">
-            {/* Sección de controles (Theme, Language) */}
             <div
               className={`p-4 border-t ${classes.borderColor} ${
                 isSidebarOpen
