@@ -342,7 +342,7 @@ export default function Dashboard({
             title={t("dashboard.avgEngagementRate")}
             value={stats.avgEngagementRate.toFixed(2)}
             icon={<TrendingUp className="w-6 h-6" />}
-            color="purple"
+            color="pink"
             format="percentage"
             theme={theme}
           />
@@ -393,12 +393,14 @@ export default function Dashboard({
               <div
                 className={`p-1.5 sm:p-2 rounded-full mb-1.5 sm:mb-2 ${
                   theme === "dark"
-                    ? `bg-${status.color}-900/20`
-                    : `bg-${status.color}-50`
+                    ? `bg-${status.color === "sky" ? "sky" : status.color}-900/20`
+                    : `bg-${status.color === "sky" ? "sky" : status.color}-50`
                 }`}
               >
                 <status.icon
-                  className={`w-3 h-3 sm:w-4 sm:h-4 text-${status.color}-500`}
+                  className={`w-3 h-3 sm:w-4 sm:h-4 text-${
+                    status.color === "sky" ? "sky" : status.color
+                  }-500`}
                 />
               </div>
               <p className="text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1">
