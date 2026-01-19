@@ -16,6 +16,7 @@ import { useTranslation } from "react-i18next";
 interface AuthenticatedLayoutProps {
   header?: ReactNode;
   children: ReactNode;
+  user?: User;
 }
 
 interface User {
@@ -100,7 +101,10 @@ export default function AuthenticatedLayout({
                   <div className="hidden md:flex items-center gap-2">
                     <NotificationButton />
                     <div className="h-6 w-px bg-gray-200 dark:bg-neutral-800 mx-1"></div>
-                    <ProfileDropdown user={user} />
+                    <ProfileDropdown
+                      user={user}
+                      isProfileActive={!!route().current("profile.edit")}
+                    />
                   </div>
                 </div>
               </div>

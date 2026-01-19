@@ -28,7 +28,8 @@ class ExistingUserDummyDataSeeder extends Seeder
     $this->command->info("Found {$users->count()} users. Generating data...");
 
     // Specific target user logic
-    $targetEmail = 'alejandroolartediaz@gmail.com';
+    // $targetEmail = 'alejandroolartediaz@gmail.com';
+    $targetEmail = 'demo@gmail.com';
     $targetUser = User::where('email', $targetEmail)->first();
 
     if (!$targetUser) {

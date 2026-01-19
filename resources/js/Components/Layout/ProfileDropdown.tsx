@@ -78,7 +78,7 @@ export default function ProfileDropdown({
       >
         <div className="px-2 pt-2 pb-3 mb-2">
           <div
-            className={`p-4 rounded-xl relative overflow-hidden group ${
+            className={`p-4 rounded-lg relative overflow-hidden group ${
               theme === "dark"
                 ? "bg-gradient-to-br from-neutral-800 to-neutral-900 border border-neutral-700/50"
                 : "bg-gradient-to-br from-gray-50 to-white border border-gray-100"

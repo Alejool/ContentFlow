@@ -106,11 +106,11 @@ const Content = ({
       leaveTo="opacity-0 scale-95"
     >
       <div
-        className={`absolute z-50 mt-2 rounded-xl shadow-2xl border border-gray-100 dark:border-neutral-700 ${alignmentClasses} ${widthClasses}`}
+        className={`absolute z-50 mt-2 rounded-lg shadow-2xl border border-gray-100 dark:border-neutral-700 ${alignmentClasses} ${widthClasses}`}
         onClick={() => setOpen(false)}
       >
         <div
-          className={`rounded-xl ring-1 ring-black ring-opacity-5 overflow-hidden
+          className={`rounded-lg ring-1 ring-black ring-opacity-5 overflow-hidden
                         ${contentClasses}`}
         >
           {children}

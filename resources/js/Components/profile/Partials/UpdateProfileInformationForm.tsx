@@ -128,18 +128,28 @@ export default function UpdateProfileInformation({
       <form onSubmit={handleSubmit} className="">
         {/* Sección: Información Personal */}
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <header className="mb-6 md:mb-8 border-b border-gray-100 dark:border-neutral-800 pb-4">
-            <div className="flex items-center gap-3 mb-1">
-              <div className="p-2 rounded-lg bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400">
+          <header className="mb-8">
+            <div className="flex items-center gap-4 mb-2">
+              <div className="p-2.5 rounded-lg bg-primary-500/10 text-primary-600 dark:text-primary-400 border border-primary-500/20">
                 <UserIcon className="w-5 h-5" />
               </div>
-              <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
-                {t("profile.information.title")}
-              </h2>
+              <div>
+                <div className="flex items-center gap-3">
+                  <h2 className="text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+                    {t("profile.information.title")}
+                  </h2>
+                  {user?.email_verified_at && (
+                    <div className="flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/50">
+                      <ShieldCheck className="w-3 h-3" />
+                      {t("profile.statistics.verified")}
+                    </div>
+                  )}
+                </div>
+                <p className="text-sm text-gray-500 dark:text-neutral-400">
+                  {t("profile.information.description")}
+                </p>
+              </div>
             </div>
-            <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 pl-11">
-              {t("profile.information.description")}
-            </p>
           </header>
           <div className="flex items-center gap-3 pb-2 ">
             <h3 className="text-sm font-bold uppercase tracking-widest text-primary-600 dark:text-primary-400">
@@ -174,13 +184,6 @@ export default function UpdateProfileInformation({
                 disabled
                 required
               />
-
-              {user?.email_verified_at && (
-                <div className="absolute right-0 top-6 flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800/50">
-                  <ShieldCheck className="w-3.5 h-3.5" />
-                  {t("profile.statistics.verified")}
-                </div>
-              )}
             </div>
           </div>
         </div>
@@ -291,7 +294,7 @@ export default function UpdateProfileInformation({
             </h3>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {platforms.map((platform) => {
               const platformSettings =
                 watchedValues.global_platform_settings?.[
@@ -304,30 +307,27 @@ export default function UpdateProfileInformation({
                   key={platform.id}
                   onClick={() => handleOpenSettings(platform.id)}
                   className={`
-                    group cursor-pointer p-4 md:p-6 rounded-2xl border transition-all duration-500
-                    bg-white dark:bg-neutral-800/40 border-gray-100 dark:border-neutral-700/50 hover:border-primary-500/50 hover:bg-neutral-50 dark:hover:bg-neutral-800/80 hover:shadow-xl dark:shadow-none hover:shadow-primary-500/10
+                    group cursor-pointer p-5 rounded-lg border transition-all duration-300
+                    bg-white dark:bg-neutral-800/40 border-gray-200 dark:border-neutral-700 hover:border-primary-500 hover:bg-white dark:hover:bg-neutral-800 hover:shadow-lg
                     ${hasSettings ? "ring-2 ring-primary-500/20" : ""}
                     hover:-translate-y-1 relative overflow-hidden
                   `}
                 >
-                  <div
-                    className={`absolute top-0 right-0 w-24 h-24 -mr-12 -mt-12 bg-primary-500/5 rounded-full blur-2xl group-hover:bg-primary-500/10 transition-colors pointer-events-none`}
-                  />
-                  <div className="flex flex-col sm:flex-row items-center sm:items-start lg:items-center gap-2 md:gap-3 text-center sm:text-left">
-                    <div className="p-2 bg-gray-50 dark:bg-neutral-800 rounded-lg group-hover:scale-110 transition-transform flex-shrink-0">
+                  <div className="flex flex-col items-center text-center gap-3">
+                    <div className="p-3 bg-gray-100 dark:bg-neutral-700 rounded-lg group-hover:scale-110 group-hover:bg-primary-500/10 group-hover:text-primary-600 transition-all">
                       <img
                         src={platform.icon}
                         alt={platform.name}
-                        className="w-4 h-4 md:w-5 md:h-5"
+                        className="w-6 h-6"
                       />
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-[11px] md:text-sm font-bold truncate">
-                        {platform.name}
-                      </div>
+                    <div className="space-y-1">
+                      <div className="text-sm font-bold">{platform.name}</div>
                       <div
-                        className={`text-[9px] md:text-[10px] font-medium uppercase tracking-wider ${
-                          hasSettings ? "text-green-500" : "text-gray-500"
+                        className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                          hasSettings
+                            ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                            : "bg-gray-100 text-gray-500 dark:bg-neutral-800 dark:text-neutral-500"
                         }`}
                       >
                         {hasSettings
@@ -399,35 +399,44 @@ export default function UpdateProfileInformation({
             </h3>
           </div>
 
-          <div className="p-5 sm:p-8 rounded-3xl border bg-white/50 dark:bg-neutral-800/20 border-gray-200 dark:border-neutral-700/50 transition-all duration-300 shadow-sm">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-              <div className="space-y-1">
-                <div className="font-bold text-lg text-gray-900 dark:text-gray-100">
-                  {t("profile.information.applicationLanguage")}
+          <div className="p-6 sm:p-10 rounded-lg border bg-gray-50/50 dark:bg-neutral-800/20 border-gray-200 dark:border-neutral-700/50 transition-all duration-300 shadow-sm relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+              <Sparkles className="w-20 h-20 text-primary-500" />
+            </div>
+            <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-8">
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-primary-500/10 text-primary-600">
+                    <Sparkles className="w-6 h-6" />
+                  </div>
+                  <div className="font-extrabold text-xl text-gray-900 dark:text-gray-100">
+                    {t("profile.information.applicationLanguage")}
+                  </div>
                 </div>
-                <div className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed max-w-md">
+                <div className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed max-w-md font-medium">
                   {t("profile.information.languageDescription")}
+                </div>
+                <div className="pt-2 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500">
+                  <div className="w-1.5 h-1.5 rounded-full bg-primary-500"></div>
+                  {t("profile.information.currentLanguage")}:{" "}
+                  <span className="text-primary-600 dark:text-primary-400">
+                    {i18n.language === "en" ? "English" : "Español"}
+                  </span>
                 </div>
               </div>
 
-              <div className="flex-shrink-0">
+              <div className="flex-shrink-0 bg-white dark:bg-neutral-800 p-4 rounded-lg shadow-sm border border-gray-100 dark:border-neutral-700">
                 {isChangingLanguage ? (
-                  <div className="flex items-center gap-2 text-sm font-medium text-primary-500">
+                  <div className="flex items-center gap-3 text-sm font-bold text-primary-500 px-4">
                     <div className="w-5 h-5 border-2 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
                     {t("common.changing")}
                   </div>
                 ) : (
-                  <LanguageSwitcher />
+                  <div className="scale-110 origin-right">
+                    <LanguageSwitcher />
+                  </div>
                 )}
               </div>
-            </div>
-
-            <div className="mt-6 pt-6 border-t border-gray-100 dark:border-neutral-700/30 text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 text-gray-400 dark:text-gray-500">
-              <Sparkles className="w-3.5 h-3.5" />
-              {t("profile.information.currentLanguage")}:{" "}
-              <span className="text-gray-800 dark:text-gray-200">
-                {i18n.language === "en" ? "English" : "Español"}
-              </span>
             </div>
           </div>
         </div>

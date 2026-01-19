@@ -240,7 +240,7 @@ export default function ManageContentPage() {
             <div className="inline-flex items-center p-1.5 rounded-2xl bg-white dark:bg-neutral-800 backdrop-blur-sm border border-gray-200/60 dark:border-neutral-700/60 gap-1 overflow-x-auto max-w-full shadow-sm">
               <button
                 onClick={() => handleTabChange("publications")}
-                className={`flex items-center justify-center gap-2 py-2.5 px-5 rounded-xl text-sm font-bold transition-all duration-200 whitespace-nowrap ${
+                className={`flex items-center justify-center gap-2 py-2.5 px-5 rounded-lg text-sm font-bold transition-all duration-200 whitespace-nowrap ${
                   activeTab === "publications"
                     ? "bg-primary-600 text-white shadow-md shadow-primary-500/20 ring-1 ring-primary-500/50"
                     : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-700/50"
@@ -253,7 +253,7 @@ export default function ManageContentPage() {
               </button>
               <button
                 onClick={() => handleTabChange("campaigns")}
-                className={`flex items-center justify-center gap-2 py-2.5 px-5 rounded-xl text-sm font-bold transition-all duration-200 whitespace-nowrap ${
+                className={`flex items-center justify-center gap-2 py-2.5 px-5 rounded-lg text-sm font-bold transition-all duration-200 whitespace-nowrap ${
                   activeTab === "campaigns"
                     ? "bg-primary-600 text-white shadow-md shadow-primary-500/20 ring-1 ring-primary-500/50"
                     : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-700/50"
@@ -266,7 +266,7 @@ export default function ManageContentPage() {
               </button>
               <button
                 onClick={() => handleTabChange("calendar")}
-                className={`flex items-center justify-center gap-2 py-2.5 px-5 rounded-xl text-sm font-bold transition-all duration-200 whitespace-nowrap ${
+                className={`flex items-center justify-center gap-2 py-2.5 px-5 rounded-lg text-sm font-bold transition-all duration-200 whitespace-nowrap ${
                   activeTab === "calendar"
                     ? "bg-primary-600 text-white shadow-md shadow-primary-500/20 ring-1 ring-primary-500/50"
                     : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-700/50"
@@ -279,7 +279,7 @@ export default function ManageContentPage() {
               </button>
               <button
                 onClick={() => handleTabChange("logs")}
-                className={`flex items-center justify-center gap-2 py-2.5 px-5 rounded-xl text-sm font-bold transition-all duration-200 whitespace-nowrap ${
+                className={`flex items-center justify-center gap-2 py-2.5 px-5 rounded-lg text-sm font-bold transition-all duration-200 whitespace-nowrap ${
                   activeTab === "logs"
                     ? "bg-primary-600 text-white shadow-md shadow-primary-500/20 ring-1 ring-primary-500/50"
                     : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-700/50"
@@ -293,7 +293,7 @@ export default function ManageContentPage() {
               {permissions.includes("approve") && (
                 <button
                   onClick={() => handleTabChange("approvals")}
-                  className={`flex items-center justify-center gap-2 py-2.5 px-5 rounded-xl text-sm font-bold transition-all duration-200 whitespace-nowrap ${
+                  className={`flex items-center justify-center gap-2 py-2.5 px-5 rounded-lg text-sm font-bold transition-all duration-200 whitespace-nowrap ${
                     activeTab === "approvals"
                       ? "bg-primary-600 text-white shadow-md shadow-primary-500/20 ring-1 ring-primary-500/50"
                       : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-700/50"
@@ -319,9 +319,9 @@ export default function ManageContentPage() {
               <div className="animate-in fade-in zoom-in duration-300 space-y-6">
                 <ApprovalStats refreshTrigger={refreshTrigger} />
 
-                <div className="bg-white dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 overflow-hidden shadow-sm">
+                <div className="bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 overflow-hidden shadow-sm">
                   <div className="border-b border-gray-200 dark:border-neutral-700 flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 bg-gray-50/50 dark:bg-neutral-800/50">
-                    <div className="flex bg-gray-200/50 dark:bg-neutral-700/50 p-1 rounded-xl w-fit">
+                    <div className="flex bg-gray-200/50 dark:bg-neutral-700/50 p-1 rounded-lg w-fit">
                       <button
                         onClick={() => setApprovalTab("pending")}
                         className={`px-6 py-2 rounded-lg font-bold text-sm transition-all ${

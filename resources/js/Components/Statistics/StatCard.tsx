@@ -232,7 +232,7 @@ const StatCard: React.FC<StatCardProps> = ({
 
   const getCardStyles = () => {
     const baseStyles =
-      "relative rounded-xl overflow-hidden transition-all duration-300 hover:shadow-2xl group";
+      "relative rounded-lg overflow-hidden transition-all duration-300 hover:shadow-2xl group";
     const darkStyles = `bg-neutral-800/40 backdrop-blur-md border ${colors.border} hover:bg-neutral-800/60`;
     const lightStyles = `bg-white border ${colors.border} hover:shadow-lg`;
 

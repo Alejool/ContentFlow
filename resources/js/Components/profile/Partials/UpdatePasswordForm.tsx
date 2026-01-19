@@ -58,18 +58,20 @@ const UpdatePasswordForm = ({ className = "" }: UpdatePasswordFormProps) => {
 
   return (
     <div className={className}>
-      <header className="mb-6 md:mb-8 border-b border-gray-100 dark:border-neutral-800 pb-4">
-        <div className="flex items-center gap-3 mb-1">
-          <div className="p-2 rounded-lg bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400">
+      <header className="mb-8">
+        <div className="flex items-center gap-4 mb-2">
+          <div className="p-2.5 rounded-lg bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20">
             <LockIcon className="w-5 h-5" />
           </div>
-          <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
-            {t("profile.password.title")}
-          </h2>
+          <div>
+            <h2 className="text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+              {t("profile.password.title")}
+            </h2>
+            <p className="text-sm text-gray-500 dark:text-neutral-400">
+              {t("profile.password.description")}
+            </p>
+          </div>
         </div>
-        <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 pl-11">
-          {t("profile.password.description")}
-        </p>
       </header>
 
       <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">

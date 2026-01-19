@@ -28,7 +28,7 @@ const navigationItems = [
   },
   {
     nameKey: "nav.manageContent",
-    href: "/ManageContent.index",
+    href: "manage-content.index",
     hrefPattern: "/ManageContent",
     icon: FileText,
   },
@@ -58,7 +58,7 @@ export default function Sidebar({
 
     const routePatterns: Record<string, string[]> = {
       dashboard: ["/dashboard"],
-      "/ManageContent.index": ["/ManageContent"],
+      "manage-content.index": ["/ManageContent"],
       "analytics.index": ["/analytics"],
       "workspaces.index": ["/workspaces"],
     };
@@ -69,14 +69,14 @@ export default function Sidebar({
 
     return patterns.some(
       (pattern) =>
-        currentPath === pattern || currentPath.startsWith(pattern + "/")
+        currentPath === pattern || currentPath.startsWith(pattern + "/"),
     );
   };
 
   const getRouteUrl = (routeName: string): string => {
     const routeUrls: Record<string, string> = {
       dashboard: "/dashboard",
-      "/ManageContent.index": "/ManageContent",
+      "manage-content.index": "/ManageContent",
       "analytics.index": "/analytics",
       "workspaces.index": "/workspaces",
     };
@@ -114,8 +114,9 @@ export default function Sidebar({
   return (
     <>
       <div
-        className={`hidden lg:block fixed  h-full z-50 pb-10 transition-all duration-500 ease-in-out ${isSidebarOpen ? "w-80" : "w-32"
-          }`}
+        className={`hidden lg:block fixed  h-full z-50 pb-10 transition-all duration-500 ease-in-out ${
+          isSidebarOpen ? "w-80" : "w-32"
+        }`}
       >
         <div
           className={`absolute inset-0 backdrop-blur-3xl border-r ${classes.borderColor} shadow-2xl opacity-90 ${classes.sidebarBg}`}
@@ -127,8 +128,9 @@ export default function Sidebar({
           >
             <Link
               href="/"
-              className={`flex items-center transition-all duration-300 ${!isSidebarOpen && "justify-center"
-                }`}
+              className={`flex items-center transition-all duration-300 ${
+                !isSidebarOpen && "justify-center"
+              }`}
             >
               <div
                 className={`w-12 h-12 bg-gradient-to-r rounded-lg flex items-center justify-center flex-shrink-0`}
@@ -159,17 +161,19 @@ export default function Sidebar({
             >
               {isSidebarOpen ? (
                 <ChevronLeft
-                  className={`h-5 w-5 transition-colors ${isDark
-                    ? "text-gray-400 hover:text-primary-400"
-                    : "text-gray-600 hover:text-primary-600"
-                    }`}
+                  className={`h-5 w-5 transition-colors ${
+                    isDark
+                      ? "text-gray-400 hover:text-primary-400"
+                      : "text-gray-600 hover:text-primary-600"
+                  }`}
                 />
               ) : (
                 <ChevronRight
-                  className={`h-5 w-5 transition-colors ${isDark
-                    ? "text-gray-400 hover:text-primary-400"
-                    : "text-gray-600 hover:text-primary-600"
-                    }`}
+                  className={`h-5 w-5 transition-colors ${
+                    isDark
+                      ? "text-gray-400 hover:text-primary-400"
+                      : "text-gray-600 hover:text-primary-600"
+                  }`}
                 />
               )}
             </button>
@@ -177,10 +181,9 @@ export default function Sidebar({
 
           <WorkspaceSwitcher isSidebarOpen={isSidebarOpen} />
 
-          {/* Navegación principal */}
           <nav className="flex-1 px-4 py-6 space-y-2">
             {navigationItems.map((item) => {
-              const isActive = isRouteActive(item.href);
+              const isActive = !!route().current(item.href);
               return (
                 <NavLink
                   key={item.href}
@@ -193,10 +196,11 @@ export default function Sidebar({
                         ${classes.hoverBg}
                         ${classes.textColor}
                         hover:shadow-lg
-                        ${isActive
-                      ? `${classes.activeGradient} text-white shadow-lg hover:text-white`
-                      : `${classes.textColor} ${classes.hoverText}`
-                    }`}
+                        ${
+                          isActive
+                            ? `${classes.activeGradient} text-white shadow-lg hover:text-white`
+                            : `${classes.textColor} ${classes.hoverText}`
+                        }`}
                 >
                   <div className="flex items-center justify-center rounded-full h-10">
                     <item.icon className="h-5 w-5" />
@@ -233,14 +237,16 @@ export default function Sidebar({
           <div className="mt-auto">
             {/* Sección de controles (Theme, Language) */}
             <div
-              className={`p-4 border-t ${classes.borderColor} ${isSidebarOpen
-                ? "flex items-center justify-between"
-                : "flex flex-col items-center gap-3"
-                }`}
+              className={`p-4 border-t ${classes.borderColor} ${
+                isSidebarOpen
+                  ? "flex items-center justify-between"
+                  : "flex flex-col items-center gap-3"
+              }`}
             >
               <div
-                className={`flex items-center justify-center gap-2 w-full ${isSidebarOpen ? "flex-row" : "flex-col"
-                  }`}
+                className={`flex items-center justify-center gap-2 w-full ${
+                  isSidebarOpen ? "flex-row" : "flex-col"
+                }`}
               >
                 <ThemeSwitcher />
                 <LanguageSwitcher />

@@ -73,7 +73,7 @@ export default function FilterSection({
   ];
 
   return (
-    <div className="flex flex-col gap-4 bg-white dark:bg-neutral-800/50 p-4 rounded-xl border border-gray-100 dark:border-neutral-700 shadow-sm mt-4">
+    <div className="flex flex-col gap-4 bg-white dark:bg-neutral-800/50 p-4 rounded-lg border border-gray-100 dark:border-neutral-700 shadow-sm mt-4">
       <div className="flex flex-col md:flex-row gap-4 items-end">
         <div className="flex-1 w-full">
           <Input
