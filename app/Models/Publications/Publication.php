@@ -130,7 +130,7 @@ class Publication extends Model
 
   public function isApproved(): bool
   {
-    if ($this->status === 'approved' || $this->status === 'published') {
+    if ($this->status === 'approved' || $this->status === 'published' || $this->status === 'scheduled') {
       return true;
     }
 

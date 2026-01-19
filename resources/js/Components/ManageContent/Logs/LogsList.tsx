@@ -27,7 +27,6 @@ interface LogsListProps {
 
 import LogCardSkeleton from "@/Components/ManageContent/Logs/LogCardSkeleton";
 import LogRowSkeleton from "@/Components/ManageContent/Logs/LogRowSkeleton";
-// import emptyStateImg from "/empty-state.svg";
 
 const LogsList = memo(
   ({
@@ -177,7 +176,6 @@ const LogsList = memo(
         }
         actions={headerActions}
       >
-        {/* Filters - Mobile collapsed, desktop always visible */}
         <div
           className={`p-4 border-b border-gray-200 dark:border-neutral-700 ${
             showFilters ? "block" : "hidden sm:block"
@@ -198,10 +196,8 @@ const LogsList = memo(
           </div>
         </div>
 
-        {/* Desktop Table */}
         <div className="hidden md:block overflow-x-auto scrollbar-subtle">
           <div className="grid grid-cols-1 grid-rows-1">
-            {/* Data Table */}
             <div
               className={`col-start-1 row-start-1 transition-all duration-500 ${smoothLoading ? "invisible opacity-0" : "visible opacity-100"}`}
             >
@@ -329,7 +325,6 @@ const LogsList = memo(
               </table>
             </div>
 
-            {/* Skeleton Layer */}
             {smoothLoading && (
               <div className="col-start-1 row-start-1 bg-white/50 dark:bg-neutral-800/50 animate-out fade-out duration-500 fill-mode-forwards z-20">
                 <table className="w-full text-left text-sm">
@@ -366,10 +361,8 @@ const LogsList = memo(
           </div>
         </div>
 
-        {/* Mobile Cards */}
         <div className="md:hidden px-2">
           <div className="grid grid-cols-1 grid-rows-1">
-            {/* Data Layer */}
             <div
               className={`col-start-1 row-start-1 transition-all duration-500 ${smoothLoading ? "invisible opacity-0" : "visible opacity-100"}`}
             >
@@ -384,7 +377,6 @@ const LogsList = memo(
                       key={log.id}
                       className="p-4 hover:bg-gray-50/50 dark:hover:bg-neutral-700/30 transition-colors"
                     >
-                      {/* Header with Date and Status */}
                       <div className="flex justify-between items-start mb-3">
                         <div className="text-sm text-gray-500 dark:text-gray-400">
                           {format(new Date(log.updated_at), "MMM d, HH:mm")}
@@ -401,7 +393,6 @@ const LogsList = memo(
                         </div>
                       </div>
 
-                      {/* Platform and Account */}
                       <div className="flex items-center gap-2 mb-3">
                         <span
                           className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${getPlatformColor(
@@ -417,7 +408,6 @@ const LogsList = memo(
                         )}
                       </div>
 
-                      {/* Content */}
                       <div className="mb-3">
                         <ExpandableText
                           text={log.content || "-"}
@@ -426,7 +416,6 @@ const LogsList = memo(
                         />
                       </div>
 
-                      {/* Source */}
                       <div className="mb-3">
                         {(log.campaign || log.publication?.campaigns?.[0]) && (
                           <div className="text-xs text-blue-600 dark:text-blue-400 font-medium">
@@ -442,7 +431,6 @@ const LogsList = memo(
                         )}
                       </div>
 
-                      {/* Actions */}
                       <div className="flex justify-between items-center mt-4 pt-3 border-t border-gray-100 dark:border-neutral-700/50">
                         <div className="text-xs text-gray-500 dark:text-gray-400">
                           ID: {log.id}
@@ -468,7 +456,6 @@ const LogsList = memo(
               )}
             </div>
 
-            {/* Skeleton Layer */}
             {smoothLoading && (
               <div className="col-start-1 row-start-1 bg-white dark:bg-neutral-800 animate-out fade-out duration-500 fill-mode-forwards space-y-3 z-20">
                 {[...Array(5)].map((_, i) => (
@@ -479,13 +466,12 @@ const LogsList = memo(
           </div>
         </div>
 
-        {/* Pagination */}
-        {pagination && pagination.last_page > 1 && (
+        {pagination && pagination.total > 0 && (
           <AdvancedPagination
             currentPage={pagination.current_page}
             lastPage={pagination.last_page}
             total={pagination.total}
-            perPage={pagination.per_page || 10}
+            perPage={pagination.per_page || 12}
             onPageChange={onPageChange || (() => {})}
             onPerPageChange={onPerPageChange || (() => {})}
             t={t}

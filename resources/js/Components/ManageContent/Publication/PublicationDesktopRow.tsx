@@ -22,6 +22,7 @@ interface PublicationRowProps {
   onDelete: (id: number) => void;
   onPublish: (item: Publication) => void;
   onEditRequest?: (item: Publication) => void;
+  onViewDetails?: (item: Publication) => void;
   remoteLock?: {
     user_id: number;
     user_name: string;
@@ -40,6 +41,7 @@ const PublicationRow = memo(
     onDelete,
     onPublish,
     onEditRequest,
+    onViewDetails,
     remoteLock,
     permissions,
   }: PublicationRowProps) => {
@@ -265,8 +267,8 @@ const PublicationRow = memo(
             {/* View Details button - Always visible for all users */}
             {!permissions?.includes("manage-content") && (
               <button
-                onClick={() => onPublish(item)}
-                className="p-1.5 text-primary-500 hover:bg-primary-50 rounded-lg dark:hover:bg-primary-900/20 transition-all font-bold"
+                onClick={() => onViewDetails?.(item)}
+                className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-300 transition-colors"
                 title="Ver Detalles"
               >
                 <Eye className="w-4 h-4" />
@@ -275,8 +277,8 @@ const PublicationRow = memo(
             {item.status === "published" &&
               permissions?.includes("manage-content") && (
                 <button
-                  onClick={() => onPublish(item)}
-                  className="p-1.5 text-primary-500 hover:bg-primary-50 rounded-lg dark:hover:bg-primary-900/20 transition-all font-bold"
+                  onClick={() => onViewDetails?.(item)}
+                  className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-300 transition-colors"
                   title="Ver Detalles"
                 >
                   <Eye className="w-4 h-4" />
@@ -321,29 +323,28 @@ const PublicationRow = memo(
                 )}
               </button>
             )}
-            {/* Delete button - Only for Owner/Admin (users with publish permission) */}
-            {permissions?.includes("publish") &&
-              permissions?.includes("manage-content") && (
-                <button
-                  onClick={async () => {
-                    setIsDeleting(true);
-                    try {
-                      await onDelete(item.id);
-                    } finally {
-                      setIsDeleting(false);
-                    }
-                  }}
-                  disabled={isPublishing || isEditing || isDeleting}
-                  className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg dark:hover:bg-red-900/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                  title="Eliminar"
-                >
-                  {isDeleting ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <Trash2 className="w-4 h-4" />
-                  )}
-                </button>
-              )}
+            {/* Delete button - Only for Owner/Admin or users with manage-content */}
+            {permissions?.includes("manage-content") && (
+              <button
+                onClick={async () => {
+                  setIsDeleting(true);
+                  try {
+                    await onDelete(item.id);
+                  } finally {
+                    setIsDeleting(false);
+                  }
+                }}
+                disabled={isPublishing || isEditing || isDeleting}
+                className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg dark:hover:bg-red-900/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                title="Eliminar"
+              >
+                {isDeleting ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Trash2 className="w-4 h-4" />
+                )}
+              </button>
+            )}
           </div>
         </td>
       </>

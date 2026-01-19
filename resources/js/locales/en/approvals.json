@@ -23,12 +23,23 @@
     "noReasonProvided": "No reason provided.",
     "editPublication": "Edit Publication",
     "searchPlaceholder": "Search by publication title...",
+    "requestedBy": "Requested by",
+    "requestedAt": "Request Date",
+    "reviewedBy": "Reviewed by",
+    "reviewedAt": "Review Date",
+    "action": "Action",
+    "reason": "Reason",
     "noHistory": "No approval history found",
     "stats": {
       "pendingRequests": "Pending Requests",
       "approvedToday": "Approved Today",
       "rejectedToday": "Rejected Today",
       "avgApprovalTime": "Avg. Approval Time"
+    },
+    "status": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected"
     },
     "historyTable": {
       "publication": "Publication",

@@ -227,10 +227,7 @@ class CampaignController extends Controller
         // Clear cache after deleting campaign
         $this->clearCampaignCache(Auth::user()->current_workspace_id);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Campaign deleted successfully',
-        ]);
+        return redirect()->back()->with('success', 'Campaign deleted successfully');
     }
 
     /**

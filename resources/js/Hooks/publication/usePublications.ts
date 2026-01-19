@@ -316,6 +316,7 @@ export const usePublications = () => {
       pagination,
       isLoading,
       handlePageChange,
+      handlePerPageChange,
       handleRefresh,
       isAddModalOpen,
       isEditModalOpen,

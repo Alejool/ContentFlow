@@ -23,7 +23,7 @@ export default function CampaignPublications({
       >
         <div className="px-4 lg:px-12 py-4">
           <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3 pl-2 border-l-2 border-primary-500">
-            {t("campaigns.modal.showCampaign.associatedPublications")}
+            {t("campaigns.modal.view.associatedPublications")}
           </div>
           {publications.length > 0 ? (
             <div className="grid grid-cols-1 gap-2">

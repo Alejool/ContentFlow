@@ -1,9 +1,12 @@
 import LogsList from "@/Components/ManageContent/Logs/LogsList";
 import ModalManager from "@/Components/ManageContent/ModalManager";
+import ModalFooter from "@/Components/ManageContent/modals/common/ModalFooter";
+import ModalHeader from "@/Components/ManageContent/modals/common/ModalHeader";
 import SocialMediaAccounts from "@/Components/ManageContent/socialAccount/SocialMediaAccounts";
+import Modal from "@/Components/common/ui/Modal";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { usePublicationStore } from "@/stores/publicationStore";
-import { Head, usePage } from "@inertiajs/react";
+import { Head, router, usePage } from "@inertiajs/react";
 import {
   AlertCircle,
   Calendar as CalendarIcon,
@@ -13,6 +16,7 @@ import {
   Folder,
   Plus,
   Target,
+  Trash2,
 } from "lucide-react";
 import {
   useCallback,
@@ -146,10 +150,41 @@ export default function ManageContentPage() {
   const [approvalTab, setApprovalTab] = useState("pending");
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
+  // Delete Confirmation State
+  const [deleteConfirmation, setDeleteConfirmation] = useState<{
+    isOpen: boolean;
+    id: number | null;
+  }>({ isOpen: false, id: null });
+
   const handleRefreshWrapped = useCallback(() => {
     handleRefresh();
     setRefreshTrigger((prev) => prev + 1);
   }, [handleRefresh]);
+
+  const handleDeleteItemClick = (id: number) => {
+    setDeleteConfirmation({ isOpen: true, id });
+  };
+
+  const confirmDelete = () => {
+    if (!deleteConfirmation.id) return;
+
+    // Determine the correct route based on activeTab
+    const routeName =
+      activeTab === "campaigns" ? "campaigns.destroy" : "publications.destroy";
+
+    router.delete(route(routeName, deleteConfirmation.id), {
+      preserveScroll: true,
+      onSuccess: () => {
+        setDeleteConfirmation({ isOpen: false, id: null });
+        handleRefreshWrapped();
+      },
+      onFinish: () => {
+        setDeleteConfirmation({ isOpen: false, id: null });
+        // Ensure manual refresh if standard inertia reload doesn't catch it
+        handleRefreshWrapped();
+      },
+    });
+  };
 
   const statusTabs = useMemo(
     () => [
@@ -408,7 +443,7 @@ export default function ManageContentPage() {
                   }
                   onPageChange={handlePageChange}
                   onEdit={openEditModal}
-                  onDelete={handleDeleteItem}
+                  onDelete={handleDeleteItemClick}
                   onViewDetails={openViewDetailsModal}
                   onPublish={openPublishModal}
                   onEditRequest={handleEditRequest}
@@ -416,6 +451,7 @@ export default function ManageContentPage() {
                   expandedCampaigns={expandedCampaigns}
                   toggleExpand={toggleExpand}
                   permissions={permissions}
+                  onPerPageChange={handlePerPageChange}
                 />
               </div>
             )}
@@ -424,6 +460,39 @@ export default function ManageContentPage() {
       </div>
 
       <ModalManager onRefresh={handleRefreshWrapped} />
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        show={deleteConfirmation.isOpen}
+        onClose={() => setDeleteConfirmation({ isOpen: false, id: null })}
+        maxWidth="md"
+      >
+        <ModalHeader
+          t={t}
+          onClose={() => setDeleteConfirmation({ isOpen: false, id: null })}
+          title="common.deleteConfirmTitle"
+          icon={Trash2}
+          iconColor="text-red-500"
+          size="md"
+        />
+
+        <div className="p-6">
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            {t("common.deleteConfirm") ||
+              "¿Estás seguro de que deseas eliminar este elemento? Esta acción no se puede deshacer."}
+          </p>
+        </div>
+
+        <ModalFooter
+          onClose={() => setDeleteConfirmation({ isOpen: false, id: null })}
+          onPrimarySubmit={confirmDelete}
+          submitText={t("common.delete") || "Eliminar"}
+          cancelText={t("common.cancel") || "Cancelar"}
+          submitVariant="danger"
+          submitIcon={<Trash2 className="w-4 h-4" />}
+          cancelStyle="outline"
+        />
+      </Modal>
     </AuthenticatedLayout>
   );
 }

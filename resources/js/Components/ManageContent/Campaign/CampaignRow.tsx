@@ -1,11 +1,16 @@
 import { Campaign } from "@/types/Campaign";
 import { usePage } from "@inertiajs/react";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
 import {
+  Calendar,
   ChevronDown,
   ChevronRight,
+  DollarSign,
   Edit,
   Eye,
   Layers,
+  Target,
   Trash2,
 } from "lucide-react";
 import { memo } from "react";
@@ -73,6 +78,45 @@ const CampaignRow = memo(
               <p className="text-xs mt-0.5 line-clamp-1 text-gray-500 dark:text-gray-400">
                 {item.description || "No description"}
               </p>
+
+              {/* Goal & Dates */}
+              <div className="flex items-center gap-3 mt-1.5 flex-wrap">
+                {(item.start_date || item.end_date) && (
+                  <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+                    <Calendar className="w-3 h-3" />
+                    <span>
+                      {item.start_date
+                        ? format(new Date(item.start_date), "d MMM", {
+                            locale: es,
+                          })
+                        : "..."}
+                      {" - "}
+                      {item.end_date
+                        ? format(new Date(item.end_date), "d MMM yyyy", {
+                            locale: es,
+                          })
+                        : "..."}
+                    </span>
+                  </div>
+                )}
+                {item.goal && (
+                  <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-white/5 px-1.5 py-0.5 rounded">
+                    <Target className="w-3 h-3 text-primary-500" />
+                    <span className="truncate max-w-[150px]">{item.goal}</span>
+                  </div>
+                )}
+                {item.budget && (
+                  <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 bg-green-50 dark:bg-green-900/10 px-1.5 py-0.5 rounded">
+                    <DollarSign className="w-3 h-3 text-green-600 dark:text-green-400" />
+                    <span>
+                      {new Intl.NumberFormat("es-ES", {
+                        style: "currency",
+                        currency: "USD",
+                      }).format(item.budget)}
+                    </span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </td>
@@ -141,6 +185,7 @@ const CampaignRow = memo(
                 <button
                   onClick={() => onDelete(item.id)}
                   className="p-2 text-red-500 hover:bg-red-50 rounded-lg dark:hover:bg-red-900/20"
+                  title="Eliminar"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>

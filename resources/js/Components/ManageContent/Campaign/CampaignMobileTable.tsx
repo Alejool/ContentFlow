@@ -1,12 +1,15 @@
 import { Campaign } from "@/types/Campaign";
 import { usePage } from "@inertiajs/react";
 import { format } from "date-fns";
+import { es } from "date-fns/locale";
 import {
   Calendar,
   ChevronDown,
   ChevronRight,
+  DollarSign,
   Edit,
   Eye,
+  Target,
   Trash2,
 } from "lucide-react";
 
@@ -39,7 +42,6 @@ export default function CampaignMobileTable({
   const canManageContent =
     auth.current_workspace?.permissions?.includes("manage-content");
 
-  console.log("items: ", items);
   return (
     <div className="lg:hidden">
       <div className="flex flex-col gap-3 m-2">
@@ -67,13 +69,44 @@ export default function CampaignMobileTable({
                 </div>
               </div>
 
+              {/* Goal & Budget */}
+              {(item.goal || item.budget) && (
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {item.goal && (
+                    <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-neutral-900/50 px-2 py-1 rounded-md">
+                      <Target className="w-3 h-3 text-primary-500" />
+                      <span className="line-clamp-1">{item.goal}</span>
+                    </div>
+                  )}
+                  {item.budget && (
+                    <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 bg-green-50 dark:bg-green-900/10 px-2 py-1 rounded-md">
+                      <DollarSign className="w-3 h-3 text-green-600 dark:text-green-400" />
+                      <span>
+                        {new Intl.NumberFormat("es-ES", {
+                          style: "currency",
+                          currency: "USD",
+                        }).format(item.budget)}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
+
               <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400 mb-3">
                 <div className="flex items-center gap-1">
                   <Calendar className="w-4 h-4" />
                   <span>
                     {item.start_date
-                      ? format(new Date(item.start_date), "MMM d, yyyy")
-                      : "N/A"}
+                      ? format(new Date(item.start_date), "d MMM", {
+                          locale: es,
+                        })
+                      : "..."}
+                    {" - "}
+                    {item.end_date
+                      ? format(new Date(item.end_date), "d MMM yyyy", {
+                          locale: es,
+                        })
+                      : "..."}
                   </span>
                 </div>
                 {item.publications && item.publications.length > 0 && (
@@ -150,7 +183,7 @@ export default function CampaignMobileTable({
               item.publications.length > 0 && (
                 <div className="border-t border-gray-200 dark:border-neutral-700 p-4">
                   <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3 pl-2 border-l-2 border-primary-500">
-                    {t("campaigns.modal.showCampaign.associatedPublications")}
+                    {t("campaigns.modal.view.associatedPublications")}
                   </div>
                   <div className="space-y-2">
                     {item.publications.map((pub) => (

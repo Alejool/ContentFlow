@@ -46,9 +46,15 @@ export default function AuthenticatedLayout({
     }
   }, [user?.id]);
 
+  //  bg-[url('/resources/assets/bg.jpg')] bg-cover bg-center bg-no-repeat
+
   return (
     <div className="h-screen flex flex-col overflow-hidden w-full max-w-full">
-      <div className="relative flex-1 min-h-0 flex bg-[url('/resources/assets/bg.jpg')] bg-cover bg-center bg-no-repeat w-full max-w-full min-w-0 overflow-x-hidden">
+      <div
+        className="relative flex-1 min-h-0 flex
+  w-full
+      max-w-full min-w-0 overflow-x-hidden"
+      >
         <div
           className={`
             absolute inset-0

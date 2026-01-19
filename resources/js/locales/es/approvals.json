@@ -23,12 +23,23 @@
     "noReasonProvided": "No se proporcionó una razón.",
     "editPublication": "Editar Publicación",
     "searchPlaceholder": "Buscar por título de publicación...",
+    "requestedBy": "Solicitado por",
+    "requestedAt": "Fecha Solicitud",
+    "reviewedBy": "Revisado por",
+    "reviewedAt": "Fecha Revisión",
+    "action": "Acción",
+    "reason": "Razón",
     "noHistory": "No se encontró historial de aprobaciones",
     "stats": {
       "pendingRequests": "Solicitudes Pendientes",
       "approvedToday": "Aprobadas Hoy",
       "rejectedToday": "Rechazadas Hoy",
       "avgApprovalTime": "Tiempo Promedio de Aprobación"
+    },
+    "status": {
+      "pending": "Pendiente",
+      "approved": "Aprobado",
+      "rejected": "Rechazado"
     },
     "historyTable": {
       "publication": "Publicación",

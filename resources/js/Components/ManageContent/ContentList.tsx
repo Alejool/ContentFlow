@@ -1,12 +1,11 @@
-import CampaignTable from "@/Components/ManageContent/Campaign/CampaignTable"; // Reuse existing table
-import PublicationTable from "@/Components/ManageContent/Publication/PublicationTable"; // Reuse existing table
-import Pagination from "@/Components/ManageContent/common/Pagination";
+import CampaignTable from "@/Components/ManageContent/Campaign/CampaignTable";
+import PublicationTable from "@/Components/ManageContent/Publication/PublicationTable";
+import AdvancedPagination from "@/Components/common/ui/AdvancedPagination";
 import { LayoutGrid, List as ListIcon } from "lucide-react";
-import React, { useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useTranslation } from "react-i18next";
 import ContentCard from "./ContentCard";
 import ContentCardSkeleton from "./ContentCardSkeleton";
-// import emptyStateImg from "/empty-state.svg";
 
 interface ContentListProps {
   items: any[];
@@ -18,8 +17,8 @@ interface ContentListProps {
   isLoading: boolean;
   pagination: any;
   onPageChange: (page: number) => void;
+  onPerPageChange?: (perPage: number) => void;
   connectedAccounts?: any[];
-  // .. add other props needed for tables
   onEditRequest?: (item: any) => void;
   expandedCampaigns?: number[];
   toggleExpand?: (id: number) => void;
@@ -28,13 +27,12 @@ interface ContentListProps {
 
 export default function ContentList(props: ContentListProps) {
   const [viewMode, setViewMode] = useState<"grid" | "list">("list");
-  const [isPending, startTransition] = React.useTransition();
+  const [isPending, startTransition] = useTransition();
   const { t } = useTranslation();
 
   const { items, isLoading, mode } = props;
-  const [smoothLoading, setSmoothLoading] = React.useState(true); // Start true for initial mount
-
-  React.useEffect(() => {
+  const [smoothLoading, setSmoothLoading] = useState(true);
+  useEffect(() => {
     if (isLoading) {
       setSmoothLoading(true);
     } else {
@@ -45,8 +43,7 @@ export default function ContentList(props: ContentListProps) {
     }
   }, [isLoading]);
 
-  // Force smooth transition when viewMode changes
-  React.useEffect(() => {
+  useEffect(() => {
     setSmoothLoading(true);
     const timer = setTimeout(() => {
       setSmoothLoading(false);
@@ -54,32 +51,8 @@ export default function ContentList(props: ContentListProps) {
     return () => clearTimeout(timer);
   }, [viewMode]);
 
-  if (!smoothLoading && (!items || items.length === 0)) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20 px-4 text-center animate-in fade-in zoom-in duration-500">
-        <div className="relative mb-6">
-          <div className="absolute inset-0 bg-primary-100 dark:bg-primary-900/20 rounded-full blur-2xl opacity-50 scale-150 animate-pulse" />
-          <div className="relative">
-            <img
-              src="/assets/empty-state.svg"
-              alt="No Content"
-              className="w-48 h-auto object-contain drop-shadow-xl"
-            />
-          </div>
-        </div>
-        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-          {t(`${mode}.table.emptyState.title`)}
-        </h3>
-        <p className="text-gray-500 dark:text-gray-400 max-w-xs mx-auto">
-          {t(`${mode}.table.emptyState.description`)}
-        </p>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-4">
-      {/* View Toggle */}
       <div className="flex justify-end mb-2">
         <div className="bg-gray-100 dark:bg-gray-800 p-1 rounded-lg flex items-center gap-1">
           <button
@@ -107,13 +80,27 @@ export default function ContentList(props: ContentListProps) {
 
       {viewMode === "grid" ? (
         <div className="grid grid-cols-1 grid-rows-1">
-          {/* Reality Layer */}
           <div
             className={`col-start-1 row-start-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 transition-all duration-500 ${smoothLoading ? "invisible opacity-0" : "visible opacity-100"}`}
           >
             {items.length === 0 ? (
-              <div className="col-span-full text-center py-20 text-gray-400">
-                No content found.
+              <div className="col-span-full flex flex-col items-center justify-center py-20 px-4 text-center animate-in fade-in zoom-in duration-500">
+                <div className="relative mb-6">
+                  <div className="absolute inset-0 bg-primary-100 dark:bg-primary-900/20 rounded-full blur-2xl opacity-50 scale-150 animate-pulse" />
+                  <div className="relative">
+                    <img
+                      src="/assets/empty-state.svg"
+                      alt="No Content"
+                      className="w-48 h-auto object-contain drop-shadow-xl"
+                    />
+                  </div>
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                  {t(`${mode}.table.emptyState.title`)}
+                </h3>
+                <p className="text-gray-500 dark:text-gray-400 max-w-xs mx-auto">
+                  {t(`${mode}.table.emptyState.description`)}
+                </p>
               </div>
             ) : (
               items.map((item) => (
@@ -131,7 +118,6 @@ export default function ContentList(props: ContentListProps) {
             )}
           </div>
 
-          {/* Skeleton Layer */}
           {smoothLoading && (
             <div className="col-start-1 row-start-1 bg-gray-50 dark:bg-neutral-900 animate-out fade-out duration-500 fill-mode-forwards z-20">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -152,6 +138,7 @@ export default function ContentList(props: ContentListProps) {
               expandedCampaigns={props.expandedCampaigns || []}
               toggleExpand={props.toggleExpand || (() => {})}
               onViewDetails={props.onViewDetails || (() => {})}
+              onPerPageChange={props.onPerPageChange}
             />
           ) : (
             <PublicationTable
@@ -160,20 +147,26 @@ export default function ContentList(props: ContentListProps) {
               t={t}
               connectedAccounts={props.connectedAccounts || []}
               onPublish={props.onPublish || (() => {})}
+              onViewDetails={props.onViewDetails}
+              onPerPageChange={props.onPerPageChange}
             />
           )}
         </div>
       )}
 
-      {props.pagination && props.pagination.last_page > 1 && (
-        <div className="mt-6">
-          <Pagination
-            pagination={props.pagination}
+      {viewMode === "grid" &&
+        props.pagination &&
+        props.pagination.total > 0 && (
+          <AdvancedPagination
+            currentPage={props.pagination.current_page}
+            lastPage={props.pagination.last_page}
+            total={props.pagination.total}
+            perPage={props.pagination.per_page || 12}
             onPageChange={props.onPageChange}
+            onPerPageChange={props.onPerPageChange || (() => {})}
             t={t}
           />
-        </div>
-      )}
+        )}
     </div>
   );
 }

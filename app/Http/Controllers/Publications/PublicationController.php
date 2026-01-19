@@ -204,9 +204,9 @@ class PublicationController extends Controller
 
       $this->clearPublicationCache($workspaceId);
 
-      return $this->successResponse(null, 'Publication deleted successfully');
+      return redirect()->back()->with('success', 'Publication deleted successfully');
     } catch (\Exception $e) {
-      return $this->errorResponse('Deletion failed: ' . $e->getMessage(), 500);
+      return redirect()->back()->with('error', 'Deletion failed: ' . $e->getMessage());
     }
   }
 

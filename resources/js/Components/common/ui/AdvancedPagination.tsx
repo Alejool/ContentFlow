@@ -7,7 +7,7 @@ interface AdvancedPaginationProps {
   perPage: number;
   onPageChange: (page: number) => void;
   onPerPageChange: (perPage: number) => void;
-  t: (key: string) => string;
+  t: (key: string, options?: any) => string;
   isLoading?: boolean;
 }
 
@@ -48,14 +48,15 @@ export default function AdvancedPagination({
 
   return (
     <div className="px-6 py-4 border-t border-gray-100 dark:border-neutral-700/50 flex flex-col lg:flex-row items-center justify-between gap-4">
-      {/* Per Page Selector & Info */}
       <div className="flex flex-col sm:flex-row items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
         <div className="flex items-center gap-2">
-          <span>{t("common.pagination.show") || "Mostrar"}</span>
+          <span>
+            {t("common.pagination.show", { defaultValue: "Mostrar" })}
+          </span>
           <select
             value={perPage}
             onChange={(e) => onPerPageChange(Number(e.target.value))}
-            className="bg-white dark:bg-neutral-800 border border-gray-300 dark:border-neutral-600 rounded-lg px-2 py-1 text-sm focus:ring-primary-500 focus:border-primary-500 transition-colors"
+            className="bg-white dark:bg-neutral-800 border border-gray-300 dark:border-neutral-600 rounded-lg pl-3 pr-8 py-1 text-sm focus:ring-primary-500 focus:border-primary-500 transition-colors"
           >
             {perPageOptions.map((opt) => (
               <option key={opt} value={opt}>
@@ -63,22 +64,23 @@ export default function AdvancedPagination({
               </option>
             ))}
           </select>
-          <span>{t("common.pagination.entries") || "entradas"}</span>
+          <span>
+            {t("common.pagination.entries", { defaultValue: "entradas" })}
+          </span>
         </div>
         {total !== undefined && (
           <span className="hidden sm:inline">
-            {t("common.pagination.info")
-              ? t("common.pagination.info", {
-                  from: (currentPage - 1) * perPage + 1,
-                  to: Math.min(currentPage * perPage, total),
-                  total,
-                } as any)
-              : `Mostrando ${(currentPage - 1) * perPage + 1} a ${Math.min(currentPage * perPage, total)} de ${total}`}
+            {t("common.pagination.info", {
+              defaultValue:
+                "Mostrando {{from}} a {{to}} de {{total}} resultados",
+              from: (currentPage - 1) * perPage + 1,
+              to: Math.min(currentPage * perPage, total),
+              total,
+            } as any)}
           </span>
         )}
       </div>
 
-      {/* Navigation */}
       <div className="flex items-center gap-1">
         <button
           onClick={() => onPageChange(currentPage - 1)}

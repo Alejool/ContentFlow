@@ -29,9 +29,7 @@ export default function ApprovalStats({ refreshTrigger }: ApprovalStatsProps) {
       const response = await axios.get(route("approvals.stats"));
       const json = response.data;
       if (json.success) {
-        // Defensive: If stats keys are at root (merged), use json. Otherwise use json.data
-        const stats =
-          json.pending_requests !== undefined ? json : json.data || {};
+        const stats = json.pending_requests !== undefined ? json : json.data || {};
         setStats(stats);
       }
     } catch (error) {
@@ -91,23 +89,23 @@ export default function ApprovalStats({ refreshTrigger }: ApprovalStatsProps) {
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
       {statCards.map((stat, index) => (
         <div
           key={index}
-          className="bg-white dark:bg-neutral-800 rounded-xl p-6 border border-gray-200 dark:border-neutral-700 shadow-sm hover:shadow-md transition-shadow"
+          className="bg-white dark:bg-neutral-800 rounded-lg p-4 border border-gray-100 dark:border-neutral-700/50 shadow-sm hover:shadow transition-all flex items-center gap-3"
         >
-          <div className="flex items-center justify-between mb-4">
-            <div className={`p-3 rounded-lg ${stat.bgColor}`}>
-              <stat.icon className={`w-6 h-6 ${stat.color}`} />
-            </div>
+          <div className={`p-2.5 rounded-lg shrink-0 ${stat.bgColor}`}>
+            <stat.icon className={`w-5 h-5 ${stat.color}`} />
           </div>
-          <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
-            {stat.value}
-          </h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            {stat.label}
-          </p>
+          <div>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white leading-tight">
+              {stat.value}
+            </h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+              {stat.label}
+            </p>
+          </div>
         </div>
       ))}
     </div>

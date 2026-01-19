@@ -8,7 +8,14 @@ import TableContainer from "@/Components/common/ui/TableContainer";
 import { useWorkspaceLocks } from "@/Hooks/usePublicationLock";
 import { Publication } from "@/types/Publication";
 import { Folder } from "lucide-react";
-import React, { memo, useCallback, useEffect, useMemo, useState } from "react";
+import {
+  forwardRef,
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { TableVirtuoso } from "react-virtuoso";
 
 interface PublicationTableProps {
@@ -19,6 +26,7 @@ interface PublicationTableProps {
   onDelete: (id: number) => void;
   onPublish: (item: Publication) => void;
   onEditRequest?: (item: Publication) => void;
+  onViewDetails?: (item: Publication) => void;
   isLoading?: boolean;
   permissions?: string[];
   pagination?: any;
@@ -35,6 +43,7 @@ const PublicationTable = memo(
     onDelete,
     onPublish,
     onEditRequest,
+    onViewDetails,
     isLoading,
     permissions,
     pagination,
@@ -47,14 +56,13 @@ const PublicationTable = memo(
     >(undefined);
     const [smoothLoading, setSmoothLoading] = useState(isLoading);
 
-    // Sync smoothLoading with isLoading with a slight delay when turning off
     useEffect(() => {
       if (isLoading) {
         setSmoothLoading(true);
       } else {
         const timer = setTimeout(() => {
           setSmoothLoading(false);
-        }, 300); // 300ms delay to allow virtualized list to breathe
+        }, 300);
         return () => clearTimeout(timer);
       }
     }, [isLoading]);
@@ -100,6 +108,7 @@ const PublicationTable = memo(
         onDelete,
         onPublish,
         onEditRequest,
+        onViewDetails,
         remoteLocks,
         permissions: permissions || [],
       }),
@@ -126,18 +135,34 @@ const PublicationTable = memo(
       >
         <div className="transition-opacity duration-300">
           <div className="hidden lg:block">
-            {!smoothLoading && items.length === 0 ? (
-              <div className="p-12 text-center text-gray-500 rounded-2xl border border-dashed border-gray-200 dark:border-neutral-800 bg-gray-50/50 dark:bg-neutral-900/20 mt-4 flex flex-col items-center justify-center animate-in fade-in duration-500">
-                <Folder className="w-12 h-12 text-gray-300 dark:text-neutral-700 mx-auto mb-4" />
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white uppercase tracking-wider">
-                  {t("publications.table.emptyState.title")}
-                </h3>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 grid-rows-1">
-                <div
-                  className={`col-start-1 row-start-1 transition-all duration-500 ${smoothLoading ? "invisible opacity-0" : "visible opacity-100"}`}
-                >
+            <div className="grid grid-cols-1 grid-rows-1">
+              <div
+                className={`col-start-1 row-start-1 transition-all duration-500 ${smoothLoading ? "invisible opacity-0" : "visible opacity-100"}`}
+              >
+                {items.length === 0 ? (
+                  <table className="w-full text-left border-collapse z-0">
+                    <thead className="bg-gray-50/50 border-gray-100 dark:bg-neutral-900/50 dark:border-neutral-800 sticky top-0 z-10">
+                      <tr className="text-xs uppercase tracking-wider border-b bg-gray-50/80 dark:bg-neutral-900/80 text-gray-500 dark:text-gray-400">
+                        <TableHeader mode="publications" t={t} />
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td
+                          colSpan={100}
+                          className="p-12 text-center text-gray-500 dark:text-gray-400"
+                        >
+                          <div className="flex flex-col items-center justify-center animate-in fade-in duration-500">
+                            <Folder className="w-12 h-12 text-gray-300 dark:text-neutral-700 mx-auto mb-4" />
+                            <h3 className="text-lg font-bold text-gray-900 dark:text-white uppercase tracking-wider">
+                              {t("publications.table.emptyState.title")}
+                            </h3>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                ) : (
                   <TableVirtuoso
                     data={items}
                     context={context}
@@ -150,7 +175,7 @@ const PublicationTable = memo(
                           className="w-full text-left border-collapse z-0"
                         />
                       ),
-                      TableHead: React.forwardRef((props, ref) => (
+                      TableHead: forwardRef((props, ref) => (
                         <thead
                           {...props}
                           ref={ref}
@@ -179,31 +204,32 @@ const PublicationTable = memo(
                         onDelete={ctx.onDelete}
                         onPublish={ctx.onPublish}
                         onEditRequest={ctx.onEditRequest}
+                        onViewDetails={ctx.onViewDetails}
                         remoteLock={ctx.remoteLocks[item.id]}
                         permissions={ctx.permissions}
                       />
                     )}
                   />
-                </div>
-
-                {smoothLoading && (
-                  <div className="col-start-1 row-start-1 bg-white/50 dark:bg-neutral-900/50 animate-out fade-out duration-500 fill-mode-forwards z-20">
-                    <table className="w-full text-left border-collapse">
-                      <thead>
-                        <tr className="text-xs uppercase tracking-wider border-b text-gray-500 dark:text-gray-400">
-                          <TableHeader mode="publications" t={t} />
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {[...Array(items.length || 8)].map((_, i) => (
-                          <PublicationRowSkeleton key={i} />
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
                 )}
               </div>
-            )}
+
+              {smoothLoading && (
+                <div className="col-start-1 row-start-1 bg-white/50 dark:bg-neutral-900/50 animate-out fade-out duration-500 fill-mode-forwards z-20">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="text-xs uppercase tracking-wider border-b text-gray-500 dark:text-gray-400">
+                        <TableHeader mode="publications" t={t} />
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {[...Array(items.length || 8)].map((_, i) => (
+                        <PublicationRowSkeleton key={i} />
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="lg:hidden">
@@ -228,7 +254,7 @@ const PublicationTable = memo(
                     onDelete={onDelete}
                     onPublish={onPublish}
                     onEditRequest={onEditRequest}
-                    onViewDetails={onPublish}
+                    onViewDetails={onViewDetails}
                     remoteLocks={remoteLocks}
                     permissions={permissions}
                   />
@@ -244,7 +270,7 @@ const PublicationTable = memo(
           </div>
         </div>
 
-        {pagination && pagination.last_page > 1 && (
+        {pagination && pagination.total > 0 && (
           <AdvancedPagination
             currentPage={pagination.current_page}
             lastPage={pagination.last_page}

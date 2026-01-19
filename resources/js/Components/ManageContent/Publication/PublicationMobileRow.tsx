@@ -1,16 +1,20 @@
-import PublicationThumbnail from "@/Components/ManageContent/Publication/PublicationThumbnail";
 import SocialAccountsDisplay from "@/Components/ManageContent/Publication/SocialAccountsDisplay";
 import { Publication } from "@/types/Publication";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
 import {
+  Calendar,
   CheckCircle,
   Clock,
   Edit,
   Eye,
-  Image,
+  Image as ImageIcon,
   Loader2,
+  Lock,
   MoreVertical,
   Rocket,
   Trash2,
+  Users,
   Video,
   XCircle,
 } from "lucide-react";
@@ -73,6 +77,16 @@ const PublicationMobileRow = memo(
       return { images, videos, total: pub.media_files.length };
     }, []);
 
+    // Check for media to show inline
+    const hasMedia = (item: Publication) => {
+      return item.media_files && item.media_files.length > 0;
+    };
+
+    const getFirstMedia = (item: Publication) => {
+      if (!hasMedia(item)) return null;
+      return item.media_files?.[0];
+    };
+
     const toggleExpand = (id: number) => {
       setExpandedRow((prev) => (prev === id ? null : id));
     };
@@ -88,10 +102,46 @@ const PublicationMobileRow = memo(
       switch (status) {
         case "published":
           return <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />;
+        case "scheduled":
+          return <Calendar className="w-3.5 h-3.5 text-blue-500" />;
         case "failed":
           return <XCircle className="w-3.5 h-3.5 text-rose-500" />;
-        default:
+        case "pending_review":
           return <Clock className="w-3.5 h-3.5 text-amber-500" />;
+        case "approved":
+          return <CheckCircle className="w-3.5 h-3.5 text-purple-500" />;
+        case "rejected":
+          return <XCircle className="w-3.5 h-3.5 text-rose-500" />;
+        default:
+          return <Clock className="w-3.5 h-3.5 text-gray-500" />;
+      }
+    };
+
+    const getStatusText = (status: string) => {
+      switch (status) {
+        case "pending_review":
+          return "En revisión";
+        case "published":
+          return "Publicado";
+        case "scheduled":
+          return "Programado";
+        case "approved":
+          return "Aprobado";
+        case "rejected":
+          return "Rechazado";
+        case "failed":
+          return "Fallido";
+        default:
+          return "Borrador";
+      }
+    };
+
+    const formatDate = (dateString?: string) => {
+      if (!dateString) return "";
+      try {
+        return format(new Date(dateString), "d MMM, HH:mm", { locale: es });
+      } catch {
+        return "";
       }
     };
 
@@ -101,190 +151,312 @@ const PublicationMobileRow = memo(
           const mediaCount = countMediaFiles(item);
           const isExpanded = expandedRow === item.id;
           const isLoading = loadingStates[item.id];
+          const firstMedia = getFirstMedia(item);
+          const isVideo = firstMedia?.file_type?.includes("video");
+          const mediaUrl =
+            firstMedia?.thumbnail?.file_path || firstMedia?.file_path;
 
           return (
             <div
               key={item.id}
               onClick={(e) => handleRowClick(item.id, e)}
               className={`
-              relative overflow-hidden rounded-2xl border transition-all duration-300
-              ${
-                isExpanded
-                  ? "bg-white dark:bg-neutral-800 border-primary-200 dark:border-primary-900/40 shadow-md ring-1 ring-primary-500/10"
-                  : "bg-white/80 dark:bg-neutral-900/80 border-gray-100 dark:border-neutral-800 hover:border-gray-200 dark:hover:border-neutral-700 shadow-sm"
-              }
-            `}
+                relative overflow-hidden rounded-2xl border transition-all duration-300
+                ${
+                  isExpanded
+                    ? "bg-white dark:bg-neutral-800 border-primary-200 dark:border-primary-900/40 shadow-md ring-1 ring-primary-500/10"
+                    : "bg-white/80 dark:bg-neutral-900/80 border-gray-100 dark:border-neutral-800 hover:border-gray-200 dark:hover:border-neutral-700 shadow-sm"
+                }
+              `}
               style={{
                 contentVisibility: "auto",
                 containIntrinsicSize: "0 88px",
               }}
             >
               {/* Header Content */}
-              <div className="p-4 flex items-center justify-between gap-4">
-                <div className="flex items-center gap-3 flex-1 min-w-0">
-                  <div className="w-12 h-12 rounded-xl flex-shrink-0 border border-gray-100 bg-gray-50 dark:border-neutral-700 dark:bg-neutral-800 overflow-hidden flex items-center justify-center shadow-sm">
-                    <PublicationThumbnail publication={item} t={t} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-sm text-gray-900 dark:text-white truncate leading-tight">
-                      {item.title || t("publications.table.untitled")}
-                    </h3>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span
-                        className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-tight ${getStatusColor(item.status)}`}
-                      >
-                        {getStatusIcon(item.status || "draft")}
-                        {t(`publications.status.${item.status || "draft"}`)}
-                      </span>
-                      {mediaCount.total > 0 && (
-                        <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 flex items-center gap-1">
-                          {mediaCount.total} •
-                          {mediaCount.images > 0 && (
-                            <Image className="w-2.5 h-2.5" />
-                          )}
-                          {mediaCount.videos > 0 && (
-                            <Video className="w-2.5 h-2.5" />
-                          )}
-                        </span>
+              <div className="p-4 flex items-start gap-3">
+                {/* Thumbnail with media preview */}
+                <div className="relative flex-shrink-0">
+                  {hasMedia(item) && mediaUrl ? (
+                    <div className="w-16 h-16 rounded-xl border border-gray-200 dark:border-neutral-700 bg-gray-100 dark:bg-neutral-800 overflow-hidden shadow-sm">
+                      <img
+                        src={mediaUrl}
+                        alt={item.title || "Preview"}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = "none";
+                          const parent = target.parentElement;
+                          if (parent) {
+                            parent.innerHTML = `
+                              <div class="w-full h-full flex items-center justify-center bg-gray-100 dark:bg-neutral-800">
+                                ${
+                                  isVideo
+                                    ? '<svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>'
+                                    : '<svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>'
+                                }
+                              </div>
+                            `;
+                          }
+                        }}
+                      />
+                      {isVideo && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                          <Video className="w-5 h-5 text-white" />
+                        </div>
                       )}
-                      {remoteLocks[item.id] && (
-                        <span className="flex items-center gap-1 animate-pulse">
-                          <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                          <span className="text-[10px] font-bold text-amber-500 uppercase">
-                            {remoteLocks[item.id].user_name.split(" ")[0]}
-                          </span>
-                        </span>
-                      )}
-                      {item.status === "publishing" && item.publisher && (
-                        <span className="flex items-center gap-1">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                          <span className="text-[10px] font-bold text-emerald-500 uppercase">
-                            {item.publisher.name.split(" ")[0]}
-                          </span>
-                        </span>
-                      )}
-                      {item.status === "rejected" && item.rejector && (
-                        <span className="flex items-center gap-1">
-                          <span className="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
-                          <span className="text-[10px] font-bold text-rose-500 uppercase">
-                            {item.rejector.name.split(" ")[0]}
-                          </span>
-                        </span>
+                      {mediaCount.total > 1 && (
+                        <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-gray-800 text-white text-[10px] flex items-center justify-center border border-white">
+                          +{mediaCount.total - 1}
+                        </div>
                       )}
                     </div>
-                  </div>
+                  ) : (
+                    <div className="w-16 h-16 rounded-xl border border-dashed border-gray-300 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-900/30 flex items-center justify-center shadow-sm">
+                      <div className="text-center">
+                        <ImageIcon className="w-6 h-6 text-gray-300 dark:text-neutral-700 mx-auto" />
+                      </div>
+                    </div>
+                  )}
                 </div>
 
-                <div className="flex items-center gap-1 shrink-0">
-                  {(permissions?.includes("publish") ||
-                    item.status === "approved") &&
-                  permissions?.includes("manage-content") ? (
+                {/* Main content */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-sm text-gray-900 dark:text-white truncate leading-tight">
+                        {item.title || t("publications.table.untitled")}
+                      </h3>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">
+                        {item.description ||
+                          item.content?.substring(0, 80) ||
+                          "Sin descripción"}
+                        {(item.content?.length || 0) > 80 && "..."}
+                      </p>
+                    </div>
                     <button
-                      onClick={async (e) => {
+                      onClick={(e) => {
                         e.stopPropagation();
+                        toggleExpand(item.id);
+                      }}
+                      className={`p-1 transition-transform duration-300 ${isExpanded ? "rotate-180" : ""}`}
+                    >
+                      <MoreVertical className="w-4 h-4 text-gray-400" />
+                    </button>
+                  </div>
+
+                  {/* Status and metadata row */}
+                  <div className="flex flex-wrap items-center gap-2">
+                    {/* Status badge */}
+                    <span
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${getStatusColor(item.status)}`}
+                    >
+                      {getStatusIcon(item.status || "draft")}
+                      <span className="font-medium">
+                        {getStatusText(item.status || "draft")}
+                      </span>
+                    </span>
+
+                    {/* Media indicators */}
+                    {hasMedia(item) && (
+                      <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+                        {mediaCount.images > 0 && (
+                          <div className="flex items-center gap-1">
+                            <ImageIcon className="w-3 h-3 text-blue-500" />
+                            <span>{mediaCount.images}</span>
+                          </div>
+                        )}
+                        {mediaCount.videos > 0 && (
+                          <div className="flex items-center gap-1">
+                            <Video className="w-3 h-3 text-purple-500" />
+                            <span>{mediaCount.videos}</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Scheduled time */}
+                    {item.status === "scheduled" && item.scheduled_at && (
+                      <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+                        <Calendar className="w-3 h-3" />
+                        <span>{formatDate(item.scheduled_at)}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Lock indicator */}
+                  {remoteLocks[item.id] && (
+                    <div className="flex items-center gap-1.5 mt-2 px-2.5 py-1 rounded-full bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800 w-fit">
+                      <Lock className="w-3 h-3" />
+                      <span className="text-xs font-medium">
+                        Editando: {remoteLocks[item.id].user_name.split(" ")[0]}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Quick actions bar */}
+              <div className="px-4 pb-4 flex items-center gap-2">
+                {/* View Details button - Always visible */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onViewDetails?.(item);
+                  }}
+                  className="flex-1 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 font-medium text-xs flex items-center justify-center gap-2 transition-colors"
+                  title="Ver detalles"
+                >
+                  <Eye className="w-4 h-4" />
+                  Ver
+                </button>
+
+                {/* Publish/Request button */}
+                {(permissions?.includes("publish") ||
+                  item.status === "approved") &&
+                permissions?.includes("manage-content") ? (
+                  <button
+                    onClick={async (e) => {
+                      e.stopPropagation();
+                      setLoadingStates((prev) => ({
+                        ...prev,
+                        [item.id]: { ...prev[item.id], publishing: true },
+                      }));
+                      try {
+                        await onPublish(item);
+                      } finally {
                         setLoadingStates((prev) => ({
                           ...prev,
-                          [item.id]: { ...prev[item.id], publishing: true },
+                          [item.id]: { ...prev[item.id], publishing: false },
                         }));
-                        try {
-                          await onPublish(item);
-                        } finally {
-                          setLoadingStates((prev) => ({
-                            ...prev,
-                            [item.id]: { ...prev[item.id], publishing: false },
-                          }));
-                        }
-                      }}
-                      disabled={
-                        isLoading?.publishing ||
-                        isLoading?.editing ||
-                        isLoading?.deleting
                       }
-                      className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-xl dark:hover:bg-emerald-900/20 disabled:opacity-50 transition-colors"
-                      title={
-                        item.status === "approved"
-                          ? "Publicar"
-                          : "Publicar / Gestionar"
-                      }
-                    >
-                      {isLoading?.publishing ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <Rocket className="w-4 h-4" />
-                      )}
-                    </button>
-                  ) : permissions?.includes("manage-content") &&
-                    !permissions?.includes("publish") &&
-                    ["draft", "failed", "rejected"].includes(
-                      item.status || "draft",
-                    ) ? (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onPublish?.(item);
-                      }}
-                      className="p-2 text-amber-600 hover:bg-amber-50 rounded-xl dark:hover:bg-amber-900/20 transition-colors"
-                      title="Solicitar Aprobación"
-                    >
-                      <Clock className="w-4 h-4" />
-                    </button>
-                  ) : null}
-                  {/* View Details button for Viewers */}
-                  {!permissions?.includes("manage-content") && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onViewDetails?.(item);
-                      }}
-                      className="p-2 text-primary-600 hover:bg-primary-50 rounded-xl dark:hover:bg-primary-900/20 transition-colors"
-                      title="Ver Detalles"
-                    >
-                      <Eye className="w-4 h-4" />
-                    </button>
-                  )}
-                  <div
-                    className={`p-1.5 transition-transform duration-300 ${isExpanded ? "rotate-180" : ""}`}
+                    }}
+                    disabled={
+                      isLoading?.publishing ||
+                      isLoading?.editing ||
+                      isLoading?.deleting
+                    }
+                    className="flex-1 py-2 rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-medium text-xs flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm"
+                    title="Publicar"
                   >
-                    <MoreVertical className="w-4 h-4 text-gray-400" />
-                  </div>
-                </div>
+                    {isLoading?.publishing ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Rocket className="w-4 h-4" />
+                    )}
+                    Publicar
+                  </button>
+                ) : permissions?.includes("manage-content") &&
+                  !permissions?.includes("publish") &&
+                  ["draft", "failed", "rejected"].includes(
+                    item.status || "draft",
+                  ) ? (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onPublish?.(item);
+                    }}
+                    className="flex-1 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-medium text-xs flex items-center justify-center gap-2 transition-colors shadow-sm"
+                    title="Solicitar aprobación"
+                  >
+                    <Clock className="w-4 h-4" />
+                    Solicitar
+                  </button>
+                ) : null}
               </div>
 
               {/* Expanded Content */}
               {isExpanded && (
                 <div className="px-4 pb-4 animate-in fade-in slide-in-from-top-1 duration-200">
                   <div className="pt-4 border-t border-gray-100 dark:border-neutral-700/50 space-y-4">
-                    {item.description && (
-                      <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-3 leading-relaxed">
-                        {item.description}
-                      </p>
-                    )}
+                    {/* Additional info */}
+                    <div className="space-y-3">
+                      {/* User info */}
+                      {item.user && (
+                        <div className="flex items-center gap-3">
+                          <div className="h-8 w-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center flex-shrink-0">
+                            {item.user.photo_url ? (
+                              <img
+                                src={item.user.photo_url}
+                                alt={item.user.name}
+                                className="h-full w-full rounded-full object-cover"
+                                loading="lazy"
+                              />
+                            ) : (
+                              <span className="text-xs font-bold text-white uppercase">
+                                {item.user.name.charAt(0)}
+                              </span>
+                            )}
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-gray-900 dark:text-white">
+                              {item.user.name}
+                            </p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                              {item.user.role || "Usuario"}
+                            </p>
+                          </div>
+                        </div>
+                      )}
 
-                    <div className="grid grid-cols-2 gap-4 bg-gray-50/50 dark:bg-neutral-800/30 p-3 rounded-xl border border-gray-100 dark:border-neutral-700/50">
+                      {/* Platform badges */}
+                      {item.platform_settings &&
+                        Object.keys(item.platform_settings).length > 0 && (
+                          <div>
+                            <h4 className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-2">
+                              Plataformas:
+                            </h4>
+                            <div className="flex flex-wrap gap-1.5">
+                              {Object.keys(item.platform_settings).map(
+                                (platform) => (
+                                  <span
+                                    key={platform}
+                                    className="px-2 py-1 rounded-lg bg-gray-100 dark:bg-gray-800 text-xs text-gray-700 dark:text-gray-300 font-medium"
+                                  >
+                                    {platform.charAt(0).toUpperCase() +
+                                      platform.slice(1)}
+                                  </span>
+                                ),
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                      {/* Campaigns */}
+                      {item.campaigns && item.campaigns.length > 0 && (
+                        <div className="flex items-center gap-2">
+                          <div className="p-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-900/20">
+                            <Users className="w-4 h-4 text-indigo-500" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-gray-900 dark:text-white">
+                              En {item.campaigns.length}{" "}
+                              {item.campaigns.length === 1
+                                ? "campaña"
+                                : "campañas"}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Accounts */}
                       <div>
-                        <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">
-                          {t("publications.table.linkedAccount")}
+                        <h4 className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-2">
+                          Cuentas vinculadas:
                         </h4>
                         <SocialAccountsDisplay
                           publication={item}
                           connectedAccounts={connectedAccounts}
                           compact={true}
+                          t={t}
                         />
                       </div>
-                      {item.campaigns && item.campaigns.length > 0 && (
-                        <div>
-                          <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">
-                            {t("campaigns.title")}
-                          </h4>
-                          <span className="inline-flex px-2 py-0.5 rounded-lg text-[10px] font-bold bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-800/30">
-                            {item.campaigns.length}{" "}
-                            {item.campaigns.length === 1 ? "Camp" : "Camps"}
-                          </span>
-                        </div>
-                      )}
                     </div>
 
+                    {/* Expanded actions */}
                     <div className="flex items-center gap-2">
+                      {/* Edit button */}
                       {permissions?.includes("manage-content") && (
                         <button
                           onClick={async (e) => {
@@ -294,9 +466,11 @@ const PublicationMobileRow = memo(
                               [item.id]: { ...prev[item.id], editing: true },
                             }));
                             try {
-                              onEditRequest
-                                ? await onEditRequest(item)
-                                : await onEdit(item);
+                              if (onEditRequest) {
+                                await onEditRequest(item);
+                              } else {
+                                await onEdit(item);
+                              }
                             } finally {
                               setLoadingStates((prev) => ({
                                 ...prev,
@@ -310,17 +484,27 @@ const PublicationMobileRow = memo(
                             isLoading?.deleting ||
                             !!remoteLocks[item.id]
                           }
-                          className="flex-1 py-2.5 rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400 font-bold text-xs flex items-center justify-center gap-2 border border-blue-100 dark:border-blue-900/30 transition-all active:scale-95 disabled:opacity-50"
+                          className={`flex-1 py-2.5 rounded-xl font-medium text-xs flex items-center justify-center gap-2 transition-colors active:scale-95 ${
+                            remoteLocks[item.id]
+                              ? "bg-gray-200 text-gray-400 dark:bg-gray-800 dark:text-gray-500 cursor-not-allowed"
+                              : "bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/30"
+                          } disabled:opacity-50`}
+                          title={
+                            remoteLocks[item.id]
+                              ? `Editando por ${remoteLocks[item.id].user_name}`
+                              : "Editar"
+                          }
                         >
                           {isLoading?.editing ? (
-                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            <Loader2 className="w-4 h-4 animate-spin" />
                           ) : (
-                            <Edit className="w-3.5 h-3.5" />
+                            <Edit className="w-4 h-4" />
                           )}
                           {t("common.edit")}
                         </button>
                       )}
-                      {/* Delete button - Only for Owner/Admin (users with publish permission) */}
+
+                      {/* Delete button */}
                       {permissions?.includes("publish") &&
                         permissions?.includes("manage-content") && (
                           <button
@@ -328,7 +512,10 @@ const PublicationMobileRow = memo(
                               e.stopPropagation();
                               setLoadingStates((prev) => ({
                                 ...prev,
-                                [item.id]: { ...prev[item.id], deleting: true },
+                                [item.id]: {
+                                  ...prev[item.id],
+                                  deleting: true,
+                                },
                               }));
                               try {
                                 await onDelete(item.id);
@@ -347,7 +534,7 @@ const PublicationMobileRow = memo(
                               isLoading?.editing ||
                               isLoading?.deleting
                             }
-                            className="p-2.5 rounded-xl bg-rose-50 text-rose-600 dark:bg-rose-900/20 dark:text-rose-400 border border-rose-100 dark:border-rose-900/30 transition-all active:scale-95"
+                            className="flex-1 py-2.5 rounded-xl bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/30 font-medium text-xs flex items-center justify-center gap-2 transition-colors active:scale-95 disabled:opacity-50"
                             title="Eliminar"
                           >
                             {isLoading?.deleting ? (
@@ -355,6 +542,7 @@ const PublicationMobileRow = memo(
                             ) : (
                               <Trash2 className="w-4 h-4" />
                             )}
+                            Eliminar
                           </button>
                         )}
                     </div>
