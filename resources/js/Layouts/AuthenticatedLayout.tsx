@@ -59,7 +59,7 @@ export default function AuthenticatedLayout({
         <div
           className={`
             absolute inset-0
-            ${theme === "dark" ? "bg-black/90" : "bg-white/90"}
+            ${theme === "dark" ? "bg-black" : "bg-white"}
           `}
         />
 

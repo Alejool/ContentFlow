@@ -2,7 +2,9 @@ import PieChart from "@/Components/Statistics/PieChart";
 import { useTranslation } from "react-i18next";
 
 interface SocialMediaAccount {
+  id: number;
   platform: string;
+  account_name: string;
   followers: number;
   engagement_rate: number;
   reach: number;
@@ -59,6 +61,7 @@ export default function SocialMediaAccounts({
             <PieChart
               data={accounts.map((acc) => ({
                 name:
+                  acc.account_name ||
                   acc.platform.charAt(0).toUpperCase() + acc.platform.slice(1),
                 value: acc.followers,
               }))}
@@ -71,7 +74,7 @@ export default function SocialMediaAccounts({
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {accounts.map((account) => (
           <div
-            key={account.platform}
+            key={account.id}
             className={`rounded-lg p-6 transition-all duration-300 hover:scale-[1.02]
                             ${
                               theme === "dark"
@@ -81,14 +84,19 @@ export default function SocialMediaAccounts({
           >
             <div className="flex items-center justify-between mb-4">
               <h3
-                className={`text-lg font-semibold capitalize
+                className={`text-lg font-semibold
                                 ${
                                   theme === "dark"
                                     ? "text-gray-100"
                                     : "text-gray-900"
                                 }`}
               >
-                {account.platform}
+                <span className="capitalize">{account.platform}</span>
+                {account.account_name && (
+                  <span className="ml-1 text-sm font-normal opacity-70">
+                    ({account.account_name})
+                  </span>
+                )}
               </h3>
               <span
                 className={`px-3 py-1 rounded-full text-xs font-medium

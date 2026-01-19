@@ -35,7 +35,7 @@ class ExistingUserDummyDataSeeder extends Seeder
     if (!$targetUser) {
       $this->command->info("Creating target user: $targetEmail");
       $targetUser = User::factory()->create([
-        'name' => 'Alejandro Olarte',
+        'name' => 'Demo User',
         'email' => $targetEmail, // Normalized email
         'password' => bcrypt('password'), // or any default
       ]);

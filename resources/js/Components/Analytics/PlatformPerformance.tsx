@@ -4,7 +4,9 @@ import { useTranslation } from "react-i18next";
 
 interface PlatformPerformanceProps {
   data: {
+    id: number;
     platform: string;
+    account_name: string;
     total_engagement: number;
     avg_engagement_rate: number;
     total_reach: number;
@@ -20,7 +22,7 @@ export default function PlatformPerformance({
   const { t } = useTranslation();
 
   const chartData = data.map((item) => ({
-    name: item.platform.charAt(0).toUpperCase() + item.platform.slice(1),
+    name: `${item.platform.charAt(0).toUpperCase() + item.platform.slice(1)} (${item.account_name})`,
     engagement: item.total_engagement,
     growth: item.follower_growth,
   }));

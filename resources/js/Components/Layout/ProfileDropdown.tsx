@@ -39,7 +39,7 @@ export default function ProfileDropdown({
                 src={user?.photo_url}
                 name={user?.name}
                 size="sm"
-                className="ring-2 ring-white dark:ring-neutral-900 shadow-sm"
+                className="shadow-sm"
                 showStatus
               />
             </div>
@@ -84,16 +84,13 @@ export default function ProfileDropdown({
                 : "bg-gradient-to-br from-gray-50 to-white border border-gray-100"
             }`}
           >
-            {/* Decorative blob */}
-            <div className="absolute top-0 right-0 -mr-8 -mt-8 w-24 h-24 rounded-full bg-primary-500/10 blur-2xl group-hover:bg-primary-500/20 transition-all duration-500"></div>
-
             <div className="relative flex items-center gap-4">
               <div className="relative">
                 <Avatar
                   src={user?.photo_url}
                   name={user?.name}
                   size="xl"
-                  className="shadow-md ring-4 ring-white dark:ring-neutral-800"
+                  className="shadow-md"
                   showStatus
                 />
               </div>

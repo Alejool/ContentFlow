@@ -49,7 +49,7 @@ export function Avatar({
   return (
     <div className={`relative inline-block ${className}`}>
       <div
-        className={`${sizeClasses[size]} relative rounded-full overflow-hidden flex items-center justify-center font-bold shadow-lg ${avatarBgClass}`}
+        className={`${sizeClasses[size]} relative rounded-full overflow-hidden flex items-center justify-center font-bold shadow-lg backdrop-blur-sm `}
       >
         {src ? (
           <img

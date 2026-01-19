@@ -224,7 +224,9 @@ class StatisticsService
       $followerGrowth = $account->getFollowerGrowth(30);
 
       return [
+        'id' => $account->id,
         'platform' => $account->platform,
+        'account_name' => $account->account_name,
         'followers' => $latestMetrics->followers ?? 0,
         'engagement_rate' => round($latestMetrics->engagement_rate ?? 0, 2),
         'follower_growth_30d' => $followerGrowth,
@@ -367,7 +369,9 @@ class StatisticsService
         ->get();
 
       return [
+        'id' => $account->id,
         'platform' => $account->platform,
+        'account_name' => $account->account_name,
         'total_engagement' => $metrics->sum(function ($m) {
           return $m->total_likes + $m->total_comments + $m->total_shares + $m->total_saves;
         }),
