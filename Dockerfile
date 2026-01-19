@@ -1,4 +1,4 @@
-FROM php:8.3-fpm-alpine
+FROM php:8.3-fpm-alpine AS production
 
 # 1. Instalar dependencias esenciales
 RUN apk add --no-cache \
@@ -12,7 +12,9 @@ WORKDIR /var/www/html
 # 2. Preparar archivos y dependencias
 COPY . .
 RUN rm -rf public/build public/hot node_modules vendor \
-    && composer install --optimize-autoloader --no-dev
+    && composer install --optimize-autoloader 
+
+  #&& composer install --optimize-autoloader --no-dev
 
 # 3. Build de Assets (Vite)
 ARG VITE_REVERB_APP_KEY
