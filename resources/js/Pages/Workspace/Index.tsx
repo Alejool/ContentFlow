@@ -181,7 +181,7 @@ export default function Index({
     >
       <Head title={t("workspace.my_workspaces")} />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-10">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-10 max-w-7xl mx-auto">
         {workspaces.map((workspace) => {
           const userRole = roles.find((r) => r.id === workspace.pivot.role_id);
           const isActive = auth.user.current_workspace_id === workspace.id;
