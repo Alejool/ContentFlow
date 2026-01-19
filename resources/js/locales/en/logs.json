@@ -40,6 +40,7 @@
       "orphaned": "Orphaned"
     },
     "empty": "No logs found",
+    "noLogsDesc": "There are no activity logs matching your current filters or in this workspace.",
     "loading": "Loading logs...",
     "pagination": {
       "previous": "Previous",

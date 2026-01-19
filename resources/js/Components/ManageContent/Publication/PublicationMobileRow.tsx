@@ -102,6 +102,8 @@ const PublicationMobileRow = memo(
       switch (status) {
         case "published":
           return <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />;
+        case "publishing":
+          return <Loader2 className="w-3.5 h-3.5 text-blue-500 animate-spin" />;
         case "scheduled":
           return <Calendar className="w-3.5 h-3.5 text-blue-500" />;
         case "failed":
@@ -118,22 +120,7 @@ const PublicationMobileRow = memo(
     };
 
     const getStatusText = (status: string) => {
-      switch (status) {
-        case "pending_review":
-          return "En revisión";
-        case "published":
-          return "Publicado";
-        case "scheduled":
-          return "Programado";
-        case "approved":
-          return "Aprobado";
-        case "rejected":
-          return "Rechazado";
-        case "failed":
-          return "Fallido";
-        default:
-          return "Borrador";
-      }
+      return t(`publications.status.${status || "draft"}`);
     };
 
     const formatDate = (dateString?: string) => {
@@ -229,10 +216,7 @@ const PublicationMobileRow = memo(
                         {item.title || t("publications.table.untitled")}
                       </h3>
                       <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">
-                        {item.description ||
-                          item.content?.substring(0, 80) ||
-                          "Sin descripción"}
-                        {(item.content?.length || 0) > 80 && "..."}
+                        {item.description || "Sin descripción"}
                       </p>
                     </div>
                     <button
@@ -394,7 +378,7 @@ const PublicationMobileRow = memo(
                               {item.user.name}
                             </p>
                             <p className="text-xs text-gray-500 dark:text-gray-400">
-                              {item.user.role || "Usuario"}
+                              Usuario
                             </p>
                           </div>
                         </div>

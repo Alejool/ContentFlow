@@ -109,7 +109,7 @@ const CampaignList = memo(
           />
         )}
 
-        {pagination && pagination.last_page > 1 && (
+        {pagination && (
           <Pagination
             pagination={pagination}
             onPageChange={onPageChange}

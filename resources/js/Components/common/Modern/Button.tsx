@@ -171,7 +171,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             }
           `;
         case "ghost":
-          return `  
+          return `
             ${colors.text}
             bg-transparent
             border border-gray-300 dark:border-gray-700

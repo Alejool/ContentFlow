@@ -1,3 +1,5 @@
+import Button from "@/Components/common/Modern/Button";
+import EmptyState from "@/Components/common/ui/EmptyState";
 import ApprovalSuccessModal from "@/Components/ManageContent/modals/ApprovalSuccessModal";
 import RejectionReasonModal from "@/Components/ManageContent/modals/RejectionReasonModal";
 import { Publication } from "@/types/Publication";
@@ -110,17 +112,10 @@ export default function ApprovalList({
 
   if (publications.length === 0) {
     return (
-      <div className="text-center py-12 bg-white dark:bg-neutral-800 rounded-xl border border-dashed border-gray-300 dark:border-neutral-700">
-        <div className="bg-gray-100 dark:bg-neutral-700 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
-          <Check className="text-gray-400 w-6 h-6" />
-        </div>
-        <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-          {t("approvals.noPending")}
-        </h3>
-        <p className="text-gray-500 dark:text-gray-400 mt-2">
-          {t("approvals.noPendingDesc")}
-        </p>
-      </div>
+      <EmptyState
+        title={t("approvals.noPending")}
+        description={t("approvals.noPendingDesc")}
+      />
     );
   }
 
@@ -166,29 +161,40 @@ export default function ApprovalList({
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 sm:self-center">
-                <button
+              <div className="flex items-center gap-3 sm:self-center">
+                <Button
+                  variant="ghost"
+                  buttonStyle="ghost"
                   onClick={() => onViewDetail(pub)}
-                  className="p-2 rounded-lg bg-gray-100 dark:bg-neutral-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-neutral-600 transition-colors"
+                  className="p-2 min-w-0"
+                  icon={Eye}
                   title={t("common.view")}
+                  rounded="lg"
+                  shadow="none"
                 >
-                  <Eye className="w-5 h-5" />
-                </button>
+                  {""}
+                </Button>
 
-                <button
+                <Button
+                  variant="success"
+                  buttonStyle="gradient"
                   onClick={() => handleApprove(pub)}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white font-bold transition-all shadow-lg shadow-green-600/20 active:scale-95"
+                  className="px-6"
+                  icon={Check}
+                  rounded="lg"
                 >
-                  <Check className="w-4 h-4" />
-                  <span>{t("approvals.approve")}</span>
-                </button>
-                <button
+                  {t("approvals.approve")}
+                </Button>
+                <Button
+                  variant="danger"
+                  buttonStyle="gradient"
                   onClick={() => handleRejectClick(pub)}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold transition-all shadow-lg shadow-rose-600/20 active:scale-95"
+                  className="px-6"
+                  icon={X}
+                  rounded="lg"
                 >
-                  <X className="w-4 h-4" />
-                  <span>{t("approvals.reject") || "Reject"}</span>
-                </button>
+                  {t("approvals.reject") || "Reject"}
+                </Button>
               </div>
             </div>
           </div>

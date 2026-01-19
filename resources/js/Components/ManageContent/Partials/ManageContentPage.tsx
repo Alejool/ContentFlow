@@ -279,42 +279,72 @@ export default function ManageContentPage() {
           <div className="mb-8">
             <SocialMediaAccounts />
           </div>
-          <div className="mb-8 border-b border-gray-200 dark:border-gray-700 w-full overflow-x-auto scrollbar-subtle snap-x h-fit">
-            <div className="flex items-center gap-1 sm:gap-2 min-w-max px-1">
+          <div className="mb-8">
+            <div className="inline-flex items-center p-1.5 rounded-2xl bg-gray-100/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 gap-1 overflow-x-auto max-w-full scrollbar-hide">
               <button
                 onClick={() => handleTabChange("publications")}
-                className={`flex items-center justify-center gap-2 py-3 px-4 sm:px-6 font-bold text-xs sm:text-sm transition-all border-b-2 snap-start ${activeTab === "publications" ? "border-primary-500 text-primary-600 dark:text-primary-400" : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"}`}
+                className={`flex items-center justify-center gap-2 py-2.5 px-5 rounded-xl text-sm font-bold transition-all duration-200 whitespace-nowrap ${
+                  activeTab === "publications"
+                    ? "bg-white dark:bg-neutral-800 text-primary-600 dark:text-primary-400 shadow-sm shadow-gray-200/50 dark:shadow-none ring-1 ring-black/5 dark:ring-white/10"
+                    : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-200/50 dark:hover:bg-gray-700/50"
+                }`}
               >
-                <Folder className="w-4 h-4 sm:w-5 sm:h-5" />
+                <Folder
+                  className={`w-4 h-4 ${activeTab === "publications" ? "text-primary-500" : "opacity-70"}`}
+                />
                 <span>{t("manageContent.tabs.publications")}</span>
               </button>
               <button
                 onClick={() => handleTabChange("campaigns")}
-                className={`flex items-center justify-center gap-2 py-3 px-4 sm:px-6 font-bold text-xs sm:text-sm transition-all border-b-2 snap-start ${activeTab === "campaigns" ? "border-primary-500 text-primary-600 dark:text-primary-400" : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"}`}
+                className={`flex items-center justify-center gap-2 py-2.5 px-5 rounded-xl text-sm font-bold transition-all duration-200 whitespace-nowrap ${
+                  activeTab === "campaigns"
+                    ? "bg-white dark:bg-neutral-800 text-primary-600 dark:text-primary-400 shadow-sm shadow-gray-200/50 dark:shadow-none ring-1 ring-black/5 dark:ring-white/10"
+                    : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-200/50 dark:hover:bg-gray-700/50"
+                }`}
               >
-                <Target className="w-4 h-4 sm:w-5 sm:h-5" />
+                <Target
+                  className={`w-4 h-4 ${activeTab === "campaigns" ? "text-primary-500" : "opacity-70"}`}
+                />
                 <span>{t("manageContent.tabs.campaigns")}</span>
               </button>
               <button
                 onClick={() => handleTabChange("calendar")}
-                className={`flex items-center justify-center gap-2 py-3 px-4 sm:px-6 font-bold text-xs sm:text-sm transition-all border-b-2 snap-start ${activeTab === "calendar" ? "border-primary-500 text-primary-600 dark:text-primary-400" : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"}`}
+                className={`flex items-center justify-center gap-2 py-2.5 px-5 rounded-xl text-sm font-bold transition-all duration-200 whitespace-nowrap ${
+                  activeTab === "calendar"
+                    ? "bg-white dark:bg-neutral-800 text-primary-600 dark:text-primary-400 shadow-sm shadow-gray-200/50 dark:shadow-none ring-1 ring-black/5 dark:ring-white/10"
+                    : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-200/50 dark:hover:bg-gray-700/50"
+                }`}
               >
-                <CalendarIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+                <CalendarIcon
+                  className={`w-4 h-4 ${activeTab === "calendar" ? "text-primary-500" : "opacity-70"}`}
+                />
                 <span>{t("manageContent.tabs.calendar")}</span>
               </button>
               <button
                 onClick={() => handleTabChange("logs")}
-                className={`flex items-center justify-center gap-2 py-3 px-4 sm:px-6 font-bold text-xs sm:text-sm transition-all border-b-2 snap-start ${activeTab === "logs" ? "border-primary-500 text-primary-600 dark:text-primary-400" : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"}`}
+                className={`flex items-center justify-center gap-2 py-2.5 px-5 rounded-xl text-sm font-bold transition-all duration-200 whitespace-nowrap ${
+                  activeTab === "logs"
+                    ? "bg-white dark:bg-neutral-800 text-primary-600 dark:text-primary-400 shadow-sm shadow-gray-200/50 dark:shadow-none ring-1 ring-black/5 dark:ring-white/10"
+                    : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-200/50 dark:hover:bg-gray-700/50"
+                }`}
               >
-                <FileText className="w-4 h-4 sm:w-5 sm:h-5" />
+                <FileText
+                  className={`w-4 h-4 ${activeTab === "logs" ? "text-primary-500" : "opacity-70"}`}
+                />
                 <span>{t("manageContent.tabs.logs")}</span>
               </button>
               {permissions.includes("approve") && (
                 <button
                   onClick={() => handleTabChange("approvals")}
-                  className={`flex items-center justify-center gap-2 py-3 px-4 sm:px-6 font-bold text-xs sm:text-sm transition-all border-b-2 snap-start ${activeTab === "approvals" ? "border-primary-500 text-primary-600 dark:text-primary-400" : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"}`}
+                  className={`flex items-center justify-center gap-2 py-2.5 px-5 rounded-xl text-sm font-bold transition-all duration-200 whitespace-nowrap ${
+                    activeTab === "approvals"
+                      ? "bg-white dark:bg-neutral-800 text-primary-600 dark:text-primary-400 shadow-sm shadow-gray-200/50 dark:shadow-none ring-1 ring-black/5 dark:ring-white/10"
+                      : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-200/50 dark:hover:bg-gray-700/50"
+                  }`}
                 >
-                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <CheckCircle
+                    className={`w-4 h-4 ${activeTab === "approvals" ? "text-primary-500" : "opacity-70"}`}
+                  />
                   <span>{t("manageContent.tabs.approvals")}</span>
                 </button>
               )}

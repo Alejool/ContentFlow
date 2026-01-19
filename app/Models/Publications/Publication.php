@@ -33,7 +33,7 @@ class Publication extends Model
   }
 
   protected $table = 'publications';
-  protected $status = [
+  protected $availableStatuses = [
     'draft',
     'published',
     'publishing',
@@ -90,42 +90,42 @@ class Publication extends Model
 
   public function scopeDraft($query)
   {
-    return $query->where('status', $this->status[0]);
+    return $query->where('status', $this->availableStatuses[0]);
   }
 
   public function scopePublished($query)
   {
-    return $query->where('status', $this->status[1]);
+    return $query->where('status', $this->availableStatuses[1]);
   }
 
   public function scopePublishing($query)
   {
-    return $query->where('status', $this->status[2]);
+    return $query->where('status', $this->availableStatuses[2]);
   }
 
   public function scopeFailed($query)
   {
-    return $query->where('status', $this->status[3]);
+    return $query->where('status', $this->availableStatuses[3]);
   }
 
   public function scopePendingReview($query)
   {
-    return $query->where('status', $this->status[4]);
+    return $query->where('status', $this->availableStatuses[4]);
   }
 
   public function scopeApproved($query)
   {
-    return $query->where('status', $this->status[5]);
+    return $query->where('status', $this->availableStatuses[5]);
   }
 
   public function scopeScheduled($query)
   {
-    return $query->where('status', $this->status[6]);
+    return $query->where('status', $this->availableStatuses[6]);
   }
 
   public function scopeRejected($query)
   {
-    return $query->where('status', $this->status[7]);
+    return $query->where('status', $this->availableStatuses[7]);
   }
 
   public function isApproved(): bool

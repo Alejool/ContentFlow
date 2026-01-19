@@ -13,8 +13,7 @@ class PublishPublicationAction
 {
   public function __construct(
     protected MediaProcessingService $mediaService
-  ) {
-  }
+  ) {}
 
   public function execute(Publication $publication, array $platformIds, array $options = []): void
   {
@@ -44,7 +43,7 @@ class PublishPublicationAction
     }
     $platformIds = array_filter(array_values($platformIds));
 
-    $socialAccounts = SocialAccount::where('user_id', $publication->user_id)
+    $socialAccounts = SocialAccount::where('workspace_id', $publication->workspace_id)
       ->whereIn('id', $platformIds)
       ->get();
 

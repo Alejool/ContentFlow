@@ -1,31 +1,28 @@
 import { usePublicationStore } from "@/stores/publicationStore";
-
-// Debounce map to prevent rapid-fire updates
-const updateDebounceMap = new Map<number, NodeJS.Timeout>();
+import { toast } from "react-hot-toast";
 
 export function initPublicationsRealtime(userId: number) {
   window.Echo.private(`users.${userId}`).listen(
     ".PublicationStatusUpdated",
     (e: any) => {
-      const publicationId =
-        typeof e.publicationId === "string"
-          ? parseInt(e.publicationId, 10)
-          : e.publicationId;
+      console.log("Realtime event received:", e);
+      const { publicationId, status } = e;
 
-      // Clear existing timeout for this publication
-      if (updateDebounceMap.has(publicationId)) {
-        clearTimeout(updateDebounceMap.get(publicationId)!);
+      // Update store
+      usePublicationStore.getState().updatePublication(publicationId, {
+        status: status,
+      });
+
+      console.log(`Updated publication ${publicationId} to status: ${status}`);
+
+      // Show toast notifications for final statuses
+      if (status === "published") {
+        console.log("Showing success toast");
+        toast.success("Publication published successfully!");
+      } else if (status === "failed") {
+        console.log("Showing error toast");
+        toast.error("Publication failed to publish.");
       }
-
-      // Debounce updates by 500ms to batch rapid changes
-      const timeout = setTimeout(() => {
-        usePublicationStore.getState().updatePublication(publicationId, {
-          status: e.status,
-        });
-        updateDebounceMap.delete(publicationId);
-      }, 500);
-
-      updateDebounceMap.set(publicationId, timeout);
-    }
+    },
   );
 }

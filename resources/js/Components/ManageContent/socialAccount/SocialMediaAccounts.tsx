@@ -1,7 +1,6 @@
-import React, { memo, useEffect, useState } from "react";
-import { SOCIAL_PLATFORMS } from "@/Constants/socialPlatforms";
 import PlatformSettingsModal from "@/Components/ConfigSocialMedia/PlatformSettingsModal";
 import DisconnectWarningModal from "@/Components/ManageContent/modals/DisconnectWarningModal";
+import { SOCIAL_PLATFORMS } from "@/Constants/socialPlatforms";
 import { useSocialMediaAuth } from "@/Hooks/useSocialMediaAuth";
 import { getPlatformSchema } from "@/schemas/platformSettings";
 import { Link, router, usePage } from "@inertiajs/react";
@@ -19,6 +18,7 @@ import {
   X,
   Zap,
 } from "lucide-react";
+import { memo, useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
@@ -97,7 +97,7 @@ const SocialMediaAccounts = memo(() => {
         onError: () => {
           toast.error(t("common.error") || "Error al guardar");
         },
-      }
+      },
     );
   };
 
@@ -106,7 +106,7 @@ const SocialMediaAccounts = memo(() => {
   const disconnectSocialMedia = (
     platform: string,
     id: number | null,
-    force: boolean = false
+    force: boolean = false,
   ) => {
     if (!id) return { success: false };
     return disconnectAccount(id, force);
@@ -171,7 +171,7 @@ const SocialMediaAccounts = memo(() => {
 
     Object.entries(SOCIAL_PLATFORMS).forEach(([key, config]) => {
       const filtered = connectedAccounts.filter(
-        (ca) => ca.platform.toLowerCase() === key.toLowerCase()
+        (ca) => ca.platform.toLowerCase() === key.toLowerCase(),
       );
 
       if (filtered.length === 0) {
@@ -202,22 +202,6 @@ const SocialMediaAccounts = memo(() => {
             connectedBy: ca.user?.name,
           });
         });
-
-        // Add an extra card to "Add another" for this platform? 
-        // Or just let them click a button inside?
-        // Let's add an "Add another" placeholder if already connected?
-        // User said: "si hay dos... que me meustre las dos"
-        // I'll add an "Add another" card for that platform to facilitate multiples
-        platformCards.push({
-          id: -config.id, // Using negative config ID to differentiate
-          platform: key,
-          name: `${t("manageContent.socialMedia.actions.connect")} ${config.name}`,
-          logo: config.logo,
-          isConnected: false,
-          accountId: null,
-          color: config.color,
-          gradient: config.gradient,
-        });
       }
     });
 
@@ -238,7 +222,7 @@ const SocialMediaAccounts = memo(() => {
       try {
         const result: any = await disconnectSocialMedia(
           account.platform,
-          account.accountId as number
+          account.accountId as number,
         );
 
         if (result && result.success) {
@@ -266,7 +250,7 @@ const SocialMediaAccounts = memo(() => {
     const result = await disconnectSocialMedia(
       account.platform,
       account.accountId as number,
-      true
+      true,
     );
 
     if (result && result.success) {
@@ -275,8 +259,8 @@ const SocialMediaAccounts = memo(() => {
       setBlockerModalData(null);
       toast.success(
         `${account.name} ${t(
-          "manageContent.socialMedia.messages.disconnectSuccess"
-        )}`
+          "manageContent.socialMedia.messages.disconnectSuccess",
+        )}`,
       );
     }
   };
@@ -296,7 +280,8 @@ const SocialMediaAccounts = memo(() => {
               {t("manageContent.socialMedia.title")}
             </h3>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              {connectedAccountsCount} {t("manageContent.socialMedia.accounts")} {t("manageContent.socialMedia.connected")}
+              {connectedAccountsCount} {t("manageContent.socialMedia.accounts")}{" "}
+              {t("manageContent.socialMedia.connected")}
             </p>
           </div>
         </div>
@@ -332,8 +317,9 @@ const SocialMediaAccounts = memo(() => {
       </button>
 
       <div
-        className={`transition-all duration-300 overflow-hidden ${isExpanded ? "max-h-[2000px] opacity-100 mt-4" : "max-h-0 opacity-0"
-          }`}
+        className={`transition-all duration-300 overflow-hidden ${
+          isExpanded ? "max-h-[2000px] opacity-100 mt-4" : "max-h-0 opacity-0"
+        }`}
       >
         <div className="space-y-8">
           <div className="rounded-lg p-4 sm:p-8 border transition-colors duration-300 bg-gradient-to-br from-primary-50/80 to-pink-50/80 border-primary-100 dark:from-neutral-900/80 dark:to-neutral-800/80 dark:border-neutral-700/50">
@@ -348,7 +334,7 @@ const SocialMediaAccounts = memo(() => {
                     {
                       icon: Zap,
                       title: t(
-                        "manageContent.socialMedia.benefits.autoPublish"
+                        "manageContent.socialMedia.benefits.autoPublish",
                       ),
                       color: "text-primary-500",
                     },
@@ -368,7 +354,9 @@ const SocialMediaAccounts = memo(() => {
                       className="flex items-center gap-3 p-3.5 rounded-xl bg-white/60 border border-primary-100 dark:bg-neutral-800/30 dark:border-neutral-700/30 transition-transform hover:scale-[1.02]"
                     >
                       <div className="p-2 rounded-lg bg-white dark:bg-neutral-800 shadow-sm flex-shrink-0">
-                        <item.icon className={`w-4 h-4 sm:w-5 sm:h-5 ${item.color}`} />
+                        <item.icon
+                          className={`w-4 h-4 sm:w-5 sm:h-5 ${item.color}`}
+                        />
                       </div>
                       <p className="text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 leading-tight">
                         {item.title}
@@ -380,8 +368,12 @@ const SocialMediaAccounts = memo(() => {
                 <div className="text-[10px] sm:text-xs p-3 rounded-xl inline-flex bg-white/60 text-primary-600/80 border border-primary-100 dark:bg-neutral-800/40 dark:text-gray-400 dark:border-neutral-700/40 group">
                   <div className="flex items-center gap-2">
                     <AlertCircle className="w-3.5 h-3.5 opacity-70 group-hover:opacity-100 transition-opacity" />
-                    <span className="font-bold uppercase tracking-wider">{t("common.note")}:</span>
-                    <span className="font-medium">{t("manageContent.socialMedia.disclaimer")}</span>
+                    <span className="font-bold uppercase tracking-wider">
+                      {t("common.note")}:
+                    </span>
+                    <span className="font-medium">
+                      {t("manageContent.socialMedia.disclaimer")}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -402,17 +394,19 @@ const SocialMediaAccounts = memo(() => {
                   key={`${account.platform}-${account.id}`}
                   className={`group relative rounded-2xl p-4 sm:p-5 border transition-all duration-300
                     hover:shadow-xl bg-white dark:bg-neutral-900 border-gray-100 dark:border-neutral-800 hover:border-primary-100 dark:hover:border-primary-900/30
-                    ${account.isConnected
-                      ? "ring-1 ring-emerald-500/10 dark:ring-emerald-500/5"
-                      : "opacity-90 hover:opacity-100"
+                    ${
+                      account.isConnected
+                        ? "ring-1 ring-emerald-500/10 dark:ring-emerald-500/5"
+                        : "opacity-90 hover:opacity-100"
                     }`}
                 >
                   <div className="absolute top-4 right-4 z-10">
                     <div
                       className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-tight transition-colors border
-                        ${account.isConnected
-                          ? "bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-900/80"
-                          : "bg-gray-50 text-gray-500 border-gray-100 dark:bg-neutral-800 dark:text-gray-400 dark:border-neutral-700"
+                        ${
+                          account.isConnected
+                            ? "bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-900/80"
+                            : "bg-gray-50 text-gray-500 border-gray-100 dark:bg-neutral-800 dark:text-gray-400 dark:border-neutral-700"
                         }`}
                     >
                       {account.isConnected ? (
@@ -433,11 +427,9 @@ const SocialMediaAccounts = memo(() => {
                     <div className="relative mb-4 group-hover:scale-110 transition-transform duration-300">
                       <div className="w-16 h-16 rounded-2xl flex items-center justify-center p-0.5 border border-gray-100 dark:border-neutral-800 bg-gray-50 dark:bg-neutral-800 overflow-hidden shadow-inner">
                         {account.isConnected &&
-                          account.accountDetails?.account_metadata?.avatar ? (
+                        account.accountDetails?.account_metadata?.avatar ? (
                           <img
-                            src={
-                              account.accountDetails.account_metadata.avatar
-                            }
+                            src={account.accountDetails.account_metadata.avatar}
                             alt={
                               account.accountDetails.account_name ||
                               account.name
@@ -463,7 +455,7 @@ const SocialMediaAccounts = memo(() => {
                     </div>
                     <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 truncate w-full px-2 leading-tight">
                       {account.isConnected &&
-                        account.accountDetails?.account_name
+                      account.accountDetails?.account_name
                         ? account.accountDetails.account_name
                         : account.name}
                     </h3>
@@ -477,7 +469,9 @@ const SocialMediaAccounts = memo(() => {
                         </p>
                         {account.connectedBy && (
                           <p className="text-[9px] text-primary-500 font-bold uppercase tracking-wider">
-                            {t('manageContent.socialMedia.connectedBy') || 'Conectado por'}: {account.connectedBy}
+                            {t("manageContent.socialMedia.connectedBy") ||
+                              "Conectado por"}
+                            : {account.connectedBy}
                           </p>
                         )}
                       </div>
@@ -494,11 +488,12 @@ const SocialMediaAccounts = memo(() => {
                       disabled={isLoading}
                       className={`flex-1 py-3 px-4 rounded-lg font-semibold text-sm flex items-center justify-center gap-2
                         transition-all duration-200 relative overflow-hidden group/btn
-                        ${isLoading
-                          ? "bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-neutral-700/50"
-                          : account.isConnected
-                            ? "bg-gradient-to-r from-primary-50 to-primary-50 text-primary-600 border border-primary-200 hover:bg-primary-100 dark:bg-gradient-to-r dark:from-primary-900/10 dark:to-primary-800/10 dark:text-primary-400 dark:border-primary-900/30 dark:hover:bg-primary-900/20"
-                            : `bg-gradient-to-r ${account.gradient} text-white shadow-lg hover:shadow-xl hover:scale-[1.02]`
+                        ${
+                          isLoading
+                            ? "bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-neutral-700/50"
+                            : account.isConnected
+                              ? "bg-gradient-to-r from-primary-50 to-primary-50 text-primary-600 border border-primary-200 hover:bg-primary-100 dark:bg-gradient-to-r dark:from-primary-900/10 dark:to-primary-800/10 dark:text-primary-400 dark:border-primary-900/30 dark:hover:bg-primary-900/20"
+                              : `bg-gradient-to-r ${account.gradient} text-white shadow-lg hover:shadow-xl hover:scale-[1.02]`
                         }`}
                     >
                       <span className="relative z-10 flex items-center gap-2">

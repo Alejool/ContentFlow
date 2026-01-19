@@ -4,10 +4,10 @@ import PublicationMobileRowSkeleton from "@/Components/ManageContent/Publication
 import PublicationRowSkeleton from "@/Components/ManageContent/Publication/PublicationRowSkeleton";
 import { TableHeader } from "@/Components/ManageContent/Publication/TableHeader";
 import AdvancedPagination from "@/Components/common/ui/AdvancedPagination";
+import EmptyState from "@/Components/common/ui/EmptyState";
 import TableContainer from "@/Components/common/ui/TableContainer";
 import { useWorkspaceLocks } from "@/Hooks/usePublicationLock";
 import { Publication } from "@/types/Publication";
-import { Folder } from "lucide-react";
 import {
   forwardRef,
   memo,
@@ -140,28 +140,14 @@ const PublicationTable = memo(
                 className={`col-start-1 row-start-1 transition-all duration-500 ${smoothLoading ? "invisible opacity-0" : "visible opacity-100"}`}
               >
                 {items.length === 0 ? (
-                  <table className="w-full text-left border-collapse z-0">
-                    <thead className="bg-gray-50/50 border-gray-100 dark:bg-neutral-900/50 dark:border-neutral-800 sticky top-0 z-10">
-                      <tr className="text-xs uppercase tracking-wider border-b bg-gray-50/80 dark:bg-neutral-900/80 text-gray-500 dark:text-gray-400">
-                        <TableHeader mode="publications" t={t} />
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td
-                          colSpan={100}
-                          className="p-12 text-center text-gray-500 dark:text-gray-400"
-                        >
-                          <div className="flex flex-col items-center justify-center animate-in fade-in duration-500">
-                            <Folder className="w-12 h-12 text-gray-300 dark:text-neutral-700 mx-auto mb-4" />
-                            <h3 className="text-lg font-bold text-gray-900 dark:text-white uppercase tracking-wider">
-                              {t("publications.table.emptyState.title")}
-                            </h3>
-                          </div>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
+                  <EmptyState
+                    title={t("publications.table.emptyState.title")}
+                    description={
+                      t("publications.table.emptyState.description") ||
+                      "No se encontraron publicaciones."
+                    }
+                    className="border-none shadow-none bg-transparent"
+                  />
                 ) : (
                   <TableVirtuoso
                     data={items}
@@ -234,12 +220,14 @@ const PublicationTable = memo(
 
           <div className="lg:hidden">
             {!smoothLoading && items.length === 0 ? (
-              <div className="p-8 text-center text-gray-500 rounded-2xl border border-gray-200 dark:border-neutral-800 bg-gray-50 dark:bg-neutral-900/50 animate-in fade-in duration-500">
-                <Folder className="w-8 h-8 text-gray-400 mx-auto mb-4" />
-                <h3 className="font-bold text-gray-900 dark:text-white">
-                  {t("publications.table.emptyState.title")}
-                </h3>
-              </div>
+              <EmptyState
+                title={t("publications.table.emptyState.title")}
+                description={
+                  t("publications.table.emptyState.description") ||
+                  "No se encontraron publicaciones."
+                }
+                imageSize="sm"
+              />
             ) : (
               <div className="grid grid-cols-1 grid-rows-1">
                 <div
@@ -270,7 +258,7 @@ const PublicationTable = memo(
           </div>
         </div>
 
-        {pagination && pagination.total > 0 && (
+        {pagination && (
           <AdvancedPagination
             currentPage={pagination.current_page}
             lastPage={pagination.last_page}

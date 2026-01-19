@@ -5,9 +5,9 @@ import CampaignRow from "@/Components/ManageContent/Campaign/CampaignRow";
 import CampaignRowSkeleton from "@/Components/ManageContent/Campaign/CampaignRowSkeleton";
 import { TableHeader } from "@/Components/ManageContent/Publication/TableHeader";
 import AdvancedPagination from "@/Components/common/ui/AdvancedPagination";
+import EmptyState from "@/Components/common/ui/EmptyState";
 import TableContainer from "@/Components/common/ui/TableContainer";
 import { Campaign } from "@/types/Campaign";
-import { Folder } from "lucide-react";
 import React, { Fragment, memo } from "react";
 
 interface CampaignTableProps {
@@ -85,24 +85,25 @@ const CampaignTable = memo(
               className={`col-start-1 row-start-1 transition-all duration-500 ${smoothLoading ? "invisible opacity-0" : "visible opacity-100"}`}
             >
               <table className="w-full text-left border-collapse z-0 whitespace-nowrap">
-                <thead className="bg-gray-50/50 border-gray-100 dark:bg-neutral-900/50 dark:border-neutral-700">
-                  <tr className="text-[10px] uppercase tracking-wider border-b text-gray-500 dark:text-gray-400">
-                    <TableHeader mode="campaigns" t={t} />
-                  </tr>
-                </thead>
+                {items.length > 0 && (
+                  <thead className="bg-gray-50/50 border-gray-100 dark:bg-neutral-900/50 dark:border-neutral-700">
+                    <tr className="text-[10px] uppercase tracking-wider border-b text-gray-500 dark:text-gray-400">
+                      <TableHeader mode="campaigns" t={t} />
+                    </tr>
+                  </thead>
+                )}
                 <tbody className="divide-y divide-gray-50 dark:divide-neutral-700/50">
                   {items.length === 0 ? (
                     <tr>
-                      <td
-                        colSpan={100}
-                        className="p-12 text-center text-gray-500 dark:text-gray-400"
-                      >
-                        <div className="flex flex-col items-center justify-center animate-in fade-in duration-500">
-                          <Folder className="w-12 h-12 text-gray-300 dark:text-neutral-700 mx-auto mb-4" />
-                          <h3 className="text-lg font-bold text-gray-900 dark:text-white uppercase tracking-wider">
-                            {t("campaigns.table.emptyState.title")}
-                          </h3>
-                        </div>
+                      <td colSpan={100} className="p-0">
+                        <EmptyState
+                          title={t("campaigns.table.emptyState.title")}
+                          description={
+                            t("campaigns.table.emptyState.description") ||
+                            "No se encontraron campañas."
+                          }
+                          className="border-none shadow-none bg-transparent"
+                        />
                       </td>
                     </tr>
                   ) : (
@@ -153,9 +154,14 @@ const CampaignTable = memo(
 
         <div className="lg:hidden relative">
           {!smoothLoading && items.length === 0 ? (
-            <div className="p-8 text-center text-gray-500 rounded-xl border border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800 mx-1 animate-in fade-in duration-500">
-              {t("campaigns.table.emptyState.title")}
-            </div>
+            <EmptyState
+              title={t("campaigns.table.emptyState.title")}
+              description={
+                t("campaigns.table.emptyState.description") ||
+                "No se encontraron campañas."
+              }
+              imageSize="sm"
+            />
           ) : (
             <div className="grid grid-cols-1 grid-rows-1">
               {/* Data Layer */}
@@ -187,7 +193,7 @@ const CampaignTable = memo(
           )}
         </div>
 
-        {pagination && pagination.total > 0 && (
+        {pagination && (
           <AdvancedPagination
             currentPage={pagination.current_page}
             lastPage={pagination.last_page}

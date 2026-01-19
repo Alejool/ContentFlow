@@ -60,14 +60,22 @@ class PublishToSocialMedia implements ShouldQueue
       $this->publication->update([
         'status' => 'failed',
       ]);
-
-
     }
 
+    // Notify owner
     event(new PublicationStatusUpdated(
       userId: $this->publication->user_id,
       publicationId: $this->publication->id,
       status: $this->publication->status
     ));
+
+    // Also notify publisher if different from owner
+    if ($this->publication->published_by && $this->publication->published_by !== $this->publication->user_id) {
+      event(new PublicationStatusUpdated(
+        userId: $this->publication->published_by,
+        publicationId: $this->publication->id,
+        status: $this->publication->status
+      ));
+    }
   }
 }

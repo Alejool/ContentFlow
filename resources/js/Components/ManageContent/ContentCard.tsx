@@ -13,6 +13,7 @@ import {
   Users,
   Video,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface ContentCardProps {
   item: any;
@@ -33,6 +34,7 @@ export default function ContentCard({
   type,
   permissions,
 }: ContentCardProps) {
+  const { t } = useTranslation();
   const canManageContent = permissions?.includes("manage-content");
   const canPublish = permissions?.includes("publish");
 
@@ -48,6 +50,8 @@ export default function ContentCard({
     approved:
       "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400",
     rejected: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
+    publishing:
+      "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
   };
 
   const statusKey = (item.status || "draft") as keyof typeof statusColors;
@@ -60,6 +64,7 @@ export default function ContentCard({
       pending_review: Clock,
       approved: CheckCircle,
       rejected: Clock,
+      publishing: Clock,
     }[statusKey] || Edit;
 
   // Check if there are media files
@@ -142,17 +147,7 @@ export default function ContentCard({
             >
               <StatusIcon className="w-3 h-3" />
               <span className="capitalize">
-                {item.status === "pending_review"
-                  ? "En revisión"
-                  : item.status === "published"
-                    ? "Publicado"
-                    : item.status === "scheduled"
-                      ? "Programado"
-                      : item.status === "approved"
-                        ? "Aprobado"
-                        : item.status === "rejected"
-                          ? "Rechazado"
-                          : item.status || "Borrador"}
+                {t(`publications.status.${item.status || "draft"}`)}
               </span>
             </span>
           </div>
@@ -182,17 +177,7 @@ export default function ContentCard({
             >
               <StatusIcon className="w-3 h-3" />
               <span className="capitalize">
-                {item.status === "pending_review"
-                  ? "En revisión"
-                  : item.status === "published"
-                    ? "Publicado"
-                    : item.status === "scheduled"
-                      ? "Programado"
-                      : item.status === "approved"
-                        ? "Aprobado"
-                        : item.status === "rejected"
-                          ? "Rechazado"
-                          : item.status || "Borrador"}
+                {t(`publications.status.${item.status || "draft"}`)}
               </span>
             </span>
           </div>

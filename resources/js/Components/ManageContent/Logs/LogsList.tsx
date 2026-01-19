@@ -1,5 +1,6 @@
 import ExpandableText from "@/Components/ManageContent/common/ExpandableText";
 import AdvancedPagination from "@/Components/common/ui/AdvancedPagination";
+import EmptyState from "@/Components/common/ui/EmptyState";
 import TableContainer from "@/Components/common/ui/TableContainer";
 import { SocialPostLog } from "@/types/Publication";
 import { format } from "date-fns";
@@ -227,17 +228,15 @@ const LogsList = memo(
                 <tbody className="divide-y divide-gray-50 dark:divide-neutral-700/50">
                   {logs.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="px-4 py-16 text-center">
-                        <div className="flex flex-col items-center justify-center">
-                          <img
-                            src="/assets/empty-state.svg"
-                            alt="No Logs"
-                            className="w-40 h-auto object-contain mb-4 opacity-80"
-                          />
-                          <p className="text-gray-500 dark:text-gray-400 font-medium">
-                            {t("logs.empty")}
-                          </p>
-                        </div>
+                      <td colSpan={6} className="p-0">
+                        <EmptyState
+                          title={t("logs.empty")}
+                          description={
+                            t("logs.noLogsDesc") ||
+                            "No se encontraron registros."
+                          }
+                          className="border-none shadow-none bg-transparent"
+                        />
                       </td>
                     </tr>
                   ) : (
@@ -367,9 +366,13 @@ const LogsList = memo(
               className={`col-start-1 row-start-1 transition-all duration-500 ${smoothLoading ? "invisible opacity-0" : "visible opacity-100"}`}
             >
               {logs.length === 0 ? (
-                <div className="p-8 text-center text-gray-500">
-                  {t("logs.empty")}
-                </div>
+                <EmptyState
+                  title={t("logs.empty")}
+                  description={
+                    t("logs.noLogsDesc") || "No se encontraron registros."
+                  }
+                  imageSize="sm"
+                />
               ) : (
                 <div className="divide-y divide-gray-100 dark:divide-neutral-700/50">
                   {logs.map((log) => (
@@ -466,7 +469,7 @@ const LogsList = memo(
           </div>
         </div>
 
-        {pagination && pagination.total > 0 && (
+        {pagination && (
           <AdvancedPagination
             currentPage={pagination.current_page}
             lastPage={pagination.last_page}

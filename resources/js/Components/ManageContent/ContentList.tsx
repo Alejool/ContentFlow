@@ -1,6 +1,7 @@
 import CampaignTable from "@/Components/ManageContent/Campaign/CampaignTable";
 import PublicationTable from "@/Components/ManageContent/Publication/PublicationTable";
 import AdvancedPagination from "@/Components/common/ui/AdvancedPagination";
+import EmptyState from "@/Components/common/ui/EmptyState";
 import { LayoutGrid, List as ListIcon } from "lucide-react";
 import { useEffect, useState, useTransition } from "react";
 import { useTranslation } from "react-i18next";
@@ -78,44 +79,29 @@ export default function ContentList(props: ContentListProps) {
         </div>
       </div>
 
-      {viewMode === "grid" ? (
+      {!smoothLoading && items.length === 0 ? (
+        <EmptyState
+          title={t(`${mode}.table.emptyState.title`)}
+          description={t(`${mode}.table.emptyState.description`)}
+          className="mt-4"
+        />
+      ) : viewMode === "grid" ? (
         <div className="grid grid-cols-1 grid-rows-1">
           <div
             className={`col-start-1 row-start-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 transition-all duration-500 ${smoothLoading ? "invisible opacity-0" : "visible opacity-100"}`}
           >
-            {items.length === 0 ? (
-              <div className="col-span-full flex flex-col items-center justify-center py-20 px-4 text-center animate-in fade-in zoom-in duration-500">
-                <div className="relative mb-6">
-                  <div className="absolute inset-0 bg-primary-100 dark:bg-primary-900/20 rounded-full blur-2xl opacity-50 scale-150 animate-pulse" />
-                  <div className="relative">
-                    <img
-                      src="/assets/empty-state.svg"
-                      alt="No Content"
-                      className="w-48 h-auto object-contain drop-shadow-xl"
-                    />
-                  </div>
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-                  {t(`${mode}.table.emptyState.title`)}
-                </h3>
-                <p className="text-gray-500 dark:text-gray-400 max-w-xs mx-auto">
-                  {t(`${mode}.table.emptyState.description`)}
-                </p>
-              </div>
-            ) : (
-              items.map((item) => (
-                <ContentCard
-                  key={item.id}
-                  item={item}
-                  type={mode === "campaigns" ? "campaign" : "publication"}
-                  onEdit={props.onEdit}
-                  onDelete={props.onDelete}
-                  onViewDetails={props.onViewDetails}
-                  onPublish={props.onPublish}
-                  permissions={props.permissions}
-                />
-              ))
-            )}
+            {items.map((item) => (
+              <ContentCard
+                key={item.id}
+                item={item}
+                type={mode === "campaigns" ? "campaign" : "publication"}
+                onEdit={props.onEdit}
+                onDelete={props.onDelete}
+                onViewDetails={props.onViewDetails}
+                onPublish={props.onPublish}
+                permissions={props.permissions}
+              />
+            ))}
           </div>
 
           {smoothLoading && (
@@ -154,19 +140,17 @@ export default function ContentList(props: ContentListProps) {
         </div>
       )}
 
-      {viewMode === "grid" &&
-        props.pagination &&
-        props.pagination.total > 0 && (
-          <AdvancedPagination
-            currentPage={props.pagination.current_page}
-            lastPage={props.pagination.last_page}
-            total={props.pagination.total}
-            perPage={props.pagination.per_page || 12}
-            onPageChange={props.onPageChange}
-            onPerPageChange={props.onPerPageChange || (() => {})}
-            t={t}
-          />
-        )}
+      {viewMode === "grid" && props.pagination && (
+        <AdvancedPagination
+          currentPage={props.pagination.current_page}
+          lastPage={props.pagination.last_page}
+          total={props.pagination.total}
+          perPage={props.pagination.per_page || 12}
+          onPageChange={props.onPageChange}
+          onPerPageChange={props.onPerPageChange || (() => {})}
+          t={t}
+        />
+      )}
     </div>
   );
 }

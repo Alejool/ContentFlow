@@ -30,10 +30,10 @@ export default function PublicationRow({
       return { images: 0, videos: 0, total: 0 };
     }
     const images = pub.media_files.filter((f) =>
-      f.file_type.includes("image")
+      f.file_type.includes("image"),
     ).length;
     const videos = pub.media_files.filter((f) =>
-      f.file_type.includes("video")
+      f.file_type.includes("video"),
     ).length;
     return { images, videos, total: pub.media_files.length };
   };
@@ -41,26 +41,18 @@ export default function PublicationRow({
   const mediaCount = countMediaFiles(item);
 
   return (
-    <tr
-      className="group transition-colors hover:bg-gray-50/50 dark:hover:bg-neutral-700/30"
-    >
+    <tr className="group transition-colors hover:bg-gray-50/50 dark:hover:bg-neutral-700/30">
       <td className="px-2 py-4 text-center"></td>
       <td className="px-6 py-4">
         <div className="flex items-center gap-4">
-          <div
-            className="w-12 h-12 rounded-lg flex-shrink-0 border border-gray-200 bg-gray-100 dark:border-neutral-700 dark:bg-neutral-800 overflow-hidden flex items-center justify-center"
-          >
+          <div className="w-12 h-12 rounded-lg flex-shrink-0 border border-gray-200 bg-gray-100 dark:border-neutral-700 dark:bg-neutral-800 overflow-hidden flex items-center justify-center">
             <PublicationThumbnail publication={item} />
           </div>
           <div>
-            <h3
-              className="font-medium text-sm text-gray-900 dark:text-white"
-            >
+            <h3 className="font-medium text-sm text-gray-900 dark:text-white">
               {item.title || "Untitled"}
             </h3>
-            <p
-              className="text-xs mt-0.5 line-clamp-1 text-gray-500 dark:text-gray-400"
-            >
+            <p className="text-xs mt-0.5 line-clamp-1 text-gray-500 dark:text-gray-400">
               {item.description || "No description"}
             </p>
             {item.platform_settings &&
@@ -111,7 +103,7 @@ export default function PublicationRow({
                       }
 
                       return null;
-                    }
+                    },
                   )}
                 </div>
               )}
@@ -121,10 +113,10 @@ export default function PublicationRow({
       <td className="px-6 py-4">
         <span
           className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${getStatusColor(
-            item.status
+            item.status,
           )}`}
         >
-          {item.status || "Draft"}
+          {t(`publications.status.${item.status || "draft"}`)}
         </span>
       </td>
       <td className="px-6 py-4 text-sm text-gray-500">
@@ -175,8 +167,9 @@ export default function PublicationRow({
                 onEdit(item);
               }
             }}
-            className={`p-2 ${item.status === "published" ? "text-amber-500" : "text-blue-500"
-              } hover:bg-blue-50 rounded-lg dark:hover:bg-blue-900/20`}
+            className={`p-2 ${
+              item.status === "published" ? "text-amber-500" : "text-blue-500"
+            } hover:bg-blue-50 rounded-lg dark:hover:bg-blue-900/20`}
             title={item.status === "published" ? "Unpublish to Edit" : "Edit"}
           >
             <Edit className="w-4 h-4" />

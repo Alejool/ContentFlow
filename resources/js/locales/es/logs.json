@@ -41,6 +41,7 @@
       "publishing": "Publicando"
     },
     "empty": "No se encontraron registros",
+    "noLogsDesc": "No hay registros de actividad que coincidan con tus filtros o en este espacio de trabajo.",
     "loading": "Cargando registros...",
     "pagination": {
       "previous": "Anterior",
