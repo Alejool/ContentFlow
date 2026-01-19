@@ -8,29 +8,23 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { usePublicationStore } from "@/stores/publicationStore";
 import { Head, router, usePage } from "@inertiajs/react";
 import {
-  AlertCircle,
   Calendar as CalendarIcon,
   CheckCircle,
-  Edit3,
   FileText,
   Folder,
   Plus,
   Target,
   Trash2,
 } from "lucide-react";
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-  useTransition,
-} from "react";
+import { useCallback, useEffect, useState, useTransition } from "react";
 
 import ApprovalHistory from "@/Components/ManageContent/ApprovalHistory";
 import ApprovalList from "@/Components/ManageContent/ApprovalList";
 import ApprovalStats from "@/Components/ManageContent/ApprovalStats";
 import ContentList from "@/Components/ManageContent/ContentList";
 import ModernCalendar from "@/Components/ManageContent/Partials/ModernCalendar";
+import Button from "@/Components/common/Modern/Button";
+
 import {
   ManageContentTab,
   usePublications,
@@ -85,20 +79,30 @@ export default function ManageContentPage() {
     })),
   );
 
+  const [isTabPending, startTransition] = useTransition();
+  const [showFilters, setShowFilters] = useState(false);
+  const [search, setSearch] = useState("");
+
+  // Sync search with filters (debounced)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      handleFilterChange({ ...filters, search: search || undefined });
+    }, 300); // 300ms debounce
+
+    return () => clearTimeout(timer);
+  }, [search]);
+
   const handleTabChange = useCallback(
     (tab: ManageContentTab) => {
       startTransition(() => {
         setActiveTab(tab);
-        // Clear filters when switching tabs to avoid cross-tab filter pollution
+        setSearch(""); // Clear search when changing tabs
         handleFilterChange({});
-        // Also reset status tab for publications if needed
-        if (tab === "publications") setStatusTab("all");
       });
     },
     [setActiveTab, handleFilterChange],
   );
 
-  // Sync state with URL changes (This is still useful for deep linking)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const tab = params.get("tab") as ManageContentTab;
@@ -110,18 +114,14 @@ export default function ManageContentPage() {
     ) {
       setActiveTab(tab);
     }
-    // ... rest of effect ...
 
-    // Handle actions (e.g. open create modal from command palette)
     if (params.get("action") === "create") {
       openAddModal();
-      // Optional: Clean up URL
       const newUrl = new URL(window.location.href);
       newUrl.searchParams.delete("action");
       window.history.replaceState({}, "", newUrl.toString());
     }
 
-    // Handle Deep Linking by ID (e.g. from approval links)
     const id = params.get("id");
     if (id) {
       const pubId = parseInt(id);
@@ -130,10 +130,6 @@ export default function ManageContentPage() {
           const pub = await fetchPublicationById(pubId);
           if (pub) {
             openViewDetailsModal(pub);
-            // Optional: Clean up ID from URL to avoid re-opening on manual refresh if desired
-            // const newUrl = new URL(window.location.href);
-            // newUrl.searchParams.delete('id');
-            // window.history.replaceState({}, '', newUrl.toString());
           }
         });
       }
@@ -146,11 +142,9 @@ export default function ManageContentPage() {
     setActiveTab,
   ]);
 
-  const [statusTab, setStatusTab] = useState("all");
   const [approvalTab, setApprovalTab] = useState("pending");
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  // Delete Confirmation State
   const [deleteConfirmation, setDeleteConfirmation] = useState<{
     isOpen: boolean;
     id: number | null;
@@ -168,7 +162,6 @@ export default function ManageContentPage() {
   const confirmDelete = () => {
     if (!deleteConfirmation.id) return;
 
-    // Determine the correct route based on activeTab
     const routeName =
       activeTab === "campaigns" ? "campaigns.destroy" : "publications.destroy";
 
@@ -180,41 +173,10 @@ export default function ManageContentPage() {
       },
       onFinish: () => {
         setDeleteConfirmation({ isOpen: false, id: null });
-        // Ensure manual refresh if standard inertia reload doesn't catch it
         handleRefreshWrapped();
       },
     });
   };
-
-  const statusTabs = useMemo(
-    () => [
-      { id: "all", label: t("manageContent.status.all"), icon: Folder },
-      { id: "draft", label: t("manageContent.status.draft"), icon: Edit3 },
-      {
-        id: "scheduled",
-        label: t("manageContent.status.scheduled"),
-        icon: CalendarIcon,
-      },
-      {
-        id: "published",
-        label: t("manageContent.status.published"),
-        icon: CheckCircle,
-      },
-    ],
-    [],
-  );
-
-  const [isTabPending, startTransition] = useTransition();
-
-  const handleStatusTabChange = useCallback(
-    (status: string) => {
-      startTransition(() => {
-        setStatusTab(status);
-        handleFilterChange({ ...filters, status });
-      });
-    },
-    [filters, handleFilterChange],
-  );
 
   const [expandedCampaigns, setExpandedCampaigns] = useState<number[]>([]);
   const toggleExpand = useCallback((id: number) => {
@@ -244,7 +206,7 @@ export default function ManageContentPage() {
     <AuthenticatedLayout>
       <Head title={t("manageContent.title")} />
 
-      <div className="w-full max-w-full overflow-x-hidden min-w-0">
+      <div className="w-full max-w-full overflow-x-hidden min-w-0 bg-gray-50/30 dark:bg-neutral-900/10 min-h-screen">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-5 sm:py-8 min-w-0">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 min-w-0">
             <div className="min-w-0 flex-1 pr-2">
@@ -256,94 +218,89 @@ export default function ManageContentPage() {
               </p>
             </div>
 
-            {permissions.includes("manage-content") ? (
-              <button
-                onClick={() => openAddModal()}
-                className="w-full sm:w-auto group relative inline-flex h-11 sm:h-12 items-center justify-center overflow-hidden rounded-2xl sm:rounded-full bg-primary-600 px-6 sm:px-8 font-bold text-white transition-all duration-300 hover:bg-primary-700 hover:scale-[1.02] active:scale-95 hover:shadow-lg focus:outline-none ring-offset-2 ring-primary-500/20 shadow-xl shadow-primary-500/10"
-              >
-                <Plus className="mr-2 h-5 w-5" />
-                <span className="relative font-bold">
+            <div className="flex items-center gap-2">
+              {permissions.includes("manage-content") && (
+                <Button
+                  onClick={() => openAddModal()}
+                  variant="primary"
+                  size="md"
+                  icon={Plus}
+                >
                   {t("manageContent.createNew")}
-                </span>
-              </button>
-            ) : (
-              <div className="flex items-center gap-2 px-4 py-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 rounded-lg animate-in fade-in slide-in-from-right-4">
-                <AlertCircle className="w-4 h-4 text-amber-500" />
-                <span className="text-xs font-bold text-amber-700 dark:text-amber-400">
-                  Tu rol solo permite ver el contenido
-                </span>
-              </div>
-            )}
+                </Button>
+              )}
+            </div>
           </div>
 
           <div className="mb-8">
             <SocialMediaAccounts />
           </div>
+
           <div className="mb-8">
-            <div className="inline-flex items-center p-1.5 rounded-2xl bg-gray-100/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 gap-1 overflow-x-auto max-w-full scrollbar-hide">
+            <div className="inline-flex items-center p-1.5 rounded-2xl bg-white dark:bg-neutral-800 backdrop-blur-sm border border-gray-200/60 dark:border-neutral-700/60 gap-1 overflow-x-auto max-w-full shadow-sm">
               <button
                 onClick={() => handleTabChange("publications")}
-                className={`flex items-center justify-center gap-2 py-2.5 px-5 rounded-lg text-sm font-bold transition-all duration-200 whitespace-nowrap ${
+                className={`flex items-center justify-center gap-2 py-2.5 px-5 rounded-xl text-sm font-bold transition-all duration-200 whitespace-nowrap ${
                   activeTab === "publications"
-                    ? "bg-white dark:bg-neutral-800 text-primary-600 dark:text-primary-400 shadow-sm shadow-gray-200/50 dark:shadow-none ring-1 ring-black/5 dark:ring-white/10"
-                    : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-200/50 dark:hover:bg-gray-700/50"
+                    ? "bg-primary-600 text-white shadow-md shadow-primary-500/20 ring-1 ring-primary-500/50"
+                    : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-700/50"
                 }`}
               >
                 <Folder
-                  className={`w-4 h-4 ${activeTab === "publications" ? "text-primary-500" : "opacity-70"}`}
+                  className={`w-4 h-4 ${activeTab === "publications" ? "text-white" : "opacity-70"}`}
                 />
                 <span>{t("manageContent.tabs.publications")}</span>
               </button>
               <button
                 onClick={() => handleTabChange("campaigns")}
-                className={`flex items-center justify-center gap-2 py-2.5 px-5 rounded-lg text-sm font-bold transition-all duration-200 whitespace-nowrap ${
+                className={`flex items-center justify-center gap-2 py-2.5 px-5 rounded-xl text-sm font-bold transition-all duration-200 whitespace-nowrap ${
                   activeTab === "campaigns"
-                    ? "bg-white dark:bg-neutral-800 text-primary-600 dark:text-primary-400 shadow-sm shadow-gray-200/50 dark:shadow-none ring-1 ring-black/5 dark:ring-white/10"
-                    : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-200/50 dark:hover:bg-gray-700/50"
+                    ? "bg-primary-600 text-white shadow-md shadow-primary-500/20 ring-1 ring-primary-500/50"
+                    : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-700/50"
                 }`}
               >
                 <Target
-                  className={`w-4 h-4 ${activeTab === "campaigns" ? "text-primary-500" : "opacity-70"}`}
+                  className={`w-4 h-4 ${activeTab === "campaigns" ? "text-white" : "opacity-70"}`}
                 />
                 <span>{t("manageContent.tabs.campaigns")}</span>
               </button>
               <button
                 onClick={() => handleTabChange("calendar")}
-                className={`flex items-center justify-center gap-2 py-2.5 px-5 rounded-lg text-sm font-bold transition-all duration-200 whitespace-nowrap ${
+                className={`flex items-center justify-center gap-2 py-2.5 px-5 rounded-xl text-sm font-bold transition-all duration-200 whitespace-nowrap ${
                   activeTab === "calendar"
-                    ? "bg-white dark:bg-neutral-800 text-primary-600 dark:text-primary-400 shadow-sm shadow-gray-200/50 dark:shadow-none ring-1 ring-black/5 dark:ring-white/10"
-                    : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-200/50 dark:hover:bg-gray-700/50"
+                    ? "bg-primary-600 text-white shadow-md shadow-primary-500/20 ring-1 ring-primary-500/50"
+                    : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-700/50"
                 }`}
               >
                 <CalendarIcon
-                  className={`w-4 h-4 ${activeTab === "calendar" ? "text-primary-500" : "opacity-70"}`}
+                  className={`w-4 h-4 ${activeTab === "calendar" ? "text-white" : "opacity-70"}`}
                 />
                 <span>{t("manageContent.tabs.calendar")}</span>
               </button>
               <button
                 onClick={() => handleTabChange("logs")}
-                className={`flex items-center justify-center gap-2 py-2.5 px-5 rounded-lg text-sm font-bold transition-all duration-200 whitespace-nowrap ${
+                className={`flex items-center justify-center gap-2 py-2.5 px-5 rounded-xl text-sm font-bold transition-all duration-200 whitespace-nowrap ${
                   activeTab === "logs"
-                    ? "bg-white dark:bg-neutral-800 text-primary-600 dark:text-primary-400 shadow-sm shadow-gray-200/50 dark:shadow-none ring-1 ring-black/5 dark:ring-white/10"
-                    : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-200/50 dark:hover:bg-gray-700/50"
+                    ? "bg-primary-600 text-white shadow-md shadow-primary-500/20 ring-1 ring-primary-500/50"
+                    : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-700/50"
                 }`}
               >
                 <FileText
-                  className={`w-4 h-4 ${activeTab === "logs" ? "text-primary-500" : "opacity-70"}`}
+                  className={`w-4 h-4 ${activeTab === "logs" ? "text-white" : "opacity-70"}`}
                 />
                 <span>{t("manageContent.tabs.logs")}</span>
               </button>
               {permissions.includes("approve") && (
                 <button
                   onClick={() => handleTabChange("approvals")}
-                  className={`flex items-center justify-center gap-2 py-2.5 px-5 rounded-lg text-sm font-bold transition-all duration-200 whitespace-nowrap ${
+                  className={`flex items-center justify-center gap-2 py-2.5 px-5 rounded-xl text-sm font-bold transition-all duration-200 whitespace-nowrap ${
                     activeTab === "approvals"
-                      ? "bg-white dark:bg-neutral-800 text-primary-600 dark:text-primary-400 shadow-sm shadow-gray-200/50 dark:shadow-none ring-1 ring-black/5 dark:ring-white/10"
-                      : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-200/50 dark:hover:bg-gray-700/50"
+                      ? "bg-primary-600 text-white shadow-md shadow-primary-500/20 ring-1 ring-primary-500/50"
+                      : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-700/50"
                   }`}
                 >
                   <CheckCircle
-                    className={`w-4 h-4 ${activeTab === "approvals" ? "text-primary-500" : "opacity-70"}`}
+                    className={`w-4 h-4 ${activeTab === "approvals" ? "text-white" : "opacity-70"}`}
                   />
                   <span>{t("manageContent.tabs.approvals")}</span>
                 </button>
@@ -351,40 +308,36 @@ export default function ManageContentPage() {
             </div>
           </div>
 
-          {/* Main Content Area */}
           <div className="min-h-[500px]">
-            {/* Calendar View */}
             {activeTab === "calendar" && (
               <div className="animate-in fade-in zoom-in duration-300">
                 <ModernCalendar onEventClick={handleEventClick} />
               </div>
             )}
 
-            {/* Approvals View */}
             {activeTab === "approvals" && (
-              <div className="animate-in fade-in zoom-in duration-300">
+              <div className="animate-in fade-in zoom-in duration-300 space-y-6">
                 <ApprovalStats refreshTrigger={refreshTrigger} />
 
-                <div className="bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 overflow-hidden">
-                  {/* Tabs */}
-                  <div className="border-b border-gray-200 dark:border-neutral-700">
-                    <div className="flex">
+                <div className="bg-white dark:bg-neutral-800 rounded-xl border border-gray-200 dark:border-neutral-700 overflow-hidden shadow-sm">
+                  <div className="border-b border-gray-200 dark:border-neutral-700 flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 bg-gray-50/50 dark:bg-neutral-800/50">
+                    <div className="flex bg-gray-200/50 dark:bg-neutral-700/50 p-1 rounded-xl w-fit">
                       <button
                         onClick={() => setApprovalTab("pending")}
-                        className={`px-6 py-3 font-bold text-sm transition-all border-b-2 ${
+                        className={`px-6 py-2 rounded-lg font-bold text-sm transition-all ${
                           approvalTab === "pending"
-                            ? "border-primary-500 text-primary-600 dark:text-primary-400"
-                            : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                            ? "bg-white dark:bg-neutral-800 text-primary-600 dark:text-primary-400 shadow-sm ring-1 ring-black/5"
+                            : "text-gray-500 hover:text-gray-700"
                         }`}
                       >
                         {t("approvals.tabs.pending")}
                       </button>
                       <button
                         onClick={() => setApprovalTab("history")}
-                        className={`px-6 py-3 font-bold text-sm transition-all border-b-2 ${
+                        className={`px-6 py-2 rounded-lg font-bold text-sm transition-all ${
                           approvalTab === "history"
-                            ? "border-primary-500 text-primary-600 dark:text-primary-400"
-                            : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                            ? "bg-white dark:bg-neutral-800 text-primary-600 dark:text-primary-400 shadow-sm ring-1 ring-black/5"
+                            : "text-gray-500 hover:text-gray-700"
                         }`}
                       >
                         {t("approvals.tabs.history")}
@@ -392,8 +345,7 @@ export default function ManageContentPage() {
                     </div>
                   </div>
 
-                  {/* Tab Content */}
-                  <div className="p-6">
+                  <div className="p-0">
                     {approvalTab === "pending" ? (
                       <ApprovalList
                         publications={publications.filter(
@@ -411,7 +363,6 @@ export default function ManageContentPage() {
               </div>
             )}
 
-            {/* Logs View */}
             {activeTab === "logs" && (
               <div className="animate-in fade-in zoom-in duration-300">
                 <LogsList
@@ -421,42 +372,25 @@ export default function ManageContentPage() {
                   onPageChange={handlePageChange}
                   onPerPageChange={handlePerPageChange}
                   onRefresh={handleRefresh}
-                  onFilterChange={handleFilterChange}
+                  onFilterChange={(key, val) =>
+                    handleFilterChange({ ...filters, [key]: val })
+                  }
+                  filters={filters}
+                  search={search}
+                  onSearchChange={setSearch}
                 />
               </div>
             )}
 
-            {/* Publications & Campaigns Views (With Status Tabs) */}
             {(activeTab === "publications" || activeTab === "campaigns") && (
               <div className="animate-in fade-in zoom-in duration-300">
-                {activeTab === "publications" && (
-                  <div className="flex items-center gap-3 mb-6 bg-gray-50 dark:bg-gray-800/50 p-2 rounded-lg border border-gray-100 dark:border-gray-700 w-full sm:w-fit overflow-x-auto scrollbar-subtle">
-                    {statusTabs.map(
-                      (tab: { id: string; label: string; icon: any }) => (
-                        <button
-                          key={tab.id}
-                          onClick={() => handleStatusTabChange(tab.id)}
-                          className={`
-                                    flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap
-                                    ${
-                                      statusTab === tab.id
-                                        ? "bg-white dark:bg-gray-700 text-primary-600 dark:text-primary-300 shadow-sm ring-1 ring-black/5"
-                                        : "text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700/50"
-                                    }
-                                `}
-                        >
-                          <tab.icon
-                            className={`w-4 h-4 ${statusTab === tab.id ? "text-primary-500" : "opacity-70"}`}
-                          />
-                          {tab.label}
-                        </button>
-                      ),
-                    )}
-                  </div>
-                )}
-
-                {/* Content List Component */}
                 <ContentList
+                  title={
+                    activeTab === "publications"
+                      ? t("manageContent.tabs.publications")
+                      : t("manageContent.tabs.campaigns")
+                  }
+                  onRefresh={handleRefreshWrapped}
                   items={
                     activeTab === "publications" ? publications : campaigns
                   }
@@ -472,16 +406,28 @@ export default function ManageContentPage() {
                       : campPagination
                   }
                   onPageChange={handlePageChange}
-                  onEdit={openEditModal}
+                  onEdit={(item) =>
+                    useManageContentUIStore.getState().openEditModal(item)
+                  }
                   onDelete={handleDeleteItemClick}
                   onViewDetails={openViewDetailsModal}
-                  onPublish={openPublishModal}
+                  onPublish={(item) =>
+                    useManageContentUIStore.getState().openPublishModal(item)
+                  }
                   onEditRequest={handleEditRequest}
                   connectedAccounts={connectedAccounts}
                   expandedCampaigns={expandedCampaigns}
                   toggleExpand={toggleExpand}
                   permissions={permissions}
                   onPerPageChange={handlePerPageChange}
+                  showFilters={showFilters}
+                  onToggleFilters={setShowFilters}
+                  filters={filters}
+                  onFilterChange={(key, val) =>
+                    handleFilterChange({ ...filters, [key]: val })
+                  }
+                  search={search}
+                  onSearchChange={setSearch}
                 />
               </div>
             )}
@@ -491,7 +437,6 @@ export default function ManageContentPage() {
 
       <ModalManager onRefresh={handleRefreshWrapped} />
 
-      {/* Delete Confirmation Modal */}
       <Modal
         show={deleteConfirmation.isOpen}
         onClose={() => setDeleteConfirmation({ isOpen: false, id: null })}

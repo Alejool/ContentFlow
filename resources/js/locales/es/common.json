@@ -76,14 +76,23 @@
     "clics": "Clics",
     "engagement": "Engagement",
     "filters": {
-      "all": "Todos"
+      "all": "Todos",
+      "title": "Filtros"
     },
     "status": {
       "active": "Activa",
       "inactive": "Inactiva",
       "completed": "Completada",
       "paused": "Pausada",
-      "draft": "Borrador"
+      "draft": "Borrador",
+      "title": "Estado"
+    },
+    "sort": {
+      "title": "Ordenar",
+      "newest": "Más recientes",
+      "oldest": "Más antiguos",
+      "title_asc": "Título (A-Z)",
+      "title_desc": "Título (Z-A)"
     },
     "errors": {
       "checkFormErrors": "Por favor, revisa los errores en el formulario"

@@ -14,6 +14,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { memo } from "react";
+import { useTranslation } from "react-i18next";
 
 interface CampaignRowProps {
   item: Campaign;
@@ -37,6 +38,7 @@ const CampaignRow = memo(
     onEditRequest,
     onViewDetails,
   }: CampaignRowProps) => {
+    const { t } = useTranslation();
     const { auth } = usePage<any>().props;
     const canManage =
       auth.current_workspace?.permissions?.includes("manage-content");
@@ -71,11 +73,11 @@ const CampaignRow = memo(
             <div className="w-12 h-12 rounded-lg flex-shrink-0 border border-gray-200 bg-gray-100 dark:border-neutral-700 dark:bg-neutral-800 overflow-hidden flex items-center justify-center">
               <Layers className="w-6 h-6 text-gray-400" />
             </div>
-            <div>
-              <h3 className="font-medium text-sm text-gray-900 dark:text-white">
+            <div className="min-w-0 flex-1">
+              <h3 className="font-medium text-sm text-gray-900 dark:text-white truncate">
                 {item.name}
               </h3>
-              <p className="text-xs mt-0.5 line-clamp-1 text-gray-500 dark:text-gray-400">
+              <p className="text-xs mt-0.5 break-words line-clamp-1 text-gray-500 dark:text-gray-400">
                 {item.description || "No description"}
               </p>
 
@@ -137,7 +139,7 @@ const CampaignRow = memo(
                 )}
               </div>
               <div className="ml-3">
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                <p className="text-sm font-medium text-gray-900 dark:text-white truncate max-w-[120px]">
                   {item.user.name}
                 </p>
               </div>
@@ -146,15 +148,15 @@ const CampaignRow = memo(
         </td>
         <td className="px-6 py-4">
           <span
-            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${getStatusColor(
+            className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${getStatusColor(
               item.status,
             )}`}
           >
-            {item.status || "Draft"}
+            {t(`campaigns.filters.${item.status || "active"}`)}
           </span>
         </td>
         <td className="px-6 py-4 text-sm text-gray-500">
-          <span>
+          <span className="whitespace-nowrap">
             {item.publications_count || item.publications?.length || 0} items
           </span>
         </td>

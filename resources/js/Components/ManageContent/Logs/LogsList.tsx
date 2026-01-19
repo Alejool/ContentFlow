@@ -1,4 +1,5 @@
 import ExpandableText from "@/Components/ManageContent/common/ExpandableText";
+import FilterSection from "@/Components/ManageContent/common/FilterSection";
 import AdvancedPagination from "@/Components/common/ui/AdvancedPagination";
 import EmptyState from "@/Components/common/ui/EmptyState";
 import TableContainer from "@/Components/common/ui/TableContainer";
@@ -22,12 +23,16 @@ interface LogsListProps {
   pagination?: any;
   onPageChange?: (page: number) => void;
   onRefresh?: () => void;
-  onFilterChange?: (filters: any) => void;
+  onFilterChange?: (key: string, val: any) => void;
   onPerPageChange?: (perPage: number) => void;
+  filters?: any;
+  search?: string;
+  onSearchChange?: (val: string) => void;
 }
 
 import LogCardSkeleton from "@/Components/ManageContent/Logs/LogCardSkeleton";
 import LogRowSkeleton from "@/Components/ManageContent/Logs/LogRowSkeleton";
+import Button from "@/Components/common/Modern/Button";
 
 const LogsList = memo(
   ({
@@ -38,9 +43,13 @@ const LogsList = memo(
     onRefresh,
     onFilterChange,
     onPerPageChange,
+    filters = {},
+    search = "",
+    onSearchChange,
   }: LogsListProps) => {
     const { t } = useTranslation();
     const [smoothLoading, setSmoothLoading] = useState(isLoading);
+    const [showFilters, setShowFilters] = useState(false);
 
     useEffect(() => {
       if (isLoading) {
@@ -52,16 +61,6 @@ const LogsList = memo(
         return () => clearTimeout(timer);
       }
     }, [isLoading]);
-
-    const [selectedStatus, setSelectedStatus] = useState<string>("all");
-    const [showFilters, setShowFilters] = useState(false);
-
-    const handleStatusChange = (status: string) => {
-      setSelectedStatus(status);
-      if (onFilterChange) {
-        onFilterChange({ status });
-      }
-    };
 
     const getStatusIcon = (status: string) => {
       switch (status) {
@@ -116,56 +115,33 @@ const LogsList = memo(
       }
     };
 
-    const statusOptions = [
-      "all",
-      "published",
-      "success",
-      "failed",
-      "pending",
-      "publishing",
-      "orphaned",
-      "deleted",
-      "removed_on_platform",
-    ];
-
-    const getStatusButtonColor = (status: string) => {
-      if (selectedStatus !== status) {
-        return "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700";
-      }
-
-      switch (status) {
-        case "all":
-          return "bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300";
-        case "published":
-        case "success":
-          return "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300";
-        case "failed":
-          return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300";
-        case "pending":
-        case "publishing":
-          return "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300";
-        default:
-          return "bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200";
-      }
-    };
-
     const headerActions = (
-      <div className="flex gap-2">
-        <button
+      <div className="flex items-center gap-2">
+        <Button
+          variant="secondary"
+          buttonStyle="outline"
+          size="sm"
           onClick={() => setShowFilters(!showFilters)}
-          className="sm:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-700 transition-colors"
-          title={t("logs.filter")}
+          icon={Filter}
+          className={
+            showFilters
+              ? "bg-primary-50 border-primary-200 text-primary-600 ring-1 ring-primary-500/20"
+              : ""
+          }
         >
-          <Filter className="w-4 h-4" />
-        </button>
-
-        <button
+          {t("common.filters.title") || "Filtros"}
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={onRefresh}
-          className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-700 transition-colors"
+          loading={isLoading}
+          icon={RotateCcw}
+          className="text-gray-500 hover:text-primary-600"
           title={t("logs.refresh")}
         >
-          <RotateCcw className="w-4 h-4" />
-        </button>
+          {""}
+        </Button>
       </div>
     );
 
@@ -177,25 +153,20 @@ const LogsList = memo(
         }
         actions={headerActions}
       >
-        <div
-          className={`p-4 border-b border-gray-200 dark:border-neutral-700 ${
-            showFilters ? "block" : "hidden sm:block"
-          }`}
-        >
-          <div className="flex flex-wrap gap-2 overflow-x-auto scrollbar-subtle pb-2">
-            {statusOptions.map((status) => (
-              <button
-                key={status}
-                onClick={() => handleStatusChange(status)}
-                className={`px-3 py-1.5 text-sm rounded-lg transition-colors whitespace-nowrap ${getStatusButtonColor(
-                  status,
-                )}`}
-              >
-                {t(`logs.status.${status}`)}
-              </button>
-            ))}
+        {showFilters && (
+          <div className="mb-4">
+            <FilterSection
+              mode="logs"
+              t={t}
+              search={search}
+              setSearch={onSearchChange || (() => {})}
+              statusFilter={filters.status || "all"}
+              dateStart={filters.date_start || ""}
+              dateEnd={filters.date_end || ""}
+              handleFilterChange={onFilterChange || (() => {})}
+            />
           </div>
-        </div>
+        )}
 
         <div className="hidden md:block overflow-x-auto scrollbar-subtle">
           <div className="grid grid-cols-1 grid-rows-1">

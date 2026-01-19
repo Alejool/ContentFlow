@@ -215,7 +215,7 @@ const PublicationMobileRow = memo(
                       <h3 className="font-semibold text-sm text-gray-900 dark:text-white truncate leading-tight">
                         {item.title || t("publications.table.untitled")}
                       </h3>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 break-words line-clamp-2">
                         {item.description || "Sin descripción"}
                       </p>
                     </div>

@@ -56,16 +56,16 @@ export default function CampaignMobileTable({
                   <h3 className="font-medium text-gray-900 dark:text-gray-100">
                     {item.name}
                   </h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 break-words line-clamp-2">
                     {item.description}
                   </p>
                 </div>
                 <div
-                  className={`text-xs px-2 py-1 rounded-full ${getStatusColor(
+                  className={`text-[10px] sm:text-xs px-2 py-1 rounded-full font-medium whitespace-nowrap ${getStatusColor(
                     item.status,
                   )}`}
                 >
-                  {item.status}
+                  {t(`campaigns.filters.${item.status || "active"}`)}
                 </div>
               </div>
 
@@ -212,11 +212,11 @@ export default function CampaignMobileTable({
                           </div>
                         </div>
                         <div
-                          className={`text-xs px-2 py-1 rounded-full flex-shrink-0 ${getStatusColor(
+                          className={`text-[10px] px-2 py-0.5 rounded-full flex-shrink-0 font-medium whitespace-nowrap ${getStatusColor(
                             pub.status,
                           )}`}
                         >
-                          {pub.status}
+                          {t(`publications.status.${pub.status || "draft"}`)}
                         </div>
                       </div>
                     ))}

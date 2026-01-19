@@ -147,7 +147,9 @@ export default function ContentCard({
             >
               <StatusIcon className="w-3 h-3" />
               <span className="capitalize">
-                {t(`publications.status.${item.status || "draft"}`)}
+                {type === "campaign"
+                  ? t(`campaigns.filters.${item.status || "active"}`)
+                  : t(`publications.status.${item.status || "draft"}`)}
               </span>
             </span>
           </div>
@@ -177,7 +179,9 @@ export default function ContentCard({
             >
               <StatusIcon className="w-3 h-3" />
               <span className="capitalize">
-                {t(`publications.status.${item.status || "draft"}`)}
+                {type === "campaign"
+                  ? t(`campaigns.filters.${item.status || "active"}`)
+                  : t(`publications.status.${item.status || "draft"}`)}
               </span>
             </span>
           </div>
@@ -196,7 +200,7 @@ export default function ContentCard({
         )}
 
         <div className="mb-3 flex-1">
-          <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-2">
+          <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-2 break-words">
             {item.content?.substring(0, 120) || "Sin contenido"}
             {(item.content?.length || 0) > 120 && "..."}
           </p>

@@ -70,6 +70,10 @@ class PublicationController extends Controller
         }
       }
 
+      if ($request->has('search') && !empty($request->search)) {
+        $query->where('title', 'LIKE', '%' . $request->search . '%');
+      }
+
       if ($request->has(['date_start', 'date_end'])) {
         $query->byDateRange($request->date_start, $request->date_end);
       }

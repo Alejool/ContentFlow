@@ -72,6 +72,10 @@ class CampaignController extends Controller
                 }
             }
 
+            if ($request->has('search') && !empty($request->search)) {
+                $query->where('name', 'LIKE', '%' . $request->search . '%');
+            }
+
             if ($request->has('date_start') && $request->has('date_end')) {
                 $query->byDateRange($request->date_start, $request->date_end);
             }

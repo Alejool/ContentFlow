@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-
 interface ExpandableTextProps {
   text: string;
   maxLength?: number;
@@ -28,10 +27,11 @@ export default function ExpandableText({
   return (
     <button
       onClick={() => needsTruncation && setIsExpanded(!isExpanded)}
-      className={`text-left focus:outline-none focus:ring-2 rounded ${needsTruncation
+      className={`text-left focus:outline-none focus:ring-2 rounded ${
+        needsTruncation
           ? "cursor-pointer hover:opacity-80 transition-opacity"
           : "cursor-default"
-        } ${className} text-gray-700 dark:text-white`}
+      } ${className} text-gray-700 dark:text-white break-words`}
       aria-label={
         needsTruncation
           ? isExpanded

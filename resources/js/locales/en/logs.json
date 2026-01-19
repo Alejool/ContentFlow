@@ -37,7 +37,8 @@
       "published": "Published",
       "deleted": "Deleted",
       "removed_on_platform": "Removed on Platform",
-      "orphaned": "Orphaned"
+      "orphaned": "Orphaned",
+      "publishing": "Publishing"
     },
     "empty": "No logs found",
     "noLogsDesc": "There are no activity logs matching your current filters or in this workspace.",

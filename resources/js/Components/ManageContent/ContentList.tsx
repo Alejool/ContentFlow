@@ -1,12 +1,14 @@
 import CampaignTable from "@/Components/ManageContent/Campaign/CampaignTable";
 import PublicationTable from "@/Components/ManageContent/Publication/PublicationTable";
+import Button from "@/Components/common/Modern/Button";
 import AdvancedPagination from "@/Components/common/ui/AdvancedPagination";
 import EmptyState from "@/Components/common/ui/EmptyState";
-import { LayoutGrid, List as ListIcon } from "lucide-react";
+import { Filter, LayoutGrid, List as ListIcon, RotateCcw } from "lucide-react";
 import { useEffect, useState, useTransition } from "react";
 import { useTranslation } from "react-i18next";
 import ContentCard from "./ContentCard";
 import ContentCardSkeleton from "./ContentCardSkeleton";
+import FilterSection from "./common/FilterSection";
 
 interface ContentListProps {
   items: any[];
@@ -24,6 +26,14 @@ interface ContentListProps {
   expandedCampaigns?: number[];
   toggleExpand?: (id: number) => void;
   permissions?: string[];
+  title?: string;
+  onRefresh?: () => void;
+  showFilters?: boolean;
+  onToggleFilters?: (show: boolean) => void;
+  filters?: any;
+  onFilterChange?: (key: string, val: any) => void;
+  search?: string;
+  onSearchChange?: (val: string) => void;
 }
 
 export default function ContentList(props: ContentListProps) {
@@ -31,8 +41,9 @@ export default function ContentList(props: ContentListProps) {
   const [isPending, startTransition] = useTransition();
   const { t } = useTranslation();
 
-  const { items, isLoading, mode } = props;
+  const { items, isLoading, mode, title, onRefresh } = props;
   const [smoothLoading, setSmoothLoading] = useState(true);
+
   useEffect(() => {
     if (isLoading) {
       setSmoothLoading(true);
@@ -54,30 +65,88 @@ export default function ContentList(props: ContentListProps) {
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-end mb-2">
-        <div className="bg-gray-100 dark:bg-gray-800 p-1 rounded-lg flex items-center gap-1">
-          <button
-            onClick={() => {
-              setSmoothLoading(true);
-              startTransition(() => setViewMode("grid"));
-            }}
-            className={`p-1.5 rounded-md transition-all ${viewMode === "grid" ? "bg-white dark:bg-gray-700 shadow-sm text-primary-600" : "text-gray-400 hover:text-gray-600"}`}
-            title="Grid View"
-          >
-            <LayoutGrid className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => {
-              setSmoothLoading(true);
-              startTransition(() => setViewMode("list"));
-            }}
-            className={`p-1.5 rounded-md transition-all ${viewMode === "list" ? "bg-white dark:bg-gray-700 shadow-sm text-primary-600" : "text-gray-400 hover:text-gray-600"}`}
-            title="List View"
-          >
-            <ListIcon className="w-4 h-4" />
-          </button>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
+        {title && (
+          <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+            {title}
+          </h3>
+        )}
+        <div className="flex items-center gap-2 ml-auto">
+          {onRefresh && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onRefresh}
+              loading={isLoading}
+              icon={RotateCcw}
+              className="text-gray-500 hover:text-primary-600"
+              title={t("common.refresh")}
+            >
+              {""}
+            </Button>
+          )}
+
+          <div className="flex items-center gap-1.5 ml-auto">
+            <Button
+              variant="secondary"
+              buttonStyle="outline"
+              size="sm"
+              onClick={() =>
+                props.onToggleFilters &&
+                props.onToggleFilters(!props.showFilters)
+              }
+              icon={Filter}
+              className={
+                props.showFilters
+                  ? "bg-primary-50 border-primary-200 text-primary-600 ring-1 ring-primary-500/20"
+                  : ""
+              }
+            >
+              {t("common.filters.title") || "Filtros"}
+            </Button>
+
+            <div className="bg-gray-100 dark:bg-gray-800 p-1 rounded-lg flex items-center gap-1">
+              <button
+                onClick={() => {
+                  setSmoothLoading(true);
+                  startTransition(() => setViewMode("grid"));
+                }}
+                className={`p-1.5 rounded-md transition-all ${viewMode === "grid" ? "bg-white dark:bg-gray-700 shadow-sm text-primary-600" : "text-gray-400 hover:text-gray-600"}`}
+                title={t("common.gridView")}
+              >
+                <LayoutGrid className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => {
+                  setSmoothLoading(true);
+                  startTransition(() => setViewMode("list"));
+                }}
+                className={`p-1.5 rounded-md transition-all ${viewMode === "list" ? "bg-white dark:bg-gray-700 shadow-sm text-primary-600" : "text-gray-400 hover:text-gray-600"}`}
+                title={t("common.listView")}
+              >
+                <ListIcon className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
         </div>
       </div>
+
+      {props.showFilters && (
+        <div className="animate-in fade-in slide-in-from-top-4 duration-300">
+          <FilterSection
+            mode={mode}
+            t={t}
+            search={props.search || ""}
+            setSearch={props.onSearchChange || (() => {})}
+            statusFilter={props.filters?.status || "all"}
+            platformFilter={props.filters?.platform || "all"}
+            sortFilter={props.filters?.sort || "newest"}
+            dateStart={props.filters?.date_start || ""}
+            dateEnd={props.filters?.date_end || ""}
+            handleFilterChange={props.onFilterChange || (() => {})}
+          />
+        </div>
+      )}
 
       {!smoothLoading && items.length === 0 ? (
         <EmptyState
