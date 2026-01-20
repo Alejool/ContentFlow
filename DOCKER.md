@@ -22,8 +22,9 @@ docker-compose exec app php artisan [command]
 
 ## Access Application
 - **Web**: http://localhost
-- **MySQL**: localhost:3306
+- **PostgreSQL**: localhost:5432
 - **Redis**: localhost:6379
+- **Redis Commander**: http://localhost:8081
 
 ## Common Tasks
 
@@ -38,9 +39,9 @@ docker-compose exec app php artisan cache:clear
 docker-compose exec app php artisan config:clear
 ```
 
-### Access MySQL
+### Access PostgreSQL
 ```bash
-docker-compose exec mysql mysql -u laravel -p
+docker-compose exec pgsql psql -U contenflow -d ContentFlow
 ```
 
 ### Rebuild Everything

@@ -20,6 +20,7 @@ use App\Http\Controllers\WorkspaceController;
 use App\Http\Controllers\Api\CalendarController;
 use App\Http\Controllers\Calendar\CalendarViewController;
 use \Laravel\Sanctum\Sanctum;
+use App\Http\Controllers\ApprovalController;
 
 /*
 |--------------------------------------------------------------------------
@@ -310,9 +311,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     |----------------------------------------------------------------------
     */
   Route::prefix('approvals')->name('approvals.')->group(function () {
-    Route::get('/', [\App\Http\Controllers\ApprovalController::class, 'index'])->name('index');
-    Route::get('/history', [\App\Http\Controllers\ApprovalController::class, 'history'])->name('history');
-    Route::get('/stats', [\App\Http\Controllers\ApprovalController::class, 'stats'])->name('stats');
+    Route::get('/', [ApprovalController::class, 'index'])->name('index');
+    Route::get('/history', [ApprovalController::class, 'history'])->name('history');
+    Route::get('/stats', [ApprovalController::class, 'stats'])->name('stats');
   });
 
   /*

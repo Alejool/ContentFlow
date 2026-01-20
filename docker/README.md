@@ -17,7 +17,7 @@ Complete Docker configuration for running the Laravel application with all requi
 cp .env.example .env
 
 # Update .env with Docker-specific settings
-# DB_HOST=mysql
+# DB_HOST=pgsql
 # REDIS_HOST=redis
 # QUEUE_CONNECTION=redis
 # CACHE_DRIVER=redis
@@ -52,7 +52,7 @@ docker-compose exec app php artisan db:seed
 ### 4. Access Application
 
 - **Application**: http://localhost
-- **MySQL**: localhost:3306
+- **PostgreSQL**: localhost:3306
 - **Redis**: localhost:6379
 
 ## 🛠️ Common Commands
@@ -81,14 +81,14 @@ docker-compose exec app php artisan view:clear
 ### Database Operations
 
 ```bash
-# Access MySQL CLI
-docker-compose exec mysql mysql -u laravel -p
+# Access PostgreSQL CLI
+docker-compose exec pgsql pgsql -u laravel -p
 
 # Backup database
-docker-compose exec mysql mysqldump -u laravel -p laravel > backup.sql
+docker-compose exec pgsql pgsqldump -u laravel -p laravel > backup.sql
 
 # Restore database
-docker-compose exec -T mysql mysql -u laravel -p laravel < backup.sql
+docker-compose exec -T pgsql pgsql -u laravel -p laravel < backup.sql
 
 # Fresh migration
 docker-compose exec app php artisan migrate:fresh --seed
@@ -125,11 +125,12 @@ docker-compose logs -f node
 |---------|---------------|------|-------------|
 | app | laravel_app | 9000 | PHP-FPM application |
 | nginx | laravel_nginx | 80, 443 | Web server |
-| mysql | laravel_mysql | 3306 | Database |
-| redis | laravel_redis | 6379 | Cache & Queue |
-| queue | laravel_queue | - | Queue worker |
-| scheduler | laravel_scheduler | - | Task scheduler |
-| node | laravel_node | 5173 | Dev server (dev profile) |
+| pgsql | laravel_pgsql | 3306 | Database |
+| redis | contentflow_redis | 6379 | Cache & Queue |
+| redis-commander | contentflow_redis_commander | 8081 | Redis Web UI |
+| queue | contentflow_queue | - | Queue worker |
+| scheduler | contentflow_scheduler | - | Task scheduler |
+| vite | contentflow_vite | 5173 | Dev server |
 
 ### Environment Variables
 
@@ -137,8 +138,8 @@ Key variables to configure in `.env`:
 
 ```env
 # Database
-DB_CONNECTION=mysql
-DB_HOST=mysql
+DB_CONNECTION=pgsql
+DB_HOST=pgsql
 DB_PORT=3306
 DB_DATABASE=laravel
 DB_USERNAME=laravel
@@ -186,11 +187,11 @@ docker-compose exec app chmod -R 775 storage bootstrap/cache
 ### Database connection failed
 
 ```bash
-# Verify MySQL is running
-docker-compose ps mysql
+# Verify PostgreSQL is running
+docker-compose ps pgsql
 
-# Check MySQL logs
-docker-compose logs mysql
+# Check PostgreSQL logs
+docker-compose logs pgsql
 
 # Test connection
 docker-compose exec app php artisan tinker

@@ -1,8 +1,6 @@
 import { CampaignStat } from "@/Components/Analytics/PerformanceTable";
-import PlatformPerformance from "@/Components/Analytics/PlatformPerformance";
-import SocialMediaAccounts from "@/Components/Analytics/SocialMediaAccounts";
-import EngagementChart from "@/Components/Statistics/EngagementChart";
 import StatCard from "@/Components/Statistics/StatCard";
+import Skeleton from "@/Components/common/ui/Skeleton";
 import { useTheme } from "@/Hooks/useTheme";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link, router } from "@inertiajs/react";
@@ -21,8 +19,18 @@ import {
   Users,
   X,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Suspense, lazy, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+
+const PlatformPerformance = lazy(
+  () => import("@/Components/Analytics/PlatformPerformance"),
+);
+const SocialMediaAccounts = lazy(
+  () => import("@/Components/Analytics/SocialMediaAccounts"),
+);
+const EngagementChart = lazy(
+  () => import("@/Components/Statistics/EngagementChart"),
+);
 
 interface DashboardProps {
   auth: {
@@ -446,30 +454,42 @@ export default function Dashboard({
                 </div>
                 {t("dashboard.engagementTrends")}
               </h2>
-              <EngagementChart
-                data={stats.engagementTrends}
-                theme={theme as any}
-              />
+              <Suspense
+                fallback={<Skeleton className="h-[400px] w-full rounded-lg" />}
+              >
+                <EngagementChart
+                  data={stats.engagementTrends}
+                  theme={theme as any}
+                />
+              </Suspense>
             </div>
           )}
         </div>
 
         {stats.platformComparison.length > 0 && (
           <div className="mb-8">
-            <PlatformPerformance
-              data={stats.platformComparison}
-              theme={theme as any}
-            />
+            <Suspense
+              fallback={<Skeleton className="h-[400px] w-full rounded-lg" />}
+            >
+              <PlatformPerformance
+                data={stats.platformComparison}
+                theme={theme as any}
+              />
+            </Suspense>
           </div>
         )}
 
         {stats.platformData.length > 0 && (
           <div className="mb-8">
-            <SocialMediaAccounts
-              accounts={stats.platformData}
-              theme={theme as any}
-              showChart={true}
-            />
+            <Suspense
+              fallback={<Skeleton className="h-[300px] w-full rounded-lg" />}
+            >
+              <SocialMediaAccounts
+                accounts={stats.platformData}
+                theme={theme as any}
+                showChart={true}
+              />
+            </Suspense>
           </div>
         )}
 

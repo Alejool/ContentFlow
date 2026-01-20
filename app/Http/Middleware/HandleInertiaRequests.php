@@ -51,13 +51,14 @@ class HandleInertiaRequests extends Middleware
         'workspaces' => $request->user() ? $request->user()->workspaces()
           ->withCount('users')
           ->with([
-            'users' => function ($query) {
-              $query->select('users.id', 'users.name', 'users.email', 'users.photo_url')
+            'users' => function ($query) use ($request) {
+              $query->where('users.id', $request->user()->id)
+                ->select('users.id', 'users.name', 'users.email', 'users.photo_url')
                 ->withPivot('role_id');
             }
           ])
           ->get() : [],
-        'roles' => \App\Models\Role::all(), // Shared globally
+        'roles' => fn() => \App\Models\Role::all(),
         'current_workspace' => function () use ($request) {
           $user = $request->user();
           if (!$user)
@@ -69,8 +70,9 @@ class HandleInertiaRequests extends Middleware
               ->where('workspaces.id', $user->current_workspace_id)
               ->withCount('users')
               ->with([
-                'users' => function ($query) {
-                  $query->select('users.id', 'users.name', 'users.email', 'users.photo_url')
+                'users' => function ($query) use ($request) {
+                  $query->where('users.id', $request->user()->id)
+                    ->select('users.id', 'users.name', 'users.email', 'users.photo_url')
                     ->withPivot('role_id', 'created_at');
                 },
                 'creator:id,name,email'
@@ -82,8 +84,9 @@ class HandleInertiaRequests extends Middleware
             $firstWorkspace = $user->workspaces()
               ->withCount('users')
               ->with([
-                'users' => function ($query) {
-                  $query->select('users.id', 'users.name', 'users.email', 'users.photo_url')
+                'users' => function ($query) use ($request) {
+                  $query->where('users.id', $request->user()->id)
+                    ->select('users.id', 'users.name', 'users.email', 'users.photo_url')
                     ->withPivot('role_id', 'created_at');
                 },
                 'creator:id,name,email'
@@ -98,7 +101,7 @@ class HandleInertiaRequests extends Middleware
 
           if ($currentWorkspace) {
             $roles = \App\Models\Role::all();
-            $currentUser = $currentWorkspace->users->where('id', $user->id)->first();
+            $currentUser = $currentWorkspace->users->first(); // Since we filtered by ID, the first one is the current user
             $roleId = $currentUser ? $currentUser->pivot->role_id : null;
             $role = $roles->find($roleId);
             $isOwner = ((int)$currentWorkspace->created_by === (int)$user->id) || ($role && $role->slug === 'owner');
@@ -106,7 +109,16 @@ class HandleInertiaRequests extends Middleware
             $currentWorkspace->user_role_slug = $isOwner ? 'owner' : ($role ? $role->slug : 'member');
 
             if ($isOwner) {
-              $currentWorkspace->permissions = \App\Models\Permission::pluck('slug')->toArray();
+              // Hardcoded permissions for Owner ensuring access even if DB is empty
+              $currentWorkspace->permissions = [
+                'publish',
+                'approve',
+                'view-analytics',
+                'manage-accounts',
+                'manage-team',
+                'manage-content',
+                'manage-campaigns'
+              ];
             } else {
               $currentWorkspace->permissions = $role ? $role->permissions->pluck('slug')->toArray() : [];
             }
