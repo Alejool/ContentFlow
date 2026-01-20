@@ -1,16 +1,24 @@
-import EngagementChart from "@/Components/Statistics/EngagementChart";
 import StatCard from "@/Components/Statistics/StatCard";
+import Skeleton from "@/Components/common/ui/Skeleton";
 import { useTheme } from "@/Hooks/useTheme";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, router } from "@inertiajs/react";
 import { Eye, Heart, MousePointer2, TrendingUp, Users } from "lucide-react";
-import { useState } from "react";
+import { Suspense, lazy, useState } from "react";
 import { useTranslation } from "react-i18next";
-import CampaignPerformance from "../../Components/Analytics/CampaignPerformance";
 import EmptyState from "../../Components/Analytics/EmptyState";
 import { CampaignStat } from "../../Components/Analytics/PerformanceTable";
 import PeriodSelector from "../../Components/Analytics/PeriodSelector";
-import SocialMediaAccounts from "../../Components/Analytics/SocialMediaAccounts";
+
+const EngagementChart = lazy(
+  () => import("@/Components/Statistics/EngagementChart"),
+);
+const CampaignPerformance = lazy(
+  () => import("../../Components/Analytics/CampaignPerformance"),
+);
+const SocialMediaAccounts = lazy(
+  () => import("../../Components/Analytics/SocialMediaAccounts"),
+);
 
 interface OverviewStats {
   total_views: number;
@@ -30,7 +38,9 @@ interface OverviewStats {
 }
 
 interface SocialMediaAccount {
+  id: number;
   platform: string;
+  account_name: string;
   followers: number;
   engagement_rate: number;
   reach: number;
@@ -213,21 +223,33 @@ export default function Index({ stats, period }: AnalyticsProps) {
             >
               {t("analytics.charts.engagementTrends")}
             </h2>
-            <EngagementChart data={engagementTrends} theme={theme as any} />
+            <Suspense
+              fallback={<Skeleton className="h-[300px] w-full rounded-lg" />}
+            >
+              <EngagementChart data={engagementTrends} theme={theme as any} />
+            </Suspense>
           </div>
         </div>
 
         {campaigns.length > 0 && (
-          <CampaignPerformance campaigns={campaigns} theme={theme} />
+          <Suspense
+            fallback={<Skeleton className="h-[400px] w-full rounded-lg" />}
+          >
+            <CampaignPerformance campaigns={campaigns} theme={theme} />
+          </Suspense>
         )}
 
         {socialMedia.length > 0 && (
           <div className="mb-8">
-            <SocialMediaAccounts
-              accounts={socialMedia}
-              theme={theme}
-              showChart={true}
-            />
+            <Suspense
+              fallback={<Skeleton className="h-[300px] w-full rounded-lg" />}
+            >
+              <SocialMediaAccounts
+                accounts={socialMedia}
+                theme={theme}
+                showChart={true}
+              />
+            </Suspense>
           </div>
         )}
 

@@ -27,6 +27,9 @@ export const useAuth = () => {
     setSuccessMessage("");
 
     try {
+      // Get CSRF cookie first
+      await axios.get("/sanctum/csrf-cookie");
+
       // Check if user exists and has a provider
       const checkResponse = await axios.post("/check-user", {
         email: data.email,
@@ -36,7 +39,7 @@ export const useAuth = () => {
 
       if (userData.provider) {
         setError(
-          `Este usuario se registró con ${userData.provider}. Por favor, inicia sesión con ${userData.provider}.`
+          `Este usuario se registró con ${userData.provider}. Por favor, inicia sesión con ${userData.provider}.`,
         );
         return;
       }
