@@ -7,16 +7,16 @@ export function TableHeader({ mode, t }: TableHeaderProps) {
   if (mode === "campaigns") {
     return (
       <>
-        <th className="px-6 py-4 font-semibold w-8"></th>
-        <th className="px-6 py-4 font-semibold">{t("campaigns.table.name")}</th>
-        <th className="px-6 py-4 font-semibold">Author</th>
-        <th className="px-6 py-4 font-semibold">
+        <th className="p-4  font-semibold w-8"></th>
+        <th className="p-4  font-semibold">{t("campaigns.table.name")}</th>
+        <th className="p-4  font-semibold">Author</th>
+        <th className="p-4  font-semibold">
           {t("campaigns.table.status")}
         </th>
-        <th className="px-6 py-4 font-semibold">
+        <th className="p-4  font-semibold">
           {t("campaigns.table.publications")}
         </th>
-        <th className="px-6 py-4 font-semibold text-right">
+        <th className="p-4  font-semibold text-right">
           {t("campaigns.table.actions")}
         </th>
       </>
@@ -25,18 +25,24 @@ export function TableHeader({ mode, t }: TableHeaderProps) {
 
   return (
     <>
-      <th className="px-6 py-4 font-semibold w-8"></th>
-      <th className="px-6 py-4 font-semibold">{t("publications.table.name")}</th>
-      <th className="px-6 py-4 font-semibold">Author</th>
-      <th className="px-6 py-4 font-semibold">{t("publications.table.status")}</th>
-      <th className="px-6 py-4 font-semibold">{t("publications.table.media")}</th>
-      <th className="px-6 py-4 font-semibold">
+      <th className="p-4  font-semibold w-8"></th>
+      <th className="p-4  font-semibold">
+        {t("publications.table.name")}
+      </th>
+      <th className="p-4  font-semibold">Author</th>
+      <th className="p-4  font-semibold">
+        {t("publications.table.status")}
+      </th>
+      <th className="p-4  font-semibold">
+        {t("publications.table.media")}
+      </th>
+      <th className="p-4  font-semibold">
         {t("publications.table.campaign")}
       </th>
-      <th className="px-6 py-4 font-semibold">
+      <th className="p-4  font-semibold">
         {t("publications.table.linkedAccount")}
       </th>
-      <th className="px-6 py-4 font-semibold text-right">
+      <th className="p-4  font-semibold text-right">
         {t("publications.table.actions")}
       </th>
     </>
