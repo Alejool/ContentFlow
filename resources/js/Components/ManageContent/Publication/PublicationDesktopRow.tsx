@@ -49,7 +49,6 @@ const PublicationRow = memo(
     const [isEditing, setIsEditing] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
 
-    // Memoize counts to avoid recalculation on every render
     const mediaCount = React.useMemo(() => {
       if (!item.media_files || item.media_files.length === 0) {
         return { images: 0, videos: 0, total: 0 };
@@ -65,8 +64,8 @@ const PublicationRow = memo(
 
     return (
       <>
-        <td className="px-2 py-4 text-center"></td>
-        <td className="px-6 py-4">
+        <td className="text-center"></td>
+        <td className="">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-lg flex-shrink-0 border border-gray-200 bg-gray-100 dark:border-neutral-700 dark:bg-neutral-800 overflow-hidden flex items-center justify-center">
               <PublicationThumbnail publication={item} t={t} />
@@ -224,7 +223,7 @@ const PublicationRow = memo(
             compact={true}
           />
         </td>
-        <td className="px-6 py-4 text-right">
+        <td className="px-2 py-4 text-right">
           <div className="flex items-center justify-end gap-1">
             {(permissions?.includes("publish") || item.status === "approved") &&
             permissions?.includes("manage-content") ? (

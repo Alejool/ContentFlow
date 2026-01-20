@@ -21,7 +21,7 @@ export interface SocialPlatformConfig {
   darkTextColor: string;
   darkBorderColor: string;
   gradient: string;
-  bgClass: string; // Tailwind background color class
+  bgClass: string;
 }
 
 export const SOCIAL_PLATFORMS: Record<string, SocialPlatformConfig> = {
@@ -40,21 +40,6 @@ export const SOCIAL_PLATFORMS: Record<string, SocialPlatformConfig> = {
     gradient: "from-blue-500 to-blue-700",
     bgClass: "bg-blue-50",
   },
-  // instagram: {
-  //     id: 2,
-  //     key: 'instagram',
-  //     name: 'Instagram',
-  //     logo: IconInstagram,
-  //     icon: FaInstagram,
-  //     color: 'bg-pink-600',
-  //     textColor: 'text-pink-700',
-  //     borderColor: 'border-pink-100',
-  //     darkColor: 'dark:bg-pink-900/20',
-  //     darkTextColor: 'dark:text-pink-400',
-  //     darkBorderColor: 'dark:border-pink-900/30',
-  //     gradient: 'from-pink-500 to-purple-700',
-  //     bgClass: 'bg-pink-50',
-  // },
   tiktok: {
     id: 3,
     key: "tiktok",
@@ -100,21 +85,6 @@ export const SOCIAL_PLATFORMS: Record<string, SocialPlatformConfig> = {
     gradient: "from-primary-600 to-primary-800",
     bgClass: "bg-red-50",
   },
-  // linkedin: {
-  //     id: 6,
-  //     key: 'linkedin',
-  //     name: 'LinkedIn',
-  //     logo: '', // LinkedIn logo not found in imports, using fallback if needed
-  //     icon: FaLinkedin,
-  //     color: 'bg-blue-700',
-  //     textColor: 'text-blue-800',
-  //     borderColor: 'border-blue-100',
-  //     darkColor: 'dark:bg-blue-900/20',
-  //     darkTextColor: 'dark:text-blue-300',
-  //     darkBorderColor: 'dark:border-blue-900/30',
-  //     gradient: 'from-blue-600 to-blue-800',
-  //     bgClass: 'bg-blue-50',
-  // }
 };
 
 export const getPlatformConfig = (platform: string): SocialPlatformConfig => {
@@ -124,7 +94,6 @@ export const getPlatformConfig = (platform: string): SocialPlatformConfig => {
 
   if (config) return config;
 
-  // Fallback config
   return {
     id: 0,
     key: "social",

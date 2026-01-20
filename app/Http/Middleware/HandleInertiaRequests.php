@@ -112,7 +112,7 @@ class HandleInertiaRequests extends Middleware
             }
 
             // Debug Logging
-            \Illuminate\Support\Facades\Log::info("Inertia Shared - Workspace: {$currentWorkspace->name}, Role: {$currentWorkspace->user_role}, Permissions: " . implode(',', $currentWorkspace->permissions));
+            \Illuminate\Support\Facades\Log::info("Inertia Shared - User: {$user->id}, Workspace: {$currentWorkspace->id} ({$currentWorkspace->name}), Role: {$currentWorkspace->user_role} ({$currentWorkspace->user_role_slug}), RoleID: {$roleId}, IsOwner: " . ($isOwner ? 'YES' : 'NO') . ", Permissions: " . implode(',', $currentWorkspace->permissions));
           }
 
           return $currentWorkspace;

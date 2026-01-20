@@ -39,50 +39,47 @@ Route::get('/', function () {
 
 Route::get('/fix-db', function () {
   try {
+    // Fix publications table constraint
     \Illuminate\Support\Facades\DB::statement("ALTER TABLE publications DROP CONSTRAINT IF EXISTS publications_status_check");
     \Illuminate\Support\Facades\Schema::table('publications', function (\Illuminate\Database\Schema\Blueprint $table) {
       $table->string('status', 50)->change();
     });
 
-    // 1. Create Permissions
-    $permissions = [
-      ['name' => 'Publish', 'slug' => 'publish', 'description' => 'Allow publishing content to social media'],
-      ['name' => 'Approve', 'slug' => 'approve', 'description' => 'Allow approving content for publication'],
-      ['name' => 'View Analytics', 'slug' => 'view-analytics', 'description' => 'Allow viewing workspace analytics'],
-      ['name' => 'Manage Accounts', 'slug' => 'manage-accounts', 'description' => 'Allow adding/removing social accounts'],
-      ['name' => 'Manage Team', 'slug' => 'manage-team', 'description' => 'Allow inviting/removing members'],
-      ['name' => 'Manage Content', 'slug' => 'manage-content', 'description' => 'Allow creating and editing publications'],
-      ['name' => 'Manage Campaigns', 'slug' => 'manage-campaigns', 'description' => 'Allow creating and editing campaigns'],
-    ];
+    // Run the roles and permissions seeder
+    \Illuminate\Support\Facades\Artisan::call('db:seed', [
+      '--class' => 'Database\\Seeders\\RolesAndPermissionsSeeder',
+      '--force' => true
+    ]);
 
-    foreach ($permissions as $p) {
-      \App\Models\Permission::firstOrCreate(['slug' => $p['slug']], $p);
-    }
-
-    // 2. Create Roles and Sync
-    $roles = [
-      'Owner' => ['publish', 'approve', 'view-analytics', 'manage-accounts', 'manage-team', 'manage-content', 'manage-campaigns'],
-      'Admin' => ['publish', 'approve', 'view-analytics', 'manage-accounts', 'manage-content', 'manage-campaigns'],
-      'Editor' => ['view-analytics', 'manage-content', 'manage-campaigns'],
-      'Viewer' => ['view-analytics'],
-    ];
-
-    foreach ($roles as $name => $permSlugs) {
-      $role = \App\Models\Role::firstOrCreate(
-        ['slug' => \Illuminate\Support\Str::slug($name)],
-        ['name' => $name, 'description' => "Default $name role"]
-      );
-
-      $ids = \App\Models\Permission::whereIn('slug', $permSlugs)->pluck('id');
-      $role->permissions()->sync($ids);
-    }
-
+    // Verify the fix worked
     $ownerRole = \App\Models\Role::where('slug', 'owner')->first();
     $ownerPerms = $ownerRole ? $ownerRole->permissions->pluck('slug')->toArray() : [];
 
-    return "Database fixed! Owner Permissions: " . implode(', ', $ownerPerms);
+    $allRoles = \App\Models\Role::with('permissions')->get();
+    $rolesSummary = $allRoles->map(function ($role) {
+      return [
+        'name' => $role->name,
+        'slug' => $role->slug,
+        'permissions_count' => $role->permissions->count(),
+        'permissions' => $role->permissions->pluck('slug')->toArray()
+      ];
+    });
+
+    return response()->json([
+      'success' => true,
+      'message' => 'Database fixed successfully!',
+      'owner_permissions' => $ownerPerms,
+      'owner_permissions_count' => count($ownerPerms),
+      'all_roles' => $rolesSummary,
+      'seeder_output' => \Illuminate\Support\Facades\Artisan::output()
+    ], 200);
   } catch (\Exception $e) {
-    return "Error: " . $e->getMessage();
+    \Illuminate\Support\Facades\Log::error('Fix-DB Error: ' . $e->getMessage());
+    return response()->json([
+      'success' => false,
+      'error' => $e->getMessage(),
+      'trace' => $e->getTraceAsString()
+    ], 500);
   }
 });
 
@@ -101,14 +98,67 @@ Route::get('/contact', function () {
 
 
 Route::get('/debug-auth', function () {
-  return [
+  $user = auth()->user();
+
+  $debugInfo = [
+    'authenticated' => $user !== null,
     'host' => request()->getHost(),
     'stateful_config' => config('sanctum.stateful'),
     'session_id' => session()->getId(),
-    'cookies' => request()->cookies->all(),
-    'user' => auth()->user(),
     'is_sanctum_stateful' => Sanctum::currentRequestHost(),
   ];
+
+  if ($user) {
+    $currentWorkspace = $user->currentWorkspace;
+    $workspaces = $user->workspaces()->with('users')->get();
+
+    $debugInfo['user'] = [
+      'id' => $user->id,
+      'name' => $user->name,
+      'email' => $user->email,
+      'current_workspace_id' => $user->current_workspace_id,
+    ];
+
+    $debugInfo['workspaces'] = $workspaces->map(function ($ws) use ($user) {
+      $userInWorkspace = $ws->users->where('id', $user->id)->first();
+      $roleId = $userInWorkspace ? $userInWorkspace->pivot->role_id : null;
+      $role = $roleId ? \App\Models\Role::find($roleId) : null;
+
+      return [
+        'id' => $ws->id,
+        'name' => $ws->name,
+        'created_by' => $ws->created_by,
+        'is_creator' => $ws->created_by === $user->id,
+        'role_id' => $roleId,
+        'role_name' => $role ? $role->name : null,
+        'role_slug' => $role ? $role->slug : null,
+        'permissions' => $role ? $role->permissions->pluck('slug')->toArray() : [],
+      ];
+    });
+
+    if ($currentWorkspace) {
+      $userInCurrent = $currentWorkspace->users->where('id', $user->id)->first();
+      $roleId = $userInCurrent ? $userInCurrent->pivot->role_id : null;
+      $role = $roleId ? \App\Models\Role::find($roleId) : null;
+      $isOwner = ($currentWorkspace->created_by === $user->id) || ($role && $role->slug === 'owner');
+
+      $debugInfo['current_workspace'] = [
+        'id' => $currentWorkspace->id,
+        'name' => $currentWorkspace->name,
+        'created_by' => $currentWorkspace->created_by,
+        'is_creator' => $currentWorkspace->created_by === $user->id,
+        'role_id' => $roleId,
+        'role_name' => $role ? $role->name : null,
+        'role_slug' => $role ? $role->slug : null,
+        'is_owner' => $isOwner,
+        'permissions' => $isOwner
+          ? \App\Models\Permission::pluck('slug')->toArray()
+          : ($role ? $role->permissions->pluck('slug')->toArray() : []),
+      ];
+    }
+  }
+
+  return response()->json($debugInfo, 200);
 });
 
 /*

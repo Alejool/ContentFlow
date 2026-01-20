@@ -39,7 +39,7 @@ export default function ApprovalHistory({ onRefresh }: ApprovalHistoryProps) {
   const [logs, setLogs] = useState<ApprovalLogItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const [perPage, setPerPage] = useState(15);
+  const [perPage, setPerPage] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [filters, setFilters] = useState({

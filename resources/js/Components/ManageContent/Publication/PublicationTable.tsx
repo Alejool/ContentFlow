@@ -8,15 +8,7 @@ import EmptyState from "@/Components/common/ui/EmptyState";
 import TableContainer from "@/Components/common/ui/TableContainer";
 import { useWorkspaceLocks } from "@/Hooks/usePublicationLock";
 import { Publication } from "@/types/Publication";
-import {
-  forwardRef,
-  memo,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
-import { TableVirtuoso } from "react-virtuoso";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
 
 interface PublicationTableProps {
   items: Publication[];
@@ -97,8 +89,6 @@ const PublicationTable = memo(
       }
     }, []);
 
-    // Compute context for Virtuoso to avoid passing props deeply or re-creating callbacks needlessly if not needed
-    // However, Virtuoso accepts a context prop.
     const context = useMemo(
       () => ({
         t,
@@ -149,53 +139,37 @@ const PublicationTable = memo(
                     className="border-none shadow-none bg-transparent"
                   />
                 ) : (
-                  <TableVirtuoso
-                    data={items}
-                    context={context}
-                    useWindowScroll
-                    className="w-full"
-                    components={{
-                      Table: (props) => (
-                        <table
-                          {...props}
-                          className="w-full text-left border-collapse z-0"
-                        />
-                      ),
-                      TableHead: forwardRef((props, ref) => (
-                        <thead
-                          {...props}
-                          ref={ref}
-                          className="bg-gray-50/50 border-gray-100 dark:bg-neutral-900/50 dark:border-neutral-800 sticky top-0 z-10"
-                        />
-                      )),
-                      TableRow: (props) => (
-                        <tr
-                          {...props}
-                          className="border-b border-gray-50 dark:border-neutral-800 hover:bg-gray-50/30 dark:hover:bg-neutral-800/30"
-                        />
-                      ),
-                    }}
-                    fixedHeaderContent={() => (
-                      <tr className="text-xs uppercase tracking-wider border-b bg-gray-50/80 dark:bg-neutral-900/80 text-gray-500 dark:text-gray-400">
-                        <TableHeader mode="publications" t={t} />
-                      </tr>
-                    )}
-                    itemContent={(index, item, ctx) => (
-                      <PublicationDesktopRow
-                        item={item}
-                        t={ctx.t}
-                        connectedAccounts={ctx.connectedAccounts}
-                        getStatusColor={ctx.getStatusColor}
-                        onEdit={ctx.onEdit}
-                        onDelete={ctx.onDelete}
-                        onPublish={ctx.onPublish}
-                        onEditRequest={ctx.onEditRequest}
-                        onViewDetails={ctx.onViewDetails}
-                        remoteLock={ctx.remoteLocks[item.id]}
-                        permissions={ctx.permissions}
-                      />
-                    )}
-                  />
+                  <div className="w-full overflow-x-auto">
+                    <table className="w-full text-left border-collapse z-0">
+                      <thead className="bg-gray-50/50 border-gray-100 dark:bg-neutral-900/50 dark:border-neutral-800 sticky top-0 z-10">
+                        <tr className="text-xs uppercase tracking-wider border-b bg-gray-50/80 dark:bg-neutral-900/80 text-gray-500 dark:text-gray-400">
+                          <TableHeader mode="publications" t={t} />
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {items.map((item) => (
+                          <tr
+                            key={item.id}
+                            className="border-b border-gray-50 dark:border-neutral-800 hover:bg-gray-50/30 dark:hover:bg-neutral-800/30"
+                          >
+                            <PublicationDesktopRow
+                              item={item}
+                              t={t}
+                              connectedAccounts={connectedAccounts}
+                              getStatusColor={getStatusColor}
+                              onEdit={onEdit}
+                              onDelete={onDelete}
+                              onPublish={onPublish}
+                              onEditRequest={onEditRequest}
+                              onViewDetails={onViewDetails}
+                              remoteLock={remoteLocks[item.id]}
+                              permissions={permissions || []}
+                            />
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 )}
               </div>
 
@@ -208,7 +182,7 @@ const PublicationTable = memo(
                       </tr>
                     </thead>
                     <tbody>
-                      {[...Array(items.length || 8)].map((_, i) => (
+                      {[...Array(pagination?.per_page || 10)].map((_, i) => (
                         <PublicationRowSkeleton key={i} />
                       ))}
                     </tbody>

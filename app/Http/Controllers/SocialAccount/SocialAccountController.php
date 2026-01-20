@@ -20,7 +20,21 @@ class SocialAccountController extends Controller
   public function index()
   {
     $workspaceId = Auth::user()->current_workspace_id;
-    $accounts = SocialAccount::where('workspace_id', $workspaceId)->with('user:id,name')->get();
+    // Only return active accounts - inactive accounts should not be counted
+    // Determine allowed platforms based on configuration
+    $allowedPlatforms = [];
+    if (config('services.facebook.client_id')) $allowedPlatforms[] = 'facebook';
+    if (config('services.instagram.client_id')) $allowedPlatforms[] = 'instagram';
+    if (config('services.twitter.client_id') || config('services.twitter.consumer_key')) $allowedPlatforms[] = 'twitter';
+    if (config('services.linkedin.client_id')) $allowedPlatforms[] = 'linkedin';
+    if (config('services.tiktok.client_key')) $allowedPlatforms[] = 'tiktok';
+    if (config('services.google.client_id')) $allowedPlatforms[] = 'youtube';
+
+    $accounts = SocialAccount::where('workspace_id', $workspaceId)
+      ->where('is_active', true)
+      ->whereIn('platform', $allowedPlatforms)
+      ->with('user:id,name')
+      ->get();
 
     return response()->json([
       'success' => true,
@@ -373,11 +387,11 @@ class SocialAccountController extends Controller
         config('services.twitter.client_id'),
         config('services.twitter.client_secret')
       )->asForm()->post('https://api.twitter.com/2/oauth2/token', [
-            'redirect_uri' => url('/auth/twitter/callback'),
-            'code' => $request->code,
-            'grant_type' => 'authorization_code',
-            'code_verifier' => $codeVerifier,
-          ]);
+        'redirect_uri' => url('/auth/twitter/callback'),
+        'code' => $request->code,
+        'grant_type' => 'authorization_code',
+        'code_verifier' => $codeVerifier,
+      ]);
 
       $data = $response->json();
 
@@ -560,8 +574,8 @@ class SocialAccountController extends Controller
       $userResponse = Http::withHeaders([
         'Authorization' => 'Bearer ' . $accessToken,
       ])->post('https://open.tiktokapis.com/v2/user/info/', [
-            'fields' => 'open_id,union_id,avatar_url,display_name'
-          ]);
+        'fields' => 'open_id,union_id,avatar_url,display_name'
+      ]);
 
       $userData = $userResponse->json();
 

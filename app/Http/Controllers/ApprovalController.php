@@ -87,7 +87,7 @@ class ApprovalController extends Controller
       });
     }
 
-    $logs = $query->paginate($request->query('per_page', 15));
+    $logs = $query->paginate($request->query('per_page', 10));
 
     return $this->successResponse(['logs' => $logs]);
   }

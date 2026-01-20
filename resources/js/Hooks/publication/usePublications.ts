@@ -112,7 +112,7 @@ export const usePublications = () => {
   );
 
   const [filters, setFilters] = useState<any>({});
-  const [itemsPerPage, setItemsPerPage] = useState(15);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   // Use a ref to prevent loops from effect triggers
   const lastFetchRef = useRef<string>("");
@@ -157,16 +157,15 @@ export const usePublications = () => {
     ],
   );
 
-  const handlePerPageChange = useCallback(
-    (val: number) => {
-      setItemsPerPage(val);
-      fetchData(1);
-    },
-    [fetchData],
-  );
+  const handlePerPageChange = useCallback((val: number) => {
+    setItemsPerPage(val);
+    // Scroll to top to prevent blank spaces in virtualized table
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    // fetchData will be called by useEffect when itemsPerPage changes
+  }, []);
 
   useEffect(() => {
-    fetchData();
+    fetchData(1); // Always reset to page 1 when filters or perPage change
   }, [activeTab, filters, itemsPerPage]); // Run when tab, filters or perPage change
 
   useEffect(() => {
