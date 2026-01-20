@@ -304,21 +304,24 @@ export default function Dashboard({
             title={t("dashboard.totalViews")}
             value={stats.totalViews}
             icon={<Eye className="w-6 h-6" />}
-            color="indigo"
+            color="orange"
+            variant={1}
             theme={theme}
           />
           <StatCard
             title={t("dashboard.totalClicks")}
             value={stats.totalClicks}
             icon={<MousePointer2 className="w-6 h-6" />}
-            color="teal"
+            color="orange"
+            variant={2}
             theme={theme}
           />
           <StatCard
             title={t("dashboard.conversions")}
             value={stats.totalConversions}
             icon={<TrendingUp className="w-6 h-6" />}
-            color="purple"
+            color="orange"
+            variant={3}
             theme={theme}
           />
           <StatCard
@@ -326,6 +329,7 @@ export default function Dashboard({
             value={stats.totalReach}
             icon={<Users className="w-6 h-6" />}
             color="orange"
+            variant={4}
             theme={theme}
           />
         </div>
@@ -335,15 +339,17 @@ export default function Dashboard({
             title={t("dashboard.totalEngagement")}
             value={stats.totalEngagement}
             icon={<Heart className="w-6 h-6" />}
-            color="red"
+            color="orange"
+            variant={1}
             theme={theme}
           />
           <StatCard
             title={t("dashboard.avgEngagementRate")}
             value={stats.avgEngagementRate.toFixed(2)}
             icon={<TrendingUp className="w-6 h-6" />}
-            color="pink"
+            color="orange"
             format="percentage"
+            variant={2}
             theme={theme}
           />
         </div>

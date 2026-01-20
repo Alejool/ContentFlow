@@ -123,7 +123,8 @@ export default function Index({ stats, period }: AnalyticsProps) {
             value={overview.total_views || 0}
             change={overview.changes?.views}
             icon={<Eye className="w-6 h-6" />}
-            color="indigo"
+            color="orange"
+            variant={1}
             theme={theme}
           />
           <StatCard
@@ -131,7 +132,8 @@ export default function Index({ stats, period }: AnalyticsProps) {
             value={overview.total_clicks || 0}
             change={overview.changes?.clicks}
             icon={<MousePointer2 className="w-6 h-6" />}
-            color="teal"
+            color="orange"
+            variant={2}
             theme={theme}
           />
           <StatCard
@@ -139,7 +141,8 @@ export default function Index({ stats, period }: AnalyticsProps) {
             value={overview.total_conversions || 0}
             change={overview.changes?.conversions}
             icon={<TrendingUp className="w-6 h-6" />}
-            color="purple"
+            color="orange"
+            variant={3}
             theme={theme}
           />
           <StatCard
@@ -148,6 +151,7 @@ export default function Index({ stats, period }: AnalyticsProps) {
             change={overview.changes?.engagement}
             icon={<Users className="w-6 h-6" />}
             color="orange"
+            variant={4}
             theme={theme}
           />
         </div>
@@ -158,7 +162,8 @@ export default function Index({ stats, period }: AnalyticsProps) {
             value={overview.avg_engagement_rate || 0}
             icon={<Heart className="w-6 h-6" />}
             format="percentage"
-            color="pink"
+            color="orange"
+            variant={1}
             theme={theme}
           />
           <StatCard
@@ -166,7 +171,8 @@ export default function Index({ stats, period }: AnalyticsProps) {
             value={overview.avg_ctr || 0}
             icon={<MousePointer2 className="w-6 h-6" />}
             format="percentage"
-            color="sky"
+            color="orange"
+            variant={2}
             theme={theme}
           />
           <StatCard
@@ -174,14 +180,16 @@ export default function Index({ stats, period }: AnalyticsProps) {
             value={overview.avg_conversion_rate || 0}
             icon={<TrendingUp className="w-6 h-6" />}
             format="percentage"
-            color="amber"
+            color="orange"
+            variant={3}
             theme={theme}
           />
           <StatCard
             title={t("analytics.stats.totalEngagement")}
             value={overview.total_engagement || 0}
             icon={<Heart className="w-6 h-6" />}
-            color="red"
+            color="orange"
+            variant={4}
             theme={theme}
           />
         </div>

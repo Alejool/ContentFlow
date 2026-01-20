@@ -23,7 +23,7 @@ interface StatCardProps {
   format?: "number" | "currency" | "percentage";
   theme?: "dark" | "light";
   compact?: boolean;
-  isLoading?: boolean;
+  variant?: 1 | 2 | 3 | 4;
 }
 
 const StatCard: React.FC<StatCardProps> = ({
@@ -36,11 +36,13 @@ const StatCard: React.FC<StatCardProps> = ({
   theme: propTheme,
   compact = false,
   isLoading,
+  variant,
 }) => {
   const { theme: themeFromHook } = useTheme();
   const theme = propTheme || themeFromHook;
 
   const getColorClasses = () => {
+    // Base color configurations
     const colorMap = {
       blue: {
         dark: {
@@ -48,12 +50,16 @@ const StatCard: React.FC<StatCardProps> = ({
           bg: "bg-blue-900/30",
           text: "text-blue-300",
           border: "border-blue-700/50",
+          iconBg: "bg-blue-500/20",
+          glow: "from-blue-600/20",
         },
         light: {
           gradient: "from-blue-500 to-blue-600",
           bg: "bg-blue-100",
           text: "text-blue-600",
           border: "border-blue-200",
+          iconBg: "bg-white/20",
+          glow: "from-blue-200/40",
         },
       },
       green: {
@@ -62,12 +68,16 @@ const StatCard: React.FC<StatCardProps> = ({
           bg: "bg-emerald-900/30",
           text: "text-emerald-300",
           border: "border-emerald-700/50",
+          iconBg: "bg-emerald-500/20",
+          glow: "from-emerald-600/20",
         },
         light: {
           gradient: "from-emerald-500 to-emerald-600",
           bg: "bg-emerald-100",
           text: "text-emerald-600",
           border: "border-emerald-200",
+          iconBg: "bg-white/20",
+          glow: "from-emerald-200/40",
         },
       },
       purple: {
@@ -76,12 +86,16 @@ const StatCard: React.FC<StatCardProps> = ({
           bg: "bg-purple-900/30",
           text: "text-purple-300",
           border: "border-purple-700/50",
+          iconBg: "bg-purple-500/20",
+          glow: "from-purple-600/20",
         },
         light: {
           gradient: "from-purple-500 to-purple-600",
           bg: "bg-purple-100",
           text: "text-purple-600",
           border: "border-purple-200",
+          iconBg: "bg-white/20",
+          glow: "from-purple-200/40",
         },
       },
       orange: {
@@ -90,12 +104,16 @@ const StatCard: React.FC<StatCardProps> = ({
           bg: "bg-orange-900/30",
           text: "text-orange-300",
           border: "border-orange-700/50",
+          iconBg: "bg-orange-500/20",
+          glow: "from-orange-600/20",
         },
         light: {
           gradient: "from-orange-500 to-orange-600",
           bg: "bg-orange-100",
           text: "text-orange-600",
           border: "border-orange-200",
+          iconBg: "bg-white/20",
+          glow: "from-orange-200/40",
         },
       },
       red: {
@@ -104,12 +122,16 @@ const StatCard: React.FC<StatCardProps> = ({
           bg: "bg-rose-900/30",
           text: "text-rose-300",
           border: "border-rose-700/50",
+          iconBg: "bg-rose-500/20",
+          glow: "from-rose-600/20",
         },
         light: {
           gradient: "from-rose-500 to-rose-600",
           bg: "bg-rose-100",
           text: "text-rose-600",
           border: "border-rose-200",
+          iconBg: "bg-white/20",
+          glow: "from-rose-200/40",
         },
       },
       indigo: {
@@ -118,12 +140,16 @@ const StatCard: React.FC<StatCardProps> = ({
           bg: "bg-indigo-900/30",
           text: "text-indigo-300",
           border: "border-indigo-700/50",
+          iconBg: "bg-indigo-500/20",
+          glow: "from-indigo-600/20",
         },
         light: {
           gradient: "from-indigo-500 to-indigo-600",
           bg: "bg-indigo-100",
           text: "text-indigo-600",
           border: "border-indigo-200",
+          iconBg: "bg-white/20",
+          glow: "from-indigo-200/40",
         },
       },
       teal: {
@@ -132,12 +158,16 @@ const StatCard: React.FC<StatCardProps> = ({
           bg: "bg-teal-900/30",
           text: "text-teal-300",
           border: "border-teal-700/50",
+          iconBg: "bg-teal-500/20",
+          glow: "from-teal-600/20",
         },
         light: {
           gradient: "from-teal-500 to-teal-600",
           bg: "bg-teal-100",
           text: "text-teal-600",
           border: "border-teal-200",
+          iconBg: "bg-white/20",
+          glow: "from-teal-200/40",
         },
       },
       pink: {
@@ -146,12 +176,16 @@ const StatCard: React.FC<StatCardProps> = ({
           bg: "bg-pink-900/30",
           text: "text-pink-300",
           border: "border-pink-700/50",
+          iconBg: "bg-pink-500/20",
+          glow: "from-pink-600/20",
         },
         light: {
           gradient: "from-pink-500 to-pink-600",
           bg: "bg-pink-100",
           text: "text-pink-600",
           border: "border-pink-200",
+          iconBg: "bg-white/20",
+          glow: "from-pink-200/40",
         },
       },
       amber: {
@@ -160,12 +194,16 @@ const StatCard: React.FC<StatCardProps> = ({
           bg: "bg-amber-900/30",
           text: "text-amber-300",
           border: "border-amber-700/50",
+          iconBg: "bg-amber-500/20",
+          glow: "from-amber-600/20",
         },
         light: {
           gradient: "from-amber-500 to-amber-600",
           bg: "bg-amber-100",
           text: "text-amber-600",
           border: "border-amber-200",
+          iconBg: "bg-white/20",
+          glow: "from-amber-200/40",
         },
       },
       sky: {
@@ -174,18 +212,95 @@ const StatCard: React.FC<StatCardProps> = ({
           bg: "bg-sky-900/30",
           text: "text-sky-300",
           border: "border-sky-700/50",
+          iconBg: "bg-sky-500/20",
+          glow: "from-sky-600/20",
         },
         light: {
           gradient: "from-sky-500 to-sky-600",
           bg: "bg-sky-100",
           text: "text-sky-600",
           border: "border-sky-200",
+          iconBg: "bg-white/20",
+          glow: "from-sky-200/40",
         },
       },
     };
-    // Helper to get nested color object
-    const colorData = (colorMap as any)[color] || colorMap.blue;
-    return colorData[theme];
+
+    // Get base configuration
+    const baseConfig = (colorMap as any)[color] || colorMap.blue;
+    const currentThemeConfig = baseConfig[theme];
+
+    // If no variant, return base config
+    if (!variant) return currentThemeConfig;
+
+    // Apply variants dynamically based on base color
+    // We modify gradients to create subtle differences while keeping the main color family
+    const getVariantGradient = (
+      baseColor: string,
+      variantNum: number,
+      themeMode: "dark" | "light",
+    ) => {
+      // Map base colors to their Tailwind variants to construct dynamic gradients
+      // This is a simplified approach. For full flexibility, we'd need a map for every combo.
+      // But assuming standard Tailwind naming (orange-500, etc.)
+
+      // Define variant shifts relative to the base color
+      // Variant 1: Standard (already in baseConfig)
+      // Variant 2: Slightly Darker/Deeper (shift up 100)
+      // Variant 3: Shifted Hue (e.g. Orange -> Amber-ish or Red-ish)
+      // Variant 4: Lighter/Softer
+
+      if (variantNum === 1) return currentThemeConfig.gradient;
+
+      // Since we can't easily generate class strings dynamically without them being purged,
+      // we must provide specific overrides for the requested setup (Oracle -> Orange)
+      // or define a "Variant Map" for supported colors.
+
+      const variantMaps: Record<string, Record<number, string>> = {
+        orange: {
+          2:
+            themeMode === "dark"
+              ? "from-orange-700 to-orange-900"
+              : "from-orange-600 to-orange-700",
+          3:
+            themeMode === "dark"
+              ? "from-orange-600 via-red-700 to-red-800"
+              : "from-orange-500 via-red-500 to-red-600", // Red shift
+          4:
+            themeMode === "dark"
+              ? "from-amber-600 via-orange-700 to-orange-800"
+              : "from-amber-500 via-orange-500 to-orange-600", // Amber shift
+        },
+        blue: {
+          2:
+            themeMode === "dark"
+              ? "from-blue-700 to-blue-900"
+              : "from-blue-600 to-blue-700",
+          3:
+            themeMode === "dark"
+              ? "from-blue-600 via-indigo-700 to-indigo-800"
+              : "from-blue-500 via-indigo-500 to-indigo-600", // Indigo shift
+          4:
+            themeMode === "dark"
+              ? "from-sky-600 via-blue-700 to-blue-800"
+              : "from-sky-500 via-blue-500 to-blue-600", // Sky shift
+        },
+        // Default fallbacks for others if needed, using simple logic or just returning base
+      };
+
+      const colorSpecificVariants = variantMaps[color];
+      if (colorSpecificVariants && colorSpecificVariants[variantNum]) {
+        return colorSpecificVariants[variantNum];
+      }
+
+      // Fallback: if no specific variant defined, return base
+      return currentThemeConfig.gradient;
+    };
+
+    return {
+      ...currentThemeConfig,
+      gradient: getVariantGradient(color, variant, theme),
+    };
   };
 
   const formatValue = (val: string | number) => {
@@ -243,7 +358,7 @@ const StatCard: React.FC<StatCardProps> = ({
       <div
         className={`bg-gradient-to-r ${colors.gradient} ${compact ? "p-3" : "p-4"}`}
       >
-        <div className="flex items-center justify-between text-white">
+        <div className="flex items-center justify-between text-white relative z-10">
           {isLoading ? (
             <Skeleton className="h-4 w-24 bg-white/20 dark:bg-white/10" />
           ) : (
@@ -259,7 +374,7 @@ const StatCard: React.FC<StatCardProps> = ({
             <div
               className={`${
                 compact ? "w-6 h-6" : "w-8 h-8"
-              } rounded-lg flex items-center justify-center backdrop-blur-sm bg-white/10`}
+              } rounded-lg flex items-center justify-center backdrop-blur-sm ${colors.iconBg || "bg-white/10"}`}
             >
               {isLoading ? (
                 <Skeleton className="w-4 h-4 rounded bg-white/20 dark:bg-white/10" />
@@ -342,9 +457,10 @@ const StatCard: React.FC<StatCardProps> = ({
       <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none">
         <div
           className={`absolute -inset-1 bg-gradient-to-r ${
-            theme === "dark"
+            colors.glow ||
+            (theme === "dark"
               ? "from-blue-600/5 via-purple-600/3 to-pink-600/5"
-              : "from-blue-200/10 via-purple-200/5 to-pink-200/10"
+              : "from-blue-200/10 via-purple-200/5 to-pink-200/10")
           } blur-xl`}
         ></div>
       </div>
