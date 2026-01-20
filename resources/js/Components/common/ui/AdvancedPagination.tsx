@@ -44,7 +44,7 @@ export default function AdvancedPagination({
     return pages;
   };
 
-  const perPageOptions = [10, 25, 50, 100];
+  const perPageOptions = [5, 10, 25, 50, 100];
 
   return (
     <div className="px-6 py-4 border-t border-gray-100 dark:border-neutral-700/50 flex flex-col lg:flex-row items-center justify-between gap-4">
@@ -56,7 +56,8 @@ export default function AdvancedPagination({
           <select
             value={perPage}
             onChange={(e) => onPerPageChange(Number(e.target.value))}
-            className="bg-white dark:bg-neutral-800 border border-gray-300 dark:border-neutral-600 rounded-lg pl-3 pr-8 py-1 text-sm focus:ring-primary-500 focus:border-primary-500 transition-colors"
+            disabled={isLoading}
+            className="bg-white dark:bg-neutral-800 border border-gray-300 dark:border-neutral-600 rounded-lg pl-3 pr-8 py-1 text-sm focus:ring-primary-500 focus:border-primary-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {perPageOptions.map((opt) => (
               <option key={opt} value={opt}>
