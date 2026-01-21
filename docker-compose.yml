@@ -27,7 +27,7 @@ services:
     environment:
       - LARAVEL_OCTANE=1
       - OCTANE_SERVER=swoole
-    command: php artisan octane:start --server=swoole --host=0.0.0.0 --port=8080
+    command: php artisan octane:start --server=swoole --host=0.0.0.0 --port=8080 --watch
     depends_on:
       pgsql:
         condition: service_healthy
@@ -163,7 +163,7 @@ services:
     image: node:20-alpine
     container_name: contentflow_vite
     working_dir: /var/www/html
-    command: npm run dev -- --host 0.0.0.0
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
     ports:
       - "5173:5173"
     volumes:
@@ -171,7 +171,7 @@ services:
       - cf_node_modules_v2:/var/www/html/node_modules
       - cf_public_build:/var/www/html/public/build
     environment:
-      - VITE_HMR_HOST=leviathan.tail4af8a1.ts.net
+      - VITE_HMR_HOST=${VITE_HMR_HOST:-localhost}
     networks:
       - laravel
 
