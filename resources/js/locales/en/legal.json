@@ -1,0 +1,160 @@
+{
+  "legal": {
+    "common": {
+      "back": "Back",
+      "lastUpdated": "Last updated: {{date}}",
+      "team": "ContentFlow Team"
+    },
+    "privacyPolicy": {
+      "title": "Privacy Policy",
+      "subtitle": "Your privacy is important to us. This policy explains how we collect, use, and protect your information.",
+      "sections": {
+        "intro": {
+          "title": "1. Introduction",
+          "content": [
+            "Welcome to ContentFlow (\"we\", \"our\", or \"the Platform\"). We are committed to protecting your privacy and ensuring that your personal data is handled securely and transparently. This Privacy Policy describes how we collect, use, disclose, and protect your information when you use our website and services (collectively, the \"Service\").",
+            "By accessing or using the Service, you agree to the practices described in this policy. If you do not agree with this policy, please do not use our services."
+          ]
+        },
+        "infoCollected": {
+          "title": "2. Information We Collect",
+          "subtitle": "We may collect and process the following types of information:",
+          "provided": {
+            "title": "Information you provide to us directly:",
+            "items": [
+              "<strong>Account Information:</strong> Name, email address, password, and other registration information.",
+              "<strong>User Content:</strong> Files, posts, comments, and other materials you upload or create on the platform.",
+              "<strong>Communications:</strong> Information sent when you contact us for support or inquiries."
+            ]
+          },
+          "auto": {
+            "title": "Information collected automatically:",
+            "items": [
+              "<strong>Usage Data:</strong> Information about how you interact with the Service (pages visited, session time, clicks).",
+              "<strong>Device Data:</strong> IP address, browser type, operating system, device identifiers.",
+              "<strong>Cookies and Similar Technologies:</strong> We use cookies to improve your experience, analyze traffic, and personalize content."
+            ]
+          },
+          "thirdParty": {
+            "title": "Third-Party Information (Google and Social Media):",
+            "description": "Our service allows integration with third-party platforms such as Google (YouTube), Facebook, Instagram, Twitter, and TikTok.",
+            "items": [
+              "<strong>Google User Data:</strong> If you connect your YouTube account, we access certain information from your Google account as permitted by your Google permissions settings. The use and transfer to any other app of information received from Google APIs will adhere to the <a href=\"https://developers.google.com/terms/api-services-user-data-policy\" target=\"_blank\" rel=\"noreferrer\" class=\"text-primary-600 hover:text-primary-500 underline\">Google API Services User Data Policy</a>, including the Limited Use requirements.",
+              "You can manage and revoke access to your data via the <a href=\"https://myaccount.google.com/permissions\" target=\"_blank\" rel=\"noreferrer\" class=\"text-primary-600 hover:text-primary-500 underline\">Google Security Configuration Page</a>."
+            ]
+          }
+        },
+        "usage": {
+          "title": "3. How We Use Your Information",
+          "subtitle": "We use the collected information for the following purposes:",
+          "items": [
+            "<strong>Service Provision:</strong> To operate, maintain, and improve the functionalities of ContentFlow.",
+            "<strong>Personalization:</strong> To adapt your experience and offer relevant content.",
+            "<strong>Communications:</strong> To send you updates, security alerts, and administrative messages.",
+            "<strong>Analytics:</strong> To understand how our service is used and improve its performance.",
+            "<strong>Security:</strong> To detect, prevent, and address technical issues or fraud.",
+            "<strong>Legal Compliance:</strong> To comply with legal obligations and protect our rights."
+          ]
+        },
+        "sharing": {
+          "title": "4. Sharing Your Information",
+          "subtitle": "We do not sell your personal information to third parties. We may share your information in the following circumstances:",
+          "items": [
+            "<strong>Service Providers:</strong> With third parties who help us operate the service (hosting, analytics, payment processing), under strict confidentiality obligations.",
+            "<strong>Law Compliance:</strong> When required by law, subpoena, or other legal process.",
+            "<strong>Business Transfer:</strong> In the event of a merger, sale, or acquisition of the company.",
+            "<strong>With Your Consent:</strong> When you give us explicit permission to share your information."
+          ]
+        },
+        "security": {
+          "title": "5. Data Security",
+          "content": "We implement reasonable technical and organizational security measures to protect your information against unauthorized access, loss, or alteration. However, no method of transmission over the Internet or electronic storage is 100% secure."
+        },
+        "rights": {
+          "title": "6. Your Rights and Data Control",
+          "subtitle": "Depending on your location, you may have certain rights regarding your data, including:",
+          "items": [
+            "<strong>Access and Portability:</strong> Request a copy of your personal data.",
+            "<strong>Rectification:</strong> Correct inaccurate or incomplete information.",
+            "<strong>Deletion (Right to be Forgotten):</strong> Request the deletion of your account and personal data. You can delete your account from your profile settings or by contacting us directly.",
+            "<strong>Revocation of Consent:</strong> Withdraw your consent for data processing at any time."
+          ],
+          "contactNote": "To exercise these rights, contact us via the information provided at the end of this policy."
+        },
+        "kids": {
+          "title": "7. Children's Privacy",
+          "content": "Our service is not directed to persons under 13 (or the minimum age required in your jurisdiction). We do not knowingly collect personal information from children. If you discover that a child has provided us with personal information, contact us and we will delete it."
+        },
+        "changes": {
+          "title": "8. Changes to this Policy",
+          "content": "We may update this Privacy Policy occasionally. We will notify you of significant changes by sending a notice to your email or posting a prominent notice on our service. We recommend reviewing this page periodically."
+        },
+        "contact": {
+          "title": "9. Contact",
+          "content": "If you have questions or concerns about this Privacy Policy, please contact us at:"
+        }
+      }
+    },
+    "termsOfService": {
+      "title": "Terms of Service",
+      "subtitle": "Please read these terms carefully before using our platform.",
+      "sections": {
+        "acceptance": {
+          "title": "1. Acceptance of Terms",
+          "content": "By accessing and using ContentFlow (\"Service\"), you agree to comply with and be bound by the following terms and conditions (\"Terms\"). If you do not agree with any part of these terms, you may not access the Service."
+        },
+        "accounts": {
+          "title": "2. Accounts",
+          "content": [
+            "When you create an account with us, you must provide accurate, complete, and up-to-date information. Failure to do so constitutes a violation of the Terms, which may result in immediate termination of your account.",
+            "You are responsible for safeguarding the password you use to access the Service and for any activity or action under your password."
+          ]
+        },
+        "use": {
+          "title": "3. Use of the Service",
+          "content": "You agree not to use the Service for any illegal or prohibited purpose under these Terms. You may not use the Service in any way that could damage, disable, overburden, or impair the Service.",
+          "items": [
+            "You must not attempt to unauthorized access to any part of the Service.",
+            "You must not use the Service to distribute malware or malicious content.",
+            "You must respect the intellectual property rights of others."
+          ]
+        },
+        "intellectualProperty": {
+          "title": "4. Intellectual Property",
+          "content": "The Service and its original content (excluding content provided by users), features, and functionality are and will remain the exclusive property of ContentFlow and its licensors. The Service is protected by copyright, trademarks, and other laws."
+        },
+        "links": {
+          "title": "5. Links to Other Websites",
+          "content": "Our Service may contain links to third-party websites or services that are not owned or controlled by ContentFlow. We have no control over and assume no responsibility for the content, privacy policies, or practices of any third-party websites or services."
+        },
+        "termination": {
+          "title": "6. Termination",
+          "content": "We may terminate or suspend your account immediately, without prior notice or liability, for any reason, including, without limitation, if you breach the Terms. Upon termination, your right to use the Service will cease immediately."
+        },
+        "limitation": {
+          "title": "7. Limitation of Liability",
+          "content": "In no event shall ContentFlow, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential, or punitive damages, including, without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from your access or use or inability to access or use the Service."
+        },
+        "changes": {
+          "title": "8. Changes",
+          "content": "We reserve the right, at our sole discretion, to modify or replace these Terms at any time. If a revision is material, we will try to provide at least 30 days' notice prior to any new terms taking effect."
+        },
+        "contact": {
+          "title": "9. Contact",
+          "content": "If you have any questions about these Terms, please contact us at:"
+        }
+      }
+    },
+    "contact": {
+      "title": "Contact",
+      "subtitle": "Have questions or suggestions? We are here to help.",
+      "support": {
+        "title": "Support and Suggestions",
+        "description": "This is the official channel for you to send us your feedback. You can send us any <strong>suggestions for improvement</strong>, report <strong>application errors</strong>, or ask us about our <strong>policies</strong>.",
+        "note": "Your feedback is fundamental to us; we review every message to keep improving the ContentFlow experience.",
+        "writeTo": "Write to us at"
+      },
+      "footer": "We review all suggestions and reported errors with priority."
+    }
+  }
+}
