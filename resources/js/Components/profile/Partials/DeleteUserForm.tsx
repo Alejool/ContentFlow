@@ -126,7 +126,7 @@ export default function DeleteUserForm({
               type="button"
               variant="secondary"
               onClick={closeModal}
-              className="w-full sm:w-auto font-bold uppercase tracking-wider rounded-xl"
+              className="w-full sm:w-auto font-bold uppercase tracking-wider rounded-lg"
             >
               {t("profile.delete.cancel")}
             </ModernButton>

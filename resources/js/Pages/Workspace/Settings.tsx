@@ -194,7 +194,7 @@ export default function WorkspaceSettings({
         />
 
         {activeTab === "integrations" && !isOwner && (
-          <div className="mb-6 p-4 bg-gradient-to-r from-amber-50 to-amber-100 dark:from-amber-900/20 dark:to-amber-900/10 border border-amber-200 dark:border-amber-800 rounded-xl">
+          <div className="mb-6 p-4 bg-gradient-to-r from-amber-50 to-amber-100 dark:from-amber-900/20 dark:to-amber-900/10 border border-amber-200 dark:border-amber-800 rounded-lg">
             <div className="flex items-start gap-3">
               <AlertCircle className="h-5 w-5 text-amber-500 mt-0.5" />
               <div>

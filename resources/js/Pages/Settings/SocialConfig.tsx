@@ -123,7 +123,7 @@ export default function SocialConfig({
         <div className="flex flex-col mt-10 sm:flex-row sm:items-center justify-between gap-6">
           <div className="space-y-2">
             <div className="flex items-center gap-3">
-              <div className="p-2.5 bg-primary-50 dark:bg-primary-500/10 rounded-xl">
+              <div className="p-2.5 bg-primary-50 dark:bg-primary-500/10 rounded-lg">
                 <Settings2 className="w-6 h-6 text-primary-500" />
               </div>
               <div>

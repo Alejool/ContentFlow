@@ -24,14 +24,25 @@ import {
   Loader2,
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import UserEventModal from "./UserEventModal";
 
 // Types
+interface ModernCalendarProps {
+  onEventClick?: (
+    id: number,
+    type: "publication" | "post" | "user_event",
+    event?: CalendarEvent,
+  ) => void;
+}
+
 interface CalendarEvent {
   id: string;
   resourceId: number;
-  type: "publication" | "post";
+  type: "publication" | "post" | "user_event";
   title: string;
   start: string; // ISO
+  end?: string; // ISO
   status: string;
   color: string;
   extendedProps: {
@@ -39,6 +50,8 @@ interface CalendarEvent {
     thumbnail?: string;
     publication_id?: number;
     platform?: string;
+    description?: string;
+    remind_at?: string;
   };
 }
 
@@ -54,17 +67,18 @@ const PlatformIcon = ({
   return <Icon className={`${config.textColor} ${className}`} />;
 };
 
-export default function ModernCalendar({
-  onEventClick,
-}: {
-  onEventClick?: (id: number, type: "publication" | "post") => void;
-}) {
+export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
+  const { t } = useTranslation();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(false);
   const [draggedEvent, setDraggedEvent] = useState<CalendarEvent | null>(null);
   const [platformFilter, setPlatformFilter] = useState<string>("all");
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [showEventModal, setShowEventModal] = useState(false);
+  const [selectedEventForModal, setSelectedEventForModal] = useState<
+    CalendarEvent | undefined
+  >(undefined);
 
   // Fetch events
   const fetchEvents = async () => {
@@ -72,7 +86,6 @@ export default function ModernCalendar({
     try {
       const start = startOfMonth(currentDate).toISOString();
       const end = endOfMonth(currentDate).toISOString();
-      // Use manual URL to avoid Ziggy issues in components if needed, or route() if accessible
       const response = await axios.get("/api/calendar/events", {
         params: { start, end },
       });
@@ -131,7 +144,8 @@ export default function ModernCalendar({
     setEvents(updatedEvents);
 
     try {
-      const resourceId = draggedEvent.id.split("_")[1];
+      const resourceId =
+        draggedEvent.id.split("_")[draggedEvent.type === "user_event" ? 2 : 1];
       await axios.patch(`/api/calendar/events/${resourceId}`, {
         scheduled_at: date.toISOString(),
         type: draggedEvent.type,
@@ -149,7 +163,6 @@ export default function ModernCalendar({
   return (
     <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
       <div className="p-6">
-        {/* Toolbar */}
         <div className="flex flex-col sm:flex-row justify-between items-center mb-6 sm:mb-8 gap-4 sm:gap-6">
           <div className="flex items-center gap-4">
             <h3 className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white capitalize flex items-center gap-3">
@@ -193,7 +206,7 @@ export default function ModernCalendar({
                 onClick={goToToday}
                 className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold hover:bg-white dark:hover:bg-gray-700 rounded-lg transition-all text-gray-700 dark:text-gray-200"
               >
-                Hoy
+                {t("calendar.actions.today")}
               </button>
               <button
                 onClick={nextMonth}
@@ -205,129 +218,131 @@ export default function ModernCalendar({
           </div>
         </div>
 
-        {/* Calendar Grid - Responsive */}
-        <div className="w-full">
-          <div className="w-full border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden shadow-sm bg-gray-50 dark:bg-gray-900/50">
-            {/* Weekday Headers */}
-            <div className="grid grid-cols-7 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
-              {["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"].map((day) => (
-                <div
-                  key={day}
-                  className="py-3 text-center text-[10px] sm:text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500"
-                >
-                  <span className="hidden sm:inline">{day}</span>
-                  <span className="inline sm:hidden">{day.charAt(0)}</span>
-                </div>
-              ))}
-            </div>
-
-            {/* Days */}
-            <div className="grid grid-cols-7 auto-rows-fr min-h-[300px] sm:min-h-[700px] bg-gray-200 dark:bg-gray-800 gap-px">
-              {/* Empty Slots */}
-              {startingEmptySlots.map((_, i) => (
-                <div
-                  key={`empty-${i}`}
-                  className="bg-gray-50/50 dark:bg-gray-900/50 p-1 sm:p-2"
-                ></div>
-              ))}
-
-              {/* Actual Days */}
-              {days.map((day) => {
-                const dayEvents = filteredEvents.filter((e) =>
-                  isSameDay(parseISO(e.start), day),
-                );
-                const isCurrentMonth = isSameMonth(day, currentDate);
-                const isTodayDay = isToday(day);
-                const isSelected = isSameDay(day, selectedDate);
-
-                return (
+        {/* Calendar Main Content - Responsive Layout */}
+        <div className="flex flex-col xl:flex-row gap-8">
+          {/* Calendar Grid Section */}
+          <div className="flex-1 min-w-0">
+            <div className="w-full border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden shadow-sm bg-gray-50 dark:bg-gray-900/50">
+              {/* Weekday Headers */}
+              <div className="grid grid-cols-7 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
+                {[
+                  { key: "sun", label: t("calendar.weekdays.sun") },
+                  { key: "mon", label: t("calendar.weekdays.mon") },
+                  { key: "tue", label: t("calendar.weekdays.tue") },
+                  { key: "wed", label: t("calendar.weekdays.wed") },
+                  { key: "thu", label: t("calendar.weekdays.thu") },
+                  { key: "fri", label: t("calendar.weekdays.fri") },
+                  { key: "sat", label: t("calendar.weekdays.sat") },
+                ].map((day) => (
                   <div
-                    key={day.toISOString()}
-                    onDragOver={handleDragOver}
-                    onDrop={(e) => handleDrop(e, day)}
-                    onClick={() => setSelectedDate(day)}
-                    className={`
-                                            relative p-1 sm:p-2 min-h-[45px] sm:min-h-[140px] transition-all group cursor-pointer
-                                            ${isCurrentMonth ? "bg-white dark:bg-gray-900" : "bg-gray-50/30 dark:bg-gray-900/30"}
-                                            ${isTodayDay ? "bg-purple-50/10 dark:bg-primary-900/5" : ""}
-                                            ${isSelected ? "ring-2 ring-primary-500/50 z-20" : ""}
-                                            hover:bg-gray-50 dark:hover:bg-gray-800/50
-                                        `}
+                    key={day.key}
+                    className="py-3 text-center text-[10px] sm:text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500"
                   >
-                    {/* Date Header */}
-                    <div className="flex justify-between items-start mb-1 sm:mb-2">
-                      <span
-                        className={`
-                                                text-[10px] sm:text-sm font-medium w-5 h-5 sm:w-8 sm:h-8 flex items-center justify-center rounded-full transition-colors
-                                                ${
-                                                  isTodayDay
-                                                    ? "bg-primary-600 text-white shadow-lg shadow-primary-500/30"
-                                                    : isSelected
-                                                      ? "bg-primary-100 dark:bg-primary-900/40 text-primary-600 dark:text-primary-400"
-                                                      : "text-gray-500 dark:text-gray-400 group-hover:bg-gray-100 dark:group-hover:bg-gray-800"
-                                                }
-                                            `}
-                      >
-                        {format(day, "d")}
-                      </span>
-                      {isTodayDay && (
-                        <span className="hidden sm:inline text-[10px] font-bold text-primary-600 dark:text-primary-400 uppercase">
-                          Hoy
-                        </span>
-                      )}
-                    </div>
+                    <span className="hidden sm:inline">{day.label}</span>
+                    <span className="inline sm:hidden">
+                      {day.label.charAt(0)}
+                    </span>
+                  </div>
+                ))}
+              </div>
 
-                    {/* Events Stack / Indicators */}
-                    <div className="flex flex-wrap sm:flex-col gap-1 sm:gap-2 relative z-10">
-                      {/* Desktop Events */}
-                      <div className="hidden sm:flex flex-col gap-2 w-full">
-                        {dayEvents.map((event) => (
+              {/* Grid Cells */}
+              <div className="grid grid-cols-7 bg-gray-200 dark:bg-gray-800 gap-[1px]">
+                {startingEmptySlots.map((_, i) => (
+                  <div
+                    key={`empty-${i}`}
+                    className="bg-gray-50/50 dark:bg-gray-900/40 h-24 sm:h-32 lg:h-40"
+                  />
+                ))}
+
+                {days.map((day) => {
+                  const dayEvents = filteredEvents.filter((e) =>
+                    isSameDay(parseISO(e.start), day),
+                  );
+                  const isTodayDay = isToday(day);
+                  const isSelected = isSameDay(day, selectedDate);
+
+                  return (
+                    <div
+                      key={day.toString()}
+                      onClick={() => setSelectedDate(day)}
+                      onDragOver={handleDragOver}
+                      onDrop={(e) => handleDrop(e, day)}
+                      className={`
+                        relative h-24 sm:h-32 lg:h-40 p-2 transition-all cursor-pointer group overflow-hidden
+                        ${isSelected ? "bg-primary-50/30 dark:bg-primary-900/10 z-10" : "bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800/50"}
+                        ${!isSameMonth(day, currentDate) ? "opacity-40" : ""}
+                      `}
+                    >
+                      <div className="flex justify-between items-start mb-1">
+                        <span
+                          className={`
+                            flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 text-xs sm:text-sm font-bold rounded-lg transition-all
+                            ${
+                              isTodayDay
+                                ? "bg-primary-500 text-white shadow-lg shadow-primary-500/30"
+                                : isSelected
+                                  ? "text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/30"
+                                  : "text-gray-700 dark:text-gray-300 group-hover:bg-gray-100 dark:group-hover:bg-gray-800"
+                            }
+                          `}
+                        >
+                          {format(day, "d")}
+                        </span>
+
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedDate(day);
+                            setSelectedEventForModal(undefined);
+                            setShowEventModal(true);
+                          }}
+                          className="opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-all text-gray-400 hover:text-primary-500"
+                        >
+                          <CalendarIcon className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+
+                      {/* Desktop Events Stack */}
+                      <div className="hidden sm:flex flex-col gap-1 overflow-y-auto scrollbar-none max-h-[calc(100%-2rem)]">
+                        {dayEvents.slice(0, 3).map((event) => (
                           <div
                             key={event.id}
                             draggable
-                            onDragStart={(e) =>
-                              handleDragStart(
-                                e as unknown as React.DragEvent,
-                                event,
-                              )
-                            }
+                            onDragStart={(e) => handleDragStart(e, event)}
                             onClick={(e) => {
                               e.stopPropagation();
-                              const pubId =
-                                event.extendedProps.publication_id ||
-                                event.resourceId;
-                              if (pubId) onEventClick?.(pubId, event.type);
+                              if (event.type === "user_event") {
+                                setSelectedEventForModal(event);
+                                setShowEventModal(true);
+                              } else {
+                                const pubId =
+                                  event.extendedProps.publication_id ||
+                                  event.resourceId;
+                                if (pubId)
+                                  onEventClick?.(pubId, event.type, event);
+                              }
                             }}
-                            className="relative overflow-hidden rounded-lg border border-gray-100 dark:border-gray-700/50 bg-white dark:bg-gray-800 shadow-sm hover:shadow-md cursor-pointer transition-all hover:-translate-y-0.5 group/card"
+                            className="flex items-center gap-1.5 px-1.5 py-1 rounded-md text-[10px] font-medium border border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 truncate transition-transform hover:scale-[1.02] shadow-sm"
                           >
                             <div
-                              className="absolute left-0 top-0 bottom-0 w-1"
+                              className="w-1.5 h-1.5 rounded-full flex-shrink-0"
                               style={{ backgroundColor: event.color }}
                             />
-                            <div className="p-2 pl-3 flex items-start gap-2">
-                              <div className="mt-0.5 flex-shrink-0 text-gray-400 dark:text-gray-500">
-                                <PlatformIcon
-                                  platform={event.extendedProps.platform}
-                                  className="w-3.5 h-3.5"
-                                />
-                              </div>
-                              <div className="min-w-0 flex-1">
-                                <div className="text-xs font-bold text-gray-700 dark:text-gray-200 truncate leading-tight">
-                                  {event.title}
-                                </div>
-                                <div className="flex items-center gap-1.5 mt-1">
-                                  <span className="text-[10px] text-gray-400 dark:text-gray-500 capitalize font-medium">
-                                    {format(parseISO(event.start), "HH:mm")}
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
+                            <span className="truncate text-gray-700 dark:text-gray-200">
+                              {event.title}
+                            </span>
                           </div>
                         ))}
+                        {dayEvents.length > 3 && (
+                          <div className="text-[10px] text-gray-400 font-bold px-1.5">
+                            + {dayEvents.length - 3}
+                          </div>
+                        )}
                       </div>
 
-                      {/* Mobile Indicators (Dots) */}
-                      <div className="flex sm:hidden flex-wrap gap-0.5 mt-auto">
+                      {/* Mobile Indicators */}
+                      <div className="flex sm:hidden flex-wrap gap-0.5 mt-1">
                         {dayEvents.slice(0, 4).map((event) => (
                           <div
                             key={event.id}
@@ -335,83 +350,115 @@ export default function ModernCalendar({
                             style={{ backgroundColor: event.color }}
                           />
                         ))}
-                        {dayEvents.length > 4 && (
-                          <div className="w-1.5 h-1.5 rounded-full bg-gray-300 dark:bg-gray-600" />
-                        )}
                       </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
           </div>
 
-          {/* Mobile Agenda View */}
-          <div className="lg:hidden mt-6 space-y-4">
-            <div className="flex items-center justify-between">
-              <h4 className="font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                <CalendarIcon className="w-4 h-4 text-primary-500" />
-                {format(selectedDate, "d 'de' MMMM", { locale: es })}
-              </h4>
-              <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
-                {
-                  filteredEvents.filter((e) =>
-                    isSameDay(parseISO(e.start), selectedDate),
-                  ).length
-                }{" "}
-                Eventos
-              </span>
-            </div>
+          {/* Agenda View Section */}
+          <div className="w-full xl:w-96 space-y-6">
+            <div className="bg-gray-50 dark:bg-neutral-800/30 p-6 rounded-2xl border border-gray-100 dark:border-neutral-800/50 h-full flex flex-col">
+              <div className="mb-6">
+                <h4 className="font-black text-gray-900 dark:text-white flex items-center gap-2 text-xl">
+                  <CalendarIcon className="w-6 h-6 text-primary-500" />
+                  {format(selectedDate, "d 'de' MMMM", { locale: es })}
+                </h4>
+                <div className="flex items-center gap-2 mt-2">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-primary-500 bg-primary-50 dark:bg-primary-900/30 px-2 py-0.5 rounded-full">
+                    {
+                      filteredEvents.filter((e) =>
+                        isSameDay(parseISO(e.start), selectedDate),
+                      ).length
+                    }{" "}
+                    {t("calendar.events.count")}
+                  </span>
+                </div>
+              </div>
 
-            <div className="space-y-3">
-              {filteredEvents.filter((e) =>
-                isSameDay(parseISO(e.start), selectedDate),
-              ).length > 0 ? (
-                filteredEvents
-                  .filter((e) => isSameDay(parseISO(e.start), selectedDate))
-                  .map((event) => (
-                    <div
-                      key={event.id}
-                      onClick={() => {
-                        const pubId =
-                          event.extendedProps.publication_id ||
-                          event.resourceId;
-                        if (pubId) onEventClick?.(pubId, event.type);
-                      }}
-                      className="flex items-center gap-4 p-4 rounded-2xl bg-gray-50 dark:bg-neutral-800/50 border border-gray-100 dark:border-neutral-700/50 active:scale-[0.98] transition-all"
-                    >
-                      <div className="w-12 h-12 rounded-lg flex-shrink-0 flex items-center justify-center bg-white dark:bg-neutral-800 shadow-sm border border-gray-100 dark:border-neutral-700">
-                        <PlatformIcon
-                          platform={event.extendedProps.platform}
-                          className="w-6 h-6"
+              <div className="space-y-4 flex-1 overflow-y-auto pr-1 scrollbar-thin">
+                {filteredEvents.filter((e) =>
+                  isSameDay(parseISO(e.start), selectedDate),
+                ).length > 0 ? (
+                  filteredEvents
+                    .filter((e) => isSameDay(parseISO(e.start), selectedDate))
+                    .sort((a, b) => a.start.localeCompare(b.start))
+                    .map((event) => (
+                      <div
+                        key={event.id}
+                        onClick={() => {
+                          if (event.type === "user_event") {
+                            setSelectedEventForModal(event);
+                            setShowEventModal(true);
+                          } else {
+                            const pubId =
+                              event.extendedProps.publication_id ||
+                              event.resourceId;
+                            if (pubId) onEventClick?.(pubId, event.type, event);
+                          }
+                        }}
+                        className="group flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-neutral-800 border border-gray-100 dark:border-neutral-700 shadow-sm hover:shadow-md hover:border-primary-200 dark:hover:border-primary-900/30 active:scale-[0.98] transition-all cursor-pointer"
+                      >
+                        <div className="w-12 h-12 rounded-lg flex-shrink-0 flex items-center justify-center bg-gray-50 dark:bg-neutral-900 border border-gray-100 dark:border-neutral-700 group-hover:scale-110 transition-transform">
+                          {event.type === "user_event" ? (
+                            <CalendarIcon
+                              className="w-6 h-6 text-primary-500"
+                              style={{ color: event.color }}
+                            />
+                          ) : (
+                            <PlatformIcon
+                              platform={event.extendedProps.platform}
+                              className="w-6 h-6"
+                            />
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h5 className="font-bold text-gray-900 dark:text-white truncate text-sm">
+                            {event.title}
+                          </h5>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-gray-100 dark:bg-neutral-900 text-gray-500 dark:text-gray-400 font-bold uppercase">
+                              {format(parseISO(event.start), "HH:mm")}
+                            </span>
+                            <span className="text-[10px] font-bold text-primary-600 dark:text-primary-400 uppercase tracking-tight">
+                              {event.status}
+                            </span>
+                          </div>
+                        </div>
+                        <div
+                          className="w-1.5 h-10 rounded-full opacity-50 group-hover:opacity-100 transition-opacity"
+                          style={{ backgroundColor: event.color }}
                         />
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <h5 className="font-bold text-gray-900 dark:text-white truncate">
-                          {event.title}
-                        </h5>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                          {format(parseISO(event.start), "HH:mm")} •{" "}
-                          <span className="capitalize">{event.status}</span>
-                        </p>
-                      </div>
-                      <div
-                        className="w-2 h-10 rounded-full"
-                        style={{ backgroundColor: event.color }}
-                      />
+                    ))
+                ) : (
+                  <div className="py-12 text-center rounded-2xl border-2 border-dashed border-gray-200 dark:border-neutral-800 bg-white/50 dark:bg-neutral-900/10">
+                    <div className="w-12 h-12 rounded-full bg-gray-50 dark:bg-neutral-800 flex items-center justify-center mx-auto mb-4">
+                      <CalendarIcon className="w-6 h-6 text-gray-300" />
                     </div>
-                  ))
-              ) : (
-                <div className="py-8 text-center rounded-2xl border border-dashed border-gray-200 dark:border-neutral-800">
-                  <p className="text-sm text-gray-400">
-                    No hay eventos para este día
-                  </p>
-                </div>
-              )}
+                    <p className="text-sm font-medium text-gray-400">
+                      {t("calendar.events.empty")}
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
       </div>
+
+      <UserEventModal
+        show={showEventModal}
+        onClose={() => {
+          setShowEventModal(false);
+          setSelectedEventForModal(undefined);
+        }}
+        event={selectedEventForModal}
+        selectedDate={selectedDate}
+        onSuccess={fetchEvents}
+      />
     </div>
   );
 }

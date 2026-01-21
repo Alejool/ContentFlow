@@ -519,7 +519,7 @@ function Lightbox({
                     src={currentMedia.file_path}
                     controls
                     autoPlay
-                    className="max-h-[70vh] max-w-full rounded-xl"
+                    className="max-h-[70vh] max-w-full rounded-lg"
                   />
                 </div>
               )}

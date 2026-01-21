@@ -115,7 +115,7 @@ export default function RolesManagementTab({
         </div>
 
         {!canManageWorkspace && (
-          <div className="mt-6 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl">
+          <div className="mt-6 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
             <div className="flex items-start gap-3">
               <ShieldAlert className="h-5 w-5 text-amber-500 mt-0.5" />
               <div>

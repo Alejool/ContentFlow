@@ -9,21 +9,21 @@ import {
 
 type IconType =
   | ComponentType<{
-    size?: number | string;
-    className?: string;
-    strokeWidth?: number;
-  }>
+      size?: number | string;
+      className?: string;
+      strokeWidth?: number;
+    }>
   | ReactNode;
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
   variant?:
-  | "primary"
-  | "danger"
-  | "secondary"
-  | "success"
-  | "ghost"
-  | "warning";
+    | "primary"
+    | "danger"
+    | "secondary"
+    | "success"
+    | "ghost"
+    | "warning";
   buttonStyle?: "solid" | "outline" | "gradient" | "ghost";
   size?: "xs" | "sm" | "md" | "lg" | "xl";
   loading?: boolean;
@@ -59,7 +59,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       theme,
       ...props
     },
-    ref
+    ref,
   ) => {
     const sizeClasses = {
       xs: "px-2 py-1 text-xs",
@@ -165,9 +165,10 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             border-2 ${colors.border}
             ${colors.text}
             hover:bg-opacity-10 hover:${colors.hoverBg.replace("hover:", "")}
-            ${currentTheme === "dark" && variant === "ghost"
-              ? "dark:border-gray-700 dark:text-gray-300"
-              : ""
+            ${
+              currentTheme === "dark" && variant === "ghost"
+                ? "dark:border-gray-700 dark:text-gray-300"
+                : ""
             }
           `;
         case "ghost":
@@ -177,9 +178,10 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             border border-gray-300 dark:border-gray-700
             hover:${colors.hoverBg}
             hover:${colors.hoverText}
-            ${currentTheme === "dark"
-              ? "dark:hover:bg-gray-800 dark:hover:text-gray-300"
-              : ""
+            ${
+              currentTheme === "dark"
+                ? "dark:hover:bg-gray-800 dark:hover:text-gray-300"
+                : ""
             }
           `;
         case "solid":
@@ -197,7 +199,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       none: "rounded-none",
       sm: "rounded-sm",
       md: "rounded-lg",
-      lg: "rounded-xl",
+      lg: "rounded-lg",
       full: "rounded-full",
     };
 
@@ -228,9 +230,10 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       ${shadowClasses[shadow]}
       ${animationClasses[animation]}
       ${colors.focusRing}
-      ${currentTheme === "dark"
-        ? "focus:ring-offset-gray-900"
-        : "focus:ring-offset-white"
+      ${
+        currentTheme === "dark"
+          ? "focus:ring-offset-gray-900"
+          : "focus:ring-offset-white"
       }
     `;
 
@@ -288,7 +291,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         )}
       </button>
     );
-  }
+  },
 );
 
 Button.displayName = "Button";

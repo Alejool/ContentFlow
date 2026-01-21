@@ -20,7 +20,7 @@ const PublicationMobileRowSkeleton = () => {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <Skeleton className="w-8 h-8 rounded-xl" />
+              <Skeleton className="w-8 h-8 rounded-lg" />
               <Skeleton className="w-4 h-4 rounded" />
             </div>
           </div>

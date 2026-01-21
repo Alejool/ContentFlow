@@ -434,7 +434,7 @@ const SocialMediaAccounts = memo(() => {
                               account.accountDetails.account_name ||
                               account.name
                             }
-                            className="w-full h-full object-cover rounded-xl"
+                            className="w-full h-full object-cover rounded-lg"
                           />
                         ) : (
                           <div className="p-3 w-full h-full">
