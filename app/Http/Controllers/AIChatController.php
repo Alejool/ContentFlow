@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Campaign;
 use App\Models\SocialAccount;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -35,7 +36,7 @@ class AIChatController extends Controller
 
         try {
             // Get user information
-            /** @var \App\Models\User $user */
+            /** @var User $user */
             $user = Auth::user();
 
             // Determine if we should include campaign context

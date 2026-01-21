@@ -8,6 +8,7 @@ use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 use App\Channels\EnhancedDatabaseChannel;
 use Illuminate\Support\Facades\Http;
+use App\Models\WebhookLog;
 
 abstract class BaseNotification extends Notification implements ShouldQueue
 {
@@ -100,7 +101,7 @@ abstract class BaseNotification extends Notification implements ShouldQueue
       ]);
 
       // Log the attempt
-      \App\Models\WebhookLog::create([
+      WebhookLog::create([
         'workspace_id' => $notifiable->current_workspace_id,
         'channel' => 'discord',
         'event_type' => class_basename($this),
@@ -126,7 +127,7 @@ abstract class BaseNotification extends Notification implements ShouldQueue
       ]);
 
       // Log the attempt
-      \App\Models\WebhookLog::create([
+      WebhookLog::create([
         'workspace_id' => $notifiable->current_workspace_id,
         'channel' => 'slack',
         'event_type' => class_basename($this),

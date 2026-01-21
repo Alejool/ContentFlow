@@ -8,6 +8,8 @@ use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use App\Models\ScheduledPost;
+use App\Models\UserCalendarEvent;
 
 class CalendarController extends Controller
 {
@@ -53,7 +55,7 @@ class CalendarController extends Controller
         });
 
         // 2. Format Scheduled Posts as separate events for more granular view
-        $posts = \App\Models\ScheduledPost::whereHas('publication', function ($q) use ($workspaceId) {
+        $posts = ScheduledPost::whereHas('publication', function ($q) use ($workspaceId) {
             $q->where('workspace_id', $workspaceId);
         })
             ->with(['socialAccount:id,platform,account_name'])
@@ -76,7 +78,29 @@ class CalendarController extends Controller
             ];
         });
 
-        return $this->successResponse($events->concat($postEvents));
+        // 3. Format User Calendar Events
+        $userEvents = UserCalendarEvent::where('workspace_id', $workspaceId)
+            ->where('user_id', Auth::id())
+            ->whereBetween('start_date', [$start ?? now()->startOfMonth(), $end ?? now()->endOfMonth()])
+            ->get();
+
+        $manualEvents = $userEvents->map(function ($event) {
+            return [
+                'id' => "user_event_{$event->id}",
+                'resourceId' => $event->id,
+                'type' => 'user_event',
+                'title' => $event->title,
+                'start' => $event->start_date->toIso8601String(),
+                'end' => $event->end_date ? $event->end_date->toIso8601String() : null,
+                'status' => 'event',
+                'color' => $event->color,
+                'extendedProps' => [
+                    'description' => $event->description,
+                ]
+            ];
+        });
+
+        return $this->successResponse($events->concat($postEvents)->concat($manualEvents));
     }
 
     /**
@@ -94,20 +118,38 @@ class CalendarController extends Controller
 
         if ($type === 'publication') {
             $model = Publication::where('workspace_id', Auth::user()->current_workspace_id)->findOrFail($id);
-        } else {
-            $model = \App\Models\ScheduledPost::whereHas('publication', function ($q) {
+            // Check if user has permission
+            if (!Auth::user()->hasPermission('manage-content', Auth::user()->current_workspace_id)) {
+                return $this->errorResponse('Unauthorized', 403);
+            }
+            $model->update([
+                'scheduled_at' => $newDate,
+            ]);
+        } elseif ($type === 'post') {
+            $model = ScheduledPost::whereHas('publication', function ($q) {
                 $q->where('workspace_id', Auth::user()->current_workspace_id);
             })->findOrFail($id);
-        }
+            // Check if user has permission
+            if (!Auth::user()->hasPermission('manage-content', Auth::user()->current_workspace_id)) {
+                return $this->errorResponse('Unauthorized', 403);
+            }
+            $model->update([
+                'scheduled_at' => $newDate,
+            ]);
+        } elseif ($type === 'user_event') {
+            $model = UserCalendarEvent::where('workspace_id', Auth::user()->current_workspace_id)
+                ->where('user_id', Auth::id())
+                ->findOrFail($id);
 
-        // Check if user has permission
-        if (!Auth::user()->hasPermission('manage-content', Auth::user()->current_workspace_id)) {
-            return $this->errorResponse('Unauthorized', 403);
-        }
+            $duration = $model->end_date ? $model->start_date->diffInSeconds($model->end_date) : null;
 
-        $model->update([
-            'scheduled_at' => $newDate,
-        ]);
+            $model->update([
+                'start_date' => $newDate,
+                'end_date' => $duration ? $newDate->copy()->addSeconds($duration) : null,
+            ]);
+        } else {
+            return $this->errorResponse('Invalid type', 400);
+        }
 
         // Clear publication cache to reflect the change in the list view
         $workspaceId = Auth::user()->current_workspace_id;

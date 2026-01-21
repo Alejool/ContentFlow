@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use App\Models\MediaFile;
 use App\Models\SocialPostLog;
+use App\Models\ApprovalLog;
 use App\Models\Workspace;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
@@ -201,7 +202,7 @@ class Publication extends Model
 
   public function socialPostLogs(): HasMany
   {
-    return $this->hasMany(\App\Models\SocialPostLog::class, 'publication_id');
+    return $this->hasMany(SocialPostLog::class, 'publication_id');
   }
 
   // Helper methods for analytics
@@ -264,7 +265,7 @@ class Publication extends Model
 
   public function approvalLogs(): HasMany
   {
-    return $this->hasMany(\App\Models\ApprovalLog::class)->orderBy('requested_at', 'desc');
+    return $this->hasMany(ApprovalLog::class)->orderBy('requested_at', 'desc');
   }
 
   // Accessors

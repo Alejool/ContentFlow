@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Publications\Publication;
+use App\Models\MediaFile;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -32,6 +33,6 @@ class PublicationMedia extends Model
 
     public function mediaFile(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\MediaFile::class);
+        return $this->belongsTo(MediaFile::class);
     }
 }

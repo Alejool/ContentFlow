@@ -4,8 +4,11 @@ namespace App\Providers;
 
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
+use App\Models\User;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Notifications\DatabaseNotification;
+use App\Observers\NotificationObserver;
+use App\Observers\UserObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -30,11 +33,8 @@ class AppServiceProvider extends ServiceProvider
     if (request()->header('X-Forwarded-Proto') === 'https') {
       URL::forceScheme('https');
     }
-    if (request()->header('X-Forwarded-Proto') === 'https') {
-      URL::forceScheme('https');
-    }
 
-    DatabaseNotification::observe(\App\Observers\NotificationObserver::class);
-    \App\Models\User::observe(\App\Observers\UserObserver::class);
+    DatabaseNotification::observe(NotificationObserver::class);
+    User::observe(UserObserver::class);
   }
 }

@@ -8,6 +8,7 @@ use App\Models\Publications\Publication;
 use App\Models\CampaignAnalytics;
 use App\Models\SocialAccount;
 use App\Models\SocialMediaMetrics;
+use App\Models\Workspace;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 
@@ -61,9 +62,9 @@ class ExistingUserDummyDataSeeder extends Seeder
           $this->command->warn("User {$user->email} has no workspace. running WorkspaceSeeder for this user...");
 
           // Create a personal workspace for this user manually since they don't have one
-          $workspace = \App\Models\Workspace::create([
+          $workspace = Workspace::create([
             'name' => 'Personal Workspace',
-            'slug' => \Illuminate\Support\Str::slug($user->name . ' Personal ' . \Illuminate\Support\Str::random(4)),
+            'slug' => Str::slug($user->name . ' Personal ' . Str::random(4)),
             'created_by' => $user->id,
           ]);
 

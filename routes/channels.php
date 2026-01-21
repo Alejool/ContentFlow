@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Broadcast;
+use App\Models\Publications\Publication;
 
 Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
     return (int) $user->id === (int) $id;
@@ -18,7 +19,7 @@ Broadcast::channel('publication.{id}', function ($user, $id) {
     // Check if user has access to the publication's workspace
     // This assumes you have a way to check access efficiently.
     // Ideally, load publication with workspace_id or check via relationship
-    $publication = \App\Models\Publications\Publication::find($id);
+    $publication = Publication::find($id);
     if (!$publication)
         return false;
 

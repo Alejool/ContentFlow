@@ -12,6 +12,8 @@ use App\Http\Controllers\Theme\ThemeController;
 use App\Http\Controllers\Locale\LocaleController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\NotificationsController;
+use App\Models\Role;
+use App\Models\Workspace;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Broadcast;
 use Inertia\Inertia;
@@ -53,10 +55,10 @@ Route::get('/fix-db', function () {
     ]);
 
     // Verify the fix worked
-    $ownerRole = \App\Models\Role::where('slug', 'owner')->first();
+    $ownerRole = Role::where('slug', 'owner')->first();
     $ownerPerms = $ownerRole ? $ownerRole->permissions->pluck('slug')->toArray() : [];
 
-    $allRoles = \App\Models\Role::with('permissions')->get();
+    $allRoles = Role::with('permissions')->get();
     $rolesSummary = $allRoles->map(function ($role) {
       return [
         'name' => $role->name,
@@ -99,64 +101,73 @@ Route::get('/contact', function () {
 
 
 Route::get('/debug-auth', function () {
-  $user = auth()->user();
+  $sessionUser = auth()->user();
+  $freshUser = $sessionUser ? $sessionUser->fresh() : null;
 
   $debugInfo = [
-    'authenticated' => $user !== null,
+    'environment' => app()->environment(),
     'host' => request()->getHost(),
-    'stateful_config' => config('sanctum.stateful'),
     'session_id' => session()->getId(),
-    'is_sanctum_stateful' => Sanctum::currentRequestHost(),
+    'authenticated' => $sessionUser !== null,
+    'user_session_vs_db' => null,
+    'current_workspace_details' => null,
+    'raw_pivot_data' => null,
   ];
 
-  if ($user) {
-    $currentWorkspace = $user->currentWorkspace;
-    $workspaces = $user->workspaces()->with('users')->get();
-
-    $debugInfo['user'] = [
-      'id' => $user->id,
-      'name' => $user->name,
-      'email' => $user->email,
-      'current_workspace_id' => $user->current_workspace_id,
+  if ($sessionUser) {
+    // Compare Session User vs Database User
+    $debugInfo['user_session_vs_db'] = [
+      'session_workspace_id' => $sessionUser->current_workspace_id,
+      'db_workspace_id' => $freshUser->current_workspace_id,
+      'match' => $sessionUser->current_workspace_id === $freshUser->current_workspace_id,
     ];
 
-    $debugInfo['workspaces'] = $workspaces->map(function ($ws) use ($user) {
-      $userInWorkspace = $ws->users->where('id', $user->id)->first();
-      $roleId = $userInWorkspace ? $userInWorkspace->pivot->role_id : null;
-      $role = $roleId ? \App\Models\Role::find($roleId) : null;
+    // Get Current Workspace details
+    $currentWorkspaceId = $freshUser->current_workspace_id;
+    if ($currentWorkspaceId) {
+      $workspace = Workspace::find($currentWorkspaceId);
 
-      return [
-        'id' => $ws->id,
-        'name' => $ws->name,
-        'created_by' => $ws->created_by,
-        'is_creator' => $ws->created_by === $user->id,
-        'role_id' => $roleId,
-        'role_name' => $role ? $role->name : null,
-        'role_slug' => $role ? $role->slug : null,
-        'permissions' => $role ? $role->permissions->pluck('slug')->toArray() : [],
+      // Get role directly from DB pivot
+      $pivot = \Illuminate\Support\Facades\DB::table('workspace_user')
+        ->where('user_id', $freshUser->id)
+        ->where('workspace_id', $currentWorkspaceId)
+        ->first();
+
+      $role = $pivot ? Role::find($pivot->role_id) : null;
+      $isOwner = $workspace && $workspace->created_by === $freshUser->id;
+
+      $debugInfo['current_workspace_details'] = [
+        'id' => $currentWorkspaceId,
+        'name' => $workspace ? $workspace->name : 'Unknown',
+        'is_creator' => $isOwner,
+        'raw_pivot_role_id' => $pivot ? $pivot->role_id : 'NOT FOUND',
+        'resolved_role_slug' => $role ? $role->slug : 'none',
+        'effective_permissions_count' => $role ? $role->permissions()->count() : 0,
+        // List a few key permissions to verify
+        'can_manage_team' => $freshUser->hasPermission('manage-team', $currentWorkspaceId),
+        'can_publish' => $freshUser->hasPermission('publish', $currentWorkspaceId),
       ];
-    });
 
-    if ($currentWorkspace) {
-      $userInCurrent = $currentWorkspace->users->where('id', $user->id)->first();
-      $roleId = $userInCurrent ? $userInCurrent->pivot->role_id : null;
-      $role = $roleId ? \App\Models\Role::find($roleId) : null;
-      $isOwner = ($currentWorkspace->created_by === $user->id) || ($role && $role->slug === 'owner');
-
-      $debugInfo['current_workspace'] = [
-        'id' => $currentWorkspace->id,
-        'name' => $currentWorkspace->name,
-        'created_by' => $currentWorkspace->created_by,
-        'is_creator' => $currentWorkspace->created_by === $user->id,
-        'role_id' => $roleId,
-        'role_name' => $role ? $role->name : null,
-        'role_slug' => $role ? $role->slug : null,
-        'is_owner' => $isOwner,
-        'permissions' => $isOwner
-          ? \App\Models\Permission::pluck('slug')->toArray()
-          : ($role ? $role->permissions->pluck('slug')->toArray() : []),
-      ];
+      $debugInfo['raw_pivot_data'] = $pivot;
     }
+
+    // List all workspaces for this user
+    $debugInfo['all_workspaces'] = \Illuminate\Support\Facades\DB::table('workspace_user')
+      ->join('workspaces', 'workspace_user.workspace_id', '=', 'workspaces.id')
+      ->join('roles', 'workspace_user.role_id', '=', 'roles.id')
+      ->where('workspace_user.user_id', $freshUser->id)
+      ->select(
+        'workspaces.id as workspace_id',
+        'workspaces.name as workspace_name',
+        'roles.slug as role_slug',
+        'roles.id as role_id',
+        'workspaces.created_by'
+      )
+      ->get()
+      ->map(function ($row) use ($freshUser) {
+        $row->is_creator = $row->created_by === $freshUser->id;
+        return $row;
+      });
   }
 
   return response()->json($debugInfo, 200);
@@ -278,11 +289,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     |----------------------------------------------------------------------
     */
   Route::get('/calendar', [CalendarViewController::class, 'index'])->name('calendar.index');
-
-  Route::prefix('api/calendar')->name('api.calendar.')->group(function () {
-    Route::get('/events', [CalendarController::class, 'index'])->name('events');
-    Route::patch('/events/{id}', [CalendarController::class, 'update'])->name('update');
-  });
 
   /*
     |----------------------------------------------------------------------

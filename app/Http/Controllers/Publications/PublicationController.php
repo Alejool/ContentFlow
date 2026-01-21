@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\SocialPostLog;
 use App\Models\ApprovalLog;
 use App\Models\Role;
+use App\Models\User;
 use App\Http\Requests\Publications\StorePublicationRequest;
 use App\Http\Requests\Publications\UpdatePublicationRequest;
 use App\Actions\Publications\CreatePublicationAction;
@@ -28,13 +29,15 @@ class PublicationController extends Controller
 
   public function index(Request $request)
   {
-    $workspaceId = Auth::user()->current_workspace_id ?? Auth::user()->workspaces()->first()?->id;
+    /** @var User $user */
+    $user = Auth::user();
+    $workspaceId = $user->current_workspace_id ?? $user->workspaces()->first()?->id;
 
     if (!$workspaceId) {
       return $this->errorResponse('No active workspace found.', 404);
     }
 
-    if (!Auth::user()->hasPermission('manage-content', $workspaceId) && !Auth::user()->hasPermission('view-content', $workspaceId)) {
+    if (!$user->hasPermission('manage-content', $workspaceId) && !$user->hasPermission('view-content', $workspaceId)) {
       return $this->errorResponse('You do not have permission to view publications.', 403);
     }
 
@@ -315,11 +318,13 @@ class PublicationController extends Controller
     ], 'Publication approved successfully.');
   }
 
-  /** @var \App\Models\User $user */
+  /** @var User $user */
 
   public function reject(Request $request, Publication $publication)
   {
-    if (!Auth::user()->hasPermission('approve', $publication->workspace_id)) {
+    /** @var User $user */
+    $user = Auth::user();
+    if (!$user->hasPermission('approve', $publication->workspace_id)) {
       return $this->errorResponse('You do not have permission to reject publications.', 403);
     }
 

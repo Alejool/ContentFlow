@@ -4,15 +4,13 @@ namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
-use App\Http\Middleware\ForceAssetHttps;
+
 
 
 
 class Kernel extends ConsoleKernel
 {
-  protected $middleware = [
-    ForceAssetHttps::class,
-  ];
+  protected $middleware = [];
   protected function schedule(Schedule $schedule)
   {
     // Procesar posts programados cada minuto
@@ -26,5 +24,8 @@ class Kernel extends ConsoleKernel
 
     // Procesar cola de playlists de YouTube cada 5 minutos
     $schedule->command('youtube:process-playlist-queue')->everyFiveMinutes();
+
+    // Enviar recordatorios de calendario cada minuto
+    $schedule->command('app:send-event-reminders')->everyMinute();
   }
 }

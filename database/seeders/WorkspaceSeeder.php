@@ -7,6 +7,7 @@ use App\Models\Role;
 use App\Models\Permission;
 use App\Models\User;
 use App\Models\Workspace;
+use App\Models\Campaign;
 use Illuminate\Support\Str;
 
 class WorkspaceSeeder extends Seeder
@@ -70,7 +71,7 @@ class WorkspaceSeeder extends Seeder
                 $user->socialPostLogs()->update(['workspace_id' => $workspace->id]);
                 $user->mediaFiles()->update(['workspace_id' => $workspace->id]);
 
-                \App\Models\Campaign::where('user_id', $user->id)->update(['workspace_id' => $workspace->id]);
+                Campaign::where('user_id', $user->id)->update(['workspace_id' => $workspace->id]);
             }
         });
 

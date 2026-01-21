@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Storage;
 
 use App\DTOs\SocialPostDTO;
 use App\DTOs\PostResultDTO;
+use App\Models\SocialAccount;
 
 class TwitterService extends BaseSocialService
 {
@@ -371,7 +372,7 @@ class TwitterService extends BaseSocialService
     // Since BaseSocialService usually doesn't store the full model, we need to fetch it
     // using the access token or just hope it was passed.
     // Assuming we need to fetch the account that owns this access token.
-    $account = \App\Models\SocialAccount::where('access_token', $this->accessToken)->first();
+    $account = SocialAccount::where('access_token', $this->accessToken)->first();
     return $account ? $account->toArray() : [];
   }
 

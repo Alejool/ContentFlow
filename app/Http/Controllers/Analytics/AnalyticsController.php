@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 use Carbon\Carbon;
+use App\Models\SocialAccount;
 use App\Http\Controllers\Controller;
 
 class AnalyticsController extends Controller
@@ -178,7 +179,7 @@ class AnalyticsController extends Controller
         $startDate = now()->subDays($days);
         $endDate = now();
 
-        $socialAccounts = \App\Models\SocialAccount::where('workspace_id', $workspaceId);
+        $socialAccounts = SocialAccount::where('workspace_id', $workspaceId);
 
         if ($platform) {
             $socialAccounts->where('platform', $platform);
