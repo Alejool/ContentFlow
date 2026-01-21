@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Tighten\Ziggy\Ziggy;
+use App\Models\Role;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -48,19 +49,36 @@ class HandleInertiaRequests extends Middleware
           'global_platform_settings' => $request->user()->global_platform_settings ?? [],
           'current_workspace_id' => $request->user()->current_workspace_id,
         ] : null,
-        'workspaces' => $request->user() ? $request->user()->workspaces()
-          ->withCount('users')
-          ->with([
-            'users' => function ($query) use ($request) {
-              $query->where('users.id', $request->user()->id)
-                ->select('users.id', 'users.name', 'users.email', 'users.photo_url')
-                ->withPivot('role_id');
-            }
-          ])
-          ->get() : [],
-        'roles' => fn() => \App\Models\Role::all(),
-        'current_workspace' => function () use ($request) {
+        'workspaces' => function () use ($request) {
           $user = $request->user();
+          if (!$user) return [];
+
+          $roles = Role::all();
+          return $user->workspaces()
+            ->withCount('users')
+            ->with([
+              'users' => function ($query) use ($user) {
+                $query->where('users.id', $user->id)
+                  ->select('users.id', 'users.name', 'users.email', 'users.photo_url')
+                  ->withPivot('role_id');
+              }
+            ])
+            ->get()
+            ->map(function ($ws) use ($user, $roles) {
+              $currentUser = $ws->users->first();
+              $roleId = $currentUser ? $currentUser->pivot->role_id : null;
+              $role = $roles->find($roleId);
+              $isOwner = ((int)$ws->created_by === (int)$user->id) || ($role && $role->slug === 'owner');
+              $ws->user_role = $isOwner ? 'Owner' : ($role ? $role->name : 'Member');
+              $ws->user_role_slug = $isOwner ? 'owner' : ($role ? $role->slug : 'member');
+              $ws->role = (object)['name' => $ws->user_role, 'slug' => $ws->user_role_slug];
+              return $ws;
+            });
+        },
+        'roles' => fn() => Role::all(),
+        'current_workspace' => function () use ($request) {
+          // Force fresh user to avoid stale state in Octane/Swoole
+          $user = $request->user() ? $request->user()->fresh() : null;
           if (!$user)
             return null;
 
@@ -70,8 +88,8 @@ class HandleInertiaRequests extends Middleware
               ->where('workspaces.id', $user->current_workspace_id)
               ->withCount('users')
               ->with([
-                'users' => function ($query) use ($request) {
-                  $query->where('users.id', $request->user()->id)
+                'users' => function ($query) use ($user) {
+                  $query->where('users.id', $user->id)
                     ->select('users.id', 'users.name', 'users.email', 'users.photo_url')
                     ->withPivot('role_id', 'created_at');
                 },
@@ -84,8 +102,8 @@ class HandleInertiaRequests extends Middleware
             $firstWorkspace = $user->workspaces()
               ->withCount('users')
               ->with([
-                'users' => function ($query) use ($request) {
-                  $query->where('users.id', $request->user()->id)
+                'users' => function ($query) use ($user) {
+                  $query->where('users.id', $user->id)
                     ->select('users.id', 'users.name', 'users.email', 'users.photo_url')
                     ->withPivot('role_id', 'created_at');
                 },
@@ -95,12 +113,13 @@ class HandleInertiaRequests extends Middleware
 
             if ($firstWorkspace) {
               $currentWorkspace = $firstWorkspace;
-              $user->update(['current_workspace_id' => $firstWorkspace->id]);
+              $user->current_workspace_id = $firstWorkspace->id;
+              $user->save();
             }
           }
 
           if ($currentWorkspace) {
-            $roles = \App\Models\Role::all();
+            $roles = Role::all();
             $currentUser = $currentWorkspace->users->first(); // Since we filtered by ID, the first one is the current user
             $roleId = $currentUser ? $currentUser->pivot->role_id : null;
             $role = $roles->find($roleId);
@@ -122,9 +141,6 @@ class HandleInertiaRequests extends Middleware
             } else {
               $currentWorkspace->permissions = $role ? $role->permissions->pluck('slug')->toArray() : [];
             }
-
-            // Debug Logging
-            \Illuminate\Support\Facades\Log::info("Inertia Shared - User: {$user->id}, Workspace: {$currentWorkspace->id} ({$currentWorkspace->name}), Role: {$currentWorkspace->user_role} ({$currentWorkspace->user_role_slug}), RoleID: {$roleId}, IsOwner: " . ($isOwner ? 'YES' : 'NO') . ", Permissions: " . implode(',', $currentWorkspace->permissions));
           }
 
           return $currentWorkspace;
