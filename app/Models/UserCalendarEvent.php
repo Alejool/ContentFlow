@@ -1,0 +1,37 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class UserCalendarEvent extends Model
+{
+    protected $fillable = [
+        'user_id',
+        'workspace_id',
+        'title',
+        'description',
+        'start_date',
+        'end_date',
+        'color',
+        'remind_at',
+        'notification_sent',
+    ];
+
+    protected $casts = [
+        'start_date' => 'datetime',
+        'end_date' => 'datetime',
+        'remind_at' => 'datetime',
+        'notification_sent' => 'boolean',
+    ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function workspace()
+    {
+        return $this->belongsTo(Workspace::class);
+    }
+}

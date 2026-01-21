@@ -3,6 +3,12 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\SetLocale;
+use App\Http\Middleware\HandleWorkspaceContext;
+use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -22,10 +28,21 @@ return Application::configure(basePath: dirname(__DIR__))
             'api/*',
         ]);
         $middleware->web(append: [
-            \App\Http\Middleware\HandleInertiaRequests::class,
-            \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
-            \App\Http\Middleware\SetLocale::class,
-            \App\Http\Middleware\HandleWorkspaceContext::class,
+            HandleInertiaRequests::class,
+            AddLinkHeadersForPreloadedAssets::class,
+            SetLocale::class,
+            HandleWorkspaceContext::class,
         ]);
     })
-    ->withExceptions(function (Exceptions $exceptions) { })->create();
+    ->withExceptions(function (Exceptions $exceptions) {
+        $exceptions->render(function (MethodNotAllowedHttpException $e, $request) {
+            Log::error('405 Method Not Allowed', [
+                'url' => $request->fullUrl(),
+                'method' => $request->method(),
+                'allowed_methods' => $e->getHeaders()['Allow'] ?? 'unknown',
+                'ip' => $request->ip(),
+                'headers' => $request->headers->all(),
+            ]);
+            return null;
+        });
+    })->create();

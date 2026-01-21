@@ -1,0 +1,59 @@
+{
+  "calendar": {
+    "weekdays": {
+      "sun": "Dom",
+      "mon": "Lun",
+      "tue": "Mar",
+      "wed": "Mié",
+      "thu": "Jue",
+      "fri": "Vie",
+      "sat": "Sáb"
+    },
+    "actions": {
+      "today": "Hoy"
+    },
+    "events": {
+      "count": "Eventos",
+      "empty": "No hay eventos para este día"
+    },
+    "userEvents": {
+      "modal": {
+        "title": {
+          "edit": "Editar Evento",
+          "new": "Nuevo Evento Personal"
+        },
+        "fields": {
+          "title": "Título",
+          "description": "Descripción",
+          "startDate": "Inicio",
+          "endDate": "Fin (Opcional)",
+          "remindAt": "Recordatorio",
+          "color": "Etiqueta de color"
+        },
+        "placeholders": {
+          "title": "Ej: Reunión de equipo",
+          "description": "Detalles adicionales...",
+          "remindAtHint": "Se enviará una notificación interna en el momento configurado."
+        },
+        "actions": {
+          "delete": "Eliminar",
+          "cancel": "Cancelar",
+          "save": "Guardar Cambios",
+          "create": "Crear Evento",
+          "deleteConfirm": "¿Estás seguro de eliminar este evento?"
+        },
+        "messages": {
+          "successCreate": "Evento creado",
+          "successUpdate": "Evento actualizado",
+          "successDelete": "Evento eliminado",
+          "errorSave": "Error al guardar el evento",
+          "errorDelete": "Error al eliminar el evento"
+        },
+        "validation": {
+          "titleRequired": "El título es obligatorio",
+          "startDateRequired": "La fecha de inicio es obligatoria"
+        }
+      }
+    }
+  }
+}

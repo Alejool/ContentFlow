@@ -2,6 +2,7 @@ import ai from "./ai.json";
 import analytics from "./analytics.json";
 import approvals from "./approvals.json";
 import auth from "./auth.json";
+import calendar from "./calendar.json";
 import campaigns from "./campaigns.json";
 import common from "./common.json";
 import dashboard from "./dashboard.json";
@@ -20,6 +21,7 @@ import workspace from "./workspace.json";
 
 export default {
   ...common,
+  ...calendar,
   ...analytics,
   ...campaigns,
   ...dashboard,
