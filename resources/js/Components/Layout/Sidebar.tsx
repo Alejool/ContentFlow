@@ -4,7 +4,7 @@ import NavLink from "@/Components/common/ui/NavLink";
 import ThemeSwitcher from "@/Components/common/ui/ThemeSwitcher";
 import WorkspaceSwitcher from "@/Components/Workspace/WorkspaceSwitcher";
 import { useTheme } from "@/Hooks/useTheme";
-import { Link } from "@inertiajs/react";
+import { Link, usePage } from "@inertiajs/react";
 import {
   BarChart3,
   ChevronLeft,
@@ -50,6 +50,7 @@ export default function Sidebar({
 }: SidebarProps) {
   const { t } = useTranslation();
   const { theme } = useTheme();
+  const { auth } = usePage().props as any;
 
   const isRouteActive = (routeName: string): boolean => {
     if (typeof window === "undefined") return false;
@@ -149,8 +150,13 @@ export default function Sidebar({
                     ContentFlow
                   </h1>
                   <p className={`text-xs ${classes.subtitleColor}`}>
-                    Social Media Manager
+                    {auth.current_workspace?.name || "Social Media Manager"}
                   </p>
+                  {auth.current_workspace?.role && (
+                    <p className="text-[10px] font-bold text-primary-500 uppercase tracking-widest mt-0.5">
+                      {auth.current_workspace.role.name}
+                    </p>
+                  )}
                 </div>
               )}
             </Link>
