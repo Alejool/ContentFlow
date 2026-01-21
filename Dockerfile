@@ -71,5 +71,5 @@ EXPOSE 8080 6001
 # 9. Start Octane with Swoole
 # CMD ["php", "artisan", "octane:start", "--server=swoole", "--host=0.0.0.0", "--port=8080"]
 
-CMD ["sleep", "infinity"]
+CMD ["php", "artisan", "octane:start", "--server=swoole", "--host=0.0.0.0", "--port=8080"]
 
