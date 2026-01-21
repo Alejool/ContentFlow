@@ -22,6 +22,7 @@ use App\Actions\Publications\DeletePublicationAction;
 use App\Notifications\PublicationAwaitingApprovalNotification;
 use App\Notifications\PublicationApprovedNotification;
 use App\Notifications\PublicationRejectedNotification;
+use App\Models\Publications\PublicationLock;
 
 class PublicationController extends Controller
 {
@@ -155,6 +156,19 @@ class PublicationController extends Controller
   {
     if (!Auth::user()->hasPermission('manage-content', $publication->workspace_id)) {
       return $this->errorResponse('You do not have permission to update this publication.', 403);
+    }
+
+    // Check for active locks by other users
+    $lock = PublicationLock::where('publication_id', $publication->id)
+      ->where('expires_at', '>', now())
+      ->first();
+
+    if ($lock && $lock->user_id !== Auth::id()) {
+      return $this->errorResponse('Publication is currently locked by ' . $lock->user->name, 423, [
+        'locked_by' => 'user',
+        'user_name' => $lock->user->name,
+        'expires_at' => $lock->expires_at->toIso8601String(),
+      ]);
     }
 
     try {
