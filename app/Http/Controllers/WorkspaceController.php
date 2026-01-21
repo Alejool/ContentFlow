@@ -10,6 +10,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
+use Illuminate\Support\Facades\Http;
+use App\Models\User;
+use App\Models\WebhookLog;
+use App\Notifications\WorkspaceRemovedNotification;
+
 class WorkspaceController extends Controller
 {
   use ApiResponse;
@@ -76,13 +81,15 @@ class WorkspaceController extends Controller
       abort(403);
     }
 
-    Auth::user()->update(['current_workspace_id' => $workspace->id]);
+    $user = Auth::user();
+    $user->current_workspace_id = $workspace->id;
+    $user->save();
 
-    if (request()->wantsJson() || request()->is('api/*')) {
+    if (request()->is('api/*') || (request()->wantsJson() && !request()->header('X-Inertia'))) {
       return $this->successResponse(null, "Switched to {$workspace->name}");
     }
 
-    return redirect()->back()->with('message', "Switched to {$workspace->name}");
+    return redirect()->route('dashboard')->with('message', "Switched to {$workspace->name}");
   }
 
   public function settings(Request $request, Workspace $workspace)
@@ -135,7 +142,6 @@ class WorkspaceController extends Controller
       }
     ])->findOrFail($workspaceId);
 
-    // Verify user belongs to workspace
     if (!Auth::user()->workspaces()->where('workspaces.id', $workspaceId)->exists()) {
       abort(403);
     }
@@ -157,7 +163,6 @@ class WorkspaceController extends Controller
   {
     $workspace = Workspace::findOrFail($workspaceId);
 
-    // Check if user has permission to manage members
     if (!Auth::user()->hasPermission('manage-team', $workspaceId)) {
       abort(403, 'You do not have permission to manage members');
     }
@@ -166,7 +171,6 @@ class WorkspaceController extends Controller
       'role_id' => 'required|exists:roles,id'
     ]);
 
-    // Prevent changing creator's role
     if ($workspace->created_by === $userId) {
       return response()->json([
         'success' => false,
@@ -185,12 +189,10 @@ class WorkspaceController extends Controller
   {
     $workspace = Workspace::findOrFail($workspaceId);
 
-    // Check if user has permission to manage members
     if (!Auth::user()->hasPermission('manage-team', $workspaceId)) {
       abort(403, 'You do not have permission to manage members');
     }
 
-    // Prevent removing the creator
     if ($workspace->created_by === $userId) {
       return response()->json([
         'success' => false,
@@ -198,10 +200,9 @@ class WorkspaceController extends Controller
       ], 422);
     }
 
-    // Send notification before detaching
-    $removedUser = \App\Models\User::find($userId);
+    $removedUser = User::find($userId);
     if ($removedUser) {
-      $removedUser->notify(new \App\Notifications\WorkspaceRemovedNotification($workspace->name));
+      $removedUser->notify(new WorkspaceRemovedNotification($workspace->name));
     }
 
     $workspace->users()->detach($userId);
@@ -237,7 +238,7 @@ class WorkspaceController extends Controller
       'role_id.required' => 'Please select a role for the new member.',
     ]);
 
-    $user = \App\Models\User::where('email', $validated['email'])->first();
+    $user = User::where('email', $validated['email'])->first();
 
     // Check if user is already a member
     if ($workspace->users()->where('users.id', $user->id)->exists()) {
@@ -273,7 +274,7 @@ class WorkspaceController extends Controller
     try {
       if ($isDiscordInvite) {
         $eventType = 'community_invite';
-        $success = true; // Invites are just links, we assume success if URL is valid for now
+        $success = true;
         $responseBody = 'Discord invite detected and saved.';
         $statusCode = 200;
         $payload = ['url' => $url];
@@ -281,17 +282,17 @@ class WorkspaceController extends Controller
         $eventType = 'test_connection';
         if ($validated['type'] === 'slack') {
           $payload = [
-            'text' => "🚀 Test notification from ContentFlow for workspace: {$workspace->name}",
-            'url' => $url, // Include URL in payload for logging
+            'text' => "Test notification from ContentFlow for workspace: {$workspace->name}",
+            'url' => $url,
           ];
         } else {
           $payload = [
-            'content' => "🚀 Test notification from ContentFlow for workspace: {$workspace->name}",
-            'url' => $url, // Include URL in payload for logging
+            'content' => "Test notification from ContentFlow for workspace: {$workspace->name}",
+            'url' => $url,
           ];
         }
 
-        $response = \Illuminate\Support\Facades\Http::timeout(10)
+        $response = Http::timeout(10)
           ->withoutVerifying()
           ->post($url, $payload);
 
@@ -309,7 +310,7 @@ class WorkspaceController extends Controller
       }
 
       // Log the attempt
-      \App\Models\WebhookLog::create([
+      WebhookLog::create([
         'workspace_id' => $workspace->id,
         'channel' => $validated['type'],
         'event_type' => $eventType,
@@ -346,7 +347,7 @@ class WorkspaceController extends Controller
       abort(403);
     }
 
-    $logs = \App\Models\WebhookLog::where('workspace_id', $workspace->id)
+    $logs = WebhookLog::where('workspace_id', $workspace->id)
       ->orderBy('created_at', 'desc')
       ->limit(50)
       ->get();
