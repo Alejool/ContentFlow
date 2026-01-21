@@ -9,6 +9,8 @@ use App\Models\Publications\Publication;
 use App\Models\ScheduledPost;
 use Illuminate\Support\Facades\Auth;
 use App\Models\SocialPostLog;
+use App\Models\ApprovalLog;
+use App\Models\Role;
 use App\Http\Requests\Publications\StorePublicationRequest;
 use App\Http\Requests\Publications\UpdatePublicationRequest;
 use App\Actions\Publications\CreatePublicationAction;
@@ -30,6 +32,10 @@ class PublicationController extends Controller
 
     if (!$workspaceId) {
       return $this->errorResponse('No active workspace found.', 404);
+    }
+
+    if (!Auth::user()->hasPermission('manage-content', $workspaceId) && !Auth::user()->hasPermission('view-content', $workspaceId)) {
+      return $this->errorResponse('You do not have permission to view publications.', 403);
     }
 
     // Get cache version for the workspace to allow instant invalidation on any driver
@@ -100,7 +106,8 @@ class PublicationController extends Controller
 
   public function store(StorePublicationRequest $request, CreatePublicationAction $action)
   {
-    if (!Auth::user()->hasPermission('manage-content')) {
+    $workspaceId = Auth::user()->current_workspace_id ?? Auth::user()->workspaces()->first()?->id;
+    if (!Auth::user()->hasPermission('manage-content', $workspaceId)) {
       return $this->errorResponse('You do not have permission to create publications.', 403);
     }
 
@@ -118,6 +125,10 @@ class PublicationController extends Controller
 
   public function show(Request $request, Publication $publication)
   {
+    if (!Auth::user()->hasPermission('manage-content', $publication->workspace_id) && !Auth::user()->hasPermission('view-content', $publication->workspace_id)) {
+      return $this->errorResponse('You do not have permission to view this publication.', 403);
+    }
+
     $publication->load([
       'mediaFiles' => fn($q) => $q->select('media_files.id', 'media_files.file_path', 'media_files.file_type', 'media_files.file_name', 'media_files.size', 'media_files.mime_type'),
       'mediaFiles.thumbnail' => fn($q) => $q->select('id', 'media_file_id', 'file_path', 'file_name', 'derivative_type'),
@@ -199,7 +210,7 @@ class PublicationController extends Controller
   {
     $workspaceId = $publication->workspace_id;
 
-    if (!Auth::user()->hasPermission('publish', $workspaceId) || !Auth::user()->hasPermission('manage-content', $workspaceId)) {
+    if (!Auth::user()->hasPermission('manage-content', $workspaceId)) {
       return $this->errorResponse('You do not have permission to delete this publication.', 403);
     }
 
@@ -233,7 +244,7 @@ class PublicationController extends Controller
     $publication->update($updateData);
 
     // Create approval log entry
-    \App\Models\ApprovalLog::create([
+    ApprovalLog::create([
       'publication_id' => $publication->id,
       'requested_by' => Auth::id(),
       'requested_at' => now(),
@@ -243,7 +254,7 @@ class PublicationController extends Controller
 
     // Notify all users in the workspace who have the 'approve' permission
     // First, find the roles that have the 'approve' permission
-    $approverRoleIds = \App\Models\Role::whereHas('permissions', function ($q) {
+    $approverRoleIds = Role::whereHas('permissions', function ($q) {
       $q->where('slug', 'approve');
     })->pluck('id');
 
@@ -384,7 +395,6 @@ class PublicationController extends Controller
       $statusGroups = ['published' => [], 'failed' => [], 'publishing' => [], 'removed_platforms' => []];
 
       foreach ($latestLogs as $log) {
-        // Skip if this account has a pending scheduled post
         if (in_array($log->social_account_id, $scheduledAccountIds))
           continue;
 
@@ -425,14 +435,11 @@ class PublicationController extends Controller
       ]);
     }
 
-    \Illuminate\Support\Facades\Log::info("Stats requested. Workspace: {$workspaceId}");
     $publications = Publication::withoutGlobalScopes()->where('workspace_id', $workspaceId)
       ->withCount(['scheduled_posts as pending_schedules_count' => function ($q) {
         $q->where('status', 'pending');
       }])
       ->get();
-
-    \Illuminate\Support\Facades\Log::info("Stats found " . $publications->count() . " publications.");
 
     $stats = [
       'draft' => 0,
@@ -446,10 +453,7 @@ class PublicationController extends Controller
 
     foreach ($publications as $pub) {
       $status = $pub->status;
-      // \Illuminate\Support\Facades\Log::info("Publication ID {$pub->id} raw status: '{$status}'");
 
-      // Logic to determine display status
-      // Publishing, Published and Failed have priority
       if ($status === 'publishing' || $status === 'publishi') {
         $stats['publishing']++;
         if ($status === 'publishi') $pub->update(['status' => 'publishing']);
@@ -463,26 +467,17 @@ class PublicationController extends Controller
       } elseif ($status === 'failed') {
         $stats['failed']++;
       } elseif (!empty($pub->scheduled_at) || $pub->pending_schedules_count > 0) {
-        // Should check scheduled first if status is draft, but scheduled_at exists
-        // If status is 'scheduled' explicitly, it falls here (if we add check)
         $stats['scheduled']++;
       } else {
-        // Fallback to the database status
         if (isset($stats[$status])) {
           $stats[$status]++;
         } else {
-          // Log unknown status falling to draft only if it's truly weird
-          if ($status !== 'draft') {
-            \Illuminate\Support\Facades\Log::warning("Unknown status falling to draft: '{$status}'");
-          }
           $stats['draft']++;
         }
       }
     }
 
     $stats['total'] = count($publications);
-    \Illuminate\Support\Facades\Log::info("Returning stats:", $stats);
-
     return $this->successResponse($stats);
   }
 
