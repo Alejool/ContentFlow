@@ -9,7 +9,8 @@ export default function WorkspaceSwitcher({
   isSidebarOpen: boolean;
 }) {
   const { t } = useTranslation();
-  const { auth, workspaces, current_workspace } = usePage().props as any;
+  const { auth } = usePage().props as any;
+  const { workspaces, current_workspace } = auth;
   const [isOpen, setIsOpen] = useState(false);
   const { post } = useForm();
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -36,11 +37,11 @@ export default function WorkspaceSwitcher({
   if (!current_workspace) return null;
 
   return (
-    <div className="relative px-4 mb-4" ref={dropdownRef}>
+    <div className="relative px-4 mb-4 z-20" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={`
-                    w-full flex items-center gap-3 p-3 rounded-xl
+                    w-full flex items-center gap-3 p-3 rounded-lg
                     transition-all duration-300 group
                     ${isOpen ? "bg-primary-600 shadow-lg scale-[1.02]" : "hover:bg-gray-100 dark:hover:bg-neutral-800/50"}
                 `}
@@ -63,12 +64,22 @@ export default function WorkspaceSwitcher({
               >
                 {current_workspace.name}
               </p>
-              <p
-                className={`text-xs truncate ${isOpen ? "text-primary-100" : "text-gray-500 dark:text-neutral-400"}`}
-              >
-                {workspaces.length}{" "}
-                {t("workspace.workspaces", { count: workspaces.length })}
-              </p>
+              <div className="flex items-center gap-2">
+                <p
+                  className={`text-[10px] font-bold uppercase tracking-wider ${isOpen ? "text-primary-100" : "text-primary-600 dark:text-primary-400"}`}
+                >
+                  {current_workspace.role?.name || t("workspace.member")}
+                </p>
+                <span
+                  className={`w-1 h-1 rounded-full ${isOpen ? "bg-primary-200" : "bg-gray-300 dark:bg-neutral-600"}`}
+                />
+                <p
+                  className={`text-[10px] truncate ${isOpen ? "text-primary-100" : "text-gray-500 dark:text-neutral-400"}`}
+                >
+                  {workspaces.length}{" "}
+                  {t("workspace.workspaces", { count: workspaces.length })}
+                </p>
+              </div>
             </div>
             <ChevronDown
               className={`h-4 w-4 transition-transform duration-300 ${isOpen ? "rotate-180 text-white" : "text-gray-400 dark:text-neutral-400"}`}
@@ -87,9 +98,14 @@ export default function WorkspaceSwitcher({
       {isOpen && (
         <div
           className={`
-                    absolute left-4 right-4 mt-2 z-50
+                    absolute z-50
                     bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 rounded-lg shadow-2xl
-                    overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200
+                    overflow-hidden animate-in fade-in duration-200
+                    ${
+                      isSidebarOpen
+                        ? "left-4 right-4 mt-2 slide-in-from-top-2"
+                        : "left-full top-0 ml-3 w-72 slide-in-from-left-2 origin-top-left"
+                    }
                 `}
         >
           <div className="p-2 border-b border-gray-100 dark:border-neutral-800">
@@ -98,13 +114,8 @@ export default function WorkspaceSwitcher({
             </p>
             <div className="space-y-1 mt-1">
               {workspaces.map((ws: any) => {
-                const memberCount = ws.users_count || ws.users?.length || 0;
-                const currentUserInWs = ws.users?.find(
-                  (u: any) => u.id === auth.user.id,
-                );
-                const userRole =
-                  currentUserInWs?.pivot?.role?.name ||
-                  currentUserInWs?.role?.name;
+                const memberCount = ws.users_count || 0;
+                const userRole = ws.user_role || ws.role?.name;
 
                 return (
                   <button
