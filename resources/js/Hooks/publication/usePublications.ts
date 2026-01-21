@@ -166,7 +166,7 @@ export const usePublications = () => {
 
   useEffect(() => {
     fetchData(1); // Always reset to page 1 when filters or perPage change
-  }, [activeTab, filters, itemsPerPage]); // Run when tab, filters or perPage change
+  }, [activeTab, filters, itemsPerPage, props.auth.user?.current_workspace_id]); // Run when tab, filters, perPage or workspace change
 
   useEffect(() => {
     fetchAccounts();

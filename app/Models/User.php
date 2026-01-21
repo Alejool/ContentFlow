@@ -117,7 +117,10 @@ class User extends Model implements Authenticatable, MustVerifyEmail, CanResetPa
             return false;
         }
 
-        $workspace = $this->workspaces()->where('workspaces.id', $workspaceId)->first();
+        // Get the workspace with pivot data
+        $workspace = $this->workspaces()
+            ->where('workspaces.id', $workspaceId)
+            ->first();
 
         if (!$workspace) {
             return false;
@@ -128,13 +131,26 @@ class User extends Model implements Authenticatable, MustVerifyEmail, CanResetPa
             return true;
         }
 
-        $role = Role::find($workspace->pivot->role_id);
+        // Get role from pivot
+        $roleId = $workspace->pivot->role_id;
+
+        if (!$roleId) {
+            return false;
+        }
+
+        $role = Role::find($roleId);
 
         if (!$role) {
             return false;
         }
 
-        if ($role->slug === 'owner') {
+        // Owner role bypass
+        if ($role->slug === 'owner' || $role->slug === 'admin-owner') {
+            return true;
+        }
+
+        // If checking for basic viewing, any role in the workspace should suffice if we want to be permissive
+        if ($permissionSlug === 'view-content') {
             return true;
         }
 

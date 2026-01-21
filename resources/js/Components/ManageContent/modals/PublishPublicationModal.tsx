@@ -77,6 +77,7 @@ export default function PublishPublicationModal({
   const currentWorkspace = auth.current_workspace;
   const permissions = currentWorkspace?.permissions || [];
   const hasPublishPermission = permissions.includes("publish");
+  const canManageContent = permissions.includes("manage-content");
   const isApproved =
     publication?.status === "approved" || publication?.status === "published";
   const canPublishDirectly = hasPublishPermission || isApproved;
@@ -629,7 +630,7 @@ export default function PublishPublicationModal({
                     )}
                   </button>
                 </div>
-              ) : (
+              ) : canManageContent ? (
                 <button
                   type="button"
                   onClick={handleRequestApproval}
@@ -648,7 +649,7 @@ export default function PublishPublicationModal({
                     </>
                   )}
                 </button>
-              )}
+              ) : null}
             </div>
 
             <PlatformSettingsModal

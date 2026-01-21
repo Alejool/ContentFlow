@@ -5,6 +5,7 @@ import auth from "./auth.json";
 import campaigns from "./campaigns.json";
 import common from "./common.json";
 import dashboard from "./dashboard.json";
+import legal from "./legal.json";
 import logs from "./logs.json";
 import manageContent from "./manageContent.json";
 import nav from "./nav.json";
@@ -36,4 +37,5 @@ export default {
   ...ai,
   ...notifications,
   ...manageContent,
+  ...legal,
 };

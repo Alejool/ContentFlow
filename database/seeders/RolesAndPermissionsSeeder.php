@@ -26,6 +26,7 @@ class RolesAndPermissionsSeeder extends Seeder
       ['name' => 'Manage Team', 'slug' => 'manage-team', 'description' => 'Allow inviting/removing members'],
       ['name' => 'Manage Content', 'slug' => 'manage-content', 'description' => 'Allow creating and editing publications'],
       ['name' => 'Manage Campaigns', 'slug' => 'manage-campaigns', 'description' => 'Allow creating and editing campaigns'],
+      ['name' => 'View Content', 'slug' => 'view-content', 'description' => 'Allow viewing workspace content (read-only)'],
     ];
 
     foreach ($permissions as $p) {
@@ -35,10 +36,10 @@ class RolesAndPermissionsSeeder extends Seeder
 
     // 2. Create Roles and Sync Permissions
     $roles = [
-      'Owner' => ['publish', 'approve', 'view-analytics', 'manage-accounts', 'manage-team', 'manage-content', 'manage-campaigns'],
-      'Admin' => ['publish', 'approve', 'view-analytics', 'manage-accounts', 'manage-content', 'manage-campaigns'],
-      'Editor' => ['view-analytics', 'manage-content', 'manage-campaigns'],
-      'Viewer' => ['view-analytics'],
+      'Owner' => ['publish', 'approve', 'view-analytics', 'manage-accounts', 'manage-team', 'manage-content', 'manage-campaigns', 'view-content'],
+      'Admin' => ['publish', 'approve', 'view-analytics', 'manage-accounts', 'manage-content', 'manage-campaigns', 'view-content'],
+      'Editor' => ['view-analytics', 'manage-content', 'manage-campaigns', 'view-content'],
+      'Viewer' => ['view-analytics', 'view-content'],
     ];
 
     foreach ($roles as $name => $permSlugs) {

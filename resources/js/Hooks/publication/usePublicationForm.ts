@@ -69,6 +69,8 @@ export const usePublicationForm = ({
     Record<number, string>
   >({});
 
+  const prevHashtagsRef = useRef<string>("");
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<PublicationFormData>({
@@ -340,12 +342,31 @@ export const usePublicationForm = ({
   };
 
   const handleHashtagChange = (value: string) => {
-    const formatted = value
-      .split(/\s+/)
-      .map((tag) => tag.trim())
-      .filter((tag) => tag.length > 0)
-      .map((tag) => (tag.startsWith("#") ? tag : `#${tag}`))
-      .join(" ");
+    const isDeleting = value.length < prevHashtagsRef.current.length;
+    const endsWithSpace = value.endsWith(" ");
+
+    let formatted = value;
+
+    if (!isDeleting && endsWithSpace && value.trim().length > 0) {
+      // If user typed a space, ensure all tags have # and add a new # at the end
+      const tags = value.trim().split(/\s+/);
+      const processedTags = tags.map((tag) =>
+        tag.startsWith("#") ? tag : `#${tag}`,
+      );
+      formatted = processedTags.join(" ") + " #";
+    } else if (!endsWithSpace) {
+      // Standard formatting: ensure tags have # but don't force a trailing #
+      const tags = value.split(/\s+/);
+      formatted = tags
+        .map((tag, index) => {
+          if (tag.length === 0) return "";
+          if (tag === "#") return "#";
+          return tag.startsWith("#") ? tag : `#${tag}`;
+        })
+        .join(" ");
+    }
+
+    prevHashtagsRef.current = formatted;
     setValue("hashtags", formatted, {
       shouldValidate: true,
       shouldDirty: true,
