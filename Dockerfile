@@ -1,6 +1,8 @@
 FROM php:8.3-alpine AS production
 
-# 1. Install system dependencies
+# ----------------------------------------------------
+# 1. System dependencies + PHP build dependencies
+# ----------------------------------------------------
 RUN apk add --no-cache \
     bash \
     curl \
@@ -18,58 +20,84 @@ RUN apk add --no-cache \
     brotli-dev \
     zstd-dev \
     libxml2-dev \
-    $PHPIZE_DEPS \
-    && pecl install redis swoole \
+    autoconf \
+    pkgconf \
+    make \
+    g++ \
+    gcc \
+    libc-dev \
+    re2c \
+    file
+
+# ----------------------------------------------------
+# 2. PHP extensions (Redis, Swoole, PostgreSQL, etc.)
+# ----------------------------------------------------
+RUN pecl install redis swoole \
     && docker-php-ext-enable redis swoole \
     && docker-php-ext-install \
-    pdo \
-    pdo_pgsql \
-    pgsql \
-    intl \
-    zip \
-    opcache \
-    pcntl \
-    xsl \
-    bcmath \
-    sockets
+        pdo \
+        pdo_pgsql \
+        pgsql \
+        intl \
+        zip \
+        opcache \
+        pcntl \
+        xsl \
+        bcmath \
+        sockets
 
-# 2. Configure PHP
-RUN echo "memory_limit=512M" > /usr/local/etc/php/conf.d/docker-php.ini \
-    && echo "variables_order=EGPCS" >> /usr/local/etc/php/conf.d/docker-php.ini
+# ----------------------------------------------------
+# 3. PHP configuration (custom.ini)
+# ----------------------------------------------------
+COPY docker/php/custom.ini /usr/local/etc/php/conf.d/99-custom.ini
 
-# 3. Install Composer
+# ----------------------------------------------------
+# 4. Install Composer
+# ----------------------------------------------------
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
-WORKDIR /var/www/html
 
-# 4. Copy application files
+# ----------------------------------------------------
+# 5. Application setup
+# ----------------------------------------------------
+WORKDIR /var/www/html
 COPY . .
 
-# 5. Install PHP dependencies
+# ----------------------------------------------------
+# 6. PHP dependencies
+# ----------------------------------------------------
 RUN rm -rf public/build public/hot node_modules vendor \
-    && composer install --optimize-autoloader
+    && composer install --optimize-autoloader --no-interaction --no-progress
 
-# 6. Build Frontend Assets
+# ----------------------------------------------------
+# 7. Frontend build (Vite)
+# ----------------------------------------------------
 ARG VITE_REVERB_APP_KEY
 ARG VITE_REVERB_HOST
 ARG VITE_REVERB_PORT
 ARG VITE_REVERB_SCHEME
+
 ENV VITE_REVERB_APP_KEY=$VITE_REVERB_APP_KEY \
     VITE_REVERB_HOST=$VITE_REVERB_HOST \
     VITE_REVERB_PORT=$VITE_REVERB_PORT \
     VITE_REVERB_SCHEME=$VITE_REVERB_SCHEME \
     NODE_ENV=production
 
-RUN npm install --include=dev && npm run build && rm -rf node_modules
+RUN npm install --include=dev \
+    && npm run build \
+    && rm -rf node_modules
 
-# 7. Set permissions
+# ----------------------------------------------------
+# 8. Permissions
+# ----------------------------------------------------
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-# 8. Expose port
+# ----------------------------------------------------
+# 9. Expose ports
+# ----------------------------------------------------
 EXPOSE 8080 6001
 
-# 9. Start Octane with Swoole
-# CMD ["php", "artisan", "octane:start", "--server=swoole", "--host=0.0.0.0", "--port=8080"]
-
+# ----------------------------------------------------
+# 10. Start Laravel Octane (Swoole)
+# ----------------------------------------------------
 CMD ["php", "artisan", "octane:start", "--server=swoole", "--host=0.0.0.0", "--port=8080"]
-
