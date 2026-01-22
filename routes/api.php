@@ -93,6 +93,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Locking API
     Route::post('/{publication}/lock', [PublicationLockController::class, 'lock'])->name('lock');
     Route::post('/{publication}/unlock', [PublicationLockController::class, 'unlock'])->name('unlock');
+    Route::get('/{publication}/lock', [PublicationLockController::class, 'status'])->name('status');
   });
 
   /*
