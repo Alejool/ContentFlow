@@ -1,4 +1,4 @@
-import { Shield, ShieldAlert } from "lucide-react";
+import { Shield, ShieldAlert, PencilLine, Eye, UserStar, User } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 interface RolesManagementTabProps {
@@ -20,9 +20,6 @@ export default function RolesManagementTab({
     <div className="space-y-6">
       <div className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-950 border border-gray-200 dark:border-neutral-800 rounded-2xl p-6">
         <div className="flex items-center gap-3 mb-6">
-          <div className="h-12 w-12 bg-gradient-to-br from-amber-500 to-orange-500 rounded-lg flex items-center justify-center">
-            <Shield className="h-6 w-6 text-white" />
-          </div>
           <div>
             <h3 className="text-xl font-bold text-gray-900 dark:text-white">
               {t("workspace.roles_management.title")}
@@ -62,7 +59,17 @@ export default function RolesManagementTab({
                               : "bg-gradient-to-br from-gray-500 to-slate-500"
                       }`}
                     >
-                      <Shield className="h-5 w-5 text-white" />
+                      {role.slug === "owner" ? (
+                        <UserStar className="h-5 w-5 text-white" />
+                      ) : role.slug === "admin" ? (
+                        <Shield className="h-5 w-5 text-white" />
+                      ) : role.slug === "editor" ? (
+                        <PencilLine className="h-5 w-5 text-white" />
+                      ) : role.slug === "viewer" ? (
+                        <Eye className="h-5 w-5 text-white" />
+                      ) : (
+                        <User className="h-5 w-5 text-white" />
+                      )}
                     </div>
                     <div>
                       <h4 className="font-bold text-gray-900 dark:text-white flex items-center gap-2">
@@ -74,7 +81,6 @@ export default function RolesManagementTab({
                         )}
                       </h4>
                       <p className="text-sm text-gray-500 dark:text-neutral-500">
-                        {memberCount}{" "}
                         {t("workspace.members_count", { count: memberCount })}
                       </p>
                     </div>
