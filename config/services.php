@@ -93,4 +93,11 @@ return [
         'timeout' => (int) env('DEEPSEEK_TIMEOUT', 90),
         'base_url' => 'https://api.deepseek.com/v1',
     ],
+    'anthropic' => [
+        'enabled' => env('ANTHROPIC_ENABLED', true),
+        'api_key' => env('ANTHROPIC_API_KEY'),
+        'model' => env('ANTHROPIC_MODEL', 'claude-haiku-4.5'),
+        'temperature' => (float) env('ANTHROPIC_TEMPERATURE', 0.7),
+        'base_url' => env('ANTHROPIC_BASE_URL', 'https://api.anthropic.com'),
+    ],
 ];

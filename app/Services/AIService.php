@@ -11,7 +11,7 @@ class AIService
     /**
      * Available AI providers in order of preference
      */
-    protected array $providers = ['deepseek', 'gemini', 'openai'];
+    protected array $providers = ['deepseek', 'gemini', 'openai', 'anthropic'];
 
     /**
      * Main chat method
@@ -308,6 +308,49 @@ class AIService
     }
 
     /**
+     * Call Anthropic / Claude API
+     */
+    protected function callAnthropic(array $context): array
+    {
+        $apiKey = config('services.anthropic.api_key');
+
+        if (!$apiKey) {
+            throw new \Exception('Anthropic API key not configured');
+        }
+
+        $system = $this->getSystemPrompt($context);
+        // Anthropics often expects a single prompt string; combine system + user
+        $prompt = "<|system|>\n" . $system . "\n<|endoftext|>\n<|user|>\n" . ($context['message'] ?? '') . "\n<|assistant|>\n";
+
+        $response = Http::withHeaders([
+            'x-api-key' => $apiKey,
+            'Content-Type' => 'application/json',
+        ])
+            ->timeout(60)
+            ->post(rtrim(config('services.anthropic.base_url', 'https://api.anthropic.com'), '/') . '/v1/complete', [
+                'model' => config('services.anthropic.model', 'claude-haiku-4.5'),
+                'prompt' => $prompt,
+                'max_tokens' => 500,
+                'temperature' => config('services.anthropic.temperature', 0.7),
+            ]);
+
+        if (!$response->successful()) {
+            Log::error('Anthropic API Error', [
+                'status' => $response->status(),
+                'body' => $response->body()
+            ]);
+            throw new \Exception('Anthropic API request failed');
+        }
+
+        $data = $response->json();
+
+        // Try common fields for completion text
+        $content = $data['completion'] ?? ($data['output_text'] ?? ($data['choices'][0]['text'] ?? '{}'));
+
+        return $this->parseAIResponse($content, 'anthropic', config('services.anthropic.model'));
+    }
+
+    /**
      * Parse and clean AI response
      */
     protected function parseAIResponse(string $content, string $provider, string $model = 'default'): array
@@ -379,6 +422,10 @@ class AIService
                 'gpt-3.5-turbo' => 'GPT-3.5 Turbo',
                 'gpt-4-turbo' => 'GPT-4 Turbo',
                 'gpt-4' => 'GPT-4',
+            ],
+            'anthropic' => [
+                'claude-haiku-4.5' => 'Claude Haiku 4.5',
+                'claude-2' => 'Claude 2',
             ],
             'gemini' => [
                 'gemini-2.0-flash' => 'Gemini 2.0 Flash',

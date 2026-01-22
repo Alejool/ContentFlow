@@ -95,4 +95,21 @@ class PublicationLockController extends Controller
 
         return $this->successResponse(null, 'Lock released');
     }
+
+    /**
+     * Get current lock status for a publication
+     */
+    public function status(Request $request, Publication $publication)
+    {
+        // Clean up expired locks first
+        PublicationLock::where('expires_at', '<', now())->delete();
+
+        $lock = PublicationLock::where('publication_id', $publication->id)->first();
+
+        if ($lock) {
+            return $this->successResponse(['lock' => $lock->load('user')]);
+        }
+
+        return $this->successResponse(['lock' => null]);
+    }
 }

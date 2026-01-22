@@ -30,7 +30,7 @@ class AIChatController extends Controller
         $request->validate([
             'message' => 'required|string|max:2000',
             'context' => 'nullable|array',
-            'provider' => 'nullable|string|in:deepseek,gemini,openai',
+            'provider' => 'nullable|string|in:deepseek,gemini,openai,anthropic',
             'source' => 'nullable|string|in:chat,assistant'
         ]);
 
@@ -163,7 +163,7 @@ class AIChatController extends Controller
             return response()->json([
                 'success' => true,
                 'models' => $models,
-                'default_provider' => config('services.deepseek.enabled') ? 'deepseek' : (config('services.gemini.enabled') ? 'gemini' : (config('services.openai.enabled') ? 'openai' : null))
+                'default_provider' => config('services.deepseek.enabled') ? 'deepseek' : (config('services.gemini.enabled') ? 'gemini' : (config('services.openai.enabled') ? 'openai' : (config('services.anthropic.enabled') ? 'anthropic' : null)))
             ]);
         } catch (\Exception $e) {
             Log::error('Failed to get available models', ['error' => $e->getMessage()]);
@@ -181,7 +181,7 @@ class AIChatController extends Controller
     public function validateApiKey(Request $request)
     {
         $request->validate([
-            'provider' => 'required|string|in:deepseek,gemini,openai',
+            'provider' => 'required|string|in:deepseek,gemini,openai,anthropic',
             'api_key' => 'required|string'
         ]);
 
