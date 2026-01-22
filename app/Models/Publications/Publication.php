@@ -285,6 +285,7 @@ class Publication extends Model
   {
     $this->activities()->create([
       'user_id' => $user ? $user->id : (Auth::id() ?? null),
+      'publication_id' => $this->id,
       'type' => $type,
       'details' => $details,
     ]);
