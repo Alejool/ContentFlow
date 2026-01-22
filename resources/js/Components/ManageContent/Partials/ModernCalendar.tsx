@@ -27,7 +27,6 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import UserEventModal from "./UserEventModal";
 
-// Types
 interface ModernCalendarProps {
   onEventClick?: (
     id: number,
@@ -41,8 +40,8 @@ interface CalendarEvent {
   resourceId: number;
   type: "publication" | "post" | "user_event";
   title: string;
-  start: string; // ISO
-  end?: string; // ISO
+  start: string;
+  end?: string;
   status: string;
   color: string;
   extendedProps: {
@@ -80,7 +79,6 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
     CalendarEvent | undefined
   >(undefined);
 
-  // Fetch events
   const fetchEvents = async () => {
     setLoading(true);
     try {
@@ -101,12 +99,10 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
     fetchEvents();
   }, [currentDate]);
 
-  // Navigation
   const nextMonth = () => setCurrentDate(addMonths(currentDate, 1));
   const prevMonth = () => setCurrentDate(subMonths(currentDate, 1));
   const goToToday = () => setCurrentDate(new Date());
 
-  // Grid Generation
   const days = eachDayOfInterval({
     start: startOfMonth(currentDate),
     end: endOfMonth(currentDate),
@@ -115,13 +111,11 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
   const firstDayOfMonth = startOfMonth(currentDate).getDay();
   const startingEmptySlots = Array.from({ length: firstDayOfMonth });
 
-  // Filter Events
   const filteredEvents = events.filter((e) => {
     if (platformFilter === "all") return true;
     return e.extendedProps.platform?.toLowerCase() === platformFilter;
   });
 
-  // Drag and Drop Handlers
   const handleDragStart = (e: React.DragEvent, event: CalendarEvent) => {
     setDraggedEvent(event);
     e.dataTransfer.effectAllowed = "move";
@@ -137,7 +131,6 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
     e.preventDefault();
     if (!draggedEvent) return;
 
-    // Optimistic Update
     const updatedEvents = events.map((ev) =>
       ev.id === draggedEvent.id ? { ...ev, start: date.toISOString() } : ev,
     );
@@ -152,7 +145,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
       });
     } catch (error) {
       console.error("Failed to update event", error);
-      fetchEvents(); // Revert
+      fetchEvents();
     } finally {
       setDraggedEvent(null);
     }
@@ -174,7 +167,6 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
           </div>
 
           <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto justify-center sm:justify-end">
-            {/* Platform Filter */}
             <div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-lg p-1 overflow-x-auto scrollbar-subtle max-w-full sm:max-w-none">
               {platforms.map((p) => (
                 <button
@@ -218,12 +210,9 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
           </div>
         </div>
 
-        {/* Calendar Main Content - Responsive Layout */}
         <div className="flex flex-col xl:flex-row gap-8">
-          {/* Calendar Grid Section */}
           <div className="flex-1 min-w-0">
             <div className="w-full border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden shadow-sm bg-gray-50 dark:bg-gray-900/50">
-              {/* Weekday Headers */}
               <div className="grid grid-cols-7 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
                 {[
                   { key: "sun", label: t("calendar.weekdays.sun") },
@@ -246,7 +235,6 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                 ))}
               </div>
 
-              {/* Grid Cells */}
               <div className="grid grid-cols-7 bg-gray-200 dark:bg-gray-800 gap-[1px]">
                 {startingEmptySlots.map((_, i) => (
                   <div
@@ -303,7 +291,6 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                         </button>
                       </div>
 
-                      {/* Desktop Events Stack */}
                       <div className="hidden sm:flex flex-col gap-1 overflow-y-auto scrollbar-none max-h-[calc(100%-2rem)]">
                         {dayEvents.slice(0, 3).map((event) => (
                           <div
@@ -341,7 +328,6 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                         )}
                       </div>
 
-                      {/* Mobile Indicators */}
                       <div className="flex sm:hidden flex-wrap gap-0.5 mt-1">
                         {dayEvents.slice(0, 4).map((event) => (
                           <div
@@ -358,7 +344,6 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
             </div>
           </div>
 
-          {/* Agenda View Section */}
           <div className="w-full xl:w-96 space-y-6">
             <div className="bg-gray-50 dark:bg-neutral-800/30 p-6 rounded-2xl border border-gray-100 dark:border-neutral-800/50 h-full flex flex-col">
               <div className="mb-6">

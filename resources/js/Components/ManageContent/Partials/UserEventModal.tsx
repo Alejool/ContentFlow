@@ -10,11 +10,10 @@ import {
   AlignLeft,
   Bell,
   Calendar as CalendarIcon,
-  Trash2,
   Type,
   X,
 } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
@@ -43,6 +42,12 @@ interface UserEventModalProps {
   onSuccess: () => void;
 }
 
+const getLightColor = (hex: string, opacity: number = 0.1) => {
+  return `${hex}${Math.round(opacity * 255)
+    .toString(16)
+    .padStart(2, "0")}`;
+};
+
 export default function UserEventModal({
   show,
   onClose,
@@ -51,6 +56,7 @@ export default function UserEventModal({
   onSuccess,
 }: UserEventModalProps) {
   const { t } = useTranslation();
+  const [selectedColor, setSelectedColor] = useState("#3B82F6");
 
   const {
     register,
@@ -70,11 +76,19 @@ export default function UserEventModal({
     },
   });
 
-  const selectedColor = watch("color");
+  // Observar cambios en el color
+  const colorValue = watch("color");
+
+  useEffect(() => {
+    if (colorValue) {
+      setSelectedColor(colorValue);
+    }
+  }, [colorValue]);
 
   useEffect(() => {
     if (show) {
       if (event) {
+        const eventColor = event.backgroundColor || event.color || "#3B82F6";
         reset({
           title: event.title || "",
           description: event?.extendedProps?.description || "",
@@ -88,13 +102,14 @@ export default function UserEventModal({
               ? parseISO(event.end)
               : event.end
             : null,
-          color: event.backgroundColor || event.color || "#3B82F6",
+          color: eventColor,
           remind_at: event.extendedProps?.remind_at
             ? typeof event.extendedProps.remind_at === "string"
               ? parseISO(event.extendedProps.remind_at)
               : event.extendedProps.remind_at
             : null,
         });
+        setSelectedColor(eventColor);
       } else if (selectedDate) {
         reset({
           title: "",
@@ -104,6 +119,7 @@ export default function UserEventModal({
           color: "#3B82F6",
           remind_at: null,
         });
+        setSelectedColor("#3B82F6");
       } else {
         reset({
           title: "",
@@ -113,6 +129,7 @@ export default function UserEventModal({
           color: "#3B82F6",
           remind_at: null,
         });
+        setSelectedColor("#3B82F6");
       }
     }
   }, [event, selectedDate, show, reset]);
@@ -167,28 +184,64 @@ export default function UserEventModal({
     }
   };
 
+  const tailwindColors = [
+    { value: "#3B82F6", name: "Azul", darkValue: "#1D4ED8" },
+    { value: "#EF4444", name: "Rojo", darkValue: "#DC2626" },
+    { value: "#10B981", name: "Verde", darkValue: "#059669" },
+    { value: "#F59E0B", name: "Ámbar", darkValue: "#D97706" },
+    { value: "#8B5CF6", name: "Violeta", darkValue: "#7C3AED" },
+    { value: "#EC4899", name: "Rosa", darkValue: "#DB2777" },
+    { value: "#6366F1", name: "Índigo", darkValue: "#4F46E5" },
+    { value: "#14B8A6", name: "Verde azulado", darkValue: "#0D9488" },
+    { value: "#F97316", name: "Naranja", darkValue: "#EA580C" },
+    { value: "#84CC16", name: "Lima", darkValue: "#65A30D" },
+  ];
+
+  const currentColor =
+    tailwindColors.find((c) => c.value === selectedColor) || tailwindColors[0];
+
   return (
     <Modal show={show} onClose={onClose} maxWidth="lg">
-      <div className="p-0 overflow-hidden rounded-2xl bg-white dark:bg-neutral-900 shadow-2xl transition-all duration-300 transform border border-gray-100 dark:border-neutral-800">
-        <div className="relative overflow-hidden px-8 py-6 border-b border-gray-100 dark:border-neutral-800 bg-gradient-to-r from-gray-50/80 to-white/80 dark:from-neutral-800/80 dark:to-neutral-900/80 backdrop-blur-md">
-          <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none transform translate-x-1/4 -translate-y-1/4">
-            <CalendarIcon size={120} className="text-primary-500" />
+      <div
+        className="p-0 overflow-hidden rounded-2xl bg-white dark:bg-neutral-900 shadow-2xl transition-all duration-500 transform border transition-colors"
+        style={{
+          borderColor: `${selectedColor}40`,
+          boxShadow: `0 25px 50px -12px ${selectedColor}15`,
+        }}
+      >
+        <div
+          className="relative overflow-hidden px-8 py-6 border-b backdrop-blur-md transition-all duration-500"
+          style={{
+            background: `linear-gradient(135deg, ${selectedColor}15, ${selectedColor}08)`,
+            borderColor: `${selectedColor}30`,
+          }}
+        >
+          <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none transform translate-x-1/4 -translate-y-1/4">
+            <CalendarIcon size={120} style={{ color: selectedColor }} />
           </div>
 
           <div className="flex items-center justify-between relative z-10">
             <div>
-              <h3 className="text-xl font-black text-gray-900 dark:text-white tracking-tight leading-none">
+              <h3 className="text-xl font-black text-gray-900 dark:text-white tracking-tight leading-none transition-colors duration-500">
                 {event
                   ? t("calendar.userEvents.modal.title.edit")
                   : t("calendar.userEvents.modal.title.new")}
               </h3>
-              <p className="text-[10px] text-gray-500 dark:text-neutral-400 mt-2 font-bold uppercase tracking-widest opacity-80">
-                {t("calendar.userEvents.modal.fields.title")}
+              <p
+                className="text-xs mt-1 font-semibold uppercase tracking-wider transition-colors duration-500"
+                style={{ color: selectedColor }}
+              >
+                {currentColor.name} • Evento
               </p>
             </div>
             <button
               onClick={onClose}
-              className="p-2 text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-neutral-800 rounded-lg transition-all duration-200 active:scale-90 bg-white/50 dark:bg-neutral-800/50 backdrop-blur"
+              className="p-2 rounded-full transition-all duration-300 active:scale-90 backdrop-blur border hover:scale-110"
+              style={{
+                color: selectedColor,
+                borderColor: `${selectedColor}40`,
+                backgroundColor: `${selectedColor}10`,
+              }}
               aria-label="Close"
             >
               <X className="w-5 h-5" />
@@ -197,32 +250,49 @@ export default function UserEventModal({
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="p-8 space-y-6">
-          <Input
-            id="title"
-            label={t("calendar.userEvents.modal.fields.title")}
-            placeholder={t("calendar.userEvents.modal.placeholders.title")}
-            icon={Type}
-            register={register}
-            error={errors.title?.message ? t(errors.title.message) : undefined}
-            required
-            variant="default"
-            sizeType="lg"
-            autoFocus
-          />
+          <div className="space-y-4">
+            <Input
+              id="title"
+              label={t("calendar.userEvents.modal.fields.title")}
+              placeholder={t("calendar.userEvents.modal.placeholders.title")}
+              icon={Type}
+              register={register}
+              error={
+                errors.title?.message ? t(errors.title.message) : undefined
+              }
+              required
+              variant="default"
+              sizeType="lg"
+              autoFocus
+              className="transition-colors duration-500"
+              style={
+                {
+                  "--ring-color": selectedColor,
+                } as React.CSSProperties
+              }
+            />
 
-          <Textarea
-            id="description"
-            name="description"
-            label={t("calendar.userEvents.modal.fields.description")}
-            placeholder={t(
-              "calendar.userEvents.modal.placeholders.description",
-            )}
-            icon={AlignLeft}
-            register={register}
-            rows={3}
-            variant="default"
-          />
+            <Textarea
+              id="description"
+              name="description"
+              label={t("calendar.userEvents.modal.fields.description")}
+              placeholder={t(
+                "calendar.userEvents.modal.placeholders.description",
+              )}
+              icon={AlignLeft}
+              register={register}
+              rows={3}
+              variant="default"
+              className="transition-colors duration-500"
+              style={
+                {
+                  "--ring-color": selectedColor,
+                } as React.CSSProperties
+              }
+            />
+          </div>
 
+          {/* Fechas */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <Controller
               name="start_date"
@@ -239,7 +309,7 @@ export default function UserEventModal({
                       ? t(errors.start_date.message)
                       : undefined
                   }
-                  icon={<CalendarIcon className="w-5 h-5 text-gray-400" />}
+                  icon={<CalendarIcon className="w-5 h-5" />}
                 />
               )}
             />
@@ -257,7 +327,7 @@ export default function UserEventModal({
                       ? t(errors.end_date.message)
                       : undefined
                   }
-                  icon={<CalendarIcon className="w-5 h-5 text-gray-400" />}
+                  icon={<CalendarIcon className="w-5 h-5" />}
                 />
               )}
             />
@@ -278,75 +348,92 @@ export default function UserEventModal({
                     ? t(errors.remind_at.message)
                     : undefined
                 }
-                icon={<Bell className="w-5 h-5 text-gray-400" />}
+                icon={<Bell className="w-5 h-5" />}
               />
             )}
           />
 
-          <div className="bg-gray-50/50 dark:bg-neutral-800/30 p-5 rounded-2xl border border-gray-100 dark:border-neutral-800/50">
-            <label className="block text-sm font-bold text-gray-900 dark:text-gray-200 mb-4 ml-1">
-              {t("calendar.userEvents.modal.fields.color")}
-            </label>
-            <div className="flex flex-wrap gap-4">
-              {[
-                "#3B82F6", // Blue
-                "#EF4444", // Red
-                "#10B981", // Emerald
-                "#F59E0B", // Amber
-                "#8B5CF6", // Violet
-                "#EC4899", // Pink
-                "#6B7280", // Gray
-              ].map((color) => (
+          <div
+            className="p-5 rounded-2xl border transition-all duration-500 backdrop-blur-sm"
+            style={{
+              background: `linear-gradient(135deg, ${selectedColor}08, ${selectedColor}03)`,
+              borderColor: `${selectedColor}20`,
+            }}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <label className="block text-sm font-bold text-gray-900 dark:text-gray-200 ml-1">
+                {t("calendar.userEvents.modal.fields.color")}
+              </label>
+              <span
+                className="text-xs font-medium px-3 py-1.5 rounded-full transition-all duration-300"
+                style={{
+                  backgroundColor: `${selectedColor}20`,
+                  color: selectedColor,
+                  border: `1px solid ${selectedColor}40`,
+                }}
+              >
+                {selectedColor}
+              </span>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              {tailwindColors.map((color) => (
                 <button
-                  key={color}
+                  key={color.value}
                   type="button"
-                  onClick={() => setValue("color", color)}
-                  className={`w-10 h-10 rounded-full border-4 transition-all duration-300 hover:scale-125 active:scale-90 shadow-sm ${
-                    selectedColor === color
-                      ? "border-white dark:border-neutral-700 ring-4 ring-primary-500/30 scale-110 rotate-12"
-                      : "border-transparent"
-                  }`}
-                  style={{ backgroundColor: color }}
-                  title={color}
+                  onClick={() => {
+                    setValue("color", color.value);
+                    setSelectedColor(color.value);
+                  }}
+                  className={`
+                    w-9 h-9 rounded-full border-3 transition-all duration-300
+                    hover:scale-125 active:scale-95 shadow-md hover:shadow-lg
+                    transform-gpu
+                    ${
+                      selectedColor === color.value
+                        ? "border-white dark:border-neutral-800 ring-3 ring-offset-2 scale-110 rotate-12"
+                        : "border-transparent hover:border-white/50 dark:hover:border-neutral-800/50"
+                    }
+                  `}
+                  style={{ backgroundColor: color.value }}
+                  title={`${color.name} (${color.value})`}
+                  aria-label={`Seleccionar color ${color.name}`}
                 />
               ))}
             </div>
           </div>
 
-          <div className="flex items-center justify-between pt-8 border-t border-gray-100 dark:border-neutral-800 mt-6">
-            {event ? (
+          <div
+            className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between pt-8 mt-8 gap-4 transition-all duration-500"
+            style={{
+              borderTop: `1px solid ${selectedColor}20`,
+            }}
+          >
+            <div
+              className={`flex flex-col sm:flex-row flex-end gap-3 ${event ? "order-1 sm:order-2 w-full sm:w-auto" : "order-1 w-full"}`}
+            >
               <Button
                 type="button"
-                variant="ghost"
+                variant="secondary"
                 buttonStyle="outline"
-                onClick={handleDelete}
-                className="text-red-500 hover:text-white hover:bg-red-600 border-red-200 hover:border-red-600 dark:border-red-900/30 transition-all duration-300 font-bold px-6 py-3 rounded-2xl group"
-                icon={
-                  <Trash2 className="w-5 h-5 group-hover:rotate-12 transition-transform" />
-                }
-              >
-                {t("calendar.userEvents.modal.actions.delete")}
-              </Button>
-            ) : (
-              <div />
-            )}
-
-            <div className="flex gap-4">
-              <Button
-                type="button"
-                variant="ghost"
-                buttonStyle="ghost"
                 onClick={onClose}
-                className="text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-800 transition-all duration-300 font-bold px-7 py-3 rounded-2xl"
+                className="w-full sm:w-auto px-7 py-3 rounded-xl transition-all duration-300 hover:shadow-md"
+                style={{
+                  borderColor: `${selectedColor}40`,
+                  color: selectedColor,
+                }}
               >
                 {t("calendar.userEvents.modal.actions.cancel")}
               </Button>
               <Button
                 type="submit"
                 variant="primary"
-                buttonStyle="gradient"
+                buttonStyle="solid"
                 loading={isSubmitting}
-                className="font-black px-10 py-3 rounded-2xl shadow-xl shadow-primary-500/20 active:translate-y-1 transition-all duration-300"
+                className="w-full sm:w-auto px-8 py-3 rounded-xl shadow-lg transition-all duration-300 font-bold hover:shadow-xl active:translate-y-0.5"
+                style={{
+                  backgroundColor: selectedColor,
+                  borderColor: selectedColor,
+                }}
               >
                 {event
                   ? t("calendar.userEvents.modal.actions.save")
@@ -354,6 +441,14 @@ export default function UserEventModal({
               </Button>
             </div>
           </div>
+
+          {!event && (
+            <div className="text-center pt-2">
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                {t("calendar.userEvents.modal.footer.note")}
+              </p>
+            </div>
+          )}
         </form>
       </div>
     </Modal>
