@@ -1,4 +1,6 @@
 import PlatformSettingsModal from "@/Components/ConfigSocialMedia/PlatformSettingsModal";
+import ApprovalHistoryCompacto from "@/Components/ManageContent/Publication/common/ApprovalHistoryCompacto";
+import TimelineCompacto from "@/Components/ManageContent/Publication/common/TimelineCompacto";
 import SocialAccountsSection from "@/Components/ManageContent/Publication/common/add/SocialAccountsSection";
 import ContentSection from "@/Components/ManageContent/Publication/common/edit/ContentSection";
 import MediaUploadSection from "@/Components/ManageContent/Publication/common/edit/MediaUploadSection";
@@ -13,16 +15,10 @@ import { useCampaignStore } from "@/stores/campaignStore";
 import { useAccountsStore } from "@/stores/socialAccountsStore";
 import { Publication } from "@/types/Publication";
 import { usePage } from "@inertiajs/react";
-import {
-  AlertCircle,
-  Save
-} from "lucide-react";
+import { AlertCircle, Save } from "lucide-react";
 import { memo, useMemo, useState } from "react";
 import { useWatch } from "react-hook-form";
 import { Trans } from "react-i18next";
-import TimelineCompacto from "@/Components/ManageContent/Publication/common/TimelineCompacto";
-import ApprovalHistoryCompacto from "@/Components/ManageContent/Publication/common/ApprovalHistoryCompacto";
-
 
 const parseUserAgent = (userAgent?: string): string => {
   if (!userAgent) return "Unknown Device";
@@ -63,7 +59,6 @@ interface EditPublicationModalProps {
   publication: Publication | null;
   onSubmit: (success: boolean) => void;
 }
-
 
 const EditPublicationModal = ({
   isOpen,

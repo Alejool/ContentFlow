@@ -23,6 +23,7 @@ export const usePublicationLock = (
   publicationId: number | null,
   isEditing: boolean,
 ) => {
+
   const { auth } = usePage().props as any;
   const [lockInfo, setLockInfo] = useState<LockInfo | null>(null);
   const [isLockedByMe, setIsLockedByMe] = useState(false);
@@ -57,7 +58,6 @@ export const usePublicationLock = (
         expires_at: lockData?.expires_at || new Date().toISOString(),
       });
     } else if (data?.details) {
-      // Handle 423 Locked
       setLockInfo(data.details);
       setIsLockedByMe(false);
     } else {
@@ -170,7 +170,7 @@ export const usePublicationLock = (
     lockInfo,
     isLockedByMe,
     isLockedByOther: !!lockInfo && !isLockedByMe,
-    activeUsers, // Return active users so we can show avatars
+    activeUsers,
     refreshLock: acquireLock,
   };
 };
