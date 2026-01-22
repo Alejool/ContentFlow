@@ -7,11 +7,20 @@ import {
   Eye,
   Image,
   Loader2,
+  Lock,
   Rocket,
   Trash2,
   Video,
 } from "lucide-react";
 import React, { memo, useState } from "react";
+
+// ... (skipping interface to save tokens if possible, or just targeting the specific blocks)
+
+// Actually I need to split this into two chunks if possible or one large replacement if they are close.
+// Imports are lines 4-13.
+// Lock indicator is lines 124-131.
+// Edit button is lines 287-323.
+// I'll use multi_replace.
 
 interface PublicationRowProps {
   item: Publication;
@@ -78,7 +87,7 @@ const PublicationRow = memo(
                 {item.title || "Untitled"}
               </h3>
               <p className="text-xs mt-0.5 truncate text-gray-500 dark:text-gray-400">
-                {item.description || "No description"}
+                {item.description || "Sin descripción"}
               </p>
               {item.platform_settings &&
                 Object.keys(item.platform_settings).length > 0 && (
@@ -122,10 +131,16 @@ const PublicationRow = memo(
                   </div>
                 )}
               {remoteLock && (
-                <div className="flex items-center gap-1.5 mt-1 animate-pulse">
-                  <span className="flex-shrink-0 w-2 h-2 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]"></span>
-                  <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-tight">
-                    {t("publications.table.lockedBy")} {remoteLock.user_name}
+                <div className="flex items-center gap-2 mt-2 p-1.5 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800/30 w-fit animate-in fade-in slide-in-from-top-1">
+                  <div className="relative flex items-center justify-center w-4 h-4 rounded-full bg-amber-100 dark:bg-amber-800 text-amber-600 dark:text-amber-400">
+                    <Lock className="w-2.5 h-2.5" />
+                    <span className="absolute -top-0.5 -right-0.5 flex h-1.5 w-1.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-500"></span>
+                    </span>
+                  </div>
+                  <span className="text-[10px] font-bold text-amber-700 dark:text-amber-400 uppercase tracking-tight">
+                    Editando: {remoteLock.user_name}
                   </span>
                 </div>
               )}
@@ -199,7 +214,9 @@ const PublicationRow = memo(
               </span>
             )}
             {mediaCount.total === 0 && (
-              <span className="text-[10px] text-gray-400">No media</span>
+              <span className="text-[10px] text-gray-400">
+                {t("publications.table.noMedia") || "Sin multimedia"}
+              </span>
             )}
           </div>
         </td>
@@ -212,7 +229,9 @@ const PublicationRow = memo(
               </span>
             </div>
           ) : (
-            <span className="text-[10px] italic text-gray-400">None</span>
+            <span className="text-[10px] italic text-gray-400">
+              {t("common.none") || "Ninguna"}
+            </span>
           )}
         </td>
         <td className="px-6 py-4 max-w-[180px]">
@@ -300,13 +319,13 @@ const PublicationRow = memo(
                 disabled={
                   isPublishing || isEditing || isDeleting || !!remoteLock
                 }
-                className={`p-1.5 ${
+                className={`flex items-center gap-1.5 p-1.5 px-2.5 ${
                   item.status === "published"
                     ? "text-amber-500"
                     : remoteLock
-                      ? "text-gray-400"
-                      : "text-blue-500"
-                } hover:bg-blue-50 rounded-lg dark:hover:bg-blue-900/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all`}
+                      ? "bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed dark:bg-gray-800 dark:border-gray-700 dark:text-gray-600"
+                      : "text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                } rounded-lg disabled:opacity-70 transition-all`}
                 title={
                   remoteLock
                     ? `${t("publications.table.lockedBy")} ${remoteLock.user_name}`
@@ -317,8 +336,13 @@ const PublicationRow = memo(
               >
                 {isEditing ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
+                ) : remoteLock ? (
+                  <Lock className="w-3.5 h-3.5" />
                 ) : (
                   <Edit className="w-4 h-4" />
+                )}
+                {remoteLock && (
+                  <span className="text-xs font-medium">Bloqueado</span>
                 )}
               </button>
             )}

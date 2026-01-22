@@ -3,6 +3,7 @@ import PublicationTable from "@/Components/ManageContent/Publication/Publication
 import Button from "@/Components/common/Modern/Button";
 import AdvancedPagination from "@/Components/common/ui/AdvancedPagination";
 import EmptyState from "@/Components/common/ui/EmptyState";
+import { useWorkspaceLocks } from "@/Hooks/usePublicationLock";
 import { Filter, LayoutGrid, List as ListIcon, RotateCcw } from "lucide-react";
 import { useEffect, useState, useTransition } from "react";
 import { useTranslation } from "react-i18next";
@@ -40,6 +41,8 @@ export default function ContentList(props: ContentListProps) {
   const [viewMode, setViewMode] = useState<"grid" | "list">("list");
   const [isPending, startTransition] = useTransition();
   const { t } = useTranslation();
+  const { remoteLocks } = useWorkspaceLocks();
+  console.log("ContentList remoteLocks updated:", remoteLocks);
 
   const { items, isLoading, mode, title, onRefresh } = props;
   const [smoothLoading, setSmoothLoading] = useState(true);
@@ -169,6 +172,7 @@ export default function ContentList(props: ContentListProps) {
                 onViewDetails={props.onViewDetails}
                 onPublish={props.onPublish}
                 permissions={props.permissions}
+                remoteLock={remoteLocks[item.id]}
               />
             ))}
           </div>
@@ -204,6 +208,7 @@ export default function ContentList(props: ContentListProps) {
               onPublish={props.onPublish || (() => {})}
               onViewDetails={props.onViewDetails}
               onPerPageChange={props.onPerPageChange}
+              remoteLocks={remoteLocks}
             />
           )}
         </div>

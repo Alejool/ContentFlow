@@ -275,4 +275,18 @@ class Publication extends Model
       $this->start_date <= now() &&
       $this->end_date >= now();
   }
+
+  public function activities(): HasMany
+  {
+    return $this->hasMany(PublicationActivity::class)->orderBy('created_at', 'desc');
+  }
+
+  public function logActivity(string $type, $details = null, $user = null): void
+  {
+    $this->activities()->create([
+      'user_id' => $user ? $user->id : (Auth::id() ?? null),
+      'type' => $type,
+      'details' => $details,
+    ]);
+  }
 }

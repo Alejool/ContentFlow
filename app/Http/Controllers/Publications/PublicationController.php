@@ -69,7 +69,9 @@ class PublicationController extends Controller
           'user' => fn($q) => $q->select('users.id', 'users.name', 'users.email', 'users.photo_url'),
           'publisher' => fn($q) => $q->select('users.id', 'users.name', 'users.photo_url'),
           'rejector' => fn($q) => $q->select('users.id', 'users.name', 'users.photo_url'),
-          'approvalLogs' => fn($q) => $q->latest('requested_at')->with(['requester:id,name,photo_url', 'reviewer:id,name,photo_url'])
+          'rejector' => fn($q) => $q->select('users.id', 'users.name', 'users.photo_url'),
+          'approvalLogs' => fn($q) => $q->latest('requested_at')->with(['requester:id,name,photo_url', 'reviewer:id,name,photo_url']),
+          'activities' => fn($q) => $q->orderBy('created_at', 'desc')->with('user:id,name,photo_url')
         ])
         ->orderBy('created_at', 'desc');
 
@@ -118,6 +120,8 @@ class PublicationController extends Controller
     try {
       $publication = $action->execute($request->validated(), $request->file('media', []));
 
+      $publication->logActivity('created', ['title' => $publication->title]);
+
       // Clear cache after creating publication
       $this->clearPublicationCache(Auth::user()->current_workspace_id);
 
@@ -144,7 +148,9 @@ class PublicationController extends Controller
       'campaigns' => fn($q) => $q->select('campaigns.id', 'campaigns.name', 'campaigns.status'),
       'publisher' => fn($q) => $q->select('users.id', 'users.name', 'users.photo_url'),
       'rejector' => fn($q) => $q->select('users.id', 'users.name', 'users.photo_url'),
-      'approvalLogs' => fn($q) => $q->latest('requested_at')->with(['requester:id,name,photo_url', 'reviewer:id,name,photo_url'])
+      'rejector' => fn($q) => $q->select('users.id', 'users.name', 'users.photo_url'),
+      'approvalLogs' => fn($q) => $q->latest('requested_at')->with(['requester:id,name,photo_url', 'reviewer:id,name,photo_url']),
+      'activities' => fn($q) => $q->orderBy('created_at', 'desc')->with('user:id,name,photo_url')
     ]);
 
     return $request->wantsJson()
@@ -174,6 +180,8 @@ class PublicationController extends Controller
     try {
       $publication = $action->execute($publication, $request->validated(), $request->file('media', []));
 
+      $publication->logActivity('updated', ['changes' => array_keys($request->validated())]);
+
       // Clear cache after updating publication
       $this->clearPublicationCache(Auth::user()->current_workspace_id);
 
@@ -202,6 +210,8 @@ class PublicationController extends Controller
         'thumbnails' => $request->file('thumbnails', []),
         'platform_settings' => $request->input('platform_settings')
       ]);
+
+      $publication->logActivity('published', ['platforms' => $request->input('platforms')]);
 
       // Clear cache after publishing
       $this->clearPublicationCache(Auth::user()->current_workspace_id);
@@ -267,6 +277,8 @@ class PublicationController extends Controller
       'requested_at' => now(),
     ]);
 
+    $publication->logActivity('requested_approval');
+
     $this->clearPublicationCache(Auth::user()->current_workspace_id);
 
     // Notify all users in the workspace who have the 'approve' permission
@@ -319,6 +331,8 @@ class PublicationController extends Controller
       ]);
     }
 
+    $publication->logActivity('approved');
+
     $this->clearPublicationCache(Auth::user()->current_workspace_id);
 
     // Notify the redactor (publication owner)
@@ -370,6 +384,8 @@ class PublicationController extends Controller
         'rejection_reason' => $request->input('rejection_reason'),
       ]);
     }
+
+    $publication->logActivity('rejected', ['reason' => $request->input('rejection_reason')]);
 
     $this->clearPublicationCache(Auth::user()->current_workspace_id);
 

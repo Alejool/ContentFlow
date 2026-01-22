@@ -273,10 +273,16 @@ const PublicationMobileRow = memo(
 
                   {/* Lock indicator */}
                   {remoteLocks[item.id] && (
-                    <div className="flex items-center gap-1.5 mt-2 px-2.5 py-1 rounded-full bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800 w-fit">
-                      <Lock className="w-3 h-3" />
-                      <span className="text-xs font-medium">
-                        Editando: {remoteLocks[item.id].user_name.split(" ")[0]}
+                    <div className="flex items-center gap-2 mt-2 p-2 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800/30 w-full animate-in fade-in slide-in-from-top-1">
+                      <div className="relative flex items-center justify-center w-5 h-5 rounded-full bg-amber-100 dark:bg-amber-800 text-amber-600 dark:text-amber-400">
+                        <Lock className="w-3 h-3" />
+                        <span className="absolute -top-1 -right-1 flex h-2 w-2">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                        </span>
+                      </div>
+                      <span className="text-xs font-semibold text-amber-700 dark:text-amber-400">
+                        Editando: {remoteLocks[item.id].user_name}
                       </span>
                     </div>
                   )}
@@ -472,9 +478,9 @@ const PublicationMobileRow = memo(
                           }
                           className={`flex-1 py-2.5 rounded-lg font-medium text-xs flex items-center justify-center gap-2 transition-colors active:scale-95 ${
                             remoteLocks[item.id]
-                              ? "bg-gray-200 text-gray-400 dark:bg-gray-800 dark:text-gray-500 cursor-not-allowed"
+                              ? "bg-gray-200 text-gray-400 dark:bg-gray-800 dark:text-gray-500 cursor-not-allowed border border-gray-300 dark:border-gray-700"
                               : "bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/30"
-                          } disabled:opacity-50`}
+                          } disabled:opacity-70`}
                           title={
                             remoteLocks[item.id]
                               ? `Editando por ${remoteLocks[item.id].user_name}`
@@ -483,10 +489,14 @@ const PublicationMobileRow = memo(
                         >
                           {isLoading?.editing ? (
                             <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : remoteLocks[item.id] ? (
+                            <Lock className="w-4 h-4" />
                           ) : (
                             <Edit className="w-4 h-4" />
                           )}
-                          {t("common.edit")}
+                          {remoteLocks[item.id]
+                            ? "Bloqueado"
+                            : t("common.edit")}
                         </button>
                       )}
 

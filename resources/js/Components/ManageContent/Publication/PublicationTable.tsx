@@ -6,7 +6,6 @@ import { TableHeader } from "@/Components/ManageContent/Publication/TableHeader"
 import AdvancedPagination from "@/Components/common/ui/AdvancedPagination";
 import EmptyState from "@/Components/common/ui/EmptyState";
 import TableContainer from "@/Components/common/ui/TableContainer";
-import { useWorkspaceLocks } from "@/Hooks/usePublicationLock";
 import { Publication } from "@/types/Publication";
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
 
@@ -24,6 +23,10 @@ interface PublicationTableProps {
   pagination?: any;
   onPageChange?: (page: number) => void;
   onPerPageChange?: (perPage: number) => void;
+  remoteLocks?: Record<
+    number,
+    { user_id: number; user_name: string; expires_at: string }
+  >;
 }
 
 const PublicationTable = memo(
@@ -41,8 +44,9 @@ const PublicationTable = memo(
     pagination,
     onPageChange,
     onPerPageChange,
+    remoteLocks = {},
   }: PublicationTableProps) => {
-    const { remoteLocks } = useWorkspaceLocks();
+    // remoteLocks is now passed as prop
     const [scrollContainer, setScrollContainer] = useState<
       HTMLElement | undefined
     >(undefined);

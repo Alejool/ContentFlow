@@ -8,6 +8,7 @@ import {
   Eye,
   FileText,
   Image as ImageIcon,
+  Lock,
   Rocket,
   Trash2,
   Users,
@@ -24,6 +25,11 @@ interface ContentCardProps {
   onPublish?: (item: any) => void;
   type: "publication" | "campaign";
   permissions?: string[];
+  remoteLock?: {
+    user_id: number;
+    user_name: string;
+    expires_at: string;
+  } | null;
 }
 
 export default function ContentCard({
@@ -34,6 +40,7 @@ export default function ContentCard({
   onPublish,
   type,
   permissions,
+  remoteLock,
 }: ContentCardProps) {
   const { t } = useTranslation();
   const canManageContent = permissions?.includes("manage-content");
@@ -153,6 +160,16 @@ export default function ContentCard({
               </span>
             </span>
           </div>
+          {remoteLock && (
+            <div className="absolute top-3 left-3 z-10">
+              <span className="px-2.5 py-1 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-sm backdrop-blur-md border border-amber-200/50 bg-amber-100/90 text-amber-700 dark:bg-amber-900/80 dark:text-amber-300 dark:border-amber-700/50">
+                <Lock className="w-3 h-3" />
+                <span className="capitalize">
+                  {remoteLock.user_name.split(" ")[0]}
+                </span>
+              </span>
+            </div>
+          )}
         </div>
       )}
 
@@ -169,9 +186,17 @@ export default function ContentCard({
                   <FileText className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                 )}
               </div>
-              <span className="text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wide">
-                {type === "campaign" ? "Campaña" : "Publicación"}
-              </span>
+              <div className="flex flex-col">
+                <span className="text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wide">
+                  {type === "campaign" ? "Campaña" : "Publicación"}
+                </span>
+                {remoteLock && (
+                  <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1">
+                    <Lock className="w-3 h-3" />
+                    {remoteLock.user_name.split(" ")[0]}
+                  </span>
+                )}
+              </div>
             </div>
 
             <span
@@ -201,12 +226,29 @@ export default function ContentCard({
 
         <div className="mb-3 flex-1">
           <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-2 break-words">
-            {item.content?.substring(0, 120) || "Sin contenido"}
-            {(item.content?.length || 0) > 120 && "..."}
+            {item.description ||
+              item.content?.substring(0, 120) ||
+              "Sin descripción"}
+            {!item.description && (item.content?.length || 0) > 120 && "..."}
           </p>
         </div>
 
         <div className="space-y-2 mt-auto">
+          {remoteLock && (
+            <div className="flex items-center gap-2 p-2 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800/30">
+              <div className="relative flex items-center justify-center w-5 h-5 rounded-full bg-amber-100 dark:bg-amber-800 text-amber-600 dark:text-amber-400">
+                <Lock className="w-3 h-3" />
+                <span className="absolute -top-1 -right-1 flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                </span>
+              </div>
+              <span className="text-xs font-semibold text-amber-700 dark:text-amber-400">
+                Editando: {remoteLock.user_name}
+              </span>
+            </div>
+          )}
+
           {type === "publication" &&
             item.accounts &&
             item.accounts.length > 0 && (
@@ -336,11 +378,30 @@ export default function ContentCard({
 
           {canManageContent && (
             <button
-              onClick={() => onEdit(item)}
-              className="flex items-center justify-center px-3 py-2 bg-white hover:bg-orange-50 text-gray-500 hover:text-orange-600 border border-gray-200 hover:border-orange-200 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 rounded-lg transition-colors shadow-sm"
-              title="Editar"
+              onClick={() => {
+                if (remoteLock) return;
+                onEdit(item);
+              }}
+              disabled={!!remoteLock}
+              className={`flex items-center justify-center gap-2 px-3 py-2 rounded-lg transition-colors shadow-sm ${
+                remoteLock
+                  ? "bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed dark:bg-gray-800 dark:border-gray-700 dark:text-gray-600"
+                  : "bg-white hover:bg-orange-50 text-gray-500 hover:text-orange-600 border border-gray-200 hover:border-orange-200 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700"
+              }`}
+              title={
+                remoteLock
+                  ? `${t("publications.table.lockedBy") || "Editando por"} ${remoteLock.user_name}`
+                  : "Editar"
+              }
             >
-              <Edit className="w-4 h-4" />
+              {remoteLock ? (
+                <>
+                  <Lock className="w-4 h-4" />
+                  <span className="text-xs font-medium">Bloqueado</span>
+                </>
+              ) : (
+                <Edit className="w-4 h-4" />
+              )}
             </button>
           )}
 

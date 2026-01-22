@@ -4,6 +4,7 @@ import ApprovalHistorySection from "@/Components/ManageContent/Publication/commo
 import ContentSection from "@/Components/ManageContent/Publication/common/edit/ContentSection";
 import MediaUploadSection from "@/Components/ManageContent/Publication/common/edit/MediaUploadSection";
 import MediaUploadSkeleton from "@/Components/ManageContent/Publication/common/edit/MediaUploadSkeleton";
+import PublicationTimeline from "@/Components/ManageContent/Publication/common/edit/PublicationTimeline";
 import ModalFooter from "@/Components/ManageContent/modals/common/ModalFooter";
 import ModalHeader from "@/Components/ManageContent/modals/common/ModalHeader";
 import ScheduleSection from "@/Components/ManageContent/modals/common/ScheduleSection";
@@ -180,7 +181,7 @@ const EditPublicationModal = ({
   const { auth } = usePage<any>().props;
   const canManage =
     auth.current_workspace?.permissions?.includes("manage-content");
-  const isDisabled = isLockedByOther || !canManage; // Disable if locked or if viewer
+  const isDisabled = isLockedByOther || !canManage;
 
   return (
     <div
@@ -404,10 +405,19 @@ const EditPublicationModal = ({
                   disabled={hasPublishedPlatform || isDisabled}
                 />
 
-                {publication?.approval_logs &&
-                  publication.approval_logs.length > 0 && (
-                    <ApprovalHistorySection logs={publication.approval_logs} />
+                <div className="space-y-6">
+                  {publication?.activities &&
+                  publication.activities.length > 0 ? (
+                    <PublicationTimeline activities={publication.activities} />
+                  ) : (
+                    publication?.approval_logs &&
+                    publication.approval_logs.length > 0 && (
+                      <ApprovalHistorySection
+                        logs={publication.approval_logs}
+                      />
+                    )
                   )}
+                </div>
               </div>
             </div>
           </form>

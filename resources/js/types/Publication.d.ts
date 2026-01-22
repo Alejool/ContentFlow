@@ -21,7 +21,16 @@ export type Publication = {
   media_files?: MediaFile[];
   scheduled_posts?: ScheduledPost[];
   social_post_logs?: SocialPostLog[];
-  campaigns?: Array<{ id: number; name: string; title?: string }>;
+  approval_logs?: ApprovalLog[];
+  activities?: any[];
+  campaigns?: {
+    id: number;
+    name: string;
+    status: string;
+    pivot: {
+      order: number;
+    };
+  }[];
   user?: {
     id: number;
     name: string;
