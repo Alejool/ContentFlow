@@ -59,7 +59,7 @@ export default function ApprovalHistorySection({
   };
 
   return (
-    <div className="mt-8 space-y-4">
+    <div className="space-y-4">
       <h3 className="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
         <Clock className="w-4 h-4 text-primary-500" />
         {t("approvals.historyTitle") || "Historial de Aprobación"}

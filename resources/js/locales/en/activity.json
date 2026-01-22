@@ -1,0 +1,24 @@
+{
+  "activity": {
+    "title": "Activity",
+    "total": "Total",
+    "timeline": {
+      "title": "Timeline",
+      "subtitle": "Timeline",
+      "empty": "No activities",
+      "status": {
+        "system": "System",
+        "created": "Created",
+        "updated": "Updated",
+        "published": "Published",
+        "unpublished": "Unpublished",
+        "scheduled": "Scheduled",
+        "draft": "Draft",
+        "deleted": "Deleted",
+        "requestedApproval": "Requested approval",
+        "approved": "Approved",
+        "rejected": "Rejected"
+      }
+    }
+  }
+}

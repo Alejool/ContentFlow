@@ -30,6 +30,8 @@
     "note": "Nota",
     "warning": "Advertencia",
     "success": "Exito",
+    "collapse": "Contraer",
+    "expand": "Expandir",
     "error": "Error",
     "next": "Siguiente",
     "previous": "Anterior",

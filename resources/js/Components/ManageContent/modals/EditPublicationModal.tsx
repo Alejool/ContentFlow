@@ -1,10 +1,8 @@
 import PlatformSettingsModal from "@/Components/ConfigSocialMedia/PlatformSettingsModal";
 import SocialAccountsSection from "@/Components/ManageContent/Publication/common/add/SocialAccountsSection";
-import ApprovalHistorySection from "@/Components/ManageContent/Publication/common/edit/ApprovalHistorySection";
 import ContentSection from "@/Components/ManageContent/Publication/common/edit/ContentSection";
 import MediaUploadSection from "@/Components/ManageContent/Publication/common/edit/MediaUploadSection";
 import MediaUploadSkeleton from "@/Components/ManageContent/Publication/common/edit/MediaUploadSkeleton";
-import PublicationTimeline from "@/Components/ManageContent/Publication/common/edit/PublicationTimeline";
 import ModalFooter from "@/Components/ManageContent/modals/common/ModalFooter";
 import ModalHeader from "@/Components/ManageContent/modals/common/ModalHeader";
 import ScheduleSection from "@/Components/ManageContent/modals/common/ScheduleSection";
@@ -15,12 +13,17 @@ import { useCampaignStore } from "@/stores/campaignStore";
 import { useAccountsStore } from "@/stores/socialAccountsStore";
 import { Publication } from "@/types/Publication";
 import { usePage } from "@inertiajs/react";
-import { AlertCircle, Save } from "lucide-react";
-import { memo, useMemo } from "react";
+import {
+  AlertCircle,
+  Save
+} from "lucide-react";
+import { memo, useMemo, useState } from "react";
 import { useWatch } from "react-hook-form";
 import { Trans } from "react-i18next";
+import TimelineCompacto from "@/Components/ManageContent/Publication/common/TimelineCompacto";
+import ApprovalHistoryCompacto from "@/Components/ManageContent/Publication/common/ApprovalHistoryCompacto";
 
-// Utils
+
 const parseUserAgent = (userAgent?: string): string => {
   if (!userAgent) return "Unknown Device";
   let browser = "Unknown Browser";
@@ -61,6 +64,7 @@ interface EditPublicationModalProps {
   onSubmit: (success: boolean) => void;
 }
 
+
 const EditPublicationModal = ({
   isOpen,
   onClose,
@@ -69,6 +73,9 @@ const EditPublicationModal = ({
 }: EditPublicationModalProps) => {
   const { campaigns } = useCampaignStore();
   const { accounts: socialAccounts } = useAccountsStore();
+  const [isTimelineExpanded, setIsTimelineExpanded] = useState(false);
+  const [isApprovalHistoryExpanded, setIsApprovalHistoryExpanded] =
+    useState(false);
 
   const { isLockedByOther, lockInfo } = usePublicationLock(
     publication?.id ?? null,
@@ -113,7 +120,6 @@ const EditPublicationModal = ({
 
   const { register } = form;
 
-  // Use individual watchers to prevent unnecessary re-renders
   const selectedSocialAccounts =
     useWatch({ control, name: "social_accounts" }) || [];
   const scheduledAt = useWatch({ control, name: "scheduled_at" });
@@ -405,19 +411,27 @@ const EditPublicationModal = ({
                   disabled={hasPublishedPlatform || isDisabled}
                 />
 
-                <div className="space-y-6">
-                  {publication?.activities &&
-                  publication.activities.length > 0 ? (
-                    <PublicationTimeline activities={publication.activities} />
-                  ) : (
-                    publication?.approval_logs &&
-                    publication.approval_logs.length > 0 && (
-                      <ApprovalHistorySection
-                        logs={publication.approval_logs}
-                      />
-                    )
+                {publication?.approval_logs &&
+                  publication.approval_logs.length > 0 && (
+                    <ApprovalHistoryCompacto
+                      logs={publication.approval_logs}
+                      isExpanded={isApprovalHistoryExpanded}
+                      onToggle={() =>
+                        setIsApprovalHistoryExpanded(!isApprovalHistoryExpanded)
+                      }
+                    />
                   )}
-                </div>
+
+                {publication?.activities &&
+                  publication.activities.length > 0 && (
+                    <TimelineCompacto
+                      activities={publication.activities}
+                      isExpanded={isTimelineExpanded}
+                      onToggle={() =>
+                        setIsTimelineExpanded(!isTimelineExpanded)
+                      }
+                    />
+                  )}
               </div>
             </div>
           </form>

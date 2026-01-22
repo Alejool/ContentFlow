@@ -120,7 +120,7 @@ class PublicationController extends Controller
     try {
       $publication = $action->execute($request->validated(), $request->file('media', []));
 
-      $publication->logActivity('created', ['title' => $publication->title]);
+      $publication->logActivity('created', $request->validated());
 
       // Clear cache after creating publication
       $this->clearPublicationCache(Auth::user()->current_workspace_id);

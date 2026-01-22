@@ -1,0 +1,24 @@
+{
+  "activity": {
+    "title": "Actividad",
+    "total": "Total",
+    "timeline": {
+      "title": "Linea de Tiempo",
+      "subtitle": "Linea de Tiempo",
+      "empty": "No hay actividades",
+      "status": {
+        "system": "Sistema",
+        "created": "Creada",
+        "updated": "Actualizada",
+        "published": "Publicada",
+        "unpublished": "No Publicada",
+        "scheduled": "Programada",
+        "draft": "Borrador",
+        "deleted": "Eliminada",
+        "requestedApproval": "Solicitó aprobación",
+        "approved": "Aprobado",
+        "rejected": "Rechazado"
+      }
+    }
+  }
+}

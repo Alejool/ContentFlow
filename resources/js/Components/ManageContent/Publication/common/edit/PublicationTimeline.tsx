@@ -86,33 +86,35 @@ export default function PublicationTimeline({
   const formatActivityType = (type: string) => {
     switch (type) {
       case "created":
-        return t("activity.created") || "Creado";
+        return t("activity.timeline.status.created") || "Creado";
       case "updated":
-        return t("activity.updated") || "Actualizado";
+        return t("activity.timeline.status.updated") || "Actualizado";
       case "requested_approval":
-        return t("activity.requestedApproval") || "Solicitó aprobación";
+        return (
+          t("activity.timeline.status.requestedApproval") ||
+          "Solicitó aprobación"
+        );
       case "approved":
-        return t("activity.approved") || "Aprobado";
+        return t("activity.timeline.status.approved") || "Aprobado";
       case "rejected":
-        return t("activity.rejected") || "Rechazado";
+        return t("activity.timeline.status.rejected") || "Rechazado";
       case "published":
-        return t("activity.published") || "Publicado";
+        return t("activity.timeline.status.published") || "Publicado";
       default:
         return type;
     }
   };
 
   return (
-    <div className="mt-8 space-y-4">
+    <div className="space-y-4">
       <h3 className="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-2">
         <Clock className="w-4 h-4 text-primary-500" />
-        {t("activity.timelineTitle") || "Línea de Tiempo de Actividad"}
+        {t("activity.timeline.title") || "Timeline"}
       </h3>
 
       <div className="relative pl-8 border-l-2 border-gray-200 dark:border-neutral-700 space-y-6">
         {activities.map((activity) => (
           <div key={activity.id} className="relative group">
-            {/* Dot on the line */}
             <div className="absolute -left-[39px] top-1.5 flex items-center justify-center w-8 h-8 bg-white dark:bg-neutral-800 rounded-full border border-gray-200 dark:border-neutral-600 shadow-sm z-10">
               {getActivityIcon(activity.type)}
             </div>
@@ -133,16 +135,16 @@ export default function PublicationTimeline({
                 <div className="flex items-center gap-1.5 opacity-80">
                   <User className="w-3.5 h-3.5" />
                   <span className="font-medium">
-                    {activity.user?.name || "Sistema"}
+                    {activity.user?.name ||
+                      t("activity.timeline.status.system")}
                   </span>
                 </div>
 
-                {activity.details && (
+                {/* {activity.details && (
                   <div className="bg-gray-50 dark:bg-neutral-900/50 p-2.5 rounded-lg border border-gray-100 dark:border-neutral-700/50">
-                    {/* Render simplified details */}
                     {activity.type === "updated" && activity.details.changes ? (
                       <p>
-                        <span className="font-medium">Cambios en:</span>{" "}
+                        <span className="font-medium">{t("activity.timeline.status.updated")}:</span>{" "}
                         {Array.isArray(activity.details.changes)
                           ? activity.details.changes.join(", ")
                           : JSON.stringify(activity.details.changes)}
@@ -150,12 +152,12 @@ export default function PublicationTimeline({
                     ) : activity.type === "rejected" &&
                       activity.details.reason ? (
                       <p className="text-rose-600">
-                        Motivo: "{activity.details.reason}"
+                        {t("activity.timeline.status.rejected")}:{" "}{activity.details.reason}
                       </p>
                     ) : activity.type === "published" &&
                       activity.details.platforms ? (
                       <p>
-                        Plataformas:{" "}
+                        {t("activity.timeline.status.published")}:{" "}
                         {Array.isArray(activity.details.platforms)
                           ? activity.details.platforms.join(", ")
                           : JSON.stringify(activity.details.platforms)}
@@ -166,7 +168,7 @@ export default function PublicationTimeline({
                       </pre>
                     )}
                   </div>
-                )}
+                )} */}
               </div>
             </div>
           </div>

@@ -29,6 +29,8 @@
     "note": "Note",
     "warning": "Warning",
     "success": "Success",
+    "collapse": "Collapse",
+    "expand": "Expand",
     "error": "Error",
     "next": "Next",
     "previous": "Previous",

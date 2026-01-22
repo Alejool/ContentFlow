@@ -18,6 +18,7 @@ import publications from "./publications.json";
 import settings from "./settings.json";
 import welcome from "./welcome.json";
 import workspace from "./workspace.json";
+import activity from "./activity.json";
 
 export default {
   ...common,
@@ -40,4 +41,5 @@ export default {
   ...notifications,
   ...manageContent,
   ...legal,
+  ...activity,
 };
