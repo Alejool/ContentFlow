@@ -281,6 +281,7 @@
       "actions": "Acciones",
       "noCampaign": "Sin Campaña",
       "noPlatforms": "Sin Plataformas",
+      "noMedia": "Sin multimedia",
       "loading": "Cargando...",
       "linkedAccount": "Cuentas Asociadas",
       "emptyState": {
