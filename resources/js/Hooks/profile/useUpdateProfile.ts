@@ -4,8 +4,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { useForm as useHookForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 export const useUpdateProfile = () => {
+  const { t } = useTranslation();
   const { user, updateProfile, isLoading } = useUserStore();
 
   const {
@@ -15,7 +17,7 @@ export const useUpdateProfile = () => {
     watch,
     formState: { errors, isSubmitting },
   } = useHookForm<UserProfileFormData>({
-    resolver: zodResolver(userProfileSchema),
+    resolver: zodResolver(userProfileSchema(t)),
     defaultValues: {
       name: user?.name || "",
       email: user?.email || "",
@@ -31,9 +33,9 @@ export const useUpdateProfile = () => {
     try {
       const result = await updateProfile(data);
       if (result.success) {
-        toast.success(result.message || "Profile updated successfully");
+        toast.success(result.message || t("profile.update_success"));
       } else {
-        toast.error(result.message || "Failed to update profile");
+        toast.error(result.message || t("profile.update_error"));
       }
     } catch (error: any) {
       if (axios.isAxiosError(error) && error.response?.data?.errors) {
@@ -43,7 +45,7 @@ export const useUpdateProfile = () => {
           toast.error(value[0]);
         });
       } else {
-        toast.error(error.message || "An error occurred");
+        toast.error(error.message || t("profile.update_error"));
       }
     }
   };

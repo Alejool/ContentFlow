@@ -10,10 +10,11 @@ import {
   UseFormSetError,
   useForm as useHookForm,
 } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import { z } from "zod";
 
 // Types
-type DeleteUserFormData = z.infer<typeof deleteUserSchema>;
+type DeleteUserFormData = z.infer<ReturnType<typeof deleteUserSchema>>;
 
 interface ApiResponse {
   errors?: Record<string, string[]>;
@@ -42,6 +43,7 @@ declare global {
 }
 
 export const useDeleteUser = (): UseDeleteUserReturn => {
+  const { t } = useTranslation();
   const passwordInputRef = useRef<HTMLInputElement>(null);
 
   const {
@@ -51,11 +53,11 @@ export const useDeleteUser = (): UseDeleteUserReturn => {
     reset,
     formState: { errors, isSubmitting },
   } = useHookForm<DeleteUserFormData>({
-    resolver: zodResolver(deleteUserSchema),
+    resolver: zodResolver(deleteUserSchema(t)),
   });
 
   const deleteUser = async (
-    data: DeleteUserFormData
+    data: DeleteUserFormData,
   ): Promise<DeleteUserResult> => {
     try {
       await axios.delete(route("profile.destroy"), {
@@ -74,7 +76,7 @@ export const useDeleteUser = (): UseDeleteUserReturn => {
               type: "server",
               message: Array.isArray(value) ? value[0] : value,
             });
-          }
+          },
         );
       }
 
