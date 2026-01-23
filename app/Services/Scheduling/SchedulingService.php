@@ -15,7 +15,8 @@ class SchedulingService
     $socialAccounts = SocialAccount::whereIn('id', $accountIds)->get()->keyBy('id');
 
     foreach ($accountIds as $accountId) {
-      $scheduledAt = $accountSchedules[$accountId] ?? $baseSchedule;
+      // Prioritize account-specific schedule over global schedule
+      $scheduledAt = isset($accountSchedules[$accountId]) ? $accountSchedules[$accountId] : $baseSchedule;
 
       if (!$scheduledAt) {
         continue;
@@ -23,20 +24,30 @@ class SchedulingService
 
       $socialAccount = $socialAccounts[$accountId] ?? null;
 
-      ScheduledPost::updateOrCreate(
-        [
+      // Use separate find and update/create to ensure scheduled_at is always updated
+      $existingPost = ScheduledPost::where('publication_id', $publication->id)
+        ->where('social_account_id', $accountId)
+        ->where('status', 'pending')
+        ->first();
+
+      if ($existingPost) {
+        $existingPost->update([
+          'scheduled_at' => $scheduledAt,
+          'account_name' => $socialAccount ? $socialAccount->account_name : 'Unknown',
+          'platform' => $socialAccount ? $socialAccount->platform : 'unknown',
+        ]);
+      } else {
+        ScheduledPost::create([
           'publication_id' => $publication->id,
           'social_account_id' => $accountId,
           'status' => 'pending',
-        ],
-        [
           'user_id' => Auth::id(),
           'workspace_id' => Auth::user()->current_workspace_id,
           'scheduled_at' => $scheduledAt,
           'account_name' => $socialAccount ? $socialAccount->account_name : 'Unknown',
           'platform' => $socialAccount ? $socialAccount->platform : 'unknown',
-        ]
-      );
+        ]);
+      }
     }
 
     // Cleanup: Remove accounts that are no longer selected but are still in pending status

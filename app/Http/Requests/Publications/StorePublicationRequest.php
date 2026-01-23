@@ -14,6 +14,14 @@ class StorePublicationRequest extends FormRequest
 
     public function rules(): array
     {
+        // Debug: Log incoming data before validation
+        \Log::info('StorePublicationRequest - Incoming data:', [
+            'all_data' => $this->all(),
+            'status' => $this->input('status'),
+            'method' => $this->method(),
+            'url' => $this->fullUrl()
+        ]);
+
         return [
             'title' => [
                 'required',
@@ -30,7 +38,7 @@ class StorePublicationRequest extends FormRequest
             'goal' => 'nullable|string',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
-
+            'status' => 'nullable|in:draft,published,publishing,failed,pending_review,approved,scheduled,rejected',
             'scheduled_at' => 'nullable|date|after:now',
             'social_accounts' => 'nullable|array',
             'social_accounts.*' => 'exists:social_accounts,id',

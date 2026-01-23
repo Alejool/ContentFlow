@@ -37,7 +37,23 @@ class PublishToSocialMedia implements ShouldQueue
         $this->socialAccounts
       );
 
-      $anySuccess = collect($result['platform_results'] ?? [])
+      $platformResults = $result['platform_results'] ?? [];
+      foreach ($platformResults as $platform => $pResult) {
+        $publisher = \App\Models\User::find($this->publication->published_by);
+        if ($pResult['success']) {
+          $this->publication->logActivity('published_on_platform', [
+            'platform' => $platform,
+            'log_id' => $pResult['logs'][0]->id ?? null,
+          ], $publisher);
+        } else {
+          $this->publication->logActivity('failed_on_platform', [
+            'platform' => $platform,
+            'error' => $pResult['errors'][0]['message'] ?? 'Unknown error',
+          ], $publisher);
+        }
+      }
+
+      $anySuccess = collect($platformResults)
         ->contains(fn($r) => !empty($r['success']));
 
       if ($anySuccess) {
@@ -45,9 +61,6 @@ class PublishToSocialMedia implements ShouldQueue
           'status' => 'published',
           'publish_date' => now(),
         ]);
-
-        $publisher = \App\Models\User::find($this->publication->published_by);
-        $this->publication->logActivity('published', null, $publisher);
       } else {
         $this->publication->update([
           'status' => 'failed',

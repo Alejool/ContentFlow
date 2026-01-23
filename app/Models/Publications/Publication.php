@@ -72,6 +72,8 @@ class Publication extends Model
     'rejection_reason',
   ];
 
+  protected $appends = ['platform_status_summary'];
+
 
   protected $casts = [
     'start_date' => 'date',
@@ -274,6 +276,30 @@ class Publication extends Model
     return $this->status === 'published' &&
       $this->start_date <= now() &&
       $this->end_date >= now();
+  }
+
+  public function getPlatformStatusSummaryAttribute(): array
+  {
+    $summary = [];
+    $logs = $this->socialPostLogs()
+      ->whereIn('id', function ($query) {
+        $query->selectRaw('MAX(id)')
+          ->from('social_post_logs')
+          ->where('publication_id', $this->id)
+          ->groupBy('social_account_id');
+      })->get();
+
+    foreach ($logs as $log) {
+      $summary[$log->social_account_id] = [
+        'platform' => $log->platform,
+        'status' => $log->status,
+        'published_at' => $log->published_at,
+        'error' => $log->error_message,
+        'url' => $log->post_url,
+      ];
+    }
+
+    return $summary;
   }
 
   public function activities(): HasMany

@@ -51,7 +51,7 @@ class CalendarController extends Controller
         'id' => "pub_{$pub->id}",
         'resourceId' => $pub->id,
         'type' => 'publication',
-        'title' => "[PUB] {$pub->title}",
+        'title' => $pub->title, // Remove [PUB] prefix
         'start' => $pub->scheduled_at ? $pub->scheduled_at->copy()->setTimezone('UTC')->toIso8601String() : null,
         'status' => $pub->status,
         'color' => $this->getStatusColor($pub->status),
@@ -83,7 +83,7 @@ class CalendarController extends Controller
         'id' => "post_{$post->id}",
         'resourceId' => $post->id,
         'type' => 'post',
-        'title' => "({$post->socialAccount->platform}) {$post->socialAccount->account_name}",
+        'title' => $post->socialAccount->account_name, // Remove platform prefix
         'start' => $post->scheduled_at ? $post->scheduled_at->copy()->setTimezone('UTC')->toIso8601String() : null,
         'status' => $post->status,
         'color' => $this->getStatusColor($post->status, true),
@@ -127,6 +127,9 @@ class CalendarController extends Controller
         'extendedProps' => [
           'description' => $event->description,
           'is_public' => $event->is_public,
+          'remind_at' => $event->remind_at ? $event->remind_at->copy()->setTimezone('UTC')->toIso8601String() : null,
+          'user_name' => $event->user ? $event->user->name : null,
+          'created_at' => $event->created_at ? $event->created_at->copy()->setTimezone('UTC')->toIso8601String() : null,
         ]
       ];
     });

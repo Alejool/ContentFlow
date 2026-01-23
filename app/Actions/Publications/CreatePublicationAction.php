@@ -21,6 +21,12 @@ class CreatePublicationAction
   public function execute(array $data, array $files = []): Publication
   {
     return DB::transaction(function () use ($data, $files) {
+      // Determine status based on scheduled_at
+      $status = $data['status'] ?? 'draft';
+      if (!empty($data['scheduled_at']) && $status === 'draft') {
+        $status = 'scheduled';
+      }
+
       $publication = Publication::create([
         'title' => $data['title'],
         'description' => $data['description'],
@@ -31,8 +37,8 @@ class CreatePublicationAction
         'workspace_id' => Auth::user()->current_workspace_id ?? Auth::user()->workspaces()->first()?->id,
         'start_date' => $data['start_date'] ?? null,
         'end_date' => $data['end_date'] ?? null,
-        'status' => $data['status'] ?? 'draft',
-        'publish_date' => ($data['status'] ?? 'draft') === 'published' ? now() : null,
+        'status' => $status,
+        'publish_date' => $status === 'published' ? now() : null,
         'scheduled_at' => $data['scheduled_at'] ?? null,
         'platform_settings' => is_string($data['platform_settings'] ?? null)
           ? json_decode($data['platform_settings'], true)
@@ -57,6 +63,9 @@ class CreatePublicationAction
           $data['social_accounts'],
           $data['social_account_schedules'] ?? []
         );
+      } elseif (!empty($data['scheduled_at'])) {
+        // If there's a scheduled date but no social accounts, still update status
+        $publication->update(['status' => 'scheduled']);
       }
 
       return $publication;
