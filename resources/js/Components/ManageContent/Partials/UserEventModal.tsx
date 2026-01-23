@@ -1,11 +1,14 @@
-import Button from "@/Components/common/Modern/Button";
+import ModalFooter from "@/Components/ManageContent/modals/common/ModalFooter";
+import ModalHeader from "@/Components/ManageContent/modals/common/ModalHeader";
 import DatePickerModern from "@/Components/common/Modern/DatePicker";
 import Input from "@/Components/common/Modern/Input";
 import Textarea from "@/Components/common/Modern/Textarea";
 import Modal from "@/Components/common/ui/Modal";
+import { useCalendar } from "@/Hooks/calendar/useCalendar";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { usePage } from "@inertiajs/react";
 import axios from "axios";
-import { parseISO } from "date-fns";
+import { isBefore, parseISO, startOfDay } from "date-fns";
 import {
   AlignLeft,
   Bell,
@@ -13,7 +16,6 @@ import {
   Globe,
   Lock,
   Type,
-  X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -65,6 +67,8 @@ export default function UserEventModal({
   onSuccess,
 }: UserEventModalProps) {
   const { t } = useTranslation();
+  const { auth } = usePage().props as any;
+  const currentUser = auth.user;
   const [selectedColor, setSelectedColor] = useState("#3B82F6");
 
   const {
@@ -147,6 +151,41 @@ export default function UserEventModal({
     }
   }, [event, selectedDate, show, reset]);
 
+  const { deleteEvent } = useCalendar();
+
+  const isOwner = !event || event.user?.id === currentUser?.id;
+  const isPast = isBefore(
+    startOfDay(watch("start_date") || new Date()),
+    startOfDay(new Date()),
+  );
+  const isReadOnly = !isOwner || (isPast && !event);
+
+  const handleDelete = async () => {
+    if (!event) return;
+    if (
+      !confirm(
+        t("calendar.userEvents.modal.messages.confirmDelete") ||
+          "¿Estás seguro de que deseas eliminar este evento?",
+      )
+    )
+      return;
+
+    const success = await deleteEvent(event.id);
+    if (success) {
+      toast.success(
+        t("calendar.userEvents.modal.messages.successDelete") ||
+          "Evento eliminado correctamente",
+      );
+      onSuccess();
+      onClose();
+    } else {
+      toast.error(
+        t("calendar.userEvents.modal.messages.errorDelete") ||
+          "Error al eliminar el evento",
+      );
+    }
+  };
+
   const onSubmit = async (data: EventFormValues) => {
     try {
       const payload = {
@@ -201,53 +240,33 @@ export default function UserEventModal({
   return (
     <Modal show={show} onClose={onClose} maxWidth="lg">
       <div
-        className="p-0 overflow-hidden rounded-2xl bg-white dark:bg-neutral-900 shadow-2xl transition-all duration-500 transform border transition-colors"
+        className="flex flex-col max-h-[90vh] md:max-h-[85vh] bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl overflow-hidden border transition-colors"
         style={{
           borderColor: `${selectedColor}40`,
-          boxShadow: `0 25px 50px -12px ${selectedColor}15`,
         }}
       >
-        <div
-          className="relative overflow-hidden px-8 py-6 border-b backdrop-blur-md transition-all duration-500"
+        <ModalHeader
+          t={t}
+          onClose={onClose}
+          title={
+            event
+              ? "calendar.userEvents.modal.title.edit"
+              : "calendar.userEvents.modal.title.new"
+          }
+          subtitle={`${currentColor.name} • Evento${event?.user?.name ? " • " + t("common.creator") + ": " + event.user.name : ""}`}
+          icon={CalendarIcon}
+          iconColor={`text-[${selectedColor}]`}
           style={{
-            background: `linear-gradient(135deg, ${selectedColor}15, ${selectedColor}08)`,
-            borderColor: `${selectedColor}30`,
+            background: `linear-gradient(135deg, ${selectedColor}25, ${selectedColor}10)`,
+            borderColor: `${selectedColor}50`,
           }}
+        />
+
+        <form
+          id="user-event-form"
+          onSubmit={handleSubmit(onSubmit)}
+          className="flex-1 overflow-y-auto p-6 md:p-8 space-y-6"
         >
-          <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none transform translate-x-1/4 -translate-y-1/4">
-            <CalendarIcon size={120} style={{ color: selectedColor }} />
-          </div>
-
-          <div className="flex items-center justify-between relative z-10">
-            <div>
-              <h3 className="text-xl font-black text-gray-900 dark:text-white tracking-tight leading-none transition-colors duration-500">
-                {event
-                  ? t("calendar.userEvents.modal.title.edit")
-                  : t("calendar.userEvents.modal.title.new")}
-              </h3>
-              <p
-                className="text-xs mt-1 font-semibold uppercase tracking-wider transition-colors duration-500"
-                style={{ color: selectedColor }}
-              >
-                {currentColor.name} • Evento
-              </p>
-            </div>
-            <button
-              onClick={onClose}
-              className="p-2 rounded-full transition-all duration-300 active:scale-90 backdrop-blur border hover:scale-110"
-              style={{
-                color: selectedColor,
-                borderColor: `${selectedColor}40`,
-                backgroundColor: `${selectedColor}10`,
-              }}
-              aria-label="Close"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
-
-        <form onSubmit={handleSubmit(onSubmit)} className="p-8 space-y-6">
           <div className="space-y-4">
             <Input
               id="title"
@@ -263,11 +282,8 @@ export default function UserEventModal({
               sizeType="lg"
               autoFocus
               className="transition-colors duration-500"
-              style={
-                {
-                  "--ring-color": selectedColor,
-                } as React.CSSProperties
-              }
+              activeColor={selectedColor}
+              disabled={isReadOnly}
             />
 
             <Textarea
@@ -282,16 +298,15 @@ export default function UserEventModal({
               rows={3}
               variant="default"
               className="transition-colors duration-500"
-              style={
-                {
-                  "--ring-color": selectedColor,
-                } as React.CSSProperties
-              }
+              activeColor={selectedColor}
+              disabled={isReadOnly}
             />
           </div>
 
           {/* Fechas */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div
+            className={`grid grid-cols-1 sm:grid-cols-2 gap-6 ${isReadOnly ? "opacity-70 pointer-events-none" : ""}`}
+          >
             <Controller
               name="start_date"
               control={control}
@@ -300,7 +315,9 @@ export default function UserEventModal({
                   label={t("calendar.userEvents.modal.fields.startDate")}
                   selected={field.value}
                   onChange={field.onChange}
+                  dateFormat="dd/MM/yyyy HH:mm"
                   showTimeSelect
+                  isClearable
                   required
                   minDate={new Date()}
                   error={
@@ -309,6 +326,8 @@ export default function UserEventModal({
                       : undefined
                   }
                   icon={<CalendarIcon className="w-5 h-5" />}
+                  activeColor={selectedColor}
+                  disabled={isReadOnly}
                 />
               )}
             />
@@ -320,13 +339,17 @@ export default function UserEventModal({
                   label={t("calendar.userEvents.modal.fields.endDate")}
                   selected={field.value}
                   onChange={field.onChange}
+                  dateFormat="dd/MM/yyyy HH:mm"
                   showTimeSelect
+                  isClearable
                   error={
                     errors.end_date?.message
                       ? t(errors.end_date.message)
                       : undefined
                   }
                   icon={<CalendarIcon className="w-5 h-5" />}
+                  activeColor={selectedColor}
+                  disabled={isReadOnly}
                 />
               )}
             />
@@ -341,19 +364,25 @@ export default function UserEventModal({
                 hint={t("calendar.userEvents.modal.placeholders.remindAtHint")}
                 selected={field.value}
                 onChange={field.onChange}
+                dateFormat="dd/MM/yyyy HH:mm"
                 showTimeSelect
+                isClearable
                 error={
                   errors.remind_at?.message
                     ? t(errors.remind_at.message)
                     : undefined
                 }
                 icon={<Bell className="w-5 h-5" />}
+                activeColor={selectedColor}
+                disabled={isReadOnly}
               />
             )}
           />
 
           {/* Visibility Toggle */}
-          <div className="space-y-2">
+          <div
+            className={`space-y-2 ${isReadOnly ? "opacity-70 pointer-events-none" : ""}`}
+          >
             <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
               {t("calendar.userEvents.modal.fields.visibility")}
             </label>
@@ -365,13 +394,25 @@ export default function UserEventModal({
                   <button
                     type="button"
                     onClick={() => field.onChange(true)}
-                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium text-sm transition-all ${
+                    className={`flex-1 flex flex-col items-center justify-center gap-1.5 px-4 py-4 rounded-2xl font-bold text-xs transition-all duration-300 border-2 ${
                       field.value
-                        ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 ring-2 ring-blue-500"
-                        : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700"
+                        ? "shadow-sm translate-y-[-2px]"
+                        : "bg-gray-50/50 dark:bg-gray-800/30 text-gray-400 dark:text-gray-500 border-gray-100 dark:border-neutral-800 hover:bg-gray-100 dark:hover:bg-gray-700"
                     }`}
+                    style={
+                      (field.value
+                        ? {
+                            backgroundColor: `${selectedColor}15`,
+                            color: selectedColor,
+                            borderColor: selectedColor,
+                            boxShadow: `0 4px 12px ${selectedColor}20`,
+                          }
+                        : {}) as React.CSSProperties
+                    }
                   >
-                    <Globe className="w-4 h-4" />
+                    <Globe
+                      className={`w-5 h-5 ${field.value ? "animate-pulse" : ""}`}
+                    />
                     <span>
                       {t("calendar.userEvents.modal.visibility.public")}
                     </span>
@@ -379,13 +420,25 @@ export default function UserEventModal({
                   <button
                     type="button"
                     onClick={() => field.onChange(false)}
-                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium text-sm transition-all ${
+                    className={`flex-1 flex flex-col items-center justify-center gap-1.5 px-4 py-4 rounded-2xl font-bold text-xs transition-all duration-300 border-2 ${
                       !field.value
-                        ? "bg-gray-50 dark:bg-gray-900/20 text-gray-600 dark:text-gray-400 ring-2 ring-gray-500"
-                        : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700"
+                        ? "shadow-sm translate-y-[-2px]"
+                        : "bg-gray-50/50 dark:bg-gray-800/30 text-gray-400 dark:text-gray-500 border-gray-100 dark:border-neutral-800 hover:bg-gray-100 dark:hover:bg-gray-700"
                     }`}
+                    style={
+                      (!field.value
+                        ? {
+                            backgroundColor: `${selectedColor}15`,
+                            color: selectedColor,
+                            borderColor: selectedColor,
+                            boxShadow: `0 4px 12px ${selectedColor}20`,
+                          }
+                        : {}) as React.CSSProperties
+                    }
                   >
-                    <Lock className="w-4 h-4" />
+                    <Lock
+                      className={`w-5 h-5 ${!field.value ? "animate-bounce-slow" : ""}`}
+                    />
                     <span>
                       {t("calendar.userEvents.modal.visibility.private")}
                     </span>
@@ -393,18 +446,21 @@ export default function UserEventModal({
                 </div>
               )}
             />
-            <p className="text-xs text-gray-500 dark:text-gray-400">
+            <p
+              className="text-xs font-medium transition-colors duration-300"
+              style={{ color: `${selectedColor}` }}
+            >
               {watch("is_public")
-                ? t("calendar.userEvents.modal.visibility.publicHint")
-                : t("calendar.userEvents.modal.visibility.privateHint")}
+                ? `● ${t("calendar.userEvents.modal.visibility.publicHint")}`
+                : `○ ${t("calendar.userEvents.modal.visibility.privateHint")}`}
             </p>
           </div>
 
           <div
             className="p-5 rounded-2xl border transition-all duration-500 backdrop-blur-sm"
             style={{
-              background: `linear-gradient(135deg, ${selectedColor}08, ${selectedColor}03)`,
-              borderColor: `${selectedColor}20`,
+              background: `linear-gradient(135deg, ${selectedColor}10, ${selectedColor}05)`,
+              borderColor: `${selectedColor}30`,
             }}
           >
             <div className="flex items-center justify-between mb-4">
@@ -422,7 +478,9 @@ export default function UserEventModal({
                 {selectedColor}
               </span>
             </div>
-            <div className="flex flex-wrap gap-3">
+            <div
+              className={`flex flex-wrap gap-3 ${isReadOnly ? "opacity-70 pointer-events-none" : ""}`}
+            >
               {tailwindColors.map((color) => (
                 <button
                   key={color.value}
@@ -444,57 +502,57 @@ export default function UserEventModal({
                   style={{ backgroundColor: color.value }}
                   title={`${color.name} (${color.value})`}
                   aria-label={`Seleccionar color ${color.name}`}
+                  disabled={isReadOnly}
                 />
               ))}
             </div>
           </div>
-
           <div
-            className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between pt-8 mt-8 gap-4 transition-all duration-500"
+            className={`text-center pt-2 pb-2 px-6 rounded-xl border border-dashed transition-all duration-500 ${isReadOnly ? "opacity-70" : ""}`}
             style={{
-              borderTop: `1px solid ${selectedColor}20`,
+              borderColor: `${selectedColor}40`,
+              backgroundColor: `${selectedColor}08`,
             }}
           >
-            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto justify-end ml-auto">
-              <Button
-                type="button"
-                variant="secondary"
-                buttonStyle="outline"
-                onClick={onClose}
-                className="px-7 py-3 rounded-xl transition-all duration-300"
-                style={{
-                  borderColor: `${selectedColor}40`,
-                  color: selectedColor,
-                }}
-              >
-                {t("calendar.userEvents.modal.actions.cancel")}
-              </Button>
-              <Button
-                type="submit"
-                variant="primary"
-                buttonStyle="solid"
-                loading={isSubmitting}
-                className="px-8 py-3 rounded-xl shadow-lg transition-all duration-300 font-bold"
-                style={{
-                  backgroundColor: selectedColor,
-                  borderColor: selectedColor,
-                }}
-              >
-                {event
-                  ? t("calendar.userEvents.modal.actions.save")
-                  : t("calendar.userEvents.modal.actions.create")}
-              </Button>
-            </div>
-          </div>
-
-          {!event && (
-            <div className="text-center pt-2">
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+            <p className="text-xs font-bold" style={{ color: selectedColor }}>
+              {watch("is_public")
+                ? t(
+                    "calendar.userEvents.modal.visibility.public",
+                  ).toUpperCase() +
+                  ": " +
+                  t("calendar.userEvents.modal.visibility.publicHint")
+                : t(
+                    "calendar.userEvents.modal.visibility.private",
+                  ).toUpperCase() +
+                  ": " +
+                  t("calendar.userEvents.modal.visibility.privateHint")}
+            </p>
+            {!event && (
+              <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-1 italic">
                 {t("calendar.userEvents.modal.footer.note")}
               </p>
-            </div>
-          )}
+            )}
+          </div>
         </form>
+
+        <ModalFooter
+          formId="user-event-form"
+          isSubmitting={isSubmitting}
+          onClose={onClose}
+          submitText={
+            event
+              ? t("calendar.userEvents.modal.actions.save")
+              : t("calendar.userEvents.modal.actions.create")
+          }
+          cancelText={t("calendar.userEvents.modal.actions.cancel")}
+          submitStyle="solid"
+          submitVariant="primary"
+          style={{
+            borderColor: `${selectedColor}20`,
+          }}
+          activeColor={selectedColor}
+          hideSubmit={isReadOnly}
+        />
       </div>
     </Modal>
   );

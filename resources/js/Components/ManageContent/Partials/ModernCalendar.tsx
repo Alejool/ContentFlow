@@ -1,30 +1,35 @@
+import ModalFooter from "@/Components/ManageContent/modals/common/ModalFooter";
+import ModalHeader from "@/Components/ManageContent/modals/common/ModalHeader";
+import Modal from "@/Components/common/ui/Modal";
 import {
   SOCIAL_PLATFORMS,
   getPlatformConfig,
 } from "@/Constants/socialPlatforms";
-import axios from "axios";
+import { useCalendar } from "@/Hooks/calendar/useCalendar";
+import { formatTime } from "@/Utils/formatDate";
+import { usePage } from "@inertiajs/react";
 import {
-  addMonths,
   eachDayOfInterval,
   endOfMonth,
   format,
+  isBefore,
   isSameDay,
   isSameMonth,
   isToday,
   parseISO,
+  startOfDay,
   startOfMonth,
-  subMonths,
 } from "date-fns";
-import { formatTime } from "@/Utils/formatDate";
-import { es } from "date-fns/locale";
 import {
   Calendar as CalendarIcon,
   ChevronLeft,
   ChevronRight,
   Filter,
   Loader2,
+  Trash2,
 } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
+import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import UserEventModal from "./UserEventModal";
 
@@ -45,6 +50,10 @@ interface CalendarEvent {
   end?: string;
   status: string;
   color: string;
+  user?: {
+    id: number;
+    name: string;
+  };
   extendedProps: {
     slug?: string;
     thumbnail?: string;
@@ -52,6 +61,7 @@ interface CalendarEvent {
     platform?: string;
     description?: string;
     remind_at?: string;
+    is_public?: boolean;
   };
 }
 
@@ -69,55 +79,47 @@ const PlatformIcon = ({
 
 export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
   const { t, i18n } = useTranslation();
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const [events, setEvents] = useState<CalendarEvent[]>([]);
-  const [loading, setLoading] = useState(false);
+  const {
+    filteredEvents,
+    currentMonth,
+    isLoading,
+    platformFilter,
+    setPlatformFilter,
+    nextMonth,
+    prevMonth,
+    goToToday,
+    handleEventDrop,
+    deleteEvent,
+    refreshEvents,
+  } = useCalendar();
+
+  const { auth } = usePage().props as any;
+  const currentUser = auth.user;
+
   const [draggedEvent, setDraggedEvent] = useState<CalendarEvent | null>(null);
-  const [platformFilter, setPlatformFilter] = useState<string>("all");
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [showEventModal, setShowEventModal] = useState(false);
   const [selectedEventForModal, setSelectedEventForModal] = useState<
     CalendarEvent | undefined
   >(undefined);
-
-  const fetchEvents = async () => {
-    setLoading(true);
-    try {
-      const start = startOfMonth(currentDate).toISOString();
-      const end = endOfMonth(currentDate).toISOString();
-      const response = await axios.get("/api/calendar/events", {
-        params: { start, end },
-      });
-      setEvents(response.data.data);
-    } catch (error) {
-      console.error("Failed to fetch events", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchEvents();
-  }, [currentDate]);
-
-  const nextMonth = () => setCurrentDate(addMonths(currentDate, 1));
-  const prevMonth = () => setCurrentDate(subMonths(currentDate, 1));
-  const goToToday = () => setCurrentDate(new Date());
+  const [deleteConfirmation, setDeleteConfirmation] = useState<{
+    isOpen: boolean;
+    event: CalendarEvent | null;
+  }>({ isOpen: false, event: null });
 
   const days = eachDayOfInterval({
-    start: startOfMonth(currentDate),
-    end: endOfMonth(currentDate),
+    start: startOfMonth(currentMonth),
+    end: endOfMonth(currentMonth),
   });
 
-  const firstDayOfMonth = startOfMonth(currentDate).getDay();
+  const firstDayOfMonth = startOfMonth(currentMonth).getDay();
   const startingEmptySlots = Array.from({ length: firstDayOfMonth });
 
-  const filteredEvents = events.filter((e) => {
-    if (platformFilter === "all") return true;
-    return e.extendedProps.platform?.toLowerCase() === platformFilter;
-  });
-
   const handleDragStart = (e: React.DragEvent, event: CalendarEvent) => {
+    if (event.type === "user_event" && event.user?.id !== currentUser?.id) {
+      e.preventDefault();
+      return;
+    }
     setDraggedEvent(event);
     e.dataTransfer.effectAllowed = "move";
     e.dataTransfer.setData("text/plain", event.id);
@@ -128,31 +130,49 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
     e.dataTransfer.dropEffect = "move";
   };
 
-  const handleDrop = async (e: React.DragEvent, date: Date) => {
+  const onDrop = async (e: React.DragEvent, date: Date) => {
     e.preventDefault();
     if (!draggedEvent) return;
 
-    const updatedEvents = events.map((ev) =>
-      ev.id === draggedEvent.id ? { ...ev, start: date.toISOString() } : ev,
-    );
-    setEvents(updatedEvents);
-
-    try {
-      const resourceId =
-        draggedEvent.id.split("_")[draggedEvent.type === "user_event" ? 2 : 1];
-      await axios.patch(`/api/calendar/events/${resourceId}`, {
-        scheduled_at: date.toISOString(),
-        type: draggedEvent.type,
-      });
-    } catch (error) {
-      console.error("Failed to update event", error);
-      fetchEvents();
-    } finally {
+    if (isBefore(startOfDay(date), startOfDay(new Date()))) {
+      toast.error(t("calendar.userEvents.modal.validation.pastDate"));
       setDraggedEvent(null);
+      return;
+    }
+
+    await handleEventDrop(
+      draggedEvent.id,
+      date.toISOString(),
+      draggedEvent.type,
+    );
+    setDraggedEvent(null);
+  };
+
+  const handleDeleteEvent = (e: React.MouseEvent, event: CalendarEvent) => {
+    e.stopPropagation();
+    setDeleteConfirmation({ isOpen: true, event });
+  };
+
+  const confirmDelete = async () => {
+    const event = deleteConfirmation.event;
+    if (!event) return;
+
+    const success = await deleteEvent(event.id);
+    if (success) {
+      toast.success(
+        t("calendar.userEvents.modal.messages.successDelete") ||
+          "Evento eliminado correctamente",
+      );
+      setDeleteConfirmation({ isOpen: false, event: null });
+    } else {
+      toast.error(
+        t("calendar.userEvents.modal.messages.errorDelete") ||
+          "Error al eliminar el evento",
+      );
     }
   };
 
-  const platforms = ["all", ...Object.keys(SOCIAL_PLATFORMS)];
+  const platforms = ["all", "user_event", ...Object.keys(SOCIAL_PLATFORMS)];
 
   return (
     <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
@@ -160,8 +180,11 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
         <div className="flex flex-col sm:flex-row justify-between items-center mb-6 sm:mb-8 gap-4 sm:gap-6">
           <div className="flex items-center gap-4">
             <h3 className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white capitalize flex items-center gap-3">
-              {new Intl.DateTimeFormat(i18n.language || undefined, { month: "long", year: "numeric" }).format(currentDate)}
-              {loading && (
+              {new Intl.DateTimeFormat(i18n.language || undefined, {
+                month: "long",
+                year: "numeric",
+              }).format(currentMonth)}
+              {isLoading && (
                 <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin text-primary-500" />
               )}
             </h3>
@@ -174,10 +197,18 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                   key={p}
                   onClick={() => setPlatformFilter(p)}
                   className={`p-1.5 sm:p-2 rounded-md transition-all ${platformFilter === p ? "bg-white dark:bg-gray-700 shadow text-primary-600" : "text-gray-400 hover:text-gray-600"}`}
-                  title={p}
+                  title={
+                    p === "all"
+                      ? t("calendar.filters.all")
+                      : p === "user_event"
+                        ? t("calendar.filters.events")
+                        : p
+                  }
                 >
                   {p === "all" ? (
                     <Filter className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  ) : p === "user_event" ? (
+                    <CalendarIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary-500" />
                   ) : (
                     <PlatformIcon
                       platform={p}
@@ -256,11 +287,11 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                       key={day.toString()}
                       onClick={() => setSelectedDate(day)}
                       onDragOver={handleDragOver}
-                      onDrop={(e) => handleDrop(e, day)}
+                      onDrop={(e) => onDrop(e, day)}
                       className={`
                         relative h-24 sm:h-32 lg:h-40 p-2 transition-all cursor-pointer group overflow-hidden
                         ${isSelected ? "bg-primary-50/30 dark:bg-primary-900/10 z-10" : "bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800/50"}
-                        ${!isSameMonth(day, currentDate) ? "opacity-40" : ""}
+                        ${!isSameMonth(day, currentMonth) ? "opacity-40" : ""}
                       `}
                     >
                       <div className="flex justify-between items-start mb-1">
@@ -282,6 +313,16 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
+                            if (
+                              isBefore(startOfDay(day), startOfDay(new Date()))
+                            ) {
+                              toast.error(
+                                t(
+                                  "calendar.userEvents.modal.validation.pastDate",
+                                ),
+                              );
+                              return;
+                            }
                             setSelectedDate(day);
                             setSelectedEventForModal(undefined);
                             setShowEventModal(true);
@@ -350,7 +391,10 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
               <div className="mb-6">
                 <h4 className="font-black text-gray-900 dark:text-white flex items-center gap-2 text-xl">
                   <CalendarIcon className="w-6 h-6 text-primary-500" />
-                  {new Intl.DateTimeFormat(i18n.language || undefined, { day: 'numeric', month: 'long' }).format(selectedDate)}
+                  {new Intl.DateTimeFormat(i18n.language || undefined, {
+                    day: "numeric",
+                    month: "long",
+                  }).format(selectedDate)}
                 </h4>
                 <div className="flex items-center gap-2 mt-2">
                   <span className="text-[10px] font-black uppercase tracking-widest text-primary-500 bg-primary-50 dark:bg-primary-900/30 px-2 py-0.5 rounded-full">
@@ -385,12 +429,16 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                             if (pubId) onEventClick?.(pubId, event.type, event);
                           }
                         }}
-                        className="group flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-neutral-800 border border-gray-100 dark:border-neutral-700 shadow-sm hover:shadow-md hover:border-primary-200 dark:hover:border-primary-900/30 active:scale-[0.98] transition-all cursor-pointer"
+                        className="group flex items-center gap-4 p-4 rounded-2xl shadow-sm hover:shadow-md active:scale-[0.98] transition-all cursor-pointer border-2"
+                        style={{
+                          backgroundColor: `${event.color}15`,
+                          borderColor: `${event.color}40`,
+                        }}
                       >
-                        <div className="w-12 h-12 rounded-lg flex-shrink-0 flex items-center justify-center bg-gray-50 dark:bg-neutral-900 border border-gray-100 dark:border-neutral-700 group-hover:scale-110 transition-transform">
+                        <div className="w-12 h-12 rounded-lg flex-shrink-0 flex items-center justify-center bg-white dark:bg-neutral-900 border border-gray-100 dark:border-neutral-700 group-hover:scale-110 transition-transform shadow-sm">
                           {event.type === "user_event" ? (
                             <CalendarIcon
-                              className="w-6 h-6 text-primary-500"
+                              className="w-6 h-6"
                               style={{ color: event.color }}
                             />
                           ) : (
@@ -404,19 +452,39 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                           <h5 className="font-bold text-gray-900 dark:text-white truncate text-sm">
                             {event.title}
                           </h5>
+                          {event.user?.name && (
+                            <p className="text-[10px] text-gray-500 dark:text-gray-400 font-medium">
+                              {t("common.creator")}: {event.user.name}
+                            </p>
+                          )}
                           <div className="flex items-center gap-2 mt-1">
-                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-gray-100 dark:bg-neutral-900 text-gray-500 dark:text-gray-400 font-bold uppercase">
-                                    {formatTime(event.start)}
+                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/50 dark:bg-neutral-900/50 text-gray-500 dark:text-gray-400 font-bold uppercase backdrop-blur-sm">
+                              {formatTime(event.start)}
                             </span>
-                            <span className="text-[10px] font-bold text-primary-600 dark:text-primary-400 uppercase tracking-tight">
+                            <span
+                              className="text-[10px] font-bold uppercase tracking-tight"
+                              style={{ color: event.color }}
+                            >
                               {event.status}
                             </span>
                           </div>
                         </div>
-                        <div
-                          className="w-1.5 h-10 rounded-full opacity-50 group-hover:opacity-100 transition-opacity"
-                          style={{ backgroundColor: event.color }}
-                        />
+                        <div className="flex flex-col items-center gap-2">
+                          {event.type === "user_event" &&
+                            event.user?.id === currentUser?.id && (
+                              <button
+                                onClick={(e) => handleDeleteEvent(e, event)}
+                                className="p-2 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 text-gray-400 hover:text-red-500 transition-all opacity-0 group-hover:opacity-100"
+                                title={t("common.delete")}
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            )}
+                          <div
+                            className="w-1.5 h-10 rounded-full opacity-50 group-hover:opacity-100 transition-opacity"
+                            style={{ backgroundColor: event.color }}
+                          />
+                        </div>
                       </div>
                     ))
                 ) : (
@@ -443,8 +511,41 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
         }}
         event={selectedEventForModal}
         selectedDate={selectedDate}
-        onSuccess={fetchEvents}
+        onSuccess={refreshEvents}
       />
+
+      <Modal
+        show={deleteConfirmation.isOpen}
+        onClose={() => setDeleteConfirmation({ isOpen: false, event: null })}
+        maxWidth="md"
+      >
+        <ModalHeader
+          t={t}
+          onClose={() => setDeleteConfirmation({ isOpen: false, event: null })}
+          title="common.deleteConfirmTitle"
+          icon={Trash2}
+          iconColor="text-red-500"
+          size="md"
+        />
+
+        <div className="p-6">
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            {t("calendar.userEvents.modal.messages.confirmDelete") ||
+              t("common.deleteConfirm") ||
+              "¿Estás seguro de que deseas eliminar este elemento? Esta acción no se puede deshacer."}
+          </p>
+        </div>
+
+        <ModalFooter
+          onClose={() => setDeleteConfirmation({ isOpen: false, event: null })}
+          onPrimarySubmit={confirmDelete}
+          submitText={t("common.delete") || "Eliminar"}
+          cancelText={t("common.cancel") || "Cancelar"}
+          submitVariant="danger"
+          submitIcon={<Trash2 className="w-4 h-4" />}
+          cancelStyle="outline"
+        />
+      </Modal>
     </div>
   );
 }

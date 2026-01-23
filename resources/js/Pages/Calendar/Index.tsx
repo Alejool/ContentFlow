@@ -398,7 +398,7 @@ export default function CalendarIndex({ auth }: { auth: any }) {
                                 {/* Icon */}
                                 <div className="mt-0.5 flex-shrink-0 text-gray-400 dark:text-gray-500">
                                   <PlatformIcon
-                                    platform={event.extendedProps.platform}
+                                    platform={["user_event", "event"].includes(String(event.type)) ? "user_event" : event.extendedProps.platform}
                                     className="w-3.5 h-3.5"
                                   />
                                 </div>
@@ -421,8 +421,15 @@ export default function CalendarIndex({ auth }: { auth: any }) {
                                   </div>
                                 </div>
 
+                                {/* Delete button - only show for user's own events */}
                                 {["user_event", "event"].includes(
                                   String(event.type),
+                                ) && (
+                                  // Only show delete button for events created by current user
+                                  // We can determine this by checking if the event ID contains the user's events
+                                  // or by checking user_name if available
+                                  !event.extendedProps?.is_public || 
+                                  event.extendedProps?.user_name === auth.user.name
                                 ) && (
                                   <button
                                     onClick={(ev) => {
