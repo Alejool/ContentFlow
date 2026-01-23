@@ -182,7 +182,21 @@ const EditPublicationModal = ({
   const { auth } = usePage<any>().props;
   const canManage =
     auth.current_workspace?.permissions?.includes("manage-content");
-  const isDisabled = isLockedByOther || !canManage;
+  const isDisabled = isLockedByOther || !canManage || hasPublishedPlatform;
+
+  const canPublish = auth.current_workspace?.permissions?.includes("publish");
+
+  // Strict check on status to avoid stale approved_at dates on failed posts
+  const isApprovedStatus =
+    publication?.status === "approved" || publication?.status === "scheduled";
+
+  // Check ownership
+  const isOwner = publication?.user_id === auth.user.id;
+
+  // Configuration allowed:
+  // 1. Admin/Owner (canPublish): Always allowed
+  // 2. Editor (!canPublish): Only if Approved AND is their own publication
+  const allowConfiguration = canPublish || (isApprovedStatus && isOwner);
 
   return (
     <div
@@ -266,17 +280,37 @@ const EditPublicationModal = ({
                   </div>
                 )}
 
-                {hasPublishedPlatform && (
-                  <div className="p-4 mb-6 rounded-lg border border-blue-500 bg-blue-50/50 dark:bg-blue-900/20 flex gap-3 text-sm text-blue-700 dark:text-blue-300 animate-in fade-in slide-in-from-top-4">
-                    <AlertCircle className="w-5 h-5 shrink-0 text-blue-500" />
+                {(hasPublishedPlatform || !allowConfiguration) && (
+                  <div
+                    className={`p-4 mb-6 rounded-lg border flex gap-3 text-sm animate-in fade-in slide-in-from-top-4 ${
+                      hasPublishedPlatform
+                        ? "border-blue-500 bg-blue-50/50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300"
+                        : "border-amber-500 bg-amber-50/50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300"
+                    }`}
+                  >
+                    <AlertCircle
+                      className={`w-5 h-5 shrink-0 ${
+                        hasPublishedPlatform
+                          ? "text-blue-500"
+                          : "text-amber-500"
+                      }`}
+                    />
                     <div>
                       <p className="font-semibold mb-1">
-                        {t("publications.modal.edit.contentLocked") ||
-                          "Content Locked"}
+                        {hasPublishedPlatform
+                          ? t("publications.modal.edit.contentLocked") ||
+                            "Content Locked"
+                          : t("publications.modal.edit.configurationLocked") ||
+                            "Configuración Bloqueada"}
                       </p>
                       <p className="opacity-80">
-                        {t("publications.modal.edit.contentLockedHint") ||
-                          "This publication is live on some platforms. While you can update schedules and thumbnails, core content (title/description) is locked. To edit everything, unpublish from all platforms."}
+                        {hasPublishedPlatform
+                          ? t("publications.modal.edit.contentLockedHint") ||
+                            "This publication is live on some platforms. To edit, you must unpublish it first."
+                          : t(
+                              "publications.modal.edit.configurationLockedHint",
+                            ) ||
+                            "Necesitas aprobación para configurar las redes y la programación. Solicita una revisión primero."}
                       </p>
                     </div>
                   </div>
@@ -308,43 +342,47 @@ const EditPublicationModal = ({
                   />
                 )}
 
-                <SocialAccountsSection
-                  socialAccounts={socialAccounts as any}
-                  selectedAccounts={watched.social_accounts || []}
-                  accountSchedules={accountSchedules}
-                  t={t}
-                  onAccountToggle={handleAccountToggle}
-                  onScheduleChange={(id, date) =>
-                    setAccountSchedules((prev) => ({ ...prev, [id]: date }))
-                  }
-                  onScheduleRemove={(id) =>
-                    setAccountSchedules((prev) => {
-                      const n = { ...prev };
-                      delete n[id];
-                      return n;
-                    })
-                  }
-                  onPlatformSettingsClick={(platform) =>
-                    setActivePlatformSettings(platform)
-                  }
-                  globalSchedule={watched.scheduled_at ?? undefined}
-                  publishedAccountIds={publishedAccountIds}
-                  publishingAccountIds={publishingAccountIds}
-                  error={errors.social_accounts?.message as string}
-                  disabled={isDisabled}
-                />
+                <div
+                  className={`transition-opacity duration-200 ${!allowConfiguration ? "opacity-50 pointer-events-none grayscale-[0.5]" : ""}`}
+                >
+                  <SocialAccountsSection
+                    socialAccounts={socialAccounts as any}
+                    selectedAccounts={watched.social_accounts || []}
+                    accountSchedules={accountSchedules}
+                    t={t}
+                    onAccountToggle={handleAccountToggle}
+                    onScheduleChange={(id, date) =>
+                      setAccountSchedules((prev) => ({ ...prev, [id]: date }))
+                    }
+                    onScheduleRemove={(id) =>
+                      setAccountSchedules((prev) => {
+                        const n = { ...prev };
+                        delete n[id];
+                        return n;
+                      })
+                    }
+                    onPlatformSettingsClick={(platform) =>
+                      setActivePlatformSettings(platform)
+                    }
+                    globalSchedule={watched.scheduled_at ?? undefined}
+                    publishedAccountIds={publishedAccountIds}
+                    publishingAccountIds={publishingAccountIds}
+                    error={errors.social_accounts?.message as string}
+                    disabled={isDisabled || !allowConfiguration}
+                  />
 
-                <ScheduleSection
-                  scheduledAt={watched.scheduled_at ?? undefined}
-                  t={t}
-                  onScheduleChange={(date) => setValue("scheduled_at", date)}
-                  useGlobalSchedule={watched.use_global_schedule}
-                  onGlobalScheduleToggle={(val) =>
-                    setValue("use_global_schedule", val)
-                  }
-                  error={errors.scheduled_at?.message as string}
-                  disabled={isDisabled}
-                />
+                  <ScheduleSection
+                    scheduledAt={watched.scheduled_at ?? undefined}
+                    t={t}
+                    onScheduleChange={(date) => setValue("scheduled_at", date)}
+                    useGlobalSchedule={watched.use_global_schedule}
+                    onGlobalScheduleToggle={(val) =>
+                      setValue("use_global_schedule", val)
+                    }
+                    error={errors.scheduled_at?.message as string}
+                    disabled={isDisabled || !allowConfiguration}
+                  />
+                </div>
 
                 {hasYouTubeAccount && (
                   <div className="mt-6">

@@ -293,7 +293,7 @@ export default function ManageContentPage() {
               {permissions.includes("approve") && (
                 <button
                   onClick={() => handleTabChange("approvals")}
-                  className={`flex items-center justify-center gap-2 py-2.5 px-5 rounded-lg text-sm font-bold transition-all duration-200 whitespace-nowrap ${
+                  className={`flex items-center justify-center gap-2 py-2.5 px-5 rounded-lg text-sm font-bold transition-all duration-200 whitespace-nowrap relative ${
                     activeTab === "approvals"
                       ? "bg-primary-600 text-white shadow-md shadow-primary-500/20 ring-1 ring-primary-500/50"
                       : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-700/50"
@@ -303,6 +303,22 @@ export default function ManageContentPage() {
                     className={`w-4 h-4 ${activeTab === "approvals" ? "text-white" : "opacity-70"}`}
                   />
                   <span>{t("manageContent.tabs.approvals")}</span>
+                  {publications.filter((p) => p.status === "pending_review")
+                    .length > 0 && (
+                    <span
+                      className={`ml-1 px-1.5 py-0.5 text-[10px] font-bold rounded-full ${
+                        activeTab === "approvals"
+                          ? "bg-white/20 text-white"
+                          : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+                      }`}
+                    >
+                      {
+                        publications.filter(
+                          (p) => p.status === "pending_review",
+                        ).length
+                      }
+                    </span>
+                  )}
                 </button>
               )}
             </div>

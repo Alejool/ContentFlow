@@ -3,12 +3,11 @@ import YouTubeThumbnailUploader from "@/Components/common/ui/YouTubeThumbnailUpl
 import { getPlatformConfig } from "@/Constants/socialPlatforms";
 import { usePublishPublication } from "@/Hooks/publication/usePublishPublication";
 import { useConfirm } from "@/Hooks/useConfirm";
+import { formatDateTime } from "@/Utils/formatDate";
 import { usePublicationStore } from "@/stores/publicationStore";
 import { Publication } from "@/types/Publication";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { usePage } from "@inertiajs/react";
-import { format } from "date-fns";
-import { es } from "date-fns/locale";
 import {
   AlertCircle,
   CheckCircle,
@@ -262,9 +261,7 @@ export default function PublishPublicationModal({
                     {publication.rejected_at && (
                       <div className="flex items-center gap-1.5 opacity-80">
                         <Clock className="w-3.5 h-3.5" />
-                        <span>
-                          {formatDateTime(publication.rejected_at)}
-                        </span>
+                        <span>{formatDateTime(publication.rejected_at)}</span>
                       </div>
                     )}
 
