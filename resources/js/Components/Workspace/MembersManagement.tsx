@@ -73,7 +73,7 @@ export default function MembersManagement({
     if (!canManageMembers) return;
     try {
       await axios.put(
-        route("workspaces.members.update-role", {
+        route("workspaces.members.role", {
           workspace: current_workspace.id,
           user: userId,
         }),

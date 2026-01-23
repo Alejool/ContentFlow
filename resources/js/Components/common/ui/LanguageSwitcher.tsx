@@ -37,7 +37,7 @@ export default function LanguageSwitcher() {
 
     if (auth?.user) {
       try {
-        await axios.patch(route("locale.update"), { locale: newLang });
+        await axios.patch(route("settings.locale"), { locale: newLang });
       } catch (error) {
         console.error("Failed to save locale preference:", error);
       }
