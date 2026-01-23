@@ -22,7 +22,7 @@ export const useUser = (initialUser: any) => {
     setValue,
     control,
   } = useHookForm<UserProfileFormData>({
-    resolver: zodResolver(userProfileSchema),
+    resolver: zodResolver(userProfileSchema(t)),
     defaultValues: {
       name: initialUser?.name || "",
       email: initialUser?.email || "",
@@ -77,10 +77,10 @@ export const useUser = (initialUser: any) => {
     try {
       const result = await updateProfile(data);
       if (result.success) {
-        toast.success(result.message || t("profile.toast.updateSuccess"));
+        toast.success(result.message || t("profile.update_success"));
         setHasChanges(false);
       } else {
-        toast.error(result.message || t("profile.toast.errorUpdating"));
+        toast.error(result.message || t("profile.update_error"));
       }
     } catch (error: any) {
       if (axios.isAxiosError(error) && error.response?.data?.errors) {
@@ -89,7 +89,7 @@ export const useUser = (initialUser: any) => {
           toast.error(value[0]);
         });
       } else {
-        toast.error(error.message || t("profile.toast.errorUpdating"));
+        toast.error(error.message || t("profile.update_error"));
       }
     }
   };

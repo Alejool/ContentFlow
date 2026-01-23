@@ -1,6 +1,9 @@
+import { getErrorMessage } from "@/Utils/validation";
 import { useForm } from "@inertiajs/react";
 import axios from "axios";
 import { useState } from "react";
+import { toast } from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 interface LoginFormData {
   email: string;
@@ -10,20 +13,22 @@ interface LoginFormData {
 }
 
 export const useAuth = () => {
-  const [error, setError] = useState<string>("");
+  const { t } = useTranslation();
+  const [generalError, setGeneralError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [successMessage, setSuccessMessage] = useState<string>("");
 
-  const { data, setData, processing } = useForm<LoginFormData>({
-    email: "",
-    password: "",
-    remember: false,
-  });
+  const { data, setData, processing, errors, setError } =
+    useForm<LoginFormData>({
+      email: "",
+      password: "",
+      remember: false,
+    });
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
+    setGeneralError("");
     setSuccessMessage("");
 
     try {
@@ -38,9 +43,11 @@ export const useAuth = () => {
       const userData = checkResponse.data;
 
       if (userData.provider) {
-        setError(
-          `Este usuario se registró con ${userData.provider}. Por favor, inicia sesión con ${userData.provider}.`,
-        );
+        const msg = t("auth.login.errors.social_account", {
+          provider: userData.provider,
+        });
+        setGeneralError(msg);
+        toast.error(msg);
         return;
       }
 
@@ -52,20 +59,36 @@ export const useAuth = () => {
       });
 
       if (loginResponse.data.success) {
-        setSuccessMessage("Login exitoso. Redirecting...");
+        setSuccessMessage(t("auth.login.success"));
         window.location.href = loginResponse.data.redirect || "/dashboard";
       } else {
-        // Fallback if success is not explicitly true but no error thrown (unlikely with axios)
         window.location.href = "/dashboard";
       }
     } catch (err: any) {
       console.error("Login error:", err);
-      if (err.response?.data?.error) {
-        setError(err.response.data.error);
+
+      if (err.response?.status === 422 && err.response?.data?.errors) {
+        const errorData = err.response.data.errors;
+        Object.keys(errorData).forEach((key) => {
+          setError(key as any, errorData[key]);
+        });
+
+        const errorMessage = Object.keys(errorData)
+          .map((key) => getErrorMessage(errorData[key], t, key))
+          .join(" ");
+
+        setGeneralError(errorMessage);
+        toast.error(errorMessage);
       } else if (err.response?.data?.message) {
-        setError(err.response.data.message);
+        const msg = getErrorMessage(err.response.data.message, t);
+        setGeneralError(msg);
+        toast.error(msg);
       } else {
-        setError("Credenciales incorrectas o error en el servidor.");
+        const msg =
+          t("validation.auth.failed") ||
+          "Credenciales incorrectas o error en el servidor.";
+        setGeneralError(msg);
+        toast.error(msg);
       }
     } finally {
       setLoading(false);
@@ -74,24 +97,23 @@ export const useAuth = () => {
 
   const handleGoogleLogin = () => {
     setLoading(true);
-    setError("");
-
-    // Redirect to Laravel Google Auth endpoint
+    setGeneralError("");
     window.location.href = "/auth/google/redirect";
   };
 
   const handleFacebookLogin = () => {
-    // Placeholder for future Socialite implementation
-    setError("Facebook login is currently disabled during migration.");
+    setGeneralError("Facebook login is currently disabled during migration.");
+    toast.error("Facebook login is currently disabled during migration.");
   };
 
   return {
     data,
     setData,
-    error,
+    error: generalError,
     loading,
     successMessage,
     processing,
+    errors,
     handleEmailLogin,
     handleGoogleLogin,
     handleFacebookLogin,
