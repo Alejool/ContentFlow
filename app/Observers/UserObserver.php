@@ -14,9 +14,9 @@ class UserObserver
             return;
         }
 
-        $workspaceName = $user->name . "'s Workspace";
+        $workspaceName = $user->name ? $user->name . "'s Workspace" : "Default Workspace";
         if ($user->locale === 'es') {
-            $workspaceName = "Espacio de " . $user->name;
+            $workspaceName = $user->name ? "Espacio de " . $user->name : "Mi Espacio";
         }
 
         $workspace = Workspace::create([

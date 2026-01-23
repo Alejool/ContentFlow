@@ -25,27 +25,25 @@ class Workspace extends Model
     protected static function booted()
     {
         static::creating(function ($workspace) {
-            if (!$workspace->slug) {
-                $baseSlug = Str::slug($workspace->name ?: 'workspace');
-                $slug = $baseSlug;
+            $baseSlug = $workspace->slug ?: Str::slug($workspace->name ?: 'workspace');
+            $slug = $baseSlug;
 
-                // Ensure slug is unique (including soft-deleted ones)
-                $count = 0;
-                while (static::withTrashed()->where('slug', $slug)->exists()) {
-                    $count++;
-                    // Safety break if it's too many attempts or if base name is empty
-                    if ($count > 10) {
-                        $slug = $baseSlug . '-' . time() . '-' . Str::random(4);
-                        break;
-                    }
-
-                    // Increase randomness as we fail
-                    $randomLen = $count > 3 ? 8 : 4;
-                    $slug = $baseSlug . '-' . Str::lower(Str::random($randomLen));
+            // Ensure slug is unique (including soft-deleted ones)
+            $count = 0;
+            while (static::withTrashed()->where('slug', $slug)->exists()) {
+                $count++;
+                // Safety break if it's too many attempts or if base name is empty
+                if ($count > 10) {
+                    $slug = $baseSlug . '-' . time() . '-' . Str::random(4);
+                    break;
                 }
 
-                $workspace->slug = $slug;
+                // Increase randomness as we fail
+                $randomLen = $count > 3 ? 8 : 4;
+                $slug = $baseSlug . '-' . Str::lower(Str::random($randomLen));
             }
+
+            $workspace->slug = $slug;
         });
     }
 
