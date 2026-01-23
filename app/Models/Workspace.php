@@ -22,13 +22,29 @@ class Workspace extends Model
         'discord_webhook_url',
     ];
 
-    public static function boot()
+    protected static function booted()
     {
-        parent::boot();
-
         static::creating(function ($workspace) {
             if (!$workspace->slug) {
-                $workspace->slug = Str::slug($workspace->name);
+                $baseSlug = Str::slug($workspace->name ?: 'workspace');
+                $slug = $baseSlug;
+
+                // Ensure slug is unique (including soft-deleted ones)
+                $count = 0;
+                while (static::withTrashed()->where('slug', $slug)->exists()) {
+                    $count++;
+                    // Safety break if it's too many attempts or if base name is empty
+                    if ($count > 10) {
+                        $slug = $baseSlug . '-' . time() . '-' . Str::random(4);
+                        break;
+                    }
+
+                    // Increase randomness as we fail
+                    $randomLen = $count > 3 ? 8 : 4;
+                    $slug = $baseSlug . '-' . Str::lower(Str::random($randomLen));
+                }
+
+                $workspace->slug = $slug;
             }
         });
     }

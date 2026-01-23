@@ -54,24 +54,43 @@ class WorkspaceController extends Controller
       'description' => 'nullable|string|max:1000',
     ]);
 
-    $workspace = Workspace::create([
-      'name' => $request->name,
-      'description' => $request->description,
-      'created_by' => Auth::id(),
-      'slug' => Str::slug($request->name) . '-' . Str::random(4),
-    ]);
+    try {
+      $workspace = Workspace::create([
+        'name' => $request->name,
+        'description' => $request->description,
+        'created_by' => Auth::id(),
+        // Slug is handled by model creating event if not provided
+      ]);
 
-    $ownerRole = Role::where('slug', 'owner')->first();
-    Auth::user()->workspaces()->attach($workspace->id, ['role_id' => $ownerRole->id]);
+      $ownerRole = Role::where('slug', 'owner')->first();
+      Auth::user()->workspaces()->attach($workspace->id, ['role_id' => $ownerRole->id]);
 
-    // Auto-switch to new workspace
-    Auth::user()->update(['current_workspace_id' => $workspace->id]);
+      // Auto-switch to new workspace
+      Auth::user()->update(['current_workspace_id' => $workspace->id]);
 
-    if ($request->wantsJson() || $request->is('api/*')) {
-      return $this->successResponse($workspace, 'Workspace created successfully.', 201);
+      if ($request->wantsJson() || $request->is('api/*')) {
+        return $this->successResponse($workspace, __('workspace.messages.update_success'), 201);
+      }
+
+      return redirect()->back()->with('message', __('workspace.messages.update_success'));
+    } catch (\Illuminate\Database\QueryException $e) {
+      if ($e->getCode() == 23505 || str_contains($e->getMessage(), 'unique constraint')) {
+        $errorMsg = __('workspace.messages.slug_already_exists', ['name' => $request->name]);
+        if ($errorMsg === 'workspace.messages.slug_already_exists') {
+          $errorMsg = "A workspace with a similar identifier for \"{$request->name}\" already exists. Please try another name.";
+        }
+
+        if ($request->wantsJson() || $request->is('api/*')) {
+          return response()->json([
+            'success' => false,
+            'message' => $errorMsg,
+            'errors' => ['name' => [$errorMsg]]
+          ], 422);
+        }
+        return redirect()->back()->withErrors(['name' => $errorMsg]);
+      }
+      throw $e;
     }
-
-    return redirect()->back()->with('message', 'Workspace created successfully.');
   }
 
   public function switch(Workspace $workspace)

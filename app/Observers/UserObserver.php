@@ -13,10 +13,10 @@ class UserObserver
         if ($user->workspaces()->count() > 0) {
             return;
         }
-        
+
         $workspaceName = $user->name . "'s Workspace";
         if ($user->locale === 'es') {
-            $workspaceName = "Mi Espacio";
+            $workspaceName = "Espacio de " . $user->name;
         }
 
         $workspace = Workspace::create([
