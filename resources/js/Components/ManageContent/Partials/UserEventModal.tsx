@@ -10,6 +10,8 @@ import {
   AlignLeft,
   Bell,
   Calendar as CalendarIcon,
+  Globe,
+  Lock,
   Type,
   X,
 } from "lucide-react";
@@ -36,6 +38,7 @@ const eventSchema = z.object({
   end_date: z.date().nullable().optional(),
   remind_at: z.date().nullable().optional(),
   color: z.string().default("#3B82F6"),
+  is_public: z.boolean().default(true),
 });
 
 type EventFormValues = z.infer<typeof eventSchema>;
@@ -79,6 +82,7 @@ export default function UserEventModal({
       description: "",
       color: "#3B82F6",
       start_date: new Date(),
+      is_public: true,
     },
   });
 
@@ -114,6 +118,7 @@ export default function UserEventModal({
               ? parseISO(event.extendedProps.remind_at)
               : event.extendedProps.remind_at
             : null,
+          is_public: event.extendedProps?.is_public ?? true,
         });
         setSelectedColor(eventColor);
       } else if (selectedDate) {
@@ -124,6 +129,7 @@ export default function UserEventModal({
           end_date: null,
           color: "#3B82F6",
           remind_at: null,
+          is_public: true,
         });
         setSelectedColor("#3B82F6");
       } else {
@@ -134,6 +140,7 @@ export default function UserEventModal({
           end_date: null,
           color: "#3B82F6",
           remind_at: null,
+          is_public: true,
         });
         setSelectedColor("#3B82F6");
       }
@@ -344,6 +351,54 @@ export default function UserEventModal({
               />
             )}
           />
+
+          {/* Visibility Toggle */}
+          <div className="space-y-2">
+            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+              {t("calendar.userEvents.modal.fields.visibility")}
+            </label>
+            <Controller
+              name="is_public"
+              control={control}
+              render={({ field }) => (
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => field.onChange(true)}
+                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium text-sm transition-all ${
+                      field.value
+                        ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 ring-2 ring-blue-500"
+                        : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700"
+                    }`}
+                  >
+                    <Globe className="w-4 h-4" />
+                    <span>
+                      {t("calendar.userEvents.modal.visibility.public")}
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => field.onChange(false)}
+                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium text-sm transition-all ${
+                      !field.value
+                        ? "bg-gray-50 dark:bg-gray-900/20 text-gray-600 dark:text-gray-400 ring-2 ring-gray-500"
+                        : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700"
+                    }`}
+                  >
+                    <Lock className="w-4 h-4" />
+                    <span>
+                      {t("calendar.userEvents.modal.visibility.private")}
+                    </span>
+                  </button>
+                </div>
+              )}
+            />
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              {watch("is_public")
+                ? t("calendar.userEvents.modal.visibility.publicHint")
+                : t("calendar.userEvents.modal.visibility.privateHint")}
+            </p>
+          </div>
 
           <div
             className="p-5 rounded-2xl border transition-all duration-500 backdrop-blur-sm"

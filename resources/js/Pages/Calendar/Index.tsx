@@ -1,3 +1,5 @@
+import Button from "@/Components/common/Modern/Button";
+import { DynamicModal } from "@/Components/common/Modern/DynamicModal";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { formatTime } from "@/Utils/formatDate";
 import { Head } from "@inertiajs/react";
@@ -35,13 +37,12 @@ import {
   FaYoutube,
 } from "react-icons/fa";
 
-// Types
 interface CalendarEvent {
-  id: string; // "pub_1" or "post_1"
+  id: string;
   resourceId: number;
-  type: "publication" | "post" | "user_event";
+  type: "publication" | "post" | "user_event" | "event";
   title: string;
-  start: string; // ISO
+  start: string;
   status: string;
   color: string;
   extendedProps: {
@@ -89,8 +90,11 @@ export default function CalendarIndex({ auth }: { auth: any }) {
   const [loading, setLoading] = useState(false);
   const [draggedEvent, setDraggedEvent] = useState<CalendarEvent | null>(null);
   const [platformFilter, setPlatformFilter] = useState<string>("all");
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [eventToDelete, setEventToDelete] = useState<CalendarEvent | null>(
+    null,
+  );
 
-  // Fetch events
   const fetchEvents = async () => {
     setLoading(true);
     try {
@@ -128,7 +132,8 @@ export default function CalendarIndex({ auth }: { auth: any }) {
   // Filter Events
   const filteredEvents = events.filter((e) => {
     if (platformFilter === "all") return true;
-    if (platformFilter === "events") return String(e.type) === "user_event";
+    if (platformFilter === "events")
+      return String(e.type) === "user_event" || String(e.type) === "event";
     return e.extendedProps.platform?.toLowerCase() === platformFilter;
   });
 
@@ -165,6 +170,31 @@ export default function CalendarIndex({ auth }: { auth: any }) {
       fetchEvents(); // Revert
     } finally {
       setDraggedEvent(null);
+    }
+  };
+
+  // Delete Event Handler
+  const handleDeleteEvent = (event: CalendarEvent) => {
+    setEventToDelete(event);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!eventToDelete) return;
+
+    try {
+      const resourceId = eventToDelete.resourceId;
+      // Optimistic remove
+      setEvents((prev) => prev.filter((x) => x.id !== eventToDelete.id));
+      await axios.delete(`/api/calendar/user-events/${resourceId}`);
+      toast.success(t("calendar.userEvents.modal.messages.successDelete"));
+    } catch (err) {
+      console.error(err);
+      toast.error(t("calendar.userEvents.modal.messages.errorDelete"));
+      fetchEvents();
+    } finally {
+      setShowDeleteModal(false);
+      setEventToDelete(null);
     }
   };
 
@@ -209,7 +239,6 @@ export default function CalendarIndex({ auth }: { auth: any }) {
                 </div>
 
                 <div className="flex flex-wrap items-center gap-3 w-full md:w-auto justify-center md:justify-end">
-                  {/* Platform Filter */}
                   <div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-lg p-1 mr-2 flex-wrap gap-1">
                     {platforms.map((p) => (
                       <button
@@ -262,8 +291,8 @@ export default function CalendarIndex({ auth }: { auth: any }) {
 
               {/* Calendar Grid */}
               <div className="border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden shadow-sm bg-gray-50 dark:bg-gray-900/50">
-                {/* Weekday Headers */}
-                <div className="grid grid-cols-7 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
+                {/* Weekday Headers - Desktop Only */}
+                <div className="hidden lg:grid grid-cols-7 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
                   {["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"].map(
                     (day) => (
                       <div
@@ -277,12 +306,12 @@ export default function CalendarIndex({ auth }: { auth: any }) {
                 </div>
 
                 {/* Days */}
-                <div className="grid grid-cols-7 auto-rows-fr min-h-[700px] bg-gray-200 dark:bg-gray-800 gap-px">
-                  {/* Empty Slots */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 auto-rows-fr min-h-[700px] bg-gray-200 dark:bg-gray-800 gap-px">
+                  {/* Empty Slots - Desktop Only */}
                   {startingEmptySlots.map((_, i) => (
                     <div
                       key={`empty-${i}`}
-                      className="bg-gray-50/50 dark:bg-gray-900/50 p-2"
+                      className="hidden lg:block bg-gray-50/50 dark:bg-gray-900/50 p-2"
                     ></div>
                   ))}
 
@@ -308,18 +337,30 @@ export default function CalendarIndex({ auth }: { auth: any }) {
                       >
                         {/* Date Header */}
                         <div className="flex justify-between items-start mb-2">
-                          <span
-                            className={`
-                                                        text-sm font-medium w-8 h-8 flex items-center justify-center rounded-full transition-colors
-                                                        ${
-                                                          isTodayDay
-                                                            ? "bg-primary-600 text-white shadow-lg shadow-primary-500/30"
-                                                            : "text-gray-500 dark:text-gray-400 group-hover:bg-gray-100 dark:group-hover:bg-gray-800"
-                                                        }
-                                                    `}
-                          >
-                            {format(day, "d")}
-                          </span>
+                          <div className="flex items-center gap-2">
+                            <span
+                              className={`
+                                    text-sm font-medium w-8 h-8 flex items-center justify-center rounded-full transition-colors
+                                    ${
+                                      isTodayDay
+                                        ? "bg-primary-600 text-white shadow-lg shadow-primary-500/30"
+                                        : "text-gray-500 dark:text-gray-400 group-hover:bg-gray-100 dark:group-hover:bg-gray-800"
+                                    }
+                                `}
+                            >
+                              {format(day, "d")}
+                            </span>
+                            {/* Show weekday on mobile/tablet */}
+                            <span className="lg:hidden text-xs font-medium text-gray-400 uppercase">
+                              {format(day, "EEE", {
+                                locale:
+                                  i18n.language === "es"
+                                    ? undefined
+                                    : undefined,
+                              })}
+                            </span>
+                          </div>
+
                           {isTodayDay && (
                             <span className="text-[10px] font-bold text-primary-600 dark:text-primary-400">
                               HOY
@@ -379,43 +420,22 @@ export default function CalendarIndex({ auth }: { auth: any }) {
                                     )}
                                   </div>
                                 </div>
+
+                                {["user_event", "event"].includes(
+                                  String(event.type),
+                                ) && (
+                                  <button
+                                    onClick={(ev) => {
+                                      ev.stopPropagation();
+                                      handleDeleteEvent(event);
+                                    }}
+                                    className="flex-shrink-0 p-1 rounded-md text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all self-start"
+                                    title="Eliminar evento"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                )}
                               </div>
-
-                              {/* Delete button for user-created events */}
-                              {String(event.type) === "user_event" && (
-                                <button
-                                  onClick={async (ev) => {
-                                    ev.stopPropagation();
-                                    if (!confirm("¿Eliminar evento?")) return;
-                                    try {
-                                      const resourceId = event.resourceId;
-                                      // Optimistic remove
-                                      setEvents((prev) =>
-                                        prev.filter((x) => x.id !== event.id),
-                                      );
-                                      await axios.delete(
-                                        `/api/calendar/user-events/${resourceId}`,
-                                      );
-                                      toast.success("Evento eliminado");
-                                    } catch (err) {
-                                      console.error(err);
-                                      toast.error(
-                                        "No se pudo eliminar el evento",
-                                      );
-                                      fetchEvents();
-                                    }
-                                  }}
-                                  className="absolute top-1 right-1 p-1 rounded-md text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 opacity-0 group-hover/card:opacity-100 transition-opacity"
-                                  title="Eliminar evento"
-                                >
-                                  <Trash2 className="w-3.5 h-3.5" />
-                                </button>
-                              )}
-
-                              {/* Thumbnail Background (Optional - Subtle) */}
-                              {/* {event.extendedProps.thumbnail && (
-                                                                <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-cover bg-center" style={{ backgroundImage: `url(${event.extendedProps.thumbnail})` }} />
-                                                            )} */}
                             </div>
                           ))}
                         </div>
@@ -428,6 +448,37 @@ export default function CalendarIndex({ auth }: { auth: any }) {
           </div>
         </div>
       </div>
+
+      <DynamicModal
+        isOpen={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setEventToDelete(null);
+        }}
+        title={t("calendar.userEvents.modal.actions.delete")}
+        size="md"
+      >
+        <div className="space-y-4">
+          <p className="text-gray-600 dark:text-gray-300">
+            {t("calendar.userEvents.modal.actions.deleteConfirm")}
+          </p>
+
+          <div className="flex justify-end gap-3 mt-6">
+            <Button
+              variant="secondary"
+              onClick={() => {
+                setShowDeleteModal(false);
+                setEventToDelete(null);
+              }}
+            >
+              {t("calendar.userEvents.modal.actions.cancel")}
+            </Button>
+            <Button variant="danger" onClick={confirmDelete}>
+              {t("calendar.userEvents.modal.actions.delete")}
+            </Button>
+          </div>
+        </div>
+      </DynamicModal>
     </AuthenticatedLayout>
   );
 }
