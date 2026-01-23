@@ -51,6 +51,7 @@
           "successCreate": "Event created",
           "successUpdate": "Event updated",
           "successDelete": "Event deleted",
+          "confirmDelete": "Are you sure you want to delete this event?",
           "errorSave": "Error saving event",
           "errorDelete": "Error deleting event"
         },

@@ -51,6 +51,7 @@
           "successCreate": "Evento creado",
           "successUpdate": "Evento actualizado",
           "successDelete": "Evento eliminado",
+          "confirmDelete": "¿Estás seguro de que deseas eliminar este evento?",
           "errorSave": "Error al guardar el evento",
           "errorDelete": "Error al eliminar el evento"
         },
