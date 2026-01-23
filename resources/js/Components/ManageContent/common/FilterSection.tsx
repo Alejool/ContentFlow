@@ -40,12 +40,6 @@ export default function FilterSection({
 
   const statusPublicationsOptions = [
     { value: "all", label: t("publications.filters.all") },
-    {
-      value: "event",
-      label:
-        t("publications.filters.only_events") ||
-        "Sólo eventos de redes sociales",
-    },
     { value: "published", label: t("publications.filters.published") },
     { value: "draft", label: t("publications.filters.draft") },
     { value: "scheduled", label: t("publications.status.scheduled") },

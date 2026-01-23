@@ -182,7 +182,7 @@ const EditPublicationModal = ({
   const { auth } = usePage<any>().props;
   const canManage =
     auth.current_workspace?.permissions?.includes("manage-content");
-  const isDisabled = isLockedByOther || !canManage || hasPublishedPlatform;
+  const isDisabled = isLockedByOther || !canManage;
 
   const canPublish = auth.current_workspace?.permissions?.includes("publish");
 
@@ -299,14 +299,14 @@ const EditPublicationModal = ({
                       <p className="font-semibold mb-1">
                         {hasPublishedPlatform
                           ? t("publications.modal.edit.contentLocked") ||
-                            "Content Locked"
+                            "Publication partially live"
                           : t("publications.modal.edit.configurationLocked") ||
                             "Configuración Bloqueada"}
                       </p>
                       <p className="opacity-80">
                         {hasPublishedPlatform
                           ? t("publications.modal.edit.contentLockedHint") ||
-                            "This publication is live on some platforms. To edit, you must unpublish it first."
+                            "This publication is live on some platforms. Changes will apply to pending and future uploads."
                           : t(
                               "publications.modal.edit.configurationLockedHint",
                             ) ||

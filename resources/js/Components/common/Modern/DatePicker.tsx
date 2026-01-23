@@ -993,12 +993,23 @@ const DatePickerModern = <T extends FieldValues>({
           name={name}
           selected={selected}
           onChange={(date) => {
-            if (date && selected && showTimeSelect) {
-              const newDate = new Date(date);
-              newDate.setHours(selected.getHours());
-              newDate.setMinutes(selected.getMinutes());
-              newDate.setSeconds(selected.getSeconds());
-              onChange(newDate);
+            if (date && showTimeSelect) {
+              // If there's already a selected date with time, preserve the time
+              if (selected) {
+                const newDate = new Date(date);
+                newDate.setHours(selected.getHours());
+                newDate.setMinutes(selected.getMinutes());
+                newDate.setSeconds(selected.getSeconds());
+                onChange(newDate);
+              } else {
+                // If no previous date, set to current time
+                const newDate = new Date(date);
+                const now = new Date();
+                newDate.setHours(now.getHours());
+                newDate.setMinutes(now.getMinutes());
+                newDate.setSeconds(0);
+                onChange(newDate);
+              }
             } else {
               onChange(date);
             }

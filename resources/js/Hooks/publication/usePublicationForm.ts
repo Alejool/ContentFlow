@@ -442,10 +442,12 @@ export const usePublicationForm = ({
       const socialAccounts = data.social_accounts || [];
 
       // If no accounts selected and no date selected, it's effectively a draft now
+      const currentStatus = getValues("status") || "draft";
+      const validStatuses = ['draft', 'published', 'publishing', 'failed', 'pending_review', 'approved', 'scheduled', 'rejected'];
       const finalStatus =
         socialAccounts.length === 0 && !data.scheduled_at
           ? "draft"
-          : getValues("status") || "draft";
+          : validStatuses.includes(currentStatus) ? currentStatus : "draft";
 
       formData.append("status", finalStatus);
 
