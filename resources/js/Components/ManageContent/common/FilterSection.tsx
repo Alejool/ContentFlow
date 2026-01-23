@@ -1,4 +1,4 @@
-import DatePickerModern from "@/Components/common/Modern/DatePicker";
+import { DatePicker as DatePickerModern } from "@/Components/common/Modern/DatePicker";
 import Input from "@/Components/common/Modern/Input";
 import Select from "@/Components/common/Modern/Select";
 import { format } from "date-fns";
@@ -40,6 +40,12 @@ export default function FilterSection({
 
   const statusPublicationsOptions = [
     { value: "all", label: t("publications.filters.all") },
+    {
+      value: "event",
+      label:
+        t("publications.filters.only_events") ||
+        "Sólo eventos de redes sociales",
+    },
     { value: "published", label: t("publications.filters.published") },
     { value: "draft", label: t("publications.filters.draft") },
     { value: "scheduled", label: t("publications.status.scheduled") },
@@ -125,7 +131,9 @@ export default function FilterSection({
             <div className="flex items-center gap-2">
               <div className="w-32">
                 <DatePickerModern
+                  isClearable
                   selected={dateStart ? new Date(dateStart) : null}
+                  dateFormat="dd/MM/yyyy HH:mm"
                   onChange={(d) =>
                     handleFilterChange(
                       "date_start",
@@ -135,13 +143,13 @@ export default function FilterSection({
                   placeholder="Inicio"
                   withPortal
                   size="md"
-                  isClearable
                 />
               </div>
               <span className="text-gray-400">-</span>
               <div className="w-32">
                 <DatePickerModern
                   selected={dateEnd ? new Date(dateEnd) : null}
+                  dateFormat="dd/MM/yyyy HH:mm"
                   onChange={(d) =>
                     handleFilterChange(
                       "date_end",

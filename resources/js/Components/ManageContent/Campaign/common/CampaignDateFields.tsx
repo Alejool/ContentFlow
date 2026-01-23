@@ -27,6 +27,8 @@ const CampaignDateFields: React.FC<CampaignDateFieldsProps> = ({
       <div className="form-group">
         <DatePickerModern
           register={undefined}
+          isClearable={true}
+          dateFormat="dd/MM/yyyy"
           name="start_date"
           error={errors.start_date?.message as string}
           label={t("campaigns.modal.add.startDate")}
@@ -46,6 +48,8 @@ const CampaignDateFields: React.FC<CampaignDateFieldsProps> = ({
       <div className="form-group">
         <DatePickerModern
           register={undefined}
+          isClearable={true}
+          dateFormat="dd/MM/yyyy"
           name="end_date"
           error={errors.end_date?.message as string}
           label={t("campaigns.modal.add.endDate")}

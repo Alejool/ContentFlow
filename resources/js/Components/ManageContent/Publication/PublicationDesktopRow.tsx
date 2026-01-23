@@ -1,7 +1,9 @@
 import PublicationThumbnail from "@/Components/ManageContent/Publication/PublicationThumbnail";
 import SocialAccountsDisplay from "@/Components/ManageContent/Publication/SocialAccountsDisplay";
 import { Publication } from "@/types/Publication";
+import axios from "axios";
 import {
+  Calendar,
   Clock,
   Edit,
   Eye,
@@ -13,6 +15,7 @@ import {
   Video,
 } from "lucide-react";
 import React, { memo, useState } from "react";
+import { toast } from "react-hot-toast";
 
 // ... (skipping interface to save tokens if possible, or just targeting the specific blocks)
 
@@ -77,7 +80,11 @@ const PublicationRow = memo(
         <td className="">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-lg flex-shrink-0 border border-gray-200 bg-gray-100 dark:border-neutral-700 dark:bg-neutral-800 overflow-hidden flex items-center justify-center">
-              <PublicationThumbnail publication={item} t={t} />
+              {(item as any).type === "user_event" ? (
+                <Calendar className="w-6 h-6 text-primary-500" />
+              ) : (
+                <PublicationThumbnail publication={item} t={t} />
+              )}
             </div>
             <div className="min-w-0 max-w-md">
               <h3
@@ -160,6 +167,23 @@ const PublicationRow = memo(
                     {t("publications.table.rejectedBy") || "Rejected by"}{" "}
                     {item.rejector.name}
                   </span>
+                </div>
+              )}
+              {((item as any).type === "user_event" || item.scheduled_at) && (
+                <div className="flex flex-col gap-0.5 mt-1">
+                  <div className="flex items-center gap-1.5">
+                    <Calendar className="w-3 h-3 text-primary-500" />
+                    <span className="text-[10px] font-bold text-primary-500 uppercase tracking-tight">
+                      {(item as any).type === "user_event"
+                        ? "Evento Manual"
+                        : "Evento de Red Social"}
+                    </span>
+                  </div>
+                  {(item as any).type === "user_event" && item.user && (
+                    <span className="text-[9px] font-medium text-gray-500 dark:text-gray-400 italic ml-4">
+                      Creado por: {item.user.name}
+                    </span>
+                  )}
                 </div>
               )}
             </div>
@@ -352,7 +376,31 @@ const PublicationRow = memo(
                 onClick={async () => {
                   setIsDeleting(true);
                   try {
-                    await onDelete(item.id);
+                    if ((item as any).type === "user_event") {
+                      if (
+                        confirm(
+                          t(
+                            "calendar.userEvents.modal.messages.confirmDelete",
+                          ) ||
+                            "¿Estás seguro de que deseas eliminar este evento?",
+                        )
+                      ) {
+                        await axios.delete(
+                          `/api/calendar/user-events/${item.id}`,
+                        );
+                        toast.success(
+                          t(
+                            "calendar.userEvents.modal.messages.successDelete",
+                          ) || "Evento eliminado",
+                        );
+                        onDelete(item.id); // Triggers refresh
+                      }
+                    } else {
+                      await onDelete(item.id);
+                    }
+                  } catch (error) {
+                    console.error("Delete failed", error);
+                    toast.error("Error al eliminar");
                   } finally {
                     setIsDeleting(false);
                   }

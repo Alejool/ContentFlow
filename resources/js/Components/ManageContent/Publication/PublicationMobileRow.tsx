@@ -1,8 +1,7 @@
 import SocialAccountsDisplay from "@/Components/ManageContent/Publication/SocialAccountsDisplay";
-import { Publication } from "@/types/Publication";
-import { format } from "date-fns";
-import { es } from "date-fns/locale";
 import { formatDateTime } from "@/Utils/formatDate";
+import { Publication } from "@/types/Publication";
+import axios from "axios";
 import {
   Calendar,
   CheckCircle,
@@ -20,6 +19,7 @@ import {
   XCircle,
 } from "lucide-react";
 import React, { memo, useCallback, useState } from "react";
+import { toast } from "react-hot-toast";
 
 interface PublicationMobileRowProps {
   items: Publication[];
@@ -174,7 +174,11 @@ const PublicationMobileRow = memo(
                 <div className="relative flex-shrink-0">
                   {hasMedia(item) && mediaUrl ? (
                     <div className="w-16 h-16 rounded-lg border border-gray-200 dark:border-neutral-700 bg-gray-100 dark:bg-neutral-800 overflow-hidden shadow-sm">
-                      {!hasImageError ? (
+                      {(item as any).type === "user_event" ? (
+                        <div className="w-16 h-16 rounded-lg border border-gray-200 dark:border-neutral-700 bg-gray-100 dark:bg-neutral-800 flex items-center justify-center shadow-sm">
+                          <Calendar className="w-8 h-8 text-primary-500" />
+                        </div>
+                      ) : !hasImageError ? (
                         <img
                           src={mediaUrl}
                           alt={item.title || "Preview"}
@@ -222,16 +226,80 @@ const PublicationMobileRow = memo(
                         {item.description || "Sin descripción"}
                       </p>
                     </div>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleExpand(item.id);
-                      }}
-                      className={`p-1 transition-transform duration-300 ${isExpanded ? "rotate-180" : ""}`}
-                    >
-                      <MoreVertical className="w-4 h-4 text-gray-400" />
-                    </button>
+                    <div className="flex items-center gap-2">
+                      {(item as any).type === "user_event" &&
+                        permissions?.includes("manage-content") && (
+                          <button
+                            onClick={async (e) => {
+                              e.stopPropagation();
+                              setLoadingStates((prev) => ({
+                                ...prev,
+                                [item.id]: { ...prev[item.id], deleting: true },
+                              }));
+                              try {
+                                if (
+                                  confirm(
+                                    t(
+                                      "calendar.userEvents.modal.messages.confirmDelete",
+                                    ) ||
+                                      "¿Estás seguro de que deseas eliminar este evento?",
+                                  )
+                                ) {
+                                  await axios.delete(
+                                    `/api/calendar/user-events/${item.id}`,
+                                  );
+                                  toast.success(
+                                    t(
+                                      "calendar.userEvents.modal.messages.successDelete",
+                                    ) || "Evento eliminado",
+                                  );
+                                  onDelete(item.id);
+                                }
+                              } catch (error) {
+                                console.error("Delete failed", error);
+                                toast.error("Error al eliminar");
+                              } finally {
+                                setLoadingStates((prev) => ({
+                                  ...prev,
+                                  [item.id]: {
+                                    ...prev[item.id],
+                                    deleting: false,
+                                  },
+                                }));
+                              }
+                            }}
+                            disabled={isLoading?.deleting}
+                            className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg dark:hover:bg-red-900/20 disabled:opacity-50 transition-all"
+                            title="Eliminar evento"
+                          >
+                            {isLoading?.deleting ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <Trash2 className="w-4 h-4" />
+                            )}
+                          </button>
+                        )}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleExpand(item.id);
+                        }}
+                        className={`p-1 transition-transform duration-300 ${isExpanded ? "rotate-180" : ""}`}
+                      >
+                        <MoreVertical className="w-4 h-4 text-gray-400" />
+                      </button>
+                    </div>
                   </div>
+
+                  {/* Creator info for events */}
+                  {(item as any).type === "user_event" && item.user && (
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <Users className="w-3 h-3 text-gray-400" />
+                      <span className="text-[10px] font-medium text-gray-500 dark:text-gray-400 italic">
+                        Creado por: {item.user.name}
+                      </span>
+                    </div>
+                  )}
 
                   {/* Status and metadata row */}
                   <div className="flex flex-wrap items-center gap-2">
@@ -264,10 +332,23 @@ const PublicationMobileRow = memo(
                     )}
 
                     {/* Scheduled time */}
-                    {item.status === "scheduled" && item.scheduled_at && (
+                    {item.scheduled_at && (
                       <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
                         <Calendar className="w-3 h-3" />
                         <span>{formatDate(item.scheduled_at)}</span>
+                      </div>
+                    )}
+
+                    {/* Event indicators */}
+                    {((item as any).type === "user_event" ||
+                      (item.scheduled_at && item.status !== "published")) && (
+                      <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400">
+                        <Calendar className="w-3.5 h-3.5" />
+                        <span className="font-medium">
+                          {(item as any).type === "user_event"
+                            ? "Evento Manual"
+                            : "Evento Red Social"}
+                        </span>
                       </div>
                     )}
                   </div>
@@ -515,7 +596,31 @@ const PublicationMobileRow = memo(
                                 },
                               }));
                               try {
-                                await onDelete(item.id);
+                                if ((item as any).type === "user_event") {
+                                  if (
+                                    confirm(
+                                      t(
+                                        "calendar.userEvents.modal.messages.confirmDelete",
+                                      ) ||
+                                        "¿Estás seguro de que deseas eliminar este evento?",
+                                    )
+                                  ) {
+                                    await axios.delete(
+                                      `/api/calendar/user-events/${item.id}`,
+                                    );
+                                    toast.success(
+                                      t(
+                                        "calendar.userEvents.modal.messages.successDelete",
+                                      ) || "Evento eliminado",
+                                    );
+                                    onDelete(item.id);
+                                  }
+                                } else {
+                                  await onDelete(item.id);
+                                }
+                              } catch (error) {
+                                console.error("Delete failed", error);
+                                toast.error("Error al eliminar");
                               } finally {
                                 setLoadingStates((prev) => ({
                                   ...prev,

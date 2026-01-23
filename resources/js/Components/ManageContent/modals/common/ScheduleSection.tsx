@@ -66,7 +66,7 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
               t("publications.modal.schedule.placeholder") ||
               "Select date and time"
             }
-            dateFormat="Pp"
+            dateFormat="dd/MM/yyyy HH:mm"
             minDate={new Date()}
             withPortal
             popperPlacement="bottom-start"

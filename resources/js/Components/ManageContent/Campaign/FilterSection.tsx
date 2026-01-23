@@ -81,7 +81,9 @@ export default function FilterSection({
         <div className="flex items-center gap-2">
           <div className="w-32">
             <DatePickerModern
+              isClearable={true}
               selected={dateStart ? new Date(dateStart) : null}
+              dateFormat="dd/MM/yyyy HH:mm"
               onChange={(d) =>
                 handleFilterChange(
                   "date_start",
@@ -95,6 +97,8 @@ export default function FilterSection({
           <span className="text-gray-400">-</span>
           <div className="w-32">
             <DatePickerModern
+              isClearable={true}
+              dateFormat="dd/MM/yyyy HH:mm"
               selected={dateEnd ? new Date(dateEnd) : null}
               onChange={(d) =>
                 handleFilterChange("date_end", d ? format(d, "yyyy-MM-dd") : "")
