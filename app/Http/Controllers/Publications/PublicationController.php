@@ -238,7 +238,7 @@ class PublicationController extends Controller
         'platform_settings' => $request->input('platform_settings')
       ]);
 
-      $publication->logActivity('published', ['platforms' => $request->input('platforms')]);
+      $publication->logActivity('publishing', ['platforms' => $request->input('platforms')]);
 
       // Clear cache after publishing
       $this->clearPublicationCache(Auth::user()->current_workspace_id);

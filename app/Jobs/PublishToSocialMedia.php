@@ -45,6 +45,9 @@ class PublishToSocialMedia implements ShouldQueue
           'status' => 'published',
           'publish_date' => now(),
         ]);
+
+        $publisher = \App\Models\User::find($this->publication->published_by);
+        $this->publication->logActivity('published', null, $publisher);
       } else {
         $this->publication->update([
           'status' => 'failed',
