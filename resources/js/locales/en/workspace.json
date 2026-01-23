@@ -128,7 +128,7 @@
       "no_permissions": "No permissions assigned."
     },
     "messages": {
-      "update_success": "Workspace updated successfully"
+      "update_success": "Workspace created successfully"
     },
     "subtitle": "Manage and switch between your workspaces",
     "create_button_subtitle": "Get Started",

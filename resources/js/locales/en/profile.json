@@ -16,6 +16,8 @@
     "newPassword": "New Password",
     "confirmPassword": "Confirm Password",
     "updateProfile": "Update Profile",
+    "update_success": "Profile updated successfully.",
+    "update_error": "Failed to update profile.",
     "deleteAccount": "Delete Account",
     "actions": {
       "saveChanges": "Save changes"

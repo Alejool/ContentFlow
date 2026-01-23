@@ -16,6 +16,8 @@
     "newPassword": "Nueva Contraseña",
     "confirmPassword": "Confirmar Contraseña",
     "updateProfile": "Actualizar Perfil",
+    "update_success": "Perfil actualizado exitosamente.",
+    "update_error": "Error al actualizar el perfil.",
     "deleteAccount": "Eliminar Cuenta",
     "actions": {
       "saveChanges": "Guardar Cambios"

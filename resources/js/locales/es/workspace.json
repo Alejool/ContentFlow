@@ -128,7 +128,7 @@
       "no_permissions": "No hay permisos asignados."
     },
     "messages": {
-      "update_success": "Espacio de trabajo actualizado exitosamente"
+      "update_success": "Espacio de trabajo creado exitosamente"
     },
     "subtitle": "Gestiona y cambia entre tus espacios de trabajo",
     "create_button_subtitle": "Empezar",
