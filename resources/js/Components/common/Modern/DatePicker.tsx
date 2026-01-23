@@ -28,6 +28,7 @@ interface DatePickerProps<T extends FieldValues> {
   showTimeSelect?: boolean;
   placeholder?: string;
   minDate?: Date;
+  allowPastDates?: boolean;
   className?: string;
   dateFormat?: string;
   isClearable?: boolean;
@@ -232,6 +233,7 @@ const DatePickerModern = <T extends FieldValues>({
   showTimeSelect = false,
   placeholder = "Select date",
   minDate,
+  allowPastDates = false,
   className = "",
   dateFormat,
   isClearable = true,
@@ -1013,7 +1015,7 @@ const DatePickerModern = <T extends FieldValues>({
           dateFormat={dateFormat || defaultDateFormat}
           locale={currentLocale}
           placeholderText={placeholder}
-          minDate={minDate || new Date()}
+          minDate={allowPastDates ? undefined : (minDate || new Date())}
           renderCustomHeader={({
             date,
             changeYear,

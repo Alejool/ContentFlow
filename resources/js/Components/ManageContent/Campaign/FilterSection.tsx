@@ -82,6 +82,7 @@ export default function FilterSection({
           <div className="w-32">
             <DatePickerModern
               isClearable={true}
+              allowPastDates={true}
               selected={dateStart ? new Date(dateStart) : null}
               dateFormat="dd/MM/yyyy HH:mm"
               onChange={(d) =>
@@ -98,6 +99,7 @@ export default function FilterSection({
           <div className="w-32">
             <DatePickerModern
               isClearable={true}
+              allowPastDates={true}
               dateFormat="dd/MM/yyyy HH:mm"
               selected={dateEnd ? new Date(dateEnd) : null}
               onChange={(d) =>
