@@ -1,10 +1,12 @@
 import Label from "@/Components/common/Modern/Label";
-import { TriangleAlert, CheckCircle, LucideIcon } from "lucide-react";
+import { CheckCircle, LucideIcon, TriangleAlert } from "lucide-react";
 import { TextareaHTMLAttributes, useState } from "react";
 import { FieldValues, Path, UseFormRegister } from "react-hook-form";
 
-interface TextareaProps<T extends FieldValues = FieldValues>
-  extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, "name"> {
+interface TextareaProps<T extends FieldValues = FieldValues> extends Omit<
+  TextareaHTMLAttributes<HTMLTextAreaElement>,
+  "name"
+> {
   id: string;
   label?: string;
   error?: string;
@@ -20,6 +22,7 @@ interface TextareaProps<T extends FieldValues = FieldValues>
   maxLength?: number;
   showCharCount?: boolean;
   rows?: number;
+  activeColor?: string;
 }
 
 export default function Textarea<T extends FieldValues>({
@@ -41,25 +44,29 @@ export default function Textarea<T extends FieldValues>({
   maxLength,
   showCharCount = false,
   rows = 4,
+  activeColor,
   ...props
 }: TextareaProps<T>) {
   const [charCount, setCharCount] = useState(0);
+  const [isFocused, setIsFocused] = useState(false);
 
   const sizeConfig = {
     sm: { textarea: "py-1 px-2 text-xs", icon: "w-3 h-3", label: "text-xs" },
     md: { textarea: "py-2 px-3 text-sm", icon: "w-4 h-4", label: "text-sm" },
-    lg: { textarea: "py-3 px-4 text-base", icon: "w-5 h-5", label: "text-base" },
+    lg: {
+      textarea: "py-3 px-4 text-base",
+      icon: "w-5 h-5",
+      label: "text-base",
+    },
   };
 
   const currentSize = sizeConfig[size];
-
 
   const getMessageStyles = (type: "error" | "success") => {
     return type === "error"
       ? "flex items-start align-center gap-2 py-2 rounded-lg text-sm text-primary-600"
       : "flex items-start align-center gap-2 py-2 rounded-lg text-sm text-green-600";
   };
-
 
   const getTextareaStyles = () => {
     const base = `
@@ -71,8 +78,10 @@ export default function Textarea<T extends FieldValues>({
       ${currentSize.textarea}
     `;
 
-    if (error) return `${base} border-primary-500 bg-white dark:bg-neutral-800 text-gray-900 dark:text-white`;
-    if (success) return `${base} border-green-500 bg-white dark:bg-neutral-800 text-gray-900 dark:text-white`;
+    if (error)
+      return `${base} border-primary-500 bg-white dark:bg-neutral-800 text-gray-900 dark:text-white`;
+    if (success)
+      return `${base} border-green-500 bg-white dark:bg-neutral-800 text-gray-900 dark:text-white`;
     if (variant === "outlined")
       return `${base} border-2 border-gray-300 dark:border-neutral-600 bg-transparent text-gray-900 dark:text-white`;
     if (variant === "filled")
@@ -118,8 +127,27 @@ export default function Textarea<T extends FieldValues>({
           disabled={disabled}
           {...registerRest}
           onChange={handleChange}
+          onFocus={(e) => {
+            setIsFocused(true);
+            props.onFocus?.(e);
+          }}
+          onBlur={(e) => {
+            setIsFocused(false);
+            props.onBlur?.(e);
+          }}
           placeholder={placeholder}
           className={`${getTextareaStyles()} ${className}`}
+          style={
+            {
+              ...(activeColor
+                ? {
+                    "--tw-ring-color": activeColor,
+                    borderColor: isFocused ? activeColor : `${activeColor}40`,
+                  }
+                : {}),
+              ...props.style,
+            } as React.CSSProperties
+          }
           maxLength={maxLength}
           aria-invalid={!!error}
           {...props}

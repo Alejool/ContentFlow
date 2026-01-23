@@ -29,6 +29,7 @@ interface InputProps<T extends FieldValues = FieldValues> extends Omit<
   variant?: "default" | "outlined" | "filled";
   sizeType?: "sm" | "md" | "lg";
   required?: boolean;
+  activeColor?: string;
 }
 
 export default function Input<T extends FieldValues>({
@@ -51,6 +52,7 @@ export default function Input<T extends FieldValues>({
   variant = "default",
   sizeType = "md",
   required = false,
+  activeColor,
   ...props
 }: InputProps<T>) {
   const [showPassword, setShowPassword] = useState(false);
@@ -172,8 +174,25 @@ export default function Input<T extends FieldValues>({
           {...(register ? register(fieldName) : {})}
           placeholder={placeholder}
           className={`${getInputStyles()} ${className}`}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
+          onFocus={(e) => {
+            setIsFocused(true);
+            props.onFocus?.(e);
+          }}
+          onBlur={(e) => {
+            setIsFocused(false);
+            props.onBlur?.(e);
+          }}
+          style={
+            {
+              ...(activeColor
+                ? {
+                    "--tw-ring-color": activeColor,
+                    borderColor: isFocused ? activeColor : `${activeColor}40`,
+                  }
+                : {}),
+              ...props.style,
+            } as React.CSSProperties
+          }
           aria-invalid={!!error}
           aria-describedby={
             error ? `${id}-error` : success ? `${id}-success` : undefined

@@ -17,6 +17,7 @@ interface DropdownPortalProps {
   isOpen: boolean;
   selectRect: DOMRect | null;
   dropdownDirection: "up" | "down";
+  usePortal?: boolean;
 }
 
 function DropdownPortal({
@@ -24,6 +25,7 @@ function DropdownPortal({
   isOpen,
   selectRect,
   dropdownDirection,
+  usePortal = true,
 }: DropdownPortalProps) {
   const [mounted, setMounted] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -34,7 +36,7 @@ function DropdownPortal({
   }, []);
 
   useEffect(() => {
-    if (isOpen && selectRect && dropdownRef.current) {
+    if (usePortal && isOpen && selectRect && dropdownRef.current) {
       const dropdown = dropdownRef.current;
       const viewportHeight = window.innerHeight;
       const dropdownHeight = Math.min(dropdown.scrollHeight, 240);
@@ -64,14 +66,16 @@ function DropdownPortal({
         }
       }
     }
-  }, [isOpen, selectRect, dropdownDirection]);
+  }, [isOpen, selectRect, dropdownDirection, usePortal]);
 
-  if (!mounted || !isOpen || !selectRect) return null;
+  if (!isOpen || (usePortal && (!mounted || !selectRect))) return null;
 
   const portalStyles: React.CSSProperties = {
-    position: "fixed",
+    position: usePortal ? "fixed" : "absolute",
     zIndex: 9999,
     maxHeight: "240px",
+    width: "100%",
+    minWidth: "120px",
     overflowY: "auto",
     transition: "opacity 150ms ease-out, transform 150ms ease-out",
     opacity: isOpen ? 1 : 0,
@@ -84,16 +88,27 @@ function DropdownPortal({
       "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
   };
 
-  return createPortal(
+  const content = (
     <div
       ref={dropdownRef}
       style={portalStyles}
-      className="bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700"
+      className={`bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 ${
+        !usePortal
+          ? dropdownDirection === "up"
+            ? "bottom-full left-0 mb-1"
+            : "top-full left-0 mt-1"
+          : ""
+      }`}
     >
       {children}
-    </div>,
-    document.body,
+    </div>
   );
+
+  if (!usePortal) {
+    return content;
+  }
+
+  return createPortal(content, document.body);
 }
 
 interface Option {
@@ -126,6 +141,7 @@ interface SelectProps<T extends FieldValues = FieldValues> {
   clearable?: boolean;
   loading?: boolean;
   dropdownPosition?: "down" | "up" | "auto";
+  usePortal?: boolean;
 }
 
 export default function Select<T extends FieldValues>({
@@ -151,6 +167,7 @@ export default function Select<T extends FieldValues>({
   clearable = false,
   loading = false,
   dropdownPosition = "auto",
+  usePortal = true,
   ...props
 }: SelectProps<T>) {
   const [isOpen, setIsOpen] = useState(false);
@@ -494,6 +511,80 @@ export default function Select<T extends FieldValues>({
               </div>
             </button>
           </div>
+
+          <DropdownPortal
+            isOpen={isOpen}
+            selectRect={selectRect}
+            dropdownDirection={dropdownDirection}
+            usePortal={usePortal}
+          >
+            <div
+              id={`${id}-dropdown`}
+              role="listbox"
+              aria-labelledby={`${id}-label`}
+              data-select-dropdown="true"
+              className="w-full"
+            >
+              {searchable && (
+                <div className="sticky top-0 bg-inherit border-b border-inherit">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 dark:text-gray-400" />
+                    <input
+                      ref={inputRef}
+                      type="text"
+                      placeholder="Search..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className={getSearchInputStyles()}
+                      style={{ paddingLeft: "2.5rem" }}
+                      aria-label="Search options"
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div className="py-1">
+                {filteredOptions.length === 0 ? (
+                  <div
+                    className={`${currentSize.option} px-4 py-3 text-center text-gray-500 dark:text-gray-400`}
+                  >
+                    No options found
+                  </div>
+                ) : (
+                  filteredOptions.map((option) => {
+                    const isSelected = option.value === value;
+                    return (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() =>
+                          !option.disabled && handleSelect(option.value)
+                        }
+                        disabled={option.disabled}
+                        className={`${getOptionStyles(
+                          isSelected,
+                          !!option.disabled,
+                        )} ${option.disabled ? "cursor-not-allowed" : ""}`}
+                        role="option"
+                        aria-selected={isSelected}
+                        aria-disabled={option.disabled}
+                      >
+                        {option.icon && (
+                          <span className="flex-shrink-0">{option.icon}</span>
+                        )}
+                        <span className="flex-1 text-left whitespace-nowrap">
+                          {option.label}
+                        </span>
+                        {isSelected && (
+                          <Check className="w-4 h-4 flex-shrink-0 text-purple-500 dark:text-purple-400" />
+                        )}
+                      </button>
+                    );
+                  })
+                )}
+              </div>
+            </div>
+          </DropdownPortal>
         </div>
 
         {error && (
@@ -518,79 +609,6 @@ export default function Select<T extends FieldValues>({
           </div>
         )}
       </div>
-
-      <DropdownPortal
-        isOpen={isOpen}
-        selectRect={selectRect}
-        dropdownDirection={dropdownDirection}
-      >
-        <div
-          id={`${id}-dropdown`}
-          role="listbox"
-          aria-labelledby={`${id}-label`}
-          data-select-dropdown="true"
-          className="w-full"
-        >
-          {searchable && (
-            <div className="sticky top-0 bg-inherit border-b border-inherit">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 dark:text-gray-400" />
-                <input
-                  ref={inputRef}
-                  type="text"
-                  placeholder="Search..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className={getSearchInputStyles()}
-                  style={{ paddingLeft: "2.5rem" }}
-                  aria-label="Search options"
-                />
-              </div>
-            </div>
-          )}
-
-          <div className="py-1">
-            {filteredOptions.length === 0 ? (
-              <div
-                className={`${currentSize.option} px-4 py-3 text-center text-gray-500 dark:text-gray-400`}
-              >
-                No options found
-              </div>
-            ) : (
-              filteredOptions.map((option) => {
-                const isSelected = option.value === value;
-                return (
-                  <button
-                    key={option.value}
-                    type="button"
-                    onClick={() =>
-                      !option.disabled && handleSelect(option.value)
-                    }
-                    disabled={option.disabled}
-                    className={`${getOptionStyles(
-                      isSelected,
-                      !!option.disabled,
-                    )} ${option.disabled ? "cursor-not-allowed" : ""}`}
-                    role="option"
-                    aria-selected={isSelected}
-                    aria-disabled={option.disabled}
-                  >
-                    {option.icon && (
-                      <span className="flex-shrink-0">{option.icon}</span>
-                    )}
-                    <span className="flex-1 text-left whitespace-nowrap">
-                      {option.label}
-                    </span>
-                    {isSelected && (
-                      <Check className="w-4 h-4 flex-shrink-0 text-purple-500 dark:text-purple-400" />
-                    )}
-                  </button>
-                );
-              })
-            )}
-          </div>
-        </div>
-      </DropdownPortal>
     </>
   );
 }
