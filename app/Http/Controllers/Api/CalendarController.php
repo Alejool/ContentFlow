@@ -34,7 +34,10 @@ class CalendarController extends Controller
 
         $workspaceId = Auth::user()->current_workspace_id;
         $query = Publication::where('workspace_id', $workspaceId)
-            ->with(['mediaFiles' => fn($q) => $q->select('media_files.id', 'media_files.file_path', 'media_files.file_type')]);
+            ->with([
+                'user:id,name',
+                'mediaFiles' => fn($q) => $q->select('media_files.id', 'media_files.file_path', 'media_files.file_type')
+            ]);
 
         if ($start && $end) {
             $query->whereBetween('scheduled_at', [$start, $end]);
@@ -57,6 +60,10 @@ class CalendarController extends Controller
                 'start' => $pub->scheduled_at ? $pub->scheduled_at->copy()->setTimezone('UTC')->toIso8601String() : null,
                 'status' => $pub->status,
                 'color' => $this->getStatusColor($pub->status),
+                'user' => $pub->user ? [
+                    'id' => $pub->user->id,
+                    'name' => $pub->user->name,
+                ] : null,
                 'extendedProps' => [
                     'slug' => $pub->slug,
                     'thumbnail' => $pub->mediaFiles->first()?->file_path,
@@ -68,7 +75,10 @@ class CalendarController extends Controller
         $posts = ScheduledPost::whereHas('publication', function ($q) use ($workspaceId) {
             $q->where('workspace_id', $workspaceId);
         })
-            ->with(['socialAccount:id,platform,account_name'])
+            ->with([
+                'socialAccount:id,platform,account_name',
+                'publication.user:id,name'
+            ])
             ->whereBetween('scheduled_at', [$start ?? now()->startOfMonth()->setTimezone('UTC'), $end ?? now()->endOfMonth()->setTimezone('UTC')])
             ->get();
 
@@ -81,6 +91,10 @@ class CalendarController extends Controller
                 'start' => $post->scheduled_at ? $post->scheduled_at->copy()->setTimezone('UTC')->toIso8601String() : null,
                 'status' => $post->status,
                 'color' => $this->getStatusColor($post->status, true),
+                'user' => $post->publication->user ? [
+                    'id' => $post->publication->user->id,
+                    'name' => $post->publication->user->name,
+                ] : null,
                 'extendedProps' => [
                     'publication_id' => $post->publication_id,
                     'platform' => $post->socialAccount->platform,
@@ -90,8 +104,12 @@ class CalendarController extends Controller
 
         // 3. Format User Calendar Events
         $userEvents = UserCalendarEvent::where('workspace_id', $workspaceId)
-            ->where('user_id', Auth::id())
+            ->where(function ($query) {
+                $query->where('is_public', true)
+                    ->orWhere('user_id', Auth::id());
+            })
             ->whereBetween('start_date', [$start ?? now()->startOfMonth()->setTimezone('UTC'), $end ?? now()->endOfMonth()->setTimezone('UTC')])
+            ->with('user:id,name,photo_url')
             ->get();
 
         $manualEvents = $userEvents->map(function ($event) {
@@ -104,8 +122,13 @@ class CalendarController extends Controller
                 'end' => $event->end_date ? $event->end_date->copy()->setTimezone('UTC')->toIso8601String() : null,
                 'status' => 'event',
                 'color' => $event->color,
+                'user' => $event->user ? [
+                    'id' => $event->user->id,
+                    'name' => $event->user->name,
+                ] : null,
                 'extendedProps' => [
                     'description' => $event->description,
+                    'is_public' => $event->is_public,
                 ]
             ];
         });
@@ -120,7 +143,7 @@ class CalendarController extends Controller
     {
         $request->validate([
             'scheduled_at' => 'required|date',
-            'type' => 'nullable|in:publication,post'
+            'type' => 'nullable|in:publication,post,user_event'
         ]);
 
         $type = $request->input('type', 'publication');

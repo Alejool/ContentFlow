@@ -128,7 +128,7 @@ class UserCalendarEventController extends Controller
   public function destroy(string $id)
   {
     $event = UserCalendarEvent::where('workspace_id', Auth::user()->current_workspace_id)
-      ->where('user_id', Auth::id())
+      ->where('user_id', Auth::id()) // Only allow deleting own events
       ->findOrFail($id);
 
     $event->delete();

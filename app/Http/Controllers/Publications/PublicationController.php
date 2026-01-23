@@ -59,6 +59,62 @@ class PublicationController extends Controller
       // Optimized eager loading: select only necessary columns to reduce memory usage
       // We avoid loading deep derivatives and all logs for every item in the list view
       // to prevent massive JSON payloads that freeze the frontend.
+      if ($request->has('status') && $request->status === 'event') {
+        $publications = Publication::where('workspace_id', $workspaceId)
+          ->with([
+            'mediaFiles' => fn($q) => $q->select('media_files.id', 'media_files.file_path', 'media_files.file_type', 'media_files.file_name', 'media_files.size', 'media_files.mime_type'),
+            'user' => fn($q) => $q->select('users.id', 'users.name', 'users.email', 'users.photo_url'),
+            'scheduled_posts.socialAccount' => fn($q) => $q->select('id', 'platform', 'account_name'),
+          ])
+          ->whereNotNull('scheduled_at')
+          ->orderBy('scheduled_at', 'desc')
+          ->get()
+          ->map(function ($pub) {
+            $pub->type = 'publication';
+            return $pub;
+          });
+
+        $userEvents = \App\Models\UserCalendarEvent::where('workspace_id', $workspaceId)
+          ->with('user:id,name,photo_url')
+          ->orderBy('start_date', 'desc')
+          ->get()
+          ->map(function ($event) {
+            return [
+              'id' => $event->id,
+              'title' => $event->title,
+              'description' => $event->description,
+              'status' => 'event',
+              'type' => 'user_event',
+              'scheduled_at' => $event->start_date,
+              'user' => $event->user,
+              'created_at' => $event->created_at,
+              'updated_at' => $event->updated_at,
+              'color' => $event->color,
+              // Add mock relations to avoid frontend errors
+              'media_files' => [],
+              'campaigns' => [],
+              'scheduled_posts' => [],
+            ];
+          });
+
+        $merged = $publications->concat($userEvents)->sortByDesc('scheduled_at')->values();
+
+        // Manual pagination for merged results
+        $page = $request->query('page', 1);
+        $perPage = $request->query('per_page', 10);
+        $offset = ($page - 1) * $perPage;
+
+        $paginated = new \Illuminate\Pagination\LengthAwarePaginator(
+          $merged->slice($offset, $perPage),
+          $merged->count(),
+          $perPage,
+          $page,
+          ['path' => $request->url(), 'query' => $request->query()]
+        );
+
+        return $this->successResponse(['publications' => $paginated]);
+      }
+
       $query = Publication::where('workspace_id', $workspaceId)
         ->with([
           'mediaFiles' => fn($q) => $q->select('media_files.id', 'media_files.file_path', 'media_files.file_type', 'media_files.file_name', 'media_files.size', 'media_files.mime_type'),
