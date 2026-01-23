@@ -27,7 +27,7 @@ export default function DeleteUserForm({
     reset,
     formState: { errors, isSubmitting },
   } = useHookForm<DeleteUserFormData>({
-    resolver: zodResolver(deleteUserSchema),
+    resolver: zodResolver(deleteUserSchema(t)),
   });
 
   const confirmUserDeletion = () => {
@@ -82,7 +82,7 @@ export default function DeleteUserForm({
         <ModernButton
           variant="danger"
           onClick={confirmUserDeletion}
-          icon={Trash2}
+          icon={Trash2 as any}
           className="font-bold uppercase tracking-wider rounded-lg shadow-lg shadow-primary-500/20 active:scale-95 transition-transform"
         >
           {t("profile.delete.deleteButton")}
