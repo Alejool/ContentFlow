@@ -23,7 +23,7 @@ class UpdatePublicationRequest extends FormRequest
       'goal' => 'nullable|string',
       'start_date' => 'nullable|date',
       'end_date' => 'nullable|date|after_or_equal:start_date',
-      'status' => 'nullable|in:draft,published',
+
       'scheduled_at' => [
         'nullable',
         'date',
