@@ -11,6 +11,8 @@ use App\Models\SocialMediaMetrics;
 use App\Models\Workspace;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 class ExistingUserDummyDataSeeder extends Seeder
 {
@@ -100,38 +102,74 @@ class ExistingUserDummyDataSeeder extends Seeder
       'New Year Resolution'
     ];
 
-    // Create 5-8 publications per user
-    $count = rand(5, 8);
+    // Create exactly 10 publications per user with richer test data
+    $count = 10;
+
+    // Some publications will be grouped into campaigns; use goal field to encode campaign name for compatibility
+    $campaignPool = [];
 
     for ($i = 0; $i < $count; $i++) {
       $title = $titles[array_rand($titles)] . ' - Test ' . Str::random(5);
-      $startDate = Carbon::now()->subDays(rand(10, 60));
-      $endDate = $startDate->copy()->addDays(rand(15, 45));
+      $startDate = Carbon::now()->subDays(rand(10, 90));
+      $endDate = $startDate->copy()->addDays(rand(7, 60));
+
+      // 40% chance to be part of a campaign grouping
+      $isCampaign = rand(1, 100) <= 40;
+      $campaignName = null;
+      if ($isCampaign) {
+        // reuse or create a campaign name
+        if (rand(1, 100) <= 60 && !empty($campaignPool)) {
+          $campaignName = $campaignPool[array_rand($campaignPool)];
+        } else {
+          $campaignName = Str::title(Str::random(6)) . ' Campaign';
+          $campaignPool[] = $campaignName;
+        }
+      }
+
+      $goal = $isCampaign ? "Campaign: {$campaignName}" : 'Test Goal for Analytics';
+      $description = ($isCampaign ? "Part of campaign {$campaignName}. " : '') . 'Generated test publication for dummy analytics.';
 
       $publication = Publication::create([
         'user_id' => $user->id,
         'workspace_id' => $workspaceId,
         'title' => $title,
-        'slug' => Str::slug($title),
-        'status' => 'published', // Make them published so they show up in stats
-        'goal' => 'Test Goal for Analytics',
-        'description' => 'Generated test publication for dummy analytics.',
+        'slug' => Str::slug($title . '-' . Str::random(4)),
+        'status' => 'published',
+        'goal' => $goal,
+        'description' => $description,
         'start_date' => $startDate,
         'end_date' => $endDate,
         'publish_date' => $startDate,
       ]);
 
+      // Create an activity record for the publication creation if an activities table exists
+      try {
+        if (Schema::hasTable('activities')) {
+          DB::table('activities')->insert([
+            'user_id' => $user->id,
+            'subject_type' => Publication::class,
+            'subject_id' => $publication->id,
+            'description' => "Created publication {$publication->title}",
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+          ]);
+        }
+      } catch (\Throwable $e) {
+        // ignore if activity table has different schema
+      }
+
       // Generate Analytics for this publication
-      $this->generateCampaignAnalytics($publication);
+      $this->generateCampaignAnalytics($publication, $isCampaign);
     }
   }
 
-  private function generateCampaignAnalytics($publication)
+  private function generateCampaignAnalytics($publication, $isCampaign = false)
   {
     $currentDate = $publication->start_date->copy();
     $endDate = $publication->end_date->copy()->min(Carbon::now()); // Don't generate future data yet
 
-    $baseViews = rand(100, 1000);
+    // Campaigns tend to have higher baseline
+    $baseViews = $isCampaign ? rand(500, 3000) : rand(100, 1000);
 
     while ($currentDate <= $endDate) {
       $isWeekend = $currentDate->isWeekend();
@@ -157,11 +195,11 @@ class ExistingUserDummyDataSeeder extends Seeder
         'comments' => $comments,
         'shares' => $shares,
         'saves' => $saves,
-        'reach' => (int) ($views * 0.9),
-        'impressions' => (int) ($views * 1.2),
-        'engagement_rate' => $views > 0 ? (($likes + $comments + $shares + $saves) / $views) * 100 : 0,
-        'ctr' => $views > 0 ? ($clicks / $views) * 100 : 0,
-        'conversion_rate' => $clicks > 0 ? ($conversions / $clicks) * 100 : 0,
+        'reach' => (int) ($views * (rand(80, 95) / 100)),
+        'impressions' => (int) ($views * (rand(110, 140) / 100)),
+        'engagement_rate' => $views > 0 ? round((($likes + $comments + $shares + $saves) / $views) * 100, 2) : 0,
+        'ctr' => $views > 0 ? round(($clicks / $views) * 100, 2) : 0,
+        'conversion_rate' => $clicks > 0 ? round(($conversions / $clicks) * 100, 2) : 0,
       ]);
 
       $currentDate->addDay();
@@ -173,7 +211,8 @@ class ExistingUserDummyDataSeeder extends Seeder
 
   private function createSocialAccountsAndMetrics($user, $workspaceId)
   {
-    $platforms = ['facebook', 'instagram', 'twitter', 'linkedin'];
+    // Read active social platforms from config if available, otherwise fallback
+    $platforms = config('social.platforms', ['facebook', 'instagram', 'twitter', 'linkedin']);
 
     foreach ($platforms as $platform) {
       // Check if account already exists to avoid duplicates
