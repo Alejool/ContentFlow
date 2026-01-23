@@ -55,6 +55,7 @@ export default function Input<T extends FieldValues>({
   const [isFocused, setIsFocused] = useState(false);
   const inputType = type === "password" && showPassword ? "text" : type;
   const fieldName = name || (id as Path<T>);
+  const { onChange: propOnChange, value: propValue, name: propName, ...restProps } = props as any;
 
   const sizeConfig = {
     sm: { input: "py-1 px-2 text-xs", icon: "w-3 h-3", label: "text-xs" },
@@ -159,6 +160,7 @@ export default function Input<T extends FieldValues>({
 
         <input
           id={id}
+          name={propName ?? fieldName}
           type={inputType}
           disabled={disabled}
           {...(register ? register(fieldName) : {})}
@@ -170,7 +172,9 @@ export default function Input<T extends FieldValues>({
           aria-describedby={
             error ? `${id}-error` : success ? `${id}-success` : undefined
           }
-          {...props}
+          value={propValue}
+          onChange={propOnChange}
+          {...restProps}
         />
 
         {(suffix || showPasswordToggle || error || success) && (
