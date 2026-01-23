@@ -10,8 +10,10 @@ import { FieldValues, Path, UseFormRegister } from "react-hook-form";
 
 import Label from "@/Components/common/Modern/Label";
 
-interface InputProps<T extends FieldValues = FieldValues>
-  extends Omit<InputHTMLAttributes<HTMLInputElement>, "name" | "prefix"> {
+interface InputProps<T extends FieldValues = FieldValues> extends Omit<
+  InputHTMLAttributes<HTMLInputElement>,
+  "name" | "prefix"
+> {
   id: string;
   label?: string;
   error?: string;
@@ -55,7 +57,12 @@ export default function Input<T extends FieldValues>({
   const [isFocused, setIsFocused] = useState(false);
   const inputType = type === "password" && showPassword ? "text" : type;
   const fieldName = name || (id as Path<T>);
-  const { onChange: propOnChange, value: propValue, name: propName, ...restProps } = props as any;
+  const {
+    onChange: propOnChange,
+    value: propValue,
+    name: propName,
+    ...restProps
+  } = props as any;
 
   const sizeConfig = {
     sm: { input: "py-1 px-2 text-xs", icon: "w-3 h-3", label: "text-xs" },
@@ -129,9 +136,7 @@ export default function Input<T extends FieldValues>({
             </Label>
           )}
           {hint && !label && (
-            <span
-              className="text-xs text-gray-500 dark:text-gray-400 ml-auto"
-            >
+            <span className="text-xs text-gray-500 dark:text-gray-400 ml-auto">
               {hint}
             </span>
           )}
@@ -143,12 +148,13 @@ export default function Input<T extends FieldValues>({
           <div
             className={`
             absolute left-3 top-1/2 -translate-y-1/2 flex items-center
-            ${error
+            ${
+              error
                 ? "text-primary-500 dark:text-primary-400"
                 : success
                   ? "text-green-500 dark:text-green-400"
                   : "text-gray-400 dark:text-gray-400"
-              }
+            }
           `}
           >
             {Icon && (
@@ -160,9 +166,9 @@ export default function Input<T extends FieldValues>({
 
         <input
           id={id}
-          name={propName ?? fieldName}
           type={inputType}
           disabled={disabled}
+          {...(!register ? { name: propName ?? fieldName } : {})}
           {...(register ? register(fieldName) : {})}
           placeholder={placeholder}
           className={`${getInputStyles()} ${className}`}
@@ -172,8 +178,8 @@ export default function Input<T extends FieldValues>({
           aria-describedby={
             error ? `${id}-error` : success ? `${id}-success` : undefined
           }
-          value={propValue}
-          onChange={propOnChange}
+          {...(propValue !== undefined ? { value: propValue } : {})}
+          {...(propOnChange !== undefined ? { onChange: propOnChange } : {})}
           {...restProps}
         />
 

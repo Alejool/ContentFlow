@@ -41,7 +41,10 @@ export default function Register() {
   const schema = z
     .object({
       name: z.string().min(1, t("validation.required")).max(255),
-      email: z.string().email(t("validation.email")).max(255),
+      email: z.preprocess(
+        (val) => (typeof val === "string" ? val.trim() : val),
+        z.string().email(t("validation.email")).max(255),
+      ),
       password: z.string().min(8, t("validation.min.string", { count: 8 })),
       password_confirmation: z.string().min(8),
     })
@@ -52,11 +55,14 @@ export default function Register() {
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
+    console.log("Submitting registration with data:", data);
+
     // Clear previous field errors
     setErrors({});
 
     const result = schema.safeParse(data);
     if (!result.success) {
+      console.error("Zod Validation Errors:", result.error.errors);
       const formatted = result.error.format();
       const fieldErrors: Record<string, string> = {};
       for (const key in formatted) {

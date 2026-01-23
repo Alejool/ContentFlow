@@ -5,7 +5,7 @@ import Modal from "@/Components/common/ui/Modal";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { Mail, Shield, UserPlus } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
@@ -21,7 +21,10 @@ interface InviteMemberModalProps {
 
 const getInviteSchema = (t: any) =>
   z.object({
-    email: z.string().email(t("workspace.invite_modal.validation.email")),
+    email: z.preprocess(
+      (val) => (typeof val === "string" ? val.trim() : val),
+      z.string().email(t("workspace.invite_modal.validation.email")),
+    ),
     role_id: z.number().min(1, t("workspace.invite_modal.validation.role")),
   });
 
@@ -55,6 +58,13 @@ export default function InviteMemberModal({
     },
   });
 
+  useEffect(() => {
+    if (Object.keys(errors).length > 0) {
+      console.log("Invite Form Errors:", errors);
+      console.log("Current Watch Email:", watch("email"));
+    }
+  }, [errors]);
+
   const roleOptions = roles.map((role) => ({
     value: role.id,
     label: role.name,
@@ -70,10 +80,10 @@ export default function InviteMemberModal({
     try {
       const response = await axios.post(
         route("workspaces.invite", workspace.id),
-        data
+        data,
       );
       toast.success(
-        response.data.message || t("workspace.invite_modal.messages.success")
+        response.data.message || t("workspace.invite_modal.messages.success"),
       );
       reset();
       onSuccess();

@@ -7,14 +7,6 @@ import {
   isValidElement,
 } from "react";
 
-type IconType =
-  | ComponentType<{
-      size?: number | string;
-      className?: string;
-      strokeWidth?: number;
-    }>
-  | ReactNode;
-
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
   variant?:
@@ -34,7 +26,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   shadow?: "none" | "sm" | "md" | "lg" | "xl";
   animation?: "none" | "pulse" | "bounce";
   theme?: "light" | "dark";
-  icon?: IconType;
+  icon?: any;
 }
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
