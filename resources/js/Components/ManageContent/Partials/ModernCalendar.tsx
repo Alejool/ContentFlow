@@ -62,6 +62,7 @@ interface CalendarEvent {
     description?: string;
     remind_at?: string;
     is_public?: boolean;
+    user_name?: string;
   };
 }
 
@@ -116,7 +117,11 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
   const startingEmptySlots = Array.from({ length: firstDayOfMonth });
 
   const handleDragStart = (e: React.DragEvent, event: CalendarEvent) => {
-    if (event.type === "user_event" && event.user?.id !== currentUser?.id) {
+    if (
+      event.type === "user_event" &&
+      !((event.user?.id && Number(event.user.id) === Number(currentUser?.id)) ||
+        (!event.user?.id && event.extendedProps?.user_name === currentUser?.name))
+    ) {
       e.preventDefault();
       return;
     }
@@ -454,7 +459,12 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                           </h5>
                           {event.user?.name && (
                             <p className="text-[10px] text-gray-500 dark:text-gray-400 font-medium">
-                              {t("common.creator")}: {event.user.name}
+                              {t("common.creator")}: {Number(event.user.id) === Number(currentUser?.id) ? t("common.me") || "Yo" : event.user.name}
+                            </p>
+                          )}
+                          {!event.user?.name && event.extendedProps?.user_name && (
+                            <p className="text-[10px] text-gray-500 dark:text-gray-400 font-medium">
+                              {t("common.creator")}: {event.extendedProps.user_name}
                             </p>
                           )}
                           <div className="flex items-center gap-2 mt-1">
@@ -471,7 +481,8 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                         </div>
                         <div className="flex flex-col items-center gap-2">
                           {event.type === "user_event" &&
-                            event.user?.id === currentUser?.id && (
+                            ((event.user?.id && Number(event.user.id) === Number(currentUser?.id)) ||
+                             (!event.user?.id && event.extendedProps?.user_name === currentUser?.name)) && (
                               <button
                                 onClick={(e) => handleDeleteEvent(e, event)}
                                 className="p-2 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 text-gray-400 hover:text-red-500 transition-all opacity-0 group-hover:opacity-100"

@@ -153,7 +153,9 @@ export default function UserEventModal({
 
   const { deleteEvent } = useCalendar();
 
-  const isOwner = !event || event.user?.id === currentUser?.id;
+  const isOwner = !event || 
+    (event.user?.id && Number(event.user.id) === Number(currentUser?.id)) ||
+    (!event.user?.id && event.extendedProps?.user_name === currentUser?.name);
   const isPast = isBefore(
     startOfDay(watch("start_date") || new Date()),
     startOfDay(new Date()),
@@ -253,7 +255,17 @@ export default function UserEventModal({
               ? "calendar.userEvents.modal.title.edit"
               : "calendar.userEvents.modal.title.new"
           }
-          subtitle={`${currentColor.name} • Evento${event?.user?.name ? " • " + t("common.creator") + ": " + event.user.name : ""}`}
+          subtitle={`${currentColor.name} • Evento${
+            event?.user?.id || event?.extendedProps?.user_name
+              ? " • " +
+                t("common.creator") +
+                ": " +
+                ((event.user?.id && Number(event.user.id) === Number(currentUser?.id)) ||
+                 (!event.user?.id && event.extendedProps?.user_name === currentUser?.name)
+                  ? t("common.me") || "Yo"
+                  : event.user?.name || event.extendedProps?.user_name)
+              : ""
+          }${!isOwner ? " • " + (t("common.readOnly") || "Solo lectura") : ""}`}
           icon={CalendarIcon}
           iconColor={`text-[${selectedColor}]`}
           style={{

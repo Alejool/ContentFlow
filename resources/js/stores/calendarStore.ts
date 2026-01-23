@@ -23,6 +23,7 @@ interface CalendarEvent {
     description?: string;
     remind_at?: string;
     is_public?: boolean;
+    user_name?: string;
   };
 }
 
