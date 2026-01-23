@@ -12,7 +12,7 @@ export default function CampaignPublications({
   campaign,
   getStatusColor,
 }: CampaignPublicationsProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const publications = campaign.publications || [];
 
   return (
@@ -47,7 +47,7 @@ export default function CampaignPublications({
                           {pub.title}
                         </div>
                         <div className="text-xs text-gray-500">
-                          {format(new Date(pub.created_at), "MMM d, yyyy")}
+                          {new Intl.DateTimeFormat(i18n.language || undefined, { year: 'numeric', month: 'short', day: 'numeric' }).format(new Date(pub.created_at))}
                         </div>
                       </div>
                     </div>

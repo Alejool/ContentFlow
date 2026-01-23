@@ -263,9 +263,7 @@ export default function PublishPublicationModal({
                       <div className="flex items-center gap-1.5 opacity-80">
                         <Clock className="w-3.5 h-3.5" />
                         <span>
-                          {format(new Date(publication.rejected_at), "PPp", {
-                            locale: i18n.language === "es" ? es : undefined,
-                          })}
+                          {formatDateTime(publication.rejected_at)}
                         </span>
                       </div>
                     )}

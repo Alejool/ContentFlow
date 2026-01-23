@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-import { es } from "date-fns/locale";
+import { getDateFnsLocale } from "@/Utils/dateLocales";
 import {
   Calendar,
   CheckCircle,
@@ -43,6 +43,8 @@ export default function ContentCard({
   remoteLock,
 }: ContentCardProps) {
   const { t } = useTranslation();
+  const { i18n } = useTranslation();
+  const locale = getDateFnsLocale(i18n.language);
   const canManageContent = permissions?.includes("manage-content");
   const canPublish = permissions?.includes("publish");
 
@@ -284,7 +286,7 @@ export default function ContentCard({
                 <Calendar className="w-3.5 h-3.5 text-gray-400" />
                 <span className="text-xs text-gray-600 dark:text-gray-300">
                   {format(new Date(item.scheduled_at), "d MMM, HH:mm", {
-                    locale: es,
+                    locale,
                   })}
                 </span>
               </div>
@@ -294,7 +296,7 @@ export default function ContentCard({
                   <Clock className="w-3.5 h-3.5 text-gray-400" />
                   <span className="text-xs text-gray-600 dark:text-gray-300">
                     {format(new Date(item.created_at), "d MMM yyyy", {
-                      locale: es,
+                      locale,
                     })}
                   </span>
                 </div>

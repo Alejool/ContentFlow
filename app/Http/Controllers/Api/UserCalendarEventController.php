@@ -43,8 +43,25 @@ class UserCalendarEventController extends Controller
       'remind_at' => 'nullable|date|before:start_date',
     ]);
 
+    // Normalize incoming datetimes using client's timezone header and store in UTC
+    $clientTz = $request->header('X-User-Timezone') ?? config('app.timezone', 'UTC');
+    $normalized = $validated;
+    try {
+      if (!empty($validated['start_date'])) {
+        $normalized['start_date'] = \Carbon\Carbon::parse($validated['start_date'], $clientTz)->setTimezone('UTC');
+      }
+      if (!empty($validated['end_date'])) {
+        $normalized['end_date'] = \Carbon\Carbon::parse($validated['end_date'], $clientTz)->setTimezone('UTC');
+      }
+      if (!empty($validated['remind_at'])) {
+        $normalized['remind_at'] = \Carbon\Carbon::parse($validated['remind_at'], $clientTz)->setTimezone('UTC');
+      }
+    } catch (\Exception $e) {
+      // If parsing fails, leave values as-is and let model/DB handle validation
+    }
+
     $event = UserCalendarEvent::create([
-      ...$validated,
+      ...$normalized,
       'user_id' => Auth::id(),
       'workspace_id' => Auth::user()->current_workspace_id,
     ]);
@@ -74,7 +91,24 @@ class UserCalendarEventController extends Controller
       'remind_at' => 'nullable|date|before:start_date',
     ]);
 
-    $event->update($validated);
+    // Normalize incoming datetimes using client's timezone header and store in UTC
+    $clientTz = $request->header('X-User-Timezone') ?? config('app.timezone', 'UTC');
+    $normalized = $validated;
+    try {
+      if (array_key_exists('start_date', $validated) && !empty($validated['start_date'])) {
+        $normalized['start_date'] = \Carbon\Carbon::parse($validated['start_date'], $clientTz)->setTimezone('UTC');
+      }
+      if (array_key_exists('end_date', $validated) && !empty($validated['end_date'])) {
+        $normalized['end_date'] = \Carbon\Carbon::parse($validated['end_date'], $clientTz)->setTimezone('UTC');
+      }
+      if (array_key_exists('remind_at', $validated) && !empty($validated['remind_at'])) {
+        $normalized['remind_at'] = \Carbon\Carbon::parse($validated['remind_at'], $clientTz)->setTimezone('UTC');
+      }
+    } catch (\Exception $e) {
+      // ignore parsing errors
+    }
+
+    $event->update($normalized);
 
     return $this->successResponse($event, 'Event updated successfully');
   }

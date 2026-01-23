@@ -2,7 +2,7 @@ import AdvancedPagination from "@/Components/common/ui/AdvancedPagination";
 import TableContainer from "@/Components/common/ui/TableContainer";
 import axios from "axios";
 import { format } from "date-fns";
-import { es } from "date-fns/locale";
+import { getDateFnsLocale } from "@/Utils/dateLocales";
 import { Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -36,6 +36,7 @@ interface ApprovalHistoryProps {
 
 export default function ApprovalHistory({ onRefresh }: ApprovalHistoryProps) {
   const { t, i18n } = useTranslation();
+  const locale = getDateFnsLocale(i18n.language);
   const [logs, setLogs] = useState<ApprovalLogItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -202,9 +203,7 @@ export default function ApprovalHistory({ onRefresh }: ApprovalHistoryProps) {
                   </td>
                   <td className="px-6 py-4">{log.requester.name}</td>
                   <td className="px-6 py-4 text-gray-500 text-sm">
-                    {format(new Date(log.requested_at), "PPp", {
-                      locale: i18n.language === "es" ? es : undefined,
-                    })}
+                    {format(new Date(log.requested_at), "PPp", { locale })}
                   </td>
                   <td className="px-6 py-4">
                     <div className="text-gray-900 dark:text-white">
@@ -212,9 +211,7 @@ export default function ApprovalHistory({ onRefresh }: ApprovalHistoryProps) {
                     </div>
                     {log.reviewed_at && (
                       <div className="text-xs text-gray-500">
-                        {format(new Date(log.reviewed_at), "PPp", {
-                          locale: i18n.language === "es" ? es : undefined,
-                        })}
+                        {format(new Date(log.reviewed_at), "PPp", { locale })}
                       </div>
                     )}
                   </td>

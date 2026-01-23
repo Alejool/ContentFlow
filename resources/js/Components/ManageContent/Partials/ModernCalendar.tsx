@@ -15,6 +15,7 @@ import {
   startOfMonth,
   subMonths,
 } from "date-fns";
+import { formatTime } from "@/Utils/formatDate";
 import { es } from "date-fns/locale";
 import {
   Calendar as CalendarIcon,
@@ -67,7 +68,7 @@ const PlatformIcon = ({
 };
 
 export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(false);
@@ -159,7 +160,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
         <div className="flex flex-col sm:flex-row justify-between items-center mb-6 sm:mb-8 gap-4 sm:gap-6">
           <div className="flex items-center gap-4">
             <h3 className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white capitalize flex items-center gap-3">
-              {format(currentDate, "MMMM yyyy", { locale: es })}
+              {new Intl.DateTimeFormat(i18n.language || undefined, { month: "long", year: "numeric" }).format(currentDate)}
               {loading && (
                 <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin text-primary-500" />
               )}
@@ -349,7 +350,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
               <div className="mb-6">
                 <h4 className="font-black text-gray-900 dark:text-white flex items-center gap-2 text-xl">
                   <CalendarIcon className="w-6 h-6 text-primary-500" />
-                  {format(selectedDate, "d 'de' MMMM", { locale: es })}
+                  {new Intl.DateTimeFormat(i18n.language || undefined, { day: 'numeric', month: 'long' }).format(selectedDate)}
                 </h4>
                 <div className="flex items-center gap-2 mt-2">
                   <span className="text-[10px] font-black uppercase tracking-widest text-primary-500 bg-primary-50 dark:bg-primary-900/30 px-2 py-0.5 rounded-full">
@@ -405,7 +406,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                           </h5>
                           <div className="flex items-center gap-2 mt-1">
                             <span className="text-[10px] px-2 py-0.5 rounded-full bg-gray-100 dark:bg-neutral-900 text-gray-500 dark:text-gray-400 font-bold uppercase">
-                              {format(parseISO(event.start), "HH:mm")}
+                                    {formatTime(event.start)}
                             </span>
                             <span className="text-[10px] font-bold text-primary-600 dark:text-primary-400 uppercase tracking-tight">
                               {event.status}

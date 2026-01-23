@@ -13,6 +13,7 @@ import {
   startOfMonth,
   subMonths,
 } from "date-fns";
+import { formatTime } from "@/Utils/formatDate";
 import { es } from "date-fns/locale";
 import {
   Calendar as CalendarIcon,
@@ -20,8 +21,11 @@ import {
   ChevronRight,
   Filter,
   Loader2,
+  Trash2
 } from "lucide-react";
+import { toast } from "react-hot-toast";
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   FaFacebook,
   FaInstagram,
@@ -75,6 +79,7 @@ const PlatformIcon = ({
 };
 
 export default function CalendarIndex({ auth }: { auth: any }) {
+  const { i18n } = useTranslation();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(false);
@@ -119,6 +124,7 @@ export default function CalendarIndex({ auth }: { auth: any }) {
   // Filter Events
   const filteredEvents = events.filter((e) => {
     if (platformFilter === "all") return true;
+    if (platformFilter === "events") return e.type === "user_event";
     return e.extendedProps.platform?.toLowerCase() === platformFilter;
   });
 
@@ -160,6 +166,7 @@ export default function CalendarIndex({ auth }: { auth: any }) {
 
   const platforms = [
     "all",
+    "events",
     "instagram",
     "facebook",
     "twitter",
@@ -187,7 +194,7 @@ export default function CalendarIndex({ auth }: { auth: any }) {
               <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-6">
                 <div className="flex items-center gap-4">
                   <h3 className="text-3xl font-bold text-gray-900 dark:text-white capitalize flex items-center gap-3">
-                    {format(currentDate, "MMMM yyyy", { locale: es })}
+                    {new Intl.DateTimeFormat(i18n.language || undefined, { month: "long", year: "numeric" }).format(currentDate)}
                     {loading && (
                       <Loader2 className="w-5 h-5 animate-spin text-primary-500" />
                     )}
@@ -345,12 +352,37 @@ export default function CalendarIndex({ auth }: { auth: any }) {
                                   </div>
                                   <div className="flex items-center gap-1.5 mt-1">
                                     <span className="text-[10px] text-gray-400 dark:text-gray-500 capitalize">
-                                      {format(parseISO(event.start), "HH:mm")} •{" "}
+                                      {formatTime(event.start)} •{" "}
                                       {event.status}
                                     </span>
                                   </div>
                                 </div>
                               </div>
+
+                              {/* Delete button for user-created events */}
+                              {event.type === "user_event" && (
+                                <button
+                                  onClick={async (ev) => {
+                                    ev.stopPropagation();
+                                    if (!confirm("¿Eliminar evento?")) return;
+                                    try {
+                                      const resourceId = event.resourceId;
+                                      // Optimistic remove
+                                      setEvents((prev) => prev.filter((x) => x.id !== event.id));
+                                      await axios.delete(`/api/calendar/user-events/${resourceId}`);
+                                      toast.success("Evento eliminado");
+                                    } catch (err) {
+                                      console.error(err);
+                                      toast.error("No se pudo eliminar el evento");
+                                      fetchEvents();
+                                    }
+                                  }}
+                                  className="absolute top-2 right-2 p-1 rounded-md text-gray-400 hover:text-red-600 bg-white/60 hover:bg-white"
+                                  title="Eliminar evento"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              )}
 
                               {/* Thumbnail Background (Optional - Subtle) */}
                               {/* {event.extendedProps.thumbnail && (

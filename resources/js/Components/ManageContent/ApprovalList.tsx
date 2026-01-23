@@ -5,7 +5,7 @@ import RejectionReasonModal from "@/Components/ManageContent/modals/RejectionRea
 import { Publication } from "@/types/Publication";
 import axios from "axios";
 import { format, formatDistanceToNow } from "date-fns";
-import { es } from "date-fns/locale";
+import { getDateFnsLocale } from "@/Utils/dateLocales";
 import { Check, Clock, Eye, User, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
@@ -24,7 +24,8 @@ export default function ApprovalList({
   onRefresh,
   onViewDetail,
 }: ApprovalListProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const locale = getDateFnsLocale(i18n.language);
   const [rejectionModalOpen, setRejectionModalOpen] = useState(false);
   const [approvalModalOpen, setApprovalModalOpen] = useState(false);
   const [selectedPublication, setSelectedPublication] =
@@ -138,7 +139,7 @@ export default function ApprovalList({
                   <span
                     className="text-xs text-gray-500 flex items-center gap-1.5"
                     title={format(new Date(pub.updated_at), "PPP HH:mm", {
-                      locale: es,
+                      locale,
                     })}
                   >
                     <Clock className="w-3.5 h-3.5" />
@@ -146,7 +147,7 @@ export default function ApprovalList({
                       {format(new Date(pub.updated_at), "HH:mm")} (
                       {formatDistanceToNow(new Date(pub.updated_at), {
                         addSuffix: true,
-                        locale: es,
+                        locale,
                       })}
                       )
                     </span>

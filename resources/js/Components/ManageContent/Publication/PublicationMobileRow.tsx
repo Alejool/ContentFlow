@@ -2,6 +2,7 @@ import SocialAccountsDisplay from "@/Components/ManageContent/Publication/Social
 import { Publication } from "@/types/Publication";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { formatDateTime } from "@/Utils/formatDate";
 import {
   Calendar,
   CheckCircle,
@@ -126,7 +127,7 @@ const PublicationMobileRow = memo(
     const formatDate = (dateString?: string) => {
       if (!dateString) return "";
       try {
-        return format(new Date(dateString), "d MMM, HH:mm", { locale: es });
+        return formatDateTime(dateString);
       } catch {
         return "";
       }

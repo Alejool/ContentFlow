@@ -11,6 +11,7 @@ import {
   startOfMonth,
   startOfWeek,
 } from "date-fns";
+import { formatTime } from "@/Utils/formatDate";
 import {
   Calendar as CalendarIcon,
   ChevronLeft,
@@ -162,7 +163,7 @@ export default function EditorialCalendar() {
                     {event.start && (
                       <div className="hidden sm:flex items-center gap-1 text-[9px] text-gray-500">
                         <Clock className="w-2.5 h-2.5" />
-                        {format(new Date(event.start), "HH:mm")}
+                        {formatTime(event.start)}
                       </div>
                     )}
                   </div>

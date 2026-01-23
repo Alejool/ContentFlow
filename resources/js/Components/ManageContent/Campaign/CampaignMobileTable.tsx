@@ -1,7 +1,8 @@
 import { Campaign } from "@/types/Campaign";
 import { usePage } from "@inertiajs/react";
 import { format } from "date-fns";
-import { es } from "date-fns/locale";
+import { getDateFnsLocale } from "@/Utils/dateLocales";
+import { useTranslation } from "react-i18next";
 import {
   Calendar,
   ChevronDown,
@@ -41,6 +42,8 @@ export default function CampaignMobileTable({
   const { auth } = usePage<any>().props;
   const canManageContent =
     auth.current_workspace?.permissions?.includes("manage-content");
+  const { i18n } = useTranslation();
+  const locale = getDateFnsLocale(i18n.language);
 
   return (
     <div className="lg:hidden">
@@ -98,13 +101,13 @@ export default function CampaignMobileTable({
                   <span>
                     {item.start_date
                       ? format(new Date(item.start_date), "d MMM", {
-                          locale: es,
+                          locale,
                         })
                       : "..."}
                     {" - "}
                     {item.end_date
                       ? format(new Date(item.end_date), "d MMM yyyy", {
-                          locale: es,
+                          locale,
                         })
                       : "..."}
                   </span>

@@ -17,6 +17,7 @@ services:
       - ./:/var/www/html
       - ./storage:/var/www/html/storage
       - ./docker/php/php_dev.ini:/usr/local/etc/php/conf.d/local.ini
+      - ./docker/php/custom.ini:/usr/local/etc/php/conf.d/custom.ini
       - cf_vendor_v2:/var/www/html/vendor
       - cf_node_modules_v2:/var/www/html/node_modules
       - cf_public_build:/var/www/html/public/build
@@ -90,6 +91,7 @@ services:
       - ./:/var/www/html
       - cf_vendor_v2:/var/www/html/vendor
       - cf_node_modules_v2:/var/www/html/node_modules
+      - ./docker/php/custom.ini:/usr/local/etc/php/conf.d/custom.ini
     env_file:
       - .env.docker
     depends_on:
@@ -112,10 +114,11 @@ services:
       - ./:/var/www/html
       - cf_vendor_v2:/var/www/html/vendor
       - cf_node_modules_v2:/var/www/html/node_modules
+      - ./docker/php/custom.ini:/usr/local/etc/php/conf.d/custom.ini
     env_file:
       - .env.docker
     ports:
-      - "8080:8080"
+      - "8081:8080"
     depends_on:
       - app
       - redis
@@ -136,6 +139,7 @@ services:
       - ./:/var/www/html
       - cf_vendor_v2:/var/www/html/vendor
       - cf_node_modules_v2:/var/www/html/node_modules
+      - ./docker/php/custom.ini:/usr/local/etc/php/conf.d/custom.ini
     env_file:
       - .env.docker
     depends_on:
@@ -152,7 +156,7 @@ services:
     environment:
       - REDIS_HOSTS=local:redis:6379
     ports:
-      - "8081:8081"
+      - "8082:8081"
     depends_on:
       - redis
     networks:

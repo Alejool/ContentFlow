@@ -48,6 +48,8 @@ Broadcast::routes();
 |--------------------------------------------------------------------------
 */
 Route::middleware('guest')->group(function () {
+  Route::get('/up', fn() => response('OK'));
+
 
   Route::get(
     '/',
@@ -201,8 +203,8 @@ Route::middleware('auth:sanctum')->group(function () {
     | Content
     |--------------------------------------------------------------------------
     */
-  Route::prefix('content')->name('content.')->group(function () {
-    Route::get('/manage', [ManageContentController::class, 'index'])->name('manage');
+  Route::prefix('ManageContent')->name('manage-content.')->group(function () {
+    Route::get('/', [ManageContentController::class, 'index'])->name('index');
     Route::get('/posts', [PostsController::class, 'index'])->name('posts');
   });
 

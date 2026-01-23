@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-import { es } from "date-fns/locale";
+import { getDateFnsLocale } from "@/Utils/dateLocales";
 import {
   Activity,
   CheckCircle,
@@ -34,6 +34,7 @@ export default function PublicationTimeline({
   activities,
 }: PublicationTimelineProps) {
   const { t, i18n } = useTranslation();
+  const locale = getDateFnsLocale(i18n.language);
 
   if (!activities || activities.length === 0) {
     return null;
@@ -125,9 +126,7 @@ export default function PublicationTimeline({
                   {formatActivityType(activity.type)}
                 </span>
                 <time className="text-xs text-gray-500 dark:text-gray-400 font-medium">
-                  {format(new Date(activity.created_at), "PPp", {
-                    locale: i18n.language === "es" ? es : undefined,
-                  })}
+                  {format(new Date(activity.created_at), "PPp", { locale })}
                 </time>
               </div>
 

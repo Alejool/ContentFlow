@@ -27,12 +27,13 @@ primary_region = "gru"
     port = 443
     handlers = ["tls", "http"]
 
-  [[services.http_checks]]
-    interval = "30s"
-    method = "get"
-    path = "/favicon.ico"
-    timeout = "5s"
-    grace_period = "1200s"
+ [[services.http_checks]]
+  interval = "30s"
+  method = "get"
+  path = "/up"
+  timeout = "5s"
+  grace_period = "1200s"
+
 
 [[services]]
   protocol = "tcp"
@@ -47,3 +48,11 @@ primary_region = "gru"
   memory = "512mb"
   cpu_kind = "shared"
   cpus = 1
+  processes = ["app", "queue","scheduler" ]
+
+[[vm]]
+  memory = "1024mb"
+  cpu_kind = "shared"
+  cpus = 1
+  processes = ["reverb"]
+

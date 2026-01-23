@@ -23,6 +23,7 @@ use App\Notifications\PublicationAwaitingApprovalNotification;
 use App\Notifications\PublicationApprovedNotification;
 use App\Notifications\PublicationRejectedNotification;
 use App\Models\Publications\PublicationLock;
+use Carbon\Carbon;
 
 class PublicationController extends Controller
 {
@@ -118,9 +119,22 @@ class PublicationController extends Controller
     }
 
     try {
-      $publication = $action->execute($request->validated(), $request->file('media', []));
+      $data = $request->validated();
 
-      $publication->logActivity('created', $request->validated());
+      // Normalize scheduled_at to UTC using client's timezone header
+      if (!empty($data['scheduled_at'])) {
+        try {
+          $tz = $request->header('X-User-Timezone');
+          $dt = $tz ? Carbon::parse($data['scheduled_at'], $tz)->setTimezone('UTC') : Carbon::parse($data['scheduled_at'])->setTimezone('UTC');
+          $data['scheduled_at'] = $dt->toIso8601String();
+        } catch (\Exception $e) {
+          // If parsing fails, keep original value and let deeper validation handle it
+        }
+      }
+
+      $publication = $action->execute($data, $request->file('media', []));
+
+      $publication->logActivity('created', $data);
 
       // Clear cache after creating publication
       $this->clearPublicationCache(Auth::user()->current_workspace_id);
@@ -178,9 +192,22 @@ class PublicationController extends Controller
     }
 
     try {
-      $publication = $action->execute($publication, $request->validated(), $request->file('media', []));
+      $data = $request->validated();
 
-      $publication->logActivity('updated', ['changes' => array_keys($request->validated())]);
+      // Normalize scheduled_at to UTC using client's timezone header
+      if (!empty($data['scheduled_at'])) {
+        try {
+          $tz = $request->header('X-User-Timezone');
+          $dt = $tz ? Carbon::parse($data['scheduled_at'], $tz)->setTimezone('UTC') : Carbon::parse($data['scheduled_at'])->setTimezone('UTC');
+          $data['scheduled_at'] = $dt->toIso8601String();
+        } catch (\Exception $e) {
+          // leave as-is
+        }
+      }
+
+      $publication = $action->execute($publication, $data, $request->file('media', []));
+
+      $publication->logActivity('updated', ['changes' => array_keys($data)]);
 
       // Clear cache after updating publication
       $this->clearPublicationCache(Auth::user()->current_workspace_id);

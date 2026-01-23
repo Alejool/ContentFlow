@@ -1,5 +1,6 @@
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { formatDateTime } from "@/Utils/formatDate";
 import { CheckCircle, Clock, MessageSquare, User, XCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -85,9 +86,7 @@ export default function ApprovalHistorySection({
                           "Pendiente de revisión"}
                   </span>
                   <span className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 font-medium">
-                    {format(new Date(log.requested_at), "PPp", {
-                      locale: i18n.language === "es" ? es : undefined,
-                    })}
+                    {formatDateTime(log.requested_at)}
                   </span>
                 </div>
 

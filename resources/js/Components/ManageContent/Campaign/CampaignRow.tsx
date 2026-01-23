@@ -1,7 +1,7 @@
 import { Campaign } from "@/types/Campaign";
 import { usePage } from "@inertiajs/react";
 import { format } from "date-fns";
-import { es } from "date-fns/locale";
+import { getDateFnsLocale } from "@/Utils/dateLocales";
 import {
   Calendar,
   ChevronDown,
@@ -38,7 +38,8 @@ const CampaignRow = memo(
     onEditRequest,
     onViewDetails,
   }: CampaignRowProps) => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+    const locale = getDateFnsLocale(i18n.language);
     const { auth } = usePage<any>().props;
     const canManage =
       auth.current_workspace?.permissions?.includes("manage-content");
@@ -89,13 +90,13 @@ const CampaignRow = memo(
                     <span>
                       {item.start_date
                         ? format(new Date(item.start_date), "d MMM", {
-                            locale: es,
+                            locale,
                           })
                         : "..."}
                       {" - "}
                       {item.end_date
                         ? format(new Date(item.end_date), "d MMM yyyy", {
-                            locale: es,
+                            locale,
                           })
                         : "..."}
                     </span>

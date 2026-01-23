@@ -2,6 +2,7 @@ import Button from "@/Components/common/Modern/Button";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { formatDateTime } from "@/Utils/formatDate";
 import { CheckCircle, User, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -76,9 +77,7 @@ export default function ApprovalSuccessModal({
                     {approverName}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    {format(new Date(approvedAt), "PPP 'a las' HH:mm", {
-                      locale: es,
-                    })}
+                    {formatDateTime(approvedAt)}
                   </p>
                 </div>
               </div>

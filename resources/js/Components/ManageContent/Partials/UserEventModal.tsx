@@ -138,13 +138,10 @@ export default function UserEventModal({
     try {
       const payload = {
         ...data,
-        start_date: format(data.start_date, "yyyy-MM-dd HH:mm:ss"),
-        end_date: data.end_date
-          ? format(data.end_date, "yyyy-MM-dd HH:mm:ss")
-          : null,
-        remind_at: data.remind_at
-          ? format(data.remind_at, "yyyy-MM-dd HH:mm:ss")
-          : null,
+        // Send ISO strings with timezone so backend parses correctly
+        start_date: data.start_date ? new Date(data.start_date).toISOString() : null,
+        end_date: data.end_date ? new Date(data.end_date).toISOString() : null,
+        remind_at: data.remind_at ? new Date(data.remind_at).toISOString() : null,
       };
 
       if (event) {

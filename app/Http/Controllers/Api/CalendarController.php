@@ -23,6 +23,15 @@ class CalendarController extends Controller
         $start = $request->input('start'); // ISO date
         $end = $request->input('end');     // ISO date
 
+        // Interpret incoming range using client's timezone when provided
+        $clientTz = $request->header('X-User-Timezone') ?? config('app.timezone', 'UTC');
+        try {
+            if ($start) $start = Carbon::parse($start, $clientTz)->setTimezone('UTC');
+            if ($end) $end = Carbon::parse($end, $clientTz)->setTimezone('UTC');
+        } catch (\Exception $e) {
+            // fallback to raw values
+        }
+
         $workspaceId = Auth::user()->current_workspace_id;
         $query = Publication::where('workspace_id', $workspaceId)
             ->with(['mediaFiles' => fn($q) => $q->select('media_files.id', 'media_files.file_path', 'media_files.file_type')]);
@@ -44,7 +53,8 @@ class CalendarController extends Controller
                 'resourceId' => $pub->id,
                 'type' => 'publication',
                 'title' => "[PUB] {$pub->title}",
-                'start' => $pub->scheduled_at ? $pub->scheduled_at->toIso8601String() : null,
+                // Return UTC ISO strings; frontend will convert to user's timezone
+                'start' => $pub->scheduled_at ? $pub->scheduled_at->copy()->setTimezone('UTC')->toIso8601String() : null,
                 'status' => $pub->status,
                 'color' => $this->getStatusColor($pub->status),
                 'extendedProps' => [
@@ -59,7 +69,7 @@ class CalendarController extends Controller
             $q->where('workspace_id', $workspaceId);
         })
             ->with(['socialAccount:id,platform,account_name'])
-            ->whereBetween('scheduled_at', [$start ?? now()->startOfMonth(), $end ?? now()->endOfMonth()])
+            ->whereBetween('scheduled_at', [$start ?? now()->startOfMonth()->setTimezone('UTC'), $end ?? now()->endOfMonth()->setTimezone('UTC')])
             ->get();
 
         $postEvents = $posts->map(function ($post) {
@@ -68,7 +78,7 @@ class CalendarController extends Controller
                 'resourceId' => $post->id,
                 'type' => 'post',
                 'title' => "({$post->socialAccount->platform}) {$post->socialAccount->account_name}",
-                'start' => $post->scheduled_at->toIso8601String(),
+                'start' => $post->scheduled_at ? $post->scheduled_at->copy()->setTimezone('UTC')->toIso8601String() : null,
                 'status' => $post->status,
                 'color' => $this->getStatusColor($post->status, true),
                 'extendedProps' => [
@@ -81,7 +91,7 @@ class CalendarController extends Controller
         // 3. Format User Calendar Events
         $userEvents = UserCalendarEvent::where('workspace_id', $workspaceId)
             ->where('user_id', Auth::id())
-            ->whereBetween('start_date', [$start ?? now()->startOfMonth(), $end ?? now()->endOfMonth()])
+            ->whereBetween('start_date', [$start ?? now()->startOfMonth()->setTimezone('UTC'), $end ?? now()->endOfMonth()->setTimezone('UTC')])
             ->get();
 
         $manualEvents = $userEvents->map(function ($event) {
@@ -90,8 +100,8 @@ class CalendarController extends Controller
                 'resourceId' => $event->id,
                 'type' => 'user_event',
                 'title' => $event->title,
-                'start' => $event->start_date->toIso8601String(),
-                'end' => $event->end_date ? $event->end_date->toIso8601String() : null,
+                'start' => $event->start_date ? $event->start_date->copy()->setTimezone('UTC')->toIso8601String() : null,
+                'end' => $event->end_date ? $event->end_date->copy()->setTimezone('UTC')->toIso8601String() : null,
                 'status' => 'event',
                 'color' => $event->color,
                 'extendedProps' => [
@@ -114,7 +124,13 @@ class CalendarController extends Controller
         ]);
 
         $type = $request->input('type', 'publication');
-        $newDate = Carbon::parse($request->scheduled_at);
+        // Parse incoming scheduled_at using client's timezone header and convert to UTC
+        $clientTz = $request->header('X-User-Timezone') ?? config('app.timezone', 'UTC');
+        try {
+            $newDate = Carbon::parse($request->scheduled_at, $clientTz)->setTimezone('UTC');
+        } catch (\Exception $e) {
+            $newDate = Carbon::parse($request->scheduled_at);
+        }
 
         if ($type === 'publication') {
             $model = Publication::where('workspace_id', Auth::user()->current_workspace_id)->findOrFail($id);
