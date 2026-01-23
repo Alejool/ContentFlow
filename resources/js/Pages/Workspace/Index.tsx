@@ -21,10 +21,14 @@ import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 
-const workspaceSchema = z.object({
-  name: z.string().min(1, "Workspace name is required").max(255),
-  description: z.string().max(1000).optional().or(z.literal("")),
-});
+const workspaceSchema = (t: TFunction) =>
+  z.object({
+    name: z
+      .string()
+      .min(1, t("workspace.invite_modal.validation.nameRequired"))
+      .max(255),
+    description: z.string().max(1000).optional().or(z.literal("")),
+  });
 
 type WorkspaceFormData = z.infer<typeof workspaceSchema>;
 
@@ -120,8 +124,9 @@ export default function Index({
     handleSubmit,
     formState: { errors },
     reset,
+    setError,
   } = useForm<WorkspaceFormData>({
-    resolver: zodResolver(workspaceSchema),
+    resolver: zodResolver(workspaceSchema(t)),
     defaultValues: {
       name: "",
       description: "",
@@ -148,10 +153,20 @@ export default function Index({
       onSuccess: () => {
         setShowCreateModal(false);
         reset();
-        toast.success("Workspace created successfully");
+        toast.success(t("workspace.messages.update_success"));
         setIsSubmitting(false);
       },
-      onError: () => setIsSubmitting(false),
+      onError: (errors) => {
+        setIsSubmitting(false);
+        if (errors) {
+          Object.keys(errors).forEach((key) => {
+            setError(key as any, {
+              type: "server",
+              message: errors[key],
+            });
+          });
+        }
+      },
     });
   };
 
