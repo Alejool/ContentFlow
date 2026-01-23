@@ -1,0 +1,22 @@
+{
+  "validation": {
+    "unique": "Has already been taken.",
+    "required": "This field is required.",
+    "email": "Must be a valid email.",
+    "min": {
+      "string": "Must be at least {{count}} characters."
+    },
+    "max": {
+      "string": "Must not exceed {{count}} characters."
+    },
+    "confirmed": "Confirmation does not match.",
+    "invalid_type": "Invalid data type.",
+    "passwords_do_not_match": "Passwords do not match.",
+    "invalid_phone": "Invalid phone number format.",
+    "auth": {
+        "failed": "These credentials do not match our records.",
+        "password": "The provided password is incorrect.",
+        "throttle": "Too many login attempts. Please try again in {{seconds}} seconds."
+    }
+  }
+}

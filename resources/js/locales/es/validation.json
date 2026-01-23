@@ -1,0 +1,22 @@
+{
+  "validation": {
+    "unique": "Ya ha sido registrado.",
+    "required": "Este campo es obligatorio.",
+    "email": "Debe ser un correo válido.",
+    "min": {
+      "string": "Debe tener al menos {{count}} caracteres."
+    },
+    "max": {
+      "string": "No debe exceder los {{count}} caracteres."
+    },
+    "confirmed": "La confirmación no coincide.",
+    "invalid_type": "Tipo de dato inválido.",
+    "passwords_do_not_match": "Las contraseñas no coinciden.",
+    "invalid_phone": "Formato de teléfono inválido.",
+    "auth": {
+        "failed": "Las credenciales no coinciden con nuestros registros.",
+        "password": "La contraseña proporcionada es incorrecta.",
+        "throttle": "Demasiados intentos de acceso. Por favor reintente en {{seconds}} segundos."
+    }
+  }
+}
