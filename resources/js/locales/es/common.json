@@ -54,6 +54,8 @@
     "copy": "Copiar",
     "created": "Creado",
     "creator": "Creador",
+    "me": "Yo",
+    "readOnly": "Solo lectura",
     "lastUpdated": "Última Actualización",
     "startDate": "Fecha de Inicio",
     "endDate": "Fecha de Fin",
