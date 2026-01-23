@@ -16,6 +16,7 @@ class UserCalendarEvent extends Model
         'color',
         'remind_at',
         'notification_sent',
+        'is_public',
     ];
 
     protected $casts = [
@@ -23,6 +24,7 @@ class UserCalendarEvent extends Model
         'end_date' => 'datetime',
         'remind_at' => 'datetime',
         'notification_sent' => 'boolean',
+        'is_public' => 'boolean',
     ];
 
     public function user()

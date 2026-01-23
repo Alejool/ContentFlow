@@ -19,8 +19,18 @@ class UserCalendarEventController extends Controller
 
   public function index(Request $request)
   {
-    $events = UserCalendarEvent::where('workspace_id', Auth::user()->current_workspace_id)
-      ->where('user_id', Auth::id())
+    // Return public events in the current workspace (any user)
+    // plus private events that belong to the authenticated user.
+    $workspaceId = Auth::user()->current_workspace_id;
+    $userId = Auth::id();
+
+    $events = UserCalendarEvent::where('workspace_id', $workspaceId)
+      ->where(function ($query) use ($userId) {
+        $query->where('is_public', true)
+          ->orWhere('user_id', $userId);
+      })
+      ->with('user:id,name,photo_url')
+      ->orderBy('start_date')
       ->get();
 
     return $this->successResponse($events);
@@ -41,6 +51,7 @@ class UserCalendarEventController extends Controller
       'end_date' => 'nullable|date|after_or_equal:start_date',
       'color' => 'nullable|string|max:20',
       'remind_at' => 'nullable|date|before:start_date',
+      'is_public' => 'nullable|boolean',
     ]);
 
     // Normalize incoming datetimes using client's timezone header and store in UTC
@@ -89,6 +100,7 @@ class UserCalendarEventController extends Controller
       'end_date' => 'nullable|date|after_or_equal:start_date',
       'color' => 'nullable|string|max:20',
       'remind_at' => 'nullable|date|before:start_date',
+      'is_public' => 'nullable|boolean',
     ]);
 
     // Normalize incoming datetimes using client's timezone header and store in UTC
