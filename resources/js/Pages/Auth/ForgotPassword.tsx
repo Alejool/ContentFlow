@@ -1,4 +1,7 @@
+import Button from "@/Components/common/Modern/Button";
+import Input from "@/Components/common/Modern/Input";
 import GuestLayout from "@/Layouts/GuestLayout";
+import { getErrorMessage } from "@/Utils/validation";
 import { Head, Link, useForm } from "@inertiajs/react";
 import { ArrowLeft, CheckCircle2, Mail, Send } from "lucide-react";
 import { FormEventHandler } from "react";
@@ -20,7 +23,7 @@ export default function ForgotPassword({ status }: ForgotPasswordProps) {
 
   return (
     <GuestLayout section="forgot-password">
-      <Head title="Forgot Password" />
+      <Head title={t("auth.forgot-password.title")} />
 
       <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-8">
         <div className="w-full max-w-md">
@@ -50,55 +53,34 @@ export default function ForgotPassword({ status }: ForgotPasswordProps) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {t("auth.forgot-password.inputs.email")}
-              </label>
               <div className="relative">
-                <div className="absolute left-3 top-1/2 -translate-y-1/2">
-                  <Mail className="w-5 h-5 text-gray-400" />
-                </div>
-                <input
-                  id="email"
+                <Input
+                  id="forgot_email"
                   type="email"
                   name="email"
+                  label={t("auth.forgot-password.inputs.email")}
+                  sizeType="lg"
                   value={data.email}
                   onChange={(e) => setData("email", e.target.value)}
-                  className="w-full pl-11 pr-4 py-3 rounded-lg border border-gray-300 dark:border-gray-700 
-                                                 bg-white dark:bg-gray-800 text-gray-900 dark:text-white
-                                                 focus:ring-2 focus:ring-primary-500 focus:border-transparent
-                                                 transition-all duration-200"
                   placeholder={t("auth.forgot-password.placeholders.email")}
                   autoComplete="email"
                   required
                   autoFocus
+                  icon={Mail}
+                  error={getErrorMessage(errors?.email, t, "email")}
                 />
               </div>
-              {errors.email && (
-                <p className="mt-2 text-sm text-primary-600 dark:text-primary-400">
-                  {errors.email}
-                </p>
-              )}
             </div>
 
-            <button
+            <Button
               type="submit"
-              disabled={processing}
-              className="w-full bg-gradient-primary text-white py-3 px-4 rounded-lg font-semibold
-                                         hover:opacity-90 active:scale-[0.98] transition-all duration-200
-                                         disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              loading={processing}
+              loadingText={t("auth.forgot-password.buttons.sending")}
+              fullWidth
+              icon={Send as any}
             >
-              {processing ? (
-                <>
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  {t("auth.forgot-password.buttons.sending")}
-                </>
-              ) : (
-                <>
-                  <Send className="w-5 h-5" />
-                  {t("auth.forgot-password.buttons.send")}
-                </>
-              )}
-            </button>
+              {t("auth.forgot-password.buttons.send")}
+            </Button>
 
             <div className="pt-4">
               <div className="rounded-lg p-4 bg-gray-50 dark:bg-gray-800/50 ">
@@ -122,7 +104,7 @@ export default function ForgotPassword({ status }: ForgotPasswordProps) {
             <div className="text-center">
               <Link
                 href={route("login")}
-                className="inline-flex items-center gap-2 text-sm text-primary-600 
+                className="inline-flex items-center gap-2 text-sm text-primary-600
                                              hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300
                                              transition-colors"
               >

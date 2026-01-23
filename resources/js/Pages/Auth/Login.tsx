@@ -2,6 +2,9 @@ import { useAuth } from "@/Hooks/useAuth";
 import GuestLayout from "@/Layouts/GuestLayout";
 import { Head, Link, usePage } from "@inertiajs/react";
 
+import Button from "@/Components/common/Modern/Button";
+import Input from "@/Components/common/Modern/Input";
+import { getErrorMessage } from "@/Utils/validation";
 import {
   AlertCircle,
   CheckCircle2,
@@ -36,7 +39,7 @@ export default function Login() {
   };
 
   return (
-    <GuestLayout title={t("auth.login.title")} section="login">
+    <GuestLayout section="login">
       <Head title={t("auth.login.title")} />
       <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-8">
         <div className="w-full max-w-md">
@@ -69,47 +72,47 @@ export default function Login() {
             )}
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {t("auth.login.inputs.email")}
-              </label>
-              <div className="relative">
-                <div className="absolute left-3 top-1/2 -translate-y-1/2">
-                  <Mail className="w-5 h-5 text-gray-400" />
-                </div>
-                <input
-                  type="email"
-                  name="email"
-                  value={data.email}
-                  onChange={handleChange}
-                  className="w-full pl-11 pr-4 py-3 rounded-lg border border-gray-300 dark:border-gray-700 
-                             bg-white dark:bg-gray-800 text-gray-900 dark:text-white
-                             focus:ring-2 focus:ring-primary-500 focus:border-transparent
-                             transition-all duration-200"
-                  placeholder={t("auth.login.placeholders.email")}
-                  required
-                />
-              </div>
+              <Input
+                id="login_email"
+                name="email"
+                label={t("auth.login.inputs.email")}
+                type="email"
+                sizeType="lg"
+                value={data.email}
+                onChange={handleChange}
+                placeholder={t("auth.login.placeholders.email")}
+                required
+                icon={Mail}
+                error={getErrorMessage(
+                  (usePage().props as any).errors?.email,
+                  t,
+                  "email",
+                )}
+              />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {t("auth.login.inputs.password")}
-              </label>
               <div className="relative">
                 <div className="absolute left-3 top-1/2 -translate-y-1/2">
                   <Lock className="w-5 h-5 text-gray-400" />
                 </div>
-                <input
-                  type="password"
+                <Input
+                  id="login_password"
                   name="password"
+                  label={t("auth.login.inputs.password")}
+                  type="password"
+                  sizeType="lg"
                   value={data.password}
                   onChange={handleChange}
-                  className="w-full pl-11 pr-4 py-3 rounded-lg border border-gray-300 dark:border-gray-700 
-                             bg-white dark:bg-gray-800 text-gray-900 dark:text-white
-                             focus:ring-2 focus:ring-primary-500 focus:border-transparent
-                             transition-all duration-200"
                   placeholder={t("auth.login.placeholders.password")}
                   required
+                  icon={Lock}
+                  showPasswordToggle
+                  error={getErrorMessage(
+                    (usePage().props as any).errors?.password,
+                    t,
+                    "password",
+                  )}
                 />
               </div>
             </div>
@@ -121,7 +124,7 @@ export default function Login() {
                   name="remember"
                   checked={data.remember}
                   onChange={handleChange}
-                  className="w-4 h-4 rounded border-gray-300 text-primary-600 
+                  className="w-4 h-4 rounded border-gray-300 text-primary-600
                              focus:ring-primary-500 focus:ring-offset-0"
                 />
                 <span className="text-sm text-gray-700 dark:text-gray-300">
@@ -131,32 +134,22 @@ export default function Login() {
 
               <Link
                 href={route("password.request")}
-                className="text-sm font-medium text-primary-600 hover:text-primary-500 
+                className="text-sm font-medium text-primary-600 hover:text-primary-500
                            dark:text-primary-400 dark:hover:text-primary-300 transition-colors"
               >
                 {t("auth.login.buttons.forgotPassword")}
               </Link>
             </div>
 
-            <button
+            <Button
               type="submit"
-              disabled={processing || loading}
-              className="w-full bg-gradient-primary text-white py-3 px-4 rounded-lg font-semibold
-                         hover:opacity-90 active:scale-[0.98] transition-all duration-200
-                         disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              loading={loading || processing}
+              loadingText={t("auth.login.buttons.loggingIn")}
+              fullWidth
+              icon={LogIn as any}
             >
-              {loading ? (
-                <>
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  {t("auth.login.buttons.loggingIn")}
-                </>
-              ) : (
-                <>
-                  <LogIn className="w-5 h-5" />
-                  {t("auth.login.buttons.login")}
-                </>
-              )}
-            </button>
+              {t("auth.login.buttons.login")}
+            </Button>
 
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
@@ -174,8 +167,8 @@ export default function Login() {
                 type="button"
                 onClick={handleGoogleLogin}
                 disabled={loading}
-                className="w-full flex items-center justify-center gap-3 px-4 py-3 
-                           rounded-lg border border-gray-300 dark:border-gray-700 
+                className="w-full flex items-center justify-center gap-3 px-4 py-3
+                           rounded-lg border border-gray-300 dark:border-gray-700
                            bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300
                            hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors
                            disabled:opacity-50 disabled:cursor-not-allowed"
@@ -209,7 +202,7 @@ export default function Login() {
                 {t("auth.login.noAccount")}{" "}
                 <Link
                   href={route("register")}
-                  className="inline-flex items-center gap-1 font-semibold text-primary-600 
+                  className="inline-flex items-center gap-1 font-semibold text-primary-600
                              hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300
                              transition-colors"
                 >

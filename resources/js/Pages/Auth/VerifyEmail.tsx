@@ -18,7 +18,7 @@ export default function VerifyEmail({ status }: VerifyEmailProps) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 flex items-center justify-center p-4">
-      <Head title="Email Verification" />
+      <Head title={t("verification.title")} />
 
       <div className="max-w-md w-full">
         {/* Card */}
@@ -40,10 +40,7 @@ export default function VerifyEmail({ status }: VerifyEmailProps) {
           <div className="p-8">
             <div className="mb-6 text-gray-600 text-center">
               <p className="mb-4">{t("verification.banner.message")}</p>
-              <p>
-                If you didn't receive the email, we will gladly send you
-                another.
-              </p>
+              <p>{t("verification.didNotReceive")}</p>
             </div>
 
             {status === "verification-link-sent" && (
@@ -81,28 +78,27 @@ export default function VerifyEmail({ status }: VerifyEmailProps) {
                 as="button"
                 className="w-full px-6 py-3 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 transition-colors duration-200"
               >
-                Log Out
+                {t("verification.logout")}
               </Link>
             </form>
           </div>
 
-          {/* Footer */}
           <div className="px-8 py-6 bg-gray-50 border-t border-gray-100">
             <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
               <Lock className="w-4 h-4" />
-              <span>Your information is secure with us</span>
+              <span>{t("verification.security")}</span>
             </div>
           </div>
         </div>
 
         {/* Help text */}
         <p className="text-center text-sm text-gray-600 mt-6">
-          Need help?{" "}
+          {t("verification.needHelp")}{" "}
           <a
             href="mailto:support@example.com"
             className="text-purple-600 hover:text-purple-700 font-medium"
           >
-            Contact Support
+            {t("verification.contactSupport")}
           </a>
         </p>
       </div>

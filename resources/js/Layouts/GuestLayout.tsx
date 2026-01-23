@@ -27,10 +27,16 @@ export default function GuestLayout({ children, section }: GuestLayoutProps) {
               <div className="mb-8">
                 <img src={Logo} alt="logo" className="w-36 h-36 mx-auto" />
                 <h1 className="text-4xl font-bold  mb-4">
-                  {t(`auth.${section}.welcome`)}
+                  {section
+                    ? t(`auth.${section}.welcome`, {
+                        defaultValue: t(`auth.${section}.title`),
+                      })
+                    : t("auth.login.welcome")}
                 </h1>
                 <p className="text-lg opacity-90 mb-8">
-                  {t(`auth.${section}.subtitle`)}
+                  {section
+                    ? t(`auth.${section}.subtitle`)
+                    : t("auth.login.subtitle")}
                 </p>
               </div>
 

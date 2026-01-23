@@ -1,7 +1,11 @@
 import { useRegister } from "@/Hooks/useRegister";
 import GuestLayout from "@/Layouts/GuestLayout";
 import { Head, Link } from "@inertiajs/react";
+import { z } from "zod";
 
+import Button from "@/Components/common/Modern/Button";
+import Input from "@/Components/common/Modern/Input";
+import { getErrorMessage } from "@/Utils/validation";
 import {
   AlertCircle,
   CheckCircle2,
@@ -15,7 +19,7 @@ import { ChangeEvent } from "react";
 import { useTranslation } from "react-i18next";
 
 export default function Register() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const {
     data,
     setData,
@@ -24,12 +28,53 @@ export default function Register() {
     successMessage,
     errors,
     handleEmailRegister,
+    setErrors,
+    submitRegister,
     handleGoogleRegister,
   } = useRegister();
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setData(name, value);
+    setData(name as any, value);
+  };
+
+  const schema = z
+    .object({
+      name: z.string().min(1, t("validation.required")).max(255),
+      email: z.string().email(t("validation.email")).max(255),
+      password: z.string().min(8, t("validation.min.string", { count: 8 })),
+      password_confirmation: z.string().min(8),
+    })
+    .refine((data) => data.password === data.password_confirmation, {
+      message: t("validation.passwords_do_not_match"),
+      path: ["password_confirmation"],
+    });
+
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+    // Clear previous field errors
+    setErrors({});
+
+    const result = schema.safeParse(data);
+    if (!result.success) {
+      const formatted = result.error.format();
+      const fieldErrors: Record<string, string> = {};
+      for (const key in formatted) {
+        if (key === "_errors") continue;
+        const msg = (formatted as any)[key]._errors?.[0];
+        if (msg) fieldErrors[key] = msg as string;
+      }
+      setErrors(fieldErrors);
+      return;
+    }
+
+    // If validation passes, call submitRegister (uses axios with JSON accept header)
+    await submitRegister({
+      name: data.name,
+      email: data.email,
+      password: data.password,
+      password_confirmation: data.password_confirmation,
+    });
   };
 
   return (
@@ -47,7 +92,7 @@ export default function Register() {
             </p>
           </div>
 
-          <form onSubmit={handleEmailRegister} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
               <div className="rounded-lg bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 p-4">
                 <div className="flex items-center gap-3 text-primary-700 dark:text-primary-400">
@@ -67,130 +112,96 @@ export default function Register() {
             )}
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {t("auth.register.inputs.name")}
-              </label>
               <div className="relative">
-                <div className="absolute left-3 top-1/2 -translate-y-1/2">
-                  <User className="w-5 h-5 text-gray-400" />
-                </div>
-                <input
+                <Input
+                  sizeType="lg"
                   id="name"
+                  label={t("auth.register.inputs.name")}
+                  type="text"
                   name="name"
                   value={data.name}
                   onChange={handleChange}
-                  className="w-full pl-11 pr-4 py-3 rounded-lg border border-gray-300 dark:border-gray-700 
-                             bg-white dark:bg-gray-800 text-gray-900 dark:text-white
-                             focus:ring-2 focus:ring-primary-500 focus:border-transparent
-                             transition-all duration-200"
                   placeholder={t("auth.register.placeholders.name")}
                   autoComplete="name"
                   required
-                  autoFocus
+                  icon={User}
+                  error={getErrorMessage((errors as any)?.name, t, "name")}
                 />
               </div>
-              {errors.name && (
-                <p className="mt-2 text-sm text-primary-600 dark:text-primary-400">
-                  {errors.name}
-                </p>
-              )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {t("auth.register.inputs.email")}
-              </label>
               <div className="relative">
-                <div className="absolute left-3 top-1/2 -translate-y-1/2">
-                  <Mail className="w-5 h-5 text-gray-400" />
-                </div>
-                <input
+                <Input
+                  sizeType="lg"
                   id="email"
+                  label={t("auth.register.inputs.email")}
                   type="email"
                   name="email"
                   value={data.email}
                   onChange={handleChange}
-                  className="w-full pl-11 pr-4 py-3 rounded-lg border border-gray-300 dark:border-gray-700 
-                             bg-white dark:bg-gray-800 text-gray-900 dark:text-white
-                             focus:ring-2 focus:ring-primary-500 focus:border-transparent
-                             transition-all duration-200"
                   placeholder={t("auth.register.placeholders.email")}
                   autoComplete="username"
                   required
+                  icon={Mail}
+                  error={getErrorMessage((errors as any)?.email, t, "email")}
                 />
               </div>
-              {errors.email && (
-                <p className="mt-2 text-sm text-primary-600 dark:text-primary-400">
-                  {errors.email}
-                </p>
-              )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {t("auth.register.inputs.password")}
-              </label>
               <div className="relative">
-                <div className="absolute left-3 top-1/2 -translate-y-1/2">
-                  <Lock className="w-5 h-5 text-gray-400" />
-                </div>
-                <input
+                <Input
+                  sizeType="lg"
                   id="password"
                   type="password"
                   name="password"
+                  label={t("auth.register.inputs.password")}
                   value={data.password}
                   onChange={handleChange}
-                  className="w-full pl-11 pr-4 py-3 rounded-lg border border-gray-300 dark:border-gray-700 
-                             bg-white dark:bg-gray-800 text-gray-900 dark:text-white
-                             focus:ring-2 focus:ring-primary-500 focus:border-transparent
-                             transition-all duration-200"
                   placeholder={t("auth.register.placeholders.password")}
                   autoComplete="new-password"
                   required
+                  icon={Lock}
+                  showPasswordToggle
+                  error={getErrorMessage(
+                    (errors as any)?.password,
+                    t,
+                    "password",
+                  )}
                 />
               </div>
-              {errors.password && (
-                <p className="mt-2 text-sm text-primary-600 dark:text-primary-400">
-                  {errors.password}
-                </p>
-              )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {t("auth.register.inputs.confirmPassword")}
-              </label>
               <div className="relative">
-                <div className="absolute left-3 top-1/2 -translate-y-1/2">
-                  <Lock className="w-5 h-5 text-gray-400" />
-                </div>
-                <input
+                <Input
+                  sizeType="lg"
                   id="password_confirmation"
                   type="password"
                   name="password_confirmation"
+                  label={t("auth.register.inputs.confirmPassword")}
                   value={data.password_confirmation}
                   onChange={handleChange}
-                  className="w-full pl-11 pr-4 py-3 rounded-lg border border-gray-300 dark:border-gray-700 
-                             bg-white dark:bg-gray-800 text-gray-900 dark:text-white
-                             focus:ring-2 focus:ring-primary-500 focus:border-transparent
-                             transition-all duration-200"
                   placeholder={t("auth.register.placeholders.confirmPassword")}
                   autoComplete="new-password"
                   required
+                  icon={Lock}
+                  showPasswordToggle
+                  error={getErrorMessage(
+                    (errors as any)?.password_confirmation,
+                    t,
+                    "password_confirmation",
+                  )}
                 />
               </div>
-              {errors.password_confirmation && (
-                <p className="mt-2 text-sm text-primary-600 dark:text-primary-400">
-                  {errors.password_confirmation}
-                </p>
-              )}
             </div>
 
             <div className="flex items-center gap-2">
               <input
                 type="checkbox"
                 id="terms"
-                className="mt-1 w-4 h-4 rounded border-gray-300 text-primary-600 
+                className="mt-1 w-4 h-4 rounded border-gray-300 text-primary-600
                            focus:ring-primary-500 focus:ring-offset-0"
                 required
               />
@@ -215,35 +226,25 @@ export default function Register() {
               </label>
             </div>
 
-            <button
+            <Button
               type="submit"
-              disabled={loading}
-              className="w-full bg-gradient-primary text-white py-3 px-4 rounded-lg font-semibold
-                         hover:opacity-90 active:scale-[0.98] transition-all duration-200
-                         disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              loading={loading}
+              loadingText={t("auth.register.buttons.registering")}
+              fullWidth
+              icon={UserPlus as any}
             >
-              {loading ? (
-                <>
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  {t("auth.register.buttons.registering")}
-                </>
-              ) : (
-                <>
-                  <UserPlus className="w-5 h-5" />
-                  {t("auth.register.buttons.register")}
-                </>
-              )}
-            </button>
+              {t("auth.register.buttons.register")}
+            </Button>
 
             <div className="text-center">
               <p
-                className="text-gray-600 dark:text-gray-400 text-sm flex 
+                className="text-gray-600 dark:text-gray-400 text-sm flex
               justify-center items-center gap-2"
               >
                 {t("auth.register.alreadyRegistered")}{" "}
                 <Link
                   href={route("login")}
-                  className="inline-flex items-center gap-1 font-semibold text-primary-600 
+                  className="inline-flex items-center gap-1 font-semibold text-primary-600
                              hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300
                              transition-colors"
                 >
@@ -269,8 +270,8 @@ export default function Register() {
                 type="button"
                 onClick={handleGoogleRegister}
                 disabled={loading}
-                className="w-full flex items-center justify-center gap-3 px-4 py-3 
-                           rounded-lg border border-gray-300 dark:border-gray-700 
+                className="w-full flex items-center justify-center gap-3 px-4 py-3
+                           rounded-lg border border-gray-300 dark:border-gray-700
                            bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300
                            hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors
                            disabled:opacity-50 disabled:cursor-not-allowed"
