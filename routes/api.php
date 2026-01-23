@@ -86,9 +86,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/{publication}/duplicate', [PublicationController::class, 'duplicate'])->name('duplicate');
     Route::post('/{publication}/request-review', [PublicationController::class, 'requestReview'])->name('request-review');
     Route::post('/{publication}/approve', [PublicationController::class, 'approve'])->name('approve');
-    Route::get('/{id}/published-platforms', [PublicationController::class, 'getPublishedPlatforms'])->name('published-platforms');
-    Route::post('/{id}/publish', [PublicationController::class, 'publish'])->name('publish');
-    Route::post('/{id}/unpublish', [PublicationController::class, 'unpublish'])->name('unpublish');
+    Route::get('/{publication}/published-platforms', [PublicationController::class, 'getPublishedPlatforms'])->name('published-platforms');
+    Route::post('/{publication}/publish', [PublicationController::class, 'publish'])->name('publish');
+    Route::post('/{publication}/unpublish', [PublicationController::class, 'unpublish'])->name('unpublish');
 
     // Locking API
     Route::post('/{publication}/lock', [PublicationLockController::class, 'lock'])->name('lock');
@@ -113,7 +113,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 |----------------------------------------------------------------------
 | Social Accounts API
 |----------------------------------------------------------------------
-*/
+|*/
   Route::prefix('social-accounts')->name('api.social-accounts.')->group(function () {
     Route::get('/', [SocialAccountController::class, 'index'])->name('index');
     Route::post('/', [SocialAccountController::class, 'store'])->name('store');
@@ -125,8 +125,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
 |----------------------------------------------------------------------
 | Social Post Logs API
 |----------------------------------------------------------------------
-*/
-  Route::prefix('social-logs')->name('api.social-logs.')->group(function () {
+|*/
+  Route::prefix('logs')->name('api.social-logs.')->group(function () {
     Route::get('/', [SocialPostLogController::class, 'index'])->name('index');
   });
 
