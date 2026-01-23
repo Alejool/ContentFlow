@@ -5,7 +5,7 @@ import Textarea from "@/Components/common/Modern/Textarea";
 import Modal from "@/Components/common/ui/Modal";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
-import { format, parseISO } from "date-fns";
+import { parseISO } from "date-fns";
 import {
   AlignLeft,
   Bell,
@@ -24,9 +24,15 @@ const eventSchema = z.object({
     .string()
     .min(1, "calendar.userEvents.modal.validation.titleRequired"),
   description: z.string().optional(),
-  start_date: z.date({
-    required_error: "calendar.userEvents.modal.validation.startDateRequired",
-  }),
+  start_date: z
+    .date({
+      required_error: "calendar.userEvents.modal.validation.startDateRequired",
+    })
+    .refine((date) => {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      return date >= today;
+    }, "calendar.userEvents.modal.validation.pastDate"),
   end_date: z.date().nullable().optional(),
   remind_at: z.date().nullable().optional(),
   color: z.string().default("#3B82F6"),
@@ -139,9 +145,13 @@ export default function UserEventModal({
       const payload = {
         ...data,
         // Send ISO strings with timezone so backend parses correctly
-        start_date: data.start_date ? new Date(data.start_date).toISOString() : null,
+        start_date: data.start_date
+          ? new Date(data.start_date).toISOString()
+          : null,
         end_date: data.end_date ? new Date(data.end_date).toISOString() : null,
-        remind_at: data.remind_at ? new Date(data.remind_at).toISOString() : null,
+        remind_at: data.remind_at
+          ? new Date(data.remind_at).toISOString()
+          : null,
       };
 
       if (event) {
@@ -162,22 +172,6 @@ export default function UserEventModal({
         error.response?.data?.message ||
           t("calendar.userEvents.modal.messages.errorSave"),
       );
-    }
-  };
-
-  const handleDelete = async () => {
-    if (!confirm(t("calendar.userEvents.modal.actions.deleteConfirm"))) return;
-    try {
-      const resourceId = event.id.includes("_")
-        ? event.id.split("_")[2]
-        : event.id;
-      await axios.delete(`/api/calendar/user-events/${resourceId}`);
-      toast.success(t("calendar.userEvents.modal.messages.successDelete"));
-      onSuccess();
-      onClose();
-    } catch (error) {
-      console.error(error);
-      toast.error(t("calendar.userEvents.modal.messages.errorDelete"));
     }
   };
 
@@ -301,6 +295,7 @@ export default function UserEventModal({
                   onChange={field.onChange}
                   showTimeSelect
                   required
+                  minDate={new Date()}
                   error={
                     errors.start_date?.message
                       ? t(errors.start_date.message)
@@ -405,15 +400,13 @@ export default function UserEventModal({
               borderTop: `1px solid ${selectedColor}20`,
             }}
           >
-            <div
-              className={`flex flex-col sm:flex-row flex-end gap-3 ${event ? "order-1 sm:order-2 w-full sm:w-auto" : "order-1 w-full"}`}
-            >
+            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto justify-end ml-auto">
               <Button
                 type="button"
                 variant="secondary"
                 buttonStyle="outline"
                 onClick={onClose}
-                className="w-full sm:w-auto px-7 py-3 rounded-xl transition-all duration-300 hover:shadow-md"
+                className="px-7 py-3 rounded-xl transition-all duration-300"
                 style={{
                   borderColor: `${selectedColor}40`,
                   color: selectedColor,
@@ -426,7 +419,7 @@ export default function UserEventModal({
                 variant="primary"
                 buttonStyle="solid"
                 loading={isSubmitting}
-                className="w-full sm:w-auto px-8 py-3 rounded-xl shadow-lg transition-all duration-300 font-bold hover:shadow-xl active:translate-y-0.5"
+                className="px-8 py-3 rounded-xl shadow-lg transition-all duration-300 font-bold"
                 style={{
                   backgroundColor: selectedColor,
                   borderColor: selectedColor,

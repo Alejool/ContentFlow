@@ -12,6 +12,10 @@
     "actions": {
       "today": "Hoy"
     },
+    "filters": {
+      "all": "Todos",
+      "events": "Solo Eventos"
+    },
     "events": {
       "count": "Eventos",
       "empty": "No hay eventos para este día"
@@ -51,7 +55,8 @@
         },
         "validation": {
           "titleRequired": "El título es obligatorio",
-          "startDateRequired": "La fecha de inicio es obligatoria"
+          "startDateRequired": "La fecha de inicio es obligatoria",
+          "pastDate": "No se pueden crear eventos en el pasado"
         }
       }
     }

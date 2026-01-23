@@ -12,6 +12,10 @@
     "actions": {
       "today": "Today"
     },
+    "filters": {
+      "all": "All",
+      "events": "Events Only"
+    },
     "events": {
       "count": "Events",
       "empty": "No events for this day"
@@ -51,7 +55,8 @@
         },
         "validation": {
           "titleRequired": "Title is required",
-          "startDateRequired": "Start date is required"
+          "startDateRequired": "Start date is required",
+          "pastDate": "Events cannot be created in the past"
         }
       }
     }

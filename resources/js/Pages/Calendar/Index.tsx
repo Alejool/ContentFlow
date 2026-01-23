@@ -1,4 +1,5 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
+import { formatTime } from "@/Utils/formatDate";
 import { Head } from "@inertiajs/react";
 import axios from "axios";
 import {
@@ -13,18 +14,17 @@ import {
   startOfMonth,
   subMonths,
 } from "date-fns";
-import { formatTime } from "@/Utils/formatDate";
-import { es } from "date-fns/locale";
 import {
   Calendar as CalendarIcon,
   ChevronLeft,
   ChevronRight,
+  Clock,
   Filter,
   Loader2,
-  Trash2
+  Trash2,
 } from "lucide-react";
-import { toast } from "react-hot-toast";
 import React, { useEffect, useState } from "react";
+import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import {
   FaFacebook,
@@ -39,7 +39,7 @@ import {
 interface CalendarEvent {
   id: string; // "pub_1" or "post_1"
   resourceId: number;
-  type: "publication" | "post";
+  type: "publication" | "post" | "user_event";
   title: string;
   start: string; // ISO
   status: string;
@@ -73,13 +73,17 @@ const PlatformIcon = ({
       return <FaYoutube className={`text-red-600 ${className}`} />;
     case "tiktok":
       return <FaTiktok className={`text-black dark:text-white ${className}`} />;
+    case "user_event":
+    case "event":
+    case "events":
+      return <CalendarIcon className={`text-indigo-500 ${className}`} />;
     default:
       return <CalendarIcon className={`text-gray-500 ${className}`} />;
   }
 };
 
 export default function CalendarIndex({ auth }: { auth: any }) {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(false);
@@ -124,7 +128,7 @@ export default function CalendarIndex({ auth }: { auth: any }) {
   // Filter Events
   const filteredEvents = events.filter((e) => {
     if (platformFilter === "all") return true;
-    if (platformFilter === "events") return e.type === "user_event";
+    if (platformFilter === "events") return String(e.type) === "user_event";
     return e.extendedProps.platform?.toLowerCase() === platformFilter;
   });
 
@@ -194,7 +198,10 @@ export default function CalendarIndex({ auth }: { auth: any }) {
               <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-6">
                 <div className="flex items-center gap-4">
                   <h3 className="text-3xl font-bold text-gray-900 dark:text-white capitalize flex items-center gap-3">
-                    {new Intl.DateTimeFormat(i18n.language || undefined, { month: "long", year: "numeric" }).format(currentDate)}
+                    {new Intl.DateTimeFormat(i18n.language || undefined, {
+                      month: "long",
+                      year: "numeric",
+                    }).format(currentDate)}
                     {loading && (
                       <Loader2 className="w-5 h-5 animate-spin text-primary-500" />
                     )}
@@ -203,19 +210,29 @@ export default function CalendarIndex({ auth }: { auth: any }) {
 
                 <div className="flex flex-wrap items-center gap-3 w-full md:w-auto justify-center md:justify-end">
                   {/* Platform Filter */}
-                  <div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-lg p-1 mr-2">
-                    {platforms.slice(0, 4).map((p) => (
+                  <div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-lg p-1 mr-2 flex-wrap gap-1">
+                    {platforms.map((p) => (
                       <button
                         key={p}
                         onClick={() => setPlatformFilter(p)}
-                        className={`p-2 rounded-md transition-all ${platformFilter === p ? "bg-white dark:bg-gray-700 shadow text-primary-600" : "text-gray-400 hover:text-gray-600"}`}
+                        className={`p-2 rounded-md transition-all flex items-center gap-2 ${platformFilter === p ? "bg-white dark:bg-gray-700 shadow text-primary-600" : "text-gray-400 hover:text-gray-600"}`}
                         title={p}
                       >
                         {p === "all" ? (
                           <Filter className="w-4 h-4" />
                         ) : (
-                          <PlatformIcon platform={p} className="w-4 h-4" />
+                          <PlatformIcon
+                            platform={p === "events" ? "user_event" : p}
+                            className="w-4 h-4"
+                          />
                         )}
+                        <span className="text-xs font-medium hidden lg:inline capitalize">
+                          {p === "all"
+                            ? t("calendar.filters.all")
+                            : p === "events"
+                              ? t("calendar.filters.events")
+                              : p}
+                        </span>
                       </button>
                     ))}
                   </div>
@@ -310,8 +327,8 @@ export default function CalendarIndex({ auth }: { auth: any }) {
                           )}
                         </div>
 
-                        {/* Events Stack */}
-                        <div className="flex flex-col gap-2 relative z-10">
+                        {/* Events Stack with Scroll */}
+                        <div className="flex flex-col gap-2 relative z-10 max-h-[120px] overflow-y-auto pr-1 custom-scrollbar">
                           {dayEvents.map((event) => (
                             <div
                               key={event.id}
@@ -350,17 +367,22 @@ export default function CalendarIndex({ auth }: { auth: any }) {
                                   <div className="text-xs font-semibold text-gray-700 dark:text-gray-200 truncate leading-tight">
                                     {event.title}
                                   </div>
-                                  <div className="flex items-center gap-1.5 mt-1">
-                                    <span className="text-[10px] text-gray-400 dark:text-gray-500 capitalize">
-                                      {formatTime(event.start)} •{" "}
-                                      {event.status}
+                                  <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1">
+                                    <span className="text-[10px] text-gray-400 dark:text-gray-500 flex items-center gap-0.5">
+                                      <Clock className="w-3 h-3" />
+                                      {formatTime(event.start)}
                                     </span>
+                                    {event.status && (
+                                      <span className="text-[9px] px-1 rounded-sm bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 capitalize">
+                                        {event.status}
+                                      </span>
+                                    )}
                                   </div>
                                 </div>
                               </div>
 
                               {/* Delete button for user-created events */}
-                              {event.type === "user_event" && (
+                              {String(event.type) === "user_event" && (
                                 <button
                                   onClick={async (ev) => {
                                     ev.stopPropagation();
@@ -368,19 +390,25 @@ export default function CalendarIndex({ auth }: { auth: any }) {
                                     try {
                                       const resourceId = event.resourceId;
                                       // Optimistic remove
-                                      setEvents((prev) => prev.filter((x) => x.id !== event.id));
-                                      await axios.delete(`/api/calendar/user-events/${resourceId}`);
+                                      setEvents((prev) =>
+                                        prev.filter((x) => x.id !== event.id),
+                                      );
+                                      await axios.delete(
+                                        `/api/calendar/user-events/${resourceId}`,
+                                      );
                                       toast.success("Evento eliminado");
                                     } catch (err) {
                                       console.error(err);
-                                      toast.error("No se pudo eliminar el evento");
+                                      toast.error(
+                                        "No se pudo eliminar el evento",
+                                      );
                                       fetchEvents();
                                     }
                                   }}
-                                  className="absolute top-2 right-2 p-1 rounded-md text-gray-400 hover:text-red-600 bg-white/60 hover:bg-white"
+                                  className="absolute top-1 right-1 p-1 rounded-md text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 opacity-0 group-hover/card:opacity-100 transition-opacity"
                                   title="Eliminar evento"
                                 >
-                                  <Trash2 className="w-4 h-4" />
+                                  <Trash2 className="w-3.5 h-3.5" />
                                 </button>
                               )}
 
