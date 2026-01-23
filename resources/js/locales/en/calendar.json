@@ -32,7 +32,8 @@
           "startDate": "Start",
           "endDate": "End (Optional)",
           "remindAt": "Reminder",
-          "color": "Color Label"
+          "color": "Color Label",
+          "visibility": "Visibility"
         },
         "placeholders": {
           "title": "Ex: Team Meeting",
@@ -57,6 +58,15 @@
           "titleRequired": "Title is required",
           "startDateRequired": "Start date is required",
           "pastDate": "Events cannot be created in the past"
+        },
+        "visibility": {
+          "public": "Public",
+          "private": "Private",
+          "publicHint": "Everyone in the workspace will be able to see this event",
+          "privateHint": "Only you will be able to see this event"
+        },
+        "footer": {
+          "note": "Note: This event will be visible to all members of your workspace."
         }
       }
     }

@@ -138,6 +138,9 @@
           "save": "Update",
           "cancel": "Cancel"
         },
+        "configurationLocked": "Configuration Locked",
+        "configurationLockedHint": "You need approval to configure networks and scheduling. Please request a review first.",
+        "configurationLockedHintAdmin": "You must approve the publication before configuring networks.",
         "contentLocked": "Content Locked",
         "contentLockedHint": "To edit the content (title, description or files), you must unpublish the post from all platforms.",
         "lockedByOther": "Post locked by another user",

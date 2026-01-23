@@ -137,6 +137,9 @@
           "save": "Actualizar",
           "cancel": "Cancelar"
         },
+        "configurationLocked": "Configuración Bloqueada",
+        "configurationLockedHint": "Necesitas aprobación para configurar las redes y la programación. Solicita una revisión primero.",
+        "configurationLockedHintAdmin": "Debes aprobar la publicación antes de configurar las redes.",
         "contentLocked": "Contenido Bloqueado",
         "contentLockedHint": "Para editar el contenido (título, descripción o archivos), debes despublicar la publicación de todas las plataformas.",
         "lockedByOther": "Publicación bloqueada por otro usuario",

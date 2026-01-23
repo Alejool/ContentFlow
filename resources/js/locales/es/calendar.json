@@ -32,7 +32,8 @@
           "startDate": "Inicio",
           "endDate": "Fin (Opcional)",
           "remindAt": "Recordatorio",
-          "color": "Etiqueta de color"
+          "color": "Etiqueta de color",
+          "visibility": "Visibilidad"
         },
         "placeholders": {
           "title": "Ej: Reunión de equipo",
@@ -57,6 +58,15 @@
           "titleRequired": "El título es obligatorio",
           "startDateRequired": "La fecha de inicio es obligatoria",
           "pastDate": "No se pueden crear eventos en el pasado"
+        },
+        "visibility": {
+          "public": "Público",
+          "private": "Privado",
+          "publicHint": "Todos en el workspace podrán ver este evento",
+          "privateHint": "Solo tú podrás ver este evento"
+        },
+        "footer": {
+          "note": "Nota: Este evento será visible para todos los miembros de tu workspace."
         }
       }
     }
