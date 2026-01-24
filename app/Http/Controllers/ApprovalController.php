@@ -87,6 +87,11 @@ class ApprovalController extends Controller
       });
     }
 
+    // Filter by specific publication ID (for details view)
+    if ($request->has('publication_id')) {
+      $query->where('publication_id', $request->publication_id);
+    }
+
     $logs = $query->paginate($request->query('per_page', 10));
 
     return $this->successResponse(['logs' => $logs]);

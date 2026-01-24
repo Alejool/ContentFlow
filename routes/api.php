@@ -48,7 +48,7 @@ Route::post('/log-error', function (\Illuminate\Http\Request $request) {
 
 Route::middleware(['auth:sanctum'])->group(function () {
 
-  /*
+/*
 |----------------------------------------------------------------------
 | Workspaces API
 |----------------------------------------------------------------------
@@ -71,29 +71,31 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/{workspace}/activity', [WorkspaceController::class, 'activity'])->name('activity');
   });
 
-  /*
+/*
 |----------------------------------------------------------------------
 | Publications API
 |----------------------------------------------------------------------
 */
+  Route::get('/publication-locks', [PublicationLockController::class, 'index'])->name('api.publication-locks.index');
+
   Route::prefix('publications')->name('api.publications.')->group(function () {
     Route::get('/', [PublicationController::class, 'index'])->name('index');
     Route::get('/stats', [PublicationController::class, 'stats'])->name('stats');
     Route::post('/', [PublicationController::class, 'store'])->name('store');
-    Route::get('/{publication}', [PublicationController::class, 'show'])->name('show');
-    Route::put('/{publication}', [PublicationController::class, 'update'])->name('update');
-    Route::delete('/{publication}', [PublicationController::class, 'destroy'])->name('destroy');
-    Route::post('/{publication}/duplicate', [PublicationController::class, 'duplicate'])->name('duplicate');
-    Route::post('/{publication}/request-review', [PublicationController::class, 'requestReview'])->name('request-review');
-    Route::post('/{publication}/approve', [PublicationController::class, 'approve'])->name('approve');
-    Route::get('/{publication}/published-platforms', [PublicationController::class, 'getPublishedPlatforms'])->name('published-platforms');
-    Route::post('/{publication}/publish', [PublicationController::class, 'publish'])->name('publish');
-    Route::post('/{publication}/unpublish', [PublicationController::class, 'unpublish'])->name('unpublish');
+    Route::get('/{publication}', [PublicationController::class, 'show'])->name('show')->whereNumber('publication');
+    Route::put('/{publication}', [PublicationController::class, 'update'])->name('update')->whereNumber('publication');
+    Route::delete('/{publication}', [PublicationController::class, 'destroy'])->name('destroy')->whereNumber('publication');
+    Route::post('/{publication}/duplicate', [PublicationController::class, 'duplicate'])->name('duplicate')->whereNumber('publication');
+    Route::post('/{publication}/request-review', [PublicationController::class, 'requestReview'])->name('request-review')->whereNumber('publication');
+    Route::post('/{publication}/approve', [PublicationController::class, 'approve'])->name('approve')->whereNumber('publication');
+    Route::get('/{publication}/published-platforms', [PublicationController::class, 'getPublishedPlatforms'])->name('published-platforms')->whereNumber('publication');
+    Route::post('/{publication}/publish', [PublicationController::class, 'publish'])->name('publish')->whereNumber('publication');
+    Route::post('/{publication}/unpublish', [PublicationController::class, 'unpublish'])->name('unpublish')->whereNumber('publication');
 
     // Locking API
-    Route::post('/{publication}/lock', [PublicationLockController::class, 'lock'])->name('lock');
-    Route::post('/{publication}/unlock', [PublicationLockController::class, 'unlock'])->name('unlock');
-    Route::get('/{publication}/lock', [PublicationLockController::class, 'status'])->name('status');
+    Route::post('/{publication}/lock', [PublicationLockController::class, 'lock'])->name('lock')->whereNumber('publication');
+    Route::post('/{publication}/unlock', [PublicationLockController::class, 'unlock'])->name('unlock')->whereNumber('publication');
+    Route::get('/{publication}/lock', [PublicationLockController::class, 'status'])->name('status')->whereNumber('publication');
   });
 
   /*

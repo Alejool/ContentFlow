@@ -14,6 +14,26 @@ class PublicationLockController extends Controller
 {
     use ApiResponse;
 
+    public function index(Request $request)
+    {
+        $user = Auth::user();
+        if (!$user->current_workspace_id) {
+            return $this->successResponse(['locks' => []]);
+        }
+
+        // Clean up expired locks first
+        PublicationLock::where('expires_at', '<', now())->delete();
+
+        $locks = PublicationLock::whereHas('publication', function ($q) use ($user) {
+            $q->where('workspace_id', $user->current_workspace_id);
+        })
+            ->where('expires_at', '>', now())
+            ->with('user:id,name') // Load minimal user info
+            ->get();
+
+        return $this->successResponse(['locks' => $locks]);
+    }
+
     public function lock(Request $request, Publication $publication)
     {
         $user = Auth::user();

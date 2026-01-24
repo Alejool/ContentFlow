@@ -48,8 +48,9 @@ class PublicationController extends Controller
     $cacheVersion = cache()->get("publications:{$workspaceId}:version", 1);
 
     // Cache key based on workspace, version, filters, and page
+    // Updated to v2-fix to purge stale sorted results
     $cacheKey = sprintf(
-      'publications:%d:v%d:%s:%d',
+      'publications:%d:v%d-fixed:%s:%d',
       $workspaceId,
       $cacheVersion,
       md5(json_encode($request->all())),

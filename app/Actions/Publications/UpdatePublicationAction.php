@@ -113,7 +113,12 @@ class UpdatePublicationAction
         $publication->update(['status' => 'draft']);
       }
 
-      return $publication->load(['mediaFiles.derivatives', 'scheduled_posts.socialAccount', 'socialPostLogs.socialAccount', 'campaigns']);
+      $publication->load(['mediaFiles.derivatives', 'scheduled_posts.socialAccount', 'socialPostLogs.socialAccount', 'campaigns']);
+
+      // Broadcast update to other users in the workspace
+      \App\Events\Publications\PublicationUpdated::dispatch($publication);
+
+      return $publication;
     });
   }
 }
