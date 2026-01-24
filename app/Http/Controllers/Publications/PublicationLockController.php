@@ -9,6 +9,7 @@ use App\Events\Publications\PublicationLockChanged;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class PublicationLockController extends Controller
 {
@@ -38,6 +39,9 @@ class PublicationLockController extends Controller
     {
         $user = Auth::user();
         $workspaceId = $user->current_workspace_id;
+        $sessionId = session()->getId();
+
+        Log::info("🔐 Lock attempt: pub {$publication->id}, user {$user->id}, session {$sessionId}");
 
         // Ensure publication belongs to current workspace
         if ($publication->workspace_id !== $workspaceId) {
@@ -51,33 +55,24 @@ class PublicationLockController extends Controller
         $sessionId = session()->getId();
 
         if ($existingLock) {
-            // Check if it's the SAME user and SAME session
-            if ($existingLock->user_id === $user->id && $existingLock->session_id === $sessionId) {
-                // Refresh our own lock
-                $existingLock->update(['expires_at' => now()->addMinutes(2)]);
-                return $this->successResponse(['lock' => $existingLock], 'Lock refreshed');
-            }
+            $force = $request->input('force', false);
 
-            // If it's the same user but DIFFERENT session
-            if ($existingLock->user_id === $user->id) {
-                return $this->errorResponse('Publication is open in another window/device.', 423, [
-                    'locked_by' => 'session',
-                    'user_name' => 'You',
-                    'user_id' => $user->id,
+            // Allow handover if it's the SAME user (different session) OR if force is requested
+            // Force is usually requested when a frontend survivor detects the locker left the presence channel
+            if ($existingLock->user_id === $user->id || $force) {
+                $oldUser = $existingLock->user->name ?? 'otro editor';
+                $existingLock->delete();
+                Log::info("🔄 Lock handover: pub {$publication->id}, taken from {$oldUser} by user {$user->id} (force: " . ($force ? 'true' : 'false') . ")");
+            } else {
+                return $this->errorResponse('Publication is being edited by ' . $existingLock->user->name, 423, [
+                    'locked_by' => 'user',
+                    'user_name' => $existingLock->user->name,
+                    'user_id' => $existingLock->user_id,
                     'ip_address' => $existingLock->ip_address,
                     'user_agent' => $existingLock->user_agent,
                     'expires_at' => $existingLock->expires_at->toIso8601String(),
                 ]);
             }
-
-            return $this->errorResponse('Publication is being edited by ' . $existingLock->user->name, 423, [
-                'locked_by' => 'user',
-                'user_name' => $existingLock->user->name,
-                'user_id' => $existingLock->user_id,
-                'ip_address' => $existingLock->ip_address,
-                'user_agent' => $existingLock->user_agent,
-                'expires_at' => $existingLock->expires_at->toIso8601String(),
-            ]);
         }
 
         // Use updateOrCreate to handle race conditions where lock might still exist
@@ -88,7 +83,7 @@ class PublicationLockController extends Controller
                 'session_id' => $sessionId,
                 'ip_address' => $request->ip(),
                 'user_agent' => $request->userAgent(),
-                'expires_at' => now()->addMinutes(2),
+                'expires_at' => now()->addSeconds(40),
             ]
         );
 
@@ -109,8 +104,22 @@ class PublicationLockController extends Controller
             ->first();
 
         if ($lock) {
+            Log::info("🔓 Lock released successfully (session match): pub {$publication->id}, user {$user->id}");
             $lock->delete();
             broadcast(new PublicationLockChanged($publication->id, null, $user->current_workspace_id))->toOthers();
+        } else {
+            // Relaxed check: if no session match, find by user only
+            $fallbackLock = PublicationLock::where('publication_id', $publication->id)
+                ->where('user_id', $user->id)
+                ->first();
+
+            if ($fallbackLock) {
+                Log::info("🔓 Lock released successfully (fallback user match): pub {$publication->id}, user {$user->id}, original session {$fallbackLock->session_id}");
+                $fallbackLock->delete();
+                broadcast(new PublicationLockChanged($publication->id, null, $user->current_workspace_id))->toOthers();
+            } else {
+                Log::warning("⚠️ Unlock failed - lock not found for user: pub {$publication->id}, user {$user->id}");
+            }
         }
 
         return $this->successResponse(null, 'Lock released');

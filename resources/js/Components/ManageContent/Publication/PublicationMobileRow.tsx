@@ -150,6 +150,10 @@ const PublicationMobileRow = memo(
           const mediaUrl =
             firstMedia?.thumbnail?.file_path || firstMedia?.file_path;
           const hasImageError = imageErrors[item.id];
+          const lock = remoteLocks[item.id];
+          const lockedByName = lock
+            ? lock.user_name || (lock as any).user?.name || "Usuario"
+            : "";
 
           return (
             <div
@@ -364,7 +368,7 @@ const PublicationMobileRow = memo(
                         </span>
                       </div>
                       <span className="text-xs font-semibold text-amber-700 dark:text-amber-400">
-                        Editando: {remoteLocks[item.id].user_name}
+                        Editando: {lockedByName}
                       </span>
                     </div>
                   )}
@@ -537,7 +541,7 @@ const PublicationMobileRow = memo(
                             e.stopPropagation();
                             if (remoteLocks[item.id]) {
                               toast.error(
-                                `${t("publications.table.lockedBy") || "Editando por"} ${remoteLocks[item.id].user_name}`,
+                                `${t("publications.table.lockedBy") || "Editando por"} ${lockedByName}`,
                               );
                               return;
                             }
@@ -561,7 +565,8 @@ const PublicationMobileRow = memo(
                           disabled={
                             isLoading?.publishing ||
                             isLoading?.editing ||
-                            isLoading?.deleting
+                            isLoading?.deleting ||
+                            !!remoteLocks[item.id]
                           }
                           className={`flex-1 py-2.5 rounded-lg font-medium text-xs flex items-center justify-center gap-2 transition-colors active:scale-95 ${
                             remoteLocks[item.id]
@@ -570,7 +575,7 @@ const PublicationMobileRow = memo(
                           } disabled:opacity-70`}
                           title={
                             remoteLocks[item.id]
-                              ? `Editando por ${remoteLocks[item.id].user_name}`
+                              ? `Editando por ${lockedByName}`
                               : "Editar"
                           }
                         >

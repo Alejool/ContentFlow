@@ -85,7 +85,7 @@ export const usePublicationForm = ({
       social_accounts: [],
       scheduled_at: null,
       lock_content: false,
-      status: "published",
+      status: "draft",
     },
   });
 
@@ -94,7 +94,7 @@ export const usePublicationForm = ({
     watch,
     setValue,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isDirty },
     trigger,
     getValues,
     control,
@@ -111,8 +111,15 @@ export const usePublicationForm = ({
   // Phase 1: Load critical data IMMEDIATELY for instant modal display
   useEffect(() => {
     if (isOpen) {
-      setIsDataReady(false);
       if (publication) {
+        // CRITICAL Protection: Do not reset form if user has unsaved changes
+        // This handles reactive updates from background syncs without wiping User A's work
+        if (isDirty) {
+          console.log("🛡️ Sync blocked: Preserving unsaved user edits.");
+          return;
+        }
+
+        setIsDataReady(false);
         // Load basic form fields synchronously
         reset({
           title: publication.title || "",
@@ -138,6 +145,7 @@ export const usePublicationForm = ({
 
         setPlatformSettings(publication.platform_settings || {});
       } else {
+        // Only clear everything if truly opening a NEW publication (no id)
         reset({
           title: "",
           description: "",
@@ -155,11 +163,14 @@ export const usePublicationForm = ({
         setIsDataReady(true);
       }
     }
-  }, [isOpen, publication?.id]);
+  }, [isOpen, publication, user?.global_platform_settings]);
 
   // Phase 2: Defer HEAVY processing using startTransition
   useEffect(() => {
     if (isOpen && publication) {
+      // Also protect secondary processing from dirty states
+      if (isDirty) return;
+
       startTransition(() => {
         // Process scheduled posts and social accounts
         const publishedAccountIds = new Set(
@@ -218,7 +229,6 @@ export const usePublicationForm = ({
               }
             }
 
-            // Map thumbnail from derivatives if available
             const thumbDerivative = media.derivatives?.find(
               (d: any) =>
                 d.derivative_type === "thumbnail" ||
@@ -255,7 +265,6 @@ export const usePublicationForm = ({
             };
           }) || [];
 
-        // Fallback for single image publications without media_files relationship
         if (existingMedia.length === 0 && publication.image) {
           let url = publication.image;
           if (url && !url.startsWith("http") && !url.startsWith("/storage/")) {
@@ -278,11 +287,8 @@ export const usePublicationForm = ({
     }
   }, [
     isOpen,
-    publication?.id,
-    publication?.media_files,
-    publication?.scheduled_posts,
-    publication?.social_post_logs,
-    publication?.image,
+    publication,
+    isDirty, // Prevent media reset if dirty
   ]);
 
   const handleFileChange = async (files: FileList | null) => {
@@ -348,14 +354,12 @@ export const usePublicationForm = ({
     let formatted = value;
 
     if (!isDeleting && endsWithSpace && value.trim().length > 0) {
-      // If user typed a space, ensure all tags have # and add a new # at the end
       const tags = value.trim().split(/\s+/);
       const processedTags = tags.map((tag) =>
         tag.startsWith("#") ? tag : `#${tag}`,
       );
       formatted = processedTags.join(" ") + " #";
     } else if (!endsWithSpace) {
-      // Standard formatting: ensure tags have # but don't force a trailing #
       const tags = value.split(/\s+/);
       formatted = tags
         .map((tag, index) => {
@@ -408,7 +412,6 @@ export const usePublicationForm = ({
       return;
     }
 
-    // Validation: Require dates if social accounts are selected
     if (data.social_accounts && data.social_accounts.length > 0) {
       const hasGlobalSchedule = !!data.scheduled_at;
       const allAccountsHaveSchedule = data.social_accounts.every(
@@ -432,7 +435,6 @@ export const usePublicationForm = ({
       formData.append("goal", data.goal || "");
       formData.append("hashtags", data.hashtags || "");
 
-      // Fix campaign_id handling
       if (data.campaign_id && data.campaign_id !== "") {
         formData.append("campaign_id", data.campaign_id.toString());
       } else {
@@ -440,21 +442,26 @@ export const usePublicationForm = ({
       }
 
       const socialAccounts = data.social_accounts || [];
-
-      // If no accounts selected and no date selected, it's effectively a draft now
       const currentStatus = getValues("status") || "draft";
-      const validStatuses = ['draft', 'published', 'publishing', 'failed', 'pending_review', 'approved', 'scheduled', 'rejected'];
+      const validStatuses = [
+        "draft",
+        "published",
+        "publishing",
+        "failed",
+        "pending_review",
+        "approved",
+        "scheduled",
+        "rejected",
+      ];
       const finalStatus =
         socialAccounts.length === 0 && !data.scheduled_at
           ? "draft"
-          : validStatuses.includes(currentStatus) ? currentStatus : "draft";
+          : validStatuses.includes(currentStatus)
+            ? currentStatus
+            : "draft";
 
       formData.append("status", finalStatus);
-
-      // Always send scheduled_at, even if null, to allow clearing it on the backend
       formData.append("scheduled_at", data.scheduled_at || "");
-
-      // Flag to tell the backend to sync social accounts, even if the list is empty
       formData.append("social_accounts_sync", "true");
 
       socialAccounts.forEach((id, index) => {
@@ -485,23 +492,16 @@ export const usePublicationForm = ({
           }
 
           if (hasNewThumbnail) {
-            // For new videos, we also send as standard thumbnails array
             formData.append(`thumbnails[${index}]`, hasNewThumbnail);
-
-            // If it's the first video, also send as youtube_thumbnail for broader compatibility
             if (media.type === "video") {
               formData.append("youtube_thumbnail", hasNewThumbnail);
             }
           }
         } else if (!media.isNew && media.id) {
-          // Tell backend to keep this existing media
           formData.append("media_keep_ids[]", media.id.toString());
 
-          // If a new thumbnail was set for this existing media
           if (hasNewThumbnail) {
             formData.append(`thumbnails[${media.id}]`, hasNewThumbnail);
-
-            // Special handling for video thumbnails to match specialized uploader format
             if (media.type === "video") {
               formData.append("youtube_thumbnail", hasNewThumbnail);
               formData.append(
@@ -561,7 +561,6 @@ export const usePublicationForm = ({
   const onInvalidSubmit = (errs: any) => {
     console.error("Form Validation Errors:", errs);
 
-    // Get field names for a more helpful message
     const errorFields = Object.keys(errs)
       .map((key) => t(`publications.modal.add.${key}`) || key)
       .join(", ");

@@ -74,6 +74,10 @@ const PublicationRow = memo(
       return { images, videos, total: item.media_files.length };
     }, [item.media_files]);
 
+    const lockedByName = remoteLock
+      ? remoteLock.user_name || (remoteLock as any).user?.name || "Usuario"
+      : "";
+
     return (
       <>
         <td className="text-center"></td>
@@ -147,7 +151,7 @@ const PublicationRow = memo(
                     </span>
                   </div>
                   <span className="text-[10px] font-bold text-amber-700 dark:text-amber-400 uppercase tracking-tight">
-                    Editando: {remoteLock.user_name}
+                    Editando: {lockedByName}
                   </span>
                 </div>
               )}
@@ -331,7 +335,7 @@ const PublicationRow = memo(
                 onClick={async () => {
                   if (remoteLock) {
                     toast.error(
-                      `${t("publications.table.lockedBy") || "Editando por"} ${remoteLock.user_name}`,
+                      `${t("publications.table.lockedBy") || "Editando por"} ${lockedByName}`,
                     );
                     return;
                   }
@@ -346,7 +350,9 @@ const PublicationRow = memo(
                     setIsEditing(false);
                   }
                 }}
-                disabled={isPublishing || isEditing || isDeleting}
+                disabled={
+                  isPublishing || isEditing || isDeleting || !!remoteLock
+                }
                 className={`flex items-center gap-1.5 p-1.5 px-2.5 ${
                   item.status === "published"
                     ? "text-amber-500"
@@ -356,7 +362,7 @@ const PublicationRow = memo(
                 } rounded-lg disabled:opacity-70 transition-all`}
                 title={
                   remoteLock
-                    ? `${t("publications.table.lockedBy")} ${remoteLock.user_name}`
+                    ? `${t("publications.table.lockedBy") || "Editando por"} ${lockedByName}`
                     : item.status === "published"
                       ? "Editar (Despublicar primero)"
                       : "Editar"

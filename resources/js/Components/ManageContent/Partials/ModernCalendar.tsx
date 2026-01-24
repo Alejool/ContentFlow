@@ -7,6 +7,7 @@ import {
 } from "@/Constants/socialPlatforms";
 import { useCalendar } from "@/Hooks/calendar/useCalendar";
 import { formatTime } from "@/Utils/formatDate";
+import { useLockStore } from "@/stores/lockStore";
 import { usePage } from "@inertiajs/react";
 import {
   eachDayOfInterval,
@@ -17,8 +18,6 @@ import {
   isSameMonth,
   isToday,
   parseISO,
-  setMonth,
-  setYear,
   startOfDay,
   startOfMonth,
 } from "date-fns";
@@ -105,6 +104,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
 
   const { auth } = usePage().props as any;
   const currentUser = auth.user;
+  const { remoteLocks } = useLockStore();
 
   const [draggedEvent, setDraggedEvent] = useState<CalendarEvent | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -122,13 +122,13 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Element;
-      if (showMonthPicker && !target.closest('.month-picker-container')) {
+      if (showMonthPicker && !target.closest(".month-picker-container")) {
         setShowMonthPicker(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showMonthPicker]);
 
   const days = eachDayOfInterval({
@@ -142,8 +142,11 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
   const handleDragStart = (e: React.DragEvent, event: CalendarEvent) => {
     if (
       event.type === "user_event" &&
-      !((event.user?.id && Number(event.user.id) === Number(currentUser?.id)) ||
-        (!event.user?.id && event.extendedProps?.user_name === currentUser?.name))
+      !(
+        (event.user?.id && Number(event.user.id) === Number(currentUser?.id)) ||
+        (!event.user?.id &&
+          event.extendedProps?.user_name === currentUser?.name)
+      )
     ) {
       e.preventDefault();
       return;
@@ -216,12 +219,14 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                   month: "long",
                   year: "numeric",
                 }).format(currentMonth)}
-                <ChevronDown className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform ${showMonthPicker ? 'rotate-180' : ''}`} />
+                <ChevronDown
+                  className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform ${showMonthPicker ? "rotate-180" : ""}`}
+                />
                 {isLoading && (
                   <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin text-primary-500" />
                 )}
               </button>
-              
+
               {showMonthPicker && (
                 <div className="absolute top-full left-0 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg z-50 p-4 min-w-[280px]">
                   <div className="grid grid-cols-3 gap-2 mb-4">
@@ -231,8 +236,8 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                         onClick={() => goToMonth(i, currentMonth.getFullYear())}
                         className={`p-2 text-sm rounded-lg transition-colors ${
                           currentMonth.getMonth() === i
-                            ? 'bg-primary-500 text-white'
-                            : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
+                            ? "bg-primary-500 text-white"
+                            : "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
                         }`}
                       >
                         {new Intl.DateTimeFormat(i18n.language || undefined, {
@@ -243,7 +248,12 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                   </div>
                   <div className="flex items-center justify-between gap-2">
                     <button
-                      onClick={() => goToMonth(currentMonth.getMonth(), currentMonth.getFullYear() - 1)}
+                      onClick={() =>
+                        goToMonth(
+                          currentMonth.getMonth(),
+                          currentMonth.getFullYear() - 1,
+                        )
+                      }
                       className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                     >
                       <ChevronLeft className="w-4 h-4" />
@@ -252,7 +262,12 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                       {currentMonth.getFullYear()}
                     </span>
                     <button
-                      onClick={() => goToMonth(currentMonth.getMonth(), currentMonth.getFullYear() + 1)}
+                      onClick={() =>
+                        goToMonth(
+                          currentMonth.getMonth(),
+                          currentMonth.getFullYear() + 1,
+                        )
+                      }
                       className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                     >
                       <ChevronRight className="w-4 h-4" />
@@ -431,6 +446,12 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                               className="w-1.5 h-1.5 rounded-full flex-shrink-0"
                               style={{ backgroundColor: event.color }}
                             />
+                            {remoteLocks[
+                              event.extendedProps.publication_id ||
+                                Number(event.resourceId)
+                            ] && (
+                              <Lock className="w-2.5 h-2.5 text-amber-500 flex-shrink-0" />
+                            )}
                             <span className="truncate text-gray-700 dark:text-gray-200">
                               {event.title}
                             </span>
@@ -522,19 +543,28 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h5 className="font-bold text-gray-900 dark:text-white truncate text-sm">
+                          <h5 className="font-bold text-gray-900 dark:text-white truncate text-sm flex items-center gap-1.5">
+                            {remoteLocks[
+                              event.extendedProps.publication_id ||
+                                Number(event.resourceId)
+                            ] && <Lock className="w-3 h-3 text-amber-500" />}
                             {event.title}
                           </h5>
                           {event.user?.name && (
                             <p className="text-[10px] text-gray-500 dark:text-gray-400 font-medium">
-                              {t("common.creator")}: {Number(event.user.id) === Number(currentUser?.id) ? t("common.me") || "Yo" : event.user.name}
+                              {t("common.creator")}:{" "}
+                              {Number(event.user.id) === Number(currentUser?.id)
+                                ? t("common.me") || "Yo"
+                                : event.user.name}
                             </p>
                           )}
-                          {!event.user?.name && event.extendedProps?.user_name && (
-                            <p className="text-[10px] text-gray-500 dark:text-gray-400 font-medium">
-                              {t("common.creator")}: {event.extendedProps.user_name}
-                            </p>
-                          )}
+                          {!event.user?.name &&
+                            event.extendedProps?.user_name && (
+                              <p className="text-[10px] text-gray-500 dark:text-gray-400 font-medium">
+                                {t("common.creator")}:{" "}
+                                {event.extendedProps.user_name}
+                              </p>
+                            )}
                           <div className="flex items-center gap-2 mt-1">
                             <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/50 dark:bg-neutral-900/50 text-gray-500 dark:text-gray-400 font-bold uppercase backdrop-blur-sm">
                               {formatTime(event.start)}
@@ -549,11 +579,15 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                         </div>
                         <div className="flex flex-col items-center gap-2">
                           {event.type === "user_event" &&
-                            ((event.user?.id && Number(event.user.id) === Number(currentUser?.id)) ||
-                             (!event.user?.id && event.extendedProps?.user_name === currentUser?.name)) && (
+                            ((event.user?.id &&
+                              Number(event.user.id) ===
+                                Number(currentUser?.id)) ||
+                              (!event.user?.id &&
+                                event.extendedProps?.user_name ===
+                                  currentUser?.name)) && (
                               <button
                                 onClick={(e) => handleDeleteEvent(e, event)}
-                                className="p-2 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 text-gray-400 hover:text-red-500 transition-all opacity-0 group-hover:opacity-100"
+                                className="p-2 rounded-xl bg-red-50 dark:bg-red-900/20 text-red-500 transition-all"
                                 title={t("common.delete")}
                               >
                                 <Trash2 className="w-4 h-4" />

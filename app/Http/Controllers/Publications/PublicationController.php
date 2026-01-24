@@ -22,6 +22,7 @@ use App\Actions\Publications\DeletePublicationAction;
 use App\Notifications\PublicationAwaitingApprovalNotification;
 use App\Notifications\PublicationApprovedNotification;
 use App\Notifications\PublicationRejectedNotification;
+use App\Events\Publications\PublicationUpdated;
 use App\Models\Publications\PublicationLock;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
@@ -242,6 +243,8 @@ class PublicationController extends Controller
       // Clear cache after updating publication
       $this->clearPublicationCache(Auth::user()->current_workspace_id);
 
+      broadcast(new PublicationUpdated($publication))->toOthers();
+
       return $this->successResponse(['publication' => $publication], 'Publication updated successfully');
     } catch (\Exception $e) {
       return response()->json([
@@ -272,6 +275,8 @@ class PublicationController extends Controller
 
       // Clear cache after publishing
       $this->clearPublicationCache(Auth::user()->current_workspace_id);
+
+      broadcast(new PublicationUpdated($publication))->toOthers();
 
       return $this->successResponse([
         'status' => 'publishing'
@@ -353,6 +358,8 @@ class PublicationController extends Controller
       $approver->notify(new PublicationAwaitingApprovalNotification($publication, Auth::user()));
     }
 
+    broadcast(new PublicationUpdated($publication))->toOthers();
+
     return $this->successResponse(['publication' => $publication], 'Publication sent for review.');
   }
 
@@ -394,6 +401,8 @@ class PublicationController extends Controller
 
     // Notify the redactor (publication owner)
     $publication->user->notify(new PublicationApprovedNotification($publication, Auth::user()));
+
+    broadcast(new PublicationUpdated($publication))->toOthers();
 
     // Load approver relationship and logs for response
     $publication->load(['approvedBy:id,name,email', 'approvalLogs' => fn($q) => $q->latest('requested_at')->with(['requester:id,name,photo_url', 'reviewer:id,name,photo_url'])]);
@@ -448,6 +457,8 @@ class PublicationController extends Controller
 
     // Notify the publication owner
     $publication->user->notify(new PublicationRejectedNotification($publication, Auth::user()));
+
+    broadcast(new PublicationUpdated($publication))->toOthers();
 
     // Load rejector relationship for response
     $publication->load(['rejectedBy:id,name,email', 'approvalLogs' => fn($q) => $q->latest('requested_at')->with(['requester:id,name,photo_url', 'reviewer:id,name,photo_url'])]);

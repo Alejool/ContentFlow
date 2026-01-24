@@ -111,6 +111,14 @@ export default function ContentCard({
     );
   };
 
+  const getLockUserName = () => {
+    if (!remoteLock) return "";
+    return remoteLock.user_name || (remoteLock as any).user?.name || "Usuario";
+  };
+
+  const lockedByName = getLockUserName();
+  const lockedByFirstName = lockedByName.split(" ")[0];
+
   const [imageError, setImageError] = useState(false);
 
   return (
@@ -166,15 +174,7 @@ export default function ContentCard({
             <div className="absolute top-3 left-3 z-10">
               <span className="px-2.5 py-1 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-sm backdrop-blur-md border border-amber-200/50 bg-amber-100/90 text-amber-700 dark:bg-amber-900/80 dark:text-amber-300 dark:border-amber-700/50">
                 <Lock className="w-3 h-3" />
-                <span className="capitalize">
-                  {
-                    (
-                      remoteLock.user_name ||
-                      (remoteLock as any).user?.name ||
-                      "..."
-                    ).split(" ")[0]
-                  }
-                </span>
+                <span className="capitalize">{lockedByFirstName}</span>
               </span>
             </div>
           )}{" "}
@@ -202,7 +202,7 @@ export default function ContentCard({
                 {remoteLock && (
                   <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1">
                     <Lock className="w-3 h-3" />
-                    {remoteLock.user_name.split(" ")[0]}
+                    {lockedByFirstName}
                   </span>
                 )}
               </div>
@@ -253,7 +253,7 @@ export default function ContentCard({
                 </span>
               </div>
               <span className="text-xs font-semibold text-amber-700 dark:text-amber-400">
-                Editando: {remoteLock.user_name}
+                Editando: {lockedByName}
               </span>
             </div>
           )}
@@ -390,7 +390,7 @@ export default function ContentCard({
               onClick={() => {
                 if (remoteLock) {
                   toast.error(
-                    `${t("publications.table.lockedBy") || "Editando por"} ${remoteLock.user_name}`,
+                    `${t("publications.table.lockedBy") || "Editando por"} ${lockedByName}`,
                   );
                   return;
                 }
@@ -401,9 +401,10 @@ export default function ContentCard({
                   ? "bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed dark:bg-gray-800 dark:border-gray-700 dark:text-gray-600"
                   : "bg-white hover:bg-orange-50 text-gray-500 hover:text-orange-600 border border-gray-200 hover:border-orange-200 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700"
               }`}
+              disabled={!!remoteLock}
               title={
                 remoteLock
-                  ? `${t("publications.table.lockedBy") || "Editando por"} ${remoteLock.user_name}`
+                  ? `${t("publications.table.lockedBy") || "Editando por"} ${lockedByName}`
                   : "Editar"
               }
             >
@@ -411,13 +412,7 @@ export default function ContentCard({
                 <>
                   <Lock className="w-4 h-4" />
                   <span className="text-xs font-medium">
-                    {
-                      (
-                        remoteLock.user_name ||
-                        (remoteLock as any).user?.name ||
-                        "Bloqueado"
-                      ).split(" ")[0]
-                    }
+                    {lockedByFirstName}
                   </span>
                 </>
               ) : (

@@ -35,14 +35,6 @@ primary_region = "gru"
   grace_period = "1200s"
 
 
-[[services]]
-  protocol = "tcp"
-  internal_port = 8081
-  processes = ["reverb"]
-
-  [[services.ports]]
-    port = 6001
-    handlers = ["tls", "http"]
 
 [[vm]]
   memory = "512mb"

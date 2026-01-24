@@ -15,7 +15,7 @@ import { useCampaignStore } from "@/stores/campaignStore";
 import { useAccountsStore } from "@/stores/socialAccountsStore";
 import { Publication } from "@/types/Publication";
 import { usePage } from "@inertiajs/react";
-import { AlertCircle, Save } from "lucide-react";
+import { AlertCircle, Lock, Save } from "lucide-react";
 import { memo, useMemo, useState } from "react";
 import { useWatch } from "react-hook-form";
 import { Trans } from "react-i18next";
@@ -72,10 +72,8 @@ const EditPublicationModal = ({
   const [isApprovalHistoryExpanded, setIsApprovalHistoryExpanded] =
     useState(false);
 
-  const { isLockedByOther, lockInfo } = usePublicationLock(
-    publication?.id ?? null,
-    isOpen,
-  );
+  const { isLockedByMe, isLockedByOther, lockInfo, activeUsers } =
+    usePublicationLock(publication?.id ?? null, isOpen);
 
   const {
     t,
@@ -221,6 +219,39 @@ const EditPublicationModal = ({
               ? "publications.modal.edit.subtitle"
               : "publications.modal.show.subtitle"
           }
+          rightElement={
+            <div className="flex -space-x-2 overflow-hidden mr-4">
+              {activeUsers.map((user: any) => {
+                const isTheLocker = lockInfo?.user_id === user.id;
+                return (
+                  <div
+                    key={user.id}
+                    className={`inline-block h-8 w-8 rounded-full ring-2 ${isTheLocker ? "ring-amber-500 z-10" : "ring-white dark:ring-neutral-800"} bg-gray-200 dark:bg-neutral-700 flex-shrink-0 relative`}
+                    title={
+                      user.name + (isTheLocker ? " (Editando)" : " (Viendo)")
+                    }
+                  >
+                    {user.avatar ? (
+                      <img
+                        src={user.avatar}
+                        alt={user.name}
+                        className="h-full w-full rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="h-full w-full flex items-center justify-center text-xs font-bold text-gray-500 uppercase">
+                        {user.name.charAt(0)}
+                      </div>
+                    )}
+                    {isTheLocker && (
+                      <div className="absolute -bottom-1 -right-1 bg-amber-500 rounded-full p-0.5 shadow-sm">
+                        <Lock className="w-2 h-2 text-white" />
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          }
         />
 
         <div className="flex-1 overflow-y-auto custom-scrollbar">
@@ -231,7 +262,7 @@ const EditPublicationModal = ({
           >
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-8">
               <div className="space-y-6">
-                {isLockedByOther && (
+                {!isLockedByMe && isLockedByOther && (
                   <div className="p-4 mb-6 rounded-lg border border-amber-500 bg-amber-50 dark:bg-amber-900/20 flex gap-3 text-sm text-amber-700 dark:text-amber-300 animate-in shake duration-500">
                     <AlertCircle className="w-5 h-5 shrink-0 text-amber-500" />
                     <div>
@@ -240,7 +271,7 @@ const EditPublicationModal = ({
                           ? t("publications.modal.edit.lockedBySession") ||
                             "Sesión Duplicada"
                           : t("publications.modal.edit.lockedByOther") ||
-                            "Publicación Bloqueada"}
+                            "En cola de espera"}
                       </p>
                       <p className="opacity-80">
                         {lockInfo?.locked_by === "session" ? (
@@ -273,10 +304,25 @@ const EditPublicationModal = ({
                                 1: <span className="font-medium" />,
                               }}
                             />
+                            <p className="mt-1 font-medium text-amber-600 dark:text-amber-400">
+                              Tomarás el control automáticamente cuando se
+                              libere.
+                            </p>
                           </>
                         )}
                       </p>
                     </div>
+                  </div>
+                )}
+
+                {isLockedByMe && activeUsers.length > 1 && (
+                  <div className="p-3 mb-6 rounded-lg border border-blue-500 bg-blue-50 dark:bg-blue-900/20 flex gap-2 text-xs text-blue-700 dark:text-blue-300">
+                    <Lock className="w-4 h-4 shrink-0" />
+                    <p>
+                      <strong>Eres el editor actual.</strong> Hay{" "}
+                      {activeUsers.length - 1} usuario(s) en espera para cuando
+                      termines.
+                    </p>
                   </div>
                 )}
 

@@ -29,7 +29,6 @@ import {
   ManageContentTab,
   usePublications,
 } from "@/Hooks/publication/usePublications";
-import { useWorkspaceLocks } from "@/Hooks/usePublicationLock";
 import { useManageContentUIStore } from "@/stores/manageContentUIStore";
 import { useShallow } from "zustand/react/shallow";
 
@@ -59,9 +58,7 @@ export default function ManageContentPage() {
     filters,
   } = usePublications();
 
-  // Initialize workspace locks listener
-  useWorkspaceLocks();
-
+  // Fetch publication details if ID in URL
   const fetchPublicationById = usePublicationStore(
     (s) => s.fetchPublicationById,
   );

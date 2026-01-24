@@ -40,17 +40,17 @@ interface PublicationState {
   createPublication: (formData: FormData) => Promise<Publication | null>;
   updatePublicationStore: (
     id: number,
-    formData: FormData
+    formData: FormData,
   ) => Promise<Publication | null>;
   deletePublication: (id: number) => Promise<boolean>;
 
   publishPublication: (
     id: number,
-    formData: FormData
+    formData: FormData,
   ) => Promise<{ success: boolean; data?: any }>;
   unpublishPublication: (
     id: number,
-    platformIds: number[]
+    platformIds: number[],
   ) => Promise<{ success: boolean; data?: any }>;
   setCurrentPublication: (publication: Publication | null) => void;
 
@@ -71,7 +71,10 @@ interface PublicationState {
   clearError: () => void;
   reset: () => void;
 
-  acquireLock: (id: number) => Promise<{ success: boolean; data?: any }>;
+  acquireLock: (
+    id: number,
+    force?: boolean,
+  ) => Promise<{ success: boolean; data?: any }>;
   releaseLock: (id: number) => Promise<{ success: boolean; data?: any }>;
 }
 
@@ -142,7 +145,7 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
 
       set((state) => ({
         publications: state.publications.map((p) =>
-          p.id === id ? publication : p
+          p.id === id ? publication : p,
         ),
         currentPublication: publication,
       }));
@@ -159,7 +162,7 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
   fetchPublishedPlatforms: async (publicationId: number) => {
     try {
       const response = await axios.get(
-        `/publications/${publicationId}/published-platforms`
+        `/publications/${publicationId}/published-platforms`,
       );
 
       const published = response.data.published_platforms ?? [];
@@ -213,7 +216,7 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
   updatePublication: (id, updated) =>
     set((state) => ({
       publications: state.publications.map((p) =>
-        p.id === id ? { ...p, ...updated } : p
+        p.id === id ? { ...p, ...updated } : p,
       ),
       currentPublication:
         state.currentPublication?.id === id
@@ -303,7 +306,7 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
-        }
+        },
       );
       return { success: response.data.success, data: response.data };
     } catch (error: any) {
@@ -396,9 +399,11 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
       error: null,
     }),
 
-  acquireLock: async (id) => {
+  acquireLock: async (id, force = false) => {
     try {
-      const response = await axios.post(`/api/publications/${id}/lock`);
+      const response = await axios.post(`/api/publications/${id}/lock`, {
+        force,
+      });
       return { success: response.data.success, data: response.data };
     } catch (error: any) {
       // Don't set global store error for locks as it's often background/ephemeral
