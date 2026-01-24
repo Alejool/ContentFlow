@@ -146,7 +146,10 @@ export default function ContentList(props: ContentListProps) {
             sortFilter={props.filters?.sort || "newest"}
             dateStart={props.filters?.date_start || ""}
             dateEnd={props.filters?.date_end || ""}
-            handleFilterChange={props.onFilterChange || (() => {})}
+            handleFilterChange={props.onFilterChange ? (key: string, val: any) => {
+              console.log('FilterSection calling onFilterChange:', key, val);
+              props.onFilterChange!(key, val);
+            } : () => {}}
           />
         </div>
       )}

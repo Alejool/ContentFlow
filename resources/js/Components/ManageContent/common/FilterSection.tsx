@@ -100,7 +100,10 @@ export default function FilterSection({
               }
               value={statusFilter}
               variant="outlined"
-              onChange={(val) => handleFilterChange("status", String(val))}
+              onChange={(val) => {
+                console.log('Status filter changed:', val); // Debug log
+                handleFilterChange("status", String(val));
+              }}
               size="md"
               icon={Filter}
               placeholder={t("common.status.title") || "Estado"}
@@ -114,7 +117,10 @@ export default function FilterSection({
                 options={sortOptions}
                 value={sortFilter}
                 variant="outlined"
-                onChange={(val) => handleFilterChange("sort", String(val))}
+                onChange={(val) => {
+                  console.log('Sort filter changed:', val); // Debug log
+                  handleFilterChange("sort", String(val));
+                }}
                 size="md"
                 placeholder={t("common.sort.title") || "Ordenar"}
               />

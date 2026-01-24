@@ -208,8 +208,15 @@ export const usePublications = () => {
   );
 
   const handleFilterChange = useCallback((newFilters: any) => {
+    console.log('Filter change:', newFilters); // Debug log
     setFilters(newFilters);
   }, []);
+
+  const handleSingleFilterChange = useCallback((key: string, value: any) => {
+    console.log('Single filter change:', key, value); // Debug log
+    const newFilters = { ...filters, [key]: value };
+    setFilters(newFilters);
+  }, [filters]);
 
   const handleRefresh = useCallback(async () => {
     await fetchData(pagination.current_page);
@@ -309,6 +316,7 @@ export const usePublications = () => {
       setActiveTab,
       filters,
       handleFilterChange,
+      handleSingleFilterChange,
       selectedItem,
       setSelectedItem,
       items,
@@ -348,6 +356,7 @@ export const usePublications = () => {
       setActiveTab,
       filters,
       handleFilterChange,
+      handleSingleFilterChange,
       selectedItem,
       setSelectedItem,
       items,

@@ -39,6 +39,7 @@ export default function ManageContentPage() {
   const {
     t,
     handleFilterChange,
+    handleSingleFilterChange,
     handlePageChange,
     handlePerPageChange,
     handleRefresh,
@@ -388,9 +389,7 @@ export default function ManageContentPage() {
                   onPageChange={handlePageChange}
                   onPerPageChange={handlePerPageChange}
                   onRefresh={handleRefresh}
-                  onFilterChange={(key, val) =>
-                    handleFilterChange({ ...filters, [key]: val })
-                  }
+                  onFilterChange={handleSingleFilterChange}
                   filters={filters}
                   search={search}
                   onSearchChange={setSearch}
@@ -439,9 +438,7 @@ export default function ManageContentPage() {
                   showFilters={showFilters}
                   onToggleFilters={setShowFilters}
                   filters={filters}
-                  onFilterChange={(key, val) =>
-                    handleFilterChange({ ...filters, [key]: val })
-                  }
+                  onFilterChange={handleSingleFilterChange}
                   search={search}
                   onSearchChange={setSearch}
                 />
