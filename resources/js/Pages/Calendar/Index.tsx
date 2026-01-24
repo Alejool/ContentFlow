@@ -13,11 +13,14 @@ import {
   isSameMonth,
   isToday,
   parseISO,
+  setMonth,
+  setYear,
   startOfMonth,
   subMonths,
 } from "date-fns";
 import {
   Calendar as CalendarIcon,
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
   Clock,
@@ -94,6 +97,20 @@ export default function CalendarIndex({ auth }: { auth: any }) {
   const [eventToDelete, setEventToDelete] = useState<CalendarEvent | null>(
     null,
   );
+  const [showMonthPicker, setShowMonthPicker] = useState(false);
+
+  // Close month picker when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (showMonthPicker && !target.closest('.month-picker-container')) {
+        setShowMonthPicker(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showMonthPicker]);
 
   const fetchEvents = async () => {
     setLoading(true);
@@ -119,6 +136,10 @@ export default function CalendarIndex({ auth }: { auth: any }) {
   const nextMonth = () => setCurrentDate(addMonths(currentDate, 1));
   const prevMonth = () => setCurrentDate(subMonths(currentDate, 1));
   const goToToday = () => setCurrentDate(new Date());
+  const goToMonth = (month: number, year: number) => {
+    setCurrentDate(setYear(setMonth(currentDate, month), year));
+    setShowMonthPicker(false);
+  };
 
   // Grid Generation
   const days = eachDayOfInterval({
@@ -227,15 +248,60 @@ export default function CalendarIndex({ auth }: { auth: any }) {
               {/* Toolbar */}
               <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-6">
                 <div className="flex items-center gap-4">
-                  <h3 className="text-3xl font-bold text-gray-900 dark:text-white capitalize flex items-center gap-3">
-                    {new Intl.DateTimeFormat(i18n.language || undefined, {
-                      month: "long",
-                      year: "numeric",
-                    }).format(currentDate)}
-                    {loading && (
-                      <Loader2 className="w-5 h-5 animate-spin text-primary-500" />
+                  <div className="relative month-picker-container">
+                    <button
+                      onClick={() => setShowMonthPicker(!showMonthPicker)}
+                      className="text-3xl font-bold text-gray-900 dark:text-white capitalize flex items-center gap-3 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                    >
+                      {new Intl.DateTimeFormat(i18n.language || undefined, {
+                        month: "long",
+                        year: "numeric",
+                      }).format(currentDate)}
+                      <ChevronDown className={`w-5 h-5 transition-transform ${showMonthPicker ? 'rotate-180' : ''}`} />
+                      {loading && (
+                        <Loader2 className="w-5 h-5 animate-spin text-primary-500" />
+                      )}
+                    </button>
+                    
+                    {showMonthPicker && (
+                      <div className="absolute top-full left-0 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg z-50 p-4 min-w-[280px]">
+                        <div className="grid grid-cols-3 gap-2 mb-4">
+                          {Array.from({ length: 12 }, (_, i) => (
+                            <button
+                              key={i}
+                              onClick={() => goToMonth(i, currentDate.getFullYear())}
+                              className={`p-2 text-sm rounded-lg transition-colors ${
+                                currentDate.getMonth() === i
+                                  ? 'bg-primary-500 text-white'
+                                  : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
+                              }`}
+                            >
+                              {new Intl.DateTimeFormat(i18n.language || undefined, {
+                                month: "short",
+                              }).format(new Date(2024, i, 1))}
+                            </button>
+                          ))}
+                        </div>
+                        <div className="flex items-center justify-between gap-2">
+                          <button
+                            onClick={() => goToMonth(currentDate.getMonth(), currentDate.getFullYear() - 1)}
+                            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                          >
+                            <ChevronLeft className="w-4 h-4" />
+                          </button>
+                          <span className="font-semibold text-gray-900 dark:text-white">
+                            {currentDate.getFullYear()}
+                          </span>
+                          <button
+                            onClick={() => goToMonth(currentDate.getMonth(), currentDate.getFullYear() + 1)}
+                            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                          >
+                            <ChevronRight className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
                     )}
-                  </h3>
+                  </div>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-3 w-full md:w-auto justify-center md:justify-end">

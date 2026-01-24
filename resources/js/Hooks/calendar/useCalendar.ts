@@ -1,7 +1,7 @@
 import { useCalendarStore } from "@/stores/calendarStore";
 import { useManageContentUIStore } from "@/stores/manageContentUIStore";
 import axios from "axios";
-import { addMonths, subMonths } from "date-fns";
+import { addMonths, setMonth, setYear, subMonths } from "date-fns";
 import { useCallback, useEffect, useMemo } from "react";
 import { useShallow } from "zustand/react/shallow";
 
@@ -54,6 +54,10 @@ export const useCalendar = () => {
 
   const goToToday = useCallback(() => {
     setCurrentMonth(new Date());
+  }, [setCurrentMonth]);
+
+  const goToMonth = useCallback((month: number, year: number) => {
+    setCurrentMonth(setYear(setMonth(new Date(), month), year));
   }, [setCurrentMonth]);
 
   const handleEventDrop = useCallback(
@@ -132,6 +136,7 @@ export const useCalendar = () => {
     nextMonth,
     prevMonth,
     goToToday,
+    goToMonth,
     handleEventDrop,
     handleEventClick,
     deleteEvent,

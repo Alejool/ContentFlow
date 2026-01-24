@@ -17,18 +17,21 @@ import {
   isSameMonth,
   isToday,
   parseISO,
+  setMonth,
+  setYear,
   startOfDay,
   startOfMonth,
 } from "date-fns";
 import {
   Calendar as CalendarIcon,
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
   Filter,
   Loader2,
   Trash2,
 } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import UserEventModal from "./UserEventModal";
@@ -89,10 +92,16 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
     nextMonth,
     prevMonth,
     goToToday,
+    goToMonth: calendarGoToMonth,
     handleEventDrop,
     deleteEvent,
     refreshEvents,
   } = useCalendar();
+
+  const goToMonth = (month: number, year: number) => {
+    calendarGoToMonth(month, year);
+    setShowMonthPicker(false);
+  };
 
   const { auth } = usePage().props as any;
   const currentUser = auth.user;
@@ -107,6 +116,20 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
     isOpen: boolean;
     event: CalendarEvent | null;
   }>({ isOpen: false, event: null });
+  const [showMonthPicker, setShowMonthPicker] = useState(false);
+
+  // Close month picker when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (showMonthPicker && !target.closest('.month-picker-container')) {
+        setShowMonthPicker(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showMonthPicker]);
 
   const days = eachDayOfInterval({
     start: startOfMonth(currentMonth),
@@ -184,15 +207,60 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
       <div className="p-6">
         <div className="flex flex-col sm:flex-row justify-between items-center mb-6 sm:mb-8 gap-4 sm:gap-6">
           <div className="flex items-center gap-4">
-            <h3 className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white capitalize flex items-center gap-3">
-              {new Intl.DateTimeFormat(i18n.language || undefined, {
-                month: "long",
-                year: "numeric",
-              }).format(currentMonth)}
-              {isLoading && (
-                <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin text-primary-500" />
+            <div className="relative month-picker-container">
+              <button
+                onClick={() => setShowMonthPicker(!showMonthPicker)}
+                className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white capitalize flex items-center gap-3 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+              >
+                {new Intl.DateTimeFormat(i18n.language || undefined, {
+                  month: "long",
+                  year: "numeric",
+                }).format(currentMonth)}
+                <ChevronDown className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform ${showMonthPicker ? 'rotate-180' : ''}`} />
+                {isLoading && (
+                  <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin text-primary-500" />
+                )}
+              </button>
+              
+              {showMonthPicker && (
+                <div className="absolute top-full left-0 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg z-50 p-4 min-w-[280px]">
+                  <div className="grid grid-cols-3 gap-2 mb-4">
+                    {Array.from({ length: 12 }, (_, i) => (
+                      <button
+                        key={i}
+                        onClick={() => goToMonth(i, currentMonth.getFullYear())}
+                        className={`p-2 text-sm rounded-lg transition-colors ${
+                          currentMonth.getMonth() === i
+                            ? 'bg-primary-500 text-white'
+                            : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
+                        }`}
+                      >
+                        {new Intl.DateTimeFormat(i18n.language || undefined, {
+                          month: "short",
+                        }).format(new Date(2024, i, 1))}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <button
+                      onClick={() => goToMonth(currentMonth.getMonth(), currentMonth.getFullYear() - 1)}
+                      className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+                    <span className="font-semibold text-gray-900 dark:text-white">
+                      {currentMonth.getFullYear()}
+                    </span>
+                    <button
+                      onClick={() => goToMonth(currentMonth.getMonth(), currentMonth.getFullYear() + 1)}
+                      className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
               )}
-            </h3>
+            </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto justify-center sm:justify-end">
