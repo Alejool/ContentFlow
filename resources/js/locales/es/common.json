@@ -107,6 +107,11 @@
       "show": "Mostrar",
       "entries": "entradas",
       "info": "Mostrando {{from}} a {{to}} de {{total}} resultados"
+    },
+    "tabs": {
+        "overview": "Resumen",
+        "activity": "Actividad",
+        "approvals": "Aprobaciones"
     }
   }
 }
