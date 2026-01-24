@@ -15,6 +15,7 @@
         "publishDate": "Fecha de Publicación",
         "publishedOn": "Publicado el",
         "publications": "Publicaciones",
+        "scheduledPosts": "Publicaciones Programadas",
         "associatedPublications": "Publicaciones Asociadas",
         "accountMissingTitle": "Cuenta Desconectada",
         "accountMissingText": "Esta publicación se publicó en una cuenta ({{account}}) que ya no está conectada. Al editarla se creará una nueva versión para tu cuenta actual. ¿Continuar?",

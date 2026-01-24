@@ -1,5 +1,5 @@
-import { format } from "date-fns";
 import { getDateFnsLocale } from "@/Utils/dateLocales";
+import { format } from "date-fns";
 import {
   Calendar,
   CheckCircle,
@@ -15,6 +15,7 @@ import {
   Video,
 } from "lucide-react";
 import { useState } from "react";
+import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
 interface ContentCardProps {
@@ -149,7 +150,6 @@ export default function ContentCard({
               </div>
             )}
           </div>
-
           <div className="absolute top-3 right-3 z-10">
             <span
               className={`px-2.5 py-1 rounded-full text-xs font-medium flex items-center gap-1.5 shadow-sm backdrop-blur-md border border-white/20 ${statusColors[statusKey] || statusColors.draft}`}
@@ -167,11 +167,18 @@ export default function ContentCard({
               <span className="px-2.5 py-1 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-sm backdrop-blur-md border border-amber-200/50 bg-amber-100/90 text-amber-700 dark:bg-amber-900/80 dark:text-amber-300 dark:border-amber-700/50">
                 <Lock className="w-3 h-3" />
                 <span className="capitalize">
-                  {remoteLock.user_name.split(" ")[0]}
+                  {
+                    (
+                      remoteLock.user_name ||
+                      (remoteLock as any).user?.name ||
+                      "..."
+                    ).split(" ")[0]
+                  }
                 </span>
               </span>
             </div>
-          )}
+          )}{" "}
+          as any
         </div>
       )}
 
@@ -381,10 +388,14 @@ export default function ContentCard({
           {canManageContent && (
             <button
               onClick={() => {
-                if (remoteLock) return;
+                if (remoteLock) {
+                  toast.error(
+                    `${t("publications.table.lockedBy") || "Editando por"} ${remoteLock.user_name}`,
+                  );
+                  return;
+                }
                 onEdit(item);
               }}
-              disabled={!!remoteLock}
               className={`flex items-center justify-center gap-2 px-3 py-2 rounded-lg transition-colors shadow-sm ${
                 remoteLock
                   ? "bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed dark:bg-gray-800 dark:border-gray-700 dark:text-gray-600"
@@ -399,7 +410,15 @@ export default function ContentCard({
               {remoteLock ? (
                 <>
                   <Lock className="w-4 h-4" />
-                  <span className="text-xs font-medium">Bloqueado</span>
+                  <span className="text-xs font-medium">
+                    {
+                      (
+                        remoteLock.user_name ||
+                        (remoteLock as any).user?.name ||
+                        "Bloqueado"
+                      ).split(" ")[0]
+                    }
+                  </span>
                 </>
               ) : (
                 <Edit className="w-4 h-4" />

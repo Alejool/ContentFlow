@@ -2,6 +2,16 @@
   "activity": {
     "title": "Actividad",
     "total": "Total",
+    "created": "Creó la publicación",
+    "updated": "Actualizó la publicación",
+    "statusChanged": "Cambió el estado",
+    "published": "Publicó el contenido",
+    "unpublished": "Despublicó el contenido",
+    "locked": "Bloqueó la publicación",
+    "unlocked": "Desbloqueó la publicación",
+    "review_requested": "Solicitó revisión",
+    "approved": "Aprobó la publicación",
+    "rejected": "Rechazó la publicación",
     "timeline": {
       "title": "Linea de Tiempo",
       "subtitle": "Linea de Tiempo",

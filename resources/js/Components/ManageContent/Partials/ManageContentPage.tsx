@@ -29,6 +29,7 @@ import {
   ManageContentTab,
   usePublications,
 } from "@/Hooks/publication/usePublications";
+import { useWorkspaceLocks } from "@/Hooks/usePublicationLock";
 import { useManageContentUIStore } from "@/stores/manageContentUIStore";
 import { useShallow } from "zustand/react/shallow";
 
@@ -58,6 +59,9 @@ export default function ManageContentPage() {
     filters,
   } = usePublications();
 
+  // Initialize workspace locks listener
+  useWorkspaceLocks();
+
   const fetchPublicationById = usePublicationStore(
     (s) => s.fetchPublicationById,
   );
@@ -81,7 +85,7 @@ export default function ManageContentPage() {
   );
 
   const [isTabPending, startTransition] = useTransition();
-  const [showFilters, setShowFilters] = useState(false);
+  const [showFilters, setShowFilters] = useState(true);
   const [search, setSearch] = useState("");
 
   // Sync search with filters (debounced)
@@ -127,12 +131,15 @@ export default function ManageContentPage() {
     if (id) {
       const pubId = parseInt(id);
       if (!isNaN(pubId)) {
-        startTransition(async () => {
+        const fetchAndShow = async () => {
           const pub = await fetchPublicationById(pubId);
-          if (pub) {
-            openViewDetailsModal(pub);
-          }
-        });
+          startTransition(() => {
+            if (pub) {
+              openViewDetailsModal(pub);
+            }
+          });
+        };
+        fetchAndShow();
       }
     }
   }, [

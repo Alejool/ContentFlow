@@ -6,6 +6,7 @@ import NotificationButton from "@/Components/Layout/NotificationButton";
 import ProfileDropdown from "@/Components/Layout/ProfileDropdown";
 import SearchButton from "@/Components/Layout/SearchButton";
 import Sidebar from "@/Components/Layout/Sidebar";
+import { useWorkspaceLocks } from "@/Hooks/usePublicationLock";
 import { useTheme } from "@/Hooks/useTheme";
 import { initNotificationRealtime } from "@/Services/notificationRealtime";
 import { useNotificationStore } from "@/stores/notificationStore";
@@ -39,6 +40,7 @@ export default function AuthenticatedLayout({
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(true);
 
   const { theme } = useTheme();
+  useWorkspaceLocks();
 
   useEffect(() => {
     if (user?.id) {

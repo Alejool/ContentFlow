@@ -1,4 +1,6 @@
 import CampaignMediaCarousel from "@/Components/Campaigns/CampaignMediaCarousel";
+import ActivityList from "@/Components/ManageContent/ActivityList";
+import ApprovalHistory from "@/Components/ManageContent/ApprovalHistory";
 import { Campaign } from "@/types/Campaign";
 import { Publication } from "@/types/Publication";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
@@ -13,6 +15,7 @@ import {
   User,
   X,
 } from "lucide-react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 interface ViewCampaignModalProps {
@@ -30,6 +33,7 @@ export default function ViewCampaignModal({
 }: ViewCampaignModalProps) {
   const { t } = useTranslation();
   const { auth } = usePage<any>().props;
+  const [activeTab, setActiveTab] = useState("overview");
   const canEdit =
     auth.current_workspace?.permissions?.includes("manage-content");
 
@@ -192,139 +196,189 @@ export default function ViewCampaignModal({
                 </div>
               )}
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {(item as any).goal && (
-                  <div className="p-4 rounded-lg bg-gray-50 dark:bg-neutral-900/50">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Target className="w-4 h-4 text-primary-600 dark:text-primary-400" />
-                      <span className="text-sm font-semibold text-gray-500 dark:text-gray-400">
-                        {t("campaigns.modal.view.goal")}
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-900 dark:text-white">
-                      {(item as any).goal}
-                    </p>
-                  </div>
-                )}
+              {/* Tabs Navigation for Publications */}
+              {isActuallyPublication && (
+                <div className="mt-8 border-b border-gray-200 dark:border-neutral-700 mb-6">
+                  <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+                    {["overview", "activity", "approvals"].map((tab) => (
+                      <button
+                        key={tab}
+                        onClick={() => setActiveTab(tab)}
+                        className={`
+                          whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm capitalize
+                          ${
+                            activeTab === tab
+                              ? "border-primary-500 text-primary-600 dark:text-primary-400"
+                              : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
+                          }
+                        `}
+                      >
+                        {t(`common.tabs.${tab}`, tab)}
+                      </button>
+                    ))}
+                  </nav>
+                </div>
+              )}
 
-                {(item as any).hashtags && (
-                  <div className="p-4 rounded-lg bg-gray-50 dark:bg-neutral-900/50">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Hash className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                      <span className="text-sm font-semibold text-gray-500 dark:text-gray-400">
-                        {t("campaigns.modal.view.hashtags")}
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-900 dark:text-white">
-                      {(item as any).hashtags}
-                    </p>
-                  </div>
-                )}
+              <div className="mt-6">
+                {/* Overview Content (Grid + Footer) */}
+                {(!isActuallyPublication || activeTab === "overview") && (
+                  <>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {(item as any).goal && (
+                        <div className="p-4 rounded-lg bg-gray-50 dark:bg-neutral-900/50">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Target className="w-4 h-4 text-primary-600 dark:text-primary-400" />
+                            <span className="text-sm font-semibold text-gray-500 dark:text-gray-400">
+                              {t("campaigns.modal.view.goal")}
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-900 dark:text-white">
+                            {(item as any).goal}
+                          </p>
+                        </div>
+                      )}
 
-                {(item as any).start_date && (
-                  <div className="p-4 rounded-lg bg-gray-50 dark:bg-neutral-900/50">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Calendar className="w-4 h-4 text-green-600 dark:text-green-400" />
-                      <span className="text-sm font-semibold text-gray-500 dark:text-gray-400">
-                        {t("campaigns.modal.view.startDate")}
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-900 dark:text-white">
-                      {formatDate((item as any).start_date)}
-                    </p>
-                  </div>
-                )}
+                      {(item as any).hashtags && (
+                        <div className="p-4 rounded-lg bg-gray-50 dark:bg-neutral-900/50">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Hash className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                            <span className="text-sm font-semibold text-gray-500 dark:text-gray-400">
+                              {t("campaigns.modal.view.hashtags")}
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-900 dark:text-white">
+                            {(item as any).hashtags}
+                          </p>
+                        </div>
+                      )}
 
-                {(item as any).end_date && (
-                  <div className="p-4 rounded-lg bg-gray-50 dark:bg-neutral-900/50">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Calendar className="w-4 h-4 text-primary-600 dark:text-primary-400" />
-                      <span className="text-sm font-semibold text-gray-500 dark:text-gray-400">
-                        {t("campaigns.modal.view.endDate")}
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-900 dark:text-white">
-                      {formatDate((item as any).end_date)}
-                    </p>
-                  </div>
-                )}
+                      {(item as any).start_date && (
+                        <div className="p-4 rounded-lg bg-gray-50 dark:bg-neutral-900/50">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Calendar className="w-4 h-4 text-green-600 dark:text-green-400" />
+                            <span className="text-sm font-semibold text-gray-500 dark:text-gray-400">
+                              {t("campaigns.modal.view.startDate")}
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-900 dark:text-white">
+                            {formatDate((item as any).start_date)}
+                          </p>
+                        </div>
+                      )}
 
-                {(item as any).scheduled_posts &&
-                  (item as any).scheduled_posts.length > 0 && (
-                    <div className="p-4 rounded-lg md:col-span-2 bg-gray-50 dark:bg-neutral-900/50">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Calendar className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-                        <span className="text-sm font-semibold text-gray-500 dark:text-gray-400">
-                          {t("publications.scheduledPosts")}
+                      {(item as any).end_date && (
+                        <div className="p-4 rounded-lg bg-gray-50 dark:bg-neutral-900/50">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Calendar className="w-4 h-4 text-primary-600 dark:text-primary-400" />
+                            <span className="text-sm font-semibold text-gray-500 dark:text-gray-400">
+                              {t("campaigns.modal.view.endDate")}
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-900 dark:text-white">
+                            {formatDate((item as any).end_date)}
+                          </p>
+                        </div>
+                      )}
+
+                      {(item as any).scheduled_posts &&
+                        (item as any).scheduled_posts.length > 0 && (
+                          <div className="p-4 rounded-lg md:col-span-2 bg-gray-50 dark:bg-neutral-900/50">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Calendar className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                              <span className="text-sm font-semibold text-gray-500 dark:text-gray-400">
+                                {t("publications.scheduledPosts")}
+                              </span>
+                            </div>
+
+                            <div className="space-y-2 mt-2 text-gray-900 dark:text-white">
+                              {(item as any).scheduled_posts.map(
+                                (post: any, index: number) => (
+                                  <div
+                                    key={post.id || index}
+                                    className="flex items-center justify-between p-2 rounded border bg-white dark:bg-neutral-800 border-gray-200 dark:border-neutral-700"
+                                  >
+                                    <div className="flex items-center gap-2">
+                                      <span className="capitalize font-medium text-sm">
+                                        {post?.social_account?.platform ||
+                                          t("common.platform")}
+                                      </span>
+                                      {post.status && (
+                                        <span
+                                          className={`text-xs px-1.5 py-0.5 rounded capitalize ${
+                                            post.status === "posted"
+                                              ? "bg-green-100 text-green-700"
+                                              : post.status === "failed"
+                                                ? "bg-primary-100 text-primary-700"
+                                                : "bg-yellow-100 text-yellow-700"
+                                          }`}
+                                        >
+                                          {post.status}
+                                        </span>
+                                      )}
+                                    </div>
+                                    <div className="text-sm opacity-80">
+                                      {formatDate(post.scheduled_at)}{" "}
+                                      {new Date(
+                                        post.scheduled_at,
+                                      ).toLocaleTimeString([], {
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                      })}
+                                    </div>
+                                  </div>
+                                ),
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                      {(item as any).publish_date && (
+                        <div className="p-4 rounded-lg md:col-span-2 bg-gray-50 dark:bg-neutral-900/50">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Calendar className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                            <span className="text-sm font-semibold text-gray-500 dark:text-gray-400">
+                              {t("campaigns.modal.view.publishedOn")}
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-900 dark:text-white">
+                            {formatDate((item as any).publish_date)}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="mt-6 p-4 rounded-lg border bg-gray-50 border-gray-200 dark:bg-neutral-900/30 dark:border-neutral-700">
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs">
+                        <span className="text-gray-500 dark:text-gray-400">
+                          {t("campaigns.modal.view.created")}:{" "}
+                          {formatDate((item as any).created_at)}
+                        </span>
+                        <span className="text-gray-500 dark:text-gray-400">
+                          {t("campaigns.modal.view.lastUpdated")}:{" "}
+                          {formatDate((item as any).updated_at)}
                         </span>
                       </div>
-
-                      <div className="space-y-2 mt-2 text-gray-900 dark:text-white">
-                        {(item as any).scheduled_posts.map(
-                          (post: any, index: number) => (
-                            <div
-                              key={post.id || index}
-                              className="flex items-center justify-between p-2 rounded border bg-white dark:bg-neutral-800 border-gray-200 dark:border-neutral-700"
-                            >
-                              <div className="flex items-center gap-2">
-                                <span className="capitalize font-medium text-sm">
-                                  {post?.social_account?.platform ||
-                                    t("common.platform")}
-                                </span>
-                                {post.status && (
-                                  <span
-                                    className={`text-xs px-1.5 py-0.5 rounded capitalize ${
-                                      post.status === "posted"
-                                        ? "bg-green-100 text-green-700"
-                                        : post.status === "failed"
-                                          ? "bg-primary-100 text-primary-700"
-                                          : "bg-yellow-100 text-yellow-700"
-                                    }`}
-                                  >
-                                    {post.status}
-                                  </span>
-                                )}
-                              </div>
-                              <div className="text-sm opacity-80">
-                                {formatDate(post.scheduled_at)}{" "}
-                                {new Date(post.scheduled_at).toLocaleTimeString(
-                                  [],
-                                  { hour: "2-digit", minute: "2-digit" },
-                                )}
-                              </div>
-                            </div>
-                          ),
-                        )}
-                      </div>
                     </div>
-                  )}
+                  </>
+                )}
 
-                {(item as any).publish_date && (
-                  <div className="p-4 rounded-lg md:col-span-2 bg-gray-50 dark:bg-neutral-900/50">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Calendar className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-                      <span className="text-sm font-semibold text-gray-500 dark:text-gray-400">
-                        {t("campaigns.modal.view.publishedOn")}
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-900 dark:text-white">
-                      {formatDate((item as any).publish_date)}
-                    </p>
+                {/* Activity Tab */}
+                {activeTab === "activity" && isActuallyPublication && (
+                  <div className="max-h-96 overflow-y-auto pr-2">
+                    <ActivityList activities={(item as any).activities || []} />
                   </div>
                 )}
-              </div>
 
-              <div className="p-4 rounded-lg border bg-gray-50 border-gray-200 dark:bg-neutral-900/30 dark:border-neutral-700">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs">
-                  <span className="text-gray-500 dark:text-gray-400">
-                    {t("campaigns.modal.view.created")}:{" "}
-                    {formatDate((item as any).created_at)}
-                  </span>
-                  <span className="text-gray-500 dark:text-gray-400">
-                    {t("campaigns.modal.view.lastUpdated")}:{" "}
-                    {formatDate((item as any).updated_at)}
-                  </span>
-                </div>
+                {/* Approvals Tab */}
+                {activeTab === "approvals" && isActuallyPublication && (
+                  <div className="max-h-96 overflow-y-auto pr-2">
+                    <ApprovalHistory
+                      logs={(item as any).approval_logs || []}
+                      publicationId={item.id}
+                    />
+                  </div>
+                )}
               </div>
             </div>
           </div>
