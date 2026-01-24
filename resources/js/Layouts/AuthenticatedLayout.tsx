@@ -1,4 +1,3 @@
-import GlobalAiAssistant from "@/Components/AiAssistant/GlobalAiAssistant";
 import CommandPalette from "@/Components/CommandPalette/CommandPalette";
 import ActiveWorkspace from "@/Components/Layout/ActiveWorkspace";
 import MobileNavbar from "@/Components/Layout/MobileNavbar";
@@ -125,7 +124,7 @@ export default function AuthenticatedLayout({
           </main>
         </div>
 
-        <GlobalAiAssistant />
+        {/* <GlobalAiAssistant /> */}
         <CommandPalette />
       </div>
     </div>
