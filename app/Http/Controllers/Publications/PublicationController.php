@@ -24,6 +24,7 @@ use App\Notifications\PublicationApprovedNotification;
 use App\Notifications\PublicationRejectedNotification;
 use App\Models\Publications\PublicationLock;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 
 class PublicationController extends Controller
 {
@@ -56,6 +57,7 @@ class PublicationController extends Controller
     );
 
     return cache()->remember($cacheKey, 10, function () use ($request, $workspaceId) {
+
       // Optimized eager loading: select only necessary columns to reduce memory usage
       // We avoid loading deep derivatives and all logs for every item in the list view
       // to prevent massive JSON payloads that freeze the frontend.
@@ -74,23 +76,32 @@ class PublicationController extends Controller
           'rejector' => fn($q) => $q->select('users.id', 'users.name', 'users.photo_url'),
           'approvalLogs' => fn($q) => $q->latest('requested_at')->with(['requester:id,name,photo_url', 'reviewer:id,name,photo_url']),
           'activities' => fn($q) => $q->orderBy('created_at', 'desc')->with('user:id,name,photo_url')
-        ])
-        ->orderBy('created_at', 'desc');
+        ]);
 
+      // Apply status filter
       if ($request->has('status') && $request->status !== 'all') {
         $status = $request->status;
-        if (method_exists(Publication::class, "scope" . ucfirst($status))) {
-          $query->$status();
+        $scopeMethod = 'scope' . Str::studly($status);
+        $methodName = Str::camel($status);
+
+        if (method_exists(Publication::class, $scopeMethod)) {
+          $query->$methodName();
+        } else {
+          // Fallback to direct status comparison
+          $query->where('status', $status);
         }
       }
 
+      // Apply search filter
       if ($request->has('search') && !empty($request->search)) {
         $query->where('title', 'LIKE', '%' . $request->search . '%');
       }
 
+      // Apply date range filter
       if ($request->has(['date_start', 'date_end'])) {
         $query->byDateRange($request->date_start, $request->date_end);
       }
+
 
       if ($request->has('exclude_assigned') && $request->exclude_assigned === 'true') {
         $query->where(function ($q) use ($request) {
@@ -99,6 +110,26 @@ class PublicationController extends Controller
             $q->orWhereHas('campaigns', fn($subQ) => $subQ->where('campaigns.id', $request->include_campaign_id));
           }
         });
+      }
+
+      // Sorting Logic
+      $sort = $request->input('sort', 'newest');
+      \Log::info('PublicationController@index - Sorting:', ['sort_val' => $sort, 'request_all' => $request->all()]);
+
+      switch ($sort) {
+        case 'oldest':
+          $query->orderBy('created_at', 'asc');
+          break;
+        case 'title_asc':
+          $query->orderBy('title', 'asc')->orderBy('created_at', 'desc');
+          break;
+        case 'title_desc':
+          $query->orderBy('title', 'desc')->orderBy('created_at', 'desc');
+          break;
+        case 'newest':
+        default:
+          $query->orderBy('created_at', 'desc');
+          break;
       }
 
       // Safety limit for 'simplified' mode to prevent memory exhaustion
@@ -120,22 +151,7 @@ class PublicationController extends Controller
     }
 
     try {
-      // Debug: Log all incoming request data
-      \Log::info('PublicationController@store - Incoming request data:', [
-        'all_data' => $request->all(),
-        'status' => $request->input('status'),
-        'method' => $request->method(),
-        'url' => $request->fullUrl()
-      ]);
-
       $data = $request->validated();
-      
-      // Debug: Log validated data
-      \Log::info('PublicationController@store - Validated data:', [
-        'validated_data' => $data,
-        'status_in_validated' => $data['status'] ?? 'NOT_SET'
-      ]);
-
       // Normalize scheduled_at to UTC using client's timezone header
       if (!empty($data['scheduled_at'])) {
         try {
@@ -156,13 +172,6 @@ class PublicationController extends Controller
 
       return $this->successResponse(['publication' => $publication], 'Publication created successfully', 201);
     } catch (\Exception $e) {
-      // Debug: Log the exact error
-      \Log::error('PublicationController@store - Error:', [
-        'message' => $e->getMessage(),
-        'file' => $e->getFile(),
-        'line' => $e->getLine(),
-        'trace' => $e->getTraceAsString()
-      ]);
       return $this->errorResponse('Creation failed: ' . $e->getMessage(), 500);
     }
   }
@@ -213,24 +222,7 @@ class PublicationController extends Controller
     }
 
     try {
-      // Debug: Log all incoming request data
-      \Log::info('PublicationController@update - Incoming request data:', [
-        'publication_id' => $publication->id,
-        'all_data' => $request->all(),
-        'status' => $request->input('status'),
-        'method' => $request->method(),
-        'url' => $request->fullUrl()
-      ]);
-
       $data = $request->validated();
-      
-      // Debug: Log validated data
-      \Log::info('PublicationController@update - Validated data:', [
-        'publication_id' => $publication->id,
-        'validated_data' => $data,
-        'status_in_validated' => $data['status'] ?? 'NOT_SET'
-      ]);
-
       // Normalize scheduled_at to UTC using client's timezone header
       if (!empty($data['scheduled_at'])) {
         try {
@@ -251,14 +243,6 @@ class PublicationController extends Controller
 
       return $this->successResponse(['publication' => $publication], 'Publication updated successfully');
     } catch (\Exception $e) {
-      // Debug: Log the exact error
-      \Log::error('PublicationController@update - Error:', [
-        'publication_id' => $publication->id,
-        'message' => $e->getMessage(),
-        'file' => $e->getFile(),
-        'line' => $e->getLine(),
-        'trace' => $e->getTraceAsString()
-      ]);
       return response()->json([
         'success' => false,
         'message' => 'Update failed: ' . $e->getMessage(),
@@ -480,15 +464,12 @@ class PublicationController extends Controller
     return cache()->remember("publication_{$id}_platforms", 30, function () use ($id) {
       $publication = Publication::where('workspace_id', Auth::user()->current_workspace_id)->findOrFail($id);
 
-      // Optimized query: select only needed columns and use whereIn for better performance
       $scheduledAccountIds = ScheduledPost::where('publication_id', $publication->id)
         ->where('status', 'pending')
         ->pluck('social_account_id')
         ->unique()
         ->toArray();
 
-      // Get only the latest log per account using a subquery for better performance
-      // This avoids loading all logs and grouping in PHP
       $latestLogs = SocialPostLog::where('publication_id', $publication->id)
         ->select('social_account_id', 'status')
         ->whereIn('id', function ($query) use ($publication) {
@@ -616,7 +597,6 @@ class PublicationController extends Controller
           }
         }
       } catch (\Exception $e) {
-        // Silently fail Redis specific clearing
       }
     }
   }

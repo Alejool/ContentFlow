@@ -4,6 +4,7 @@ namespace App\Http\Requests\Publications;
 
 use Illuminate\Foundation\Http\FormRequest;
 use App\Models\Publications\Publication;
+use Illuminate\Support\Facades\Log;
 
 class StorePublicationRequest extends FormRequest
 {
@@ -42,6 +43,7 @@ class StorePublicationRequest extends FormRequest
             'scheduled_at' => 'nullable|date|after:now',
             'social_accounts' => 'nullable|array',
             'social_accounts.*' => 'exists:social_accounts,id',
+            'social_account_schedules' => 'nullable|array',
             'platform_settings' => 'nullable|string',
             'campaign_id' => 'nullable|exists:campaigns,id',
             'media' => 'nullable|array',

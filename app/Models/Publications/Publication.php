@@ -93,42 +93,42 @@ class Publication extends Model
 
   public function scopeDraft($query)
   {
-    return $query->where('status', $this->availableStatuses[0]);
+    return $query->where('status', 'draft');
   }
 
   public function scopePublished($query)
   {
-    return $query->where('status', $this->availableStatuses[1]);
+    return $query->where('status', 'published');
   }
 
   public function scopePublishing($query)
   {
-    return $query->where('status', $this->availableStatuses[2]);
+    return $query->where('status', 'publishing');
   }
 
   public function scopeFailed($query)
   {
-    return $query->where('status', $this->availableStatuses[3]);
+    return $query->where('status', 'failed');
   }
 
   public function scopePendingReview($query)
   {
-    return $query->where('status', $this->availableStatuses[4]);
+    return $query->where('status', 'pending_review');
   }
 
   public function scopeApproved($query)
   {
-    return $query->where('status', $this->availableStatuses[5]);
+    return $query->where('status', 'approved');
   }
 
   public function scopeScheduled($query)
   {
-    return $query->where('status', $this->availableStatuses[6]);
+    return $query->where('status', 'scheduled');
   }
 
   public function scopeRejected($query)
   {
-    return $query->where('status', $this->availableStatuses[7]);
+    return $query->where('status', 'rejected');
   }
 
   public function isApproved(): bool
