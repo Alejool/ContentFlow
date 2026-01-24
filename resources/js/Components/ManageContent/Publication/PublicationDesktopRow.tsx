@@ -329,6 +329,12 @@ const PublicationRow = memo(
             {permissions?.includes("manage-content") && (
               <button
                 onClick={async () => {
+                  if (remoteLock) {
+                    toast.error(
+                      `${t("publications.table.lockedBy") || "Editando por"} ${remoteLock.user_name}`,
+                    );
+                    return;
+                  }
                   setIsEditing(true);
                   try {
                     if (onEditRequest) {
@@ -340,9 +346,7 @@ const PublicationRow = memo(
                     setIsEditing(false);
                   }
                 }}
-                disabled={
-                  isPublishing || isEditing || isDeleting || !!remoteLock
-                }
+                disabled={isPublishing || isEditing || isDeleting}
                 className={`flex items-center gap-1.5 p-1.5 px-2.5 ${
                   item.status === "published"
                     ? "text-amber-500"

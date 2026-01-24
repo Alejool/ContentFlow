@@ -535,6 +535,12 @@ const PublicationMobileRow = memo(
                         <button
                           onClick={async (e) => {
                             e.stopPropagation();
+                            if (remoteLocks[item.id]) {
+                              toast.error(
+                                `${t("publications.table.lockedBy") || "Editando por"} ${remoteLocks[item.id].user_name}`,
+                              );
+                              return;
+                            }
                             setLoadingStates((prev) => ({
                               ...prev,
                               [item.id]: { ...prev[item.id], editing: true },
@@ -555,8 +561,7 @@ const PublicationMobileRow = memo(
                           disabled={
                             isLoading?.publishing ||
                             isLoading?.editing ||
-                            isLoading?.deleting ||
-                            !!remoteLocks[item.id]
+                            isLoading?.deleting
                           }
                           className={`flex-1 py-2.5 rounded-lg font-medium text-xs flex items-center justify-center gap-2 transition-colors active:scale-95 ${
                             remoteLocks[item.id]

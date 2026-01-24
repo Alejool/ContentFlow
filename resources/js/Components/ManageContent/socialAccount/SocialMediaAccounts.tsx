@@ -538,9 +538,7 @@ const SocialMediaAccounts = memo(() => {
             <DisconnectWarningModal
               isOpen={!!blockerModalData}
               onClose={() => setBlockerModalData(null)}
-              onConfirm={() =>
-                handleForceDisconnect(blockerModalData.account.id)
-              }
+              onConfirm={() => handleForceDisconnect(blockerModalData.account)}
               accountName={blockerModalData.account.name}
               posts={blockerModalData.posts}
               isLoading={isLoading}

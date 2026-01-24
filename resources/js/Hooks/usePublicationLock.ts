@@ -1,7 +1,8 @@
+import { useLockStore } from "@/stores/lockStore";
 import { usePublicationStore } from "@/stores/publicationStore";
 import { usePage } from "@inertiajs/react";
-import { useCallback, useEffect, useRef, useState } from "react";
 import axios from "axios";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 
 interface LockInfo {
@@ -24,7 +25,6 @@ export const usePublicationLock = (
   publicationId: number | null,
   isEditing: boolean,
 ) => {
-
   const { auth } = usePage().props as any;
   const userId = auth?.user?.id;
   const userName = auth?.user?.name;
@@ -60,6 +60,30 @@ export const usePublicationLock = (
         user_name: userName,
         expires_at: lockData?.expires_at || new Date().toISOString(),
       });
+
+      // Only refresh data if the lock was previously held by someone else
+      // This prevents clearing the form when opening a fresh edit
+      if (data?.details?.user_id && data.details.user_id !== userId) {
+        import("@/stores/manageContentUIStore").then(
+          async ({ useManageContentUIStore }) => {
+            const uiStore = useManageContentUIStore.getState();
+            if (uiStore.selectedItem?.id === publicationId) {
+              try {
+                const { data: freshData } = await axios.get(
+                  `/api/publications/${publicationId}`,
+                );
+                uiStore.setSelectedItem(freshData.data || freshData);
+                toast.success("Datos actualizados del editor anterior.");
+              } catch (err) {
+                console.error(
+                  "Failed to refresh data after lock acquisition",
+                  err,
+                );
+              }
+            }
+          },
+        );
+      }
     } else if (data?.details) {
       setLockInfo(data.details);
       setIsLockedByMe(false);
@@ -89,7 +113,9 @@ export const usePublicationLock = (
       if (pollInterval) return;
       pollInterval = setInterval(async () => {
         try {
-          const resp = await axios.get(`/api/publications/${publicationId}/lock`);
+          const resp = await axios.get(
+            `/api/publications/${publicationId}/lock`,
+          );
           const data = resp.data;
           if (data.lock) {
             setLockInfo(data.lock);
@@ -136,8 +162,13 @@ export const usePublicationLock = (
 
           if (lockInfoRef.current && lockInfoRef.current.user_id === user.id) {
             setTimeout(() => {
-              if (lockInfoRef.current && lockInfoRef.current.user_id === user.id) {
-                toast.success("El bloqueo ha sido liberado. Intentando adquirir...");
+              if (
+                lockInfoRef.current &&
+                lockInfoRef.current.user_id === user.id
+              ) {
+                toast.success(
+                  "El bloqueo ha sido liberado. Intentando adquirir...",
+                );
                 acquireLock();
               }
             }, 1500);
@@ -168,10 +199,14 @@ export const usePublicationLock = (
             setLockInfo(null);
             setIsLockedByMe(false);
             if (isEditing) {
-              const myIndex = activeUsersRef.current.findIndex((u) => u.id === userId);
+              const myIndex = activeUsersRef.current.findIndex(
+                (u) => u.id === userId,
+              );
               const delay = Math.max(0, myIndex) * 500;
               setTimeout(() => {
-                toast.success("El bloqueo ha sido liberado. Intentando adquirir...");
+                toast.success(
+                  "El bloqueo ha sido liberado. Intentando adquirir...",
+                );
                 acquireLock();
               }, delay);
             }
@@ -203,38 +238,100 @@ export const usePublicationLock = (
 };
 
 export const useWorkspaceLocks = () => {
-  // This can remain relatively similar or also use presence if we wanted "who is in workspace"
-  // But for now, let's keep it listening to events
   const { auth } = usePage().props as any;
-  const [remoteLocks, setRemoteLocks] = useState<Record<number, LockInfo>>({});
   const wsUserId = auth?.user?.id;
+  const { remoteLocks, setRemoteLocks, updateLock } = useLockStore();
 
   useEffect(() => {
     const workspaceId = auth.current_workspace?.id;
     if (!workspaceId) return;
 
+    // Initial fetch of active locks
+    const fetchLocks = async () => {
+      try {
+        const { data } = await axios.get("/api/publication-locks");
+        const locks = data.data?.locks || data.locks || [];
+        const lockMap: Record<number, LockInfo> = {};
+
+        locks.forEach((lock: any) => {
+          if (lock.user_id !== wsUserId) {
+            lockMap[lock.publication_id] = lock;
+          }
+        });
+
+        console.log("🔒 Initial locks fetched:", lockMap);
+        setRemoteLocks(lockMap);
+      } catch (error) {
+        console.error("Failed to fetch initial locks", error);
+      }
+    };
+
+    fetchLocks();
+
     const channel = window.Echo.private(`workspace.${workspaceId}`);
 
     const handleLockChange = (data: any) => {
-      setRemoteLocks((prev) => {
-        const next = { ...prev };
-        if (data.lock) {
-          if (data.lock.user_id !== wsUserId) {
-            next[data.publicationId] = data.lock;
-          }
+      console.log("🔒 Lock change event received:", data);
+      if (data.lock) {
+        if (data.lock.user_id !== wsUserId) {
+          console.log(
+            "🔒 Updating lock for publication:",
+            data.publicationId,
+            data.lock,
+          );
+          updateLock(data.publicationId, data.lock);
         } else {
-          delete next[data.publicationId];
+          console.log("🔒 Ignoring own lock");
         }
-        return next;
-      });
+      } else {
+        console.log("🔓 Removing lock for publication:", data.publicationId);
+        updateLock(data.publicationId, null);
+      }
+    };
+
+    const handlePublicationUpdate = async (e: any) => {
+      if (e.publication) {
+        // Update the central store
+        import("@/stores/publicationStore").then(({ usePublicationStore }) => {
+          usePublicationStore
+            .getState()
+            .updatePublication(e.publication.id, e.publication);
+        });
+
+        // Also update the UI store if this item is currently selected (open in modal)
+        import("@/stores/manageContentUIStore").then(
+          async ({ useManageContentUIStore }) => {
+            const uiStore = useManageContentUIStore.getState();
+            if (
+              uiStore.selectedItem &&
+              uiStore.selectedItem.id === e.publication.id
+            ) {
+              try {
+                // Fetch full data to ensure we have activities, logs, etc.
+                const { data } = await axios.get(
+                  `/api/publications/${e.publication.id}`,
+                );
+                const freshData = data.data || data;
+
+                // Update the modal
+                uiStore.setSelectedItem(freshData);
+                toast.success("Publicación actualizada por otro usuario.");
+              } catch (error) {
+                console.error("Failed to refresh details", error);
+              }
+            }
+          },
+        );
+      }
     };
 
     channel.listen(".publication.lock.changed", handleLockChange);
+    channel.listen(".publication.updated", handlePublicationUpdate);
 
     return () => {
-      channel.stopListening(".publication.lock.changed", handleLockChange);
+      window.Echo.leave(`workspace.${workspaceId}`);
     };
-  }, [auth.current_workspace?.id, wsUserId]);
+  }, [auth.current_workspace?.id, wsUserId, setRemoteLocks, updateLock]);
 
   return { remoteLocks };
 };

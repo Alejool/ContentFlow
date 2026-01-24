@@ -1,8 +1,8 @@
 import AdvancedPagination from "@/Components/common/ui/AdvancedPagination";
 import TableContainer from "@/Components/common/ui/TableContainer";
+import { getDateFnsLocale } from "@/Utils/dateLocales";
 import axios from "axios";
 import { format } from "date-fns";
-import { getDateFnsLocale } from "@/Utils/dateLocales";
 import { Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -32,13 +32,19 @@ interface ApprovalLogItem {
 
 interface ApprovalHistoryProps {
   onRefresh?: () => void;
+  publicationId?: number;
+  logs?: ApprovalLogItem[]; // Optional: pass logs directly to avoid fetch
 }
 
-export default function ApprovalHistory({ onRefresh }: ApprovalHistoryProps) {
+export default function ApprovalHistory({
+  onRefresh,
+  publicationId,
+  logs: initialLogs,
+}: ApprovalHistoryProps) {
   const { t, i18n } = useTranslation();
   const locale = getDateFnsLocale(i18n.language);
-  const [logs, setLogs] = useState<ApprovalLogItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [logs, setLogs] = useState<ApprovalLogItem[]>(initialLogs || []);
+  const [isLoading, setIsLoading] = useState(!initialLogs);
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
@@ -49,16 +55,44 @@ export default function ApprovalHistory({ onRefresh }: ApprovalHistoryProps) {
   });
 
   useEffect(() => {
+    if (initialLogs && publicationId) {
+      // Client-side filtering
+      let filtered = [...initialLogs];
+
+      if (filters.action !== "all") {
+        filtered = filtered.filter((log) => log.action === filters.action);
+      }
+
+      if (filters.search) {
+        const searchLower = filters.search.toLowerCase();
+        filtered = filtered.filter(
+          (log) =>
+            log.requester.name.toLowerCase().includes(searchLower) ||
+            (log.rejection_reason &&
+              log.rejection_reason.toLowerCase().includes(searchLower)),
+        );
+      }
+
+      setLogs(filtered);
+      setIsLoading(false);
+      setTotalItems(filtered.length);
+      setTotalPages(1);
+      return;
+    }
     fetchHistory();
-  }, [currentPage, perPage, filters]);
+  }, [currentPage, perPage, filters, publicationId, initialLogs]);
 
   const fetchHistory = async () => {
+    // Skip fetch if we are in client-side mode (initialLogs provided)
+    if (initialLogs && publicationId) return;
+
     try {
       setIsLoading(true);
       const params: any = {
         page: currentPage,
         per_page: perPage,
         ...filters,
+        ...(publicationId ? { publication_id: publicationId } : {}),
       };
 
       const response = await axios.get(route("approvals.history"), { params });
@@ -148,9 +182,11 @@ export default function ApprovalHistory({ onRefresh }: ApprovalHistoryProps) {
         <table className="w-full">
           <thead className="bg-gray-50/50 dark:bg-neutral-900/50 border-b border-gray-100 dark:border-neutral-700">
             <tr className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
-              <th className="px-6 py-4 text-left font-bold">
-                {t("approvals.historyTable.publication")}
-              </th>
+              {!publicationId && (
+                <th className="px-6 py-4 text-left font-bold">
+                  {t("approvals.historyTable.publication")}
+                </th>
+              )}
               <th className="px-6 py-4 text-left font-bold">
                 {t("approvals.historyTable.requestedBy")}
               </th>
@@ -168,7 +204,7 @@ export default function ApprovalHistory({ onRefresh }: ApprovalHistoryProps) {
           <tbody className="divide-y divide-gray-50 dark:divide-neutral-700/50">
             {isLoading ? (
               <tr>
-                <td colSpan={5} className="px-6 py-12">
+                <td colSpan={publicationId ? 4 : 5} className="px-6 py-12">
                   <div className="flex justify-center flex-col items-center gap-3">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
                     <span className="text-sm text-gray-500">
@@ -179,7 +215,10 @@ export default function ApprovalHistory({ onRefresh }: ApprovalHistoryProps) {
               </tr>
             ) : logs.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-6 py-16 text-center">
+                <td
+                  colSpan={publicationId ? 4 : 5}
+                  className="px-6 py-16 text-center"
+                >
                   <div className="flex flex-col items-center justify-center">
                     <img
                       src="/assets/empty-state.svg"
@@ -198,9 +237,11 @@ export default function ApprovalHistory({ onRefresh }: ApprovalHistoryProps) {
                   key={log.id}
                   className="hover:bg-gray-50/50 dark:hover:bg-neutral-700/30 transition-colors"
                 >
-                  <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
-                    {log.publication.title}
-                  </td>
+                  {!publicationId && (
+                    <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
+                      {log.publication?.title || t("common.unknown", "Unknown")}
+                    </td>
+                  )}
                   <td className="px-6 py-4">{log.requester.name}</td>
                   <td className="px-6 py-4 text-gray-500 text-sm">
                     {format(new Date(log.requested_at), "PPp", { locale })}

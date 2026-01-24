@@ -81,7 +81,7 @@ export default function ManageContentPage() {
   );
 
   const [isTabPending, startTransition] = useTransition();
-  const [showFilters, setShowFilters] = useState(false);
+  const [showFilters, setShowFilters] = useState(true);
   const [search, setSearch] = useState("");
 
   // Sync search with filters (debounced)

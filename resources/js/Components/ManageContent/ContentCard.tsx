@@ -1,5 +1,5 @@
-import { format } from "date-fns";
 import { getDateFnsLocale } from "@/Utils/dateLocales";
+import { format } from "date-fns";
 import {
   Calendar,
   CheckCircle,
@@ -15,6 +15,7 @@ import {
   Video,
 } from "lucide-react";
 import { useState } from "react";
+import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
 interface ContentCardProps {
@@ -381,10 +382,14 @@ export default function ContentCard({
           {canManageContent && (
             <button
               onClick={() => {
-                if (remoteLock) return;
+                if (remoteLock) {
+                  toast.error(
+                    `${t("publications.table.lockedBy") || "Editando por"} ${remoteLock.user_name}`,
+                  );
+                  return;
+                }
                 onEdit(item);
               }}
-              disabled={!!remoteLock}
               className={`flex items-center justify-center gap-2 px-3 py-2 rounded-lg transition-colors shadow-sm ${
                 remoteLock
                   ? "bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed dark:bg-gray-800 dark:border-gray-700 dark:text-gray-600"

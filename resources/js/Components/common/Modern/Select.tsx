@@ -488,14 +488,20 @@ export default function Select<T extends FieldValues>({
                   value !== "" &&
                   !disabled &&
                   !loading && (
-                    <button
-                      type="button"
+                    <div
+                      role="button"
+                      tabIndex={0}
                       onClick={handleClear}
-                      className="p-1 hover:bg-black/10 dark:hover:bg-white/10 rounded transition-colors"
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          handleClear(e as any);
+                        }
+                      }}
+                      className="p-1 hover:bg-black/10 dark:hover:bg-white/10 rounded transition-colors cursor-pointer"
                       aria-label="Clear selection"
                     >
                       <X className="w-4 h-4" />
-                    </button>
+                    </div>
                   )}
 
                 <ChevronDown
