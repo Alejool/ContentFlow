@@ -11,6 +11,7 @@ use Inertia\Response;
 use Carbon\Carbon;
 use App\Models\SocialAccount;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\RedirectResponse;
 
 class AnalyticsController extends Controller
 {
@@ -24,7 +25,7 @@ class AnalyticsController extends Controller
     /**
      * Display the dashboard with statistics
      */
-    public function dashboard(Request $request): Response|\Illuminate\Http\RedirectResponse
+    public function dashboard(Request $request): Response|RedirectResponse
     {
         $user = Auth::user();
         $workspaceId = $user->current_workspace_id;
@@ -83,7 +84,7 @@ class AnalyticsController extends Controller
     /**
      * Display the main analytics page
      */
-    public function index(Request $request): Response|\Illuminate\Http\RedirectResponse
+    public function index(Request $request): Response|RedirectResponse
     {
         $user = Auth::user();
         $workspaceId = $user->current_workspace_id;
