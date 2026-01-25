@@ -25,6 +25,7 @@ use App\Http\Controllers\ApprovalController;
 use App\Http\Controllers\AIChatController;
 use App\Http\Controllers\Calendar\CalendarViewController;
 use App\Http\Controllers\SocialPostLogController;
+use App\Http\Controllers\Api\UploadController;
 
 /*
 |--------------------------------------------------------------------------
@@ -207,6 +208,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/', [ManageContentController::class, 'index'])->name('index');
     Route::get('/posts', [PostsController::class, 'index'])->name('posts');
   });
+
+  Route::post('/upload/sign', [UploadController::class, 'sign'])->name('upload.sign');
 
   /*
     |--------------------------------------------------------------------------

@@ -27,6 +27,11 @@ interface PublicationTableProps {
     number,
     { user_id: number; user_name: string; expires_at: string }
   >;
+  onPreviewMedia?: (media: {
+    url: string;
+    type: "image" | "video";
+    title?: string;
+  }) => void;
 }
 
 const PublicationTable = memo(
@@ -45,6 +50,7 @@ const PublicationTable = memo(
     onPageChange,
     onPerPageChange,
     remoteLocks = {},
+    onPreviewMedia,
   }: PublicationTableProps) => {
     // remoteLocks is now passed as prop
     const [scrollContainer, setScrollContainer] = useState<
@@ -154,7 +160,8 @@ const PublicationTable = memo(
                         {items.map((item) => (
                           <tr
                             key={item.id}
-                            className="border-b border-gray-50 dark:border-neutral-800 hover:bg-gray-50/30 dark:hover:bg-neutral-800/30"
+                            onClick={() => onViewDetails?.(item)}
+                            className="border-b border-gray-50 dark:border-neutral-800 hover:bg-gray-50/30 dark:hover:bg-neutral-800/30 cursor-pointer transition-colors"
                           >
                             <PublicationDesktopRow
                               item={item}
@@ -168,6 +175,7 @@ const PublicationTable = memo(
                               onViewDetails={onViewDetails}
                               remoteLock={remoteLocks[item.id]}
                               permissions={permissions || []}
+                              onPreviewMedia={onPreviewMedia}
                             />
                           </tr>
                         ))}
@@ -223,6 +231,7 @@ const PublicationTable = memo(
                     onViewDetails={onViewDetails}
                     remoteLocks={remoteLocks}
                     permissions={permissions}
+                    onPreviewMedia={onPreviewMedia}
                   />
                 </div>
 

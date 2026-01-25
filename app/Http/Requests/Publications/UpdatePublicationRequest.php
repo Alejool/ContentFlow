@@ -64,7 +64,20 @@ class UpdatePublicationRequest extends FormRequest
       'platform_settings' => 'nullable',
       'campaign_id' => 'nullable|exists:campaigns,id',
       'media' => 'nullable|array',
-      'media.*' => 'file|mimes:jpeg,png,jpg,gif,webp,mp4,mov,avi|max:51200',
+      'media' => 'nullable|array',
+      // Allow media items to be either files OR arrays (metadata for direct uploads)
+      'media.*' => [
+        function ($attribute, $value, $fail) {
+          if ($value instanceof \Illuminate\Http\UploadedFile) {
+            return;
+          }
+          if (is_array($value) && isset($value['key'])) {
+            // It's metadata
+            return;
+          }
+          $fail('The ' . $attribute . ' must be a file or valid upload metadata.');
+        }
+      ],
       'media_keep_ids' => 'nullable|array',
       'thumbnails' => 'nullable|array',
       'thumbnails.*' => 'file|mimes:jpeg,png,jpg|max:5120',

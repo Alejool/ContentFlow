@@ -41,6 +41,11 @@ interface PublicationRowProps {
     expires_at: string;
   } | null;
   permissions?: string[];
+  onPreviewMedia?: (media: {
+    url: string;
+    type: "image" | "video";
+    title?: string;
+  }) => void;
 }
 
 const PublicationRow = memo(
@@ -56,6 +61,7 @@ const PublicationRow = memo(
     onViewDetails,
     remoteLock,
     permissions,
+    onPreviewMedia,
   }: PublicationRowProps) => {
     const [isPublishing, setIsPublishing] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
@@ -83,7 +89,42 @@ const PublicationRow = memo(
         <td className="text-center"></td>
         <td className="">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-lg flex-shrink-0 border border-gray-200 bg-gray-100 dark:border-neutral-700 dark:bg-neutral-800 overflow-hidden flex items-center justify-center">
+            <div
+              className="w-12 h-12 rounded-lg flex-shrink-0 border border-gray-200 bg-gray-100 dark:border-neutral-700 dark:bg-neutral-800 overflow-hidden flex items-center justify-center cursor-zoom-in"
+              onClick={(e) => {
+                e.stopPropagation();
+                const hasMedia =
+                  item.media_files && item.media_files.length > 0;
+                if (hasMedia && onPreviewMedia) {
+                  const firstMedia = item.media_files?.[0];
+                  const isVideo = firstMedia?.file_type?.includes("video");
+                  const mediaUrl =
+                    firstMedia?.thumbnail?.file_path || firstMedia?.file_path;
+                  const path = firstMedia?.file_path;
+                  // Use path or mediaUrl logic.
+                  // If video, we want the video file. MediaUrl might be thumb.
+                  // We need the video source.
+                  // If path is available, use it.
+                  const url =
+                    isVideo && path
+                      ? path.startsWith("http")
+                        ? path
+                        : `/storage/${path}`
+                      : mediaUrl || path;
+
+                  // Fallback if url is somehow empty but we have something
+                  const finalUrl = url || "";
+
+                  if (finalUrl) {
+                    onPreviewMedia({
+                      url: finalUrl,
+                      type: isVideo ? "video" : "image",
+                      title: item.title,
+                    });
+                  }
+                }
+              }}
+            >
               {(item as any).type === "user_event" ? (
                 <Calendar className="w-6 h-6 text-primary-500" />
               ) : (
@@ -275,7 +316,8 @@ const PublicationRow = memo(
             {(permissions?.includes("publish") || item.status === "approved") &&
             permissions?.includes("manage-content") ? (
               <button
-                onClick={async () => {
+                onClick={async (e) => {
+                  e.stopPropagation();
                   setIsPublishing(true);
                   try {
                     await onPublish(item);
@@ -303,7 +345,10 @@ const PublicationRow = memo(
                 item.status || "draft",
               ) ? (
               <button
-                onClick={() => onPublish(item)} // This modal handles status updates/request review
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onPublish(item);
+                }} // This modal handles status updates/request review
                 className="p-1.5 text-amber-600 hover:bg-amber-50 rounded-lg dark:hover:bg-amber-900/20 transition-all"
                 title="Solicitar Aprobación"
               >
@@ -313,7 +358,10 @@ const PublicationRow = memo(
             {/* View Details button - Always visible for all users */}
             {!permissions?.includes("manage-content") && (
               <button
-                onClick={() => onViewDetails?.(item)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onViewDetails?.(item);
+                }}
                 className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-300 transition-colors"
                 title="Ver Detalles"
               >
@@ -323,7 +371,10 @@ const PublicationRow = memo(
             {item.status === "published" &&
               permissions?.includes("manage-content") && (
                 <button
-                  onClick={() => onViewDetails?.(item)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onViewDetails?.(item);
+                  }}
                   className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-300 transition-colors"
                   title="Ver Detalles"
                 >
@@ -332,7 +383,8 @@ const PublicationRow = memo(
               )}
             {permissions?.includes("manage-content") && (
               <button
-                onClick={async () => {
+                onClick={async (e) => {
+                  e.stopPropagation();
                   if (remoteLock) {
                     toast.error(
                       `${t("publications.table.lockedBy") || "Editando por"} ${lockedByName}`,
@@ -383,7 +435,8 @@ const PublicationRow = memo(
             {/* Delete button - Only for Owner/Admin or users with manage-content */}
             {permissions?.includes("manage-content") && (
               <button
-                onClick={async () => {
+                onClick={async (e) => {
+                  e.stopPropagation();
                   setIsDeleting(true);
                   try {
                     if ((item as any).type === "user_event") {

@@ -31,6 +31,8 @@ class MediaFile extends Model
         'mime_type',
         'size',
         'workspace_id',
+        'status',
+        'processing_error',
     ];
 
     protected $casts = [

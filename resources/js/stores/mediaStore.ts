@@ -23,9 +23,10 @@ interface MediaState {
   setMediaFiles: (files: MediaFile[]) => void;
   addFiles: (files: MediaFile[]) => void;
   removeFile: (index: number) => void;
+  updateFile: (tempId: string, updates: Partial<MediaFile>) => void;
   setVideoMetadata: (
     tempId: string,
-    metadata: { duration: number; youtubeType: "short" | "video" }
+    metadata: { duration: number; youtubeType: "short" | "video" },
   ) => void;
   setThumbnail: (tempId: string, file: File) => void;
   clearThumbnail: (tempId: string) => void;
@@ -45,6 +46,13 @@ export const useMediaStore = create<MediaState>((set) => ({
   addFiles: (newFiles) =>
     set((state) => ({
       mediaFiles: [...state.mediaFiles, ...newFiles],
+    })),
+
+  updateFile: (tempId, updates) =>
+    set((state) => ({
+      mediaFiles: state.mediaFiles.map((f) =>
+        f.tempId === tempId ? { ...f, ...updates } : f,
+      ),
     })),
 
   removeFile: (index) =>

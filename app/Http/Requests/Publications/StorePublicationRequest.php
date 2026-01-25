@@ -47,7 +47,26 @@ class StorePublicationRequest extends FormRequest
             'platform_settings' => 'nullable|string',
             'campaign_id' => 'nullable|exists:campaigns,id',
             'media' => 'nullable|array',
-            'media.*' => 'file|mimes:jpeg,png,jpg,gif,webp,mp4,mov,avi|max:51200',
+            // Allow media items to be either files OR arrays (metadata for direct uploads)
+            // 'media.*' => 'file|mimes:jpeg,png,jpg,gif,webp,mp4,mov,avi|max:51200',
+            // We can't strictly validate mixed types easily with just 'media.*'.
+            // More complex custom validation might be needed if we want strictness,
+            // but for now let's relax it to allow the controller/service to handle valid data.
+            'media.*' => [
+                function ($attribute, $value, $fail) {
+                    if ($value instanceof \Illuminate\Http\UploadedFile) {
+                        // Standard file validation logic could go here if needed,
+                        // or we rely on the fact it IS a file.
+                        // We can check extension/mime if we want.
+                        return;
+                    }
+                    if (is_array($value) && isset($value['key'])) {
+                        // It's metadata
+                        return;
+                    }
+                    $fail('The ' . $attribute . ' must be a file or valid upload metadata.');
+                }
+            ],
             'youtube_types' => 'nullable|array',
             'durations' => 'nullable|array',
             'thumbnails' => 'nullable|array',

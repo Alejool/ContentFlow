@@ -10,6 +10,7 @@ interface MediaUploadSectionProps {
     type: string;
     isNew: boolean;
     thumbnailUrl?: string;
+    file?: File;
   }[];
   thumbnails: Record<string, File>;
   imageError: string | null;
@@ -23,6 +24,8 @@ interface MediaUploadSectionProps {
   onDragLeave: (e: React.DragEvent<HTMLDivElement>) => void;
   onDrop: (e: React.DragEvent<HTMLDivElement>) => void;
   disabled?: boolean;
+  uploadProgress?: Record<string, number>;
+  uploadStats?: Record<string, { eta?: number; speed?: number }>;
 }
 
 const MediaUploadSection = memo(
@@ -40,6 +43,8 @@ const MediaUploadSection = memo(
     onDragLeave,
     onDrop,
     disabled,
+    uploadProgress,
+    uploadStats,
   }: MediaUploadSectionProps) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -102,6 +107,8 @@ const MediaUploadSection = memo(
                     }
                     onClearThumbnail={() => onClearThumbnail(preview.tempId)}
                     disabled={disabled}
+                    progress={uploadProgress?.[preview.file?.name || ""]}
+                    stats={uploadStats?.[preview.file?.name || ""]}
                   />
                 ))}
                 {!disabled && (
@@ -149,6 +156,8 @@ const MediaPreviewItem = memo(
     onSetThumbnail,
     onClearThumbnail,
     disabled,
+    progress,
+    stats,
   }: {
     preview: any;
     index: number;
@@ -157,8 +166,18 @@ const MediaPreviewItem = memo(
     onSetThumbnail: (file: File) => void;
     onClearThumbnail: () => void;
     disabled?: boolean;
+    progress?: number;
+    stats?: { eta?: number; speed?: number };
   }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const formatETA = (seconds?: number) => {
+      if (!seconds) return "";
+      if (seconds < 60) return `${seconds}s`;
+      const mins = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      return `${mins}m ${secs}s`;
+    };
 
     return (
       <div
@@ -180,6 +199,22 @@ const MediaPreviewItem = memo(
           <img src={preview.url} className="w-full h-full object-cover" />
         )}
 
+        {/* Upload Overlay */}
+        {progress !== undefined && progress < 100 && (
+          <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center p-4 backdrop-blur-sm z-20">
+            <div className="w-full bg-gray-700 h-2 rounded-full overflow-hidden mb-2">
+              <div
+                className="bg-primary-500 h-full transition-all duration-300 ease-out"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+            <div className="text-white text-xs font-medium flex justify-between w-full">
+              <span>{progress}%</span>
+              {stats?.eta && <span>~{formatETA(stats.eta)} left</span>}
+            </div>
+          </div>
+        )}
+
         {!disabled && (
           <button
             type="button"
@@ -187,7 +222,7 @@ const MediaPreviewItem = memo(
               e.stopPropagation();
               onRemove();
             }}
-            className="absolute top-2 right-2 p-1.5 bg-red-500/80 text-white rounded-full hover:bg-red-600 transition-colors opacity-0 group-hover/item:opacity-100 backdrop-blur-sm"
+            className="absolute top-2 right-2 p-1.5 bg-red-500/80 text-white rounded-full hover:bg-red-600 transition-colors opacity-0 group-hover/item:opacity-100 backdrop-blur-sm z-30"
           >
             <X className="w-3 h-3" />
           </button>

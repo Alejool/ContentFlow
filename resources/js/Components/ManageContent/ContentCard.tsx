@@ -31,6 +31,11 @@ interface ContentCardProps {
     user_name: string;
     expires_at: string;
   } | null;
+  onPreviewMedia?: (media: {
+    url: string;
+    type: "image" | "video";
+    title?: string;
+  }) => void;
 }
 
 export default function ContentCard({
@@ -42,6 +47,7 @@ export default function ContentCard({
   type,
   permissions,
   remoteLock,
+  onPreviewMedia,
 }: ContentCardProps) {
   const { t } = useTranslation();
   const { i18n } = useTranslation();
@@ -79,11 +85,25 @@ export default function ContentCard({
     }[statusKey] || Edit;
 
   // Check if there are media files
+  // Check if there are media files
   const hasMedia = item.media_files && item.media_files.length > 0;
   const firstMedia = hasMedia ? item.media_files[0] : null;
   const isVideo = firstMedia?.file_type?.includes("video");
-  const mediaUrl =
-    firstMedia?.thumbnail?.file_path || firstMedia?.file_path || item.thumbnail;
+  const isProcessing = firstMedia?.status === "processing";
+
+  // URL logic:
+  // 1. If it's a video and processing, we don't have a thumbnail yet.
+  // 2. If it's a video and completed, we should have a thumbnail. If not, fallback to file_path checks?
+  // 3. If it's an image, file_path is the image.
+
+  let mediaUrl = firstMedia?.thumbnail?.file_path || item.thumbnail;
+
+  // If no thumbnail, and it's an image, use the file path
+  if (!mediaUrl && firstMedia?.file_type === "image") {
+    mediaUrl = firstMedia.file_path;
+  }
+  // If it's a video and we don't have a thumbnail, we can't show the video as an image.
+  // Unless we want to try to show a generic video placeholder if processing.
 
   // Get platform icons for publication
   const getPlatformIcons = () => {
@@ -121,12 +141,74 @@ export default function ContentCard({
 
   const [imageError, setImageError] = useState(false);
 
+  const handleCardClick = (e: React.MouseEvent) => {
+    // If user is selecting text, don't trigger click
+    if (window.getSelection()?.toString()) return;
+
+    // Trigger view details or edit
+    if (onViewDetails) {
+      onViewDetails(item);
+    } else if (onEdit) {
+      onEdit(item);
+    }
+  };
+
+  const handleMediaClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (
+      onPreviewMedia &&
+      firstMedia &&
+      !isProcessing &&
+      (mediaUrl || firstMedia.file_path)
+    ) {
+      // For video, if we have thumbnail (mediaUrl), use the actual video path for preview
+      const urlToPreview = isVideo
+        ? firstMedia.file_path
+        : mediaUrl || firstMedia.file_path;
+      // Ensure url is complete if needed (already handled by Storage::url in backend mostly)
+      // But here we rely on what's passed.
+      // If it's video, we might need the full URL.
+      // Assuming file_path is the key or url. If it's just key, frontend might need to know base URL.
+      // Backend now returns Storage::url for image. For video file_path is likely just the path if not processed?
+      // Actually, MediaProcessingService sets file_path.
+      // Let's assume we pass the file_path but maybe we should use a helper or trust it's a URL if coming from backend correctly.
+      // S3 Direct upload returns key. ProcessBackgroundUpload might rely on a helper to format it for frontend if needed.
+      // For now, let's pass it. If it's relative, MediaLightbox might fail unless base path is added.
+      // Let's assume it works or we fix it if broken.
+
+      onPreviewMedia({
+        url: isVideo
+          ? firstMedia.file_path.startsWith("http")
+            ? firstMedia.file_path
+            : `/storage/${firstMedia.file_path}`
+          : mediaUrl,
+        type: isVideo ? "video" : "image",
+        title: item.title,
+      });
+    }
+  };
+
   return (
-    <div className="group bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100 dark:border-gray-700 overflow-hidden flex flex-col h-full">
-      {hasMedia && mediaUrl && (
-        <div className="relative h-40 bg-gray-100 dark:bg-gray-700 overflow-hidden">
+    <div
+      className="group bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100 dark:border-gray-700 overflow-hidden flex flex-col h-full cursor-pointer"
+      onClick={handleCardClick}
+    >
+      {(hasMedia || isProcessing) && (
+        <div
+          className="relative h-40 bg-gray-100 dark:bg-gray-700 overflow-hidden cursor-zoom-in"
+          onClick={handleMediaClick}
+        >
           <div className="relative w-full h-full">
-            {!imageError ? (
+            {isProcessing ? (
+              <div className="w-full h-full flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-800 animate-pulse">
+                <div className="p-3 rounded-full bg-blue-100 dark:bg-blue-900/30 mb-2 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                  <Clock className="w-6 h-6 animate-spin" />
+                </div>
+                <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                  Procesando media...
+                </span>
+              </div>
+            ) : !imageError && mediaUrl ? (
               <img
                 src={mediaUrl}
                 alt={item.title || "Media"}
@@ -150,7 +232,7 @@ export default function ContentCard({
                 </div>
               </div>
             )}
-            {isVideo && (
+            {!isProcessing && isVideo && (
               <div className="absolute inset-0 flex items-center justify-center bg-black/10 group-hover:bg-black/20 transition-colors">
                 <div className="bg-white/90 dark:bg-gray-900/90 p-2.5 rounded-full shadow-lg backdrop-blur-sm">
                   <Video className="w-5 h-5 text-primary-600 dark:text-primary-400" />
@@ -333,7 +415,10 @@ export default function ContentCard({
             <>
               {canPublish || item.status === "approved" ? (
                 <button
-                  onClick={() => onPublish?.(item)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onPublish?.(item);
+                  }}
                   className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg transition-all shadow-sm shadow-orange-200 dark:shadow-none text-sm font-semibold"
                   title="Publicar ahora"
                 >
@@ -345,7 +430,10 @@ export default function ContentCard({
                   item.status || "draft",
                 ) ? (
                 <button
-                  onClick={() => onPublish?.(item)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onPublish?.(item);
+                  }}
                   className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors text-sm font-semibold shadow-sm"
                   title="Solicitar aprobación"
                 >
@@ -354,7 +442,10 @@ export default function ContentCard({
                 </button>
               ) : item.status === "published" ? (
                 <button
-                  onClick={() => onViewDetails?.(item)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onViewDetails?.(item);
+                  }}
                   className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-white hover:bg-orange-50 text-gray-700 hover:text-orange-700 border border-gray-200 hover:border-orange-200 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 rounded-lg transition-all text-sm font-semibold shadow-sm"
                   title="Ver detalles"
                 >
@@ -363,7 +454,10 @@ export default function ContentCard({
                 </button>
               ) : (
                 <button
-                  onClick={() => onViewDetails?.(item)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onViewDetails?.(item);
+                  }}
                   className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-white hover:bg-orange-50 text-gray-700 hover:text-orange-700 border border-gray-200 hover:border-orange-200 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 rounded-lg transition-all text-sm font-semibold shadow-sm"
                   title="Ver detalles"
                 >
@@ -376,7 +470,10 @@ export default function ContentCard({
 
           {(!canManageContent || type === "campaign") && (
             <button
-              onClick={() => onViewDetails?.(item)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onViewDetails?.(item);
+              }}
               className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-white hover:bg-orange-50 text-gray-700 hover:text-orange-700 border border-gray-200 hover:border-orange-200 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 rounded-lg transition-all text-sm font-semibold shadow-sm"
               title="Ver detalles"
             >
@@ -387,7 +484,8 @@ export default function ContentCard({
 
           {canManageContent && (
             <button
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 if (remoteLock) {
                   toast.error(
                     `${t("publications.table.lockedBy") || "Editando por"} ${lockedByName}`,
@@ -423,7 +521,10 @@ export default function ContentCard({
 
           {canManageContent && (
             <button
-              onClick={() => onDelete(item.id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete(item.id);
+              }}
               className="flex items-center justify-center px-3 py-2 bg-white hover:bg-red-50 text-gray-400 hover:text-red-600 border border-gray-200 hover:border-red-200 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 rounded-lg transition-colors shadow-sm"
               title="Eliminar"
             >

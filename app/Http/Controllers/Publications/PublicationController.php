@@ -165,7 +165,14 @@ class PublicationController extends Controller
         }
       }
 
-      $publication = $action->execute($data, $request->file('media', []));
+      // Handle media: can be File objects OR metadata arrays from S3 Direct Upload
+      $mediaInput = $request->input('media', []);
+      $mediaFiles = $request->file('media', []);
+
+      // If media input exists but no files, it's S3 metadata
+      $newFiles = !empty($mediaFiles) ? $mediaFiles : $mediaInput;
+
+      $publication = $action->execute($data, $newFiles);
 
       $publication->logActivity('created', $data);
 
@@ -236,7 +243,14 @@ class PublicationController extends Controller
         }
       }
 
-      $publication = $action->execute($publication, $data, $request->file('media', []));
+      // Handle media: can be File objects OR metadata arrays from S3 Direct Upload
+      $mediaInput = $request->input('media', []);
+      $mediaFiles = $request->file('media', []);
+
+      // If media input exists but no files, it's S3 metadata
+      $newFiles = !empty($mediaFiles) ? $mediaFiles : $mediaInput;
+
+      $publication = $action->execute($publication, $data, $newFiles);
 
       $publication->logActivity('updated', ['changes' => array_keys($data)]);
 

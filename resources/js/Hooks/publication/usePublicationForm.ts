@@ -1,3 +1,4 @@
+import { useS3Upload } from "@/Hooks/useS3Upload";
 import { PublicationFormData, publicationSchema } from "@/schemas/publication";
 import { useMediaStore } from "@/stores/mediaStore";
 import { usePublicationStore } from "@/stores/publicationStore";
@@ -62,6 +63,14 @@ export const usePublicationForm = ({
   const [activePlatformSettings, setActivePlatformSettings] = useState<
     string | null
   >(null);
+
+  // Direct S3 Upload Hooks
+  const {
+    uploadFile,
+    progress: uploadProgress,
+    uploading: isS3Uploading,
+  } = useS3Upload();
+  const [uploadingFiles, setUploadingFiles] = useState<Set<string>>(new Set());
   const [activePlatformPreview, setActivePlatformPreview] = useState<
     string | null
   >(null);
@@ -294,7 +303,29 @@ export const usePublicationForm = ({
   const handleFileChange = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
 
-    const newMediaItems = Array.from(files).map((file) => ({
+    // Check if there's already a video
+    const hasVideo = mediaFiles.some((m) => m.type.includes("video"));
+
+    const newFiles = Array.from(files);
+    const newVideos = newFiles.filter((f) => f.type.startsWith("video/"));
+
+    if (hasVideo && newVideos.length > 0) {
+      toast.error(
+        t("publications.modal.validation.singleVideo") ||
+          "Solo puedes subir un video por publicación.",
+      );
+      return;
+    }
+
+    if (newVideos.length > 1) {
+      toast.error(
+        t("publications.modal.validation.singleVideo") ||
+          "Solo puedes subir un video por publicación.",
+      );
+      return;
+    }
+
+    const newMediaItems = newFiles.map((file) => ({
       tempId: Math.random().toString(36).substring(7),
       url: URL.createObjectURL(file),
       type: file.type.startsWith("image/") ? "image" : "video",
@@ -474,11 +505,44 @@ export const usePublicationForm = ({
         }
       });
 
-      (mediaFiles || []).forEach((media, index) => {
+      // CRITICAL: Read mediaFiles FRESH from store (not from stale selector)
+      // This ensures we get the updated metadata after S3 upload
+      const currentMediaFiles = useMediaStore.getState().mediaFiles;
+      console.log(
+        "📦 [FORM] Reading fresh mediaFiles from store:",
+        currentMediaFiles.length,
+      );
+
+      (currentMediaFiles || []).forEach((media, index) => {
         const hasNewThumbnail = thumbnails[media.tempId];
 
         if (media.isNew && media.file) {
-          formData.append(`media[${index}]`, media.file);
+          // Check if media.file is already S3 metadata (from Direct Upload)
+          // If it has a 'key' property, it's metadata, not a File
+          const isS3Metadata =
+            typeof media.file === "object" &&
+            "key" in media.file &&
+            !media.file.constructor.name.includes("File");
+
+          if (isS3Metadata) {
+            // It's S3 metadata, send it as-is
+            formData.append(`media[${index}][key]`, (media.file as any).key);
+            formData.append(
+              `media[${index}][filename]`,
+              (media.file as any).filename,
+            );
+            formData.append(
+              `media[${index}][mime_type]`,
+              (media.file as any).mime_type,
+            );
+            formData.append(
+              `media[${index}][size]`,
+              (media.file as any).size.toString(),
+            );
+          } else {
+            // It's a File object, send it normally (for small files or fallback)
+            formData.append(`media[${index}]`, media.file);
+          }
 
           if (videoMetadata[media.tempId]) {
             formData.append(
@@ -616,5 +680,11 @@ export const usePublicationForm = ({
 
     // Data loading state
     isDataReady,
+
+    // Upload state
+    uploadingFiles,
+    isS3Uploading,
+    uploadProgress,
+    uploadStats: isS3Uploading ? uploadStats : {}, // Expose stats
   };
 };

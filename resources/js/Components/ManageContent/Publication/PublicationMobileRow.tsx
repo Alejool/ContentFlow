@@ -36,6 +36,11 @@ interface PublicationMobileRowProps {
     { user_id: number; user_name: string; expires_at: string }
   >;
   permissions?: string[];
+  onPreviewMedia?: (media: {
+    url: string;
+    type: "image" | "video";
+    title?: string;
+  }) => void;
 }
 
 const PublicationMobileRow = memo(
@@ -51,6 +56,7 @@ const PublicationMobileRow = memo(
     onViewDetails,
     remoteLocks = {},
     permissions,
+    onPreviewMedia,
   }: PublicationMobileRowProps) => {
     const [expandedRow, setExpandedRow] = useState<number | null>(null);
     const [loadingStates, setLoadingStates] = useState<
@@ -175,7 +181,34 @@ const PublicationMobileRow = memo(
               {/* Header Content */}
               <div className="p-4 flex items-start gap-3">
                 {/* Thumbnail with media preview */}
-                <div className="relative flex-shrink-0">
+                <div
+                  className="relative flex-shrink-0 cursor-pointer"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    // Trigger preview
+                    if (hasMedia(item) && mediaUrl && onPreviewMedia) {
+                      const firstMedia = item.media_files?.[0];
+                      const isVideo = firstMedia?.file_type?.includes("video");
+                      // Logic similar to ContentCard
+                      const path = firstMedia?.file_path;
+                      const url = path
+                        ? path.startsWith("http")
+                          ? path
+                          : `/storage/${path}`
+                        : mediaUrl;
+
+                      onPreviewMedia({
+                        url: url,
+                        type: isVideo ? "video" : "image",
+                        title: item.title,
+                      });
+                    } else {
+                      // If no media or preview handler, specific fallback logic or just toggle row?
+                      // Let's toggle row if not previewable
+                      if (!hasMedia(item)) toggleExpand(item.id);
+                    }
+                  }}
+                >
                   {hasMedia(item) && mediaUrl ? (
                     <div className="w-16 h-16 rounded-lg border border-gray-200 dark:border-neutral-700 bg-gray-100 dark:bg-neutral-800 overflow-hidden shadow-sm">
                       {(item as any).type === "user_event" ? (
@@ -534,6 +567,19 @@ const PublicationMobileRow = memo(
 
                     {/* Expanded actions */}
                     <div className="flex items-center gap-2">
+                      {/* View Button (Expanded) */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onViewDetails?.(item);
+                        }}
+                        className="flex-1 py-2.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-300 font-medium text-xs flex items-center justify-center gap-2 transition-colors active:scale-95"
+                        title="Ver detalles completos"
+                      >
+                        <Eye className="w-4 h-4" />
+                        Ver Detalles
+                      </button>
+
                       {/* Edit button */}
                       {permissions?.includes("manage-content") && (
                         <button

@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use App\Jobs\ProcessBackgroundUpload;
 
 class MediaProcessingService
 {
@@ -38,31 +39,80 @@ class MediaProcessingService
         $this->createThumbnail($mediaFile, $thumbFile);
       }
 
-      // Set main image if not set
-      if (!$publication->image) {
-        $publication->update(['image' => asset('storage/' . $mediaFile->file_path)]);
+      // Update main image logic:
+      // Always update if it's the first image in this batch, or if publication has no image.
+      // In 'Edit' flow, processUploads is called with new files. We typically want the first new image to become the main one
+      // if the user intended to replace it.
+      if ($mediaFile->status === 'completed' && $mediaFile->file_type === 'image') {
+        // Should we always update? If drag-drop multiple, the last one might win or first?
+        // Let's assume index 0 of new files is intended main if it's an image.
+        if ($index === 0 || !$publication->image) {
+          $publication->update(['image' => \Illuminate\Support\Facades\Storage::url($mediaFile->file_path)]);
+        }
       }
     }
   }
 
-  public function uploadAndCreateMediaFile(Publication $publication, UploadedFile $file, array $metadata = []): MediaFile
+  public function uploadAndCreateMediaFile(Publication $publication, $file, array $metadata = []): MediaFile
   {
-    $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
-    $path = $file->storeAs('publications', $filename, 's3');
-    $fileType = str_starts_with($file->getClientMimeType(), 'video/') ? 'video' : 'image';
+    if ($file instanceof UploadedFile) {
+      $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
+      // Default path for S3
+      $path = 'publications/' . $filename;
 
-    return MediaFile::create([
+      $fileType = str_starts_with($file->getClientMimeType(), 'video/') ? 'video' : 'image';
+      $fileSize = $file->getSize();
+      $mimeType = $file->getClientMimeType();
+      $originalName = $file->getClientOriginalName();
+      $isLargeFile = $fileSize > 20 * 1024 * 1024; // 20MB
+    } else {
+      // Direct Upload Metadata ({ key, filename, mime_type, size })
+      $path = $file['key'];
+      $fileType = str_starts_with($file['mime_type'], 'video/') ? 'video' : 'image';
+      $fileSize = $file['size'];
+      $mimeType = $file['mime_type'];
+      $originalName = $file['filename'];
+      $isLargeFile = false; // Already uploaded to S3, no need to treat as "large upload" locally
+      $filename = basename($path);
+    }
+
+    $isBackgroundCandidate = $fileType === 'video' || ($file instanceof UploadedFile && $isLargeFile);
+
+    // Create MediaFile record first
+    $mediaFile = MediaFile::create([
       'user_id' => Auth::id(),
       'workspace_id' => Auth::user()->current_workspace_id,
       'publication_id' => $publication->id,
-      'file_name' => $file->getClientOriginalName(),
-      'file_path' => $path,
+      'file_name' => $originalName,
+      'file_path' => $path, // Targeted S3 path
       'file_type' => $fileType,
       'youtube_type' => $fileType === 'video' ? ($metadata['youtube_type'] ?? null) : null,
       'duration' => $fileType === 'video' ? ($metadata['duration'] ?? null) : null,
-      'mime_type' => $file->getClientMimeType(),
-      'size' => $file->getSize(),
+      'mime_type' => $mimeType,
+      'size' => $fileSize,
+      'status' => $isBackgroundCandidate ? 'processing' : 'completed',
     ]);
+
+    if ($isBackgroundCandidate) {
+      if ($file instanceof UploadedFile) {
+        // Store in local temp storage for background processing
+        $tempPath = 'temp/' . $filename;
+        Storage::disk('local')->put($tempPath, file_get_contents($file->getRealPath()));
+
+        // Dispatch Job
+        ProcessBackgroundUpload::dispatch($publication, $mediaFile, $tempPath, $metadata);
+      } else {
+        // It's already on S3 (Direct Upload)
+        ProcessBackgroundUpload::dispatch($publication, $mediaFile, null, $metadata);
+      }
+    } else {
+      // Synchronous upload (Only for small files sent to backend)
+      if ($file instanceof UploadedFile) {
+        $file->storeAs('publications', $filename, 's3');
+      }
+    }
+
+    return $mediaFile;
   }
 
   public function createThumbnail(MediaFile $mediaFile, UploadedFile $thumbFile, string $platform = 'all'): MediaDerivative
