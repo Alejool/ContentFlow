@@ -45,7 +45,7 @@ export default function ProfileDropdown({
             </div>
 
             <span className="hidden sm:block font-medium text-sm truncate max-w-[100px] group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
-              {user.name || "User"}
+              {user?.name || "User"}
             </span>
 
             <ChevronDown

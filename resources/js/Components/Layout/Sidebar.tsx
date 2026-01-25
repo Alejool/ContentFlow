@@ -150,9 +150,9 @@ export default function Sidebar({
                     ContentFlow
                   </h1>
                   <p className={`text-xs ${classes.subtitleColor}`}>
-                    {auth.current_workspace?.name || "Social Media Manager"}
+                    {auth?.current_workspace?.name || "Social Media Manager"}
                   </p>
-                  {auth.current_workspace?.role && (
+                  {auth?.current_workspace?.role && (
                     <p className="text-[10px] font-bold text-primary-500 uppercase tracking-widest mt-0.5">
                       {auth.current_workspace.role.name}
                     </p>
