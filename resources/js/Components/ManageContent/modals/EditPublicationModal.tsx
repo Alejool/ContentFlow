@@ -11,9 +11,7 @@ import ScheduleSection from "@/Components/ManageContent/modals/common/ScheduleSe
 import YouTubeThumbnailUploader from "@/Components/common/ui/YouTubeThumbnailUploader";
 import { usePublicationForm } from "@/Hooks/publication/usePublicationForm";
 import { usePublicationLock } from "@/Hooks/usePublicationLock";
-import { useS3Upload } from "@/Hooks/useS3Upload";
 import { useCampaignStore } from "@/stores/campaignStore";
-import { useMediaStore } from "@/stores/mediaStore";
 import { useAccountsStore } from "@/stores/socialAccountsStore";
 import { Publication } from "@/types/Publication";
 import { usePage } from "@inertiajs/react";
@@ -106,65 +104,16 @@ const EditPublicationModal = ({
     setValue,
     control,
     isDataReady,
+    uploadProgress,
+    uploadStats,
+    uploadErrors,
+    isS3Uploading: uploading,
   } = usePublicationForm({
     publication,
     onClose,
     onSubmitSuccess: onSubmit,
     isOpen,
   });
-
-  const { uploadFile, uploading, progress: uploadProgress } = useS3Upload();
-
-  const handleUploadAndSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    // Filter NEW files needing upload (instanceof File)
-    const filesToUpload = mediaFiles.filter((m) => m.file instanceof File);
-
-    if (filesToUpload.length > 0) {
-      try {
-        // Upload files and get metadata
-        const uploadResults = await Promise.all(
-          filesToUpload.map(async (m) => ({
-            tempId: m.tempId,
-            metadata: await uploadFile(m.file!),
-          })),
-        );
-
-        // CRITICAL: Update the mediaFiles store to replace File objects with metadata
-        const updatedMediaFiles = mediaFiles.map((media) => {
-          const uploadResult = uploadResults.find(
-            (r) => r.tempId === media.tempId,
-          );
-          if (uploadResult) {
-            return {
-              ...media,
-              file: uploadResult.metadata, // Replace File with S3 metadata
-            };
-          }
-          return media;
-        });
-
-        console.log(
-          "🚀 [S3 UPLOAD] Updating store with metadata...",
-          updatedMediaFiles,
-        );
-        // Update the store using the proper method
-        const setMediaFiles = useMediaStore.getState().setMediaFiles;
-        setMediaFiles(updatedMediaFiles as any);
-
-        // Small delay to ensure state update propagates
-        await new Promise((resolve) => setTimeout(resolve, 100));
-
-        // Proceed with normal submit
-        handleSubmit(e);
-      } catch (err) {
-        console.error("Upload failed", err);
-      }
-    } else {
-      handleSubmit(e);
-    }
-  };
 
   const { register } = form;
 
@@ -312,7 +261,7 @@ const EditPublicationModal = ({
         <div className="flex-1 overflow-y-auto custom-scrollbar">
           <form
             id="edit-publication-form"
-            onSubmit={handleUploadAndSubmit}
+            onSubmit={handleSubmit}
             className="space-y-8"
           >
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-8">
@@ -442,6 +391,7 @@ const EditPublicationModal = ({
                     disabled={hasPublishedPlatform || isDisabled}
                     uploadProgress={uploadProgress}
                     uploadStats={uploadStats}
+                    uploadErrors={uploadErrors}
                   />
                 )}
 

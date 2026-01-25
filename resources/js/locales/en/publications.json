@@ -3,6 +3,9 @@
     "title": "Publications",
     "subtitle": "Manage your publications",
     "modal": {
+      "media": {
+        "uploadingPending": "Uploading Pending"
+      },
       "show": {
         "title": "Detailed View",
         "subtitle": "View the campaign details",

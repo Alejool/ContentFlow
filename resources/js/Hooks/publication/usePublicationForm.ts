@@ -68,7 +68,9 @@ export const usePublicationForm = ({
   const {
     uploadFile,
     progress: uploadProgress,
+    stats: uploadStats,
     uploading: isS3Uploading,
+    errors: uploadErrors,
   } = useS3Upload();
   const [uploadingFiles, setUploadingFiles] = useState<Set<string>>(new Set());
   const [activePlatformPreview, setActivePlatformPreview] = useState<
@@ -513,12 +515,61 @@ export const usePublicationForm = ({
         currentMediaFiles.length,
       );
 
-      (currentMediaFiles || []).forEach((media, index) => {
+      // SAFETY CHECK: Ensure all large files are uploaded to S3 before submitting form
+      // This prevents 413 Payload Too Large error on the server
+      for (const media of currentMediaFiles) {
+        if (media.isNew && media.file instanceof File) {
+          const file = media.file;
+          // Check if it's "large" (e.g. > 10MB to be safe, PHP default is often 20MB)
+          if (file.size > 10 * 1024 * 1024) {
+            // It's a large file that hasn't been replaced by metadata yet.
+            // We MUST upload it now or fail.
+            toast.loading(
+              t("publications.modal.media.uploadingPending") ||
+                `Uploading pending file: ${file.name}...`,
+              { id: "upload-pending" },
+            );
+
+            try {
+              // Reuse the exposed uploadFile function (requires passing file)
+              // Since we are inside the hook, we can call uploadFile directly if we have access to it?
+              // No, uploadFile is from useS3Upload. We need to access it.
+              // We have 'uploadFile' from the hook scope above.
+              const s3Meta = await uploadFile(file);
+
+              // Update the temp object in our loop so the FormData builder below uses the metadata
+              // Note: This doesn't update the store, but updates our local reference for this submission
+              (media.file as any) = s3Meta;
+
+              // Also update store to be consistent
+              useMediaStore
+                .getState()
+                .updateFile(media.tempId, { file: s3Meta as any });
+
+              toast.success("Upload complete", { id: "upload-pending" });
+            } catch (e) {
+              console.error("Critical upload failure in submit", e);
+              toast.error(
+                t("publications.modal.media.uploadError") ||
+                  "Failed to upload file. Please try again.",
+                { id: "upload-pending" },
+              );
+              setIsSubmitting(false);
+              return; // ABORT SUBMISSION
+            }
+          }
+        }
+      }
+
+      // Re-read strictly for formData loop (although we modified references above)
+      // Actually the loop below uses 'currentMediaFiles' which holds references we just mutated if we did (media.file = ...)
+      // But purely safe way is to proceed.
+
+      currentMediaFiles.forEach((media, index) => {
         const hasNewThumbnail = thumbnails[media.tempId];
 
         if (media.isNew && media.file) {
-          // Check if media.file is already S3 metadata (from Direct Upload)
-          // If it has a 'key' property, it's metadata, not a File
+          // Re-check metadata existence (it might have been just uploaded above)
           const isS3Metadata =
             typeof media.file === "object" &&
             "key" in media.file &&
@@ -540,7 +591,13 @@ export const usePublicationForm = ({
               (media.file as any).size.toString(),
             );
           } else {
-            // It's a File object, send it normally (for small files or fallback)
+            // It's a File object.
+            // Double check size to prevent 413 if something slipped through
+            if ((media.file as File).size > 50 * 1024 * 1024) {
+              toast.error("File too large to send directly. Upload failed.");
+              throw new Error("File too large for direct payload");
+            }
+            // Send normally (small files)
             formData.append(`media[${index}]`, media.file);
           }
 
@@ -685,6 +742,7 @@ export const usePublicationForm = ({
     uploadingFiles,
     isS3Uploading,
     uploadProgress,
-    uploadStats: isS3Uploading ? uploadStats : {}, // Expose stats
+    uploadStats: isS3Uploading ? uploadStats : {},
+    uploadErrors,
   };
 };

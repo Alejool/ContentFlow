@@ -26,6 +26,7 @@ interface MediaUploadSectionProps {
   disabled?: boolean;
   uploadProgress?: Record<string, number>;
   uploadStats?: Record<string, { eta?: number; speed?: number }>;
+  uploadErrors?: Record<string, string>;
 }
 
 const MediaUploadSection = memo(
@@ -45,6 +46,7 @@ const MediaUploadSection = memo(
     disabled,
     uploadProgress,
     uploadStats,
+    uploadErrors,
   }: MediaUploadSectionProps) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -109,6 +111,7 @@ const MediaUploadSection = memo(
                     disabled={disabled}
                     progress={uploadProgress?.[preview.file?.name || ""]}
                     stats={uploadStats?.[preview.file?.name || ""]}
+                    error={uploadErrors?.[preview.file?.name || ""]}
                   />
                 ))}
                 {!disabled && (
@@ -158,6 +161,7 @@ const MediaPreviewItem = memo(
     disabled,
     progress,
     stats,
+    error,
   }: {
     preview: any;
     index: number;
@@ -168,6 +172,7 @@ const MediaPreviewItem = memo(
     disabled?: boolean;
     progress?: number;
     stats?: { eta?: number; speed?: number };
+    error?: string;
   }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -183,7 +188,7 @@ const MediaPreviewItem = memo(
       <div
         className={`relative group/item aspect-video border rounded-lg overflow-hidden bg-gray-900 ${
           disabled ? "opacity-90" : ""
-        }`}
+        } ${error ? "border-red-500 ring-2 ring-red-500/20" : ""}`}
         onClick={(e) => e.stopPropagation()}
       >
         {preview.type.includes("video") ? (
@@ -200,7 +205,7 @@ const MediaPreviewItem = memo(
         )}
 
         {/* Upload Overlay */}
-        {progress !== undefined && progress < 100 && (
+        {!error && progress !== undefined && progress < 100 && (
           <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center p-4 backdrop-blur-sm z-20">
             <div className="w-full bg-gray-700 h-2 rounded-full overflow-hidden mb-2">
               <div
@@ -212,6 +217,17 @@ const MediaPreviewItem = memo(
               <span>{progress}%</span>
               {stats?.eta && <span>~{formatETA(stats.eta)} left</span>}
             </div>
+          </div>
+        )}
+
+        {/* Error Overlay */}
+        {error && (
+          <div className="absolute inset-0 bg-red-900/80 flex flex-col items-center justify-center p-4 backdrop-blur-sm z-20 text-center animate-in fade-in zoom-in duration-300">
+            <AlertTriangle className="w-8 h-8 text-white mb-2" />
+            <span className="text-white text-sm font-bold">Upload Failed</span>
+            <span className="text-white/80 text-xs mt-1 px-2 line-clamp-2">
+              {error}
+            </span>
           </div>
         )}
 

@@ -3,6 +3,9 @@
     "title": "Publicaciones",
     "subtitle": "Gestionar tus publicaciones",
     "modal": {
+      "media": {
+        "uploadingPending": "Subiendo Pendiente"
+      },
       "show": {
         "title": "Vista Detallada",
         "subtitle": "Ver la publicación",
