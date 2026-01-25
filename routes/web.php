@@ -211,6 +211,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
   Route::post('/upload/sign', [UploadController::class, 'sign'])->name('upload.sign');
 
+  Route::prefix('upload/multipart')->name('upload.multipart.')->group(function () {
+    Route::post('/init', [\App\Http\Controllers\Api\MultipartUploadController::class, 'initiate'])->name('init');
+    Route::post('/sign-part', [\App\Http\Controllers\Api\MultipartUploadController::class, 'signPart'])->name('sign-part');
+    Route::post('/complete', [\App\Http\Controllers\Api\MultipartUploadController::class, 'complete'])->name('complete');
+  });
+
   /*
     |--------------------------------------------------------------------------
     | Calendar
