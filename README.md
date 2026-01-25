@@ -13,16 +13,16 @@
 ## 🚀 Core Functionalities
 
 ### 📱 Unified Social Publishing
-Schedule and publish content across the world's leading platforms from a single dashboard:
-- **YouTube & TikTok**: Full support for long-form videos and vertical content (Shorts/Reels). Includes automated metadata management and thumbnail customization.
-- **Instagram & Facebook**: Direct integration for Posts, Reels, and Stories via the Meta Graph API.
-- **Twitter (X)**: Advanced thread builder, auto-splitting long content, and native poll support.
+Manage and publish content across leading platforms from a single dashboard:
+- **YouTube & TikTok**: Support for long-form videos and vertical content (Shorts/Reels). Includes metadata management and thumbnail customization.
+- **Instagram & Facebook**: Integration for Posts, Reels, and Stories via the Meta Graph API.
+- **Twitter (X)**: Thread builder, content splitting, and native poll support.
 
 ### 🤖 Intelligent AI Engine
-ContentFlow integrates a multi-provider AI layer (DeepSeek, Gemini, OpenAI, Claude) to assist you in every step:
-- **Content Strategy**: Generate 30-day content plans tailored to your niche.
-- **Micro-Copywriting**: Automated generation of captions, hashtags, and engagement-focused titles.
-- **Media Optimization**: Context-aware suggestions for the best publishing times and platform-specific formatting.
+ContentFlow integrates a multi-provider AI layer (DeepSeek, Gemini, OpenAI, Claude) to assist you:
+- **Content Strategy**: Tools to generate content plans tailored to your niche.
+- **Micro-Copywriting**: Assistance in generating captions, hashtags, and engagement-focused titles.
+- **Media Optimization**: Suggestions for publishing times and platform-specific formatting.
 
 ### 📅 Visual Strategy Calendar
 Manage your entire editorial timeline with an interactive drag-and-drop calendar. View scheduled posts, user events, and campaign milestones at a glance, ensuring a consistent brand voice across all channels.
@@ -50,7 +50,7 @@ ContentFlow follows a **Hybrid Monolith** architecture, combining the robustness
 - **Frontend**: [React 18](https://reactjs.org/) with [TypeScript](https://www.typescriptlang.org/) and [Inertia.js](https://inertiajs.com/) for a seamless Single Page experience.
 - **UI/UX**: [TailwindCSS](https://tailwindcss.com/) with a custom "Modern Design System" and [Lucide React](https://lucide.dev/) icons.
 - **Real-time**: [Laravel Reverb](https://reverb.laravel.com/) for high-performance WebSocket communication.
-- **Data Persistence**: [MySQL 8.0](https://www.mysql.com/) & [Redis](https://redis.io/) for caching/queues.
+- **Data Persistence**: [PostgreSQL](https://www.postgresql.org/) & [Redis](https://redis.io/) for caching/queues.
 - **Cloud Infrastructure**: [AWS S3](https://aws.amazon.com/s3/) for multimedia storage and [Firebase](https://firebase.google.com/) for secondary services.
 
 ### 🗺️ System Overview
@@ -61,7 +61,7 @@ graph TD
     Inertia <--> Laravel["Laravel 11 Engine"]
     
     subgraph "Infrastructure Layer"
-        Laravel <--> MySQL[(MySQL Database)]
+        Laravel <--> PostgreSQL[(PostgreSQL Database)]
         Laravel <--> Redis[(Redis Queue/Cache)]
         Laravel <--> Reverb[Realtime Events]
     end
@@ -124,6 +124,12 @@ ContentFlow/
    # Run the dev server (Vite + Reverb + Queues)
    npm run dev
    ```
+
+---
+
+## 🌐 Language Versions
+- [Español (Spanish)](./README.es.md)
+- [English](./README.md)
 
 ---
 
