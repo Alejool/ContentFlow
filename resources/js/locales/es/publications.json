@@ -263,7 +263,8 @@
         "scheduleRequired": "Debes programar una fecha para todas las redes seleccionadas o establecer una fecha global.",
         "scheduledAtRequired": "La fecha programada es requerida cuando seleccionas redes sociales",
         "socialAccountsRequired": "Por favor, selecciona al menos una red social",
-        "allSchedulesRequired": "Todas las redes deben tener una fecha o activa la fecha global"
+        "allSchedulesRequired": "Todas las redes deben tener una fecha o activa la fecha global",
+        "singleVideo": "Solo puedes subir un video por publicación."
       }
     },
     "status": {
@@ -317,6 +318,7 @@
       "deleteSuccess": "¡Publicación eliminada exitosamente!",
       "deleteError": "Error al eliminar publicación",
       "fetchError": "Error al cargar campañas",
+      "error": "Ha ocurrido un error inesperado",
       "confirmDelete": {
         "title": "¿Estás seguro?",
         "text": "¡No podrás recuperar esta campaña!",

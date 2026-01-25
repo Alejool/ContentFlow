@@ -256,7 +256,8 @@
         "scheduleDateRequired": "Please select a date to schedule on the selected networks or uncheck the schedule option",
         "scheduleRequired": "You must schedule a date for all selected networks or set a global date.",
         "scheduledAtRequired": "Scheduled date is required when you select social networks",
-        "socialAccountsRequired": "Please select at least one social media account"
+        "socialAccountsRequired": "Please select at least one social media account",
+        "singleVideo": "You can only upload one video per publication."
       }
     },
     "status": {
@@ -307,6 +308,7 @@
       "deleteSuccess": "Publication deleted successfully!",
       "deleteError": "Error deleting publication",
       "fetchError": "Error fetching campaigns",
+      "error": "An unexpected error occurred",
       "confirmDelete": {
         "title": "Are you sure?",
         "text": "You won't be able to revert this!",

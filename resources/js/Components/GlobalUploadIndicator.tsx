@@ -1,4 +1,8 @@
 import { useUploadQueue } from "@/stores/uploadQueueStore";
+import { PageProps } from "@/types";
+import { Publication } from "@/types/Publication";
+import { usePage } from "@inertiajs/react";
+import axios from "axios";
 import {
   AlertTriangle,
   CheckCircle2,
@@ -12,16 +16,46 @@ import { useTranslation } from "react-i18next";
 
 export default function GlobalUploadIndicator() {
   const { t } = useTranslation();
+  const { props } = usePage<PageProps>();
   const queue = useUploadQueue((state) => state.queue);
   const removeUpload = useUploadQueue((state) => state.removeUpload);
   const [isMinimized, setIsMinimized] = useState(false);
+  const [processingItems, setProcessingItems] = useState<Publication[]>([]);
 
   const uploads = Object.values(queue);
+
+  // Fetch publications in 'processing' state from the workspace
+  const fetchProcessingItems = async () => {
+    try {
+      const response = await axios.get(route("api.publications.index"), {
+        params: { status: "processing", simplified: "true" },
+      });
+      if (response.data?.success && response.data?.publications) {
+        // Handle both paginated and simple collections
+        const items = Array.isArray(response.data.publications)
+          ? response.data.publications
+          : response.data.publications.data || [];
+        setProcessingItems(items);
+      }
+    } catch (err) {
+      console.error("Failed to fetch processing items", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchProcessingItems();
+    // Poll every 30 seconds for external processing changes
+    const interval = setInterval(fetchProcessingItems, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
   const activeUploads = uploads.filter(
     (u) => u.status === "uploading" || u.status === "pending",
   );
   const completedUploads = uploads.filter((u) => u.status === "completed");
   const errorUploads = uploads.filter((u) => u.status === "error");
+
+  const totalActiveTasks = activeUploads.length + processingItems.length;
 
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -36,42 +70,41 @@ export default function GlobalUploadIndicator() {
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [activeUploads.length]);
 
-  if (uploads.length === 0) return null;
+  if (uploads.length === 0 && processingItems.length === 0) return null;
 
   return (
     <div
       className={`fixed bottom-4 right-4 z-[100] transition-all duration-300 ${isMinimized ? "w-auto" : "w-80"} bg-white dark:bg-neutral-800 rounded-lg shadow-2xl border border-gray-200 dark:border-neutral-700 overflow-hidden`}
     >
-      {/* Header */}
       <div
         className="flex items-center justify-between p-3 bg-gray-50 dark:bg-neutral-700/50 cursor-pointer"
         onClick={() => setIsMinimized(!isMinimized)}
       >
         <div className="flex items-center gap-2">
-          {activeUploads.length > 0 ? (
+          {totalActiveTasks > 0 ? (
             <Loader2 className="w-4 h-4 text-blue-500 animate-spin" />
           ) : errorUploads.length > 0 ? (
             <AlertTriangle className="w-4 h-4 text-red-500" />
           ) : (
             <CheckCircle2 className="w-4 h-4 text-green-500" />
           )}
-          <span className="font-medium text-sm text-gray-700 dark:text-gray-200">
-            {activeUploads.length > 0
-              ? t("publications.upload.uploadingFiles", {
-                  count: activeUploads.length,
-                  defaultValue: `Uploading ${activeUploads.length} file(s)...`,
+          <span className="font-medium text-sm text-gray-700 dark:text-neutral-200">
+            {totalActiveTasks > 0
+              ? t("publications.modal.upload.uploadingFiles", {
+                  count: totalActiveTasks,
+                  defaultValue: `Subiendo/Procesando ${totalActiveTasks}...`,
                 })
               : errorUploads.length > 0
-                ? t("publications.upload.uploadFailed", {
+                ? t("publications.modal.upload.uploadFailed", {
                     defaultValue: "Upload Failed",
                   })
-                : t("publications.upload.uploadsCompleted", {
+                : t("publications.modal.upload.uploadsCompleted", {
                     defaultValue: "Uploads Completed",
                   })}
           </span>
         </div>
         <div className="flex items-center gap-1">
-          <button className="p-1 hover:bg-gray-200 dark:hover:bg-neutral-600 rounded">
+          <button className="p-1 hover:bg-gray-200 dark:hover:bg-neutral-600 rounded text-gray-500 dark:text-neutral-400">
             {isMinimized ? (
               <Maximize2 className="w-3 h-3" />
             ) : (
@@ -80,9 +113,10 @@ export default function GlobalUploadIndicator() {
           </button>
         </div>
       </div>
-      
+
       {!isMinimized && (
         <div className="max-h-60 overflow-y-auto custom-scrollbar">
+          {/* Current Local Uploads */}
           {uploads.map((upload) => (
             <div
               key={upload.id}
@@ -90,7 +124,7 @@ export default function GlobalUploadIndicator() {
             >
               <div className="flex justify-between items-start mb-1">
                 <span
-                  className="text-xs font-medium truncate max-w-[180px]"
+                  className="text-xs font-medium truncate max-w-[180px] text-neutral-900 dark:text-neutral-100"
                   title={upload.file.name}
                 >
                   {upload.file.name}
@@ -119,12 +153,12 @@ export default function GlobalUploadIndicator() {
                     style={{ width: `${upload.progress}%` }}
                   />
                 </div>
-                <span className="text-[10px] text-gray-500 w-8 text-right">
+                <span className="text-[10px] text-gray-500 dark:text-neutral-400 w-8 text-right">
                   {upload.progress}%
                 </span>
               </div>
 
-              <div className="flex justify-between text-[10px] text-gray-400">
+              <div className="flex justify-between text-[10px] text-gray-400 dark:text-neutral-500">
                 <span>
                   {upload.status === "uploading" && upload.stats?.speed
                     ? `${formatSpeed(upload.stats.speed)}`
@@ -132,17 +166,38 @@ export default function GlobalUploadIndicator() {
                 </span>
                 <span>
                   {upload.status === "uploading" && upload.stats?.eta
-                    ? `~${formatTime(upload.stats.eta)} ${t("publications.upload.left", { defaultValue: "left" })}`
+                    ? `~${formatTime(upload.stats.eta)} ${t("publications.modal.upload.left", { defaultValue: "left" })}`
                     : upload.status === "error"
                       ? upload.error
                       : upload.status === "completed"
-                        ? t("publications.upload.done", {
+                        ? t("publications.modal.upload.done", {
                             defaultValue: "Done",
                           })
-                        : t("publications.upload.pending", {
+                        : t("publications.modal.upload.pending", {
                             defaultValue: "Pending",
                           })}
                 </span>
+              </div>
+            </div>
+          ))}
+
+          {/* External Processing Items */}
+          {processingItems.map((item) => (
+            <div
+              key={item.id}
+              className="p-3 border-b border-gray-100 dark:border-neutral-700 last:border-0"
+            >
+              <div className="flex items-center gap-2 mb-1">
+                <Loader2 className="w-3 h-3 text-blue-500 animate-spin" />
+                <span
+                  className="text-xs font-medium truncate text-neutral-900 dark:text-neutral-100"
+                  title={item.title}
+                >
+                  {item.title}
+                </span>
+              </div>
+              <div className="flex justify-between text-[10px] text-gray-400 dark:text-neutral-500">
+                <span>Procesando en segundo plano...</span>
               </div>
             </div>
           ))}

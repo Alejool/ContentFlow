@@ -6,13 +6,13 @@ use App\Models\MediaDerivative;
 use App\Models\MediaFile;
 use App\Models\Publications\Publication;
 use App\Models\Publications\PublicationMedia;
+use App\Jobs\ProcessBackgroundUpload;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
-use App\Jobs\ProcessBackgroundUpload;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class MediaProcessingService
 {
@@ -48,7 +48,7 @@ class MediaProcessingService
         // Should we always update? If drag-drop multiple, the last one might win or first?
         // Let's assume index 0 of new files is intended main if it's an image.
         if ($index === 0 || !$publication->image) {
-          $publication->update(['image' => \Illuminate\Support\Facades\Storage::url($mediaFile->file_path)]);
+          $publication->update(['image' => \Illuminate\Support\Facades\Storage::url($mediaFile->getRawOriginal('file_path'))]);
         }
       }
     }
@@ -192,16 +192,11 @@ class MediaProcessingService
     $derivatives = $mediaFile->derivatives()->where('derivative_type', $type)->get();
     foreach ($derivatives as $derivative) {
       try {
-        // If it's a full URL, we need to extract the path
-        $path = $derivative->file_path;
-        if (filter_var($path, FILTER_VALIDATE_URL)) {
-          $s3Url = Storage::disk('s3')->url('');
-          $path = str_replace($s3Url, '', $path);
-        }
+        $path = $derivative->getRawOriginal('file_path');
 
-        if (Storage::disk('s3')->exists($path)) {
-          Storage::disk('s3')->delete($path);
-        }
+        // Efficiency optimization: Don't check exists() as it's an extra API call.
+        // PHP's S3 driver handles non-existent keys gracefully if we just call delete.
+        Storage::disk('s3')->delete($path);
       } catch (\Exception $e) {
         Log::warning('Failed to delete old derivative', ['error' => $e->getMessage(), 'path' => $derivative->file_path]);
       }
@@ -230,8 +225,9 @@ class MediaProcessingService
 
     // 2. Delete main file from storage
     try {
-      if (Storage::disk('s3')->exists($mediaFile->file_path)) {
-        Storage::disk('s3')->delete($mediaFile->file_path);
+      $path = $mediaFile->getRawOriginal('file_path');
+      if (Storage::disk('s3')->exists($path)) {
+        Storage::disk('s3')->delete($path);
       }
     } catch (\Exception $e) {
       Log::warning('Failed to delete main media file', [

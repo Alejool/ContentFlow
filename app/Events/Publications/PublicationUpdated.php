@@ -46,7 +46,7 @@ class PublicationUpdated implements ShouldBroadcast
 
   public function broadcastWith()
   {
-    // Load relationships needed for the frontend list/card view
+    // Load relationships needed for the frontend list/card view with strict limits
     $this->publication->load([
       'mediaFiles' => fn($q) => $q->select('media_files.id', 'media_files.file_path', 'media_files.file_type', 'media_files.file_name', 'media_files.size', 'media_files.mime_type'),
       'mediaFiles.thumbnail' => fn($q) => $q->select('id', 'media_file_id', 'file_path', 'file_name', 'derivative_type'),
@@ -57,8 +57,9 @@ class PublicationUpdated implements ShouldBroadcast
       'user' => fn($q) => $q->select('users.id', 'users.name', 'users.email', 'users.photo_url'),
       'publisher' => fn($q) => $q->select('users.id', 'users.name', 'users.photo_url'),
       'rejector' => fn($q) => $q->select('users.id', 'users.name', 'users.photo_url'),
-      'approvalLogs' => fn($q) => $q->latest('requested_at')->with(['requester:id,name,photo_url', 'reviewer:id,name,photo_url']),
-      'activities' => fn($q) => $q->orderBy('created_at', 'desc')->with('user:id,name,photo_url')
+      // Optimization: only send the latest 5 logs and activities for global updates
+      'approvalLogs' => fn($q) => $q->latest('requested_at')->take(5)->with(['requester:id,name,photo_url', 'reviewer:id,name,photo_url']),
+      'activities' => fn($q) => $q->orderBy('created_at', 'desc')->take(10)->with('user:id,name,photo_url')
     ]);
 
     return [

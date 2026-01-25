@@ -185,7 +185,17 @@ const EditPublicationModal = ({
   const { auth } = usePage<any>().props;
   const canManage =
     auth.current_workspace?.permissions?.includes("manage-content");
-  const isDisabled = isLockedByOther || !canManage;
+
+  // Partial locking:
+  // - Global lock: only if another user has the lock
+  const isLockedByOtherEditor = isLockedByOther;
+
+  // - Media section lock: if another user has lock OR media is processing
+  const isMediaSectionDisabled =
+    isLockedByOtherEditor || isAnyMediaProcessing || !canManage;
+
+  // - Content/Settings section lock: ONLY if another user has lock
+  const isContentSectionDisabled = isLockedByOtherEditor || !canManage;
 
   const canPublish = auth.current_workspace?.permissions?.includes("publish");
 
@@ -389,7 +399,7 @@ const EditPublicationModal = ({
                       setIsDragOver(false);
                       handleFileChange(e.dataTransfer.files);
                     }}
-                    disabled={hasPublishedPlatform || isDisabled}
+                    disabled={hasPublishedPlatform || isMediaSectionDisabled}
                     isAnyMediaProcessing={isAnyMediaProcessing}
                     uploadProgress={uploadProgress}
                     uploadStats={uploadStats}
@@ -398,7 +408,7 @@ const EditPublicationModal = ({
                 )}
 
                 <div
-                  className={`transition-opacity duration-200 ${!allowConfiguration ? "opacity-50 pointer-events-none grayscale-[0.5]" : ""}`}
+                  className={`transition-opacity duration-200 ${!allowConfiguration || isContentSectionDisabled ? "opacity-50 pointer-events-none grayscale-[0.5]" : ""}`}
                 >
                   <SocialAccountsSection
                     socialAccounts={socialAccounts as any}
@@ -423,7 +433,7 @@ const EditPublicationModal = ({
                     publishedAccountIds={publishedAccountIds}
                     publishingAccountIds={publishingAccountIds}
                     error={errors.social_accounts?.message as string}
-                    disabled={isDisabled || !allowConfiguration}
+                    disabled={isContentSectionDisabled || !allowConfiguration}
                   />
 
                   <ScheduleSection
@@ -435,7 +445,7 @@ const EditPublicationModal = ({
                       setValue("use_global_schedule", val)
                     }
                     error={errors.scheduled_at?.message as string}
-                    disabled={isDisabled || !allowConfiguration}
+                    disabled={isContentSectionDisabled || !allowConfiguration}
                   />
                 </div>
 
@@ -496,7 +506,7 @@ const EditPublicationModal = ({
                   campaigns={campaigns}
                   publication={publication}
                   onHashtagChange={handleHashtagChange}
-                  disabled={hasPublishedPlatform || isDisabled}
+                  disabled={hasPublishedPlatform || isContentSectionDisabled}
                 />
 
                 {publication?.approval_logs &&
@@ -526,7 +536,7 @@ const EditPublicationModal = ({
         </div>
         <ModalFooter
           onClose={handleClose}
-          isSubmitting={isSubmitting || isDisabled}
+          isSubmitting={isSubmitting || isContentSectionDisabled}
           formId="edit-publication-form"
           submitText={
             uploading

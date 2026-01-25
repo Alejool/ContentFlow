@@ -57,12 +57,12 @@ class PublicationLockController extends Controller
         if ($existingLock) {
             $force = $request->input('force', false);
 
-            // Allow handover if it's the SAME user (different session) OR if force is requested
+            // Allow handover if it's the SAME user (even with different session) OR if force is requested
             // Force is usually requested when a frontend survivor detects the locker left the presence channel
             if ($existingLock->user_id === $user->id || $force) {
                 $oldUser = $existingLock->user->name ?? 'otro editor';
                 $existingLock->delete();
-                Log::info("🔄 Lock handover: pub {$publication->id}, taken from {$oldUser} by user {$user->id} (force: " . ($force ? 'true' : 'false') . ")");
+                Log::info("🔄 Lock handover: pub {$publication->id}, user {$user->id} taking over (previous session: {$existingLock->session_id}, force: " . ($force ? 'true' : 'false') . ")");
             } else {
                 return $this->errorResponse('Publication is being edited by ' . $existingLock->user->name, 423, [
                     'locked_by' => 'user',
@@ -97,29 +97,18 @@ class PublicationLockController extends Controller
         $user = Auth::user();
         $sessionId = session()->getId();
 
-        // Match by both user_id AND session_id to ensure we're releasing the correct lock
+        // Relaxed check: Match by user_id to ensure we're releasing the correct lock
+        // Session ID check is secondary to avoid "sticky" locks across multi-tab usage
         $lock = PublicationLock::where('publication_id', $publication->id)
             ->where('user_id', $user->id)
-            ->where('session_id', $sessionId)
             ->first();
 
         if ($lock) {
-            Log::info("🔓 Lock released successfully (session match): pub {$publication->id}, user {$user->id}");
+            Log::info("🔓 Lock released successfully: pub {$publication->id}, user {$user->id}");
             $lock->delete();
             broadcast(new PublicationLockChanged($publication->id, null, $user->current_workspace_id))->toOthers();
         } else {
-            // Relaxed check: if no session match, find by user only
-            $fallbackLock = PublicationLock::where('publication_id', $publication->id)
-                ->where('user_id', $user->id)
-                ->first();
-
-            if ($fallbackLock) {
-                Log::info("🔓 Lock released successfully (fallback user match): pub {$publication->id}, user {$user->id}, original session {$fallbackLock->session_id}");
-                $fallbackLock->delete();
-                broadcast(new PublicationLockChanged($publication->id, null, $user->current_workspace_id))->toOthers();
-            } else {
-                Log::warning("⚠️ Unlock failed - lock not found for user: pub {$publication->id}, user {$user->id}");
-            }
+            Log::warning("⚠️ Unlock failed - lock not found for user: pub {$publication->id}, user {$user->id}");
         }
 
         return $this->successResponse(null, 'Lock released');

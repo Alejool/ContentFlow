@@ -279,6 +279,25 @@ export const usePublicationForm = ({
             };
           }) || [];
 
+        // RECOVERY: Check global upload queue for files currently uploading/linked to this publication
+        // This ensures if User A closes/reopens while uploading, they see their progress.
+        const queue = useUploadQueue.getState().queue;
+        Object.values(queue).forEach((item) => {
+          if (item.publicationId === publication.id) {
+            // Avoid duplicates (though item.id is tempId)
+            if (!existingMedia.some((m) => m.tempId === item.id)) {
+              existingMedia.push({
+                tempId: item.id,
+                url: URL.createObjectURL(item.file),
+                type: item.file.type.startsWith("image/") ? "image" : "video",
+                isNew: true,
+                file: item.file,
+                status: item.status === "completed" ? "completed" : "uploading",
+              });
+            }
+          }
+        });
+
         if (existingMedia.length === 0 && publication.image) {
           let url = publication.image;
           if (url && !url.startsWith("http") && !url.startsWith("/storage/")) {
@@ -577,7 +596,12 @@ export const usePublicationForm = ({
             }
           }
         } else if (!media.isNew && media.id) {
+          // Send media_keep_ids to the backend to track existing media
           formData.append("media_keep_ids[]", media.id.toString());
+
+          // ONLY add to formData if it's new or modified.
+          // BUT UpdatePublicationAction doesn't currently use a 'media' array for existing items
+          // unless they are new uploads. So we only need to send the ID in media_keep_ids.
 
           if (hasNewThumbnail) {
             formData.append(`thumbnails[${media.id}]`, hasNewThumbnail);
@@ -785,6 +809,8 @@ export const usePublicationForm = ({
         (m) => m.status === "uploading" || m.status === "processing",
       ) ||
       isS3Uploading ||
-      (publication?.status as string) === "processing",
+      (publication?.status as string) === "processing" ||
+      (!!publication?.media_locked_by &&
+        (publication.media_locked_by as any).id !== user?.id),
   };
 };

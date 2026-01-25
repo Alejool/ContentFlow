@@ -637,18 +637,25 @@ const PublicationMobileRow = memo(
                           title={
                             remoteLocks[item.id]
                               ? `Editando por ${lockedByName}`
-                              : "Editar"
+                              : (item.status as string) === "processing"
+                                ? "Procesando..."
+                                : "Editar"
                           }
                         >
                           {isLoading?.editing ? (
                             <Loader2 className="w-4 h-4 animate-spin" />
                           ) : remoteLocks[item.id] ? (
                             <Lock className="w-4 h-4" />
+                          ) : (item.status as string) === "processing" ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
                           ) : (
                             <Edit className="w-4 h-4" />
                           )}
-                          {remoteLocks[item.id]
-                            ? "Bloqueado"
+                          {remoteLocks[item.id] ||
+                          (item.status as string) === "processing"
+                            ? (item.status as string) === "processing"
+                              ? "Procesando"
+                              : "Bloqueado"
                             : t("common.edit")}
                         </button>
                       )}

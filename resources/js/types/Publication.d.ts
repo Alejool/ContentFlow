@@ -61,6 +61,11 @@ export type Publication = {
     name: string;
     photo_url: string;
   };
+  media_locked_by?: {
+    id: number;
+    name: string;
+    photo_url?: string;
+  } | null;
   approval_logs?: ApprovalLog[];
 };
 

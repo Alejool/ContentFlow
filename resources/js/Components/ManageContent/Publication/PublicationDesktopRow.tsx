@@ -425,11 +425,17 @@ const PublicationRow = memo(
                   <Loader2 className="w-4 h-4 animate-spin" />
                 ) : remoteLock ? (
                   <Lock className="w-3.5 h-3.5" />
+                ) : (item.status as string) === "processing" ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
                   <Edit className="w-4 h-4" />
                 )}
-                {remoteLock && (
-                  <span className="text-xs font-medium">Bloqueado</span>
+                {(remoteLock || (item.status as string) === "processing") && (
+                  <span className="text-xs font-medium">
+                    {(item.status as string) === "processing"
+                      ? "Procesando"
+                      : "Bloqueado"}
+                  </span>
                 )}
               </button>
             )}

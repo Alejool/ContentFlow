@@ -58,7 +58,7 @@ class ProcessBackgroundUpload implements ShouldQueue
       } else {
         // 2. Direct Upload Flow (Already on S3)
         // Check for S3 existence with retries
-        $path = $this->mediaFile->file_path;
+        $path = $this->mediaFile->getRawOriginal('file_path');
         $pathTrimmed = ltrim($path, '/');
 
         $found = false;
@@ -85,7 +85,7 @@ class ProcessBackgroundUpload implements ShouldQueue
         }
 
         // Normalize path in DB if needed
-        if ($this->mediaFile->file_path !== $path) {
+        if ($this->mediaFile->getRawOriginal('file_path') !== $path) {
           $this->mediaFile->update(['file_path' => $path]);
         }
       }
@@ -93,7 +93,7 @@ class ProcessBackgroundUpload implements ShouldQueue
       // Update status
       $this->mediaFile->update([
         'status' => 'completed',
-        'size' => Storage::disk('s3')->size($this->mediaFile->file_path)
+        'size' => Storage::disk('s3')->size($this->mediaFile->getRawOriginal('file_path'))
       ]);
 
       // Notify user
@@ -101,7 +101,7 @@ class ProcessBackgroundUpload implements ShouldQueue
 
       // Update publication image if this was the main image
       if ($this->mediaFile->file_type === 'image' && !$this->publication->image) {
-        $this->publication->update(['image' => \Illuminate\Support\Facades\Storage::url($this->mediaFile->file_path)]);
+        $this->publication->update(['image' => \Illuminate\Support\Facades\Storage::url($this->mediaFile->getRawOriginal('file_path'))]);
       }
 
       // Check if we can release the "processing" lock

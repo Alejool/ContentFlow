@@ -1,192 +1,149 @@
-# ContentFlow - Multimedia Content & Social Strategy Platform
+# ContentFlow — Social Strategy & Multimedia Hub
 
-![ContentFlow Banner](https://raw.githubusercontent.com/Alejool/ContentFlow/main/resources/assets/banner.png)
-
-**ContentFlow** es una plataforma avanzada de gestión de contenido multimedia diseñada para creadores, agencias y equipos de marketing. Permite centralizar la estrategia digital mediante el uso de Inteligencia Artificial y una integración profunda con las principales redes sociales.
+<div align="center">
+  <img src="resources/assets/logo-with-name.png" alt="ContentFlow Logo" width="400" />
+  <p><em>Centralize your digital presence with AI-powered strategy and multi-platform automation.</em></p>
+</div>
 
 ---
 
-El proyecto sigue una arquitectura de **Monolito Híbrido** avanzada:
-- **Inertia.js**: Para una experiencia de Single Page Application (SPA) fluida.
-- **RESTful API**: Una capa de API completa y estandarizada para integraciones externas y futura expansión móvil.
-- **Workspaces (Multi-tenancy)**: Gestión multinivel para equipos y agencias.
+## 🌟 Vision
+**ContentFlow** is an enterprise-grade multimedia content management platform designed for creators, marketing agencies, and modern teams. It bridges the gap between raw ideas and published excellence by centralizing social media strategy, AI-assisted creation, and multi-tenant collaboration into a single, cohesive interface.
 
+## 🚀 Core Functionalities
+
+### 📱 Unified Social Publishing
+Schedule and publish content across the world's leading platforms from a single dashboard:
+- **YouTube & TikTok**: Full support for long-form videos and vertical content (Shorts/Reels). Includes automated metadata management and thumbnail customization.
+- **Instagram & Facebook**: Direct integration for Posts, Reels, and Stories via the Meta Graph API.
+- **Twitter (X)**: Advanced thread builder, auto-splitting long content, and native poll support.
+
+### 🤖 Intelligent AI Engine
+ContentFlow integrates a multi-provider AI layer (DeepSeek, Gemini, OpenAI, Claude) to assist you in every step:
+- **Content Strategy**: Generate 30-day content plans tailored to your niche.
+- **Micro-Copywriting**: Automated generation of captions, hashtags, and engagement-focused titles.
+- **Media Optimization**: Context-aware suggestions for the best publishing times and platform-specific formatting.
+
+### 📅 Visual Strategy Calendar
+Manage your entire editorial timeline with an interactive drag-and-drop calendar. View scheduled posts, user events, and campaign milestones at a glance, ensuring a consistent brand voice across all channels.
+
+### 🏢 Agency-Ready Workspaces
+Built with scalability in mind, ContentFlow supports multi-tenancy:
+- **Isolated Environments**: Keep clients, projects, or brands completely separate with dedicated workspaces.
+- **Role-Based Access Control (RBAC)**: Fine-grained permissions (Owner, Admin, Editor, Viewer).
+- **Real-time Collaboration**: Live presence indicators and editing locks to prevent content overwrites.
+
+### 📊 Deep Analytics & Reporting
+Unified metrics tracking to understand your global impact:
+- Aggregated engagement data across all connected platforms.
+- Individual post performance tracking.
+- Campaign-level ROI analysis.
+
+---
+
+## 🏗️ Architecture & Technology Stack
+
+ContentFlow follows a **Hybrid Monolith** architecture, combining the robustness of a traditional backend with the fluidity of a modern SPA.
+
+### 🛠️ The Stack
+- **Backend**: [Laravel 11](https://laravel.com/) (PHP 8.2+) — Utilizing Service-Action patterns for decoupled logic.
+- **Frontend**: [React 18](https://reactjs.org/) with [TypeScript](https://www.typescriptlang.org/) and [Inertia.js](https://inertiajs.com/) for a seamless Single Page experience.
+- **UI/UX**: [TailwindCSS](https://tailwindcss.com/) with a custom "Modern Design System" and [Lucide React](https://lucide.dev/) icons.
+- **Real-time**: [Laravel Reverb](https://reverb.laravel.com/) for high-performance WebSocket communication.
+- **Data Persistence**: [MySQL 8.0](https://www.mysql.com/) & [Redis](https://redis.io/) for caching/queues.
+- **Cloud Infrastructure**: [AWS S3](https://aws.amazon.com/s3/) for multimedia storage and [Firebase](https://firebase.google.com/) for secondary services.
+
+### 🗺️ System Overview
 ```mermaid
 graph TD
-    User((Usuario)) <--> React[React + Tailwind Frontend]
-    React <--> Hybrid[Inertia.js & REST API]
-    Hybrid <--> Laravel[Laravel 11 Backend]
-    Laravel <--> MySQL[(MySQL 8.0)]
-    Laravel <--> Reverb[Laravel Reverb - Realtime]
-    Laravel <--> AI[AIService - DeepSeek/Gemini/OpenAI]
-    Laravel <--> Social[Social Services - FB/IG/X/TikTok/YT]
-    Social <--> APIs[Social Media APIs]
-    Laravel <--> Redis[(Redis Cache/Queue)]
-    Laravel <--> AWS[AWS S3/Firebase Storage]
+    User((User)) <--> React["React + TS Frontend"]
+    React <--> Inertia["Inertia.js (Bridge)"]
+    Inertia <--> Laravel["Laravel 11 Engine"]
+    
+    subgraph "Infrastructure Layer"
+        Laravel <--> MySQL[(MySQL Database)]
+        Laravel <--> Redis[(Redis Queue/Cache)]
+        Laravel <--> Reverb[Realtime Events]
+    end
+    
+    subgraph "External Integrations"
+        Laravel <--> AI_Hub["AI Hub (DeepSeek/Gemini/GPT)"]
+        Laravel <--> Social_Gate["Social Gateway (FB/IG/X/TT/YT)"]
+        Laravel <--> AWS_S3["AWS S3 Storage"]
+    end
 ```
-
-### Stack Tecnológico
-- **Backend**: Laravel 11 (PHP 8.2+) con sistema de servicios desacoplados.
-- **Frontend**: React 18 con Inertia.js para rutas y estado compartido.
-- **Real-time**: Laravel Reverb para notificaciones y estados en vivo.
-- **Estilos**: TailwindCSS con un sistema de diseño "Modern" personalizado.
-- **IA**: Implementación multi-proveedor (DeepSeek, Gemini Pro, GPT-4).
-- **Infraestructura**: Docker ready con soporte para S3 y Redis.
 
 ---
 
-## 📁 Estructura del Proyecto
+## 📁 Repository Structure
 
 ```text
 ContentFlow/
 ├── app/
-│   ├── Http/Controllers/    # Controladores de la aplicación e Inertia
-│   ├── Models/              # Modelos Eloquent (Users, Workspaces, Publications, etc.)
-│   ├── Services/            # Lógica de negocio (IA, SocialPlatforms, Analytics)
-│   ├── Traits/              # Utilidades compartidas (ApiResponse standardization)
-│   └── Notifications/       # Sistema de notificaciones internas
-├── config/                  # Configuraciones de Laravel y Servicios Social Media
-├── database/
-│   ├── migrations/          # Estructura de la base de datos
-│   └── seeders/              # Datos de prueba iniciales
-├── docker/                  # Archivos de configuración de contenedores
-├── resources/
-│   ├── js/
-│   │   ├── Components/      # Componentes React reutilizables (Modern UI)
-│   │   ├── Pages/           # Vistas principales del dashboard
-│   │   └── Layouts/         # Plantillas de la interfaz
-│   └── css/                 # Estilos globales y Tailwind
-├── routes/                  # Definición de rutas (web.php, api.php, auth.php)
-└── storage/                 # Archivos temporales, logs y media local
+│   ├── Actions/             # Unitary business logic (Create, Update, Publish)
+│   ├── Http/Controllers/    # Inertia & API controllers
+│   ├── Models/              # Eloquent models with RBAC & Multi-tenancy scopes
+│   ├── Services/            # Third-party integrations (Social, AI, Stats)
+│   └── Notifications/       # Multi-channel notification system
+├── resources/js/
+│   ├── Components/          # Atomic and compound UI components
+│   ├── Hooks/               # Custom React hooks for locks, uploads, and state
+│   └── Pages/               # Route-level views (React)
+├── routes/                  # Web (Inertia), API (Sanctum), and Channels (Reverb)
+└── tests/                   # Comprehensive Feature and Unit testing suite
 ```
 
 ---
 
-## ⚙️ Infraestructura y Servicios
+## 🛠️ Getting Started
 
-El proyecto está diseñado para ser desplegado en entornos escalables mediante contenedores y servicios distribuidos:
+### Prerequisites
+- PHP 8.2+ & Composer
+- Node.js 18+ & NPM
+- Docker (Recommended for local dev)
 
-### Servidores y Procesos
-*   **Web Server**: Nginx/Apache sirviendo la aplicación Laravel.
-*   **Websockets**: **Laravel Reverb** integrado para actualizaciones de estado en tiempo real sin dependencias externas pesadas.
-*   **Queue Workers**: Procesos en segundo plano para la publicación en redes sociales y consultas de IA (asíncronas).
-*   **Scheduler**: Tareas programadas para la sincronización de analíticas y publicaciones futuras.
-
-### Almacenamiento y Cache
-*   **Base de Datos**: MySQL 8.0 para persistencia de datos relacionales.
-*   **Cache & Queue**: Redis para una gestión rápida de colas de trabajo y almacenamiento temporal.
-*   **Storage**: Soporte para **AWS S3** o sistemas locales para la gestión de archivos multimedia (imágenes/videos).
-
-### Docker Environment
-Incluye una configuración completa de Docker Compose para levantar el entorno completo con un solo comando:
-```bash
-docker-compose up -d
-```
-Servicios definidos: `app` (PHP-FPM), `nginx`, `mysql`, `redis`, `reverb`.
-
----
-
-## ⚡ Características Principales
-
-### 📱 Integración Multi-Plataforma
-- **YouTube**: Soporte completo para Videos y **Shorts**, gestión de Playlists y subida de miniaturas.
-- **Twitter (X)**: Publicación de hilos automáticos, encuestas y optimización de caracteres.
-- **Facebook/Instagram**: Gestión de páginas, reels y publicaciones programadas via Meta Graph API.
-- **TikTok**: Integración para subida de contenido vertical y tendencias.
-
-### 🤖 Inteligencia Artificial (AI Engine)
-Un motor versátil que permite:
-- **Estrategia de Contenido**: Generación de planes mensuales basados en tu nicho.
-- **Optimización**: Sugerencia de hashtags, títulos y mejores horas de publicación.
-- **Background Removal**: Herramientas integradas para edición rápida de media.
-
-### 🏢 Workspaces & Multi-tenancy
-- Gestión de múltiples espacios de trabajo por usuario.
-- Sistema de roles (Owner, Member) y permisos granulares.
-- Aislamiento de contenido y analíticas por espacio.
-
-### 📊 Campañas y Estrategia
-- Organización de publicaciones por campañas temporales.
-- Dashboard unificado con métricas de engagement transversales.
-- Seguimiento de estados de publicación en tiempo real.
-
-### 🔌 API First Architecture
-- Respuestas estandarizadas vía `ApiResponse` trait.
-- Autenticación vía **Laravel Sanctum**.
-- Preparado para migración completa a frontend independiente.
+### Installation
+1. **Clone the repo**
+   ```bash
+   git clone https://github.com/Alejool/ContentFlow.git
+   cd ContentFlow
+   ```
+2. **Setup Dependencies**
+   ```bash
+   composer install
+   npm install
+   ```
+3. **Environment Setup**
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   php artisan migrate --seed
+   ```
+4. **Development Launch**
+   ```bash
+   # Run the dev server (Vite + Reverb + Queues)
+   npm run dev
+   ```
 
 ---
 
-## 🚀 Instalación y Configuración
+## 🤝 Support & Contribution
 
-### Requisitos Previos
-- PHP 8.2+
-- Node.js 18+
-- Composer
-- Docker (Opcional)
+We believe in the power of community! Here's how you can support the project:
 
-### Pasos de Configuración
-
-1. **Clonar y Dependencias**
-```bash
-git clone https://github.com/Alejool/ContentFlow.git
-cd ContentFlow
-composer install
-npm install
-```
-
-2. **Entorno**
-```bash
-cp .env.example .env
-php artisan key:generate
-```
-
-3. **Base de Datos y Real-time**
-```bash
-php artisan migrate --seed
-php artisan reverb:install
-```
-
-4. **Variables de Entorno Críticas**
-Asegúrate de configurar los siguientes bloques en tu `.env`:
-- `DEEPSEEK_API_KEY`, `GEMINI_API_KEY`, `OPENAI_API_KEY`
-- `FACEBOOK_CLIENT_ID`, `YOUTUBE_CLIENT_ID`, etc.
-- `REVERB_APP_ID`, `REVERB_APP_KEY`
-
-5. **Ejecución (Desarrollo)**
-```bash
-# Iniciar todos los servicios (Reverb, Queue, Vite, PHP)
-npm run dev
-```
+- **⭐ Star the Repository**: Show your support and help others find the project.
+- **🐛 Report Bugs**: Found an issue? Open a [GitHub Issue](https://github.com/Alejool/ContentFlow/issues).
+- **💡 Feature Requests**: Have a great idea? Let us know in the discussions.
+- **💻 Contribute Code**: Pull requests are always welcome! Please read our `CONTRIBUTING.md` (coming soon).
 
 ---
 
-## 📅 Roadmap del Proyecto
-
-### Fase 1: Cimientos (Completado)
-- [x] Arquitectura de base de datos y modelos relacionales.
-- [x] Sistema de autenticación OAuth2 modular.
-- [x] Motor de IA con soporte multi-modelo.
-
-### Fase 2: Social & Workspaces (Completado)
-- [x] Gestión de Workspaces y Team Management.
-- [x] Integración avanzada con YouTube (Shorts/Playlists).
-- [x] Sistema de hilos y encuestas para Twitter.
-- [x] Arquitectura API Híbrida (Inertia + JSON).
-
-### Fase 3: Analytics & Scale (En Progreso)
-- [ ] Procesamiento de video en segundo plano (Transcoding).
-- [ ] Dashboards interactivos con exportación de reportes.
-- [ ] Aplicación móvil (React Native) consumiendo la API.
-- [ ] Editor de imagen avanzado en el navegador.
+## 📄 License
+ContentFlow is open-sourced software licensed under the [MIT license](LICENSE).
 
 ---
 
-## 🛠️ Estructura y Mejora
-Para más detalles sobre la arquitectura interna y las áreas de mejora identificadas, consulta el archivo:
-👉 [STRUCTURE_IMPROVEMENTS.md](./STRUCTURE_IMPROVEMENTS.md)
+<div align="center">
+  Built with ❤️ by the ContentFlow Team.
+</div>
 
----
-
-## 📄 Licencia
-Este proyecto es software de código abierto bajo la licencia [MIT](LICENSE).

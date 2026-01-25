@@ -73,7 +73,7 @@ class Publication extends Model
     'rejection_reason',
   ];
 
-  protected $appends = ['platform_status_summary'];
+  protected $appends = ['platform_status_summary', 'media_locked_by'];
 
 
   protected $casts = [
@@ -301,6 +301,15 @@ class Publication extends Model
     }
 
     return $summary;
+  }
+
+  public function getMediaLockedByAttribute()
+  {
+    $lockUserId = cache()->get("publication:{$this->id}:media_lock");
+    if ($lockUserId) {
+      return User::find($lockUserId)?->only(['id', 'name', 'photo_url']);
+    }
+    return null;
   }
 
   public function activities(): HasMany

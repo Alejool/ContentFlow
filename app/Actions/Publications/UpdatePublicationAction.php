@@ -6,6 +6,7 @@ use App\Models\Publications\Publication;
 use App\Services\Media\MediaProcessingService;
 use App\Services\Scheduling\SchedulingService;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class UpdatePublicationAction
 {
@@ -16,7 +17,10 @@ class UpdatePublicationAction
 
   public function execute(Publication $publication, array $data, array $newFiles = []): Publication
   {
-    return DB::transaction(function () use ($publication, $data, $newFiles) {
+    $start = microtime(true);
+    \Log::info("⏱️ Starting UpdatePublicationAction for pub {$publication->id}");
+
+    return DB::transaction(function () use ($publication, $data, $newFiles, $start) {
       // Determine status based on scheduled_at and current state
       $currentStatus = $publication->status;
       $newStatus = $data['status'] ?? $currentStatus;
@@ -81,6 +85,7 @@ class UpdatePublicationAction
       }
 
       $publication->update($updateData);
+      \Log::info("⏱️ Pub basic update took: " . (microtime(true) - $start) . "s");
 
       // Handle Campaign
       if (isset($data['campaign_id'])) {
@@ -131,6 +136,7 @@ class UpdatePublicationAction
           'durations' => $data['durations_new'] ?? [],
           'thumbnails' => $data['thumbnails'] ?? [],
         ]);
+        \Log::info("⏱️ ProcessUploads took: " . (microtime(true) - $start) . "s");
       }
 
       // Handle Schedules - Always process if social_accounts key exists
@@ -148,11 +154,14 @@ class UpdatePublicationAction
         $publication->update(['status' => 'draft']);
       }
 
-      $publication->load(['mediaFiles.derivatives', 'scheduled_posts.socialAccount', 'socialPostLogs.socialAccount', 'campaigns']);
+      // REMOVED Redundant load - PublicationUpdated broadcast handles this with specific limits
+      // $publication->load(['mediaFiles.derivatives', 'scheduled_posts.socialAccount', 'socialPostLogs.socialAccount', 'campaigns']);
 
       // Broadcast update to other users in the workspace
       \App\Events\Publications\PublicationUpdated::dispatch($publication);
+      \Log::info("⏱️ Event dispatch took: " . (microtime(true) - $start) . "s");
 
+      \Log::info("✅ UpdatePublicationAction completed for pub {$publication->id} in " . (microtime(true) - $start) . "s");
       return $publication;
     });
   }
