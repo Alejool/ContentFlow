@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use App\Jobs\ProcessBackgroundUpload;
+use Illuminate\Support\Facades\DB;
 
 class MediaProcessingService
 {
@@ -79,31 +80,54 @@ class MediaProcessingService
     $isBackgroundCandidate = $fileType === 'video' || ($file instanceof UploadedFile && $isLargeFile);
 
     // Create MediaFile record first
-    $mediaFile = MediaFile::create([
-      'user_id' => Auth::id(),
-      'workspace_id' => Auth::user()->current_workspace_id,
-      'publication_id' => $publication->id,
-      'file_name' => $originalName,
-      'file_path' => $path, // Targeted S3 path
-      'file_type' => $fileType,
-      'youtube_type' => $fileType === 'video' ? ($metadata['youtube_type'] ?? null) : null,
-      'duration' => $fileType === 'video' ? ($metadata['duration'] ?? null) : null,
-      'mime_type' => $mimeType,
-      'size' => $fileSize,
-      'status' => $isBackgroundCandidate ? 'processing' : 'completed',
-    ]);
+    try {
+      \Log::info('Attempting to create MediaFile record', [
+        'original_name' => $originalName,
+        'path' => $path,
+        'type' => $fileType,
+        'metadata' => $metadata
+      ]);
+
+      $mediaFile = MediaFile::create([
+        'user_id' => Auth::id(),
+        'workspace_id' => Auth::user()->current_workspace_id,
+        'publication_id' => $publication->id,
+        'file_name' => $originalName,
+        'file_path' => $path, // Targeted S3 path
+        'file_type' => $fileType,
+        'youtube_type' => $fileType === 'video' ? ($metadata['youtube_type'] ?? null) : null,
+        'duration' => $fileType === 'video' ? ($metadata['duration'] ?? null) : null,
+        'mime_type' => $mimeType,
+        'size' => $fileSize,
+        'status' => $isBackgroundCandidate ? 'processing' : 'completed',
+      ]);
+
+      \Log::info('MediaFile created successfully', ['id' => $mediaFile->id]);
+    } catch (\Exception $e) {
+      \Log::error('Failed to create MediaFile record', ['error' => $e->getMessage()]);
+      throw $e;
+    }
 
     if ($isBackgroundCandidate) {
       if ($file instanceof UploadedFile) {
         // Store in local temp storage for background processing
-        $tempPath = 'temp/' . $filename;
-        Storage::disk('local')->put($tempPath, file_get_contents($file->getRealPath()));
+        // Store in local temp storage for background processing without loading fully into memory
+        // $tempPath = 'temp/' . $filename;
+        // Storage::disk('local')->put($tempPath, file_get_contents($file->getRealPath()));
+        // Use putFileAs to stream the file instead of loading into memory
+        $storedPath = Storage::disk('local')->putFileAs('temp', $file, $filename);
+        $tempPath = $storedPath; // Normalized path from Storage facade
 
-        // Dispatch Job
-        ProcessBackgroundUpload::dispatch($publication, $mediaFile, $tempPath, $metadata);
+        // Dispatch Job after transaction commits
+        DB::afterCommit(function () use ($publication, $mediaFile, $tempPath, $metadata) {
+          ProcessBackgroundUpload::dispatch($publication, $mediaFile, $tempPath, $metadata);
+        });
       } else {
         // It's already on S3 (Direct Upload)
-        ProcessBackgroundUpload::dispatch($publication, $mediaFile, null, $metadata);
+        // It's already on S3 (Direct Upload)
+        DB::afterCommit(function () use ($publication, $mediaFile, $metadata) {
+          ProcessBackgroundUpload::dispatch($publication, $mediaFile, null, $metadata);
+        });
       }
     } else {
       // Synchronous upload (Only for small files sent to backend)

@@ -41,11 +41,14 @@ interface PublicationRowProps {
     expires_at: string;
   } | null;
   permissions?: string[];
-  onPreviewMedia?: (media: {
-    url: string;
-    type: "image" | "video";
-    title?: string;
-  }) => void;
+  onPreviewMedia?: (
+    media: {
+      url: string;
+      type: "image" | "video";
+      title?: string;
+    }[],
+    initialIndex?: number,
+  ) => void;
 }
 
 const PublicationRow = memo(
@@ -96,32 +99,30 @@ const PublicationRow = memo(
                 const hasMedia =
                   item.media_files && item.media_files.length > 0;
                 if (hasMedia && onPreviewMedia) {
-                  const firstMedia = item.media_files?.[0];
-                  const isVideo = firstMedia?.file_type?.includes("video");
-                  const mediaUrl =
-                    firstMedia?.thumbnail?.file_path || firstMedia?.file_path;
-                  const path = firstMedia?.file_path;
-                  // Use path or mediaUrl logic.
-                  // If video, we want the video file. MediaUrl might be thumb.
-                  // We need the video source.
-                  // If path is available, use it.
-                  const url =
-                    isVideo && path
-                      ? path.startsWith("http")
-                        ? path
-                        : `/storage/${path}`
-                      : mediaUrl || path;
+                  const allMedia = (item.media_files || []).map(
+                    (media: any) => {
+                      const isV = media.file_type?.includes("video");
+                      let mUrl = media.thumbnail?.file_path || media.file_path;
 
-                  // Fallback if url is somehow empty but we have something
-                  const finalUrl = url || "";
+                      if (!mUrl && media.file_type === "image") {
+                        mUrl = media.file_path;
+                      }
 
-                  if (finalUrl) {
-                    onPreviewMedia({
-                      url: finalUrl,
-                      type: isVideo ? "video" : "image",
-                      title: item.title,
-                    });
-                  }
+                      return {
+                        url: isV
+                          ? media.file_path.startsWith("http")
+                            ? media.file_path
+                            : `/storage/${media.file_path}`
+                          : mUrl.startsWith("http")
+                            ? mUrl
+                            : `/storage/${mUrl}`,
+                        type: (isV ? "video" : "image") as "image" | "video",
+                        title: item.title,
+                      };
+                    },
+                  );
+
+                  onPreviewMedia(allMedia, 0);
                 }
               }}
             >

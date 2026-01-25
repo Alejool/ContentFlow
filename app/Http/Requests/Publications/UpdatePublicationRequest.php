@@ -79,6 +79,7 @@ class UpdatePublicationRequest extends FormRequest
         }
       ],
       'media_keep_ids' => 'nullable|array',
+      'removed_media_ids' => 'nullable|array',
       'thumbnails' => 'nullable|array',
       'thumbnails.*' => 'file|mimes:jpeg,png,jpg|max:5120',
       'removed_thumbnail_ids' => 'nullable|array',

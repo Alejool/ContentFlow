@@ -166,7 +166,12 @@ export const usePublications = () => {
 
   useEffect(() => {
     fetchData(1); // Always reset to page 1 when filters or perPage change
-  }, [activeTab, filters, itemsPerPage, props.auth.user?.current_workspace_id]); // Run when tab, filters, perPage or workspace change
+  }, [
+    activeTab,
+    filters,
+    itemsPerPage,
+    (props.auth.user as any)?.current_workspace_id,
+  ]); // Run when tab, filters, perPage or workspace change
 
   useEffect(() => {
     fetchAccounts();
@@ -208,15 +213,16 @@ export const usePublications = () => {
   );
 
   const handleFilterChange = useCallback((newFilters: any) => {
-    console.log('Filter change:', newFilters); // Debug log
     setFilters(newFilters);
   }, []);
 
-  const handleSingleFilterChange = useCallback((key: string, value: any) => {
-    console.log('Single filter change:', key, value); // Debug log
-    const newFilters = { ...filters, [key]: value };
-    setFilters(newFilters);
-  }, [filters]);
+  const handleSingleFilterChange = useCallback(
+    (key: string, value: any) => {
+      const newFilters = { ...filters, [key]: value };
+      setFilters(newFilters);
+    },
+    [filters],
+  );
 
   const handleRefresh = useCallback(async () => {
     await fetchData(pagination.current_page);

@@ -2,10 +2,12 @@ import { useS3Upload } from "@/Hooks/useS3Upload";
 import { PublicationFormData, publicationSchema } from "@/schemas/publication";
 import { useMediaStore } from "@/stores/mediaStore";
 import { usePublicationStore } from "@/stores/publicationStore";
+import { useUploadQueue } from "@/stores/uploadQueueStore";
 import { PageProps } from "@/types";
 import { Publication } from "@/types/Publication";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { usePage } from "@inertiajs/react";
+import { router, usePage } from "@inertiajs/react";
+import axios from "axios";
 import { startTransition, useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -273,6 +275,7 @@ export const usePublicationForm = ({
               thumbnailUrl: thumbnailUrl,
               type: isVideo ? "video" : "image",
               isNew: false,
+              status: media.status || "completed",
             };
           }) || [];
 
@@ -329,16 +332,32 @@ export const usePublicationForm = ({
 
     const newMediaItems = newFiles.map((file) => ({
       tempId: Math.random().toString(36).substring(7),
-      url: URL.createObjectURL(file),
+      url: URL.createObjectURL(file), // Still keep for images if possible, but we'll show placeholder if uploading
       type: file.type.startsWith("image/") ? "image" : "video",
       isNew: true,
       file,
+      status: "uploading" as const,
     }));
 
     addFiles(newMediaItems);
     setImageError(null);
 
+    // Get upload queue functions
+    const { linkUploadToPublication } = useUploadQueue.getState();
+
     for (const item of newMediaItems) {
+      // Auto-start upload immediately
+      if (item.file) {
+        uploadFile(item.file, item.tempId).catch((err) =>
+          console.error("Auto-upload failed", err),
+        );
+        // CRITICAL FIX: If editing an existing publication, link immediately
+        // so attachMedia gets called when upload completes
+        if (publication?.id) {
+          linkUploadToPublication(item.tempId, publication.id);
+        }
+      }
+
       if (item.type === "video" && item.file) {
         try {
           const duration = await getVideoDuration(item.file);
@@ -510,96 +529,35 @@ export const usePublicationForm = ({
       // CRITICAL: Read mediaFiles FRESH from store (not from stale selector)
       // This ensures we get the updated metadata after S3 upload
       const currentMediaFiles = useMediaStore.getState().mediaFiles;
-      console.log(
-        "📦 [FORM] Reading fresh mediaFiles from store:",
-        currentMediaFiles.length,
-      );
 
-      // SAFETY CHECK: Ensure all large files are uploaded to S3 before submitting form
-      // This prevents 413 Payload Too Large error on the server
-      for (const media of currentMediaFiles) {
-        if (media.isNew && media.file instanceof File) {
-          const file = media.file;
-          // Check if it's "large" (e.g. > 10MB to be safe, PHP default is often 20MB)
-          if (file.size > 10 * 1024 * 1024) {
-            // It's a large file that hasn't been replaced by metadata yet.
-            // We MUST upload it now or fail.
-            toast.loading(
-              t("publications.modal.media.uploadingPending") ||
-                `Uploading pending file: ${file.name}...`,
-              { id: "upload-pending" },
-            );
+      // 1. Filter out files that are still uploading (File objects)
+      // We will link them later via background process
+      const readyMediaFiles = (currentMediaFiles || []).filter((media) => {
+        // Keep key-based (uploaded) files or existing IDs
+        const isUploaded =
+          typeof media.file === "object" && "key" in media.file;
+        const isExisting = !media.isNew && media.id;
+        return isUploaded || isExisting;
+      });
 
-            try {
-              // Reuse the exposed uploadFile function (requires passing file)
-              // Since we are inside the hook, we can call uploadFile directly if we have access to it?
-              // No, uploadFile is from useS3Upload. We need to access it.
-              // We have 'uploadFile' from the hook scope above.
-              const s3Meta = await uploadFile(file);
-
-              // Update the temp object in our loop so the FormData builder below uses the metadata
-              // Note: This doesn't update the store, but updates our local reference for this submission
-              (media.file as any) = s3Meta;
-
-              // Also update store to be consistent
-              useMediaStore
-                .getState()
-                .updateFile(media.tempId, { file: s3Meta as any });
-
-              toast.success("Upload complete", { id: "upload-pending" });
-            } catch (e) {
-              console.error("Critical upload failure in submit", e);
-              toast.error(
-                t("publications.modal.media.uploadError") ||
-                  "Failed to upload file. Please try again.",
-                { id: "upload-pending" },
-              );
-              setIsSubmitting(false);
-              return; // ABORT SUBMISSION
-            }
-          }
-        }
-      }
-
-      // Re-read strictly for formData loop (although we modified references above)
-      // Actually the loop below uses 'currentMediaFiles' which holds references we just mutated if we did (media.file = ...)
-      // But purely safe way is to proceed.
-
-      currentMediaFiles.forEach((media, index) => {
+      readyMediaFiles.forEach((media, index) => {
         const hasNewThumbnail = thumbnails[media.tempId];
 
         if (media.isNew && media.file) {
-          // Re-check metadata existence (it might have been just uploaded above)
-          const isS3Metadata =
-            typeof media.file === "object" &&
-            "key" in media.file &&
-            !media.file.constructor.name.includes("File");
-
-          if (isS3Metadata) {
-            // It's S3 metadata, send it as-is
-            formData.append(`media[${index}][key]`, (media.file as any).key);
-            formData.append(
-              `media[${index}][filename]`,
-              (media.file as any).filename,
-            );
-            formData.append(
-              `media[${index}][mime_type]`,
-              (media.file as any).mime_type,
-            );
-            formData.append(
-              `media[${index}][size]`,
-              (media.file as any).size.toString(),
-            );
-          } else {
-            // It's a File object.
-            // Double check size to prevent 413 if something slipped through
-            if ((media.file as File).size > 50 * 1024 * 1024) {
-              toast.error("File too large to send directly. Upload failed.");
-              throw new Error("File too large for direct payload");
-            }
-            // Send normally (small files)
-            formData.append(`media[${index}]`, media.file);
-          }
+          // It's S3 metadata, send it as-is
+          formData.append(`media[${index}][key]`, (media.file as any).key);
+          formData.append(
+            `media[${index}][filename]`,
+            (media.file as any).filename,
+          );
+          formData.append(
+            `media[${index}][mime_type]`,
+            (media.file as any).mime_type,
+          );
+          formData.append(
+            `media[${index}][size]`,
+            (media.file as any).size.toString(),
+          );
 
           if (videoMetadata[media.tempId]) {
             formData.append(
@@ -650,7 +608,7 @@ export const usePublicationForm = ({
         formData.append("platform_settings", JSON.stringify(platformSettings));
       }
 
-      let result;
+      let result: any;
       if (publication) {
         result = await updatePublicationStore(publication.id, formData);
       } else {
@@ -663,9 +621,87 @@ export const usePublicationForm = ({
             ? t("publications.messages.updateSuccess")
             : t("publications.messages.createSuccess"),
         );
-        onSubmitSuccess?.(true);
-        handleClose();
       }
+
+      // 2. LINK PENDING UPLOADS (Moving this to background, non-awaited for UI snappiness)
+      // Identify files that were filtered out (File objects)
+      const pendingFiles = (currentMediaFiles || []).filter(
+        (media) => media.isNew && media.file instanceof File,
+      );
+
+      const handleBackgroundLinking = async (pubId: number) => {
+        // 2.a Lock Media for others
+        try {
+          await axios.post(route("publications.lock-media", pubId));
+        } catch (err) {
+          console.error("Failed to lock media", err);
+        }
+
+        // 2.b Link in Store and handle already completed
+        const uploadQueueState = useUploadQueue.getState();
+        const linkUploadToPublication =
+          uploadQueueState.linkUploadToPublication;
+        const removeUpload = uploadQueueState.removeUpload;
+        const queueObj = uploadQueueState.queue;
+
+        let attachedImmediately = false;
+
+        for (const media of pendingFiles) {
+          const queueItem = queueObj[media.tempId];
+
+          // If already finished uploading before we saved, we must attach manually NOW
+          if (
+            queueItem &&
+            queueItem.status === "completed" &&
+            !queueItem.publicationId
+          ) {
+            try {
+              const { data: attachResult } = await axios.post(
+                route("publications.attach-media", pubId),
+                {
+                  key: queueItem.s3Key,
+                  filename: queueItem.file.name,
+                  mime_type: queueItem.file.type,
+                  size: queueItem.file.size,
+                },
+              );
+
+              // Also sync DB ID to mediaStore here
+              if (attachResult.media_file?.id) {
+                useMediaStore.getState().updateFile(media.tempId, {
+                  id: attachResult.media_file.id,
+                  isNew: false,
+                });
+              }
+
+              removeUpload(media.tempId);
+              attachedImmediately = true;
+            } catch (e) {
+              console.error("Failed to attach completed media", e);
+            }
+          } else {
+            // Otherwise, link it so useS3Upload attaches it when done
+            linkUploadToPublication(media.tempId, pubId);
+          }
+        }
+
+        if (attachedImmediately) {
+          router.reload({ only: ["publications", "publication"] });
+        }
+      };
+
+      if (pendingFiles.length > 0 && (result as any).publication?.id) {
+        handleBackgroundLinking((result as any).publication.id);
+        toast.success(
+          t("publications.modal.media.backgroundUpload") ||
+            "Saved! Media is uploading in background.",
+        );
+      }
+
+      // CLOSE IMMEDIATELY - Don't wait for background linking or status checks
+      setIsSubmitting(false);
+      handleClose();
+      if (onSubmitSuccess) onSubmitSuccess(true);
     } catch (error: any) {
       console.error(
         "Submission error details:",
@@ -744,5 +780,9 @@ export const usePublicationForm = ({
     uploadProgress,
     uploadStats: isS3Uploading ? uploadStats : {},
     uploadErrors,
+    isAnyMediaProcessing:
+      mediaFiles.some(
+        (m) => m.status === "uploading" || m.status === "processing",
+      ) || isS3Uploading,
   };
 };

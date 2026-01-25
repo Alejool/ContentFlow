@@ -207,6 +207,16 @@ class PublicationController extends Controller
       'activities' => fn($q) => $q->orderBy('created_at', 'desc')->with('user:id,name,photo_url')
     ]);
 
+    // Check for media lock
+    $mediaLockUserId = cache()->get("publication:{$publication->id}:media_lock");
+    $mediaLockedBy = null;
+    if ($mediaLockUserId) {
+      $mediaLockedBy = User::find($mediaLockUserId)?->only(['id', 'name', 'photo_url']);
+    }
+
+    // Append to publication object (dynamically)
+    $publication->media_locked_by = $mediaLockedBy;
+
     return $request->wantsJson()
       ? $this->successResponse(['publication' => $publication])
       : redirect()->route('manage-content.index', ['tab' => 'publications', 'id' => $publication->id]);
@@ -598,6 +608,97 @@ class PublicationController extends Controller
   /**
    * Clear publication caches for a workspace
    */
+  /**
+   * Lock media upload for a publication to prevent concurrent uploads
+   */
+  public function lockMedia(Request $request, Publication $publication)
+  {
+    if (!Auth::user()->hasPermission('manage-content', $publication->workspace_id)) {
+      return $this->errorResponse('Unauthorized', 403);
+    }
+
+    // Lock for 2 hours (enough for large uploads)
+    $lockKey = "publication:{$publication->id}:media_lock";
+    cache()->put($lockKey, Auth::id(), now()->addHours(2));
+
+    // Force update of modified_at to trigger UI refresh for others if using polling/sockets
+    $publication->touch();
+    broadcast(new PublicationUpdated($publication))->toOthers();
+
+    return $this->successResponse([], 'Media locked successfully');
+  }
+
+  /**
+   * Attach uploaded media to a publication
+   */
+  public function attachMedia(Request $request, Publication $publication)
+  {
+    if (!Auth::user()->hasPermission('manage-content', $publication->workspace_id)) {
+      return $this->errorResponse('You do not have permission to modify this publication.', 403);
+    }
+
+    $request->validate([
+      'key' => 'required|string',
+      'filename' => 'required|string',
+      'mime_type' => 'required|string',
+      'size' => 'required|integer',
+    ]);
+
+    try {
+      \Log::info("📤 attachMedia called", [
+        'publication_id' => $publication->id,
+        'key' => $request->key,
+        'filename' => $request->filename,
+        'mime_type' => $request->mime_type,
+        'size' => $request->size
+      ]);
+
+      // Calculate next order
+      // Using generic DB query to avoid loading all models if possible, or use relationship
+      $maxOrder = $publication->mediaFiles()->max('order') ?? -1;
+      $nextOrder = $maxOrder + 1;
+
+      \Log::info("📊 Calculated order", ['max_order' => $maxOrder, 'next_order' => $nextOrder]);
+
+      // Create MediaFile record explicitly
+      $mediaFile = \App\Models\MediaFile::create([
+        'workspace_id' => $publication->workspace_id,
+        'publication_id' => $publication->id, // Redundant if pivot used, but good for direct belonging
+        'file_path' => $request->key,
+        'file_name' => $request->filename,
+        'file_type' => str_starts_with($request->mime_type, 'video') ? 'video' : 'image',
+        'mime_type' => $request->mime_type,
+        'size' => $request->size,
+        'status' => 'processing',
+        'user_id' => Auth::id(), // Ensure user ownership
+      ]);
+
+      \Log::info('✅ MediaFile created', ['id' => $mediaFile->id, 'status' => $mediaFile->status]);
+
+      // Explicitly attach with pivot data
+      $publication->mediaFiles()->attach($mediaFile->id, ['order' => $nextOrder]);
+
+      \Log::info('🔗 Media attached to publication', ['media_id' => $mediaFile->id, 'publication_id' => $publication->id, 'order' => $nextOrder]);
+
+      // Dispatch job to verify S3 file and generate thumbnails if needed
+      // Passing null as tempPath indicates it's already on S3 (Direct Upload)
+      \App\Jobs\ProcessBackgroundUpload::dispatch($publication, $mediaFile, null);
+
+      \Log::info('🚀 ProcessBackgroundUpload job dispatched', ['media_file_id' => $mediaFile->id]);
+
+      // Clear media lock
+      cache()->forget("publication:{$publication->id}:media_lock");
+
+      // Clear cache
+      $this->clearPublicationCache($publication->workspace_id);
+
+      return $this->successResponse(['media_file' => $mediaFile], 'Media attached successfully');
+    } catch (\Exception $e) {
+      \Log::error('❌ Failed to attach media', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+      return $this->errorResponse('Failed to attach media: ' . $e->getMessage(), 500);
+    }
+  }
+
   private function clearPublicationCache($workspaceId)
   {
     if (!$workspaceId)

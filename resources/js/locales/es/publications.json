@@ -6,6 +6,14 @@
       "media": {
         "uploadingPending": "Subiendo Pendiente"
       },
+      "upload": {
+        "uploadingFiles": "Subiendo {{count}} archivo(s)...",
+        "uploadFailed": "Error al subir",
+        "uploadsCompleted": "Cargas Completadas",
+        "done": "Listo",
+        "pending": "Pendiente",
+        "left": "restante"
+      },
       "show": {
         "title": "Vista Detallada",
         "subtitle": "Ver la publicación",

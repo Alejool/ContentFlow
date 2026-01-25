@@ -32,6 +32,33 @@ class UpdatePublicationAction
         $newStatus = 'draft';
       }
 
+      // If currently processing, we MUST preserve that status unless this action is specifically finishing the job.
+      // And we must block NEW media uploads if it is processing.
+      if ($currentStatus === 'processing') {
+        $newStatus = 'processing'; // Force keep processing
+
+        if (!empty($newFiles)) {
+          throw new \Exception('Cannot upload new media while publication is processing. Please wait.');
+        }
+      }
+
+      // Check for video uploads to set processing status (only if not already processing)
+      if ($currentStatus !== 'processing') {
+        foreach ($newFiles as $file) {
+          $isVideo = false;
+          if ($file instanceof \Illuminate\Http\UploadedFile) {
+            $isVideo = str_starts_with($file->getMimeType(), 'video/');
+          } elseif (is_array($file)) {
+            $isVideo = str_starts_with($file['mime_type'] ?? '', 'video/');
+          }
+
+          if ($isVideo) {
+            $newStatus = 'processing';
+            break;
+          }
+        }
+      }
+
       $updateData = [
         'title' => $data['title'],
         'description' => $data['description'],
@@ -65,10 +92,18 @@ class UpdatePublicationAction
       }
 
       // Handle Media Deletions
-      $mediaKeepIds = $data['media_keep_ids'] ?? [];
-      $publication->mediaFiles()->whereNotIn('media_files.id', $mediaKeepIds)->get()->each(function ($mediaFile) {
-        $this->mediaService->deleteMediaFile($mediaFile);
-      });
+      // Handle Media Deletions (Explicitly)
+      if (!empty($data['removed_media_ids'])) {
+        \Log::info("🗑️ Removing media files from publication {$publication->id}", ['ids' => $data['removed_media_ids']]);
+        $publication->mediaFiles()->whereIn('media_files.id', $data['removed_media_ids'])->get()->each(function ($mediaFile) {
+          $this->mediaService->deleteMediaFile($mediaFile);
+        });
+      }
+
+      // Legacy support: If media_keep_ids IS provided but removed_media_ids is NOT, fallback to old logic?
+      // No, let's stick to explicit removal to solve the race condition.
+      // But we must ensure the frontend ALWAYS sends removed_media_ids if it wants to remove something.
+      // The current frontend does send it.
 
       // Handle Thumbnail Deletions
       if (!empty($data['removed_thumbnail_ids'])) {

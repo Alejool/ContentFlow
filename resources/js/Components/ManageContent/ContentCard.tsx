@@ -8,6 +8,7 @@ import {
   Eye,
   FileText,
   Image as ImageIcon,
+  Loader2,
   Lock,
   Rocket,
   Trash2,
@@ -31,11 +32,14 @@ interface ContentCardProps {
     user_name: string;
     expires_at: string;
   } | null;
-  onPreviewMedia?: (media: {
-    url: string;
-    type: "image" | "video";
-    title?: string;
-  }) => void;
+  onPreviewMedia?: (
+    media: {
+      url: string;
+      type: "image" | "video";
+      title?: string;
+    }[],
+    initialIndex?: number,
+  ) => void;
 }
 
 export default function ContentCard({
@@ -155,36 +159,29 @@ export default function ContentCard({
 
   const handleMediaClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (
-      onPreviewMedia &&
-      firstMedia &&
-      !isProcessing &&
-      (mediaUrl || firstMedia.file_path)
-    ) {
-      // For video, if we have thumbnail (mediaUrl), use the actual video path for preview
-      const urlToPreview = isVideo
-        ? firstMedia.file_path
-        : mediaUrl || firstMedia.file_path;
-      // Ensure url is complete if needed (already handled by Storage::url in backend mostly)
-      // But here we rely on what's passed.
-      // If it's video, we might need the full URL.
-      // Assuming file_path is the key or url. If it's just key, frontend might need to know base URL.
-      // Backend now returns Storage::url for image. For video file_path is likely just the path if not processed?
-      // Actually, MediaProcessingService sets file_path.
-      // Let's assume we pass the file_path but maybe we should use a helper or trust it's a URL if coming from backend correctly.
-      // S3 Direct upload returns key. ProcessBackgroundUpload might rely on a helper to format it for frontend if needed.
-      // For now, let's pass it. If it's relative, MediaLightbox might fail unless base path is added.
-      // Let's assume it works or we fix it if broken.
+    if (onPreviewMedia && hasMedia && !isProcessing) {
+      const allMedia = item.media_files.map((media: any) => {
+        const isV = media.file_type?.includes("video");
+        let mUrl = media.thumbnail?.file_path || media.file_path;
 
-      onPreviewMedia({
-        url: isVideo
-          ? firstMedia.file_path.startsWith("http")
-            ? firstMedia.file_path
-            : `/storage/${firstMedia.file_path}`
-          : mediaUrl,
-        type: isVideo ? "video" : "image",
-        title: item.title,
+        if (!mUrl && media.file_type === "image") {
+          mUrl = media.file_path;
+        }
+
+        return {
+          url: isV
+            ? media.file_path.startsWith("http")
+              ? media.file_path
+              : `/storage/${media.file_path}`
+            : mUrl.startsWith("http")
+              ? mUrl
+              : `/storage/${mUrl}`,
+          type: (isV ? "video" : "image") as "image" | "video",
+          title: item.title,
+        };
       });
+
+      onPreviewMedia(allMedia, 0);
     }
   };
 
@@ -344,6 +341,14 @@ export default function ContentCard({
             item.accounts &&
             item.accounts.length > 0 && (
               <div className="flex items-center justify-between">
+                <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                  <span className="text-white text-xs font-medium px-2 py-1 bg-black/50 rounded-full flex gap-1 items-center">
+                    <Loader2 className="w-3 h-3 animate-spin" />{" "}
+                    {t("publications.gallery.processing", {
+                      defaultValue: "Generating Preview...",
+                    })}
+                  </span>
+                </div>
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-gray-500 dark:text-gray-400">
                     Plataformas:

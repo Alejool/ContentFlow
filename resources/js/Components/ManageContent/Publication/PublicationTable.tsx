@@ -27,11 +27,14 @@ interface PublicationTableProps {
     number,
     { user_id: number; user_name: string; expires_at: string }
   >;
-  onPreviewMedia?: (media: {
-    url: string;
-    type: "image" | "video";
-    title?: string;
-  }) => void;
+  onPreviewMedia?: (
+    media: {
+      url: string;
+      type: "image" | "video";
+      title?: string;
+    }[],
+    initialIndex?: number,
+  ) => void;
 }
 
 const PublicationTable = memo(

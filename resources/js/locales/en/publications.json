@@ -6,6 +6,14 @@
       "media": {
         "uploadingPending": "Uploading Pending"
       },
+      "upload": {
+        "uploadingFiles": "Uploading {{count}} file(s)...",
+        "uploadFailed": "Upload Failed",
+        "uploadsCompleted": "Uploads Completed",
+        "done": "Done",
+        "pending": "Pending",
+        "left": "left"
+      },
       "show": {
         "title": "Detailed View",
         "subtitle": "View the campaign details",

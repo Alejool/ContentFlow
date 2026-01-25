@@ -248,6 +248,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('{publication}/request-review', [PublicationController::class, 'requestReview'])->name('request-review');
     Route::post('{publication}/approve', [PublicationController::class, 'approve'])->name('approve');
     Route::post('{publication}/reject', [PublicationController::class, 'reject'])->name('reject');
+    Route::post('{publication}/attach-media', [PublicationController::class, 'attachMedia'])->name('attach-media');
+    Route::post('{publication}/lock-media', [PublicationController::class, 'lockMedia'])->name('lock-media');
     Route::get('{publication}/published-platforms', [PublicationController::class, 'getPublishedPlatforms'])->name('published-platforms');
     Route::get('stats/all', [PublicationController::class, 'stats'])->name('stats');
   });

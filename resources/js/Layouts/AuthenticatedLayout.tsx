@@ -1,4 +1,5 @@
 import CommandPalette from "@/Components/CommandPalette/CommandPalette";
+import GlobalUploadIndicator from "@/Components/GlobalUploadIndicator";
 import ActiveWorkspace from "@/Components/Layout/ActiveWorkspace";
 import MobileNavbar from "@/Components/Layout/MobileNavbar";
 import NotificationButton from "@/Components/Layout/NotificationButton";
@@ -11,6 +12,7 @@ import { initNotificationRealtime } from "@/Services/notificationRealtime";
 import { useNotificationStore } from "@/stores/notificationStore";
 import { usePage } from "@inertiajs/react";
 import { ReactNode, useEffect, useState } from "react";
+import { Toaster } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
 interface AuthenticatedLayoutProps {
@@ -127,6 +129,8 @@ export default function AuthenticatedLayout({
         {/* <GlobalAiAssistant /> */}
         <CommandPalette />
       </div>
+      <Toaster position="top-right" />
+      <GlobalUploadIndicator />
     </div>
   );
 }

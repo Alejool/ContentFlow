@@ -108,6 +108,7 @@ const EditPublicationModal = ({
     uploadStats,
     uploadErrors,
     isS3Uploading: uploading,
+    isAnyMediaProcessing,
   } = usePublicationForm({
     publication,
     onClose,
@@ -389,6 +390,7 @@ const EditPublicationModal = ({
                       handleFileChange(e.dataTransfer.files);
                     }}
                     disabled={hasPublishedPlatform || isDisabled}
+                    isAnyMediaProcessing={isAnyMediaProcessing}
                     uploadProgress={uploadProgress}
                     uploadStats={uploadStats}
                     uploadErrors={uploadErrors}
@@ -524,11 +526,13 @@ const EditPublicationModal = ({
         </div>
         <ModalFooter
           onClose={handleClose}
-          isSubmitting={isSubmitting || isDisabled || uploading}
+          isSubmitting={isSubmitting || isDisabled}
           formId="edit-publication-form"
           submitText={
             uploading
-              ? "Uploading..."
+              ? t("publications.modal.button.saveBackground", {
+                  defaultValue: "Save & Background Upload",
+                })
               : t("publications.button.edit") || "Edit Publication"
           }
           submitIcon={<Save className="w-4 h-4" />}

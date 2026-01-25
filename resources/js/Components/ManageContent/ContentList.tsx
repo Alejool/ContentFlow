@@ -40,39 +40,29 @@ interface ContentListProps {
 }
 
 export default function ContentList(props: ContentListProps) {
-  const [viewMode, setViewMode] = useState<"grid" | "list">("list");
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [isPending, startTransition] = useTransition();
   const { t } = useTranslation();
   const { remoteLocks } = useLockStore();
 
-  console.log("📋 ContentList remoteLocks:", remoteLocks);
-
   const { items, isLoading, mode, title, onRefresh } = props;
   const [smoothLoading, setSmoothLoading] = useState(true);
-  const [lightboxMedia, setLightboxMedia] = useState<{
-    url: string;
-    type: "image" | "video";
-    title?: string;
-  } | null>(null);
+  const [lightboxMedia, setLightboxMedia] = useState<
+    | {
+        url: string;
+        type: "image" | "video";
+        title?: string;
+      }[]
+    | null
+  >(null);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
 
-  const handlePreviewMedia = (item: any) => {
-    const hasMedia = item.media_files && item.media_files.length > 0;
-    const firstMedia = hasMedia ? item.media_files[0] : null;
-
-    if (firstMedia) {
-      // Use file_path (S3 key) and wrap with Storage URL logic if needed,
-      // but typically the backend should return full URL or we use the helper logic.
-      // In ContentCard we used logic to determine mediaUrl.
-      // Ideally, the item passed here should have the resolved URL.
-      // Let's assume we can reconstruct it or pass it.
-      // Actually, let's pass the ready-to-use URL from ContentCard if possible,
-      // or reconstruct it here.
-      // Simpler: ContentCard will pass the url and type.
-      // Update: ContentList prop needs to change?
-      // No, we can define handlePreviewMedia to accept { url, type, title }
-      // But the prop in ContentCard is designed to pass just the item usually.
-      // Let's make ContentCard pass the media object.
-    }
+  const handlePreviewMedia = (
+    media: { url: string; type: "image" | "video"; title?: string }[],
+    index = 0,
+  ) => {
+    setLightboxMedia(media);
+    setLightboxIndex(index);
   };
 
   useEffect(() => {
@@ -207,7 +197,7 @@ export default function ContentList(props: ContentListProps) {
                 onPublish={props.onPublish}
                 permissions={props.permissions}
                 remoteLock={remoteLocks[item.id]}
-                onPreviewMedia={(media) => setLightboxMedia(media)}
+                onPreviewMedia={handlePreviewMedia}
               />
             ))}
           </div>
@@ -244,7 +234,18 @@ export default function ContentList(props: ContentListProps) {
               onViewDetails={props.onViewDetails}
               onPerPageChange={props.onPerPageChange}
               remoteLocks={remoteLocks}
-              onPreviewMedia={handlePreviewMedia}
+              onPreviewMedia={(item: any) => {
+                const allM = (item.media_files || []).map((m: any) => ({
+                  url: m.file_path.startsWith("http")
+                    ? m.file_path
+                    : `/storage/${m.file_path}`,
+                  type: (m.file_type?.includes("video") ? "video" : "image") as
+                    | "image"
+                    | "video",
+                  title: item.title,
+                }));
+                handlePreviewMedia(allM, 0);
+              }}
             />
           )}
         </div>
@@ -266,6 +267,7 @@ export default function ContentList(props: ContentListProps) {
         isOpen={!!lightboxMedia}
         onClose={() => setLightboxMedia(null)}
         media={lightboxMedia}
+        initialIndex={lightboxIndex}
       />
     </div>
   );

@@ -36,11 +36,14 @@ interface PublicationMobileRowProps {
     { user_id: number; user_name: string; expires_at: string }
   >;
   permissions?: string[];
-  onPreviewMedia?: (media: {
-    url: string;
-    type: "image" | "video";
-    title?: string;
-  }) => void;
+  onPreviewMedia?: (
+    media: {
+      url: string;
+      type: "image" | "video";
+      title?: string;
+    }[],
+    initialIndex?: number,
+  ) => void;
 }
 
 const PublicationMobileRow = memo(
@@ -186,22 +189,34 @@ const PublicationMobileRow = memo(
                   onClick={(e) => {
                     e.stopPropagation();
                     // Trigger preview
-                    if (hasMedia(item) && mediaUrl && onPreviewMedia) {
-                      const firstMedia = item.media_files?.[0];
-                      const isVideo = firstMedia?.file_type?.includes("video");
-                      // Logic similar to ContentCard
-                      const path = firstMedia?.file_path;
-                      const url = path
-                        ? path.startsWith("http")
-                          ? path
-                          : `/storage/${path}`
-                        : mediaUrl;
+                    if (hasMedia(item) && onPreviewMedia) {
+                      const allMedia = (item.media_files || []).map(
+                        (media: any) => {
+                          const isV = media.file_type?.includes("video");
+                          let mUrl =
+                            media.thumbnail?.file_path || media.file_path;
 
-                      onPreviewMedia({
-                        url: url,
-                        type: isVideo ? "video" : "image",
-                        title: item.title,
-                      });
+                          if (!mUrl && media.file_type === "image") {
+                            mUrl = media.file_path;
+                          }
+
+                          return {
+                            url: isV
+                              ? media.file_path.startsWith("http")
+                                ? media.file_path
+                                : `/storage/${media.file_path}`
+                              : mUrl.startsWith("http")
+                                ? mUrl
+                                : `/storage/${mUrl}`,
+                            type: (isV ? "video" : "image") as
+                              | "image"
+                              | "video",
+                            title: item.title,
+                          };
+                        },
+                      );
+
+                      onPreviewMedia(allMedia, 0);
                     } else {
                       // If no media or preview handler, specific fallback logic or just toggle row?
                       // Let's toggle row if not previewable

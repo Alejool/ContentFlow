@@ -1,5 +1,5 @@
 import Label from "@/Components/common/Modern/Label";
-import { AlertTriangle, FileImage, Upload, X } from "lucide-react";
+import { AlertTriangle, FileImage, Upload, Video, X } from "lucide-react";
 import React, { memo, useRef } from "react";
 
 interface MediaUploadSectionProps {
@@ -24,6 +24,7 @@ interface MediaUploadSectionProps {
   onDragLeave: (e: React.DragEvent<HTMLDivElement>) => void;
   onDrop: (e: React.DragEvent<HTMLDivElement>) => void;
   disabled?: boolean;
+  isAnyMediaProcessing?: boolean;
   uploadProgress?: Record<string, number>;
   uploadStats?: Record<string, { eta?: number; speed?: number }>;
   uploadErrors?: Record<string, string>;
@@ -44,6 +45,7 @@ const MediaUploadSection = memo(
     onDragLeave,
     onDrop,
     disabled,
+    isAnyMediaProcessing,
     uploadProgress,
     uploadStats,
     uploadErrors,
@@ -51,7 +53,7 @@ const MediaUploadSection = memo(
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const getUploadAreaStyles = () => {
-      if (disabled) {
+      if (disabled || isAnyMediaProcessing) {
         return "bg-gray-100 dark:bg-neutral-800/50 cursor-not-allowed opacity-60 border-gray-300 dark:border-neutral-700";
       }
       if (imageError) {
@@ -184,14 +186,36 @@ const MediaPreviewItem = memo(
       return `${mins}m ${secs}s`;
     };
 
+    const isProcessing =
+      preview.status === "processing" ||
+      (progress !== undefined &&
+        progress >= 100 &&
+        preview.status !== "completed");
+    const isUploading =
+      preview.status === "uploading" ||
+      (progress !== undefined && progress < 100);
+
     return (
       <div
         className={`relative group/item aspect-video border rounded-lg overflow-hidden bg-gray-900 ${
           disabled ? "opacity-90" : ""
-        } ${error ? "border-red-500 ring-2 ring-red-500/20" : ""}`}
+        } ${error ? "border-red-500 ring-2 ring-red-500/20" : ""} ${isProcessing || isUploading ? "animate-pulse" : ""}`}
         onClick={(e) => e.stopPropagation()}
       >
-        {preview.type.includes("video") ? (
+        {isProcessing || isUploading ? (
+          <div className="w-full h-full flex flex-col items-center justify-center bg-gray-800 text-white p-4">
+            <div className="p-3 rounded-full bg-white/10 mb-2">
+              {preview.type.includes("video") ? (
+                <Video className="w-8 h-8 text-white/50" />
+              ) : (
+                <FileImage className="w-8 h-8 text-white/50" />
+              )}
+            </div>
+            <span className="text-xs font-bold uppercase tracking-wider opacity-70">
+              {isUploading ? "Uploading..." : "Processing..."}
+            </span>
+          </div>
+        ) : preview.type.includes("video") ? (
           <VideoPreview
             preview={preview}
             thumbnail={thumbnail}
@@ -204,18 +228,18 @@ const MediaPreviewItem = memo(
           <img src={preview.url} className="w-full h-full object-cover" />
         )}
 
-        {/* Upload Overlay */}
-        {!error && progress !== undefined && progress < 100 && (
-          <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center p-4 backdrop-blur-sm z-20">
-            <div className="w-full bg-gray-700 h-2 rounded-full overflow-hidden mb-2">
+        {/* Upload Overlay (Matching Outside Style) */}
+        {!error && isUploading && (
+          <div className="absolute inset-x-0 bottom-0 bg-black/60 p-3 backdrop-blur-md border-t border-white/10 z-20">
+            <div className="w-full bg-gray-700/50 h-1.5 rounded-full overflow-hidden mb-1.5">
               <div
-                className="bg-primary-500 h-full transition-all duration-300 ease-out"
-                style={{ width: `${progress}%` }}
+                className="bg-primary-500 h-full transition-all duration-500 linear"
+                style={{ width: `${progress || 0}%` }}
               />
             </div>
-            <div className="text-white text-xs font-medium flex justify-between w-full">
-              <span>{progress}%</span>
-              {stats?.eta && <span>~{formatETA(stats.eta)} left</span>}
+            <div className="text-[10px] text-white/90 font-bold flex justify-between w-full uppercase tracking-tighter">
+              <span>{Math.round(progress || 0)}%</span>
+              {stats?.eta && <span>~{formatETA(stats.eta)}</span>}
             </div>
           </div>
         )}

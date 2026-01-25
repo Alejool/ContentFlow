@@ -57,23 +57,36 @@ class ProcessBackgroundUpload implements ShouldQueue
         Storage::disk('local')->delete($this->tempPath);
       } else {
         // 2. Direct Upload Flow (Already on S3)
-        // Check for S3 existence (account for potential leading slash mismatch)
+        // Check for S3 existence with retries
         $path = $this->mediaFile->file_path;
         $pathTrimmed = ltrim($path, '/');
 
-        if (!Storage::disk('s3')->exists($path) && !Storage::disk('s3')->exists($pathTrimmed)) {
-          // Retry logic or soft-fail could be added here, but for now explicitly throw with the path
-          // Try one wait cycle for S3 consistency?
-          sleep(2);
-          if (!Storage::disk('s3')->exists($pathTrimmed)) {
-            throw new \Exception("Direct upload file not found in S3 at: {$pathTrimmed} (Original: {$path})");
+        $found = false;
+        $attempts = 0;
+        $maxAttempts = 5;
+
+        while (!$found && $attempts < $maxAttempts) {
+          if (Storage::disk('s3')->exists($path)) {
+            $found = true;
+          } elseif (Storage::disk('s3')->exists($pathTrimmed)) {
+            $found = true;
+            $path = $pathTrimmed; // Normalize to trimmed
+          } else {
+            $attempts++;
+            if ($attempts < $maxAttempts) {
+              Log::warning("ProcessBackgroundUpload: File not found yet in S3 ($path). Retrying ($attempts/$maxAttempts)...");
+              sleep(2);
+            }
           }
         }
 
-        // Normalize path if needed (update BD if we found it under trimmed path but BD had slash)
-        if ($path !== $pathTrimmed && Storage::disk('s3')->exists($pathTrimmed)) {
-          $this->mediaFile->update(['file_path' => $pathTrimmed]);
-          $path = $pathTrimmed;
+        if (!$found) {
+          throw new \Exception("Direct upload file not found in S3 after {$maxAttempts} attempts at: {$pathTrimmed}");
+        }
+
+        // Normalize path in DB if needed
+        if ($this->mediaFile->file_path !== $path) {
+          $this->mediaFile->update(['file_path' => $path]);
         }
       }
 
@@ -91,9 +104,22 @@ class ProcessBackgroundUpload implements ShouldQueue
         $this->publication->update(['image' => \Illuminate\Support\Facades\Storage::url($this->mediaFile->file_path)]);
       }
 
-      // Fire event to update frontend lists
-      // event(new \App\Events\Publications\PublicationUpdated($this->publication));
+      // Check if we can release the "processing" lock
+      if ($this->publication->status === 'processing') {
+        // Check if there are any media files still processing
+        $hasProcessingMedia = $this->publication->mediaFiles()
+          ->where('media_files.status', 'processing')
+          ->exists(); // current mediaFile is already 'completed' at this point
 
+        if (!$hasProcessingMedia) {
+          // Restore status based on schedule
+          $newStatus = $this->publication->scheduled_at ? 'scheduled' : 'draft';
+          $this->publication->update(['status' => $newStatus]);
+        }
+      }
+
+      // Fire event to update frontend lists
+      event(new \App\Events\Publications\PublicationUpdated($this->publication));
     } catch (\Exception $e) {
       Log::error('Background upload failed', [
         'error' => $e->getMessage(),

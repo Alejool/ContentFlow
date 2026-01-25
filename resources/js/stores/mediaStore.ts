@@ -8,6 +8,7 @@ interface MediaFile {
   isNew: boolean;
   file?: File;
   thumbnailUrl?: string;
+  status?: "uploading" | "processing" | "completed" | "failed";
 }
 
 interface MediaState {

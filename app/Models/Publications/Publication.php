@@ -38,6 +38,7 @@ class Publication extends Model
     'draft',
     'published',
     'publishing',
+    'processing', // Added processing status
     'failed',
     'pending_review',
     'approved',
