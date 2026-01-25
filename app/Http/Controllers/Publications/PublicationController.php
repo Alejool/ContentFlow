@@ -692,7 +692,13 @@ class PublicationController extends Controller
       // Clear cache
       $this->clearPublicationCache($publication->workspace_id);
 
-      return $this->successResponse(['media_file' => $mediaFile], 'Media attached successfully');
+      // Reload publication to include new media and other relationships for broadcast
+      $publication->load(['mediaFiles.derivatives', 'scheduled_posts.socialAccount', 'socialPostLogs.socialAccount', 'campaigns']);
+
+      // Broadcast to other users in the workspace
+      event(new \App\Events\Publications\PublicationUpdated($publication));
+
+      return $this->successResponse(['publication' => $publication], 'Media attached successfully.');
     } catch (\Exception $e) {
       \Log::error('❌ Failed to attach media', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
       return $this->errorResponse('Failed to attach media: ' . $e->getMessage(), 500);

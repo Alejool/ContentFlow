@@ -1,5 +1,12 @@
 import Label from "@/Components/common/Modern/Label";
-import { AlertTriangle, FileImage, Upload, Video, X } from "lucide-react";
+import {
+  AlertTriangle,
+  FileImage,
+  Loader2,
+  Upload,
+  Video,
+  X,
+} from "lucide-react";
 import React, { memo, useRef } from "react";
 
 interface MediaUploadSectionProps {
@@ -11,6 +18,7 @@ interface MediaUploadSectionProps {
     isNew: boolean;
     thumbnailUrl?: string;
     file?: File;
+    status?: string;
   }[];
   thumbnails: Record<string, File>;
   imageError: string | null;
@@ -89,7 +97,11 @@ const MediaUploadSection = memo(
           onDragOver={disabled ? undefined : onDragOver}
           onDragLeave={disabled ? undefined : onDragLeave}
           onClick={(e) => {
-            if (!disabled && mediaPreviews.length === 0) {
+            if (
+              !disabled &&
+              !isAnyMediaProcessing &&
+              mediaPreviews.length === 0
+            ) {
               fileInputRef.current?.click();
             }
           }}
@@ -110,13 +122,14 @@ const MediaUploadSection = memo(
                       onSetThumbnail(preview.tempId, file)
                     }
                     onClearThumbnail={() => onClearThumbnail(preview.tempId)}
-                    disabled={disabled}
+                    disabled={disabled || isAnyMediaProcessing}
                     progress={uploadProgress?.[preview.file?.name || ""]}
                     stats={uploadStats?.[preview.file?.name || ""]}
                     error={uploadErrors?.[preview.file?.name || ""]}
+                    isExternalProcessing={preview.status === "processing"}
                   />
                 ))}
-                {!disabled && (
+                {!disabled && !isAnyMediaProcessing && (
                   <AddMoreButton
                     onClick={(e: any) => {
                       e.stopPropagation();
@@ -126,10 +139,38 @@ const MediaUploadSection = memo(
                 )}
               </div>
             ) : (
-              <EmptyUploadState t={t} />
+              <EmptyUploadState t={t} isProcessing={isAnyMediaProcessing} />
+            )}
+
+            {/* Global Processing Indicator for the whole area */}
+            {isAnyMediaProcessing && (
+              <div className="absolute inset-x-0 bottom-0 py-1.5 px-4 bg-primary-500/10 backdrop-blur-md border-t border-primary-500/20 animate-in slide-in-from-bottom-2">
+                <div className="flex items-center gap-3">
+                  <div className="flex-1 h-1.5 bg-gray-200 dark:bg-neutral-800 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-primary-500 transition-all duration-500 ease-out"
+                      style={{
+                        width: `${
+                          Object.values(uploadProgress || {}).length > 0
+                            ? Object.values(uploadProgress || {}).reduce(
+                                (a, b) => a + b,
+                                0,
+                              ) / Object.values(uploadProgress || {}).length
+                            : 100
+                        }%`,
+                      }}
+                    />
+                  </div>
+                  <span className="text-[10px] font-bold text-primary-600 dark:text-primary-400 uppercase whitespace-nowrap">
+                    {Object.values(uploadProgress || {}).length > 0
+                      ? "Subiendo..."
+                      : "Procesando S3..."}
+                  </span>
+                </div>
+              </div>
             )}
           </div>
-          {!disabled && (
+          {!disabled && !isAnyMediaProcessing && (
             <input
               ref={fileInputRef}
               type="file"
@@ -164,6 +205,7 @@ const MediaPreviewItem = memo(
     progress,
     stats,
     error,
+    isExternalProcessing,
   }: {
     preview: any;
     index: number;
@@ -175,6 +217,7 @@ const MediaPreviewItem = memo(
     progress?: number;
     stats?: { eta?: number; speed?: number };
     error?: string;
+    isExternalProcessing?: boolean;
   }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -190,7 +233,8 @@ const MediaPreviewItem = memo(
       preview.status === "processing" ||
       (progress !== undefined &&
         progress >= 100 &&
-        preview.status !== "completed");
+        preview.status !== "completed") ||
+      isExternalProcessing;
     const isUploading =
       preview.status === "uploading" ||
       (progress !== undefined && progress < 100);
@@ -358,20 +402,38 @@ const AddMoreButton = memo(
   ),
 );
 
-const EmptyUploadState = memo(({ t }: { t: (key: string) => string }) => (
-  <div className="space-y-4">
-    <div className="w-16 h-16 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300">
-      <Upload className="w-8 h-8 text-primary-500" />
+const EmptyUploadState = memo(
+  ({
+    t,
+    isProcessing,
+  }: {
+    t: (key: string) => string;
+    isProcessing?: boolean;
+  }) => (
+    <div className="space-y-4">
+      <div
+        className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto transition-all duration-300 ${isProcessing ? "bg-primary-500 animate-pulse" : "bg-primary-100 dark:bg-primary-900/30 group-hover:scale-110"}`}
+      >
+        {isProcessing ? (
+          <Loader2 className="w-8 h-8 text-white animate-spin" />
+        ) : (
+          <Upload className="w-8 h-8 text-primary-500" />
+        )}
+      </div>
+      <div>
+        <p className="font-medium text-lg">
+          {isProcessing
+            ? "Procesando archivos..."
+            : t("publications.modal.edit.dragDrop.title")}
+        </p>
+        <p className="text-sm mt-1 opacity-70">
+          {isProcessing
+            ? "Por favor, espera a que termine la subida actual."
+            : t("publications.modal.edit.dragDrop.subtitle")}
+        </p>
+      </div>
     </div>
-    <div>
-      <p className="font-medium text-lg">
-        {t("publications.modal.edit.dragDrop.title")}
-      </p>
-      <p className="text-sm mt-1">
-        {t("publications.modal.edit.dragDrop.subtitle")}
-      </p>
-    </div>
-  </div>
-));
+  ),
+);
 
 export default MediaUploadSection;

@@ -783,6 +783,8 @@ export const usePublicationForm = ({
     isAnyMediaProcessing:
       mediaFiles.some(
         (m) => m.status === "uploading" || m.status === "processing",
-      ) || isS3Uploading,
+      ) ||
+      isS3Uploading ||
+      (publication?.status as string) === "processing",
   };
 };

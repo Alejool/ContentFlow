@@ -66,7 +66,7 @@ export default function MediaLightbox({
   const currentMedia = mediaArray[currentIndex];
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/95 backdrop-blur-md animate-in fade-in duration-300">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/95 backdrop-blur-md animate-in fade-in duration-300">
       <button
         onClick={onClose}
         className="absolute top-6 right-6 p-2.5 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 rounded-full transition-all z-50 hover:scale-110 active:scale-95"
