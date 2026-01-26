@@ -198,6 +198,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('{workspace}/invite', [WorkspaceController::class, 'invite'])->name('invite');
     Route::put('{workspace}/members/{user}/role', [WorkspaceController::class, 'updateMemberRole'])->name('members.role');
     Route::delete('{workspace}/members/{user}', [WorkspaceController::class, 'removeMember'])->name('members.remove');
+    Route::delete('{workspace}', [WorkspaceController::class, 'destroy'])->name('destroy');
     Route::get('{workspace}', [WorkspaceController::class, 'show'])->name('show');
   });
 

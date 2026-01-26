@@ -1,14 +1,17 @@
 import Button from "@/Components/common/Modern/Button";
 import Input from "@/Components/common/Modern/Input";
+import ConfirmDialog from "@/Components/common/ui/ConfirmDialog";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { router, usePage } from "@inertiajs/react";
 import {
+  AlertTriangle,
   Copy,
   Globe,
   Info,
   Lock,
   SettingsIcon,
   Shield,
+  Trash2,
   UserCheck,
 } from "lucide-react";
 import { useState } from "react";
@@ -51,6 +54,8 @@ export default function GeneralSettingsTab({
   const { t } = useTranslation();
   const { auth } = usePage().props as any;
   const [isSaving, setIsSaving] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Only workspace creator (Owner) can edit workspace settings
   const isOwner = Number(workspace.created_by) === Number(auth.user.id);
@@ -87,6 +92,27 @@ export default function GeneralSettingsTab({
         setIsSaving(false);
       },
       onError: () => setIsSaving(false),
+    });
+  };
+
+  const handleDeleteWorkspace = () => {
+    setIsDeleting(true);
+    router.delete(route("workspaces.destroy", workspace.id), {
+      onSuccess: () => {
+        toast.success(
+          t("workspace.messages.delete_success") ||
+            "Workspace deleted successfully",
+        );
+        setIsDeleting(false);
+        setShowDeleteConfirm(false);
+      },
+      onError: () => {
+        toast.error(
+          t("workspace.messages.delete_error") || "Failed to delete workspace",
+        );
+        setIsDeleting(false);
+        setShowDeleteConfirm(false);
+      },
     });
   };
 
@@ -260,6 +286,62 @@ export default function GeneralSettingsTab({
           </div>
         </form>
       </div>
+
+      {isOwner && (
+        <div className="bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30 rounded-2xl shadow-sm p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="h-10 w-10 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center">
+              <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-red-700 dark:text-red-400">
+                {t("workspace.danger_zone") || "Danger Zone"}
+              </h3>
+              <p className="text-sm text-red-600/80 dark:text-red-400/70">
+                {t("workspace.delete_workspace_description") ||
+                  "Irreversible actions for this workspace"}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between p-4 bg-white dark:bg-neutral-900 rounded-xl border border-red-100 dark:border-red-900/30">
+            <div>
+              <h4 className="font-medium text-gray-900 dark:text-white">
+                {t("workspace.delete_workspace") || "Delete this workspace"}
+              </h4>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                {t("workspace.delete_workspace_warning") ||
+                  "Once you delete a workspace, there is no going back. Please be certain."}
+              </p>
+            </div>
+            <Button
+              variant="danger"
+              onClick={() => setShowDeleteConfirm(true)}
+              icon={Trash2}
+            >
+              {t("workspace.delete_button") || "Delete Workspace"}
+            </Button>
+          </div>
+        </div>
+      )}
+
+      <ConfirmDialog
+        isOpen={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={handleDeleteWorkspace}
+        title={t("workspace.delete_confirmation_title") || "Delete Workspace?"}
+        message={
+          t("workspace.delete_confirmation_message") ||
+          "Are you sure you want to delete this workspace? All data including content, campaigns, and team members will be permanently removed. This action cannot be undone."
+        }
+        confirmText={
+          isDeleting
+            ? t("common.deleting") || "Deleting..."
+            : t("workspace.confirm_delete") || "Yes, delete workspace"
+        }
+        cancelText={t("common.cancel")}
+        type="danger"
+      />
     </div>
   );
 }

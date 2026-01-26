@@ -4,6 +4,7 @@
     "deleteConfirm": "¿Estás seguro de que deseas eliminar este elemento? Esta acción no se puede deshacer.",
     "welcome": "Bienvenido",
     "loading": "Cargando...",
+    "deleting": "Eliminando...",
     "select": "Seleccionar",
     "more": "Más",
     "confirm": "Confirmar",

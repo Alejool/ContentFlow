@@ -34,9 +34,13 @@
     "description_placeholder": "What is this workspace for?",
     "create": "Create Workspace",
     "danger_zone": "Danger Zone",
-    "manage_members_description": "Manage your workspace members and configurations.",
+    "delete_workspace_description": "Irreversible actions for this workspace",
     "delete_workspace": "Delete Workspace",
-    "delete_description": "Once you delete a workspace, there is no going back. Please be certain.",
+    "delete_workspace_warning": "Once you delete a workspace, there is no going back. Please be certain.",
+    "delete_button": "Delete Workspace",
+    "delete_confirmation_title": "Delete Workspace?",
+    "delete_confirmation_message": "Are you sure you want to delete this workspace? All data including content, campaigns, and team members will be permanently removed. This action cannot be undone.",
+    "confirm_delete": "Yes, delete workspace",
     "general_settings": "General Settings",
     "manage_workspace": "Manage {{name}} workspace",
     "owners": "Owners",
@@ -128,7 +132,9 @@
       "no_permissions": "No permissions assigned."
     },
     "messages": {
-      "update_success": "Workspace created successfully"
+      "update_success": "Workspace created successfully",
+      "delete_success": "Workspace deleted successfully",
+      "delete_error": "Failed to delete workspace"
     },
     "subtitle": "Manage and switch between your workspaces",
     "create_button_subtitle": "Get Started",

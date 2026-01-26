@@ -62,6 +62,14 @@ class PublicationUpdated implements ShouldBroadcast
       'activities' => fn($q) => $q->orderBy('created_at', 'desc')->take(10)->with('user:id,name,photo_url')
     ]);
 
+    // Append media lock info
+    $mediaLockUserId = cache()->get("publication:{$this->publication->id}:media_lock");
+    $mediaLockedBy = null;
+    if ($mediaLockUserId) {
+      $mediaLockedBy = \App\Models\User::find($mediaLockUserId)?->only(['id', 'name', 'photo_url']);
+    }
+    $this->publication->media_locked_by = $mediaLockedBy;
+
     return [
       'publication' => $this->publication,
     ];
