@@ -28,10 +28,15 @@ return Application::configure(basePath: dirname(__DIR__))
             'api/*',
         ]);
         $middleware->web(append: [
+            \App\Http\Middleware\SecurityHeaders::class,
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
             SetLocale::class,
             HandleWorkspaceContext::class,
+        ]);
+        $middleware->api(append: [
+            \App\Http\Middleware\SecurityHeaders::class,
+            \App\Http\Middleware\RateLimitByIP::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

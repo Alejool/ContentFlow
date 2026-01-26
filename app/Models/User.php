@@ -42,6 +42,9 @@ class User extends Model implements Authenticatable, MustVerifyEmail, CanResetPa
         'remember_token',
         'current_workspace_id',
         'ai_settings',
+        'last_login_at',
+        'last_login_ip',
+        'known_devices',
     ];
 
     protected $hidden = [
@@ -54,6 +57,8 @@ class User extends Model implements Authenticatable, MustVerifyEmail, CanResetPa
         'password' => 'hashed',
         'global_platform_settings' => 'array',
         'ai_settings' => 'array',
+        'known_devices' => 'array',
+        'last_login_at' => 'datetime',
     ];
 
     /**
