@@ -34,9 +34,13 @@
     "description_placeholder": "¿Para qué es este espacio?",
     "create": "Crear Espacio",
     "danger_zone": "Zona de Peligro",
-    "manage_members_description": "Gestiona los miembros y configuraciones de tu espacio.",
+    "delete_workspace_description": "Acciones irreversibles para este espacio de trabajo",
     "delete_workspace": "Eliminar Espacio",
-    "delete_description": "Una vez que elimines un espacio, no hay vuelta atrás. Por favor, asegúrate.",
+    "delete_workspace_warning": "Una vez eliminado, no hay vuelta atrás. Por favor, asegúrate.",
+    "delete_button": "Eliminar Espacio",
+    "delete_confirmation_title": "¿Eliminar Espacio?",
+    "delete_confirmation_message": "¿Estás seguro de que quieres eliminar este espacio de trabajo? Todos los datos, incluyendo contenido, campañas y miembros del equipo serán eliminados permanentemente. Esta acción no se puede deshacer.",
+    "confirm_delete": "Sí, eliminar espacio",
     "general_settings": "Ajustes Generales",
     "manage_workspace": "Gestionar espacio {{name}}",
     "owners": "Propietarios",
@@ -128,7 +132,9 @@
       "no_permissions": "No hay permisos asignados."
     },
     "messages": {
-      "update_success": "Espacio de trabajo creado exitosamente"
+      "update_success": "Espacio de trabajo creado exitosamente",
+      "delete_success": "Espacio eliminado exitosamente",
+      "delete_error": "Error al eliminar el espacio"
     },
     "subtitle": "Gestiona y cambia entre tus espacios de trabajo",
     "create_button_subtitle": "Empezar",

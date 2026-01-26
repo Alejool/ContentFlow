@@ -409,4 +409,24 @@ class WorkspaceController extends Controller
 
     return redirect()->route('dashboard')->with('message', "Switched to workspace: {$workspace->name}");
   }
+
+  public function destroy(Workspace $workspace)
+  {
+    // STRICT CHECK: Only the creator can delete the workspace
+    if (Auth::id() !== $workspace->created_by) {
+      abort(403, 'Only the workspace owner can delete this workspace.');
+    }
+
+    $workspace->delete();
+
+    // Switch user to another workspace if available
+    $user = Auth::user();
+    $firstWorkspace = $user->workspaces()->where('workspaces.id', '!=', $workspace->id)->first();
+
+    $user->update([
+      'current_workspace_id' => $firstWorkspace ? $firstWorkspace->id : null
+    ]);
+
+    return redirect()->route('dashboard')->with('message', 'Workspace deleted successfully.');
+  }
 }
