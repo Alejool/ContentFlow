@@ -38,6 +38,7 @@
   "aiAssistant": {
     "welcomeMessage": "I am here to help you with your social media campaigns. You can ask me about creating new campaigns, improving existing ones, or analyzing your content performance.",
     "error": "I apologize, but I encountered an error processing your request. Please try again later.",
+    "notEnabled": "AI service is not enabled or configured.",
     "suggestion": "Suggestion",
     "thinking": "Thinking...",
     "askPlaceholder": "Ask about your campaigns...",

@@ -5,6 +5,8 @@ namespace App\Services;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 class AIService
 {
@@ -46,10 +48,71 @@ class AIService
     }
 
     /**
+     * Check if any AI provider is currently enabled and configured
+     */
+    public function isAiEnabled(): bool
+    {
+        return !empty($this->getEnabledProviders());
+    }
+
+    /**
+     * Get list of enabled and configured providers
+     */
+    public function getEnabledProviders(): array
+    {
+        $enabled = [];
+        foreach ($this->providers as $provider) {
+            if ($this->isProviderEnabled($provider)) {
+                $enabled[] = $provider;
+            }
+        }
+        return $enabled;
+    }
+
+    /**
+     * Generate specific field suggestions for publications or campaigns
+     */
+    public function generateFieldSuggestions(array $currentFields, string $type, string $language): array
+    {
+        $enabledProviders = $this->getEnabledProviders();
+
+        if (empty($enabledProviders)) {
+            throw new \Exception('No AI providers are enabled. Please configure an API key for Gemini or DeepSeek.');
+        }
+
+        $context = [
+            'message' => "Generate field suggestions for a social media {$type}.",
+            'current_fields' => $currentFields,
+            'user_locale' => $language,
+            'project_type' => 'field_suggestion',
+            'suggestion_type' => $type
+        ];
+
+        try {
+            // Prefer DeepSeek or Gemini for suggestions if available
+            $provider = in_array('deepseek', $enabledProviders)
+                ? 'deepseek'
+                : (in_array('gemini', $enabledProviders) ? 'gemini' : $enabledProviders[0]);
+
+            return $this->callProvider($provider, $context);
+        } catch (\Exception $e) {
+            Log::error("Field suggestion failed: " . $e->getMessage());
+            return $this->getDefaultResponse("Field suggestion failure", $context);
+        }
+    }
+
+    /**
      * Check if provider is enabled
      */
-    protected function isProviderEnabled(string $provider): bool
+    protected function isProviderEnabled(string $provider, User $user = null): bool
     {
+        $user = $user ?? Auth::user();
+
+        if ($user && isset($user->ai_settings[$provider])) {
+            $settings = $user->ai_settings[$provider];
+            return ($settings['enabled'] ?? false) && !empty($settings['api_key']);
+        }
+
         return config("services.{$provider}.enabled", false)
             && !empty(config("services.{$provider}.api_key"));
     }
@@ -73,7 +136,10 @@ class AIService
      */
     protected function callDeepSeek(array $context): array
     {
-        $apiKey = config('services.deepseek.api_key');
+        $user = Auth::user();
+        $apiKey = ($user && isset($user->ai_settings['deepseek']['api_key']))
+            ? $user->ai_settings['deepseek']['api_key']
+            : config('services.deepseek.api_key');
 
         if (!$apiKey) {
             throw new \Exception('DeepSeek API key not configured');
@@ -210,9 +276,18 @@ class AIService
             "    \"type\": \"suggestion_type\",\n" .
             "    \"data\": {}\n" .
             "  }\n" .
-            "}\n\n" .
-            "The 'suggestion' field can be null if no specific suggestion is needed.\n" .
-            "Available suggestion types: new_campaign, improvement, content_idea, analytics_insight, scheduling";
+            "}\n\n";
+        $systemMessage .= "The 'suggestion' field can be null if no specific suggestion is needed.\n" .
+            "Available suggestion types: new_campaign, improvement, content_idea, analytics_insight, scheduling\n\n";
+
+        if (isset($context['project_type']) && $context['project_type'] === 'field_suggestion') {
+            $type = $context['suggestion_type'] ?? 'publication';
+            $systemMessage .= "SPECIAL MODE: FIELD SUGGESTION FOR " . strtoupper($type) . ".\n";
+            $systemMessage .= "Input data: " . json_encode($context['current_fields']) . "\n";
+            $systemMessage .= "Based on the provided title, description or idea, you MUST provide optimized values for all fields.\n";
+            $systemMessage .= "Required fields in 'suggestion.data': title, description, goal, hashtags.\n";
+            $systemMessage .= "Maintain the requested language: {$language}.\n";
+        }
 
         return $systemMessage;
     }
@@ -222,7 +297,10 @@ class AIService
      */
     protected function callGemini(array $context): array
     {
-        $apiKey = config('services.gemini.api_key');
+        $user = Auth::user();
+        $apiKey = ($user && isset($user->ai_settings['gemini']['api_key']))
+            ? $user->ai_settings['gemini']['api_key']
+            : config('services.gemini.api_key');
 
         if (!$apiKey) {
             throw new \Exception('Gemini API key not configured');
@@ -266,7 +344,10 @@ class AIService
      */
     protected function callOpenAI(array $context): array
     {
-        $apiKey = config('services.openai.api_key');
+        $user = Auth::user();
+        $apiKey = ($user && isset($user->ai_settings['openai']['api_key']))
+            ? $user->ai_settings['openai']['api_key']
+            : config('services.openai.api_key');
 
         if (!$apiKey) {
             throw new \Exception('OpenAI API key not configured');
@@ -312,7 +393,10 @@ class AIService
      */
     protected function callAnthropic(array $context): array
     {
-        $apiKey = config('services.anthropic.api_key');
+        $user = Auth::user();
+        $apiKey = ($user && isset($user->ai_settings['anthropic']['api_key']))
+            ? $user->ai_settings['anthropic']['api_key']
+            : config('services.anthropic.api_key');
 
         if (!$apiKey) {
             throw new \Exception('Anthropic API key not configured');

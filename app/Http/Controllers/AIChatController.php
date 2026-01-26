@@ -124,6 +124,105 @@ class AIChatController extends Controller
     }
 
     /**
+     * Suggest fields for publication or campaign
+     */
+    public function suggestFields(Request $request)
+    {
+        $request->validate([
+            'fields' => 'required|array',
+            'type' => 'required|string|in:publication,campaign',
+            'language' => 'nullable|string'
+        ]);
+
+        try {
+            /** @var User $user */
+            $user = Auth::user();
+            $language = $request->input('language', $user->locale ?? 'es');
+
+            // Check if AI is enabled at all
+            if (!$this->aiService->isAiEnabled()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $language === 'es' ? 'El servicio de IA no está configurado o habilitado.' : 'AI service is not configured or enabled.'
+                ], 403);
+            }
+
+            $aiResponse = $this->aiService->generateFieldSuggestions(
+                $request->input('fields'),
+                $request->input('type'),
+                $language
+            );
+
+            return response()->json([
+                'success' => true,
+                'data' => $aiResponse['suggestion']['data'] ?? null,
+                'message' => $aiResponse['message'] ?? ''
+            ]);
+        } catch (\Exception $e) {
+            Log::error('AI Field Suggestion Error', [
+                'user_id' => Auth::id(),
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to generate suggestions'
+            ], 500);
+        }
+    }
+
+    /**
+     * Update user AI settings
+     */
+    public function updateAiSettings(Request $request)
+    {
+        $request->validate([
+            'settings' => 'required|array',
+            'validate' => 'nullable|boolean'
+        ]);
+
+        try {
+            /** @var User $user */
+            $user = Auth::user();
+            $settings = $request->input('settings');
+
+            // Optional: validate API keys if requested
+            if ($request->input('validate', false)) {
+                foreach ($settings as $provider => $config) {
+                    if (!empty($config['api_key']) && ($config['enabled'] ?? false)) {
+                        $isValid = $this->aiService->validateApiKey($provider, $config['api_key']);
+                        if (!$isValid) {
+                            return response()->json([
+                                'success' => false,
+                                'message' => "Invalid API key for {$provider}"
+                            ], 422);
+                        }
+                    }
+                }
+            }
+
+            $user->ai_settings = $settings;
+            $user->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'AI settings updated successfully',
+                'settings' => $user->ai_settings
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to update AI settings', [
+                'user_id' => Auth::id(),
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to save settings'
+            ], 500);
+        }
+    }
+
+    /**
      * Get user's campaigns for context
      */
     public function getCampaigns()

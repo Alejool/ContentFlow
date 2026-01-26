@@ -38,6 +38,7 @@
   "aiAssistant": {
     "welcomeMessage": "Estoy aquí para ayudarte con tus campañas de redes sociales. Puedes preguntarme sobre la creación de nuevas campañas, la mejora de las existentes o el análisis del rendimiento de tu contenido.",
     "error": "Lo siento, pero encontré un error al procesar tu solicitud. Por favor intenta de nuevo más tarde.",
+    "notEnabled": "El servicio de IA no está habilitado o configurado.",
     "suggestion": "Sugerencia",
     "thinking": "Pensando...",
     "askPlaceholder": "Pregunta sobre tus campañas...",
