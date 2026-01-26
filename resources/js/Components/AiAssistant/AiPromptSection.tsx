@@ -36,7 +36,7 @@ const AiPromptSection: React.FC<AiPromptSectionProps> = ({
 
     setLoading(true);
     try {
-      const response = await axios.post(route("api.ai.suggest-fields"), {
+      const response = await axios.post(route("api.v1.ai.suggest-fields"), {
         fields: { ...currentFields, ai_prompt: prompt },
         type,
         language: auth.user?.locale || "es",

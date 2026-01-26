@@ -52,7 +52,7 @@ export const useCampaignStore = create<CampaignState>((set, get) => ({
 
     try {
       const params = { ...filters, page };
-      const response = await axios.get("/campaigns", { params });
+      const response = await axios.get("/api/v1/campaigns", { params });
 
       let campaignsData = [];
       let paginationData = {
@@ -112,7 +112,7 @@ export const useCampaignStore = create<CampaignState>((set, get) => ({
   updateCampaign: (id: number, updatedCampaign: Partial<Campaign>) => {
     set((state) => ({
       campaigns: state.campaigns.map((campaign) =>
-        campaign.id === id ? { ...campaign, ...updatedCampaign } : campaign
+        campaign.id === id ? { ...campaign, ...updatedCampaign } : campaign,
       ),
     }));
   },
@@ -126,7 +126,7 @@ export const useCampaignStore = create<CampaignState>((set, get) => ({
   deleteCampaign: async (id) => {
     set({ isLoading: true, error: null });
     try {
-      await axios.delete(`/campaigns/${id}`);
+      await axios.delete(`/api/v1/campaigns/${id}`);
       get().removeCampaign(id);
       set({ isLoading: false });
       return true;

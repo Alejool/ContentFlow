@@ -43,7 +43,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
   fetchNotifications: async () => {
     set({ isLoading: true });
     try {
-      const response = await axios.get("/notifications");
+      const response = await axios.get("/api/v1/notifications");
       const notifications = response.data.notifications.sort(
         (a: NotificationData, b: NotificationData) => {
           // Sort by read status (unread first)
@@ -54,20 +54,20 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
           return (
             new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
           );
-        }
+        },
       );
 
       const unreadCount = response.data.unread_count;
 
       const applicationNotifications = notifications.filter(
         (n: NotificationData) =>
-          n.category === "application" || n.data.category === "application"
+          n.category === "application" || n.data.category === "application",
       );
 
       const systemNotifications = notifications.filter(
         (n: NotificationData) =>
           (n.category === "system" || !n.category) &&
-          n.data.category !== "application"
+          n.data.category !== "application",
       );
 
       set({
@@ -85,10 +85,10 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
 
   markAsRead: async (id: string) => {
     try {
-      await axios.post(`/notifications/${id}/read`);
+      await axios.post(`/api/v1/notifications/${id}/read`);
       set((state) => {
         const updatedNotifications = state.notifications.map((n) =>
-          n.id === id ? { ...n, read_at: new Date().toISOString() } : n
+          n.id === id ? { ...n, read_at: new Date().toISOString() } : n,
         );
 
         // Re-calculate derived state
@@ -100,12 +100,12 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
           unreadCount,
           applicationNotifications: updatedNotifications.filter(
             (n) =>
-              n.category === "application" || n.data.category === "application"
+              n.category === "application" || n.data.category === "application",
           ),
           systemNotifications: updatedNotifications.filter(
             (n) =>
               (n.category === "system" || !n.category) &&
-              n.data.category !== "application"
+              n.data.category !== "application",
           ),
         };
       });
@@ -116,7 +116,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
 
   markAllAsRead: async () => {
     try {
-      await axios.post("/notifications/read-all");
+      await axios.post("/api/v1/notifications/read-all");
       set((state) => {
         const updatedNotifications = state.notifications.map((n) => ({
           ...n,
@@ -128,12 +128,12 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
           unreadCount: 0,
           applicationNotifications: updatedNotifications.filter(
             (n) =>
-              n.category === "application" || n.data.category === "application"
+              n.category === "application" || n.data.category === "application",
           ),
           systemNotifications: updatedNotifications.filter(
             (n) =>
               (n.category === "system" || !n.category) &&
-              n.data.category !== "application"
+              n.data.category !== "application",
           ),
         };
       });
@@ -144,11 +144,11 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
 
   deleteNotification: async (id: string) => {
     try {
-      await axios.delete(`/notifications/${id}`);
+      await axios.delete(`/api/v1/notifications/${id}`);
       set((state) => {
         const notification = state.notifications.find((n) => n.id === id);
         const updatedNotifications = state.notifications.filter(
-          (n) => n.id !== id
+          (n) => n.id !== id,
         );
         let unreadCount = state.unreadCount;
 
@@ -161,12 +161,12 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
           unreadCount,
           applicationNotifications: updatedNotifications.filter(
             (n) =>
-              n.category === "application" || n.data.category === "application"
+              n.category === "application" || n.data.category === "application",
           ),
           systemNotifications: updatedNotifications.filter(
             (n) =>
               (n.category === "system" || !n.category) &&
-              n.data.category !== "application"
+              n.data.category !== "application",
           ),
         };
       });

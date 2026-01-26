@@ -117,7 +117,7 @@ export default function CalendarIndex({ auth }: { auth: any }) {
     try {
       const start = startOfMonth(currentDate).toISOString();
       const end = endOfMonth(currentDate).toISOString();
-      const response = await axios.get(route("api.calendar.events"), {
+      const response = await axios.get(route("api.v1.calendar.index"), {
         params: { start, end },
       });
       setEvents(response.data.data);

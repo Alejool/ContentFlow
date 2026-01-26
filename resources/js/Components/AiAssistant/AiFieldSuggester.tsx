@@ -37,7 +37,7 @@ const AiFieldSuggester: React.FC<AiFieldSuggesterProps> = ({
 
     setLoading(true);
     try {
-      const response = await axios.post(route("api.ai.suggest-fields"), {
+      const response = await axios.post(route("api.v1.ai.suggest-fields"), {
         fields,
         type,
         language: auth.user?.locale || "es",

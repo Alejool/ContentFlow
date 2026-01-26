@@ -90,7 +90,7 @@ export default function Dashboard({
   useEffect(() => {
     if (!stats.publicationStats) {
       axios
-        .get(route("api.publications.stats"))
+        .get(route("api.v1.publications.stats"))
         .then((res) => setPubStats(res.data || {}))
         .catch((error) => {
           if (error.response?.status !== 401) {
@@ -108,7 +108,7 @@ export default function Dashboard({
 
     const refreshStats = () => {
       axios
-        .get(route("api.publications.stats"))
+        .get(route("api.v1.publications.stats"))
         .then((res) => setPubStats(res.data || {})) // Use res.data directly
         .catch((error) => {
           if (error.response?.status !== 401) {

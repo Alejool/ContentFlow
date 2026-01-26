@@ -1,11 +1,11 @@
-import Button from "@/Components/common/Modern/Button";
-import EmptyState from "@/Components/common/ui/EmptyState";
 import ApprovalSuccessModal from "@/Components/ManageContent/modals/ApprovalSuccessModal";
 import RejectionReasonModal from "@/Components/ManageContent/modals/RejectionReasonModal";
+import Button from "@/Components/common/Modern/Button";
+import EmptyState from "@/Components/common/ui/EmptyState";
+import { getDateFnsLocale } from "@/Utils/dateLocales";
 import { Publication } from "@/types/Publication";
 import axios from "axios";
 import { format, formatDistanceToNow } from "date-fns";
-import { getDateFnsLocale } from "@/Utils/dateLocales";
 import { Check, Clock, Eye, User, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
@@ -38,7 +38,7 @@ export default function ApprovalList({
   const handleApprove = async (publication: Publication) => {
     try {
       const response = await axios.post(
-        route("publications.approve", publication.id),
+        route("api.v1.publications.approve", publication.id),
       );
       if (response.data.success) {
         toast.success(t("approvals.approvedSuccess"));
@@ -69,7 +69,7 @@ export default function ApprovalList({
 
     try {
       const response = await axios.post(
-        route("publications.reject", selectedPublication.id),
+        route("api.v1.publications.reject", selectedPublication.id),
         {
           rejection_reason: reason,
         },

@@ -106,7 +106,7 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
     get().clearPageData();
 
     try {
-      const response = await axios.get("/publications", {
+      const response = await axios.get("/api/v1/publications", {
         params: { ...filters, page },
       });
 
@@ -140,7 +140,7 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
 
     set({ error: null });
     try {
-      const response = await axios.get(`/publications/${id}`);
+      const response = await axios.get(`/api/v1/publications/${id}`);
       const publication = response.data.publication;
 
       set((state) => ({
@@ -162,7 +162,7 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
   fetchPublishedPlatforms: async (publicationId: number) => {
     try {
       const response = await axios.get(
-        `/publications/${publicationId}/published-platforms`,
+        `/api/v1/publications/${publicationId}/published-platforms`,
       );
 
       const published = response.data.published_platforms ?? [];
@@ -234,7 +234,7 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
   createPublication: async (formData) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await axios.post("/publications", formData, {
+      const response = await axios.post("/api/v1/publications", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       const publication = response.data.publication;
@@ -261,9 +261,13 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
       if (!formData.has("_method")) {
         formData.append("_method", "PUT");
       }
-      const response = await axios.post(`/publications/${id}`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const response = await axios.post(
+        `/api/v1/publications/${id}`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        },
+      );
       const publication = response.data.publication || response.data.data;
       if (publication) {
         get().updatePublication(id, publication);
@@ -284,7 +288,7 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
   deletePublication: async (id) => {
     set({ isLoading: true, error: null });
     try {
-      await axios.delete(`/publications/${id}`);
+      await axios.delete(`/api/v1/publications/${id}`);
       get().removePublication(id);
       set({ isLoading: false });
       // Refresh calendar store
@@ -302,7 +306,7 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
   publishPublication: async (id, formData) => {
     try {
       const response = await axios.post(
-        `/publications/${id}/publish`,
+        `/api/v1/publications/${id}/publish`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
@@ -319,9 +323,12 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
 
   unpublishPublication: async (id, platformIds) => {
     try {
-      const response = await axios.post(`/publications/${id}/unpublish`, {
-        platform_ids: platformIds,
-      });
+      const response = await axios.post(
+        `/api/v1/publications/${id}/unpublish`,
+        {
+          platform_ids: platformIds,
+        },
+      );
       return { success: true, data: response.data };
     } catch (error: any) {
       return {
@@ -401,7 +408,7 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
 
   acquireLock: async (id, force = false) => {
     try {
-      const response = await axios.post(`/api/publications/${id}/lock`, {
+      const response = await axios.post(`/api/v1/publications/${id}/lock`, {
         force,
       });
       return { success: response.data.success, data: response.data };
@@ -417,7 +424,7 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
 
   releaseLock: async (id) => {
     try {
-      const response = await axios.post(`/api/publications/${id}/unlock`);
+      const response = await axios.post(`/api/v1/publications/${id}/unlock`);
       return { success: true, data: response.data };
     } catch (error: any) {
       return {

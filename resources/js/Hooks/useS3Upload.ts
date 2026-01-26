@@ -70,7 +70,10 @@ export const useS3Upload = () => {
           if (currentItem?.publicationId) {
             try {
               const { data } = await axios.post(
-                route("publications.attach-media", currentItem.publicationId),
+                route(
+                  "api.v1.publications.attach-media",
+                  currentItem.publicationId,
+                ),
                 {
                   key: result.key,
                   filename: file.name,
@@ -121,7 +124,7 @@ export const useS3Upload = () => {
   );
 
   const uploadSingle = async (file: File, id: string, startTime: number) => {
-    const { data: signData } = await axios.post(route("upload.sign"), {
+    const { data: signData } = await axios.post(route("api.v1.uploads.sign"), {
       filename: file.name,
       content_type: file.type,
     });
@@ -139,7 +142,7 @@ export const useS3Upload = () => {
 
   const uploadMultipart = async (file: File, id: string, startTime: number) => {
     const { data: initData } = await axios.post(
-      route("upload.multipart.init"),
+      route("api.v1.uploads.multipart.init"),
       {
         filename: file.name,
         content_type: file.type,
@@ -157,7 +160,7 @@ export const useS3Upload = () => {
       const chunk = file.slice(start, end);
 
       const { data: signData } = await axios.post(
-        route("upload.multipart.sign-part"),
+        route("api.v1.uploads.multipart.sign-part"),
         {
           key,
           uploadId,
@@ -185,7 +188,7 @@ export const useS3Upload = () => {
       parts.push({ ETag: etag, PartNumber: partNumber });
     }
 
-    await axios.post(route("upload.multipart.complete"), {
+    await axios.post(route("api.v1.uploads.multipart.complete"), {
       key,
       uploadId,
       parts,

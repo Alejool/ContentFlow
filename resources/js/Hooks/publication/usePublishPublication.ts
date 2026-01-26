@@ -400,7 +400,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
     async (publicationId: number, settings?: any) => {
       try {
         const response = await axios.post(
-          route("publications.request-review", publicationId),
+          route("api.v1.publications.request-review", publicationId),
           {
             platform_settings: settings,
           },
@@ -423,7 +423,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
   const handleApprove = useCallback(async (publicationId: number) => {
     try {
       const response = await axios.post(
-        route("publications.approve", publicationId),
+        route("api.v1.publications.approve", publicationId),
       );
       if (response.data.success) {
         toast.success("Publication approved");
@@ -439,7 +439,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
   const handleReject = useCallback(async (publicationId: number) => {
     try {
       const response = await axios.post(
-        route("publications.reject", publicationId),
+        route("api.v1.publications.reject", publicationId),
       );
       if (response.data.success) {
         toast.success("Publication rejected and moved to draft");

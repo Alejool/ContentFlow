@@ -27,7 +27,7 @@ export default function GlobalUploadIndicator() {
   // Fetch publications in 'processing' state from the workspace
   const fetchProcessingItems = async () => {
     try {
-      const response = await axios.get(route("api.publications.index"), {
+      const response = await axios.get(route("api.v1.publications.index"), {
         params: { status: "processing", simplified: "true" },
       });
       if (response.data?.success && response.data?.publications) {

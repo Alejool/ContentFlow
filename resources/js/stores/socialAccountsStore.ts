@@ -1,6 +1,6 @@
+import { SocialAccount } from "@/types/SocialAccount";
 import axios from "axios";
 import { create } from "zustand";
-import { SocialAccount } from "@/types/SocialAccount";
 
 interface AccountsStore {
   accounts: SocialAccount[];
@@ -57,12 +57,11 @@ export const useAccountsStore = create<AccountsStore>((set) => ({
       accounts: state.accounts.map((account) =>
         account.id === accountId
           ? {
-            ...account,
-            ...updates,
-            account_name:
-              updates.account_name || account.account_name,
-          }
-          : account
+              ...account,
+              ...updates,
+              account_name: updates.account_name || account.account_name,
+            }
+          : account,
       ),
       lastUpdated: new Date(),
     })),
@@ -74,7 +73,7 @@ export const useAccountsStore = create<AccountsStore>((set) => ({
   fetchAccounts: async () => {
     set({ isLoading: true, error: null });
     try {
-      const response = await axios.get("/social-accounts");
+      const response = await axios.get("/api/v1/social-accounts");
       const accounts = response.data.accounts || [];
 
       const processedAccounts = accounts.map((acc: SocialAccount) => ({

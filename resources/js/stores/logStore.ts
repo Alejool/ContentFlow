@@ -30,7 +30,7 @@ export const useLogStore = create<LogState>((set) => ({
   fetchLogs: async (filters = {}, page = 1) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await axios.get("/logs", {
+      const response = await axios.get("/api/v1/logs", {
         params: { ...filters, page },
       });
       if (response.data.success) {

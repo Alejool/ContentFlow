@@ -59,7 +59,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
       const start = startOfWeek(startOfMonth(currentMonth)).toISOString();
       const end = endOfWeek(endOfMonth(currentMonth)).toISOString();
 
-      const response = await axios.get("/api/calendar/events", {
+      const response = await axios.get("/api/v1/calendar/events", {
         params: { start, end },
       });
 
@@ -86,7 +86,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
         else if (id.startsWith("user_event_")) eventType = "user_event";
       }
 
-      await axios.patch(`/api/calendar/events/${resourceId}`, {
+      await axios.patch(`/api/v1/calendar/events/${resourceId}`, {
         scheduled_at: newDate,
         type: eventType,
       });
@@ -110,7 +110,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
   deleteEvent: async (id) => {
     try {
       const resourceId = id.includes("_") ? id.split("_")[2] : id;
-      await axios.delete(`/api/calendar/user-events/${resourceId}`);
+      await axios.delete(`/api/v1/calendar/user-events/${resourceId}`);
 
       // Update local state
       const events = get().events.filter((ev) => ev.id !== id);
