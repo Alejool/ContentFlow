@@ -18,18 +18,18 @@ import {
 } from "lucide-react";
 import { useCallback, useEffect, useState, useTransition } from "react";
 
-import ApprovalHistory from "@/Components/Content/ApprovalHistory";
-import ApprovalList from "@/Components/Content/ApprovalList";
-import ApprovalStats from "@/Components/Content/ApprovalStats";
-import ContentList from "@/Components/Content/ContentList";
-import ModernCalendar from "@/Components/Content/Partials/ModernCalendar";
+import ApprovalHistory from "@/Components/ManageContent/ApprovalHistory";
+import ApprovalList from "@/Components/ManageContent/ApprovalList";
+import ApprovalStats from "@/Components/ManageContent/ApprovalStats";
+import ContentList from "@/Components/ManageContent/ContentList";
+import ModernCalendar from "@/Components/ManageContent/Partials/ModernCalendar";
 import Button from "@/Components/common/Modern/Button";
 
 import {
   ContentTab,
   usePublications,
 } from "@/Hooks/publication/usePublications";
-import { useContentUIStore } from "@/stores/contentUIStore";
+import { useManageContentUIStore } from "@/stores/manageContentUIStore";
 import { useShallow } from "zustand/react/shallow";
 
 export default function ContentPage() {
@@ -70,7 +70,7 @@ export default function ContentPage() {
     openEditModal,
     openPublishModal,
     openViewDetailsModal,
-  } = useContentUIStore(
+  } = useManageContentUIStore(
     useShallow((s) => ({
       activeTab: s.activeTab,
       setActiveTab: s.setActiveTab,
@@ -429,12 +429,12 @@ export default function ContentPage() {
                   }
                   onPageChange={handlePageChange}
                   onEdit={(item) =>
-                    useContentUIStore.getState().openEditModal(item)
+                    useManageContentUIStore.getState().openEditModal(item)
                   }
                   onDelete={handleDeleteItemClick}
                   onViewDetails={openViewDetailsModal}
                   onPublish={(item) =>
-                    useContentUIStore.getState().openPublishModal(item)
+                    useManageContentUIStore.getState().openPublishModal(item)
                   }
                   onEditRequest={handleEditRequest}
                   connectedAccounts={connectedAccounts}

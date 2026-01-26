@@ -12,7 +12,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useShallow } from "zustand/react/shallow";
 
-export type ManageContentTab =
+export type ContentTab =
   | "publications"
   | "campaigns"
   | "logs"

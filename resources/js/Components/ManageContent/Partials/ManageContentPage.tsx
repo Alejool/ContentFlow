@@ -26,7 +26,7 @@ import ModernCalendar from "@/Components/ManageContent/Partials/ModernCalendar";
 import Button from "@/Components/common/Modern/Button";
 
 import {
-  ManageContentTab,
+  ContentTab,
   usePublications,
 } from "@/Hooks/publication/usePublications";
 import { useManageContentUIStore } from "@/stores/manageContentUIStore";
@@ -95,7 +95,7 @@ export default function ManageContentPage() {
   }, [search]);
 
   const handleTabChange = useCallback(
-    (tab: ManageContentTab) => {
+    (tab: ContentTab) => {
       startTransition(() => {
         setActiveTab(tab);
         setSearch(""); // Clear search when changing tabs
@@ -107,7 +107,7 @@ export default function ManageContentPage() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const tab = params.get("tab") as ManageContentTab;
+    const tab = params.get("tab") as ContentTab;
     if (
       tab &&
       ["publications", "campaigns", "calendar", "logs", "approvals"].includes(

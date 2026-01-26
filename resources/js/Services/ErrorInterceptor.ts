@@ -66,7 +66,8 @@ class ErrorInterceptorClass {
   }
 
   private handle400(data?: ErrorResponse) {
-    const message = data?.message || "Bad request. Please check your input.";
+    const message =
+      data?.message || "Solicitud incorrecta. Por favor, revisa tus datos.";
     ToastService.error(message);
   }
 
@@ -83,19 +84,19 @@ class ErrorInterceptorClass {
     // Instead of redirecting automatically (which can cause loops if the session is actually valid
     // but a specific request fails), we just show a warning message.
     ToastService.warning(
-      "Unauthenticated request detected. If you are having issues, please try logging in again.",
+      "Se detectó una solicitud no autenticada. Si tienes problemas, por favor intenta iniciar sesión de nuevo.",
     );
   }
 
   private handle403(data?: ErrorResponse) {
     const message =
-      data?.message || "You don't have permission to perform this action.";
+      data?.message || "No tienes permiso para realizar esta acción.";
     ToastService.error(message);
     console.error("403 Forbidden:", data);
   }
 
   private handle404(data?: ErrorResponse) {
-    const message = data?.message || "The requested resource was not found.";
+    const message = data?.message || "El recurso solicitado no fue encontrado.";
     ToastService.warning(message);
   }
 
@@ -105,20 +106,22 @@ class ErrorInterceptorClass {
       ToastService.validationErrors(data.errors);
     } else {
       const message =
-        data?.message || "Validation failed. Please check your input.";
+        data?.message || "La validación falló. Por favor, revisa tus datos.";
       ToastService.error(message);
     }
   }
 
   private handle429(data?: ErrorResponse) {
     const message =
-      data?.message || "Too many requests. Please wait a moment and try again.";
+      data?.message ||
+      "Demasiadas solicitudes. Por favor, espera un momento e intenta de nuevo.";
     ToastService.warning(message);
   }
 
   private handle5xx(data?: ErrorResponse) {
     const message =
-      data?.message || "A server error occurred. Please try again later.";
+      data?.message ||
+      "Ocurrió un error en el servidor. Por favor, intenta de nuevo más tarde.";
     ToastService.error(message);
 
     // Log error for monitoring
@@ -160,7 +163,7 @@ class ErrorInterceptorClass {
 
   private handleDefault(error: AxiosError<ErrorResponse>) {
     const message =
-      error.response?.data?.message || "An unexpected error occurred.";
+      error.response?.data?.message || "Ocurrió un error inesperado.";
     ToastService.error(message);
     console.error("Unexpected error:", error);
   }

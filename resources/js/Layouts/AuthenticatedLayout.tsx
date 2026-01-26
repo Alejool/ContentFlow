@@ -12,7 +12,6 @@ import { initNotificationRealtime } from "@/Services/notificationRealtime";
 import { useNotificationStore } from "@/stores/notificationStore";
 import { usePage } from "@inertiajs/react";
 import { ReactNode, useEffect, useState } from "react";
-import { Toaster } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
 interface AuthenticatedLayoutProps {
@@ -129,7 +128,6 @@ export default function AuthenticatedLayout({
         {/* <GlobalAiAssistant /> */}
         <CommandPalette />
       </div>
-      <Toaster position="top-right" />
       <GlobalUploadIndicator />
     </div>
   );

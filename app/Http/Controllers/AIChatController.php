@@ -84,7 +84,7 @@ class AIChatController extends Controller
             $provider = $request->input('provider');
 
             $startTime = microtime(true);
-            $aiResponse = $this->aiService->chat($context, $provider);
+            $aiResponse = $this->aiService->chat($context, $provider, $user);
             $endTime = microtime(true);
             $duration = $endTime - $startTime;
 
@@ -117,7 +117,7 @@ class AIChatController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'An error occurred while processing your message. Please try again.',
+                'message' => 'Ocurrió un error al procesar tu mensaje. Por favor, intenta de nuevo.',
                 'error' => app()->environment('local') ? $e->getMessage() : null
             ], 500);
         }
@@ -140,7 +140,7 @@ class AIChatController extends Controller
             $language = $request->input('language', $user->locale ?? 'es');
 
             // Check if AI is enabled at all
-            if (!$this->aiService->isAiEnabled()) {
+            if (!$this->aiService->isAiEnabled($user)) {
                 return response()->json([
                     'success' => false,
                     'message' => $language === 'es' ? 'El servicio de IA no está configurado o habilitado.' : 'AI service is not configured or enabled.'
@@ -150,7 +150,8 @@ class AIChatController extends Controller
             $aiResponse = $this->aiService->generateFieldSuggestions(
                 $request->input('fields'),
                 $request->input('type'),
-                $language
+                $language,
+                $user
             );
 
             return response()->json([
@@ -257,7 +258,8 @@ class AIChatController extends Controller
     public function getAvailableModels()
     {
         try {
-            $models = $this->aiService->getAvailableModels();
+            $user = Auth::user();
+            $models = $this->aiService->getAvailableModels($user);
 
             return response()->json([
                 'success' => true,
@@ -310,7 +312,7 @@ class AIChatController extends Controller
     public function getStats()
     {
         try {
-            $stats = $this->aiService->getProviderStats();
+            $stats = $this->aiService->getProviderStats(Auth::user());
 
             return response()->json([
                 'success' => true,

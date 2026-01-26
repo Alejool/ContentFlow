@@ -4,6 +4,8 @@ import { Toaster } from "react-hot-toast";
 export default function ThemedToaster() {
   const { theme } = useTheme();
 
+  const isDark = theme === "dark";
+
   return (
     <Toaster
       position="top-center"
@@ -11,46 +13,48 @@ export default function ThemedToaster() {
       gutter={8}
       toastOptions={{
         duration: 4000,
+        style: {
+          maxWidth: "500px",
+          padding: "12px 20px",
+          borderRadius: "12px",
+          fontSize: "14px",
+          fontWeight: 500,
+          border: isDark
+            ? "1px solid rgba(255,255,255,0.1)"
+            : "1px solid rgba(0,0,0,0.05)",
+          background: isDark
+            ? "rgba(10, 10, 10, 0.95)"
+            : "rgba(255, 255, 255, 0.95)",
+          color: isDark ? "#ffffff" : "#000000",
+          backdropFilter: "blur(12px)",
+          boxShadow: isDark
+            ? "0 10px 30px -10px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05)"
+            : "0 10px 30px -10px rgba(0,0,0,0.1)",
+        },
         success: {
-          duration: 3000,
-          className:
-            theme === "dark"
-              ? "!bg-neutral-800/80 !text-green-400 !border !border-neutral-700 !shadow-xl !backdrop-blur-lg !rounded-lg !px-4 !py-3 !text-sm !font-medium"
-              : "!bg-white/80 !text-green-600 !border !border-gray-200 !shadow-lg !backdrop-blur-lg !rounded-lg !px-4 !py-3 !text-sm !font-medium",
           iconTheme: {
-            primary: theme === "dark" ? "#22c55e" : "#16a34a",
-            secondary: theme === "dark" ? "#171717" : "#ffffff",
+            primary: "#10b981",
+            secondary: isDark ? "#000" : "#fff",
           },
         },
-
         error: {
-          duration: 4000,
-          className:
-            theme === "dark"
-              ? "!bg-neutral-800/80 !text-primary-400 !border !border-neutral-700 !shadow-xl !backdrop-blur-lg !rounded-lg !px-4 !py-3 !text-sm !font-bold"
-              : "!bg-white/80 !text-primary-600 !border !border-gray-200 !shadow-lg !backdrop-blur-lg !rounded-lg !px-4 !py-3 !text-sm !font-bold",
+          duration: 5000,
+          style: {
+            fontWeight: 600,
+            border: isDark
+              ? "1px solid rgba(239, 68, 68, 0.2)"
+              : "1px solid rgba(239, 68, 68, 0.1)",
+          },
           iconTheme: {
-            primary: theme === "dark" ? "#ef4444" : "#dc2626",
-            secondary: theme === "dark" ? "#171717" : "#ffffff",
+            primary: "#ef4444",
+            secondary: isDark ? "#000" : "#fff",
           },
         },
-
         loading: {
-          className:
-            theme === "dark"
-              ? "!bg-neutral-800/80 !text-primary-400 !border !border-neutral-700 !shadow-xl !backdrop-blur-lg !rounded-lg !px-4 !py-3 !text-sm !font-medium"
-              : "!bg-white/90 !text-primary-600 !border !border-gray-200 !shadow-lg !backdrop-blur-lg !rounded-lg !px-4 !py-3 !text-sm !font-medium",
           iconTheme: {
-            primary: theme === "dark" ? "#f97316" : "#ea580c",
-            secondary: theme === "dark" ? "#171717" : "#ffffff",
+            primary: "#f59e0b",
+            secondary: isDark ? "#000" : "#fff",
           },
-        },
-
-        blank: {
-          className:
-            theme === "dark"
-              ? "!bg-neutral-800/80 !text-gray-100 !border !border-neutral-700 !shadow-xl !backdrop-blur-lg !rounded-lg !px-4 !py-3 !text-sm !font-medium"
-              : "!bg-white/90 !text-gray-900 !border !border-gray-200 !shadow-lg !backdrop-blur-lg !rounded-lg !px-4 !py-3 !text-sm !font-medium",
         },
       }}
     />
