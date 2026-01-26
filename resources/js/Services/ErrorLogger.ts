@@ -8,7 +8,7 @@ interface ErrorLogEntry {
 }
 
 class ErrorLoggerClass {
-  private endpoint = "/api/log-error";
+  private endpoint = "/api/v1/log-error";
 
   /**
    * Log an error to the backend

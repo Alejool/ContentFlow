@@ -212,12 +212,31 @@ export const usePublicationForm = ({
           setRemoteLock(null);
         }
 
-        // Only sync media files if NOT locked by self (to avoid overwriting own optimistic updates)
-        // and if not currently editing something critical (optional, but good for safety)
+        // AUTO-REFRESH fields if form is NOT dirty
         if (!isDirty) {
-          // For now, we trust the re-mount or manual refresh for full media sync
-          // to avoid complexity of merging lists in real-time while user might be typing.
-          // BUT, if we want to show "User B upload finished", we might want to trigger a refresh
+          console.log("🔄 Auto-syncing form fields with remote update.");
+          reset(
+            {
+              title: e.publication.title || "",
+              description: e.publication.description || "",
+              goal: e.publication.goal || "",
+              hashtags: e.publication.hashtags || "",
+              campaign_id: e.publication.campaigns?.[0]?.id?.toString() || null,
+              social_accounts: getValues("social_accounts"), // Keep selections
+              scheduled_at: e.publication.scheduled_at || null,
+              status: e.publication.status || "draft",
+              lock_content: !!e.publication.social_post_logs?.some(
+                (l: any) =>
+                  l.status === "published" || l.status === "publishing",
+              ),
+              use_global_schedule: !!e.publication.scheduled_at,
+            },
+            { keepDirty: false },
+          );
+        } else {
+          console.log(
+            "🛡️ Local changes detected. Skipping auto-sync to prevent data loss.",
+          );
         }
       }
     };
@@ -425,7 +444,11 @@ export const usePublicationForm = ({
         // CRITICAL FIX: If editing an existing publication, link immediately
         // so attachMedia gets called when upload completes
         if (publication?.id) {
-          linkUploadToPublication(item.tempId, publication.id);
+          linkUploadToPublication(
+            item.tempId,
+            publication.id,
+            publication.title,
+          );
         }
       }
 
@@ -705,7 +728,10 @@ export const usePublicationForm = ({
         (media) => media.isNew && media.file instanceof File,
       );
 
-      const handleBackgroundLinking = async (pubId: number) => {
+      const handleBackgroundLinking = async (
+        pubId: number,
+        pubTitle?: string,
+      ) => {
         // 2.a Lock Media for others
         try {
           await axios.post(route("api.v1.publications.lock-media", pubId));
@@ -757,7 +783,7 @@ export const usePublicationForm = ({
             }
           } else {
             // Otherwise, link it so useS3Upload attaches it when done
-            linkUploadToPublication(media.tempId, pubId);
+            linkUploadToPublication(media.tempId, pubId, pubTitle);
           }
         }
 
@@ -766,12 +792,18 @@ export const usePublicationForm = ({
         }
       };
 
-      if (pendingFiles.length > 0 && (result as any).publication?.id) {
-        handleBackgroundLinking((result as any).publication.id);
-        toast.success(
-          t("publications.modal.media.backgroundUpload") ||
-            "Saved! Media is uploading in background.",
-        );
+      if (pendingFiles.length > 0 && result) {
+        const pubId = (result as any).id || (result as any).publication?.id;
+        const pubTitle =
+          (result as any).title || (result as any).publication?.title;
+
+        if (pubId) {
+          handleBackgroundLinking(pubId, pubTitle);
+          toast.success(
+            t("publications.modal.media.backgroundUpload") ||
+              "Saved! Media is uploading in background.",
+          );
+        }
       }
 
       // CLOSE IMMEDIATELY - Don't wait for background linking or status checks

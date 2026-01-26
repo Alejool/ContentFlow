@@ -4,6 +4,7 @@ import { router } from "@inertiajs/react";
 import axios from "axios";
 import { useCallback } from "react";
 import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 export const useS3Upload = () => {
   // Use global store state
@@ -11,6 +12,7 @@ export const useS3Upload = () => {
   const addUpload = useUploadQueue((state) => state.addUpload);
   const updateUpload = useUploadQueue((state) => state.updateUpload);
   const removeUpload = useUploadQueue((state) => state.removeUpload);
+  const { t } = useTranslation();
 
   // Derived state for the consuming component (EditPublicationModal)
   // We recreate the 'progress', 'stats', 'errors' objects for compatibility
@@ -90,7 +92,14 @@ export const useS3Upload = () => {
                 });
               }
 
-              toast.success("Media attached successfully (Background Upload)");
+              toast.success(
+                t("publications.messages.mediaAttached", {
+                  title:
+                    currentItem.publicationTitle ||
+                    data.publication?.title ||
+                    "...",
+                }),
+              );
               router.reload({ only: ["publications", "publication"] }); // Refresh data to show new media
               removeUpload(tempId); // Clean up on success
             } catch (attachErr) {

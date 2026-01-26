@@ -298,7 +298,7 @@ const PublicationMobileRow = memo(
                                   )
                                 ) {
                                   await axios.delete(
-                                    `/api/calendar/user-events/${item.id}`,
+                                    `/api/v1/calendar/user-events/${item.id}`,
                                   );
                                   toast.success(
                                     t(
@@ -684,7 +684,7 @@ const PublicationMobileRow = memo(
                                     )
                                   ) {
                                     await axios.delete(
-                                      `/api/calendar/user-events/${item.id}`,
+                                      `/api/v1/calendar/user-events/${item.id}`,
                                     );
                                     toast.success(
                                       t(

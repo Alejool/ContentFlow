@@ -6,6 +6,7 @@ export interface QueuedUpload {
   progress: number;
   status: "pending" | "uploading" | "completed" | "error";
   publicationId?: number; // Linked after saving
+  publicationTitle?: string; // For notifications
   s3Key?: string;
   error?: string;
   stats?: { eta?: number; speed?: number };
@@ -18,7 +19,11 @@ interface UploadQueueState {
   addUpload: (id: string, file: File) => void;
   updateUpload: (id: string, updates: Partial<QueuedUpload>) => void;
   removeUpload: (id: string) => void;
-  linkUploadToPublication: (id: string, publicationId: number) => void;
+  linkUploadToPublication: (
+    id: string,
+    publicationId: number,
+    publicationTitle?: string,
+  ) => void;
 }
 
 export const useUploadQueue = create<UploadQueueState>((set) => ({
@@ -55,14 +60,14 @@ export const useUploadQueue = create<UploadQueueState>((set) => ({
       return { queue: rest };
     }),
 
-  linkUploadToPublication: (id, publicationId) =>
+  linkUploadToPublication: (id, publicationId, publicationTitle) =>
     set((state) => {
       const item = state.queue[id];
       if (!item) return state;
       return {
         queue: {
           ...state.queue,
-          [id]: { ...item, publicationId }, // Link it!
+          [id]: { ...item, publicationId, publicationTitle }, // Link it!
         },
       };
     }),

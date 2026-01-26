@@ -182,7 +182,7 @@ export default function CalendarIndex({ auth }: { auth: any }) {
 
     try {
       const resourceId = draggedEvent.id.split("_")[1];
-      await axios.patch(`/api/calendar/events/${resourceId}`, {
+      await axios.patch(`/api/v1/calendar/events/${resourceId}`, {
         scheduled_at: date.toISOString(),
         type: draggedEvent.type,
       });
@@ -207,7 +207,7 @@ export default function CalendarIndex({ auth }: { auth: any }) {
       const resourceId = eventToDelete.resourceId;
       // Optimistic remove
       setEvents((prev) => prev.filter((x) => x.id !== eventToDelete.id));
-      await axios.delete(`/api/calendar/user-events/${resourceId}`);
+      await axios.delete(`/api/v1/calendar/user-events/${resourceId}`);
       toast.success(t("calendar.userEvents.modal.messages.successDelete"));
     } catch (err) {
       console.error(err);

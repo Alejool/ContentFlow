@@ -308,6 +308,7 @@
       "addError": "Error adding publication",
       "updateSuccess": "Publication updated successfully!",
       "updateError": "Error updating publication",
+      "mediaAttached": "Media file attached successfully to '{{title}}' (Background Upload)",
       "deleteSuccess": "Publication deleted successfully!",
       "deleteError": "Error deleting publication",
       "fetchError": "Error fetching campaigns",

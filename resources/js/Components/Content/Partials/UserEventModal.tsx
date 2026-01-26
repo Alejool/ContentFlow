@@ -207,10 +207,10 @@ export default function UserEventModal({
         const resourceId = event.id.includes("_")
           ? event.id.split("_")[2]
           : event.id;
-        await axios.put(`/api/calendar/user-events/${resourceId}`, payload);
+        await axios.put(`/api/v1/calendar/user-events/${resourceId}`, payload);
         toast.success(t("calendar.userEvents.modal.messages.successUpdate"));
       } else {
-        await axios.post("/api/calendar/user-events", payload);
+        await axios.post("/api/v1/calendar/user-events", payload);
         toast.success(t("calendar.userEvents.modal.messages.successCreate"));
       }
       onSuccess();

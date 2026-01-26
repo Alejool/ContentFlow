@@ -52,7 +52,7 @@ class UserCalendarEventTest extends TestCase
             'is_public' => false,
         ]);
 
-        $response = $this->actingAs($userA, 'sanctum')->getJson('/api/calendar/user-events');
+        $response = $this->actingAs($userA, 'sanctum')->getJson('/api/v1/calendar/user-events');
 
         $response->assertStatus(200);
 

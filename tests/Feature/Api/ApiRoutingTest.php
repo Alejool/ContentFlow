@@ -32,7 +32,7 @@ class ApiRoutingTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $response = $this->getJson('/api/workspaces');
+        $response = $this->getJson('/api/v1/workspaces');
 
         $response->assertStatus(200)
             ->assertJsonStructure([
@@ -53,13 +53,13 @@ class ApiRoutingTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $response = $this->getJson('/api/publications');
+        $response = $this->getJson('/api/v1/publications');
 
         $response->assertStatus(200)
             ->assertJsonStructure([
                 'success',
                 'data' => [
-                    'data', // pagination data
+                    'data',
                     'links'
                 ]
             ]);
@@ -70,7 +70,7 @@ class ApiRoutingTest extends TestCase
         $user = User::factory()->create();
         Sanctum::actingAs($user);
 
-        $response = $this->getJson('/api/notifications/stats');
+        $response = $this->getJson('/api/v1/notifications/stats');
 
         $response->assertStatus(200)
             ->assertJson([

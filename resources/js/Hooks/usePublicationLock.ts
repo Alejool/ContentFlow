@@ -88,7 +88,7 @@ export const usePublicationLock = (
                 if (uiStore.selectedItem?.id === publicationId) {
                   try {
                     const { data: freshData } = await axios.get(
-                      `/api/publications/${publicationId}`,
+                      `/api/v1/publications/${publicationId}`,
                     );
                     // Extract properly: freshData.data is { publication: ... }
                     const pub =
@@ -156,7 +156,7 @@ export const usePublicationLock = (
       pollInterval = setInterval(async () => {
         try {
           const resp = await axios.get(
-            `/api/publications/${publicationId}/lock`,
+            `/api/v1/publications/${publicationId}/lock`,
           );
           const data = resp.data;
           if (data.lock) {
@@ -302,7 +302,7 @@ export const useWorkspaceLocks = () => {
 
     const fetchLocks = async () => {
       try {
-        const { data } = await axios.get("/api/publication-locks");
+        const { data } = await axios.get("/api/v1/publication-locks");
         const locks = data.data?.locks || data.locks || [];
         const lockMap: Record<number, LockInfo> = {};
 
@@ -365,7 +365,7 @@ export const useWorkspaceLocks = () => {
               try {
                 // Fetch full data to ensure we have activities, logs, etc.
                 const { data } = await axios.get(
-                  `/api/publications/${e.publication.id}`,
+                  `/api/v1/publications/${e.publication.id}`,
                 );
                 const freshData =
                   data.data?.publication ||

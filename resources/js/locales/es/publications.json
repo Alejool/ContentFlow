@@ -318,6 +318,7 @@
       "addError": "Error al agregar publicación",
       "updateSuccess": "¡Publicación actualizada exitosamente!",
       "updateError": "Error al actualizar publicación",
+      "mediaAttached": "Archivo multimedia adjuntado con éxito a '{{title}}' (Carga en segundo plano)",
       "deleteSuccess": "¡Publicación eliminada exitosamente!",
       "deleteError": "Error al eliminar publicación",
       "fetchError": "Error al cargar campañas",
