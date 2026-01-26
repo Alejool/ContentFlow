@@ -96,9 +96,18 @@ export const useAuth = () => {
   };
 
   const handleGoogleLogin = () => {
+    console.log("Iniciando redirección a Google...");
     setLoading(true);
     setGeneralError("");
-    window.location.href = "/auth/google/redirect";
+    try {
+      const url = route("auth.google.redirect");
+      console.log("URL de redirección:", url);
+      window.location.href = url;
+    } catch (err) {
+      console.error("Ziggy route error:", err);
+      // Fallback
+      window.location.href = "/auth/google/redirect";
+    }
   };
 
   const handleFacebookLogin = () => {

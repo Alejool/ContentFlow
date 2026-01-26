@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
+
 class AuthController extends Controller
 {
     public function redirectToGoogle()
@@ -19,8 +20,12 @@ class AuthController extends Controller
 
     public function handleGoogleCallback()
     {
+        \Illuminate\Support\Facades\Log::info('Google Callback: Started');
         try {
+            /** @var \Laravel\Socialite\Two\User $googleUser */
             $googleUser = Socialite::driver('google')->stateless()->user();
+            \Illuminate\Support\Facades\Log::info('Google Callback: User received', ['email' => $googleUser->getEmail()]);
+
             $user = User::where('email', $googleUser->getEmail())->first();
 
             if ($user) {
@@ -45,10 +50,24 @@ class AuthController extends Controller
                 ]);
             }
             Auth::login($user, true);
+            \Illuminate\Support\Facades\Log::info('Google Callback: User logged in', ['id' => $user->id]);
+
             request()->session()->regenerate();
-            return redirect()->route('dashboard');
+            \Illuminate\Support\Facades\Log::info('Google Callback: Session regenerated, redirecting to dashboard');
+
+            return redirect()->intended(route('dashboard'));
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Google Callback: Error', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             return redirect()->route('login')->with('error', 'Error al iniciar sesión con Google: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Handle authentication via API token (e.g., from a mobile app or frontend SDK).
+     */
+    public function handleGoogleAuth(Request $request)
+    {
+        // This is a placeholder for custom token validation if needed
+        return response()->json(['message' => 'API Google Auth not fully implemented. please use /auth/google/redirect'], 501);
     }
 }

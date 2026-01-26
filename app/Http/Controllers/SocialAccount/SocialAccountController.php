@@ -160,9 +160,12 @@ class SocialAccountController extends Controller
 
   public function handleFacebookCallback(Request $request)
   {
-    if ($request->state !== session('social_auth_state')) {
-      return $this->handleOAuthError('Invalid state');
+    $this->ensureNotRateLimited('fb-callback');
+
+    if (!$this->validateOAuthState($request->state)) {
+      return $this->handleOAuthError('Invalid or expired security state');
     }
+
     if (!$request->has('code')) {
       return $this->handleOAuthError('Authorization code not received');
     }
@@ -243,8 +246,10 @@ class SocialAccountController extends Controller
 
   public function handleInstagramCallback(Request $request)
   {
-    if ($request->state !== session('social_auth_state')) {
-      return $this->handleOAuthError('Invalid state');
+    $this->ensureNotRateLimited('ig-callback');
+
+    if (!$this->validateOAuthState($request->state)) {
+      return $this->handleOAuthError('Invalid or expired security state');
     }
 
     if (!$request->has('code')) {
@@ -309,6 +314,8 @@ class SocialAccountController extends Controller
    */
   public function handleTwitterV1Callback(Request $request)
   {
+    $this->ensureNotRateLimited('twitter-v1-callback');
+
     if (!$request->has('oauth_token') || !$request->has('oauth_verifier')) {
       return $this->handleOAuthError('Twitter V1: Missing tokens');
     }
@@ -316,6 +323,8 @@ class SocialAccountController extends Controller
     $cachedToken = session('oauth_token');
     $cachedSecret = session('oauth_token_secret');
 
+    // For Twitter V1, we don't have 'state' in the same way, but we have oauth_token.
+    // However, social_auth_state is still used for the V2 flow later.
     if ($request->oauth_token !== $cachedToken) {
       return $this->handleOAuthError('Twitter V1: Token mismatch');
     }
@@ -369,8 +378,10 @@ class SocialAccountController extends Controller
 
   public function handleTwitterCallback(Request $request)
   {
-    if ($request->state !== session('social_auth_state')) {
-      return $this->handleOAuthError('Invalid state');
+    $this->ensureNotRateLimited('twitter-callback');
+
+    if (!$this->validateOAuthState($request->state)) {
+      return $this->handleOAuthError('Invalid or expired security state');
     }
     if (!$request->has('code')) {
       return $this->handleOAuthError('Authorization code not received');
@@ -437,7 +448,7 @@ class SocialAccountController extends Controller
           : null,
       ]);
 
-      session()->forget(['twitter_v1_creds', 'twitter_code_verifier', 'social_auth_state', 'oauth_token', 'oauth_token_secret']);
+      session()->forget(['twitter_v1_creds', 'twitter_code_verifier', 'oauth_token', 'oauth_token_secret']);
 
       return $this->closeWindowWithMessage('success', [
         'platform' => 'twitter',
@@ -452,9 +463,12 @@ class SocialAccountController extends Controller
 
   public function handleYoutubeCallback(Request $request)
   {
-    if ($request->state !== session('social_auth_state')) {
-      return $this->handleOAuthError('Invalid state');
+    $this->ensureNotRateLimited('youtube-callback');
+
+    if (!$this->validateOAuthState($request->state)) {
+      return $this->handleOAuthError('Invalid or expired security state');
     }
+
     if (!$request->has('code')) {
       return $this->handleOAuthError('Authorization code not received');
     }
@@ -522,8 +536,10 @@ class SocialAccountController extends Controller
 
   public function handleTiktokCallback(Request $request)
   {
-    if ($request->state !== session('social_auth_state')) {
-      return $this->handleOAuthError('Invalid state');
+    $this->ensureNotRateLimited('tiktok-callback');
+
+    if (!$this->validateOAuthState($request->state)) {
+      return $this->handleOAuthError('Invalid or expired security state');
     }
 
     if (!$request->has('code')) {
@@ -550,7 +566,7 @@ class SocialAccountController extends Controller
 
       $data = $response->json();
 
-      session()->forget(['tiktok_code_verifier', 'social_auth_state']);
+      session()->forget('tiktok_code_verifier');
 
       if (isset($data['error'])) {
         return $this->handleOAuthError(
@@ -680,6 +696,32 @@ class SocialAccountController extends Controller
       'success' => false,
       'message' => $message
     ]);
+  }
+
+  /**
+   * Validate and consume the OAuth state to prevent replay attacks.
+   */
+  private function validateOAuthState($state): bool
+  {
+    if (empty($state) || $state !== session('social_auth_state')) {
+      return false;
+    }
+
+    // Immediately consume the state
+    session()->forget('social_auth_state');
+    return true;
+  }
+
+  /**
+   * Ensure the request is not being flooded from the same IP.
+   */
+  private function ensureNotRateLimited($key): void
+  {
+    $throttleKey = $key . '|' . request()->ip();
+    if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($throttleKey, 5)) {
+      abort(429, 'Too many attempts. Please try again later.');
+    }
+    \Illuminate\Support\Facades\RateLimiter::hit($throttleKey, 60);
   }
 
   private function closeWindowWithMessage($status, $data = [])

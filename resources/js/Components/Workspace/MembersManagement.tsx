@@ -35,7 +35,7 @@ export default function MembersManagement({
     try {
       setIsLoading(true);
       const response = await axios.get(
-        route("workspaces.members", current_workspace.id),
+        route("api.v1.workspaces.members", current_workspace.id),
       );
       setMembers(response.data.members || []);
     } catch (error) {
@@ -73,7 +73,7 @@ export default function MembersManagement({
     if (!canManageMembers) return;
     try {
       await axios.put(
-        route("workspaces.members.role", {
+        route("api.v1.workspaces.members.update-role", {
           workspace: current_workspace.id,
           user: userId,
         }),
@@ -99,7 +99,7 @@ export default function MembersManagement({
 
     try {
       const response = await axios.delete(
-        route("workspaces.members.remove", {
+        route("api.v1.workspaces.members.remove", {
           workspace: current_workspace.id,
           user: userToRemove,
         }),

@@ -58,7 +58,7 @@ export default function IntegrationsSettingsTab({
     try {
       setLoadingActivity(true);
       const response = await axios.get(
-        route("api.workspaces.activity", workspace.id),
+        route("api.v1.workspaces.activity", workspace.id),
       );
       setActivity(response.data.data || []);
     } catch (error) {
@@ -105,7 +105,7 @@ export default function IntegrationsSettingsTab({
     setTesting(type);
     try {
       await axios.post(
-        route("api.workspaces.webhooks.test", {
+        route("api.v1.workspaces.webhooks.test", {
           workspace: workspace.id,
         }),
         {

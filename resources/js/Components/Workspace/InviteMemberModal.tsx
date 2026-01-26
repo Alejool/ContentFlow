@@ -81,7 +81,7 @@ export default function InviteMemberModal({
     setIsSubmitting(true);
     try {
       const response = await axios.post(
-        route("workspaces.invite", workspace.id),
+        route("api.v1.workspaces.invite", workspace.id),
         data,
       );
       toast.success(
