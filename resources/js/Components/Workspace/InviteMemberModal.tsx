@@ -65,11 +65,13 @@ export default function InviteMemberModal({
     }
   }, [errors]);
 
-  const roleOptions = roles.map((role) => ({
-    value: role.id,
-    label: role.name,
-    icon: <Shield className="w-4 h-4" />,
-  }));
+  const roleOptions = roles
+    .filter((role) => role.slug !== "owner")
+    .map((role) => ({
+      value: role.id,
+      label: role.name,
+      icon: <Shield className="w-4 h-4" />,
+    }));
 
   const onSubmit = async (data: InviteFormData) => {
     if (!workspace?.id) {

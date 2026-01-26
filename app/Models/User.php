@@ -111,6 +111,26 @@ class User extends Model implements Authenticatable, MustVerifyEmail, CanResetPa
         return $this->belongsTo(Workspace::class, 'current_workspace_id');
     }
 
+    /**
+     * Get user's workspaces with their roles and permissions.
+     *
+     * Usage:
+     *   $user->getWorkspacesWithRolesAndPermissions();
+     *
+     * Access data:
+     *   foreach ($user->workspaces as $workspace) {
+     *       $role = $workspace->pivot->role;
+     *       $permissions = $role->permissions;
+     *   }
+     *
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getWorkspacesWithRolesAndPermissions()
+    {
+        return $this->load('workspaces')->workspaces;
+    }
+
+
     public function hasPermission($permissionSlug, $workspaceId = null)
     {
         $workspaceId = $workspaceId ?: $this->current_workspace_id;

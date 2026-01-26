@@ -18,6 +18,8 @@ class Workspace extends Model
         'slug',
         'description',
         'created_by',
+        'public',
+        'allow_public_invites',
         'slack_webhook_url',
         'discord_webhook_url',
     ];
@@ -58,11 +60,6 @@ class Workspace extends Model
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');
-    }
-
-    public function roles()
-    {
-        return $this->hasMany(Role::class);
     }
 
     public function socialAccounts()

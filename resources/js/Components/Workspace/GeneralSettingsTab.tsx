@@ -1,7 +1,7 @@
 import Button from "@/Components/common/Modern/Button";
 import Input from "@/Components/common/Modern/Input";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { router } from "@inertiajs/react";
+import { router, usePage } from "@inertiajs/react";
 import {
   Copy,
   Globe,
@@ -49,7 +49,11 @@ export default function GeneralSettingsTab({
   canManageWorkspace,
 }: GeneralSettingsTabProps) {
   const { t } = useTranslation();
+  const { auth } = usePage().props as any;
   const [isSaving, setIsSaving] = useState(false);
+
+  // Only workspace creator (Owner) can edit workspace settings
+  const isOwner = Number(workspace.created_by) === Number(auth.user.id);
 
   const {
     register,
@@ -67,8 +71,11 @@ export default function GeneralSettingsTab({
   });
 
   const onSubmit = (data: SettingsFormData) => {
-    if (!canManageWorkspace) {
-      toast.error(t("workspace.permissions_required"));
+    if (!isOwner) {
+      toast.error(
+        t("workspace.permissions_required") ||
+          "Only the workspace owner can update these settings",
+      );
       return;
     }
 
@@ -111,7 +118,7 @@ export default function GeneralSettingsTab({
                 register={register}
                 error={errors.name?.message}
                 required
-                disabled={!canManageWorkspace}
+                disabled={!isOwner}
                 className="bg-white dark:bg-neutral-900"
                 placeholder={t("workspace.name_placeholder")}
               />
@@ -122,7 +129,7 @@ export default function GeneralSettingsTab({
                 </label>
                 <textarea
                   {...register("description")}
-                  disabled={!canManageWorkspace}
+                  disabled={!isOwner}
                   className="mt-1 block w-full rounded-lg border border-gray-300 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm transition-colors px-4 py-3 min-h-[120px] disabled:opacity-50 disabled:cursor-not-allowed"
                   rows={4}
                   placeholder={t("workspace.description_placeholder")}
@@ -175,7 +182,7 @@ export default function GeneralSettingsTab({
                       <input
                         type="checkbox"
                         {...register("public")}
-                        disabled={!canManageWorkspace}
+                        disabled={!isOwner}
                         className="sr-only peer"
                       />
                       <div className="w-11 h-6 bg-gray-200 dark:bg-neutral-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"></div>
@@ -201,7 +208,7 @@ export default function GeneralSettingsTab({
                         <input
                           type="checkbox"
                           {...register("allow_public_invites")}
-                          disabled={!canManageWorkspace}
+                          disabled={!isOwner}
                           className="sr-only peer"
                         />
                         <div className="w-11 h-6 bg-gray-200 dark:bg-neutral-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"></div>
@@ -245,7 +252,7 @@ export default function GeneralSettingsTab({
             <Button
               type="submit"
               loading={isSaving}
-              disabled={!canManageWorkspace}
+              disabled={!isOwner}
               className="px-8"
             >
               {isSaving ? t("common.saving") : t("common.save_changes")}

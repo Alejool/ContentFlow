@@ -144,8 +144,9 @@ class HandleInertiaRequests extends Middleware
                   'view-analytics',
                   'manage-accounts',
                   'manage-team',
-                  'content',
-                  'manage-campaigns'
+                  'manage-content',
+                  'manage-campaigns',
+                  'view-content'
                 ];
               } else {
                 $currentWorkspace->permissions = $role ? $role->permissions->pluck('slug')->toArray() : [];

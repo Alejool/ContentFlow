@@ -133,14 +133,16 @@ class WorkspaceController extends Controller
 
   public function update(Request $request, Workspace $workspace)
   {
-    // Check permission (manage-workspace or manage-team typically)
-    if (!Auth::user()->hasPermission('manage-team', $workspace->id)) {
-      abort(403);
+    // Only workspace creator (Owner) can update workspace settings
+    if (Auth::id() !== $workspace->created_by) {
+      abort(403, 'Only the workspace owner can update workspace settings');
     }
 
     $validated = $request->validate([
       'name' => 'required|string|max:255',
       'description' => 'nullable|string|max:1000',
+      'public' => 'nullable|boolean',
+      'allow_public_invites' => 'nullable|boolean',
     ]);
 
     $workspace->update($validated);
@@ -190,10 +192,20 @@ class WorkspaceController extends Controller
       'role_id' => 'required|exists:roles,id'
     ]);
 
+    // Prevent changing workspace creator's role
     if ($workspace->created_by === $userId) {
       return response()->json([
         'success' => false,
         'message' => 'Cannot change workspace creator\'s role'
+      ], 422);
+    }
+
+    // Prevent assigning Owner role to anyone
+    $role = Role::find($validated['role_id']);
+    if ($role && $role->slug === 'owner') {
+      return response()->json([
+        'success' => false,
+        'message' => 'Owner role cannot be assigned. It is reserved for the workspace creator.'
       ], 422);
     }
 
@@ -256,6 +268,15 @@ class WorkspaceController extends Controller
       'email.exists' => 'We could not find a user with this email address in our system.',
       'role_id.required' => 'Please select a role for the new member.',
     ]);
+
+    // Prevent inviting with Owner role
+    $role = Role::find($validated['role_id']);
+    if ($role && $role->slug === 'owner') {
+      return response()->json([
+        'success' => false,
+        'message' => 'Owner role cannot be assigned. It is reserved for the workspace creator.',
+      ], 422);
+    }
 
     $user = User::where('email', $validated['email'])->first();
 

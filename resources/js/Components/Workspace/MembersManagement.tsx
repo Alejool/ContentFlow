@@ -145,7 +145,9 @@ export default function MembersManagement({
     },
   ];
 
-  const roleOptions = roles.map((r) => ({ value: r.id, label: r.name }));
+  const roleOptions = roles
+    .filter((r) => r.slug !== "owner")
+    .map((r) => ({ value: r.id, label: r.name }));
 
   if (isLoading) {
     return (
