@@ -36,6 +36,12 @@ interface MediaUploadSectionProps {
   uploadProgress?: Record<string, number>;
   uploadStats?: Record<string, { eta?: number; speed?: number }>;
   uploadErrors?: Record<string, string>;
+  lockedBy?: {
+    id: number;
+    name: string;
+    photo_url: string;
+    isSelf: boolean;
+  } | null;
 }
 
 const MediaUploadSection = memo(
@@ -57,11 +63,12 @@ const MediaUploadSection = memo(
     uploadProgress,
     uploadStats,
     uploadErrors,
+    lockedBy,
   }: MediaUploadSectionProps) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const getUploadAreaStyles = () => {
-      if (disabled || isAnyMediaProcessing) {
+      if (disabled || isAnyMediaProcessing || (lockedBy && !lockedBy.isSelf)) {
         return "bg-gray-100 dark:bg-neutral-800/50 cursor-not-allowed opacity-60 border-gray-300 dark:border-neutral-700";
       }
       if (imageError) {
@@ -139,7 +146,11 @@ const MediaUploadSection = memo(
                 )}
               </div>
             ) : (
-              <EmptyUploadState t={t} isProcessing={isAnyMediaProcessing} />
+              <EmptyUploadState
+                t={t}
+                isProcessing={isAnyMediaProcessing}
+                lockedBy={lockedBy}
+              />
             )}
 
             {/* Global Processing Indicator for the whole area */}
@@ -406,16 +417,20 @@ const EmptyUploadState = memo(
   ({
     t,
     isProcessing,
+    lockedBy,
   }: {
     t: (key: string) => string;
     isProcessing?: boolean;
+    lockedBy?: { name: string; isSelf: boolean } | null;
   }) => (
     <div className="space-y-4">
       <div
-        className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto transition-all duration-300 ${isProcessing ? "bg-primary-500 animate-pulse" : "bg-primary-100 dark:bg-primary-900/30 group-hover:scale-110"}`}
+        className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto transition-all duration-300 ${isProcessing || (lockedBy && !lockedBy.isSelf) ? "bg-gray-200 dark:bg-gray-800" : "bg-primary-100 dark:bg-primary-900/30 group-hover:scale-110"}`}
       >
         {isProcessing ? (
           <Loader2 className="w-8 h-8 text-white animate-spin" />
+        ) : lockedBy && !lockedBy.isSelf ? (
+          <AlertTriangle className="w-8 h-8 text-yellow-500" />
         ) : (
           <Upload className="w-8 h-8 text-primary-500" />
         )}
@@ -424,12 +439,16 @@ const EmptyUploadState = memo(
         <p className="font-medium text-lg">
           {isProcessing
             ? "Procesando archivos..."
-            : t("publications.modal.edit.dragDrop.title")}
+            : lockedBy && !lockedBy.isSelf
+              ? `Subida bloqueada por ${lockedBy.name}`
+              : t("publications.modal.edit.dragDrop.title")}
         </p>
         <p className="text-sm mt-1 opacity-70">
           {isProcessing
             ? "Por favor, espera a que termine la subida actual."
-            : t("publications.modal.edit.dragDrop.subtitle")}
+            : lockedBy && !lockedBy.isSelf
+              ? "Solo una persona puede subir archivos a la vez."
+              : t("publications.modal.edit.dragDrop.subtitle")}
         </p>
       </div>
     </div>

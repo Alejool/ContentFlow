@@ -109,6 +109,7 @@ const EditPublicationModal = ({
     uploadErrors,
     isS3Uploading: uploading,
     isAnyMediaProcessing,
+    remoteLock,
   } = usePublicationForm({
     publication,
     onClose,
@@ -404,6 +405,7 @@ const EditPublicationModal = ({
                     uploadProgress={uploadProgress}
                     uploadStats={uploadStats}
                     uploadErrors={uploadErrors}
+                    lockedBy={remoteLock}
                   />
                 )}
 

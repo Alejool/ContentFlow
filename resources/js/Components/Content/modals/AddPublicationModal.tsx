@@ -59,6 +59,7 @@ export default function AddPublicationModal({
     setAccountSchedules,
     setValue,
     control,
+    remoteLock,
   } = usePublicationForm({
     onClose,
     onSubmitSuccess: onSubmit,
@@ -122,7 +123,7 @@ export default function AddPublicationModal({
         await Promise.all(
           filesToUpload.map(async (media) => {
             if (media.file) {
-              const result = await uploadFile(media.file);
+              const result = await uploadFile(media.file, media.tempId);
               // Store result alongside the original index or id to map it back?
               // We can just rely on order if we are careful, but async might mix order.
               // Better to modify the form data 'media' field.
@@ -174,7 +175,7 @@ export default function AddPublicationModal({
         const uploadResults = await Promise.all(
           filesToUpload.map(async (m) => ({
             tempId: m.tempId,
-            metadata: await uploadFile(m.file!),
+            metadata: await uploadFile(m.file!, m.tempId),
           })),
         );
 
@@ -304,6 +305,7 @@ export default function AddPublicationModal({
                     setIsDragOver(false);
                     handleFileChange(e.dataTransfer.files);
                   }}
+                  lockedBy={remoteLock}
                 />
 
                 <SocialAccountsSection

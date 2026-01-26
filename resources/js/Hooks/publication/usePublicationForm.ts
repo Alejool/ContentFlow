@@ -57,6 +57,12 @@ export const usePublicationForm = ({
   const [removedMediaIds, setRemovedMediaIds] = useState<number[]>([]);
   const [isDragOver, setIsDragOver] = useState(false);
   const [isDataReady, setIsDataReady] = useState(false);
+  const [remoteLock, setRemoteLock] = useState<{
+    id: number;
+    name: string;
+    photo_url: string;
+    isSelf: boolean;
+  } | null>(null);
 
   // Platform settings and previews
   const [platformSettings, setPlatformSettings] = useState<Record<string, any>>(
@@ -177,6 +183,52 @@ export const usePublicationForm = ({
       }
     }
   }, [isOpen, publication, user?.global_platform_settings]);
+
+  // Phase 1.5: Real-time Lock & Update Listener
+  useEffect(() => {
+    if (!isOpen || !publication?.id || !user?.current_workspace_id) return;
+
+    const channelName = `workspace.${user.current_workspace_id}`;
+    const channel = window.Echo.private(channelName);
+
+    console.log(
+      `🔌 Subscribing to ${channelName} for Publication ${publication.id}`,
+    );
+
+    const handlePublicationUpdate = (e: any) => {
+      if (e.publication?.id === publication.id) {
+        console.log(
+          "📨 Received Remote Update for current publication:",
+          e.publication,
+        );
+
+        // Handle Media Lock
+        if (e.publication.media_locked_by) {
+          setRemoteLock({
+            ...e.publication.media_locked_by,
+            isSelf: e.publication.media_locked_by.id === user.id,
+          });
+        } else {
+          setRemoteLock(null);
+        }
+
+        // Only sync media files if NOT locked by self (to avoid overwriting own optimistic updates)
+        // and if not currently editing something critical (optional, but good for safety)
+        if (!isDirty) {
+          // For now, we trust the re-mount or manual refresh for full media sync
+          // to avoid complexity of merging lists in real-time while user might be typing.
+          // BUT, if we want to show "User B upload finished", we might want to trigger a refresh
+        }
+      }
+    };
+
+    channel.listen(".publication.updated", handlePublicationUpdate);
+
+    return () => {
+      console.log(`🔌 Unsubscribing from ${channelName}`);
+      channel.stopListening(".publication.updated", handlePublicationUpdate);
+    };
+  }, [isOpen, publication?.id, user?.current_workspace_id, user?.id, isDirty]);
 
   // Phase 2: Defer HEAVY processing using startTransition
   useEffect(() => {
@@ -656,7 +708,7 @@ export const usePublicationForm = ({
       const handleBackgroundLinking = async (pubId: number) => {
         // 2.a Lock Media for others
         try {
-          await axios.post(route("publications.lock-media", pubId));
+          await axios.post(route("api.v1.publications.lock-media", pubId));
         } catch (err) {
           console.error("Failed to lock media", err);
         }
@@ -681,7 +733,7 @@ export const usePublicationForm = ({
           ) {
             try {
               const { data: attachResult } = await axios.post(
-                route("publications.attach-media", pubId),
+                route("api.v1.publications.attach-media", pubId),
                 {
                   key: queueItem.s3Key,
                   filename: queueItem.file.name,
@@ -797,6 +849,7 @@ export const usePublicationForm = ({
 
     // Data loading state
     isDataReady,
+    remoteLock,
 
     // Upload state
     uploadingFiles,

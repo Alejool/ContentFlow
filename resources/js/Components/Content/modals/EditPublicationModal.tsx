@@ -109,6 +109,7 @@ const EditPublicationModal = ({
     uploadErrors,
     isS3Uploading: uploading,
     isAnyMediaProcessing,
+    remoteLock,
   } = usePublicationForm({
     publication,
     onClose,
@@ -183,8 +184,7 @@ const EditPublicationModal = ({
   });
 
   const { auth } = usePage<any>().props;
-  const canManage =
-    auth.current_workspace?.permissions?.includes("content");
+  const canManage = auth.current_workspace?.permissions?.includes("content");
 
   // Partial locking:
   // - Global lock: only if another user has the lock
@@ -404,6 +404,7 @@ const EditPublicationModal = ({
                     uploadProgress={uploadProgress}
                     uploadStats={uploadStats}
                     uploadErrors={uploadErrors}
+                    lockedBy={remoteLock}
                   />
                 )}
 
