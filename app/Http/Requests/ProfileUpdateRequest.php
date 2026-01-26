@@ -16,8 +16,9 @@ class ProfileUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['sometimes', 'required', 'string', 'max:255'],
             'email' => [
+                'sometimes',
                 'required',
                 'string',
                 'lowercase',
@@ -72,6 +73,7 @@ class ProfileUpdateRequest extends FormRequest
             'country_code' => ['nullable', 'string', 'max:10'],
             'bio' => ['nullable', 'string', 'max:1000'],
             'global_platform_settings' => ['nullable', 'array'],
+            'ai_settings' => ['nullable', 'array'],
         ];
     }
 }

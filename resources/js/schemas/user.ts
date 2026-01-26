@@ -26,7 +26,8 @@ export const userProfileSchema = (t: any) =>
       .nullable()
       .optional()
       .or(z.literal("")),
-    global_platform_settings: z.record(z.any()).optional().nullable(),
+    global_platform_settings: z.any().optional().nullable(),
+    ai_settings: z.any().optional().nullable(),
   });
 
 export type UserProfileFormData = z.infer<ReturnType<typeof userProfileSchema>>;

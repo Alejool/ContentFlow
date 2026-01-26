@@ -1,10 +1,11 @@
-﻿{
+{
   "profile": {
     "menu_title": "Settings",
     "tabs": {
       "general": "General",
       "security": "Security",
-      "accounts": "Connections"
+      "accounts": "Connections",
+      "ai": "Artificial Intelligence"
     },
     "title": "Profile",
     "settings_description": "Update your personal information and security settings.",
@@ -104,6 +105,14 @@
     "toast": {
       "languageChanged": "Language changed successfully.",
       "languageChangeError": "Error changing language."
+    },
+    "ai": {
+      "title": "Personal AI Configuration",
+      "description": "Configure your own API keys to enable personalized intelligent features.",
+      "hint": "If you configure a provider here, the system will use your personal key instead of the system default. This gives you more control over usage and capabilities.",
+      "get_key": "Get Key",
+      "api_key_label": "API Key",
+      "secured_storage": "Secure Encrypted Storage"
     }
   }
 }

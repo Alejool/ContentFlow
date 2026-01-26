@@ -68,28 +68,25 @@ class ProfileController extends Controller
             $user = User::find(Auth::id());
             $validated = $request->validated();
 
+            $user->fill($validated);
 
-            $changes = array_filter($validated, function ($value, $key) use ($user) {
-                return $user->$key !== $value;
-            }, ARRAY_FILTER_USE_BOTH);
-
-            // if (!empty($changes)) {
-            $user->fill($changes);
-
-            if (isset($changes['email'])) {
+            if ($user->isDirty('email')) {
                 $user->email_verified_at = null;
             }
 
             $user->save();
 
-            if ($request->wantsJson() || $request->is('api/*')) {
-                return $this->successResponse($user, 'Profile updated successfully');
-            }
+            // Reload the user to get fresh data with proper JSON casting
+            $freshUser = $user->fresh();
+
+            // Ensure JSON fields are properly cast
+            $userData = $freshUser->toArray();
 
             return response()->json([
                 'success' => true,
                 'message' => 'Profile updated successfully',
-                'user' => $user
+                'user' => $userData,
+                'debug_received' => $validated
             ]);
         } catch (\Exception $e) {
             return $this->errorResponse('Error updating profile: ' . $e->getMessage(), 500);

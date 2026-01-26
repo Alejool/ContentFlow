@@ -82,9 +82,9 @@ export const usePublicationLock = (
           // Only refresh data if we JUST took over the lock or if it was forced
           // This prevents data loss during regular heartbeats
           if (!wasAlreadyLockedByMe || force) {
-            import("@/stores/manageContentUIStore").then(
-              async ({ useManageContentUIStore }) => {
-                const uiStore = useManageContentUIStore.getState();
+            import("@/stores/contentUIStore").then(
+              async ({ useContentUIStore }) => {
+                const uiStore = useContentUIStore.getState();
                 if (uiStore.selectedItem?.id === publicationId) {
                   try {
                     const { data: freshData } = await axios.get(
@@ -358,9 +358,9 @@ export const useWorkspaceLocks = () => {
             .updatePublication(e.publication.id, e.publication);
         });
 
-        import("@/stores/manageContentUIStore").then(
-          async ({ useManageContentUIStore }) => {
-            const uiStore = useManageContentUIStore.getState();
+        import("@/stores/contentUIStore").then(
+          async ({ useContentUIStore }) => {
+            const uiStore = useContentUIStore.getState();
             if (uiStore.selectedItem?.id === e.publication.id) {
               try {
                 // Fetch full data to ensure we have activities, logs, etc.

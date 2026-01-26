@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 
 interface UpdatePasswordFormProps {
   className?: string;
+  user?: any;
 }
 
 interface IconProps {
@@ -50,7 +51,10 @@ const SuccessAlert = ({ show, t }: SuccessAlertProps) => (
   </Transition>
 );
 
-const UpdatePasswordForm = ({ className = "" }: UpdatePasswordFormProps) => {
+const UpdatePasswordForm = ({
+  className = "",
+  user,
+}: UpdatePasswordFormProps) => {
   const { t } = useTranslation();
 
   const { register, handleSubmit, errors, isSubmitting, isSuccess } =

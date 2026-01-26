@@ -56,12 +56,14 @@ const SUPPORTED_COUNTRIES = [
 
 interface UpdateProfileInformationProps {
   mustVerifyEmail: boolean;
+  user: any;
   status: string | null | undefined;
   className?: string;
 }
 
 export default function UpdateProfileInformation({
   mustVerifyEmail,
+  user: initialUser,
   status,
   className = "",
 }: UpdateProfileInformationProps) {
@@ -79,7 +81,7 @@ export default function UpdateProfileInformation({
     watchedValues,
     setValue,
     control,
-  } = useUser(null);
+  } = useUser(initialUser);
 
   const [activePlatform, setActivePlatform] = useState<string | null>(null);
 
@@ -453,12 +455,12 @@ export default function UpdateProfileInformation({
           </div>
 
           <Button
-            disabled={isSubmitting || !hasChanges}
+            disabled={isSubmitting}
             icon={Save}
             loading={isSubmitting}
             loadingText={t("common.saving")}
             className={`w-full sm:w-auto min-w-[200px] transition-all duration-300 rounded-lg shadow-xl font-bold uppercase tracking-wider ${
-              !hasChanges
+              isSubmitting
                 ? "opacity-50 grayscale"
                 : "hover:scale-[1.05] active:scale-[0.95] bg-primary-600 hover:bg-primary-500 text-white border-0 shadow-primary-500/25"
             }`}

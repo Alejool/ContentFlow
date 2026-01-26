@@ -16,7 +16,7 @@ class ErrorInterceptorClass {
       async (error: AxiosError<ErrorResponse>) => {
         await this.handleError(error);
         return Promise.reject(error);
-      }
+      },
     );
   }
 
@@ -26,7 +26,12 @@ class ErrorInterceptorClass {
 
     // Network error
     if (!error.response) {
+      if ((error.config as any)?.skipErrorHandler) return;
       return this.handleNetworkError(error);
+    }
+
+    if ((error.config as any)?.skipErrorHandler) {
+      return;
     }
 
     // Handle by status code
@@ -78,7 +83,7 @@ class ErrorInterceptorClass {
     // Instead of redirecting automatically (which can cause loops if the session is actually valid
     // but a specific request fails), we just show a warning message.
     ToastService.warning(
-      "Unauthenticated request detected. If you are having issues, please try logging in again."
+      "Unauthenticated request detected. If you are having issues, please try logging in again.",
     );
   }
 
@@ -135,17 +140,20 @@ class ErrorInterceptorClass {
     if (retries < this.maxRetries) {
       this.retryCount.set(url, retries + 1);
       ToastService.info(
-        `Connection failed. Retrying... (${retries + 1}/${this.maxRetries})`
+        `Connection failed. Retrying... (${retries + 1}/${this.maxRetries})`,
       );
 
       // Retry after delay
-      setTimeout(() => {
-        axios.request(config);
-      }, 1000 * (retries + 1));
+      setTimeout(
+        () => {
+          axios.request(config);
+        },
+        1000 * (retries + 1),
+      );
     } else {
       this.retryCount.delete(url);
       ToastService.error(
-        "Network error. Please check your connection and try again."
+        "Network error. Please check your connection and try again.",
       );
     }
   }

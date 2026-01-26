@@ -49,52 +49,61 @@ class ApprovalController extends Controller
    */
   public function history(Request $request)
   {
-    $workspaceId = Auth::user()->current_workspace_id ?? Auth::user()->workspaces()->first()?->id;
+    \Illuminate\Support\Facades\Log::debug('ENTERED ApprovalController::history', [
+      'user_id' => Auth::id(),
+      'query' => $request->all()
+    ]);
+    try {
+      $workspaceId = Auth::user()->current_workspace_id ?? Auth::user()->workspaces()->first()?->id;
 
-    if (!$workspaceId) {
-      return $this->errorResponse('No active workspace found.', 404);
+      if (!$workspaceId) {
+        return $this->errorResponse('No active workspace found.', 404);
+      }
+
+      // Only users with 'approve' permission can access this
+      if (!Auth::user()->hasPermission('approve', $workspaceId)) {
+        return $this->errorResponse('You do not have permission to view approval history.', 403);
+      }
+
+      $query = ApprovalLog::whereHas('publication', function ($q) use ($workspaceId) {
+        $q->where('workspace_id', $workspaceId);
+      })
+        ->with([
+          'publication:id,title,status',
+          'requester:id,name,email,photo_url',
+          'reviewer:id,name,email,photo_url'
+        ])
+        ->orderBy('requested_at', 'desc');
+
+      // Filter by action (approved/rejected)
+      if ($request->has('action') && in_array($request->action, ['approved', 'rejected'])) {
+        $query->where('action', $request->action);
+      }
+
+      // Filter by date range
+      if ($request->has('date_start') && $request->has('date_end')) {
+        $query->whereBetween('requested_at', [$request->date_start, $request->date_end]);
+      }
+
+      // Search by publication title
+      if ($request->has('search') && $request->search) {
+        $query->whereHas('publication', function ($q) use ($request) {
+          $q->where('title', 'ILIKE', '%' . $request->search . '%');
+        });
+      }
+
+      // Filter by specific publication ID (for details view)
+      if ($request->has('publication_id')) {
+        $query->where('publication_id', $request->publication_id);
+      }
+
+      $logs = $query->paginate($request->query('per_page', 10));
+
+      return $this->successResponse(['logs' => $logs]);
+    } catch (\Throwable $e) {
+      \Illuminate\Support\Facades\Log::error('Approval History Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+      return $this->errorResponse('Server Error: ' . $e->getMessage(), 500);
     }
-
-    // Only users with 'approve' permission can access this
-    if (!Auth::user()->hasPermission('approve', $workspaceId)) {
-      return $this->errorResponse('You do not have permission to view approval history.', 403);
-    }
-
-    $query = ApprovalLog::whereHas('publication', function ($q) use ($workspaceId) {
-      $q->where('workspace_id', $workspaceId);
-    })
-      ->with([
-        'publication:id,title,status',
-        'requester:id,name,email,photo_url',
-        'reviewer:id,name,email,photo_url'
-      ])
-      ->orderBy('requested_at', 'desc');
-
-    // Filter by action (approved/rejected)
-    if ($request->has('action') && in_array($request->action, ['approved', 'rejected'])) {
-      $query->where('action', $request->action);
-    }
-
-    // Filter by date range
-    if ($request->has('date_start') && $request->has('date_end')) {
-      $query->whereBetween('requested_at', [$request->date_start, $request->date_end]);
-    }
-
-    // Search by publication title
-    if ($request->has('search') && $request->search) {
-      $query->whereHas('publication', function ($q) use ($request) {
-        $q->where('title', 'ILIKE', '%' . $request->search . '%');
-      });
-    }
-
-    // Filter by specific publication ID (for details view)
-    if ($request->has('publication_id')) {
-      $query->where('publication_id', $request->publication_id);
-    }
-
-    $logs = $query->paginate($request->query('per_page', 10));
-
-    return $this->successResponse(['logs' => $logs]);
   }
 
   /**
