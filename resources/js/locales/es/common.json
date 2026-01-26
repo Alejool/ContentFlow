@@ -27,6 +27,17 @@
     "analytics": "Analíticas",
     "aiChat": "Chat IA",
     "logout": "Cerrar Sesión",
+    "ai": {
+      "suggest": "Sugerir con IA",
+      "improve": "Mejorar con IA",
+      "thinking": "Pensando...",
+      "suggestions_generated": "Sugerencias generadas con éxito",
+      "suggestion_failed": "No se pudieron generar sugerencias",
+      "get_suggestions": "Obtener sugerencias con IA",
+      "idea_prompt": "Prompt de Idea (IA)",
+      "idea_prompt_placeholder": "Describe tu idea para autocompletar el formulario...",
+      "generate": "Generar todo"
+    },
     "note": "Nota",
     "warning": "Advertencia",
     "success": "Exito",

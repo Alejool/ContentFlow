@@ -55,7 +55,7 @@ const ModalHeader: React.FC<ModalHeaderProps> = ({
         {rightElement}
         <button
           onClick={onClose}
-          className="p-2 hover:bg-gray-100 dark:hover:bg-neutral-700 rounded-xl transition-colors text-gray-400 dark:text-gray-500"
+          className="p-2 hover:bg-gray-100 dark:hover:bg-neutral-700 rounded-lg transition-colors text-gray-400 dark:text-gray-500"
         >
           <X className="w-6 h-6" />
         </button>

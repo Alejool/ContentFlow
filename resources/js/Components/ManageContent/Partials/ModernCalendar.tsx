@@ -228,7 +228,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
               </button>
 
               {showMonthPicker && (
-                <div className="absolute top-full left-0 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg z-50 p-4 min-w-[280px]">
+                <div className="absolute top-full left-0 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 p-4 min-w-[280px]">
                   <div className="grid grid-cols-3 gap-2 mb-4">
                     {Array.from({ length: 12 }, (_, i) => (
                       <button
@@ -587,7 +587,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                                   currentUser?.name)) && (
                               <button
                                 onClick={(e) => handleDeleteEvent(e, event)}
-                                className="p-2 rounded-xl bg-red-50 dark:bg-red-900/20 text-red-500 transition-all"
+                                className="p-2 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-500 transition-all"
                                 title={t("common.delete")}
                               >
                                 <Trash2 className="w-4 h-4" />

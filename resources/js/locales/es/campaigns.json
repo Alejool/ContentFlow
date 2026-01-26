@@ -54,6 +54,9 @@
       "error": "Error"
     },
     "modal": {
+      "sections": {
+        "details": "Detalles de la Campaña"
+      },
       "add": {
         "title": "Crear Campaña",
         "subtitle": "Puedes crear una campaña para organizar y publicar tu contenido.",

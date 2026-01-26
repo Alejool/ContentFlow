@@ -26,6 +26,17 @@
     "analytics": "Analytics",
     "aiChat": "AI Chat",
     "logout": "Logout",
+    "ai": {
+      "suggest": "Suggest with AI",
+      "improve": "Improve with AI",
+      "thinking": "Thinking...",
+      "suggestions_generated": "Suggestions generated successfully",
+      "suggestion_failed": "Failed to generate suggestions",
+      "get_suggestions": "Get suggestions with AI",
+      "idea_prompt": "Idea Prompt (AI)",
+      "idea_prompt_placeholder": "Describe your idea to autocomplete the form...",
+      "generate": "Generate all"
+    },
     "note": "Note",
     "warning": "Warning",
     "success": "Success",

@@ -102,7 +102,7 @@ export default function MediaLightbox({
           {currentMedia.type === "video" ? (
             <video
               src={currentMedia.url}
-              className="max-h-full max-w-full rounded-xl shadow-[0_0_50px_rgba(0,0,0,0.5)] bg-black"
+              className="max-h-full max-w-full rounded-lg shadow-[0_0_50px_rgba(0,0,0,0.5)] bg-black"
               controls
               autoPlay
             />
@@ -110,7 +110,7 @@ export default function MediaLightbox({
             <img
               src={currentMedia.url}
               alt={currentMedia.title || "Media preview"}
-              className="max-h-full max-w-full object-contain rounded-xl shadow-[0_0_50px_rgba(0,0,0,0.5)]"
+              className="max-h-full max-w-full object-contain rounded-lg shadow-[0_0_50px_rgba(0,0,0,0.5)]"
             />
           )}
         </div>

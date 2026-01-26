@@ -284,6 +284,7 @@ class AIService
             $type = $context['suggestion_type'] ?? 'publication';
             $systemMessage .= "SPECIAL MODE: FIELD SUGGESTION FOR " . strtoupper($type) . ".\n";
             $systemMessage .= "Input data: " . json_encode($context['current_fields']) . "\n";
+            $systemMessage .= "INSTRUCTION: If 'ai_idea' or 'ai_prompt' is provided in the input data, prioritize it as the core concept for the suggestion. Your goal is to expand this idea into a fully professional " . $type . ".\n";
             $systemMessage .= "Based on the provided title, description or idea, you MUST provide optimized values for all fields.\n";
             $systemMessage .= "Required fields in 'suggestion.data': title, description, goal, hashtags.\n";
             $systemMessage .= "Maintain the requested language: {$language}.\n";

@@ -101,7 +101,7 @@ export default function AiConfigSection({
         </div>
       </header>
 
-      <div className="bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800/30 rounded-xl p-4 mb-8 flex gap-3">
+      <div className="bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800/30 rounded-lg p-4 mb-8 flex gap-3">
         <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
         <p className="text-sm text-blue-700 dark:text-blue-300">
           {t("profile.ai.hint") ||
@@ -118,7 +118,7 @@ export default function AiConfigSection({
             <div
               key={provider.id}
               className={`
-                group p-6 rounded-xl border transition-all duration-300
+                group p-6 rounded-lg border transition-all duration-300
                 ${
                   isEnabled
                     ? "bg-white dark:bg-neutral-800/60 border-primary-500/30 shadow-md ring-1 ring-primary-500/10"

@@ -155,6 +155,7 @@ export default function EditCampaignModal({
           >
             <CampaignFormFields
               register={register}
+              setValue={setValue}
               errors={errors}
               watched={watchedFields}
               t={t}

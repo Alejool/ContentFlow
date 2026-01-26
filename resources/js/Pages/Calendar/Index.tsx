@@ -103,13 +103,13 @@ export default function CalendarIndex({ auth }: { auth: any }) {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Element;
-      if (showMonthPicker && !target.closest('.month-picker-container')) {
+      if (showMonthPicker && !target.closest(".month-picker-container")) {
         setShowMonthPicker(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showMonthPicker]);
 
   const fetchEvents = async () => {
@@ -257,34 +257,46 @@ export default function CalendarIndex({ auth }: { auth: any }) {
                         month: "long",
                         year: "numeric",
                       }).format(currentDate)}
-                      <ChevronDown className={`w-5 h-5 transition-transform ${showMonthPicker ? 'rotate-180' : ''}`} />
+                      <ChevronDown
+                        className={`w-5 h-5 transition-transform ${showMonthPicker ? "rotate-180" : ""}`}
+                      />
                       {loading && (
                         <Loader2 className="w-5 h-5 animate-spin text-primary-500" />
                       )}
                     </button>
-                    
+
                     {showMonthPicker && (
-                      <div className="absolute top-full left-0 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg z-50 p-4 min-w-[280px]">
+                      <div className="absolute top-full left-0 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 p-4 min-w-[280px]">
                         <div className="grid grid-cols-3 gap-2 mb-4">
                           {Array.from({ length: 12 }, (_, i) => (
                             <button
                               key={i}
-                              onClick={() => goToMonth(i, currentDate.getFullYear())}
+                              onClick={() =>
+                                goToMonth(i, currentDate.getFullYear())
+                              }
                               className={`p-2 text-sm rounded-lg transition-colors ${
                                 currentDate.getMonth() === i
-                                  ? 'bg-primary-500 text-white'
-                                  : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
+                                  ? "bg-primary-500 text-white"
+                                  : "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
                               }`}
                             >
-                              {new Intl.DateTimeFormat(i18n.language || undefined, {
-                                month: "short",
-                              }).format(new Date(2024, i, 1))}
+                              {new Intl.DateTimeFormat(
+                                i18n.language || undefined,
+                                {
+                                  month: "short",
+                                },
+                              ).format(new Date(2024, i, 1))}
                             </button>
                           ))}
                         </div>
                         <div className="flex items-center justify-between gap-2">
                           <button
-                            onClick={() => goToMonth(currentDate.getMonth(), currentDate.getFullYear() - 1)}
+                            onClick={() =>
+                              goToMonth(
+                                currentDate.getMonth(),
+                                currentDate.getFullYear() - 1,
+                              )
+                            }
                             className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                           >
                             <ChevronLeft className="w-4 h-4" />
@@ -293,7 +305,12 @@ export default function CalendarIndex({ auth }: { auth: any }) {
                             {currentDate.getFullYear()}
                           </span>
                           <button
-                            onClick={() => goToMonth(currentDate.getMonth(), currentDate.getFullYear() + 1)}
+                            onClick={() =>
+                              goToMonth(
+                                currentDate.getMonth(),
+                                currentDate.getFullYear() + 1,
+                              )
+                            }
                             className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                           >
                             <ChevronRight className="w-4 h-4" />
@@ -464,7 +481,13 @@ export default function CalendarIndex({ auth }: { auth: any }) {
                                 {/* Icon */}
                                 <div className="mt-0.5 flex-shrink-0 text-gray-400 dark:text-gray-500">
                                   <PlatformIcon
-                                    platform={["user_event", "event"].includes(String(event.type)) ? "user_event" : event.extendedProps.platform}
+                                    platform={
+                                      ["user_event", "event"].includes(
+                                        String(event.type),
+                                      )
+                                        ? "user_event"
+                                        : event.extendedProps.platform
+                                    }
                                     className="w-3.5 h-3.5"
                                   />
                                 </div>
@@ -490,24 +513,24 @@ export default function CalendarIndex({ auth }: { auth: any }) {
                                 {/* Delete button - only show for user's own events */}
                                 {["user_event", "event"].includes(
                                   String(event.type),
-                                ) && (
+                                ) &&
                                   // Only show delete button for events created by current user
                                   // We can determine this by checking if the event ID contains the user's events
                                   // or by checking user_name if available
-                                  !event.extendedProps?.is_public || 
-                                  event.extendedProps?.user_name === auth.user.name
-                                ) && (
-                                  <button
-                                    onClick={(ev) => {
-                                      ev.stopPropagation();
-                                      handleDeleteEvent(event);
-                                    }}
-                                    className="flex-shrink-0 p-1 rounded-md text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all self-start"
-                                    title="Eliminar evento"
-                                  >
-                                    <Trash2 className="w-3.5 h-3.5" />
-                                  </button>
-                                )}
+                                  (!event.extendedProps?.is_public ||
+                                    event.extendedProps?.user_name ===
+                                      auth.user.name) && (
+                                    <button
+                                      onClick={(ev) => {
+                                        ev.stopPropagation();
+                                        handleDeleteEvent(event);
+                                      }}
+                                      className="flex-shrink-0 p-1 rounded-md text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all self-start"
+                                      title="Eliminar evento"
+                                    >
+                                      <Trash2 className="w-3.5 h-3.5" />
+                                    </button>
+                                  )}
                               </div>
                             </div>
                           ))}

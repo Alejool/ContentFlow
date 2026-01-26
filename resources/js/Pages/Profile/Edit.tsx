@@ -185,20 +185,6 @@ export default function Edit({ mustVerifyEmail, status }: EditProps) {
               {activeTab === "accounts" && (
                 <div className="animate-in fade-in slide-in-from-right-4 duration-500">
                   <div className="space-y-8">
-                    <header className="border-b border-gray-100 dark:border-neutral-800 pb-4">
-                      <div className="flex items-center gap-3 mb-1">
-                        <div className="p-2 rounded-lg bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400">
-                          <Share2 className="w-5 h-5" />
-                        </div>
-                        <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
-                          {t("connectedAccounts.title") || "Cuentas Conectadas"}
-                        </h2>
-                      </div>
-                      <p className="text-sm text-gray-500 dark:text-neutral-400 pl-11">
-                        {t("connectedAccounts.description") ||
-                          "Gestiona tus conexiones con redes sociales y servicios externos."}
-                      </p>
-                    </header>
                     <ConnectedAccounts />
                   </div>
                 </div>

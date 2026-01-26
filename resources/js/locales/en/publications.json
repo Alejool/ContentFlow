@@ -3,6 +3,9 @@
     "title": "Publications",
     "subtitle": "Manage your publications",
     "modal": {
+      "sections": {
+        "details": "Content Details"
+      },
       "media": {
         "uploadingPending": "Uploading Pending"
       },

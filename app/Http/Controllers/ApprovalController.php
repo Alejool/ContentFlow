@@ -49,7 +49,7 @@ class ApprovalController extends Controller
    */
   public function history(Request $request)
   {
-    \Illuminate\Support\Facades\Log::debug('ENTERED ApprovalController::history', [
+    \Illuminate\Support\Facades\Log::info('ENTERED ApprovalController::history', [
       'user_id' => Auth::id(),
       'query' => $request->all()
     ]);

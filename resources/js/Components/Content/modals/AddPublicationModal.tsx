@@ -10,7 +10,7 @@ import Select from "@/Components/common/Modern/Select";
 import Textarea from "@/Components/common/Modern/Textarea";
 import { useCampaigns } from "@/Hooks/campaign/useCampaigns";
 import { usePublicationForm } from "@/Hooks/publication/usePublicationForm";
-import { useS3Upload } from "@/Hooks/useS3Upload"; // Import hook
+import { useS3Upload } from "@/Hooks/useS3Upload";
 import { useMediaStore } from "@/stores/mediaStore";
 import { useAccountsStore } from "@/stores/socialAccountsStore";
 import { FileText, Hash, Save, Target } from "lucide-react";

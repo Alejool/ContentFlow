@@ -5,6 +5,8 @@ import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
+import AiFieldSuggester from "@/Components/AiAssistant/AiFieldSuggester";
+import AiPromptSection from "@/Components/AiAssistant/AiPromptSection";
 import ModalHeader from "@/Components/ManageContent/modals/common/ModalHeader";
 import Input from "@/Components/common/Modern/Input";
 import Textarea from "@/Components/common/Modern/Textarea";
@@ -43,6 +45,24 @@ export default function AddCampaignModal({
   } = usePublicationsForCampaign(isOpen);
 
   const watchedFields = watch();
+
+  const handleAiSuggestion = (data: any) => {
+    if (data.name || data.title) {
+      setValue("name", data.name || data.title, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+    }
+    if (data.description) {
+      setValue("description", data.description, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+    }
+    if (data.goal) {
+      setValue("goal", data.goal, { shouldValidate: true, shouldDirty: true });
+    }
+  };
 
   const onFormSubmit = async (data: any) => {
     setIsSubmitting(true);
@@ -119,11 +139,26 @@ export default function AddCampaignModal({
         />
 
         <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
+          <AiPromptSection
+            type="campaign"
+            currentFields={watchedFields}
+            onSuggest={handleAiSuggestion}
+            disabled={isSubmitting}
+          />
           <form
             id="campaign-form"
             onSubmit={handleSubmit(onFormSubmit)}
             className="space-y-6"
           >
+            <div className="flex justify-between items-end mb-4 px-1">
+              <AiFieldSuggester
+                fields={watchedFields}
+                type="campaign"
+                onSuggest={handleAiSuggestion}
+                disabled={isSubmitting}
+              />
+            </div>
+
             <div className="form-group">
               <Input
                 id="name"

@@ -64,6 +64,7 @@ Route::middleware('guest')->group(function () {
   Route::get('/privacy', fn() => Inertia::render('PrivacyPolicy'))->name('privacy');
   Route::get('/terms', fn() => Inertia::render('TermsOfService'))->name('terms');
   Route::get('/contact', fn() => Inertia::render('Contact'))->name('contact');
+  Route::get('/approvals/history-test', fn() => response()->json(['message' => 'History route is reachable outside middleware']));
 });
 
 /*
@@ -230,6 +231,7 @@ Route::middleware('auth:sanctum')->group(function () {
     |--------------------------------------------------------------------------
     */
   Route::post('/ai-chat/process', [AIChatController::class, 'processMessage'])->name('ai.process');
+  Route::post('/ai-chat/suggest-fields', [AIChatController::class, 'suggestFields'])->name('ai.suggest-fields');
 
   /*
     |--------------------------------------------------------------------------
@@ -260,8 +262,8 @@ Route::middleware('auth:sanctum')->group(function () {
     |--------------------------------------------------------------------------
     */
   Route::prefix('approvals')->name('approvals.')->group(function () {
-    Route::get('/', [ApprovalController::class, 'index'])->name('index');
     Route::get('/history', [ApprovalController::class, 'history'])->name('history');
+    Route::get('/', [ApprovalController::class, 'index'])->name('index');
     Route::get('/stats', [ApprovalController::class, 'stats'])->name('stats');
   });
 

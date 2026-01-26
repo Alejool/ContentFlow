@@ -153,7 +153,8 @@ export default function UserEventModal({
 
   const { deleteEvent } = useCalendar();
 
-  const isOwner = !event || 
+  const isOwner =
+    !event ||
     (event.user?.id && Number(event.user.id) === Number(currentUser?.id)) ||
     (!event.user?.id && event.extendedProps?.user_name === currentUser?.name);
   const isPast = isBefore(
@@ -260,8 +261,10 @@ export default function UserEventModal({
               ? " • " +
                 t("common.creator") +
                 ": " +
-                ((event.user?.id && Number(event.user.id) === Number(currentUser?.id)) ||
-                 (!event.user?.id && event.extendedProps?.user_name === currentUser?.name)
+                ((event.user?.id &&
+                  Number(event.user.id) === Number(currentUser?.id)) ||
+                (!event.user?.id &&
+                  event.extendedProps?.user_name === currentUser?.name)
                   ? t("common.me") || "Yo"
                   : event.user?.name || event.extendedProps?.user_name)
               : ""
@@ -520,7 +523,7 @@ export default function UserEventModal({
             </div>
           </div>
           <div
-            className={`text-center pt-2 pb-2 px-6 rounded-xl border border-dashed transition-all duration-500 ${isReadOnly ? "opacity-70" : ""}`}
+            className={`text-center pt-2 pb-2 px-6 rounded-lg border border-dashed transition-all duration-500 ${isReadOnly ? "opacity-70" : ""}`}
             style={{
               borderColor: `${selectedColor}40`,
               backgroundColor: `${selectedColor}08`,

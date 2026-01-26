@@ -1,11 +1,14 @@
+import AiFieldSuggester from "@/Components/AiAssistant/AiFieldSuggester";
+import AiPromptSection from "@/Components/AiAssistant/AiPromptSection";
 import Input from "@/Components/common/Modern/Input";
 import Textarea from "@/Components/common/Modern/Textarea";
 import { FileText, Target } from "lucide-react";
 import React from "react";
-import { FieldErrors, UseFormRegister } from "react-hook-form";
+import { FieldErrors, UseFormRegister, UseFormSetValue } from "react-hook-form";
 
 interface CampaignFormFieldsProps {
   register: UseFormRegister<any>;
+  setValue: UseFormSetValue<any>;
   errors: FieldErrors<any>;
   watched: any;
   t: (key: string) => string;
@@ -15,12 +18,31 @@ interface CampaignFormFieldsProps {
 
 const CampaignFormFields: React.FC<CampaignFormFieldsProps> = ({
   register,
+  setValue,
   errors,
   watched,
   t,
   mode = "add",
   disabled = false,
 }) => {
+  const handleAiSuggestion = (data: any) => {
+    if (data.name || data.title) {
+      setValue("name", data.name || data.title, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+    }
+    if (data.description) {
+      setValue("description", data.description, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+    }
+    if (data.goal) {
+      setValue("goal", data.goal, { shouldValidate: true, shouldDirty: true });
+    }
+  };
+
   const goalPlaceholder =
     mode === "edit"
       ? t("campaigns.modal.edit.placeholders.goal")
@@ -33,6 +55,19 @@ const CampaignFormFields: React.FC<CampaignFormFieldsProps> = ({
 
   return (
     <>
+      <AiPromptSection
+        type="campaign"
+        currentFields={watched}
+        onSuggest={handleAiSuggestion}
+      />
+      <div className="flex justify-between items-end mb-4 px-1">
+        <AiFieldSuggester
+          fields={watched}
+          type="campaign"
+          onSuggest={handleAiSuggestion}
+          disabled={disabled}
+        />
+      </div>
       <div className="form-group">
         <Input
           id="name"

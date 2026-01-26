@@ -45,4 +45,13 @@ return Application::configure(basePath: dirname(__DIR__))
             ]);
             return null;
         });
+        $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\NotFoundHttpException $e, $request) {
+            Log::warning('404 Not Found', [
+                'url' => $request->fullUrl(),
+                'method' => $request->method(),
+                'ip' => $request->ip(),
+                'headers' => $request->headers->all(),
+            ]);
+            return null;
+        });
     })->create();

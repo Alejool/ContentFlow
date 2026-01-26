@@ -48,7 +48,7 @@ Route::post('/log-error', function (\Illuminate\Http\Request $request) {
 
 Route::middleware(['auth:sanctum'])->group(function () {
 
-/*
+  /*
 |----------------------------------------------------------------------
 | Workspaces API
 |----------------------------------------------------------------------
@@ -71,7 +71,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/{workspace}/activity', [WorkspaceController::class, 'activity'])->name('activity');
   });
 
-/*
+  /*
 |----------------------------------------------------------------------
 | Publications API
 |----------------------------------------------------------------------
@@ -203,6 +203,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 */
   Route::prefix('ai')->name('api.ai.')->group(function () {
     Route::post('/chat', [AIChatController::class, 'processMessage'])->name('chat');
+    Route::post('/suggest-fields', [AIChatController::class, 'suggestFields'])->name('suggest-fields');
   });
 
   /*

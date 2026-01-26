@@ -1,3 +1,5 @@
+import AiFieldSuggester from "@/Components/AiAssistant/AiFieldSuggester";
+import AiPromptSection from "@/Components/AiAssistant/AiPromptSection";
 import PlatformSettingsModal from "@/Components/ConfigSocialMedia/PlatformSettingsModal";
 import SocialAccountsSection from "@/Components/ManageContent/Publication/common/add/SocialAccountsSection";
 import MediaUploadSection from "@/Components/ManageContent/Publication/common/edit/MediaUploadSection";
@@ -252,6 +254,28 @@ export default function AddPublicationModal({
     ],
   );
 
+  const handleAiSuggestion = (data: any) => {
+    if (data.title)
+      setValue("title", data.title, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+    if (data.description)
+      setValue("description", data.description, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+    if (data.goal)
+      setValue("goal", data.goal, { shouldValidate: true, shouldDirty: true });
+    if (data.hashtags) {
+      setValue("hashtags", data.hashtags, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+      handleHashtagChange(data.hashtags);
+    }
+  };
+
   const stabilizedMediaPreviews = useMemo(() => {
     return mediaFiles.map((m) => ({
       ...m,
@@ -338,6 +362,18 @@ export default function AddPublicationModal({
               </div>
 
               <div className="space-y-6">
+                <AiPromptSection
+                  type="publication"
+                  currentFields={watched}
+                  onSuggest={handleAiSuggestion}
+                />
+                <div className="flex justify-between items-end px-1">
+                  <AiFieldSuggester
+                    fields={watched}
+                    type="publication"
+                    onSuggest={handleAiSuggestion}
+                  />
+                </div>
                 <Input
                   id="title"
                   label={t("publications.modal.add.titleField")}
