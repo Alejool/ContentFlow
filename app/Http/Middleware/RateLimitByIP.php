@@ -16,8 +16,13 @@ class RateLimitByIP
     public function handle(Request $request, Closure $next): Response
     {
         $key = $request->ip();
-        $maxAttempts = 60; // Configurable
+        $maxAttempts = 60; // Default limit
         $decayMinutes = 1;
+
+        // Increase limit for upload-related routes (multipart, signing, etc.)
+        if ($request->is('api/*/uploads*') || $request->is('api/*/publications/*/attach-media')) {
+            $maxAttempts = 1000;
+        }
 
         if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($key, $maxAttempts)) {
             return response()->json([
