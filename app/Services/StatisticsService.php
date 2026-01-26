@@ -90,9 +90,13 @@ class StatisticsService
   /**
    * Get performing campaigns with aggregated stats and nested publications
    */
+  /**
+   * Get performing campaigns with aggregated stats and nested publications
+   */
   public function getTopCampaigns(int $workspaceId, int $limit = 5)
   {
     // 1. Get all campaigns for the workspace with their publications and analytics
+    // Eager load analytics to avoid N+1 queries during iteration
     $campaigns = Campaign::where('workspace_id', $workspaceId)
       ->with(['publications.analytics'])
       ->get();
@@ -105,21 +109,19 @@ class StatisticsService
       $publicationStats = [];
 
       foreach ($campaign->publications as $publication) {
-        // Aggregate analytics for this publication
-        $pubAnalytics = $publication->analytics()
-          ->selectRaw('
-                        SUM(views) as total_views,
-                        SUM(clicks) as total_clicks,
-                        SUM(conversions) as total_conversions,
-                        SUM(likes + comments + shares + saves) as total_engagement,
-                        AVG(engagement_rate) as avg_engagement_rate
-                    ')
-          ->first();
+        // Use eager loaded analytics collection instead of running new queries
+        $analytics = $publication->analytics;
 
-        $views = intval($pubAnalytics->total_views ?? 0);
-        $clicks = intval($pubAnalytics->total_clicks ?? 0);
-        $conversions = intval($pubAnalytics->total_conversions ?? 0);
-        $engagement = intval($pubAnalytics->total_engagement ?? 0);
+        // Perform aggregation in memory
+        $views = $analytics->sum('views');
+        $clicks = $analytics->sum('clicks');
+        $conversions = $analytics->sum('conversions');
+        // Calculate total engagement (likes + comments + shares + saves)
+        $engagement = $analytics->sum(function ($record) {
+          return $record->likes + $record->comments + $record->shares + $record->saves;
+        });
+
+        $avgEngagementRate = $analytics->avg('engagement_rate');
 
         $totalViews += $views;
         $totalClicks += $clicks;
@@ -133,7 +135,7 @@ class StatisticsService
           'clicks' => $clicks,
           'conversions' => $conversions,
           'engagement' => $engagement,
-          'avg_engagement_rate' => round($pubAnalytics->avg_engagement_rate ?? 0, 2),
+          'avg_engagement_rate' => round($avgEngagementRate ?? 0, 2),
         ];
       }
 
@@ -163,20 +165,15 @@ class StatisticsService
       $sEng = 0;
 
       foreach ($standalonePublications as $pub) {
-        $pubAnalytics = $pub->analytics()
-          ->selectRaw('
-                        SUM(views) as total_views,
-                        SUM(clicks) as total_clicks,
-                        SUM(conversions) as total_conversions,
-                        SUM(likes + comments + shares + saves) as total_engagement,
-                        AVG(engagement_rate) as avg_engagement_rate
-                    ')
-          ->first();
+        $analytics = $pub->analytics;
 
-        $views = intval($pubAnalytics->total_views ?? 0);
-        $clicks = intval($pubAnalytics->total_clicks ?? 0);
-        $conversions = intval($pubAnalytics->total_conversions ?? 0);
-        $engagement = intval($pubAnalytics->total_engagement ?? 0);
+        $views = $analytics->sum('views');
+        $clicks = $analytics->sum('clicks');
+        $conversions = $analytics->sum('conversions');
+        $engagement = $analytics->sum(function ($record) {
+          return $record->likes + $record->comments + $record->shares + $record->saves;
+        });
+        $avgEngagementRate = $analytics->avg('engagement_rate');
 
         $sViews += $views;
         $sClicks += $clicks;
@@ -190,7 +187,7 @@ class StatisticsService
           'clicks' => $clicks,
           'conversions' => $conversions,
           'engagement' => $engagement,
-          'avg_engagement_rate' => round($pubAnalytics->avg_engagement_rate ?? 0, 2),
+          'avg_engagement_rate' => round($avgEngagementRate ?? 0, 2),
         ];
       }
 
