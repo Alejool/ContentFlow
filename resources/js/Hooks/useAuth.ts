@@ -45,18 +45,22 @@ export const useAuth = () => {
       if (userData.provider) {
         const msg = t("auth.login.errors.social_account", {
           provider: userData.provider,
+          defaultValue: `Esta cuenta usa ${userData.provider}. Por favor inicia sesión con ese servicio.`,
         });
         setGeneralError(msg);
         toast.error(msg);
+        setLoading(false); // Stop loading state
         return;
       }
 
       // Standard Laravel Login
+      console.log("UseAuth: Sending login request...");
       const loginResponse = await axios.post("/login", {
         email: data.email,
         password: data.password,
         remember: data.remember,
       });
+      console.log("UseAuth: Login response received", loginResponse);
 
       if (loginResponse.data.success) {
         setSuccessMessage(t("auth.login.success"));

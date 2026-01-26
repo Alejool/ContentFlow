@@ -49,12 +49,14 @@ class LoginRequest extends FormRequest
         $user = User::where('email', $credentials['email'])->first();
 
         if (!$user) {
+            \Illuminate\Support\Facades\Log::warning('Login: User not found', ['email' => $credentials['email']]);
             throw ValidationException::withMessages([
                 'email' => 'User not found in the system'
             ]);
         }
 
         if (!Auth::attempt($credentials, true)) {
+            \Illuminate\Support\Facades\Log::warning('Login: Auth::attempt failed', ['email' => $credentials['email']]);
             RateLimiter::hit($this->throttleKey());
             throw ValidationException::withMessages([
                 'email' => 'These credentials do not match our records'

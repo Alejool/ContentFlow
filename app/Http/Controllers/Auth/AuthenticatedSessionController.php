@@ -34,14 +34,25 @@ class AuthenticatedSessionController extends Controller
 
     public function store(LoginRequest $request)
     {
+        \Illuminate\Support\Facades\Log::info('Login: Attempting Normal Login', ['email' => $request->input('email')]);
         try {
             $return = $request->authenticate();
+            \Illuminate\Support\Facades\Log::info('Login: Authenticate Success', ['user_id' => Auth::id()]);
+
             $request->session()->regenerate();
+            // Explicitly save session to prevent race conditions
+            $request->session()->save();
+            \Illuminate\Support\Facades\Log::info('Login: Session Regenerated and Saved');
+
             return response()->json($return);
-            // return redirect(route('/dashboard', absolute: true));
+            \Illuminate\Support\Facades\Log::info('Login: Session Regenerated and Saved');
 
-
+            return response()->json($return);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Let the frontend handle validation errors (422) naturally
+            throw $e;
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Login: Exception', ['message' => $e->getMessage()]);
             return response()->json([
                 'error' => 'Authentication failed: ' . $e->getMessage()
             ], 401);

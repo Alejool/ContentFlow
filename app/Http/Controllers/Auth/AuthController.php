@@ -12,62 +12,62 @@ use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
 {
-    public function redirectToGoogle()
-    {
-        $redirect = Socialite::driver('google')->redirect();
-        return $redirect;
+  public function redirectToGoogle()
+  {
+    $redirect = Socialite::driver('google')->redirect();
+    return $redirect;
+  }
+
+  public function handleGoogleCallback()
+  {
+    \Illuminate\Support\Facades\Log::info('Google Callback: Started');
+    try {
+      /** @var \Laravel\Socialite\Two\User $googleUser */
+      $googleUser = Socialite::driver('google')->stateless()->user();
+      \Illuminate\Support\Facades\Log::info('Google Callback: User received', ['email' => $googleUser->getEmail()]);
+
+      $user = User::where('email', $googleUser->getEmail())->first();
+
+      if ($user) {
+        $user->update([
+          'name' => $googleUser->getName(),
+          'photo_url' => $googleUser->getAvatar(),
+          'provider' => 'google',
+          'provider_id' => $googleUser->getId(),
+          'email_verified_at' => $user->email_verified_at ?? now(),
+        ]);
+      } else {
+        $user = User::create([
+          'name' => $googleUser->getName(),
+          'email' => $googleUser->getEmail(),
+          'password' => Hash::make(Str::random(32)),
+          'photo_url' => $googleUser->getAvatar(),
+          'provider' => 'google',
+          'provider_id' => $googleUser->getId(),
+          'email_verified_at' => now(),
+          'locale' => 'en',
+          'theme' => 'light',
+        ]);
+      }
+      Auth::login($user, true);
+      \Illuminate\Support\Facades\Log::info('Google Callback: User logged in', ['id' => $user->id]);
+
+      // request()->session()->regenerate(); // Potentially causing race conditions in Docker/mixed content
+      request()->session()->save();
+      \Illuminate\Support\Facades\Log::info('Google Callback: Session saved', ['user_id' => $user->id, 'session_id' => request()->session()->getId()]);
+
+      return redirect()->route('dashboard');
+    } catch (\Exception $e) {
+      \Illuminate\Support\Facades\Log::error('Google Callback: Error', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+      return redirect()->route('login')->with('error', 'Error al iniciar sesión con Google: ' . $e->getMessage());
     }
+  }
 
-    public function handleGoogleCallback()
-    {
-        \Illuminate\Support\Facades\Log::info('Google Callback: Started');
-        try {
-            /** @var \Laravel\Socialite\Two\User $googleUser */
-            $googleUser = Socialite::driver('google')->stateless()->user();
-            \Illuminate\Support\Facades\Log::info('Google Callback: User received', ['email' => $googleUser->getEmail()]);
-
-            $user = User::where('email', $googleUser->getEmail())->first();
-
-            if ($user) {
-                $user->update([
-                    'name' => $googleUser->getName(),
-                    'photo_url' => $googleUser->getAvatar(),
-                    'provider' => 'google',
-                    'provider_id' => $googleUser->getId(),
-                    'email_verified_at' => $user->email_verified_at ?? now(),
-                ]);
-            } else {
-                $user = User::create([
-                    'name' => $googleUser->getName(),
-                    'email' => $googleUser->getEmail(),
-                    'password' => Hash::make(Str::random(32)),
-                    'photo_url' => $googleUser->getAvatar(),
-                    'provider' => 'google',
-                    'provider_id' => $googleUser->getId(),
-                    'email_verified_at' => now(),
-                    'locale' => 'en',
-                    'theme' => 'light',
-                ]);
-            }
-            Auth::login($user, true);
-            \Illuminate\Support\Facades\Log::info('Google Callback: User logged in', ['id' => $user->id]);
-
-            request()->session()->regenerate();
-            \Illuminate\Support\Facades\Log::info('Google Callback: Session regenerated, redirecting to dashboard');
-
-            return redirect()->intended(route('dashboard'));
-        } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Google Callback: Error', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
-            return redirect()->route('login')->with('error', 'Error al iniciar sesión con Google: ' . $e->getMessage());
-        }
-    }
-
-    /**
-     * Handle authentication via API token (e.g., from a mobile app or frontend SDK).
-     */
-    public function handleGoogleAuth(Request $request)
-    {
-        // This is a placeholder for custom token validation if needed
-        return response()->json(['message' => 'API Google Auth not fully implemented. please use /auth/google/redirect'], 501);
-    }
+  /**
+   * Handle authentication via API token (e.g., from a mobile app or frontend SDK).
+   */
+  public function handleGoogleAuth(Request $request)
+  {
+    return response()->json(['message' => 'API Google Auth not fully implemented. please use /auth/google/redirect'], 501);
+  }
 }
