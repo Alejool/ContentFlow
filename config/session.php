@@ -171,7 +171,7 @@ return [
 
     'secure' => env('SESSION_SECURE_COOKIE', Str::startsWith(env('APP_URL', ''), 'https://')),
     'http_only' => env('SESSION_HTTP_ONLY', true),
-    'same_site' => env('SESSION_SAME_SITE', 'strict'),
+    'same_site' => env('SESSION_SAME_SITE', 'lax'),
 
     /*
     |--------------------------------------------------------------------------

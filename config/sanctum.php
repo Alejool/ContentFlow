@@ -1,6 +1,9 @@
 <?php
 
 use Laravel\Sanctum\Sanctum;
+use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
+use Laravel\Sanctum\Http\Middleware\AuthenticateSession;
 
 return [
 
@@ -16,17 +19,17 @@ return [
     */
 
   'stateful' => array_unique(array_merge(
-    explode(',', env('SANCTUM_STATEFUL_DOMAINS', 'localhost,127.0.0.1')),
+    explode(',', env('SANCTUM_STATEFUL_DOMAINS', 'localhost,127.0.0.1,contenflow.fly.dev')),
     [
       'localhost',
-      'localhost:8000',
-      'localhost:3000',
+      'localhost:80',
+      'localhost:30',
       '127.0.0.1',
-      '127.0.0.1:8000',
+      '127.0.0.1:80',
       '::1',
       Sanctum::currentApplicationUrlWithPort(),
       Sanctum::currentRequestHost(),
-      'leviathan-port.tail4af8a1.ts.net',
+      'localhost','leviathan-port.tail4af8a1.ts.net',
       'contenflow.fly.dev',
     ]
   )),
@@ -85,9 +88,9 @@ return [
     */
 
   'middleware' => [
-    'authenticate_session' => Laravel\Sanctum\Http\Middleware\AuthenticateSession::class,
-    'encrypt_cookies' => Illuminate\Cookie\Middleware\EncryptCookies::class,
-    'validate_csrf_token' => Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class,
+    'authenticate_session' => AuthenticateSession::class,
+    'encrypt_cookies' => EncryptCookies::class,
+    'validate_csrf_token' => ValidateCsrfToken::class,
   ],
 
 ];

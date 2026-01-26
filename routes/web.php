@@ -144,7 +144,7 @@ Route::get('/debug-auth', function () {
 | Authenticated Routes
 |--------------------------------------------------------------------------
 */
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware('auth')->group(function () {
 
   /*
     |--------------------------------------------------------------------------
