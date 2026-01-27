@@ -101,7 +101,7 @@ export const useS3Upload = () => {
                 }),
               );
               router.reload({ only: ["publications", "publication"] }); // Refresh data to show new media
-              removeUpload(tempId); // Clean up on success
+              // removeUpload(tempId); // REMOVED: Keep in queue for GlobalUploadIndicator visibility
             } catch (attachErr) {
               console.error(
                 "Failed to attach media after background upload",
