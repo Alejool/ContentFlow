@@ -1,39 +1,29 @@
 {
   "activity": {
-    "title": "Actividad",
-    "total": "Total",
-    "created": "Creado",
-    "updated": "Actualizado",
-    "published": "Publicado",
-    "unpublished": "Despublicado",
-    "locked": "Bloqueado",
-    "unlocked": "Desbloqueado",
-    "review_requested": "Revisión solicitada",
-    "approved": "Aprobado",
-    "rejected": "Rechazado",
-    "publishing": "Publicando...",
-    "publication_failed": "Fallo en la publicación",
-    "statusChanged": "Estado cambiado",
     "timeline": {
-      "title": "Línea de tiempo",
-      "subtitle": "Historial de actividad",
+      "title": "Actividad",
+      "total": "Total",
       "empty": "Sin actividades",
+      "noActivity": "Sin actividad registrada aún.",
+      "system": "Sistema",
+      "requested_approval": "Revisión solicitada",
+      "publication_failed": "Fallo en la publicación",
       "status": {
-        "system": "Sistema",
         "created": "Creado",
         "updated": "Actualizado",
         "published": "Publicado",
         "unpublished": "Despublicado",
-        "scheduled": "Programado",
-        "draft": "Borrador",
-        "deleted": "Eliminado",
-        "requestedApproval": "Aprobación solicitada",
+        "locked": "Bloqueado",
+        "unlocked": "Desbloqueado",
         "approved": "Aprobado",
         "rejected": "Rechazado",
         "publishing": "Publicando...",
-        "failedOnPlatform": "Fallo en plataforma",
-        "publishedOnPlatform": "Publicado en plataforma",
-        "publication_failed": "Fallo en la publicación"
+        "failed_on_platform": "Fallo en plataforma",
+        "published_on_platform": "Publicado en plataforma",
+        "statusChanged": "Estado cambiado",
+        "pending": "Pendiente",
+        "scheduled": "Programado",
+        "draft": "Borrador"
       }
     }
   }

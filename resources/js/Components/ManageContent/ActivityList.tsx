@@ -2,7 +2,6 @@ import { getDateFnsLocale } from "@/Utils/dateLocales";
 import { format } from "date-fns";
 import {
   Activity,
-  AlertCircle,
   CheckCircle,
   Clock,
   Edit,
@@ -10,20 +9,16 @@ import {
   Lock,
   MessageSquare,
   Send,
+  ServerCrash,
   XCircle,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 interface ActivityItem {
   id: number;
-  description: string;
-  properties?: any;
+  details?: any;
   created_at: string;
-  event: string;
-  causer_id?: number;
-  causer_type?: string;
-  subject_id?: number;
-  subject_type?: string;
+  type: string;
   user?: {
     id: number;
     name: string;
@@ -39,8 +34,8 @@ export default function ActivityList({ activities }: ActivityListProps) {
   const { t, i18n } = useTranslation();
   const locale = getDateFnsLocale(i18n.language);
 
-  const getActivityIcon = (event: string) => {
-    switch (event) {
+  const getActivityIcon = (type: string) => {
+    switch (type) {
       case "created":
         return <FileText className="w-4 h-4 text-green-500" />;
       case "updated":
@@ -50,6 +45,7 @@ export default function ActivityList({ activities }: ActivityListProps) {
       case "published":
         return <Send className="w-4 h-4 text-purple-500" />;
       case "status_updated":
+      case "status_changed":
         return <Activity className="w-4 h-4 text-yellow-500" />;
       case "locked":
         return <Lock className="w-4 h-4 text-orange-500" />;
@@ -62,33 +58,41 @@ export default function ActivityList({ activities }: ActivityListProps) {
       case "rejected":
         return <XCircle className="w-4 h-4 text-red-600" />;
       case "review_requested":
+      case "requested_approval":
         return <Clock className="w-4 h-4 text-orange-400" />;
       case "publication_failed":
-        return <AlertCircle className="w-4 h-4 text-red-600" />;
+        return <ServerCrash className="w-4 h-4 text-red-600" />;
       default:
         return <Activity className="w-4 h-4 text-gray-400" />;
     }
   };
 
   const formatActivityText = (activity: ActivityItem) => {
-    // Check specific event types first
-    if (activity.event === "created") return t("activity.created");
-    if (activity.event === "published") return t("activity.published");
-    if (activity.event === "unpublished") return t("activity.unpublished");
-    if (activity.event === "locked") return t("activity.locked");
-    if (activity.event === "unlocked") return t("activity.unlocked");
-    if (activity.event === "review_requested")
-      return t("activity.review_requested");
-    if (activity.event === "approved") return t("activity.approved");
-    if (activity.event === "rejected") return t("activity.rejected");
-    if (activity.event === "publication_failed")
-      return t("activity.publication_failed");
+    if (activity.type === "created")
+      return t("activity.timeline.status.created");
+    if (activity.type === "published")
+      return t("activity.timeline.status.published");
+    if (activity.type === "unpublished")
+      return t("activity.timeline.status.unpublished");
+    if (activity.type === "locked") return t("activity.timeline.status.locked");
+    if (activity.type === "unlocked")
+      return t("activity.timeline.status.unlocked");
+    if (
+      activity.type === "review_requested" ||
+      activity.type === "requested_approval"
+    )
+      return t("activity.timeline.requested_approval");
+    if (activity.type === "approved")
+      return t("activity.timeline.status.approved");
+    if (activity.type === "rejected")
+      return t("activity.timeline.status.rejected");
+    if (activity.type === "publication_failed")
+      return t("activity.timeline.publication_failed");
 
-    // Handle updates and status changes
-    if (activity.event === "updated") {
-      if (activity.properties?.attributes?.status) {
-        const oldStatus = activity.properties?.old?.status;
-        const newStatus = activity.properties?.attributes?.status;
+    if (activity.type === "updated") {
+      if (activity.details?.attributes?.status) {
+        const oldStatus = activity.details?.old?.status;
+        const newStatus = activity.details?.attributes?.status;
         if (oldStatus !== newStatus) {
           const oldStatusText = t(
             `publications.status.${oldStatus}`,
@@ -98,20 +102,22 @@ export default function ActivityList({ activities }: ActivityListProps) {
             `publications.status.${newStatus}`,
             newStatus,
           );
-          return `${t("activity.statusChanged")} (${oldStatusText} → ${newStatusText})`;
+          return `${t("activity.timeline.status.statusChanged")} (${oldStatusText} → ${newStatusText})`;
         }
       }
-      return t("activity.updated");
+      return t("activity.timeline.status.updated");
     }
 
-    // Fallback to description or unknown
-    return activity.description || t("activity.timeline.status.system");
+    // Attempt to translate the type as a fallback if not explicitly handled
+    return t(`activity.timeline.${activity.type}`, {
+      defaultValue: activity.type,
+    });
   };
 
   if (activities.length === 0) {
     return (
       <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-        <p>{t("activity.noActivity", "No activity recorded yet.")}</p>
+        <p>{t("activity.timeline.noActivity", "No activity recorded yet.")}</p>
       </div>
     );
   }
@@ -138,13 +144,13 @@ export default function ActivityList({ activities }: ActivityListProps) {
                     />
                   ) : (
                     <div className="h-8 w-8 rounded-full bg-gray-100 dark:bg-neutral-700 flex items-center justify-center ring-8 ring-white dark:ring-neutral-800">
-                      {getActivityIcon(activity.event)}
+                      {getActivityIcon(activity.type)}
                     </div>
                   )}
 
                   {activity.user?.photo_url && (
                     <span className="absolute -bottom-1 -right-1 bg-white dark:bg-neutral-800 rounded-full p-0.5">
-                      {getActivityIcon(activity.event)}
+                      {getActivityIcon(activity.type)}
                     </span>
                   )}
                 </div>
@@ -153,7 +159,10 @@ export default function ActivityList({ activities }: ActivityListProps) {
                   <div>
                     <p className="text-sm text-gray-500 dark:text-gray-400">
                       <span className="font-medium text-gray-900 dark:text-gray-200">
-                        {activity.user?.name || t("activity.system", "Sistema")}
+                        {activity.type === "publication_failed"
+                          ? t("activity.timeline.system", "Sistema")
+                          : activity.user?.name ||
+                            t("activity.timeline.system", "Sistema")}
                       </span>{" "}
                       {formatActivityText(activity)}
                     </p>

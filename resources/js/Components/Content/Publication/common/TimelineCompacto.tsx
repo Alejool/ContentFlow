@@ -83,7 +83,7 @@ const TimelineCompacto = ({
           <div className="text-left">
             <div className="flex items-center gap-2">
               <span className="font-medium text-gray-900 dark:text-white">
-                {t("activity.title")}
+                {t("activity.timeline.title")}
               </span>
               {lastActivity && (
                 <span
@@ -94,7 +94,7 @@ const TimelineCompacto = ({
               )}
             </div>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              {totalActivities + " " + t("activity.total")}
+              {totalActivities + " " + t("activity.timeline.total")}
             </p>
           </div>
         </div>

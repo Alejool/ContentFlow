@@ -1,5 +1,5 @@
-import { format } from "date-fns";
 import { getDateFnsLocale } from "@/Utils/dateLocales";
+import { format } from "date-fns";
 import {
   Activity,
   CheckCircle,
@@ -7,6 +7,7 @@ import {
   Edit,
   Lock,
   PlusCircle,
+  ServerCrash,
   Shield,
   Unlock,
   User,
@@ -60,6 +61,8 @@ export default function PublicationTimeline({
         return <Lock className="w-5 h-5 text-gray-500" />;
       case "unlocked":
         return <Unlock className="w-5 h-5 text-gray-500" />;
+      case "publication_failed":
+        return <ServerCrash className="w-5 h-5 text-red-600" />;
       default:
         return <Clock className="w-5 h-5 text-gray-400" />;
     }
@@ -79,6 +82,8 @@ export default function PublicationTimeline({
         return "bg-rose-50 dark:bg-rose-900/10 border-rose-100 dark:border-rose-900/20";
       case "published":
         return "bg-teal-50 dark:bg-teal-900/10 border-teal-100 dark:border-teal-900/20";
+      case "publication_failed":
+        return "bg-red-50 dark:bg-red-900/10 border-red-100 dark:border-red-900/20";
       default:
         return "bg-gray-50 dark:bg-neutral-800/50 border-gray-100 dark:border-neutral-700";
     }
@@ -92,8 +97,7 @@ export default function PublicationTimeline({
         return t("activity.timeline.status.updated") || "Actualizado";
       case "requested_approval":
         return (
-          t("activity.timeline.status.requestedApproval") ||
-          "Solicitó aprobación"
+          t("activity.timeline.requested_approval") || "Solicitó aprobación"
         );
       case "approved":
         return t("activity.timeline.status.approved") || "Aprobado";
@@ -101,6 +105,10 @@ export default function PublicationTimeline({
         return t("activity.timeline.status.rejected") || "Rechazado";
       case "published":
         return t("activity.timeline.status.published") || "Publicado";
+      case "publication_failed":
+        return (
+          t("activity.timeline.publication_failed") || "Fallo en la publicación"
+        );
       default:
         return type;
     }
@@ -134,8 +142,7 @@ export default function PublicationTimeline({
                 <div className="flex items-center gap-1.5 opacity-80">
                   <User className="w-3.5 h-3.5" />
                   <span className="font-medium">
-                    {activity.user?.name ||
-                      t("activity.timeline.status.system")}
+                    {activity.user?.name || t("activity.timeline.system")}
                   </span>
                 </div>
 

@@ -1,39 +1,29 @@
 {
   "activity": {
-    "title": "Activity",
-    "total": "Total",
-    "created": "Created",
-    "updated": "Updated",
-    "published": "Published",
-    "unpublished": "Unpublished",
-    "locked": "Locked",
-    "unlocked": "Unlocked",
-    "review_requested": "Review requested",
-    "approved": "Approved",
-    "rejected": "Rejected",
-    "publishing": "Publishing...",
-    "publication_failed": "Publication failed",
-    "statusChanged": "Status changed",
     "timeline": {
-      "title": "Timeline",
-      "subtitle": "Activity History",
+      "title": "Activity",
+      "total": "Total",
       "empty": "No activities",
+      "noActivity": "No activity recorded yet.",
+      "system": "System",
+      "requested_approval": "Review requested",
+      "publication_failed": "Publication failed",
       "status": {
-        "system": "System",
         "created": "Created",
         "updated": "Updated",
         "published": "Published",
         "unpublished": "Unpublished",
-        "scheduled": "Scheduled",
-        "draft": "Draft",
-        "deleted": "Deleted",
-        "requestedApproval": "Requested approval",
+        "locked": "Locked",
+        "unlocked": "Unlocked",
         "approved": "Approved",
         "rejected": "Rejected",
         "publishing": "Publishing...",
-        "failedOnPlatform": "Failed on platform",
-        "publishedOnPlatform": "Published on platform",
-        "publication_failed": "Publication failed"
+        "failed_on_platform": "Failed on platform",
+        "published_on_platform": "Published on platform",
+        "statusChanged": "Status changed",
+        "pending": "Pending",
+        "scheduled": "Scheduled",
+        "draft": "Draft"
       }
     }
   }
