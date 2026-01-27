@@ -172,9 +172,6 @@ Route::middleware('auth')->group(function () {
     | Notifications
     |--------------------------------------------------------------------------
     */
-  Route::prefix('notifications')->name('notifications.')->group(function () {
-    Route::get('/', [NotificationsController::class, 'index'])->name('index');
-  });
 
   /*
     |--------------------------------------------------------------------------
@@ -183,8 +180,11 @@ Route::middleware('auth')->group(function () {
     |*/
   Route::prefix('workspaces')->name('workspaces.')->group(function () {
     Route::get('/', [WorkspaceController::class, 'index'])->name('index');
+    Route::post('/', [WorkspaceController::class, 'store'])->name('store');
     Route::get('{workspace}/settings', [WorkspaceController::class, 'settings'])->name('settings');
     Route::get('{workspace}', [WorkspaceController::class, 'show'])->name('show');
+    Route::put('{workspace}', [WorkspaceController::class, 'update'])->name('update');
+    Route::delete('{workspace}', [WorkspaceController::class, 'destroy'])->name('destroy');
   });
 
   /*
