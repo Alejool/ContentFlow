@@ -18,7 +18,7 @@ export const useSocialMediaAuth = () => {
         setError(null);
 
         const response = await axios.get(
-          `/social-accounts/auth-url/${platform}`,
+          `/api/v1/social-accounts/auth-url/${platform}`,
           {
             headers: {
               "X-CSRF-TOKEN": document
@@ -27,7 +27,7 @@ export const useSocialMediaAuth = () => {
               Accept: "application/json",
             },
             withCredentials: true,
-          }
+          },
         );
 
         if (response.data.success && response.data.url) {
@@ -39,7 +39,7 @@ export const useSocialMediaAuth = () => {
           const authWindow = window.open(
             response.data.url,
             `${platform}Auth`,
-            `width=${width},height=${height},left=${left},top=${top}`
+            `width=${width},height=${height},left=${left},top=${top}`,
           );
 
           if (!authWindow) {
@@ -98,7 +98,7 @@ export const useSocialMediaAuth = () => {
     setError(null);
     try {
       await axios.delete(
-        `/social-accounts/${id}${force ? "?force=true" : ""}`,
+        `/api/v1/social-accounts/${id}${force ? "?force=true" : ""}`,
         {
           headers: {
             "X-CSRF-TOKEN": document
@@ -107,7 +107,7 @@ export const useSocialMediaAuth = () => {
             Accept: "application/json",
           },
           withCredentials: true,
-        }
+        },
       );
       removeAccount(id);
       await fetchAccounts();
