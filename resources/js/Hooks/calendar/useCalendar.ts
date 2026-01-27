@@ -56,9 +56,12 @@ export const useCalendar = () => {
     setCurrentMonth(new Date());
   }, [setCurrentMonth]);
 
-  const goToMonth = useCallback((month: number, year: number) => {
-    setCurrentMonth(setYear(setMonth(new Date(), month), year));
-  }, [setCurrentMonth]);
+  const goToMonth = useCallback(
+    (month: number, year: number) => {
+      setCurrentMonth(setYear(setMonth(new Date(), month), year));
+    },
+    [setCurrentMonth],
+  );
 
   const handleEventDrop = useCallback(
     async (id: string, newDate: string, type: string) => {
@@ -109,7 +112,7 @@ export const useCalendar = () => {
         }
 
         // Fallback for other types (e.g., campaigns)
-        const response = await axios.get(`/campaigns/${resourceId}`);
+        const response = await axios.get(`/api/v1/campaigns/${resourceId}`);
         const data =
           response.data.campaign || response.data.data || response.data;
 

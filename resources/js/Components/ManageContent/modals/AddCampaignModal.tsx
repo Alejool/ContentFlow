@@ -78,7 +78,7 @@ export default function AddCampaignModal({
         publication_ids: data.publication_ids || [],
       };
 
-      const response = await axios.post(`/campaigns`, payload);
+      const response = await axios.post(`/api/v1/campaigns`, payload);
 
       if (response.data && response.data.campaign) {
         addCampaign(response.data.campaign);

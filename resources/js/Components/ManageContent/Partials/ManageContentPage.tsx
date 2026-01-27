@@ -3,6 +3,7 @@ import ModalManager from "@/Components/ManageContent/ModalManager";
 import ModalFooter from "@/Components/ManageContent/modals/common/ModalFooter";
 import ModalHeader from "@/Components/ManageContent/modals/common/ModalHeader";
 import SocialMediaAccounts from "@/Components/ManageContent/socialAccount/SocialMediaAccounts";
+import Dropdown from "@/Components/common/ui/Dropdown";
 import Modal from "@/Components/common/ui/Modal";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { usePublicationStore } from "@/stores/publicationStore";
@@ -225,14 +226,48 @@ export default function ManageContentPage() {
 
             <div className="flex items-center gap-2">
               {permissions.includes("manage-content") && (
-                <Button
-                  onClick={() => openAddModal()}
-                  variant="primary"
-                  size="md"
-                  icon={Plus}
-                >
-                  {t("manageContent.createNew")}
-                </Button>
+                <Dropdown>
+                  <Dropdown.Trigger>
+                    <Button
+                      variant="primary"
+                      size="md"
+                      icon={Plus}
+                      className="gap-2"
+                    >
+                      {t("manageContent.createNew")}
+                    </Button>
+                  </Dropdown.Trigger>
+                  <Dropdown.Content
+                    align="right"
+                    width="48"
+                    contentClasses="py-1 bg-white dark:bg-neutral-800 shadow-xl rounded-xl border border-gray-200 dark:border-neutral-700"
+                  >
+                    <Button
+                      onClick={() => openAddModal("publication")}
+                      variant="ghost"
+                      buttonStyle="ghost"
+                      size="sm"
+                      icon={FileText}
+                      iconPosition="left"
+                      fullWidth
+                      className="justify-start hover:bg-gray-50 dark:hover:bg-neutral-700/50 rounded-none border-0"
+                    >
+                      {t("manageContent.tabs.publications")}
+                    </Button>
+                    <Button
+                      onClick={() => openAddModal("campaign")}
+                      variant="ghost"
+                      buttonStyle="ghost"
+                      size="sm"
+                      icon={Target}
+                      iconPosition="left"
+                      fullWidth
+                      className="justify-start hover:bg-gray-50 dark:hover:bg-neutral-700/50 rounded-none border-t border-gray-100 dark:border-neutral-700/50"
+                    >
+                      {t("manageContent.tabs.campaigns")}
+                    </Button>
+                  </Dropdown.Content>
+                </Dropdown>
               )}
             </div>
           </div>

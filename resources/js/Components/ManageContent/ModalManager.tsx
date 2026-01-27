@@ -1,5 +1,4 @@
 import { usePublishPublication } from "@/Hooks/publication/usePublishPublication";
-import { useContentUIStore } from "@/stores/contentUIStore";
 import { useManageContentUIStore } from "@/stores/manageContentUIStore";
 import { Campaign } from "@/types/Campaign";
 import { Publication } from "@/types/Publication";
@@ -20,16 +19,13 @@ interface ModalManagerProps {
 }
 
 const ModalManager = memo(({ onRefresh }: ModalManagerProps) => {
-  const contentUI = useContentUIStore();
   const manageContentUI = useManageContentUIStore();
-
-  // Pick the active UI state based on which one has a selection
-  const uiState = manageContentUI.selectedItem ? manageContentUI : contentUI;
 
   const {
     activeTab,
     selectedItem,
     isAddModalOpen,
+    addType,
     isEditModalOpen,
     isPublishModalOpen,
     isViewDetailsModalOpen,
@@ -38,7 +34,7 @@ const ModalManager = memo(({ onRefresh }: ModalManagerProps) => {
     closeEditModal,
     closePublishModal,
     closeViewDetailsModal,
-  } = uiState;
+  } = manageContentUI;
 
   const { fetchPublishedPlatforms } = usePublishPublication();
 
@@ -63,11 +59,17 @@ const ModalManager = memo(({ onRefresh }: ModalManagerProps) => {
         (selectedItem as Publication)
       : null;
 
+  // Determine which Add Modal to show
+  // Prefer addType from store, fallback to activeTab logic
+  const showAddCampaign =
+    addType === "campaign" || (addType === null && activeTab === "campaigns");
+  const showAddPublication = !showAddCampaign;
+
   return (
     <>
       {isAddModalOpen &&
         createPortal(
-          activeTab === "campaigns" ? (
+          showAddCampaign ? (
             <AddCampaignModal
               isOpen={isAddModalOpen}
               onClose={closeAddModal}

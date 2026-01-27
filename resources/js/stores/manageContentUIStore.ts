@@ -1,75 +1,85 @@
-import { create } from "zustand";
 import { Campaign } from "@/types/Campaign";
 import { Publication } from "@/types/Publication";
+import { create } from "zustand";
 
 type SelectedItem = Campaign | Publication | null;
 
 interface ManageContentUIState {
-    activeTab: "publications" | "campaigns" | "logs" | "calendar" | "approvals";
-    selectedItem: SelectedItem;
+  activeTab: "publications" | "campaigns" | "logs" | "calendar" | "approvals";
+  selectedItem: SelectedItem;
 
-    // Modal States
-    isAddModalOpen: boolean;
-    isEditModalOpen: boolean;
-    isPublishModalOpen: boolean;
-    isViewDetailsModalOpen: boolean;
+  // Modal States
+  isAddModalOpen: boolean;
+  addType: "publication" | "campaign" | null;
+  isEditModalOpen: boolean;
+  isPublishModalOpen: boolean;
+  isViewDetailsModalOpen: boolean;
 
-    // Actions
-    setActiveTab: (tab: "publications" | "campaigns" | "logs" | "calendar" | "approvals") => void;
-    setSelectedItem: (item: SelectedItem) => void;
+  // Actions
+  setActiveTab: (
+    tab: "publications" | "campaigns" | "logs" | "calendar" | "approvals",
+  ) => void;
+  setSelectedItem: (item: SelectedItem) => void;
 
-    openAddModal: () => void;
-    closeAddModal: () => void;
+  openAddModal: (type?: "publication" | "campaign") => void;
+  closeAddModal: () => void;
 
-    openEditModal: (item: SelectedItem) => void;
-    closeEditModal: () => void;
+  openEditModal: (item: SelectedItem) => void;
+  closeEditModal: () => void;
 
-    openPublishModal: (item: Publication) => void;
-    closePublishModal: () => void;
+  openPublishModal: (item: Publication) => void;
+  closePublishModal: () => void;
 
-    openViewDetailsModal: (item: SelectedItem) => void;
-    closeViewDetailsModal: () => void;
+  openViewDetailsModal: (item: SelectedItem) => void;
+  closeViewDetailsModal: () => void;
 }
 
 export const useManageContentUIStore = create<ManageContentUIState>((set) => ({
-    activeTab: "publications",
-    selectedItem: null,
+  activeTab: "publications",
+  selectedItem: null,
 
-    isAddModalOpen: false,
-    isEditModalOpen: false,
-    isPublishModalOpen: false,
-    isViewDetailsModalOpen: false,
+  isAddModalOpen: false,
+  addType: null,
+  isEditModalOpen: false,
+  isPublishModalOpen: false,
+  isViewDetailsModalOpen: false,
 
-    setActiveTab: (tab) => set({ activeTab: tab }),
-    setSelectedItem: (item) => set({ selectedItem: item }),
+  setActiveTab: (tab) => set({ activeTab: tab }),
+  setSelectedItem: (item) => set({ selectedItem: item }),
 
-    openAddModal: () => set({ isAddModalOpen: true }),
-    closeAddModal: () => set({ isAddModalOpen: false }),
+  openAddModal: (type) => set({ isAddModalOpen: true, addType: type || null }),
+  closeAddModal: () => set({ isAddModalOpen: false, addType: null }),
 
-    openEditModal: (item) => set({
-        selectedItem: item,
-        isEditModalOpen: true
+  openEditModal: (item) =>
+    set({
+      selectedItem: item,
+      isEditModalOpen: true,
     }),
-    closeEditModal: () => set({
-        selectedItem: null,
-        isEditModalOpen: false
-    }),
-
-    openPublishModal: (item) => set({
-        selectedItem: item,
-        isPublishModalOpen: true
-    }),
-    closePublishModal: () => set({
-        selectedItem: null,
-        isPublishModalOpen: false
+  closeEditModal: () =>
+    set({
+      selectedItem: null,
+      isEditModalOpen: false,
     }),
 
-    openViewDetailsModal: (item) => set({
-        selectedItem: item,
-        isViewDetailsModalOpen: true
+  openPublishModal: (item) =>
+    set({
+      selectedItem: item,
+      isPublishModalOpen: true,
     }),
-    closeViewDetailsModal: () => set({
-        selectedItem: null,
-        isViewDetailsModalOpen: false
+  closePublishModal: () =>
+    set({
+      selectedItem: null,
+      isPublishModalOpen: false,
+    }),
+
+  openViewDetailsModal: (item) =>
+    set({
+      selectedItem: item,
+      isViewDetailsModalOpen: true,
+    }),
+  closeViewDetailsModal: () =>
+    set({
+      selectedItem: null,
+      isViewDetailsModalOpen: false,
     }),
 }));

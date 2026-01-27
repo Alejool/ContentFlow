@@ -24,6 +24,7 @@ import ApprovalStats from "@/Components/ManageContent/ApprovalStats";
 import ContentList from "@/Components/ManageContent/ContentList";
 import ModernCalendar from "@/Components/ManageContent/Partials/ModernCalendar";
 import Button from "@/Components/common/Modern/Button";
+import Dropdown from "@/Components/common/ui/Dropdown";
 
 import {
   ContentTab,
@@ -209,30 +210,64 @@ export default function ContentPage() {
 
   return (
     <AuthenticatedLayout>
-      <Head title={t("content.title")} />
+      <Head title={t("manageContent.title")} />
 
       <div className="w-full max-w-full overflow-x-hidden min-w-0 bg-gray-50/30 dark:bg-neutral-900/10 min-h-screen">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-5 sm:py-8 min-w-0">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 min-w-0">
             <div className="min-w-0 flex-1 pr-2">
               <h1 className="text-xl sm:text-3xl font-extrabold text-gray-900 dark:text-white truncate tracking-tight">
-                {t("content.title")}
+                {t("manageContent.title")}
               </h1>
               <p className="text-gray-500 dark:text-gray-400 mt-0.5 sm:mt-2 text-xs sm:text-base lg:text-lg truncate">
-                {t("content.subtitle")}
+                {t("manageContent.subtitle")}
               </p>
             </div>
 
             <div className="flex items-center gap-2">
               {permissions.includes("content") && (
-                <Button
-                  onClick={() => openAddModal()}
-                  variant="primary"
-                  size="md"
-                  icon={Plus}
-                >
-                  {t("content.createNew")}
-                </Button>
+                <Dropdown>
+                  <Dropdown.Trigger>
+                    <Button
+                      variant="primary"
+                      size="md"
+                      icon={Plus}
+                      className="gap-2"
+                    >
+                      {t("manageContent.createNew")}
+                    </Button>
+                  </Dropdown.Trigger>
+                  <Dropdown.Content
+                    align="right"
+                    width="48"
+                    contentClasses="py-1 bg-white dark:bg-neutral-800 shadow-xl rounded-xl border border-gray-200 dark:border-neutral-700"
+                  >
+                    <Button
+                      onClick={() => openAddModal("publication")}
+                      variant="ghost"
+                      buttonStyle="ghost"
+                      size="sm"
+                      icon={FileText}
+                      iconPosition="left"
+                      fullWidth
+                      className="justify-start hover:bg-gray-50 dark:hover:bg-neutral-700/50 rounded-none border-0"
+                    >
+                      {t("manageContent.tabs.publications")}
+                    </Button>
+                    <Button
+                      onClick={() => openAddModal("campaign")}
+                      variant="ghost"
+                      buttonStyle="ghost"
+                      size="sm"
+                      icon={Target}
+                      iconPosition="left"
+                      fullWidth
+                      className="justify-start hover:bg-gray-50 dark:hover:bg-neutral-700/50 rounded-none border-t border-gray-100 dark:border-neutral-700/50"
+                    >
+                      {t("manageContent.tabs.campaigns")}
+                    </Button>
+                  </Dropdown.Content>
+                </Dropdown>
               )}
             </div>
           </div>
@@ -375,9 +410,6 @@ export default function ContentPage() {
                         isLoading={isPubLoading}
                         onRefresh={handleRefreshWrapped}
                         onViewDetail={openViewDetailsModal}
-                        pagination={pubPagination}
-                        onPageChange={handlePageChange}
-                        onPerPageChange={handlePerPageChange}
                       />
                     ) : (
                       <ApprovalHistory onRefresh={handleRefreshWrapped} />

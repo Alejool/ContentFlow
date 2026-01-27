@@ -1,9 +1,10 @@
-import React, { memo } from "react";
-import { createPortal } from "react-dom";
-import { useContentUIStore } from "@/stores/contentUIStore";
 import { usePublishPublication } from "@/Hooks/publication/usePublishPublication";
+import { useManageContentUIStore } from "@/stores/manageContentUIStore";
+import { usePublicationStore } from "@/stores/publicationStore";
 import { Campaign } from "@/types/Campaign";
 import { Publication } from "@/types/Publication";
+import { memo } from "react";
+import { createPortal } from "react-dom";
 
 // Modals
 import AddCampaignModal from "@/Components/Content/modals/AddCampaignModal";
@@ -14,115 +15,128 @@ import PublishPublicationModal from "@/Components/Content/modals/PublishPublicat
 import ViewCampaignModal from "@/Components/Content/modals/ViewCampaignModal";
 
 interface ModalManagerProps {
-    onRefresh: () => void;
+  onRefresh: () => void;
 }
 
 const ModalManager = memo(({ onRefresh }: ModalManagerProps) => {
-    const {
-        activeTab,
-        selectedItem,
-        isAddModalOpen,
-        isEditModalOpen,
-        isPublishModalOpen,
-        isViewDetailsModalOpen,
-        openEditModal,
-        closeAddModal,
-        closeEditModal,
-        closePublishModal,
-        closeViewDetailsModal,
-    } = useContentUIStore();
+  const {
+    activeTab,
+    selectedItem,
+    isAddModalOpen,
+    addType,
+    isEditModalOpen,
+    isPublishModalOpen,
+    isViewDetailsModalOpen,
+    openEditModal,
+    closeAddModal,
+    closeEditModal,
+    closePublishModal,
+    closeViewDetailsModal,
+  } = useManageContentUIStore();
 
+  const { fetchPublishedPlatforms } = usePublishPublication();
 
-    const { fetchPublishedPlatforms } = usePublishPublication();
+  // Helper to determine item type safely
+  const isCampaignItem =
+    selectedItem &&
+    ((selectedItem as any).__type === "campaign" ||
+      ("name" in selectedItem && !("title" in selectedItem)));
+  const isPublicationItem = selectedItem && !isCampaignItem;
 
-    // Helper to determine item type safely
-    const isCampaignItem =
-        selectedItem &&
-        ((selectedItem as any).__type === "campaign" ||
-            ("name" in selectedItem && !("title" in selectedItem)));
-    const isPublicationItem = selectedItem && !isCampaignItem;
+  // Logic for targeting correct modal based on selection or active tab
+  const targetIsCampaign =
+    isCampaignItem || (activeTab === "campaigns" && !selectedItem);
+  const targetIsPublication =
+    isPublicationItem || (activeTab === "publications" && !selectedItem);
 
-    // Logic for targeting correct modal based on selection or active tab
-    const targetIsCampaign =
-        isCampaignItem || (activeTab === "campaigns" && !selectedItem);
-    const targetIsPublication =
-        isPublicationItem || (activeTab === "publications" && !selectedItem);
+  // CRITICAL: Get FRESH data from stores to ensure reactivity when background processes update them
+  const publications = usePublicationStore((s) => s.publications);
+  const currentPub =
+    targetIsPublication && selectedItem?.id
+      ? (publications.find((p) => p.id === selectedItem.id) as Publication) ||
+        (selectedItem as Publication)
+      : null;
 
-    return (
+  // Determine which Add Modal to show
+  const showAddCampaign =
+    addType === "campaign" || (addType === null && activeTab === "campaigns");
+  const showAddPublication = !showAddCampaign;
+
+  return (
+    <>
+      {isAddModalOpen &&
+        createPortal(
+          showAddCampaign ? (
+            <AddCampaignModal
+              isOpen={isAddModalOpen}
+              onClose={closeAddModal}
+              onSubmit={onRefresh}
+            />
+          ) : (
+            <AddPublicationModal
+              isOpen={isAddModalOpen}
+              onClose={closeAddModal}
+              onSubmit={onRefresh}
+            />
+          ),
+          document.body,
+        )}
+
+      {createPortal(
         <>
-            {isAddModalOpen &&
-                createPortal(
-                    activeTab === "campaigns" ? (
-                        <AddCampaignModal
-                            isOpen={isAddModalOpen}
-                            onClose={closeAddModal}
-                            onSubmit={onRefresh}
-                        />
-                    ) : (
-                        <AddPublicationModal
-                            isOpen={isAddModalOpen}
-                            onClose={closeAddModal}
-                            onSubmit={onRefresh}
-                        />
-                    ),
-                    document.body
-                )}
+          {/* Always render Publication Modal (hidden/visible handled internally via CSS for performance) */}
+          <EditPublicationModal
+            isOpen={isEditModalOpen && targetIsPublication}
+            onClose={closeEditModal}
+            publication={currentPub}
+            onSubmit={onRefresh}
+          />
 
-            {createPortal(
-                <>
-                    {/* Always render Publication Modal (hidden/visible handled internally via CSS for performance) */}
-                    <EditPublicationModal
-                        isOpen={isEditModalOpen && targetIsPublication}
-                        onClose={closeEditModal}
-                        publication={targetIsPublication ? (selectedItem as Publication) : null}
-                        onSubmit={onRefresh}
-                    />
+          {/* Render Campaign Modal conditionally */}
+          {isEditModalOpen && targetIsCampaign && (
+            <EditCampaignModal
+              isOpen={isEditModalOpen}
+              onClose={closeEditModal}
+              campaign={selectedItem as Campaign}
+              onSubmit={onRefresh}
+            />
+          )}
+        </>,
+        document.body,
+      )}
 
-                    {/* Render Campaign Modal conditionally */}
-                    {isEditModalOpen && targetIsCampaign && (
-                        <EditCampaignModal
-                            isOpen={isEditModalOpen}
-                            onClose={closeEditModal}
-                            campaign={selectedItem as Campaign}
-                            onSubmit={onRefresh}
-                        />
-                    )}
-                </>,
-                document.body
-            )}
+      {isPublishModalOpen &&
+        createPortal(
+          activeTab === "publications" && (
+            <PublishPublicationModal
+              isOpen={isPublishModalOpen}
+              onClose={(id?: number) => {
+                const idToRefresh = id || selectedItem?.id;
+                closePublishModal();
+                if (idToRefresh) {
+                  fetchPublishedPlatforms(idToRefresh);
+                }
+              }}
+              publication={selectedItem as Publication}
+              onSuccess={onRefresh}
+            />
+          ),
+          document.body,
+        )}
 
-            {isPublishModalOpen &&
-                createPortal(
-                    activeTab === "publications" && (
-                        <PublishPublicationModal
-                            isOpen={isPublishModalOpen}
-                            onClose={(id?: number) => {
-                                const idToRefresh = id || selectedItem?.id;
-                                closePublishModal();
-                                if (idToRefresh) {
-                                    fetchPublishedPlatforms(idToRefresh);
-                                }
-                            }}
-                            publication={selectedItem as Publication}
-                            onSuccess={onRefresh}
-                        />
-                    ),
-                    document.body
-                )}
+      {isViewDetailsModalOpen &&
+        createPortal(
+          <ViewCampaignModal
+            isOpen={isViewDetailsModalOpen}
+            onClose={closeViewDetailsModal}
+            campaign={selectedItem as any}
+            onEdit={openEditModal}
+          />,
 
-            {isViewDetailsModalOpen &&
-                createPortal(
-                    <ViewCampaignModal
-                        isOpen={isViewDetailsModalOpen}
-                        onClose={closeViewDetailsModal}
-                        campaign={selectedItem as any}
-                        onEdit={openEditModal}
-                    />,
-
-                    document.body
-                )}
-        </>
-    );
+          document.body,
+        )}
+    </>
+  );
 });
 
 export default ModalManager;
