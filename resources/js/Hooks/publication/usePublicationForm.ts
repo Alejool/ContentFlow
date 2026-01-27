@@ -87,6 +87,10 @@ export const usePublicationForm = ({
   const [accountSchedules, setAccountSchedules] = useState<
     Record<number, string>
   >({});
+  const [publishingAccountIds, setPublishingAccountIds] = useState<number[]>(
+    [],
+  );
+  const [publishedAccountIds, setPublishedAccountIds] = useState<number[]>([]);
 
   const prevHashtagsRef = useRef<string>("");
 
@@ -230,8 +234,19 @@ export const usePublicationForm = ({
         // Process scheduled posts and social accounts
         const publishedAccountIds = new Set(
           publication.social_post_logs
+            ?.filter((l) => l.status === "published")
+            .map((l) => l.social_account_id) || [],
+        );
+
+        const publishingAccountIds = new Set(
+          publication.social_post_logs
             ?.filter(
-              (l) => l.status === "published" || l.status === "publishing",
+              (l) =>
+                l.status === "publishing" ||
+                // If publication is 'publishing' or 'processing', treat 'pending' logs as actively publishing
+                ((publication.status === "publishing" ||
+                  publication.status === "processing") &&
+                  l.status === "pending"),
             )
             .map((l) => l.social_account_id) || [],
         );
@@ -828,6 +843,7 @@ export const usePublicationForm = ({
 
   return {
     t,
+    publication,
     form,
     watched,
     errors,
@@ -874,6 +890,8 @@ export const usePublicationForm = ({
     uploadProgress,
     uploadStats: isS3Uploading ? uploadStats : {},
     uploadErrors,
+    publishingAccountIds,
+    publishedAccountIds,
     isAnyMediaProcessing:
       mediaFiles.some(
         (m) => m.status === "uploading" || m.status === "processing",

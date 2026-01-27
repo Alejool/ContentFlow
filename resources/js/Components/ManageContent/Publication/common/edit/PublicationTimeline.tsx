@@ -102,8 +102,8 @@ export default function PublicationTimeline({
     }
   };
 
-  const formatActivityType = (type: string) => {
-    switch (type) {
+  const formatActivityType = (activity: PublicationActivity) => {
+    switch (activity.type) {
       case "created":
         return t("activity.timeline.status.created") || "Creado";
       case "updated":
@@ -121,21 +121,21 @@ export default function PublicationTimeline({
       case "publishing":
         return t("activity.timeline.status.publishing") || "Publicando...";
       case "failed_on_platform":
-        return (
-          t("activity.timeline.status.failed_on_platform") ||
-          "Falló en plataforma"
-        );
+        return t("activity.timeline.status.failed_on_platform_detail", {
+          platform: activity.details?.platform || "Plataforma",
+          defaultValue: `Fallo en ${activity.details?.platform || "plataforma"}`,
+        });
       case "published_on_platform":
-        return (
-          t("activity.timeline.status.published_on_platform") ||
-          "Publicado en plataforma"
-        );
+        return t("activity.timeline.status.published_on_platform_detail", {
+          platform: activity.details?.platform || "Plataforma",
+          defaultValue: `Publicado en ${activity.details?.platform || "plataforma"}`,
+        });
       case "publication_failed":
         return (
           t("activity.timeline.publication_failed") || "Fallo en la publicación"
         );
       default:
-        return type;
+        return activity.type;
     }
   };
 
@@ -156,7 +156,7 @@ export default function PublicationTimeline({
             <div className="flex flex-col gap-1">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
                 <span className="font-bold text-sm text-gray-900 dark:text-gray-100">
-                  {formatActivityType(activity.type)}
+                  {formatActivityType(activity)}
                 </span>
                 <time className="text-xs text-gray-500 dark:text-gray-400 font-medium">
                   {format(new Date(activity.created_at), "PPp", { locale })}

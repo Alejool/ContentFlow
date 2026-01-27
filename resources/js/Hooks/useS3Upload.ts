@@ -40,8 +40,9 @@ export const useS3Upload = () => {
   });
 
   // Threshold for switching to Multipart Upload
-  const MULTIPART_THRESHOLD = 100 * 1024 * 1024;
-  const CHUNK_SIZE = 6 * 1024 * 1024;
+  const MULTIPART_THRESHOLD = 5 * 1024 * 1024; // 5MB threshold for videos
+  const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB chunks (S3 minimum)
+  const CONCURRENCY = 3; // 3 parallel chunks as requested
 
   const uploadFile = useCallback(
     async (file: File, tempId: string) => {
@@ -54,7 +55,9 @@ export const useS3Upload = () => {
       const performUpload = async () => {
         try {
           let result;
-          if (file.size >= MULTIPART_THRESHOLD) {
+          // Apply optimization primarily to videos or files over threshold
+          const isVideo = file.type.startsWith("video/");
+          if (file.size >= MULTIPART_THRESHOLD || isVideo) {
             result = await uploadMultipart(file, tempId, startTime);
           } else {
             result = await uploadSingle(file, tempId, startTime);
@@ -161,9 +164,11 @@ export const useS3Upload = () => {
     const { uploadId, key } = initData;
     const totalParts = Math.ceil(file.size / CHUNK_SIZE);
     const parts: { ETag: string; PartNumber: number }[] = [];
-    let uploadedBytes = 0;
 
-    for (let partNumber = 1; partNumber <= totalParts; partNumber++) {
+    // Internal state to track progress of each parallel chunk
+    const partProgress: Record<number, number> = {};
+
+    const uploadPart = async (partNumber: number) => {
       const start = (partNumber - 1) * CHUNK_SIZE;
       const end = Math.min(start + CHUNK_SIZE, file.size);
       const chunk = file.slice(start, end);
@@ -181,8 +186,14 @@ export const useS3Upload = () => {
         withCredentials: false,
         headers: { "Content-Type": "" },
         onUploadProgress: (p) => {
+          partProgress[partNumber] = p.loaded;
+          // Calculate collective progress across all parallel chunks
+          const totalLoaded = Object.values(partProgress).reduce(
+            (a, b) => a + b,
+            0,
+          );
           handleProgress(
-            { loaded: uploadedBytes + p.loaded, total: file.size } as any,
+            { loaded: totalLoaded, total: file.size } as any,
             id,
             startTime,
             0,
@@ -191,11 +202,24 @@ export const useS3Upload = () => {
         },
       });
 
-      uploadedBytes += chunk.size;
       const etag = response.headers["etag"]?.replaceAll('"', "");
       if (!etag) throw new Error(`Missing ETag for part ${partNumber}`);
-      parts.push({ ETag: etag, PartNumber: partNumber });
-    }
+      return { ETag: etag, PartNumber: partNumber };
+    };
+
+    // Parallel processing with concurrency limit
+    const queue = Array.from({ length: totalParts }, (_, i) => i + 1);
+    const workers = Array(Math.min(CONCURRENCY, totalParts))
+      .fill(null)
+      .map(async () => {
+        while (queue.length > 0) {
+          const partNumber = queue.shift()!;
+          const res = await uploadPart(partNumber);
+          parts.push(res);
+        }
+      });
+
+    await Promise.all(workers);
 
     await axios.post(route("api.v1.uploads.multipart.complete"), {
       key,

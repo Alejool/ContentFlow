@@ -1,5 +1,5 @@
+import { useConfirm } from "@/Hooks/useConfirm";
 import { useUploadQueue } from "@/stores/uploadQueueStore";
-import { PageProps } from "@/types";
 import { Publication } from "@/types/Publication";
 import { usePage } from "@inertiajs/react";
 import axios from "axios";
@@ -15,27 +15,38 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 export default function GlobalUploadIndicator() {
-  const { t } = useTranslation();
-  const { props } = usePage<PageProps>();
-  const queue = useUploadQueue((state) => state.queue);
-  const removeUpload = useUploadQueue((state) => state.removeUpload);
+  const { queue, removeUpload } = useUploadQueue();
   const [isMinimized, setIsMinimized] = useState(false);
   const [processingItems, setProcessingItems] = useState<Publication[]>([]);
+  const { t } = useTranslation();
+  const props = usePage().props as any;
 
   const uploads = Object.values(queue);
 
-  // Fetch publications in 'processing' or 'publishing' state from the workspace
+  // Fetch publications in 'processing', 'publishing', or recently 'failed' state
   const fetchProcessingItems = async () => {
     try {
       const response = await axios.get(route("api.v1.publications.index"), {
-        params: { status: "processing,publishing", simplified: "true" },
+        params: { status: "processing,publishing,failed", simplified: "true" },
       });
       if (response.data?.success && response.data?.publications) {
-        // Handle both paginated and simple collections
-        const items = Array.isArray(response.data.publications)
+        const items: Publication[] = Array.isArray(response.data.publications)
           ? response.data.publications
           : response.data.publications.data || [];
-        setProcessingItems(items);
+
+        // Filter: Keep all processing/publishing, plus failures from last 5 minutes
+        const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+        const filtered = items.filter((item) => {
+          if (item.status === "processing" || item.status === "publishing")
+            return true;
+          if (item.status === "failed") {
+            const updatedAt = new Date(item.updated_at || "");
+            return updatedAt > fiveMinutesAgo;
+          }
+          return false;
+        });
+
+        setProcessingItems(filtered);
       }
     } catch (err) {
       console.error("Failed to fetch processing items", err);
@@ -44,19 +55,19 @@ export default function GlobalUploadIndicator() {
 
   useEffect(() => {
     fetchProcessingItems();
-    // Poll every 15 seconds for external processing/publishing changes
-    const interval = setInterval(fetchProcessingItems, 15000);
+    // Poll every 10 seconds for more responsive updates
+    const interval = setInterval(fetchProcessingItems, 10000);
 
     // Listen for real-time status updates
     if (props.auth?.user?.id) {
       const channel = window.Echo.private(`users.${props.auth.user.id}`);
-      channel.listen("PublicationStatusUpdated", () => {
+      channel.listen(".PublicationStatusUpdated", () => {
         fetchProcessingItems();
       });
 
       return () => {
         clearInterval(interval);
-        channel.stopListening("PublicationStatusUpdated");
+        channel.stopListening(".PublicationStatusUpdated");
       };
     }
 
@@ -66,21 +77,19 @@ export default function GlobalUploadIndicator() {
   const activeUploads = uploads.filter(
     (u) => u.status === "uploading" || u.status === "pending",
   );
-  const completedUploads = uploads.filter((u) => u.status === "completed");
   const errorUploads = uploads.filter((u) => u.status === "error");
 
-  // Differentiate between processing and publishing items
-  const actualProcessingItems = processingItems.filter(
-    (i) => i.status === "processing",
-  );
+  // Differentiate between status types
   const publishingItems = processingItems.filter(
     (i) => i.status === "publishing",
   );
+  const failedItems = processingItems.filter((i) => i.status === "failed");
 
   const totalActiveTasks =
     activeUploads.length +
-    actualProcessingItems.length +
-    publishingItems.length;
+    processingItems.filter((i) => i.status !== "failed").length;
+
+  const { confirm, ConfirmDialog } = useConfirm();
 
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -95,6 +104,33 @@ export default function GlobalUploadIndicator() {
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [activeUploads.length]);
 
+  const handleCancelPublication = async (e: React.MouseEvent, id: number) => {
+    e.stopPropagation();
+
+    const isConfirmed = await confirm({
+      title:
+        t("publications.modal.cancel_confirmation.title") ||
+        "Cancelar Publicación",
+      message:
+        t("publications.modal.cancel_confirmation.message") ||
+        "¿Estás seguro de que deseas cancelar esta publicación? El envío a redes se detendrá.",
+      confirmText:
+        t("publications.modal.cancel_confirmation.confirm") || "Sí, cancelar",
+      cancelText:
+        t("publications.modal.cancel_confirmation.cancel") || "No, continuar",
+      type: "danger",
+    });
+
+    if (!isConfirmed) return;
+
+    try {
+      await axios.post(route("api/v1.publications/cancel", id));
+      fetchProcessingItems();
+    } catch (err) {
+      console.error("Failed to cancel publication", err);
+    }
+  };
+
   if (uploads.length === 0 && processingItems.length === 0) return null;
 
   return (
@@ -108,7 +144,7 @@ export default function GlobalUploadIndicator() {
         <div className="flex items-center gap-2">
           {totalActiveTasks > 0 ? (
             <Loader2 className="w-4 h-4 text-blue-500 animate-spin" />
-          ) : errorUploads.length > 0 ? (
+          ) : errorUploads.length > 0 || failedItems.length > 0 ? (
             <AlertTriangle className="w-4 h-4 text-red-500" />
           ) : (
             <CheckCircle2 className="w-4 h-4 text-green-500" />
@@ -124,12 +160,12 @@ export default function GlobalUploadIndicator() {
                     count: totalActiveTasks,
                     defaultValue: `Subiendo/Procesando (${totalActiveTasks})...`,
                   })
-              : errorUploads.length > 0
+              : errorUploads.length > 0 || failedItems.length > 0
                 ? t("publications.modal.upload.uploadFailed", {
-                    defaultValue: "Upload Failed",
+                    defaultValue: "Algo salió mal",
                   })
                 : t("publications.modal.upload.uploadsCompleted", {
-                    defaultValue: "Uploads Completed",
+                    defaultValue: "Subidas completadas",
                   })}
           </span>
         </div>
@@ -171,19 +207,19 @@ export default function GlobalUploadIndicator() {
               </div>
 
               <div className="flex items-center gap-2 mb-1">
-                <div className="flex-1 bg-gray-200 dark:bg-neutral-600 h-1.5 rounded-full overflow-hidden">
+                <div className="flex-1 bg-gray-100 dark:bg-neutral-700 h-1.5 rounded-full overflow-hidden">
                   <div
-                    className={`h-full transition-all duration-300 ${
+                    className={`h-full transition-all duration-500 ease-out ${
                       upload.status === "error"
-                        ? "bg-red-500"
+                        ? "bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]"
                         : upload.status === "completed"
-                          ? "bg-green-500"
-                          : "bg-blue-500"
+                          ? "bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]"
+                          : "bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]"
                     }`}
                     style={{ width: `${upload.progress}%` }}
                   />
                 </div>
-                <span className="text-[10px] text-gray-500 dark:text-neutral-400 w-8 text-right">
+                <span className="text-[10px] font-bold text-neutral-600 dark:text-neutral-300 w-8 text-right">
                   {upload.progress}%
                 </span>
               </div>
@@ -196,56 +232,175 @@ export default function GlobalUploadIndicator() {
                 </span>
                 <span>
                   {upload.status === "uploading" && upload.stats?.eta
-                    ? `~${formatTime(upload.stats.eta)} ${t("publications.modal.upload.left", { defaultValue: "left" })}`
+                    ? `~${formatTime(upload.stats.eta)} ${t("publications.modal.upload.left", { defaultValue: "restante" })}`
                     : upload.status === "error"
                       ? upload.error
                       : upload.status === "completed"
                         ? t("publications.modal.upload.done", {
-                            defaultValue: "Done",
+                            defaultValue: "Listo",
                           })
                         : t("publications.modal.upload.pending", {
-                            defaultValue: "Pending",
+                            defaultValue: "Pendiente",
                           })}
                 </span>
               </div>
             </div>
           ))}
 
-          {/* External Processing/Publishing Items */}
+          {/* External Processing/Publishing/Failed Items */}
           {processingItems.map((item) => (
             <div
               key={item.id}
-              className="p-3 border-b border-gray-100 dark:border-neutral-700 last:border-0"
+              className="p-3 border-b border-gray-100 dark:border-neutral-700 last:border-0 relative group"
             >
               <div className="flex items-center gap-2 mb-1">
-                <Loader2 className="w-3 h-3 text-blue-500 animate-spin" />
+                {item.status === "failed" ? (
+                  <AlertTriangle className="w-3 h-3 text-red-500" />
+                ) : (
+                  <Loader2 className="w-3 h-3 text-blue-500 animate-spin" />
+                )}
                 <span
                   className="text-xs font-medium truncate text-neutral-900 dark:text-neutral-100 flex-1"
                   title={item.title}
                 >
                   {item.title}
                 </span>
-                {item.status === "publishing" && (
-                  <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 font-bold uppercase tracking-wider">
-                    {t("common.publishing") || "Publicando"}
-                  </span>
-                )}
+                <div className="flex items-center gap-1.5">
+                  {(item.status === "publishing" ||
+                    item.status === "processing") && (
+                    <button
+                      onClick={(e) => handleCancelPublication(e, item.id)}
+                      className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                      title="Cancelar envío"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  )}
+                  {item.status === "publishing" && (
+                    <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 font-bold uppercase tracking-wider">
+                      {t("common.publishing") || "Publicando"}
+                    </span>
+                  )}
+                  {item.status === "failed" && (
+                    <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 font-bold uppercase tracking-wider">
+                      {t("common.failed") || "Falló"}
+                    </span>
+                  )}
+                </div>
               </div>
-              <div className="flex justify-between text-[10px] text-gray-400 dark:text-neutral-500">
-                <span>
-                  {item.status === "publishing"
-                    ? t("publications.gallery.sendingToSocial", {
-                        defaultValue: "Enviando a plataformas sociales...",
-                      })
-                    : t("publications.gallery.processing", {
-                        defaultValue: "Procesando en segundo plano...",
-                      })}
-                </span>
+              <div className="flex flex-col gap-1 text-[10px] text-gray-400 dark:text-neutral-500">
+                {(item as any).platform_status_summary ? (
+                  <div className="space-y-2 mt-2">
+                    {/* Progress Bar for Publication */}
+                    {(() => {
+                      const platforms = Object.values(
+                        (item as any).platform_status_summary,
+                      );
+                      const total = platforms.length;
+                      const completed = platforms.filter(
+                        (p: any) =>
+                          p.status === "published" || p.status === "failed",
+                      ).length;
+                      const progress =
+                        total > 0
+                          ? Math.max(5, Math.round((completed / total) * 100))
+                          : 0;
+
+                      return (
+                        <div className="space-y-1">
+                          <div className="flex justify-between items-center text-[9px] uppercase tracking-wider font-bold">
+                            <span className="text-blue-500 dark:text-blue-400">
+                              {t("common.progress") || "Progreso"}
+                            </span>
+                            <span className="text-neutral-500 dark:text-neutral-400">
+                              {completed}/{total}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="flex-1 bg-gray-100 dark:bg-neutral-700 h-1.5 rounded-full overflow-hidden">
+                              <div
+                                className={`h-full transition-all duration-500 ease-out shadow-[0_0_8px_rgba(59,130,246,0.5)] ${item.status === "failed" ? "bg-red-500" : "bg-blue-500"}`}
+                                style={{
+                                  width: `${item.status === "failed" ? 100 : progress}%`,
+                                }}
+                              />
+                            </div>
+                            <span className="w-8 text-right font-medium">
+                              {item.status === "failed" ? "100" : progress}%
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })()}
+
+                    <div className="space-y-1.5 pt-1 border-t border-gray-50 dark:border-neutral-700/50">
+                      {Object.values((item as any).platform_status_summary).map(
+                        (platform: any, idx) => {
+                          const isDone = platform.status === "published";
+                          const isFailed = platform.status === "failed";
+                          return (
+                            <div
+                              key={idx}
+                              className="flex items-center justify-between"
+                            >
+                              <span className="capitalize text-neutral-600 dark:text-neutral-400">
+                                {platform.platform}:
+                              </span>
+                              <div className="flex items-center gap-1.5">
+                                {platform.status === "publishing" ||
+                                platform.status === "pending" ? (
+                                  <Loader2 className="w-2.5 h-2.5 animate-spin text-blue-500" />
+                                ) : isDone ? (
+                                  <CheckCircle2 className="w-2.5 h-2.5 text-green-500" />
+                                ) : (
+                                  <AlertTriangle className="w-2.5 h-2.5 text-red-500" />
+                                )}
+                                <span
+                                  className={`font-medium ${
+                                    isDone
+                                      ? "text-green-600 dark:text-green-400"
+                                      : isFailed
+                                        ? "text-red-500 dark:text-red-400"
+                                        : "text-blue-500 dark:text-blue-400"
+                                  }`}
+                                >
+                                  {isDone
+                                    ? "Enviado"
+                                    : isFailed
+                                      ? "Falló"
+                                      : "Enviando..."}
+                                </span>
+                              </div>
+                            </div>
+                          );
+                        },
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-2 mt-2">
+                    <div className="flex-1 bg-gray-100 dark:bg-neutral-700 h-1.5 rounded-full overflow-hidden">
+                      <div className="h-full bg-blue-400/50 animate-pulse w-full" />
+                    </div>
+                    <span className="block text-center italic opacity-70">
+                      {item.status === "publishing"
+                        ? t("publications.gallery.sendingToSocial", {
+                            defaultValue: "Iniciando envío a redes...",
+                          })
+                        : item.status === "failed"
+                          ? "Error en el procesamiento"
+                          : t("publications.gallery.processing", {
+                              defaultValue: "Procesando archivos...",
+                            })}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
           ))}
         </div>
       )}
+      <ConfirmDialog />
     </div>
   );
 }

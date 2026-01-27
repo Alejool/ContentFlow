@@ -89,6 +89,21 @@ export default function ActivityList({ activities }: ActivityListProps) {
     if (activity.type === "publication_failed")
       return t("activity.timeline.publication_failed");
 
+    if (activity.type === "published_on_platform") {
+      return t("activity.timeline.status.published_on_platform_detail", {
+        platform: activity.details?.platform || "Plataforma",
+        defaultValue: `Publicado en ${activity.details?.platform || "plataforma"}`,
+      });
+    }
+
+    if (activity.type === "failed_on_platform") {
+      return t("activity.timeline.status.failed_on_platform_detail", {
+        platform: activity.details?.platform || "Plataforma",
+        error: activity.details?.error || "",
+        defaultValue: `Fallo en ${activity.details?.platform || "plataforma"}`,
+      });
+    }
+
     if (activity.type === "updated") {
       if (activity.details?.attributes?.status) {
         const oldStatus = activity.details?.old?.status;

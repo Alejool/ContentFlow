@@ -10,12 +10,15 @@ import Select from "@/Components/common/Modern/Select";
 import Textarea from "@/Components/common/Modern/Textarea";
 import { useCampaigns } from "@/Hooks/campaign/useCampaigns";
 import { usePublicationForm } from "@/Hooks/publication/usePublicationForm";
+import { useConfirm } from "@/Hooks/useConfirm";
 import { useS3Upload } from "@/Hooks/useS3Upload";
 import { useMediaStore } from "@/stores/mediaStore";
 import { useAccountsStore } from "@/stores/socialAccountsStore";
-import { FileText, Hash, Save, Target } from "lucide-react";
+import axios from "axios";
+import { FileText, Hash, Loader2, Save, Target, X } from "lucide-react";
 import { useMemo } from "react";
 import { useWatch } from "react-hook-form";
+import { toast } from "react-hot-toast";
 
 interface AddPublicationModalProps {
   isOpen: boolean;
@@ -60,11 +63,15 @@ export default function AddPublicationModal({
     setValue,
     control,
     remoteLock,
+    publishingAccountIds,
+    publication,
   } = usePublicationForm({
     onClose,
     onSubmitSuccess: onSubmit,
     isOpen,
   });
+
+  const { confirm, ConfirmDialog } = useConfirm();
 
   const { uploadFile, uploading, progress: uploadProgress } = useS3Upload(); // Use hook
 
@@ -178,6 +185,14 @@ export default function AddPublicationModal({
             metadata: await uploadFile(m.file!, m.tempId),
           })),
         );
+
+        // If any upload was cancelled (metadata is undefined), stop the process
+        if (uploadResults.some((r) => !r.metadata)) {
+          console.log(
+            "🚀 [S3 UPLOAD] One or more uploads cancelled, stopping submission",
+          );
+          return;
+        }
 
         console.log("🚀 [S3 UPLOAD] Upload complete, metadata:", uploadResults);
 
@@ -309,6 +324,7 @@ export default function AddPublicationModal({
                 />
 
                 <SocialAccountsSection
+                  publishingAccountIds={publishingAccountIds}
                   socialAccounts={socialAccounts as any}
                   selectedAccounts={watched.social_accounts || []}
                   accountSchedules={accountSchedules}
@@ -499,14 +515,69 @@ export default function AddPublicationModal({
                   className="bg-blue-600 h-2.5 rounded-full"
                   style={{ width: "50%" }}
                 ></div>
-                {/* Simplified progress visualization - ideally aggregate 'progress' map */}
               </div>
               <p className="text-xs text-center mt-1 text-gray-500">
                 Uploading to S3...
               </p>
             </div>
           )}
+
+          {publishingAccountIds && publishingAccountIds.length > 0 && (
+            <div className="px-6 pb-4">
+              <div className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/10 rounded-lg border border-blue-100 dark:border-blue-900/30">
+                <div className="flex items-center gap-2">
+                  <Loader2 className="w-4 h-4 text-blue-500 animate-spin" />
+                  <span className="text-xs font-bold text-blue-700 dark:text-blue-300 uppercase tracking-tight">
+                    {t("publish.publishing") || "Publicando en redes..."}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    const isConfirmed = await confirm({
+                      title:
+                        t("publications.modal.cancel_confirmation.title") ||
+                        "Cancelar Publicación",
+                      message:
+                        t("publications.modal.cancel_confirmation.message") ||
+                        "¿Estás seguro de que deseas cancelar esta publicación? El envío a redes se detendrá.",
+                      confirmText:
+                        t("publications.modal.cancel_confirmation.confirm") ||
+                        "Sí, cancelar",
+                      cancelText:
+                        t("publications.modal.cancel_confirmation.cancel") ||
+                        "No, continuar",
+                      type: "danger",
+                    });
+
+                    if (isConfirmed) {
+                      try {
+                        const id = (publication as any)?.id;
+                        if (id) {
+                          await axios.post(
+                            route("api/v1/publications/cancel", id),
+                          );
+                          toast.success("Publicación cancelada");
+                          handleClose();
+                        }
+                      } catch (err) {
+                        console.error("Failed to cancel", err);
+                      }
+                    }
+                  }}
+                  className="flex items-center gap-1.5 px-3 py-1 rounded-md bg-red-50 hover:bg-red-100 text-red-600 dark:bg-red-900/20 dark:hover:bg-red-900/30 dark:text-red-400 transition-colors border border-red-100 dark:border-red-900/50 group"
+                >
+                  <X className="w-3.5 h-3.5 group-hover:rotate-90 transition-transform" />
+                  <span className="text-[11px] font-black uppercase tracking-tighter">
+                    {t("common.cancel") || "Cancelar Publicación"}
+                  </span>
+                </button>
+              </div>
+            </div>
+          )}
         </div>
+
+        <ConfirmDialog />
 
         <PlatformSettingsModal
           isOpen={!!activePlatformSettings}

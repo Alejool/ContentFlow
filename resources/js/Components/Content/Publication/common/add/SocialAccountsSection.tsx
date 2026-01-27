@@ -1,6 +1,6 @@
 import DatePickerModern from "@/Components/common/Modern/DatePicker";
 import { format } from "date-fns";
-import { Check, Clock, Settings, Target, X } from "lucide-react";
+import { Check, Clock, Loader2, Settings, Target, X } from "lucide-react";
 import React, { memo, useState } from "react";
 
 interface SocialAccount {
@@ -195,37 +195,70 @@ const SocialAccountItem = memo(
 
     return (
       <div
-        className={`relative flex items-center p-3 rounded-lg border transition-all ${
-          isInternalDisabled ? "opacity-80 cursor-default" : ""
+        className={`relative flex items-center p-3 rounded-lg border transition-all duration-300 ${
+          isInternalDisabled ? "cursor-default" : "cursor-pointer"
         } ${
-          isCheckedActually
-            ? `border-primary-500 bg-primary-50 dark:bg-primary-900/20 shadow-sm`
-            : "border-gray-200 dark:border-neutral-600 hover:bg-gray-50 dark:hover:bg-neutral-700/5"
+          isPublished
+            ? "border-green-500 bg-green-50 dark:bg-green-900/10 shadow-sm"
+            : isPublishing
+              ? "border-blue-500 bg-blue-50 dark:bg-blue-900/10 shadow-sm"
+              : isCheckedActually
+                ? "border-primary-500 bg-primary-50 dark:bg-primary-900/20 shadow-sm"
+                : "border-gray-200 dark:border-neutral-600 hover:bg-gray-50 dark:hover:bg-neutral-700/5"
         }`}
+        onClick={() => {
+          if (!isInternalDisabled) onToggle();
+        }}
       >
+        {/* Blocking Overlay Effect for Publishing */}
+        {isPublishing && (
+          <div className="absolute inset-0 bg-white/40 dark:bg-black/20 backdrop-blur-[0.5px] rounded-lg z-10 flex items-center justify-center pointer-events-none">
+            <div className="bg-white dark:bg-neutral-800 px-2 py-1 rounded-full shadow-sm border border-blue-200 dark:border-blue-900/50 flex items-center gap-1.5 scale-90">
+              <Loader2 className="w-3 h-3 text-blue-500 animate-spin" />
+              <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-tight">
+                {t("common.publishing") || "Publicando"}
+              </span>
+            </div>
+          </div>
+        )}
+
         <div className="flex items-center gap-3 flex-1">
-          <VisualCheckbox
-            isChecked={!!isCheckedActually}
-            onToggle={(e) => {
-              e?.stopPropagation();
-              if (!isInternalDisabled) onToggle();
-            }}
-          />
+          <div className="relative w-5 h-5 flex items-center justify-center">
+            {isPublished ? (
+              <div className="w-5 h-5 bg-green-500 rounded flex items-center justify-center">
+                <Check className="w-3 h-3 text-white stroke-[3]" />
+              </div>
+            ) : isPublishing ? (
+              <div className="w-5 h-5 bg-blue-500 rounded flex items-center justify-center">
+                <Loader2 className="w-3 h-3 text-white animate-spin" />
+              </div>
+            ) : (
+              <VisualCheckbox
+                isChecked={!!isCheckedActually}
+                onToggle={(e) => {
+                  e?.stopPropagation();
+                  if (!isInternalDisabled) onToggle();
+                }}
+              />
+            )}
+          </div>
 
           <div className="flex flex-col flex-1">
             <div className="flex items-center gap-2">
-              <span className="font-medium text-sm">{account.platform}</span>
+              <span className="font-semibold text-sm text-gray-900 dark:text-neutral-100">
+                {account.platform}
+              </span>
               {isCheckedActually && (
                 <span
-                  className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold uppercase ${
+                  className={`text-[9px] px-1.5 py-0.5 rounded-full font-black tracking-tighter uppercase ${
                     isPublished
                       ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300"
                       : isPublishing
-                        ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300"
+                        ? "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300"
                         : (customSchedule || globalSchedule) &&
                             !isPublished &&
                             !isPublishing
-                          ? "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300"
+                          ? "bg-primary-100 text-primary-700 dark:bg-primary-900/40 dark:text-primary-300"
                           : "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300"
                   }`}
                 >
@@ -369,8 +402,7 @@ const SocialAccountsSection = memo(
         <div className="flex items-center justify-between">
           <label className="text-sm font-semibold flex items-center gap-2">
             <Target className="w-4 h-4" />
-            {t("Content.configureNetworks") ||
-              "Configura tus redes sociales"}
+            {t("Content.configureNetworks") || "Configura tus redes sociales"}
           </label>
           {error && (
             <span className="text-xs text-primary-500 font-medium animate-pulse">

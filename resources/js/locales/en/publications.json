@@ -263,6 +263,12 @@
         "scheduledAtRequired": "Scheduled date is required when you select social networks",
         "socialAccountsRequired": "Please select at least one social media account",
         "singleVideo": "You can only upload one video per publication."
+      },
+      "cancel_confirmation": {
+        "title": "Cancel Publication",
+        "message": "Are you sure you want to cancel this publication? Social media broadcasting will stop.",
+        "confirm": "Yes, cancel",
+        "cancel": "No, continue"
       }
     },
     "status": {
