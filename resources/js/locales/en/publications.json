@@ -14,6 +14,7 @@
         "uploadingFiles": "Uploading {{count}} file(s)...",
         "uploadFailed": "Upload Failed",
         "uploadsCompleted": "Uploads Completed",
+        "publishingSocial": "Publishing to social ({{count}})...",
         "done": "Done",
         "pending": "Pending",
         "left": "left"
@@ -342,6 +343,10 @@
       "all": "All",
       "published": "Published",
       "draft": "Draft"
+    },
+    "gallery": {
+      "sendingToSocial": "Sending to social platforms...",
+      "processing": "Processing in background..."
     }
   }
 }

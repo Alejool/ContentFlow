@@ -24,11 +24,11 @@ export default function GlobalUploadIndicator() {
 
   const uploads = Object.values(queue);
 
-  // Fetch publications in 'processing' state from the workspace
+  // Fetch publications in 'processing' or 'publishing' state from the workspace
   const fetchProcessingItems = async () => {
     try {
       const response = await axios.get(route("api.v1.publications.index"), {
-        params: { status: "processing", simplified: "true" },
+        params: { status: "processing,publishing", simplified: "true" },
       });
       if (response.data?.success && response.data?.publications) {
         // Handle both paginated and simple collections
@@ -44,8 +44,8 @@ export default function GlobalUploadIndicator() {
 
   useEffect(() => {
     fetchProcessingItems();
-    // Poll every 30 seconds for external processing changes
-    const interval = setInterval(fetchProcessingItems, 30000);
+    // Poll every 15 seconds for external processing/publishing changes
+    const interval = setInterval(fetchProcessingItems, 15000);
     return () => clearInterval(interval);
   }, []);
 
@@ -55,7 +55,18 @@ export default function GlobalUploadIndicator() {
   const completedUploads = uploads.filter((u) => u.status === "completed");
   const errorUploads = uploads.filter((u) => u.status === "error");
 
-  const totalActiveTasks = activeUploads.length + processingItems.length;
+  // Differentiate between processing and publishing items
+  const actualProcessingItems = processingItems.filter(
+    (i) => i.status === "processing",
+  );
+  const publishingItems = processingItems.filter(
+    (i) => i.status === "publishing",
+  );
+
+  const totalActiveTasks =
+    activeUploads.length +
+    actualProcessingItems.length +
+    publishingItems.length;
 
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -90,10 +101,15 @@ export default function GlobalUploadIndicator() {
           )}
           <span className="font-medium text-sm text-gray-700 dark:text-neutral-200">
             {totalActiveTasks > 0
-              ? t("publications.modal.upload.uploadingFiles", {
-                  count: totalActiveTasks,
-                  defaultValue: `Subiendo/Procesando ${totalActiveTasks}...`,
-                })
+              ? publishingItems.length > 0
+                ? t("publications.modal.upload.publishingSocial", {
+                    count: publishingItems.length,
+                    defaultValue: `Publicando en redes (${publishingItems.length})...`,
+                  })
+                : t("publications.modal.upload.uploadingFiles", {
+                    count: totalActiveTasks,
+                    defaultValue: `Subiendo/Procesando (${totalActiveTasks})...`,
+                  })
               : errorUploads.length > 0
                 ? t("publications.modal.upload.uploadFailed", {
                     defaultValue: "Upload Failed",
@@ -181,7 +197,7 @@ export default function GlobalUploadIndicator() {
             </div>
           ))}
 
-          {/* External Processing Items */}
+          {/* External Processing/Publishing Items */}
           {processingItems.map((item) => (
             <div
               key={item.id}
@@ -190,14 +206,27 @@ export default function GlobalUploadIndicator() {
               <div className="flex items-center gap-2 mb-1">
                 <Loader2 className="w-3 h-3 text-blue-500 animate-spin" />
                 <span
-                  className="text-xs font-medium truncate text-neutral-900 dark:text-neutral-100"
+                  className="text-xs font-medium truncate text-neutral-900 dark:text-neutral-100 flex-1"
                   title={item.title}
                 >
                   {item.title}
                 </span>
+                {item.status === "publishing" && (
+                  <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 font-bold uppercase tracking-wider">
+                    {t("common.publishing") || "Publicando"}
+                  </span>
+                )}
               </div>
               <div className="flex justify-between text-[10px] text-gray-400 dark:text-neutral-500">
-                <span>Procesando en segundo plano...</span>
+                <span>
+                  {item.status === "publishing"
+                    ? t("publications.gallery.sendingToSocial", {
+                        defaultValue: "Enviando a plataformas sociales...",
+                      })
+                    : t("publications.gallery.processing", {
+                        defaultValue: "Procesando en segundo plano...",
+                      })}
+                </span>
               </div>
             </div>
           ))}

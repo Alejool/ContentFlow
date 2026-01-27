@@ -15,6 +15,7 @@ export type Publication = {
     | "published"
     | "scheduled"
     | "publishing"
+    | "processing"
     | "pending_review"
     | "approved"
     | "rejected";

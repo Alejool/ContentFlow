@@ -27,7 +27,10 @@
         "deleted": "Eliminada",
         "requestedApproval": "Solicitó aprobación",
         "approved": "Aprobado",
-        "rejected": "Rechazado"
+        "rejected": "Rechazado",
+        "publishing": "Publicando...",
+        "failedOnPlatform": "Falló en plataforma",
+        "publishedOnPlatform": "Publicado en plataforma"
       }
     }
   }

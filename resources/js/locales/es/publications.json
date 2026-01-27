@@ -14,6 +14,7 @@
         "uploadingFiles": "Subiendo {{count}} archivo(s)...",
         "uploadFailed": "Error al subir",
         "uploadsCompleted": "Cargas Completadas",
+        "publishingSocial": "Publicando en redes ({{count}})...",
         "done": "Listo",
         "pending": "Pendiente",
         "left": "restante"
@@ -352,6 +353,10 @@
       "all": "Todo",
       "published": "Publicadas",
       "draft": "Borrador"
+    },
+    "gallery": {
+      "sendingToSocial": "Enviando a plataformas sociales...",
+      "processing": "Procesando en segundo plano..."
     }
   }
 }
