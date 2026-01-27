@@ -46,8 +46,22 @@ export default function GlobalUploadIndicator() {
     fetchProcessingItems();
     // Poll every 15 seconds for external processing/publishing changes
     const interval = setInterval(fetchProcessingItems, 15000);
+
+    // Listen for real-time status updates
+    if (props.auth?.user?.id) {
+      const channel = window.Echo.private(`users.${props.auth.user.id}`);
+      channel.listen("PublicationStatusUpdated", () => {
+        fetchProcessingItems();
+      });
+
+      return () => {
+        clearInterval(interval);
+        channel.stopListening("PublicationStatusUpdated");
+      };
+    }
+
     return () => clearInterval(interval);
-  }, []);
+  }, [props.auth?.user?.id]);
 
   const activeUploads = uploads.filter(
     (u) => u.status === "uploading" || u.status === "pending",

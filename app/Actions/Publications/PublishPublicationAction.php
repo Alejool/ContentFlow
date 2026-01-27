@@ -7,7 +7,7 @@ use App\Models\Publications\Publication;
 use App\Models\ScheduledPost;
 use App\Models\SocialAccount;
 use App\Services\Media\MediaProcessingService;
-use Illuminate\Support\Facades\Log;
+use App\Events\PublicationStatusUpdated;
 
 class PublishPublicationAction
 {
@@ -71,6 +71,13 @@ class PublishPublicationAction
       'published_by' => auth()->id(),
       'published_at' => now(),
     ]);
+
+    // Notify immediately that publishing has started
+    event(new PublicationStatusUpdated(
+      userId: $publication->user_id,
+      publicationId: $publication->id,
+      status: 'publishing'
+    ));
 
     // Mark any pending scheduled posts for these platforms as 'posted'
     ScheduledPost::where('publication_id', $publication->id)
