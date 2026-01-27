@@ -57,14 +57,13 @@ export const NotificationProvider = ({
 
   const fetchNotifications = useCallback(async () => {
     try {
-      const response = await axios.get("/notifications");
+      const response = await axios.get("/api/v1/notifications");
       const sortedNotifications = response.data.notifications.sort(
         (a: NotificationData, b: NotificationData) => {
           // Sort by read status (unread first)
           if (a.read_at === null && b.read_at !== null) return -1;
           if (a.read_at !== null && b.read_at === null) return 1;
 
-          // Then by date (newest first)
           return (
             new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
           );
@@ -81,7 +80,7 @@ export const NotificationProvider = ({
 
   const markAsRead = async (id: string) => {
     try {
-      await axios.post(`/notifications/${id}/read`);
+      await axios.post(`/api/v1/notifications/${id}/read`);
       setNotifications((prev) =>
         prev.map((n) =>
           n.id === id ? { ...n, read_at: new Date().toISOString() } : n,
@@ -95,7 +94,7 @@ export const NotificationProvider = ({
 
   const markAllAsRead = async () => {
     try {
-      await axios.post("/notifications/read-all");
+      await axios.post("/api/v1/notifications/read-all");
       setNotifications((prev) =>
         prev.map((n) => ({ ...n, read_at: new Date().toISOString() })),
       );
@@ -107,9 +106,8 @@ export const NotificationProvider = ({
 
   const deleteNotification = async (id: string) => {
     try {
-      await axios.delete(`/notifications/${id}`);
+      await axios.delete(`/api/v1/notifications/${id}`);
       setNotifications((prev) => prev.filter((n) => n.id !== id));
-      // Update unread count if it was unread
       const notification = notifications.find((n) => n.id === id);
       if (notification && !notification.read_at) {
         setUnreadCount((prev) => Math.max(0, prev - 1));
@@ -121,7 +119,7 @@ export const NotificationProvider = ({
 
   const deleteAllRead = async () => {
     try {
-      await axios.delete("/notifications/read");
+      await axios.delete("/api/v1/notifications/read");
       setNotifications((prev) => prev.filter((n) => !n.read_at));
     } catch (error) {
       console.error("Failed to delete read notifications", error);
