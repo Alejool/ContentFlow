@@ -1,4 +1,5 @@
 import { usePublishPublication } from "@/Hooks/publication/usePublishPublication";
+import { useContentUIStore } from "@/stores/contentUIStore";
 import { useManageContentUIStore } from "@/stores/manageContentUIStore";
 import { Campaign } from "@/types/Campaign";
 import { Publication } from "@/types/Publication";
@@ -19,6 +20,12 @@ interface ModalManagerProps {
 }
 
 const ModalManager = memo(({ onRefresh }: ModalManagerProps) => {
+  const contentUI = useContentUIStore();
+  const manageContentUI = useManageContentUIStore();
+
+  // Pick the active UI state based on which one has a selection
+  const uiState = manageContentUI.selectedItem ? manageContentUI : contentUI;
+
   const {
     activeTab,
     selectedItem,
@@ -31,7 +38,7 @@ const ModalManager = memo(({ onRefresh }: ModalManagerProps) => {
     closeEditModal,
     closePublishModal,
     closeViewDetailsModal,
-  } = useManageContentUIStore();
+  } = uiState;
 
   const { fetchPublishedPlatforms } = usePublishPublication();
 
@@ -52,7 +59,7 @@ const ModalManager = memo(({ onRefresh }: ModalManagerProps) => {
   const publications = usePublicationStore((s) => s.publications);
   const currentPub =
     targetIsPublication && selectedItem?.id
-      ? publications.find((p) => p.id === selectedItem.id) ||
+      ? (publications.find((p) => p.id === selectedItem.id) as Publication) ||
         (selectedItem as Publication)
       : null;
 

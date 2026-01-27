@@ -7,7 +7,8 @@
         "details": "Detalles del Contenido"
       },
       "media": {
-        "uploadingPending": "Subiendo Pendiente"
+        "uploadingPending": "Subiendo Pendiente",
+        "backgroundUpload": "¡Guardado! Los archivos multimedia se están subiendo en segundo plano."
       },
       "upload": {
         "uploadingFiles": "Subiendo {{count}} archivo(s)...",

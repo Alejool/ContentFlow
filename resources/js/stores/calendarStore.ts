@@ -38,6 +38,11 @@ interface CalendarState {
   setPlatformFilter: (platform: string) => void;
   fetchEvents: () => Promise<void>;
   updateEvent: (id: string, newDate: string, type: string) => Promise<boolean>;
+  updateEventByResourceId: (
+    resourceId: number,
+    type: "publication" | "post" | "user_event",
+    updates: Partial<CalendarEvent>,
+  ) => void;
   deleteEvent: (id: string) => Promise<boolean>;
 }
 
@@ -105,6 +110,23 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
       get().fetchEvents(); // Re-fetch on error to sync
       return false;
     }
+  },
+
+  updateEventByResourceId: (resourceId, type, updates) => {
+    set((state) => ({
+      events: state.events.map((ev) =>
+        ev.resourceId === resourceId && ev.type === type
+          ? {
+              ...ev,
+              ...updates,
+              extendedProps: {
+                ...ev.extendedProps,
+                ...(updates.extendedProps || {}),
+              },
+            }
+          : ev,
+      ),
+    }));
   },
 
   deleteEvent: async (id) => {

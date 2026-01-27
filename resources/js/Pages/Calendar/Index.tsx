@@ -3,7 +3,6 @@ import { DynamicModal } from "@/Components/common/Modern/DynamicModal";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { formatTime } from "@/Utils/formatDate";
 import { Head } from "@inertiajs/react";
-import axios from "axios";
 import {
   addMonths,
   eachDayOfInterval,
@@ -86,13 +85,37 @@ const PlatformIcon = ({
   }
 };
 
+import { useCalendarStore } from "@/stores/calendarStore";
+import { useShallow } from "zustand/react/shallow";
+
 export default function CalendarIndex({ auth }: { auth: any }) {
   const { t, i18n } = useTranslation();
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const [events, setEvents] = useState<CalendarEvent[]>([]);
-  const [loading, setLoading] = useState(false);
+
+  const {
+    events,
+    currentDate,
+    loading,
+    platformFilter,
+    setCurrentDate,
+    setPlatformFilter,
+    fetchEvents,
+    updateEvent,
+    deleteEvent,
+  } = useCalendarStore(
+    useShallow((s) => ({
+      events: s.events,
+      currentDate: s.currentMonth,
+      loading: s.isLoading,
+      platformFilter: s.platformFilter,
+      setCurrentDate: s.setCurrentMonth,
+      setPlatformFilter: s.setPlatformFilter,
+      fetchEvents: s.fetchEvents,
+      updateEvent: s.updateEvent,
+      deleteEvent: s.deleteEvent,
+    })),
+  );
+
   const [draggedEvent, setDraggedEvent] = useState<CalendarEvent | null>(null);
-  const [platformFilter, setPlatformFilter] = useState<string>("all");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [eventToDelete, setEventToDelete] = useState<CalendarEvent | null>(
     null,
@@ -112,22 +135,6 @@ export default function CalendarIndex({ auth }: { auth: any }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showMonthPicker]);
 
-  const fetchEvents = async () => {
-    setLoading(true);
-    try {
-      const start = startOfMonth(currentDate).toISOString();
-      const end = endOfMonth(currentDate).toISOString();
-      const response = await axios.get(route("api.v1.calendar.index"), {
-        params: { start, end },
-      });
-      setEvents(response.data.data);
-    } catch (error) {
-      console.error("Failed to fetch events", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
     fetchEvents();
   }, [currentDate]);
@@ -137,7 +144,7 @@ export default function CalendarIndex({ auth }: { auth: any }) {
   const prevMonth = () => setCurrentDate(subMonths(currentDate, 1));
   const goToToday = () => setCurrentDate(new Date());
   const goToMonth = (month: number, year: number) => {
-    setCurrentDate(setYear(setMonth(currentDate, month), year));
+    setCurrentDate(setYear(setMonth(new Date(), month), year));
     setShowMonthPicker(false);
   };
 
@@ -159,7 +166,7 @@ export default function CalendarIndex({ auth }: { auth: any }) {
   });
 
   // Drag and Drop Handlers
-  const handleDragStart = (e: React.DragEvent, event: CalendarEvent) => {
+  const handleDragStart = (e: React.DragEvent, event: any) => {
     setDraggedEvent(event);
     e.dataTransfer.effectAllowed = "move";
     e.dataTransfer.setData("text/plain", event.id); // Required for Firefox
@@ -174,28 +181,12 @@ export default function CalendarIndex({ auth }: { auth: any }) {
     e.preventDefault();
     if (!draggedEvent) return;
 
-    // Optimistic Update
-    const updatedEvents = events.map((ev) =>
-      ev.id === draggedEvent.id ? { ...ev, start: date.toISOString() } : ev,
-    );
-    setEvents(updatedEvents);
-
-    try {
-      const resourceId = draggedEvent.id.split("_")[1];
-      await axios.patch(`/api/v1/calendar/events/${resourceId}`, {
-        scheduled_at: date.toISOString(),
-        type: draggedEvent.type,
-      });
-    } catch (error) {
-      console.error("Failed to update event", error);
-      fetchEvents(); // Revert
-    } finally {
-      setDraggedEvent(null);
-    }
+    await updateEvent(draggedEvent.id, date.toISOString(), draggedEvent.type);
+    setDraggedEvent(null);
   };
 
   // Delete Event Handler
-  const handleDeleteEvent = (event: CalendarEvent) => {
+  const handleDeleteEvent = (event: any) => {
     setEventToDelete(event);
     setShowDeleteModal(true);
   };
@@ -203,20 +194,14 @@ export default function CalendarIndex({ auth }: { auth: any }) {
   const confirmDelete = async () => {
     if (!eventToDelete) return;
 
-    try {
-      const resourceId = eventToDelete.resourceId;
-      // Optimistic remove
-      setEvents((prev) => prev.filter((x) => x.id !== eventToDelete.id));
-      await axios.delete(`/api/v1/calendar/user-events/${resourceId}`);
+    const success = await deleteEvent(eventToDelete.id);
+    if (success) {
       toast.success(t("calendar.userEvents.modal.messages.successDelete"));
-    } catch (err) {
-      console.error(err);
+    } else {
       toast.error(t("calendar.userEvents.modal.messages.errorDelete"));
-      fetchEvents();
-    } finally {
-      setShowDeleteModal(false);
-      setEventToDelete(null);
     }
+    setShowDeleteModal(false);
+    setEventToDelete(null);
   };
 
   const platforms = [

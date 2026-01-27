@@ -13,9 +13,8 @@ export function useRealtime(userId?: number) {
 
     return () => {
       window.Echo.leave(`users.${userId}`);
-      if (workspaceId) {
-        window.Echo.leave(`workspace.${workspaceId}`);
-      }
+      // DO NOT leave workspace channel here, as it may be used by the layout or other hooks
+      // window.Echo.leave(`workspace.${workspaceId}`);
     };
   }, [userId, workspaceId]);
 }
