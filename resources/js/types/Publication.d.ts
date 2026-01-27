@@ -18,7 +18,8 @@ export type Publication = {
     | "processing"
     | "pending_review"
     | "approved"
-    | "rejected";
+    | "rejected"
+    | "failed";
   is_active?: boolean;
   media_files?: MediaFile[];
   scheduled_posts?: ScheduledPost[];

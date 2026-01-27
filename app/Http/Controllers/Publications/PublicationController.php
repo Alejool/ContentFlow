@@ -24,6 +24,7 @@ use App\Notifications\PublicationApprovedNotification;
 use App\Notifications\PublicationRejectedNotification;
 use App\Events\Publications\PublicationUpdated;
 use App\Models\Publications\PublicationLock;
+use App\Events\PublicationStatusUpdated;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 
@@ -482,6 +483,51 @@ class PublicationController extends Controller
     return $this->successResponse([
       'publication' => $publication,
     ], 'Publication rejected successfully.');
+  }
+
+  public function cancel(Request $request, Publication $publication)
+  {
+    if (!Auth::user()->hasPermission('manage-content', $publication->workspace_id)) {
+      return $this->errorResponse('You do not have permission to cancel this publication.', 403);
+    }
+
+    // Capture the current status for the log
+    $oldStatus = $publication->status;
+
+    // We only allow cancelling if it's in a state that means it's "in flight"
+    $allowedStatuses = ['publishing', 'processing', 'scheduled', 'pending_review'];
+    if (!in_array($oldStatus, $allowedStatuses)) {
+      return $this->errorResponse('This publication cannot be cancelled in its current state.', 422);
+    }
+
+    // 1. Mark publication as failed
+    $publication->update([
+      'status' => 'failed',
+      'updated_at' => now(),
+    ]);
+
+    // 2. Mark any pending or publishing logs as failed
+    $publication->socialPostLogs()
+      ->whereIn('status', ['pending', 'publishing'])
+      ->update([
+        'status' => 'failed',
+        'error_message' => 'Cancelado por el usuario',
+        'updated_at' => now(),
+      ]);
+
+    // 3. Log activity
+    $publication->logActivity('cancelled', ['previous_status' => $oldStatus]);
+
+    // 4. Broadcast the update
+    broadcast(new PublicationStatusUpdated(Auth::id(), $publication->id, 'failed'))->toOthers();
+    broadcast(new PublicationUpdated($publication))->toOthers();
+
+    // 5. Clear cache
+    $this->clearPublicationCache($publication->workspace_id);
+
+    return $this->successResponse([
+      'publication' => $publication->load(['socialPostLogs', 'mediaFiles'])
+    ], 'Publicación cancelada correctamente.');
   }
 
   public function getPublishedPlatforms(Publication $publication)

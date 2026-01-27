@@ -267,48 +267,79 @@ class YouTubeService extends BaseSocialService
     ];
   }
 
-  private string $currentBoundary;
-
   private function uploadToYouTube(string $tempFile, array $metadata): array
   {
     try {
-      $body = $this->buildMultipartBody($tempFile, $metadata);
-      $boundary = $this->currentBoundary;
+      $videoSize = filesize($tempFile);
 
-      Log::info('Uploading to YouTube API', [
-        'body_size' => number_format(strlen($body) / 1024 / 1024, 2) . ' MB'
+      Log::info('Initiating YouTube Resumable Upload', [
+        'file_size' => number_format($videoSize / 1024 / 1024, 2) . ' MB'
       ]);
 
-      $response = $this->client->post('https://www.googleapis.com/upload/youtube/v3/videos', [
+      // 1. Initiate the resumable session
+      $initResponse = $this->client->post('https://www.googleapis.com/upload/youtube/v3/videos', [
         'headers' => [
           'Authorization' => "Bearer {$this->accessToken}",
-          'Content-Type' => "multipart/related; boundary={$boundary}",
-          'Content-Length' => strlen($body),
+          'X-Upload-Content-Length' => $videoSize,
+          'X-Upload-Content-Type' => 'video/*',
+          'Content-Type' => 'application/json; charset=UTF-8',
         ],
         'query' => [
           'part' => 'snippet,status',
-          'uploadType' => 'multipart',
+          'uploadType' => 'resumable',
         ],
-        'body' => $body,
-        'timeout' => 600, // 10 minutos para videos grandes
+        'json' => $metadata,
       ]);
+
+      if ($initResponse->getStatusCode() !== 200) {
+        throw new \Exception("YouTube API failed to initiate resumable upload (Status: {$initResponse->getStatusCode()})");
+      }
+
+      $uploadUrl = $initResponse->getHeaderLine('Location');
+
+      if (!$uploadUrl) {
+        throw new \Exception("YouTube API did not return an upload URL");
+      }
+
+      // 2. Upload the video content using a stream
+      Log::info('Streaming video content to YouTube', ['upload_url' => $uploadUrl]);
+
+      $handle = fopen($tempFile, 'r');
+      if (!$handle) {
+        throw new \Exception('Failed to open temporary video file for streaming');
+      }
+
+      $response = $this->client->put($uploadUrl, [
+        'headers' => [
+          'Authorization' => "Bearer {$this->accessToken}",
+          'Content-Length' => $videoSize,
+          'Content-Type' => 'video/*',
+        ],
+        'body' => $handle,
+        'timeout' => 1200, // 20 minutes for large files
+      ]);
+
+      // Ensure handle is closed
+      if (is_resource($handle)) {
+        fclose($handle);
+      }
 
       // Limpiar archivo temporal
       if (file_exists($tempFile)) {
         unlink($tempFile);
       }
 
-      if ($response->getStatusCode() !== 200) {
-        throw new \Exception("YouTube API returned status {$response->getStatusCode()}");
+      if ($response->getStatusCode() !== 200 && $response->getStatusCode() !== 201) {
+        throw new \Exception("YouTube API returned status {$response->getStatusCode()} during content upload");
       }
 
       $result = json_decode($response->getBody()->getContents(), true);
 
       if (!isset($result['id'])) {
-        throw new \Exception('YouTube API response missing video ID');
+        throw new \Exception('YouTube API response missing video ID after resumable upload');
       }
 
-      Log::info('Video uploaded successfully', ['video_id' => $result['id']]);
+      Log::info('Resumable video upload completed', ['video_id' => $result['id']]);
 
       return $result;
     } catch (\Exception $e) {
@@ -318,32 +349,6 @@ class YouTubeService extends BaseSocialService
       }
       throw $e;
     }
-  }
-
-  private function buildMultipartBody(string $tempFile, array $metadata): string
-  {
-    $this->currentBoundary = uniqid('youtube_boundary_');
-    $boundary = $this->currentBoundary;
-
-    $delimiter = "\r\n--{$boundary}\r\n";
-    $closeDelimiter = "\r\n--{$boundary}--";
-
-    // Parte 1: Metadata JSON
-    $metadataPart = $delimiter;
-    $metadataPart .= "Content-Type: application/json; charset=UTF-8\r\n\r\n";
-    $metadataPart .= json_encode($metadata);
-
-    // Parte 2: Video content
-    $videoPart = $delimiter;
-    $videoPart .= "Content-Type: video/*\r\n\r\n";
-
-    $videoContent = file_get_contents($tempFile);
-
-    if ($videoContent === false) {
-      throw new \Exception('Failed to read video file');
-    }
-
-    return $metadataPart . $videoPart . $videoContent . $closeDelimiter;
   }
 
   private function formatSuccessResponse(array $result, bool $isShort): array

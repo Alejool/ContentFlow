@@ -21,6 +21,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/{publication}/publish', [PublicationController::class, 'publish'])->name('publish');
     Route::post('/{publication}/unpublish', [PublicationController::class, 'unpublish'])->name('unpublish');
     Route::post('/{publication}/reject', [PublicationController::class, 'reject'])->name('reject');
+    Route::post('/{publication}/cancel', [PublicationController::class, 'cancel'])->name('cancel')->whereNumber('publication');
     Route::post('/{publication}/attach-media', [PublicationController::class, 'attachMedia'])->name('attach-media');
     Route::post('/{publication}/lock-media', [PublicationController::class, 'lockMedia'])->name('lock-media');
     Route::get('/stats/all', [PublicationController::class, 'stats'])->name('stats_all');

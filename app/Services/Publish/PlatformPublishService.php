@@ -18,8 +18,10 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Artisan;
 use App\Models\YouTubePlaylistQueue;
-use App\Notifications\PublicationPostFailedNotification;
+use App\Events\PublicationStatusUpdated;
 use App\Jobs\VerifyYouTubeVideoStatus;
+use App\Models\User;
+use App\Notifications\PublicationPostFailedNotification;
 
 class PlatformPublishService
 {
@@ -333,8 +335,16 @@ class PlatformPublishService
             'logs' => $platformLogs,
           ];
 
+
           $allLogs = array_merge($allLogs, $platformLogs);
         }
+
+        // Broadcast progress after each platform
+        event(new PublicationStatusUpdated(
+          userId: $publication->user_id,
+          publicationId: $publication->id,
+          status: 'publishing' // Keep it in 'publishing' state
+        ));
       } catch (\Throwable $e) {
         Log::warning('Exception caught, rolling back transaction', ['error' => $e->getMessage()]);
         DB::rollBack();
