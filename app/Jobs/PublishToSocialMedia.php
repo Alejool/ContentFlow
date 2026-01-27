@@ -11,6 +11,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use App\Events\PublicationStatusUpdated;
+use App\Models\User;
 
 class PublishToSocialMedia implements ShouldQueue
 {
@@ -39,7 +40,7 @@ class PublishToSocialMedia implements ShouldQueue
 
       $platformResults = $result['platform_results'] ?? [];
       foreach ($platformResults as $platform => $pResult) {
-        $publisher = \App\Models\User::find($this->publication->published_by);
+        $publisher = User::find($this->publication->published_by);
         if ($pResult['success']) {
           $this->publication->logActivity('published_on_platform', [
             'platform' => $platform,
@@ -72,6 +73,15 @@ class PublishToSocialMedia implements ShouldQueue
         'publication_id' => $this->publication->id,
         'error' => $e->getMessage(),
       ]);
+
+      $publisher = User::find($this->publication->published_by);
+      foreach ($this->socialAccounts as $account) {
+        $this->publication->logActivity('failed_on_platform', [
+          'platform' => $account->platform,
+          'error' => $e->getMessage(),
+          'note' => 'Job crashed'
+        ], $publisher);
+      }
 
       $this->publication->update([
         'status' => 'failed',

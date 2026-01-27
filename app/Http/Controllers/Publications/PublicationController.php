@@ -82,16 +82,8 @@ class PublicationController extends Controller
 
       // Apply status filter
       if ($request->has('status') && $request->status !== 'all') {
-        $status = $request->status;
-        $scopeMethod = 'scope' . Str::studly($status);
-        $methodName = Str::camel($status);
-
-        if (method_exists(Publication::class, $scopeMethod)) {
-          $query->$methodName();
-        } else {
-          // Fallback to direct status comparison
-          $query->where('status', $status);
-        }
+        $statuses = explode(',', $request->status);
+        $query->whereIn('status', $statuses);
       }
 
       // Apply search filter
