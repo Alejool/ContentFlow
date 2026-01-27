@@ -96,7 +96,7 @@ export const useCalendar = () => {
             );
             return;
           }
-          const response = await axios.get(`/publications/${pubId}`);
+          const response = await axios.get(`/api/v1/publications/${pubId}`);
           const data = response.data.publication || response.data.data;
           if (data) (data as any).__type = "publication";
           openEditModal(data);
@@ -104,7 +104,9 @@ export const useCalendar = () => {
         }
 
         if (type === "publication") {
-          const response = await axios.get(`/publications/${resourceId}`);
+          const response = await axios.get(
+            `/api/v1/publications/${resourceId}`,
+          );
           const data = response.data.publication || response.data.data;
           if (data) (data as any).__type = "publication";
           openEditModal(data);

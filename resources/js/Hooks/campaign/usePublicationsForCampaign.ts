@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
 import axios from "axios";
+import { useEffect, useState } from "react";
 
 export const usePublicationsForCampaign = (isOpen: boolean) => {
   const [availablePublications, setAvailablePublications] = useState<any[]>([]);
@@ -11,7 +11,7 @@ export const usePublicationsForCampaign = (isOpen: boolean) => {
     setLoading(true);
     try {
       const response = await axios.get(
-        "/publications?simplified=true&exclude_assigned=true"
+        "/api/v1/publications?simplified=true&exclude_assigned=true",
       );
 
       if (response.data?.publications) {
@@ -41,7 +41,7 @@ export const usePublicationsForCampaign = (isOpen: boolean) => {
     if (!pub.media_files || pub.media_files.length === 0) return null;
 
     const firstImage = pub.media_files.find((f: any) =>
-      f.file_type.includes("image")
+      f.file_type.includes("image"),
     );
     if (firstImage) {
       const url = firstImage.file_path.startsWith("http")
@@ -51,7 +51,7 @@ export const usePublicationsForCampaign = (isOpen: boolean) => {
     }
 
     const hasVideo = pub.media_files.some((f: any) =>
-      f.file_type.includes("video")
+      f.file_type.includes("video"),
     );
     if (hasVideo) {
       return { url: null, type: "video" };

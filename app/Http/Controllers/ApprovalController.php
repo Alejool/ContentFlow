@@ -57,7 +57,7 @@ class ApprovalController extends Controller
       $workspaceId = Auth::user()->current_workspace_id ?? Auth::user()->workspaces()->first()?->id;
 
       if (!$workspaceId) {
-        return $this->errorResponse('No active workspace found.', 404);
+        return $this->errorResponse('No active workspace found.', 400);
       }
 
       // Only users with 'approve' permission can access this
@@ -114,7 +114,7 @@ class ApprovalController extends Controller
     $workspaceId = Auth::user()->current_workspace_id ?? Auth::user()->workspaces()->first()?->id;
 
     if (!$workspaceId) {
-      return $this->errorResponse('No active workspace found.', 404);
+      return $this->errorResponse('No active workspace found.', 400);
     }
 
     // Only users with 'approve' permission can access this

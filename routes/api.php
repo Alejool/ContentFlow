@@ -58,6 +58,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     require __DIR__ . '/api/v1/social.php';
     require __DIR__ . '/api/v1/ai.php';
     require __DIR__ . '/api/v1/workspaces.php';
+    require __DIR__ . '/api/v1/approvals.php';
     require __DIR__ . '/api/v1/publications.php';
     require __DIR__ . '/api/v1/campaigns.php';
     require __DIR__ . '/api/v1/analytics.php';

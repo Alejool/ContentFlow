@@ -239,14 +239,14 @@ export default function ManageContentPage() {
                   </Dropdown.Trigger>
                   <Dropdown.Content
                     align="right"
-                    width="48"
-                    contentClasses="py-1 bg-white dark:bg-neutral-800 shadow-xl rounded-xl border border-gray-200 dark:border-neutral-700"
+                    width="auto"
+                    contentClasses="py-1 bg-white dark:bg-neutral-800 shadow-xl rounded-xl border border-gray-200 dark:border-neutral-700 min-w-[200px]"
                   >
                     <Button
                       onClick={() => openAddModal("publication")}
                       variant="ghost"
                       buttonStyle="ghost"
-                      size="sm"
+                      size="lg"
                       icon={FileText}
                       iconPosition="left"
                       fullWidth
@@ -258,7 +258,7 @@ export default function ManageContentPage() {
                       onClick={() => openAddModal("campaign")}
                       variant="ghost"
                       buttonStyle="ghost"
-                      size="sm"
+                      size="lg"
                       icon={Target}
                       iconPosition="left"
                       fullWidth

@@ -26,7 +26,7 @@ export default function ApprovalStats({ refreshTrigger }: ApprovalStatsProps) {
   const fetchStats = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.get(route("approvals.stats"));
+      const response = await axios.get("/api/v1/approvals/stats");
       const json = response.data;
       if (json.success) {
         const stats =

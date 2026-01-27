@@ -209,10 +209,6 @@ Route::middleware('auth')->group(function () {
     | Approvals & Campaigns
     |--------------------------------------------------------------------------
     */
-  Route::prefix('approvals')->name('approvals.')->group(function () {
-    Route::get('/history', [ApprovalController::class, 'history'])->name('history');
-    Route::get('/', [ApprovalController::class, 'index'])->name('index');
-  });
 
   /*
     |--------------------------------------------------------------------------

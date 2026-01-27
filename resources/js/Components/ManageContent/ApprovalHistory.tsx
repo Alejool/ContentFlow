@@ -95,7 +95,7 @@ export default function ApprovalHistory({
         ...(publicationId ? { publication_id: publicationId } : {}),
       };
 
-      const response = await axios.get(route("approvals.history"), { params });
+      const response = await axios.get("/api/v1/approvals/history", { params });
 
       const json = response.data;
       if (json.success) {

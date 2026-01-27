@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
 import axios from "axios";
+import { useEffect, useState } from "react";
 
 export const useCampaigns = () => {
   const [campaigns, setCampaigns] = useState<any[]>([]);
@@ -8,7 +8,7 @@ export const useCampaigns = () => {
   const fetchCampaigns = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("/campaigns");
+      const response = await axios.get("/api/v1/campaigns");
       if (response.data?.campaigns?.data) {
         setCampaigns(response.data.campaigns.data);
       } else if (Array.isArray(response.data?.campaigns)) {
