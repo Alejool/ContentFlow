@@ -1,6 +1,5 @@
 import { Avatar } from "@/Components/common/Avatar";
 import Dropdown from "@/Components/common/ui/Dropdown";
-import { useTheme } from "@/Hooks/useTheme";
 import { ChevronDown, LogOut, User } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -19,7 +18,6 @@ export default function ProfileDropdown({
   isProfileActive = false,
 }: ProfileDropdownProps) {
   const { t } = useTranslation();
-  const { theme } = useTheme();
 
   return (
     <Dropdown>
@@ -27,19 +25,15 @@ export default function ProfileDropdown({
         <span className="block">
           <button
             type="button"
-            className={`group inline-flex items-center gap-3 py-1.5 pl-2 pr-3 rounded-full transition-all duration-300
-                        ${
-                          theme === "dark"
-                            ? "bg-neutral-800/50 hover:bg-neutral-800 border border-neutral-700 hover:border-neutral-600 text-gray-200"
-                            : "bg-white hover:bg-gray-50 border border-gray-200 hover:border-gray-300 text-gray-700"
-                        } shadow-sm hover:shadow-md`}
+            className="group inline-flex items-center gap-3 py-1.5 pl-2 pr-3 rounded-full transition-all duration-300
+                       bg-white hover:bg-gray-50 border border-gray-200 hover:border-gray-300 text-gray-700
+                       dark:bg-neutral-800/50 dark:hover:bg-neutral-800 dark:border-neutral-700 dark:hover:border-neutral-600 dark:text-gray-200"
           >
             <div className="relative">
               <Avatar
                 src={user?.photo_url}
                 name={user?.name}
                 size="sm"
-                className="shadow-sm"
                 showStatus
               />
             </div>
@@ -48,11 +42,7 @@ export default function ProfileDropdown({
               {user?.name || "User"}
             </span>
 
-            <ChevronDown
-              className={`h-4 w-4 transition-transform duration-300 group-hover:rotate-180 ${
-                theme === "dark" ? "text-gray-400" : "text-gray-400"
-              }`}
-            />
+            <ChevronDown className="h-4 w-4 transition-transform duration-300 group-hover:rotate-180 text-gray-400" />
           </button>
         </span>
       </Dropdown.Trigger>
@@ -60,20 +50,14 @@ export default function ProfileDropdown({
       <Dropdown.Content
         align="right"
         width="64"
-        contentClasses={`py-2
-                  ${
-                    theme === "dark"
-                      ? "bg-neutral-900/95 backdrop-blur-xl border border-neutral-800"
-                      : "bg-white/95 backdrop-blur-xl border border-white/20"
-                  }`}
+        contentClasses="py-2 bg-white/95 backdrop-blur-xl border border-white/20
+                        dark:bg-neutral-900/95 dark:border-neutral-800"
       >
         <div className="px-2 pt-2 pb-3 mb-2">
           <div
-            className={`p-4 rounded-lg relative overflow-hidden group ${
-              theme === "dark"
-                ? "bg-gradient-to-br from-neutral-800 to-neutral-900 border border-neutral-700/50"
-                : "bg-gradient-to-br from-gray-50 to-white border border-gray-100"
-            }`}
+            className="p-4 rounded-lg relative overflow-hidden group
+                       bg-gradient-to-br from-gray-50 to-white border border-gray-100
+                       dark:from-neutral-800 dark:to-neutral-900 dark:border-neutral-700/50"
           >
             <div className="relative flex items-center gap-4">
               <div className="relative">
@@ -81,7 +65,6 @@ export default function ProfileDropdown({
                   src={user?.photo_url}
                   name={user?.name}
                   size="xl"
-                  className="shadow-md"
                   showStatus
                 />
               </div>
