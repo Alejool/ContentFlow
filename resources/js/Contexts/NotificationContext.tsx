@@ -41,7 +41,7 @@ interface NotificationContextType {
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(
-  undefined
+  undefined,
 );
 
 export const NotificationProvider = ({
@@ -68,7 +68,7 @@ export const NotificationProvider = ({
           return (
             new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
           );
-        }
+        },
       );
 
       setNotifications(sortedNotifications);
@@ -84,8 +84,8 @@ export const NotificationProvider = ({
       await axios.post(`/notifications/${id}/read`);
       setNotifications((prev) =>
         prev.map((n) =>
-          n.id === id ? { ...n, read_at: new Date().toISOString() } : n
-        )
+          n.id === id ? { ...n, read_at: new Date().toISOString() } : n,
+        ),
       );
       setUnreadCount((prev) => Math.max(0, prev - 1));
     } catch (error) {
@@ -97,7 +97,7 @@ export const NotificationProvider = ({
     try {
       await axios.post("/notifications/read-all");
       setNotifications((prev) =>
-        prev.map((n) => ({ ...n, read_at: new Date().toISOString() }))
+        prev.map((n) => ({ ...n, read_at: new Date().toISOString() })),
       );
       setUnreadCount(0);
     } catch (error) {
@@ -131,7 +131,7 @@ export const NotificationProvider = ({
   const filterByPlatform = (platform: string | null): NotificationData[] => {
     if (!platform) return notifications;
     return notifications.filter(
-      (n) => n.data.platform?.toLowerCase() === platform.toLowerCase()
+      (n) => n.data.platform?.toLowerCase() === platform.toLowerCase(),
     );
   };
 
@@ -142,7 +142,7 @@ export const NotificationProvider = ({
 
   const getPlatformNotifications = (platform: string): NotificationData[] => {
     return applicationNotifications.filter(
-      (n) => n.data.platform?.toLowerCase() === platform.toLowerCase()
+      (n) => n.data.platform?.toLowerCase() === platform.toLowerCase(),
     );
   };
 
@@ -164,20 +164,20 @@ export const NotificationProvider = ({
 
       return () => {
         if ((window as any).Echo) {
-          (window as any).Echo.leave(`users.${user.id}`);
+          channel.stopListening(".NotificationCreated");
         }
       };
     }
   }, [user, fetchNotifications]);
 
   const applicationNotifications = notifications.filter(
-    (n) => n.category === "application" || n.data.category === "application"
+    (n) => n.category === "application" || n.data.category === "application",
   );
 
   const systemNotifications = notifications.filter(
     (n) =>
       (n.category === "system" || !n.category) &&
-      n.data.category !== "application"
+      n.data.category !== "application",
   );
 
   return (
@@ -208,7 +208,7 @@ export const useNotificationContext = () => {
   const context = useContext(NotificationContext);
   if (!context) {
     throw new Error(
-      "useNotificationContext must be used within a NotificationProvider"
+      "useNotificationContext must be used within a NotificationProvider",
     );
   }
   return context;

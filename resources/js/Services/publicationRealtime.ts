@@ -22,27 +22,19 @@ export function initPublicationsRealtime(userId: number, workspaceId?: number) {
     },
   );
 
-  // NEW: Workspace channel listener for deep publication updates (e.g. video processing finished)
+  // NEW: Workspace channel listener (Global data sync is now handled in usePublicationLock.ts)
   if (workspaceId) {
     window.Echo.private(`workspace.${workspaceId}`).listen(
       ".publication.updated",
       (e: any) => {
         const { publication } = e;
-
-        if (publication && publication.id) {
-          // Update the store with the full object (includes new media, status, etc.)
-          usePublicationStore
-            .getState()
-            .updatePublication(publication.id, publication);
-
-          if (
-            publication.status === "approved" ||
-            publication.status === "draft"
-          ) {
-            toast.success(
-              `Video processing complete for: ${publication.title}`,
-            );
-          }
+        if (
+          publication &&
+          (publication.status === "approved" || publication.status === "draft")
+        ) {
+          // We only keep the toast here to notify about processing completion
+          // The actual store updates are handled in useWorkspaceLocks
+          toast.success(`Procesado completado: ${publication.title}`);
         }
       },
     );
