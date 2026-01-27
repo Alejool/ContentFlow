@@ -39,18 +39,29 @@ class PublishToSocialMedia implements ShouldQueue
       );
 
       $platformResults = $result['platform_results'] ?? [];
-      foreach ($platformResults as $platform => $pResult) {
-        $publisher = User::find($this->publication->published_by);
-        if ($pResult['success']) {
-          $this->publication->logActivity('published_on_platform', [
-            'platform' => $platform,
-            'log_id' => $pResult['logs'][0]->id ?? null,
-          ], $publisher);
-        } else {
+      $publisher = User::find($this->publication->published_by);
+
+      // If no platforms in results, it might be an initialization failure
+      if (empty($platformResults)) {
+        foreach ($this->socialAccounts as $account) {
           $this->publication->logActivity('failed_on_platform', [
-            'platform' => $platform,
-            'error' => $pResult['errors'][0]['message'] ?? 'Unknown error',
+            'platform' => $account->platform,
+            'error' => $result['message'] ?? 'Platform initialization failed',
           ], $publisher);
+        }
+      } else {
+        foreach ($platformResults as $platform => $pResult) {
+          if ($pResult['success']) {
+            $this->publication->logActivity('published_on_platform', [
+              'platform' => $platform,
+              'log_id' => $pResult['logs'][0]->id ?? null,
+            ], $publisher);
+          } else {
+            $this->publication->logActivity('failed_on_platform', [
+              'platform' => $platform,
+              'error' => $pResult['errors'][0]['message'] ?? 'Unknown platform error',
+            ], $publisher);
+          }
         }
       }
 
@@ -66,12 +77,18 @@ class PublishToSocialMedia implements ShouldQueue
         $this->publication->update([
           'status' => 'failed',
         ]);
+
+        $this->publication->logActivity('publication_failed', [
+          'reason' => empty($platformResults) ? ($result['message'] ?? 'Initialization failed') : 'All platforms failed',
+          'results' => $platformResults
+        ], $publisher);
       }
     } catch (\Throwable $e) {
 
-      Log::info('Publishing job crashed', [
+      Log::error('Publishing job crashed', [
         'publication_id' => $this->publication->id,
         'error' => $e->getMessage(),
+        'trace' => $e->getTraceAsString(),
       ]);
 
       $publisher = User::find($this->publication->published_by);
@@ -86,6 +103,11 @@ class PublishToSocialMedia implements ShouldQueue
       $this->publication->update([
         'status' => 'failed',
       ]);
+
+      $this->publication->logActivity('publication_failed', [
+        'reason' => 'Job crashed',
+        'error' => $e->getMessage()
+      ], $publisher);
     }
 
     // Notify owner

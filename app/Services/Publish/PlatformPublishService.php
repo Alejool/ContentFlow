@@ -25,8 +25,7 @@ class PlatformPublishService
 {
   public function __construct(
     private SocialPostLogService $logService
-  ) {
-  }
+  ) {}
 
   /**
    * Initialize logs for all platforms (Create or Update to Pending)
@@ -249,7 +248,16 @@ class PlatformPublishService
     $platformResults = [];
 
     // Initialize/Update logs for ALL accounts first (idempotent)
-    $preparedLogsMap = $this->initializeLogs($publication, $socialAccounts);
+    try {
+      $preparedLogsMap = $this->initializeLogs($publication, $socialAccounts);
+    } catch (\Exception $e) {
+      Log::error('Log initialization failed globally', ['publication_id' => $publication->id, 'error' => $e->getMessage()]);
+      return [
+        'success' => false,
+        'message' => 'Failed to initialize logs: ' . $e->getMessage(),
+        'platform_results' => [],
+      ];
+    }
 
     foreach ($socialAccounts as $socialAccount) {
       $platformLogs = [];
@@ -259,6 +267,13 @@ class PlatformPublishService
       if (!isset($preparedLogsMap[$socialAccount->id])) {
         $msg = 'Failed to initialize logs for platform: ' . $socialAccount->platform;
         $allErrors[$socialAccount->platform] = [['message' => $msg]];
+        $platformResults[$socialAccount->platform] = [
+          'success' => false,
+          'published' => 0,
+          'failed' => 1,
+          'errors' => [['message' => $msg]],
+          'logs' => [],
+        ];
         Log::error($msg);
         continue;
       }

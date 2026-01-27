@@ -165,6 +165,7 @@ Route::middleware('auth')->group(function () {
 
   Route::prefix('settings')->name('settings.')->group(function () {
     Route::get('/social', [ProfileController::class, 'socialSettings'])->name('social');
+    Route::patch('/locale', [LocaleController::class, 'update'])->name('locale');
   });
 
   /*

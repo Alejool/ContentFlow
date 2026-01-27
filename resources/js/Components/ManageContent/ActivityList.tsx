@@ -2,6 +2,7 @@ import { getDateFnsLocale } from "@/Utils/dateLocales";
 import { format } from "date-fns";
 import {
   Activity,
+  AlertCircle,
   CheckCircle,
   Clock,
   Edit,
@@ -62,6 +63,8 @@ export default function ActivityList({ activities }: ActivityListProps) {
         return <XCircle className="w-4 h-4 text-red-600" />;
       case "review_requested":
         return <Clock className="w-4 h-4 text-orange-400" />;
+      case "publication_failed":
+        return <AlertCircle className="w-4 h-4 text-red-600" />;
       default:
         return <Activity className="w-4 h-4 text-gray-400" />;
     }
@@ -78,6 +81,8 @@ export default function ActivityList({ activities }: ActivityListProps) {
       return t("activity.review_requested");
     if (activity.event === "approved") return t("activity.approved");
     if (activity.event === "rejected") return t("activity.rejected");
+    if (activity.event === "publication_failed")
+      return t("activity.publication_failed");
 
     // Handle updates and status changes
     if (activity.event === "updated") {

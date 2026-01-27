@@ -2,9 +2,21 @@
   "activity": {
     "title": "Activity",
     "total": "Total",
+    "created": "Created",
+    "updated": "Updated",
+    "published": "Published",
+    "unpublished": "Unpublished",
+    "locked": "Locked",
+    "unlocked": "Unlocked",
+    "review_requested": "Review requested",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "publishing": "Publishing...",
+    "publication_failed": "Publication failed",
+    "statusChanged": "Status changed",
     "timeline": {
       "title": "Timeline",
-      "subtitle": "Timeline",
+      "subtitle": "Activity History",
       "empty": "No activities",
       "status": {
         "system": "System",
@@ -20,7 +32,8 @@
         "rejected": "Rejected",
         "publishing": "Publishing...",
         "failedOnPlatform": "Failed on platform",
-        "publishedOnPlatform": "Published on platform"
+        "publishedOnPlatform": "Published on platform",
+        "publication_failed": "Publication failed"
       }
     }
   }
