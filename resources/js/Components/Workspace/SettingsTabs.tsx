@@ -1,3 +1,5 @@
+import Button from "@/Components/common/Modern/Button";
+
 interface Tab {
   id: string;
   label: string;
@@ -16,23 +18,28 @@ export default function SettingsTabs({
   onTabChange,
 }: SettingsTabsProps) {
   const TabButton = ({ id, label, icon: Icon }: Tab) => (
-    <button
+    <Button
+      variant="ghost"
+      buttonStyle="ghost"
+      shadow="none"
       onClick={() => onTabChange(id)}
       className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-300 ${
         activeTab === id
           ? "bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-lg shadow-primary-600/25"
           : "bg-white dark:bg-neutral-900 text-gray-700 dark:text-neutral-300 hover:bg-gray-50 dark:hover:bg-neutral-800 border border-gray-200 dark:border-neutral-800 hover:border-gray-300 dark:hover:border-neutral-700"
       }`}
+      icon={
+        <Icon
+          className={`h-5 w-5 ${
+            activeTab === id
+              ? "text-white"
+              : "text-gray-500 dark:text-neutral-400"
+          }`}
+        />
+      }
     >
-      <Icon
-        className={`h-5 w-5 ${
-          activeTab === id
-            ? "text-white"
-            : "text-gray-500 dark:text-neutral-400"
-        }`}
-      />
       <span className="font-medium">{label}</span>
-    </button>
+    </Button>
   );
 
   return (

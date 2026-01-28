@@ -1,3 +1,4 @@
+import Button from "@/Components/common/Modern/Button";
 import StatCard from "@/Components/Workspace/StatCard";
 import {
   Activity,
@@ -107,8 +108,11 @@ export default function OverviewTab({
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {quickActions.map((action) => (
-            <button
+            <Button
               key={action.label}
+              variant="ghost"
+              buttonStyle="ghost"
+              shadow="none"
               onClick={action.action}
               disabled={loading}
               className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-950 border border-gray-200 dark:border-neutral-800 rounded-lg p-5 text-left transition-all duration-300 hover:border-primary-300 dark:hover:border-primary-700 hover:shadow-lg hover:-translate-y-1 group disabled:opacity-50 disabled:cursor-not-allowed"
@@ -124,7 +128,7 @@ export default function OverviewTab({
               <p className="text-sm text-gray-500 dark:text-neutral-500">
                 {action.description}
               </p>
-            </button>
+            </Button>
           ))}
         </div>
       </div>

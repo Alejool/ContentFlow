@@ -255,17 +255,23 @@ export default function GeneralSettingsTab({
                   <code className="flex-1 bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 rounded-lg px-3 py-2 text-sm font-mono text-gray-900 dark:text-gray-300 truncate">
                     {workspace.id}
                   </code>
-                  <button
+                  <Button
                     type="button"
+                    variant="ghost"
+                    buttonStyle="ghost"
+                    shadow="none"
                     onClick={() => {
                       navigator.clipboard.writeText(workspace.id);
                       toast.success(t("workspace.id_copied"));
                     }}
                     className="p-2 hover:bg-gray-100 dark:hover:bg-neutral-800 rounded-lg transition-colors"
                     title={t("common.copy")}
+                    icon={
+                      <Copy className="h-4 w-4 text-gray-500 dark:text-neutral-400" />
+                    }
                   >
-                    <Copy className="h-4 w-4 text-gray-500 dark:text-neutral-400" />
-                  </button>
+                    {""}
+                  </Button>
                 </div>
                 <p className="text-xs text-gray-500 dark:text-neutral-500 mt-2">
                   {t("workspace.id_description")}
