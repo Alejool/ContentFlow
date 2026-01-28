@@ -85,6 +85,18 @@ export default function GlobalUploadIndicator() {
     return () => clearInterval(interval);
   }, [props.auth?.user?.id]);
 
+  useEffect(() => {
+    const handlePublicationStarted = () => {
+      fetchProcessingItems();
+    };
+    window.addEventListener("publication-started", handlePublicationStarted);
+    return () =>
+      window.removeEventListener(
+        "publication-started",
+        handlePublicationStarted,
+      );
+  }, []);
+
   // Filter out dismissed items for rendering
   const visibleProcessingItems = processingItems.filter(
     (item) => !dismissedPublicationIds.includes(item.id),
