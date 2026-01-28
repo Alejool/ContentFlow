@@ -3,9 +3,8 @@
 namespace App\Jobs;
 
 use App\Models\SocialAccount;
-use App\Models\SocialMetric;
-use App\Services\SocialPlatforms\SocialPlatformFactory;
-use App\Services\SocialTokenManager;
+use App\Services\SocialAnalyticsService;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -21,42 +20,22 @@ class SyncSocialAnalyticsJob implements ShouldQueue
     public $days = 7
   ) {}
 
-  public function handle(SocialTokenManager $tokenManager)
+  public function handle(SocialAnalyticsService $analyticsService)
   {
     try {
-      $token = $tokenManager->getValidToken($this->account);
-      $platform = SocialPlatformFactory::make($this->account->platform, $token);
+      // 1. Sincronizar métricas de la cuenta (seguidores, posts, etc.)
+      $analyticsService->fetchAccountMetrics($this->account);
 
-      // Obtener estadísticas de la cuenta
-      $accountMetrics = $platform->getAccountMetrics($this->days);
+      // 2. Sincronizar métricas de posts recientes
+      $analyticsService->syncRecentPostsMetrics($this->account, $this->days);
 
-      // Obtener estadísticas de posts recientes
-      $posts = $this->account->posts()
-        ->where('published_at', '>=', now()->subDays($this->days))
-        ->get();
-
-      foreach ($posts as $post) {
-        if ($post->platform_post_id) {
-          $postMetrics = $platform->getPostAnalytics($post->platform_post_id);
-
-          SocialMetric::updateOrCreate(
-            [
-              'social_account_id' => $this->account->id,
-              'social_post_id' => $post->id,
-              'metric_date' => now()->toDateString(),
-            ],
-            [
-              'metrics' => array_merge($postMetrics, ['synced_at' => now()])
-            ]
-          );
-        }
-      }
-
-      // Actualizar última sincronización
+      // 3. Actualizar estado de la cuenta
       $this->account->update([
         'last_synced_at' => now(),
         'failure_count' => 0,
       ]);
+
+      \Log::info("Sincronización completada para cuenta {$this->account->id} ({$this->account->platform})");
     } catch (\Exception $e) {
       \Log::error("Error syncing analytics for account {$this->account->id}: " . $e->getMessage());
       $this->account->increment('failure_count');
