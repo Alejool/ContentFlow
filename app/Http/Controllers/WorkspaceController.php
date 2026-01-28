@@ -95,7 +95,6 @@ class WorkspaceController extends Controller
 
   public function switch(Workspace $workspace)
   {
-    // Verify user belongs to workspace
     if (!Auth::user()->workspaces()->where('workspaces.id', $workspace->id)->exists()) {
       abort(403);
     }
@@ -113,7 +112,7 @@ class WorkspaceController extends Controller
 
   public function settings(Request $request, Workspace $workspace)
   {
-    // Allow any member of the workspace to view settings
+
     if (!$workspace->users()->where('users.id', Auth::id())->exists()) {
       abort(403);
     }
@@ -133,7 +132,7 @@ class WorkspaceController extends Controller
 
   public function update(Request $request, Workspace $workspace)
   {
-    // Only workspace creator (Owner) can update workspace settings
+
     if (Auth::id() !== $workspace->created_by) {
       abort(403, 'Only the workspace owner can update workspace settings');
     }
@@ -238,7 +237,6 @@ class WorkspaceController extends Controller
 
     $workspace->users()->detach($userId);
 
-    // If removed user was using this workspace, switch them to another
     if ($removedUser && $removedUser->current_workspace_id === (int)$workspaceId) {
       $firstWorkspace = $removedUser->workspaces()->first();
       $removedUser->update(['current_workspace_id' => $firstWorkspace ? $firstWorkspace->id : null]);
@@ -256,7 +254,6 @@ class WorkspaceController extends Controller
   {
     $workspace = Workspace::findOrFail($workspaceId);
 
-    // Check permission
     if (!Auth::user()->hasPermission('manage-team', $workspaceId)) {
       abort(403, 'You do not have permission to invite members');
     }
@@ -280,7 +277,6 @@ class WorkspaceController extends Controller
 
     $user = User::where('email', $validated['email'])->first();
 
-    // Check if user is already a member
     if ($workspace->users()->where('users.id', $user->id)->exists()) {
       return response()->json([
         'success' => false,
