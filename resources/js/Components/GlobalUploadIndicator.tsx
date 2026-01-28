@@ -18,6 +18,9 @@ export default function GlobalUploadIndicator() {
   const { queue, removeUpload } = useUploadQueue();
   const [isMinimized, setIsMinimized] = useState(false);
   const [processingItems, setProcessingItems] = useState<Publication[]>([]);
+  const [dismissedPublicationIds, setDismissedPublicationIds] = useState<
+    number[]
+  >([]);
   const { t } = useTranslation();
   const props = usePage().props as any;
 
@@ -27,20 +30,28 @@ export default function GlobalUploadIndicator() {
   const fetchProcessingItems = async () => {
     try {
       const response = await axios.get(route("api.v1.publications.index"), {
-        params: { status: "processing,publishing,failed", simplified: "true" },
+        params: {
+          status: "processing,publishing,failed,published",
+          simplified: "true",
+        },
       });
       if (response.data?.success && response.data?.publications) {
         const items: Publication[] = Array.isArray(response.data.publications)
           ? response.data.publications
           : response.data.publications.data || [];
 
-        // Filter: Keep all processing/publishing, plus failures from last 5 minutes
+        // Filter: Keep all processing/publishing/published(recent/not dismissed)
         const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
         const filtered = items.filter((item) => {
           if (item.status === "processing" || item.status === "publishing")
             return true;
-          if (item.status === "failed") {
+
+          if (item.status === "failed" || item.status === "published") {
+            // If already dismissed, hide it
+            if (dismissedPublicationIds.includes(item.id)) return false;
+
             const updatedAt = new Date(item.updated_at || "");
+            // Keep failures/successes for 5 mins automatically, OR indefinitely if they are the most recent ones
             return updatedAt > fiveMinutesAgo;
           }
           return false;
@@ -74,20 +85,32 @@ export default function GlobalUploadIndicator() {
     return () => clearInterval(interval);
   }, [props.auth?.user?.id]);
 
+  // Filter out dismissed items for rendering
+  const visibleProcessingItems = processingItems.filter(
+    (item) => !dismissedPublicationIds.includes(item.id),
+  );
+
   const activeUploads = uploads.filter(
     (u) => u.status === "uploading" || u.status === "pending",
   );
   const errorUploads = uploads.filter((u) => u.status === "error");
 
-  // Differentiate between status types
-  const publishingItems = processingItems.filter(
+  // Differentiate between status types based on VISIBLE items
+  const publishingItems = visibleProcessingItems.filter(
     (i) => i.status === "publishing",
   );
-  const failedItems = processingItems.filter((i) => i.status === "failed");
+  const failedItems = visibleProcessingItems.filter(
+    (i) => i.status === "failed",
+  );
+  const completedItems = visibleProcessingItems.filter(
+    (i) => i.status === "published",
+  );
 
   const totalActiveTasks =
     activeUploads.length +
-    processingItems.filter((i) => i.status !== "failed").length;
+    visibleProcessingItems.filter(
+      (i) => i.status !== "failed" && i.status !== "published",
+    ).length;
 
   const { confirm, ConfirmDialog } = useConfirm();
 
@@ -131,7 +154,14 @@ export default function GlobalUploadIndicator() {
     }
   };
 
-  if (uploads.length === 0 && processingItems.length === 0) return null;
+  const handleDismissPublication = (e: React.MouseEvent, id: number) => {
+    e.stopPropagation();
+    setDismissedPublicationIds((prev) => [...prev, id]);
+    // Optimization: avoid waiting for next fetch
+    setProcessingItems((prev) => prev.filter((item) => item.id !== id));
+  };
+
+  if (uploads.length === 0 && visibleProcessingItems.length === 0) return null;
 
   return (
     <div
@@ -164,9 +194,13 @@ export default function GlobalUploadIndicator() {
                 ? t("publications.modal.upload.uploadFailed", {
                     defaultValue: "Algo salió mal",
                   })
-                : t("publications.modal.upload.uploadsCompleted", {
-                    defaultValue: "Subidas completadas",
-                  })}
+                : completedItems.length > 0
+                  ? t("publications.modal.upload.uploadsCompleted", {
+                      defaultValue: "Procesos completados",
+                    })
+                  : t("publications.modal.upload.uploadsCompleted", {
+                      defaultValue: "Subidas completadas",
+                    })}
           </span>
         </div>
         <div className="flex items-center gap-1">
@@ -248,7 +282,7 @@ export default function GlobalUploadIndicator() {
           ))}
 
           {/* External Processing/Publishing/Failed Items */}
-          {processingItems.map((item) => (
+          {visibleProcessingItems.map((item) => (
             <div
               key={item.id}
               className="p-3 border-b border-gray-100 dark:border-neutral-700 last:border-0 relative group"
@@ -266,19 +300,37 @@ export default function GlobalUploadIndicator() {
                   {item.title}
                 </span>
                 <div className="flex items-center gap-1.5">
-                  {(item.status === "publishing" ||
-                    item.status === "processing") && (
+                  {item.status === "failed" || item.status === "published" ? (
                     <button
-                      onClick={(e) => handleCancelPublication(e, item.id)}
-                      className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
-                      title="Cancelar envío"
+                      onClick={(e) => handleDismissPublication(e, item.id)}
+                      className="text-gray-400 hover:text-green-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                      title={t("common.dismiss") || "Descartar"}
                     >
                       <X className="w-3 h-3" />
                     </button>
+                  ) : (
+                    (item.status === "publishing" ||
+                      item.status === "processing") && (
+                      <button
+                        onClick={(e) => handleCancelPublication(e, item.id)}
+                        className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                        title={
+                          t("publications.publish.button.cancel") ||
+                          "Cancelar envío"
+                        }
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    )
                   )}
                   {item.status === "publishing" && (
                     <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 font-bold uppercase tracking-wider">
                       {t("common.publishing") || "Publicando"}
+                    </span>
+                  )}
+                  {item.status === "published" && (
+                    <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 font-bold uppercase tracking-wider">
+                      {t("common.success") || "Éxito"}
                     </span>
                   )}
                   {item.status === "failed" && (
@@ -334,8 +386,25 @@ export default function GlobalUploadIndicator() {
                     })()}
 
                     <div className="space-y-1.5 pt-1 border-t border-gray-50 dark:border-neutral-700/50">
-                      {Object.values((item as any).platform_status_summary).map(
-                        (platform: any, idx) => {
+                      {Object.values((item as any).platform_status_summary)
+                        .filter((platform: any) => {
+                          // SMART FILTER: Only show platforms that were part of this publishing attempt.
+                          // A platform is relevant if it's currently publishing, failed, or was published recently.
+                          // We use 5 minutes as a safety margin for "recent" status.
+                          const logDate = platform.published_at
+                            ? new Date(platform.published_at)
+                            : new Date(item.updated_at || "");
+                          const fiveMinsAgo = new Date(
+                            Date.now() - 5 * 60 * 1000,
+                          );
+
+                          return (
+                            platform.status === "publishing" ||
+                            platform.status === "pending" ||
+                            logDate > fiveMinsAgo
+                          );
+                        })
+                        .map((platform: any, idx) => {
                           const isDone = platform.status === "published";
                           const isFailed = platform.status === "failed";
                           return (
@@ -373,8 +442,7 @@ export default function GlobalUploadIndicator() {
                               </div>
                             </div>
                           );
-                        },
-                      )}
+                        })}
                     </div>
                   </div>
                 ) : (

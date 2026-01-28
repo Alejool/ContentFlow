@@ -364,6 +364,17 @@ export default function PublishPublicationModal({
                                         : "bg-white dark:bg-neutral-900/30 border-primary-200 dark:border-neutral-700 hover:border-primary-300 dark:hover:border-neutral-600"
                           }`}
                         >
+                          {/* Publishing Overlay */}
+                          {isPublishing && (
+                            <div className="absolute inset-0 z-20 bg-white/60 dark:bg-neutral-900/60 backdrop-blur-[1px] flex flex-col items-center justify-center rounded-lg animate-in fade-in duration-300">
+                              <div className="flex flex-col items-center gap-2">
+                                <div className="w-8 h-8 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin" />
+                                <span className="text-[10px] font-bold text-yellow-700 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-900/50 px-2 py-1 rounded-md shadow-sm border border-yellow-200 dark:border-yellow-800 uppercase tracking-wider">
+                                  {t("publications.publish.publishing")}
+                                </span>
+                              </div>
+                            </div>
+                          )}
                           <div className="w-12 h-12 rounded-lg  flex items-center justify-center flex-shrink-0 ">
                             <img src={iconSrc} alt={account.platform} />
                           </div>
@@ -392,14 +403,7 @@ export default function PublishPublicationModal({
                               </span>
                             </div>
                           )}
-                          {isPublishing && (
-                            <div className="flex items-center gap-2">
-                              <span className="flex items-center gap-1 text-xs font-medium text-yellow-600 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-900/30 px-2 py-1 rounded-full">
-                                <div className="w-3 h-3 border-2 border-yellow-600 border-t-transparent rounded-full animate-spin" />
-                                {t("publications.modal.publish.publishing")}
-                              </span>
-                            </div>
-                          )}
+
                           {isScheduled && (
                             <div className="flex items-center gap-2">
                               <span className="flex flex-col items-end">
@@ -594,6 +598,8 @@ export default function PublishPublicationModal({
                     }
                     disabled={
                       publishing ||
+                      publication.status === "publishing" ||
+                      publication.status === "processing" ||
                       (isPendingReview && !hasPublishPermission && false) || // placeholder to match logic
                       (!isPendingReview &&
                         !isApproved &&
