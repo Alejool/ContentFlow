@@ -27,7 +27,7 @@ class SocialMediaMetrics extends Model
         'followers_lost',
         'growth_rate',
         'engagement_rate',
-        'platform_data',
+        'metadata',
     ];
 
     protected $casts = [
@@ -46,7 +46,7 @@ class SocialMediaMetrics extends Model
         'followers_lost' => 'integer',
         'growth_rate' => 'decimal:2',
         'engagement_rate' => 'decimal:2',
-        'platform_data' => 'array',
+        'metadata' => 'array',
     ];
 
     public function socialAccount(): BelongsTo

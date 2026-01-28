@@ -22,31 +22,123 @@ class SocialAnalyticsService
   }
 
   /**
-   * Fetch account metrics from platform
+   * Fetch and persist account metrics from platform
    */
   public function fetchAccountMetrics(SocialAccount $account): array
   {
-    $cacheKey = "social_metrics_{$account->id}";
+    try {
+      $token = $this->tokenManager->getValidToken($account);
+      $service = $this->getPlatformService($account->platform, $token);
 
-    return Cache::remember($cacheKey, 3600, function () use ($account) {
-      try {
-        $token = $this->tokenManager->getValidToken($account);
-        $service = $this->getPlatformService($account->platform, $token);
+      $info = $service->getAccountInfo();
 
-        $info = $service->getAccountInfo();
+      // Normalize metrics
+      $normalized = $this->normalizeAccountMetrics($account->platform, $info);
 
-        // Update account metadata
-        $account->update([
-          'account_name' => $info['name'] ?? $info['username'] ?? $info['title'] ?? null,
-          'account_metadata' => $info,
-        ]);
+      // Update account metadata and basic info
+      $account->update([
+        'account_name' => $normalized['name'] ?? $account->account_name,
+        'account_metadata' => $info,
+      ]);
 
-        return $this->normalizeAccountMetrics($account->platform, $info);
-      } catch (\Exception $e) {
-        Log::error("Failed to fetch metrics for {$account->platform}: " . $e->getMessage());
-        return [];
+      // Calculate deltas comparing with previous record
+      $previousMetrics = \App\Models\SocialMediaMetrics::where('social_account_id', $account->id)
+        ->where('date', '<', now()->toDateString())
+        ->orderBy('date', 'desc')
+        ->first();
+
+      $followersGained = 0;
+      $followersLost = 0;
+
+      if ($previousMetrics) {
+        $diff = ($normalized['followers'] ?? 0) - $previousMetrics->followers;
+        if ($diff > 0) {
+          $followersGained = $diff;
+        } elseif ($diff < 0) {
+          $followersLost = abs($diff);
+        }
       }
-    });
+
+      // Persist daily metrics in social_media_metrics table
+      \App\Models\SocialMediaMetrics::updateOrCreate(
+        [
+          'social_account_id' => $account->id,
+          'date' => now()->toDateString(),
+        ],
+        [
+          'user_id' => $account->user_id,
+          'followers' => $normalized['followers'] ?? 0,
+          'following' => $normalized['following'] ?? 0,
+          'posts_count' => $normalized['posts'] ?? 0,
+          'total_likes' => $normalized['engagement'] ?? 0, // platform-specific aggregate if available
+          'reach' => $normalized['reach'] ?? 0,
+          'followers_gained' => $followersGained,
+          'followers_lost' => $followersLost,
+          'engagement_rate' => $normalized['engagement_rate'] ?? 0,
+          'metadata' => $info,
+        ]
+      );
+
+      return $normalized;
+    } catch (\Exception $e) {
+      Log::error("Failed to fetch metrics for {$account->platform} (Account: {$account->id}): " . $e->getMessage());
+      return [];
+    }
+  }
+
+  /**
+   * Sync metrics for recent posts of an account
+   */
+  public function syncRecentPostsMetrics(SocialAccount $account, int $days = 7): void
+  {
+    try {
+      $token = $this->tokenManager->getValidToken($account);
+      $service = $this->getPlatformService($account->platform, $token);
+
+      // Fetch posts published within the timeframe
+      $posts = $account->postLogs()
+        ->where('status', 'published')
+        ->where('published_at', '>=', now()->subDays($days))
+        ->get();
+
+      foreach ($posts as $post) {
+        if (!$post->platform_post_id) continue;
+
+        try {
+          $metrics = $service->getPostAnalytics($post->platform_post_id);
+
+          $post->update([
+            'engagement_data' => array_merge($post->engagement_data ?? [], $metrics, ['synced_at' => now()->toIso8601String()])
+          ]);
+
+          // Also update campaign_analytics if linked to a publication
+          if ($post->publication_id) {
+            \App\Models\CampaignAnalytics::updateOrCreate(
+              [
+                'publication_id' => $post->publication_id,
+                'platform' => $account->platform,
+                'date' => now()->toDateString(),
+              ],
+              [
+                'user_id' => $account->user_id,
+                'views' => $metrics['views'] ?? $metrics['impressions'] ?? 0,
+                'reach' => $metrics['reach'] ?? 0,
+                'impressions' => $metrics['impressions'] ?? 0,
+                'likes' => $metrics['likes'] ?? 0,
+                'comments' => $metrics['comments'] ?? 0,
+                'shares' => $metrics['shares'] ?? $metrics['retweets'] ?? 0,
+                'saves' => $metrics['saved'] ?? 0,
+                'metadata' => $metrics,
+              ]
+            );
+          }
+        } catch (\Exception $postException) {
+          Log::warning("Failed to sync metrics for post {$post->id}: " . $postException->getMessage());
+        }
+      }
+    } catch (\Exception $e) {
+      Log::error("Failed to start post sync for account {$account->id}: " . $e->getMessage());
+    }
   }
 
   /**
@@ -95,71 +187,21 @@ class SocialAnalyticsService
   }
 
   /**
-   * Generate analytics report for a date range
-   */
-  public function generateAnalyticsReport(int $userId, $startDate, $endDate): array
-  {
-    $posts = SocialPostLog::where('user_id', $userId)
-      ->whereBetween('published_at', [$startDate, $endDate])
-      ->where('status', 'published')
-      ->get();
-
-    $report = [
-      'period' => [
-        'start' => $startDate,
-        'end' => $endDate,
-      ],
-      'summary' => [
-        'total_posts' => $posts->count(),
-        'by_platform' => [],
-        'total_engagement' => 0,
-      ],
-      'top_posts' => [],
-    ];
-
-    // Group by platform
-    foreach ($posts->groupBy('platform') as $platform => $platformPosts) {
-      $report['summary']['by_platform'][$platform] = $platformPosts->count();
-    }
-
-    // Calculate total engagement
-    foreach ($posts as $post) {
-      $engagement = $post->getEngagementMetrics();
-      $totalEngagement = array_sum($engagement);
-      $report['summary']['total_engagement'] += $totalEngagement;
-
-      // Track top posts
-      $report['top_posts'][] = [
-        'id' => $post->id,
-        'platform' => $post->platform,
-        'content' => substr($post->content, 0, 100),
-        'engagement' => $totalEngagement,
-        'published_at' => $post->published_at,
-      ];
-    }
-
-    // Sort top posts by engagement
-    usort($report['top_posts'], fn($a, $b) => $b['engagement'] <=> $a['engagement']);
-    $report['top_posts'] = array_slice($report['top_posts'], 0, 10);
-
-    return $report;
-  }
-
-  /**
-   * Update engagement data for a post
+   * Update engagement data for a post (Individual sync)
    */
   public function updatePostEngagement(SocialPostLog $post): void
   {
-    if (!$post->platform_post_id) {
+    if (!$post->platform_post_id || !$post->socialAccount) {
       return;
     }
 
-    $account = $post->socialAccount;
-    $metrics = $this->fetchPostMetrics($post->platform_post_id, $post->platform, $account);
+    $metrics = $this->fetchPostMetrics($post->platform_post_id, $post->platform, $post->socialAccount);
 
-    $post->update([
-      'engagement_data' => $metrics,
-    ]);
+    if (!empty($metrics)) {
+      $post->update([
+        'engagement_data' => array_merge($post->engagement_data ?? [], $metrics, ['synced_at' => now()->toIso8601String()]),
+      ]);
+    }
   }
 
   /**
@@ -167,14 +209,7 @@ class SocialAnalyticsService
    */
   protected function getPlatformService(string $platform, string $token)
   {
-    return match ($platform) {
-      'facebook' => new FacebookService($token),
-      'instagram' => new InstagramService($token),
-      'twitter' => new TwitterService($token),
-      'tiktok' => new TikTokService($token),
-      'youtube' => new YouTubeService($token),
-      default => throw new \Exception("Unsupported platform: {$platform}"),
-    };
+    return \App\Services\SocialPlatforms\SocialPlatformFactory::make($platform, $token);
   }
 
   /**
@@ -187,30 +222,35 @@ class SocialAnalyticsService
         'followers' => $data['followers_count'] ?? 0,
         'posts' => 0,
         'engagement' => 0,
+        'reach' => $data['reach'] ?? 0,
         'name' => $data['name'] ?? '',
       ],
       'instagram' => [
         'followers' => $data['followers_count'] ?? 0,
         'posts' => $data['media_count'] ?? 0,
         'engagement' => 0,
+        'reach' => $data['reach'] ?? 0,
         'name' => $data['username'] ?? '',
       ],
       'twitter' => [
         'followers' => $data['public_metrics']['followers_count'] ?? 0,
         'posts' => $data['public_metrics']['tweet_count'] ?? 0,
         'engagement' => 0,
+        'reach' => $data['reach'] ?? 0,
         'name' => $data['username'] ?? '',
       ],
       'tiktok' => [
         'followers' => $data['follower_count'] ?? 0,
         'posts' => $data['video_count'] ?? 0,
         'engagement' => $data['likes_count'] ?? 0,
+        'reach' => $data['reach'] ?? 0,
         'name' => $data['display_name'] ?? '',
       ],
       'youtube' => [
         'followers' => $data['subscribers'] ?? 0,
         'posts' => $data['video_count'] ?? 0,
         'engagement' => $data['view_count'] ?? 0,
+        'reach' => $data['view_count'] ?? 0, // YouTube views are often considered reach in simple terms
         'name' => $data['title'] ?? '',
       ],
       default => [],
