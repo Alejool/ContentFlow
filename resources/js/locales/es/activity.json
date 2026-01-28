@@ -1,0 +1,32 @@
+{
+  "activity": {
+    "timeline": {
+      "title": "Actividad",
+      "total": "Total",
+      "empty": "Sin actividades",
+      "noActivity": "Sin actividad registrada aún.",
+      "system": "Sistema",
+      "requested_approval": "Revisión solicitada",
+      "publication_failed": "Fallo en la publicación",
+      "status": {
+        "created": "Creado",
+        "updated": "Actualizado",
+        "published": "Publicado",
+        "unpublished": "Despublicado",
+        "locked": "Bloqueado",
+        "unlocked": "Desbloqueado",
+        "approved": "Aprobado",
+        "rejected": "Rechazado",
+        "publishing": "Publicando...",
+        "failed_on_platform": "Fallo en plataforma",
+        "failed_on_platform_detail": "Fallo en {{platform}}",
+        "published_on_platform": "Publicado en plataforma",
+        "published_on_platform_detail": "Publicado en {{platform}}",
+        "statusChanged": "Estado cambiado",
+        "pending": "Pendiente",
+        "scheduled": "Programado",
+        "draft": "Borrador"
+      }
+    }
+  }
+}

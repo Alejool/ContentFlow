@@ -1,0 +1,85 @@
+﻿{
+  "welcome": {
+    "title": "Manage your content",
+    "titleHighlight": "with artificial intelligence",
+    "subtitle": "Organize, optimize, and schedule your multimedia content with AI-powered tools to maximize your social media presence.",
+    "featured": "Featured",
+    "featuredCollection": "Featured Collection",
+    "startFree": "Start Free",
+    "demo": "Demo",
+    "beta": "Beta",
+    "featuresTitle": "Features",
+    "featuresSubtitle": "Manage your content with AI-powered tools",
+    "login": "Login",
+    "getStarted": "Get Started",
+    "readyToStart": "Ready to start",
+    "joinNow": "Join Now",
+    "createAccount": "Create Account",
+    "noCreditCard": "No credit card required",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "contact": "Contact",
+    "aiOrganization": {
+      "title": "AI Organization",
+      "description": "Easily categorize, tag, and search your multimedia files with AI-powered organization",
+      "tags": {
+        "smartAlbums": "Smart Albums",
+        "autoOrganization": "Auto-Organization",
+        "customTags": "Custom Tags"
+      }
+    },
+    "multiPlatform": {
+      "title": "Multi-Platform Publishing",
+      "description": "Optimize and seamlessly share content across multiple social media platforms"
+    },
+    "analytics": {
+      "title": "Performance Analytics",
+      "description": "Get insights into your content engagement and optimize your strategy accordingly"
+    },
+    "scheduling": {
+      "title": "Smart Scheduling",
+      "description": "Automate and schedule your posts with AI recommendations for optimal performance"
+    },
+    "pricing": {
+      "title": "Pricing",
+      "description": "Get information about your content engagement and optimize your strategy accordingly"
+    },
+    "contentManagement": {
+      "title": "Content Management",
+      "description": "Manage your content with AI-powered tools"
+    },
+    "socialIntegration": {
+      "title": "Social Integration",
+      "description": "Integrate your social media accounts with AI-powered tools"
+    },
+    "aiTools": {
+      "title": "AI Tools",
+      "description": "Chat with AI to get answers to your questions"
+    },
+    "tags": {
+      "multimedia": "Multimedia",
+      "organization": "Organization",
+      "advanced_search": "Advanced Search",
+      "tags": "Tags",
+      "facebook": "Facebook",
+      "instagram": "Instagram",
+      "tiktok": "TikTok",
+      "youtube": "YouTube",
+      "twitter": "Twitter",
+      "calendar": "Calendar",
+      "scheduling": "Scheduling",
+      "ai": "AI",
+      "optimal_times": "Optimal Times",
+      "hashtags": "Hashtags",
+      "recommendations": "Recommendations",
+      "optimization": "Optimization",
+      "ai_analysis": "AI Analysis",
+      "collections": "Collections",
+      "filters": "Filters",
+      "auto_post": "Auto-Post",
+      "time_zones": "Time Zones",
+      "search": "Search",
+      "queue": "Queue"
+    }
+  }
+}

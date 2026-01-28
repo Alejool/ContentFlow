@@ -1,0 +1,104 @@
+{
+  "manageContent": {
+    "configureNetworks": "Configure your scheduled publications",
+    "title": "Content Management",
+    "subtitle": "Organize and manage your multimedia content elegantly and efficiently",
+    "createNew": "Create New",
+    "publications": "Publications",
+    "campaigns": "Campaigns",
+    "logs": "Logs",
+    "tabs": {
+      "publications": "Publications",
+      "campaigns": "Campaigns",
+      "calendar": "Calendar",
+      "logs": "Logs",
+      "approvals": "Approvals"
+    },
+    "status": {
+      "all": "All",
+      "draft": "Drafts",
+      "scheduled": "Scheduled",
+      "pending_review": "Pending Review",
+      "rejected": "Rejected",
+      "published": "Published"
+    },
+    "socialMedia": {
+      "title": "Connect Your Social Networks",
+      "description": "Connect your social media accounts to allow automatic content publishing. Your information will be kept secure and will only be used for the functions you authorize.",
+      "whyConnect": "Why connect your social networks?",
+      "connected": "Connected",
+      "of": "of",
+      "accounts": "accounts",
+      "seeAccounts": "See networks",
+      "hide": "Hide",
+      "benefits": {
+        "autoPublish": "Automatically publish content",
+        "manageAll": "Manage all accounts in one place",
+        "schedule": "Schedule posts for optimal times",
+        "control": "Maintain full control always"
+      },
+      "disclaimer": "You can disconnect your accounts at any time. We will not publish anything without your permission.",
+      "status": {
+        "connected": "Connected",
+        "notConnected": "Not Connected",
+        "connectToShare": "Connect to start sharing",
+        "connectedBy": "Connected by"
+      },
+      "actions": {
+        "connect": "Connect",
+        "disconnect": "Disconnect",
+        "processing": "Processing..."
+      },
+      "disconnectModal": {
+        "title": "Disconnect Account",
+        "warning": "Account has pending posts",
+        "explanation": "This account has scheduled posts associated. To disconnect it, you must first delete these posts or force the disconnection.",
+        "table": {
+          "date": "Date",
+          "publication": "Publication"
+        },
+        "cancelButton": "Keep connected",
+        "confirmButton": "Disconnect "
+      },
+      "validation": {
+        "facebook": {
+          "typeRequired": "You must select a post type for Facebook",
+          "typeInvalid": "Invalid post type for Facebook"
+        },
+        "instagram": {
+          "typeRequired": "You must select a post type for Instagram",
+          "typeInvalid": "Invalid post type for Instagram"
+        },
+        "twitter": {
+          "typeRequired": "You must select a post type for Twitter",
+          "pollOptionsMin": "Polls require at least 2 options",
+          "pollOptionEmpty": "Poll options cannot be empty"
+        },
+        "youtube": {
+          "typeRequired": "You must select a video type for YouTube",
+          "typeInvalid": "Invalid video type for YouTube"
+        },
+        "tiktok": {
+          "typeRequired": "Format required for TikTok",
+          "typeInvalid": "Invalid format"
+        }
+      },
+      "messages": {
+        "settingsUpdated": {
+          "facebook": "Facebook settings updated successfully",
+          "instagram": "Instagram settings updated successfully",
+          "twitter": "Twitter settings updated successfully",
+          "tiktok": "TikTok settings updated successfully",
+          "youtube": "YouTube settings updated successfully",
+          "default": "Settings updated successfully"
+        },
+        "connectSuccess": "Account connected successfully",
+        "disconnectSuccess": "Account disconnected successfully",
+        "authError": "Authentication error",
+        "unauthorized": "Unauthorized. Please log in again.",
+        "loadError": "Could not load connected accounts",
+        "disconnectError": "Error disconnecting"
+      }
+    }
+  }
+}

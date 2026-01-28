@@ -1,0 +1,99 @@
+﻿{
+  "platformSettings": {
+    "status": "Estado",
+    "save": "Guardar Cambios",
+    "configured": "Configurado",
+    "success": "Configuración guardada exitosamente",
+    "error": "Error al guardar la configuración",
+    "title": "Configuraciones Globales de Plataforma",
+    "subtitle": "Define las configuraciones predeterminadas para cada red social.",
+    "clickToConfigure": "Haz clic para configurar",
+    "configure": "Configurar red",
+    "messages": {
+      "success": "Configuración guardada exitosamente ",
+      "error": "Error al guardar la configuración "
+    },
+    "preview": {
+      "view": "Ver vista previa"
+    },
+    "button": {
+      "save": "Guardar Cambios"
+    },
+    "youtube": {
+      "title": "YouTube",
+      "type": "Tipo de Video",
+      "video": "Video Normal",
+      "videoStandard": "Video estándar",
+      "contentType": "Tipo de Contenido",
+      "short": "Shorts",
+      "shortVertical": "Video Vertical Shorts",
+      "privacy": "Privacidad",
+      "public": "Público",
+      "private": "Privado",
+      "unlisted": "Oculto",
+      "madeForKids": "SÍ, es contenido para niños"
+    },
+    "facebook": {
+      "title": "Facebook",
+      "type": "Tipo de Publicación",
+      "feed": "Publicación del Muro",
+      "feedDescription": "Publicación del Muro",
+      "reel": "Reel",
+      "reelDescription": "Video corto vertical"
+    },
+    "instagram": {
+      "title": "Instagram",
+      "type": "Tipo de Publicación",
+      "feed": "Publicación del Feed",
+      "feedDescription": "Publicación del Feed",
+      "reel": "Reel",
+      "reelDescription": "Video corto vertical",
+      "story": "Historia",
+      "storyDescription": "Historia"
+    },
+    "tiktok": {
+      "title": "TikTok",
+      "privacy": "Privacidad",
+      "public": "Público",
+      "publicDescription": "Todos pueden ver",
+      "friends": "Solo Amigos",
+      "friendsDescription": "Solo tus amigos pueden ver",
+      "private": "Privado",
+      "privateDescription": "Solo tú",
+      "interactions": "Interacciones",
+      "interactionsDescription": "Permitir interacciones",
+      "comments": "Comentarios",
+      "commentsDescription": "Permitir comentarios",
+      "duets": "Dúo",
+      "duetsDescription": "Permitir dúos",
+      "stitchs": "Pegar",
+      "stitchsDescription": "Permitir pegar"
+    },
+    "twitter": {
+      "title": "Twitter (X)",
+      "type": "Tipo de Post",
+      "tweet": "Tweet Estándar",
+      "thread": "Hilo (Dividir texto)",
+      "poll": "Encuesta",
+      "pollOptions": "Opciones de Encuesta",
+      "optionPlaceholder": "Opción {{index}}",
+      "optional": "(Opcional)",
+      "pollDuration": "Duración (Minutos)",
+      "30m": "30 Minutos",
+      "1h": "1 Hora",
+      "24h": "24 Horas",
+      "3d": "3 Días",
+      "7d": "7 Días",
+      "subtitle": "Ajustar opciones específicas de la plataforma"
+    },
+    "labels": {
+      "type": "Tipo de Publicación",
+      "privacy": "Privacidad",
+      "made_for_kids": "Contenido para Niños",
+      "disable_comment": "Desactivar Comentarios",
+      "disable_duet": "Desactivar Dúos",
+      "disable_stitch": "Desactivar Pegar",
+      "poll_duration": "Duración de Encuesta"
+    }
+  }
+}

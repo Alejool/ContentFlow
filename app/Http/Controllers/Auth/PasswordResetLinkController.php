@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
-
+use App\Models\User;
 class PasswordResetLinkController extends Controller
 {
     /**
@@ -32,6 +32,17 @@ class PasswordResetLinkController extends Controller
         $request->validate([
             'email' => 'required|email',
         ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if ($user) {
+            if (!empty($user->provider)) {
+                throw ValidationException::withMessages([
+                    'email' => [trans('auth.forgot-password.provider')],
+                ]);
+            }
+        }
+
 
         // We will send the password reset link to this user. Once we have attempted
         // to send the link, we will examine the response then see the message we

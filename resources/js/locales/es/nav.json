@@ -1,0 +1,15 @@
+{
+  "nav": {
+    "dashboard": "Panel",
+    "calendar": "Calendario",
+    "profile": "Perfil",
+    "settings": "Configuración",
+    "manageContent": "Gestionar Contenido",
+    "analytics": "Analíticas",
+    "aiChat": "Chat IA",
+    "socialNetworks": "Redes Sociales",
+    "logout": "Cerrar Sesión",
+    "notifications": "Notificaciones",
+    "workspaces": "Espacios"
+  }
+}

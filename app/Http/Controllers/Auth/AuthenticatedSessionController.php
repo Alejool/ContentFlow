@@ -4,18 +4,26 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Inertia\Response;
+use App\Models\User;
+
+/*
+|--------------------------------------------------------------------------
+| Login Controller
+|--------------------------------------------------------------------------
+|
+| This controller handles authenticating users for the application and
+| redirecting them to your home screen. The controller uses a trait
+| to conveniently provide its functionality to your applications.
+|
+*/
 
 class AuthenticatedSessionController extends Controller
 {
-    /**
-     * Display the login view.
-     */
     public function create(): Response
     {
         return Inertia::render('Auth/Login', [
@@ -24,29 +32,59 @@ class AuthenticatedSessionController extends Controller
         ]);
     }
 
-    /**
-     * Handle an incoming authentication request.
-     */
-    public function store(LoginRequest $request): RedirectResponse
+    public function store(LoginRequest $request)
     {
-        $request->authenticate();
+        \Illuminate\Support\Facades\Log::info('Login: Attempting Normal Login', ['email' => $request->input('email')]);
+        try {
+            $return = $request->authenticate();
+            \Illuminate\Support\Facades\Log::info('Login: Authenticate Success', ['user_id' => Auth::id()]);
 
-        $request->session()->regenerate();
+            $request->session()->regenerate();
+            // Explicitly save session to prevent race conditions
+            $request->session()->save();
+            \Illuminate\Support\Facades\Log::info('Login: Session Regenerated and Saved');
 
-        return redirect()->intended(route('dashboard', absolute: false));
+            return response()->json($return);
+            \Illuminate\Support\Facades\Log::info('Login: Session Regenerated and Saved');
+
+            return response()->json($return);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Let the frontend handle validation errors (422) naturally
+            throw $e;
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Login: Exception', ['message' => $e->getMessage()]);
+            return response()->json([
+                'error' => 'Authentication failed: ' . $e->getMessage()
+            ], 401);
+        }
     }
 
-    /**
-     * Destroy an authenticated session.
-     */
-    public function destroy(Request $request): RedirectResponse
+    public function destroy(Request $request)
     {
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();
-
         $request->session()->regenerateToken();
 
         return redirect('/');
+    }
+
+    public function checkUser(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if ($user && $user->provider) {
+            return response()->json([
+                'provider' => $user->provider,
+            ]);
+        }
+
+        return response()->json([
+            'provider' => null,
+        ]);
     }
 }

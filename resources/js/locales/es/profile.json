@@ -1,0 +1,118 @@
+{
+  "profile": {
+    "menu_title": "Configuración",
+    "tabs": {
+      "general": "General",
+      "security": "Seguridad",
+      "accounts": "Conexiones",
+      "ai": "Inteligencia Artificial"
+    },
+    "title": "Perfil",
+    "settings_description": "Actualiza tu información personal y ajustes de seguridad.",
+    "editProfile": "Editar Perfil",
+    "changePassword": "Cambiar Contraseña",
+    "name": "Nombre",
+    "email": "Correo Electrónico",
+    "currentPassword": "Contraseña Actual",
+    "newPassword": "Nueva Contraseña",
+    "confirmPassword": "Confirmar Contraseña",
+    "updateProfile": "Actualizar Perfil",
+    "update_success": "Perfil actualizado exitosamente.",
+    "update_error": "Error al actualizar el perfil.",
+    "deleteAccount": "Eliminar Cuenta",
+    "actions": {
+      "saveChanges": "Guardar Cambios"
+    },
+    "messages": {
+      "unsavedChanges": "Tienes cambios no guardados. ¿Deseas continuar?"
+    },
+    "information": {
+      "title": "Información del Perfil",
+      "description": "Actualiza la información de tu cuenta y dirección de correo electrónico.",
+      "saved": "Guardado.",
+      "nameLabel": "Nombre",
+      "namePlaceholder": "Tu Nombre",
+      "emailLabel": "Correo Electrónico",
+      "emailPlaceholder": "tu.correo@ejemplo.com",
+      "emailUnverified": "Tu dirección de correo electrónico no está verificada. Por favor verifícala para acceder a todas las funciones.",
+      "sendVerification": "Enviar Correo de Verificación",
+      "verificationSent": "Se ha enviado un nuevo enlace de verificación a tu dirección de correo electrónico.",
+      "applicationLanguage": "Idioma de la Aplicación",
+      "languageDescription": "Selecciona tu idioma preferido para la interfaz de la aplicación.",
+      "currentLanguage": "Idioma Actual",
+      "phoneLabel": "Teléfono",
+      "phonePlaceholder": "Tu número de teléfono",
+      "bioLabel": "Biografía",
+      "bioPlaceholder": "Háblanos un poco de ti...",
+      "sections": {
+        "personal": "Información Personal",
+        "contact": "Detalles de Contacto",
+        "bio": "Sobre Mí",
+        "language": "Idioma y Preferencias"
+      }
+    },
+    "statistics": {
+      "title": "Estadísticas de la Cuenta",
+      "description": "Resumen de la actividad y estado de tu cuenta.",
+      "memberSince": "Miembro Desde",
+      "daysActive": "Días Activo",
+      "days": "días",
+      "accountStatus": "Estado de la Cuenta",
+      "active": "Activa",
+      "emailStatus": "Estado del Correo",
+      "verified": "Verificado",
+      "unverified": "No Verificado"
+    },
+    "connectedAccounts": {
+      "title": "Cuentas Sociales Conectadas",
+      "description": "Administra tus perfiles de redes sociales conectados para publicación de contenido.",
+      "connected": "Conectadas",
+      "notConnected": "No Conectadas",
+      "manageLink": "Administrar conexiones en el Gestor de Contenido"
+    },
+    "password": {
+      "title": "Actualizar Contraseña",
+      "description": "Mantén tu cuenta segura con una contraseña fuerte",
+      "currentPassword": "Contraseña Actual",
+      "newPassword": "Nueva Contraseña",
+      "confirmPassword": "Confirmar Nueva Contraseña",
+      "updateButton": "Actualizar Contraseña",
+      "successTitle": "¡Contraseña actualizada exitosamente!",
+      "successMessage": "La seguridad de tu cuenta ha sido mejorada.",
+      "errorTitle": "Por favor corrige los siguientes errores:",
+      "securityTips": "Consejos de Seguridad para Contraseñas:",
+      "tip1": "Usa al menos 8 caracteres con una mezcla de letras, números y símbolos",
+      "tip2": "Evita usar información personal o palabras comunes",
+      "tip3": "Considera usar un administrador de contraseñas para mayor seguridad",
+      "placeholders": {
+        "current": "Ingresa tu contraseña actual",
+        "new": "Ingresa tu nueva contraseña",
+        "confirm": "Confirma tu nueva contraseña"
+      }
+    },
+    "delete": {
+      "title": "Eliminar Cuenta",
+      "description": "Eliminar permanentemente tu cuenta y datos",
+      "warningTitle": "Advertencia: Acción Irreversible",
+      "warningMessage": "Una vez que tu cuenta sea eliminada, todos sus recursos y datos serán eliminados permanentemente. Antes de eliminar tu cuenta, por favor descarga cualquier dato o información que desees conservar.",
+      "deleteButton": "Eliminar Cuenta",
+      "confirmTitle": "¿Estás seguro de que quieres eliminar tu cuenta?",
+      "confirmMessage": "Por favor ingresa tu contraseña para confirmar que deseas eliminar permanentemente tu cuenta.",
+      "passwordLabel": "Contraseña",
+      "passwordPlaceholder": "Ingresa tu contraseña para confirmar",
+      "cancel": "Cancelar"
+    },
+    "toast": {
+      "languageChanged": "Idioma cambiado exitosamente.",
+      "languageChangeError": "Error cambiando idioma."
+    },
+    "ai": {
+      "title": "Configuración de IA Personal",
+      "description": "Configura tus propias claves de API para habilitar funciones inteligentes personalizadas.",
+      "hint": "Si configuras un proveedor aquí, el sistema usará tu clave personal en lugar de la predeterminada del sistema. Esto te da más control sobre el uso y las capacidades.",
+      "get_key": "Obtener Clave",
+      "api_key_label": "Clave API",
+      "secured_storage": "Almacenamiento Seguro Encriptado"
+    }
+  }
+}

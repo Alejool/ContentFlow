@@ -1,0 +1,52 @@
+{
+  "analytics": {
+    "title": "Analíticas",
+    "subtitle": "Visualiza el rendimiento de tus campañas y publicaciones",
+    "days": "días",
+    "vistas": "Vistas",
+    "clics": "Clics",
+    "engagement": "Engagement",
+    "platform": {
+      "engagement": "Engagement Total",
+      "growth": "Crecimiento"
+    },
+    "trends": {
+      "likes": "Me gusta",
+      "comments": "Comentarios",
+      "shares": "Compartidos",
+      "saves": "Guardados"
+    },
+    "stats": {
+      "totalViews": "Total de Vistas",
+      "totalClicks": "Total de Clics",
+      "conversions": "Conversiones",
+      "totalReach": "Alcance Total",
+      "avgEngagementRate": "Tasa de Engagement Promedio",
+      "avgCtr": "CTR Promedio",
+      "avgConversionRate": "Tasa de Conversión Promedio",
+      "totalEngagement": "Engagement Total"
+    },
+    "charts": {
+      "engagementTrends": "Tendencias de Engagement",
+      "followersByPlatform": "Seguidores por Plataforma",
+      "topCampaignPerformance": "Rendimiento de Campañas Principales",
+      "views": "Vistas",
+      "clicks": "Clics",
+      "engagement": "Engagement"
+    },
+    "socialMedia": {
+      "title": "Redes Sociales",
+      "followers": "Seguidores",
+      "engagementRate": "Tasa de Engagement",
+      "reach": "Alcance"
+    },
+    "drilldown": {
+      "standalone": "Publicaciones Independientes",
+      "title": "Detalle de Rendimiento"
+    },
+    "emptyState": {
+      "title": "No hay datos disponibles",
+      "description": "Comienza a crear campañas y conecta tus cuentas de redes sociales para ver tus analíticas aquí."
+    }
+  }
+}

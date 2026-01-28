@@ -1,0 +1,99 @@
+﻿{
+  "platformSettings": {
+    "status": "Status",
+    "save": "Save Changes",
+    "configured": "Configured",
+    "success": "Configuration saved successfully",
+    "error": "Error saving configuration",
+    "title": "Global Platform Settings",
+    "subtitle": "Define default settings for each social network.",
+    "clickToConfigure": "Click to configure",
+    "messages": {
+      "success": "Configuration saved successfully ",
+      "error": "Error saving configuration "
+    },
+    "configure": "Configure Network",
+    "preview": {
+      "view": "View Preview"
+    },
+    "button": {
+      "save": "Save Changes"
+    },
+    "youtube": {
+      "title": "YouTube",
+      "type": "Video Type",
+      "video": "Video Normal",
+      "videoStandard": "Standard video",
+      "contentType": "Content Type",
+      "short": "Shorts",
+      "shortVertical": "Video Vertical Shorts",
+      "privacy": "Privacy",
+      "public": "Public",
+      "private": "Private",
+      "unlisted": "Unlisted",
+      "madeForKids": "Yes, it is children's content"
+    },
+    "facebook": {
+      "title": "Facebook",
+      "type": "Publication Type",
+      "feed": "Wall Publication",
+      "feedDescription": "Wall Publication",
+      "reel": "Reel",
+      "reelDescription": "Vertical short video"
+    },
+    "instagram": {
+      "title": "Instagram",
+      "type": "Publication Type",
+      "feed": "Feed Publication",
+      "feedDescription": "Feed Publication",
+      "reel": "Reel",
+      "reelDescription": "Vertical short video",
+      "story": "Story",
+      "storyDescription": "Story"
+    },
+    "tiktok": {
+      "title": "TikTok",
+      "privacy": "Privacy",
+      "public": "Public",
+      "friends": "Friends Only",
+      "private": "Private",
+      "publicDescription": "Visible for all",
+      "friendsDescription": "Visible for followers",
+      "privateDescription": "Visible for you",
+      "interactions": "Interactions",
+      "interactionsDescription": "Interactions",
+      "comments": "Comments",
+      "commentsDescription": "Allowed comments",
+      "duets": "Duet",
+      "duetsDescription": "Allowed duets",
+      "stitchs": "Stitch",
+      "stitchsDescription": "Allowed stitches"
+    },
+    "twitter": {
+      "title": "Twitter (X)",
+      "type": "Post Type",
+      "tweet": "Standard Tweet",
+      "thread": "Thread (Split text)",
+      "poll": "Poll",
+      "pollOptions": "Poll Options",
+      "optionPlaceholder": "Option {{index}}",
+      "optional": "(Optional)",
+      "pollDuration": "Duration (Minutes)",
+      "30m": "30 Minutes",
+      "1h": "1 Hour",
+      "24h": "24 Hours",
+      "3d": "3 Days",
+      "7d": "7 Days",
+      "subtitle": "Adjust platform-specific options"
+    },
+    "labels": {
+      "type": "Post Type",
+      "privacy": "Privacy",
+      "made_for_kids": "Made for Kids",
+      "disable_comment": "Disable Comments",
+      "disable_duet": "Disable Duet",
+      "disable_stitch": "Disable Stitch",
+      "poll_duration": "Poll Duration"
+    }
+  }
+}

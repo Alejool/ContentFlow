@@ -1,0 +1,207 @@
+services:
+  # Laravel Application (PHP-FPM)
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+      args:
+        VITE_REVERB_APP_KEY: "${REVERB_APP_KEY}"
+        VITE_REVERB_HOST: "${VITE_REVERB_HOST}"
+        VITE_REVERB_PORT: "${REVERB_PORT}"
+        VITE_REVERB_SCHEME: "${REVERB_SCHEME}"
+    container_name: contentflow_app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+      - ./storage:/var/www/html/storage
+      - ./docker/php/php_dev.ini:/usr/local/etc/php/conf.d/local.ini
+      - ./docker/php/custom.ini:/usr/local/etc/php/conf.d/custom.ini
+      - cf_vendor_v2:/var/www/html/vendor
+      - cf_node_modules_v2:/var/www/html/node_modules
+      - cf_public_build:/var/www/html/public/build
+    env_file:
+      - .env.docker
+    # ports:
+    #   - "80:8080"
+    environment:
+      - LARAVEL_OCTANE=1
+      - OCTANE_SERVER=swoole
+    command: php artisan octane:start --server=swoole --host=0.0.0.0 --port=8080 --watch
+    depends_on:
+      pgsql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - laravel
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: contentflow_nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./:/var/www/html
+      - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+      - reverb
+    networks:
+      - laravel
+
+  # PostgreSQL
+  pgsql:
+    image: postgres:15-alpine
+    container_name: contentflow_pgsql
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    env_file:
+      - .env.docker
+    environment:
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - pgsql_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - laravel
+
+  # Redis
+  redis:
+    image: redis:7-alpine
+    container_name: contentflow_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - laravel
+
+  # Queue Worker
+  queue:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: contentflow_queue
+    restart: unless-stopped
+    working_dir: /var/www/html
+    command: php artisan queue:work --queue=publishing,publishing:notify,notifications,emails,high,default,low --tries=3 --timeout=90
+    volumes:
+      - ./:/var/www/html
+      - cf_vendor_v2:/var/www/html/vendor
+      - cf_node_modules_v2:/var/www/html/node_modules
+      - ./docker/php/custom.ini:/usr/local/etc/php/conf.d/custom.ini
+    env_file:
+      - .env.docker
+    depends_on:
+      - app
+      - redis
+    networks:
+      - laravel
+
+  # Reverb
+  reverb:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: contentflow_reverb
+    restart: unless-stopped
+    working_dir: /var/www/html
+    command: php artisan reverb:start --host=0.0.0.0 --port=8080
+    volumes:
+      - ./:/var/www/html
+      - cf_vendor_v2:/var/www/html/vendor
+      - cf_node_modules_v2:/var/www/html/node_modules
+      - ./docker/php/custom.ini:/usr/local/etc/php/conf.d/custom.ini
+    env_file:
+      - .env.docker
+    ports:
+      - "8081:8080"
+    depends_on:
+      - app
+      - redis
+    networks:
+      - laravel
+
+  # Scheduler
+  scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: contentflow_scheduler
+    restart: unless-stopped
+    working_dir: /var/www/html
+    command: sh -c "while true; do php artisan schedule:run --no-interaction; sleep 60; done"
+    volumes:
+      - ./:/var/www/html
+      - cf_vendor_v2:/var/www/html/vendor
+      - cf_node_modules_v2:/var/www/html/node_modules
+      - ./docker/php/custom.ini:/usr/local/etc/php/conf.d/custom.ini
+    env_file:
+      - .env.docker
+    depends_on:
+      - app
+      - redis
+    networks:
+      - laravel
+
+  # Redis Commander (Web UI)
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: contentflow_redis_commander
+    restart: unless-stopped
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    ports:
+      - "8082:8081"
+    depends_on:
+      - redis
+    networks:
+      - laravel
+
+  # vite
+  vite:
+    image: node:20-alpine
+    container_name: contentflow_vite
+    working_dir: /var/www/html
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./:/var/www/html
+      - cf_node_modules_v2:/var/www/html/node_modules
+      - cf_public_build:/var/www/html/public/build
+    environment:
+      - VITE_HMR_HOST=${VITE_HMR_HOST:-localhost}
+    networks:
+      - laravel
+
+networks:
+  laravel:
+    driver: bridge
+
+volumes:
+  pgsql_data:
+  redis_data:
+  cf_vendor_v2:
+  cf_node_modules_v2:
+  cf_public_build:

@@ -1,0 +1,40 @@
+app = "contenflow"
+primary_region = "gru"
+
+[build]
+  dockerfile = "Dockerfile"
+
+  [build.args]
+    VITE_REVERB_APP_KEY = "contenflow-key"
+    VITE_REVERB_HOST = "contenflow.fly.dev"
+
+[processes]
+  app = "php artisan octane:start --server=swoole --host=0.0.0.0 --port=8080"
+  queue = "php artisan queue:work --queue=publishing,publishing:notify,notifications,emails,high,default,low --tries=3 --timeout=90"
+  scheduler = "sh -c 'while true; do php artisan schedule:run --no-interaction; sleep 60; done'"
+
+[[services]]
+  protocol = "tcp"
+  internal_port = 8080
+  processes = ["app"]
+
+  [[services.ports]]
+    port = 80
+    handlers = ["http"]
+
+  [[services.ports]]
+    port = 443
+    handlers = ["tls", "http"]
+
+[[services.http_checks]]
+  interval = "30s"
+  method = "get"
+  path = "/up"
+  timeout = "5s"
+  grace_period = "1200s"
+
+[[vm]]
+  memory = "512mb"
+  cpu_kind = "shared"
+  cpus = 1
+  processes = ["app", "queue", "scheduler"]

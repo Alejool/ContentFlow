@@ -1,0 +1,172 @@
+{
+  "manageContent": {
+    "configureNetworks": "Configura tus publicaciones programadas",
+    "index": "Gestión de Contenido",
+    "title": "Gestión de Contenido",
+    "subtitle": "Organiza y gestiona tu contenido multimedia de forma elegante y eficiente",
+    "createNew": "Crear Nuevo",
+    "publications": "Publicaciones",
+    "campaigns": "Campañas",
+    "logs": "Registros",
+    "tabs": {
+      "publications": "Publicaciones",
+      "campaigns": "Campañas",
+      "calendar": "Calendario",
+      "logs": "Registros",
+      "approvals": "Aprobaciones"
+    },
+    "status": {
+      "all": "Todos",
+      "draft": "Borradores",
+      "scheduled": "Programados",
+      "pending_review": "Pendiente de Revisión",
+      "rejected": "Rechazados",
+      "published": "Publicados"
+    },
+    "socialMedia": {
+      "title": "Conecta tus Redes Sociales",
+      "description": "Conecta tus cuentas de redes sociales para permitir la publicación automática de contenido. Tu información se mantendrá segura y solo se utilizará para las funciones que autorices.",
+      "whyConnect": "¿Por qué conectar tus redes sociales?",
+      "connectedAccounts": "Cuentas Conectadas",
+      "of": "de",
+      "accounts": "cuentas",
+      "seeAccounts": "Ver redes",
+      "hide": "Ocultar",
+      "connected": "Conectado",
+      "notConnected": "No Conectada",
+      "connectToShare": "Conecta para comenzar a compartir",
+      "connectedBy": "Conectado por",
+      "benefits": {
+        "autoPublish": "Publicar contenido automáticamente",
+        "manageAll": "Gestionar todas las cuentas en un solo lugar",
+        "schedule": "Programar publicaciones para momentos óptimos",
+        "control": "Mantener el control total siempre"
+      },
+      "disclaimer": "Puedes desconectar tus cuentas en cualquier momento. No publicaremos nada sin tu permiso.",
+      "status": {
+        "connected": "Conectado",
+        "notConnected": "No Conectado",
+        "connectToShare": "Conecta para comenzar a compartir",
+        "connectedBy": "Conectado por"
+      },
+      "actions": {
+        "connect": "Conectar",
+        "disconnect": "Desconectar",
+        "processing": "Procesando..."
+      },
+      "validation": {
+        "facebook": {
+          "typeRequired": "Debes seleccionar un tipo de publicación para Facebook",
+          "typeInvalid": "Tipo de publicación inválido para Facebook"
+        },
+        "instagram": {
+          "typeRequired": "Debes seleccionar un tipo de publicación para Instagram",
+          "typeInvalid": "Tipo de publicación inválido para Instagram"
+        },
+        "twitter": {
+          "typeRequired": "Debes seleccionar un tipo de publicación para Twitter",
+          "pollOptionsMin": "Las encuestas requieren al menos 2 opciones",
+          "pollOptionEmpty": "Las opciones de la encuesta no pueden estar vacías"
+        },
+        "youtube": {
+          "typeRequired": "Debes seleccionar un tipo de video para YouTube",
+          "typeInvalid": "Tipo de video inválido para YouTube"
+        },
+        "tiktok": {
+          "typeRequired": "Formato requerido para TikTok",
+          "typeInvalid": "Formato inválido"
+        }
+      },
+      "messages": {
+        "settingsUpdated": {
+          "facebook": "Configuración de Facebook actualizada correctamente",
+          "instagram": "Configuración de Instagram actualizada correctamente",
+          "twitter": "Configuración de Twitter actualizada correctamente",
+          "tiktok": "Configuración de TikTok actualizada correctamente",
+          "youtube": "Configuración de YouTube actualizada correctamente",
+          "default": "Configuración actualizada correctamente"
+        },
+        "connectSuccess": "Cuenta conectada exitosamente",
+        "disconnectSuccess": "Cuenta desconectada exitosamente",
+        "authError": "Error de autenticación",
+        "unauthorized": "No autorizado. Por favor inicia sesión nuevamente.",
+        "loadError": "No se pudieron cargar las cuentas conectadas",
+        "disconnectError": "Error al desconectar",
+        "popupBlocked": "El navegador bloqueó la ventana emergente. Por favor permite ventanas emergentes para este sitio.",
+        "urlError": "No se pudo obtener la URL de autenticación",
+        "connectError": "Error al conectar con"
+      },
+      "disconnectModal": {
+        "title": "Advertencia de desconexión",
+        "warning": "Cuenta con publicaciones pendientes",
+        "explanation": "Esta cuenta tiene publicaciones programadas asociadas. Para desconectarla, debes eliminar estas publicaciones primero o forzar la desconexión.",
+        "table": {
+          "date": "Fecha",
+          "publication": "Publicación"
+        },
+        "cancelButton": "Mantener conectado",
+        "confirmButton": "Desconectar"
+      }
+    },
+    "modals": {
+      "add": {
+        "title": "Nueva Campaña",
+        "subtitle": "Crea una campaña impactante y atractiva",
+        "createButton": "Crear Campaña",
+        "creating": "Creando...",
+        "save": "Crear"
+      },
+      "edit": {
+        "title": "Editar Campaña",
+        "subtitle": "Actualiza tu campaña con nueva información",
+        "saveButton": "Guardar Cambios",
+        "saving": "Guardando...",
+        "save": "Actualizar"
+      },
+      "fields": {
+        "title": "Título de la Campaña",
+        "description": "Descripción",
+        "image": "Imagen de la Campaña",
+        "goal": "Objetivo de la Campaña",
+        "hashtags": "Hashtags",
+        "optional": "(Opcional)",
+        "schedulePublication": "Programar Publicación (Opcional)",
+        "optionalSchedule": "Dejar vacío para guardar como borrador o publicar inmediatamente.",
+        "selectSocialAccounts": "Seleccionar Redes Sociales",
+        "socialAccounts": "Seleccionar Redes Sociales",
+        "noConnectedAccounts": "No se encontraron cuentas conectadas.",
+        "alreadyScheduled": "Ya se programó una publicación para esta fecha.",
+        "placeholders": {
+          "title": "Ej: Campaña de Verano 2024",
+          "description": "Describe tu campaña de manera detallada y atractiva...",
+          "goal": "Ej: Aumentar el engagement en redes sociales",
+          "hashtags": "#marketing #campaña #verano2024"
+        },
+        "dragDrop": {
+          "title": "Arrastra tu imagen aquí o haz clic para seleccionar",
+          "subtitle": "JPG, PNG o WebP • Máximo 5MB"
+        }
+      },
+      "validation": {
+        "titleRequired": "El título es obligatorio",
+        "titleLength": "El título no puede exceder los 100 caracteres",
+        "descRequired": "La descripción es obligatoria",
+        "descMin": "La descripción debe tener al menos 10 caracteres",
+        "descMax": "La descripción no puede exceder los 200 caracteres",
+        "imageRequired": "La imagen es obligatoria",
+        "imageSize": "La imagen debe ser menor a 5MB",
+        "imageType": "Solo se permiten archivos JPG, PNG o WebP",
+        "objRequired": "El objetivo es obligatorio",
+        "objMin": "El objetivo debe tener al menos 5 caracteres",
+        "objMax": "El objetivo no puede exceder los 200 caracteres",
+        "hashtagsRequired": "Los hashtags son obligatorios",
+        "hashtagValid": "Debe incluir al menos un hashtag válido (#ejemplo)",
+        "hashtagMax": "Máximo 10 hashtags permitidos",
+        "confirmDeleteSchedule": "¿Estás seguro de que deseas eliminar esta publicación programada? Esta acción no se puede deshacer.",
+        "deleteScheduleTitle": "¿Eliminar publicación programada?",
+        "scheduleDeleted": "Publicación programada eliminada correctamente",
+        "scheduleDeleteError": "Error al eliminar la publicación programada"
+      }
+    }
+  }
+}

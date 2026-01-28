@@ -1,0 +1,50 @@
+{
+  "aiChat": {
+    "title": "AI Assistant",
+    "subtitle": "Intelligent recommendations for your campaigns",
+    "campaignsAvailable": "campaigns available",
+    "chatTitle": "Chat ContentFlow",
+    "online": "Online",
+    "thinking": "Thinking...",
+    "welcomeMessage": "Hi! I'm your AI assistant. How can I help you today?",
+    "inputPlaceholder": "Write your message...",
+    "enterToSend": "Enter to send",
+    "send": "Send",
+    "ideas": {
+      "title": "Ideas",
+      "panelTitle": "Campaign Ideas",
+      "visualMarketing": {
+        "title": "Visual Marketing",
+        "description": "Visual content generates 40% more engagement"
+      },
+      "sustainability": {
+        "title": "Sustainability",
+        "description": "Eco-friendly brands retain 25% more customers"
+      },
+      "microInfluencers": {
+        "title": "Micro-Influencers",
+        "description": "Higher conversion than celebrities"
+      },
+      "ugcContent": {
+        "title": "UGC Content",
+        "description": "Increases authenticity and reduces costs"
+      }
+    },
+    "stats": {
+      "active": "Active",
+      "total": "Total"
+    }
+  },
+  "aiAssistant": {
+    "welcomeMessage": "I am here to help you with your social media campaigns. You can ask me about creating new campaigns, improving existing ones, or analyzing your content performance.",
+    "error": "I apologize, but I encountered an error processing your request. Please try again later.",
+    "notEnabled": "AI service is not enabled or configured.",
+    "suggestion": "Suggestion",
+    "thinking": "Thinking...",
+    "askPlaceholder": "Ask about your campaigns...",
+    "buttonLabel": "Ask AI Assistant",
+    "headerTitle": "AI Assistant",
+    "subtitle": "Ask your AI assistant anything.",
+    "tips": "Tips"
+  }
+}

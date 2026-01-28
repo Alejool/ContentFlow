@@ -1,0 +1,128 @@
+{
+  "campaigns": {
+    "title": "Performance Summary",
+    "subtitle": "Analyze the impact and performance of your campaigns and publications.",
+    "noPublications": "No associated publications",
+    "scheduledPosts": "Scheduled Posts",
+    "create": "Create Campaign",
+    "table": {
+      "name": "Name",
+      "description": "Description",
+      "publications": "Publications",
+      "media": "Media",
+      "status": "Status",
+      "actions": "Actions",
+      "loading": "Loading...",
+      "timeline": "Timeline",
+      "performance": "Performance",
+      "emptyState": {
+        "title": "No campaigns found",
+        "description": "Create a campaign to start publishing content.",
+        "button": "Add Campaign"
+      }
+    },
+    "filters": {
+      "title": "Campaign Filters",
+      "all": "All",
+      "active": "Active",
+      "inactive": "Inactive",
+      "completed": "Completed",
+      "deleted": "Deleted",
+      "paused": "Paused"
+    },
+    "actions": {
+      "viewCampaign": "View Campaign",
+      "edit": "Edit",
+      "publishNow": "Publish Now",
+      "viewDetails": "View Details",
+      "delete": "Delete",
+      "active": "Active",
+      "remove": "Remove",
+      "change": "Change",
+      "showPublications": "Show publications",
+      "hidePublications": "Hide publications"
+    },
+    "messages": {
+      "fetchError": "Error fetching campaigns",
+      "addSuccess": "Campaign created successfully",
+      "addError": "Error creating campaign",
+      "updateSuccess": "Campaign updated successfully",
+      "updateError": "Error updating campaign",
+      "deleteSuccess": "Campaign deleted successfully",
+      "deleteError": "Error deleting campaign",
+      "success": "Success",
+      "error": "Error"
+    },
+    "modal": {
+      "sections": {
+        "details": "Campaign Details"
+      },
+      "add": {
+        "title": "Create Campaign",
+        "subtitle": "You can create a campaign to organize and publish your content.",
+        "name": "Campaign Name",
+        "description": "Description",
+        "goal": "Goal",
+        "budget": "Budget",
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "publications": "Publications",
+        "loadingPublications": "Loading publications...",
+        "noPublications": "No publications found. Create some first!",
+        "associatedPublicationsRequired": "Associated Publications is required",
+        "status": "Status",
+        "media": "Media",
+        "placeholders": {
+          "name": "e.g. Summer Campaign",
+          "description": "Brief campaign description",
+          "description_hint": "Maximum 200 characters",
+          "goal": "e.g. Increase social media reach",
+          "budget": "e.g. 1000.00",
+          "startDate": "Select start date",
+          "endDate": "Select end date"
+        }
+      },
+      "edit": {
+        "title": "Edit Campaign",
+        "subtitle": "Update your campaign information.",
+        "name": "Campaign Name",
+        "description": "Description",
+        "goal": "Goal",
+        "budget": "Budget",
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "associatedPublications": "Associated Publications",
+        "noPublications": "No publications found.",
+        "placeholders": {
+          "goal": "e.g. $1000.00",
+          "budget": "e.g. $1000.00"
+        }
+      },
+      "view": {
+        "title": "View Campaign",
+        "associatedPublications": "Associated Publications",
+        "goal": "Goal",
+        "hashtags": "Hashtags",
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "publishedOn": "Published On",
+        "created": "Created",
+        "lastUpdated": "Last Updated"
+      },
+      "validation": {
+        "nameRequired": "Name is required",
+        "nameLength": "Name must be less than 100 characters",
+        "descriptionRequired": "Description is required",
+        "descriptionLength": "Description must be less than 255 characters",
+        "goalRequired": "Goal is required",
+        "budgetRequired": "Budget is required",
+        "startDateRequired": "Start date is required",
+        "endDateRequired": "End date is required"
+      }
+    },
+    "button": {
+      "add": "Create Campaign",
+      "edit": "Save Changes"
+    }
+  }
+}

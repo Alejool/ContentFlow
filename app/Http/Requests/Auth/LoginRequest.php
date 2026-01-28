@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use App\Models\User; // Ensure the User model is imported
 
 class LoginRequest extends FormRequest
 {
@@ -37,19 +38,84 @@ class LoginRequest extends FormRequest
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function authenticate(): void
+    public function authenticate(): array
     {
         $this->ensureIsNotRateLimited();
+        $credentials = [
+            'email' => $this->input('email'),
+            'password' => $this->input('password')
+        ];
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
-            RateLimiter::hit($this->throttleKey());
+        $user = User::where('email', $credentials['email'])->first();
 
+        if (!$user) {
+            \Illuminate\Support\Facades\Log::warning('Login: User not found', ['email' => $credentials['email']]);
             throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
+                'email' => 'User not found in the system'
             ]);
         }
 
+        if (!Auth::attempt($credentials, true)) {
+            \Illuminate\Support\Facades\Log::warning('Login: Auth::attempt failed', ['email' => $credentials['email']]);
+            RateLimiter::hit($this->throttleKey());
+            throw ValidationException::withMessages([
+                'email' => 'These credentials do not match our records'
+            ]);
+        }
+
+        $this->updateSessionSecurity($user);
+
         RateLimiter::clear($this->throttleKey());
+        $request = request();
+        $request->session()->regenerate();
+
+        return [
+            'success' => true,
+            'user' => Auth::user(),
+            'redirect' => route('dashboard'),
+            'status' => 200
+        ];
+    }
+
+    /**
+     * Update user security tracking information.
+     */
+    protected function updateSessionSecurity(User $user): void
+    {
+        $request = request();
+        $previousIp = $user->last_login_ip;
+        $currentIp = $request->ip();
+
+        // Log IP change if needed
+        if ($previousIp && $previousIp !== $currentIp) {
+            \Illuminate\Support\Facades\Log::info('User login from new IP', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'old_ip' => $previousIp,
+                'new_ip' => $currentIp
+            ]);
+        }
+
+        // Device validation
+        $userAgent = $request->userAgent();
+        $fingerprint = hash('sha256', $userAgent);
+        $knownDevices = $user->known_devices ?? [];
+
+        if (!in_array($fingerprint, $knownDevices)) {
+            $knownDevices[] = $fingerprint;
+            \Illuminate\Support\Facades\Log::info('User login from new device', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'user_agent' => $userAgent
+            ]);
+        }
+
+        // Update user record
+        $user->forceFill([
+            'last_login_at' => now(),
+            'last_login_ip' => $currentIp,
+            'known_devices' => $knownDevices,
+        ])->save();
     }
 
     /**
@@ -59,7 +125,7 @@ class LoginRequest extends FormRequest
      */
     public function ensureIsNotRateLimited(): void
     {
-        if (! RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
+        if (! RateLimiter::tooManyAttempts($this->throttleKey(), 3)) {
             return;
         }
 
@@ -80,6 +146,6 @@ class LoginRequest extends FormRequest
      */
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('email')).'|'.$this->ip());
+        return Str::transliterate(Str::lower($this->string('email')) . '|' . $this->ip());
     }
 }

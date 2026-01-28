@@ -1,0 +1,358 @@
+﻿{
+  "publications": {
+    "title": "Publications",
+    "subtitle": "Manage your publications",
+    "modal": {
+      "sections": {
+        "details": "Content Details"
+      },
+      "media": {
+        "uploadingPending": "Uploading Pending",
+        "backgroundUpload": "Saved! Media is uploading in the background."
+      },
+      "upload": {
+        "uploadingFiles": "Uploading {{count}} file(s)...",
+        "uploadFailed": "Upload Failed",
+        "uploadsCompleted": "Uploads Completed",
+        "publishingSocial": "Publishing to social ({{count}})...",
+        "done": "Done",
+        "pending": "Pending",
+        "left": "left"
+      },
+      "show": {
+        "title": "Detailed View",
+        "subtitle": "View the campaign details",
+        "goal": "Goal",
+        "status": "Status",
+        "campaigns": "Campaigns",
+        "budget": "Budget",
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "publishDate": "Publish Date",
+        "publishedOn": "Published On",
+        "publications": "Publications",
+        "associatedPublications": "Associated Publications",
+        "accountMissingTitle": "Account Disconnected",
+        "accountMissingText": "This publication was posted on an account ({{account}}) that is no longer connected. Editing it will create a new version for your current account(s). Proceed?",
+        "created": "Created",
+        "lastUpdated": "Last Updated",
+        "selectSocialAccounts": "Select Accounts",
+        "lockedBySession": "Locked by Session",
+        "dragDrop": {
+          "title": "Drag and drop to sort",
+          "subtitle": "Upload your multimedia files here"
+        },
+        "placeholders": {
+          "title": "Title",
+          "description": "Description",
+          "hashtags": "Hashtags",
+          "schedulePublication": "Schedule Publication",
+          "goal": "Goal",
+          "startDate": "12/12/2025",
+          "endDate": "12/12/2026"
+        },
+        "button": {
+          "save": "Update",
+          "cancel": "Cancel"
+        },
+        "contentLocked": "Content Locked",
+        "contentLockedHint": "To edit the content (title, description or files), you must unpublish the post from all platforms.",
+        "lockedByOther": "Post locked by another user",
+        "locking": {
+          "sessionMessage": "You have this publication open on <1>{{browser}}</1>. Close the other session to edit here.",
+          "userMessage": "{{user}} is editing this publication <1>from {{browser}}</1>. Your changes cannot be saved to avoid conflicts."
+        }
+      },
+      "add": {
+        "title": "Add Publication",
+        "titleField": "Title",
+        "subtitle": "Create a publication",
+        "name": "Name",
+        "description": "Description",
+        "image": "Image",
+        "hashtags": "Hashtags",
+        "schedulePublication": "Schedule Publication",
+        "scheduled_at": "Scheduled Date",
+        "goal": "Goal",
+        "status": "Status",
+        "campaigns": "Campaigns",
+        "budget": "Budget",
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "publishDate": "Publish Date",
+        "publishedOn": "Published On",
+        "publications": "Publications",
+        "creating": "Creating",
+        "optionalSchedule": "Optional Schedule",
+        "selectSocialAccounts": "Select Accounts",
+        "associatedPublicationsRequired": "Associated Publications is required",
+        "dragDrop": {
+          "title": "Drag and drop to sort",
+          "subtitle": "Upload your multimedia files here"
+        },
+        "placeholders": {
+          "title": "Title",
+          "description": "Description",
+          "hashtags": "#marketing #publicidad #comunicación",
+          "schedulePublication": "Schedule Publication",
+          "goal": "Goal",
+          "startDate": "12/12/2025",
+          "endDate": "12/12/2026"
+        },
+        "button": {
+          "save": "Save",
+          "cancel": "Cancel"
+        }
+      },
+      "schedule": {
+        "title": "Date for all networks",
+        "description": "Set a single date to publish on all selected social networks at once.",
+        "placeholder": "Select date and time",
+        "instantWarning": "To publish now, use the Publish button after saving.",
+        "useGlobal": "Use global schedule settings"
+      },
+      "edit": {
+        "title": "Edit Publication",
+        "titleField": "Title",
+        "subtitle": "Update the existing publication",
+        "description": "Description",
+        "hashtags": "Hashtags",
+        "schedulePublication": "Schedule Publication",
+        "addCampaign": "Add Campaign",
+        "editCampaign": "Edit Campaign",
+        "deleteCampaign": "Delete Campaign",
+        "campaignTitle": "Campaign Title",
+        "name": "Name",
+        "image": "Image",
+        "campaigns": "Campaigns",
+        "goal": "Goal",
+        "status": "Status",
+        "budget": "Budget",
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "publishDate": "Publish Date",
+        "publishedOn": "Published On",
+        "associatedPublications": "Associated Publications",
+        "accountMissingTitle": "Account Disconnected",
+        "accountMissingText": "This publication was posted on an account ({{account}}) that is no longer connected. Editing it will create a new version for your current account(s). Proceed?",
+        "selectSocialAccounts": "Select Accounts",
+        "lockedBySession": "Locked by Session",
+        "dragDrop": {
+          "title": "Drag and drop to sort",
+          "subtitle": "Upload your multimedia files here"
+        },
+        "placeholders": {
+          "title": "Title",
+          "description": "Description",
+          "hashtags": "Hashtags",
+          "schedulePublication": "Schedule Publication",
+          "goal": "Goal",
+          "startDate": "12/12/2025",
+          "endDate": "12/12/2026"
+        },
+        "button": {
+          "save": "Update",
+          "cancel": "Cancel"
+        },
+        "configurationLocked": "Configuration Locked",
+        "configurationLockedHint": "You need approval to configure networks and scheduling. Please request a review first.",
+        "configurationLockedHintAdmin": "You must approve the publication before configuring networks.",
+        "contentLocked": "Content Locked",
+        "contentLockedHint": "To edit the content (title, description or files), you must unpublish the post from all platforms.",
+        "lockedByOther": "Post locked by another user",
+        "locking": {
+          "sessionMessage": "You have this publication open on <1>{{browser}}</1>. Close the other session to edit here.",
+          "userMessage": "{{user}} is editing this publication <1>from {{browser}}</1>. Your changes cannot be saved to avoid conflicts."
+        }
+      },
+      "approvals": {
+        "noPending": "No pending approvals",
+        "noPendingDesc": "Great! All publications are up to date.",
+        "approve": "Approve",
+        "approvedSuccess": "Publication approved successfully",
+        "title": "Approvals",
+        "historyTitle": "Approval History",
+        "historySubtitle": "Logs of status changes and reviews",
+        "date": "Date",
+        "user": "User",
+        "publication": "Publication",
+        "actions": "Actions"
+      },
+      "publish": {
+        "title": "Publish",
+        "selectPlatforms": "Select Platforms",
+        "selectAll": "Select All",
+        "deselectAll": "Deselect All",
+        "noConnectedAccounts": "No accounts found.",
+        "connectAccounts": "Please connect your accounts first.",
+        "published": "Published",
+        "loading": "Loading...",
+        "publishing": "Publishing...",
+        "platforms": "Platforms",
+        "failed": "Failed",
+        "scheduled": "scheduled",
+        "removed": "Removed",
+        "youtube": {
+          "youtubeThumbnails": "YouTube Thumbnails"
+        },
+        "dragDrop": {
+          "title": "Drag and drop to add",
+          "subtitle": "PNG, JPG, WebP (max 2MB)"
+        },
+        "modal": {
+          "title": "Unpublish ",
+          "message": "Are you sure you want to unpublish? This will remove the publication from this platform.",
+          "confirmText": "Unpublish",
+          "cancelText": "Cancel"
+        },
+        "button": {
+          "publish": "Publish",
+          "requestApproval": "Request Approval",
+          "pendingReview": "Pending Approval",
+          "approve": "Approve",
+          "reject": "Reject",
+          "cancel": "Cancel",
+          "change": "Change"
+        },
+        "pendingReviewBanner": {
+          "title": "Publication Under Review",
+          "message": "This publication has already been sent for review. An administrator must approve it before it can be published."
+        },
+        "rejectedBanner": {
+          "title": "Publication Rejected",
+          "message": "This publication has been rejected by {{name}}.",
+          "footer": "Please make the necessary adjustments and resubmit for review."
+        }
+      },
+      "preview": {
+        "title": "Preview",
+        "simulated": "Simulated",
+        "real": "Real",
+        "realInfo": "Real Preview",
+        "view": "View preview",
+        "notAvailable": "Preview not available for this platform"
+      },
+      "validation": {
+        "descRequired": "Description is required",
+        "nameRequired": "Name is required",
+        "descMin": "Description must be at least 10 characters long",
+        "descMax": "Description cannot exceed 200 characters",
+        "objMin": "Objective must be at least 5 characters long",
+        "objMax": "Objective cannot exceed 200 characters",
+        "objRequired": "Objective is required",
+        "goalRequired": "Goal is required",
+        "titleRequired": "Title is required",
+        "titleLength": "Title must be at least 70 characters long",
+        "statusRequired": "Status is required",
+        "budgetRequired": "Budget is required",
+        "startDateRequired": "Start Date is required",
+        "endDateRequired": "End Date is required",
+        "publishDateRequired": "Publish Date is required",
+        "publishedOnRequired": "Published On is required",
+        "associatedPublicationsRequired": "Associated Publications is required",
+        "hashtagsRequired": "Hashtags is required",
+        "schedulePublicationRequired": "Schedule Publication is required",
+        "descriptionLength": "Description must be at least 10 characters long",
+        "hashtagsLength": "Hashtags must be at least 10 characters long",
+        "schedulePublicationLength": "Schedule Publication must be at least 10 characters long",
+        "imageRequired": "Image is required",
+        "hashtagValid": "Hashtag must be valid",
+        "hashtagMax": "Hashtag must be at least 10 characters long",
+        "scheduleDateRequired": "Please select a date to schedule on the selected networks or uncheck the schedule option",
+        "scheduleRequired": "You must schedule a date for all selected networks or set a global date.",
+        "scheduledAtRequired": "Scheduled date is required when you select social networks",
+        "socialAccountsRequired": "Please select at least one social media account",
+        "singleVideo": "You can only upload one video per publication."
+      },
+      "cancel_confirmation": {
+        "title": "Cancel Publication",
+        "message": "Are you sure you want to cancel this publication? Social media broadcasting will stop.",
+        "confirm": "Yes, cancel",
+        "cancel": "No, continue"
+      }
+    },
+    "status": {
+      "draft": "Draft",
+      "publishing": "Publishing",
+      "published": "Published",
+      "scheduled": "Scheduled",
+      "failed": "Failed",
+      "pending_review": "Pending Review",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "instant": "Instant",
+      "deleted": "Deleted"
+    },
+    "button": {
+      "add": "Add Publication",
+      "edit": "Edit Publication",
+      "delete": "Delete Publication",
+      "close": "Close"
+    },
+    "table": {
+      "name": "Name",
+      "description": "Description",
+      "publications": "Publications",
+      "media": "Media",
+      "campaign": "Campaign",
+      "status": "Status",
+      "actions": "Actions",
+      "noCampaign": "No Campaign",
+      "noPlatforms": "No platforms configured",
+      "loading": "Loading...",
+      "linkedAccount": "Linked Accounts",
+      "emptyState": {
+        "title": "No publications found",
+        "description": "Create a publication to start publishing content.",
+        "button": "Add Publication"
+      },
+      "lockedBy": "Locked by:",
+      "publishingBy": "Publishing by",
+      "rejectedBy": "Rejected by"
+    },
+    "messages": {
+      "addSuccess": "Publication added successfully!",
+      "createSuccess": "Publication created successfully!",
+      "addError": "Error adding publication",
+      "updateSuccess": "Publication updated successfully!",
+      "updateError": "Error updating publication",
+      "mediaAttached": "Media file attached successfully to '{{title}}' (Background Upload)",
+      "deleteSuccess": "Publication deleted successfully!",
+      "deleteError": "Error deleting publication",
+      "fetchError": "Error fetching campaigns",
+      "error": "An unexpected error occurred",
+      "confirmDelete": {
+        "title": "Are you sure?",
+        "text": "You won't be able to revert this!",
+        "confirmButton": "Yes, delete it!",
+        "cancelButton": "Cancel"
+      }
+    },
+    "actions": {
+      "viewCampaign": "View publication",
+      "edit": "Edit",
+      "publishNow": "Publish Now",
+      "viewDetails": "View Details",
+      "delete": "Delete",
+      "active": "Active",
+      "remove": "Remove",
+      "change": "Change"
+    },
+    "headers": {
+      "status": "Status",
+      "duration": "Duration",
+      "mediaFiles": "Media Files",
+      "actions": "Actions"
+    },
+    "filters": {
+      "title": "Publications Filters",
+      "all": "All",
+      "published": "Published",
+      "draft": "Draft"
+    },
+    "gallery": {
+      "sendingToSocial": "Sending to social platforms...",
+      "processing": "Processing in background..."
+    }
+  }
+}

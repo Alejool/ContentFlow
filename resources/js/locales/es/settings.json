@@ -1,0 +1,11 @@
+﻿{
+  "settings": {
+    "social": {
+      "title": "Configuración Global de Redes Sociales",
+      "subtitle": "Configura los ajustes por defecto que se aplicarán a todas tus nuevas publicaciones en las diferentes plataformas.",
+      "save": "Guardar Configuración Global",
+      "success": "Configuración global guardada exitosamente",
+      "error": "Error al guardar la configuración global"
+    }
+  }
+}
