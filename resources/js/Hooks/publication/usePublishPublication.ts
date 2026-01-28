@@ -42,6 +42,7 @@ export interface UsePublishPublicationReturn extends PublishPublicationState {
     publication: Publication,
     platformSettings?: Record<string, any>,
   ) => Promise<boolean>;
+  handleCancelPublication: (publicationId: number) => Promise<void>;
   setYoutubeThumbnails: React.Dispatch<
     React.SetStateAction<Record<number, File | null>>
   >;
@@ -377,8 +378,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
 
         Object.entries(youtubeThumbnails).forEach(([videoId, file]) => {
           if (file) {
-            formData.append("youtube_thumbnails[]", file);
-            formData.append("youtube_thumbnail_video_ids[]", videoId);
+            formData.append(`thumbnails[${videoId}]`, file);
           }
         });
 
@@ -400,6 +400,13 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
         }
 
         toast.success("Publishing started");
+
+        // Immediate local state update for faster UI response
+        usePublicationStore
+          .getState()
+          .setPublishingPlatforms(publication.id, selectedPlatforms);
+
+        window.dispatchEvent(new CustomEvent("publication-started"));
         setYoutubeThumbnails({});
         return true;
       } catch {
@@ -470,6 +477,17 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
     }
   }, []);
 
+  const handleCancelPublication = useCallback(async (publicationId: number) => {
+    try {
+      await axios.post(route("api.v1.publications.cancel", publicationId));
+      toast.success("Publicación cancelada");
+      usePublicationStore.getState().fetchPublicationById(publicationId);
+    } catch (err) {
+      console.error("Failed to cancel publication", err);
+      toast.error("Error al cancelar la publicación");
+    }
+  }, []);
+
   /* ------------------------------- RETURN ----------------------------------- */
 
   return {
@@ -496,6 +514,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
     deselectAll,
     isYoutubeSelected,
     handlePublish,
+    handleCancelPublication,
     handleRequestReview,
     handleApprove,
     handleReject,
@@ -510,38 +529,3 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
     resetState,
   };
 };
-
-export interface UsePublishPublicationReturn extends PublishPublicationState {
-  connectedAccounts: SocialAccount[];
-  activeAccounts: SocialAccount[];
-  fetchPublishedPlatforms: (publicationId: number) => Promise<void>;
-  loadExistingThumbnails: (publication: Publication) => Promise<void>;
-  handleUnpublish: (
-    publicationId: number,
-    accountId: number,
-    platform: string,
-  ) => Promise<boolean>;
-  togglePlatform: (accountId: number) => void;
-  selectAll: () => void;
-  deselectAll: () => void;
-  isYoutubeSelected: () => boolean;
-  handlePublish: (
-    publication: Publication,
-    platformSettings?: Record<string, any>,
-  ) => Promise<boolean>;
-  handleThumbnailDelete: (videoId: number) => void;
-  handleRequestReview: (
-    publicationId: number,
-    settings?: any,
-  ) => Promise<boolean>;
-  handleApprove: (publicationId: number) => Promise<any>;
-  handleReject: (publicationId: number) => Promise<boolean>;
-  setYoutubeThumbnails: React.Dispatch<
-    React.SetStateAction<Record<number, File | null>>
-  >;
-  setExistingThumbnails: React.Dispatch<
-    React.SetStateAction<Record<number, { url: string; id: number }>>
-  >;
-  setUnpublishing: React.Dispatch<React.SetStateAction<number | null>>;
-  resetState: () => void;
-}
