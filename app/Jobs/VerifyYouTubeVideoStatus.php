@@ -68,7 +68,7 @@ class VerifyYouTubeVideoStatus implements ShouldQueue
       // If still 'uploaded' but not processed, we wait for next retry
       if ($uploadStatus === 'uploaded') {
         Log::info('YouTube Video still processing...', ['video_id' => $videoId]);
-        throw new \Exception("Video still processing on YouTube..."); // Trigger retry
+        throw new \Exception("Video still processing on YouTube..."); 
       }
     } catch (\Exception $e) {
       Log::error('VerifyYouTubeVideoStatus error', ['error' => $e->getMessage()]);
