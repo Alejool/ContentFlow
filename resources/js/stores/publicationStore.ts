@@ -214,15 +214,75 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
     })),
 
   updatePublication: (id, updated) =>
-    set((state) => ({
-      publications: state.publications.map((p) =>
-        p.id === id ? { ...p, ...updated } : p,
-      ),
-      currentPublication:
-        state.currentPublication?.id === id
-          ? { ...state.currentPublication, ...updated }
-          : state.currentPublication,
-    })),
+    set((state) => {
+      // 1. Process social_post_logs if they are part of the update
+      // This ensures that platform status caches (published, publishing, etc.)
+      // are always in sync with the latest data from Echo or API.
+      const logs = updated.social_post_logs || (updated as any).socialPostLogs;
+
+      const newPlatformStatusUpdates: Partial<PublicationState> = {};
+
+      if (logs && Array.isArray(logs)) {
+        const published: number[] = [];
+        const failed: number[] = [];
+        const publishing: number[] = [];
+        const removed: number[] = [];
+        const scheduled: number[] = [];
+
+        // Determine which social accounts have pending scheduled posts
+        // to avoid marking them as "available" prematurely
+        const publication = state.publications.find((p) => p.id === id);
+        const scheduledIds = new Set(
+          publication?.scheduled_posts
+            ?.filter((sp) => sp.status === "pending")
+            .map((sp) => sp.social_account_id) || [],
+        );
+
+        logs.forEach((log: any) => {
+          if (scheduledIds.has(log.social_account_id)) return;
+
+          const status = log.status;
+          if (status === "published" || status === "success") {
+            published.push(log.social_account_id);
+          } else if (status === "failed") {
+            failed.push(log.social_account_id);
+          } else if (status === "publishing" || status === "pending") {
+            // Include 'pending' as publishing because it means it's in the queue or initializing
+            publishing.push(log.social_account_id);
+          } else if (status === "removed_on_platform" || status === "deleted") {
+            removed.push(log.social_account_id);
+          }
+        });
+
+        newPlatformStatusUpdates.publishedPlatforms = {
+          ...state.publishedPlatforms,
+          [id]: Array.from(new Set(published)),
+        };
+        newPlatformStatusUpdates.failedPlatforms = {
+          ...state.failedPlatforms,
+          [id]: Array.from(new Set(failed)),
+        };
+        newPlatformStatusUpdates.publishingPlatforms = {
+          ...state.publishingPlatforms,
+          [id]: Array.from(new Set(publishing)),
+        };
+        newPlatformStatusUpdates.removedPlatforms = {
+          ...state.removedPlatforms,
+          [id]: Array.from(new Set(removed)),
+        };
+      }
+
+      return {
+        ...newPlatformStatusUpdates,
+        publications: state.publications.map((p) =>
+          p.id === id ? { ...p, ...updated } : p,
+        ),
+        currentPublication:
+          state.currentPublication?.id === id
+            ? { ...state.currentPublication, ...updated }
+            : state.currentPublication,
+      };
+    }),
 
   removePublication: (id) =>
     set((state) => ({

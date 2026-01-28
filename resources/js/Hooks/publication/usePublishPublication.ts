@@ -305,25 +305,43 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
 
   /* ---------------------------- Platform selection -------------------------- */
 
-  const togglePlatform = useCallback((accountId: number) => {
-    setSelectedPlatforms((prev) =>
-      prev.includes(accountId)
-        ? prev.filter((id) => id !== accountId)
-        : [...prev, accountId],
-    );
-  }, []);
+  const togglePlatform = useCallback(
+    (accountId: number) => {
+      // Prevent toggling if platform is already published, publishing, or scheduled
+      if (
+        publishedPlatforms.includes(accountId) ||
+        publishingPlatforms.includes(accountId) ||
+        scheduledPlatforms.includes(accountId)
+      ) {
+        return;
+      }
+
+      setSelectedPlatforms((prev) =>
+        prev.includes(accountId)
+          ? prev.filter((id) => id !== accountId)
+          : [...prev, accountId],
+      );
+    },
+    [publishedPlatforms, publishingPlatforms, scheduledPlatforms],
+  );
 
   const selectAll = useCallback(() => {
-    const published = currentPublicationId
-      ? publishedPlatformsCache[currentPublicationId] || []
-      : [];
-
     setSelectedPlatforms(
       activeAccounts
-        .filter((acc) => !published.includes(acc.id))
+        .filter(
+          (acc) =>
+            !publishedPlatforms.includes(acc.id) &&
+            !publishingPlatforms.includes(acc.id) &&
+            !scheduledPlatforms.includes(acc.id),
+        )
         .map((acc) => acc.id),
     );
-  }, [activeAccounts, currentPublicationId, publishedPlatformsCache]);
+  }, [
+    activeAccounts,
+    publishedPlatforms,
+    publishingPlatforms,
+    scheduledPlatforms,
+  ]);
 
   const deselectAll = useCallback(() => {
     setSelectedPlatforms([]);
