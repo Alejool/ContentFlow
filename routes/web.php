@@ -184,7 +184,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/', [WorkspaceController::class, 'store'])->name('store');
     Route::get('{workspace}/settings', [WorkspaceController::class, 'settings'])->name('settings');
     Route::get('{workspace}', [WorkspaceController::class, 'show'])->name('show');
-    Route::get('{workspace}/switch', [WorkspaceController::class, 'switch'])->name('switch');
+    Route::post('{workspace}/switch', [WorkspaceController::class, 'switch'])->name('switch');
     Route::put('{workspace}', [WorkspaceController::class, 'update'])->name('update');
     Route::delete('{workspace}', [WorkspaceController::class, 'destroy'])->name('destroy');
   });

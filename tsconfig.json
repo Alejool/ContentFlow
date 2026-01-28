@@ -4,7 +4,7 @@
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "jsx": "react-jsx",
     "module": "ESNext",
-    "moduleResolution": "bundler", // o "node16" / "nodenext"
+    "moduleResolution": "bundler",
     "allowJs": true,
     "strict": true,
     "noEmit": true,

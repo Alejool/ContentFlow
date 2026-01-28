@@ -15,7 +15,7 @@ export const ThemeContext = createContext<ThemeContextType | undefined>(
 
 interface ThemeProviderProps {
   children: ReactNode;
-  initialTheme?: Theme; // Prop opcional para el tema inicial
+  initialTheme?: Theme;
   isAuthenticated?: boolean;
 }
 
@@ -26,7 +26,6 @@ export function ThemeProvider({
 }: ThemeProviderProps) {
   const [theme, setThemeState] = useState<Theme>(initialTheme || "light");
 
-  // Inicializar el tema solo en el cliente
   useEffect(() => {
     const initializeTheme = () => {
       // Priority if authenticated: 1. initialTheme (from DB), 2. localStorage, 3. system preference
