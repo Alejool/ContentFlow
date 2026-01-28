@@ -1,4 +1,5 @@
 *.sqlite*
 
 *.sql
-complete_structure.sql
+database/complete_structure.sql
+database/testing.sqlite

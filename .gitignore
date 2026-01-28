@@ -33,13 +33,17 @@ package-lock.json
 .env.example
 .qodo
 
+.env
+.env.production
+.env.local
+database.sqlite
+backups/*.sql
+dump.sql
 
 
 .env.docker
 .env.local
-docker-compose.yml
 docker-compose.override.yml
-Dockerfile
 docker/entrypoint.sh
 docker/entrypoint-dev.sh
 docker/nginx/nginx.conf
@@ -56,3 +60,12 @@ nginx.conf.dist
 dev.ini
 supervisor
 nginx
+
+
+
+fix-db-route.php
+debug_owner.php
+debug_accounts.php
+test_relationships.php
+verify_db.php
+
