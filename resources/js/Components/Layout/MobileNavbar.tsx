@@ -1,8 +1,10 @@
 import Logo from "@/../assets/logo-with-name.png";
+import Button from "@/Components/common/Modern/Button";
 import LanguageSwitcher from "@/Components/common/ui/LanguageSwitcher";
 import ResponsiveNavLink from "@/Components/common/ui/ResponsiveNavLink";
 import ThemeSwitcher from "@/Components/common/ui/ThemeSwitcher";
 import { useTheme } from "@/Hooks/useTheme";
+import { Link } from "@inertiajs/react";
 import {
   BarChart3,
   X as CloseIcon,
@@ -63,7 +65,12 @@ export default function MobileNavbar({
       <div className="w-full mx-auto max-w-7xl">
         <div className="flex h-16 justify-between items-center px-4">
           <div className="flex items-center">
-            <button
+            <Button
+              variant="ghost"
+              buttonStyle="icon"
+              size="md"
+              shadow="none"
+              rounded="lg"
               onClick={() =>
                 setShowingNavigationDropdown(!showingNavigationDropdown)
               }
@@ -82,7 +89,7 @@ export default function MobileNavbar({
               ) : (
                 <Menu className="h-6 w-6" />
               )}
-            </button>
+            </Button>
           </div>
 
           <div className="flex-1 flex justify-center">
@@ -138,22 +145,29 @@ export default function MobileNavbar({
             className={`pt-4 mt-4 border-t ${theme === "dark" ? "border-neutral-800" : "border-gray-100"}`}
           >
             <div className="flex items-center justify-between gap-4">
-              <ResponsiveNavLink
+              <Link
                 href={route("logout")}
                 method="post"
                 as="button"
-                className={`flex-1 flex items-center justify-center space-x-3 px-4 py-3 rounded-lg border transition-all duration-300 font-bold
+                className="flex-1"
+              >
+                <Button
+                  variant="danger"
+                  buttonStyle="ghost"
+                  fullWidth
+                  className={`flex items-center justify-center space-x-3 px-4 py-3 rounded-lg border transition-all duration-300 font-bold
                     ${
                       theme === "dark"
                         ? "bg-neutral-800 border-neutral-700 text-red-400 hover:bg-red-900/20"
                         : "bg-gray-50 border-gray-200 text-red-600 hover:bg-red-50"
                     }`}
-              >
-                <LogOut className="h-5 w-5" />
-                <span>{t("nav.logout")}</span>
-              </ResponsiveNavLink>
+                  icon={<LogOut className="h-5 w-5" />}
+                >
+                  <span>{t("nav.logout")}</span>
+                </Button>
+              </Link>
 
-              <div className="flex items-center bg-gray-100 dark:bg-neutral-800 rounded-lg p-1">
+              <div className="flex items-center gap-1">
                 <ThemeSwitcher />
                 <LanguageSwitcher />
               </div>

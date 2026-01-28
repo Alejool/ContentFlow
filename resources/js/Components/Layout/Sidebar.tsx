@@ -1,8 +1,9 @@
 import Logo from "@/../assets/logo.png";
+import WorkspaceSwitcher from "@/Components/Workspace/WorkspaceSwitcher";
+import Button from "@/Components/common/Modern/Button";
 import LanguageSwitcher from "@/Components/common/ui/LanguageSwitcher";
 import NavLink from "@/Components/common/ui/NavLink";
 import ThemeSwitcher from "@/Components/common/ui/ThemeSwitcher";
-import WorkspaceSwitcher from "@/Components/Workspace/WorkspaceSwitcher";
 import { useTheme } from "@/Hooks/useTheme";
 import { Link, usePage } from "@inertiajs/react";
 import {
@@ -161,7 +162,11 @@ export default function Sidebar({
               )}
             </Link>
 
-            <button
+            <Button
+              variant="ghost"
+              buttonStyle="icon"
+              size="sm"
+              shadow="none"
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
               className={`p-2 rounded-lg transition-colors duration-200 ${classes.buttonHoverBg} ${classes.textColor}`}
             >
@@ -182,7 +187,7 @@ export default function Sidebar({
                   }`}
                 />
               )}
-            </button>
+            </Button>
           </div>
 
           <WorkspaceSwitcher isSidebarOpen={isSidebarOpen} />
