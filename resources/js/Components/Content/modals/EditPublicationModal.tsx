@@ -110,6 +110,8 @@ const EditPublicationModal = ({
     isS3Uploading: uploading,
     isAnyMediaProcessing,
     remoteLock,
+    publishedAccountIds,
+    publishingAccountIds,
   } = usePublicationForm({
     publication,
     onClose,
@@ -159,22 +161,6 @@ const EditPublicationModal = ({
   const hasPublishedPlatform = useMemo(() => {
     return publication?.social_post_logs?.some(
       (log: any) => log.status === "published",
-    );
-  }, [publication]);
-
-  const publishedAccountIds = useMemo(() => {
-    return (
-      publication?.social_post_logs
-        ?.filter((log: any) => log.status === "published")
-        .map((log: any) => log.social_account_id) || []
-    );
-  }, [publication]);
-
-  const publishingAccountIds = useMemo(() => {
-    return (
-      publication?.social_post_logs
-        ?.filter((log: any) => log.status === "publishing")
-        .map((log: any) => log.social_account_id) || []
     );
   }, [publication]);
 

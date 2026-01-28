@@ -232,13 +232,13 @@ export const usePublicationForm = ({
     if (isOpen && publication) {
       startTransition(() => {
         // Process scheduled posts and social accounts
-        const publishedAccountIds = new Set(
+        const calculatedPublished = new Set(
           publication.social_post_logs
             ?.filter((l) => l.status === "published")
             .map((l) => l.social_account_id) || [],
         );
 
-        const publishingAccountIds = new Set(
+        const calculatedPublishing = new Set(
           publication.social_post_logs
             ?.filter(
               (l) =>
@@ -250,6 +250,9 @@ export const usePublicationForm = ({
             )
             .map((l) => l.social_account_id) || [],
         );
+
+        setPublishedAccountIds(Array.from(calculatedPublished));
+        setPublishingAccountIds(Array.from(calculatedPublishing));
 
         const pendingSocialAccounts = Array.from(
           new Set(
@@ -275,7 +278,7 @@ export const usePublicationForm = ({
             if (
               sp.social_account_id &&
               sp.scheduled_at &&
-              !publishedAccountIds.has(sp.social_account_id)
+              !calculatedPublished.has(sp.social_account_id)
             ) {
               initialAccountSchedules[sp.social_account_id] = sp.scheduled_at;
             }

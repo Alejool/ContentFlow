@@ -64,6 +64,7 @@ export default function AddPublicationModal({
     control,
     remoteLock,
     publishingAccountIds,
+    publishedAccountIds,
     publication,
   } = usePublicationForm({
     onClose,
@@ -325,6 +326,7 @@ export default function AddPublicationModal({
 
                 <SocialAccountsSection
                   publishingAccountIds={publishingAccountIds}
+                  publishedAccountIds={publishedAccountIds}
                   socialAccounts={socialAccounts as any}
                   selectedAccounts={watched.social_accounts || []}
                   accountSchedules={accountSchedules}
@@ -555,7 +557,7 @@ export default function AddPublicationModal({
                         const id = (publication as any)?.id;
                         if (id) {
                           await axios.post(
-                            route("api/v1/publications/cancel", id),
+                            route("api.v1.publications.cancel", id),
                           );
                           toast.success("Publicación cancelada");
                           handleClose();
