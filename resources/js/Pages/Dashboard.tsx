@@ -60,7 +60,7 @@ export default function Dashboard({
   period = 30,
 }: DashboardProps) {
   const { t } = useTranslation();
-  const { theme } = useTheme();
+  const { theme } = useTheme() as { theme: "light" | "dark" | undefined };
   const [pubStats, setPubStats] = useState<Record<string, number>>(
     stats.publicationStats || {},
   );
@@ -494,131 +494,70 @@ export default function Dashboard({
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Link
-            href="/campaigns"
-            className={`group relative overflow-hidden rounded-lg p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${
-              theme === "dark"
-                ? "bg-gradient-to-r from-blue-900/40 to-blue-800/40 border border-blue-800/30"
-                : "bg-gradient-to-r from-blue-500 to-blue-600"
-            }`}
-          >
-            <div
-              className={`p-3 rounded-lg inline-block mb-4 ${
-                theme === "dark" ? "bg-blue-900/30" : "bg-white/20"
-              }`}
-            >
-              <Calendar
-                className={`w-6 h-6 ${
-                  theme === "dark" ? "text-blue-400" : "text-white"
-                }`}
-              />
-            </div>
-            <h3
-              className={`text-lg font-semibold mb-2 ${
-                theme === "dark" ? "text-white" : "text-white"
-              }`}
-            >
-              {t("dashboard.quickActions.campaigns.title")}
-            </h3>
-            <p
-              className={`text-sm ${
-                theme === "dark" ? "text-blue-300/80" : "text-blue-100"
-              }`}
-            >
-              {t("dashboard.quickActions.campaigns.description")}
-            </p>
-            <div
-              className={`absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ${
+          {[
+            {
+              href: "/campaigns",
+              icon: Calendar,
+              title: t("dashboard.quickActions.campaigns.title"),
+              desc: t("dashboard.quickActions.campaigns.description"),
+              color: "blue",
+            },
+            {
+              href: "/analytics",
+              icon: BarChart3,
+              title: t("dashboard.quickActions.analytics.title"),
+              desc: t("dashboard.quickActions.analytics.description"),
+              color: "purple",
+            },
+            {
+              href: "/ManageContent",
+              icon: FileText,
+              title: t("dashboard.quickActions.content.title"),
+              desc: t("dashboard.quickActions.content.description"),
+              color: "green",
+            },
+          ].map((action, idx) => (
+            <Link
+              key={idx}
+              href={action.href}
+              className={`group relative overflow-hidden rounded-xl p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${
                 theme === "dark"
-                  ? "bg-gradient-to-r from-transparent via-white/5 to-transparent"
-                  : "bg-gradient-to-r from-transparent via-white/10 to-transparent"
+                  ? "bg-neutral-800/40 backdrop-blur-md border border-neutral-700/50 hover:bg-neutral-800/60"
+                  : "bg-white border border-gray-100 shadow-sm hover:border-gray-200"
               }`}
-            ></div>
-          </Link>
+            >
+              <div
+                className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110 ${
+                  theme === "dark"
+                    ? `bg-${action.color}-900/20 text-${action.color}-400`
+                    : `bg-${action.color}-50 text-${action.color}-600`
+                }`}
+              >
+                <action.icon className="w-6 h-6" />
+              </div>
+              <h3
+                className={`text-lg font-bold mb-2 ${
+                  theme === "dark" ? "text-white" : "text-gray-900"
+                }`}
+              >
+                {action.title}
+              </h3>
+              <p
+                className={`text-sm leading-relaxed ${getTextColor("secondary")}`}
+              >
+                {action.desc}
+              </p>
 
-          <Link
-            href="/analytics"
-            className={`group relative overflow-hidden rounded-lg p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${
-              theme === "dark"
-                ? "bg-gradient-to-r from-purple-900/40 to-purple-800/40 border border-purple-800/30"
-                : "bg-gradient-to-r from-purple-500 to-purple-600"
-            }`}
-          >
-            <div
-              className={`p-3 rounded-lg inline-block mb-4 ${
-                theme === "dark" ? "bg-purple-900/30" : "bg-white/20"
-              }`}
-            >
-              <BarChart3
-                className={`w-6 h-6 ${
-                  theme === "dark" ? "text-purple-400" : "text-white"
+              {/* Subtle hover indicator */}
+              <div
+                className={`absolute bottom-0 left-0 h-1 transition-all duration-300 ${
+                  theme === "dark"
+                    ? `bg-${action.color}-500/50 w-0 group-hover:w-full`
+                    : `bg-${action.color}-500 w-0 group-hover:w-full`
                 }`}
               />
-            </div>
-            <h3
-              className={`text-lg font-semibold mb-2 ${
-                theme === "dark" ? "text-white" : "text-white"
-              }`}
-            >
-              {t("dashboard.quickActions.analytics.title")}
-            </h3>
-            <p
-              className={`text-sm ${
-                theme === "dark" ? "text-purple-300/80" : "text-purple-100"
-              }`}
-            >
-              {t("dashboard.quickActions.analytics.description")}
-            </p>
-            <div
-              className={`absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ${
-                theme === "dark"
-                  ? "bg-gradient-to-r from-transparent via-white/5 to-transparent"
-                  : "bg-gradient-to-r from-transparent via-white/10 to-transparent"
-              }`}
-            ></div>
-          </Link>
-
-          <Link
-            href="/ManageContent"
-            className={`group relative overflow-hidden rounded-lg p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${
-              theme === "dark"
-                ? "bg-gradient-to-r from-green-900/40 to-green-800/40 border border-green-800/30"
-                : "bg-gradient-to-r from-green-500 to-green-600"
-            }`}
-          >
-            <div
-              className={`p-3 rounded-lg inline-block mb-4 ${
-                theme === "dark" ? "bg-green-900/30" : "bg-white/20"
-              }`}
-            >
-              <FileText
-                className={`w-6 h-6 ${
-                  theme === "dark" ? "text-green-400" : "text-white"
-                }`}
-              />
-            </div>
-            <h3
-              className={`text-lg font-semibold mb-2 ${
-                theme === "dark" ? "text-white" : "text-white"
-              }`}
-            >
-              {t("dashboard.quickActions.content.title")}
-            </h3>
-            <p
-              className={`text-sm ${
-                theme === "dark" ? "text-green-300/80" : "text-green-100"
-              }`}
-            >
-              {t("dashboard.quickActions.content.description")}
-            </p>
-            <div
-              className={`absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ${
-                theme === "dark"
-                  ? "bg-gradient-to-r from-transparent via-white/5 to-transparent"
-                  : "bg-gradient-to-r from-transparent via-white/10 to-transparent"
-              }`}
-            ></div>
-          </Link>
+            </Link>
+          ))}
         </div>
       </div>
     </AuthenticatedLayout>
