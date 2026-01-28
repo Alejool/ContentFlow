@@ -1,5 +1,6 @@
+import Button from "@/Components/common/Modern/Button";
 import { Head, Link, useForm } from "@inertiajs/react";
-import { Check, Loader2, Lock, Mail } from "lucide-react";
+import { Check, Lock, Mail } from "lucide-react";
 import { FormEventHandler } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -57,28 +58,34 @@ export default function VerifyEmail({ status }: VerifyEmailProps) {
             )}
 
             <form onSubmit={submit} className="space-y-4">
-              <button
+              <Button
                 type="submit"
-                disabled={processing}
-                className="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                loading={processing}
+                loadingText={t("verification.banner.sending")}
+                fullWidth
+                size="lg"
+                variant="primary"
+                buttonStyle="gradient"
+                className="shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
               >
-                {processing ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <Loader2 className="animate-spin h-5 w-5" />
-                    {t("verification.banner.sending")}
-                  </span>
-                ) : (
-                  t("verification.banner.resendButton")
-                )}
-              </button>
+                {t("verification.banner.resendButton")}
+              </Button>
 
               <Link
                 href={route("logout")}
                 method="post"
                 as="button"
-                className="w-full px-6 py-3 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 transition-colors duration-200"
+                className="w-full"
               >
-                {t("verification.logout")}
+                <Button
+                  variant="secondary"
+                  buttonStyle="solid"
+                  fullWidth
+                  size="lg"
+                  className="!bg-gray-100 !text-gray-700 hover:!bg-gray-200"
+                >
+                  {t("verification.logout")}
+                </Button>
               </Link>
             </form>
           </div>
