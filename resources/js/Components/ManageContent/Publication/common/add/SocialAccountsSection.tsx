@@ -22,6 +22,7 @@ interface SocialAccountsSectionProps {
   globalSchedule?: string;
   publishedAccountIds?: number[];
   publishingAccountIds?: number[];
+  onCancel?: () => void;
   error?: string;
   disabled?: boolean;
 }
@@ -169,6 +170,7 @@ interface SocialAccountItemProps {
   globalSchedule?: string;
   isPublished?: boolean;
   isPublishing?: boolean;
+  onCancel?: () => void;
   disabled?: boolean;
 }
 
@@ -188,6 +190,7 @@ const SocialAccountItem = memo(
     globalSchedule,
     isPublished,
     isPublishing,
+    onCancel,
     disabled = false,
   }: SocialAccountItemProps) => {
     const isInternalDisabled = isPublished || isPublishing || disabled;
@@ -232,7 +235,10 @@ const SocialAccountItem = memo(
                   {isPublished
                     ? t("publish.published")
                     : isPublishing
-                      ? t("publish.publishing")
+                      ? (t("publish.publishing") || "Publicando") +
+                        " (" +
+                        (t("common.wait") || "Espere...") +
+                        ")"
                       : (customSchedule || globalSchedule) &&
                           !isPublished &&
                           !isPublishing
@@ -319,9 +325,23 @@ const SocialAccountItem = memo(
               </div>
             )}
             {isPublishing && (
-              <div className="mt-1 flex items-center gap-1 text-[10px] font-medium text-yellow-600 dark:text-yellow-400">
-                <div className="w-3 h-3 border-2 border-yellow-600 border-t-transparent rounded-full animate-spin" />
-                {t("publish.publishing")}
+              <div className="mt-1 flex items-center justify-between gap-1 text-[10px] font-medium text-yellow-600 dark:text-yellow-400">
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 border-2 border-yellow-600 border-t-transparent rounded-full animate-spin" />
+                  {t("publish.publishing") || "Publicando"}
+                </div>
+                {onCancel && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onCancel();
+                    }}
+                    className="px-2 py-0.5 rounded bg-red-100 hover:bg-red-200 dark:bg-red-900/30 dark:hover:bg-red-900/50 text-red-700 dark:text-red-400 font-bold uppercase transition-colors"
+                  >
+                    {t("common.cancel") || "Cancelar"}
+                  </button>
+                )}
               </div>
             )}
           </div>
@@ -359,6 +379,7 @@ const SocialAccountsSection = memo(
     globalSchedule,
     publishedAccountIds,
     publishingAccountIds,
+    onCancel,
     error,
     disabled = false,
   }: SocialAccountsSectionProps) => {
@@ -409,6 +430,7 @@ const SocialAccountsSection = memo(
                 globalSchedule={globalSchedule}
                 isPublished={isPublished}
                 isPublishing={isPublishing}
+                onCancel={onCancel}
                 disabled={disabled}
               />
             );

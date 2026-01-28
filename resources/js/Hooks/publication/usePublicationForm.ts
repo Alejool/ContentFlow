@@ -555,6 +555,31 @@ export const usePublicationForm = ({
     onClose();
   };
 
+  const handleCancelPublication = async () => {
+    if (!publication?.id) return;
+    try {
+      await axios.post(route("api.v1.publications.cancel", publication.id));
+      toast.success(
+        t("publications.messages.cancelSuccess") || "Publicación cancelada",
+      );
+
+      // Proactive store update
+      usePublicationStore.getState().setPublishingPlatforms(publication.id, []);
+      usePublicationStore.getState().updatePublication(publication.id, {
+        status: "failed" as any,
+      });
+
+      // Optionally reload or sync store
+      usePublicationStore.getState().fetchPublicationById(publication.id);
+    } catch (err) {
+      console.error("Failed to cancel publication", err);
+      toast.error(
+        t("publications.messages.cancelError") ||
+          "Error al cancelar la publicación",
+      );
+    }
+  };
+
   const onFormSubmit = async (data: PublicationFormData) => {
     if (mediaFiles.length === 0) {
       setImageError(t("publications.modal.validation.imageRequired"));
@@ -866,6 +891,7 @@ export const usePublicationForm = ({
     handleHashtagChange,
     handleAccountToggle,
     handleClose,
+    handleCancelPublication,
     handleSubmit: handleSubmit(onFormSubmit, onInvalidSubmit),
     fileInputRef,
 
