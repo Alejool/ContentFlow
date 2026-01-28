@@ -124,7 +124,7 @@ export default function GlobalUploadIndicator() {
     if (!isConfirmed) return;
 
     try {
-      await axios.post(route("api/v1.publications/cancel", id));
+      await axios.post(route("api.v1.publications.cancel", id));
       fetchProcessingItems();
     } catch (err) {
       console.error("Failed to cancel publication", err);
