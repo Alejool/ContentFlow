@@ -2,13 +2,14 @@
 
 namespace App\Jobs;
 
-use App\Models\SocialPost;
+use App\Models\Publications\Publication;
 use App\Services\SocialPlatforms\SocialPlatformFactory;
 use App\Services\SocialTokenManager;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use App\Models\SocialAccount;
+use Illuminate\Support\Facades\Log;
 
 class PublishSocialPostJob implements ShouldQueue
 {
@@ -17,7 +18,7 @@ class PublishSocialPostJob implements ShouldQueue
   public $tries = 3;
   public $backoff = [60, 300, 600]; // Reintentos: 1min, 5min, 10min
 
-  public function __construct(public SocialPost $post) {}
+  public function __construct(public Publication $post) {}
 
   public function handle(SocialTokenManager $tokenManager)
   {
@@ -46,13 +47,11 @@ class PublishSocialPostJob implements ShouldQueue
           'account_type' => $account->account_type ?? 'profile',
         ];
 
-        // Publicar
         Log::info('Uploading data 5------', ['postData' => $postData]);
         $result = $platform->publishPost($postData);
         $result['account_id'] = $accountId;
         $responses[] = $result;
 
-        // Reiniciar contador de fallos
         $account->update(['failure_count' => 0]);
       } catch (\Exception $e) {
         \Log::error("Error publishing to account {$accountId}: " . $e->getMessage());
@@ -63,7 +62,6 @@ class PublishSocialPostJob implements ShouldQueue
           'error' => $e->getMessage(),
         ];
 
-        // Incrementar contador de fallos
         if ($account) {
           $account->increment('failure_count');
           if ($account->failure_count >= 3) {
@@ -72,8 +70,7 @@ class PublishSocialPostJob implements ShouldQueue
         }
       }
     }
-
-    // Actualizar post
+    
     $this->post->update([
       'status' => empty(array_filter($responses, fn($r) => $r['success'])) ? 'failed' : 'published',
       'published_at' => now(),
