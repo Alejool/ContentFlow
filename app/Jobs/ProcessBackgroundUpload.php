@@ -13,6 +13,8 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use App\Models\SocialPostLog;
+use App\Events\Publications\PublicationUpdated;
 
 class ProcessBackgroundUpload implements ShouldQueue
 {
@@ -23,7 +25,7 @@ class ProcessBackgroundUpload implements ShouldQueue
    *
    * @var int
    */
-  public $timeout = 3600; // 1 hour for large files
+  public $timeout = 3600;
 
   public function __construct(
     protected Publication $publication,
@@ -71,7 +73,7 @@ class ProcessBackgroundUpload implements ShouldQueue
               $found = true;
             } elseif (Storage::disk('s3')->exists($pathTrimmed)) {
               $found = true;
-              $path = $pathTrimmed; // Normalize to trimmed
+              $path = $pathTrimmed;
             } else {
               $attempts++;
               if ($attempts < $maxAttempts) {
@@ -102,7 +104,7 @@ class ProcessBackgroundUpload implements ShouldQueue
 
         // Update publication image if this was the main image
         if ($this->mediaFile->file_type === 'image' && !$this->publication->image) {
-          $this->publication->update(['image' => \Illuminate\Support\Facades\Storage::url($this->mediaFile->getRawOriginal('file_path'))]);
+          $this->publication->update(['image' => Storage::url($this->mediaFile->getRawOriginal('file_path'))]);
         }
 
         // Check if we can release the "processing" lock
@@ -120,7 +122,7 @@ class ProcessBackgroundUpload implements ShouldQueue
         }
 
         // Fire event to update frontend lists
-        event(new \App\Events\Publications\PublicationUpdated($this->publication));
+        event(new PublicationUpdated($this->publication));
       } catch (\Exception $e) {
         Log::error('Background upload failed', [
           'error' => $e->getMessage(),
@@ -135,7 +137,7 @@ class ProcessBackgroundUpload implements ShouldQueue
         ]);
 
         // Create a SocialPostLog entry for the failure so it appears in the logs tab
-        \App\Models\SocialPostLog::create([
+        SocialPostLog::create([
           'user_id' => $this->publication->user_id,
           'workspace_id' => $this->publication->workspace_id,
           'publication_id' => $this->publication->id,
