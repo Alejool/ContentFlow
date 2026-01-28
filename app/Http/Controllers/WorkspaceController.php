@@ -95,7 +95,6 @@ class WorkspaceController extends Controller
 
   public function switch(Workspace $workspace)
   {
-    // Verify user belongs to workspace
     if (!Auth::user()->workspaces()->where('workspaces.id', $workspace->id)->exists()) {
       abort(403);
     }
