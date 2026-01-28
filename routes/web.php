@@ -17,19 +17,10 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Profile\ProfileController;
 use App\Http\Controllers\Analytics\AnalyticsController;
 use App\Http\Controllers\ManageContent\ManageContentController;
-use App\Http\Controllers\Posts\PostsController;
-use App\Http\Controllers\Campaigns\CampaignController;
-use App\Http\Controllers\Publications\PublicationController;
 use App\Http\Controllers\SocialAccount\SocialAccountController;
-use App\Http\Controllers\Theme\ThemeController;
 use App\Http\Controllers\Locale\LocaleController;
-use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\WorkspaceController;
-use App\Http\Controllers\ApprovalController;
-use App\Http\Controllers\AIChatController;
 use App\Http\Controllers\Calendar\CalendarViewController;
-use App\Http\Controllers\SocialPostLogController;
-use App\Http\Controllers\Api\UploadController;
 
 /*
 |--------------------------------------------------------------------------
@@ -54,7 +45,6 @@ Broadcast::routes();
 */
 Route::middleware('guest')->group(function () {
   Route::get('/up', fn() => response('OK'));
-
 
   Route::get(
     '/',
@@ -87,57 +77,6 @@ Route::prefix('auth')->name('auth.')->group(function () {
   Route::get('/google/redirect', [AuthController::class, 'redirectToGoogle'])->name('google.redirect');
   Route::get('/google/callback', [AuthController::class, 'handleGoogleCallback'])->name('google.callback');
 });
-
-/*
-|--------------------------------------------------------------------------
-| ⚠️ Debug / Maintenance Routes (RECOMENDADO SOLO LOCAL)
-|--------------------------------------------------------------------------
-*/
-Route::get('/fix-db', function () {
-  try {
-    DB::statement("ALTER TABLE publications DROP CONSTRAINT IF EXISTS publications_status_check");
-
-    Schema::table('publications', function ($table) {
-      $table->string('status', 50)->change();
-    });
-
-    Artisan::call('db:seed', [
-      '--class' => 'Database\\Seeders\\RolesAndPermissionsSeeder',
-      '--force' => true
-    ]);
-
-    $roles = Role::with('permissions')->get();
-
-    return response()->json([
-      'success' => true,
-      'roles' => $roles->map(fn($r) => [
-        'slug' => $r->slug,
-        'permissions' => $r->permissions->pluck('slug'),
-      ]),
-    ]);
-  } catch (\Exception $e) {
-    return response()->json(['error' => $e->getMessage()], 500);
-  }
-});
-
-Route::get('/debug-auth', function () {
-  $user = Auth::user()?->fresh();
-
-  if (!$user) {
-    return response()->json(['authenticated' => false]);
-  }
-
-  $workspaceId = $user->current_workspace_id;
-  $workspace = $workspaceId ? Workspace::find($workspaceId) : null;
-
-  return response()->json([
-    'authenticated' => true,
-    'workspace' => $workspace?->name,
-    'can_manage_team' => $user->hasPermission('manage-team', $workspaceId),
-    'can_publish' => $user->hasPermission('publish', $workspaceId),
-  ]);
-});
-
 
 /*
 |--------------------------------------------------------------------------
@@ -182,6 +121,7 @@ Route::middleware('auth')->group(function () {
   Route::prefix('workspaces')->name('workspaces.')->group(function () {
     Route::get('/', [WorkspaceController::class, 'index'])->name('index');
     Route::post('/', [WorkspaceController::class, 'store'])->name('store');
+    Route::post('/{workspace}/switch', [WorkspaceController::class, 'switch'])->name('switch');
     Route::get('{workspace}/settings', [WorkspaceController::class, 'settings'])->name('settings');
     Route::get('{workspace}', [WorkspaceController::class, 'show'])->name('show');
     Route::put('{workspace}', [WorkspaceController::class, 'update'])->name('update');
