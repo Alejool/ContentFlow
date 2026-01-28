@@ -94,6 +94,7 @@ const EditPublicationModal = ({
     handleHashtagChange,
     handleAccountToggle,
     handleClose,
+    handleCancelPublication,
     handleSubmit,
     platformSettings,
     setPlatformSettings,
@@ -434,6 +435,7 @@ const EditPublicationModal = ({
                     globalSchedule={watched.scheduled_at ?? undefined}
                     publishedAccountIds={publishedAccountIds}
                     publishingAccountIds={publishingAccountIds}
+                    onCancel={handleCancelPublication}
                     error={errors.social_accounts?.message as string}
                     disabled={isContentSectionDisabled || !allowConfiguration}
                   />
