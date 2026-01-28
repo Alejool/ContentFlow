@@ -63,6 +63,7 @@ export default function PublishPublicationModal({
     deselectAll,
     isYoutubeSelected,
     handlePublish,
+    handleCancelPublication,
     handleThumbnailChange,
     handleThumbnailDelete,
     handleRequestReview,
@@ -366,12 +367,26 @@ export default function PublishPublicationModal({
                         >
                           {/* Publishing Overlay */}
                           {isPublishing && (
-                            <div className="absolute inset-0 z-20 bg-white/60 dark:bg-neutral-900/60 backdrop-blur-[1px] flex flex-col items-center justify-center rounded-lg animate-in fade-in duration-300">
-                              <div className="flex flex-col items-center gap-2">
-                                <div className="w-8 h-8 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin" />
-                                <span className="text-[10px] font-bold text-yellow-700 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-900/50 px-2 py-1 rounded-md shadow-sm border border-yellow-200 dark:border-yellow-800 uppercase tracking-wider">
-                                  {t("publications.publish.publishing")}
-                                </span>
+                            <div className="absolute inset-0 z-20 bg-white/70 dark:bg-neutral-900/80 backdrop-blur-[2px] flex flex-col items-center justify-center rounded-lg animate-in fade-in duration-300">
+                              <div className="flex flex-col items-center gap-3">
+                                <div className="w-10 h-10 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin shadow-sm" />
+                                <div className="flex flex-col items-center">
+                                  <span className="text-[11px] font-bold text-yellow-700 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-900/50 px-2.5 py-1 rounded-md shadow-sm border border-yellow-200 dark:border-yellow-800 uppercase tracking-wider mb-2">
+                                    {t("publications.publish.publishing") ||
+                                      "Publicando"}{" "}
+                                    ({t("common.wait") || "Espere..."})
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleCancelPublication(publication.id);
+                                    }}
+                                    className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded-lg text-[10px] font-bold uppercase transition-all shadow-md active:scale-95"
+                                  >
+                                    {t("common.cancel") || "Cancelar"}
+                                  </button>
+                                </div>
                               </div>
                             </div>
                           )}
