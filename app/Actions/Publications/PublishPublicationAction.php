@@ -17,6 +17,13 @@ class PublishPublicationAction
 
   public function execute(Publication $publication, array $platformIds, array $options = []): void
   {
+    \Log::info('Executing PublishPublicationAction', [
+      'publication_id' => $publication->id,
+      'platforms' => $platformIds,
+      'has_thumbnails' => !empty($options['thumbnails']),
+      'has_platform_settings' => !empty($options['platform_settings'])
+    ]);
+
     if (!$publication->isApproved()) {
       // Check if user is authorized to approve (Owner/Admin)
       $user = auth()->user();
@@ -53,10 +60,16 @@ class PublishPublicationAction
 
     // Handle Thumbnails for Publish (if any)
     if (!empty($options['thumbnails'] ?? [])) {
+      \Log::info('Processing thumbnails in PublishPublicationAction', [
+        'count' => count($options['thumbnails'])
+      ]);
       foreach ($options['thumbnails'] as $mediaId => $thumbnailFile) {
         $mediaFile = $publication->mediaFiles->find($mediaId);
         if ($mediaFile) {
+          \Log::info('Creating thumbnail for media', ['media_id' => $mediaId]);
           $this->mediaService->createThumbnail($mediaFile, $thumbnailFile);
+        } else {
+          \Log::warning('Media file not found for thumbnail', ['media_id' => $mediaId]);
         }
       }
     }
@@ -84,6 +97,11 @@ class PublishPublicationAction
       ->whereIn('social_account_id', $socialAccounts->pluck('id'))
       ->where('status', 'pending')
       ->update(['status' => 'posted']);
+
+    \Log::info('Dispatching PublishToSocialMedia job', [
+      'publication_id' => $publication->id,
+      'platform_count' => $socialAccounts->count()
+    ]);
 
     PublishToSocialMedia::dispatch($publication, $socialAccounts)->onQueue('publishing');
   }
