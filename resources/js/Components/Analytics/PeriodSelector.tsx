@@ -1,3 +1,4 @@
+import Button from "@/Components/common/Modern/Button";
 import { useTranslation } from "react-i18next";
 
 interface PeriodSelectorProps {
@@ -17,8 +18,11 @@ export default function PeriodSelector({
   return (
     <div className="flex bg-neutral-100 dark:bg-neutral-800 p-1 rounded-lg w-fit mb-6">
       {periods.map((days) => (
-        <button
+        <Button
           key={days}
+          variant="ghost"
+          buttonStyle="ghost"
+          shadow="none"
           onClick={() => onPeriodChange(days)}
           className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
             selectedPeriod === days
@@ -27,7 +31,7 @@ export default function PeriodSelector({
           }`}
         >
           {days} {t("analytics.days")}
-        </button>
+        </Button>
       ))}
     </div>
   );

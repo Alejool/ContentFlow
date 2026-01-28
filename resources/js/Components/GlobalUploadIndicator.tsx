@@ -1,3 +1,4 @@
+import Button from "@/Components/common/Modern/Button";
 import { useConfirm } from "@/Hooks/useConfirm";
 import { useUploadQueue } from "@/stores/uploadQueueStore";
 import { Publication } from "@/types/Publication";
@@ -216,13 +217,22 @@ export default function GlobalUploadIndicator() {
           </span>
         </div>
         <div className="flex items-center gap-1">
-          <button className="p-1 hover:bg-gray-200 dark:hover:bg-neutral-600 rounded text-gray-500 dark:text-neutral-400">
-            {isMinimized ? (
-              <Maximize2 className="w-3 h-3" />
-            ) : (
-              <Minimize2 className="w-3 h-3" />
-            )}
-          </button>
+          <Button
+            variant="ghost"
+            buttonStyle="ghost"
+            shadow="none"
+            size="xs"
+            className="p-1 hover:bg-gray-200 dark:hover:bg-neutral-600 rounded text-gray-500 dark:text-neutral-400"
+            icon={
+              isMinimized ? (
+                <Maximize2 className="w-3 h-3" />
+              ) : (
+                <Minimize2 className="w-3 h-3" />
+              )
+            }
+          >
+            {""}
+          </Button>
         </div>
       </div>
 
@@ -241,15 +251,20 @@ export default function GlobalUploadIndicator() {
                 >
                   {upload.file.name}
                 </span>
-                <button
+                <Button
+                  variant="ghost"
+                  buttonStyle="ghost"
+                  shadow="none"
+                  size="xs"
                   onClick={(e) => {
                     e.stopPropagation();
                     removeUpload(upload.id);
                   }}
-                  className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity p-0 min-w-0"
+                  icon={<X className="w-3 h-3" />}
                 >
-                  <X className="w-3 h-3" />
-                </button>
+                  {""}
+                </Button>
               </div>
 
               <div className="flex items-center gap-2 mb-1">
@@ -313,26 +328,36 @@ export default function GlobalUploadIndicator() {
                 </span>
                 <div className="flex items-center gap-1.5">
                   {item.status === "failed" || item.status === "published" ? (
-                    <button
+                    <Button
+                      variant="ghost"
+                      buttonStyle="ghost"
+                      shadow="none"
+                      size="xs"
                       onClick={(e) => handleDismissPublication(e, item.id)}
-                      className="text-gray-400 hover:text-green-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="text-gray-400 hover:text-green-500 opacity-0 group-hover:opacity-100 transition-opacity p-0 min-w-0"
                       title={t("common.dismiss") || "Descartar"}
+                      icon={<X className="w-3 h-3" />}
                     >
-                      <X className="w-3 h-3" />
-                    </button>
+                      {""}
+                    </Button>
                   ) : (
                     (item.status === "publishing" ||
                       item.status === "processing") && (
-                      <button
+                      <Button
+                        variant="ghost"
+                        buttonStyle="ghost"
+                        shadow="none"
+                        size="xs"
                         onClick={(e) => handleCancelPublication(e, item.id)}
-                        className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity p-0 min-w-0"
                         title={
                           t("publications.publish.button.cancel") ||
                           "Cancelar envío"
                         }
+                        icon={<X className="w-3 h-3" />}
                       >
-                        <X className="w-3 h-3" />
-                      </button>
+                        {""}
+                      </Button>
                     )
                   )}
                   {item.status === "publishing" && (

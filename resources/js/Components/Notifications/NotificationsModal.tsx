@@ -1,3 +1,5 @@
+import NotificationItem from "@/Components/Notifications/NotificationItem";
+import Button from "@/Components/common/Modern/Button";
 import { useNotifications } from "@/Hooks/useNotifications";
 import { useTheme } from "@/Hooks/useTheme";
 import {
@@ -23,7 +25,6 @@ import {
 } from "lucide-react";
 import { Fragment, useState } from "react";
 import { useTranslation } from "react-i18next";
-import NotificationItem from "@/Components/Notifications/NotificationItem";
 
 interface NotificationsModalProps {
   isOpen: boolean;
@@ -157,28 +158,34 @@ export default function NotificationsModal({
                           )}
                         </div>
                         <div className="ml-3 flex h-7 items-center">
-                          <button
+                          <Button
                             type="button"
+                            variant="ghost"
+                            buttonStyle="ghost"
+                            shadow="none"
                             className={`relative rounded-md focus:outline-none focus:ring-2 focus:ring-main-color focus:ring-offset-2 p-1 ${colors.closeBtn}`}
                             onClick={onClose}
+                            icon={<X className="h-5 w-5" aria-hidden="true" />}
                           >
                             <span className="absolute -inset-2.5" />
                             <span className="sr-only">{t("common.close")}</span>
-                            <X className="h-5 w-5" aria-hidden="true" />
-                          </button>
+                          </Button>
                         </div>
                       </div>
 
                       {unreadCount > 0 && (
                         <div className="mt-8 flex justify-end">
-                          <button
+                          <Button
                             type="button"
+                            variant="ghost"
+                            buttonStyle="ghost"
+                            shadow="none"
                             onClick={markAllAsRead}
                             className="flex items-center gap-1.5 text-sm font-medium text-main-color hover:text-main-color/80 transition-colors"
+                            icon={<CheckCheck className="h-4 w-4" />}
                           >
-                            <CheckCheck className="h-4 w-4" />
                             {t("notifications.mark_all_read")}
-                          </button>
+                          </Button>
                         </div>
                       )}
                     </div>
@@ -196,7 +203,7 @@ export default function NotificationsModal({
                                       selected
                                         ? colors.tabSelected
                                         : colors.tabUnselected,
-                                      "whitespace-nowrap  pt-4 pb-3 px-1 text-sm font-medium flex items-center gap-2 outline-none transition-colors border-b-2 "
+                                      "whitespace-nowrap  pt-4 pb-3 px-1 text-sm font-medium flex items-center gap-2 outline-none transition-colors border-b-2 ",
                                     )
                                   }
                                 >
@@ -233,10 +240,11 @@ export default function NotificationsModal({
                                     ))}
                                   {notifications.length > 100 && (
                                     <div
-                                      className={`p-4 text-center ${theme === "dark"
-                                        ? "text-gray-500"
-                                        : "text-gray-400"
-                                        }`}
+                                      className={`p-4 text-center ${
+                                        theme === "dark"
+                                          ? "text-gray-500"
+                                          : "text-gray-400"
+                                      }`}
                                     >
                                       <p className="text-sm">
                                         Showing 100 of {notifications.length}{" "}
@@ -265,54 +273,70 @@ export default function NotificationsModal({
                                 className={`px-4 py-3 border-b ${colors.border} shrink-0`}
                               >
                                 <div className="flex gap-2 overflow-x-auto custom-scrollbar pb-1 flex-nowrap">
-                                  <button
+                                  <Button
+                                    variant="ghost"
+                                    buttonStyle="ghost"
+                                    shadow="none"
                                     onClick={() => setSelectedPriority(null)}
-                                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors whitespace-nowrap flex-shrink-0 ${selectedPriority === null
-                                      ? "bg-gray-800 text-white"
-                                      : isDark
-                                        ? "bg-neutral-800 text-gray-400 hover:bg-neutral-700"
-                                        : "bg-gray-100 text-black hover:bg-gray-200"
-                                      }`}
+                                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
+                                      selectedPriority === null
+                                        ? "bg-gray-800 text-white"
+                                        : isDark
+                                          ? "bg-neutral-800 text-gray-400 hover:bg-neutral-700"
+                                          : "bg-gray-100 text-black hover:bg-gray-200"
+                                    }`}
+                                    icon={<Layers className="h-3.5 w-3.5" />}
                                   >
-                                    <Layers className="h-3.5 w-3.5" />
                                     {t("notifications.all")}
-                                  </button>
-                                  <button
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    buttonStyle="ghost"
+                                    shadow="none"
                                     onClick={() => setSelectedPriority("high")}
-                                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors whitespace-nowrap flex-shrink-0 ${selectedPriority === "high"
-                                      ? "bg-orange-800 text-white"
-                                      : isDark
-                                        ? "bg-neutral-800 text-gray-400 hover:bg-neutral-700"
-                                        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                                      }`}
+                                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
+                                      selectedPriority === "high"
+                                        ? "bg-orange-800 text-white"
+                                        : isDark
+                                          ? "bg-neutral-800 text-gray-400 hover:bg-neutral-700"
+                                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                                    }`}
+                                    icon={
+                                      <AlertCircle className="h-3.5 w-3.5" />
+                                    }
                                   >
-                                    <AlertCircle className="h-3.5 w-3.5" />
                                     {t("notifications.high_priority")}
                                     {filterByPriority("high").filter(
-                                      (n) => n.data.category === "application"
+                                      (n) => n.data.category === "application",
                                     ).length > 0 && (
-                                        <span className="ml-1 px-1.5 py-0.5 rounded-full bg-white/20 text-xs">
-                                          {
-                                            filterByPriority("high").filter(
-                                              (n) =>
-                                                n.data.category === "application"
-                                            ).length
-                                          }
-                                        </span>
-                                      )}
-                                  </button>
-                                  <button
-                                    onClick={() => setSelectedPriority("normal")}
-                                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors whitespace-nowrap flex-shrink-0 ${selectedPriority === "normal"
-                                      ? "bg-blue-500 text-white"
-                                      : isDark
-                                        ? "bg-neutral-800 text-gray-400 hover:bg-neutral-700"
-                                        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                                      }`}
+                                      <span className="ml-1 px-1.5 py-0.5 rounded-full bg-white/20 text-xs">
+                                        {
+                                          filterByPriority("high").filter(
+                                            (n) =>
+                                              n.data.category === "application",
+                                          ).length
+                                        }
+                                      </span>
+                                    )}
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    buttonStyle="ghost"
+                                    shadow="none"
+                                    onClick={() =>
+                                      setSelectedPriority("normal")
+                                    }
+                                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
+                                      selectedPriority === "normal"
+                                        ? "bg-blue-500 text-white"
+                                        : isDark
+                                          ? "bg-neutral-800 text-gray-400 hover:bg-neutral-700"
+                                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                                    }`}
+                                    icon={<Info className="h-3.5 w-3.5" />}
                                   >
-                                    <Info className="h-3.5 w-3.5" />
                                     {t("notifications.normal_priority")}
-                                  </button>
+                                  </Button>
                                 </div>
                               </div>
 
@@ -320,10 +344,10 @@ export default function NotificationsModal({
                                 {(() => {
                                   const filteredNotifications = selectedPriority
                                     ? applicationNotifications.filter((n) => {
-                                      const priority =
-                                        n.data.priority || "normal";
-                                      return priority === selectedPriority;
-                                    })
+                                        const priority =
+                                          n.data.priority || "normal";
+                                        return priority === selectedPriority;
+                                      })
                                     : applicationNotifications;
 
                                   return filteredNotifications.length > 0 ? (
@@ -341,10 +365,11 @@ export default function NotificationsModal({
                                         ))}
                                       {filteredNotifications.length > 100 && (
                                         <div
-                                          className={`p-4 text-center ${theme === "dark"
-                                            ? "text-gray-500"
-                                            : "text-gray-400"
-                                            }`}
+                                          className={`p-4 text-center ${
+                                            theme === "dark"
+                                              ? "text-gray-500"
+                                              : "text-gray-400"
+                                          }`}
                                         >
                                           <p className="text-sm">
                                             Showing 100 of{" "}
@@ -407,10 +432,11 @@ export default function NotificationsModal({
                                     ))}
                                   {systemNotifications.length > 100 && (
                                     <div
-                                      className={`p-4 text-center ${theme === "dark"
-                                        ? "text-gray-500"
-                                        : "text-gray-400"
-                                        }`}
+                                      className={`p-4 text-center ${
+                                        theme === "dark"
+                                          ? "text-gray-500"
+                                          : "text-gray-400"
+                                      }`}
                                     >
                                       <p className="text-sm">
                                         Showing 100 of{" "}

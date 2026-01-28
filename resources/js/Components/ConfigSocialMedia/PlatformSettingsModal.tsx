@@ -138,16 +138,20 @@ export default function PlatformSettingsModal({
                 </p>
               </div>
             </div>
-            <button
+            <Button
+              variant="ghost"
+              buttonStyle="ghost"
+              shadow="none"
               onClick={onClose}
               className={`p-2 rounded-lg transition-all duration-200 ${
                 theme === "dark"
                   ? "hover:bg-neutral-800 text-neutral-400"
                   : "hover:bg-neutral-100 text-neutral-500"
               }`}
+              icon={<X className="w-6 h-6" />}
             >
-              <X className="w-6 h-6" />
-            </button>
+              {""}
+            </Button>
           </div>
 
           <div

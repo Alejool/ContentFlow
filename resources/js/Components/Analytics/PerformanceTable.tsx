@@ -342,17 +342,21 @@ export default function PerformanceTable({
             </Button>
             <div className="flex items-center gap-1">
               {[...Array(totalPages)].map((_, i) => (
-                <button
+                <Button
                   key={i}
+                  variant={currentPage === i + 1 ? "primary" : "ghost"}
+                  buttonStyle={currentPage === i + 1 ? "solid" : "ghost"}
+                  size="sm"
+                  shadow="none"
                   onClick={() => setCurrentPage(i + 1)}
-                  className={`w-8 h-8 rounded-lg text-xs font-bold transition-all ${
+                  className={`w-8 h-8 p-0 rounded-lg text-xs font-bold transition-all ${
                     currentPage === i + 1
-                      ? "bg-primary-600 text-white"
+                      ? "text-white"
                       : "text-gray-500 hover:bg-gray-100 dark:hover:bg-neutral-800"
                   }`}
                 >
                   {i + 1}
-                </button>
+                </Button>
               ))}
             </div>
             <Button
