@@ -8,7 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
-use App\Models\User; // Ensure the User model is imported
+use App\Models\User;
+use Illuminate\Support\Facades\Log;
 
 class LoginRequest extends FormRequest
 {
@@ -49,14 +50,14 @@ class LoginRequest extends FormRequest
         $user = User::where('email', $credentials['email'])->first();
 
         if (!$user) {
-            \Illuminate\Support\Facades\Log::warning('Login: User not found', ['email' => $credentials['email']]);
+            Log::warning('Login: User not found', ['email' => $credentials['email']]);
             throw ValidationException::withMessages([
                 'email' => 'User not found in the system'
             ]);
         }
 
         if (!Auth::attempt($credentials, true)) {
-            \Illuminate\Support\Facades\Log::warning('Login: Auth::attempt failed', ['email' => $credentials['email']]);
+            Log::warning('Login: Auth::attempt failed', ['email' => $credentials['email']]);
             RateLimiter::hit($this->throttleKey());
             throw ValidationException::withMessages([
                 'email' => 'These credentials do not match our records'
@@ -86,9 +87,8 @@ class LoginRequest extends FormRequest
         $previousIp = $user->last_login_ip;
         $currentIp = $request->ip();
 
-        // Log IP change if needed
         if ($previousIp && $previousIp !== $currentIp) {
-            \Illuminate\Support\Facades\Log::info('User login from new IP', [
+            Log::info('User login from new IP', [
                 'user_id' => $user->id,
                 'email' => $user->email,
                 'old_ip' => $previousIp,
@@ -96,14 +96,13 @@ class LoginRequest extends FormRequest
             ]);
         }
 
-        // Device validation
         $userAgent = $request->userAgent();
         $fingerprint = hash('sha256', $userAgent);
         $knownDevices = $user->known_devices ?? [];
 
         if (!in_array($fingerprint, $knownDevices)) {
             $knownDevices[] = $fingerprint;
-            \Illuminate\Support\Facades\Log::info('User login from new device', [
+            Log::info('User login from new device', [
                 'user_id' => $user->id,
                 'email' => $user->email,
                 'user_agent' => $userAgent
