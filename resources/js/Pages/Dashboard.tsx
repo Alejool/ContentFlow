@@ -47,7 +47,7 @@ interface DashboardProps {
     publicationStats?: Record<string, number>;
     campaigns: CampaignStat[];
     engagementTrends: any[];
-    platformData: any[]; // This is SocialMediaAccount[]
+    platformData: any[];
     platformComparison: any[];
   };
   period: number;
@@ -109,7 +109,7 @@ export default function Dashboard({
     const refreshStats = () => {
       axios
         .get(route("api.v1.publications.stats"))
-        .then((res) => setPubStats(res.data || {})) // Use res.data directly
+        .then((res) => setPubStats(res.data || {}))
         .catch((error) => {
           if (error.response?.status !== 401) {
             console.error("Failed to refresh publication stats", error);
