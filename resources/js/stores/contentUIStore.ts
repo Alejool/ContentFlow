@@ -8,13 +8,11 @@ interface ContentUIState {
   activeTab: "publications" | "campaigns" | "logs" | "calendar" | "approvals";
   selectedItem: SelectedItem;
 
-  // Modal States
   isAddModalOpen: boolean;
   isEditModalOpen: boolean;
   isPublishModalOpen: boolean;
   isViewDetailsModalOpen: boolean;
 
-  // Actions
   setActiveTab: (
     tab: "publications" | "campaigns" | "logs" | "calendar" | "approvals",
   ) => void;

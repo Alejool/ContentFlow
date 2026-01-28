@@ -96,7 +96,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
         type: eventType,
       });
 
-      // Update local state for immediate feedback
+      // Update local state inmediately
       const events = get().events.map((ev) =>
         ev.id === id ? { ...ev, start: newDate } : ev,
       );
@@ -107,7 +107,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
       set({
         error: error.message ?? "Failed to update event",
       });
-      get().fetchEvents(); // Re-fetch on error to sync
+      get().fetchEvents();
       return false;
     }
   },
@@ -133,8 +133,6 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
     try {
       const resourceId = id.includes("_") ? id.split("_")[2] : id;
       await axios.delete(`/api/v1/calendar/user-events/${resourceId}`);
-
-      // Update local state
       const events = get().events.filter((ev) => ev.id !== id);
       set({ events });
 

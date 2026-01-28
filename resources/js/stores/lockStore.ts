@@ -15,16 +15,9 @@ interface LockState {
 export const useLockStore = create<LockState>((set) => ({
   remoteLocks: {},
   setRemoteLocks: (locks) => {
-    console.log("🔒 Lock store: setRemoteLocks called with:", locks);
     set({ remoteLocks: locks });
   },
   updateLock: (publicationId, lock) => {
-    console.log(
-      "🔒 Lock store: updateLock called for pub",
-      publicationId,
-      "lock:",
-      lock,
-    );
     set((state) => {
       const next = { ...state.remoteLocks };
       if (lock) {
@@ -32,7 +25,6 @@ export const useLockStore = create<LockState>((set) => ({
       } else {
         delete next[publicationId];
       }
-      console.log("🔒 Lock store: new state:", next);
       return { remoteLocks: next };
     });
   },

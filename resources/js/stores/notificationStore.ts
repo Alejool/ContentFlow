@@ -93,7 +93,6 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
 
         // Re-calculate derived state
         const unreadCount = Math.max(0, state.unreadCount - 1);
-        // Note: We are not re-sorting here to avoid UI jumping, similar to publications
 
         return {
           notifications: updatedNotifications,

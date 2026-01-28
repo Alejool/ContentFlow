@@ -8,14 +8,12 @@ interface ManageContentUIState {
   activeTab: "publications" | "campaigns" | "logs" | "calendar" | "approvals";
   selectedItem: SelectedItem;
 
-  // Modal States
   isAddModalOpen: boolean;
   addType: "publication" | "campaign" | null;
   isEditModalOpen: boolean;
   isPublishModalOpen: boolean;
   isViewDetailsModalOpen: boolean;
 
-  // Actions
   setActiveTab: (
     tab: "publications" | "campaigns" | "logs" | "calendar" | "approvals",
   ) => void;

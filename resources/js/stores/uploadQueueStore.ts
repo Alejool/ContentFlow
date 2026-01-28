@@ -1,12 +1,12 @@
 import { create } from "zustand";
 
 export interface QueuedUpload {
-  id: string; // tempId
+  id: string;
   file: File;
   progress: number;
   status: "pending" | "uploading" | "completed" | "error";
-  publicationId?: number; // Linked after saving
-  publicationTitle?: string; // For notifications
+  publicationId?: number;
+  publicationTitle?: string;
   s3Key?: string;
   error?: string;
   stats?: { eta?: number; speed?: number };
@@ -15,7 +15,6 @@ export interface QueuedUpload {
 interface UploadQueueState {
   queue: Record<string, QueuedUpload>;
 
-  // Actions
   addUpload: (id: string, file: File) => void;
   updateUpload: (id: string, updates: Partial<QueuedUpload>) => void;
   removeUpload: (id: string) => void;
@@ -45,7 +44,7 @@ export const useUploadQueue = create<UploadQueueState>((set) => ({
   updateUpload: (id, updates) =>
     set((state) => {
       const current = state.queue[id];
-      if (!current) return state; // Don't update if removed
+      if (!current) return state;
       return {
         queue: {
           ...state.queue,
@@ -67,7 +66,7 @@ export const useUploadQueue = create<UploadQueueState>((set) => ({
       return {
         queue: {
           ...state.queue,
-          [id]: { ...item, publicationId, publicationTitle }, // Link it!
+          [id]: { ...item, publicationId, publicationTitle }, 
         },
       };
     }),
