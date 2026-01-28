@@ -16,7 +16,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     | "success"
     | "ghost"
     | "warning";
-  buttonStyle?: "solid" | "outline" | "gradient" | "ghost";
+  buttonStyle?: "solid" | "outline" | "gradient" | "ghost" | "icon";
   size?: "xs" | "sm" | "md" | "lg" | "xl";
   loading?: boolean;
   loadingText?: string;
@@ -177,6 +177,22 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             }
           `;
         case "solid":
+          return `
+            ${colors.text}
+            ${colors.bg}
+            ${colors.hoverBg}
+            border-0
+          `;
+        case "icon":
+          return `
+            bg-transparent
+            border-0
+            p-0
+            ${colors.text}
+            hover:opacity-80
+            focus:ring-0
+          `;
+
         default:
           return `
             ${colors.text}
@@ -216,7 +232,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       focus:outline-none focus:ring-2 focus:ring-offset-2
       active:scale-[0.98]
       ${fullWidth ? "w-full" : ""}
-      ${sizeClasses[size]}
+      ${buttonStyle === "icon" ? "" : sizeClasses[size]}
       ${getStyleClasses()}
       ${roundedClasses[rounded]}
       ${shadowClasses[shadow]}
