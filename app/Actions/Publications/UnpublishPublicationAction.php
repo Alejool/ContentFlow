@@ -4,7 +4,7 @@ namespace App\Actions\Publications;
 
 use App\Models\Publications\Publication;
 use App\Services\Publish\PlatformPublishService;
-
+use App\Events\Publications\PublicationUpdated;
 class UnpublishPublicationAction
 {
   public function __construct(
@@ -27,6 +27,8 @@ class UnpublishPublicationAction
       if ($remaining === 0) {
         $publication->update(['status' => 'draft']);
       }
+
+      event(new PublicationUpdated($publication));
     }
 
     return $result;

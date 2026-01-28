@@ -343,8 +343,12 @@ class PlatformPublishService
         event(new PublicationStatusUpdated(
           userId: $publication->user_id,
           publicationId: $publication->id,
-          status: 'publishing' // Keep it in 'publishing' state
+          status: 'publishing'
         ));
+
+        // Use full namespace to avoid adding 'use' statement if possible, or add it at top.
+        // I will add it at top for cleanliness.
+        event(new \App\Events\Publications\PublicationUpdated($publication));
       } catch (\Throwable $e) {
         Log::warning('Exception caught, rolling back transaction', ['error' => $e->getMessage()]);
         DB::rollBack();
