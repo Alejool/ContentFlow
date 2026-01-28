@@ -1,8 +1,7 @@
+import Button from "@/Components/common/Modern/Button";
+import { formatDateTime } from "@/Utils/formatDate";
 import { Publication } from "@/types/Publication";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
-import { format } from "date-fns";
-import { es } from "date-fns/locale";
-import { formatDateTime } from "@/Utils/formatDate";
 import { Edit, User, X, XCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -42,12 +41,16 @@ export default function RejectionDetailsModal({
               <XCircle className="w-6 h-6 text-rose-500" />
               {t("approvals.publicationRejected") || "Publicación Rechazada"}
             </DialogTitle>
-            <button
+            <Button
+              variant="ghost"
+              buttonStyle="ghost"
+              shadow="none"
               onClick={onClose}
-              className="p-2 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-neutral-700 text-gray-500 dark:text-gray-400"
+              className="p-2 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-neutral-700 text-gray-500 dark:text-gray-400 h-auto min-w-0"
+              icon={<X className="w-5 h-5" />}
             >
-              <X className="w-5 h-5" />
-            </button>
+              {""}
+            </Button>
           </div>
 
           <div className="p-6">
@@ -105,20 +108,25 @@ export default function RejectionDetailsModal({
           </div>
 
           <div className="flex justify-end gap-3 p-6 border-t border-gray-100 dark:border-neutral-700">
-            <button
+            <Button
+              variant="secondary"
+              buttonStyle="ghost"
+              shadow="none"
               onClick={onClose}
-              className="px-6 py-2.5 rounded-lg font-medium transition-colors bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:text-white"
+              className="px-6 py-2.5 rounded-lg font-medium transition-colors bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:text-white h-auto"
             >
               {t("common.close")}
-            </button>
+            </Button>
             {onEdit && (
-              <button
+              <Button
+                variant="primary"
+                buttonStyle="solid"
                 onClick={handleEdit}
-                className="px-6 py-2.5 rounded-lg font-bold transition-all bg-primary-600 hover:bg-primary-700 text-white flex items-center gap-2 shadow-lg shadow-primary-600/20 active:scale-95"
+                className="px-6 py-2.5 rounded-lg font-bold transition-all bg-primary-600 hover:bg-primary-700 text-white flex items-center gap-2 shadow-lg shadow-primary-600/20 active:scale-95 h-auto text-sm"
+                icon={<Edit className="w-4 h-4" />}
               >
-                <Edit className="w-4 h-4" />
                 {t("approvals.editPublication") || "Editar Publicación"}
-              </button>
+              </Button>
             )}
           </div>
         </DialogPanel>

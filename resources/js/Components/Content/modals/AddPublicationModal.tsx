@@ -5,6 +5,7 @@ import MediaUploadSection from "@/Components/Content/Publication/common/edit/Med
 import ModalFooter from "@/Components/Content/modals/common/ModalFooter";
 import ModalHeader from "@/Components/Content/modals/common/ModalHeader";
 import ScheduleSection from "@/Components/Content/modals/common/ScheduleSection";
+import Button from "@/Components/common/Modern/Button";
 import Input from "@/Components/common/Modern/Input";
 import Select from "@/Components/common/Modern/Select";
 import Textarea from "@/Components/common/Modern/Textarea";
@@ -533,8 +534,11 @@ export default function AddPublicationModal({
                     {t("publish.publishing") || "Publicando en redes..."}
                   </span>
                 </div>
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
+                  buttonStyle="ghost"
+                  shadow="none"
                   onClick={async () => {
                     const isConfirmed = await confirm({
                       title:
@@ -567,13 +571,15 @@ export default function AddPublicationModal({
                       }
                     }
                   }}
-                  className="flex items-center gap-1.5 px-3 py-1 rounded-md bg-red-50 hover:bg-red-100 text-red-600 dark:bg-red-900/20 dark:hover:bg-red-900/30 dark:text-red-400 transition-colors border border-red-100 dark:border-red-900/50 group"
+                  className="flex items-center gap-1.5 px-3 py-1 rounded-md bg-red-50 hover:bg-red-100 text-red-600 dark:bg-red-900/20 dark:hover:bg-red-900/30 dark:text-red-400 transition-colors border border-red-100 dark:border-red-900/50 group h-auto"
+                  icon={
+                    <X className="w-3.5 h-3.5 group-hover:rotate-90 transition-transform" />
+                  }
                 >
-                  <X className="w-3.5 h-3.5 group-hover:rotate-90 transition-transform" />
                   <span className="text-[11px] font-black uppercase tracking-tighter">
                     {t("common.cancel") || "Cancelar Publicación"}
                   </span>
-                </button>
+                </Button>
               </div>
             </div>
           )}

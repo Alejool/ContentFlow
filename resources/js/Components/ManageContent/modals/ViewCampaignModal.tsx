@@ -1,4 +1,5 @@
 import CampaignMediaCarousel from "@/Components/Campaigns/CampaignMediaCarousel";
+import Button from "@/Components/common/Modern/Button";
 import ActivityList from "@/Components/ManageContent/ActivityList";
 import ApprovalHistory from "@/Components/ManageContent/ApprovalHistory";
 import { Campaign } from "@/types/Campaign";
@@ -96,12 +97,16 @@ export default function ViewCampaignModal({
                 ? t("publications.modal.show.title")
                 : t("campaigns.modal.view.title")}
             </DialogTitle>
-            <button
+            <Button
+              variant="ghost"
+              buttonStyle="ghost"
+              shadow="none"
               onClick={onClose}
-              className="p-2 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-neutral-700 text-gray-500 dark:text-gray-400"
+              className="p-2 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-neutral-700 text-gray-500 dark:text-gray-400 h-auto min-w-0"
+              icon={<X className="w-5 h-5" />}
             >
-              <X className="w-5 h-5" />
-            </button>
+              {""}
+            </Button>
           </div>
 
           <div className="flex-1 overflow-y-auto p-6">
@@ -385,23 +390,28 @@ export default function ViewCampaignModal({
 
           <div className="flex-shrink-0 flex justify-end gap-3 p-6 border-t border-gray-100 dark:border-neutral-700">
             {onEdit && canEdit && (
-              <button
+              <Button
+                variant="primary"
+                buttonStyle="solid"
                 onClick={() => {
                   onClose();
                   onEdit(item);
                 }}
-                className="px-6 py-2.5 rounded-lg font-bold transition-all bg-primary-600 hover:bg-primary-700 text-white flex items-center gap-2 shadow-lg shadow-primary-500/20 active:scale-95"
+                className="px-6 py-2.5 rounded-lg font-bold transition-all bg-primary-600 hover:bg-primary-700 text-white flex items-center gap-2 shadow-lg shadow-primary-500/20 active:scale-95 h-auto text-sm"
+                icon={<Edit className="w-4 h-4" />}
               >
-                <Edit className="w-4 h-4" />
                 {t("common.editInPanel")}
-              </button>
+              </Button>
             )}
-            <button
+            <Button
+              variant="secondary"
+              buttonStyle="ghost"
+              shadow="none"
               onClick={onClose}
-              className="px-6 py-2.5 rounded-lg font-medium transition-colors bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:text-white"
+              className="px-6 py-2.5 rounded-lg font-medium transition-colors bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:text-white h-auto"
             >
               {t("common.close")}
-            </button>
+            </Button>
           </div>
         </DialogPanel>
       </div>

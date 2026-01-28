@@ -1,4 +1,5 @@
 import PlatformSettingsModal from "@/Components/ConfigSocialMedia/PlatformSettingsModal";
+import Button from "@/Components/common/Modern/Button";
 import YouTubeThumbnailUploader from "@/Components/common/ui/YouTubeThumbnailUploader";
 import { getPlatformConfig } from "@/Constants/socialPlatforms";
 import { usePublishPublication } from "@/Hooks/publication/usePublishPublication";
@@ -218,12 +219,16 @@ export default function PublishPublicationModal({
                   {t("publications.modal.publish.title")}
                 </div>
               </DialogTitle>
-              <button
+              <Button
+                variant="ghost"
+                buttonStyle="ghost"
+                shadow="none"
                 onClick={() => onClose(publication.id)}
                 className="p-2 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-neutral-700 text-gray-500 dark:text-gray-400"
+                icon={<X className="w-5 h-5" />}
               >
-                <X className="w-5 h-5" />
-              </button>
+                {""}
+              </Button>
             </div>
 
             {isPendingReview && (
@@ -292,19 +297,27 @@ export default function PublishPublicationModal({
             <div className="mb-6">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex gap-2">
-                  <button
+                  <Button
+                    variant="ghost"
+                    buttonStyle="ghost"
+                    shadow="none"
+                    size="xs"
                     onClick={selectAll}
-                    className="text-sm text-primary-500 hover:text-primary-600 font-medium"
+                    className="text-sm text-primary-500 hover:text-primary-600 font-medium p-0 h-auto"
                   >
                     {t("publications.modal.publish.selectAll")}
-                  </button>
+                  </Button>
                   <span className="text-gray-400 dark:text-gray-600">|</span>
-                  <button
+                  <Button
+                    variant="ghost"
+                    buttonStyle="ghost"
+                    shadow="none"
+                    size="xs"
                     onClick={deselectAll}
-                    className="text-sm text-primary-500 hover:text-primary-600 font-medium"
+                    className="text-sm text-primary-500 hover:text-primary-600 font-medium p-0 h-auto"
                   >
                     {t("publications.modal.publish.deselectAll")}
-                  </button>
+                  </Button>
                 </div>
               </div>
 
@@ -376,16 +389,19 @@ export default function PublishPublicationModal({
                                       "Publicando"}{" "}
                                     ({t("common.wait") || "Espere..."})
                                   </span>
-                                  <button
+                                  <Button
                                     type="button"
+                                    variant="danger"
+                                    buttonStyle="solid"
+                                    size="xs"
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       handleCancelPublication(publication.id);
                                     }}
-                                    className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded-lg text-[10px] font-bold uppercase transition-all shadow-md active:scale-95"
+                                    className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded-lg text-[10px] font-bold uppercase transition-all shadow-md active:scale-95 h-auto min-w-0"
                                   >
                                     {t("common.cancel") || "Cancelar"}
-                                  </button>
+                                  </Button>
                                 </div>
                               </div>
                             </div>
@@ -469,16 +485,21 @@ export default function PublishPublicationModal({
 
                           <div className="flex items-center gap-1 ml-auto">
                             {!isPublished && !isPublishing && !isScheduled && (
-                              <button
+                              <Button
                                 type="button"
+                                variant="ghost"
+                                buttonStyle="ghost"
+                                shadow="none"
+                                size="xs"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   setActivePlatformSettings(account.platform);
                                 }}
                                 className="p-1.5 rounded-lg transition-all z-10 hover:bg-gray-100 dark:hover:bg-neutral-700 text-gray-500 dark:text-gray-400"
+                                icon={<SettingsIcon className="w-4 h-4" />}
                               >
-                                <SettingsIcon className="w-4 h-4" />
-                              </button>
+                                {""}
+                              </Button>
                             )}
 
                             {isSelected &&
@@ -491,7 +512,10 @@ export default function PublishPublicationModal({
                         </div>
 
                         {isPublished && (
-                          <button
+                          <Button
+                            variant="primary"
+                            buttonStyle="solid"
+                            size="xs"
                             onClick={(e) => {
                               e.stopPropagation();
                               handleUnpublishWithConfirm(
@@ -500,15 +524,18 @@ export default function PublishPublicationModal({
                               );
                             }}
                             disabled={isUnpublishing}
-                            className="absolute top-2 right-2 p-1.5 bg-red-500/80 hover:bg-red-600 text-white rounded-full transition-colors disabled:opacity-50"
+                            className="absolute top-2 right-2 p-1.5 bg-red-500/80 hover:bg-red-600 text-white rounded-full transition-colors disabled:opacity-50 min-w-0"
                             title="Unpublish to allow re-publishing"
+                            icon={
+                              isUnpublishing ? (
+                                <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                              ) : (
+                                <X className="w-3 h-3" />
+                              )
+                            }
                           >
-                            {isUnpublishing ? (
-                              <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                            ) : (
-                              <X className="w-3 h-3" />
-                            )}
-                          </button>
+                            {""}
+                          </Button>
                         )}
                       </div>
                     );
@@ -572,40 +599,48 @@ export default function PublishPublicationModal({
             )}
 
             <div className="flex gap-3 mt-8">
-              <button
+              <Button
                 type="button"
+                variant="secondary"
+                buttonStyle="outline"
                 onClick={() => onClose(publication.id)}
                 className="flex-1 px-4 py-3 rounded-lg font-medium transition-colors bg-gray-100 dark:bg-neutral-700 hover:bg-gray-200 dark:hover:bg-neutral-600 text-gray-700 dark:text-white"
               >
                 {t("publications.modal.publish.button.cancel")}
-              </button>
+              </Button>
               {canPublishDirectly ? (
                 <div className="flex-[2] flex gap-3">
                   {isPendingReview && hasPublishPermission && (
-                    <button
+                    <Button
                       type="button"
+                      variant="success"
+                      buttonStyle="outline"
                       onClick={handleApproveRequest}
-                      className="flex-1 px-4 py-3 rounded-lg font-medium bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors flex items-center justify-center gap-2"
+                      className="flex-1 px-4 py-3 rounded-lg font-medium bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors flex items-center justify-center gap-2 h-auto"
                       title="Aprobar sin publicar ahora"
+                      icon={<CheckCircle className="w-4 h-4" />}
                     >
-                      <CheckCircle className="w-4 h-4" />
                       {t("publications.modal.publish.button.approve") ||
                         "Aprobar"}
-                    </button>
+                    </Button>
                   )}
                   {isPendingReview && !hasPublishPermission && (
-                    <button
+                    <Button
                       type="button"
+                      variant="danger"
+                      buttonStyle="outline"
                       onClick={handleRejectRequest}
-                      className="flex-1 px-4 py-3 rounded-lg font-medium bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors flex items-center justify-center gap-2"
+                      className="flex-1 px-4 py-3 rounded-lg font-medium bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors flex items-center justify-center gap-2 h-auto"
+                      icon={<XCircle className="w-4 h-4" />}
                     >
-                      <XCircle className="w-4 h-4" />
                       {t("publications.modal.publish.button.reject") ||
                         "Rechazar"}
-                    </button>
+                    </Button>
                   )}
-                  <button
+                  <Button
                     type="button"
+                    variant="primary"
+                    buttonStyle="solid"
                     onClick={
                       isPendingReview && !hasPublishPermission
                         ? handleApproveRequest
@@ -623,48 +658,51 @@ export default function PublishPublicationModal({
                         selectedPlatforms.length === 0 &&
                         !isPendingReview)
                     }
-                    className="flex-[2] px-4 py-3 rounded-lg font-medium bg-gradient-to-r from-primary-500 to-pink-500 hover:from-primary-600 hover:to-pink-600 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="flex-[2] px-4 py-3 rounded-lg font-medium bg-gradient-to-r from-primary-500 to-pink-500 hover:from-primary-600 hover:to-pink-600 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 h-auto border-none"
+                    icon={
+                      publishing || publication.status === "publishing" ? (
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      ) : isPendingReview && !hasPublishPermission ? (
+                        <CheckCircle className="w-4 h-4" />
+                      ) : (
+                        <Share2 className="w-4 h-4" />
+                      )
+                    }
                   >
                     {publishing || publication.status === "publishing" ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                        {t("publications.modal.publish.publishing")}
-                      </>
+                      t("publications.modal.publish.publishing")
                     ) : isPendingReview && !hasPublishPermission ? (
-                      <>
-                        <CheckCircle className="w-4 h-4" />
-                        {t("publications.modal.publish.button.approve") ||
-                          "Aprobar"}
-                      </>
+                      t("publications.modal.publish.button.approve") ||
+                      "Aprobar"
                     ) : (
                       <>
-                        <Share2 className="w-4 h-4" />
                         {t("publications.modal.publish.button.publish")}{" "}
                         {selectedPlatforms.length > 0 &&
                           `(${selectedPlatforms.length})`}
                       </>
                     )}
-                  </button>
+                  </Button>
                 </div>
               ) : canManageContent ? (
-                <button
+                <Button
                   type="button"
+                  variant="warning"
+                  buttonStyle="solid"
                   onClick={handleRequestApproval}
                   disabled={publishing || isPendingReview}
-                  className="flex-[2] px-4 py-3 rounded-lg font-medium bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                  {isPendingReview ? (
-                    <>
+                  className="flex-[2] px-4 py-3 rounded-lg font-medium bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 h-auto border-none"
+                  icon={
+                    isPendingReview ? (
                       <Clock className="w-4 h-4" />
-                      {t("publications.modal.publish.button.pendingReview")}
-                    </>
-                  ) : (
-                    <>
+                    ) : (
                       <CheckCircle className="w-4 h-4" />
-                      {t("publications.modal.publish.button.requestApproval")}
-                    </>
-                  )}
-                </button>
+                    )
+                  }
+                >
+                  {isPendingReview
+                    ? t("publications.modal.publish.button.pendingReview")
+                    : t("publications.modal.publish.button.requestApproval")}
+                </Button>
               ) : null}
             </div>
 

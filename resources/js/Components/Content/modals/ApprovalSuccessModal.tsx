@@ -1,8 +1,6 @@
 import Button from "@/Components/common/Modern/Button";
-import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
-import { format } from "date-fns";
-import { es } from "date-fns/locale";
 import { formatDateTime } from "@/Utils/formatDate";
+import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { CheckCircle, User, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -37,12 +35,16 @@ export default function ApprovalSuccessModal({
               <CheckCircle className="w-6 h-6 text-green-500" />
               {t("approvals.approvalSuccess") || "¡Publicación Aprobada!"}
             </DialogTitle>
-            <button
+            <Button
+              variant="ghost"
+              buttonStyle="ghost"
+              shadow="none"
               onClick={onClose}
-              className="p-2 rounded-lg transition-all hover:bg-gray-100 dark:hover:bg-neutral-700 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
+              className="p-2 rounded-lg transition-all hover:bg-gray-100 dark:hover:bg-neutral-700 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 h-auto min-w-0"
+              icon={<X className="w-5 h-5" />}
             >
-              <X className="w-5 h-5" />
-            </button>
+              {""}
+            </Button>
           </div>
 
           <div className="p-6">

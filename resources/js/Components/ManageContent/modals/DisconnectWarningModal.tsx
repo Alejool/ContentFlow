@@ -1,3 +1,4 @@
+import Button from "@/Components/common/Modern/Button";
 import { useTheme } from "@/Hooks/useTheme";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { AlertTriangle, Calendar, X } from "lucide-react";
@@ -97,12 +98,12 @@ export default function DisconnectWarningModal({
                         <tr>
                           <th className="px-4 py-2 font-medium">
                             {t(
-                              "manageContent.socialMedia.disconnectModal.table.date"
+                              "manageContent.socialMedia.disconnectModal.table.date",
                             )}
                           </th>
                           <th className="px-4 py-2 font-medium">
                             {t(
-                              "manageContent.socialMedia.disconnectModal.table.publication"
+                              "manageContent.socialMedia.disconnectModal.table.publication",
                             )}
                           </th>
                         </tr>
@@ -150,47 +151,49 @@ export default function DisconnectWarningModal({
               </div>
 
               <div className="mt-8 flex justify-end gap-3">
-                <button
+                <Button
                   type="button"
+                  variant="secondary"
+                  buttonStyle="ghost"
+                  shadow="none"
+                  onClick={onClose}
+                  disabled={isLoading}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     theme === "dark"
                       ? "text-gray-300 hover:bg-neutral-700"
                       : "text-gray-700 hover:bg-gray-100"
-                  }`}
-                  onClick={onClose}
-                  disabled={isLoading}
+                  } h-auto`}
                 >
                   {t("manageContent.socialMedia.disconnectModal.cancelButton")}
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
-                  className={`px-4 py-2 rounded-lg text-sm font-medium text-white transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed ${
-                    theme === "dark"
-                      ? "bg-primary-600 hover:bg-primary-700"
-                      : "bg-primary-600 hover:bg-primary-700"
-                  }`}
+                  variant="primary"
+                  buttonStyle="solid"
                   onClick={onConfirm}
                   disabled={isLoading}
+                  loading={isLoading}
+                  className="px-4 py-2 rounded-lg text-sm font-medium text-white transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed h-auto"
                 >
-                  {isLoading
-                    ? t("common.processing")
-                    : t(
-                        "manageContent.socialMedia.disconnectModal.confirmButton"
-                      )}
-                </button>
+                  {t("manageContent.socialMedia.disconnectModal.confirmButton")}
+                </Button>
               </div>
             </div>
 
-            <button
+            <Button
+              variant="ghost"
+              buttonStyle="ghost"
+              shadow="none"
               onClick={onClose}
               className={`flex-shrink-0 -mt-2 -mr-2 p-2 rounded-full transition-colors ${
                 theme === "dark"
                   ? "text-gray-400 hover:bg-neutral-700"
                   : "text-gray-400 hover:bg-gray-100"
-              }`}
+              } h-auto min-w-0`}
+              icon={<X className="w-5 h-5" />}
             >
-              <X className="w-5 h-5" />
-            </button>
+              {""}
+            </Button>
           </div>
         </DialogPanel>
       </div>

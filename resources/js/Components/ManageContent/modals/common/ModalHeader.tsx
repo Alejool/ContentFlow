@@ -1,3 +1,4 @@
+import Button from "@/Components/common/Modern/Button";
 import { LucideIcon, Sparkles, X } from "lucide-react";
 import React from "react";
 
@@ -53,12 +54,16 @@ const ModalHeader: React.FC<ModalHeaderProps> = ({
       </div>
       <div className="flex items-center gap-4">
         {rightElement}
-        <button
+        <Button
+          variant="ghost"
+          buttonStyle="ghost"
+          shadow="none"
           onClick={onClose}
           className="p-2 hover:bg-gray-100 dark:hover:bg-neutral-700 rounded-lg transition-colors text-gray-400 dark:text-gray-500"
+          icon={<X className="w-6 h-6" />}
         >
-          <X className="w-6 h-6" />
-        </button>
+          {""}
+        </Button>
       </div>
     </div>
   );
