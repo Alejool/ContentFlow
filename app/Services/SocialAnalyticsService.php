@@ -4,12 +4,10 @@ namespace App\Services;
 
 use App\Models\SocialAccount;
 use App\Models\SocialPostLog;
-use App\Services\SocialPlatforms\FacebookService;
-use App\Services\SocialPlatforms\InstagramService;
-use App\Services\SocialPlatforms\TwitterService;
-use App\Services\SocialPlatforms\TikTokService;
-use App\Services\SocialPlatforms\YouTubeService;
-use Illuminate\Support\Facades\Cache;
+use App\Models\SocialMediaMetrics;
+use App\Models\CampaignAnalytics;
+use App\Services\SocialPlatforms\SocialPlatformFactory;
+
 use Illuminate\Support\Facades\Log;
 
 class SocialAnalyticsService
@@ -31,18 +29,14 @@ class SocialAnalyticsService
       $service = $this->getPlatformService($account->platform, $token);
 
       $info = $service->getAccountInfo();
-
-      // Normalize metrics
       $normalized = $this->normalizeAccountMetrics($account->platform, $info);
 
-      // Update account metadata and basic info
       $account->update([
         'account_name' => $normalized['name'] ?? $account->account_name,
         'account_metadata' => $info,
       ]);
 
-      // Calculate deltas comparing with previous record
-      $previousMetrics = \App\Models\SocialMediaMetrics::where('social_account_id', $account->id)
+      $previousMetrics = SocialMediaMetrics::where('social_account_id', $account->id)
         ->where('date', '<', now()->toDateString())
         ->orderBy('date', 'desc')
         ->first();
@@ -59,8 +53,7 @@ class SocialAnalyticsService
         }
       }
 
-      // Persist daily metrics in social_media_metrics table
-      \App\Models\SocialMediaMetrics::updateOrCreate(
+      SocialMediaMetrics::updateOrCreate(
         [
           'social_account_id' => $account->id,
           'date' => now()->toDateString(),
@@ -70,7 +63,7 @@ class SocialAnalyticsService
           'followers' => $normalized['followers'] ?? 0,
           'following' => $normalized['following'] ?? 0,
           'posts_count' => $normalized['posts'] ?? 0,
-          'total_likes' => $normalized['engagement'] ?? 0, // platform-specific aggregate if available
+          'total_likes' => $normalized['engagement'] ?? 0,
           'reach' => $normalized['reach'] ?? 0,
           'followers_gained' => $followersGained,
           'followers_lost' => $followersLost,
@@ -95,7 +88,6 @@ class SocialAnalyticsService
       $token = $this->tokenManager->getValidToken($account);
       $service = $this->getPlatformService($account->platform, $token);
 
-      // Fetch posts published within the timeframe
       $posts = $account->postLogs()
         ->where('status', 'published')
         ->where('published_at', '>=', now()->subDays($days))
@@ -111,9 +103,8 @@ class SocialAnalyticsService
             'engagement_data' => array_merge($post->engagement_data ?? [], $metrics, ['synced_at' => now()->toIso8601String()])
           ]);
 
-          // Also update campaign_analytics if linked to a publication
           if ($post->publication_id) {
-            \App\Models\CampaignAnalytics::updateOrCreate(
+            CampaignAnalytics::updateOrCreate(
               [
                 'publication_id' => $post->publication_id,
                 'platform' => $account->platform,
@@ -209,7 +200,7 @@ class SocialAnalyticsService
    */
   protected function getPlatformService(string $platform, string $token)
   {
-    return \App\Services\SocialPlatforms\SocialPlatformFactory::make($platform, $token);
+    return SocialPlatformFactory::make($platform, $token);
   }
 
   /**
@@ -250,7 +241,7 @@ class SocialAnalyticsService
         'followers' => $data['subscribers'] ?? 0,
         'posts' => $data['video_count'] ?? 0,
         'engagement' => $data['view_count'] ?? 0,
-        'reach' => $data['view_count'] ?? 0, // YouTube views are often considered reach in simple terms
+        'reach' => $data['view_count'] ?? 0,
         'name' => $data['title'] ?? '',
       ],
       default => [],
