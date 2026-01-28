@@ -562,6 +562,9 @@ class PublicationController extends Controller
 
         $status = $log->status === 'removed_on_platform' ? 'removed_platforms' : $log->status;
 
+        // Treat pending logs as publishing if they are not scheduled
+        if ($status === 'pending') $status = 'publishing';
+
         if (isset($statusGroups[$status])) {
           $statusGroups[$status][] = $log->social_account_id;
         }
