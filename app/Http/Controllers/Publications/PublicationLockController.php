@@ -22,14 +22,13 @@ class PublicationLockController extends Controller
             return $this->successResponse(['locks' => []]);
         }
 
-        // Clean up expired locks first
         PublicationLock::where('expires_at', '<', now())->delete();
 
         $locks = PublicationLock::whereHas('publication', function ($q) use ($user) {
             $q->where('workspace_id', $user->current_workspace_id);
         })
             ->where('expires_at', '>', now())
-            ->with('user:id,name') // Load minimal user info
+            ->with('user:id,name')
             ->get();
 
         return $this->successResponse(['locks' => $locks]);
@@ -119,7 +118,6 @@ class PublicationLockController extends Controller
      */
     public function status(Request $request, Publication $publication)
     {
-        // Clean up expired locks first
         PublicationLock::where('expires_at', '<', now())->delete();
 
         $lock = PublicationLock::where('publication_id', $publication->id)->first();

@@ -55,7 +55,7 @@ class OAuthController extends Controller
         'account' => $account,
       ]);
     } catch (\Exception $e) {
-      \Log::error("OAuth error: " . $e->getMessage());
+      Log::error("OAuth error: " . $e->getMessage());
       return response()->json(['error' => 'Authentication failed'], 500);
     }
   }

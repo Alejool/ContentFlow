@@ -26,7 +26,7 @@ use App\Events\Publications\PublicationUpdated;
 use App\Models\Publications\PublicationLock;
 use App\Events\PublicationStatusUpdated;
 use Carbon\Carbon;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
 class PublicationController extends Controller
 {
@@ -81,22 +81,18 @@ class PublicationController extends Controller
           'activities' => fn($q) => $q->orderBy('created_at', 'desc')->with('user:id,name,photo_url')
         ]);
 
-      // Apply status filter
       if ($request->has('status') && $request->status !== 'all') {
         $statuses = explode(',', $request->status);
         $query->whereIn('status', $statuses);
       }
 
-      // Apply search filter
       if ($request->has('search') && !empty($request->search)) {
         $query->where('title', 'LIKE', '%' . $request->search . '%');
       }
 
-      // Apply date range filter
       if ($request->has(['date_start', 'date_end'])) {
         $query->byDateRange($request->date_start, $request->date_end);
       }
-
 
       if ($request->has('exclude_assigned') && $request->exclude_assigned === 'true') {
         $query->where(function ($q) use ($request) {
@@ -107,9 +103,8 @@ class PublicationController extends Controller
         });
       }
 
-      // Sorting Logic
       $sort = $request->input('sort', 'newest');
-      \Log::info('PublicationController@index - Sorting:', ['sort_val' => $sort, 'request_all' => $request->all()]);
+      Log::info('PublicationController@index - Sorting:', ['sort_val' => $sort, 'request_all' => $request->all()]);
 
       switch ($sort) {
         case 'oldest':
@@ -349,7 +344,6 @@ class PublicationController extends Controller
 
     $publication->update($updateData);
 
-    // Create approval log entry
     ApprovalLog::create([
       'publication_id' => $publication->id,
       'requested_by' => Auth::id(),
@@ -391,14 +385,12 @@ class PublicationController extends Controller
       'status' => 'approved',
       'approved_by' => Auth::id(),
       'approved_at' => now(),
-      'approved_retries_remaining' => 3, // Set the retry limit
-      // Clear rejection fields if previously rejected
+      'approved_retries_remaining' => 3,
       'rejected_by' => null,
       'rejected_at' => null,
       'rejection_reason' => null,
     ]);
 
-    // Update the most recent approval log
     $latestLog = $publication->approvalLogs()
       ->whereNull('reviewed_at')
       ->latest('requested_at')
@@ -448,12 +440,10 @@ class PublicationController extends Controller
       'rejected_by' => Auth::id(),
       'rejected_at' => now(),
       'rejection_reason' => $request->input('rejection_reason'),
-      // Clear approval fields if previously approved
       'approved_by' => null,
       'approved_at' => null,
     ]);
 
-    // Update the most recent approval log
     $latestLog = $publication->approvalLogs()
       ->whereNull('reviewed_at')
       ->latest('requested_at')
@@ -491,7 +481,6 @@ class PublicationController extends Controller
       return $this->errorResponse('You do not have permission to cancel this publication.', 403);
     }
 
-    // Capture the current status for the log
     $oldStatus = $publication->status;
 
     // We only allow cancelling if it's in a state that means it's "in flight"
@@ -500,13 +489,11 @@ class PublicationController extends Controller
       return $this->errorResponse('This publication cannot be cancelled in its current state.', 422);
     }
 
-    // 1. Mark publication as failed
     $publication->update([
       'status' => 'failed',
       'updated_at' => now(),
     ]);
 
-    // 2. Mark any pending or publishing logs as failed
     $publication->socialPostLogs()
       ->whereIn('status', ['pending', 'publishing'])
       ->update([
@@ -515,14 +502,11 @@ class PublicationController extends Controller
         'updated_at' => now(),
       ]);
 
-    // 3. Log activity
     $publication->logActivity('cancelled', ['previous_status' => $oldStatus]);
 
-    // 4. Broadcast the update
     broadcast(new PublicationStatusUpdated(Auth::id(), $publication->id, 'failed'))->toOthers();
     broadcast(new PublicationUpdated($publication))->toOthers();
 
-    // 5. Clear cache
     $this->clearPublicationCache($publication->workspace_id);
 
     return $this->successResponse([
@@ -562,7 +546,6 @@ class PublicationController extends Controller
 
         $status = $log->status === 'removed_on_platform' ? 'removed_platforms' : $log->status;
 
-        // Treat pending logs as publishing if they are not scheduled
         if ($status === 'pending') $status = 'publishing';
 
         if (isset($statusGroups[$status])) {
@@ -625,7 +608,6 @@ class PublicationController extends Controller
       } elseif ($status === 'published' || $status === 'publis') {
         $stats['published']++;
 
-        // Auto-fix truncated status if encountered
         if ($status === 'publis') {
           $pub->update(['status' => 'published']);
         }
@@ -686,7 +668,7 @@ class PublicationController extends Controller
     ]);
 
     try {
-      \Log::info("📤 attachMedia called", [
+      Log::info("📤 attachMedia called", [
         'publication_id' => $publication->id,
         'key' => $request->key,
         'filename' => $request->filename,
@@ -699,7 +681,7 @@ class PublicationController extends Controller
       $maxOrder = $publication->mediaFiles()->max('order') ?? -1;
       $nextOrder = $maxOrder + 1;
 
-      \Log::info("📊 Calculated order", ['max_order' => $maxOrder, 'next_order' => $nextOrder]);
+      Log::info("📊 Calculated order", ['max_order' => $maxOrder, 'next_order' => $nextOrder]);
 
       // Create MediaFile record explicitly
       $mediaFile = \App\Models\MediaFile::create([
@@ -714,18 +696,18 @@ class PublicationController extends Controller
         'user_id' => Auth::id(), // Ensure user ownership
       ]);
 
-      \Log::info('✅ MediaFile created', ['id' => $mediaFile->id, 'status' => $mediaFile->status]);
+      Log::info('✅ MediaFile created', ['id' => $mediaFile->id, 'status' => $mediaFile->status]);
 
       // Explicitly attach with pivot data
       $publication->mediaFiles()->attach($mediaFile->id, ['order' => $nextOrder]);
 
-      \Log::info('🔗 Media attached to publication', ['media_id' => $mediaFile->id, 'publication_id' => $publication->id, 'order' => $nextOrder]);
+      Log::info('🔗 Media attached to publication', ['media_id' => $mediaFile->id, 'publication_id' => $publication->id, 'order' => $nextOrder]);
 
       // Dispatch job to verify S3 file and generate thumbnails if needed
       // Passing null as tempPath indicates it's already on S3 (Direct Upload)
       \App\Jobs\ProcessBackgroundUpload::dispatch($publication, $mediaFile, null);
 
-      \Log::info('🚀 ProcessBackgroundUpload job dispatched', ['media_file_id' => $mediaFile->id]);
+      Log::info('🚀 ProcessBackgroundUpload job dispatched', ['media_file_id' => $mediaFile->id]);
 
       // Clear media lock
       cache()->forget("publication:{$publication->id}:media_lock");
@@ -741,7 +723,7 @@ class PublicationController extends Controller
 
       return $this->successResponse(['publication' => $publication], 'Media attached successfully.');
     } catch (\Exception $e) {
-      \Log::error('❌ Failed to attach media', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+      Log::error('❌ Failed to attach media', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
       return $this->errorResponse('Failed to attach media: ' . $e->getMessage(), 500);
     }
   }

@@ -7,6 +7,7 @@ use Inertia\Middleware;
 use Tighten\Ziggy\Ziggy;
 use App\Models\Role;
 use App\Services\AIService;
+use Illuminate\Support\Facades\Log;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -79,7 +80,7 @@ class HandleInertiaRequests extends Middleware
                 return $ws;
               });
           } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Inertia Workspaces Share Error: ' . $e->getMessage());
+            Log::error('Inertia Workspaces Share Error: ' . $e->getMessage());
             return [];
           }
         },
@@ -155,7 +156,7 @@ class HandleInertiaRequests extends Middleware
 
             return $currentWorkspace;
           } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Inertia Current Workspace Share Error: ' . $e->getMessage());
+            Log::error('Inertia Current Workspace Share Error: ' . $e->getMessage());
             return null;
           }
         },

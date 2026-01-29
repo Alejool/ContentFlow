@@ -62,12 +62,10 @@ class RegisteredUserController extends Controller
         ]);
 
         event(new Registered($user));
-        
-        // Log in and regenerate session
+
         Auth::login($user);
         $request->session()->regenerate();
 
-        // Send email verification notification
         try {
             $user->sendEmailVerificationNotification();
             Log::info('Email verification sent to: ' . $user->email);

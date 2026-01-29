@@ -9,6 +9,8 @@ use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\SetLocale;
 use App\Http\Middleware\HandleWorkspaceContext;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
+use App\Http\Middleware\SecurityHeaders;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -28,14 +30,14 @@ return Application::configure(basePath: dirname(__DIR__))
             'api/*',
         ]);
         $middleware->web(append: [
-            \App\Http\Middleware\SecurityHeaders::class,
+            SecurityHeaders::class,
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
             SetLocale::class,
             HandleWorkspaceContext::class,
         ]);
         $middleware->api(append: [
-            \App\Http\Middleware\SecurityHeaders::class,
+            SecurityHeaders::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
@@ -49,7 +51,7 @@ return Application::configure(basePath: dirname(__DIR__))
             ]);
             return null;
         });
-        $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\NotFoundHttpException $e, $request) {
+        $exceptions->render(function (NotFoundHttpException $e, $request) {
             Log::warning('404 Not Found', [
                 'url' => $request->fullUrl(),
                 'method' => $request->method(),

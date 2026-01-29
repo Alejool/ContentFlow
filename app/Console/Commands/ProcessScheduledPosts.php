@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Models\SocialPost;
+use App\Models\SocialPostLog;
 use App\Jobs\PublishSocialPostJob;
 use Illuminate\Console\Command;
 
@@ -12,7 +12,7 @@ class ProcessScheduledPosts extends Command
 
   public function handle()
   {
-    $posts = SocialPost::where('status', 'scheduled')
+    $posts = SocialPostLog::where('status', 'scheduled')
       ->where('scheduled_for', '<=', now())
       ->get();
 

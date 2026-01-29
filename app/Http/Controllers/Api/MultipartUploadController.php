@@ -76,7 +76,7 @@ class MultipartUploadController extends Controller
         'Key' => $key,
         'UploadId' => $uploadId,
         'PartNumber' => $partNumber,
-        'Body' => '', // Empty for signing
+        'Body' => '',
       ]);
 
       $requestS3 = $client->createPresignedRequest($cmd, '+20 minutes');

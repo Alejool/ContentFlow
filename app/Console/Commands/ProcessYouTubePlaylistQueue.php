@@ -189,7 +189,7 @@ class ProcessYouTubePlaylistQueue extends Command
 
             Log::info('Playlist operation completed', [
                 'video_id' => $item->video_id,
-                'playlist_id' => $item->playlist_id, // Use updated ID
+                'playlist_id' => $item->playlist_id,
                 'playlist_name' => $item->playlist_name
             ]);
 
@@ -197,7 +197,6 @@ class ProcessYouTubePlaylistQueue extends Command
 
             return true;
         } catch (\Exception $e) {
-            // Marcar como fallido
             $item->markAsFailed($e->getMessage());
 
             // Get video title from publication if available

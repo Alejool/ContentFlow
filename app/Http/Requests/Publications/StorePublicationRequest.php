@@ -5,6 +5,7 @@ namespace App\Http\Requests\Publications;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Models\Publications\Publication;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Http\UploadedFile;
 
 class StorePublicationRequest extends FormRequest
 {
@@ -16,7 +17,7 @@ class StorePublicationRequest extends FormRequest
     public function rules(): array
     {
         // Debug: Log incoming data before validation
-        \Log::info('StorePublicationRequest - Incoming data:', [
+        Log::info('StorePublicationRequest - Incoming data:', [
             'all_data' => $this->all(),
             'status' => $this->input('status'),
             'method' => $this->method(),
@@ -54,7 +55,7 @@ class StorePublicationRequest extends FormRequest
             // but for now let's relax it to allow the controller/service to handle valid data.
             'media.*' => [
                 function ($attribute, $value, $fail) {
-                    if ($value instanceof \Illuminate\Http\UploadedFile) {
+                    if ($value instanceof UploadedFile) {
                         // Standard file validation logic could go here if needed,
                         // or we rely on the fact it IS a file.
                         // We can check extension/mime if we want.

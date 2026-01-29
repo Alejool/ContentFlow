@@ -4,6 +4,8 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\SocialPostLog;
+use App\Services\SocialPlatforms\YouTubeService;
+use App\Notifications\PublicationStatusUpdate;
 
 class CheckPublicationStatus extends Command
 {
@@ -45,7 +47,7 @@ class CheckPublicationStatus extends Command
                     continue;
                 }
 
-                $service = new \App\Services\SocialPlatforms\YouTubeService(
+                $service = new YouTubeService(
                     $log->socialAccount->access_token,
                     $log->socialAccount
                 );
@@ -137,7 +139,7 @@ class CheckPublicationStatus extends Command
     private function notifyUser($log, $status, $message)
     {
         if ($log->user) {
-            $log->user->notify(new \App\Notifications\PublicationStatusUpdate($log, [
+            $log->user->notify(new PublicationStatusUpdate($log, [
                 'status' => $status,
                 'message' => $message,
                 'details' => ['platform_post_id' => $log->platform_post_id]

@@ -22,12 +22,10 @@ class UploadController extends Controller
     $filename = $request->input('filename');
     $contentType = $request->input('content_type');
 
-    // Create a unique path
     $uuid = Str::uuid();
     $extension = pathinfo($filename, PATHINFO_EXTENSION);
     $key = "publications/{$uuid}.{$extension}";
 
-    // Check if we are using S3
     if (config('filesystems.default') === 's3') {
       $client = Storage::disk('s3')->getClient();
       $bucket = config('filesystems.disks.s3.bucket');
@@ -53,7 +51,6 @@ class UploadController extends Controller
       // Fallback for local driver (if not using S3 in dev)
       // This is tricky for "direct upload" simulation locally without MinIO.
       // For now, let's assume S3 is configured or error out/fallback to normal.
-      // But user asked for this architecture.
       return response()->json([
         'error' => 'Storage driver must be S3 for direct upload'
       ], 400);

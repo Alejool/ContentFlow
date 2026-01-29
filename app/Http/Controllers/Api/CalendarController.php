@@ -83,7 +83,7 @@ class CalendarController extends Controller
         'id' => "post_{$post->id}",
         'resourceId' => $post->id,
         'type' => 'post',
-        'title' => $post->socialAccount->account_name, // Remove platform prefix
+        'title' => $post->socialAccount->account_name, 
         'start' => $post->scheduled_at ? $post->scheduled_at->copy()->setTimezone('UTC')->toIso8601String() : null,
         'status' => $post->status,
         'color' => $this->getStatusColor($post->status, true),

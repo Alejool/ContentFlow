@@ -9,6 +9,7 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Broadcasting\PresenceChannel;
 
 class PublicationLockChanged implements ShouldBroadcast
 {
@@ -45,7 +46,7 @@ class PublicationLockChanged implements ShouldBroadcast
   {
     return [
       new PrivateChannel('workspace.' . $this->workspaceId),
-      new \Illuminate\Broadcasting\PresenceChannel('publication.' . $this->publicationId),
+      new PresenceChannel('publication.' . $this->publicationId),
     ];
   }
 

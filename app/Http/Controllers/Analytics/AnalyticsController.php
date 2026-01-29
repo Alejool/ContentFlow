@@ -105,7 +105,6 @@ class AnalyticsController extends Controller
 
         $stats = $this->statisticsService->getDashboardStats($workspaceId, $days);
 
-        // Format trends consistently with Dashboard
         if (isset($stats['engagement_trends'])) {
             $stats['engagement_trends'] = collect($stats['engagement_trends'])->map(function ($trend) {
                 return [
@@ -287,10 +286,8 @@ class AnalyticsController extends Controller
         $callback = function () use ($data) {
             $file = fopen('php://output', 'w');
 
-            // Add headers
             fputcsv($file, ['Metric', 'Value']);
 
-            // Add overview data
             foreach ($data['overview'] as $key => $value) {
                 if (!is_array($value)) {
                     fputcsv($file, [$key, $value]);

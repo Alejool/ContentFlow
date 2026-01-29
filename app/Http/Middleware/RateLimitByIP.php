@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\RateLimiter;
 
 class RateLimitByIP
 {
@@ -16,7 +17,7 @@ class RateLimitByIP
     public function handle(Request $request, Closure $next): Response
     {
         $key = $request->ip();
-        $maxAttempts = 60; // Default limit
+        $maxAttempts = 60;
         $decayMinutes = 1;
 
         // Increase limit for upload-related routes (multipart, signing, etc.)
@@ -24,19 +25,19 @@ class RateLimitByIP
             $maxAttempts = 1000;
         }
 
-        if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($key, $maxAttempts)) {
+        if (RateLimiter::tooManyAttempts($key, $maxAttempts)) {
             return response()->json([
                 'message' => 'Too many requests.',
-                'retry_after' => \Illuminate\Support\Facades\RateLimiter::availableIn($key)
+                'retry_after' => RateLimiter::availableIn($key)
             ], 429);
         }
 
-        \Illuminate\Support\Facades\RateLimiter::hit($key, $decayMinutes * 60);
+        RateLimiter::hit($key, $decayMinutes * 60);
 
         $response = $next($request);
 
         $response->headers->set('X-RateLimit-Limit', $maxAttempts);
-        $response->headers->set('X-RateLimit-Remaining', \Illuminate\Support\Facades\RateLimiter::remaining($key, $maxAttempts));
+        $response->headers->set('X-RateLimit-Remaining', RateLimiter::remaining($key, $maxAttempts));
 
         return $response;
     }

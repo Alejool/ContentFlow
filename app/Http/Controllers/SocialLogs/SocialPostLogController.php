@@ -17,8 +17,7 @@ class SocialPostLogController extends Controller
   public function __construct(
     private SocialPostLogService $logService,
     private PlatformPublishService $publishService
-  ) {
-  }
+  ) {}
 
   /**
    * Obtener publicaciones de una campaña
@@ -54,7 +53,6 @@ class SocialPostLogController extends Controller
       'user' => fn($q) => $q->select('id', 'name', 'email')
     ])->findOrFail($id);
 
-    // Verificar que el log pertenece al usuario
     if ($log->user_id !== auth()->id()) {
       return response()->json([
         'success' => false,
@@ -91,7 +89,6 @@ class SocialPostLogController extends Controller
       'socialAccount' => fn($q) => $q->select('id', 'platform', 'account_name', 'access_token', 'refresh_token')
     ])->findOrFail($id);
 
-    // Verificar permisos
     if ($log->user_id !== auth()->id()) {
       return response()->json([
         'success' => false,
@@ -107,12 +104,8 @@ class SocialPostLogController extends Controller
     }
 
     try {
-      // Resetear el log
+      // Reset log
       $this->logService->resetForRetry($log);
-
-      // Aquí deberías implementar la lógica de reintento
-      // Por ahora solo actualizamos el estado
-
       return response()->json([
         'success' => true,
         'message' => 'Retry initiated',
@@ -127,7 +120,7 @@ class SocialPostLogController extends Controller
   }
 
   /**
-   * Reintentar todas las publicaciones fallidas de una campaña
+   * Retry all failed publications of a campaign
    */
   public function retryAllFailed($campaignId)
   {
@@ -162,7 +155,6 @@ class SocialPostLogController extends Controller
     foreach ($failedLogs as $log) {
       try {
         $this->logService->resetForRetry($log);
-        // Implementar lógica de reintento aquí
         $retried++;
       } catch (\Exception $e) {
         $this->logService->markAsFailed($log, 'Retry failed: ' . $e->getMessage());
@@ -179,7 +171,7 @@ class SocialPostLogController extends Controller
   }
 
   /**
-   * Eliminar un log
+   * Delete a log
    */
   public function destroy($id)
   {

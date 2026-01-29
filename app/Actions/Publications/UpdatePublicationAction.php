@@ -3,10 +3,12 @@
 namespace App\Actions\Publications;
 
 use App\Models\Publications\Publication;
+use App\Events\Publications\PublicationUpdated;
 use App\Services\Media\MediaProcessingService;
 use App\Services\Scheduling\SchedulingService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Http\UploadedFile;
 
 class UpdatePublicationAction
 {
@@ -18,7 +20,7 @@ class UpdatePublicationAction
   public function execute(Publication $publication, array $data, array $newFiles = []): Publication
   {
     $start = microtime(true);
-    \Log::info("⏱️ Starting UpdatePublicationAction for pub {$publication->id}");
+    Log::info("⏱️ Starting UpdatePublicationAction for pub {$publication->id}");
 
     return DB::transaction(function () use ($publication, $data, $newFiles, $start) {
       // Determine status based on scheduled_at and current state
@@ -50,7 +52,7 @@ class UpdatePublicationAction
       if ($currentStatus !== 'processing') {
         foreach ($newFiles as $file) {
           $isVideo = false;
-          if ($file instanceof \Illuminate\Http\UploadedFile) {
+          if ($file instanceof UploadedFile) {
             $isVideo = str_starts_with($file->getMimeType(), 'video/');
           } elseif (is_array($file)) {
             $isVideo = str_starts_with($file['mime_type'] ?? '', 'video/');
@@ -85,9 +87,8 @@ class UpdatePublicationAction
       }
 
       $publication->update($updateData);
-      \Log::info("⏱️ Pub basic update took: " . (microtime(true) - $start) . "s");
+      Log::info("⏱️ Pub basic update took: " . (microtime(true) - $start) . "s");
 
-      // Handle Campaign
       if (isset($data['campaign_id'])) {
         if (empty($data['campaign_id'])) {
           $publication->campaigns()->detach();
@@ -96,10 +97,8 @@ class UpdatePublicationAction
         }
       }
 
-      // Handle Media Deletions
-      // Handle Media Deletions (Explicitly)
       if (!empty($data['removed_media_ids'])) {
-        \Log::info("🗑️ Removing media files from publication {$publication->id}", ['ids' => $data['removed_media_ids']]);
+        Log::info("🗑️ Removing media files from publication {$publication->id}", ['ids' => $data['removed_media_ids']]);
         $publication->mediaFiles()->whereIn('media_files.id', $data['removed_media_ids'])->get()->each(function ($mediaFile) {
           $this->mediaService->deleteMediaFile($mediaFile);
         });
@@ -136,7 +135,7 @@ class UpdatePublicationAction
           'durations' => $data['durations_new'] ?? [],
           'thumbnails' => $data['thumbnails'] ?? [],
         ]);
-        \Log::info("⏱️ ProcessUploads took: " . (microtime(true) - $start) . "s");
+        Log::info("⏱️ ProcessUploads took: " . (microtime(true) - $start) . "s");
       }
 
       // Handle Schedules - Always process if social_accounts key exists
@@ -158,10 +157,10 @@ class UpdatePublicationAction
       // $publication->load(['mediaFiles.derivatives', 'scheduled_posts.socialAccount', 'socialPostLogs.socialAccount', 'campaigns']);
 
       // Broadcast update to other users in the workspace
-      \App\Events\Publications\PublicationUpdated::dispatch($publication);
-      \Log::info("⏱️ Event dispatch took: " . (microtime(true) - $start) . "s");
+      PublicationUpdated::dispatch($publication);
+      Log::info("⏱️ Event dispatch took: " . (microtime(true) - $start) . "s");
 
-      \Log::info("✅ UpdatePublicationAction completed for pub {$publication->id} in " . (microtime(true) - $start) . "s");
+      Log::info("✅ UpdatePublicationAction completed for pub {$publication->id} in " . (microtime(true) - $start) . "s");
       return $publication;
     });
   }

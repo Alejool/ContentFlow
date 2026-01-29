@@ -5,6 +5,7 @@ use App\Events\TokenExpired;
 use App\Notifications\TokenExpiredNotification;
 use App\Events\AccountReconnectionNeeded;
 
+
 class HandleTokenExpired
 {
   public function handle(TokenExpired $event)

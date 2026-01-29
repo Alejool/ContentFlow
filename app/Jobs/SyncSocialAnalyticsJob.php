@@ -8,8 +8,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
+
 
 class SyncSocialAnalyticsJob implements ShouldQueue
 {
@@ -35,9 +34,9 @@ class SyncSocialAnalyticsJob implements ShouldQueue
         'failure_count' => 0,
       ]);
 
-      \Log::info("Sincronización completada para cuenta {$this->account->id} ({$this->account->platform})");
+      Log::info("Sincronización completada para cuenta {$this->account->id} ({$this->account->platform})");
     } catch (\Exception $e) {
-      \Log::error("Error syncing analytics for account {$this->account->id}: " . $e->getMessage());
+      Log::error("Error syncing analytics for account {$this->account->id}: " . $e->getMessage());
       $this->account->increment('failure_count');
     }
   }

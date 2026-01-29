@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 
 use App\Traits\ApiResponse;
 use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 class UserCalendarEventController extends Controller
 {
@@ -80,13 +81,13 @@ class UserCalendarEventController extends Controller
     $normalized = $validated;
     try {
       if (!empty($validated['start_date'])) {
-        $normalized['start_date'] = \Carbon\Carbon::parse($validated['start_date'], $clientTz)->setTimezone('UTC');
+        $normalized['start_date'] = Carbon::parse($validated['start_date'], $clientTz)->setTimezone('UTC');
       }
       if (!empty($validated['end_date'])) {
-        $normalized['end_date'] = \Carbon\Carbon::parse($validated['end_date'], $clientTz)->setTimezone('UTC');
+        $normalized['end_date'] = Carbon::parse($validated['end_date'], $clientTz)->setTimezone('UTC');
       }
       if (!empty($validated['remind_at'])) {
-        $normalized['remind_at'] = \Carbon\Carbon::parse($validated['remind_at'], $clientTz)->setTimezone('UTC');
+        $normalized['remind_at'] = Carbon::parse($validated['remind_at'], $clientTz)->setTimezone('UTC');
       }
     } catch (\Exception $e) {
       // If parsing fails, leave values as-is and let model/DB handle validation
@@ -151,16 +152,15 @@ class UserCalendarEventController extends Controller
     $normalized = $validated;
     try {
       if (array_key_exists('start_date', $validated) && !empty($validated['start_date'])) {
-        $normalized['start_date'] = \Carbon\Carbon::parse($validated['start_date'], $clientTz)->setTimezone('UTC');
+        $normalized['start_date'] = Carbon::parse($validated['start_date'], $clientTz)->setTimezone('UTC');
       }
       if (array_key_exists('end_date', $validated) && !empty($validated['end_date'])) {
-        $normalized['end_date'] = \Carbon\Carbon::parse($validated['end_date'], $clientTz)->setTimezone('UTC');
+        $normalized['end_date'] = Carbon::parse($validated['end_date'], $clientTz)->setTimezone('UTC');
       }
       if (array_key_exists('remind_at', $validated) && !empty($validated['remind_at'])) {
-        $normalized['remind_at'] = \Carbon\Carbon::parse($validated['remind_at'], $clientTz)->setTimezone('UTC');
+        $normalized['remind_at'] = Carbon::parse($validated['remind_at'], $clientTz)->setTimezone('UTC');
       }
     } catch (\Exception $e) {
-      // ignore parsing errors
     }
 
     $event->update($normalized);
@@ -171,7 +171,7 @@ class UserCalendarEventController extends Controller
   public function destroy(string $id)
   {
     $event = UserCalendarEvent::where('workspace_id', Auth::user()->current_workspace_id)
-      ->where('user_id', Auth::id()) // Only allow deleting own events
+      ->where('user_id', Auth::id())
       ->findOrFail($id);
 
     $event->delete();
