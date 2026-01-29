@@ -12,11 +12,12 @@ primary_region = "gru"
   app = "php artisan octane:start --server=swoole --host=0.0.0.0 --port=8080"
   queue = "php artisan queue:work --queue=publishing,publishing:notify,notifications,emails,high,default,low --tries=3 --timeout=90"
   scheduler = "sh -c 'while true; do php artisan schedule:run --no-interaction; sleep 60; done'"
+  reverb = "php artisan reverb:start --host=0.0.0.0 --port=8080"
 
 [[services]]
   protocol = "tcp"
   internal_port = 8080
-  processes = ["app"]
+  processes = ["app", "reverb"]
 
   [[services.ports]]
     port = 80
