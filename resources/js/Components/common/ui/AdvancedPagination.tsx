@@ -86,7 +86,7 @@ export default function AdvancedPagination({
         <button
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1 || isLoading}
-          className="p-2 rounded-lg border border-gray-200 dark:border-neutral-700 hover:bg-gray-50 dark:hover:bg-neutral-700 disabled:opacity-50 transition-colors"
+          className="p-2 rounded-lg border border-gray-200 dark:border-neutral-700 hover:bg-gray-50 dark:hover:bg-neutral-700 disabled:opacity-50 text-gray-800 dark:text-white transition-colors"
           title={t("common.previous")}
         >
           <ChevronLeft className="w-4 h-4" />
@@ -121,7 +121,7 @@ export default function AdvancedPagination({
         <button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === lastPage || isLoading}
-          className="p-2 rounded-lg border border-gray-200 dark:border-neutral-700 hover:bg-gray-50 dark:hover:bg-neutral-700 disabled:opacity-50 transition-colors"
+          className="p-2 rounded-lg border border-gray-200 dark:border-neutral-700 hover:bg-gray-50 dark:hover:bg-neutral-700 disabled:opacity-50 text-gray-800 dark:text-white  transition-colors"
           title={t("common.next")}
         >
           <ChevronRight className="w-4 h-4" />
