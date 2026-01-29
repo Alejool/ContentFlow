@@ -10,9 +10,9 @@ primary_region = "gru"
 
 [processes]
   app = "php artisan octane:start --server=swoole --host=0.0.0.0 --port=8080"
+  reverb = "php artisan reverb:start --host=0.0.0.0 --port=8080"
   queue = "php artisan queue:work --queue=publishing,publishing:notify,notifications,emails,high,default,low --tries=3 --timeout=90"
   scheduler = "sh -c 'while true; do php artisan schedule:run --no-interaction; sleep 60; done'"
-  reverb = "php artisan reverb:start --host=0.0.0.0 --port=8080"
 
 [[services]]
   protocol = "tcp"
@@ -39,3 +39,9 @@ primary_region = "gru"
   cpu_kind = "shared"
   cpus = 1
   processes = ["app", "queue", "scheduler"]
+
+[[vm]]
+  memory = "512mb"
+  cpu_kind = "shared"
+  cpus = 1
+  processes = ["reverb"]
