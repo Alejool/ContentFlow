@@ -90,7 +90,7 @@ export default function ManageContentPage() {
   useEffect(() => {
     const timer = setTimeout(() => {
       handleFilterChange({ ...filters, search: search || undefined });
-    }, 300); // 300ms debounce
+    }, 300);
 
     return () => clearTimeout(timer);
   }, [search]);
@@ -99,7 +99,7 @@ export default function ManageContentPage() {
     (tab: ContentTab) => {
       startTransition(() => {
         setActiveTab(tab);
-        setSearch(""); // Clear search when changing tabs
+        setSearch(""); 
         handleFilterChange({});
       });
     },

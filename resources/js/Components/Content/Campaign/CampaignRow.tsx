@@ -158,7 +158,7 @@ const CampaignRow = memo(
         </td>
         <td className="px-6 py-4 text-sm text-gray-500">
           <span className="whitespace-nowrap">
-            {item.publications_count || item.publications?.length || 0} items
+            {item.publications?.length || 0} items
           </span>
         </td>
         <td className="px-6 py-4 text-right">

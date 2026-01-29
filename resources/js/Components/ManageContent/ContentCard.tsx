@@ -363,7 +363,7 @@ export default function ContentCard({
               <div className="flex items-center gap-2">
                 <Users className="w-3.5 h-3.5 text-gray-400" />
                 <span className="text-xs text-gray-600 dark:text-gray-300">
-                  {item.publications_count || 0} publicaciones
+                  {item.publications?.length || 0} publicaciones
                 </span>
               </div>
               {item.engagement_rate && (

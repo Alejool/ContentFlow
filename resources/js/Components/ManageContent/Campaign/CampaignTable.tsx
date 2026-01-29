@@ -80,7 +80,6 @@ const CampaignTable = memo(
       >
         <div className="hidden lg:block overflow-x-auto scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-gray-700">
           <div className="grid grid-cols-1 grid-rows-1">
-            {/* Data Table */}
             <div
               className={`col-start-1 row-start-1 transition-all duration-500 ${smoothLoading ? "invisible opacity-0" : "visible opacity-100"}`}
             >
@@ -132,7 +131,6 @@ const CampaignTable = memo(
               </table>
             </div>
 
-            {/* Skeleton Layer */}
             {smoothLoading && (
               <div className="col-start-1 row-start-1 bg-white/50 dark:bg-neutral-900/50 animate-out fade-out duration-500 fill-mode-forwards z-20">
                 <table className="w-full text-left border-collapse whitespace-nowrap">
@@ -164,7 +162,6 @@ const CampaignTable = memo(
             />
           ) : (
             <div className="grid grid-cols-1 grid-rows-1">
-              {/* Data Layer */}
               <div
                 className={`col-start-1 row-start-1 transition-all duration-500 ${smoothLoading ? "invisible opacity-0" : "visible opacity-100"}`}
               >
@@ -181,7 +178,6 @@ const CampaignTable = memo(
                 />
               </div>
 
-              {/* Skeleton Layer */}
               {smoothLoading && (
                 <div className="col-start-1 row-start-1 bg-white dark:bg-neutral-900 animate-out fade-out duration-500 fill-mode-forwards space-y-3 z-20">
                   {[...Array(3)].map((_, i) => (

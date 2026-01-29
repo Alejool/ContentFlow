@@ -1,7 +1,7 @@
+import { getDateFnsLocale } from "@/Utils/dateLocales";
 import { Campaign } from "@/types/Campaign";
 import { usePage } from "@inertiajs/react";
 import { format } from "date-fns";
-import { getDateFnsLocale } from "@/Utils/dateLocales";
 import {
   Calendar,
   ChevronDown,
@@ -82,7 +82,6 @@ const CampaignRow = memo(
                 {item.description || "No description"}
               </p>
 
-              {/* Goal & Dates */}
               <div className="flex items-center gap-3 mt-1.5 flex-wrap">
                 {(item.start_date || item.end_date) && (
                   <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
@@ -158,7 +157,7 @@ const CampaignRow = memo(
         </td>
         <td className="px-6 py-4 text-sm text-gray-500">
           <span className="whitespace-nowrap">
-            {item.publications_count || item.publications?.length || 0} items
+            {item.publications?.length || 0} items
           </span>
         </td>
         <td className="px-6 py-4 text-right">
