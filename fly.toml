@@ -7,17 +7,31 @@ primary_region = "gru"
   [build.args]
     VITE_REVERB_APP_KEY = "contenflow-key"
     VITE_REVERB_HOST = "contenflow.fly.dev"
+    VITE_REVERB_PORT = "6001"
+    VITE_REVERB_SCHEME = "wss"
+
+[env]
+  APP_ENV = "production"
+  APP_DEBUG = "false"
+  LOG_CHANNEL = "stderr"
+
+  # Variables para Reverb
+  REVERB_APP_ID = "contenflow-app"
+  REVERB_APP_KEY = "contenflow-key"
+  REVERB_HOST = "0.0.0.0"
+  REVERB_PORT = "6001"
+  REVERB_SCHEME = "http"
 
 [processes]
   app = "php artisan octane:start --server=swoole --host=0.0.0.0 --port=8080"
-  reverb = "php artisan reverb:start --host=0.0.0.0 --port=8080"
+  reverb = "php artisan reverb:start --host=0.0.0.0 --port=6001"
   queue = "php artisan queue:work --queue=publishing,publishing:notify,notifications,emails,high,default,low --tries=3 --timeout=90"
   scheduler = "sh -c 'while true; do php artisan schedule:run --no-interaction; sleep 60; done'"
 
 [[services]]
   protocol = "tcp"
   internal_port = 8080
-  processes = ["app", "reverb"]
+  processes = ["app"]
 
   [[services.ports]]
     port = 80
@@ -27,12 +41,21 @@ primary_region = "gru"
     port = 443
     handlers = ["tls", "http"]
 
-[[services.http_checks]]
-  interval = "30s"
-  method = "get"
-  path = "/up"
-  timeout = "5s"
-  grace_period = "1200s"
+  [[services.http_checks]]
+    interval = "30s"
+    method = "get"
+    path = "/up"
+    timeout = "5s"
+    grace_period = "120s"
+
+[[services]]
+  protocol = "tcp"
+  internal_port = 6001
+  processes = ["reverb"]
+
+  [[services.ports]]
+    port = 6001
+    handlers = ["tls", "http"]
 
 [[vm]]
   memory = "512mb"
@@ -41,7 +64,7 @@ primary_region = "gru"
   processes = ["app", "queue", "scheduler"]
 
 [[vm]]
-  memory = "512mb"
+  memory = "256mb"
   cpu_kind = "shared"
   cpus = 1
   processes = ["reverb"]
