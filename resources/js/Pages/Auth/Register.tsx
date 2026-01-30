@@ -55,9 +55,7 @@ export default function Register() {
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-    console.log("Submitting registration with data:", data);
 
-    // Clear previous field errors
     setErrors({});
 
     const result = schema.safeParse(data);
@@ -74,7 +72,6 @@ export default function Register() {
       return;
     }
 
-    // If validation passes, call submitRegister (uses axios with JSON accept header)
     await submitRegister({
       name: data.name,
       email: data.email,

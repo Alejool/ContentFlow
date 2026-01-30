@@ -45,7 +45,6 @@ export const useUser = (initialUser: any) => {
 
   useEffect(() => {
     if (user) {
-      console.log("Resetting form with data:", user);
       reset({
         name: user.name || "",
         email: user.email || "",
@@ -108,7 +107,6 @@ export const useUser = (initialUser: any) => {
 
   const handleProfileUpdate = async (data: UserProfileFormData) => {
     try {
-      console.log("Sending Profile Update:", data);
       const result = await updateProfile(data);
       if (result.success) {
         toast.success(result.message || t("profile.update_success"));
@@ -122,7 +120,6 @@ export const useUser = (initialUser: any) => {
         setTimeout(() => {
           const latestUser = useUserStore.getState().user;
           if (latestUser) {
-            console.log("Force resetting form with updated user:", latestUser);
             reset({
               name: latestUser.name || "",
               email: latestUser.email || "",
@@ -181,7 +178,6 @@ export const useUser = (initialUser: any) => {
   return {
     register,
     handleSubmit: (e?: React.BaseSyntheticEvent) => {
-      console.log("Submit triggered");
       return handleSubmit(handleProfileUpdate, onInvalid)(e);
     },
     errors,

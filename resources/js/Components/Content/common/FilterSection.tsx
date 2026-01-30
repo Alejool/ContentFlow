@@ -101,7 +101,6 @@ export default function FilterSection({
               value={statusFilter}
               variant="outlined"
               onChange={(val) => {
-                console.log('Status filter changed:', val); // Debug log
                 handleFilterChange("status", String(val));
               }}
               size="md"
@@ -118,7 +117,6 @@ export default function FilterSection({
                 value={sortFilter}
                 variant="outlined"
                 onChange={(val) => {
-                  console.log('Sort filter changed:', val); // Debug log
                   handleFilterChange("sort", String(val));
                 }}
                 size="md"

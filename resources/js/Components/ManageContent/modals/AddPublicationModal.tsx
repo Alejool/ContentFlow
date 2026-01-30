@@ -163,15 +163,12 @@ export default function AddPublicationModal({
 
   const handleUploadAndSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("🚀 [S3 UPLOAD] handleUploadAndSubmit called");
 
     const filesToUpload = mediaFiles.filter((m) => m.file instanceof File);
-    console.log("🚀 [S3 UPLOAD] Files to upload:", filesToUpload.length);
 
     if (filesToUpload.length > 0) {
       // Upload all files
       try {
-        console.log("🚀 [S3 UPLOAD] Starting S3 upload...");
         // Upload files and get metadata
         const uploadResults = await Promise.all(
           filesToUpload.map(async (m) => ({
@@ -179,8 +176,6 @@ export default function AddPublicationModal({
             metadata: await uploadFile(m.file!, m.tempId),
           })),
         );
-
-        console.log("🚀 [S3 UPLOAD] Upload complete, metadata:", uploadResults);
 
         // CRITICAL: Update the mediaFiles store to replace File objects with metadata
         // The usePublicationForm hook reads from mediaFiles store, not form values
@@ -198,10 +193,6 @@ export default function AddPublicationModal({
           return media;
         });
 
-        console.log(
-          "🚀 [S3 UPLOAD] Updating store with metadata...",
-          updatedMediaFiles,
-        );
         // Update the store using the proper method
         const setMediaFiles = useMediaStore.getState().setMediaFiles;
         setMediaFiles(updatedMediaFiles as any);
@@ -209,7 +200,6 @@ export default function AddPublicationModal({
         // Small delay to ensure state update propagates
         await new Promise((resolve) => setTimeout(resolve, 100));
 
-        console.log("🚀 [S3 UPLOAD] Calling handleSubmit...");
         // Proceed with normal submit
         handleSubmit(e);
       } catch (err) {
@@ -217,7 +207,6 @@ export default function AddPublicationModal({
         // Show error
       }
     } else {
-      console.log("🚀 [S3 UPLOAD] No files to upload, proceeding with submit");
       handleSubmit(e);
     }
   };

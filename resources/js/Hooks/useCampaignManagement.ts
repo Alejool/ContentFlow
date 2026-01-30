@@ -3,8 +3,7 @@ import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
-export function useCampaignManagement(
-) {
+export function useCampaignManagement() {
   const { t } = useTranslation();
   const [campaigns, setCampaigns] = useState<(Campaign | Publication)[]>([]);
   const [pagination, setPagination] = useState({
@@ -15,7 +14,11 @@ export function useCampaignManagement(
   });
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchCampaigns = async (filters: any = {}, page: number = 1, endpoint: "publications" | "campaigns"| "logs") => {
+  const fetchCampaigns = async (
+    filters: any = {},
+    page: number = 1,
+    endpoint: "publications" | "campaigns" | "logs",
+  ) => {
     try {
       setIsLoading(true);
       const params = new URLSearchParams();
@@ -25,7 +28,6 @@ export function useCampaignManagement(
       if (filters.date_end) params.append("date_end", filters.date_end);
 
       const response = await axios.get(`/${endpoint}?${params.toString()}`);
-      console.log(response.data);
 
       // Handle both publications and campaigns response structure
       const dataKey =
@@ -51,8 +53,6 @@ export function useCampaignManagement(
   // ... (add, update, delete methods remain mostly same, but might trigger fetchCampaigns with current page)
 
   const addCampaign = async (data: any) => {
-
-    console.log(data);
     try {
       let formData;
       if (data instanceof FormData) {
@@ -80,7 +80,11 @@ export function useCampaignManagement(
     }
   };
 
-  const updateCampaign = async (id: number, data: any, endpoint: "publications" | "campaigns" = "publications") => {
+  const updateCampaign = async (
+    id: number,
+    data: any,
+    endpoint: "publications" | "campaigns" = "publications",
+  ) => {
     try {
       let response;
       if (data instanceof FormData) {
@@ -137,8 +141,8 @@ export function useCampaignManagement(
         prevCampaigns.map((campaign) =>
           campaign.id === id
             ? response.data.campaign || response.data.publication
-            : campaign
-        )
+            : campaign,
+        ),
       );
       toast.success(t("campaigns.messages.updateSuccess"));
       return true;
@@ -153,7 +157,7 @@ export function useCampaignManagement(
     try {
       await axios.delete(`/${endpoint}/${id}`);
       setCampaigns((prevCampaigns) =>
-        prevCampaigns.filter((campaign) => campaign.id !== id)
+        prevCampaigns.filter((campaign) => campaign.id !== id),
       );
       // If page becomes empty, maybe go back one page? For now just fetch current.
       await fetchCampaigns({}, pagination.current_page);

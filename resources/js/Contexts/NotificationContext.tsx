@@ -146,17 +146,13 @@ export const NotificationProvider = ({
 
   useEffect(() => {
     fetchNotifications();
-    // Polling removed in favor of realtime updates
   }, [fetchNotifications]);
 
-  // Real-time listener
   useEffect(() => {
     if (user?.id && (window as any).Echo) {
-      console.log("Initializing Notification listener for user:", user.id);
       const channel = (window as any).Echo.private(`users.${user.id}`);
 
       channel.listen(".NotificationCreated", (e: any) => {
-        console.log("Notification event received, refreshing list...", e);
         fetchNotifications();
       });
 

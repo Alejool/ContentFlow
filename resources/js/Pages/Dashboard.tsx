@@ -73,8 +73,6 @@ export default function Dashboard({
     status === "verification-link-sent",
   );
 
-  console.log(pubStats);
-
   const handlePeriodChange = (days: number) => {
     router.get(
       route("dashboard"),

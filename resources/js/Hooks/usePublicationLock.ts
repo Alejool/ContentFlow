@@ -42,7 +42,6 @@ const syncAllUIStores = async (pubId: number, freshData: Publication) => {
       if (useStore) {
         const store = useStore.getState();
         if (store.selectedItem?.id === pubId) {
-          console.log(`🔄 Syncing ${s.name} for pub ${pubId}`);
           store.setSelectedItem(freshData);
         }
       }
@@ -134,10 +133,8 @@ export const usePublicationLock = (
     async (force: boolean = false) => {
       if (!publicationId || !isEditingRef.current) return;
 
-      if (force)
-        console.log(
-          "✊ Attempting forced lock acquisition (survivor handover)",
-        );
+      if (force) {
+      }
 
       try {
         const { success, data } = await usePublicationStore
@@ -179,7 +176,6 @@ export const usePublicationLock = (
 
     if (!publicationId || !isLockedByMeRef.current) return;
 
-    console.log("🔓 Releasing lock for:", publicationId);
     setLockedByMeInternal(false);
     setLockInfo(null);
 
@@ -249,7 +245,6 @@ export const usePublicationLock = (
         });
 
         channel.leaving((user: User) => {
-          console.log(`👤 User ${user.name} left presence.`);
           setActiveUsers((prev) => prev.filter((u) => u.id !== user.id));
 
           if (lockInfoRef.current && lockInfoRef.current.user_id === user.id) {
@@ -382,8 +377,6 @@ export const useWorkspaceLocks = () => {
   useEffect(() => {
     if (!workspaceId) return;
 
-    console.log(`🔌 Global Workspace Connect: ${workspaceId}`);
-
     const fetchLocks = async () => {
       try {
         const { data } = await axios.get("/api/v1/publication-locks");
@@ -413,7 +406,6 @@ export const useWorkspaceLocks = () => {
     channel.listen(".publication.updated", handlePublicationUpdate);
 
     return () => {
-      console.log(`🔌 Global Workspace Cleanup: ${workspaceId}`);
       channel.stopListening(".publication.lock.changed", handleLockChange);
       channel.stopListening(".publication.updated", handlePublicationUpdate);
       // We do NOT call window.Echo.leave here because this hook is used in AuthenticatedLayout

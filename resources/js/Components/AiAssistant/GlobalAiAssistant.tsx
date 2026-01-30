@@ -68,9 +68,6 @@ export default function GlobalAiAssistant() {
     setIsLoading(true);
 
     try {
-      console.time("AI_Total_Roundtrip");
-      console.time("AI_Network_Request");
-
       const response = await axios.post("/ai-chat/process", {
         message: userMessage.content,
         source: "assistant",
@@ -79,15 +76,6 @@ export default function GlobalAiAssistant() {
           user_locale: locale || "en",
         },
       });
-
-      console.timeEnd("AI_Network_Request");
-
-      console.log("AI Response received", {
-        size_bytes: JSON.stringify(response.data).length,
-        server_processing_time: response.data.server_processing_time
-      });
-
-      console.time("AI_State_Update");
 
       if (response.data.success) {
         const aiMessage: Message = {
@@ -98,8 +86,6 @@ export default function GlobalAiAssistant() {
         };
         setMessages((prev) => [...prev, aiMessage]);
       }
-      console.timeEnd("AI_State_Update");
-      console.timeEnd("AI_Total_Roundtrip");
     } catch (error) {
       console.error("AI Chat Error:", error);
       toast.error(t("common.error"));
@@ -169,18 +155,20 @@ export default function GlobalAiAssistant() {
       >
         <Sparkles className="w-6 h-6 group-hover:scale-110 transition-transform" />
         <span
-          className={`absolute right-full mr-3 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap ${theme === "dark"
+          className={`absolute right-full mr-3 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap ${
+            theme === "dark"
               ? "bg-neutral-800 text-white border border-neutral-700"
               : "bg-gray-900 text-white"
-            }`}
+          }`}
         >
           {t("aiAssistant.buttonLabel")}
         </span>
 
         {/* Efecto de pulso */}
         <div
-          className={`absolute inset-0 rounded-full animate-ping ${theme === "dark" ? "bg-primary-600/30" : "bg-primary-600/30"
-            }`}
+          className={`absolute inset-0 rounded-full animate-ping ${
+            theme === "dark" ? "bg-primary-600/30" : "bg-primary-600/30"
+          }`}
         ></div>
       </button>
     );
@@ -188,8 +176,9 @@ export default function GlobalAiAssistant() {
 
   return (
     <div
-      className={`fixed bottom-6 right-6 rounded-lg shadow-2xl overflow-hidden transition-all duration-300 z-50 flex flex-col backdrop-blur-2xl ${isMinimized ? "w-68 h-18" : "w-80 sm:w-96 h-[500px]"
-        } `}
+      className={`fixed bottom-6 right-6 rounded-lg shadow-2xl overflow-hidden transition-all duration-300 z-50 flex flex-col backdrop-blur-2xl ${
+        isMinimized ? "w-68 h-18" : "w-80 sm:w-96 h-[500px]"
+      } `}
     >
       <div
         className={`p-4 flex items-center justify-between text-white shrink-0 cursor-pointer transition-colors ${getHeaderBg()}`}
@@ -197,8 +186,9 @@ export default function GlobalAiAssistant() {
       >
         <div className="flex items-center gap-3">
           <div
-            className={`p-2 rounded-lg ${theme === "dark" ? "bg-primary-800/40" : "bg-white/20"
-              }`}
+            className={`p-2 rounded-lg ${
+              theme === "dark" ? "bg-primary-800/40" : "bg-white/20"
+            }`}
           >
             <Brain className="w-5 h-5" />
           </div>
@@ -207,8 +197,9 @@ export default function GlobalAiAssistant() {
               {t("aiAssistant.headerTitle")}
             </span>
             <p
-              className={`text-xs ${theme === "dark" ? "text-primary-200/80" : "text-white/90"
-                }`}
+              className={`text-xs ${
+                theme === "dark" ? "text-primary-200/80" : "text-white/90"
+              }`}
             >
               {t("aiAssistant.subtitle")}
             </p>
@@ -220,10 +211,11 @@ export default function GlobalAiAssistant() {
               e.stopPropagation();
               setIsMinimized(!isMinimized);
             }}
-            className={`p-2 rounded transition-colors 
-              ${theme === "dark"
-                ? "hover:bg-primary-800/40"
-                : "hover:bg-white/20"
+            className={`p-2 rounded transition-colors
+              ${
+                theme === "dark"
+                  ? "hover:bg-primary-800/40"
+                  : "hover:bg-white/20"
               }
               `}
           >
@@ -238,8 +230,9 @@ export default function GlobalAiAssistant() {
               e.stopPropagation();
               setIsOpen(false);
             }}
-            className={`p-2 rounded transition-colors ${theme === "dark" ? "hover:bg-primary-800/40" : "hover:bg-white/20"
-              }`}
+            className={`p-2 rounded transition-colors ${
+              theme === "dark" ? "hover:bg-primary-800/40" : "hover:bg-white/20"
+            }`}
           >
             <X className="w-4 h-4" />
           </button>
@@ -255,39 +248,44 @@ export default function GlobalAiAssistant() {
             {messages.map((msg) => (
               <div
                 key={msg.id}
-                className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"
-                  }`}
+                className={`flex ${
+                  msg.role === "user" ? "justify-end" : "justify-start"
+                }`}
               >
                 <div
                   className={`max-w-[85%] rounded-lg px-4 py-3 shadow-sm transition-all duration-300 ${getMessageBg(
-                    msg.role
-                  )} ${msg.role === "user" ? "rounded-br-none" : "rounded-bl-none"
-                    }`}
+                    msg.role,
+                  )} ${
+                    msg.role === "user" ? "rounded-br-none" : "rounded-bl-none"
+                  }`}
                 >
                   <div className="text-sm leading-relaxed">{msg.content}</div>
 
                   {msg.suggestion && (
                     <div
-                      className={`mt-3 pt-3 
-                        ${theme === "dark"
-                          ? "border-t border-neutral-600/50"
-                          : "border-t border-gray-100"
+                      className={`mt-3 pt-3
+                        ${
+                          theme === "dark"
+                            ? "border-t border-neutral-600/50"
+                            : "border-t border-gray-100"
                         }
                           `}
                     >
                       <div
-                        className={`text-xs font-medium mb-1 uppercase tracking-wider ${theme === "dark"
+                        className={`text-xs font-medium mb-1 uppercase tracking-wider ${
+                          theme === "dark"
                             ? "text-primary-400"
                             : "text-gray-500"
-                          }`}
+                        }`}
                       >
                         {t("aiAssistant.suggestion")}
                       </div>
                       <div
-                        className={`rounded p-2 text-xs font-mono 
-                          ${theme === "dark"
-                            ? "bg-neutral-800/50 text-gray-300"
-                            : "bg-gray-50 text-gray-600"
+                        className={`rounded p-2 text-xs font-mono
+                          ${
+                            theme === "dark"
+                              ? "bg-neutral-800/50 text-gray-300"
+                              : "bg-gray-50 text-gray-600"
                           }
                             `}
                       >
@@ -302,18 +300,21 @@ export default function GlobalAiAssistant() {
             {isLoading && (
               <div className="flex justify-start">
                 <div
-                  className={`rounded-lg rounded-bl-none px-4 py-3 shadow-sm flex items-center gap-2 ${theme === "dark"
+                  className={`rounded-lg rounded-bl-none px-4 py-3 shadow-sm flex items-center gap-2 ${
+                    theme === "dark"
                       ? "bg-neutral-700/70 border border-neutral-600/50"
                       : "bg-white border border-gray-100"
-                    }`}
+                  }`}
                 >
                   <Loader2
-                    className={`w-4 h-4 animate-spin ${theme === "dark" ? "text-primary-400" : "text-primary-600"
-                      }`}
+                    className={`w-4 h-4 animate-spin ${
+                      theme === "dark" ? "text-primary-400" : "text-primary-600"
+                    }`}
                   />
                   <span
-                    className={`text-xs ${theme === "dark" ? "text-gray-400" : "text-gray-500"
-                      }`}
+                    className={`text-xs ${
+                      theme === "dark" ? "text-gray-400" : "text-gray-500"
+                    }`}
                   >
                     {t("aiAssistant.thinking")}
                   </span>
@@ -325,10 +326,11 @@ export default function GlobalAiAssistant() {
 
           {/* Input Section */}
           <div
-            className={`p-4 border-t transition-colors 
-              ${theme === "dark"
-                ? "bg-neutral-800/50 border-neutral-700/50"
-                : "bg-white/90 border-gray-100"
+            className={`p-4 border-t transition-colors
+              ${
+                theme === "dark"
+                  ? "bg-neutral-800/50 border-neutral-700/50"
+                  : "bg-white/90 border-gray-100"
               }
                 `}
           >
@@ -343,10 +345,11 @@ export default function GlobalAiAssistant() {
               <button
                 type="submit"
                 disabled={!inputValue.trim() || isLoading}
-                className={`p-3 rounded-lg transition-all duration-300 shadow-sm ${theme === "dark"
+                className={`p-3 rounded-lg transition-all duration-300 shadow-sm ${
+                  theme === "dark"
                     ? "bg-gradient-to-r from-primary-600 to-primary-700 text-white hover:from-primary-700 hover:to-primary-800 disabled:opacity-50 disabled:cursor-not-allowed"
                     : "bg-gradient-to-r from-primary-600 to-primary-600 text-white hover:from-primary-700 hover:to-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                  }`}
+                }`}
               >
                 <Send className="w-4 h-4" />
               </button>
@@ -354,8 +357,9 @@ export default function GlobalAiAssistant() {
 
             {/* Quick Tips */}
             <div
-              className={`mt-3 text-xs flex items-center gap-1 ${theme === "dark" ? "text-gray-400" : "text-gray-500"
-                }`}
+              className={`mt-3 text-xs flex items-center gap-1 ${
+                theme === "dark" ? "text-gray-400" : "text-gray-500"
+              }`}
             >
               <Zap className="w-3 h-3" />
               <span>{t("aiAssistant.tips")}</span>

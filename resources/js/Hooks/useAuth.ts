@@ -54,13 +54,12 @@ export const useAuth = () => {
       }
 
       // Standard Laravel Login
-      console.log("UseAuth: Sending login request...");
+
       const loginResponse = await axios.post("/login", {
         email: data.email,
         password: data.password,
         remember: data.remember,
       });
-      console.log("UseAuth: Login response received", loginResponse);
 
       if (loginResponse.data.success) {
         setSuccessMessage(t("auth.login.success"));
@@ -100,12 +99,11 @@ export const useAuth = () => {
   };
 
   const handleGoogleLogin = () => {
-    console.log("Iniciando redirección a Google...");
     setLoading(true);
     setGeneralError("");
     try {
       const url = route("auth.google.redirect");
-      console.log("URL de redirección:", url);
+
       window.location.href = url;
     } catch (err) {
       console.error("Ziggy route error:", err);

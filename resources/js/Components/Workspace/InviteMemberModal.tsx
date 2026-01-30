@@ -59,10 +59,7 @@ export default function InviteMemberModal({
   });
 
   useEffect(() => {
-    if (Object.keys(errors).length > 0) {
-      console.log("Invite Form Errors:", errors);
-      console.log("Current Watch Email:", watch("email"));
-    }
+    // Form errors checking removed from prod logic
   }, [errors]);
 
   const roleOptions = roles

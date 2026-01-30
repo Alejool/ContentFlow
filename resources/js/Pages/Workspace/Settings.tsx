@@ -41,22 +41,7 @@ export default function WorkspaceSettings({
     "general" | "members" | "roles" | "integrations" | "overview"
   >((initialTab as any) || "overview");
 
-  // DEBUG: Verifica los datos recibidos
-  console.log("Datos recibidos:", {
-    workspace: current_workspace,
-    roles,
-    auth,
-    hasWorkspace: !!current_workspace,
-    hasRoles: !!roles,
-    hasAuth: !!auth,
-  });
-
   if (!current_workspace || !roles) {
-    console.log("Faltan datos:", {
-      workspace: current_workspace,
-      roles,
-    });
-
     return (
       <AuthenticatedLayout>
         <Head title={t("workspace.settings")} />
@@ -127,11 +112,6 @@ export default function WorkspaceSettings({
   ];
 
   const renderTabContent = () => {
-    console.log("Renderizando tab:", activeTab, {
-      workspace: current_workspace,
-      canManageWorkspace,
-    });
-
     switch (activeTab) {
       case "overview":
         return (

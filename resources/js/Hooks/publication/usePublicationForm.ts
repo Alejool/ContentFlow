@@ -138,10 +138,6 @@ export const usePublicationForm = ({
     if (isOpen && publication) {
       const isInitialLoad = !isDataReady;
 
-      console.log(
-        `🔄 SYNC: Publication ${publication.id} (${isInitialLoad ? "Initial" : "Live"})`,
-      );
-
       const resetData = {
         title: publication.title || "",
         description: publication.description || "",
@@ -401,27 +397,8 @@ export const usePublicationForm = ({
   const handleFileChange = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
 
-    // Check if there's already a video
-    const hasVideo = mediaFiles.some((m) => m.type.includes("video"));
-
     const newFiles = Array.from(files);
     const newVideos = newFiles.filter((f) => f.type.startsWith("video/"));
-
-    if (hasVideo && newVideos.length > 0) {
-      toast.error(
-        t("publications.modal.validation.singleVideo") ||
-          "Solo puedes subir un video por publicación.",
-      );
-      return;
-    }
-
-    if (newVideos.length > 1) {
-      toast.error(
-        t("publications.modal.validation.singleVideo") ||
-          "Solo puedes subir un video por publicación.",
-      );
-      return;
-    }
 
     const newMediaItems = newFiles.map((file) => ({
       tempId: Math.random().toString(36).substring(7),

@@ -22,6 +22,8 @@ export interface SocialPlatformConfig {
   darkBorderColor: string;
   gradient: string;
   bgClass: string;
+  maxVideoDuration?: number;
+  maxVideoCount?: number;
 }
 
 export const SOCIAL_PLATFORMS: Record<string, SocialPlatformConfig> = {
@@ -39,6 +41,8 @@ export const SOCIAL_PLATFORMS: Record<string, SocialPlatformConfig> = {
     darkBorderColor: "dark:border-blue-900/30",
     gradient: "from-blue-500 to-blue-700",
     bgClass: "bg-blue-50",
+    maxVideoDuration: 14400, // 4 hours
+    maxVideoCount: 10,
   },
   tiktok: {
     id: 3,
@@ -54,6 +58,8 @@ export const SOCIAL_PLATFORMS: Record<string, SocialPlatformConfig> = {
     darkBorderColor: "dark:border-gray-700",
     gradient: "from-neutral-900 via-neutral-800 to-rose-900",
     bgClass: "bg-gray-100",
+    maxVideoDuration: 600, // 10 minutes
+    maxVideoCount: 1,
   },
   twitter: {
     id: 4,
@@ -69,6 +75,8 @@ export const SOCIAL_PLATFORMS: Record<string, SocialPlatformConfig> = {
     darkBorderColor: "dark:border-sky-900/30",
     gradient: "from-neutral-800 to-neutral-900",
     bgClass: "bg-sky-50",
+    maxVideoDuration: 140, // 2m 20s for non-premium
+    maxVideoCount: 4,
   },
   youtube: {
     id: 5,
@@ -84,6 +92,25 @@ export const SOCIAL_PLATFORMS: Record<string, SocialPlatformConfig> = {
     darkBorderColor: "dark:border-red-900/30",
     gradient: "from-primary-600 to-primary-800",
     bgClass: "bg-red-50",
+    maxVideoDuration: 43200, // 12 hours
+    maxVideoCount: 1,
+  },
+  instagram: {
+    id: 6,
+    key: "instagram",
+    name: "Instagram",
+    logo: "", // Assuming there's an icon for this too if needed
+    icon: FaTwitter, // Placeholder, usually FaInstagram
+    color: "bg-pink-600",
+    textColor: "text-pink-700",
+    borderColor: "border-pink-100",
+    darkColor: "dark:bg-pink-900/20",
+    darkTextColor: "dark:text-pink-400",
+    darkBorderColor: "dark:border-pink-900/30",
+    gradient: "from-purple-500 via-pink-500 to-orange-500",
+    bgClass: "bg-pink-50",
+    maxVideoDuration: 90, // Reels limit usually
+    maxVideoCount: 10,
   },
 };
 
