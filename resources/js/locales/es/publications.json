@@ -190,14 +190,14 @@
         "connectAccounts": "Por favor, conecta tus cuentas primero.",
         "published": "Publicado",
         "loading": "Cargando...",
-        "publishing": "Publicando...",
+        "publishing": "Publicando (Espere...)",
         "platforms": "plataformas",
         "removed": "Removido",
         "failed": "Fallido",
         "scheduled": "Programado",
-        "youtube": {
-          "youtubeThumbnails": "Thumbnails de YouTube"
-        },
+        "youtube": "YouTube",
+        "youtubeThumbnails": "Thumbnails de YouTube",
+        "author": "@Alejandro Olarte",
         "dragDrop": {
           "title": "Arrastra y suelta para agregar",
           "subtitle": "PNG, JPG, WebP (max 2MB)"

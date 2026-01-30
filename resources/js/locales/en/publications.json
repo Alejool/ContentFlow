@@ -187,14 +187,14 @@
         "connectAccounts": "Please connect your accounts first.",
         "published": "Published",
         "loading": "Loading...",
-        "publishing": "Publishing...",
+        "publishing": "Publishing (Wait...)",
         "platforms": "Platforms",
         "failed": "Failed",
         "scheduled": "scheduled",
         "removed": "Removed",
-        "youtube": {
-          "youtubeThumbnails": "YouTube Thumbnails"
-        },
+        "youtube": "YouTube",
+        "youtubeThumbnails": "YouTube Thumbnails",
+        "author": "@Alejandro Olarte",
         "dragDrop": {
           "title": "Drag and drop to add",
           "subtitle": "PNG, JPG, WebP (max 2MB)"
