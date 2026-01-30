@@ -222,6 +222,12 @@
           "title": "Publicación en Revisión",
           "message": "Esta publicación ya ha sido enviada para revisión. Un administrador debe aprobarla antes de que pueda ser publicada."
         },
+        "videoSplitter": "Herramienta de Recorte de Video",
+        "editSegments": "Editar Segmentos",
+        "replaceVideo": "Reemplazar Video",
+        "splitToNew": "Crear Nuevas Pub.",
+        "splitSuccess": "Video recortado con éxito",
+        "editVideo": "Editar Video",
         "rejectedBanner": {
           "title": "Publicación Rechazada",
           "message": "Esta publicación ha sido rechazada por {{name}}.",

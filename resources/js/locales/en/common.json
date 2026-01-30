@@ -111,7 +111,11 @@
       "title_desc": "Title (Z-A)"
     },
     "errors": {
-      "checkFormErrors": "Please check the errors in the form"
+      "checkFormErrors": "Please check the errors in the form",
+      "ffmpeg_load": "Error loading the video processor. Please ensure you have a stable connection and SharedArrayBuffer support.",
+      "processing_failed": "Error processing the video.",
+      "no_shared_array_buffer": "Your browser or environment does not support the necessary features to process video locally (SharedArrayBuffer).",
+      "video_load": "Error loading the video for processing."
     },
     "vsLastPeriod": "vs last period",
     "pagination": {
