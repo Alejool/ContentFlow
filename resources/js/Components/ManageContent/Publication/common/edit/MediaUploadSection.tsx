@@ -3,11 +3,13 @@ import {
   AlertTriangle,
   FileImage,
   Loader2,
+  Scissors,
   Upload,
   Video,
   X,
 } from "lucide-react";
-import React, { memo, useRef } from "react";
+import React, { memo, useRef, useState } from "react";
+import VideoSplitter from "./VideoSplitter";
 
 interface MediaUploadSectionProps {
   mediaPreviews: {
@@ -66,6 +68,20 @@ const MediaUploadSection = memo(
     lockedBy,
   }: MediaUploadSectionProps) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const [splittingMedia, setSplittingMedia] = useState<{
+      tempId: string;
+      file?: File;
+      url: string;
+    } | null>(null);
+
+    const handleSplitComplete = (
+      newFiles: File[],
+      mode: "replace" | "new_publications",
+    ) => {
+      if (!splittingMedia) return;
+      onFileChange(newFiles as unknown as FileList);
+      setSplittingMedia(null);
+    };
 
     const getUploadAreaStyles = () => {
       if (disabled || isAnyMediaProcessing || (lockedBy && !lockedBy.isSelf)) {
@@ -134,6 +150,13 @@ const MediaUploadSection = memo(
                     stats={uploadStats?.[preview.file?.name || ""]}
                     error={uploadErrors?.[preview.file?.name || ""]}
                     isExternalProcessing={preview.status === "processing"}
+                    onSplit={() =>
+                      setSplittingMedia({
+                        tempId: preview.tempId,
+                        file: preview.file,
+                        url: preview.url,
+                      })
+                    }
                   />
                 ))}
                 {!disabled && !isAnyMediaProcessing && (
@@ -199,6 +222,16 @@ const MediaUploadSection = memo(
             {imageError}
           </div>
         )}
+
+        {splittingMedia && (
+          <VideoSplitter
+            isOpen={!!splittingMedia}
+            onClose={() => setSplittingMedia(null)}
+            videoFile={splittingMedia.file}
+            videoUrl={splittingMedia.url}
+            onSplitComplete={handleSplitComplete}
+          />
+        )}
       </div>
     );
   },
@@ -217,6 +250,7 @@ const MediaPreviewItem = memo(
     stats,
     error,
     isExternalProcessing,
+    onSplit,
   }: {
     preview: any;
     index: number;
@@ -229,6 +263,7 @@ const MediaPreviewItem = memo(
     stats?: { eta?: number; speed?: number };
     error?: string;
     isExternalProcessing?: boolean;
+    onSplit?: () => void;
   }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -311,16 +346,32 @@ const MediaPreviewItem = memo(
         )}
 
         {!disabled && (
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onRemove();
-            }}
-            className="absolute top-2 right-2 p-1.5 bg-red-500/80 text-white rounded-full hover:bg-red-600 transition-colors opacity-0 group-hover/item:opacity-100 backdrop-blur-sm z-30"
-          >
-            <X className="w-3 h-3" />
-          </button>
+          <div className="absolute top-2 right-2 flex items-center gap-1.5 opacity-0 group-hover/item:opacity-100 z-30">
+            {preview.type.includes("video") && onSplit && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSplit();
+                }}
+                className="p-1.5 bg-primary-600/80 text-white rounded-full hover:bg-primary-700 transition-colors backdrop-blur-sm"
+                title="Recortar Video"
+              >
+                <Scissors className="w-3 h-3" />
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onRemove();
+              }}
+              className="p-1.5 bg-red-500/80 text-white rounded-full hover:bg-red-600 transition-colors backdrop-blur-sm"
+              title="Eliminar"
+            >
+              <X className="w-3 h-3" />
+            </button>
+          </div>
         )}
       </div>
     );

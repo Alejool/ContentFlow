@@ -18,8 +18,8 @@ abstract class BaseSocialService implements SocialPlatformInterface
     $this->accessToken = $accessToken;
     $this->socialAccount = $socialAccount;
     $this->client = new Client([
-      'timeout' => 30,
-      'connect_timeout' => 10,
+      'timeout' => 120,
+      'connect_timeout' => 30,
     ]);
   }
 

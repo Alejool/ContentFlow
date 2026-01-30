@@ -1,6 +1,7 @@
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Scissors, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import { useTranslation } from "react-i18next";
 
 interface MediaItem {
   url: string;
@@ -13,6 +14,7 @@ interface MediaLightboxProps {
   onClose: () => void;
   media: MediaItem | MediaItem[] | null;
   initialIndex?: number;
+  onEdit?: (url: string, type: "image" | "video") => void;
 }
 
 export default function MediaLightbox({
@@ -20,7 +22,9 @@ export default function MediaLightbox({
   onClose,
   media,
   initialIndex = 0,
+  onEdit,
 }: MediaLightboxProps) {
+  const { t } = useTranslation();
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [isAnimating, setIsAnimating] = useState(false);
 
@@ -74,6 +78,17 @@ export default function MediaLightbox({
       >
         <X className="w-6 h-6" />
       </button>
+
+      {/* Edit Button for Videos */}
+      {currentMedia.type === "video" && onEdit && (
+        <button
+          onClick={() => onEdit(currentMedia.url, "video")}
+          className="absolute top-6 right-20 p-2.5 text-white/70 hover:text-white bg-primary-500/20 hover:bg-primary-500/30 rounded-full transition-all z-50 hover:scale-110 active:scale-95 group"
+          title={t("publications.modal.publish.editVideo") || "Editar Video"}
+        >
+          <Scissors className="w-5 h-5" />
+        </button>
+      )}
 
       {mediaArray.length > 1 && (
         <>

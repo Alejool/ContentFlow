@@ -1,9 +1,7 @@
-import Button from "@/Components/common/Modern/Button";
 import Input from "@/Components/common/Modern/Input";
+import AdvancedPagination from "@/Components/common/ui/AdvancedPagination";
 import { useTheme } from "@/Hooks/useTheme";
 import {
-  ArrowLeft,
-  ArrowRight,
   ArrowUpDown,
   ChevronDown,
   ChevronUp,
@@ -58,7 +56,7 @@ export default function PerformanceTable({
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
   const [internalSearchTerm, setInternalSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const searchTerm = externalSearchTerm ?? internalSearchTerm;
   const setSearchTerm = onSearchChange ?? setInternalSearchTerm;
@@ -82,8 +80,11 @@ export default function PerformanceTable({
     );
   };
 
+  // Filtrar campañas basadas en búsqueda
   const filteredCampaigns = useMemo(() => {
     const term = searchTerm.toLowerCase();
+    if (!term.trim()) return campaigns;
+
     return campaigns
       .map((campaign) => {
         const campaignTitle = (
@@ -92,24 +93,17 @@ export default function PerformanceTable({
             : campaign.title
         ).toLowerCase();
 
-        // Check if campaign title matches
         const matchesCampaign = campaignTitle.includes(term);
-
-        // Filter publications that match the search term
         const matchingPublications = campaign.publications.filter((pub) =>
           pub.title.toLowerCase().includes(term),
         );
 
-        // If campaign matches OR any publication matches, keep the campaign
+        // Si la campaña coincide o tiene publicaciones que coinciden
         if (matchesCampaign || matchingPublications.length > 0) {
           return {
             ...campaign,
-            // If the campaign itself doesn't match, only show the matching publications
-            // Otherwise, show all publications of the campaign (as before)
-            // But user said "busca por nombre de cmapaña o publicaciones"
-            // Let's refine it: show campaign if it matches, and within it, show all publications?
-            // Or only show publications that match if any do?
-            // Usually, user expects to see the "path" to the result.
+            // Mostrar todas las publicaciones si la campaña coincide,
+            // o solo las que coinciden si solo publicaciones coinciden
             publications: matchesCampaign
               ? campaign.publications
               : matchingPublications,
@@ -120,12 +114,12 @@ export default function PerformanceTable({
       .filter((c): c is CampaignStat => c !== null);
   }, [campaigns, searchTerm, t]);
 
+  // Ordenar campañas
   const sortedCampaigns = useMemo(() => {
     return [...filteredCampaigns].sort((a, b) => {
       let valA = a[sortField];
       let valB = b[sortField];
 
-      // Handle numeric comparisons
       if (typeof valA === "string" && typeof valB === "string") {
         return sortDirection === "asc"
           ? valA.localeCompare(valB)
@@ -138,15 +132,71 @@ export default function PerformanceTable({
     });
   }, [filteredCampaigns, sortField, sortDirection]);
 
-  const totalPages = Math.ceil(sortedCampaigns.length / itemsPerPage);
+  // Calcular el número TOTAL de filas (campañas + publicaciones) para el paginado
+  const totalRows = useMemo(() => {
+    return sortedCampaigns.reduce((total, campaign) => {
+      // Contar 1 fila por campaña + 1 fila por cada publicación
+      return total + 1 + campaign.publications.length;
+    }, 0);
+  }, [sortedCampaigns]);
+
+  // Obtener las campañas paginadas basadas en el número de filas
   const paginatedCampaigns = useMemo(() => {
-    const start = (currentPage - 1) * itemsPerPage;
-    return sortedCampaigns.slice(start, start + itemsPerPage);
-  }, [sortedCampaigns, currentPage]);
+    let rowsProcessed = 0;
+    const result: CampaignStat[] = [];
+    const startRow = (currentPage - 1) * itemsPerPage;
+    const endRow = startRow + itemsPerPage;
+
+    for (const campaign of sortedCampaigns) {
+      const campaignRowCount = 1 + campaign.publications.length;
+      const nextRowsProcessed = rowsProcessed + campaignRowCount;
+
+      // Si alguna parte de esta campaña cae dentro del rango paginado
+      if (nextRowsProcessed > startRow && rowsProcessed < endRow) {
+        // Crear una copia de la campaña con posibles ajustes en las publicaciones
+        // si estamos cortando en medio de las publicaciones
+        let publicationsToShow = campaign.publications;
+
+        // Si la campaña comienza antes del inicio de la página
+        if (rowsProcessed < startRow) {
+          const skipPublications = startRow - rowsProcessed - 1; // -1 por la fila de la campaña
+          if (skipPublications > 0) {
+            publicationsToShow = campaign.publications.slice(skipPublications);
+          }
+        }
+
+        // Si la campaña termina después del final de la página
+        const rowsNeeded = endRow - Math.max(rowsProcessed, startRow);
+        const publicationsNeeded = Math.max(0, rowsNeeded - 1); // -1 por la fila de la campaña
+        if (publicationsNeeded < publicationsToShow.length) {
+          publicationsToShow = publicationsToShow.slice(0, publicationsNeeded);
+        }
+
+        result.push({
+          ...campaign,
+          publications: publicationsToShow,
+        });
+      }
+
+      rowsProcessed = nextRowsProcessed;
+
+      // Si ya procesamos suficientes filas, salir
+      if (rowsProcessed >= endRow) {
+        break;
+      }
+    }
+
+    return result;
+  }, [sortedCampaigns, currentPage, itemsPerPage]);
+
+  const totalPages = Math.ceil(totalRows / itemsPerPage);
+
+  // Calcular los índices de filas para mostrar en el paginador
+  const startRow = (currentPage - 1) * itemsPerPage + 1;
+  const endRow = Math.min(currentPage * itemsPerPage, totalRows);
 
   return (
     <div className="space-y-4">
-      {/* Search Filter */}
       {!hideSearch && (
         <div className="flex justify-end p-2">
           <div className="w-full md:w-64">
@@ -215,7 +265,6 @@ export default function PerformanceTable({
           <tbody className="divide-y divide-gray-100 dark:divide-neutral-800">
             {paginatedCampaigns.map((campaign) => (
               <React.Fragment key={campaign.id}>
-                {/* Campaign Row */}
                 <tr
                   className={
                     theme === "dark" ? "bg-neutral-800/30" : "bg-primary-50/10"
@@ -265,7 +314,6 @@ export default function PerformanceTable({
                   </td>
                 </tr>
 
-                {/* Individual Publication Rows */}
                 {campaign.publications.map((pub) => (
                   <tr
                     key={pub.id}
@@ -315,57 +363,19 @@ export default function PerformanceTable({
         </table>
       </div>
 
-      {/* Pagination Controls */}
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between px-4 py-3 bg-gray-50/50 dark:bg-neutral-900/30 border-t border-gray-100 dark:border-neutral-800">
-          <div className="text-xs font-medium text-gray-500">
-            {t("common.showing") || "Mostrando"}{" "}
-            <span className="font-bold">
-              {(currentPage - 1) * itemsPerPage + 1}
-            </span>{" "}
-            -{" "}
-            <span className="font-bold">
-              {Math.min(currentPage * itemsPerPage, sortedCampaigns.length)}
-            </span>{" "}
-            {t("common.of") || "de"}{" "}
-            <span className="font-bold">{sortedCampaigns.length}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => setCurrentPage(currentPage - 1)}
-              disabled={currentPage === 1}
-              className="p-2 min-w-0"
-            >
-              <ArrowLeft className="w-4 h-4" />
-            </Button>
-            <div className="flex items-center gap-1">
-              {[...Array(totalPages)].map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setCurrentPage(i + 1)}
-                  className={`w-8 h-8 rounded-lg text-xs font-bold transition-all ${
-                    currentPage === i + 1
-                      ? "bg-primary-600 text-white"
-                      : "text-gray-500 hover:bg-gray-100 dark:hover:bg-neutral-800"
-                  }`}
-                >
-                  {i + 1}
-                </button>
-              ))}
-            </div>
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => setCurrentPage(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className="p-2 min-w-0"
-            >
-              <ArrowRight className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
+      {sortedCampaigns.length > 0 && (
+        <AdvancedPagination
+          currentPage={currentPage}
+          lastPage={totalPages}
+          total={totalRows}
+          perPage={itemsPerPage}
+          onPageChange={setCurrentPage}
+          onPerPageChange={(val) => {
+            setItemsPerPage(val);
+            setCurrentPage(1);
+          }}
+          t={t}
+        />
       )}
     </div>
   );

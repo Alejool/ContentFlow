@@ -1,9 +1,14 @@
 import PlatformSettingsModal from "@/Components/ConfigSocialMedia/PlatformSettingsModal";
+import VideoSplitter from "@/Components/ManageContent/Publication/common/edit/VideoSplitter";
 import YouTubeThumbnailUploader from "@/Components/common/ui/YouTubeThumbnailUploader";
-import { getPlatformConfig } from "@/Constants/socialPlatforms";
+import {
+  SOCIAL_PLATFORMS,
+  getPlatformConfig,
+} from "@/Constants/socialPlatforms";
 import { usePublishPublication } from "@/Hooks/publication/usePublishPublication";
 import { useConfirm } from "@/Hooks/useConfirm";
 import { formatDateTime } from "@/Utils/formatDate";
+import { useMediaStore } from "@/stores/mediaStore";
 import { usePublicationStore } from "@/stores/publicationStore";
 import { Publication } from "@/types/Publication";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
@@ -13,12 +18,14 @@ import {
   CheckCircle,
   Clock,
   Loader2,
+  Scissors,
   Settings as SettingsIcon,
   Share2,
   X,
   XCircle,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
 interface PublishPublicationModalProps {
@@ -73,6 +80,47 @@ export default function PublishPublicationModal({
     setUnpublishing,
     resetState,
   } = usePublishPublication();
+
+  const [splittingMedia, setSplittingMedia] = useState<{
+    id: number;
+    url: string;
+    file_name: string;
+  } | null>(null);
+
+  const handleSplitComplete = async (
+    newFiles: File[],
+    mode: "replace" | "new_publications",
+  ) => {
+    if (!splittingMedia || !publication) return;
+
+    if (mode === "replace") {
+      // This is complicated in Publish modal because it's already saved.
+      // We'd need to upload the new segment and replace the old media item.
+      toast.error(
+        "Reemplazar video no está disponible desde aquí. Por favor usa el editor.",
+      );
+    } else {
+      // Create new publications for each segment
+      // We can use the current publication as template
+      for (const file of newFiles) {
+        const formData = new FormData();
+        formData.append("title", `${publication.title} - Segment`);
+        formData.append("description", publication.description || "");
+        formData.append("goal", publication.goal || "");
+        formData.append("hashtags", publication.hashtags || "");
+        formData.append("status", "draft");
+        formData.append("files[]", file);
+
+        try {
+          await usePublicationStore.getState().createPublication(formData);
+        } catch (e) {
+          console.error("Failed to create new publication from split", e);
+        }
+      }
+      toast.success("Nuevas publicaciones creadas en borradores.");
+    }
+    setSplittingMedia(null);
+  };
 
   const { auth } = usePage<any>().props;
   const currentWorkspace = auth.current_workspace;
@@ -197,6 +245,34 @@ export default function PublishPublicationModal({
 
   const videoFiles =
     publication.media_files?.filter((m) => m.file_type === "video") || [];
+
+  const videoMetadata = useMediaStore((s) => s.videoMetadata);
+
+  const getViolations = (platform: string) => {
+    const config = SOCIAL_PLATFORMS[platform];
+    if (!config)
+      return {
+        countExceeded: false,
+        durationExceeded: false,
+        exceedingVideos: [],
+      };
+
+    const maxCount = config.maxVideoCount || 100;
+    const maxDuration = config.maxVideoDuration || 0;
+
+    const countExceeded = videoFiles.length > maxCount;
+    const exceedingVideos = videoFiles.filter((v) => {
+      const duration =
+        videoMetadata[v.id.toString()]?.duration || v.metadata?.duration || 0;
+      return maxDuration > 0 && duration > maxDuration;
+    });
+
+    return {
+      countExceeded,
+      durationExceeded: exceedingVideos.length > 0,
+      exceedingVideos,
+    };
+  };
 
   return (
     <>
@@ -420,6 +496,84 @@ export default function PublishPublicationModal({
                                 : {account.user.name}
                               </div>
                             )}
+
+                            {/* Video Violations */}
+                            {isSelected &&
+                              !isPublished &&
+                              !isPublishing &&
+                              !isScheduled && (
+                                <div className="mt-2 space-y-1">
+                                  {(() => {
+                                    const {
+                                      countExceeded,
+                                      durationExceeded,
+                                      exceedingVideos,
+                                    } = getViolations(account.platform);
+                                    const config =
+                                      SOCIAL_PLATFORMS[account.platform];
+
+                                    return (
+                                      <>
+                                        {countExceeded && (
+                                          <div className="flex items-center gap-1.5 text-[10px] text-red-600 font-semibold bg-red-100 dark:bg-red-900/30 px-2 py-0.5 rounded border border-red-200 dark:border-red-800">
+                                            <AlertCircle className="w-3 h-3" />
+                                            {t(
+                                              "publications.modal.publish.validation.maxVideos",
+                                              { count: config.maxVideoCount },
+                                            ) ||
+                                              `Límite: ${config.maxVideoCount} videos`}
+                                          </div>
+                                        )}
+                                        {durationExceeded && (
+                                          <div className="flex flex-col gap-1">
+                                            <div className="flex items-center gap-1.5 text-[10px] text-red-600 font-semibold bg-red-100 dark:bg-red-900/30 px-2 py-0.5 rounded border border-red-200 dark:border-red-800">
+                                              <Clock className="w-3 h-3" />
+                                              {t(
+                                                "publications.modal.publish.validation.maxDuration",
+                                                {
+                                                  duration:
+                                                    config.maxVideoDuration,
+                                                },
+                                              ) ||
+                                                `Límite: ${config.maxVideoDuration}s por video`}
+                                            </div>
+                                            <button
+                                              type="button"
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                const vid = exceedingVideos[0];
+                                                let finalUrl = vid.file_path;
+                                                if (
+                                                  finalUrl &&
+                                                  !finalUrl.startsWith(
+                                                    "http",
+                                                  ) &&
+                                                  !finalUrl.startsWith(
+                                                    "/storage/",
+                                                  )
+                                                ) {
+                                                  finalUrl = `/storage/${finalUrl}`;
+                                                }
+                                                setSplittingMedia({
+                                                  id: vid.id,
+                                                  url: finalUrl,
+                                                  file_name: vid.file_name,
+                                                });
+                                              }}
+                                              className="flex items-center justify-center gap-1 w-full py-1 bg-primary-600 hover:bg-primary-700 text-white rounded text-[10px] font-bold transition-all shadow-sm"
+                                            >
+                                              <Scissors className="w-3 h-3" />
+                                              {t(
+                                                "publications.modal.publish.splitVideo",
+                                              ) || "Recortar Video"}
+                                            </button>
+                                          </div>
+                                        )}
+                                      </>
+                                    );
+                                  })()}
+                                </div>
+                              )}
                           </div>
 
                           {isUnpublishing && (
@@ -723,6 +877,15 @@ export default function PublishPublicationModal({
         </div>
       </Dialog>
       <ConfirmDialog />
+
+      {splittingMedia && (
+        <VideoSplitter
+          isOpen={!!splittingMedia}
+          onClose={() => setSplittingMedia(null)}
+          videoUrl={splittingMedia.url}
+          onSplitComplete={handleSplitComplete}
+        />
+      )}
     </>
   );
 }

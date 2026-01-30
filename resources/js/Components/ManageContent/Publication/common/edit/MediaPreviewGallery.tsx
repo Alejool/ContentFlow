@@ -1,6 +1,15 @@
 import MediaLightbox from "@/Components/common/ui/MediaLightbox";
-import { ChevronDown, ChevronUp, FileImage, Play, X } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  FileImage,
+  Play,
+  Scissors,
+  X,
+} from "lucide-react";
 import { memo, useState } from "react";
+import { useTranslation } from "react-i18next";
+import VideoSplitter from "./VideoSplitter";
 
 interface MediaPreviewGalleryProps {
   mediaItems: {
@@ -12,6 +21,7 @@ interface MediaPreviewGalleryProps {
   thumbnails: Record<string, File>;
   onSetThumbnail: (tempId: string, file: File) => void;
   onClearThumbnail: (tempId: string) => void;
+  onEditVideo?: (tempId: string, newFiles: File[]) => void;
 }
 
 const MediaPreviewGallery = memo(
@@ -20,14 +30,21 @@ const MediaPreviewGallery = memo(
     thumbnails,
     onSetThumbnail,
     onClearThumbnail,
+    onEditVideo,
   }: MediaPreviewGalleryProps) => {
+    const { t } = useTranslation();
     const [isOpen, setIsOpen] = useState(false);
     const [activeIndex, setActiveIndex] = useState(0);
     const [lightboxMedia, setLightboxMedia] = useState<{
-        url: string;
-        type: "image" | "video";
-        title?: string;
+      url: string;
+      type: "image" | "video";
+      title?: string;
     } | null>(null);
+    const [videoSplitterOpen, setVideoSplitterOpen] = useState(false);
+    const [editingVideoUrl, setEditingVideoUrl] = useState<string | null>(null);
+    const [editingVideoTempId, setEditingVideoTempId] = useState<string | null>(
+      null,
+    );
 
     if (mediaItems.length === 0) return null;
 
@@ -120,6 +137,20 @@ const MediaPreviewGallery = memo(
                     </label>
                   </div>
                 )}
+                {isVideo && onEditVideo && (
+                  <button
+                    onClick={() => {
+                      setEditingVideoUrl(activeItem.url);
+                      setEditingVideoTempId(activeItem.tempId);
+                      setVideoSplitterOpen(true);
+                    }}
+                    className="bg-black/60 hover:bg-black/80 text-white px-3 py-1.5 rounded-lg text-xs font-medium backdrop-blur-sm flex items-center gap-2 transition-colors"
+                  >
+                    <Scissors className="w-4 h-4" />
+                    {t("publications.modal.publish.editVideo") ||
+                      "Editar Video"}
+                  </button>
+                )}
               </div>
 
               {(thumbnails[activeItem.tempId] || activeItem.thumbnailUrl) &&
@@ -180,14 +211,44 @@ const MediaPreviewGallery = memo(
             </div>
           </div>
         )}
-          </div>
-        )}
 
         <MediaLightbox
-            isOpen={!!lightboxMedia}
-            onClose={() => setLightboxMedia(null)}
-            media={lightboxMedia}
+          isOpen={!!lightboxMedia}
+          onClose={() => setLightboxMedia(null)}
+          media={lightboxMedia}
+          onEdit={(url, type) => {
+            if (type === "video") {
+              // Find the tempId for this URL
+              const item = mediaItems.find((m) => m.url === url);
+              if (item) {
+                setEditingVideoUrl(url);
+                setEditingVideoTempId(item.tempId);
+                setVideoSplitterOpen(true);
+                setLightboxMedia(null); // Close lightbox
+              }
+            }
+          }}
         />
+
+        {videoSplitterOpen && editingVideoUrl && editingVideoTempId && (
+          <VideoSplitter
+            isOpen={videoSplitterOpen}
+            onClose={() => {
+              setVideoSplitterOpen(false);
+              setEditingVideoUrl(null);
+              setEditingVideoTempId(null);
+            }}
+            videoUrl={editingVideoUrl}
+            onSplitComplete={(newFiles) => {
+              if (onEditVideo && editingVideoTempId) {
+                onEditVideo(editingVideoTempId, newFiles);
+              }
+              setVideoSplitterOpen(false);
+              setEditingVideoUrl(null);
+              setEditingVideoTempId(null);
+            }}
+          />
+        )}
       </div>
     );
   },

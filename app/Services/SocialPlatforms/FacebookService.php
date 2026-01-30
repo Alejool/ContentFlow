@@ -109,27 +109,54 @@ class FacebookService extends BaseSocialService
   private function uploadVideo($pageId, $videoUrl, $description, $title = null)
   {
     $endpoint = "https://graph.facebook.com/" . self::API_VERSION . "/{$pageId}/videos";
+    $isLocalFile = !filter_var($videoUrl, FILTER_VALIDATE_URL) && file_exists($videoUrl);
 
-    // Facebook can upload videos from URL too
-    $params = [
-      'file_url' => $videoUrl,
-      'description' => $description,
-      'access_token' => $this->accessToken,
-    ];
-
-    if ($title) {
-      $params['title'] = $title;
-    }
-
-    Log::info('Facebook uploadVideo params', [
+    Log::info('Facebook uploadVideo', [
       'pageId' => $pageId,
-      'description_present' => !empty($description),
-      'description_length' => strlen($description),
-      'title_present' => !empty($title),
-      'videoUrl' => $videoUrl
+      'isLocalFile' => $isLocalFile,
+      'path' => $videoUrl
     ]);
 
-    $response = $this->client->post($endpoint, ['form_params' => $params]);
+    $options = [
+      'timeout' => 600, // 10 minutes for video upload
+    ];
+
+    if ($isLocalFile) {
+      $options['multipart'] = [
+        [
+          'name' => 'access_token',
+          'contents' => $this->accessToken
+        ],
+        [
+          'name' => 'description',
+          'contents' => $description
+        ],
+        [
+          'name' => 'source',
+          'contents' => fopen($videoUrl, 'r'),
+          'filename' => basename($videoUrl)
+        ]
+      ];
+
+      if ($title) {
+        $options['multipart'][] = [
+          'name' => 'title',
+          'contents' => $title
+        ];
+      }
+    } else {
+      $params = [
+        'file_url' => $videoUrl,
+        'description' => $description,
+        'access_token' => $this->accessToken,
+      ];
+      if ($title) {
+        $params['title'] = $title;
+      }
+      $options['form_params'] = $params;
+    }
+
+    $response = $this->client->post($endpoint, $options);
     $result = json_decode($response->getBody(), true);
 
     if (!isset($result['id'])) {

@@ -65,6 +65,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     require __DIR__ . '/api/v1/notifications.php';
     require __DIR__ . '/api/v1/profile.php';
     require __DIR__ . '/api/v1/calendar.php';
+    Route::prefix('video')->name('video.')->group(function () {
+      require __DIR__ . '/api/v1/video.php';
+    });
     Route::prefix('uploads')->name('uploads.')->group(function () {
       require __DIR__ . '/api/v1/uploads.php';
     });

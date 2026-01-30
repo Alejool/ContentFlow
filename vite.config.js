@@ -28,7 +28,10 @@ export default defineConfig({
         tsconfigPaths(),
     ],
     optimizeDeps: {
-        include: ['@ffmpeg/ffmpeg'],
+        exclude: ['@ffmpeg/ffmpeg', '@ffmpeg/util', '@ffmpeg/core'],
+    },
+    build: {
+        target: 'es2020',
     },
     server: isProduction ? {} : {
         host: '0.0.0.0',

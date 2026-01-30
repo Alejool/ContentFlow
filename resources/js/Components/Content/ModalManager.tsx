@@ -6,7 +6,6 @@ import { Publication } from "@/types/Publication";
 import { memo } from "react";
 import { createPortal } from "react-dom";
 
-// Modals
 import AddCampaignModal from "@/Components/Content/modals/AddCampaignModal";
 import AddPublicationModal from "@/Components/Content/modals/AddPublicationModal";
 import EditCampaignModal from "@/Components/Content/modals/EditCampaignModal";
@@ -36,20 +35,17 @@ const ModalManager = memo(({ onRefresh }: ModalManagerProps) => {
 
   const { fetchPublishedPlatforms } = usePublishPublication();
 
-  // Helper to determine item type safely
   const isCampaignItem =
     selectedItem &&
     ((selectedItem as any).__type === "campaign" ||
       ("name" in selectedItem && !("title" in selectedItem)));
   const isPublicationItem = selectedItem && !isCampaignItem;
 
-  // Logic for targeting correct modal based on selection or active tab
   const targetIsCampaign =
     isCampaignItem || (activeTab === "campaigns" && !selectedItem);
   const targetIsPublication =
     isPublicationItem || (activeTab === "publications" && !selectedItem);
 
-  // CRITICAL: Get FRESH data from stores to ensure reactivity when background processes update them
   const publications = usePublicationStore((s) => s.publications);
   const currentPub =
     targetIsPublication && selectedItem?.id
@@ -57,7 +53,6 @@ const ModalManager = memo(({ onRefresh }: ModalManagerProps) => {
         (selectedItem as Publication)
       : null;
 
-  // Determine which Add Modal to show
   const showAddCampaign =
     addType === "campaign" || (addType === null && activeTab === "campaigns");
   const showAddPublication = !showAddCampaign;
@@ -84,15 +79,12 @@ const ModalManager = memo(({ onRefresh }: ModalManagerProps) => {
 
       {createPortal(
         <>
-          {/* Always render Publication Modal (hidden/visible handled internally via CSS for performance) */}
           <EditPublicationModal
             isOpen={isEditModalOpen && targetIsPublication}
             onClose={closeEditModal}
             publication={currentPub}
             onSubmit={onRefresh}
           />
-
-          {/* Render Campaign Modal conditionally */}
           {isEditModalOpen && targetIsCampaign && (
             <EditCampaignModal
               isOpen={isEditModalOpen}
