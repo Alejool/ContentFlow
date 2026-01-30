@@ -21,33 +21,28 @@ class ExistingUserDummyDataSeeder extends Seeder
    */
   public function run(): void
   {
-    $users = User::all();
+    // Ensure we have some test users first
+    $testUsers = [
+      ['name' => 'Demo User', 'email' => 'demo@gmail.com'],
+      ['name' => 'Admin User', 'email' => 'admin@gmail.com'],
+      ['name' => 'Test User', 'email' => 'test@example.com'],
+    ];
 
-    if ($users->isEmpty()) {
-      $this->command->error('No users found in the database.');
-      return;
+    foreach ($testUsers as $testUser) {
+      if (!User::where('email', $testUser['email'])->exists()) {
+        $this->command->info("Creating test user: {$testUser['email']}");
+        User::create([
+          'name' => $testUser['name'],
+          'email' => $testUser['email'],
+          'password' => bcrypt('password'),
+          'email_verified_at' => now(),
+        ]);
+      }
     }
 
+    $users = User::all();
     $this->command->info("Found {$users->count()} users. Generating data...");
 
-    // Specific target user logic
-    // $targetEmail = 'alejandroolartediaz@gmail.com';
-    $targetEmail = 'demo@gmail.com';
-    $targetUser = User::where('email', $targetEmail)->first();
-
-    if (!$targetUser) {
-      $this->command->info("Creating target user: $targetEmail");
-      $targetUser = User::factory()->create([
-        'name' => 'Demo User',
-        'email' => $targetEmail, // Normalized email
-        'password' => bcrypt('password'), // or any default
-      ]);
-    }
-
-    // Ensure target user is in the loop even if they were just created
-    if (!$users->contains('id', $targetUser->id)) {
-      $users->push($targetUser);
-    }
 
     foreach ($users as $user) {
       $this->command->info("Processing user: {$user->email}");
@@ -212,7 +207,7 @@ class ExistingUserDummyDataSeeder extends Seeder
   private function createSocialAccountsAndMetrics($user, $workspaceId)
   {
     // Read active social platforms from config if available, otherwise fallback
-    $platforms = config('social.platforms', ['facebook', 'instagram', 'twitter', 'linkedin']);
+    $platforms = config('social.platforms', ['facebook', 'youtube', 'twitter', 'tiktok']);
 
     foreach ($platforms as $platform) {
       // Check if account already exists to avoid duplicates
