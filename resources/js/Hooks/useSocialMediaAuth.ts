@@ -50,10 +50,13 @@ export const useSocialMediaAuth = () => {
           }
 
           const handleMessage = async (event: MessageEvent) => {
-            if (
+            const isSuccessEvent =
               event.data === "social-auth-success" ||
-              event.data?.type === "SOCIAL_AUTH_SUCCESS"
-            ) {
+              event.data?.type === "SOCIAL_AUTH_SUCCESS" ||
+              (event.data?.type === "social_auth_callback" &&
+                event.data?.success === true);
+
+            if (isSuccessEvent) {
               window.removeEventListener("message", handleMessage);
               authWindow.close();
 
