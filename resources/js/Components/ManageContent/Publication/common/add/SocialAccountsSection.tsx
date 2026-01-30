@@ -22,6 +22,8 @@ interface SocialAccountsSectionProps {
   globalSchedule?: string;
   publishedAccountIds?: number[];
   publishingAccountIds?: number[];
+  failedAccountIds?: number[];
+  unpublishing?: number | null;
   onCancel?: () => void;
   error?: string;
   disabled?: boolean;
@@ -170,6 +172,8 @@ interface SocialAccountItemProps {
   globalSchedule?: string;
   isPublished?: boolean;
   isPublishing?: boolean;
+  isFailed?: boolean;
+  isUnpublishing?: boolean;
   onCancel?: () => void;
   disabled?: boolean;
 }
@@ -190,20 +194,28 @@ const SocialAccountItem = memo(
     globalSchedule,
     isPublished,
     isPublishing,
+    isFailed,
+    isUnpublishing,
     onCancel,
     disabled = false,
   }: SocialAccountItemProps) => {
-    const isInternalDisabled = isPublished || isPublishing || disabled;
-    const isCheckedActually = isChecked || isPublished || isPublishing;
+    const isInternalDisabled =
+      isPublished || isPublishing || isUnpublishing || disabled;
+    const isCheckedActually =
+      isChecked || isPublished || isPublishing || isUnpublishing;
 
     return (
       <div
         className={`relative flex items-center p-3 rounded-lg border transition-all ${
           isInternalDisabled ? "opacity-80 cursor-default" : ""
         } ${
-          isCheckedActually
-            ? `border-primary-500 bg-primary-50 dark:bg-primary-900/20 shadow-sm`
-            : "border-gray-200 dark:border-neutral-600 hover:bg-gray-50 dark:hover:bg-neutral-700/5"
+          isFailed
+            ? "border-red-500 bg-red-50 dark:bg-red-900/20 shadow-sm"
+            : isUnpublishing
+              ? "border-amber-500 bg-amber-50 dark:bg-amber-900/20 shadow-sm"
+              : isCheckedActually
+                ? `border-primary-500 bg-primary-50 dark:bg-primary-900/20 shadow-sm`
+                : "border-gray-200 dark:border-neutral-600 hover:bg-gray-50 dark:hover:bg-neutral-700/5"
         }`}
       >
         <div className="flex items-center gap-3 flex-1">
@@ -233,17 +245,19 @@ const SocialAccountItem = memo(
                   }`}
                 >
                   {isPublished
-                    ? t("publish.published")
+                    ? t("publications.modal.publish.published")
                     : isPublishing
-                      ? (t("publish.publishing") || "Publicando") +
-                        " (" +
-                        (t("common.wait") || "Espere...") +
-                        ")"
-                      : (customSchedule || globalSchedule) &&
-                          !isPublished &&
-                          !isPublishing
-                        ? t("publications.status.scheduled") || "Programado"
-                        : t("publications.status.instant") || "Instantáneo"}
+                      ? t("publications.modal.publish.publishing")
+                      : isFailed
+                        ? t("publications.modal.publish.failed") || "Fallido"
+                        : isUnpublishing
+                          ? t("publications.modal.publish.unpublishing") ||
+                            "Despublicando..."
+                          : (customSchedule || globalSchedule) &&
+                              !isPublished &&
+                              !isPublishing
+                            ? t("publications.status.scheduled") || "Programado"
+                            : t("publications.status.instant") || "Instantáneo"}
                 </span>
               )}
             </div>
@@ -310,9 +324,9 @@ const SocialAccountItem = memo(
                   !globalSchedule &&
                   !isPublished &&
                   !isPublishing && (
-                    <div className="flex items-center gap-1 text-[10px] text-primary-500 font-medium animate-in fade-in slide-in-from-left-1">
+                    <div className="flex items-center gap-1 text-[10px] text-primary-500 font-medium animate-in fade-in slide-in-from-top-1">
                       <Clock className="w-3 h-3" />
-                      {t("schedule.instantWarning") ||
+                      {t("publications.modal.schedule.instantWarning") ||
                         "Para publicar ahora, usa el botón Publicar después de guardar."}
                     </div>
                   )}
@@ -321,14 +335,14 @@ const SocialAccountItem = memo(
             {isPublished && (
               <div className="mt-1 flex items-center gap-1 text-[10px] font-medium text-green-600 dark:text-green-400">
                 <Check className="w-3 h-3" />
-                {t("publish.published")}
+                {t("publications.modal.publish.published")}
               </div>
             )}
             {isPublishing && (
               <div className="mt-1 flex items-center justify-between gap-1 text-[10px] font-medium text-yellow-600 dark:text-yellow-400">
                 <div className="flex items-center gap-1">
                   <div className="w-3 h-3 border-2 border-yellow-600 border-t-transparent rounded-full animate-spin" />
-                  {t("publish.publishing") || "Publicando"}
+                  {t("publications.modal.publish.publishing")}
                 </div>
                 {onCancel && (
                   <button
@@ -342,6 +356,21 @@ const SocialAccountItem = memo(
                     {t("common.cancel") || "Cancelar"}
                   </button>
                 )}
+              </div>
+            )}
+            {isUnpublishing && (
+              <div className="mt-1 flex items-center gap-1 text-[10px] font-medium text-amber-600 dark:text-amber-400">
+                <div className="w-3 h-3 border-2 border-amber-600 border-t-transparent rounded-full animate-spin" />
+                {t("publications.modal.publish.unpublishing") ||
+                  "Despublicando..."}
+              </div>
+            )}
+            {isFailed && (
+              <div className="mt-1 flex items-center gap-1 text-[10px] font-medium text-red-600 dark:text-red-400">
+                <div className="w-3 h-3 rounded-full bg-red-500 flex items-center justify-center">
+                  <X className="w-2 h-2 text-white" />
+                </div>
+                {t("publications.modal.publish.failed") || "Fallido"}
               </div>
             )}
           </div>
@@ -379,6 +408,8 @@ const SocialAccountsSection = memo(
     globalSchedule,
     publishedAccountIds,
     publishingAccountIds,
+    failedAccountIds,
+    unpublishing,
     onCancel,
     error,
     disabled = false,
@@ -406,6 +437,8 @@ const SocialAccountsSection = memo(
             const customSchedule = accountSchedules[account.id];
             const isPublished = publishedAccountIds?.includes(account.id);
             const isPublishing = publishingAccountIds?.includes(account.id);
+            const isFailed = failedAccountIds?.includes(account.id);
+            const isIndividualUnpublishing = unpublishing === account.id;
 
             return (
               <SocialAccountItem
@@ -430,6 +463,8 @@ const SocialAccountsSection = memo(
                 globalSchedule={globalSchedule}
                 isPublished={isPublished}
                 isPublishing={isPublishing}
+                isFailed={isFailed}
+                isUnpublishing={isIndividualUnpublishing}
                 onCancel={onCancel}
                 disabled={disabled}
               />

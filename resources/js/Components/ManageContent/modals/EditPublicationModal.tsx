@@ -12,6 +12,7 @@ import YouTubeThumbnailUploader from "@/Components/common/ui/YouTubeThumbnailUpl
 import { usePublicationForm } from "@/Hooks/publication/usePublicationForm";
 import { usePublicationLock } from "@/Hooks/usePublicationLock";
 import { useCampaignStore } from "@/stores/campaignStore";
+import { usePublicationStore } from "@/stores/publicationStore";
 import { useAccountsStore } from "@/stores/socialAccountsStore";
 import { Publication } from "@/types/Publication";
 import { usePage } from "@inertiajs/react";
@@ -163,21 +164,36 @@ const EditPublicationModal = ({
     );
   }, [publication]);
 
+  const { publishedPlatforms, publishingPlatforms, failedPlatforms } =
+    usePublicationStore();
+
   const publishedAccountIds = useMemo(() => {
-    return (
+    const fromStore = publishedPlatforms[publication?.id ?? 0] || [];
+    const fromLogs =
       publication?.social_post_logs
         ?.filter((log: any) => log.status === "published")
-        .map((log: any) => log.social_account_id) || []
-    );
-  }, [publication]);
+        .map((log: any) => log.social_account_id) || [];
+    return Array.from(new Set([...fromStore, ...fromLogs]));
+  }, [publication, publishedPlatforms]);
 
   const publishingAccountIds = useMemo(() => {
-    return (
+    const fromStore = publishingPlatforms[publication?.id ?? 0] || [];
+    const fromLogs =
       publication?.social_post_logs
         ?.filter((log: any) => log.status === "publishing")
-        .map((log: any) => log.social_account_id) || []
-    );
-  }, [publication]);
+        .map((log: any) => log.social_account_id) || [];
+
+    return Array.from(new Set([...fromStore, ...fromLogs]));
+  }, [publication, publishingPlatforms]);
+
+  const failedAccountIds = useMemo(() => {
+    const fromStore = failedPlatforms[publication?.id ?? 0] || [];
+    const fromLogs =
+      publication?.social_post_logs
+        ?.filter((log: any) => log.status === "failed")
+        .map((log: any) => log.social_account_id) || [];
+    return Array.from(new Set([...fromStore, ...fromLogs]));
+  }, [publication, failedPlatforms]);
 
   const hasYouTubeAccount = selectedSocialAccounts.some((id: number) => {
     const account = socialAccounts.find((a) => a.id === id);
@@ -435,6 +451,7 @@ const EditPublicationModal = ({
                     globalSchedule={watched.scheduled_at ?? undefined}
                     publishedAccountIds={publishedAccountIds}
                     publishingAccountIds={publishingAccountIds}
+                    failedAccountIds={failedAccountIds}
                     onCancel={handleCancelPublication}
                     error={errors.social_accounts?.message as string}
                     disabled={isContentSectionDisabled || !allowConfiguration}

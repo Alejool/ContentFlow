@@ -12,6 +12,7 @@ import {
   AlertCircle,
   CheckCircle,
   Clock,
+  Loader2,
   Settings as SettingsIcon,
   Share2,
   X,
@@ -122,7 +123,9 @@ export default function PublishPublicationModal({
   useEffect(() => {
     if (isOpen && publication) {
       fetchPublishedPlatforms(publication.id);
-      fetchPublicationById(publication.id);
+      fetchPublicationById(publication.id).then((fresh) => {
+        if (fresh) loadExistingThumbnails(fresh);
+      });
       loadExistingThumbnails(publication);
       if (publication.platform_settings) {
         setPlatformSettings(publication.platform_settings);
@@ -371,11 +374,20 @@ export default function PublishPublicationModal({
                               <div className="flex flex-col items-center gap-3">
                                 <div className="w-10 h-10 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin shadow-sm" />
                                 <div className="flex flex-col items-center">
-                                  <span className="text-[11px] font-bold text-yellow-700 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-900/50 px-2.5 py-1 rounded-md shadow-sm border border-yellow-200 dark:border-yellow-800 uppercase tracking-wider mb-2">
-                                    {t("publications.publish.publishing") ||
-                                      "Publicando"}{" "}
-                                    ({t("common.wait") || "Espere..."})
-                                  </span>
+                                  {isPublishing && (
+                                    <span className="text-[11px] font-bold text-yellow-700 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-900/50 px-2.5 py-1 rounded-md shadow-sm border border-yellow-200 dark:border-yellow-800 uppercase tracking-wider mb-2">
+                                      {t(
+                                        "publications.modal.publish.publishing",
+                                      )}
+                                    </span>
+                                  )}
+                                  {isUnpublishing && (
+                                    <span className="text-[11px] font-bold text-amber-700 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/50 px-2.5 py-1 rounded-md shadow-sm border border-amber-200 dark:border-amber-800 uppercase tracking-wider mb-2">
+                                      {t(
+                                        "publications.modal.publish.unpublishing",
+                                      ) || "Despublicando..."}
+                                    </span>
+                                  )}
                                   <button
                                     type="button"
                                     onClick={(e) => {
@@ -409,6 +421,28 @@ export default function PublishPublicationModal({
                               </div>
                             )}
                           </div>
+
+                          {isUnpublishing && (
+                            <div className="flex items-center gap-2">
+                              <span className="flex items-center gap-1 text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/30 px-2 py-1 rounded-full">
+                                <Loader2 className="w-3 h-3 animate-spin" />
+                                {t("publications.modal.publish.unpublishing") ||
+                                  "Despublicando..."}
+                              </span>
+                            </div>
+                          )}
+
+                          {isFailed &&
+                            !isPublished &&
+                            !isPublishing &&
+                            !isUnpublishing && (
+                              <div className="flex items-center gap-2">
+                                <span className="flex items-center gap-1 text-xs font-medium text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900/30 px-2 py-1 rounded-full">
+                                  <AlertCircle className="w-3 h-3" />
+                                  {t("publications.modal.publish.failed")}
+                                </span>
+                              </div>
+                            )}
 
                           {isPublished && (
                             <div className="flex items-center gap-2">
@@ -526,7 +560,7 @@ export default function PublishPublicationModal({
                     alt="YouTube"
                   />
                   <h4 className="font-semibold text-gray-900 dark:text-white">
-                    {t("publications.modal.publish.youtube.youtubeThumbnails")}
+                    {t("publications.modal.publish.youtubeThumbnails")}
                     {isLoadingThumbnails && (
                       <span className="ml-2 text-xs text-gray-500">
                         {t("publications.modal.publish.loading")}

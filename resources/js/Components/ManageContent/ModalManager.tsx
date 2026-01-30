@@ -118,7 +118,7 @@ const ModalManager = memo(({ onRefresh }: ModalManagerProps) => {
                 fetchPublishedPlatforms(idToRefresh);
               }
             }}
-            publication={selectedItem as Publication}
+            publication={currentPub}
             onSuccess={onRefresh}
           />,
           document.body,

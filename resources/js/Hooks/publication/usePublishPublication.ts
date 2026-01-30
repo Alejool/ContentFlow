@@ -279,22 +279,31 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
 
   const handleUnpublish = useCallback(
     async (publicationId: number, accountId: number, platform: string) => {
-      const { success, data } = await unpublishPublication(publicationId, [
-        accountId,
-      ]);
+      setUnpublishing(accountId);
+      try {
+        const { success, data } = await unpublishPublication(publicationId, [
+          accountId,
+        ]);
 
-      if (success) {
-        toast.success(`Unpublished from ${platform}`);
+        if (success) {
+          toast.success(`Unpublished from ${platform}`);
 
-        const current = publishedPlatformsCache[publicationId] || [];
-        setPublishedPlatformsInStore(
-          publicationId,
-          current.filter((id) => id !== accountId),
-        );
-        return true;
-      } else {
-        toast.error(data || "Error unpublishing");
-        return false;
+          await usePublicationStore
+            .getState()
+            .fetchPublicationById(publicationId);
+
+          const current = publishedPlatformsCache[publicationId] || [];
+          setPublishedPlatformsInStore(
+            publicationId,
+            current.filter((id) => id !== accountId),
+          );
+          return true;
+        } else {
+          toast.error(data || "Error unpublishing");
+          return false;
+        }
+      } finally {
+        setUnpublishing(null);
       }
     },
     [

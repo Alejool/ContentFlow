@@ -22,6 +22,8 @@ interface SocialAccountsSectionProps {
   globalSchedule?: string;
   publishedAccountIds?: number[];
   publishingAccountIds?: number[];
+  failedAccountIds?: number[];
+  unpublishing?: number | null;
   error?: string;
   disabled?: boolean;
 }
@@ -169,6 +171,8 @@ interface SocialAccountItemProps {
   globalSchedule?: string;
   isPublished?: boolean;
   isPublishing?: boolean;
+  isFailed?: boolean;
+  isUnpublishing?: boolean;
   disabled?: boolean;
 }
 
@@ -188,35 +192,62 @@ const SocialAccountItem = memo(
     globalSchedule,
     isPublished,
     isPublishing,
+    isFailed,
+    isUnpublishing,
     disabled = false,
   }: SocialAccountItemProps) => {
-    const isInternalDisabled = isPublished || isPublishing || disabled;
-    const isCheckedActually = isChecked || isPublished || isPublishing;
+    const isInternalDisabled =
+      isPublished || isPublishing || isUnpublishing || disabled;
+    const isCheckedActually =
+      isChecked || isPublished || isPublishing || isUnpublishing;
 
     return (
       <div
         className={`relative flex items-center p-3 rounded-lg border transition-all duration-300 ${
           isInternalDisabled ? "cursor-default" : "cursor-pointer"
         } ${
-          isPublished
-            ? "border-green-500 bg-green-50 dark:bg-green-900/10 shadow-sm"
-            : isPublishing
-              ? "border-blue-500 bg-blue-50 dark:bg-blue-900/10 shadow-sm"
-              : isCheckedActually
-                ? "border-primary-500 bg-primary-50 dark:bg-primary-900/20 shadow-sm"
-                : "border-gray-200 dark:border-neutral-600 hover:bg-gray-50 dark:hover:bg-neutral-700/5"
+          isFailed
+            ? "border-red-500 bg-red-50 dark:bg-red-900/10 shadow-sm"
+            : isUnpublishing
+              ? "border-amber-500 bg-amber-50 dark:bg-amber-900/10 shadow-sm"
+              : isPublished
+                ? "border-green-500 bg-green-50 dark:bg-green-900/10 shadow-sm"
+                : isPublishing
+                  ? "border-blue-500 bg-blue-50 dark:bg-blue-900/10 shadow-sm"
+                  : isCheckedActually
+                    ? "border-primary-500 bg-primary-50 dark:bg-primary-900/20 shadow-sm"
+                    : "border-gray-200 dark:border-neutral-600 hover:bg-gray-50 dark:hover:bg-neutral-700/5"
         }`}
         onClick={() => {
           if (!isInternalDisabled) onToggle();
         }}
       >
-        {/* Blocking Overlay Effect for Publishing */}
-        {isPublishing && (
+        {/* Blocking Overlay Effect for Publishing / Unpublishing */}
+        {(isPublishing || isUnpublishing) && (
           <div className="absolute inset-0 bg-white/40 dark:bg-black/20 backdrop-blur-[0.5px] rounded-lg z-10 flex items-center justify-center pointer-events-none">
-            <div className="bg-white dark:bg-neutral-800 px-2 py-1 rounded-full shadow-sm border border-blue-200 dark:border-blue-900/50 flex items-center gap-1.5 scale-90">
-              <Loader2 className="w-3 h-3 text-blue-500 animate-spin" />
-              <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-tight">
-                {t("common.publishing") || "Publicando"}
+            <div
+              className={`bg-white dark:bg-neutral-800 px-2 py-1 rounded-full shadow-sm border flex items-center gap-1.5 scale-90 ${
+                isUnpublishing
+                  ? "border-amber-200 dark:border-amber-900/50"
+                  : "border-blue-200 dark:border-blue-900/50"
+              }`}
+            >
+              <Loader2
+                className={`w-3 h-3 animate-spin ${
+                  isUnpublishing ? "text-amber-500" : "text-blue-500"
+                }`}
+              />
+              <span
+                className={`text-[10px] font-bold uppercase tracking-tight ${
+                  isUnpublishing
+                    ? "text-amber-600 dark:text-amber-400"
+                    : "text-blue-600 dark:text-blue-400"
+                }`}
+              >
+                {isUnpublishing
+                  ? t("publications.modal.publish.unpublishing") ||
+                    "Despublicando..."
+                  : t("publications.modal.publish.publishing") || "Publicando"}
               </span>
             </div>
           </div>
@@ -230,6 +261,14 @@ const SocialAccountItem = memo(
               </div>
             ) : isPublishing ? (
               <div className="w-5 h-5 bg-blue-500 rounded flex items-center justify-center">
+                <Loader2 className="w-3 h-3 text-white animate-spin" />
+              </div>
+            ) : isFailed ? (
+              <div className="w-5 h-5 bg-red-500 rounded flex items-center justify-center">
+                <X className="w-3 h-3 text-white stroke-[3]" />
+              </div>
+            ) : isUnpublishing ? (
+              <div className="w-5 h-5 bg-amber-500 rounded flex items-center justify-center">
                 <Loader2 className="w-3 h-3 text-white animate-spin" />
               </div>
             ) : (
@@ -253,24 +292,31 @@ const SocialAccountItem = memo(
                   className={`text-[9px] px-1.5 py-0.5 rounded-full font-black tracking-tighter uppercase ${
                     isPublished
                       ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300"
-                      : isPublishing
-                        ? "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300"
-                        : (customSchedule || globalSchedule) &&
-                            !isPublished &&
-                            !isPublishing
-                          ? "bg-primary-100 text-primary-700 dark:bg-primary-900/40 dark:text-primary-300"
-                          : "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300"
+                      : isFailed
+                        ? "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300"
+                        : isUnpublishing
+                          ? "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
+                          : (customSchedule || globalSchedule) &&
+                              !isPublished &&
+                              !isPublishing
+                            ? "bg-primary-100 text-primary-700 dark:bg-primary-900/40 dark:text-primary-300"
+                            : "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300"
                   }`}
                 >
                   {isPublished
-                    ? t("publish.published")
+                    ? t("publications.modal.publish.published")
                     : isPublishing
-                      ? t("publish.publishing")
-                      : (customSchedule || globalSchedule) &&
-                          !isPublished &&
-                          !isPublishing
-                        ? t("publications.status.scheduled") || "Programado"
-                        : t("publications.status.instant") || "Instantáneo"}
+                      ? t("publications.modal.publish.publishing")
+                      : isFailed
+                        ? t("publications.modal.publish.failed") || "Fallido"
+                        : isUnpublishing
+                          ? t("publications.modal.publish.unpublishing") ||
+                            "Despublicando..."
+                          : (customSchedule || globalSchedule) &&
+                              !isPublished &&
+                              !isPublishing
+                            ? t("publications.status.scheduled") || "Programado"
+                            : t("publications.status.instant") || "Instantáneo"}
                 </span>
               )}
             </div>
@@ -348,13 +394,28 @@ const SocialAccountItem = memo(
             {isPublished && (
               <div className="mt-1 flex items-center gap-1 text-[10px] font-medium text-green-600 dark:text-green-400">
                 <Check className="w-3 h-3" />
-                {t("publish.published")}
+                {t("publications.modal.publish.published")}
               </div>
             )}
             {isPublishing && (
               <div className="mt-1 flex items-center gap-1 text-[10px] font-medium text-yellow-600 dark:text-yellow-400">
                 <div className="w-3 h-3 border-2 border-yellow-600 border-t-transparent rounded-full animate-spin" />
-                {t("publish.publishing")}
+                {t("publications.modal.publish.publishing")}
+              </div>
+            )}
+            {isUnpublishing && (
+              <div className="mt-1 flex items-center gap-1 text-[10px] font-medium text-amber-600 dark:text-amber-400">
+                <div className="w-3 h-3 border-2 border-amber-600 border-t-transparent rounded-full animate-spin" />
+                {t("publications.modal.publish.unpublishing") ||
+                  "Despublicando..."}
+              </div>
+            )}
+            {isFailed && (
+              <div className="mt-1 flex items-center gap-1 text-[10px] font-medium text-red-600 dark:text-red-400">
+                <div className="w-3 h-3 rounded-full bg-red-500 flex items-center justify-center">
+                  <X className="w-2 h-2 text-white" />
+                </div>
+                {t("publications.modal.publish.failed") || "Fallido"}
               </div>
             )}
           </div>
@@ -392,6 +453,8 @@ const SocialAccountsSection = memo(
     globalSchedule,
     publishedAccountIds,
     publishingAccountIds,
+    failedAccountIds,
+    unpublishing,
     error,
     disabled = false,
   }: SocialAccountsSectionProps) => {
@@ -441,6 +504,8 @@ const SocialAccountsSection = memo(
                 globalSchedule={globalSchedule}
                 isPublished={isPublished}
                 isPublishing={isPublishing}
+                isFailed={failedAccountIds?.includes(account.id)}
+                isUnpublishing={unpublishing === account.id}
                 disabled={disabled}
               />
             );

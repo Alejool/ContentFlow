@@ -366,9 +366,10 @@ export default function GlobalUploadIndicator() {
                           p.status === "published" || p.status === "failed",
                       ).length;
                       const progress =
-                        total > 0
-                          ? Math.max(5, Math.round((completed / total) * 100))
-                          : 0;
+                        total > 0 ? Math.round((completed / total) * 100) : 0;
+                      const isInProgress =
+                        item.status === "publishing" ||
+                        item.status === "processing";
 
                       return (
                         <div className="space-y-1">
@@ -383,14 +384,18 @@ export default function GlobalUploadIndicator() {
                           <div className="flex items-center gap-2">
                             <div className="flex-1 bg-gray-100 dark:bg-neutral-700 h-1.5 rounded-full overflow-hidden">
                               <div
-                                className={`h-full transition-all duration-500 ease-out shadow-[0_0_8px_rgba(59,130,246,0.5)] ${item.status === "failed" ? "bg-red-500" : "bg-blue-500"}`}
+                                className={`h-full transition-all duration-500 ease-out shadow-[0_0_8px_rgba(59,130,246,0.5)] ${item.status === "failed" ? "bg-red-500" : "bg-blue-500"} ${isInProgress && progress < 100 ? "animate-shimmer bg-gradient-to-r from-blue-500 via-blue-400 to-blue-500 bg-[length:200%_100%]" : ""}`}
                                 style={{
                                   width: `${item.status === "failed" ? 100 : progress}%`,
                                 }}
                               />
                             </div>
                             <span className="w-8 text-right font-medium">
-                              {item.status === "failed" ? "100" : progress}%
+                              {item.status === "failed"
+                                ? "100%"
+                                : isInProgress && progress < 100
+                                  ? ""
+                                  : `${progress}%`}
                             </span>
                           </div>
                         </div>

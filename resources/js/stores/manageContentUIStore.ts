@@ -6,6 +6,7 @@ type SelectedItem = Campaign | Publication | null;
 
 interface ManageContentUIState {
   activeTab: "publications" | "campaigns" | "logs" | "calendar" | "approvals";
+  tabOrder: string[];
   selectedItem: SelectedItem;
 
   isAddModalOpen: boolean;
@@ -17,6 +18,7 @@ interface ManageContentUIState {
   setActiveTab: (
     tab: "publications" | "campaigns" | "logs" | "calendar" | "approvals",
   ) => void;
+  setTabOrder: (order: string[]) => void;
   setSelectedItem: (item: SelectedItem) => void;
 
   openAddModal: (type?: "publication" | "campaign") => void;
@@ -32,52 +34,71 @@ interface ManageContentUIState {
   closeViewDetailsModal: () => void;
 }
 
-export const useManageContentUIStore = create<ManageContentUIState>((set) => ({
-  activeTab: "publications",
-  selectedItem: null,
+export const useManageContentUIStore = create<ManageContentUIState>((set) => {
+  // Try to load saved order from localStorage
+  const savedOrder =
+    typeof window !== "undefined"
+      ? localStorage.getItem("manage_content_tab_order")
+      : null;
+  const initialOrder = savedOrder
+    ? JSON.parse(savedOrder)
+    : ["publications", "campaigns", "calendar", "logs", "approvals"];
 
-  isAddModalOpen: false,
-  addType: null,
-  isEditModalOpen: false,
-  isPublishModalOpen: false,
-  isViewDetailsModalOpen: false,
+  return {
+    activeTab: "publications",
+    tabOrder: initialOrder,
+    selectedItem: null,
 
-  setActiveTab: (tab) => set({ activeTab: tab }),
-  setSelectedItem: (item) => set({ selectedItem: item }),
+    isAddModalOpen: false,
+    addType: null,
+    isEditModalOpen: false,
+    isPublishModalOpen: false,
+    isViewDetailsModalOpen: false,
 
-  openAddModal: (type) => set({ isAddModalOpen: true, addType: type || null }),
-  closeAddModal: () => set({ isAddModalOpen: false, addType: null }),
+    setActiveTab: (tab) => set({ activeTab: tab }),
+    setTabOrder: (order) => {
+      set({ tabOrder: order });
+      if (typeof window !== "undefined") {
+        localStorage.setItem("manage_content_tab_order", JSON.stringify(order));
+      }
+    },
+    setSelectedItem: (item) => set({ selectedItem: item }),
 
-  openEditModal: (item) =>
-    set({
-      selectedItem: item,
-      isEditModalOpen: true,
-    }),
-  closeEditModal: () =>
-    set({
-      selectedItem: null,
-      isEditModalOpen: false,
-    }),
+    openAddModal: (type) =>
+      set({ isAddModalOpen: true, addType: type || null }),
+    closeAddModal: () => set({ isAddModalOpen: false, addType: null }),
 
-  openPublishModal: (item) =>
-    set({
-      selectedItem: item,
-      isPublishModalOpen: true,
-    }),
-  closePublishModal: () =>
-    set({
-      selectedItem: null,
-      isPublishModalOpen: false,
-    }),
+    openEditModal: (item) =>
+      set({
+        selectedItem: item,
+        isEditModalOpen: true,
+      }),
+    closeEditModal: () =>
+      set({
+        selectedItem: null,
+        isEditModalOpen: false,
+      }),
 
-  openViewDetailsModal: (item) =>
-    set({
-      selectedItem: item,
-      isViewDetailsModalOpen: true,
-    }),
-  closeViewDetailsModal: () =>
-    set({
-      selectedItem: null,
-      isViewDetailsModalOpen: false,
-    }),
-}));
+    openPublishModal: (item) =>
+      set({
+        selectedItem: item,
+        isPublishModalOpen: true,
+      }),
+    closePublishModal: () =>
+      set({
+        selectedItem: null,
+        isPublishModalOpen: false,
+      }),
+
+    openViewDetailsModal: (item) =>
+      set({
+        selectedItem: item,
+        isViewDetailsModalOpen: true,
+      }),
+    closeViewDetailsModal: () =>
+      set({
+        selectedItem: null,
+        isViewDetailsModalOpen: false,
+      }),
+  };
+});

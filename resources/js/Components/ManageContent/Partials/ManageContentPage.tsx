@@ -7,12 +7,30 @@ import Dropdown from "@/Components/common/ui/Dropdown";
 import Modal from "@/Components/common/ui/Modal";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { usePublicationStore } from "@/stores/publicationStore";
+import {
+  DndContext,
+  DragEndEvent,
+  KeyboardSensor,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  arrayMove,
+  horizontalListSortingStrategy,
+  sortableKeyboardCoordinates,
+  useSortable,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { Head, router, usePage } from "@inertiajs/react";
 import {
   Calendar as CalendarIcon,
   CheckCircle,
   FileText,
   Folder,
+  GripHorizontal,
   Plus,
   Target,
   Trash2,
@@ -67,6 +85,8 @@ export default function ManageContentPage() {
   const {
     activeTab,
     setActiveTab,
+    tabOrder,
+    setTabOrder,
     openAddModal,
     openEditModal,
     openPublishModal,
@@ -75,6 +95,8 @@ export default function ManageContentPage() {
     useShallow((s) => ({
       activeTab: s.activeTab,
       setActiveTab: s.setActiveTab,
+      tabOrder: s.tabOrder,
+      setTabOrder: s.setTabOrder,
       openAddModal: s.openAddModal,
       openEditModal: s.openEditModal,
       openPublishModal: s.openPublishModal,
@@ -99,7 +121,7 @@ export default function ManageContentPage() {
     (tab: ContentTab) => {
       startTransition(() => {
         setActiveTab(tab);
-        setSearch(""); 
+        setSearch("");
         handleFilterChange({});
       });
     },
@@ -208,6 +230,101 @@ export default function ManageContentPage() {
     [publications, openEditModal, fetchPublicationById],
   );
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = tabOrder.indexOf(active.id as string);
+      const newIndex = tabOrder.indexOf(over.id as string);
+      setTabOrder(arrayMove(tabOrder, oldIndex, newIndex));
+    }
+  };
+
+  const getTabIcon = (id: string, active: boolean) => {
+    const className = `w-4 h-4 ${active ? "text-white" : "opacity-70"}`;
+    switch (id) {
+      case "publications":
+        return <Folder className={className} />;
+      case "campaigns":
+        return <Target className={className} />;
+      case "calendar":
+        return <CalendarIcon className={className} />;
+      case "logs":
+        return <FileText className={className} />;
+      case "approvals":
+        return <CheckCircle className={className} />;
+      default:
+        return null;
+    }
+  };
+
+  const SortableTab = ({ id, label, hasBadge, badgeCount }: any) => {
+    const {
+      attributes,
+      listeners,
+      setNodeRef,
+      transform,
+      transition,
+      isDragging,
+    } = useSortable({ id });
+
+    const style = {
+      transform: CSS.Transform.toString(transform),
+      transition,
+      zIndex: isDragging ? 50 : "auto",
+      opacity: isDragging ? 0.5 : 1,
+    };
+
+    const isActive = activeTab === id;
+
+    return (
+      <div
+        ref={setNodeRef}
+        style={style}
+        className="flex items-center gap-1 group/tab"
+      >
+        <button
+          onClick={() => handleTabChange(id)}
+          {...attributes}
+          {...listeners}
+          className={`flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-bold transition-all duration-200 whitespace-nowrap relative select-none ${
+            isActive
+              ? "bg-primary-600 text-white shadow-md shadow-primary-500/20 ring-1 ring-primary-500/50"
+              : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-700/50"
+          }`}
+        >
+          <GripHorizontal
+            className={`w-3 h-3 opacity-0 group-hover/tab:opacity-40 transition-opacity cursor-grab active:cursor-grabbing mr-[-4px] ${isActive ? "text-white" : ""}`}
+          />
+          {getTabIcon(id, isActive)}
+          <span>{label}</span>
+          {hasBadge && badgeCount > 0 && (
+            <span
+              className={`ml-1 px-1.5 py-0.5 text-[10px] font-bold rounded-full ${
+                isActive
+                  ? "bg-white/20 text-white"
+                  : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+              }`}
+            >
+              {badgeCount}
+            </span>
+          )}
+        </button>
+      </div>
+    );
+  };
+
   return (
     <AuthenticatedLayout>
       <Head title={t("manageContent.title")} />
@@ -277,91 +394,42 @@ export default function ManageContentPage() {
           </div>
 
           <div className="mb-8">
-            <div className="inline-flex items-center p-1.5 rounded-2xl bg-white dark:bg-neutral-800 backdrop-blur-sm border border-gray-200/60 dark:border-neutral-700/60 gap-1 overflow-x-auto max-w-full shadow-sm">
-              <button
-                onClick={() => handleTabChange("publications")}
-                className={`flex items-center justify-center gap-2 py-2.5 px-5 rounded-lg text-sm font-bold transition-all duration-200 whitespace-nowrap ${
-                  activeTab === "publications"
-                    ? "bg-primary-600 text-white shadow-md shadow-primary-500/20 ring-1 ring-primary-500/50"
-                    : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-700/50"
-                }`}
-              >
-                <Folder
-                  className={`w-4 h-4 ${activeTab === "publications" ? "text-white" : "opacity-70"}`}
-                />
-                <span>{t("manageContent.tabs.publications")}</span>
-              </button>
-              <button
-                onClick={() => handleTabChange("campaigns")}
-                className={`flex items-center justify-center gap-2 py-2.5 px-5 rounded-lg text-sm font-bold transition-all duration-200 whitespace-nowrap ${
-                  activeTab === "campaigns"
-                    ? "bg-primary-600 text-white shadow-md shadow-primary-500/20 ring-1 ring-primary-500/50"
-                    : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-700/50"
-                }`}
-              >
-                <Target
-                  className={`w-4 h-4 ${activeTab === "campaigns" ? "text-white" : "opacity-70"}`}
-                />
-                <span>{t("manageContent.tabs.campaigns")}</span>
-              </button>
-              <button
-                onClick={() => handleTabChange("calendar")}
-                className={`flex items-center justify-center gap-2 py-2.5 px-5 rounded-lg text-sm font-bold transition-all duration-200 whitespace-nowrap ${
-                  activeTab === "calendar"
-                    ? "bg-primary-600 text-white shadow-md shadow-primary-500/20 ring-1 ring-primary-500/50"
-                    : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-700/50"
-                }`}
-              >
-                <CalendarIcon
-                  className={`w-4 h-4 ${activeTab === "calendar" ? "text-white" : "opacity-70"}`}
-                />
-                <span>{t("manageContent.tabs.calendar")}</span>
-              </button>
-              <button
-                onClick={() => handleTabChange("logs")}
-                className={`flex items-center justify-center gap-2 py-2.5 px-5 rounded-lg text-sm font-bold transition-all duration-200 whitespace-nowrap ${
-                  activeTab === "logs"
-                    ? "bg-primary-600 text-white shadow-md shadow-primary-500/20 ring-1 ring-primary-500/50"
-                    : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-700/50"
-                }`}
-              >
-                <FileText
-                  className={`w-4 h-4 ${activeTab === "logs" ? "text-white" : "opacity-70"}`}
-                />
-                <span>{t("manageContent.tabs.logs")}</span>
-              </button>
-              {permissions.includes("approve") && (
-                <button
-                  onClick={() => handleTabChange("approvals")}
-                  className={`flex items-center justify-center gap-2 py-2.5 px-5 rounded-lg text-sm font-bold transition-all duration-200 whitespace-nowrap relative ${
-                    activeTab === "approvals"
-                      ? "bg-primary-600 text-white shadow-md shadow-primary-500/20 ring-1 ring-primary-500/50"
-                      : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-700/50"
-                  }`}
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <div className="inline-flex items-center p-1.5 rounded-2xl bg-white dark:bg-neutral-800 backdrop-blur-sm border border-gray-200/60 dark:border-neutral-700/60 gap-1 overflow-x-auto max-w-full shadow-sm">
+                <SortableContext
+                  items={tabOrder}
+                  strategy={horizontalListSortingStrategy}
                 >
-                  <CheckCircle
-                    className={`w-4 h-4 ${activeTab === "approvals" ? "text-white" : "opacity-70"}`}
-                  />
-                  <span>{t("manageContent.tabs.approvals")}</span>
-                  {publications.filter((p) => p.status === "pending_review")
-                    .length > 0 && (
-                    <span
-                      className={`ml-1 px-1.5 py-0.5 text-[10px] font-bold rounded-full ${
-                        activeTab === "approvals"
-                          ? "bg-white/20 text-white"
-                          : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
-                      }`}
-                    >
-                      {
-                        publications.filter(
-                          (p) => p.status === "pending_review",
-                        ).length
-                      }
-                    </span>
-                  )}
-                </button>
-              )}
-            </div>
+                  {tabOrder.map((id) => {
+                    if (id === "approvals" && !permissions.includes("approve"))
+                      return null;
+
+                    const label = t(`manageContent.tabs.${id}`);
+                    const hasBadge = id === "approvals";
+                    const badgeCount =
+                      id === "approvals"
+                        ? publications.filter(
+                            (p) => p.status === "pending_review",
+                          ).length
+                        : 0;
+
+                    return (
+                      <SortableTab
+                        key={id}
+                        id={id}
+                        label={label}
+                        hasBadge={hasBadge}
+                        badgeCount={badgeCount}
+                      />
+                    );
+                  })}
+                </SortableContext>
+              </div>
+            </DndContext>
           </div>
 
           <div className="min-h-[500px]">
