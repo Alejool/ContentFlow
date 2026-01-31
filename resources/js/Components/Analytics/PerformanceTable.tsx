@@ -1,9 +1,7 @@
-import Button from "@/Components/common/Modern/Button";
 import Input from "@/Components/common/Modern/Input";
+import AdvancedPagination from "@/Components/common/ui/AdvancedPagination";
 import { useTheme } from "@/Hooks/useTheme";
 import {
-  ArrowLeft,
-  ArrowRight,
   ArrowUpDown,
   ChevronDown,
   ChevronUp,
@@ -58,7 +56,7 @@ export default function PerformanceTable({
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
   const [internalSearchTerm, setInternalSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const [itemsPerPage, setItemsPerPage] = useState(5);
 
   const searchTerm = externalSearchTerm ?? internalSearchTerm;
   const setSearchTerm = onSearchChange ?? setInternalSearchTerm;
@@ -92,24 +90,15 @@ export default function PerformanceTable({
             : campaign.title
         ).toLowerCase();
 
-        // Check if campaign title matches
         const matchesCampaign = campaignTitle.includes(term);
 
-        // Filter publications that match the search term
         const matchingPublications = campaign.publications.filter((pub) =>
           pub.title.toLowerCase().includes(term),
         );
 
-        // If campaign matches OR any publication matches, keep the campaign
         if (matchesCampaign || matchingPublications.length > 0) {
           return {
             ...campaign,
-            // If the campaign itself doesn't match, only show the matching publications
-            // Otherwise, show all publications of the campaign (as before)
-            // But user said "busca por nombre de cmapaña o publicaciones"
-            // Let's refine it: show campaign if it matches, and within it, show all publications?
-            // Or only show publications that match if any do?
-            // Usually, user expects to see the "path" to the result.
             publications: matchesCampaign
               ? campaign.publications
               : matchingPublications,
@@ -125,7 +114,6 @@ export default function PerformanceTable({
       let valA = a[sortField];
       let valB = b[sortField];
 
-      // Handle numeric comparisons
       if (typeof valA === "string" && typeof valB === "string") {
         return sortDirection === "asc"
           ? valA.localeCompare(valB)
@@ -138,15 +126,25 @@ export default function PerformanceTable({
     });
   }, [filteredCampaigns, sortField, sortDirection]);
 
-  const totalPages = Math.ceil(sortedCampaigns.length / itemsPerPage);
-  const paginatedCampaigns = useMemo(() => {
+  const allPublications = useMemo(() => {
+    const items: { publication: PublicationStat; campaign: CampaignStat }[] =
+      [];
+    sortedCampaigns.forEach((campaign) => {
+      campaign.publications.forEach((pub) => {
+        items.push({ publication: pub, campaign });
+      });
+    });
+    return items;
+  }, [sortedCampaigns]);
+
+  const totalPages = Math.ceil(allPublications.length / itemsPerPage);
+  const paginatedItems = useMemo(() => {
     const start = (currentPage - 1) * itemsPerPage;
-    return sortedCampaigns.slice(start, start + itemsPerPage);
-  }, [sortedCampaigns, currentPage]);
+    return allPublications.slice(start, start + itemsPerPage);
+  }, [allPublications, currentPage, itemsPerPage]);
 
   return (
     <div className="space-y-4">
-      {/* Search Filter */}
       {!hideSearch && (
         <div className="flex justify-end p-2">
           <div className="w-full md:w-64">
@@ -213,93 +211,99 @@ export default function PerformanceTable({
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 dark:divide-neutral-800">
-            {paginatedCampaigns.map((campaign) => (
-              <React.Fragment key={campaign.id}>
-                {/* Campaign Row */}
-                <tr
-                  className={
-                    theme === "dark" ? "bg-neutral-800/30" : "bg-primary-50/10"
-                  }
-                >
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center gap-3">
-                      <div className="flex-shrink-0 w-8 h-8 rounded bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
-                        <Layers className="w-4 h-4 text-primary-600 dark:text-primary-400" />
-                      </div>
-                      <div>
-                        <div className="text-sm font-bold text-gray-900 dark:text-white">
-                          {campaign.id === 0
-                            ? t("analytics.drilldown.standalone")
-                            : campaign.title}
-                        </div>
-                        <div className="text-[10px] text-gray-500 font-bold tracking-tight">
-                          {campaign.id !== 0 && (
-                            <>
-                              <span className="uppercase">
-                                {t(`common.status.${campaign.status}`) ||
-                                  campaign.status}
-                              </span>
-                              <span className="mx-1">•</span>
-                            </>
-                          )}
-                          {campaign.publications.length}{" "}
-                          {t("common.publications") || "Publicaciones"}
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-center whitespace-nowrap">
-                    <span className="text-sm font-bold text-gray-900 dark:text-white">
-                      {campaign.total_views.toLocaleString()}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-center whitespace-nowrap">
-                    <span className="text-sm font-bold text-gray-900 dark:text-white">
-                      {campaign.total_clicks.toLocaleString()}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-center whitespace-nowrap">
-                    <span className="text-sm font-bold text-purple-600 dark:text-purple-400">
-                      {campaign.total_engagement.toLocaleString()}
-                    </span>
-                  </td>
-                </tr>
+            {paginatedItems.map((item, index) => {
+              const showCampaignHeader =
+                index === 0 ||
+                item.campaign.id !== paginatedItems[index - 1].campaign.id;
 
-                {/* Individual Publication Rows */}
-                {campaign.publications.map((pub) => (
-                  <tr
-                    key={pub.id}
-                    className="hover:bg-gray-50 dark:hover:bg-neutral-800/50 transition-colors"
-                  >
+              return (
+                <React.Fragment
+                  key={`${item.campaign.id}-${item.publication.id}`}
+                >
+                  {showCampaignHeader && (
+                    <tr
+                      className={
+                        theme === "dark"
+                          ? "bg-neutral-800/30"
+                          : "bg-primary-50/10"
+                      }
+                    >
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center gap-3">
+                          <div className="flex-shrink-0 w-8 h-8 rounded bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
+                            <Layers className="w-4 h-4 text-primary-600 dark:text-primary-400" />
+                          </div>
+                          <div>
+                            <div className="text-sm font-bold text-gray-900 dark:text-white">
+                              {item.campaign.id === 0
+                                ? t("analytics.drilldown.standalone")
+                                : item.campaign.title}
+                            </div>
+                            <div className="text-[10px] text-gray-500 font-bold tracking-tight">
+                              {item.campaign.id !== 0 && (
+                                <>
+                                  <span className="uppercase">
+                                    {t(
+                                      `common.status.${item.campaign.status}`,
+                                    ) || item.campaign.status}
+                                  </span>
+                                  <span className="mx-1">•</span>
+                                </>
+                              )}
+                              {item.campaign.publications.length}{" "}
+                              {t("common.publications") || "Publicaciones"}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-center whitespace-nowrap">
+                        <span className="text-sm font-bold text-gray-900 dark:text-white">
+                          {item.campaign.total_views.toLocaleString()}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-center whitespace-nowrap">
+                        <span className="text-sm font-bold text-gray-900 dark:text-white">
+                          {item.campaign.total_clicks.toLocaleString()}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-center whitespace-nowrap">
+                        <span className="text-sm font-bold text-purple-600 dark:text-purple-400">
+                          {item.campaign.total_engagement.toLocaleString()}
+                        </span>
+                      </td>
+                    </tr>
+                  )}
+
+                  <tr className="hover:bg-gray-50 dark:hover:bg-neutral-800/50 transition-colors">
                     <td className="px-6 py-3 whitespace-nowrap">
                       <div className="flex items-center gap-2 pl-8">
                         <FileText className="w-3.5 h-3.5 text-gray-400" />
                         <span className="text-sm text-gray-600 dark:text-gray-300 truncate max-w-[250px]">
-                          {pub.title}
+                          {item.publication.title}
                         </span>
                       </div>
                     </td>
                     <td className="px-6 py-3 text-center whitespace-nowrap">
                       <span className="text-xs text-gray-500 dark:text-gray-400">
-                        {pub.views.toLocaleString()}
+                        {item.publication.views.toLocaleString()}
                       </span>
                     </td>
                     <td className="px-6 py-3 text-center whitespace-nowrap">
                       <span className="text-xs text-gray-500 dark:text-gray-400">
-                        {pub.clicks.toLocaleString()}
+                        {item.publication.clicks.toLocaleString()}
                       </span>
                     </td>
                     <td className="px-6 py-3 text-center whitespace-nowrap">
                       <span className="text-xs font-medium text-gray-700 dark:text-gray-200">
-                        {pub.engagement.toLocaleString()}
+                        {item.publication.engagement.toLocaleString()}
                       </span>
                     </td>
                   </tr>
-                ))}
-              </React.Fragment>
-            ))}
+                </React.Fragment>
+              );
+            })}
 
-            {paginatedCampaigns.length === 0 && (
+            {paginatedItems.length === 0 && (
               <tr>
                 <td
                   colSpan={4}
@@ -315,57 +319,19 @@ export default function PerformanceTable({
         </table>
       </div>
 
-      {/* Pagination Controls */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between px-4 py-3 bg-gray-50/50 dark:bg-neutral-900/30 border-t border-gray-100 dark:border-neutral-800">
-          <div className="text-xs font-medium text-gray-500">
-            {t("common.showing") || "Mostrando"}{" "}
-            <span className="font-bold">
-              {(currentPage - 1) * itemsPerPage + 1}
-            </span>{" "}
-            -{" "}
-            <span className="font-bold">
-              {Math.min(currentPage * itemsPerPage, sortedCampaigns.length)}
-            </span>{" "}
-            {t("common.of") || "de"}{" "}
-            <span className="font-bold">{sortedCampaigns.length}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => setCurrentPage(currentPage - 1)}
-              disabled={currentPage === 1}
-              className="p-2 min-w-0"
-            >
-              <ArrowLeft className="w-4 h-4" />
-            </Button>
-            <div className="flex items-center gap-1">
-              {[...Array(totalPages)].map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setCurrentPage(i + 1)}
-                  className={`w-8 h-8 rounded-lg text-xs font-bold transition-all ${
-                    currentPage === i + 1
-                      ? "bg-primary-600 text-white"
-                      : "text-gray-500 hover:bg-gray-100 dark:hover:bg-neutral-800"
-                  }`}
-                >
-                  {i + 1}
-                </button>
-              ))}
-            </div>
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => setCurrentPage(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className="p-2 min-w-0"
-            >
-              <ArrowRight className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
+        <AdvancedPagination
+          currentPage={currentPage}
+          lastPage={totalPages}
+          total={allPublications.length}
+          perPage={itemsPerPage}
+          onPageChange={setCurrentPage}
+          onPerPageChange={(newPerPage: number) => {
+            setItemsPerPage(newPerPage);
+            setCurrentPage(1);
+          }}
+          t={t}
+        />
       )}
     </div>
   );
