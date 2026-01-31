@@ -3,11 +3,12 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\Role;
-use App\Models\Permission;
+use App\Models\Role\Role;;
+
+use App\Models\Permission\Permission;
 use App\Models\User;
-use App\Models\Workspace;
-use App\Models\Campaign;
+use App\Models\Workspace\Workspace;
+use App\Models\Campaigns\Campaign;
 use Illuminate\Support\Str;
 
 class WorkspaceSeeder extends Seeder

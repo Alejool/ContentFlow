@@ -44,7 +44,6 @@ export function useToast() {
   return context;
 }
 
-// Iconos para cada tipo de toast
 const ToastIcons: Record<ToastType, React.ReactNode> = {
   success: <CheckCircle className="w-5 h-5 text-green-500" />,
   error: <AlertCircle className="w-5 h-5 text-primary-500" />,
@@ -53,7 +52,6 @@ const ToastIcons: Record<ToastType, React.ReactNode> = {
   loading: <Loader2 className="w-5 h-5 text-blue-500 animate-spin" />,
 };
 
-// Colores de fondo para cada tipo
 const ToastBgColors: Record<ToastType, string> = {
   success:
     "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800/50",
@@ -66,7 +64,6 @@ const ToastBgColors: Record<ToastType, string> = {
     "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800/50",
 };
 
-// Text colors for each type
 const ToastTextColors: Record<ToastType, string> = {
   success: "text-green-800 dark:text-green-300",
   error: "text-primary-800 dark:text-primary-300",
@@ -75,7 +72,6 @@ const ToastTextColors: Record<ToastType, string> = {
   loading: "text-blue-800 dark:text-blue-300",
 };
 
-// Progress bar colors for each type
 const ToastProgressColors: Record<ToastType, string> = {
   success: "bg-green-500",
   error: "bg-primary-500",
@@ -84,7 +80,6 @@ const ToastProgressColors: Record<ToastType, string> = {
   loading: "bg-blue-500",
 };
 
-// Componente individual de toast
 const ToastItem = ({ toast }: { toast: ToastProps }) => {
   const { dismissToast } = useToast();
   const [isVisible, setIsVisible] = React.useState(true);
@@ -151,7 +146,6 @@ const ToastItem = ({ toast }: { toast: ToastProps }) => {
         animation: isVisible ? "toastSlideIn 0.3s ease-out" : "none",
       }}
     >
-      {/* Barra de progreso */}
       {toast.duration && toast.type !== "loading" && (
         <div className="absolute top-0 left-0 right-0 h-1 bg-gray-200 dark:bg-gray-700 overflow-hidden">
           <div
@@ -209,7 +203,6 @@ const ToastItem = ({ toast }: { toast: ToastProps }) => {
   );
 };
 
-// Componente del contenedor de toasts
 export const Toaster = () => {
   const { toasts } = useToast();
 
@@ -222,7 +215,6 @@ export const Toaster = () => {
   );
 };
 
-// Provider principal
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = React.useState<ToastProps[]>([]);
 
@@ -257,7 +249,6 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-// Hook helper para usar toasts fácilmente
 export function useToaster() {
   const { showToast, dismissToast, dismissAllToasts } = useToast();
 
@@ -361,7 +352,6 @@ export function useToaster() {
   };
 }
 
-// Componente más simple para usar directamente
 export function SimpleToaster() {
   const [toasts, setToasts] = React.useState<ToastProps[]>([]);
   const toastIdCounter = React.useRef(0);
@@ -438,7 +428,6 @@ export function SimpleToaster() {
   );
 }
 
-// Estilos CSS para animaciones (añade esto a tu CSS global)
 const toastStyles = `
 @keyframes toastSlideIn {
   from {
@@ -463,12 +452,9 @@ const toastStyles = `
 }
 `;
 
-// Componente para inyectar estilos
 export function ToastStyles() {
   return <style>{toastStyles}</style>;
 }
-
-// Función global para usar toasts sin contexto
 let globalToaster: ReturnType<typeof useToaster> | null = null;
 
 export function setGlobalToaster(toaster: ReturnType<typeof useToaster>) {
@@ -477,7 +463,6 @@ export function setGlobalToaster(toaster: ReturnType<typeof useToaster>) {
 
 export function getGlobalToaster() {
   if (!globalToaster) {
-    // Create a simple fallback
     const fallbackToaster = {
       toast: (options: Omit<ToastProps, "id">) => {
         console.log("Toast (fallback):", options);
@@ -507,14 +492,13 @@ export function getGlobalToaster() {
   return globalToaster;
 }
 
-// Hook para usar toasts fácilmente en cualquier componente
 export function useToastManager() {
   const toast = React.useRef(getGlobalToaster());
 
   return toast.current;
 }
 
-// High Order Component para añadir toasts a un componente
+// High Order Component to add toasts to a component
 export function withToaster<P extends object>(
   Component: React.ComponentType<P>
 ) {

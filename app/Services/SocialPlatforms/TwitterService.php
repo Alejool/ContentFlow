@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Storage;
 
 use App\DTOs\SocialPostDTO;
 use App\DTOs\PostResultDTO;
-use App\Models\SocialAccount;
+use App\Models\Social\SocialAccount;
 
 class TwitterService extends BaseSocialService
 {

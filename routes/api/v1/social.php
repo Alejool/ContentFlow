@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\SocialAccount\SocialAccountController;
-use App\Http\Controllers\SocialPostLogController;
+use App\Http\Controllers\Social\SocialAccountController;
+use App\Http\Controllers\Logs\SocialPostLogController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function () {

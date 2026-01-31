@@ -2,7 +2,6 @@
 
 namespace App\Actions\Publications;
 
-use App\Models\Campaign;
 use App\Models\Publications\Publication;
 use App\Services\Media\MediaProcessingService;
 use App\Services\Scheduling\SchedulingService;

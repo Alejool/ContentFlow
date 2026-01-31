@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Publications\Publication;
-use App\Models\MediaFile;
+use App\Models\MediaFiles\MediaFile;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 

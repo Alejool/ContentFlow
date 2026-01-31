@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Models\SocialPostLog;
+use App\Models\Social\SocialPostLog;
 use App\Models\Publications\Publication;
 use App\Services\SocialPlatforms\YouTubeService;
 use Illuminate\Bus\Queueable;
@@ -68,7 +68,7 @@ class VerifyYouTubeVideoStatus implements ShouldQueue
       // If still 'uploaded' but not processed, we wait for next retry
       if ($uploadStatus === 'uploaded') {
         Log::info('YouTube Video still processing...', ['video_id' => $videoId]);
-        throw new \Exception("Video still processing on YouTube..."); 
+        throw new \Exception("Video still processing on YouTube...");
       }
     } catch (\Exception $e) {
       Log::error('VerifyYouTubeVideoStatus error', ['error' => $e->getMessage()]);

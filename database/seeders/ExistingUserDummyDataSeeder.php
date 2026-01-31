@@ -3,16 +3,17 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\User;
-use App\Models\Publications\Publication;
-use App\Models\CampaignAnalytics;
-use App\Models\SocialAccount;
-use App\Models\SocialMediaMetrics;
-use App\Models\Workspace;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+
+use App\Models\User;
+use App\Models\Publications\Publication;
+use App\Models\Campaigns\CampaignAnalytics;
+use App\Models\Social\SocialAccount;
+use App\Models\Social\SocialMediaMetrics;
+use App\Models\Workspace\Workspace;
 
 class ExistingUserDummyDataSeeder extends Seeder
 {

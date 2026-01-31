@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\UserCalendarEvent;
+use App\Models\User\UserCalendarEvent;
 use Illuminate\Support\Facades\Auth;
 
 use App\Traits\ApiResponse;

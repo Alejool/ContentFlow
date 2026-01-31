@@ -3,10 +3,9 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
-use App\Models\MediaFile;
-use App\Models\ScheduledPost;
-use App\Models\SocialAccount;
+use App\Models\MediaFiles\MediaFile;
+use App\Models\Social\ScheduledPost;
+use App\Models\Social\SocialAccount;
 use App\Models\User;
 
 class ScheduledPostFactory extends Factory
@@ -29,7 +28,7 @@ class ScheduledPostFactory extends Factory
             'media_file_id' => MediaFile::factory(),
             'caption' => fake()->text(),
             'scheduled_at' => fake()->dateTime(),
-            'status' => fake()->randomElement(["pending","posted","failed"]),
+            'status' => fake()->randomElement(["pending", "posted", "failed"]),
         ];
     }
 }

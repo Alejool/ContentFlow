@@ -2,14 +2,13 @@
 
 namespace App\Services;
 
-use App\Models\Campaign;
-use App\Models\Analytics;
-use App\Models\CampaignAnalytics;
-use App\Models\SocialMediaMetrics;
-use App\Models\Publications\Publication;
-use App\Models\SocialAccount;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
+
+use App\Models\Campaigns\Campaign;
+use App\Models\Campaigns\CampaignAnalytics;
+use App\Models\Publications\Publication;
+use App\Models\Social\SocialAccount;
+use App\Models\Social\SocialMediaMetrics;
 
 class StatisticsService
 {

@@ -4,7 +4,7 @@ namespace Tests\Feature\Models;
 
 use App\Models\Publications\Publication;
 use App\Models\User;
-use App\Models\Workspace;
+use App\Models\Workspace\Workspace;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

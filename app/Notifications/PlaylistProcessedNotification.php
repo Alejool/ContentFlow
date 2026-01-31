@@ -3,7 +3,7 @@
 namespace App\Notifications;
 
 use App\Channels\ExtendedDatabaseChannel;
-use App\Models\YouTubePlaylistQueue;
+use App\Models\Youtube\YouTubePlaylistQueue;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;

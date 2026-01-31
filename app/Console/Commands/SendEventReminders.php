@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use App\Models\UserCalendarEvent;
+use App\Models\User\UserCalendarEvent;
 use App\Notifications\EventReminderNotification;
 
 class SendEventReminders extends Command

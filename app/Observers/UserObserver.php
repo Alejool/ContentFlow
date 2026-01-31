@@ -3,8 +3,8 @@
 namespace App\Observers;
 
 use App\Models\User;
-use App\Models\Workspace;
-use App\Models\Role;
+use App\Models\Workspace\Workspace;
+use App\Models\Role\Role;;
 
 class UserObserver
 {

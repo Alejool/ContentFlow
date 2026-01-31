@@ -4,8 +4,8 @@ namespace App\Actions\Publications;
 
 use App\Jobs\PublishToSocialMedia;
 use App\Models\Publications\Publication;
-use App\Models\ScheduledPost;
-use App\Models\SocialAccount;
+use App\Models\Social\ScheduledPost;
+use App\Models\Social\SocialAccount;
 use App\Services\Media\MediaProcessingService;
 use App\Events\PublicationStatusUpdated;
 use Illuminate\Support\Facades\Log;

@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\SocialMediaMetrics;
-use App\Models\SocialAccount;
+use App\Models\Social\SocialAccount;
 use Carbon\Carbon;
 
 class SocialMediaMetricsSeeder extends Seeder
@@ -24,33 +24,33 @@ class SocialMediaMetricsSeeder extends Seeder
         foreach ($socialAccounts as $account) {
             // Platform-specific base metrics
             $platformMetrics = $this->getPlatformBaseMetrics($account->platform);
-            
+
             // Generate 90 days of metrics
             $startDate = now()->subDays(90);
             $currentDate = $startDate->copy();
-            
+
             $followers = $platformMetrics['base_followers'];
             $postsCount = $platformMetrics['base_posts'];
 
             while ($currentDate <= now()) {
                 $dayOfWeek = $currentDate->dayOfWeek;
                 $isWeekend = ($dayOfWeek == 0 || $dayOfWeek == 6);
-                
+
                 // Follower growth (more on weekdays)
                 $followersGained = $isWeekend ? rand(5, 20) : rand(15, 50);
                 $followersLost = rand(2, 10);
                 $followers += ($followersGained - $followersLost);
-                
+
                 // Post activity (varies by platform)
                 $dailyPosts = $this->getDailyPosts($account->platform, $isWeekend);
                 $postsCount += $dailyPosts;
-                
+
                 // Engagement metrics
                 $totalLikes = (int)($followers * rand(5, 15) / 100 * $dailyPosts);
                 $totalComments = (int)($totalLikes * rand(5, 15) / 100);
                 $totalShares = (int)($totalLikes * rand(3, 10) / 100);
                 $totalSaves = (int)($totalLikes * rand(8, 20) / 100);
-                
+
                 // Reach metrics
                 $reach = (int)($followers * rand(20, 60) / 100);
                 $impressions = (int)($reach * rand(150, 300) / 100);
@@ -83,7 +83,7 @@ class SocialMediaMetricsSeeder extends Seeder
                 if ($previousDay) {
                     $metrics->calculateGrowthRate($previousDay->followers);
                 }
-                
+
                 $metrics->calculateMetrics()->save();
 
                 $currentDate->addDay();

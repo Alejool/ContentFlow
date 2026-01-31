@@ -15,8 +15,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Notifications\VerifyEmailNotification;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Contracts\Translation\HasLocalePreference;
+
 use App\Models\Publications\Publication;
-use App\Models\WorkspaceUser;
+use App\Models\Workspace\WorkspaceUser;
+use App\Models\Social\SocialAccount;
+use App\Models\Social\ScheduledPost;
+use App\Models\Social\SocialPostLog;
+use App\Models\MediaFiles\MediaFile;
+use App\Models\Workspace\Workspace;
+use App\Models\Role\Role;;
 
 class User extends Model implements Authenticatable, MustVerifyEmail, CanResetPassword, HasLocalePreference
 {

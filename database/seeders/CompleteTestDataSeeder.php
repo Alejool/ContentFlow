@@ -4,8 +4,8 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\User;
-use App\Models\Campaign;
-use App\Models\SocialAccount;
+use App\Models\Campaigns\Campaign;
+use App\Models\Social\SocialAccount;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 

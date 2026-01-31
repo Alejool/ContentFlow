@@ -28,8 +28,8 @@ const navigationItems = [
   },
   {
     nameKey: "nav.manageContent",
-    href: "manage-content.index",
-    hrefPattern: "/ManageContent",
+    href: "content.index",
+    hrefPattern: "/content",
     icon: FileText,
   },
   {
@@ -59,7 +59,7 @@ export default function Sidebar({
 
     const routePatterns: Record<string, string[]> = {
       dashboard: ["/dashboard"],
-      "manage-content.index": ["/ManageContent"],
+      "content.index": ["/content"],
       "analytics.index": ["/analytics"],
       "workspaces.index": ["/workspaces"],
     };
@@ -77,7 +77,7 @@ export default function Sidebar({
   const getRouteUrl = (routeName: string): string => {
     const routeUrls: Record<string, string> = {
       dashboard: "/dashboard",
-      "manage-content.index": "/ManageContent",
+      "content.index": "/content",
       "analytics.index": "/analytics",
       "workspaces.index": "/workspaces",
     };

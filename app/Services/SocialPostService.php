@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use App\Models\SocialAccount;
-use App\Models\SocialPostLog;
+use App\Models\Social\SocialAccount;
+use App\Models\Social\SocialPostLog;
 use App\Services\SocialPlatforms\FacebookService;
 use App\Services\SocialPlatforms\InstagramService;
 use App\Services\SocialPlatforms\TwitterService;

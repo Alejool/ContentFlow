@@ -3,8 +3,9 @@
 namespace App\Models\Publications;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+use App\Models\User;
 
 class PublicationLock extends Model
 {

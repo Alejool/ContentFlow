@@ -5,8 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\User;
 use App\Models\Publications\Publication;
-use App\Models\Campaign;
-use App\Models\MediaFile;
+use App\Models\Campaigns\Campaign;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 

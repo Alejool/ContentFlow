@@ -12,10 +12,10 @@ use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Support\Facades\Hash;
-use App\Models\User;
 use App\Http\Controllers\Controller;
 use App\Traits\ApiResponse;
 
+use App\Models\User;
 
 use function Laravel\Prompts\warning;
 

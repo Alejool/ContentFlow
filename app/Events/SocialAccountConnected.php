@@ -4,7 +4,7 @@ namespace App\Events;
 
 use Illuminate\Broadcasting\ShouldBroadcast;
 use Illuminate\Broadcasting\PrivateChannel;
-use App\Models\SocialAccount;
+use App\Models\Social\SocialAccount;
 
 class SocialAccountConnected implements ShouldBroadcast
 {
@@ -15,4 +15,3 @@ class SocialAccountConnected implements ShouldBroadcast
     return new PrivateChannel('user.' . $this->account->user_id);
   }
 }
-

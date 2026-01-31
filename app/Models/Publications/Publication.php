@@ -2,21 +2,25 @@
 
 namespace App\Models\Publications;
 
-use App\Models\User;
-use App\Models\CampaignAnalytics;
-use App\Models\ScheduledPost;
-use App\Models\Campaign;
+
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use App\Models\MediaFile;
-use App\Models\SocialPostLog;
-use App\Models\ApprovalLog;
-use App\Models\Workspace;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
+
+use App\Models\MediaFiles\MediaFile;
+use App\Models\Social\SocialPostLog;
+use App\Models\Logs\ApprovalLog;
+use App\Models\Workspace\Workspace;
+use App\Models\User;
+use App\Models\Campaigns\CampaignAnalytics;
+use App\Models\Social\ScheduledPost;
+use App\Models\Campaigns\Campaign;
+
+
 
 class Publication extends Model
 {

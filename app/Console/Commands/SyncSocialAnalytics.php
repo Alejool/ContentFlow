@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Models\SocialAccount;
+use App\Models\Social\SocialAccount;
 use App\Jobs\SyncSocialAnalyticsJob;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Bus;

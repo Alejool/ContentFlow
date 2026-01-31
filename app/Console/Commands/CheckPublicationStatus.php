@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use App\Models\SocialPostLog;
+use App\Models\Social\SocialPostLog;
 use App\Services\SocialPlatforms\YouTubeService;
 use App\Notifications\PublicationStatusUpdate;
 

@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Models\SocialAccount;
+use App\Models\Social\SocialAccount;
 use App\Services\SocialAnalyticsService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Bus\Batchable;

@@ -2,8 +2,9 @@
 
 namespace App\Notifications;
 
-use App\Models\SocialPostLog;
-use App\Notifications\BaseNotification;
+use Illuminate\Support\Facades\Storage;
+
+use App\Models\Social\SocialPostLog;
 
 class VideoUploadedNotification extends BaseNotification
 {
@@ -82,13 +83,13 @@ class VideoUploadedNotification extends BaseNotification
             // Generate URL based on storage driver
             if (config('filesystems.default') === 's3') {
                 try {
-                    return \Illuminate\Support\Facades\Storage::temporaryUrl($path, now()->addMinutes(120));
+                    return Storage::temporaryUrl($path, now()->addMinutes(120));
                 } catch (\Exception $e) {
-                    return \Illuminate\Support\Facades\Storage::url($path);
+                    return Storage::url($path);
                 }
             }
 
-            return \Illuminate\Support\Facades\Storage::url($path);
+            return Storage::url($path);
         } catch (\Exception $e) {
             return null;
         }

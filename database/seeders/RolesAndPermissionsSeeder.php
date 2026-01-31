@@ -2,8 +2,9 @@
 
 namespace Database\Seeders;
 
-use App\Models\Permission;
-use App\Models\Role;
+use App\Models\Permission\Permission;
+use App\Models\Role\Role;;
+
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Log;
 

@@ -3,13 +3,13 @@
 namespace App\Events\Publications;
 
 use App\Models\Publications\Publication;
-use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+
+use App\Models\User;
 
 class PublicationUpdated implements ShouldBroadcast
 {
@@ -66,7 +66,7 @@ class PublicationUpdated implements ShouldBroadcast
     $mediaLockUserId = cache()->get("publication:{$this->publication->id}:media_lock");
     $mediaLockedBy = null;
     if ($mediaLockUserId) {
-      $mediaLockedBy = \App\Models\User::find($mediaLockUserId)?->only(['id', 'name', 'photo_url']);
+      $mediaLockedBy = User::find($mediaLockUserId)?->only(['id', 'name', 'photo_url']);
     }
     $this->publication->media_locked_by = $mediaLockedBy;
 

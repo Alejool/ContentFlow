@@ -39,10 +39,10 @@ export default function CommandPalette() {
 
   const navigation = [
     { name: "Dashboard", href: route("dashboard"), icon: LayoutDashboard },
-    { name: "Gestionar Contenido", href: "/ManageContent", icon: FileText },
+    { name: "Gestionar Contenido", href: "/content", icon: FileText },
     {
       name: "Planificador",
-      href: "/ManageContent?tab=calendar",
+      href: "/content?tab=calendar",
       icon: Calendar,
     },
     {
@@ -56,7 +56,7 @@ export default function CommandPalette() {
   const actions = [
     {
       name: "Crear publicación",
-      action: () => router.visit("/ManageContent?action=create"),
+      action: () => router.visit("/content?action=create"),
       icon: Plus,
     },
     {

@@ -5,7 +5,7 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 use App\Models\PostLog;
-use App\Models\ScheduledPost;
+use App\Models\Social\ScheduledPost;
 
 class PostLogFactory extends Factory
 {

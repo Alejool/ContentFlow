@@ -3,9 +3,9 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use App\Models\ScheduledPost;
-use App\Models\SocialPostLog;
-use App\Models\SocialAccount;
+use App\Models\Social\ScheduledPost;
+use App\Models\Social\SocialPostLog;
+use App\Models\Social\SocialAccount;
 
 return new class extends Migration
 {

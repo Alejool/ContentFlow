@@ -2,7 +2,7 @@
 
 namespace App\Services\SocialPlatforms;
 
-use App\Models\SocialAccount;
+use App\Models\Social\SocialAccount;
 use App\Interfaces\SocialPlatformInterface;
 use App\Services\SocialTokenManager;
 use GuzzleHttp\Client;

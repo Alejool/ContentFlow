@@ -13,7 +13,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use App\Models\SocialPostLog;
+use App\Models\Social\SocialPostLog;
 use App\Events\Publications\PublicationUpdated;
 
 class ProcessBackgroundUpload implements ShouldQueue

@@ -2,10 +2,6 @@
 
 namespace App\Services\Media;
 
-use App\Models\MediaDerivative;
-use App\Models\MediaFile;
-use App\Models\Publications\Publication;
-use App\Models\Publications\PublicationMedia;
 use App\Jobs\ProcessBackgroundUpload;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
@@ -13,6 +9,11 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+
+use App\Models\MediaFiles\MediaDerivative;
+use App\Models\MediaFiles\MediaFile;
+use App\Models\Publications\Publication;
+use App\Models\Publications\PublicationMedia;
 
 class MediaProcessingService
 {
@@ -58,7 +59,6 @@ class MediaProcessingService
   {
     if ($file instanceof UploadedFile) {
       $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
-      // Default path for S3
       $path = 'publications/' . $filename;
 
       $fileType = str_starts_with($file->getClientMimeType(), 'video/') ? 'video' : 'image';
@@ -81,7 +81,7 @@ class MediaProcessingService
 
     // Create MediaFile record first
     try {
-      \Log::info('Attempting to create MediaFile record', [
+      Log::info('Attempting to create MediaFile record', [
         'original_name' => $originalName,
         'path' => $path,
         'type' => $fileType,
@@ -102,9 +102,9 @@ class MediaProcessingService
         'status' => $isBackgroundCandidate ? 'processing' : 'completed',
       ]);
 
-      \Log::info('MediaFile created successfully', ['id' => $mediaFile->id]);
+      Log::info('MediaFile created successfully', ['id' => $mediaFile->id]);
     } catch (\Exception $e) {
-      \Log::error('Failed to create MediaFile record', ['error' => $e->getMessage()]);
+      Log::error('Failed to create MediaFile record', ['error' => $e->getMessage()]);
       throw $e;
     }
 

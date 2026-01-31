@@ -5,8 +5,8 @@ namespace Tests\Feature;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\User;
-use App\Models\Workspace;
-use App\Models\UserCalendarEvent;
+use App\Models\Workspace\Workspace;
+use App\Models\User\UserCalendarEvent;
 
 class UserCalendarEventTest extends TestCase
 {

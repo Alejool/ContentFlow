@@ -2,10 +2,6 @@
 
 namespace App\Services\Publish;
 
-use App\Models\Publications\Publication;
-use App\Models\SocialAccount;
-use App\Models\SocialPostLog;
-use App\Services\Logs\SocialPostLogService;
 use App\Services\SocialPlatforms\YouTubeService;
 use App\Services\SocialPlatforms\InstagramService;
 use App\Services\SocialPlatforms\FacebookService;
@@ -17,10 +13,19 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Artisan;
-use App\Models\YouTubePlaylistQueue;
+
+
+use App\Models\YouTube\YouTubePlaylistQueue;
+use App\Models\Publications\Publication;
+use App\Models\Social\SocialAccount;
+use App\Models\Social\SocialPostLog;
+use App\Services\Logs\SocialPostLogService;
+
 use App\Events\PublicationStatusUpdated;
 use App\Jobs\VerifyYouTubeVideoStatus;
-use App\Models\User;
+
+use App\DTOs\SocialPostDTO;
+
 use App\Notifications\PublicationPostFailedNotification;
 
 class PlatformPublishService
@@ -160,7 +165,7 @@ class PlatformPublishService
     }
   }
 
-  private function buildSocialPostDTO(Publication $publication, SocialAccount $socialAccount, SocialPostLog $postLog): \App\DTOs\SocialPostDTO
+  private function buildSocialPostDTO(Publication $publication, SocialAccount $socialAccount, SocialPostLog $postLog): SocialPostDTO
   {
     $mediaPaths = [];
     if ($socialAccount->platform === 'youtube' || $socialAccount->platform === 'tiktok') {
@@ -185,7 +190,7 @@ class PlatformPublishService
       $pSettings = json_decode($pSettings, true) ?? [];
     }
 
-    return new \App\DTOs\SocialPostDTO(
+    return new SocialPostDTO(
       content: $this->buildCaption($publication),
       mediaPaths: $mediaPaths,
       title: $publication->title,
@@ -666,7 +671,6 @@ class PlatformPublishService
         $socialAccount = $log->socialAccount;
 
         if (!$socialAccount) {
-          // Marcar como deleted de todas formas si no hay cuenta
           $log->update(['status' => 'deleted']);
           $results[] = [
             'log_id' => $log->id,

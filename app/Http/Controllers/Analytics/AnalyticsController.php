@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 use Carbon\Carbon;
-use App\Models\SocialAccount;
+use App\Models\Social\SocialAccount;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 

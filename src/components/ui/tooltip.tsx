@@ -55,7 +55,7 @@ export const Tooltip = React.forwardRef<HTMLDivElement, TooltipProps>(
       setIsVisible(false);
     }, []);
 
-    // Manejar tecla Escape
+    // Handle Escape key
     React.useEffect(() => {
       const handleEscape = (e: KeyboardEvent) => {
         if (e.key === "Escape" && isVisible) {
@@ -69,7 +69,7 @@ export const Tooltip = React.forwardRef<HTMLDivElement, TooltipProps>(
       }
     }, [isVisible, hideTooltip]);
 
-    // Calcular posición del tooltip
+    // Calculate tooltip position
     const getTooltipStyle = (): React.CSSProperties => {
       if (!triggerRef.current || !tooltipRef.current) return {};
 
@@ -121,7 +121,7 @@ export const Tooltip = React.forwardRef<HTMLDivElement, TooltipProps>(
       }
     };
 
-    // Obtener clases de flecha según posición
+    // Get arrow classes based on position
     const getArrowClasses = () => {
       const baseClasses =
         "absolute w-2 h-2 bg-gray-900 dark:bg-gray-700 transform rotate-45";
@@ -140,7 +140,7 @@ export const Tooltip = React.forwardRef<HTMLDivElement, TooltipProps>(
       }
     };
 
-    // Clases de posición para animación
+    // Placement classes for animation
     const getPlacementClasses = () => {
       switch (placement) {
         case "top":
@@ -206,7 +206,7 @@ export const Tooltip = React.forwardRef<HTMLDivElement, TooltipProps>(
   }
 );
 
-// Versión simplificada para uso común
+// Simplified version for common use
 interface SimpleTooltipProps {
   children: React.ReactNode;
   text: string;
@@ -234,7 +234,7 @@ export const SimpleTooltip = React.forwardRef<
   );
 });
 
-// Hook para crear tooltips programáticamente
+// Hook to create tooltips programmatically
 export function useTooltip() {
   const [tooltips, setTooltips] = React.useState<
     Array<{
@@ -285,7 +285,7 @@ export function useTooltip() {
             className="fixed z-[9999] bg-gray-900 dark:bg-gray-800 text-white text-sm rounded-lg shadow-lg px-3 py-2 max-w-xs"
             style={{
               left: tooltip.position.x,
-              top: tooltip.position.y - 40, // Ajustar según posición
+              top: tooltip.position.y - 40,
             }}
           >
             {tooltip.content}
@@ -302,7 +302,7 @@ export function useTooltip() {
   };
 }
 
-// Componente TooltipProvider para manejar tooltips globalmente
+// TooltipProvider component to manage tooltips globally
 interface TooltipProviderProps {
   children: React.ReactNode;
   delay?: number;

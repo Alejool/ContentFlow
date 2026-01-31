@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Campaigns;
 
 use App\Http\Controllers\Controller;
 use App\Services\StatisticsService;
-use App\Models\Campaign;
+use App\Models\Campaigns\Campaign;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;

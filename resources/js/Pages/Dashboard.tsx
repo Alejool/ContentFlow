@@ -508,7 +508,7 @@ export default function Dashboard({
               color: "purple",
             },
             {
-              href: "/ManageContent",
+              href: "/content",
               icon: FileText,
               title: t("dashboard.quickActions.content.title"),
               desc: t("dashboard.quickActions.content.description"),

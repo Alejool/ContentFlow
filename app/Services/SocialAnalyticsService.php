@@ -2,10 +2,10 @@
 
 namespace App\Services;
 
-use App\Models\SocialAccount;
-use App\Models\SocialPostLog;
-use App\Models\SocialMediaMetrics;
-use App\Models\CampaignAnalytics;
+use App\Models\Social\SocialAccount;
+use App\Models\Social\SocialPostLog;
+use App\Models\Social\SocialMediaMetrics;
+use App\Models\Campaigns\CampaignAnalytics;
 use App\Services\SocialPlatforms\SocialPlatformFactory;
 
 use Illuminate\Support\Facades\Log;

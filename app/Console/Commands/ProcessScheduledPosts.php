@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Models\SocialPostLog;
+use App\Models\Social\SocialPostLog;
 use App\Jobs\PublishSocialPostJob;
 use Illuminate\Console\Command;
 

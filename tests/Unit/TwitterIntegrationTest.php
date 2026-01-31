@@ -9,7 +9,7 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Storage;
-use App\Models\SocialAccount;
+use App\Models\Social\SocialAccount;
 
 class TwitterIntegrationTest extends TestCase
 {

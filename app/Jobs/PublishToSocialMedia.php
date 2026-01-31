@@ -11,6 +11,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use App\Events\PublicationStatusUpdated;
+
 use App\Models\User;
 
 class PublishToSocialMedia implements ShouldQueue

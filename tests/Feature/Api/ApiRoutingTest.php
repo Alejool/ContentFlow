@@ -3,8 +3,9 @@
 namespace Tests\Feature\Api;
 
 use App\Models\User;
-use App\Models\Workspace;
-use App\Models\Role;
+use App\Models\Workspace\Workspace;
+use App\Models\Role\Role;;
+
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Laravel\Sanctum\Sanctum;

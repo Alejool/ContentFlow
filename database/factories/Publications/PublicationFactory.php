@@ -4,7 +4,6 @@ namespace Database\Factories\Publications;
 
 use App\Models\Publications\Publication;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
 use App\Models\User;
 
 class PublicationFactory extends Factory

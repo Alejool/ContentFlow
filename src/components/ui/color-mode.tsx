@@ -13,7 +13,7 @@ export interface ColorModeProviderProps {
   themes?: string[];
 }
 
-// Context para el tema
+// Context for the theme
 const ThemeContext = React.createContext<{
   theme: "light" | "dark" | "system";
   setTheme: (theme: "light" | "dark" | "system") => void;
@@ -22,7 +22,7 @@ const ThemeContext = React.createContext<{
   setTheme: () => {},
 });
 
-// Hook para usar el contexto del tema
+// Hook to use the theme context
 export function useTheme() {
   const context = React.useContext(ThemeContext);
   if (!context) {
@@ -31,7 +31,7 @@ export function useTheme() {
   return context;
 }
 
-// Provider simplificado
+// Simplified provider
 export function ColorModeProvider({
   children,
   attribute = "class",
@@ -49,7 +49,7 @@ export function ColorModeProvider({
         return stored;
       }
 
-      // Detectar preferencia del sistema
+      // Detect system preference
       if (defaultTheme === "system") {
         return window.matchMedia("(prefers-color-scheme: dark)").matches
           ? "dark"
@@ -98,7 +98,7 @@ export function ColorModeProvider({
     [disableTransitionOnChange, storageKey]
   );
 
-  // Efecto para aplicar el tema al montar
+  // Effect to apply the theme on mount
   React.useEffect(() => {
     if (typeof window !== "undefined") {
       const root = document.documentElement;
@@ -115,7 +115,7 @@ export function ColorModeProvider({
     }
   }, [theme, attribute]);
 
-  // Escuchar cambios en la preferencia del sistema
+  // Listen to system preference changes
   React.useEffect(() => {
     if (theme === "system" && typeof window !== "undefined") {
       const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
@@ -154,7 +154,7 @@ export interface UseColorModeReturn {
   toggleColorMode: () => void;
 }
 
-// Hook principal para el modo de color
+// Main hook for color mode
 export function useColorMode(): UseColorModeReturn {
   const { theme, setTheme } = useTheme();
 
@@ -179,13 +179,13 @@ export function useColorMode(): UseColorModeReturn {
   };
 }
 
-// Hook para valores dependientes del tema
+// Hook for theme-dependent values
 export function useColorModeValue<T>(light: T, dark: T) {
   const { colorMode } = useColorMode();
   return colorMode === "dark" ? dark : light;
 }
 
-// Icono que cambia según el tema
+// Icon that changes according to the theme
 export function ColorModeIcon() {
   const { colorMode } = useColorMode();
   return colorMode === "dark" ? (
@@ -195,7 +195,7 @@ export function ColorModeIcon() {
   );
 }
 
-// Props para el botón de modo de color
+// Props for the color mode button
 interface ColorModeButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "ghost" | "solid" | "outline";
@@ -204,7 +204,7 @@ interface ColorModeButtonProps
   iconSize?: "sm" | "md" | "lg";
 }
 
-// Botón de cambio de tema
+// Theme change button
 export const ColorModeButton = React.forwardRef<
   HTMLButtonElement,
   ColorModeButtonProps
@@ -286,7 +286,7 @@ export const ColorModeButton = React.forwardRef<
   );
 });
 
-// Versión con skeleton para SSR
+// Version with skeleton for SSR
 export const ColorModeButtonWithSkeleton = React.forwardRef<
   HTMLButtonElement,
   ColorModeButtonProps
@@ -311,7 +311,7 @@ export const ColorModeButtonWithSkeleton = React.forwardRef<
   return <ColorModeButton ref={ref} {...props} />;
 });
 
-// Componentes para contenido específico del tema
+// Components for theme-specific content
 interface ThemeContentProps extends React.HTMLAttributes<HTMLSpanElement> {
   children?: React.ReactNode;
 }
@@ -344,7 +344,7 @@ export const DarkMode = React.forwardRef<HTMLSpanElement, ThemeContentProps>(
   }
 );
 
-// Hook para detectar si estamos en el cliente
+// Hook to detect if we are on the client
 export function useIsClient() {
   const [isClient, setIsClient] = React.useState(false);
   React.useEffect(() => {
@@ -365,7 +365,7 @@ export function ClientOnly({
   return isClient ? <>{children}</> : <>{fallback}</>;
 }
 
-// Versión simplificada del ThemeProvider con soporte SSR
+// Simplified version of ThemeProvider with SSR support
 export function SimpleThemeProvider({
   children,
 }: {
@@ -377,7 +377,7 @@ export function SimpleThemeProvider({
     setMounted(true);
   }, []);
 
-  // Previene el flash de contenido
+  // Prevents content flash
   if (!mounted) {
     return (
       <div
@@ -393,7 +393,7 @@ export function SimpleThemeProvider({
   return <>{children}</>;
 }
 
-// Hook para obtener el color mode actual de manera segura
+// Hook to get the current color mode safely
 export function useSafeColorMode() {
   const isClient = useIsClient();
   const { colorMode, setColorMode, toggleColorMode } = useColorMode();

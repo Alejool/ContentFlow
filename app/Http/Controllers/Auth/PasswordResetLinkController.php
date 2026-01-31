@@ -9,7 +9,9 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
+
 use App\Models\User;
+
 class PasswordResetLinkController extends Controller
 {
     /**

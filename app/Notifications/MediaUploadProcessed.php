@@ -2,12 +2,8 @@
 
 namespace App\Notifications;
 
-use App\Models\MediaFile;
+use App\Models\MediaFiles\MediaFile;
 use App\Models\Publications\Publication;
-use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 
 class MediaUploadProcessed extends BaseNotification
 {

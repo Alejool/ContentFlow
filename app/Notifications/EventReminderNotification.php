@@ -3,10 +3,10 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use App\Models\UserCalendarEvent;
+
+use App\Models\User\UserCalendarEvent;
+use App\Channels\ExtendedDatabaseChannel;
 
 class EventReminderNotification extends Notification
 {
@@ -27,7 +27,7 @@ class EventReminderNotification extends Notification
      */
     public function via(object $notifiable): array
     {
-        return [\App\Channels\ExtendedDatabaseChannel::class];
+        return [ExtendedDatabaseChannel::class];
     }
 
     /**

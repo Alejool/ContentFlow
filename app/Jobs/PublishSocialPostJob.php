@@ -8,7 +8,7 @@ use App\Services\SocialTokenManager;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use App\Models\SocialAccount;
+use App\Models\Social\SocialAccount;
 use Illuminate\Support\Facades\Log;
 
 class PublishSocialPostJob implements ShouldQueue
@@ -70,7 +70,7 @@ class PublishSocialPostJob implements ShouldQueue
         }
       }
     }
-    
+
     $this->post->update([
       'status' => empty(array_filter($responses, fn($r) => $r['success'])) ? 'failed' : 'published',
       'published_at' => now(),

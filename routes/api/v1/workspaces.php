@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\WorkspaceController;
+use App\Http\Controllers\Workspace\WorkspaceController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->prefix('workspaces')->name('workspaces.')->group(function () {

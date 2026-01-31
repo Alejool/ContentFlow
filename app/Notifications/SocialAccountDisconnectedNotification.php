@@ -17,8 +17,8 @@ class SocialAccountDisconnectedNotification extends BaseNotification
   ) {
     $this->platform = strtolower($platformName);
 
-    // Si hay publicaciones huérfanas, aumentar prioridad a ALTA
-    // Pero sigue siendo una acción de APLICACIÓN (no del sistema)
+    // If there are orphaned posts, increase priority to HIGH
+    // But it's still an APPLICATION action (not system)
     if ($this->orphanedPostsCount > 0) {
       $this->priority = self::PRIORITY_HIGH;
     }

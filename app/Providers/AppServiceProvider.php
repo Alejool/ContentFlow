@@ -4,11 +4,12 @@ namespace App\Providers;
 
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
-use App\Models\User;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Notifications\DatabaseNotification;
 use App\Observers\NotificationObserver;
 use App\Observers\UserObserver;
+
+use App\Models\User;
 
 class AppServiceProvider extends ServiceProvider
 {

@@ -2,47 +2,23 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Broadcast;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
-/*
-|--------------------------------------------------------------------------
-| Controllers
-|--------------------------------------------------------------------------
-*/
+
+// Controllers
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Profile\ProfileController;
 use App\Http\Controllers\Analytics\AnalyticsController;
-use App\Http\Controllers\ManageContent\ManageContentController;
-use App\Http\Controllers\SocialAccount\SocialAccountController;
+use App\Http\Controllers\Content\ContentController;
+use App\Http\Controllers\Social\SocialAccountController;
 use App\Http\Controllers\Locale\LocaleController;
-use App\Http\Controllers\WorkspaceController;
+use App\Http\Controllers\Workspace\WorkspaceController;
 use App\Http\Controllers\Calendar\CalendarViewController;
 
-/*
-|--------------------------------------------------------------------------
-| Models / Utils
-|--------------------------------------------------------------------------
-*/
-use App\Models\Role;
-use App\Models\Workspace;
-
-/*
-|--------------------------------------------------------------------------
-| Broadcast
-|--------------------------------------------------------------------------
-*/
-
+// Broadcast
 Broadcast::routes();
 
-/*
-|--------------------------------------------------------------------------
-| Public Routes
-|--------------------------------------------------------------------------
-*/
+// Public Routes
 Route::middleware('guest')->group(function () {
   Route::get('/up', fn() => response('OK'));
 
@@ -61,11 +37,7 @@ Route::middleware('guest')->group(function () {
   Route::get('/approvals/history-test', fn() => response()->json(['message' => 'History route is reachable outside middleware']));
 });
 
-/*
-|--------------------------------------------------------------------------
-| OAuth Callbacks (Public)
-|--------------------------------------------------------------------------
-*/
+// OAuth Callbacks (Public)
 Route::prefix('auth')->name('auth.')->group(function () {
   Route::get('/facebook/callback', [SocialAccountController::class, 'handleFacebookCallback'])->name('facebook.callback');
   Route::get('/instagram/callback', [SocialAccountController::class, 'handleInstagramCallback'])->name('instagram.callback');
@@ -78,26 +50,14 @@ Route::prefix('auth')->name('auth.')->group(function () {
   Route::get('/google/callback', [AuthController::class, 'handleGoogleCallback'])->name('google.callback');
 });
 
-/*
-|--------------------------------------------------------------------------
-| Authenticated Routes
-|--------------------------------------------------------------------------
-*/
+// Authenticated Routes
 Route::middleware('auth')->group(function () {
 
-  /*
-    |--------------------------------------------------------------------------
-    | Dashboard & Analytics
-    |--------------------------------------------------------------------------
-    */
+  // Dashboard & Analytics
   Route::get('/dashboard', [AnalyticsController::class, 'dashboard'])->name('dashboard');
   Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics.index');
 
-  /*
-    |--------------------------------------------------------------------------
-    | Profile & Settings
-    |--------------------------------------------------------------------------
-    */
+  // Profile & Settings
   Route::prefix('profile')->name('profile.')->group(function () {
     Route::get('/', [ProfileController::class, 'edit'])->name('edit');
   });
@@ -107,17 +67,8 @@ Route::middleware('auth')->group(function () {
     Route::patch('/locale', [LocaleController::class, 'update'])->name('locale');
   });
 
-  /*
-    |--------------------------------------------------------------------------
-    | Notifications
-    |--------------------------------------------------------------------------
-    */
 
-  /*
-    |--------------------------------------------------------------------------
-    | Workspaces
-    |--------------------------------------------------------------------------
-    |*/
+  // Workspaces
   Route::prefix('workspaces')->name('workspaces.')->group(function () {
     Route::get('/', [WorkspaceController::class, 'index'])->name('index');
     Route::post('/', [WorkspaceController::class, 'store'])->name('store');
@@ -128,33 +79,15 @@ Route::middleware('auth')->group(function () {
     Route::delete('{workspace}', [WorkspaceController::class, 'destroy'])->name('destroy');
   });
 
-  /*
-    |--------------------------------------------------------------------------
-    | Content Management
-    |--------------------------------------------------------------------------
-    */
-  Route::prefix('ManageContent')->name('manage-content.')->group(function () {
-    Route::get('/', [ManageContentController::class, 'index'])->name('index');
+  // Content
+  Route::prefix('content')->name('content.')->group(function () {
+    Route::get('/', [ContentController::class, 'index'])->name('index');
   });
 
-  /*
-    |--------------------------------------------------------------------------
-    | Calendar
-    |--------------------------------------------------------------------------
-    */
+  // Calendar
   Route::get('/calendar', [CalendarViewController::class, 'index'])->name('calendar.index');
 
-  /*
-    |--------------------------------------------------------------------------
-    | Approvals & Campaigns
-    |--------------------------------------------------------------------------
-    */
-
-  /*
-    |--------------------------------------------------------------------------
-    | Social Accounts & Logs
-    |--------------------------------------------------------------------------
-    */
+  // Social Accounts & Logs
   Route::prefix('social-accounts')->name('social-accounts.')->group(function () {
     Route::get('/', [SocialAccountController::class, 'index'])->name('index');
     Route::get('auth-url/{platform}', [SocialAccountController::class, 'getAuthUrl'])->name('auth-url');

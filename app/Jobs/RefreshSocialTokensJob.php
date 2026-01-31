@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Models\SocialAccount;
+use App\Models\Social\SocialAccount;
 use App\Services\SocialTokenManager;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;

@@ -5,9 +5,12 @@ namespace App\Http\Middleware;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Tighten\Ziggy\Ziggy;
-use App\Models\Role;
-use App\Services\AIService;
+
 use Illuminate\Support\Facades\Log;
+
+use App\Models\Role\Role;
+
+use App\Services\AIService;
 
 class HandleInertiaRequests extends Middleware
 {

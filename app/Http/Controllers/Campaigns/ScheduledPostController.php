@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Campaigns;
 
 use App\Http\Controllers\Controller;
-use App\Models\ScheduledPost;
+use App\Models\Social\ScheduledPost;
 use Illuminate\Support\Facades\Auth;
 
 class ScheduledPostController extends Controller

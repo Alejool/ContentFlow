@@ -2,9 +2,10 @@
 
 namespace App\Services;
 
-use App\Models\SocialAccount;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Log;
+
+use App\Models\Social\SocialAccount;
 
 class SocialTokenManager
 {

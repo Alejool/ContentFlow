@@ -2,7 +2,6 @@
 
 namespace App\Notifications;
 
-use App\Notifications\BaseNotification;
 use App\Channels\EnhancedDatabaseChannel;
 
 class TestNotification extends BaseNotification

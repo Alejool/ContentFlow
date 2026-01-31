@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\YouTubePlaylistQueue;
-use App\Models\SocialAccount;
+use App\Models\Social\SocialAccount;
 use App\Services\SocialPlatforms\YouTubeService;
 use App\Notifications\PlaylistProcessedNotification;
 use App\Notifications\PlaylistProcessFailedNotification;

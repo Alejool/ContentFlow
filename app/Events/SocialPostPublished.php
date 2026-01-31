@@ -2,7 +2,7 @@
 
 namespace App\Events;
 
-use App\Models\SocialPostLog;
+use App\Models\Social\SocialPostLog;
 
 class SocialPostPublished
 {

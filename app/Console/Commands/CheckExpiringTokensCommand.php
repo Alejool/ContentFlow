@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Jobs\RefreshSocialTokensJob;
-use App\Models\SocialAccount;
+use App\Models\Social\SocialAccount;
 use Illuminate\Console\Command;
 
 class CheckExpiringTokensCommand extends Command

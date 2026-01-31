@@ -8,8 +8,8 @@ use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
-use App\Models\ScheduledPost;
-use App\Models\UserCalendarEvent;
+use App\Models\Social\ScheduledPost;
+use App\Models\User\UserCalendarEvent;
 
 class CalendarController extends Controller
 {
@@ -83,7 +83,7 @@ class CalendarController extends Controller
         'id' => "post_{$post->id}",
         'resourceId' => $post->id,
         'type' => 'post',
-        'title' => $post->socialAccount->account_name, 
+        'title' => $post->socialAccount->account_name,
         'start' => $post->scheduled_at ? $post->scheduled_at->copy()->setTimezone('UTC')->toIso8601String() : null,
         'status' => $post->status,
         'color' => $this->getStatusColor($post->status, true),

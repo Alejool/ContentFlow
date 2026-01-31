@@ -2,30 +2,10 @@
 
 use Illuminate\Support\Facades\Route;
 
-
-use App\Http\Controllers\Api\CalendarController;
 use App\Http\Controllers\Auth\AuthController;
-use App\Http\Controllers\AIChatController;
-use App\Http\Controllers\Analytics\AnalyticsController;
-use App\Http\Controllers\Campaigns\CampaignController;
-use App\Http\Controllers\Campaigns\ScheduledPostController;
-use App\Http\Controllers\SocialAccount\SocialAccountController;
-use App\Http\Controllers\SocialPostLogController;
-use App\Http\Controllers\WorkspaceController;
-use App\Http\Controllers\Publications\PublicationController;
-use App\Http\Controllers\Profile\ProfileController;
-use App\Http\Controllers\NotificationsController;
-use App\Http\Controllers\Locale\LocaleController;
-use App\Http\Controllers\Theme\ThemeController;
-use App\Http\Controllers\Publications\PublicationLockController;
 use App\Http\Controllers\Webhooks\YouTubeWebhookController;
-use App\Http\Controllers\Api\UserCalendarEventController;
 
-/*
-|--------------------------------------------------------------------------
-| Public API Routes
-|--------------------------------------------------------------------------
-*/
+// Public API Routes
 
 // Google Authentication (receives user data from frontend)
 Route::post('/auth/google', [AuthController::class, 'handleGoogleAuth']);
@@ -40,19 +20,10 @@ Route::post('/log-error', function (\Illuminate\Http\Request $request) {
   return response()->json(['status' => 'logged']);
 });
 
-/*
-|--------------------------------------------------------------------------
-| Protected API Routes
-|--------------------------------------------------------------------------
-*/
-
+// Protected API Routes
 Route::middleware(['auth:sanctum'])->group(function () {
 
-  /*
-|----------------------------------------------------------------------
-| API v1 Routes
-|----------------------------------------------------------------------
-*/
+  // API v1 Routes
   Route::prefix('v1')->name('api.v1.')->group(function () {
     require __DIR__ . '/api/v1/auth.php';
     require __DIR__ . '/api/v1/social.php';

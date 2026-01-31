@@ -3,8 +3,7 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
-use App\Models\SocialAccount;
+use App\Models\Social\SocialAccount;
 use App\Models\User;
 
 class SocialAccountFactory extends Factory
@@ -23,7 +22,7 @@ class SocialAccountFactory extends Factory
     {
         return [
             'user_id' => User::factory(),
-            'platform' => fake()->randomElement(["facebook","instagram","tiktok","twitter","youtube"]),
+            'platform' => fake()->randomElement(["facebook", "instagram", "tiktok", "twitter", "youtube"]),
             'account_id' => fake()->word(),
             'access_token' => fake()->text(),
             'refresh_token' => fake()->text(),

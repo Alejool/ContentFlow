@@ -2,7 +2,7 @@
 
 namespace App\Events;
 
-use App\Models\SocialAccount;
+use App\Models\Social\SocialAccount;
 
 class TokenExpired
 {

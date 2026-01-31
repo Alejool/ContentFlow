@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\CampaignAnalytics;
-use App\Models\Campaign;
+use App\Models\Campaigns\Campaign;
 use Carbon\Carbon;
 
 class CampaignAnalyticsSeeder extends Seeder

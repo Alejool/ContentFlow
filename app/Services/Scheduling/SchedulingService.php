@@ -3,8 +3,8 @@
 namespace App\Services\Scheduling;
 
 use App\Models\Publications\Publication;
-use App\Models\ScheduledPost;
-use App\Models\SocialAccount;
+use App\Models\Social\ScheduledPost;
+use App\Models\Social\SocialAccount;
 use Illuminate\Support\Facades\Auth;
 
 class SchedulingService

@@ -2,7 +2,6 @@
 
 namespace App\Notifications;
 
-use Illuminate\Notifications\Messages\BroadcastMessage;
 use App\Channels\ExtendedDatabaseChannel;
 
 class WorkspaceRemovedNotification extends BaseNotification

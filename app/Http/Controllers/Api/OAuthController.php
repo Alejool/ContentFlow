@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\SocialAccount;
+use App\Models\Social\SocialAccount;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;

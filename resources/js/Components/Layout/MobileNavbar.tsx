@@ -34,7 +34,7 @@ const mobileNavigationItems = [
   { nameKey: "nav.profile", href: "profile.edit", lucideIcon: User },
   {
     nameKey: "nav.manageContent",
-    href: "manage-content.index",
+    href: "content.index",
     lucideIcon: FileText,
   },
   { nameKey: "nav.analytics", href: "analytics.index", lucideIcon: BarChart3 },

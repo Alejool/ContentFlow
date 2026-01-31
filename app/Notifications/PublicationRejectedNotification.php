@@ -12,8 +12,7 @@ class PublicationRejectedNotification extends BaseNotification
     public function __construct(
         protected $publication,
         protected $rejector
-    ) {
-    }
+    ) {}
 
     public function toArray($notifiable): array
     {
@@ -30,7 +29,7 @@ class PublicationRejectedNotification extends BaseNotification
             'rejected_at' => $this->publication->rejected_at,
             'action' => $this->createAction(
                 'Ver Detalles',
-                route('manage-content.index', ['tab' => 'publications', 'id' => $this->publication->id])
+                route('content.index', ['tab' => 'publications', 'id' => $this->publication->id])
             ),
         ];
     }

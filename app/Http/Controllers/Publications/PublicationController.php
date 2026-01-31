@@ -6,12 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use App\Models\Publications\Publication;
-use App\Models\ScheduledPost;
 use Illuminate\Support\Facades\Auth;
-use App\Models\SocialPostLog;
-use App\Models\ApprovalLog;
-use App\Models\Role;
-use App\Models\User;
 use App\Http\Requests\Publications\StorePublicationRequest;
 use App\Http\Requests\Publications\UpdatePublicationRequest;
 use App\Actions\Publications\CreatePublicationAction;
@@ -23,10 +18,20 @@ use App\Notifications\PublicationAwaitingApprovalNotification;
 use App\Notifications\PublicationApprovedNotification;
 use App\Notifications\PublicationRejectedNotification;
 use App\Events\Publications\PublicationUpdated;
-use App\Models\Publications\PublicationLock;
 use App\Events\PublicationStatusUpdated;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+
+use App\Models\Social\ScheduledPost;
+use App\Models\Social\SocialPostLog;
+use App\Models\Logs\ApprovalLog;
+use App\Models\Role\Role;;
+
+use App\Jobs\ProcessBackgroundUpload;
+use App\Models\MediaFiles\MediaFile;
+
+use App\Models\User;
+use App\Models\Publications\PublicationLock;
 
 class PublicationController extends Controller
 {
@@ -207,7 +212,7 @@ class PublicationController extends Controller
 
     return $request->wantsJson()
       ? $this->successResponse(['publication' => $publication])
-      : redirect()->route('manage-content.index', ['tab' => 'publications', 'id' => $publication->id]);
+      : redirect()->route('content.index', ['tab' => 'publications', 'id' => $publication->id]);
   }
 
   public function update(UpdatePublicationRequest $request, Publication $publication, UpdatePublicationAction $action)
@@ -684,7 +689,7 @@ class PublicationController extends Controller
       Log::info("📊 Calculated order", ['max_order' => $maxOrder, 'next_order' => $nextOrder]);
 
       // Create MediaFile record explicitly
-      $mediaFile = \App\Models\MediaFile::create([
+      $mediaFile = MediaFile::create([
         'workspace_id' => $publication->workspace_id,
         'publication_id' => $publication->id, // Redundant if pivot used, but good for direct belonging
         'file_path' => $request->key,
@@ -705,7 +710,7 @@ class PublicationController extends Controller
 
       // Dispatch job to verify S3 file and generate thumbnails if needed
       // Passing null as tempPath indicates it's already on S3 (Direct Upload)
-      \App\Jobs\ProcessBackgroundUpload::dispatch($publication, $mediaFile, null);
+      ProcessBackgroundUpload::dispatch($publication, $mediaFile, null);
 
       Log::info('🚀 ProcessBackgroundUpload job dispatched', ['media_file_id' => $mediaFile->id]);
 
@@ -719,7 +724,7 @@ class PublicationController extends Controller
       $publication->load(['mediaFiles.derivatives', 'scheduled_posts.socialAccount', 'socialPostLogs.socialAccount', 'campaigns']);
 
       // Broadcast to other users in the workspace
-      event(new \App\Events\Publications\PublicationUpdated($publication));
+      event(new PublicationUpdated($publication));
 
       return $this->successResponse(['publication' => $publication], 'Media attached successfully.');
     } catch (\Exception $e) {
