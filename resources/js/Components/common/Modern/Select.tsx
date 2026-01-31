@@ -316,12 +316,12 @@ export default function Select<T extends FieldValues>({
       return `${base} bg-white dark:bg-neutral-800 text-gray-900 dark:text-white border-green-500 focus:ring-green-500/20 dark:focus:ring-green-500/30`;
     }
     if (variant === "outlined") {
-      return `${base} bg-transparent text-gray-900 dark:text-white border-gray-300 dark:border-neutral-600 hover:border-gray-400 dark:hover:border-neutral-500 focus:ring-purple-500/20 dark:focus:ring-purple-500/30`;
+      return `${base} bg-transparent text-gray-900 dark:text-white border-gray-300 dark:border-neutral-600 hover:border-gray-400 dark:hover:border-neutral-500 focus:ring-primary-500/20 dark:focus:ring-primary-500/30`;
     }
     if (variant === "filled") {
-      return `${base} bg-gray-50 dark:bg-neutral-800 text-gray-900 dark:text-white border-gray-300 dark:border-neutral-700 hover:border-gray-400 dark:hover:border-neutral-600 focus:ring-purple-500/20 dark:focus:ring-purple-500/30`;
+      return `${base} bg-gray-50 dark:bg-neutral-800 text-gray-900 dark:text-white border-gray-300 dark:border-neutral-700 hover:border-gray-400 dark:hover:border-neutral-600 focus:ring-primary-500/20 dark:focus:ring-primary-500/30`;
     }
-    return `${base} bg-white dark:bg-neutral-900 text-gray-900 dark:text-white border-gray-300 dark:border-neutral-700 hover:border-gray-400 dark:hover:border-neutral-600 focus:ring-purple-500/20 dark:focus:ring-purple-500/30`;
+    return `${base} bg-white dark:bg-neutral-900 text-gray-900 dark:text-white border-gray-300 dark:border-neutral-700 hover:border-gray-400 dark:hover:border-neutral-600 focus:ring-primary-500/20 dark:focus:ring-primary-500/30`;
   };
 
   const getOptionStyles = (isSelected: boolean, isDisabled: boolean) => {
@@ -336,7 +336,7 @@ export default function Select<T extends FieldValues>({
     `;
 
     if (isSelected) {
-      return `${base} bg-purple-50 dark:bg-purple-600/20 text-purple-700 dark:text-purple-300`;
+      return `${base} bg-primary-50 dark:bg-primary-600/20 text-primary-700 dark:text-primary-300`;
     }
     return `${base} text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-700/80`;
   };
@@ -347,7 +347,7 @@ export default function Select<T extends FieldValues>({
       ${currentSize.search}
     `;
 
-    return `${base} text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 border-b border-gray-200 dark:border-neutral-700 focus:border-purple-500`;
+    return `${base} text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 border-b border-gray-200 dark:border-neutral-700 focus:border-primary-500`;
   };
 
   const getMessageStyles = (type: "error" | "success") => {
@@ -582,7 +582,7 @@ export default function Select<T extends FieldValues>({
                           {option.label}
                         </span>
                         {isSelected && (
-                          <Check className="w-4 h-4 flex-shrink-0 text-purple-500 dark:text-purple-400" />
+                          <Check className="w-4 h-4 flex-shrink-0 text-primary-500 dark:text-primary-400" />
                         )}
                       </button>
                     );
