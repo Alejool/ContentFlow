@@ -51,6 +51,7 @@ interface DatePickerProps<T extends FieldValues> {
   variant?: "default" | "outlined" | "filled";
   containerClassName?: string;
   activeColor?: string;
+  id?: string;
 }
 
 // Custom Time Selector Component
@@ -255,6 +256,7 @@ const DatePickerModern = <T extends FieldValues>({
   variant = "default",
   containerClassName = "",
   activeColor = "#ea580c",
+  id,
 }: DatePickerProps<T>) => {
   const { i18n } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
@@ -314,7 +316,10 @@ const DatePickerModern = <T extends FieldValues>({
   };
 
   const CustomInput = forwardRef<HTMLInputElement, any>(
-    ({ value, onClick, onChange, placeholder: inputPlaceholder }, ref) => (
+    (
+      { value, onClick, onChange, placeholder: inputPlaceholder, ...props },
+      ref,
+    ) => (
       <div className="relative flex items-center w-full">
         <input
           value={value}
@@ -331,6 +336,8 @@ const DatePickerModern = <T extends FieldValues>({
           readOnly={false}
           className={`${getInputStyles()} ${className} pr-10`}
           {...register}
+          {...props}
+          id={id || props.id}
           aria-invalid={!!error}
           aria-describedby={
             error
@@ -376,7 +383,7 @@ const DatePickerModern = <T extends FieldValues>({
         <div className="flex items-center justify-between">
           {label && (
             <Label
-              htmlFor={label?.toLowerCase().replace(/\s+/g, "-")}
+              htmlFor={id || label?.toLowerCase().replace(/\s+/g, "-")}
               size={size}
               required={required}
               error={error}
@@ -990,6 +997,7 @@ const DatePickerModern = <T extends FieldValues>({
         `}</style>
 
         <DatePicker
+          id={id}
           name={name}
           selected={selected}
           onChange={(date) => {
@@ -1026,7 +1034,7 @@ const DatePickerModern = <T extends FieldValues>({
           dateFormat={dateFormat || defaultDateFormat}
           locale={currentLocale}
           placeholderText={placeholder}
-          minDate={allowPastDates ? undefined : (minDate || new Date())}
+          minDate={allowPastDates ? undefined : minDate || new Date()}
           renderCustomHeader={({
             date,
             changeYear,

@@ -57,6 +57,7 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
 
         <div className="relative">
           <DatePickerModern
+            id="scheduled_at"
             selected={scheduledAt ? new Date(scheduledAt) : null}
             onChange={(date) =>
               onScheduleChange(date ? format(date, "yyyy-MM-dd'T'HH:mm") : "")
