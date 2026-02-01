@@ -226,8 +226,8 @@ const EditPublicationModal = ({
 
   // Configuration allowed:
   // 1. Admin/Owner (canPublish): Always allowed
-  // 2. Editor (!canPublish): Only if Approved AND is their own publication
-  const allowConfiguration = canPublish || (isApprovedStatus && isOwner);
+  // 2. Editor (!canPublish): Allowed if publication is Approved (regardless of ownership)
+  const allowConfiguration = canPublish || isApprovedStatus;
 
   return (
     <div
