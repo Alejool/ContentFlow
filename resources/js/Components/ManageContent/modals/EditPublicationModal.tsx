@@ -20,6 +20,7 @@ import { AlertCircle, Lock, Save } from "lucide-react";
 import { memo, useMemo, useState } from "react";
 import { useWatch } from "react-hook-form";
 import { Trans } from "react-i18next";
+import PublicationStatusTimeline from "../Publication/common/PublicationStatusTimeline";
 
 const parseUserAgent = (userAgent?: string): string => {
   if (!userAgent) return "Unknown Device";
@@ -569,7 +570,18 @@ const EditPublicationModal = ({
           submitIcon={<Save className="w-4 h-4" />}
           cancelText={t("common.cancel") || "Close"}
           hideSubmit={!canManage}
-        />
+        >
+          {publication && (
+            <PublicationStatusTimeline
+              currentStatus={publication.status}
+              scheduledAt={publication.scheduled_at}
+              approvedAt={publication.approved_at}
+              publishedAt={publication.published_at}
+              rejectedAt={publication.rejected_at}
+              compact={true}
+            />
+          )}
+        </ModalFooter>
 
         <PlatformSettingsModal
           isOpen={!!activePlatformSettings}

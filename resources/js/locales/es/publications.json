@@ -295,8 +295,13 @@
       "approved": "Aprobado",
       "instant": "Instantáneo",
       "rejected": "Rechazado",
-      "deleted": "Eliminado"
+      "deleted": "Eliminado",
+      "progress": "Progreso de Publicación",
+      "current": "Actual",
+      "completed": "Completado",
+      "processing": "Procesando"
     },
+    "scheduled_for": "Programado para",
     "button": {
       "add": "Agregar publicación",
       "edit": "Editar publicación",

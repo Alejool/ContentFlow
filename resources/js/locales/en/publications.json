@@ -281,8 +281,12 @@
       "approved": "Approved",
       "rejected": "Rejected",
       "instant": "Instant",
-      "deleted": "Deleted"
+      "deleted": "Deleted",
+      "progress": "Publication Progress",
+      "current": "Current",
+      "completed": "Completed"
     },
+    "scheduled_for": "Scheduled for",
     "button": {
       "add": "Add Publication",
       "edit": "Edit Publication",

@@ -10,8 +10,6 @@ interface ModalFooterProps {
   formId?: string;
   submitIcon?: React.ReactNode;
   cancelIcon?: React.ReactNode;
-
-  // Secondary submit (e.g. Publish)
   showSecondarySubmit?: boolean;
   secondarySubmitText?: string;
   secondarySubmitVariant?: ModalFooterProps["submitVariant"];
@@ -39,6 +37,7 @@ interface ModalFooterProps {
   hideSubmit?: boolean;
   style?: React.CSSProperties;
   activeColor?: string;
+  children?: React.ReactNode;
 }
 
 export default function ModalFooter({
@@ -64,74 +63,81 @@ export default function ModalFooter({
   hideSubmit = false,
   style,
   activeColor,
+  children,
 }: ModalFooterProps) {
   return (
     <div
-      className="bg-gradient-to-r from-gray-50 to-white dark:from-neutral-900 dark:to-neutral-800 border-t border-gray-100 dark:border-neutral-700 p-6 sticky bottom-0 flex justify-end gap-3"
+      className="bg-gradient-to-r from-gray-50 to-white dark:from-neutral-900 dark:to-neutral-800 border-t border-gray-100 dark:border-neutral-700 p-6 sticky bottom-0 flex items-center justify-between gap-4"
       style={style}
     >
-      {onClose && (
-        <Button
-          type="button"
-          onClick={onClose}
-          disabled={isSubmitting}
-          variant={cancelVariant}
-          buttonStyle={cancelStyle}
-          size="md"
-          icon={cancelIcon}
-          style={{
-            ...(activeColor
-              ? {
-                  borderColor: `${activeColor}40`,
-                  color: activeColor,
-                }
-              : {}),
-          }}
-        >
-          {cancelText}
-        </Button>
-      )}
+      <div className="flex flex-col flex-1 gap-4 overflow-x-auto">
+        <div className="flex-1 overflow-x-auto min-w-0">{children}</div>
 
-      {showSecondarySubmit && (
-        <Button
-          type={onSecondarySubmit ? "button" : "submit"}
-          form={onSecondarySubmit ? undefined : formId}
-          onClick={onSecondarySubmit}
-          disabled={isSubmitting}
-          loading={isSubmitting}
-          variant={secondarySubmitVariant || "secondary"}
-          buttonStyle={secondarySubmitStyle || "outline"}
-          size="md"
-          icon={secondarySubmitIcon}
-        >
-          {secondarySubmitText}
-        </Button>
-      )}
+        <div className="flex justify-end gap-3 shrink-0">
+          {onClose && (
+            <Button
+              type="button"
+              onClick={onClose}
+              disabled={isSubmitting}
+              variant={cancelVariant}
+              buttonStyle={cancelStyle}
+              size="md"
+              icon={cancelIcon}
+              style={{
+                ...(activeColor
+                  ? {
+                      borderColor: `${activeColor}40`,
+                      color: activeColor,
+                    }
+                  : {}),
+              }}
+            >
+              {cancelText}
+            </Button>
+          )}
 
-      {!hideSubmit && (
-        <Button
-          type={onPrimarySubmit ? "button" : formId ? "submit" : "button"}
-          form={onPrimarySubmit ? undefined : formId}
-          onClick={onPrimarySubmit}
-          disabled={isSubmitting}
-          loading={isSubmitting}
-          variant={submitVariant}
-          buttonStyle={submitStyle}
-          size="md"
-          icon={submitIcon}
-          style={{
-            ...(activeColor && submitVariant === "primary"
-              ? {
-                  backgroundColor: activeColor,
-                  borderColor: activeColor,
-                  backgroundImage: "none",
-                }
-              : {}),
-          }}
-        >
-          {submitText}
-        </Button>
-      )}
+          {showSecondarySubmit && (
+            <Button
+              type={onSecondarySubmit ? "button" : "submit"}
+              form={onSecondarySubmit ? undefined : formId}
+              onClick={onSecondarySubmit}
+              disabled={isSubmitting}
+              loading={isSubmitting}
+              variant={secondarySubmitVariant || "secondary"}
+              buttonStyle={secondarySubmitStyle || "outline"}
+              size="md"
+              icon={secondarySubmitIcon}
+            >
+              {secondarySubmitText}
+            </Button>
+          )}
+
+          {!hideSubmit && (
+            <Button
+              type={onPrimarySubmit ? "button" : formId ? "submit" : "button"}
+              form={onPrimarySubmit ? undefined : formId}
+              onClick={onPrimarySubmit}
+              disabled={isSubmitting}
+              loading={isSubmitting}
+              variant={submitVariant}
+              buttonStyle={submitStyle}
+              size="md"
+              icon={submitIcon}
+              style={{
+                ...(activeColor && submitVariant === "primary"
+                  ? {
+                      backgroundColor: activeColor,
+                      borderColor: activeColor,
+                      backgroundImage: "none",
+                    }
+                  : {}),
+              }}
+            >
+              {submitText}
+            </Button>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
