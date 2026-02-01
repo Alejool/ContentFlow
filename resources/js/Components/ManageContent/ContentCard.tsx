@@ -4,6 +4,7 @@ import {
   Calendar,
   CheckCircle,
   Clock,
+  Copy,
   Edit,
   Eye,
   FileText,
@@ -25,6 +26,7 @@ interface ContentCardProps {
   onDelete: (id: number) => void;
   onViewDetails?: (item: any) => void;
   onPublish?: (item: any) => void;
+  onDuplicate?: (id: number) => void;
   type: "publication" | "campaign";
   permissions?: string[];
   remoteLock?: {
@@ -48,6 +50,7 @@ export default function ContentCard({
   onDelete,
   onViewDetails,
   onPublish,
+  onDuplicate,
   type,
   permissions,
   remoteLock,
@@ -521,6 +524,19 @@ export default function ContentCard({
               ) : (
                 <Edit className="w-4 h-4" />
               )}
+            </button>
+          )}
+
+          {canManageContent && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onDuplicate?.(item.id);
+              }}
+              className="flex items-center justify-center px-3 py-2 bg-white hover:bg-purple-50 text-gray-400 hover:text-purple-600 border border-gray-200 hover:border-purple-200 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 rounded-lg transition-colors shadow-sm"
+              title="Duplicar"
+            >
+              <Copy className="w-4 h-4" />
             </button>
           )}
 
