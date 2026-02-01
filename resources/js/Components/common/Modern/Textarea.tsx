@@ -1,6 +1,6 @@
 import Label from "@/Components/common/Modern/Label";
-import { CheckCircle, LucideIcon, TriangleAlert } from "lucide-react";
-import { TextareaHTMLAttributes, useState } from "react";
+import { CheckCircle, TriangleAlert } from "lucide-react";
+import { TextareaHTMLAttributes, isValidElement, useState } from "react";
 import { FieldValues, Path, UseFormRegister } from "react-hook-form";
 
 interface TextareaProps<T extends FieldValues = FieldValues> extends Omit<
@@ -14,7 +14,7 @@ interface TextareaProps<T extends FieldValues = FieldValues> extends Omit<
   register: UseFormRegister<T>;
   name: Path<T>;
   containerClassName?: string;
-  icon?: LucideIcon;
+  icon?: any;
   hint?: string;
   size?: "sm" | "md" | "lg";
   variant?: "default" | "outlined" | "filled";
@@ -115,9 +115,13 @@ export default function Textarea<T extends FieldValues>({
       <div className="relative">
         {Icon && (
           <div className="absolute left-3 top-3">
-            <Icon
-              className={`${currentSize.icon} text-gray-500 dark:text-gray-400`}
-            />
+            {isValidElement(Icon) ? (
+              Icon
+            ) : (
+              <Icon
+                className={`${currentSize.icon} text-gray-500 dark:text-gray-400`}
+              />
+            )}
           </div>
         )}
 
