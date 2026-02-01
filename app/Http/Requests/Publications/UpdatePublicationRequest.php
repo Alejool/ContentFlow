@@ -4,6 +4,8 @@ namespace App\Http\Requests\Publications;
 
 use Illuminate\Foundation\Http\FormRequest;
 use App\Models\Publications\Publication;
+use Carbon\Carbon;
+use Illuminate\Http\UploadedFile;
 
 class UpdatePublicationRequest extends FormRequest
 {
@@ -51,9 +53,15 @@ class UpdatePublicationRequest extends FormRequest
         function ($attribute, $value, $fail) use ($publication) {
           if (!$publication) return;
           $existing = $publication->scheduled_at;
-          if ($value && strtotime($value) < time()) {
-            if (!$existing || abs(strtotime($value) - strtotime($existing)) > 60) {
-              $fail('The scheduled date must be in the future.');
+          if ($value) {
+            $scheduledDate = Carbon::parse($value);
+            $now = Carbon::now();
+
+            if ($scheduledDate->lt($now)) {
+              // Allow if it's an existing schedule and the difference is less than 60 seconds
+              if (!$existing || abs($scheduledDate->diffInSeconds(Carbon::parse($existing))) > 60) {
+                $fail('The scheduled date must be in the future.');
+              }
             }
           }
         }
@@ -68,7 +76,7 @@ class UpdatePublicationRequest extends FormRequest
       // Allow media items to be either files OR arrays (metadata for direct uploads)
       'media.*' => [
         function ($attribute, $value, $fail) {
-          if ($value instanceof \Illuminate\Http\UploadedFile) {
+          if ($value instanceof UploadedFile) {
             return;
           }
           if (is_array($value) && isset($value['key'])) {

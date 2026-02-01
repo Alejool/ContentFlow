@@ -1,5 +1,5 @@
 import DatePickerModern from "@/Components/common/Modern/DatePicker";
-import { format, parseISO } from "date-fns";
+import { parseISO } from "date-fns";
 import { Check, Clock, Settings, Target, X } from "lucide-react";
 import React, { memo, useState } from "react";
 
@@ -84,7 +84,7 @@ const SchedulePopoverContent = memo(
         <DatePickerModern
           selected={customSchedule ? parseISO(customSchedule) : null}
           onChange={(date: Date | null) => {
-            onScheduleChange(date ? format(date, "yyyy-MM-dd'T'HH:mm") : "");
+            onScheduleChange(date ? date.toISOString() : "");
           }}
           showTimeSelect
           placeholder="Select date & time"

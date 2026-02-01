@@ -6,6 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use App\Models\Publications\Publication;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\UploadedFile;
+use Carbon\Carbon;
 
 class StorePublicationRequest extends FormRequest
 {
@@ -41,7 +42,20 @@ class StorePublicationRequest extends FormRequest
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
             'status' => 'nullable|in:draft,published,publishing,failed,pending_review,approved,scheduled,rejected',
-            'scheduled_at' => 'nullable|date|after:now',
+            'scheduled_at' => [
+                'nullable',
+                'date',
+                function ($attribute, $value, $fail) {
+                    if ($value) {
+                        $scheduledDate = Carbon::parse($value);
+                        $now = Carbon::now();
+
+                        if ($scheduledDate->lt($now)) {
+                            $fail('The scheduled date must be in the future.');
+                        }
+                    }
+                }
+            ],
             'social_accounts' => 'nullable|array',
             'social_accounts.*' => 'exists:social_accounts,id',
             'social_account_schedules' => 'nullable|array',
