@@ -6,6 +6,7 @@ import {
   Calendar,
   CheckCircle,
   Clock,
+  Copy,
   Edit,
   Eye,
   Image as ImageIcon,
@@ -31,6 +32,8 @@ interface PublicationMobileRowProps {
   onPublish: (item: Publication) => void;
   onEditRequest?: (item: Publication) => void;
   onViewDetails?: (item: Publication) => void;
+  onDuplicate?: (id: number) => void;
+  isLoading?: boolean;
   remoteLocks?: Record<
     number,
     { user_id: number; user_name: string; expires_at: string }
@@ -57,6 +60,7 @@ const PublicationMobileRow = memo(
     onPublish,
     onEditRequest,
     onViewDetails,
+    onDuplicate,
     remoteLocks = {},
     permissions,
     onPreviewMedia,
@@ -437,6 +441,26 @@ const PublicationMobileRow = memo(
                   <Eye className="w-4 h-4" />
                   Ver
                 </button>
+
+                {/* Duplicate button */}
+                {permissions?.includes("manage-content") && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDuplicate?.(item.id);
+                    }}
+                    disabled={
+                      isLoading?.publishing ||
+                      isLoading?.editing ||
+                      isLoading?.deleting
+                    }
+                    className="flex-1 py-2 rounded-lg bg-purple-50 hover:bg-purple-100 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 font-medium text-xs flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
+                    title="Duplicar"
+                  >
+                    <Copy className="w-4 h-4" />
+                    Duplicar
+                  </button>
+                )}
 
                 {/* Publish/Request button */}
                 {(permissions?.includes("publish") ||
