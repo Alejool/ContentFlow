@@ -1,16 +1,13 @@
 import Input from "@/Components/common/Modern/Input";
-import Label from "@/Components/common/Modern/Label";
 import Select from "@/Components/common/Modern/Select";
 import { enUS, es } from "date-fns/locale";
 import {
   Calendar,
-  Check,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
   ChevronUp,
   Clock,
-  TriangleAlert,
   X,
 } from "lucide-react";
 import { ReactNode, forwardRef, useEffect, useMemo, useState } from "react";
@@ -54,12 +51,11 @@ interface DatePickerProps<T extends FieldValues> {
   id?: string;
 }
 
-// Custom Time Selector Component
 const CustomTimeSelector = ({
   date,
   onChange,
   currentLocale,
-  activeColor = "#ea580c",
+  activeColor = "primary-500",
 }: {
   date: Date | null;
   onChange: (date: Date) => void;
@@ -147,7 +143,6 @@ const CustomTimeSelector = ({
     setIsFocused((prev) => ({ ...prev, [field]: false }));
     setHours((prev) => (prev === "" ? "00" : prev.padStart(2, "0")));
     setMinutes((prev) => (prev === "" ? "00" : prev.padStart(2, "0")));
-    // Use a small timeout to ensure state is updated before syncing
     setTimeout(syncTime, 0);
   };
 
@@ -255,7 +250,7 @@ const DatePickerModern = <T extends FieldValues>({
   size = "md",
   variant = "default",
   containerClassName = "",
-  activeColor = "#ea580c",
+  activeColor = "gray-400",
   id,
 }: DatePickerProps<T>) => {
   const { i18n } = useTranslation();
@@ -264,147 +259,46 @@ const DatePickerModern = <T extends FieldValues>({
   const currentLocale = i18n.language.startsWith("es") ? "es" : "en";
   const defaultDateFormat = showTimeSelect ? "Pp" : "P";
 
-  const sizeConfig = {
-    sm: {
-      input: "py-1 px-2 text-sm",
-      icon: "w-4 h-4",
-      label: "text-sm",
-    },
-    md: {
-      input: "py-2 px-4 text-base",
-      icon: "w-5 h-5",
-      label: "text-base",
-    },
-    lg: {
-      input: "py-3 px-4 text-lg",
-      icon: "w-6 h-6",
-      label: "text-lg",
-    },
-  };
-
-  const currentSize = sizeConfig[size];
-
-  const getInputStyles = () => {
-    const base = `
-      w-full flex items-center justify-between rounded-lg border transition-all
-      focus:outline-none focus:ring-2 focus:ring-offset-2
-      ${disabled ? "opacity-60 cursor-not-allowed" : "cursor-pointer"}
-      ${currentSize.input}
-    `;
-
-    if (error) {
-      return `${base} bg-white dark:bg-neutral-800 text-gray-900 dark:text-white border-primary-500 focus:ring-primary-500/20 dark:focus:ring-primary-500/30 pl-11`;
-    }
-    if (success) {
-      return `${base} bg-white dark:bg-neutral-800 text-gray-900 dark:text-white border-green-500 focus:ring-green-500/20 dark:focus:ring-green-500/30 pl-11`;
-    }
-    if (variant === "outlined") {
-      return `${base} bg-transparent text-gray-900 dark:text-white border-2 border-gray-300 dark:border-neutral-600 hover:border-gray-400 dark:hover:border-neutral-500 focus:ring-purple-500/20 dark:focus:ring-purple-500/30 pl-11`;
-    }
-    if (variant === "filled") {
-      return `${base} bg-gray-50 dark:bg-neutral-800 text-gray-900 dark:text-white border border-gray-300 dark:border-neutral-700 hover:border-gray-400 dark:hover:border-neutral-600 focus:ring-purple-500/20 dark:focus:ring-purple-500/30 pl-11`;
-    }
-    return `${base} bg-white dark:bg-neutral-800/50 text-gray-900 dark:text-white border border-gray-300 dark:border-neutral-700/50 hover:border-gray-400 dark:hover:border-neutral-600/70 focus:ring-purple-500/20 dark:focus:ring-purple-500/30 pl-11`;
-  };
-
-  const getMessageStyles = (type: "error" | "success") => {
-    const base = "flex items-start gap-2 px-3 py-2 rounded-lg text-sm";
-
-    return type === "error"
-      ? `${base} text-primary-600 dark:text-primary-500`
-      : `${base} text-green-600 dark:text-green-500`;
-  };
-
   const CustomInput = forwardRef<HTMLInputElement, any>(
     (
       { value, onClick, onChange, placeholder: inputPlaceholder, ...props },
       ref,
     ) => (
-      <div className="relative flex items-center w-full">
-        <input
-          value={value}
-          onChange={onChange}
-          onClick={(e) => {
-            if (!disabled) {
-              onClick(e);
-              setIsOpen(true);
-            }
-          }}
-          ref={ref}
-          disabled={disabled}
-          placeholder={inputPlaceholder}
-          readOnly={false}
-          className={`${getInputStyles()} ${className} pr-10`}
-          {...register}
-          {...props}
-          id={id || props.id}
-          aria-invalid={!!error}
-          aria-describedby={
-            error
-              ? `${label?.toLowerCase()}-error`
-              : success
-                ? `${label?.toLowerCase()}-success`
-                : undefined
+      <Input
+        {...props}
+        id={id || name || "datepicker-input"}
+        ref={ref}
+        value={value}
+        onChange={onChange}
+        onClick={(e) => {
+          if (!disabled) {
+            onClick?.(e);
+            setIsOpen(true);
           }
-        />
-        <div className="absolute left-4 flex items-center pointer-events-none">
-          {icon ||
-            (showTimeSelect ? (
-              <Clock
-                className={`${currentSize.icon} text-gray-500 dark:text-gray-400 ${
-                  error
-                    ? "text-primary-500 dark:text-primary-400"
-                    : success
-                      ? "text-green-500 dark:text-green-400"
-                      : ""
-                }`}
-              />
-            ) : (
-              <Calendar
-                className={`${currentSize.icon} text-gray-500 dark:text-gray-400 ${
-                  error
-                    ? "text-primary-500 dark:text-primary-400"
-                    : success
-                      ? "text-green-500 dark:text-green-400"
-                      : ""
-                }`}
-              />
-            ))}
-        </div>
-      </div>
+        }}
+        label={label}
+        error={error}
+        success={success}
+        hint={hint}
+        required={required}
+        disabled={disabled}
+        variant={variant}
+        sizeType={size === "md" ? "md" : size === "lg" ? "lg" : "sm"}
+        icon={(icon as any) || (showTimeSelect ? Clock : Calendar)}
+        activeColor={activeColor}
+        placeholder={inputPlaceholder || placeholder}
+        containerClassName="w-full"
+        autoComplete="off"
+        className="cursor-pointer"
+      />
     ),
   );
 
   CustomInput.displayName = "CustomDateInput";
 
   return (
-    <div className={` ${containerClassName}`}>
-      {(label || hint) && (
-        <div className="flex items-center justify-between">
-          {label && (
-            <Label
-              htmlFor={id || label?.toLowerCase().replace(/\s+/g, "-")}
-              size={size}
-              required={required}
-              error={error}
-              success={success}
-              variant="default"
-              align="left"
-              className="mb-2"
-            >
-              {label}
-            </Label>
-          )}
-          {hint && !label && (
-            <span className="text-xs text-gray-500 dark:text-gray-400 ml-auto">
-              {hint}
-            </span>
-          )}
-        </div>
-      )}
-
-      <div className="relative">
-        <style>{`
+    <div className={`relative ${containerClassName}`}>
+      <style>{`
           .react-datepicker-wrapper {
             width: 100%;
           }
@@ -996,238 +890,215 @@ const DatePickerModern = <T extends FieldValues>({
           }
         `}</style>
 
-        <DatePicker
-          id={id}
-          name={name}
-          selected={selected}
-          onChange={(date) => {
-            if (date && showTimeSelect) {
-              // If there's already a selected date with time, preserve the time
-              if (selected) {
-                const newDate = new Date(date);
-                newDate.setHours(selected.getHours());
-                newDate.setMinutes(selected.getMinutes());
-                newDate.setSeconds(selected.getSeconds());
-                onChange(newDate);
-              } else {
-                // If no previous date, set to current time
-                const newDate = new Date(date);
-                const now = new Date();
-                newDate.setHours(now.getHours());
-                newDate.setMinutes(now.getMinutes());
-                newDate.setSeconds(0);
-                onChange(newDate);
-              }
+      <DatePicker
+        id={id}
+        name={name}
+        selected={selected}
+        onChange={(date) => {
+          if (date && showTimeSelect) {
+            if (selected) {
+              const newDate = new Date(date);
+              newDate.setHours(selected.getHours());
+              newDate.setMinutes(selected.getMinutes());
+              newDate.setSeconds(selected.getSeconds());
+              onChange(newDate);
             } else {
-              onChange(date);
+              // If no previous date, set to current time
+              const newDate = new Date(date);
+              const now = new Date();
+              newDate.setHours(now.getHours());
+              newDate.setMinutes(now.getMinutes());
+              newDate.setSeconds(0);
+              onChange(newDate);
             }
-            if (!showTimeSelect) {
-              setIsOpen(false);
-            }
-          }}
-          onCalendarClose={() => setIsOpen(false)}
-          onCalendarOpen={() => setIsOpen(true)}
-          showTimeSelect={false}
-          showMonthDropdown={showMonthDropdown}
-          showYearDropdown={showYearDropdown}
-          dropdownMode={dropdownMode}
-          dateFormat={dateFormat || defaultDateFormat}
-          locale={currentLocale}
-          placeholderText={placeholder}
-          minDate={allowPastDates ? undefined : minDate || new Date()}
-          renderCustomHeader={({
-            date,
-            changeYear,
-            changeMonth,
-            decreaseMonth,
-            increaseMonth,
-            prevMonthButtonDisabled,
-            nextMonthButtonDisabled,
-          }) => {
-            const months = [
-              "January",
-              "February",
-              "March",
-              "April",
-              "May",
-              "June",
-              "July",
-              "August",
-              "September",
-              "October",
-              "November",
-              "December",
-            ];
-            const monthsEs = [
-              "Enero",
-              "Febrero",
-              "Marzo",
-              "Abril",
-              "Mayo",
-              "Junio",
-              "Julio",
-              "Agosto",
-              "Septiembre",
-              "Octubre",
-              "Noviembre",
-              "Diciembre",
-            ];
+          } else {
+            onChange(date);
+          }
+          if (!showTimeSelect) {
+            setIsOpen(false);
+          }
+        }}
+        onCalendarClose={() => setIsOpen(false)}
+        onCalendarOpen={() => setIsOpen(true)}
+        showTimeSelect={false}
+        showMonthDropdown={showMonthDropdown}
+        showYearDropdown={showYearDropdown}
+        dropdownMode={dropdownMode}
+        dateFormat={dateFormat || defaultDateFormat}
+        locale={currentLocale}
+        placeholderText={placeholder}
+        minDate={allowPastDates ? undefined : minDate || new Date()}
+        renderCustomHeader={({
+          date,
+          changeYear,
+          changeMonth,
+          decreaseMonth,
+          increaseMonth,
+          prevMonthButtonDisabled,
+          nextMonthButtonDisabled,
+        }) => {
+          const months = [
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December",
+          ];
+          const monthsEs = [
+            "Enero",
+            "Febrero",
+            "Marzo",
+            "Abril",
+            "Mayo",
+            "Junio",
+            "Julio",
+            "Agosto",
+            "Septiembre",
+            "Octubre",
+            "Noviembre",
+            "Diciembre",
+          ];
 
-            const monthOptions = (
-              currentLocale === "es" ? monthsEs : months
-            ).map((m, i) => ({
+          const monthOptions = (currentLocale === "es" ? monthsEs : months).map(
+            (m, i) => ({
               value: i,
               label: m,
-            }));
+            }),
+          );
 
-            const currentYear = new Date().getFullYear();
-            const years = Array.from(
-              { length: 101 },
-              (_, i) => currentYear - 50 + i,
-            );
-            const yearOptions = years.map((y) => ({
-              value: y,
-              label: y.toString(),
-            }));
+          const currentYear = new Date().getFullYear();
+          const years = Array.from(
+            { length: 101 },
+            (_, i) => currentYear - 50 + i,
+          );
+          const yearOptions = years.map((y) => ({
+            value: y,
+            label: y.toString(),
+          }));
 
-            return (
-              <div className="custom-header-container">
-                <button
-                  type="button"
-                  className="header-nav-btn"
-                  onClick={decreaseMonth}
-                  disabled={prevMonthButtonDisabled}
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
+          return (
+            <div className="custom-header-container">
+              <button
+                type="button"
+                className="header-nav-btn"
+                onClick={decreaseMonth}
+                disabled={prevMonthButtonDisabled}
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
 
-                <div className="flex gap-2 items-center justify-center flex-1">
-                  <div className="w-[130px]">
-                    <Select
-                      id="month-select"
-                      options={monthOptions}
-                      value={date.getMonth()}
-                      onChange={(val) => changeMonth(Number(val))}
-                      size="sm"
-                      usePortal={false}
-                    />
-                  </div>
-                  <div className="w-[100px]">
-                    <Select
-                      id="year-select"
-                      options={yearOptions}
-                      value={date.getFullYear()}
-                      onChange={(val) => changeYear(Number(val))}
-                      size="sm"
-                      usePortal={false}
-                    />
-                  </div>
+              <div className="flex gap-2 items-center justify-center flex-1">
+                <div className="w-[130px]">
+                  <Select
+                    id="month-select"
+                    options={monthOptions}
+                    value={date.getMonth()}
+                    onChange={(val) => changeMonth(Number(val))}
+                    size="sm"
+                    usePortal={false}
+                  />
                 </div>
-
-                <button
-                  type="button"
-                  className="header-nav-btn"
-                  onClick={increaseMonth}
-                  disabled={nextMonthButtonDisabled}
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
+                <div className="w-[100px]">
+                  <Select
+                    id="year-select"
+                    options={yearOptions}
+                    value={date.getFullYear()}
+                    onChange={(val) => changeYear(Number(val))}
+                    size="sm"
+                    usePortal={false}
+                  />
+                </div>
               </div>
-            );
-          }}
-          isClearable={false}
-          customInput={<CustomInput />}
-          popperClassName="z-50 !fixed"
-          popperPlacement={popperPlacement}
-          previousMonthButtonLabel="Mes anterior"
-          nextMonthButtonLabel="Mes siguiente"
-          previousYearButtonLabel="Año anterior"
-          nextYearButtonLabel="Año siguiente"
-          withPortal={withPortal}
-          portalId="root-portal"
-          disabled={disabled}
-          className="w-full"
-          calendarContainer={useMemo(
-            () =>
-              ({ children }: { children: ReactNode }) => (
-                <div
-                  className="react-datepicker-container"
-                  style={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    position: "relative",
-                  }}
-                >
-                  <div style={{ flex: 1 }}>{children}</div>
-                  {showTimeSelect && (
-                    <CustomTimeSelector
-                      date={selected || new Date()}
-                      onChange={onChange}
-                      currentLocale={currentLocale}
-                      activeColor={activeColor}
-                    />
-                  )}
-                  <div className="react-datepicker__footer">
-                    <div className="react-datepicker__footer-selected">
-                      <Calendar className="w-4 h-4 flex-shrink-0" />
-                      <span>
-                        {selected
-                          ? showTimeSelect
-                            ? selected.toLocaleString(currentLocale, {
-                                dateStyle: "medium",
-                                timeStyle: "short",
-                              })
-                            : selected.toLocaleDateString(currentLocale, {
-                                dateStyle: "medium",
-                              })
-                          : currentLocale === "es"
-                            ? "Sin fecha seleccionada"
-                            : "No date selected"}
-                      </span>
-                    </div>
-                    {isClearable && selected && (
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onChange(null);
-                          setIsOpen(false);
-                        }}
-                        className="react-datepicker__footer-clear"
-                        title={currentLocale === "es" ? "Limpiar" : "Clear"}
-                      >
-                        <X className="w-4 h-4" />
-                        {currentLocale === "es" ? "Limpiar" : "Clear"}
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ),
-            [selected, onChange, currentLocale, showTimeSelect, isClearable],
-          )}
-        />
-      </div>
-      {error && (
-        <div
-          id={`${label?.toLowerCase().replace(/\s+/g, "-")}-error`}
-          className={getMessageStyles("error")}
-          role="alert"
-        >
-          <TriangleAlert className="w-4 h-4" />
-          <span>{error}</span>
-        </div>
-      )}
 
-      {success && !error && (
-        <div
-          id={`${label?.toLowerCase().replace(/\s+/g, "-")}-success`}
-          className={getMessageStyles("success")}
-          role="status"
-        >
-          <Check />
-          <span>{success}</span>
-        </div>
-      )}
+              <button
+                type="button"
+                className="header-nav-btn"
+                onClick={increaseMonth}
+                disabled={nextMonthButtonDisabled}
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          );
+        }}
+        isClearable={false}
+        customInput={<CustomInput />}
+        popperClassName="z-50 !fixed"
+        popperPlacement={popperPlacement}
+        previousMonthButtonLabel="Mes anterior"
+        nextMonthButtonLabel="Mes siguiente"
+        previousYearButtonLabel="Año anterior"
+        nextYearButtonLabel="Año siguiente"
+        withPortal={withPortal}
+        portalId="root-portal"
+        disabled={disabled}
+        className="w-full"
+        calendarContainer={useMemo(
+          () =>
+            ({ children }: { children: ReactNode }) => (
+              <div
+                className="react-datepicker-container"
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  position: "relative",
+                }}
+              >
+                <div style={{ flex: 1 }}>{children}</div>
+                {showTimeSelect && (
+                  <CustomTimeSelector
+                    date={selected || new Date()}
+                    onChange={onChange}
+                    currentLocale={currentLocale}
+                    activeColor={activeColor}
+                  />
+                )}
+                <div className="react-datepicker__footer">
+                  <div className="react-datepicker__footer-selected">
+                    <Calendar className="w-4 h-4 flex-shrink-0" />
+                    <span>
+                      {selected
+                        ? showTimeSelect
+                          ? selected.toLocaleString(currentLocale, {
+                              dateStyle: "medium",
+                              timeStyle: "short",
+                            })
+                          : selected.toLocaleDateString(currentLocale, {
+                              dateStyle: "medium",
+                            })
+                        : currentLocale === "es"
+                          ? "Sin fecha seleccionada"
+                          : "No date selected"}
+                    </span>
+                  </div>
+                  {isClearable && selected && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onChange(null);
+                        setIsOpen(false);
+                      }}
+                      className="react-datepicker__footer-clear"
+                      title={currentLocale === "es" ? "Limpiar" : "Clear"}
+                    >
+                      <X className="w-4 h-4" />
+                      {currentLocale === "es" ? "Limpiar" : "Clear"}
+                    </button>
+                  )}
+                </div>
+              </div>
+            ),
+          [selected, onChange, currentLocale, showTimeSelect, isClearable],
+        )}
+      />
     </div>
   );
 };
