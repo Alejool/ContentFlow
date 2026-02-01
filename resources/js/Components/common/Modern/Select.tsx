@@ -4,11 +4,10 @@ import {
   Check,
   CheckCircle,
   ChevronDown,
-  LucideIcon,
   Search,
   X,
 } from "lucide-react";
-import { ReactNode, useEffect, useRef, useState } from "react";
+import { ReactNode, isValidElement, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { FieldValues, Path, UseFormRegister } from "react-hook-form";
 
@@ -130,7 +129,7 @@ interface SelectProps<T extends FieldValues = FieldValues> {
   disabled?: boolean;
   className?: string;
   containerClassName?: string;
-  icon?: LucideIcon;
+  icon?: any;
   hint?: string;
   size?: "sm" | "md" | "lg";
   variant?: "default" | "outlined" | "filled";
@@ -142,6 +141,7 @@ interface SelectProps<T extends FieldValues = FieldValues> {
   loading?: boolean;
   dropdownPosition?: "down" | "up" | "auto";
   usePortal?: boolean;
+  activeColor?: string;
 }
 
 export default function Select<T extends FieldValues>({
@@ -168,6 +168,7 @@ export default function Select<T extends FieldValues>({
   loading = false,
   dropdownPosition = "auto",
   usePortal = true,
+  activeColor,
   ...props
 }: SelectProps<T>) {
   const [isOpen, setIsOpen] = useState(false);
@@ -315,13 +316,18 @@ export default function Select<T extends FieldValues>({
     if (success) {
       return `${base} bg-white dark:bg-neutral-800 text-gray-900 dark:text-white border-green-500 focus:ring-green-500/20 dark:focus:ring-green-500/30`;
     }
+
+    const ringColorClass = activeColor
+      ? "" // We'll apply it via style
+      : "focus:ring-primary-500/20 dark:focus:ring-primary-500/30";
+
     if (variant === "outlined") {
-      return `${base} bg-transparent text-gray-900 dark:text-white border-gray-300 dark:border-neutral-600 hover:border-gray-400 dark:hover:border-neutral-500 focus:ring-primary-500/20 dark:focus:ring-primary-500/30`;
+      return `${base} bg-transparent text-gray-900 dark:text-white border-gray-300 dark:border-neutral-600 hover:border-gray-400 dark:hover:border-neutral-500 ${ringColorClass}`;
     }
     if (variant === "filled") {
-      return `${base} bg-gray-50 dark:bg-neutral-800 text-gray-900 dark:text-white border-gray-300 dark:border-neutral-700 hover:border-gray-400 dark:hover:border-neutral-600 focus:ring-primary-500/20 dark:focus:ring-primary-500/30`;
+      return `${base} bg-gray-50 dark:bg-neutral-800 text-gray-900 dark:text-white border-gray-300 dark:border-neutral-700 hover:border-gray-400 dark:hover:border-neutral-600 ${ringColorClass}`;
     }
-    return `${base} bg-white dark:bg-neutral-900 text-gray-900 dark:text-white border-gray-300 dark:border-neutral-700 hover:border-gray-400 dark:hover:border-neutral-600 focus:ring-primary-500/20 dark:focus:ring-primary-500/30`;
+    return `${base} bg-white dark:bg-neutral-900 text-gray-900 dark:text-white border-gray-300 dark:border-neutral-700 hover:border-gray-400 dark:hover:border-neutral-600 ${ringColorClass}`;
   };
 
   const getOptionStyles = (isSelected: boolean, isDisabled: boolean) => {
@@ -336,7 +342,10 @@ export default function Select<T extends FieldValues>({
     `;
 
     if (isSelected) {
-      return `${base} bg-primary-50 dark:bg-primary-600/20 text-primary-700 dark:text-primary-300`;
+      const selectedBase = activeColor
+        ? "text-gray-900 dark:text-white"
+        : "bg-primary-50 dark:bg-primary-600/20 text-primary-700 dark:text-primary-300";
+      return `${base} ${selectedBase}`;
     }
     return `${base} text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-700/80`;
   };
@@ -434,7 +443,13 @@ export default function Select<T extends FieldValues>({
           <div className="relative">
             {Icon && (
               <div className="absolute left-3 top-1/2 -translate-y-1/2 z-10 text-gray-500 dark:text-gray-400">
-                <Icon className={currentSize.icon} />
+                <div className={currentSize.icon}>
+                  {isValidElement(Icon) ? (
+                    Icon
+                  ) : (
+                    <Icon className="w-full h-full" />
+                  )}
+                </div>
               </div>
             )}
 
@@ -470,6 +485,16 @@ export default function Select<T extends FieldValues>({
               aria-haspopup="listbox"
               aria-labelledby={`${id}-label`}
               aria-controls={`${id}-dropdown`}
+              style={
+                {
+                  ...(activeColor
+                    ? {
+                        "--tw-ring-color": activeColor,
+                        borderColor: isOpen ? activeColor : undefined,
+                      }
+                    : {}),
+                } as React.CSSProperties
+              }
             >
               <span className="truncate" id={`${id}-label`}>
                 {loading ? (
@@ -571,6 +596,14 @@ export default function Select<T extends FieldValues>({
                           isSelected,
                           !!option.disabled,
                         )} ${option.disabled ? "cursor-not-allowed" : ""}`}
+                        style={
+                          isSelected && activeColor
+                            ? ({
+                                backgroundColor: `${activeColor}20`,
+                                color: activeColor,
+                              } as React.CSSProperties)
+                            : {}
+                        }
                         role="option"
                         aria-selected={isSelected}
                         aria-disabled={option.disabled}
