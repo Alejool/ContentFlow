@@ -64,7 +64,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
       const start = startOfWeek(startOfMonth(currentMonth)).toISOString();
       const end = endOfWeek(endOfMonth(currentMonth)).toISOString();
 
-      const response = await axios.get("/api/v1/calendar/events", {
+      const response = await axios.get(route("api.v1.calendar.events"), {
         params: { start, end },
       });
 

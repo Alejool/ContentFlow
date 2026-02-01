@@ -1,5 +1,6 @@
 import axios from "axios";
 import { create } from "zustand";
+import { useCalendarStore } from "@/stores/calendarStore";
 
 export interface Campaign {
   id: number;
@@ -132,6 +133,7 @@ export const useCampaignStore = create<CampaignState>((set, get) => ({
       await axios.delete(route("api.v1.campaigns.destroy", id));
       get().removeCampaign(id);
       set({ isLoading: false });
+      useCalendarStore.getState().fetchEvents();
       return true;
     } catch (error: any) {
       set({
@@ -148,11 +150,12 @@ export const useCampaignStore = create<CampaignState>((set, get) => ({
       const response = await axios.post(
         route("api.v1.campaigns.duplicate", id),
       );
-      const campaign = response.data.campaign;
+      const campaign = response.data?.campaign;
       if (campaign) {
         get().addCampaign(campaign);
       }
       set({ isLoading: false });
+      useCalendarStore.getState().fetchEvents();
       return true;
     } catch (error: any) {
       set({

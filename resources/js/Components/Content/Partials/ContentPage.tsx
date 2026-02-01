@@ -5,8 +5,9 @@ import ModalHeader from "@/Components/Content/modals/common/ModalHeader";
 import SocialMediaAccounts from "@/Components/Content/socialAccount/SocialMediaAccounts";
 import Modal from "@/Components/common/ui/Modal";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
+import { useCampaignStore } from "@/stores/campaignStore";
 import { usePublicationStore } from "@/stores/publicationStore";
-import { Head, router, usePage } from "@inertiajs/react";
+import { Head, usePage } from "@inertiajs/react";
 import {
   Calendar as CalendarIcon,
   CheckCircle,
@@ -67,6 +68,7 @@ export default function ContentPage() {
   const deletePublicationAction = usePublicationStore(
     (s) => s.deletePublication,
   );
+  const deleteCampaignAction = useCampaignStore((s) => s.deleteCampaign);
 
   const {
     activeTab,
@@ -173,17 +175,17 @@ export default function ContentPage() {
     if (!deleteConfirmation.id) return;
 
     if (activeTab === "campaigns") {
-      router.delete(route("api.v1.campaigns.destroy", deleteConfirmation.id), {
-        preserveScroll: true,
-        onSuccess: () => {
-          setDeleteConfirmation({ isOpen: false, id: null });
-          handleRefreshWrapped();
-        },
-        onFinish: () => {
-          setDeleteConfirmation({ isOpen: false, id: null });
-          handleRefreshWrapped();
-        },
-      });
+      const success = await deleteCampaignAction(deleteConfirmation.id);
+
+      setDeleteConfirmation({ isOpen: false, id: null });
+      if (success) {
+        toast.success(
+          t("common.deleteSuccess") || "Campaign deleted successfully",
+        );
+        handleRefreshWrapped();
+      } else {
+        toast.error(t("common.deleteError") || "Failed to delete campaign");
+      }
       return;
     }
 
