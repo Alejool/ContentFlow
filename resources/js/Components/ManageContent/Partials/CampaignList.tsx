@@ -2,7 +2,7 @@ import CampaignTable from "@/Components/ManageContent/Campaign/CampaignTable";
 import PublicationTable from "@/Components/ManageContent/Publication/PublicationTable";
 import FilterSection from "@/Components/ManageContent/common/FilterSection";
 import HeaderSection from "@/Components/ManageContent/common/HeaderSection";
-import Pagination from "@/Components/ManageContent/common/Pagination";
+import AdvancedPagination from "@/Components/common/ui/AdvancedPagination";
 import { useTheme } from "@/Hooks/useTheme";
 import { CampaignListProps } from "@/types/CampaignListProps";
 import { memo, useState } from "react";
@@ -22,6 +22,7 @@ const CampaignList = memo(
     onRefresh,
     pagination,
     onPageChange,
+    onPerPageChange,
     onEditRequest,
     connectedAccounts = [],
   }: CampaignListProps) => {
@@ -110,10 +111,15 @@ const CampaignList = memo(
         )}
 
         {pagination && (
-          <Pagination
-            pagination={pagination}
+          <AdvancedPagination
+            currentPage={pagination.current_page}
+            lastPage={pagination.last_page}
+            total={pagination.total}
+            perPage={pagination.per_page}
             onPageChange={onPageChange}
+            onPerPageChange={onPerPageChange || (() => {})}
             t={t}
+            isLoading={isLoading}
           />
         )}
       </div>
