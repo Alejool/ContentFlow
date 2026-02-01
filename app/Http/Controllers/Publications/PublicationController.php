@@ -326,9 +326,16 @@ class PublicationController extends Controller
 
       $this->clearPublicationCache($workspaceId);
 
+      if (request()->wantsJson()) {
+        return $this->successResponse(null, 'Publication deleted successfully');
+      }
+
       return redirect()->back()->with('success', 'Publication deleted successfully');
     } catch (\Exception $e) {
-      return redirect()->back()->with('error', 'Deletion failed: ' . $e->getMessage());
+      if (request()->wantsJson()) {
+        return $this->errorResponse('Deletion failed: ' . $e->getMessage(), 500);
+      }
+   
     }
   }
 
@@ -358,7 +365,6 @@ class PublicationController extends Controller
         $newTitle = $baseTitle . ' ' . $counter;
       }
 
-      // Create a new publication with duplicated data
       $newPublication = Publication::create([
         'user_id' => Auth::id(),
         'workspace_id' => $publication->workspace_id,
@@ -369,12 +375,11 @@ class PublicationController extends Controller
         'hashtags' => $publication->hashtags,
         'url' => $publication->url,
         'goal' => $publication->goal,
-        'status' => 'draft', // Reset to draft
+        'status' => 'draft',
         'platform_settings' => $publication->platform_settings,
-        // Reset approval/publish fields
         'approved_by' => null,
         'approved_at' => null,
-        'approved_retries_remaining' => null,
+        'approved_retries_remaining' => 3,
         'published_by' => null,
         'published_at' => null,
         'rejected_by' => null,
