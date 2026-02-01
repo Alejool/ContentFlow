@@ -2,6 +2,8 @@
   "common": {
     "deleteConfirmTitle": "Confirmar eliminación",
     "deleteConfirm": "¿Estás seguro de que deseas eliminar este elemento? Esta acción no se puede deshacer.",
+    "deleteSuccess": "Elemento eliminado correctamente",
+    "deleteError": "Error al eliminar el elemento",
     "welcome": "Bienvenido",
     "loading": "Cargando...",
     "deleting": "Eliminando...",
