@@ -1,7 +1,7 @@
 import { DatePicker as DatePickerModern } from "@/Components/common/Modern/DatePicker";
 import Input from "@/Components/common/Modern/Input";
 import Select from "@/Components/common/Modern/Select";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { Filter, Search } from "lucide-react";
 
 interface FilterSectionProps {
@@ -72,6 +72,8 @@ export default function FilterSection({
     },
   ];
 
+  const activeColor = "gray-400";
+
   return (
     <div className="flex flex-col gap-4 bg-white dark:bg-neutral-800/50 p-4 rounded-lg border border-gray-100 dark:border-neutral-700 shadow-sm mt-4">
       <div className="flex flex-col md:flex-row gap-4 items-end">
@@ -83,7 +85,8 @@ export default function FilterSection({
             onChange={(e) => setSearch(e.target.value)}
             icon={Search}
             sizeType="md"
-            className="w-full"
+            className="w-full cursor-pointer"
+            activeColor={activeColor}
           />
         </div>
 
@@ -106,6 +109,7 @@ export default function FilterSection({
               size="md"
               icon={Filter}
               placeholder={t("common.status.title") || "Estado"}
+              activeColor={activeColor}
             />
           </div>
 
@@ -121,6 +125,7 @@ export default function FilterSection({
                 }}
                 size="md"
                 placeholder={t("common.sort.title") || "Ordenar"}
+                activeColor={activeColor}
               />
             </div>
           )}
@@ -131,7 +136,7 @@ export default function FilterSection({
                 <DatePickerModern
                   isClearable
                   allowPastDates={true}
-                  selected={dateStart ? new Date(dateStart) : null}
+                  selected={dateStart ? parseISO(dateStart) : null}
                   dateFormat="dd/MM/yyyy HH:mm"
                   onChange={(d) =>
                     handleFilterChange(
@@ -141,13 +146,15 @@ export default function FilterSection({
                   }
                   placeholder="Inicio"
                   withPortal
+                  variant="outlined"
                   size="md"
+                  activeColor={activeColor}
                 />
               </div>
               <span className="text-gray-400">-</span>
               <div className="w-32">
                 <DatePickerModern
-                  selected={dateEnd ? new Date(dateEnd) : null}
+                  selected={dateEnd ? parseISO(dateEnd) : null}
                   allowPastDates={true}
                   dateFormat="dd/MM/yyyy HH:mm"
                   onChange={(d) =>
@@ -158,6 +165,7 @@ export default function FilterSection({
                   }
                   placeholder="Fin"
                   withPortal
+                  activeColor={activeColor}
                   size="md"
                   isClearable
                 />
