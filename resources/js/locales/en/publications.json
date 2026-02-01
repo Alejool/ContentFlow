@@ -313,6 +313,7 @@
     "messages": {
       "addSuccess": "Publication added successfully!",
       "createSuccess": "Publication created successfully!",
+      "duplicateSuccess": "Publication duplicated successfully!",
       "addError": "Error adding publication",
       "updateSuccess": "Publication updated successfully!",
       "updateError": "Error updating publication",

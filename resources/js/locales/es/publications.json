@@ -329,6 +329,7 @@
     "messages": {
       "addSuccess": "¡Publicación agregada exitosamente!",
       "createSuccess": "¡Publicación creada exitosamente!",
+      "duplicateSuccess": "¡Publicación duplicada con éxito!",
       "addError": "Error al agregar publicación",
       "updateSuccess": "¡Publicación actualizada exitosamente!",
       "updateError": "Error al actualizar publicación",

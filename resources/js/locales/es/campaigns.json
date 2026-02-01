@@ -45,6 +45,7 @@
     "messages": {
       "fetchError": "Error al cargar campañas",
       "addSuccess": "Campaña creada exitosamente",
+      "duplicateSuccess": "Campaña duplicada correctamente",
       "addError": "Error al crear campaña",
       "updateSuccess": "Campaña actualizada exitosamente",
       "updateError": "Error al actualizar campaña",
