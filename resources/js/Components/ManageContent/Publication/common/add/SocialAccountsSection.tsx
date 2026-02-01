@@ -1,5 +1,5 @@
 import DatePickerModern from "@/Components/common/Modern/DatePicker";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { Check, Clock, Settings, Target, X } from "lucide-react";
 import React, { memo, useState } from "react";
 
@@ -82,7 +82,7 @@ const SchedulePopoverContent = memo(
         </div>
 
         <DatePickerModern
-          selected={customSchedule ? new Date(customSchedule) : null}
+          selected={customSchedule ? parseISO(customSchedule) : null}
           onChange={(date: Date | null) => {
             onScheduleChange(date ? format(date, "yyyy-MM-dd'T'HH:mm") : "");
           }}
@@ -279,7 +279,7 @@ const SocialAccountItem = memo(
                     }`}
                   >
                     <Clock className="w-3 h-3" />
-                    {new Date(
+                    {parseISO(
                       customSchedule || globalSchedule || "",
                     ).toLocaleString([], {
                       dateStyle: "short",

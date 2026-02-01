@@ -1,5 +1,5 @@
 import DatePickerModern from "@/Components/common/Modern/DatePicker";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import React from "react";
 import { FieldErrors, UseFormSetValue } from "react-hook-form";
 
@@ -32,7 +32,7 @@ const CampaignDateFields: React.FC<CampaignDateFieldsProps> = ({
           name="start_date"
           error={errors.start_date?.message as string}
           label={t("campaigns.modal.add.startDate")}
-          selected={startDate ? new Date(startDate) : null}
+          selected={startDate ? parseISO(startDate) : null}
           onChange={(date: Date | null) =>
             setValue("start_date", date ? format(date, "yyyy-MM-dd") : "", {
               shouldValidate: true,
@@ -53,7 +53,7 @@ const CampaignDateFields: React.FC<CampaignDateFieldsProps> = ({
           name="end_date"
           error={errors.end_date?.message as string}
           label={t("campaigns.modal.add.endDate")}
-          selected={endDate ? new Date(endDate) : null}
+          selected={endDate ? parseISO(endDate) : null}
           onChange={(date: Date | null) =>
             setValue("end_date", date ? format(date, "yyyy-MM-dd") : "", {
               shouldValidate: true,

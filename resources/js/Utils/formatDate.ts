@@ -1,11 +1,18 @@
+import { parseISO } from "date-fns";
+
 // Small helper to format UTC ISO timestamps into the user's timezone (browser-detected)
-const getUserTimezone = () => (window as any).USER_TIMEZONE || Intl.DateTimeFormat().resolvedOptions().timeZone;
-const getUserLocale = () => (window as any).APP_LOCALE || document.documentElement.lang || Intl.DateTimeFormat().resolvedOptions().locale;
+const getUserTimezone = () =>
+  (window as any).USER_TIMEZONE ||
+  Intl.DateTimeFormat().resolvedOptions().timeZone;
+const getUserLocale = () =>
+  (window as any).APP_LOCALE ||
+  document.documentElement.lang ||
+  Intl.DateTimeFormat().resolvedOptions().locale;
 
 export function formatTime(iso?: string | null) {
   if (!iso) return "";
   try {
-    const date = new Date(iso);
+    const date = parseISO(iso);
     const tz = getUserTimezone();
     const locale = getUserLocale();
     return new Intl.DateTimeFormat(locale || undefined, {
@@ -22,7 +29,7 @@ export function formatTime(iso?: string | null) {
 export function formatDate(iso?: string | null) {
   if (!iso) return "";
   try {
-    const date = new Date(iso);
+    const date = parseISO(iso);
     const tz = getUserTimezone();
     const locale = getUserLocale();
     return new Intl.DateTimeFormat(locale || undefined, {
@@ -39,7 +46,7 @@ export function formatDate(iso?: string | null) {
 export function formatDateTime(iso?: string | null) {
   if (!iso) return "";
   try {
-    const date = new Date(iso);
+    const date = parseISO(iso);
     const tz = getUserTimezone();
     const locale = getUserLocale();
     return new Intl.DateTimeFormat(locale || undefined, {

@@ -1,6 +1,6 @@
 import DatePickerModern from "@/Components/common/Modern/DatePicker";
 import Label from "@/Components/common/Modern/Label";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { Clock } from "lucide-react";
 import React from "react";
 
@@ -58,7 +58,7 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
         <div className="relative">
           <DatePickerModern
             id="scheduled_at"
-            selected={scheduledAt ? new Date(scheduledAt) : null}
+            selected={scheduledAt ? parseISO(scheduledAt) : null}
             onChange={(date) =>
               onScheduleChange(date ? format(date, "yyyy-MM-dd'T'HH:mm") : "")
             }
