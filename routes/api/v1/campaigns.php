@@ -11,6 +11,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/{campaign}', [CampaignController::class, 'show'])->name('show');
     Route::put('/{campaign}', [CampaignController::class, 'update'])->name('update');
     Route::delete('/{campaign}', [CampaignController::class, 'destroy'])->name('destroy');
+    Route::post('/{campaign}/duplicate', [CampaignController::class, 'duplicate'])->name('duplicate');
   });
 
   Route::prefix('scheduled-posts')->name('scheduled-posts.')->group(function () {
