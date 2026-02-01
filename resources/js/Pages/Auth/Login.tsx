@@ -1,10 +1,12 @@
 import { useAuth } from "@/Hooks/useAuth";
 import GuestLayout from "@/Layouts/GuestLayout";
-import { Head, Link, usePage } from "@inertiajs/react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Head, Link } from "@inertiajs/react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
 import Button from "@/Components/common/Modern/Button";
 import Input from "@/Components/common/Modern/Input";
-import { getErrorMessage } from "@/Utils/validation";
 import {
   AlertCircle,
   CheckCircle2,
@@ -13,30 +15,59 @@ import {
   Mail,
   UserPlus,
 } from "lucide-react";
-import { ChangeEvent, useEffect } from "react";
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
 export default function Login() {
   const { t } = useTranslation();
-  const { errors } = usePage().props;
   const {
-    data,
-    setData,
-    error,
-    loading,
+    error: authError,
     successMessage,
-    processing,
-    handleEmailLogin,
+    submitLogin,
     handleGoogleLogin,
-    handleFacebookLogin,
   } = useAuth();
 
-  useEffect(() => {}, []);
+  const loginSchema = z.object({
+    email: z
+      .string()
+      .min(1, { message: t("validation.required") })
+      .email({ message: t("validation.email") }),
+    password: z.string().min(1, { message: t("validation.required") }),
+    remember: z.boolean().default(false),
+  });
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
-    setData(name, type === "checkbox" ? checked : value);
+  type LoginFormData = z.infer<typeof loginSchema>;
+
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+      remember: false,
+    },
+  });
+
+  const onSubmit = async (data: LoginFormData) => {
+    try {
+      await submitLogin(data);
+    } catch (errorData: any) {
+      if (typeof errorData === "object") {
+        Object.keys(errorData).forEach((key) => {
+          setError(key as any, {
+            type: "server",
+            message: errorData[key][0],
+          });
+        });
+      }
+    }
   };
+
+  useEffect(() => {}, []);
 
   return (
     <GuestLayout section="login">
@@ -52,12 +83,12 @@ export default function Login() {
             </p>
           </div>
 
-          <form onSubmit={handleEmailLogin} className="space-y-6">
-            {error && (
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            {authError && (
               <div className="rounded-lg bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 p-4">
                 <div className="flex items-center gap-3 text-primary-700 dark:text-primary-400">
                   <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                  <p className="text-sm font-medium">{error}</p>
+                  <p className="text-sm font-medium">{authError}</p>
                 </div>
               </div>
             )}
@@ -74,20 +105,13 @@ export default function Login() {
             <div>
               <Input
                 id="login_email"
-                name="email"
                 label={t("auth.login.inputs.email")}
                 type="email"
                 sizeType="lg"
-                value={data.email}
-                onChange={handleChange}
                 placeholder={t("auth.login.placeholders.email")}
-                required
                 icon={Mail}
-                error={getErrorMessage(
-                  (usePage().props as any).errors?.email,
-                  t,
-                  "email",
-                )}
+                error={errors.email?.message}
+                {...register("email")}
               />
             </div>
 
@@ -98,21 +122,14 @@ export default function Login() {
                 </div>
                 <Input
                   id="login_password"
-                  name="password"
                   label={t("auth.login.inputs.password")}
                   type="password"
                   sizeType="lg"
-                  value={data.password}
-                  onChange={handleChange}
                   placeholder={t("auth.login.placeholders.password")}
-                  required
                   icon={Lock}
                   showPasswordToggle
-                  error={getErrorMessage(
-                    (usePage().props as any).errors?.password,
-                    t,
-                    "password",
-                  )}
+                  error={errors.password?.message}
+                  {...register("password")}
                 />
               </div>
             </div>
@@ -121,11 +138,9 @@ export default function Login() {
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
-                  name="remember"
-                  checked={data.remember}
-                  onChange={handleChange}
                   className="w-4 h-4 rounded border-gray-300 text-primary-600
                              focus:ring-primary-500 focus:ring-offset-0"
+                  {...register("remember")}
                 />
                 <span className="text-sm text-gray-700 dark:text-gray-300">
                   {t("auth.login.buttons.rememberMe")}
@@ -143,7 +158,7 @@ export default function Login() {
 
             <Button
               type="submit"
-              loading={loading || processing}
+              loading={isSubmitting}
               loadingText={t("auth.login.buttons.loggingIn")}
               fullWidth
               icon={LogIn as any}
@@ -166,7 +181,7 @@ export default function Login() {
               <button
                 type="button"
                 onClick={handleGoogleLogin}
-                disabled={loading}
+                disabled={isSubmitting}
                 className="w-full flex items-center justify-center gap-3 px-4 py-3
                            rounded-lg border border-gray-300 dark:border-gray-700
                            bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300

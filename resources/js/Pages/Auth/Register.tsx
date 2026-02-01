@@ -1,11 +1,12 @@
 import { useRegister } from "@/Hooks/useRegister";
 import GuestLayout from "@/Layouts/GuestLayout";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Head, Link } from "@inertiajs/react";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import Button from "@/Components/common/Modern/Button";
 import Input from "@/Components/common/Modern/Input";
-import { getErrorMessage } from "@/Utils/validation";
 import {
   AlertCircle,
   CheckCircle2,
@@ -15,69 +16,68 @@ import {
   User,
   UserPlus,
 } from "lucide-react";
-import { ChangeEvent } from "react";
 import { useTranslation } from "react-i18next";
 
 export default function Register() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const {
-    data,
-    setData,
-    error,
-    loading,
+    error: authError,
     successMessage,
-    errors,
-    handleEmailRegister,
-    setErrors,
     submitRegister,
     handleGoogleRegister,
   } = useRegister();
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setData(name as any, value);
-  };
-
-  const schema = z
+  const registerSchema = z
     .object({
       name: z.string().min(1, t("validation.required")).max(255),
       email: z.preprocess(
         (val) => (typeof val === "string" ? val.trim() : val),
-        z.string().email(t("validation.email")).max(255),
+        z
+          .string()
+          .min(1, t("validation.required"))
+          .email(t("validation.email"))
+          .max(255),
       ),
       password: z.string().min(8, t("validation.min.string", { count: 8 })),
-      password_confirmation: z.string().min(8),
+      password_confirmation: z
+        .string()
+        .min(8, t("validation.min.string", { count: 8 })),
     })
     .refine((data) => data.password === data.password_confirmation, {
       message: t("validation.passwords_do_not_match"),
       path: ["password_confirmation"],
     });
 
-  const handleSubmit = async (e: any) => {
-    e.preventDefault();
+  type RegisterFormData = z.infer<typeof registerSchema>;
 
-    setErrors({});
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors, isSubmitting },
+  } = useForm<RegisterFormData>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      password_confirmation: "",
+    },
+  });
 
-    const result = schema.safeParse(data);
-    if (!result.success) {
-      console.error("Zod Validation Errors:", result.error.errors);
-      const formatted = result.error.format();
-      const fieldErrors: Record<string, string> = {};
-      for (const key in formatted) {
-        if (key === "_errors") continue;
-        const msg = (formatted as any)[key]._errors?.[0];
-        if (msg) fieldErrors[key] = msg as string;
+  const onSubmit = async (data: RegisterFormData) => {
+    try {
+      await submitRegister(data);
+    } catch (errorData: any) {
+      if (typeof errorData === "object") {
+        Object.keys(errorData).forEach((key) => {
+          setError(key as any, {
+            type: "server",
+            message: errorData[key][0],
+          });
+        });
       }
-      setErrors(fieldErrors);
-      return;
     }
-
-    await submitRegister({
-      name: data.name,
-      email: data.email,
-      password: data.password,
-      password_confirmation: data.password_confirmation,
-    });
   };
 
   return (
@@ -95,12 +95,12 @@ export default function Register() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {error && (
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            {authError && (
               <div className="rounded-lg bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 p-4">
                 <div className="flex items-center gap-3 text-primary-700 dark:text-primary-400">
                   <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                  <p className="text-sm font-medium">{error}</p>
+                  <p className="text-sm font-medium">{authError}</p>
                 </div>
               </div>
             )}
@@ -121,14 +121,11 @@ export default function Register() {
                   id="name"
                   label={t("auth.register.inputs.name")}
                   type="text"
-                  name="name"
-                  value={data.name}
-                  onChange={handleChange}
                   placeholder={t("auth.register.placeholders.name")}
                   autoComplete="name"
-                  required
                   icon={User}
-                  error={getErrorMessage((errors as any)?.name, t, "name")}
+                  error={errors.name?.message}
+                  {...register("name")}
                 />
               </div>
             </div>
@@ -140,14 +137,11 @@ export default function Register() {
                   id="email"
                   label={t("auth.register.inputs.email")}
                   type="email"
-                  name="email"
-                  value={data.email}
-                  onChange={handleChange}
                   placeholder={t("auth.register.placeholders.email")}
                   autoComplete="username"
-                  required
                   icon={Mail}
-                  error={getErrorMessage((errors as any)?.email, t, "email")}
+                  error={errors.email?.message}
+                  {...register("email")}
                 />
               </div>
             </div>
@@ -158,20 +152,13 @@ export default function Register() {
                   sizeType="lg"
                   id="password"
                   type="password"
-                  name="password"
                   label={t("auth.register.inputs.password")}
-                  value={data.password}
-                  onChange={handleChange}
                   placeholder={t("auth.register.placeholders.password")}
                   autoComplete="new-password"
-                  required
                   icon={Lock}
                   showPasswordToggle
-                  error={getErrorMessage(
-                    (errors as any)?.password,
-                    t,
-                    "password",
-                  )}
+                  error={errors.password?.message}
+                  {...register("password")}
                 />
               </div>
             </div>
@@ -182,20 +169,13 @@ export default function Register() {
                   sizeType="lg"
                   id="password_confirmation"
                   type="password"
-                  name="password_confirmation"
                   label={t("auth.register.inputs.confirmPassword")}
-                  value={data.password_confirmation}
-                  onChange={handleChange}
                   placeholder={t("auth.register.placeholders.confirmPassword")}
                   autoComplete="new-password"
-                  required
                   icon={Lock}
                   showPasswordToggle
-                  error={getErrorMessage(
-                    (errors as any)?.password_confirmation,
-                    t,
-                    "password_confirmation",
-                  )}
+                  error={errors.password_confirmation?.message}
+                  {...register("password_confirmation")}
                 />
               </div>
             </div>
@@ -231,7 +211,7 @@ export default function Register() {
 
             <Button
               type="submit"
-              loading={loading}
+              loading={isSubmitting} // Use RHF loading state or hook loading
               loadingText={t("auth.register.buttons.registering")}
               fullWidth
               icon={UserPlus as any}
@@ -272,7 +252,7 @@ export default function Register() {
               <button
                 type="button"
                 onClick={handleGoogleRegister}
-                disabled={loading}
+                disabled={isSubmitting}
                 className="w-full flex items-center justify-center gap-3 px-4 py-3
                            rounded-lg border border-gray-300 dark:border-gray-700
                            bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300

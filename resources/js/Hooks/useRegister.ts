@@ -87,6 +87,7 @@ export const useRegister = () => {
 
         setGeneralError(errorMessage);
         toast.error(errorMessage);
+        throw errorData;
       } else if (backendError.response?.data?.message) {
         setGeneralError(backendError.response.data.message);
         toast.error(backendError.response.data.message);

@@ -25,8 +25,7 @@ export const useAuth = () => {
       remember: false,
     });
 
-  const handleEmailLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const submitLogin = async (payload: LoginFormData) => {
     setLoading(true);
     setGeneralError("");
     setSuccessMessage("");
@@ -37,7 +36,7 @@ export const useAuth = () => {
 
       // Check if user exists and has a provider
       const checkResponse = await axios.post("/check-user", {
-        email: data.email,
+        email: payload.email,
       });
 
       const userData = checkResponse.data;
@@ -56,9 +55,9 @@ export const useAuth = () => {
       // Standard Laravel Login
 
       const loginResponse = await axios.post("/login", {
-        email: data.email,
-        password: data.password,
-        remember: data.remember,
+        email: payload.email,
+        password: payload.password,
+        remember: payload.remember,
       });
 
       if (loginResponse.data.success) {
@@ -72,6 +71,7 @@ export const useAuth = () => {
 
       if (err.response?.status === 422 && err.response?.data?.errors) {
         const errorData = err.response.data.errors;
+        // If using interactively via handleEmailLogin, update Inertia errors
         Object.keys(errorData).forEach((key) => {
           setError(key as any, errorData[key]);
         });
@@ -82,6 +82,8 @@ export const useAuth = () => {
 
         setGeneralError(errorMessage);
         toast.error(errorMessage);
+        // Rethrow for external handling if needed
+        throw errorData;
       } else if (err.response?.data?.message) {
         const msg = getErrorMessage(err.response.data.message, t);
         setGeneralError(msg);
@@ -96,6 +98,11 @@ export const useAuth = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleEmailLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await submitLogin(data);
   };
 
   const handleGoogleLogin = () => {
@@ -126,6 +133,7 @@ export const useAuth = () => {
     processing,
     errors,
     handleEmailLogin,
+    submitLogin,
     handleGoogleLogin,
     handleFacebookLogin,
   };
