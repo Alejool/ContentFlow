@@ -73,7 +73,6 @@ const PublicationSelector: React.FC<PublicationSelectorProps> = ({
   );
 };
 
-// Componentes internos (sin cambios)
 const Checkbox: React.FC<{ isSelected: boolean; disabled?: boolean }> = ({
   isSelected,
   disabled,
