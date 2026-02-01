@@ -1,6 +1,7 @@
 import { useRealtime } from "@/Hooks/publication/useRealtime";
 import { useConfirm } from "@/Hooks/useConfirm";
 import { useSocialMediaAuth } from "@/Hooks/useSocialMediaAuth";
+import { ToastService } from "@/Services/ToastService";
 import { useCampaignStore } from "@/stores/campaignStore";
 import { useLogStore } from "@/stores/logStore";
 import { useManageContentUIStore } from "@/stores/manageContentUIStore";
@@ -25,13 +26,13 @@ export const usePublications = () => {
   const { props } = usePage<PageProps>();
   const user = props.auth.user;
 
-  // Store data with useShallow to prevent unnecessary re-renders
   const {
     publications,
     pubPagination,
     isPubLoading,
     fetchPublications,
     deletePublicationAction,
+    duplicatePublicationAction,
   } = usePublicationStore(
     useShallow((s) => ({
       publications: s.publications,
@@ -39,6 +40,7 @@ export const usePublications = () => {
       isPubLoading: s.isLoading,
       fetchPublications: s.fetchPublications,
       deletePublicationAction: s.deletePublication,
+      duplicatePublicationAction: s.duplicatePublication,
     })),
   );
 
@@ -48,6 +50,7 @@ export const usePublications = () => {
     isCampLoading,
     fetchCampaigns,
     deleteCampaignAction,
+    duplicateCampaignAction,
   } = useCampaignStore(
     useShallow((s) => ({
       campaigns: s.campaigns,
@@ -55,6 +58,7 @@ export const usePublications = () => {
       isCampLoading: s.isLoading,
       fetchCampaigns: s.fetchCampaigns,
       deleteCampaignAction: s.deleteCampaign,
+      duplicateCampaignAction: s.duplicateCampaign,
     })),
   );
 
@@ -278,6 +282,44 @@ export const usePublications = () => {
     ],
   );
 
+  const handleDuplicateItem = useCallback(
+    async (id: number) => {
+      const isCampaign = activeTab === "campaigns";
+      let success = false;
+      if (isCampaign) {
+        success = await duplicateCampaignAction(id);
+      } else {
+        success = await duplicatePublicationAction(id);
+      }
+
+      if (success) {
+        ToastService.success(
+          t(
+            isCampaign
+              ? "campaigns.messages.duplicateSuccess"
+              : "publications.messages.duplicateSuccess",
+          ),
+        );
+        fetchData(pagination.current_page);
+      } else {
+        ToastService.error(
+          t(
+            isCampaign
+              ? "campaigns.messages.error"
+              : "publications.messages.error",
+          ),
+        );
+      }
+    },
+    [
+      activeTab,
+      duplicateCampaignAction,
+      duplicatePublicationAction,
+      fetchData,
+      pagination.current_page,
+    ],
+  );
+
   const handleEditRequest = useCallback(
     (item: Publication) => {
       openEditModal(item);
@@ -344,6 +386,7 @@ export const usePublications = () => {
       openViewDetailsModal: stableOpenViewDetailsModal,
       closeViewDetailsModal: stableCloseViewDetailsModal,
       handleDeleteItem,
+      handleDuplicateItem,
       handleEditRequest,
       connectedAccounts,
       publications,
@@ -383,6 +426,7 @@ export const usePublications = () => {
       openViewDetailsModal,
       closeViewDetailsModal,
       handleDeleteItem,
+      handleDuplicateItem,
       handleEditRequest,
       connectedAccounts,
       publications,
