@@ -2,7 +2,8 @@
 
 namespace App\Jobs;
 
-use App\Models\MediaFile;
+use App\Models\MediaFiles\MediaFile;
+
 use App\Models\Publications\Publication;
 use App\Notifications\MediaUploadProcessed;
 use App\Services\Media\MediaProcessingService;
