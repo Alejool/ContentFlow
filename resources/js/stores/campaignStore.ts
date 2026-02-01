@@ -53,7 +53,9 @@ export const useCampaignStore = create<CampaignState>((set, get) => ({
 
     try {
       const params = { ...filters, page };
-      const response = await axios.get("/api/v1/campaigns", { params });
+      const response = await axios.get(route("api.v1.campaigns.index"), {
+        params,
+      });
 
       let campaignsData = [];
       let paginationData = {
@@ -127,7 +129,7 @@ export const useCampaignStore = create<CampaignState>((set, get) => ({
   deleteCampaign: async (id) => {
     set({ isLoading: true, error: null });
     try {
-      await axios.delete(`/api/v1/campaigns/${id}`);
+      await axios.delete(route("api.v1.campaigns.destroy", id));
       get().removeCampaign(id);
       set({ isLoading: false });
       return true;
@@ -143,7 +145,9 @@ export const useCampaignStore = create<CampaignState>((set, get) => ({
   duplicateCampaign: async (id: number) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await axios.post(`/api/v1/campaigns/${id}/duplicate`);
+      const response = await axios.post(
+        route("api.v1.campaigns.duplicate", id),
+      );
       const campaign = response.data.campaign;
       if (campaign) {
         get().addCampaign(campaign);
