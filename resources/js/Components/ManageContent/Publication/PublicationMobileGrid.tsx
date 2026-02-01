@@ -1,7 +1,16 @@
 import PublicationThumbnail from "@/Components/ManageContent/Publication/PublicationThumbnail";
 import SocialAccountsDisplay from "@/Components/ManageContent/Publication/SocialAccountsDisplay";
 import { Publication } from "@/types/Publication";
-import { Edit, Eye, Folder, Image, Rocket, Trash2, Video } from "lucide-react";
+import {
+  Copy,
+  Edit,
+  Eye,
+  Folder,
+  Image,
+  Rocket,
+  Trash2,
+  Video,
+} from "lucide-react";
 import { memo } from "react";
 
 interface PublicationMobileGridProps {
@@ -14,6 +23,7 @@ interface PublicationMobileGridProps {
   onPublish: (item: Publication) => void;
   onEditRequest?: (item: Publication) => void;
   onViewDetails?: (item: Publication) => void;
+  onDuplicate?: (id: number) => void;
   canManage: boolean;
 }
 
@@ -28,6 +38,7 @@ const PublicationMobileGrid = memo(
     onPublish,
     onEditRequest,
     onViewDetails,
+    onDuplicate,
     canManage,
   }: PublicationMobileGridProps) => {
     const countMediaFiles = (pub: Publication) => {
@@ -145,6 +156,16 @@ const PublicationMobileGrid = memo(
                     >
                       <Edit className="w-3.5 h-3.5" />
                       {t("common.edit")}
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDuplicate?.(item.id);
+                      }}
+                      className="p-2.5 rounded-lg bg-purple-50 text-purple-600 dark:bg-purple-900/20 dark:text-purple-400 border border-purple-100 dark:border-purple-900/30 hover:bg-purple-100 transition-all active:scale-95"
+                      title="Duplicar"
+                    >
+                      <Copy className="w-4 h-4" />
                     </button>
                     <button
                       onClick={(e) => {

@@ -31,6 +31,7 @@ interface CampaignState {
   updateCampaign: (id: number, campaign: Partial<Campaign>) => void;
   removeCampaign: (id: number) => void;
   deleteCampaign: (id: number) => Promise<boolean>;
+  duplicateCampaign: (id: number) => Promise<boolean>;
   clearPageData: () => void;
 }
 
@@ -133,6 +134,25 @@ export const useCampaignStore = create<CampaignState>((set, get) => ({
     } catch (error: any) {
       set({
         error: error.response?.data?.message ?? "Failed to delete campaign",
+        isLoading: false,
+      });
+      return false;
+    }
+  },
+
+  duplicateCampaign: async (id: number) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await axios.post(`/api/v1/campaigns/${id}/duplicate`);
+      const campaign = response.data.campaign;
+      if (campaign) {
+        get().addCampaign(campaign);
+      }
+      set({ isLoading: false });
+      return true;
+    } catch (error: any) {
+      set({
+        error: error.response?.data?.message ?? "Failed to duplicate campaign",
         isLoading: false,
       });
       return false;

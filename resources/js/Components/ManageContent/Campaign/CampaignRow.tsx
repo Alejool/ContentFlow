@@ -6,6 +6,7 @@ import {
   Calendar,
   ChevronDown,
   ChevronRight,
+  Copy,
   DollarSign,
   Edit,
   Eye,
@@ -25,6 +26,7 @@ interface CampaignRowProps {
   onDelete: (id: number) => void;
   onEditRequest?: (item: Campaign) => void;
   onViewDetails: (item: Campaign) => void;
+  onDuplicate?: (id: number) => void;
 }
 
 const CampaignRow = memo(
@@ -37,6 +39,7 @@ const CampaignRow = memo(
     onDelete,
     onEditRequest,
     onViewDetails,
+    onDuplicate,
   }: CampaignRowProps) => {
     const { t, i18n } = useTranslation();
     const locale = getDateFnsLocale(i18n.language);
@@ -184,6 +187,15 @@ const CampaignRow = memo(
                 >
                   <Edit className="w-4 h-4" />
                 </button>
+                {onDuplicate && (
+                  <button
+                    onClick={() => onDuplicate(item.id)}
+                    className="p-2 text-purple-500 hover:bg-purple-50 rounded-lg dark:hover:bg-purple-900/20"
+                    title="Duplicate"
+                  >
+                    <Copy className="w-4 h-4" />
+                  </button>
+                )}
                 <button
                   onClick={() => onDelete(item.id)}
                   className="p-2 text-red-500 hover:bg-red-50 rounded-lg dark:hover:bg-red-900/20"

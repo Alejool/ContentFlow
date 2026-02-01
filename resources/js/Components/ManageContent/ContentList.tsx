@@ -1,5 +1,6 @@
 import CampaignTable from "@/Components/ManageContent/Campaign/CampaignTable";
 import PublicationTable from "@/Components/ManageContent/Publication/PublicationTable";
+import FilterSection from "@/Components/ManageContent/common/FilterSection";
 import Button from "@/Components/common/Modern/Button";
 import AdvancedPagination from "@/Components/common/ui/AdvancedPagination";
 import EmptyState from "@/Components/common/ui/EmptyState";
@@ -9,7 +10,6 @@ import { useEffect, useState, useTransition } from "react";
 import { useTranslation } from "react-i18next";
 import ContentCard from "./ContentCard";
 import ContentCardSkeleton from "./ContentCardSkeleton";
-import FilterSection from "./common/FilterSection";
 
 import MediaLightbox from "@/Components/common/ui/MediaLightbox";
 
@@ -18,6 +18,7 @@ interface ContentListProps {
   mode: "publications" | "campaigns";
   onEdit: (item: any) => void;
   onDelete: (id: number) => void;
+  onDuplicate?: (id: number) => void;
   onViewDetails?: (item: any) => void;
   onPublish?: (item: any) => void;
   isLoading: boolean;
@@ -198,6 +199,7 @@ export default function ContentList(props: ContentListProps) {
                 permissions={props.permissions}
                 remoteLock={remoteLocks[item.id]}
                 onPreviewMedia={handlePreviewMedia}
+                onDuplicate={props.onDuplicate}
               />
             ))}
           </div>

@@ -63,6 +63,7 @@ export default function ManageContentPage() {
     handlePerPageChange,
     handleRefresh,
     handleDeleteItem,
+    handleDuplicateItem,
     handleEditRequest,
     connectedAccounts,
     publications,
@@ -77,7 +78,6 @@ export default function ManageContentPage() {
     filters,
   } = usePublications();
 
-  // Fetch publication details if ID in URL
   const fetchPublicationById = usePublicationStore(
     (s) => s.fetchPublicationById,
   );
@@ -108,7 +108,6 @@ export default function ManageContentPage() {
   const [showFilters, setShowFilters] = useState(true);
   const [search, setSearch] = useState("");
 
-  // Sync search with filters (debounced)
   useEffect(() => {
     const timer = setTimeout(() => {
       handleFilterChange({ ...filters, search: search || undefined });
@@ -532,6 +531,7 @@ export default function ManageContentPage() {
                     useManageContentUIStore.getState().openEditModal(item)
                   }
                   onDelete={handleDeleteItemClick}
+                  onDuplicate={handleDuplicateItem}
                   onViewDetails={openViewDetailsModal}
                   onPublish={(item) =>
                     useManageContentUIStore.getState().openPublishModal(item)

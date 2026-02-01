@@ -1,18 +1,19 @@
+import { getDateFnsLocale } from "@/Utils/dateLocales";
 import { Campaign } from "@/types/Campaign";
 import { usePage } from "@inertiajs/react";
 import { format } from "date-fns";
-import { getDateFnsLocale } from "@/Utils/dateLocales";
-import { useTranslation } from "react-i18next";
 import {
   Calendar,
   ChevronDown,
   ChevronRight,
+  Copy,
   DollarSign,
   Edit,
   Eye,
   Target,
   Trash2,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import PublicationThumbnail from "@/Components/ManageContent/Publication/PublicationThumbnail";
 
@@ -25,9 +26,9 @@ interface CampaignMobileTableProps {
   onDelete: (id: number) => void;
   onEditRequest?: (item: Campaign) => void;
   onViewDetails: (item: Campaign) => void;
+  onDuplicate?: (id: number) => void;
   getStatusColor: (status?: string) => string;
 }
-
 export default function CampaignMobileTable({
   items,
   t,
@@ -37,6 +38,7 @@ export default function CampaignMobileTable({
   onDelete,
   onEditRequest,
   onViewDetails,
+  onDuplicate,
   getStatusColor,
 }: CampaignMobileTableProps) {
   const { auth } = usePage<any>().props;
@@ -161,6 +163,13 @@ export default function CampaignMobileTable({
                   </button>
                   {canManageContent && (
                     <>
+                      <button
+                        onClick={() => onDuplicate?.(item.id)}
+                        className="p-2 text-purple-500 hover:bg-white dark:hover:bg-neutral-800 rounded-lg transition-all"
+                        title="Duplicar"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
                       <button
                         onClick={() => onEdit(item)}
                         className="p-2 text-blue-500 hover:bg-white dark:hover:bg-neutral-800 rounded-lg transition-all"

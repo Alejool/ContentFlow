@@ -43,6 +43,7 @@ interface PublicationState {
     formData: FormData,
   ) => Promise<Publication | null>;
   deletePublication: (id: number) => Promise<boolean>;
+  duplicatePublication: (id: number) => Promise<boolean>;
 
   publishPublication: (
     id: number,
@@ -357,6 +358,28 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
     } catch (error: any) {
       set({
         error: error.response?.data?.message ?? "Failed to delete publication",
+        isLoading: false,
+      });
+      return false;
+    }
+  },
+
+  duplicatePublication: async (id) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await axios.post(`/api/v1/publications/${id}/duplicate`);
+      const publication = response.data.publication;
+      if (publication) {
+        get().addPublication(publication);
+      }
+      set({ isLoading: false });
+      // Refresh calendar store
+      useCalendarStore.getState().fetchEvents();
+      return true;
+    } catch (error: any) {
+      set({
+        error:
+          error.response?.data?.message ?? "Failed to duplicate publication",
         isLoading: false,
       });
       return false;

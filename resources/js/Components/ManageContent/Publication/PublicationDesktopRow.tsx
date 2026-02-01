@@ -5,6 +5,7 @@ import axios from "axios";
 import {
   Calendar,
   Clock,
+  Copy,
   Edit,
   Eye,
   Image,
@@ -35,6 +36,7 @@ interface PublicationRowProps {
   onPublish: (item: Publication) => void;
   onEditRequest?: (item: Publication) => void;
   onViewDetails?: (item: Publication) => void;
+  onDuplicate?: (id: number) => void;
   remoteLock?: {
     user_id: number;
     user_name: string;
@@ -62,6 +64,7 @@ const PublicationRow = memo(
     onPublish,
     onEditRequest,
     onViewDetails,
+    onDuplicate,
     remoteLock,
     permissions,
     onPreviewMedia,
@@ -437,6 +440,20 @@ const PublicationRow = memo(
                       : "Bloqueado"}
                   </span>
                 )}
+              </button>
+            )}
+            {/* Duplicate button */}
+            {permissions?.includes("manage-content") && onDuplicate && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDuplicate(item.id);
+                }}
+                disabled={isPublishing || isEditing || isDeleting}
+                className="p-1.5 text-purple-500 hover:bg-purple-50 rounded-lg dark:hover:bg-purple-900/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                title="Duplicate"
+              >
+                <Copy className="w-4 h-4" />
               </button>
             )}
             {/* Delete button - Only for Owner/Admin or users with manage-content */}

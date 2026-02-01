@@ -27,7 +27,7 @@ export function useCampaignManagement() {
       if (filters.date_start) params.append("date_start", filters.date_start);
       if (filters.date_end) params.append("date_end", filters.date_end);
 
-      const response = await axios.get(`/${endpoint}?${params.toString()}`);
+      const response = await axios.get(`/api/v1/${endpoint}?${params.toString()}`);
 
       // Handle both publications and campaigns response structure
       const dataKey =
@@ -69,7 +69,7 @@ export function useCampaignManagement() {
           }
         });
       }
-      await axios.post(`/${endpoint}`, formData);
+      await axios.post(`/api/v1/${endpoint}`, formData);
       toast.success(t("campaigns.messages.addSuccess"));
       // Refresh current page
       await fetchCampaigns({}, pagination.current_page);
@@ -88,7 +88,7 @@ export function useCampaignManagement() {
     try {
       let response;
       if (data instanceof FormData) {
-        response = await axios.post(`/${endpoint}/${id}`, data, {
+        response = await axios.post(`/api/v1/${endpoint}/${id}`, data, {
           headers: { "Content-Type": "multipart/form-data" },
         });
       } else {
