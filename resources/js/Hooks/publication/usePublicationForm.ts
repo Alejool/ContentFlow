@@ -892,19 +892,21 @@ export const usePublicationForm = ({
 
     // Upload state
     uploadingFiles,
-    isS3Uploading,
     uploadProgress,
-    uploadStats: isS3Uploading ? uploadStats : {},
+    uploadStats,
     uploadErrors,
     publishingAccountIds,
     publishedAccountIds,
     isAnyMediaProcessing:
       mediaFiles.some(
-        (m) => m.status === "uploading" || m.status === "processing",
+        (m) =>
+          m.status === "uploading" ||
+          m.status === "processing" ||
+          (uploadingFiles.has(m.tempId) && !m.id),
       ) ||
-      isS3Uploading ||
       (publication?.status as string) === "processing" ||
       (!!publication?.media_locked_by &&
         (publication.media_locked_by as any).id !== user?.id),
+    isS3Uploading: mediaFiles.some((m) => m.status === "uploading"),
   };
 };

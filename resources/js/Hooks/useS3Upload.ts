@@ -92,6 +92,7 @@ export const useS3Upload = () => {
                 useMediaStore.getState().updateFile(tempId, {
                   id: data.media_file.id,
                   isNew: false, // Mark as existing now
+                  status: "completed",
                 });
               }
 

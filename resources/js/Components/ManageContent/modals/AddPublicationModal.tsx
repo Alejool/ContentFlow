@@ -61,13 +61,18 @@ export default function AddPublicationModal({
     setValue,
     control,
     remoteLock,
+    isS3Uploading,
   } = usePublicationForm({
     onClose,
     onSubmitSuccess: onSubmit,
     isOpen,
   });
 
-  const { uploadFile, uploading, progress: uploadProgress } = useS3Upload(); // Use hook
+  const {
+    uploadFile,
+    uploading: globalUploading,
+    progress: uploadProgress,
+  } = useS3Upload(); // Use hook
 
   // Custom submit handler to intercept fields and upload first
   const handleFormSubmit = async (e: React.FormEvent) => {
@@ -472,10 +477,10 @@ export default function AddPublicationModal({
         <div>
           <ModalFooter
             onClose={handleClose}
-            isSubmitting={isSubmitting || uploading} // Block on upload too
+            isSubmitting={isSubmitting || isS3Uploading} // Block on upload too
             formId="add-publication-form"
             submitText={
-              uploading
+              isS3Uploading
                 ? `Uploading...`
                 : t("publications.button.add") || "Save Publication"
             }
@@ -483,7 +488,7 @@ export default function AddPublicationModal({
             cancelText={t("common.cancel") || "Close"}
           />
           {/* Progress bar could go here */}
-          {uploading && (
+          {isS3Uploading && (
             <div className="px-6 pb-2">
               <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
                 <div
