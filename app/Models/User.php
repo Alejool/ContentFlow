@@ -23,171 +23,171 @@ use App\Models\Social\ScheduledPost;
 use App\Models\Social\SocialPostLog;
 use App\Models\MediaFiles\MediaFile;
 use App\Models\Workspace\Workspace;
-use App\Models\Role\Role;;
+use App\Models\Role\Role;
 
 class User extends Model implements Authenticatable, MustVerifyEmail, CanResetPassword, HasLocalePreference
 {
-    use AuthenticatableTrait;
-    use MustVerifyEmailTrait;
-    use CanResetPasswordTrait;
-    use HasApiTokens, HasFactory, Notifiable;
+  use AuthenticatableTrait;
+  use MustVerifyEmailTrait;
+  use CanResetPasswordTrait;
+  use HasApiTokens, HasFactory, Notifiable;
 
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'provider',
-        'provider_id',
-        'photo_url',
-        'email_verified_at',
-        'locale',
-        'theme',
-        'global_platform_settings',
-        'phone',
-        'country_code',
-        'bio',
-        'remember_token',
-        'current_workspace_id',
-        'ai_settings',
-        'last_login_at',
-        'last_login_ip',
-        'known_devices',
-    ];
+  protected $fillable = [
+    'name',
+    'email',
+    'password',
+    'provider',
+    'provider_id',
+    'photo_url',
+    'email_verified_at',
+    'locale',
+    'theme',
+    'global_platform_settings',
+    'phone',
+    'country_code',
+    'bio',
+    'remember_token',
+    'current_workspace_id',
+    'ai_settings',
+    'last_login_at',
+    'last_login_ip',
+    'known_devices',
+  ];
 
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
+  protected $hidden = [
+    'password',
+    'remember_token',
+  ];
 
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-        'password' => 'hashed',
-        'global_platform_settings' => 'array',
-        'ai_settings' => 'array',
-        'known_devices' => 'array',
-        'last_login_at' => 'datetime',
-    ];
+  protected $casts = [
+    'email_verified_at' => 'datetime',
+    'password' => 'hashed',
+    'global_platform_settings' => 'array',
+    'ai_settings' => 'array',
+    'known_devices' => 'array',
+    'last_login_at' => 'datetime',
+  ];
 
-    /**
-     * Get the user's preferred locale.
-     */
-    public function preferredLocale(): string
-    {
-        return $this->locale ?? app()->getLocale();
+  /**
+   * Get the user's preferred locale.
+   */
+  public function preferredLocale(): string
+  {
+    return $this->locale ?? app()->getLocale();
+  }
+
+  public function publications(): HasMany
+  {
+    return $this->hasMany(Publication::class);
+  }
+
+
+  public function sendEmailVerificationNotification()
+  {
+    $this->notify(new VerifyEmailNotification);
+  }
+
+  // Social Media Relationships
+  public function socialAccounts(): HasMany
+  {
+    return $this->hasMany(SocialAccount::class);
+  }
+
+  public function scheduledPosts(): HasMany
+  {
+    return $this->hasMany(ScheduledPost::class);
+  }
+
+
+  public function socialPostLogs(): HasMany
+  {
+    return $this->hasMany(SocialPostLog::class);
+  }
+
+  public function mediaFiles(): HasMany
+  {
+    return $this->hasMany(MediaFile::class);
+  }
+
+  // Workspace Relationships
+  public function workspaces()
+  {
+    return $this->belongsToMany(Workspace::class, 'workspace_user')
+      ->using(WorkspaceUser::class)
+      ->withPivot('role_id')
+      ->withTimestamps();
+  }
+
+  public function currentWorkspace()
+  {
+    return $this->belongsTo(Workspace::class, 'current_workspace_id');
+  }
+
+  /**
+   * Get user's workspaces with their roles and permissions.
+   *
+   * Usage:
+   *   $user->getWorkspacesWithRolesAndPermissions();
+   *
+   * Access data:
+   *   foreach ($user->workspaces as $workspace) {
+   *       $role = $workspace->pivot->role;
+   *       $permissions = $role->permissions;
+   *   }
+   *
+   * @return \Illuminate\Database\Eloquent\Collection
+   */
+  public function getWorkspacesWithRolesAndPermissions()
+  {
+    return $this->load('workspaces')->workspaces;
+  }
+
+
+  public function hasPermission($permissionSlug, $workspaceId = null)
+  {
+    $workspaceId = $workspaceId ?: $this->current_workspace_id;
+
+    if (!$workspaceId) {
+      return false;
     }
 
-    public function publications(): HasMany
-    {
-        return $this->hasMany(Publication::class);
+    // Get the workspace with pivot data
+    $workspace = $this->workspaces()
+      ->where('workspaces.id', $workspaceId)
+      ->first();
+
+    if (!$workspace) {
+      return false;
     }
 
-
-    public function sendEmailVerificationNotification()
-    {
-        $this->notify(new VerifyEmailNotification);
+    // Owner/Creator bypass
+    if ($workspace->created_by === $this->id) {
+      return true;
     }
 
-    // Social Media Relationships
-    public function socialAccounts(): HasMany
-    {
-        return $this->hasMany(SocialAccount::class);
+    // Get role from pivot
+    $roleId = $workspace->pivot->role_id;
+
+    if (!$roleId) {
+      return false;
     }
 
-    public function scheduledPosts(): HasMany
-    {
-        return $this->hasMany(ScheduledPost::class);
+    $role = Role::find($roleId);
+
+    if (!$role) {
+      return false;
     }
 
-
-    public function socialPostLogs(): HasMany
-    {
-        return $this->hasMany(SocialPostLog::class);
+    // Owner role bypass
+    if ($role->slug === 'owner' || $role->slug === 'admin-owner') {
+      return true;
     }
 
-    public function mediaFiles(): HasMany
-    {
-        return $this->hasMany(MediaFile::class);
+    // If checking for basic viewing, any role in the workspace should suffice if we want to be permissive
+    if ($permissionSlug === 'view-content') {
+      return true;
     }
 
-    // Workspace Relationships
-    public function workspaces()
-    {
-        return $this->belongsToMany(Workspace::class, 'workspace_user')
-            ->using(WorkspaceUser::class)
-            ->withPivot('role_id')
-            ->withTimestamps();
-    }
-
-    public function currentWorkspace()
-    {
-        return $this->belongsTo(Workspace::class, 'current_workspace_id');
-    }
-
-    /**
-     * Get user's workspaces with their roles and permissions.
-     *
-     * Usage:
-     *   $user->getWorkspacesWithRolesAndPermissions();
-     *
-     * Access data:
-     *   foreach ($user->workspaces as $workspace) {
-     *       $role = $workspace->pivot->role;
-     *       $permissions = $role->permissions;
-     *   }
-     *
-     * @return \Illuminate\Database\Eloquent\Collection
-     */
-    public function getWorkspacesWithRolesAndPermissions()
-    {
-        return $this->load('workspaces')->workspaces;
-    }
-
-
-    public function hasPermission($permissionSlug, $workspaceId = null)
-    {
-        $workspaceId = $workspaceId ?: $this->current_workspace_id;
-
-        if (!$workspaceId) {
-            return false;
-        }
-
-        // Get the workspace with pivot data
-        $workspace = $this->workspaces()
-            ->where('workspaces.id', $workspaceId)
-            ->first();
-
-        if (!$workspace) {
-            return false;
-        }
-
-        // Owner/Creator bypass
-        if ($workspace->created_by === $this->id) {
-            return true;
-        }
-
-        // Get role from pivot
-        $roleId = $workspace->pivot->role_id;
-
-        if (!$roleId) {
-            return false;
-        }
-
-        $role = Role::find($roleId);
-
-        if (!$role) {
-            return false;
-        }
-
-        // Owner role bypass
-        if ($role->slug === 'owner' || $role->slug === 'admin-owner') {
-            return true;
-        }
-
-        // If checking for basic viewing, any role in the workspace should suffice if we want to be permissive
-        if ($permissionSlug === 'view-content') {
-            return true;
-        }
-
-        return $role->permissions()->where('slug', $permissionSlug)->exists();
-    }
+    return $role->permissions()->where('slug', $permissionSlug)->exists();
+  }
 }
