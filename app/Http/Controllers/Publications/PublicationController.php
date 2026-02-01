@@ -325,17 +325,10 @@ class PublicationController extends Controller
       $action->execute($publication);
 
       $this->clearPublicationCache($workspaceId);
-
-      if (request()->wantsJson()) {
-        return $this->successResponse(null, 'Publication deleted successfully');
-      }
-
-      return redirect()->back()->with('success', 'Publication deleted successfully');
+      return $this->successResponse(null, 'Publication deleted successfully');
     } catch (\Exception $e) {
-      if (request()->wantsJson()) {
-        return $this->errorResponse('Deletion failed: ' . $e->getMessage(), 500);
-      }
-   
+      return $this->errorResponse('Deletion failed: ' . $e->getMessage(), 500);
+
     }
   }
 
