@@ -17,7 +17,14 @@ class DeletePublicationAction
     return DB::transaction(function () use ($publication) {
       // 1. Delete associated media files (physical and database)
       $publication->mediaFiles()->get()->each(function ($mediaFile) {
-        $this->mediaService->deleteMediaFile($mediaFile);
+        // Check if media is used by other publications
+        $usageCount = DB::table('publication_media')
+          ->where('media_file_id', $mediaFile->id)
+          ->count();
+
+        if ($usageCount <= 1) {
+          $this->mediaService->deleteMediaFile($mediaFile);
+        }
       });
 
       // 2. Delete the publication itself
