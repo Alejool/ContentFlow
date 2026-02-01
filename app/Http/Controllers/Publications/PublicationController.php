@@ -7,6 +7,7 @@ use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use App\Models\Publications\Publication;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use App\Http\Requests\Publications\StorePublicationRequest;
 use App\Http\Requests\Publications\UpdatePublicationRequest;
 use App\Actions\Publications\CreatePublicationAction;
@@ -25,7 +26,7 @@ use Illuminate\Support\Facades\Log;
 use App\Models\Social\ScheduledPost;
 use App\Models\Social\SocialPostLog;
 use App\Models\Logs\ApprovalLog;
-use App\Models\Role\Role;;
+use App\Models\Role\Role;
 
 use App\Jobs\ProcessBackgroundUpload;
 use App\Models\MediaFiles\MediaFile;
@@ -328,6 +329,86 @@ class PublicationController extends Controller
       return redirect()->back()->with('success', 'Publication deleted successfully');
     } catch (\Exception $e) {
       return redirect()->back()->with('error', 'Deletion failed: ' . $e->getMessage());
+    }
+  }
+
+  /**
+   * Duplicate the specified publication
+   */
+  public function duplicate(Publication $publication)
+  {
+    if (!Auth::user()->hasPermission('manage-content', $publication->workspace_id)) {
+      return $this->errorResponse('You do not have permission to duplicate this publication.', 403);
+    }
+
+    try {
+      // Load relationships
+      $publication->load(['mediaFiles', 'campaigns']);
+
+      // Generate unique title with number
+      $baseTitle = $publication->title;
+      $counter = 1;
+      $newTitle = $baseTitle . ' ' . $counter;
+
+      while (Publication::where('workspace_id', $publication->workspace_id)
+        ->where('title', $newTitle)
+        ->exists()
+      ) {
+        $counter++;
+        $newTitle = $baseTitle . ' ' . $counter;
+      }
+
+      // Create a new publication with duplicated data
+      $newPublication = Publication::create([
+        'user_id' => Auth::id(),
+        'workspace_id' => $publication->workspace_id,
+        'title' => $newTitle,
+        'slug' => Str::slug($newTitle) ?: Str::random(10),
+        'body' => $publication->body,
+        'description' => $publication->description,
+        'hashtags' => $publication->hashtags,
+        'url' => $publication->url,
+        'goal' => $publication->goal,
+        'status' => 'draft', // Reset to draft
+        'platform_settings' => $publication->platform_settings,
+        // Reset approval/publish fields
+        'approved_by' => null,
+        'approved_at' => null,
+        'approved_retries_remaining' => null,
+        'published_by' => null,
+        'published_at' => null,
+        'rejected_by' => null,
+        'rejected_at' => null,
+        'rejection_reason' => null,
+        'scheduled_at' => null,
+      ]);
+
+      // Duplicate media files with their order
+      if ($publication->mediaFiles->isNotEmpty()) {
+        $syncData = [];
+        foreach ($publication->mediaFiles as $mediaFile) {
+          $syncData[$mediaFile->id] = ['order' => $mediaFile->pivot->order];
+        }
+        $newPublication->mediaFiles()->sync($syncData);
+      }
+
+      // Sync the same campaigns
+      if ($publication->campaigns->isNotEmpty()) {
+        $syncData = [];
+        foreach ($publication->campaigns as $campaign) {
+          $syncData[$campaign->id] = ['order' => $campaign->pivot->order];
+        }
+        $newPublication->campaigns()->sync($syncData);
+      }
+
+      $newPublication->logActivity('duplicated', ['original_id' => $publication->id]);
+
+      // Clear cache after creating publication
+      $this->clearPublicationCache(Auth::user()->current_workspace_id);
+
+      return $this->successResponse(['publication' => $newPublication->load(['mediaFiles', 'campaigns'])], 'Publication duplicated successfully', 201);
+    } catch (\Exception $e) {
+      return $this->errorResponse('Duplication failed: ' . $e->getMessage(), 500);
     }
   }
 
