@@ -17,6 +17,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { useCallback, useEffect, useState, useTransition } from "react";
+import { toast } from "react-hot-toast";
 
 import ApprovalHistory from "@/Components/ManageContent/ApprovalHistory";
 import ApprovalList from "@/Components/ManageContent/ApprovalList";
@@ -62,6 +63,9 @@ export default function ContentPage() {
   // Fetch publication details if ID in URL
   const fetchPublicationById = usePublicationStore(
     (s) => s.fetchPublicationById,
+  );
+  const deletePublicationAction = usePublicationStore(
+    (s) => s.deletePublication,
   );
 
   const {
@@ -165,23 +169,34 @@ export default function ContentPage() {
     setDeleteConfirmation({ isOpen: true, id });
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (!deleteConfirmation.id) return;
 
-    const routeName =
-      activeTab === "campaigns" ? "campaigns.destroy" : "publications.destroy";
+    if (activeTab === "campaigns") {
+      router.delete(route("api.v1.campaigns.destroy", deleteConfirmation.id), {
+        preserveScroll: true,
+        onSuccess: () => {
+          setDeleteConfirmation({ isOpen: false, id: null });
+          handleRefreshWrapped();
+        },
+        onFinish: () => {
+          setDeleteConfirmation({ isOpen: false, id: null });
+          handleRefreshWrapped();
+        },
+      });
+      return;
+    }
 
-    router.delete(route(routeName, deleteConfirmation.id), {
-      preserveScroll: true,
-      onSuccess: () => {
-        setDeleteConfirmation({ isOpen: false, id: null });
-        handleRefreshWrapped();
-      },
-      onFinish: () => {
-        setDeleteConfirmation({ isOpen: false, id: null });
-        handleRefreshWrapped();
-      },
-    });
+    // For publications, use store action
+    const success = await deletePublicationAction(deleteConfirmation.id);
+    setDeleteConfirmation({ isOpen: false, id: null });
+    if (success) {
+      toast.success(
+        t("common.deleteSuccess") || "Elemento eliminado correctamente",
+      );
+    } else {
+      toast.error(t("common.deleteError") || "Error al eliminar el elemento");
+    }
   };
 
   const [expandedCampaigns, setExpandedCampaigns] = useState<number[]>([]);
