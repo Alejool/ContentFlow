@@ -494,7 +494,7 @@ export default function Dashboard({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           {[
             {
-              href: "/campaigns",
+              href: "/content?tab=campaigns",
               icon: Calendar,
               title: t("dashboard.quickActions.campaigns.title"),
               desc: t("dashboard.quickActions.campaigns.description"),
