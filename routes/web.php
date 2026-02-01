@@ -14,6 +14,13 @@ use App\Http\Controllers\Locale\LocaleController;
 use App\Http\Controllers\Workspace\WorkspaceController;
 use App\Http\Controllers\Calendar\CalendarViewController;
 
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Artisan;
+use App\Models\Role\Role;
+use App\Models\Workspace\Workspace;
+use Illuminate\Support\Facades\Auth;
+
 Broadcast::routes();
 
 Route::middleware('guest')->group(function () {
@@ -32,6 +39,57 @@ Route::middleware('guest')->group(function () {
   Route::get('/terms', fn() => Inertia::render('TermsOfService'))->name('terms');
   Route::get('/contact', fn() => Inertia::render('Contact'))->name('contact');
   Route::get('/approvals/history-test', fn() => response()->json(['message' => 'History route is reachable outside middleware']));
+
+  /*
+|--------------------------------------------------------------------------
+| ⚠️ Debug / Maintenance Routes (RECOMENDADO SOLO LOCAL)
+|--------------------------------------------------------------------------
+*/
+Route::get('/fix-db', function () {
+  try {
+    DB::statement("ALTER TABLE publications DROP CONSTRAINT IF EXISTS publications_status_check");
+
+    Schema::table('publications', function ($table) {
+      $table->string('status', 50)->change();
+    });
+
+    Artisan::call('db:seed', [
+      '--class' => 'Database\\Seeders\\RolesAndPermissionsSeeder',
+      '--force' => true
+    ]);
+
+    $roles = Role::with('permissions')->get();
+
+    return response()->json([
+      'success' => true,
+      'roles' => $roles->map(fn($r) => [
+        'slug' => $r->slug,
+        'permissions' => $r->permissions->pluck('slug'),
+      ]),
+    ]);
+  } catch (\Exception $e) {
+    return response()->json(['error' => $e->getMessage()], 500);
+  }
+});
+
+Route::get('/debug-auth', function () {
+  $user = Auth::user()?->fresh();
+
+  if (!$user) {
+    return response()->json(['authenticated' => false]);
+  }
+
+  $workspaceId = $user->current_workspace_id;
+  $workspace = $workspaceId ? Workspace::find($workspaceId) : null;
+
+  return response()->json([
+    'authenticated' => true,
+    'workspace' => $workspace?->name,
+    'can_manage_team' => $user->hasPermission('manage-team', $workspaceId),
+    'can_publish' => $user->hasPermission('publish', $workspaceId),
+  ]);
+});
+
 });
 
 Route::prefix('auth')->name('auth.')->group(function () {
