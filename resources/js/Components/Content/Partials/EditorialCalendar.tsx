@@ -1,5 +1,6 @@
 import { useCalendar } from "@/Hooks/calendar/useCalendar";
 import { useTheme } from "@/Hooks/useTheme";
+import { formatTime } from "@/Utils/formatDate";
 import {
   eachDayOfInterval,
   endOfMonth,
@@ -8,10 +9,10 @@ import {
   isSameDay,
   isSameMonth,
   isToday,
+  parseISO,
   startOfMonth,
   startOfWeek,
 } from "date-fns";
-import { formatTime } from "@/Utils/formatDate";
 import {
   Calendar as CalendarIcon,
   ChevronLeft,
@@ -103,7 +104,7 @@ export default function EditorialCalendar() {
         {days.map((day, idx) => {
           const dayEvents = events.filter((event) => {
             if (!event.start) return false;
-            return isSameDay(new Date(event.start), day);
+            return isSameDay(parseISO(event.start), day);
           });
           const isCurrentMonth = isSameMonth(day, monthStart);
           const isTodayDate = isToday(day);
