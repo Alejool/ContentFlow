@@ -19,11 +19,15 @@ interface StatCardProps {
     | "teal"
     | "pink"
     | "amber"
-    | "sky";
+    | "pink"
+    | "amber"
+    | "sky"
+    | "primary";
   format?: "number" | "currency" | "percentage";
   theme?: "dark" | "light";
   compact?: boolean;
   variant?: 1 | 2 | 3 | 4;
+  isLoading?: boolean;
 }
 
 const StatCard: React.FC<StatCardProps> = ({
@@ -39,7 +43,7 @@ const StatCard: React.FC<StatCardProps> = ({
   variant,
 }) => {
   const { theme: themeFromHook } = useTheme();
-  const theme = propTheme || themeFromHook;
+  const theme = (propTheme || themeFromHook) as "dark" | "light";
 
   const getColorClasses = () => {
     // Base color configurations
@@ -222,6 +226,24 @@ const StatCard: React.FC<StatCardProps> = ({
           border: "border-sky-200",
           iconBg: "bg-white/20",
           glow: "from-sky-200/40",
+        },
+      },
+      primary: {
+        dark: {
+          gradient: "from-primary-600 to-primary-800",
+          bg: "bg-primary-900/30",
+          text: "text-primary-300",
+          border: "border-primary-700/50",
+          iconBg: "bg-primary-500/20",
+          glow: "from-primary-600/20",
+        },
+        light: {
+          gradient: "from-primary-500 to-primary-600",
+          bg: "bg-primary-100",
+          text: "text-primary-600",
+          border: "border-primary-200",
+          iconBg: "bg-white/20",
+          glow: "from-primary-200/40",
         },
       },
     };
