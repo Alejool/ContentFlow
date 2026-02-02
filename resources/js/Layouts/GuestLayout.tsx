@@ -4,7 +4,7 @@ import LoginSection from "@/Components/Auth/LoginSection";
 import RegisterSection from "@/Components/Auth/RegisterSection";
 import ReturnToLogin from "@/Components/common/ReturnToLogin";
 import ThemeLanguageContainer from "@/Components/common/ThemeLanguageContainer";
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 interface GuestLayoutProps {
   children: ReactNode;
@@ -14,14 +14,17 @@ interface GuestLayoutProps {
 export default function GuestLayout({ children, section }: GuestLayoutProps) {
   const { t } = useTranslation();
 
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme-color", "orange");
+  }, []);
+
   return (
     <div>
       {section !== "login" && <ReturnToLogin />}
       <ThemeLanguageContainer />
       <div className="min-h-screen flex flex-col lg:flex-row bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
-        <div className="w-full lg:w-1/2 bg-gradient-primary relative overflow-hidden">
+        <div className="w-full lg:w-1/2 bg-primary-500 relative overflow-hidden">
           <div className="absolute inset-0 bg-black/10" />
-
           <div className="relative h-full flex flex-col items-center justify-center p-8 text-white">
             <div className="text-center max-w-xl">
               <div className="mb-8">

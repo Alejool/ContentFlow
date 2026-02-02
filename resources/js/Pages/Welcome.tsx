@@ -49,6 +49,10 @@ export default function Welcome({ auth, canLogin, canRegister }: WelcomeProps) {
     }
   }, []);
 
+    useEffect(() => {
+      document.documentElement.setAttribute("data-theme-color", "orange");
+    }, []);
+
   const features = [
     {
       href: canLogin ? "/dashboard" : "/register",
