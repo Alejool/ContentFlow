@@ -310,7 +310,7 @@ export default function Dashboard({
             title={t("dashboard.totalViews")}
             value={stats.totalViews}
             icon={<Eye className="w-6 h-6" />}
-            color="orange"
+            color="primary"
             variant={1}
             theme={theme}
           />
@@ -318,7 +318,7 @@ export default function Dashboard({
             title={t("dashboard.totalClicks")}
             value={stats.totalClicks}
             icon={<MousePointer2 className="w-6 h-6" />}
-            color="orange"
+            color="primary"
             variant={2}
             theme={theme}
           />
@@ -326,7 +326,7 @@ export default function Dashboard({
             title={t("dashboard.conversions")}
             value={stats.totalConversions}
             icon={<TrendingUp className="w-6 h-6" />}
-            color="orange"
+            color="primary"
             variant={3}
             theme={theme}
           />
@@ -334,7 +334,7 @@ export default function Dashboard({
             title={t("dashboard.totalReach")}
             value={stats.totalReach}
             icon={<Users className="w-6 h-6" />}
-            color="orange"
+            color="primary"
             variant={4}
             theme={theme}
           />
@@ -345,7 +345,7 @@ export default function Dashboard({
             title={t("dashboard.totalEngagement")}
             value={stats.totalEngagement}
             icon={<Heart className="w-6 h-6" />}
-            color="orange"
+            color="primary"
             variant={1}
             theme={theme}
           />
@@ -353,7 +353,7 @@ export default function Dashboard({
             title={t("dashboard.avgEngagementRate")}
             value={stats.avgEngagementRate.toFixed(2)}
             icon={<TrendingUp className="w-6 h-6" />}
-            color="orange"
+            color="primary"
             format="percentage"
             variant={2}
             theme={theme}
@@ -369,7 +369,7 @@ export default function Dashboard({
             },
             {
               key: "pending_review",
-              color: "orange",
+              color: "primary",
               icon: Eye,
             },
             {

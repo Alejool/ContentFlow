@@ -49,7 +49,11 @@ export default function AuthenticatedLayout({
     }
   }, [user?.id]);
 
-  //  bg-[url('/resources/assets/bg.jpg')] bg-cover bg-center bg-no-repeat
+  useEffect(() => {
+    const color = user?.theme_color || "orange";
+    document.documentElement.setAttribute("data-theme-color", color);
+  }, [user?.theme_color]);
+
 
   return (
     <div className="h-screen flex flex-col overflow-hidden w-full max-w-full">
@@ -111,7 +115,6 @@ export default function AuthenticatedLayout({
                 </div>
               </div>
 
-              {/* Dedicated Page Header Row */}
               {header && (
                 <div className="mx-auto w-full max-w-7xl px-4 md:px-6 py-4 border-t border-gray-100 dark:border-neutral-800/50">
                   <div className="min-w-0">{header}</div>
@@ -125,7 +128,6 @@ export default function AuthenticatedLayout({
           </main>
         </div>
 
-        {/* <GlobalAiAssistant /> */}
         <CommandPalette />
       </div>
       <GlobalUploadIndicator />
