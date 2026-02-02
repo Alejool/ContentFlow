@@ -83,33 +83,16 @@ class LoginRequest extends FormRequest
      */
     protected function updateSessionSecurity(User $user): void
     {
-        $request = request();
-        $previousIp = $user->last_login_ip;
-        $currentIp = $request->ip();
-
-        if ($previousIp && $previousIp !== $currentIp) {
-            Log::info('User login from new IP', [
-                'user_id' => $user->id,
-                'email' => $user->email,
-                'old_ip' => $previousIp,
-                'new_ip' => $currentIp
-            ]);
-        }
-
-        $userAgent = $request->userAgent();
+        $currentIp = $this->ip();
+        $userAgent = $this->userAgent();
         $fingerprint = hash('sha256', $userAgent);
-        $knownDevices = $user->known_devices ?? [];
 
+        // Track known devices
+        $knownDevices = $user->known_devices ?? [];
         if (!in_array($fingerprint, $knownDevices)) {
             $knownDevices[] = $fingerprint;
-            Log::info('User login from new device', [
-                'user_id' => $user->id,
-                'email' => $user->email,
-                'user_agent' => $userAgent
-            ]);
         }
 
-        // Update user record
         $user->forceFill([
             'last_login_at' => now(),
             'last_login_ip' => $currentIp,
