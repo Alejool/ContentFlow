@@ -58,13 +58,13 @@ primary_region = "gru"
     handlers = ["tls", "http"]
 
 [[vm]]
-  memory = "512mb"
+  memory = "256mb"
   cpu_kind = "shared"
   cpus = 1
   processes = ["app", "queue", "scheduler"]
 
 [[vm]]
-  memory = "1gb"
+  memory = "256mb"
   cpu_kind = "shared"
   cpus = 1
   processes = ["reverb"]
