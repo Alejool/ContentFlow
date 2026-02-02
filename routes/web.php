@@ -45,51 +45,50 @@ Route::middleware('guest')->group(function () {
 | ⚠️ Debug / Maintenance Routes (RECOMENDADO SOLO LOCAL)
 |--------------------------------------------------------------------------
 */
-Route::get('/fix-db', function () {
-  try {
-    DB::statement("ALTER TABLE publications DROP CONSTRAINT IF EXISTS publications_status_check");
+  Route::get('/fix-db', function () {
+    try {
+      DB::statement("ALTER TABLE publications DROP CONSTRAINT IF EXISTS publications_status_check");
 
-    Schema::table('publications', function ($table) {
-      $table->string('status', 50)->change();
-    });
+      Schema::table('publications', function ($table) {
+        $table->string('status', 50)->change();
+      });
 
-    Artisan::call('db:seed', [
-      '--class' => 'Database\\Seeders\\RolesAndPermissionsSeeder',
-      '--force' => true
-    ]);
+      Artisan::call('db:seed', [
+        '--class' => 'Database\\Seeders\\RolesAndPermissionsSeeder',
+        '--force' => true
+      ]);
 
-    $roles = Role::with('permissions')->get();
+      $roles = Role::with('permissions')->get();
+
+      return response()->json([
+        'success' => true,
+        'roles' => $roles->map(fn($r) => [
+          'slug' => $r->slug,
+          'permissions' => $r->permissions->pluck('slug'),
+        ]),
+      ]);
+    } catch (\Exception $e) {
+      return response()->json(['error' => $e->getMessage()], 500);
+    }
+  });
+
+  Route::get('/debug-auth', function () {
+    $user = Auth::user()?->fresh();
+
+    if (!$user) {
+      return response()->json(['authenticated' => false]);
+    }
+
+    $workspaceId = $user->current_workspace_id;
+    $workspace = $workspaceId ? Workspace::find($workspaceId) : null;
 
     return response()->json([
-      'success' => true,
-      'roles' => $roles->map(fn($r) => [
-        'slug' => $r->slug,
-        'permissions' => $r->permissions->pluck('slug'),
-      ]),
+      'authenticated' => true,
+      'workspace' => $workspace?->name,
+      'can_manage_team' => $user->hasPermission('manage-team', $workspaceId),
+      'can_publish' => $user->hasPermission('publish', $workspaceId),
     ]);
-  } catch (\Exception $e) {
-    return response()->json(['error' => $e->getMessage()], 500);
-  }
-});
-
-Route::get('/debug-auth', function () {
-  $user = Auth::user()?->fresh();
-
-  if (!$user) {
-    return response()->json(['authenticated' => false]);
-  }
-
-  $workspaceId = $user->current_workspace_id;
-  $workspace = $workspaceId ? Workspace::find($workspaceId) : null;
-
-  return response()->json([
-    'authenticated' => true,
-    'workspace' => $workspace?->name,
-    'can_manage_team' => $user->hasPermission('manage-team', $workspaceId),
-    'can_publish' => $user->hasPermission('publish', $workspaceId),
-  ]);
-});
-
+  });
 });
 
 Route::prefix('auth')->name('auth.')->group(function () {
@@ -111,6 +110,8 @@ Route::middleware('auth')->group(function () {
 
   Route::prefix('profile')->name('profile.')->group(function () {
     Route::get('/', [ProfileController::class, 'edit'])->name('edit');
+    Route::patch('/', [ProfileController::class, 'update'])->name('update');
+    Route::delete('/', [ProfileController::class, 'destroy'])->name('destroy');
   });
 
   Route::prefix('settings')->name('settings.')->group(function () {
