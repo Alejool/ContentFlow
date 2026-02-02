@@ -52,12 +52,14 @@ class RegisteredUserController extends Controller
             'provider' => $request->provider,
             'provider_id' => $request->provider_id,
             'password' => Hash::make($request->password),
-            'locale' => $request->locale ?? 'es', // Default to Spanish
+            'locale' => $request->locale ?? 'es',
+            'created_ip' => $request->ip(),
         ]);
 
         event(new Registered($user));
 
         Auth::login($user);
+        $user->updateLoginStats();
         $request->session()->regenerate();
 
         try {
