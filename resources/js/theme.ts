@@ -1,23 +1,23 @@
 export const theme = {
   colors: {
     primary: {
-      50: "#fff7ed",
-      100: "#ffedd5",
-      200: "#fed7aa",
-      300: "#fdba74",
-      400: "#fb923c",
-      500: "#f97316",
-      600: "#FF6D1F", 
-      700: "#ea580c",
-      800: "#c2410c",
-      900: "#9a3412",
+      50: "rgb(var(--primary-50) / <alpha-value>)",
+      100: "rgb(var(--primary-100) / <alpha-value>)",
+      200: "rgb(var(--primary-200) / <alpha-value>)",
+      300: "rgb(var(--primary-300) / <alpha-value>)",
+      400: "rgb(var(--primary-400) / <alpha-value>)",
+      500: "rgb(var(--primary-500) / <alpha-value>)",
+      600: "rgb(var(--primary-600) / <alpha-value>)",
+      700: "rgb(var(--primary-700) / <alpha-value>)",
+      800: "rgb(var(--primary-800) / <alpha-value>)",
+      900: "rgb(var(--primary-900) / <alpha-value>)",
     },
 
     secondary: {
       50: "#fefaf6",
       100: "#fdf6f0",
       200: "#FAF3E1",
-      300: "#f5e7c6", 
+      300: "#f5e7c6",
       400: "#f0dbb0",
       500: "#ebcf9a",
       600: "#e6c384",
@@ -39,7 +39,7 @@ export const theme = {
       900: "#171717",
     },
 
-    black: "#222222", 
+    black: "#222222",
     white: "#ffffff",
 
     accent: {
@@ -127,13 +127,13 @@ export const theme = {
   },
 
   gradients: {
-    primary: "linear-gradient(to right, #FF6D1F, #f97316)", 
-    secondary: "linear-gradient(to right, #FAF3E1, #f5e7c6)", 
-    accent: "linear-gradient(to right, #FF6D1F, #f97316, #fb923c)", 
-    dark: "linear-gradient(to right, #222222, #404040)", 
+    primary: "linear-gradient(to right, #FF6D1F, #f97316)",
+    secondary: "linear-gradient(to right, #FAF3E1, #f5e7c6)",
+    accent: "linear-gradient(to right, #FF6D1F, #f97316, #fb923c)",
+    dark: "linear-gradient(to right, #222222, #404040)",
     light: "linear-gradient(to right, #FAF3E1, #ffffff, #FAF3E1)",
-    warm: "linear-gradient(to right, #FAF3E1, #FF6D1F)", 
-    cool: "linear-gradient(to right, #FAF3E1, #3b82f6)", 
+    warm: "linear-gradient(to right, #FAF3E1, #FF6D1F)",
+    cool: "linear-gradient(to right, #FAF3E1, #3b82f6)",
   },
 
   typography: {

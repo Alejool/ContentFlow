@@ -42,6 +42,7 @@ class User extends Model implements Authenticatable, MustVerifyEmail, CanResetPa
     'email_verified_at',
     'locale',
     'theme',
+    'theme_color',
     'global_platform_settings',
     'phone',
     'country_code',
@@ -51,6 +52,7 @@ class User extends Model implements Authenticatable, MustVerifyEmail, CanResetPa
     'ai_settings',
     'last_login_at',
     'last_login_ip',
+    'created_ip',
     'known_devices',
   ];
 
@@ -66,6 +68,10 @@ class User extends Model implements Authenticatable, MustVerifyEmail, CanResetPa
     'ai_settings' => 'array',
     'known_devices' => 'array',
     'last_login_at' => 'datetime',
+  ];
+
+  protected $attributes = [
+    'theme_color' => 'orange',
   ];
 
   /**
@@ -189,5 +195,35 @@ class User extends Model implements Authenticatable, MustVerifyEmail, CanResetPa
     }
 
     return $role->permissions()->where('slug', $permissionSlug)->exists();
+  }
+
+  /**
+   * Update user login statistics.
+   */
+  public function updateLoginStats(): void
+  {
+    $request = request();
+    $currentIp = $request->ip();
+    \Illuminate\Support\Facades\Log::info('updateLoginStats called', [
+      'ip' => $currentIp,
+      'user_id' => $this->id,
+      'x-forwarded-for' => $request->header('x-forwarded-for'),
+      'remote_addr' => $request->server('REMOTE_ADDR'),
+    ]);
+
+    $userAgent = $request->userAgent();
+    $fingerprint = hash('sha256', $userAgent);
+
+    // Track known devices (simple fingerprinting)
+    $knownDevices = $this->known_devices ?? [];
+    if (!in_array($fingerprint, $knownDevices)) {
+      $knownDevices[] = $fingerprint;
+    }
+
+    $this->forceFill([
+      'last_login_at' => now(),
+      'last_login_ip' => $currentIp,
+      'known_devices' => $knownDevices,
+    ])->save();
   }
 }

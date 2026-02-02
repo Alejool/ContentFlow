@@ -4,6 +4,7 @@ import AiConfigSection from "@/Components/profile/Partials/AiConfigSection";
 import ConnectedAccounts from "@/Components/profile/Partials/ConnectedAccounts";
 import UpdatePasswordForm from "@/Components/profile/Partials/UpdatePasswordForm";
 import UpdateProfileInformationForm from "@/Components/profile/Partials/UpdateProfileInformationForm";
+import UpdateThemeForm from "@/Components/profile/Partials/UpdateThemeForm";
 import { useTheme } from "@/Hooks/useTheme";
 import { useUser } from "@/Hooks/useUser";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
@@ -14,6 +15,7 @@ import {
   ChevronRight,
   Info,
   Lock,
+  Palette,
   Save,
   Share2,
   User,
@@ -66,6 +68,11 @@ export default function Edit({ mustVerifyEmail, status }: EditProps) {
       id: "ai",
       name: t("profile.tabs.ai") || "Inteligencia Artificial",
       icon: BrainCircuit,
+    },
+    {
+      id: "appearance",
+      name: t("profile.tabs.appearance") || "Apariencia",
+      icon: Palette,
     },
   ];
 
@@ -193,6 +200,12 @@ export default function Edit({ mustVerifyEmail, status }: EditProps) {
               {activeTab === "ai" && (
                 <div className="animate-in fade-in slide-in-from-right-4 duration-500">
                   <AiConfigSectionWrapper user={user} />
+                </div>
+              )}
+
+              {activeTab === "appearance" && (
+                <div className="animate-in fade-in slide-in-from-right-4 duration-500">
+                  <UpdateThemeForm user={user} />
                 </div>
               )}
             </div>

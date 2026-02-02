@@ -5,6 +5,7 @@ import approvals from "./approvals.json";
 import auth from "./auth.json";
 import calendar from "./calendar.json";
 import campaigns from "./campaigns.json";
+import colors from "./colors.json";
 import common from "./common.json";
 import dashboard from "./dashboard.json";
 import legal from "./legal.json";
@@ -23,6 +24,7 @@ import workspace from "./workspace.json";
 
 export default {
   ...common,
+  ...colors,
   ...calendar,
   ...analytics,
   ...campaigns,

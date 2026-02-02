@@ -4,11 +4,20 @@
     "tabs": {
       "general": "General",
       "security": "Security",
-      "accounts": "Connections",
-      "ai": "Artificial Intelligence"
+      "accounts": "Connected Accounts",
+      "ai": "Artificial Intelligence",
+      "appearance": "Appearance"
     },
     "title": "Profile",
+    "appearance": "Appearance",
     "settings_description": "Update your personal information and security settings.",
+    "theme": {
+      "title": "System Appearance",
+      "description": "Select the primary system color. This will affect buttons, links, and other highlighted elements.",
+      "success_title": "Theme Updated!",
+      "success_message": "The system color has been updated successfully.",
+      "close": "Close"
+    },
     "editProfile": "Edit Profile",
     "changePassword": "Change Password",
     "name": "Name",

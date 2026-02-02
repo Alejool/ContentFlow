@@ -215,7 +215,7 @@ export default function PublishPublicationModal({
             <div className="flex items-center justify-between mb-6">
               <DialogTitle className="text-2xl font-bold text-gray-900 dark:text-white">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-gradient-to-r from-primary-500 to-pink-500 rounded-lg">
+                  <div className="p-2 bg-gradient-to-r from-primary-500 to-primary-600 rounded-lg">
                     <Share2 className="w-6 h-6 text-white" />
                   </div>
                   {t("publications.modal.publish.title")}
@@ -657,7 +657,7 @@ export default function PublishPublicationModal({
                         selectedPlatforms.length === 0 &&
                         !isPendingReview)
                     }
-                    className="flex-[2] px-4 py-3 rounded-lg font-medium bg-gradient-to-r from-primary-500 to-pink-500 hover:from-primary-600 hover:to-pink-600 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="flex-[2] px-4 py-3 rounded-lg font-medium bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     {publishing || publication.status === "publishing" ? (
                       <>

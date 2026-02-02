@@ -5,10 +5,18 @@
       "general": "General",
       "security": "Seguridad",
       "accounts": "Conexiones",
-      "ai": "Inteligencia Artificial"
+      "ai": "Inteligencia Artificial",
+      "appearance": "Apariencia"
     },
     "title": "Perfil",
     "settings_description": "Actualiza tu información personal y ajustes de seguridad.",
+    "theme": {
+      "title": "Apariencia del Sistema",
+      "description": "Selecciona el color principal del sistema. Esto afectará a botones, enlaces y otros elementos destacados.",
+      "success_title": "¡Tema actualizado!",
+      "success_message": "El color del sistema se ha actualizado correctamente.",
+      "close": "Cerrar"
+    },
     "editProfile": "Editar Perfil",
     "changePassword": "Cambiar Contraseña",
     "name": "Nombre",

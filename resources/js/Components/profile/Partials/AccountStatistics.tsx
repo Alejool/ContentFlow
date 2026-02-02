@@ -143,11 +143,11 @@ export default function AccountStatistics({
           ))}
         </div>
 
-        <div className="p-6 rounded-2xl border border-yellow-200 dark:border-yellow-800/30 bg-yellow-50/30 dark:bg-yellow-900/10">
+        <div className="p-6 rounded-2xl border border-primary-200 dark:border-primary-800/30 bg-primary-50/30 dark:bg-primary-900/10">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-yellow-100 dark:bg-yellow-900/30">
-                <MailWarning className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
+              <div className="p-2 rounded-lg bg-primary-100 dark:bg-primary-900/30">
+                <MailWarning className="w-5 h-5 text-primary-600 dark:text-primary-400" />
               </div>
               <p className="font-bold text-gray-800 dark:text-gray-200">
                 {t("profile.statistics.emailStatus")}
@@ -160,7 +160,7 @@ export default function AccountStatistics({
                 {t("profile.statistics.verified")}
               </div>
             ) : (
-              <div className="flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-bold bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800/50">
+              <div className="flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-bold bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 border border-primary-200 dark:border-primary-800/50">
                 <MailWarning className="w-4 h-4" />
                 {t("profile.statistics.unverified")}
               </div>
@@ -169,7 +169,7 @@ export default function AccountStatistics({
 
           {!user?.email_verified_at && (
             <div className="space-y-4">
-              <p className="text-sm text-yellow-700 dark:text-yellow-400 font-medium leading-relaxed">
+              <p className="text-sm text-primary-700 dark:text-primary-400 font-medium leading-relaxed">
                 {t("profile.information.emailUnverified")}
               </p>
 

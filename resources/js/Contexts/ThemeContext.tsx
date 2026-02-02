@@ -93,7 +93,7 @@ export function ThemeProvider({
     // Solo sincronizar con el backend si está autenticado
     if (isAuthenticated) {
       try {
-        await axios.patch("/api/v1/theme", { theme: newTheme });
+        await axios.patch(route("api.v1.profile.theme.update"), { theme: newTheme });
       } catch (error) {
         console.error("Failed to save theme preference:", error);
       }

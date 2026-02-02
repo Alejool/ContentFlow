@@ -11,8 +11,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/password', [ProfileController::class, 'changePassword'])->name('change-password');
     Route::delete('/', [ProfileController::class, 'destroy'])->name('destroy');
     Route::patch('/social-settings', [ProfileController::class, 'updateSocialSettings'])->name('social-settings.update');
+    Route::patch('/theme', [ThemeController::class, 'update'])->name('theme.update');
   });
 
   Route::patch('/locale', [LocaleController::class, 'update'])->name('locale.update');
-  Route::patch('/theme', [ThemeController::class, 'update'])->name('theme.update');
 });

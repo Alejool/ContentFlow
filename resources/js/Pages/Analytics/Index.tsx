@@ -133,7 +133,7 @@ export default function Index({ stats, period }: AnalyticsProps) {
             value={overview.total_views || 0}
             change={overview.changes?.views}
             icon={<Eye className="w-6 h-6" />}
-            color="orange"
+            color="primary"
             variant={1}
             theme={theme}
           />
@@ -142,7 +142,7 @@ export default function Index({ stats, period }: AnalyticsProps) {
             value={overview.total_clicks || 0}
             change={overview.changes?.clicks}
             icon={<MousePointer2 className="w-6 h-6" />}
-            color="orange"
+            color="primary"
             variant={2}
             theme={theme}
           />
@@ -151,7 +151,7 @@ export default function Index({ stats, period }: AnalyticsProps) {
             value={overview.total_conversions || 0}
             change={overview.changes?.conversions}
             icon={<TrendingUp className="w-6 h-6" />}
-            color="orange"
+            color="primary"
             variant={3}
             theme={theme}
           />
@@ -160,7 +160,7 @@ export default function Index({ stats, period }: AnalyticsProps) {
             value={overview.total_reach || 0}
             change={overview.changes?.engagement}
             icon={<Users className="w-6 h-6" />}
-            color="orange"
+            color="primary"
             variant={4}
             theme={theme}
           />
@@ -172,7 +172,7 @@ export default function Index({ stats, period }: AnalyticsProps) {
             value={overview.avg_engagement_rate || 0}
             icon={<Heart className="w-6 h-6" />}
             format="percentage"
-            color="orange"
+            color="primary"
             variant={1}
             theme={theme}
           />
@@ -181,7 +181,7 @@ export default function Index({ stats, period }: AnalyticsProps) {
             value={overview.avg_ctr || 0}
             icon={<MousePointer2 className="w-6 h-6" />}
             format="percentage"
-            color="orange"
+            color="primary"
             variant={2}
             theme={theme}
           />
@@ -190,7 +190,7 @@ export default function Index({ stats, period }: AnalyticsProps) {
             value={overview.avg_conversion_rate || 0}
             icon={<TrendingUp className="w-6 h-6" />}
             format="percentage"
-            color="orange"
+            color="primary"
             variant={3}
             theme={theme}
           />
@@ -198,7 +198,7 @@ export default function Index({ stats, period }: AnalyticsProps) {
             title={t("analytics.stats.totalEngagement")}
             value={overview.total_engagement || 0}
             icon={<Heart className="w-6 h-6" />}
-            color="orange"
+            color="primary"
             variant={4}
             theme={theme}
           />
