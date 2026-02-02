@@ -6,7 +6,6 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Workspace;
 
 class HandleWorkspaceContext
 {
@@ -18,6 +17,7 @@ class HandleWorkspaceContext
     public function handle(Request $request, Closure $next): Response
     {
         if (Auth::check()) {
+            /** @var \App\Models\User $user */
             $user = Auth::user();
 
             // Ensure the user has a current workspace
