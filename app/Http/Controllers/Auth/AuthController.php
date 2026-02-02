@@ -49,9 +49,11 @@ class AuthController extends Controller
           'email_verified_at' => now(),
           'locale' => 'en',
           'theme' => 'light',
+          'created_ip' => request()->ip(),
         ]);
       }
       Auth::login($user, true);
+      $user->updateLoginStats();
       Log::info('Google Callback: User logged in', ['id' => $user->id]);
 
       // request()->session()->regenerate(); // Potentially causing race conditions in Docker/mixed content
