@@ -36,25 +36,29 @@
       "title": "Analíticas de Rendimiento",
       "description": "Obtén información sobre el engagement de tu contenido y optimiza tu estrategia en consecuencia"
     },
-    "scheduling": {
-      "title": "Programación Inteligente",
-      "description": "Automatiza y programa tus publicaciones con recomendaciones de IA para un rendimiento óptimo"
-    },
+
     "pricing": {
       "title": "Precios",
       "description": "Obtén información sobre el engagement de tu contenido y optimiza tu estrategia en consecuencia"
     },
+    "connectsWith": "Se integra perfectamente con",
+    "goViral": "ser viral",
+    "watchDemo": "Ver Demo",
     "contentManagement": {
-      "title": "Gestión de Contenido",
-      "description": "Gestiona tu contenido con herramientas impulsadas por IA"
+      "title": "Hub de Contenido Inteligente",
+      "description": "Centraliza tus activos creativos con filtrado y etiquetado impulsado por IA."
     },
     "socialIntegration": {
-      "title": "Integración Social",
-      "description": "Integra tus cuentas de redes sociales con herramientas impulsadas por IA"
+      "title": "Sincronización Multiplataforma",
+      "description": "Publica directamente en Instagram, TikTok, YouTube y más desde un solo lugar."
+    },
+    "scheduling": {
+      "title": "Auto-Programación",
+      "description": "La IA predice los mejores momentos para publicar y maximizar el engagement."
     },
     "aiTools": {
-      "title": "Herramientas IA",
-      "description": "Chat con IA para obtener respuestas a tus preguntas"
+      "title": "Optimización con IA",
+      "description": "Genera hashtags, descripciones y mejoras instantáneamente."
     },
     "tags": {
       "multimedia": "Multimedia",

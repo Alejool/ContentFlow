@@ -36,25 +36,29 @@
       "title": "Performance Analytics",
       "description": "Get insights into your content engagement and optimize your strategy accordingly"
     },
-    "scheduling": {
-      "title": "Smart Scheduling",
-      "description": "Automate and schedule your posts with AI recommendations for optimal performance"
-    },
+
     "pricing": {
       "title": "Pricing",
       "description": "Get information about your content engagement and optimize your strategy accordingly"
     },
+    "connectsWith": "Connects seamlessly with",
+    "goViral": "go viral",
+    "watchDemo": "Watch Demo",
     "contentManagement": {
-      "title": "Content Management",
-      "description": "Manage your content with AI-powered tools"
+      "title": "Smart Content Hub",
+      "description": "Centralize your creative assets with AI-powered filtering and tagging."
     },
     "socialIntegration": {
-      "title": "Social Integration",
-      "description": "Integrate your social media accounts with AI-powered tools"
+      "title": "Multi-Platform Sync",
+      "description": "Publish directly to Instagram, TikTok, YouTube, and more from one place."
+    },
+    "scheduling": {
+      "title": "Auto-Scheduling",
+      "description": "AI predicts the best times to post for maximum engagement."
     },
     "aiTools": {
-      "title": "AI Tools",
-      "description": "Chat with AI to get answers to your questions"
+      "title": "AI Optimization",
+      "description": "Generate hashtags, captions, and improvements instantly."
     },
     "tags": {
       "multimedia": "Multimedia",

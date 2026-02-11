@@ -106,7 +106,9 @@
       "webhook_secret": "Secreto de Webhook",
       "secret_placeholder": "Genera un secreto para la verificación de webhooks",
       "secret_description": "Este secreto se usará para verificar las solicitudes de webhook entrantes",
-      "community_invite": "Invitación de Comunidad"
+      "community_invite": "Invitación de Comunidad",
+      "owner_permissions_required": "Permisos de propietario requeridos",
+      "owner_exclusive_description": "Solo los propietarios del workspace pueden gestionar integraciones."
     },
     "activity": {
       "title": "Actividad de Notificaciones",
