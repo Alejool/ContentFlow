@@ -1,4 +1,11 @@
-import { Shield, ShieldAlert, PencilLine, Eye, UserStar, User } from "lucide-react";
+import {
+  Eye,
+  PencilLine,
+  Shield,
+  ShieldAlert,
+  User,
+  UserStar,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 interface RolesManagementTabProps {
@@ -51,12 +58,14 @@ export default function RolesManagementTab({
                     <div
                       className={`h-10 w-10 rounded-lg flex items-center justify-center ${
                         role.slug === "owner"
-                          ? "bg-gradient-to-br from-amber-500 to-orange-500"
+                          ? "bg-gradient-to-br from-primary-500 to-primary-600"
                           : role.slug === "admin"
-                            ? "bg-gradient-to-br from-purple-500 to-pink-500"
-                            : role.slug === "member"
-                              ? "bg-gradient-to-br from-blue-500 to-cyan-500"
-                              : "bg-gradient-to-br from-gray-500 to-slate-500"
+                            ? "bg-gradient-to-br from-blue-500 to-cyan-500"
+                            : role.slug === "editor"
+                              ? "bg-gradient-to-br from-purple-500 to-pink-500"
+                              : role.slug === "member"
+                                ? "bg-gradient-to-br from-emerald-500 to-green-500"
+                                : "bg-gradient-to-br from-slate-500 to-gray-500"
                       }`}
                     >
                       {role.slug === "owner" ? (
@@ -121,14 +130,14 @@ export default function RolesManagementTab({
         </div>
 
         {!canManageWorkspace && (
-          <div className="mt-6 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+          <div className="mt-6 p-4 bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 rounded-lg">
             <div className="flex items-start gap-3">
-              <ShieldAlert className="h-5 w-5 text-amber-500 mt-0.5" />
+              <ShieldAlert className="h-5 w-5 text-primary-500 mt-0.5" />
               <div>
-                <p className="text-sm font-medium text-amber-800 dark:text-amber-400">
+                <p className="text-sm font-medium text-primary-800 dark:text-primary-400">
                   {t("workspace.permissions_required")}
                 </p>
-                <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
+                <p className="text-sm text-primary-700 dark:text-primary-300 mt-1">
                   {t("workspace.owner_admin_required")}
                 </p>
               </div>

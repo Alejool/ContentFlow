@@ -1,10 +1,11 @@
-import InviteMemberModal from "@/Components/Workspace/InviteMemberModal";
 import Button from "@/Components/common/Modern/Button";
 import Select from "@/Components/common/Modern/Select";
 import ConfirmDialog from "@/Components/common/ui/ConfirmDialog";
+import InviteMemberModal from "@/Components/Workspace/InviteMemberModal";
+import { getRoleStyle, ROLE_STYLES } from "@/Constants/RoleConstants";
 import { usePage } from "@inertiajs/react";
 import axios from "axios";
-import { Shield, Trash2, UserCog, UserPlus, Users } from "lucide-react";
+import { Trash2, UserPlus, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
@@ -128,20 +129,20 @@ export default function MembersManagement({
     {
       label: t("workspace.owners"),
       value: roleDistribution[roles.find((r) => r.slug === "owner")?.id] || 0,
-      icon: Shield,
-      color: "text-purple-600",
+      icon: ROLE_STYLES.owner.icon,
+      color: ROLE_STYLES.owner.color,
     },
     {
       label: t("workspace.admins"),
       value: roleDistribution[roles.find((r) => r.slug === "admin")?.id] || 0,
-      icon: Shield,
-      color: "text-blue-600",
+      icon: ROLE_STYLES.admin.icon,
+      color: ROLE_STYLES.admin.color,
     },
     {
       label: t("workspace.members"),
       value: roleDistribution[roles.find((r) => r.slug === "member")?.id] || 0,
-      icon: UserCog,
-      color: "text-green-600",
+      icon: ROLE_STYLES.member.icon,
+      color: ROLE_STYLES.member.color,
     },
   ];
 
@@ -251,9 +252,7 @@ export default function MembersManagement({
                   {isCreator || !canManageMembers ? (
                     <span
                       className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border ${
-                        isCreator
-                          ? "bg-purple-50 text-purple-700 border-purple-100 dark:bg-purple-900/20 dark:text-purple-400 dark:border-purple-800"
-                          : "bg-gray-50 text-gray-600 border-gray-100 dark:bg-neutral-700 dark:text-gray-400 dark:border-neutral-600"
+                        getRoleStyle(currentRole.slug).badge
                       }`}
                     >
                       {isCreator ? t("workspace.owners") : currentRole.name}
