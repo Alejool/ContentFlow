@@ -8,7 +8,7 @@ use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 use App\Channels\EnhancedDatabaseChannel;
 use Illuminate\Support\Facades\Http;
-use App\Models\WebhookLog;
+use App\Models\Logs\WebhookLog;
 
 abstract class BaseNotification extends Notification implements ShouldQueue
 {

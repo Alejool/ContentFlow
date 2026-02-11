@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Http;
 use App\Notifications\WorkspaceRemovedNotification;
 
 use App\Models\User;
-use App\Models\WebhookLog\WebhookLog;
+use App\Models\Logs\WebhookLog;
 use App\Models\Workspace\Workspace;
 use App\Models\Role\Role;;
 
