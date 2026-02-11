@@ -66,7 +66,7 @@ interface AnalyticsProps {
 
 export default function Index({ stats, period }: AnalyticsProps) {
   const { t } = useTranslation();
-  const { theme } = useTheme();
+  const { theme } = useTheme() as { theme: "light" | "dark" | undefined };
   const [loading, setLoading] = useState(false);
 
   const overview = stats?.overview || {};
@@ -99,8 +99,8 @@ export default function Index({ stats, period }: AnalyticsProps) {
         <div
           className={`rounded-lg p-8 mb-8 shadow-sm transition-colors duration-300 flex flex-col md:flex-row items-center justify-between gap-6 ${
             theme === "dark"
-              ? "bg-gradient-to-r from-neutral-800/50 to-purple-900/90 border border-neutral-700/50"
-              : "bg-gradient-to-r from-white to-gray-50 border border-gray-100"
+              ? "bg-gradient-to-r from-black/90 to-black/95 border border-black/70"
+              : "bg-gradient-to-r from-white/90 to-white/95 border border-white/70"
           }`}
         >
           <div>
