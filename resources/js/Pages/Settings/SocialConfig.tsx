@@ -35,17 +35,6 @@ const platforms = [
     buttonColor: "bg-blue-500 hover:bg-blue-600",
     ringColor: "ring-blue-200 dark:ring-blue-900/30",
   },
-  // {
-  //   id: "instagram",
-  //   name: "Instagram",
-  //   icon: IconInstagram,
-  //   color: "text-pink-600",
-  //   bgColor: "bg-pink-50 dark:bg-pink-900/10",
-  //   borderColor: "border-pink-100 dark:border-pink-900/20",
-  //   buttonColor:
-  //     "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600",
-  //   ringColor: "ring-pink-200 dark:ring-pink-900/30",
-  // },
   {
     id: "twitter",
     name: "X (Twitter)",
