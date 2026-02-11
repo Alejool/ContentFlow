@@ -53,7 +53,7 @@ const WorkspaceCard = ({
 
   return (
     <div
-      className={`group relative bg-gradient-to-br from-white/90 to-white/95 dark:from-black/90 dark:to-black/95 border border-white/70 dark:border-black/70 rounded-2xl p-6 transition-all duration-300 hover:border-primary-300 dark:hover:border-primary-500/30 hover:shadow-2xl hover:shadow-primary-600/10 hover:-translate-y-1 ${
+      className={`group relative bg-gradient-to-br from-white/90 to-white/95 dark:from-black/90 dark:to-black/95 border border-white/70 dark:border-black/70 rounded-lg p-6 transition-all duration-300 hover:border-primary-300 dark:hover:border-primary-500/30 hover:shadow-2xl hover:shadow-primary-600/10 hover:-translate-y-1 ${
         openMenuId === workspace.id ? "z-50 shadow-2xl" : "z-0"
       }`}
       onMouseEnter={() => setHoveredWorkspace(workspace.id)}

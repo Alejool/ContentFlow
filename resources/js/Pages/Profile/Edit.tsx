@@ -100,7 +100,7 @@ export default function Edit({ mustVerifyEmail, status }: EditProps) {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
           {/* Horizontal Menu - Styled like ContentPage */}
           <div className="mb-8 overflow-x-auto">
-            <div className="inline-flex items-center p-1.5 rounded-2xl bg-white dark:bg-neutral-800 backdrop-blur-sm border border-gray-200/60 dark:border-neutral-700/60 gap-1 shadow-sm min-w-max">
+            <div className="inline-flex items-center p-1.5 rounded-lg bg-white dark:bg-neutral-800 backdrop-blur-sm border border-gray-200/60 dark:border-neutral-700/60 gap-1 shadow-sm min-w-max">
               {tabs
                 .filter((tab) => !tab.hidden)
                 .map((tab) => (

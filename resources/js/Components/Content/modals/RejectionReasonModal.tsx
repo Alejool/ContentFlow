@@ -64,7 +64,7 @@ export default function RejectionReasonModal({
       />
 
       <div className="fixed inset-0 flex items-center justify-center p-4">
-        <DialogPanel className="w-full max-w-md rounded-2xl shadow-2xl bg-white dark:bg-neutral-800 dark:border dark:border-neutral-700/50 overflow-hidden">
+        <DialogPanel className="w-full max-w-md rounded-lg shadow-2xl bg-white dark:bg-neutral-800 dark:border dark:border-neutral-700/50 overflow-hidden">
           <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-neutral-700/50">
             <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
               <AlertCircle className="w-6 h-6 text-red-500" />

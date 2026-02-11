@@ -35,7 +35,7 @@ const SuccessAlert = ({ show, t }: SuccessAlertProps) => (
     leaveFrom="translate-y-0 opacity-100"
     leaveTo="translate-y-2 opacity-0"
   >
-    <div className="flex items-center gap-4 p-5 rounded-2xl mb-8 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800/50 shadow-sm">
+    <div className="flex items-center gap-4 p-5 rounded-lg mb-8 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800/50 shadow-sm">
       <div className="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center bg-green-100 dark:bg-green-800/40">
         <CheckIcon className="w-6 h-6 text-green-600 dark:text-green-400" />
       </div>
@@ -80,7 +80,7 @@ const UpdatePasswordForm = ({
 
       <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
         {errors && Object.keys(errors).length > 0 && (
-          <div className="p-5 mb-8 rounded-2xl bg-primary-50 dark:bg-primary-900/20 border border-primary-100 dark:border-primary-800/30 shadow-sm animate-in fade-in slide-in-from-top-2 duration-300">
+          <div className="p-5 mb-8 rounded-lg bg-primary-50 dark:bg-primary-900/20 border border-primary-100 dark:border-primary-800/30 shadow-sm animate-in fade-in slide-in-from-top-2 duration-300">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-primary-100 dark:bg-primary-800/40">
                 <AlertTriangle className="w-5 h-5 text-primary-600 dark:text-primary-400" />

@@ -81,7 +81,7 @@ const CreateWorkspaceModal = ({
         className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-200"
         onClick={onClose}
       />
-      <div className="relative w-full max-w-lg bg-gradient-to-b from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-950 border border-gray-200 dark:border-neutral-800 rounded-2xl shadow-2xl p-8 animate-in zoom-in-95 duration-300">
+      <div className="relative w-full max-w-lg bg-gradient-to-b from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-950 border border-gray-200 dark:border-neutral-800 rounded-lg shadow-2xl p-8 animate-in zoom-in-95 duration-300">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
             <div className="h-12 w-12 bg-gradient-to-br from-primary-600 to-primary-700 rounded-lg flex items-center justify-center shadow-lg">

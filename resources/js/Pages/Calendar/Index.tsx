@@ -228,7 +228,7 @@ export default function CalendarIndex({ auth }: { auth: any }) {
 
       <div className="py-8">
         <div className="max-w-[1600px] mx-auto sm:px-6 lg:px-8">
-          <div className="bg-white dark:bg-black overflow-hidden shadow-xl sm:rounded-2xl border border-gray-100 dark:border-gray-800">
+          <div className="bg-white dark:bg-black overflow-hidden shadow-xl sm:rounded-lg border border-gray-100 dark:border-gray-800">
             <div className="p-6">
               {/* Toolbar */}
               <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-6">
@@ -358,7 +358,7 @@ export default function CalendarIndex({ auth }: { auth: any }) {
               </div>
 
               {/* Calendar Grid */}
-              <div className="border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden shadow-sm bg-gray-50 dark:bg-black/50">
+              <div className="border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden shadow-sm bg-gray-50 dark:bg-black/50">
                 {/* Weekday Headers - Desktop Only */}
                 <div className="hidden lg:grid grid-cols-7 bg-white dark:bg-black border-b border-gray-200 dark:border-gray-800">
                   {["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"].map(

@@ -71,7 +71,7 @@ const AiPromptSection: React.FC<AiPromptSectionProps> = ({
 
   return (
     <div
-      className={`p-4 bg-primary-50/30 dark:bg-primary-900/10 border border-primary-100 dark:border-primary-800/50 rounded-2xl space-y-4 mb-6 ${className}`}
+      className={`p-4 bg-primary-50/30 dark:bg-primary-900/10 border border-primary-100 dark:border-primary-800/50 rounded-lg space-y-4 mb-6 ${className}`}
     >
       <div className="flex items-center gap-2">
         <div className="p-1.5 bg-primary-100 dark:bg-primary-800/50 rounded-lg text-primary-600 dark:text-primary-400">

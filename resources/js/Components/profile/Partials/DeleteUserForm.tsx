@@ -65,7 +65,7 @@ export default function DeleteUserForm({
       className={className}
     >
       <div className="space-y-6">
-        <div className="p-5 bg-primary-50 dark:bg-primary-900/10 border border-primary-200 dark:border-primary-800/30 rounded-2xl flex gap-4 shadow-inner">
+        <div className="p-5 bg-primary-50 dark:bg-primary-900/10 border border-primary-200 dark:border-primary-800/30 rounded-lg flex gap-4 shadow-inner">
           <div className="flex-shrink-0 p-2 bg-primary-100 dark:bg-primary-800/40 rounded-lg h-fit">
             <AlertTriangle className="w-6 h-6 text-primary-600 dark:text-primary-400" />
           </div>
@@ -95,7 +95,7 @@ export default function DeleteUserForm({
           className="p-8 dark:bg-neutral-900"
         >
           <div className="flex items-center gap-4 mb-6">
-            <div className="p-3 bg-primary-50 dark:bg-primary-900/20 rounded-2xl">
+            <div className="p-3 bg-primary-50 dark:bg-primary-900/20 rounded-lg">
               <AlertTriangle className="w-8 h-8 text-primary-600 dark:text-primary-400" />
             </div>
             <h2 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight">

@@ -113,7 +113,7 @@ export default function PlatformSettingsModal({
           <div className="flex items-start justify-between mb-8">
             <div className="flex items-center gap-5">
               <div
-                className={`p-4 rounded-2xl shadow-sm ${
+                className={`p-4 rounded-lg shadow-sm ${
                   theme === "dark"
                     ? "bg-neutral-800 border border-neutral-700/50"
                     : "bg-neutral-50 border border-neutral-100"

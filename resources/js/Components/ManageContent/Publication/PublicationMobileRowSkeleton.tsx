@@ -6,7 +6,7 @@ const PublicationMobileRowSkeleton = () => {
       {[...Array(3)].map((_, i) => (
         <div
           key={i}
-          className="relative overflow-hidden rounded-2xl border border-gray-100 dark:border-neutral-800 bg-white/80 dark:bg-neutral-900/80 p-4 shadow-sm"
+          className="relative overflow-hidden rounded-lg border border-gray-100 dark:border-neutral-800 bg-white/80 dark:bg-neutral-900/80 p-4 shadow-sm"
         >
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3 flex-1 min-w-0">

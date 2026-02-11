@@ -149,7 +149,7 @@ export default function IntegrationsSettingsTab({
           isConnected
             ? "border-emerald-200 dark:border-emerald-800/50"
             : "border-gray-200 dark:border-neutral-800"
-        } rounded-2xl p-6 transition-all duration-300 hover:shadow-lg`}
+        } rounded-lg p-6 transition-all duration-300 hover:shadow-lg`}
       >
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-4">
@@ -274,7 +274,7 @@ export default function IntegrationsSettingsTab({
       </div>
 
       {showAdvanced && canManageWorkspace && (
-        <div className="bg-gradient-to-br from-neutral-50 to-white dark:from-neutral-900 dark:to-neutral-950 border border-gray-200 dark:border-neutral-800 rounded-2xl p-6">
+        <div className="bg-gradient-to-br from-neutral-50 to-white dark:from-neutral-900 dark:to-neutral-950 border border-gray-200 dark:border-neutral-800 rounded-lg p-6">
           <div className="flex items-center gap-3 mb-6">
             <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center">
               <ShieldCheck className="h-5 w-5 text-white" />
@@ -322,7 +322,7 @@ export default function IntegrationsSettingsTab({
         </div>
       )}
 
-      <div className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-950 border border-gray-200 dark:border-neutral-800 rounded-2xl overflow-hidden">
+      <div className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-950 border border-gray-200 dark:border-neutral-800 rounded-lg overflow-hidden">
         <div className="p-6 border-b border-gray-100 dark:border-neutral-800">
           <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <Activity className="h-5 w-5 text-primary-500" />

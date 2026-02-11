@@ -359,7 +359,7 @@ export default function UpdateProfileInformation({
         )}
 
         {mustVerifyEmail && user?.email_verified_at === null && (
-          <div className="rounded-2xl p-6 shadow-inner bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800/30">
+          <div className="rounded-lg p-6 shadow-inner bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800/30">
             <div className="flex items-center gap-3 font-bold text-amber-800 dark:text-amber-300">
               <div className="p-2 rounded-lg bg-amber-500/20">
                 <MailWarning className="w-5 h-5 text-amber-600 dark:text-amber-400" />

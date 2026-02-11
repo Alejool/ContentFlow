@@ -206,7 +206,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
   const platforms = ["all", "user_event", ...Object.keys(SOCIAL_PLATFORMS)];
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
+    <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
       <div className="p-6">
         <div className="flex flex-col sm:flex-row justify-between items-center mb-6 sm:mb-8 gap-4 sm:gap-6">
           <div className="flex items-center gap-4">
@@ -332,7 +332,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
 
         <div className="flex flex-col xl:flex-row gap-8">
           <div className="flex-1 min-w-0">
-            <div className="w-full border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden shadow-sm bg-gray-50 dark:bg-gray-900/50">
+            <div className="w-full border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden shadow-sm bg-gray-50 dark:bg-gray-900/50">
               <div className="grid grid-cols-7 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
                 {[
                   { key: "sun", label: t("calendar.weekdays.sun") },
@@ -481,7 +481,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
           </div>
 
           <div className="w-full xl:w-96 space-y-6">
-            <div className="bg-gray-50 dark:bg-neutral-800/30 p-6 rounded-2xl border border-gray-100 dark:border-neutral-800/50 h-full flex flex-col">
+            <div className="bg-gray-50 dark:bg-neutral-800/30 p-6 rounded-lg border border-gray-100 dark:border-neutral-800/50 h-full flex flex-col">
               <div className="mb-6">
                 <h4 className="font-black text-gray-900 dark:text-white flex items-center gap-2 text-xl">
                   <CalendarIcon className="w-6 h-6 text-primary-500" />
@@ -523,7 +523,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                             if (pubId) onEventClick?.(pubId, event.type, event);
                           }
                         }}
-                        className="group flex items-center gap-4 p-4 rounded-2xl shadow-sm hover:shadow-md active:scale-[0.98] transition-all cursor-pointer border-2"
+                        className="group flex items-center gap-4 p-4 rounded-lg shadow-sm hover:shadow-md active:scale-[0.98] transition-all cursor-pointer border-2"
                         style={{
                           backgroundColor: `${event.color}15`,
                           borderColor: `${event.color}40`,
@@ -601,7 +601,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                       </div>
                     ))
                 ) : (
-                  <div className="py-12 text-center rounded-2xl border-2 border-dashed border-gray-200 dark:border-neutral-800 bg-white/50 dark:bg-neutral-900/10">
+                  <div className="py-12 text-center rounded-lg border-2 border-dashed border-gray-200 dark:border-neutral-800 bg-white/50 dark:bg-neutral-900/10">
                     <div className="w-12 h-12 rounded-full bg-gray-50 dark:bg-neutral-800 flex items-center justify-center mx-auto mb-4">
                       <CalendarIcon className="w-6 h-6 text-gray-300" />
                     </div>

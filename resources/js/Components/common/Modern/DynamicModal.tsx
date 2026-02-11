@@ -76,7 +76,7 @@ export const DynamicModal = ({
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
               <DialogPanel
-                className={`relative transform overflow-hidden rounded-2xl text-left shadow-2xl transition-all sm:my-8 w-full ${
+                className={`relative transform overflow-hidden rounded-lg text-left shadow-2xl transition-all sm:my-8 w-full ${
                   sizeClasses[size]
                 }
                 ${

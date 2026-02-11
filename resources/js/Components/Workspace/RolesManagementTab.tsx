@@ -25,7 +25,7 @@ export default function RolesManagementTab({
 
   return (
     <div className="space-y-6">
-      <div className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-950 border border-gray-200 dark:border-neutral-800 rounded-2xl p-6">
+      <div className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-950 border border-gray-200 dark:border-neutral-800 rounded-lg p-6">
         <div className="flex items-center gap-3 mb-6">
           <div>
             <h3 className="text-xl font-bold text-gray-900 dark:text-white">

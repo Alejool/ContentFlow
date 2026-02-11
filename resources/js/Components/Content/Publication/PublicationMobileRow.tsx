@@ -169,7 +169,7 @@ const PublicationMobileRow = memo(
               key={item.id}
               onClick={(e) => handleRowClick(item.id, e)}
               className={`
-                relative overflow-hidden rounded-2xl border transition-all duration-300
+                relative overflow-hidden rounded-lg border transition-all duration-300
                 ${
                   isExpanded
                     ? "bg-white dark:bg-neutral-800 border-primary-200 dark:border-primary-900/40 shadow-md ring-1 ring-primary-500/10"

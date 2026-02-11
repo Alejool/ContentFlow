@@ -333,9 +333,7 @@ const SocialMediaAccounts = memo(() => {
                   {[
                     {
                       icon: Zap,
-                      title: t(
-                        "Content.socialMedia.benefits.autoPublish",
-                      ),
+                      title: t("Content.socialMedia.benefits.autoPublish"),
                       color: "text-primary-500",
                     },
                     {
@@ -381,7 +379,7 @@ const SocialMediaAccounts = memo(() => {
           </div>
 
           {loading ? (
-            <div className="flex flex-col items-center justify-center py-12 rounded-2xl border transition-colors duration-300 bg-white border-gray-100 dark:bg-neutral-800/50 dark:border-neutral-700/50">
+            <div className="flex flex-col items-center justify-center py-12 rounded-lg border transition-colors duration-300 bg-white border-gray-100 dark:bg-neutral-800/50 dark:border-neutral-700/50">
               <Loader2 className="w-10 h-10 animate-spin mb-4 text-primary-600 dark:text-primary-400" />
               <p className="font-bold text-gray-500 dark:text-gray-400 uppercase text-xs tracking-widest">
                 {t("common.loading")}
@@ -392,7 +390,7 @@ const SocialMediaAccounts = memo(() => {
               {accounts.map((account) => (
                 <div
                   key={`${account.platform}-${account.id}`}
-                  className={`group relative rounded-2xl p-4 sm:p-5 border transition-all duration-300
+                  className={`group relative rounded-lg p-4 sm:p-5 border transition-all duration-300
                     hover:shadow-xl bg-white dark:bg-neutral-900 border-gray-100 dark:border-neutral-800 hover:border-primary-100 dark:hover:border-primary-900/30
                     ${
                       account.isConnected
@@ -425,7 +423,7 @@ const SocialMediaAccounts = memo(() => {
 
                   <div className="flex flex-col items-center text-center mb-5 pt-3">
                     <div className="relative mb-4 group-hover:scale-110 transition-transform duration-300">
-                      <div className="w-16 h-16 rounded-2xl flex items-center justify-center p-0.5 border border-gray-100 dark:border-neutral-800 bg-gray-50 dark:bg-neutral-800 overflow-hidden shadow-inner">
+                      <div className="w-16 h-16 rounded-lg flex items-center justify-center p-0.5 border border-gray-100 dark:border-neutral-800 bg-gray-50 dark:bg-neutral-800 overflow-hidden shadow-inner">
                         {account.isConnected &&
                         account.accountDetails?.account_metadata?.avatar ? (
                           <img

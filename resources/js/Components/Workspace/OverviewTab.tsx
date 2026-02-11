@@ -101,7 +101,7 @@ export default function OverviewTab({
         />
       </div>
 
-      <div className="bg-gradient-to-br from-white/90 to-white/95 dark:from-black/90 dark:to-black/95 border border-white/70 dark:border-black/70 rounded-2xl p-6">
+      <div className="bg-gradient-to-br from-white/90 to-white/95 dark:from-black/90 dark:to-black/95 border border-white/70 dark:border-black/70 rounded-lg p-6">
         <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
           {t("workspace.quick_actions.title")}
         </h3>

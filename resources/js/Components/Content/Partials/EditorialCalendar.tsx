@@ -179,7 +179,7 @@ export default function EditorialCalendar() {
 
   return (
     <div
-      className={`p-3 sm:p-6 rounded-2xl ${theme === "dark" ? "bg-neutral-900/50 border border-neutral-800" : "bg-white shadow-sm border border-gray-100"}`}
+      className={`p-3 sm:p-6 rounded-lg ${theme === "dark" ? "bg-neutral-900/50 border border-neutral-800" : "bg-white shadow-sm border border-gray-100"}`}
     >
       {renderHeader()}
       <div className="relative">

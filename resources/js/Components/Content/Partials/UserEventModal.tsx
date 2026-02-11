@@ -243,7 +243,7 @@ export default function UserEventModal({
   return (
     <Modal show={show} onClose={onClose} maxWidth="lg">
       <div
-        className="flex flex-col max-h-[90vh] md:max-h-[85vh] bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl overflow-hidden border transition-colors"
+        className="flex flex-col max-h-[90vh] md:max-h-[85vh] bg-white dark:bg-neutral-900 rounded-lg shadow-2xl overflow-hidden border transition-colors"
         style={{
           borderColor: `${selectedColor}40`,
         }}
@@ -409,7 +409,7 @@ export default function UserEventModal({
                   <button
                     type="button"
                     onClick={() => field.onChange(true)}
-                    className={`flex-1 flex flex-col items-center justify-center gap-1.5 px-4 py-4 rounded-2xl font-bold text-xs transition-all duration-300 border-2 ${
+                    className={`flex-1 flex flex-col items-center justify-center gap-1.5 px-4 py-4 rounded-lg font-bold text-xs transition-all duration-300 border-2 ${
                       field.value
                         ? "shadow-sm translate-y-[-2px]"
                         : "bg-gray-50/50 dark:bg-gray-800/30 text-gray-400 dark:text-gray-500 border-gray-100 dark:border-neutral-800 hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -435,7 +435,7 @@ export default function UserEventModal({
                   <button
                     type="button"
                     onClick={() => field.onChange(false)}
-                    className={`flex-1 flex flex-col items-center justify-center gap-1.5 px-4 py-4 rounded-2xl font-bold text-xs transition-all duration-300 border-2 ${
+                    className={`flex-1 flex flex-col items-center justify-center gap-1.5 px-4 py-4 rounded-lg font-bold text-xs transition-all duration-300 border-2 ${
                       !field.value
                         ? "shadow-sm translate-y-[-2px]"
                         : "bg-gray-50/50 dark:bg-gray-800/30 text-gray-400 dark:text-gray-500 border-gray-100 dark:border-neutral-800 hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -472,7 +472,7 @@ export default function UserEventModal({
           </div>
 
           <div
-            className="p-5 rounded-2xl border transition-all duration-500 backdrop-blur-sm"
+            className="p-5 rounded-lg border transition-all duration-500 backdrop-blur-sm"
             style={{
               background: `linear-gradient(135deg, ${selectedColor}10, ${selectedColor}05)`,
               borderColor: `${selectedColor}30`,

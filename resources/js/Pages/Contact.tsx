@@ -37,7 +37,7 @@ export default function Contact() {
             </div>
 
             <div className="max-w-2xl mx-auto text-center">
-              <div className="bg-gray-50 dark:bg-gray-800/50 p-8 rounded-2xl border border-gray-100 dark:border-gray-800">
+              <div className="bg-gray-50 dark:bg-gray-800/50 p-8 rounded-lg border border-gray-100 dark:border-gray-800">
                 <div className="w-16 h-16 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center mb-6 mx-auto">
                   <Mail className="w-8 h-8 text-primary-600 dark:text-primary-400" />
                 </div>

@@ -121,7 +121,7 @@ export default function AccountStatistics({
           {statisticsItems.map((item, index) => (
             <div
               key={index}
-              className={`group p-4 rounded-2xl border transition-all duration-300 ${item.bgClasses.replace("from-blue-50 to-white", "bg-white/40 dark:bg-neutral-800/40").replace("from-primary-50 to-white", "bg-white/40 dark:bg-neutral-800/40").replace("from-green-50 to-white", "bg-white/40 dark:bg-neutral-800/40")}`}
+              className={`group p-4 rounded-lg border transition-all duration-300 ${item.bgClasses.replace("from-blue-50 to-white", "bg-white/40 dark:bg-neutral-800/40").replace("from-primary-50 to-white", "bg-white/40 dark:bg-neutral-800/40").replace("from-green-50 to-white", "bg-white/40 dark:bg-neutral-800/40")}`}
             >
               <div className="flex items-center gap-4">
                 <div className="p-2.5 rounded-lg bg-white dark:bg-neutral-800 shadow-sm border border-gray-100 dark:border-neutral-700">
@@ -143,7 +143,7 @@ export default function AccountStatistics({
           ))}
         </div>
 
-        <div className="p-6 rounded-2xl border border-primary-200 dark:border-primary-800/30 bg-primary-50/30 dark:bg-primary-900/10">
+        <div className="p-6 rounded-lg border border-primary-200 dark:border-primary-800/30 bg-primary-50/30 dark:bg-primary-900/10">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-primary-100 dark:bg-primary-900/30">

@@ -66,12 +66,12 @@ const PublicationMobileGrid = memo(
           return (
             <div
               key={item.id}
-              className="group relative flex flex-col min-h-[16rem] rounded-2xl bg-white dark:bg-neutral-900 border border-gray-100 dark:border-neutral-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden"
+              className="group relative flex flex-col min-h-[16rem] rounded-lg bg-white dark:bg-neutral-900 border border-gray-100 dark:border-neutral-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden"
             >
               {/* Primary Visual/Info Area */}
               <div className="p-5 flex-1">
                 <div className="flex items-start gap-4 mb-4">
-                  <div className="w-16 h-16 rounded-2xl flex-shrink-0 border border-gray-100 bg-gray-50/50 dark:border-neutral-800 dark:bg-neutral-800/50 overflow-hidden flex items-center justify-center shadow-inner group-hover:scale-105 transition-transform duration-300">
+                  <div className="w-16 h-16 rounded-lg flex-shrink-0 border border-gray-100 bg-gray-50/50 dark:border-neutral-800 dark:bg-neutral-800/50 overflow-hidden flex items-center justify-center shadow-inner group-hover:scale-105 transition-transform duration-300">
                     <PublicationThumbnail publication={item} t={t} />
                   </div>
                   <div className="flex-1 min-w-0">

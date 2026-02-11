@@ -120,7 +120,7 @@ export default function GeneralSettingsTab({
 
   return (
     <div className="space-y-6">
-      <div className="bg-gradient-to-br from-white/90 to-white/95 dark:from-black/90 dark:to-black/95 border border-white/70 dark:border-black/70 rounded-2xl shadow-sm p-6">
+      <div className="bg-gradient-to-br from-white/90 to-white/95 dark:from-black/90 dark:to-black/95 border border-white/70 dark:border-black/70 rounded-lg shadow-sm p-6">
         <div className="flex items-center gap-3 mb-8">
           <div className="h-12 w-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg flex items-center justify-center">
             <SettingsIcon className="h-6 w-6 text-white" />
@@ -288,7 +288,7 @@ export default function GeneralSettingsTab({
       </div>
 
       {isOwner && (
-        <div className="bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30 rounded-2xl shadow-sm p-6">
+        <div className="bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30 rounded-lg shadow-sm p-6">
           <div className="flex items-center gap-3 mb-6">
             <div className="h-10 w-10 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center">
               <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
