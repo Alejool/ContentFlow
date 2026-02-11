@@ -174,16 +174,15 @@ export default function WorkspaceSettings({
         />
 
         {activeTab === "integrations" && !isOwner && (
-          <div className="mb-6 p-4 bg-gradient-to-r from-amber-50 to-amber-100 dark:from-amber-900/20 dark:to-amber-900/10 border border-amber-200 dark:border-amber-800 rounded-lg">
+          <div className="mb-6 p-4 bg-gradient-to-r from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-900/10 border border-primary-200 dark:border-primary-800 rounded-lg">
             <div className="flex items-start gap-3">
-              <AlertCircle className="h-5 w-5 text-amber-500 mt-0.5" />
+              <AlertCircle className="h-5 w-5 text-primary-500 mt-0.5" />
               <div>
-                <p className="text-sm font-medium text-amber-800 dark:text-amber-400">
-                  Permisos de propietario requeridos
+                <p className="text-sm font-medium text-primary-800 dark:text-primary-400">
+                  {t("workspace.integrations.owner_permissions_required")}
                 </p>
-                <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
-                  Solo los propietarios del workspace pueden gestionar
-                  integraciones.
+                <p className="text-sm text-primary-700 dark:text-primary-300 mt-1">
+                  {t("workspace.integrations.owner_exclusive_description")}
                 </p>
               </div>
             </div>
