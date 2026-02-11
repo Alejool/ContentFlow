@@ -32,6 +32,8 @@ interface WelcomeProps {
   canRegister: boolean;
 }
 
+const SUPPORTED_NETWORKS = ["YouTube", "Facebook", "X", "TikTok"];
+
 export default function Welcome({ auth, canLogin, canRegister }: WelcomeProps) {
   const { t, i18n } = useTranslation();
   const { theme } = useTheme();
@@ -49,9 +51,9 @@ export default function Welcome({ auth, canLogin, canRegister }: WelcomeProps) {
     }
   }, []);
 
-    useEffect(() => {
-      document.documentElement.setAttribute("data-theme-color", "orange");
-    }, []);
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme-color", "orange");
+  }, []);
 
   const features = [
     {
@@ -120,8 +122,13 @@ export default function Welcome({ auth, canLogin, canRegister }: WelcomeProps) {
     <>
       <Head title="ContentFlow - Plataforma de Gestión de Contenido" />
 
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-950">
-        <div className="relative">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-950 relative overflow-hidden">
+        <div className="fixed inset-0 z-0 pointer-events-none">
+          <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-blue-500/10 rounded-full blur-[120px] animate-pulse-slow" />
+          <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-purple-500/10 rounded-full blur-[120px] animate-pulse-slow delay-1000" />
+        </div>
+
+        <div className="relative z-10">
           <header className="absolute top-0 left-0 right-0 z-50">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-3 md:mt-5">
               <div className="flex items-center justify-between h-16 md:h-20">
@@ -165,7 +172,7 @@ export default function Welcome({ auth, canLogin, canRegister }: WelcomeProps) {
                   ${theme === "dark" ? "text-white" : "text-gray-900"}`}
                 >
                   {t("welcome.title") || "Transforma tu contenido"}
-                  <span className="block text-primary-600 mt-3 flex items-center justify-center gap-2">
+                  <span className="text-primary-600 mt-3 flex items-center justify-center gap-2">
                     <Zap className="w-8 h-8" />
                     {t("welcome.titleHighlight") || "en resultados reales"}
                     <Rocket className="w-8 h-8" />
@@ -190,13 +197,6 @@ export default function Welcome({ auth, canLogin, canRegister }: WelcomeProps) {
                         {t("welcome.startFree") || "Comenzar Gratis"}
                         <ArrowRight className="w-5 h-5 ml-2" />
                       </Link>
-
-                      <Link
-                        href="/login"
-                        className="inline-flex items-center justify-center px-8 py-3 text-base font-medium text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-                      >
-                        {t("welcome.demo") || "Ver Demo"}
-                      </Link>
                     </>
                   ) : canLogin ? (
                     <Link
@@ -207,6 +207,26 @@ export default function Welcome({ auth, canLogin, canRegister }: WelcomeProps) {
                       <ArrowRight className="w-5 h-5 ml-2" />
                     </Link>
                   ) : null}
+                </div>
+                <div className="mt-24 py-8 border-y border-gray-200/50 dark:border-white/5 bg-white/50 dark:bg-white/5 backdrop-blur-sm relative left-[50%] right-[50%] mx-[-50vw] w-screen px-4">
+                  <div className="max-w-7xl mx-auto text-center">
+                    <p className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-8">
+                      {t(
+                        "welcome.connectsWith",
+                        "Se integra perfectamente con",
+                      )}
+                    </p>
+                    <div className="flex flex-wrap justify-center gap-8 md:gap-16 opacity-70 grayscale hover:grayscale-0 transition-all duration-500">
+                      {SUPPORTED_NETWORKS.map((brand) => (
+                        <span
+                          key={brand}
+                          className="text-xl md:text-2xl font-bold font-heading text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors cursor-default"
+                        >
+                          {brand}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
 
