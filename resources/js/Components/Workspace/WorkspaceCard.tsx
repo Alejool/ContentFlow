@@ -1,17 +1,17 @@
-import { useState } from "react";
 import { Link, router } from "@inertiajs/react";
 import {
+  ChevronRight,
+  ExternalLink,
   Globe,
   Info,
   Lock,
   Settings as SettingsIcon,
-  Users,
-  ExternalLink,
   UserPlus,
-  ChevronRight,
+  Users,
 } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import { useState } from "react";
 import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 import AvatarStack from "@/Components/Workspace/AvatarStack";
 import RoleBadge from "@/Components/Workspace/RoleBadge";
@@ -53,7 +53,7 @@ const WorkspaceCard = ({
 
   return (
     <div
-      className={`group relative bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900/50 dark:to-neutral-900 border border-gray-200 dark:border-neutral-800 rounded-2xl p-6 transition-all duration-300 hover:border-primary-300 dark:hover:border-primary-500/30 hover:shadow-2xl hover:shadow-primary-600/10 hover:-translate-y-1 ${
+      className={`group relative bg-gradient-to-br from-white/90 to-white/95 dark:from-black/90 dark:to-black/95 border border-white/70 dark:border-black/70 rounded-2xl p-6 transition-all duration-300 hover:border-primary-300 dark:hover:border-primary-500/30 hover:shadow-2xl hover:shadow-primary-600/10 hover:-translate-y-1 ${
         openMenuId === workspace.id ? "z-50 shadow-2xl" : "z-0"
       }`}
       onMouseEnter={() => setHoveredWorkspace(workspace.id)}
@@ -72,7 +72,7 @@ const WorkspaceCard = ({
             {workspace.name.charAt(0).toUpperCase()}
           </div>
           {userRole?.slug === "owner" && (
-            <div className="absolute -top-1 -left-1 h-6 w-6 bg-amber-500 rounded-full flex items-center justify-center border-2 border-white dark:border-neutral-900">
+            <div className="absolute -top-1 -left-1 h-6 w-6 bg-primary-500 rounded-full flex items-center justify-center border-2 border-white dark:border-neutral-900">
               <Users className="h-3 w-3 text-white" />
             </div>
           )}

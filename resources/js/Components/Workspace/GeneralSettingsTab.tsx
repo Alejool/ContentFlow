@@ -120,7 +120,7 @@ export default function GeneralSettingsTab({
 
   return (
     <div className="space-y-6">
-      <div className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-950 border border-gray-200 dark:border-neutral-800 rounded-2xl shadow-sm p-6">
+      <div className="bg-gradient-to-br from-white/90 to-white/95 dark:from-black/90 dark:to-black/95 border border-white/70 dark:border-black/70 rounded-2xl shadow-sm p-6">
         <div className="flex items-center gap-3 mb-8">
           <div className="h-12 w-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg flex items-center justify-center">
             <SettingsIcon className="h-6 w-6 text-white" />
@@ -181,7 +181,7 @@ export default function GeneralSettingsTab({
                       <div
                         className={`h-10 w-10 rounded-lg flex items-center justify-center ${
                           isPublic
-                            ? "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400"
+                            ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400"
                             : "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
                         }`}
                       >
@@ -211,14 +211,14 @@ export default function GeneralSettingsTab({
                         disabled={!isOwner}
                         className="sr-only peer"
                       />
-                      <div className="w-11 h-6 bg-gray-200 dark:bg-neutral-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"></div>
+                      <div className="w-11 h-6 bg-gray-200 dark:bg-neutral-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"></div>
                     </label>
                   </div>
 
                   {isPublic && (
                     <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-neutral-800">
                       <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-lg bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+                        <div className="h-10 w-10 rounded-lg bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 flex items-center justify-center">
                           <UserCheck className="h-5 w-5" />
                         </div>
                         <div>
