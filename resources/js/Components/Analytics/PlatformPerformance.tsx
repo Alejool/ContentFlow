@@ -65,12 +65,12 @@ export default function PlatformPerformance({
         >
           <div
             className={`p-2 rounded-lg ${
-              theme === "dark" ? "bg-indigo-900/20" : "bg-indigo-100"
+              theme === "dark" ? "bg-primary-900/20" : "bg-primary-100"
             }`}
           >
             <LayoutPanelLeft
               className={`w-5 h-5 ${
-                theme === "dark" ? "text-indigo-400" : "text-indigo-600"
+                theme === "dark" ? "text-primary-400" : "text-primary-600"
               }`}
             />
           </div>

@@ -481,8 +481,8 @@ const StatCard: React.FC<StatCardProps> = ({
           className={`absolute -inset-1 bg-gradient-to-r ${
             colors.glow ||
             (theme === "dark"
-              ? "from-blue-600/5 via-purple-600/3 to-pink-600/5"
-              : "from-blue-200/10 via-purple-200/5 to-pink-200/10")
+              ? "from-primary-600/10 via-primary-400/5 to-primary-600/10"
+              : "from-primary-200/20 via-primary-300/10 to-primary-200/20")
           } blur-xl`}
         ></div>
       </div>
