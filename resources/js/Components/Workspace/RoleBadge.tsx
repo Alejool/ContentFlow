@@ -9,7 +9,7 @@ interface RoleBadgeProps {
 const RoleBadge = ({ role, showIcon = false, size = "md" }: RoleBadgeProps) => {
   const roleColors: Record<string, string> = {
     owner:
-      "bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800/50",
+      "bg-gradient-to-r from-primary-500/20 to-primary-600/20 text-primary-700 dark:text-primary-400 border border-primary-200 dark:border-primary-800/50",
     admin:
       "bg-gradient-to-r from-purple-500/20 to-pink-500/20 text-purple-700 dark:text-purple-400 border border-purple-200 dark:border-purple-800/50",
     member:

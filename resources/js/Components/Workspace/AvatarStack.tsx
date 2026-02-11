@@ -26,7 +26,7 @@ const AvatarStack = ({
         return (
           <div
             key={user.id}
-            className="relative inline-block h-8 w-8 rounded-full ring-2 ring-white dark:ring-neutral-900 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-neutral-800 dark:to-neutral-700 overflow-hidden cursor-help hover:scale-110 hover:z-10 transition-all duration-200 group"
+            className="relative inline-block h-8 w-8 rounded-full ring-2 ring-white dark:ring-neutral-900 bg-gradient-to-br from-primary-100 to-primary-200 dark:from-neutral-800 dark:to-neutral-700 overflow-hidden cursor-help hover:scale-110 hover:z-10 transition-all duration-200 group"
             title={`${user.name} - ${roleName}`}
           >
             {user.photo_url ? (
@@ -36,7 +36,7 @@ const AvatarStack = ({
                 className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-200"
               />
             ) : (
-              <div className="h-full w-full flex items-center justify-center text-[10px] font-bold bg-gradient-to-br from-blue-500 to-purple-500 text-white">
+              <div className="h-full w-full flex items-center justify-center text-[10px] font-bold bg-gradient-to-br from-primary-500 to-primary-600 text-white">
                 {user.name?.charAt(0).toUpperCase() || "?"}
               </div>
             )}
