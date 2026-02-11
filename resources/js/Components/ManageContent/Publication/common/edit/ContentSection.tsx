@@ -1,9 +1,9 @@
 import AiFieldSuggester from "@/Components/AiAssistant/AiFieldSuggester";
 import AiPromptSection from "@/Components/AiAssistant/AiPromptSection";
+import CampaignSelector from "@/Components/ManageContent/Publication/common/CampaignSelector";
 import Input from "@/Components/common/Modern/Input";
-import Select from "@/Components/common/Modern/Select";
 import Textarea from "@/Components/common/Modern/Textarea";
-import { FileText, Hash, Target } from "lucide-react";
+import { FileText, Hash } from "lucide-react";
 import { memo } from "react";
 import { FieldErrors, UseFormRegister, UseFormSetValue } from "react-hook-form";
 
@@ -145,27 +145,34 @@ const ContentSection = memo(
           disabled={disabled}
         />
 
-        <Select
-          id="campaign_id"
-          label={t("publications.modal.edit.campaigns") || "Add to Campaign"}
-          options={(campaigns || []).map((campaign: any) => ({
-            value: campaign.id.toString(),
-            label: campaign.name || campaign.title || `Campaign ${campaign.id}`,
-          }))}
-          value={watched.campaign_id || ""}
-          onChange={(val) => {
-            setValue("campaign_id", val.toString(), { shouldValidate: true });
-          }}
-          register={register}
-          name="campaign_id"
-          placeholder={t("common.select") || "Select a campaign..."}
-          error={errors.campaign_id?.message as string}
-          icon={Target}
-          variant="filled"
-          size="lg"
-          clearable
-          disabled={disabled}
-        />
+        <div className="space-y-2">
+          <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+            {t("publications.modal.edit.campaigns") || "Add to Campaign"}
+          </label>
+          <div className="border border-gray-200 dark:border-neutral-700 rounded-lg p-3 bg-gray-50 dark:bg-black/20">
+            <CampaignSelector
+              campaigns={campaigns || []}
+              selectedId={
+                watched.campaign_id
+                  ? parseInt(watched.campaign_id.toString())
+                  : null
+              }
+              loading={false}
+              t={t}
+              onSelectCampaign={(id: number | null) => {
+                setValue("campaign_id", id?.toString() ?? "", {
+                  shouldValidate: true,
+                });
+              }}
+              disabled={disabled}
+            />
+          </div>
+          {errors.campaign_id?.message && (
+            <p className="text-xs text-red-500 mt-1">
+              {errors.campaign_id.message as string}
+            </p>
+          )}
+        </div>
       </div>
     );
   },

@@ -1,6 +1,8 @@
 import Loader from "@/Components/common/Loader";
+import SearchableSelector from "@/Components/common/Modern/SearchableSelector";
 import { Check } from "lucide-react";
 import React from "react";
+
 interface PublicationSelectorProps {
   publications: any[];
   selectedIds: number[];
@@ -10,6 +12,7 @@ interface PublicationSelectorProps {
   onTogglePublication: (id: number) => void;
   mode?: "add" | "edit";
   disabled?: boolean;
+  maxHeight?: string;
 }
 
 const PublicationSelector: React.FC<PublicationSelectorProps> = ({
@@ -21,6 +24,7 @@ const PublicationSelector: React.FC<PublicationSelectorProps> = ({
   onTogglePublication,
   mode = "add",
   disabled = false,
+  maxHeight,
 }) => {
   if (loading) {
     return (
@@ -42,19 +46,34 @@ const PublicationSelector: React.FC<PublicationSelectorProps> = ({
   }
 
   return (
-    <div className="grid grid-cols-1 gap-2">
-      {publications.map((pub) => {
-        const isSelected = selectedIds.includes(pub.id);
+    <SearchableSelector
+      items={publications}
+      selectedIds={selectedIds}
+      onToggle={onTogglePublication}
+      loading={loading}
+      mode="multiple"
+      searchPlaceholder={t("common.search") || "Search publications..."}
+      emptyMessage={
+        mode === "edit"
+          ? t("campaigns.modal.edit.noPublications")
+          : t("campaigns.modal.add.noPublications")
+      }
+      noResultsMessage={t("common.noResults") || "No publications found"}
+      getItemId={(pub) => pub.id}
+      getSearchableText={(pub) => pub.title || pub.name || ""}
+      disabled={disabled}
+      maxHeight={maxHeight}
+      renderItem={(pub, isSelected) => {
         const thumbnail = getThumbnail(pub);
 
         return (
           <div
-            key={pub.id}
-            onClick={() => !disabled && onTogglePublication(pub.id)}
-            className={`flex items-center gap-3 p-2 rounded cursor-pointer border transition-all ${disabled ? "opacity-60 cursor-default" : ""} ${
+            className={`flex items-center gap-3 p-2 rounded cursor-pointer border transition-all ${
+              disabled ? "opacity-60 cursor-default" : ""
+            } ${
               isSelected
                 ? "border-primary-500 bg-primary-50 dark:bg-primary-900/20 shadow-sm"
-                : "border-gray-200 bg-white hover:border-primary-300 dark:border-neutral-700 dark:bg-neutral-800 hover:bg-gray-50"
+                : "border-gray-200 bg-white hover:border-primary-300 dark:border-neutral-700 dark:bg-neutral-800 hover:bg-gray-50 dark:hover:bg-neutral-700/50"
             }`}
           >
             <Checkbox isSelected={isSelected} disabled={disabled} />
@@ -68,8 +87,8 @@ const PublicationSelector: React.FC<PublicationSelectorProps> = ({
             </div>
           </div>
         );
-      })}
-    </div>
+      }}
+    />
   );
 };
 

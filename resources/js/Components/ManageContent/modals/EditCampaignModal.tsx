@@ -187,7 +187,7 @@ export default function EditCampaignModal({
                 {t("campaigns.modal.edit.associatedPublications")}
               </label>
 
-              <div className="border border-gray-200 dark:border-neutral-700 rounded-lg max-h-48 overflow-y-auto p-2 bg-gray-50 dark:bg-black/20">
+              <div className="border border-gray-200 dark:border-neutral-700 rounded-lg p-2 bg-gray-50 dark:bg-black/20">
                 <PublicationSelector
                   publications={availablePublications}
                   selectedIds={watchedFields.publication_ids || []}
@@ -196,6 +196,7 @@ export default function EditCampaignModal({
                   getThumbnail={getThumbnail}
                   onTogglePublication={togglePublication}
                   disabled={isDisabled}
+                  maxHeight="max-h-48"
                 />
               </div>
             </div>
