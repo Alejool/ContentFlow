@@ -117,9 +117,6 @@ export default function Login() {
 
             <div>
               <div className="relative">
-                <div className="absolute left-3 top-1/2 -translate-y-1/2">
-                  <Lock className="w-5 h-5 text-gray-400" />
-                </div>
                 <Input
                   id="login_password"
                   label={t("auth.login.inputs.password")}
@@ -167,9 +164,6 @@ export default function Login() {
             </Button>
 
             <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300 dark:border-gray-700"></div>
-              </div>
               <div className="relative flex justify-center text-sm">
                 <span className="px-4 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">
                   {t("auth.login.orContinueWith")}
