@@ -79,7 +79,7 @@ const PlatformIcon = ({
     case "user_event":
     case "event":
     case "events":
-      return <CalendarIcon className={`text-indigo-500 ${className}`} />;
+      return <CalendarIcon className={`text-primary-500 ${className}`} />;
     default:
       return <CalendarIcon className={`text-gray-500 ${className}`} />;
   }
@@ -228,7 +228,7 @@ export default function CalendarIndex({ auth }: { auth: any }) {
 
       <div className="py-8">
         <div className="max-w-[1600px] mx-auto sm:px-6 lg:px-8">
-          <div className="bg-white dark:bg-gray-900 overflow-hidden shadow-xl sm:rounded-2xl border border-gray-100 dark:border-gray-800">
+          <div className="bg-white dark:bg-black overflow-hidden shadow-xl sm:rounded-2xl border border-gray-100 dark:border-gray-800">
             <div className="p-6">
               {/* Toolbar */}
               <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-6">
@@ -251,7 +251,7 @@ export default function CalendarIndex({ auth }: { auth: any }) {
                     </button>
 
                     {showMonthPicker && (
-                      <div className="absolute top-full left-0 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 p-4 min-w-[280px]">
+                      <div className="absolute top-full left-0 mt-2 bg-white dark:bg-black border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 p-4 min-w-[280px]">
                         <div className="grid grid-cols-3 gap-2 mb-4">
                           {Array.from({ length: 12 }, (_, i) => (
                             <button
@@ -358,9 +358,9 @@ export default function CalendarIndex({ auth }: { auth: any }) {
               </div>
 
               {/* Calendar Grid */}
-              <div className="border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden shadow-sm bg-gray-50 dark:bg-gray-900/50">
+              <div className="border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden shadow-sm bg-gray-50 dark:bg-black/50">
                 {/* Weekday Headers - Desktop Only */}
-                <div className="hidden lg:grid grid-cols-7 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
+                <div className="hidden lg:grid grid-cols-7 bg-white dark:bg-black border-b border-gray-200 dark:border-gray-800">
                   {["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"].map(
                     (day) => (
                       <div
@@ -379,7 +379,7 @@ export default function CalendarIndex({ auth }: { auth: any }) {
                   {startingEmptySlots.map((_, i) => (
                     <div
                       key={`empty-${i}`}
-                      className="hidden lg:block bg-gray-50/50 dark:bg-gray-900/50 p-2"
+                      className="hidden lg:block bg-gray-50/50 dark:bg-black/50 p-2"
                     ></div>
                   ))}
 
@@ -398,8 +398,8 @@ export default function CalendarIndex({ auth }: { auth: any }) {
                         onDrop={(e) => handleDrop(e, day)}
                         className={`
                                                     relative p-2 min-h-[140px] transition-all group
-                                                    ${isCurrentMonth ? "bg-white dark:bg-gray-900" : "bg-gray-50/30 dark:bg-gray-900/30"}
-                                                    ${isTodayDay ? "bg-purple-50/10 dark:bg-primary-900/5" : ""}
+                                                    ${isCurrentMonth ? "bg-white dark:bg-black" : "bg-gray-50/30 dark:bg-black/30"}
+                                                    ${isTodayDay ? "bg-primary-50/10 dark:bg-primary-900/5" : ""}
                                                     hover:bg-gray-50 dark:hover:bg-gray-800/50
                                                 `}
                       >
