@@ -18,4 +18,7 @@ return [
     'accountMissingTitle' => 'Account Disconnected',
     'accountMissingText' => 'This publication was posted on an account (:account) that is no longer connected. Editing it will create a new version for your current account(s). Proceed?',
   ],
+  'validation' => [
+    'scheduledMinDifference' => 'The scheduled date must be at least 5 minutes after the current time.',
+  ],
 ];

@@ -55,13 +55,10 @@ class UpdatePublicationRequest extends FormRequest
           $existing = $publication->scheduled_at;
           if ($value) {
             $scheduledDate = Carbon::parse($value);
-            $now = Carbon::now();
+            $now = Carbon::now('UTC')->addMinutes(5);
 
             if ($scheduledDate->lt($now)) {
-              // Allow if it's an existing schedule and the difference is less than 60 seconds
-              if (!$existing || abs($scheduledDate->diffInSeconds(Carbon::parse($existing))) > 60) {
-                $fail('The scheduled date must be in the future.');
-              }
+              $fail(__('publications.validation.scheduledMinDifference'));
             }
           }
         }
@@ -69,6 +66,54 @@ class UpdatePublicationRequest extends FormRequest
       'social_accounts' => 'nullable|array',
       'social_accounts.*' => 'exists:social_accounts,id',
       'social_account_schedules' => 'nullable|array',
+      'social_account_schedules.*' => [
+        'nullable',
+        'date',
+        function ($attribute, $value, $fail) use ($publication) {
+          if (!$publication || !$value) return;
+
+          // Extract account ID from attribute name
+          preg_match('/(?:social_account_schedules|account_schedules)\.(\d+)/', $attribute, $matches);
+          $accountId = $matches[1] ?? null;
+
+          if ($accountId) {
+            $existingPost = $publication->scheduled_posts()
+              ->where('social_account_id', $accountId)
+              ->first();
+            $existing = $existingPost?->scheduled_at;
+
+            $scheduledDate = Carbon::parse($value);
+            $now = Carbon::now('UTC')->addMinutes(5);
+
+            if ($scheduledDate->lt($now)) {
+              $fail(__('publications.validation.scheduledMinDifference'));
+            }
+          }
+        }
+      ],
+      'social_accounts.*' => [
+        function ($attribute, $value, $fail) use ($publication) {
+          if (!$publication) return;
+
+          $accountId = $value;
+          // Check if this account has an individual schedule in the request
+          $individualSchedule = $this->input("social_account_schedules.{$accountId}");
+
+          // If no individual schedule, it inherits the global scheduled_at
+          if (!$individualSchedule) {
+            $globalSchedule = $this->input('scheduled_at') ?? $publication->scheduled_at;
+
+            if ($globalSchedule) {
+              $scheduledDate = Carbon::parse($globalSchedule);
+              $now = Carbon::now('UTC')->addMinutes(5);
+
+              if ($scheduledDate->lt($now)) {
+                $fail(__('publications.validation.scheduledMinDifference'));
+              }
+            }
+          }
+        }
+      ],
       'platform_settings' => 'nullable',
       'campaign_id' => 'nullable|exists:campaigns,id',
       'media' => 'nullable|array',

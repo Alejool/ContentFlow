@@ -275,7 +275,8 @@
         "scheduledAtRequired": "La fecha programada es requerida cuando seleccionas redes sociales",
         "socialAccountsRequired": "Por favor, selecciona al menos una red social",
         "allSchedulesRequired": "Todas las redes deben tener una fecha o activa la fecha global",
-        "singleVideo": "Solo puedes subir un video por publicación."
+        "singleVideo": "Solo puedes subir un video por publicación.",
+        "scheduledMinDifference": "La fecha debe ser al menos 5 minutos después de la actual"
       },
       "cancel_confirmation": {
         "title": "Cancelar Publicación",

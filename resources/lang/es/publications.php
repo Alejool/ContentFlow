@@ -18,4 +18,7 @@ return [
     'accountMissingTitle' => 'Cuenta Desconectada',
     'accountMissingText' => 'Esta publicación fue publicada en una cuenta (:account) que ya no está conectada. Editarla creará una nueva versión para tus cuentas actuales. ¿Proceder?',
   ],
+  'validation' => [
+    'scheduledMinDifference' => 'La fecha debe ser al menos 5 minutos después de la actual.',
+  ],
 ];
