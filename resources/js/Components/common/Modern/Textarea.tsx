@@ -146,7 +146,11 @@ export default function Textarea<T extends FieldValues>({
               ...(activeColor
                 ? {
                     "--tw-ring-color": activeColor,
-                    borderColor: isFocused ? activeColor : `${activeColor}40`,
+                    borderColor: isFocused
+                      ? activeColor
+                      : activeColor.includes("var(")
+                        ? `rgb(${activeColor} / 0.4)`
+                        : `${activeColor}40`,
                   }
                 : {}),
               ...props.style,

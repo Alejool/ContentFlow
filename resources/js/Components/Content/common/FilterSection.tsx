@@ -72,11 +72,11 @@ export default function FilterSection({
     },
   ];
 
-  const activeColor = "gray-400";
+  const activeColor = "primary-500";
 
   return (
     <div className="flex flex-col gap-4 bg-white dark:bg-neutral-800/50 p-4 rounded-lg border border-gray-100 dark:border-neutral-700 shadow-sm mt-4">
-      <div className="flex flex-col md:flex-row gap-4 items-end">
+      <div className="flex flex-col md:flex-row gap-3 items-between">
         <div className="flex-1 w-full">
           <Input
             id="search"
@@ -91,7 +91,7 @@ export default function FilterSection({
         </div>
 
         <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-          <div className="min-w-[140px]">
+          <div>
             <Select<any>
               id="status-filter"
               options={
@@ -114,7 +114,7 @@ export default function FilterSection({
           </div>
 
           {mode !== "logs" && (
-            <div className="min-w-[140px]">
+            <div>
               <Select<any>
                 id="sort-filter"
                 options={sortOptions}

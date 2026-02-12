@@ -19,6 +19,22 @@ import { useTranslation } from "react-i18next";
 registerLocale("es", es);
 registerLocale("en", enUS);
 
+const getColor = (color: string, alpha: string = "1") => {
+  if (!color) return color;
+  if (color.startsWith("primary-")) {
+    const alphaMap: Record<string, string> = {
+      dd: "0.86",
+      "60": "0.37",
+      "10": "0.06",
+      "05": "0.03",
+      "20": "0.12",
+    };
+    const a = alphaMap[alpha] || alpha;
+    return `rgb(var(--${color}) / ${a})`;
+  }
+  return alpha !== "1" ? `${color}${alpha}` : color;
+};
+
 interface DatePickerProps<T extends FieldValues> {
   selected?: Date | null;
   onChange: (date: Date | null) => void;
@@ -250,7 +266,7 @@ const DatePickerModern = <T extends FieldValues>({
   size = "md",
   variant = "default",
   containerClassName = "",
-  activeColor = "gray-400",
+  activeColor = "primary-500",
   id,
 }: DatePickerProps<T>) => {
   const { i18n } = useTranslation();
@@ -446,9 +462,9 @@ const DatePickerModern = <T extends FieldValues>({
           }
 
           .header-nav-btn:hover:not(:disabled) {
-            background: #f3f4f6 !important;
-            border-color: #9ca3af !important;
-            color: #111827 !important;
+            background: ${getColor(activeColor, "05")} !important;
+            border-color: ${getColor(activeColor)} !important;
+            color: ${getColor(activeColor)} !important;
             transform: scale(1.05);
           }
 
@@ -464,9 +480,9 @@ const DatePickerModern = <T extends FieldValues>({
           }
 
           .dark .header-nav-btn:hover:not(:disabled) {
-            background: #404040 !important;
-            border-color: #525252 !important;
-            color: #ffffff !important;
+            background: ${getColor(activeColor, "10")} !important;
+            border-color: ${getColor(activeColor, "60")} !important;
+            color: white !important;
           }
 
           .react-datepicker__current-month,
@@ -557,11 +573,11 @@ const DatePickerModern = <T extends FieldValues>({
           }
 
           .time-spinner-btn:hover {
-            background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
-            border-color: #ea580c;
+            background: linear-gradient(135deg, ${getColor(activeColor)} 0%, ${getColor(activeColor, "dd")} 100%);
+            border-color: ${getColor(activeColor)};
             color: white;
             transform: translateY(-1px);
-            box-shadow: 0 4px 6px -1px rgba(234, 88, 12, 0.3);
+            box-shadow: 0 4px 6px -1px ${getColor(activeColor, "60")};
           }
 
           .dark .time-spinner-btn {
@@ -571,8 +587,8 @@ const DatePickerModern = <T extends FieldValues>({
           }
 
           .dark .time-spinner-btn:hover {
-            background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
-            border-color: #ea580c;
+            background: linear-gradient(135deg, ${getColor(activeColor)} 0%, ${getColor(activeColor, "dd")} 100%);
+            border-color: ${getColor(activeColor)};
             color: white;
           }
 
@@ -591,9 +607,9 @@ const DatePickerModern = <T extends FieldValues>({
 
           .time-input:focus {
             outline: none;
-            border-color: ${activeColor};
-            box-shadow: 0 0 0 3px ${activeColor}20;
-            background-color: ${activeColor}05;
+            border-color: ${getColor(activeColor)};
+            box-shadow: 0 0 0 3px ${getColor(activeColor, "20")};
+            background-color: ${getColor(activeColor, "05")};
           }
 
           .dark .time-input {
@@ -603,8 +619,8 @@ const DatePickerModern = <T extends FieldValues>({
           }
 
           .dark .time-input:focus {
-            border-color: ${activeColor};
-            background-color: ${activeColor}20;
+            border-color: ${getColor(activeColor)};
+            background-color: ${getColor(activeColor, "20")};
           }
 
           .time-label {
@@ -646,10 +662,10 @@ const DatePickerModern = <T extends FieldValues>({
           }
 
           .react-datepicker__day:hover {
-            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%) !important;
-            color: #111827 !important;
+            background: ${getColor(activeColor, "10")} !important;
+            color: ${getColor(activeColor)} !important;
             transform: scale(1.1);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px -1px ${getColor(activeColor, "20")};
           }
 
           .dark .react-datepicker__day:hover {
@@ -659,22 +675,23 @@ const DatePickerModern = <T extends FieldValues>({
 
           .react-datepicker__day--selected,
           .react-datepicker__day--keyboard-selected {
-            background: linear-gradient(135deg, ${activeColor} 0%, ${activeColor}dd 100%) !important;
+            background: ${getColor(activeColor)} !important;
             color: white !important;
             font-weight: 700 !important;
-            box-shadow: 0 4px 6px -1px ${activeColor}60;
+            box-shadow: 0 4px 6px -1px ${getColor(activeColor, "60")};
             transform: scale(1.05);
           }
 
           .react-datepicker__day--today {
             font-weight: 700;
-            color: ${activeColor} !important;
-            background: linear-gradient(135deg, ${activeColor}10 0%, ${activeColor}05 100%) !important;
-            border: 2px solid ${activeColor};
+            color: ${getColor(activeColor)} !important;
+            background: linear-gradient(135deg, ${getColor(activeColor, "10")} 0%, ${getColor(activeColor, "05")} 100%) !important;
+            border: 2px solid ${getColor(activeColor)};
           }
 
           .dark .react-datepicker__day--today {
-            background: linear-gradient(135deg, rgba(234, 88, 12, 0.2) 0%, rgba(234, 88, 12, 0.1) 100%) !important;
+            background: linear-gradient(135deg, ${getColor(activeColor, "20")} 0%, ${getColor(activeColor, "10")} 100%) !important;
+            border-color: ${getColor(activeColor, "60")} !important;
           }
 
           .react-datepicker__day-name {
@@ -714,8 +731,8 @@ const DatePickerModern = <T extends FieldValues>({
 
           .react-datepicker__month-dropdown:hover,
           .react-datepicker__year-dropdown:hover {
-            border-color: #9ca3af !important;
-            background-color: #f9fafb !important;
+            border-color: ${getColor(activeColor)} !important;
+            background-color: ${getColor(activeColor, "05")} !important;
           }
 
           .dark .react-datepicker__month-dropdown,
@@ -727,8 +744,8 @@ const DatePickerModern = <T extends FieldValues>({
 
           .dark .react-datepicker__month-dropdown:hover,
           .dark .react-datepicker__year-dropdown:hover {
-            border-color: #737373 !important;
-            background-color: #404040 !important;
+            border-color: ${getColor(activeColor)} !important;
+            background-color: ${getColor(activeColor, "20")} !important;
           }
 
 

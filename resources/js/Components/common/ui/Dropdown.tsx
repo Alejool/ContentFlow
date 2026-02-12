@@ -33,7 +33,7 @@ const Dropdown = ({ children }: DropdownProps) => {
 
   return (
     <DropDownContext.Provider value={{ open, setOpen, toggleOpen }}>
-      <div className="relative">{children}</div>
+      <div className="relative w-fit">{children}</div>
     </DropDownContext.Provider>
   );
 };
@@ -66,6 +66,7 @@ interface ContentProps {
   align?: "left" | "right";
   width?: "48" | string;
   contentClasses?: string;
+  className?: string;
   children: ReactNode;
 }
 
@@ -73,6 +74,7 @@ const Content = ({
   align = "right",
   width = "86",
   contentClasses = "py-4 mt-3 bg-gray-50 font-bold block text-center",
+  className = "",
   children,
 }: ContentProps) => {
   const context = useContext(DropDownContext);
@@ -83,16 +85,16 @@ const Content = ({
 
   let alignmentClasses = "origin-top";
   if (align === "left") {
-    alignmentClasses = "ltr:origin-top-left rtl:origin-top-right start-0";
+    alignmentClasses = "origin-top-left left-0";
   } else if (align === "right") {
-    alignmentClasses = "ltr:origin-top-right rtl:origin-top-left end-0";
+    alignmentClasses = "origin-top-right right-0";
   }
 
   let widthClasses = "";
   if (width === "48") {
     widthClasses = "w-48";
   } else if (width) {
-    widthClasses = `w-${width}`; // Example for custom width
+    widthClasses = `w-${width}`;
   }
 
   return (
@@ -106,7 +108,7 @@ const Content = ({
       leaveTo="opacity-0 scale-95"
     >
       <div
-        className={`absolute z-50 mt-2 rounded-lg shadow-2xl border border-gray-100 dark:border-neutral-700 ${alignmentClasses} ${widthClasses}`}
+        className={`absolute z-50 mt-2 rounded-lg shadow-2xl border border-gray-100 dark:border-neutral-700 ${alignmentClasses} ${widthClasses} ${className}`}
         onClick={() => setOpen(false)}
       >
         <div

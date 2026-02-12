@@ -408,6 +408,9 @@ export default function Select<T extends FieldValues>({
     }
   };
 
+  const isSolidActive =
+    activeColor && value !== undefined && value !== "" && value !== null;
+
   return (
     <>
       <div
@@ -442,7 +445,13 @@ export default function Select<T extends FieldValues>({
         <div className={getContainerStyles()}>
           <div className="relative">
             {Icon && (
-              <div className="absolute left-3 top-1/2 -translate-y-1/2 z-10 text-gray-500 dark:text-gray-400">
+              <div
+                className={`absolute left-3 top-1/2 -translate-y-1/2 z-10 ${
+                  isSolidActive
+                    ? "text-white"
+                    : "text-gray-500 dark:text-gray-400"
+                }`}
+              >
                 <div className={currentSize.icon}>
                   {isValidElement(Icon) ? (
                     Icon
@@ -489,8 +498,22 @@ export default function Select<T extends FieldValues>({
                 {
                   ...(activeColor
                     ? {
-                        "--tw-ring-color": activeColor,
-                        borderColor: isOpen ? activeColor : undefined,
+                        "--tw-ring-color": activeColor.startsWith("primary-")
+                          ? `rgb(var(--${activeColor}))`
+                          : activeColor,
+                        borderColor: isSolidActive
+                          ? "transparent"
+                          : isOpen
+                            ? activeColor.startsWith("primary-")
+                              ? `rgb(var(--${activeColor}))`
+                              : activeColor
+                            : undefined,
+                        backgroundColor: isSolidActive
+                          ? activeColor.startsWith("primary-")
+                            ? `rgb(var(--${activeColor}))`
+                            : activeColor
+                          : undefined,
+                        color: isSolidActive ? "#ffffff" : undefined,
                       }
                     : {}),
                 } as React.CSSProperties
@@ -522,7 +545,11 @@ export default function Select<T extends FieldValues>({
                           handleClear(e as any);
                         }
                       }}
-                      className="p-1 hover:bg-black/10 dark:hover:bg-white/10 rounded transition-colors cursor-pointer"
+                      className={`p-1 ${
+                        isSolidActive
+                          ? "hover:bg-white/10"
+                          : "hover:bg-black/10 dark:hover:bg-white/10"
+                      } rounded transition-colors cursor-pointer`}
                       aria-label="Clear selection"
                     >
                       <X className="w-4 h-4" />
@@ -535,7 +562,11 @@ export default function Select<T extends FieldValues>({
                       currentSize.icon
                     } transition-transform duration-200 flex-shrink-0
                     ${isOpen ? "rotate-180" : ""}
-                    text-gray-500 dark:text-gray-400
+                    ${
+                      isSolidActive
+                        ? "text-white"
+                        : "text-gray-500 dark:text-gray-400"
+                    }
                   `}
                   aria-hidden="true"
                 />
@@ -584,6 +615,7 @@ export default function Select<T extends FieldValues>({
                 ) : (
                   filteredOptions.map((option) => {
                     const isSelected = option.value === value;
+
                     return (
                       <button
                         key={option.value}
@@ -599,8 +631,12 @@ export default function Select<T extends FieldValues>({
                         style={
                           isSelected && activeColor
                             ? ({
-                                backgroundColor: `${activeColor}20`,
-                                color: activeColor,
+                                backgroundColor: activeColor.startsWith(
+                                  "primary-",
+                                )
+                                  ? `rgb(var(--${activeColor}))`
+                                  : activeColor,
+                                color: "#ffffff",
                               } as React.CSSProperties)
                             : {}
                         }

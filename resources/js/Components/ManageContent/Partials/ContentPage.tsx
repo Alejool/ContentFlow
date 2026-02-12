@@ -310,33 +310,38 @@ export default function ManageContentPage() {
         style={style}
         className="flex items-center gap-1 group/tab"
       >
-        <button
+        <Button
           onClick={() => handleTabChange(id)}
+          variant={isActive ? "primary" : "ghost"}
+          buttonStyle={isActive ? "solid" : "ghost"}
+          size="md"
           {...attributes}
           {...listeners}
-          className={`flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-bold transition-all duration-200 whitespace-nowrap relative select-none ${
+          className={`flex items-center justify-center p-0 rounded-lg text-sm font-bold transition-all duration-200 select-none border-0 ${
             isActive
               ? "bg-primary-600 text-white shadow-md shadow-primary-500/20 ring-1 ring-primary-500/50"
               : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-700/50"
           }`}
         >
-          <GripHorizontal
-            className={`w-3 h-3 opacity-0 group-hover/tab:opacity-40 transition-opacity cursor-grab active:cursor-grabbing mr-[-4px] ${isActive ? "text-white" : ""}`}
-          />
-          {getTabIcon(id, isActive)}
-          <span>{label}</span>
-          {hasBadge && badgeCount > 0 && (
-            <span
-              className={`ml-1 px-1.5 py-0.5 text-[10px] font-bold rounded-full ${
-                isActive
-                  ? "bg-white/20 text-white"
-                  : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
-              }`}
-            >
-              {badgeCount}
-            </span>
-          )}
-        </button>
+          <div className="flex items-center justify-center gap-2">
+            <GripHorizontal
+              className={`w-3 h-3 opacity-0 group-hover/tab:opacity-40 transition-opacity cursor-grab active:cursor-grabbing mr-[-4px] ${isActive ? "text-white" : ""}`}
+            />
+            {getTabIcon(id, isActive)}
+            <span>{label}</span>
+            {hasBadge && badgeCount > 0 && (
+              <span
+                className={`ml-1 px-1.5 py-0.5 text-[10px] font-bold rounded-full ${
+                  isActive
+                    ? "bg-white/20 text-white"
+                    : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+                }`}
+              >
+                {badgeCount}
+              </span>
+            )}
+          </div>
+        </Button>
       </div>
     );
   };
@@ -365,40 +370,43 @@ export default function ManageContentPage() {
                       variant="primary"
                       size="md"
                       icon={Plus}
-                      className="gap-2"
+                      className="gap-2 uppercase tracking-wider font-bold text-xs"
                     >
-                      {t("manageContent.createNew")}
+                      {t("manageContent.createNew").toUpperCase()}
                     </Button>
                   </Dropdown.Trigger>
                   <Dropdown.Content
                     align="right"
                     width="auto"
-                    contentClasses="py-1 bg-white dark:bg-neutral-800 shadow-xl rounded-xl border border-gray-200 dark:border-neutral-700 min-w-[200px]"
+                    contentClasses="py-1 bg-white dark:bg-neutral-800 shadow-xl rounded-lg border border-gray-200 dark:border-neutral-700 min-w-[220px]"
                   >
-                    <Button
-                      onClick={() => openAddModal("publication")}
-                      variant="ghost"
-                      buttonStyle="ghost"
-                      size="lg"
-                      icon={FileText}
-                      iconPosition="left"
-                      fullWidth
-                      className="justify-start hover:bg-gray-50 dark:hover:bg-neutral-700/50 rounded-none border-0"
-                    >
-                      {t("manageContent.tabs.publications")}
-                    </Button>
-                    <Button
-                      onClick={() => openAddModal("campaign")}
-                      variant="ghost"
-                      buttonStyle="ghost"
-                      size="lg"
-                      icon={Target}
-                      iconPosition="left"
-                      fullWidth
-                      className="justify-start hover:bg-gray-50 dark:hover:bg-neutral-700/50 rounded-none border-t border-gray-100 dark:border-neutral-700/50"
-                    >
-                      {t("manageContent.tabs.campaigns")}
-                    </Button>
+                    <div className="p-1">
+                      <Button
+                        onClick={() => openAddModal("publication")}
+                        variant="ghost"
+                        buttonStyle="ghost"
+                        size="md"
+                        icon={FileText}
+                        iconPosition="left"
+                        fullWidth
+                        className="justify-start px-4 py-2 hover:bg-gray-50 dark:hover:bg-neutral-700/50 rounded-lg border-0 transition-all duration-200 uppercase tracking-wider font-bold text-xs"
+                      >
+                        {t("manageContent.tabs.publications").toUpperCase()}
+                      </Button>
+                      <div className="mx-2 my-1 border-t border-gray-100 dark:border-neutral-700/50" />
+                      <Button
+                        onClick={() => openAddModal("campaign")}
+                        variant="ghost"
+                        buttonStyle="ghost"
+                        size="md"
+                        icon={Target}
+                        iconPosition="left"
+                        fullWidth
+                        className="justify-start px-4 py-2 hover:bg-gray-50 dark:hover:bg-neutral-700/50 rounded-lg border-0 transition-all duration-200 uppercase tracking-wider font-bold text-xs"
+                      >
+                        {t("manageContent.tabs.campaigns").toUpperCase()}
+                      </Button>
+                    </div>
                   </Dropdown.Content>
                 </Dropdown>
               )}
@@ -462,26 +470,30 @@ export default function ManageContentPage() {
                 <div className="bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 overflow-hidden shadow-sm">
                   <div className="border-b border-gray-200 dark:border-neutral-700 flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 bg-gray-50/50 dark:bg-neutral-800/50">
                     <div className="flex bg-gray-200/50 dark:bg-neutral-700/50 p-1 rounded-lg w-fit">
-                      <button
+                      <Button
                         onClick={() => setApprovalTab("pending")}
-                        className={`px-6 py-2 rounded-lg font-bold text-sm transition-all ${
+                        variant="ghost"
+                        buttonStyle="solid"
+                        className={`px-6 py-2 rounded-lg font-bold text-sm transition-all border-0 shadow-none hover:bg-transparent ${
                           approvalTab === "pending"
                             ? "bg-white dark:bg-neutral-800 text-primary-600 dark:text-primary-400 shadow-sm ring-1 ring-black/5"
                             : "text-gray-500 hover:text-gray-700"
                         }`}
                       >
-                        {t("approvals.tabs.pending")}
-                      </button>
-                      <button
+                        {t("approvals.tabs.pending").toUpperCase()}
+                      </Button>
+                      <Button
                         onClick={() => setApprovalTab("history")}
-                        className={`px-6 py-2 rounded-lg font-bold text-sm transition-all ${
+                        variant="ghost"
+                        buttonStyle="solid"
+                        className={`px-6 py-2 rounded-lg font-bold text-sm transition-all border-0 shadow-none hover:bg-transparent ${
                           approvalTab === "history"
                             ? "bg-white dark:bg-neutral-800 text-primary-600 dark:text-primary-400 shadow-sm ring-1 ring-black/5"
                             : "text-gray-500 hover:text-gray-700"
                         }`}
                       >
-                        {t("approvals.tabs.history")}
-                      </button>
+                        {t("approvals.tabs.history").toUpperCase()}
+                      </Button>
                     </div>
                   </div>
 
@@ -598,8 +610,8 @@ export default function ManageContentPage() {
         <ModalFooter
           onClose={() => setDeleteConfirmation({ isOpen: false, id: null })}
           onPrimarySubmit={confirmDelete}
-          submitText={t("common.delete") || "Eliminar"}
-          cancelText={t("common.cancel") || "Cancelar"}
+          submitText={t("common.delete").toUpperCase() || "ELIMINAR"}
+          cancelText={t("common.cancel").toUpperCase() || "CANCELAR"}
           submitVariant="danger"
           submitIcon={<Trash2 className="w-4 h-4" />}
           cancelStyle="outline"

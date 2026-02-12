@@ -1,5 +1,5 @@
-import ExpandableText from "@/Components/ManageContent/common/ExpandableText";
-import FilterSection from "@/Components/ManageContent/common/FilterSection";
+import ExpandableText from "@/Components/Content/common/ExpandableText";
+import FilterSection from "@/Components/Content/common/FilterSection";
 import AdvancedPagination from "@/Components/common/ui/AdvancedPagination";
 import EmptyState from "@/Components/common/ui/EmptyState";
 import TableContainer from "@/Components/common/ui/TableContainer";

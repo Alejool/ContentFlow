@@ -1,7 +1,7 @@
-import CampaignTable from "@/Components/ManageContent/Campaign/CampaignTable";
-import PublicationTable from "@/Components/ManageContent/Publication/PublicationTable";
-import FilterSection from "@/Components/ManageContent/common/FilterSection";
-import HeaderSection from "@/Components/ManageContent/common/HeaderSection";
+import CampaignTable from "@/Components/Content/Campaign/CampaignTable";
+import PublicationTable from "@/Components/Content/Publication/PublicationTable";
+import FilterSection from "@/Components/Content/common/FilterSection";
+import HeaderSection from "@/Components/Content/common/HeaderSection";
 import AdvancedPagination from "@/Components/common/ui/AdvancedPagination";
 import { useTheme } from "@/Hooks/useTheme";
 import { CampaignListProps } from "@/types/CampaignListProps";
