@@ -1,11 +1,16 @@
-import axios from "axios";
+import { Campaign } from "@/types/Campaign";
+import { Publication } from "@/types/Publication";
+import axios, { AxiosResponse } from "axios";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
-export function useCampaignManagement() {
+export type ContentItem = Campaign | Publication;
+export type ContentEndpoint = "publications" | "campaigns" | "logs";
+
+export function useContentManagement() {
   const { t } = useTranslation();
-  const [campaigns, setCampaigns] = useState<(Campaign | Publication)[]>([]);
+  const [items, setItems] = useState<ContentItem[]>([]);
   const [pagination, setPagination] = useState({
     current_page: 1,
     last_page: 1,
@@ -14,10 +19,10 @@ export function useCampaignManagement() {
   });
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchCampaigns = async (
+  const fetchItems = async (
     filters: any = {},
     page: number = 1,
-    endpoint: "publications" | "campaigns" | "logs",
+    endpoint: ContentEndpoint = "publications",
   ) => {
     try {
       setIsLoading(true);
@@ -27,16 +32,18 @@ export function useCampaignManagement() {
       if (filters.date_start) params.append("date_start", filters.date_start);
       if (filters.date_end) params.append("date_end", filters.date_end);
 
-      const response = await axios.get(`/api/v1/${endpoint}?${params.toString()}`);
+      const response: AxiosResponse = await axios.get(`/api/v1/${endpoint}`, {
+        params,
+      });
 
       // Handle both publications and campaigns response structure
       const dataKey =
         endpoint === "publications" ? "publications" : "campaigns";
 
       const responseData = response.data[dataKey];
-      const items = responseData?.data || [];
+      const resultItems = responseData?.data || [];
 
-      setCampaigns(items);
+      setItems(resultItems);
       setPagination({
         current_page: responseData.current_page || 1,
         last_page: responseData.last_page || 1,
@@ -50,11 +57,12 @@ export function useCampaignManagement() {
     }
   };
 
-  // ... (add, update, delete methods remain mostly same, but might trigger fetchCampaigns with current page)
-
-  const addCampaign = async (data: any) => {
+  const addItem = async (
+    data: any,
+    endpoint: Exclude<ContentEndpoint, "logs"> = "publications",
+  ) => {
     try {
-      let formData;
+      let formData: FormData;
       if (data instanceof FormData) {
         formData = data;
       } else {
@@ -64,6 +72,8 @@ export function useCampaignManagement() {
             if (data[key].length > 0) {
               formData.append(key, data[key][0]);
             }
+          } else if (Array.isArray(data[key])) {
+            data[key].forEach((val: any) => formData.append(`${key}[]`, val));
           } else {
             formData.append(key, data[key]);
           }
@@ -72,7 +82,7 @@ export function useCampaignManagement() {
       await axios.post(`/api/v1/${endpoint}`, formData);
       toast.success(t("campaigns.messages.addSuccess"));
       // Refresh current page
-      await fetchCampaigns({}, pagination.current_page);
+      await fetchItems({}, pagination.current_page, endpoint);
       return true;
     } catch (error) {
       toast.error(t("campaigns.messages.addError"));
@@ -80,13 +90,13 @@ export function useCampaignManagement() {
     }
   };
 
-  const updateCampaign = async (
+  const updateItem = async (
     id: number,
     data: any,
-    endpoint: "publications" | "campaigns" = "publications",
+    endpoint: Exclude<ContentEndpoint, "logs"> = "publications",
   ) => {
     try {
-      let response;
+      let response: AxiosResponse;
       if (data instanceof FormData) {
         response = await axios.post(`/api/v1/${endpoint}/${id}`, data, {
           headers: { "Content-Type": "multipart/form-data" },
@@ -99,7 +109,7 @@ export function useCampaignManagement() {
             data.media.some((item: any) => item instanceof File));
 
         if (hasFile) {
-          const formData = new FormData();
+          const formData: FormData = new FormData();
           formData.append("_method", "PUT");
 
           Object.keys(data).forEach((key) => {
@@ -127,21 +137,21 @@ export function useCampaignManagement() {
             }
           });
 
-          response = await axios.post(`/${endpoint}/${id}`, formData, {
+          response = await axios.post(`/api/v1/${endpoint}/${id}`, formData, {
             headers: { "Content-Type": "multipart/form-data" },
           });
         } else {
-          response = await axios.put(`/${endpoint}/${id}`, data);
+          response = await axios.put(`/api/v1/${endpoint}/${id}`, data);
         }
       }
 
-      // Optimistic update for list, but re-fetch to ensure order/pagination correct?
-      // Actually we just updated one item.
-      setCampaigns((prevCampaigns) =>
-        prevCampaigns.map((campaign) =>
-          campaign.id === id
-            ? response.data.campaign || response.data.publication
-            : campaign,
+      setItems((prevItems) =>
+        prevItems.map((item) =>
+          item.id === id
+            ? response.data.campaign ||
+              response.data.publication ||
+              response.data.item
+            : item,
         ),
       );
       toast.success(t("campaigns.messages.updateSuccess"));
@@ -153,27 +163,29 @@ export function useCampaignManagement() {
     }
   };
 
-  const deleteCampaign = async (id: number) => {
+  const deleteItem = async (
+    id: number,
+    endpoint: Exclude<ContentEndpoint, "logs"> = "publications",
+  ) => {
     try {
-      await axios.delete(`/${endpoint}/${id}`);
-      setCampaigns((prevCampaigns) =>
-        prevCampaigns.filter((campaign) => campaign.id !== id),
-      );
-      // If page becomes empty, maybe go back one page? For now just fetch current.
-      await fetchCampaigns({}, pagination.current_page);
+      await axios.delete(`/api/v1/${endpoint}/${id}`);
+      setItems((prevItems) => prevItems.filter((item) => item.id !== id));
+      await fetchItems({}, pagination.current_page, endpoint);
       toast.success(t("campaigns.messages.deleteSuccess"));
+      return true;
     } catch (error) {
       toast.error(t("campaigns.messages.deleteError"));
+      return false;
     }
   };
 
   return {
-    campaigns,
+    items,
     pagination,
     isLoading,
-    fetchCampaigns,
-    addCampaign,
-    updateCampaign,
-    deleteCampaign,
+    fetchItems,
+    addItem,
+    updateItem,
+    deleteItem,
   };
 }

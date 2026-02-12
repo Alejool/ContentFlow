@@ -130,9 +130,9 @@ const MediaUploadSection = memo(
                     }
                     onClearThumbnail={() => onClearThumbnail(preview.tempId)}
                     disabled={disabled || isAnyMediaProcessing}
-                    progress={uploadProgress?.[preview.file?.name || ""]}
-                    stats={uploadStats?.[preview.file?.name || ""]}
-                    error={uploadErrors?.[preview.file?.name || ""]}
+                    progress={uploadProgress?.[preview.tempId]}
+                    stats={uploadStats?.[preview.tempId]}
+                    error={uploadErrors?.[preview.tempId]}
                     isExternalProcessing={preview.status === "processing"}
                   />
                 ))}

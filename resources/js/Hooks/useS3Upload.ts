@@ -46,6 +46,36 @@ export const useS3Upload = () => {
 
   const uploadFile = useCallback(
     async (file: File, tempId: string) => {
+      // PROACTIVELY CHECK if this file is already being uploaded or is completed
+      const existingItem = useUploadQueue.getState().queue[tempId];
+      if (
+        existingItem &&
+        (existingItem.status === "uploading" ||
+          existingItem.status === "completed")
+      ) {
+        // If it's already uploading, we don't want to reset it or re-fire the whole process
+        // But we might want to return the existing promise if we were tracking it.
+        // For now, just skip the reset to avoid the "jumping progress" (5% -> 0%).
+        console.log(
+          `[S3] File ${tempId} is already ${existingItem.status}, skipping initialization.`,
+        );
+
+        // If it's already completed, we can just return the result (if we stored it)
+        if (existingItem.status === "completed" && existingItem.s3Key) {
+          return {
+            key: existingItem.s3Key,
+            filename: file.name,
+            mime_type: file.type,
+            size: file.size,
+          };
+        }
+
+        // If it's uploading but we called it again (e.g. from a redundant wrapper),
+        // we should ideally wait for the existing one. However, the existing 'performUpload'
+        // will update the store when done.
+        return;
+      }
+
       // Add to global queue
       addUpload(tempId, file);
       updateUpload(tempId, { status: "uploading", progress: 0 });
@@ -72,6 +102,18 @@ export const useS3Upload = () => {
 
           // Check if we need to attach to a publication (Background Upload feature)
           const currentItem = useUploadQueue.getState().queue[tempId];
+
+          // SYNC status back to mediaStore so UI reflects completion even before saving
+          useMediaStore.getState().updateFile(tempId, {
+            status: "completed",
+            file: {
+              key: result.key,
+              filename: file.name,
+              mime_type: file.type,
+              size: file.size,
+            } as any,
+          });
+
           if (currentItem?.publicationId) {
             try {
               const { data } = await axios.post(
@@ -92,7 +134,6 @@ export const useS3Upload = () => {
                 useMediaStore.getState().updateFile(tempId, {
                   id: data.media_file.id,
                   isNew: false, // Mark as existing now
-                  status: "completed",
                 });
               }
 

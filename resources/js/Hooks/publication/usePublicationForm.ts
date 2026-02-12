@@ -899,6 +899,7 @@ export const usePublicationForm = ({
     setValue,
     trigger,
     control,
+    uploadFile,
 
     // Data loading state
     isDataReady,

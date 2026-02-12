@@ -1,4 +1,4 @@
-import { useCampaignManagement } from "@/Hooks/useCampaignManagement";
+import { useContentManagement } from "@/Hooks/useContentManagement";
 import { Campaign } from "@/types/Campaign";
 import { AlertTriangle, Target } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -29,7 +29,7 @@ export default function EditCampaignModal({
   onSubmit,
 }: EditCampaignModalProps) {
   const { t } = useTranslation();
-  const { updateCampaign } = useCampaignManagement();
+  const { updateItem: updateCampaign } = useContentManagement();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { auth } = usePage<any>().props;
   const canManage = auth.current_workspace?.permissions?.includes("content");
