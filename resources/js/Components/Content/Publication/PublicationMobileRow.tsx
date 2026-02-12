@@ -280,7 +280,7 @@ const PublicationMobileRow = memo(
                     </div>
                     <div className="flex items-center gap-2">
                       {(item as any).type === "user_event" &&
-                        permissions?.includes("content") && (
+                        permissions?.includes("manage-content") && (
                           <button
                             onClick={async (e) => {
                               e.stopPropagation();
@@ -441,7 +441,7 @@ const PublicationMobileRow = memo(
                 {/* Publish/Request button */}
                 {(permissions?.includes("publish") ||
                   item.status === "approved") &&
-                permissions?.includes("content") ? (
+                permissions?.includes("manage-content") ? (
                   <button
                     onClick={async (e) => {
                       e.stopPropagation();
@@ -473,7 +473,7 @@ const PublicationMobileRow = memo(
                     )}
                     Publicar
                   </button>
-                ) : permissions?.includes("content") &&
+                ) : permissions?.includes("manage-content") &&
                   !permissions?.includes("publish") &&
                   ["draft", "failed", "rejected"].includes(
                     item.status || "draft",
@@ -596,7 +596,7 @@ const PublicationMobileRow = memo(
                       </button>
 
                       {/* Edit button */}
-                      {permissions?.includes("content") && (
+                      {permissions?.includes("manage-content") && (
                         <button
                           onClick={async (e) => {
                             e.stopPropagation();
@@ -662,7 +662,7 @@ const PublicationMobileRow = memo(
 
                       {/* Delete button */}
                       {permissions?.includes("publish") &&
-                        permissions?.includes("content") && (
+                        permissions?.includes("manage-content") && (
                           <button
                             onClick={async (e) => {
                               e.stopPropagation();

@@ -315,7 +315,7 @@ const PublicationRow = memo(
         <td className="px-2 py-4 text-right">
           <div className="flex items-center justify-end gap-1">
             {(permissions?.includes("publish") || item.status === "approved") &&
-            permissions?.includes("content") ? (
+            permissions?.includes("manage-content") ? (
               <button
                 onClick={async (e) => {
                   e.stopPropagation();
@@ -340,7 +340,7 @@ const PublicationRow = memo(
                   <Rocket className="w-4 h-4" />
                 )}
               </button>
-            ) : permissions?.includes("content") &&
+            ) : permissions?.includes("manage-content") &&
               !permissions?.includes("publish") &&
               ["draft", "failed", "rejected"].includes(
                 item.status || "draft",
@@ -357,7 +357,7 @@ const PublicationRow = memo(
               </button>
             ) : null}
             {/* View Details button - Always visible for all users */}
-            {!permissions?.includes("content") && (
+            {!permissions?.includes("manage-content") && (
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -370,7 +370,7 @@ const PublicationRow = memo(
               </button>
             )}
             {item.status === "published" &&
-              permissions?.includes("content") && (
+              permissions?.includes("manage-content") && (
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
@@ -382,7 +382,7 @@ const PublicationRow = memo(
                   <Eye className="w-4 h-4" />
                 </button>
               )}
-            {permissions?.includes("content") && (
+            {permissions?.includes("manage-content") && (
               <button
                 onClick={async (e) => {
                   e.stopPropagation();
@@ -440,7 +440,7 @@ const PublicationRow = memo(
               </button>
             )}
             {/* Delete button - Only for Owner/Admin or users with content */}
-            {permissions?.includes("content") && (
+            {permissions?.includes("manage-content") && (
               <button
                 onClick={async (e) => {
                   e.stopPropagation();
