@@ -15,9 +15,13 @@ use App\Models\Campaigns\Campaign;
 use App\Models\Publications\Publication;
 use App\Models\Logs\PostLog;
 
+use App\Traits\HandlesUtcDates;
+
 class ScheduledPost extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, HandlesUtcDates, SoftDeletes;
+
+    protected $utcDateFields = ['scheduled_at'];
 
     protected $fillable = [
         'user_id',

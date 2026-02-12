@@ -11,9 +11,13 @@ use App\Models\Publications\Publication;
 use App\Models\User;
 use App\Models\Workspace\Workspace;
 
+use App\Traits\HandlesUtcDates;
+
 class Campaign extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, HandlesUtcDates, SoftDeletes;
+
+    protected $utcDateFields = ['start_date', 'end_date'];
 
     private static $status = [
         'active',

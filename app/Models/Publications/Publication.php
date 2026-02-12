@@ -22,9 +22,21 @@ use App\Models\Campaigns\Campaign;
 
 
 
+use App\Traits\HandlesUtcDates;
+
 class Publication extends Model
 {
-  use HasFactory;
+  use HasFactory, HandlesUtcDates;
+
+  protected $utcDateFields = [
+    'scheduled_at',
+    'start_date',
+    'end_date',
+    'publish_date',
+    'approved_at',
+    'published_at',
+    'rejected_at',
+  ];
 
   protected static function boot()
   {
