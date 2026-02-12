@@ -1,4 +1,5 @@
 import { useS3Upload } from "@/Hooks/useS3Upload";
+import { validateVideoDuration } from "@/Utils/validationUtils";
 import { PublicationFormData, publicationSchema } from "@/schemas/publication";
 import { useMediaStore } from "@/stores/mediaStore";
 import { usePublicationStore } from "@/stores/publicationStore";
@@ -12,6 +13,8 @@ import { startTransition, useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
+import { SOCIAL_PLATFORMS } from "../../Constants/socialPlatformsConfig";
+import { useAccountsStore } from "../../stores/socialAccountsStore";
 
 interface UsePublicationFormProps {
   publication?: Publication | null;
@@ -91,6 +94,9 @@ export const usePublicationForm = ({
     [],
   );
   const [publishedAccountIds, setPublishedAccountIds] = useState<number[]>([]);
+  const [durationErrors, setDurationErrors] = useState<Record<number, string>>(
+    {},
+  );
 
   const prevHashtagsRef = useRef<string>("");
 
@@ -131,6 +137,12 @@ export const usePublicationForm = ({
       console.warn("Publication Form Errors:", errors);
     }
   }, [errors]);
+
+  // Duration Validation Effect
+  useEffect(() => {
+    const accountIds = watched.social_accounts || [];
+    validateDurations(accountIds, mediaFiles, videoMetadata);
+  }, [watched.social_accounts, mediaFiles, videoMetadata]);
 
   // Phase 1: Load critical data IMMEDIATELY for instant modal display
   // We explicitly watch for publication object changes to enable real-time reactive updates
@@ -503,6 +515,54 @@ export const usePublicationForm = ({
     });
   };
 
+  const validateDurations = (
+    accountIds: number[],
+    currentMedia: any[],
+    currentMetadata: Record<string, any>,
+  ) => {
+    const errors: Record<number, string> = {};
+    const videos = currentMedia.filter((m) => m.type === "video");
+
+    if (videos.length === 0) {
+      setDurationErrors({});
+      return true;
+    }
+
+    const { accounts } = useAccountsStore.getState();
+
+    accountIds.forEach((accountId) => {
+      const account = accounts.find((a) => a.id === accountId);
+      if (!account) return;
+
+      const platformKey = account.platform?.toLowerCase();
+      const platformConfig = (SOCIAL_PLATFORMS as any)[platformKey];
+
+      if (!platformConfig || !platformConfig.maxVideoDuration) return;
+
+      const maxDuration = platformConfig.maxVideoDuration;
+
+      videos.forEach((video) => {
+        const metadata = currentMetadata[video.tempId];
+        if (metadata) {
+          const validation = validateVideoDuration(
+            platformKey,
+            metadata.duration,
+          );
+          if (!validation.isValid) {
+            errors[accountId] = t("publications.validation.videoTooLong", {
+              platform: platformConfig.name,
+              max: validation.formattedMax,
+              defaultValue: `Video too long for ${platformConfig.name} (max ${validation.formattedMax})`,
+            });
+          }
+        }
+      });
+    });
+
+    setDurationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleAccountToggle = (accountId: number) => {
     const current = watched.social_accounts || [];
     const isAlreadySelected = current.includes(accountId);
@@ -535,6 +595,8 @@ export const usePublicationForm = ({
       shouldValidate: true,
       shouldDirty: true,
     });
+
+    validateDurations(nextAccounts, mediaFiles, videoMetadata);
   };
 
   const handleClose = () => {
@@ -590,6 +652,14 @@ export const usePublicationForm = ({
         );
         return;
       }
+    }
+
+    if (Object.keys(durationErrors).length > 0) {
+      toast.error(
+        t("publications.validation.durationErrors") ||
+          "Por favor, corrige los errores de duración antes de guardar.",
+      );
+      return;
     }
 
     setIsSubmitting(true);
@@ -872,6 +942,7 @@ export const usePublicationForm = ({
     mediaFiles,
     imageError,
     videoMetadata,
+    durationErrors,
     thumbnails,
     removedThumbnailIds,
     setThumbnail,

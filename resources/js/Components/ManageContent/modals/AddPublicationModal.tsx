@@ -40,6 +40,7 @@ export default function AddPublicationModal({
     mediaFiles,
     imageError,
     videoMetadata,
+    durationErrors,
     thumbnails,
     setThumbnail,
     clearThumbnail,
@@ -179,6 +180,7 @@ export default function AddPublicationModal({
                   uploadStats={uploadStats}
                   uploadErrors={uploadErrors}
                   lockedBy={remoteLock}
+                  videoMetadata={videoMetadata}
                 />
 
                 <SocialAccountsSection
@@ -202,6 +204,9 @@ export default function AddPublicationModal({
                   }
                   globalSchedule={watched.scheduled_at ?? undefined}
                   error={errors.social_accounts?.message as string}
+                  durationErrors={durationErrors}
+                  videoMetadata={videoMetadata}
+                  mediaFiles={mediaFiles}
                 />
 
                 <ScheduleSection

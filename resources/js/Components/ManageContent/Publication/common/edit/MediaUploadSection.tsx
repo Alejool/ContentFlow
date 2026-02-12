@@ -42,6 +42,7 @@ interface MediaUploadSectionProps {
     photo_url: string;
     isSelf: boolean;
   } | null;
+  videoMetadata?: Record<string, { duration: number; youtubeType: string }>;
 }
 
 const MediaUploadSection = memo(
@@ -64,6 +65,7 @@ const MediaUploadSection = memo(
     uploadStats,
     uploadErrors,
     lockedBy,
+    videoMetadata,
   }: MediaUploadSectionProps) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -134,6 +136,7 @@ const MediaUploadSection = memo(
                     stats={uploadStats?.[preview.tempId]}
                     error={uploadErrors?.[preview.tempId]}
                     isExternalProcessing={preview.status === "processing"}
+                    metadata={videoMetadata?.[preview.tempId]}
                   />
                 ))}
                 {!disabled && !isAnyMediaProcessing && (
@@ -217,6 +220,7 @@ const MediaPreviewItem = memo(
     stats,
     error,
     isExternalProcessing,
+    metadata,
   }: {
     preview: any;
     index: number;
@@ -229,6 +233,7 @@ const MediaPreviewItem = memo(
     stats?: { eta?: number; speed?: number };
     error?: string;
     isExternalProcessing?: boolean;
+    metadata?: { duration: number };
   }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -278,6 +283,7 @@ const MediaPreviewItem = memo(
             onClearThumbnail={onClearThumbnail}
             fileInputRef={fileInputRef}
             disabled={disabled}
+            duration={metadata?.duration}
           />
         ) : (
           <img src={preview.url} className="w-full h-full object-cover" />
@@ -335,6 +341,7 @@ const VideoPreview = memo(
     onClearThumbnail,
     fileInputRef,
     disabled,
+    duration,
   }: {
     preview: any;
     thumbnail?: File;
@@ -342,6 +349,7 @@ const VideoPreview = memo(
     onClearThumbnail: () => void;
     fileInputRef: React.RefObject<HTMLInputElement | null>;
     disabled?: boolean;
+    duration?: number;
   }) => (
     <>
       <video
@@ -350,7 +358,9 @@ const VideoPreview = memo(
       />
       <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
         <span className="text-white/80 text-xs font-medium bg-black/50 px-2 py-1 rounded">
-          Video
+          {duration
+            ? `${Math.floor(duration / 60)}:${(duration % 60).toString().padStart(2, "0")}`
+            : "Video"}
         </span>
         <div className="relative" onClick={(e) => e.stopPropagation()}>
           <input

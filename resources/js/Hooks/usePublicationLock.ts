@@ -1,5 +1,6 @@
 import { useLockStore } from "@/stores/lockStore";
 import { usePublicationStore } from "@/stores/publicationStore";
+import { Publication } from "@/types/Publication";
 import { usePage } from "@inertiajs/react";
 import axios from "axios";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -21,33 +22,29 @@ interface User {
   avatar?: string;
 }
 
-interface Publication {
-  id: number;
-  title: string;
-  media_files?: any[]; // Assuming it has this property based on the original code
-  // ... other properties
-}
-
 // Helper for multi-store synchronization
 const syncAllUIStores = async (pubId: number, freshData: Publication) => {
-  const stores = [
-    { name: "useContentUIStore", path: "@/stores/contentUIStore" },
-    { name: "useManageContentUIStore", path: "@/stores/manageContentUIStore" },
-  ];
-
-  for (const s of stores) {
-    try {
-      const module = await import(s.path);
-      const useStore = module[s.name];
-      if (useStore) {
-        const store = useStore.getState();
-        if (store.selectedItem?.id === pubId) {
-          store.setSelectedItem(freshData);
-        }
-      }
-    } catch (e) {
-      console.warn(`Failed to sync store ${s.name}:`, e);
+  // 1. Sync useContentUIStore
+  try {
+    const { useContentUIStore } = await import("@/stores/contentUIStore");
+    const store = useContentUIStore.getState();
+    if (store.selectedItem?.id === pubId) {
+      store.setSelectedItem(freshData);
     }
+  } catch (e) {
+    console.warn("Failed to sync store useContentUIStore:", e);
+  }
+
+  // 2. Sync useManageContentUIStore
+  try {
+    const { useManageContentUIStore } =
+      await import("@/stores/manageContentUIStore");
+    const store = useManageContentUIStore.getState();
+    if (store.selectedItem?.id === pubId) {
+      store.setSelectedItem(freshData);
+    }
+  } catch (e) {
+    console.warn("Failed to sync store useManageContentUIStore:", e);
   }
 };
 

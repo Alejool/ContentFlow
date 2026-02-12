@@ -4,6 +4,7 @@ import { getPlatformConfig } from "@/Constants/socialPlatforms";
 import { usePublishPublication } from "@/Hooks/publication/usePublishPublication";
 import { useConfirm } from "@/Hooks/useConfirm";
 import { formatDateTime } from "@/Utils/formatDate";
+import { validateVideoDuration } from "@/Utils/validationUtils";
 import { usePublicationStore } from "@/stores/publicationStore";
 import { Publication } from "@/types/Publication";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
@@ -137,7 +138,7 @@ export default function PublishPublicationModal({
     if (!isOpen) {
       resetState();
     }
-  }, [isOpen, publication]);
+  }, [isOpen, publication?.id]);
 
   const handleUnpublishWithConfirm = async (
     accountId: number,
@@ -402,6 +403,45 @@ export default function PublishPublicationModal({
                               </div>
                             </div>
                           )}
+
+                          {(() => {
+                            const mediaFiles = publication.media_files || [];
+                            const video = mediaFiles.find(
+                              (m: any) =>
+                                m.file_type === "video" ||
+                                m.mime_type?.startsWith("video/"),
+                            );
+                            if (!video) return null;
+
+                            const duration = video.metadata?.duration || 0;
+                            const validation = validateVideoDuration(
+                              account.platform,
+                              duration,
+                            );
+
+                            if (validation.maxDuration === Infinity)
+                              return null;
+
+                            return (
+                              <div
+                                className={`absolute top-1 left-1 z-10 flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[9px] font-bold border shadow-sm ${
+                                  validation.isValid
+                                    ? "bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800/30"
+                                    : "bg-red-50 text-red-600 border-red-100 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800/30 animate-pulse"
+                                }`}
+                              >
+                                {validation.isValid ? (
+                                  <CheckCircle className="w-3 h-3" />
+                                ) : (
+                                  <XCircle className="w-3 h-3" />
+                                )}
+                                {validation.isValid
+                                  ? "OK"
+                                  : `MAX ${validation.formattedMax}`}
+                              </div>
+                            );
+                          })()}
+
                           <div className="w-12 h-12 rounded-lg  flex items-center justify-center flex-shrink-0 ">
                             <img src={iconSrc} alt={account.platform} />
                           </div>

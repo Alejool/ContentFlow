@@ -113,6 +113,7 @@ const EditPublicationModal = ({
     isS3Uploading: uploading,
     isAnyMediaProcessing,
     remoteLock,
+    durationErrors,
   } = usePublicationForm({
     publication,
     onClose,
@@ -424,6 +425,7 @@ const EditPublicationModal = ({
                     uploadStats={uploadStats}
                     uploadErrors={uploadErrors}
                     lockedBy={remoteLock}
+                    videoMetadata={videoMetadata}
                   />
                 )}
 
@@ -455,6 +457,9 @@ const EditPublicationModal = ({
                     failedAccountIds={failedAccountIds}
                     onCancel={handleCancelPublication}
                     error={errors.social_accounts?.message as string}
+                    durationErrors={durationErrors}
+                    videoMetadata={videoMetadata}
+                    mediaFiles={mediaFiles}
                     disabled={isContentSectionDisabled || !allowConfiguration}
                   />
 
@@ -573,11 +578,11 @@ const EditPublicationModal = ({
         >
           {publication && (
             <PublicationStatusTimeline
-              currentStatus={publication.status}
-              scheduledAt={publication.scheduled_at}
-              approvedAt={publication.approved_at}
-              publishedAt={publication.published_at}
-              rejectedAt={publication.rejected_at}
+              currentStatus={publication.status as string}
+              scheduledAt={publication.scheduled_at ?? undefined}
+              approvedAt={publication.approved_at ?? undefined}
+              publishedAt={publication.published_at ?? undefined}
+              rejectedAt={publication.rejected_at ?? undefined}
               compact={true}
             />
           )}
