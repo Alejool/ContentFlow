@@ -210,7 +210,7 @@ export default function Welcome({ auth, canLogin, canRegister }: WelcomeProps) {
                     </Link>
                   ) : null}
                 </div>
-                <div className="mt-24 py-8 border-y border-gray-200/50 dark:border-white/5 bg-white/50 dark:bg-white/5 backdrop-blur-sm relative left-[50%] right-[50%] mx-[-50vw] w-screen px-4">
+                <div className="mt-24 py-8 border-y border-gray-200/50 dark:border-white/5 backdrop-blur-sm relative left-[50%] right-[50%] mx-[-50vw] w-screen px-4">
                   <div className="max-w-7xl mx-auto text-center">
                     <p className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-8">
                       {t(
