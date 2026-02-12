@@ -169,41 +169,43 @@ const SocialMediaAccounts = memo(() => {
 
     const platformCards: Account[] = [];
 
-    Object.entries(SOCIAL_PLATFORMS).forEach(([key, config]) => {
-      const filtered = connectedAccounts.filter(
-        (ca) => ca.platform.toLowerCase() === key.toLowerCase(),
-      );
+    Object.entries(SOCIAL_PLATFORMS)
+      .filter(([_, config]) => config.active)
+      .forEach(([key, config]) => {
+        const filtered = connectedAccounts.filter(
+          (ca) => ca.platform.toLowerCase() === key.toLowerCase(),
+        );
 
-      if (filtered.length === 0) {
-        // Not connected: Add one placeholder card
-        platformCards.push({
-          id: config.id, // Using config ID as a stable key for placeholder
-          platform: key,
-          name: config.name,
-          logo: config.logo,
-          isConnected: false,
-          accountId: null,
-          color: config.color,
-          gradient: config.gradient,
-        });
-      } else {
-        // Connected: Add a card for each connected account
-        filtered.forEach((ca) => {
+        if (filtered.length === 0) {
+          // Not connected: Add one placeholder card
           platformCards.push({
-            id: ca.id, // Real DB ID
+            id: config.id, // Using config ID as a stable key for placeholder
             platform: key,
             name: config.name,
             logo: config.logo,
-            isConnected: true,
-            accountId: ca.id,
-            accountDetails: ca,
+            isConnected: false,
+            accountId: null,
             color: config.color,
             gradient: config.gradient,
-            connectedBy: ca.user?.name,
           });
-        });
-      }
-    });
+        } else {
+          // Connected: Add a card for each connected account
+          filtered.forEach((ca) => {
+            platformCards.push({
+              id: ca.id, // Real DB ID
+              platform: key,
+              name: config.name,
+              logo: config.logo,
+              isConnected: true,
+              accountId: ca.id,
+              accountDetails: ca,
+              color: config.color,
+              gradient: config.gradient,
+              connectedBy: ca.user?.name,
+            });
+          });
+        }
+      });
 
     setAccounts(platformCards);
   };

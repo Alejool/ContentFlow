@@ -2,7 +2,7 @@ import ModalFooter from "@/Components/ManageContent/modals/common/ModalFooter";
 import ModalHeader from "@/Components/ManageContent/modals/common/ModalHeader";
 import Modal from "@/Components/common/ui/Modal";
 import {
-  SOCIAL_PLATFORMS,
+  getActivePlatformKeys,
   getPlatformConfig,
 } from "@/Constants/socialPlatforms";
 import { useCalendar } from "@/Hooks/calendar/useCalendar";
@@ -28,6 +28,7 @@ import {
   ChevronRight,
   Filter,
   Loader2,
+  Lock,
   Trash2,
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
@@ -203,7 +204,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
     }
   };
 
-  const platforms = ["all", "user_event", ...Object.keys(SOCIAL_PLATFORMS)];
+  const platforms = ["all", "user_event", ...getActivePlatformKeys()];
 
   return (
     <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
@@ -290,7 +291,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                       ? t("calendar.filters.all")
                       : p === "user_event"
                         ? t("calendar.filters.events")
-                        : p
+                        : getPlatformConfig(p).name
                   }
                 >
                   {p === "all" ? (

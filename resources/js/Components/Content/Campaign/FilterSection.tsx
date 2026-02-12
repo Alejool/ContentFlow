@@ -1,6 +1,7 @@
 import DatePickerModern from "@/Components/common/Modern/DatePicker";
 import Input from "@/Components/common/Modern/Input";
 import Select from "@/Components/common/Modern/Select";
+import { getPlatformOptions } from "@/Constants/socialPlatforms";
 import { format, parseISO } from "date-fns";
 import { Search } from "lucide-react";
 
@@ -77,12 +78,11 @@ export default function FilterSection({
               value={platformFilter}
               onChange={(val) => handleFilterChange("platform", val.toString())}
               options={[
-                { value: "all", label: "All Platforms" },
-                { value: "instagram", label: "Instagram" },
-                { value: "facebook", label: "Facebook" },
-                { value: "twitter", label: "Twitter" },
-                { value: "linkedin", label: "LinkedIn" },
-                { value: "tiktok", label: "TikTok" },
+                {
+                  value: "all",
+                  label: t("campaigns.filters.allPlatforms") || "All Platforms",
+                },
+                ...getPlatformOptions(),
               ]}
               size="md"
               activeColor={activeColor}
