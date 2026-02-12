@@ -510,6 +510,20 @@ export const usePublicationForm = ({
     let nextAccounts;
     if (!isAlreadySelected) {
       nextAccounts = [...current, accountId];
+
+      // Reset global schedule if it's in the past
+      const currentGlobal = getValues("scheduled_at");
+      if (currentGlobal) {
+        const globalDate = new Date(currentGlobal);
+        const now = new Date();
+        // Allow no grace period here, if past, update to now
+        if (globalDate < now) {
+          setValue("scheduled_at", now.toISOString(), {
+            shouldValidate: true,
+            shouldDirty: true,
+          });
+        }
+      }
     } else {
       nextAccounts = current.filter((x) => x !== accountId);
       const newScheds = { ...accountSchedules };
