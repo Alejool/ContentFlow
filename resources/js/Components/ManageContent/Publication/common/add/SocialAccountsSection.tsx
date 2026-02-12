@@ -375,7 +375,8 @@ const SocialAccountItem = memo(
               <div className="mt-1 flex items-center justify-between gap-1 text-[10px] font-medium text-yellow-600 dark:text-yellow-400">
                 <div className="flex items-center gap-1">
                   <div className="w-3 h-3 border-2 border-yellow-600 border-t-transparent rounded-full animate-spin" />
-                  {t("publications.modal.publish.publishing")}
+                  {t("publications.modal.publish.publishing")} en{" "}
+                  {account.platform}
                 </div>
                 {onCancel && (
                   <button

@@ -1,5 +1,6 @@
 import SocialAccountsDisplay from "@/Components/ManageContent/Publication/SocialAccountsDisplay";
 import { formatDateTime } from "@/Utils/formatDate";
+import { usePublicationStore } from "@/stores/publicationStore";
 import { Publication } from "@/types/Publication";
 import axios from "axios";
 import {
@@ -72,6 +73,10 @@ const PublicationMobileRow = memo(
         { publishing?: boolean; editing?: boolean; deleting?: boolean }
       >
     >({});
+
+    const getPublishingPlatforms = usePublicationStore(
+      (s) => s.getPublishingPlatforms,
+    );
 
     const countMediaFiles = useCallback((pub: Publication) => {
       if (
@@ -598,6 +603,7 @@ const PublicationMobileRow = memo(
                         <SocialAccountsDisplay
                           publication={item}
                           connectedAccounts={connectedAccounts}
+                          publishingPlatforms={getPublishingPlatforms(item.id)}
                           compact={true}
                           t={t}
                         />

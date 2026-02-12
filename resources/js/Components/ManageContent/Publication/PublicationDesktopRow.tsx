@@ -1,5 +1,6 @@
 import PublicationThumbnail from "@/Components/ManageContent/Publication/PublicationThumbnail";
 import SocialAccountsDisplay from "@/Components/ManageContent/Publication/SocialAccountsDisplay";
+import { usePublicationStore } from "@/stores/publicationStore";
 import { Publication } from "@/types/Publication";
 import axios from "axios";
 import {
@@ -72,6 +73,10 @@ const PublicationRow = memo(
     const [isPublishing, setIsPublishing] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
+
+    const publishingPlatforms = usePublicationStore((s) =>
+      s.getPublishingPlatforms(item.id),
+    );
 
     const mediaCount = React.useMemo(() => {
       if (!item.media_files || item.media_files.length === 0) {
@@ -204,8 +209,27 @@ const PublicationRow = memo(
                 <div className="flex items-center gap-1.5 mt-1">
                   <span className="flex-shrink-0 w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                   <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-tight">
-                    {t("publications.table.publishingBy") || "Publishing by"}{" "}
-                    {item.publisher.name}
+                    {(() => {
+                      const publishingAccounts = connectedAccounts.filter(
+                        (acc) => publishingPlatforms.includes(acc.id),
+                      );
+                      if (publishingAccounts.length === 1) {
+                        const platformName =
+                          publishingAccounts[0].platform
+                            .charAt(0)
+                            .toUpperCase() +
+                          publishingAccounts[0].platform.slice(1);
+                        return `Publicando en ${platformName} por ${item.publisher.name}`;
+                      } else if (publishingAccounts.length > 1) {
+                        return `Publicando en ${publishingAccounts.length} redes por ${item.publisher.name}`;
+                      }
+                      return (
+                        (t("publications.table.publishingBy") ||
+                          "Publicando por") +
+                        " " +
+                        item.publisher.name
+                      );
+                    })()}
                   </span>
                 </div>
               )}
@@ -311,6 +335,7 @@ const PublicationRow = memo(
           <SocialAccountsDisplay
             publication={item}
             connectedAccounts={connectedAccounts}
+            publishingPlatforms={publishingPlatforms}
             t={t}
             compact={true}
           />

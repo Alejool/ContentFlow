@@ -333,6 +333,10 @@
       },
       "lockedBy": "Bloqueado por:",
       "publishingBy": "Publicando por",
+      "publishingOn": "Publicando en {{platform}}",
+      "publishingOnMultiple": "Publicando en {{count}} redes",
+      "publishingOnBy": "Publicando en {{platform}} por {{user}}",
+      "publishingOnMultipleBy": "Publicando en {{count}} redes por {{user}}",
       "rejectedBy": "Rechazado por"
     },
     "messages": {

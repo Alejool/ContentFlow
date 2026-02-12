@@ -379,7 +379,8 @@ export default function PublishPublicationModal({
                                     <span className="text-[11px] font-bold text-yellow-700 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-900/50 px-2.5 py-1 rounded-md shadow-sm border border-yellow-200 dark:border-yellow-800 uppercase tracking-wider mb-2">
                                       {t(
                                         "publications.modal.publish.publishing",
-                                      )}
+                                      )}{" "}
+                                      en {account.platform}
                                     </span>
                                   )}
                                   {isUnpublishing && (

@@ -17,7 +17,7 @@ import { useAccountsStore } from "@/stores/socialAccountsStore";
 import { Publication } from "@/types/Publication";
 import { usePage } from "@inertiajs/react";
 import { AlertCircle, Lock, Save } from "lucide-react";
-import { memo, useMemo, useState } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import { useWatch } from "react-hook-form";
 import { Trans } from "react-i18next";
 import PublicationStatusTimeline from "../Publication/common/PublicationStatusTimeline";
@@ -168,6 +168,17 @@ const EditPublicationModal = ({
 
   const { publishedPlatforms, publishingPlatforms, failedPlatforms } =
     usePublicationStore();
+
+  const fetchPublishedPlatformsFromStore = usePublicationStore(
+    (s) => s.fetchPublishedPlatforms,
+  );
+
+  // Fetch published platforms when modal opens
+  useEffect(() => {
+    if (isOpen && publication?.id) {
+      fetchPublishedPlatformsFromStore(publication.id);
+    }
+  }, [isOpen, publication?.id, fetchPublishedPlatformsFromStore]);
 
   const publishedAccountIds = useMemo(() => {
     const fromStore = publishedPlatforms[publication?.id ?? 0] || [];
