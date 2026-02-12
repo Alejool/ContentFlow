@@ -23,21 +23,21 @@ class PublicationValidationTest extends TestCase
   {
     parent::setUp();
 
-    $this->user = User::factory()->create();
+    $this->user = User::factory()->create([
+      'email_verified_at' => now(),
+    ]);
 
     $this->workspace = Workspace::create([
       'name' => 'Test Workspace',
       'created_by' => $this->user->id,
     ]);
 
-    $this->user->workspaces()->attach($this->workspace->id);
+    $this->user->workspaces()->attach($this->workspace->id, [
+      'role_id' => Role::firstOrCreate(['slug' => 'owner', 'name' => 'Owner', 'workspace_id' => $this->workspace->id])->id
+    ]);
+
     $this->user->current_workspace_id = $this->workspace->id;
     $this->user->save();
-
-    $manageContentPermission = Permission::firstOrCreate(['slug' => 'manage-content', 'name' => 'Manage Content']);
-    $adminRole = Role::firstOrCreate(['slug' => 'admin', 'name' => 'Admin', 'workspace_id' => $this->workspace->id]);
-    $adminRole->permissions()->syncWithoutDetaching([$manageContentPermission->id]);
-    $this->user->workspaces()->updateExistingPivot($this->workspace->id, ['role_id' => $adminRole->id]);
 
     $this->socialAccount = SocialAccount::factory()->create([
       'user_id' => $this->user->id,
@@ -47,20 +47,20 @@ class PublicationValidationTest extends TestCase
   }
 
 
-  public function test_simple_assertion()
-  {
-    $this->assertTrue(true);
-  }
-
   public function test_cannot_store_publication_with_past_global_scheduled_at()
   {
     $response = $this->actingAs($this->user)
       ->postJson(route('api.v1.publications.store'), [
         'title' => 'Test Publication',
         'description' => 'Test Description',
-        'scheduled_at' => Carbon::now()->subDay()->toIso8601String(),
+        'scheduled_at' => Carbon::now('UTC')->subDay()->toIso8601String(),
         'social_accounts' => [$this->socialAccount->id]
       ]);
+
+    if ($response->status() !== 422) {
+      dump($response->status());
+      dump($response->json());
+    }
 
     $response->assertStatus(422);
     $response->assertJsonValidationErrors(['scheduled_at']);
@@ -77,6 +77,11 @@ class PublicationValidationTest extends TestCase
           $this->socialAccount->id => Carbon::now()->subDay()->toIso8601String()
         ]
       ]);
+
+    if ($response->status() !== 422) {
+      dump($response->status());
+      dump($response->json());
+    }
 
     $response->assertStatus(422);
     $response->assertJsonValidationErrors(['social_account_schedules.' . $this->socialAccount->id]);
@@ -101,6 +106,11 @@ class PublicationValidationTest extends TestCase
           $this->socialAccount->id => Carbon::now('UTC')->subDay()->toIso8601String()
         ]
       ]);
+
+    if ($response->status() !== 422) {
+      dump($response->status());
+      dump($response->json());
+    }
 
     $response->assertStatus(422);
     $response->assertJsonValidationErrors(['social_account_schedules.' . $this->socialAccount->id]);
