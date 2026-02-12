@@ -33,9 +33,9 @@ interface WelcomeProps {
   canRegister: boolean;
 }
 
-const SUPPORTED_NETWORKS = Object.values(SOCIAL_PLATFORMS)
-  .filter((platform) => platform.active)
-  .map((platform) => platform.name);
+const SUPPORTED_NETWORKS = Object.values(SOCIAL_PLATFORMS).filter(
+  (platform) => platform.active,
+);
 
 export default function Welcome({ auth, canLogin, canRegister }: WelcomeProps) {
   const { t, i18n } = useTranslation();
@@ -151,8 +151,6 @@ export default function Welcome({ auth, canLogin, canRegister }: WelcomeProps) {
                     isWelcome={true}
                     canLogin={canLogin}
                     canRegister={canRegister}
-                    loginText={t("welcome.login")}
-                    registerText={t("welcome.getStarted")}
                   />
                 </div>
               </div>
@@ -219,14 +217,20 @@ export default function Welcome({ auth, canLogin, canRegister }: WelcomeProps) {
                       )}
                     </p>
                     <div className="flex flex-wrap justify-center gap-8 md:gap-16 opacity-70 grayscale hover:grayscale-0 transition-all duration-500">
-                      {SUPPORTED_NETWORKS.map((brand) => (
-                        <span
-                          key={brand}
-                          className="text-xl md:text-2xl font-bold font-heading text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors cursor-default"
-                        >
-                          {brand}
-                        </span>
-                      ))}
+                      {SUPPORTED_NETWORKS.map((platform) => {
+                        const Icon = platform.icon;
+                        return (
+                          <div
+                            key={platform.key}
+                            className="flex items-center gap-3 text-xl md:text-2xl font-bold font-heading text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:hover:text-white transition-all duration-300 transform hover:scale-105 cursor-default grayscale hover:grayscale-0"
+                          >
+                            <Icon
+                              className={`w-6 h-6 md:w-8 md:h-8 ${platform.textColor}`}
+                            />
+                            <span>{platform.name}</span>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 </div>
