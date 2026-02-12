@@ -227,7 +227,7 @@ const EditPublicationModal = ({
                 return (
                   <div
                     key={user.id}
-                    className={`inline-block h-8 w-8 rounded-full ring-2 ${isTheLocker ? "ring-amber-500 z-10" : "ring-white dark:ring-neutral-800"} bg-gray-200 dark:bg-neutral-700 flex-shrink-0 relative`}
+                    className={`inline-block h-8 w-8 rounded-full ring-2 ${isTheLocker ? "ring-primary-500 z-10" : "ring-white dark:ring-neutral-800"} bg-gray-200 dark:bg-neutral-700 flex-shrink-0 relative`}
                     title={
                       user.name + (isTheLocker ? " (Editando)" : " (Viendo)")
                     }

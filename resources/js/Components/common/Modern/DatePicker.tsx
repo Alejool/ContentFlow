@@ -41,6 +41,8 @@ interface DatePickerProps<T extends FieldValues> {
   showTimeSelect?: boolean;
   placeholder?: string;
   minDate?: Date;
+  minTime?: Date;
+  maxTime?: Date;
   allowPastDates?: boolean;
   className?: string;
   dateFormat?: string;
@@ -245,6 +247,8 @@ const DatePickerModern = <T extends FieldValues>({
   showTimeSelect = false,
   placeholder = "Select date",
   minDate,
+  minTime,
+  maxTime,
   allowPastDates = false,
   className = "",
   dateFormat,
@@ -942,6 +946,8 @@ const DatePickerModern = <T extends FieldValues>({
         showYearDropdown={showYearDropdown}
         dropdownMode={dropdownMode}
         dateFormat={dateFormat || defaultDateFormat}
+        minTime={minTime}
+        maxTime={maxTime}
         locale={currentLocale}
         placeholderText={placeholder}
         minDate={allowPastDates ? undefined : minDate || new Date()}

@@ -89,6 +89,7 @@ const SchedulePopoverContent = memo(
           showTimeSelect
           placeholder="Select date & time"
           dateFormat="dd/MM/yyyy HH:mm"
+          minDate={new Date()}
           withPortal
           popperPlacement="bottom-start"
           isClearable

@@ -69,6 +69,18 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
             }
             dateFormat="dd/MM/yyyy HH:mm"
             minDate={new Date()}
+            minTime={
+              scheduledAt &&
+              new Date(scheduledAt).toDateString() === new Date().toDateString()
+                ? new Date()
+                : undefined
+            }
+            maxTime={
+              scheduledAt &&
+              new Date(scheduledAt).toDateString() === new Date().toDateString()
+                ? new Date(new Date().setHours(23, 59, 59, 999))
+                : undefined
+            }
             withPortal
             popperPlacement="bottom-start"
             size="lg"
