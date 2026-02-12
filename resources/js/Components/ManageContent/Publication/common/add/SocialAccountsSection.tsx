@@ -1,6 +1,7 @@
 import DatePickerModern from "@/Components/common/Modern/DatePicker";
+import { validateVideoDuration } from "@/Utils/validationUtils";
 import { parseISO } from "date-fns";
-import { Check, Clock, Settings, Target, X } from "lucide-react";
+import { AlertTriangle, Check, Clock, Settings, Target, X } from "lucide-react";
 import React, { memo, useState } from "react";
 
 interface SocialAccount {
@@ -26,6 +27,9 @@ interface SocialAccountsSectionProps {
   unpublishing?: number | null;
   onCancel?: () => void;
   error?: string;
+  durationErrors?: Record<number, string>;
+  videoMetadata?: Record<string, any>;
+  mediaFiles?: any[];
   disabled?: boolean;
 }
 
@@ -177,6 +181,9 @@ interface SocialAccountItemProps {
   isUnpublishing?: boolean;
   onCancel?: () => void;
   disabled?: boolean;
+  durationError?: string;
+  videoMetadata?: Record<string, any>;
+  mediaFiles?: any[];
 }
 
 const SocialAccountItem = memo(
@@ -199,18 +206,43 @@ const SocialAccountItem = memo(
     isUnpublishing,
     onCancel,
     disabled = false,
+    durationError,
+    videoMetadata = {},
+    mediaFiles = [],
   }: SocialAccountItemProps) => {
     const isInternalDisabled =
       isPublished || isPublishing || isUnpublishing || disabled;
     const isCheckedActually =
       isChecked || isPublished || isPublishing || isUnpublishing;
 
+    const complianceInfo = React.useMemo(() => {
+      const videos = mediaFiles.filter((m) => m.type === "video");
+      if (videos.length === 0 || !isCheckedActually) return null;
+
+      const results = videos
+        .map((v) => {
+          const metadata = videoMetadata[v.tempId];
+          if (!metadata) return null;
+          const platformKey = account.platform?.toLowerCase();
+          return validateVideoDuration(platformKey, metadata.duration);
+        })
+        .filter((r): r is NonNullable<typeof r> => r !== null);
+
+      if (results.length === 0) return null;
+
+      const allValid = results.every((r) => r.isValid);
+      return {
+        allValid,
+        formattedMax: results[0].formattedMax,
+      };
+    }, [mediaFiles, videoMetadata, account.platform, isCheckedActually]);
+
     return (
       <div
         className={`relative flex items-center p-3 rounded-lg border transition-all ${
           isInternalDisabled ? "opacity-80 cursor-default" : ""
         } ${
-          isFailed
+          isFailed || durationError
             ? "border-red-500 bg-red-50 dark:bg-red-900/20 shadow-sm"
             : isUnpublishing
               ? "border-amber-500 bg-amber-50 dark:bg-amber-900/20 shadow-sm"
@@ -374,6 +406,21 @@ const SocialAccountItem = memo(
                 {t("publications.modal.publish.failed") || "Fallido"}
               </div>
             )}
+            {durationError && (
+              <div className="mt-1 flex items-center gap-1 text-[10px] font-medium text-red-600 dark:text-red-400 animate-in slide-in-from-top-1">
+                <AlertTriangle className="w-3 h-3" />
+                {durationError}
+              </div>
+            )}
+            {complianceInfo && complianceInfo.allValid && !durationError && (
+              <div className="mt-1 flex items-center gap-1 text-[10px] font-medium text-emerald-600 dark:text-emerald-400 animate-in slide-in-from-top-1">
+                <Check className="w-3 h-3" />
+                {t("publications.validation.videoComplies", {
+                  platform: account.platform,
+                  defaultValue: `Cumple con la duración para ${account.platform}`,
+                })}
+              </div>
+            )}
           </div>
         </div>
 
@@ -413,6 +460,9 @@ const SocialAccountsSection = memo(
     unpublishing,
     onCancel,
     error,
+    durationErrors = {},
+    videoMetadata = {},
+    mediaFiles = [],
     disabled = false,
   }: SocialAccountsSectionProps) => {
     const [activePopover, setActivePopover] = useState<number | null>(null);
@@ -468,6 +518,9 @@ const SocialAccountsSection = memo(
                 isUnpublishing={isIndividualUnpublishing}
                 onCancel={onCancel}
                 disabled={disabled}
+                durationError={durationErrors[account.id]}
+                videoMetadata={videoMetadata}
+                mediaFiles={mediaFiles}
               />
             );
           })}

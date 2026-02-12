@@ -30,8 +30,8 @@ export const getPlatformConfig = (platform: string): SocialPlatformConfig => {
   // Try exact match, then check for 'twitter' mapping to 'x' or 'x' mapping to its config
   const config =
     SOCIAL_PLATFORMS[key] ||
-    (key === "twitter" ? SOCIAL_PLATFORMS["x"] : null) ||
-    (key === "x" ? SOCIAL_PLATFORMS["x"] : null);
+    (key === "x" ? SOCIAL_PLATFORMS["twitter"] : null) ||
+    (key === "twitter" ? SOCIAL_PLATFORMS["twitter"] : null);
 
   if (config) return config;
 

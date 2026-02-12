@@ -41,6 +41,9 @@ class SocialAccountController extends Controller
 
   public function getAuthUrl(Request $request, $platform)
   {
+    if (strtolower($platform) === 'x') {
+      $platform = 'twitter';
+    }
     $state = Str::random(40);
     session(['social_auth_state' => $state]);
 
@@ -74,6 +77,7 @@ class SocialAccountController extends Controller
         ]);
         break;
 
+      case 'x':
       case 'twitter':
         $consumerKey = config('services.twitter.consumer_key');
         $consumerSecret = config('services.twitter.consumer_secret');
@@ -89,7 +93,7 @@ class SocialAccountController extends Controller
 
         try {
           $request_token = $connection->oauth('oauth/request_token', [
-            'oauth_callback' => url('/auth/twitter/callback-v1')
+            'oauth_callback' => url("/auth/{$platform}/callback-v1")
           ]);
 
           session([
@@ -357,9 +361,10 @@ class SocialAccountController extends Controller
 
       session(['twitter_code_verifier' => $codeVerifier]);
 
+      $platform = request()->is('auth/x/*') ? 'x' : 'twitter';
       $v2Url = 'https://twitter.com/i/oauth2/authorize?' . http_build_query([
         'client_id' => config('services.twitter.client_id'),
-        'redirect_uri' => url('/auth/twitter/callback'),
+        'redirect_uri' => url("/auth/{$platform}/callback"),
         'response_type' => 'code',
         'scope' => 'tweet.read tweet.write users.read offline.access media.write',
         'state' => $state,
@@ -391,11 +396,12 @@ class SocialAccountController extends Controller
         return $this->handleOAuthError('Code verifier not found');
       }
 
+      $platform = request()->is('auth/x/*') ? 'x' : 'twitter';
       $response = Http::withBasicAuth(
         config('services.twitter.client_id'),
         config('services.twitter.client_secret')
       )->asForm()->post('https://api.twitter.com/2/oauth2/token', [
-        'redirect_uri' => url('/auth/twitter/callback'),
+        'redirect_uri' => url("/auth/{$platform}/callback"),
         'code' => $request->code,
         'grant_type' => 'authorization_code',
         'code_verifier' => $codeVerifier,

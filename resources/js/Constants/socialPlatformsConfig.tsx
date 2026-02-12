@@ -67,9 +67,9 @@ export const SOCIAL_PLATFORMS = {
     maxVideoCount: 1,
     active: true,
   },
-  x: {
+  twitter: {
     id: 4,
-    key: "x",
+    key: "twitter",
     name: "X",
     logo: IconTwitter,
     icon: FaXTwitter,
