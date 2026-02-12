@@ -276,7 +276,10 @@
         "socialAccountsRequired": "Por favor, selecciona al menos una red social",
         "allSchedulesRequired": "Todas las redes deben tener una fecha o activa la fecha global",
         "singleVideo": "Solo puedes subir un video por publicación.",
-        "scheduledMinDifference": "La fecha debe ser al menos 5 minutos después de la actual"
+        "scheduledMinDifference": "La fecha debe ser al menos 5 minutos después de la actual",
+        "videoTooLong": "Video demasiado largo para {{platform}} (máx {{max}})",
+        "videoComplies": "Cumple con la duración para {{platform}}",
+        "durationErrors": "Por favor, corrige los errores de duración antes de guardar."
       },
       "cancel_confirmation": {
         "title": "Cancelar Publicación",
