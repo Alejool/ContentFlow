@@ -1,6 +1,7 @@
 import Logo from "@/../assets/logo.png";
 import FeatureCard from "@/Components/common/FeatureCard";
 import ThemeLanguageContainer from "@/Components/common/ThemeLanguageContainer";
+import { SOCIAL_PLATFORMS } from "@/Constants/socialPlatforms";
 import { useTheme } from "@/Hooks/useTheme";
 import { Head, Link } from "@inertiajs/react";
 import {
@@ -32,7 +33,9 @@ interface WelcomeProps {
   canRegister: boolean;
 }
 
-const SUPPORTED_NETWORKS = ["YouTube", "Facebook", "X", "TikTok"];
+const SUPPORTED_NETWORKS = Object.values(SOCIAL_PLATFORMS)
+  .filter((platform) => platform.active)
+  .map((platform) => platform.name);
 
 export default function Welcome({ auth, canLogin, canRegister }: WelcomeProps) {
   const { t, i18n } = useTranslation();
@@ -80,13 +83,12 @@ export default function Welcome({ auth, canLogin, canRegister }: WelcomeProps) {
       description:
         t("welcome.socialIntegration.description") ||
         "Conecta y gestiona contenido en Facebook, Instagram, TikTok, YouTube y más.",
-      tags: [
-        t("welcome.tags.facebook"),
-        t("welcome.tags.instagram"),
-        t("welcome.tags.tiktok"),
-        t("welcome.tags.youtube"),
-        t("welcome.tags.twitter"),
-      ],
+      tags: Object.values(SOCIAL_PLATFORMS)
+        .filter((p) => p.active)
+        .map(
+          (p) =>
+            t(`welcome.tags.${p.key === "x" ? "twitter" : p.key}`) || p.name,
+        ),
     },
     {
       href: canLogin ? "/dashboard" : "/register",

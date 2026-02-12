@@ -67,10 +67,10 @@ export const SOCIAL_PLATFORMS = {
     maxVideoCount: 1,
     active: true,
   },
-  twitter: {
+  x: {
     id: 4,
-    key: "twitter",
-    name: "Twitter",
+    key: "x",
+    name: "X",
     logo: IconTwitter,
     icon: FaXTwitter,
     color: "bg-gray-900",
@@ -107,7 +107,7 @@ export const SOCIAL_PLATFORMS = {
     id: 6,
     key: "linkedin",
     name: "LinkedIn",
-    logo: "", 
+    logo: "",
     icon: FaLinkedin,
     color: "bg-blue-700",
     textColor: "text-blue-800",
