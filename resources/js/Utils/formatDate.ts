@@ -15,12 +15,12 @@ export function formatTime(iso?: string | null) {
     const date = parseISO(iso);
     const tz = getUserTimezone();
     const locale = getUserLocale();
-    return new Intl.DateTimeFormat(locale || undefined, {
+    return date.toLocaleString(locale || undefined, {
       hour: "2-digit",
       minute: "2-digit",
       hour12: false,
       timeZone: tz,
-    }).format(date);
+    });
   } catch (e) {
     return "";
   }
@@ -32,12 +32,12 @@ export function formatDate(iso?: string | null) {
     const date = parseISO(iso);
     const tz = getUserTimezone();
     const locale = getUserLocale();
-    return new Intl.DateTimeFormat(locale || undefined, {
+    return date.toLocaleString(locale || undefined, {
       year: "numeric",
       month: "short",
       day: "numeric",
       timeZone: tz,
-    }).format(date);
+    });
   } catch (e) {
     return "";
   }
@@ -49,7 +49,7 @@ export function formatDateTime(iso?: string | null) {
     const date = parseISO(iso);
     const tz = getUserTimezone();
     const locale = getUserLocale();
-    return new Intl.DateTimeFormat(locale || undefined, {
+    return date.toLocaleString(locale || undefined, {
       year: "numeric",
       month: "short",
       day: "numeric",
@@ -57,7 +57,7 @@ export function formatDateTime(iso?: string | null) {
       minute: "2-digit",
       hour12: false,
       timeZone: tz,
-    }).format(date);
+    });
   } catch (e) {
     return "";
   }

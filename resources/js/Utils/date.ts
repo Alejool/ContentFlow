@@ -23,9 +23,13 @@ export function convertDate(date: string): string {
   const fechaNormalizada = new Date(
     dateObj.getFullYear(),
     dateObj.getMonth(),
-    dateObj.getDate()
+    dateObj.getDate(),
   );
-  return fechaNormalizada.toLocaleDateString("es-ES", {
+  const locale =
+    (window as any).APP_LOCALE ||
+    Intl.DateTimeFormat().resolvedOptions().locale ||
+    "es-ES";
+  return fechaNormalizada.toLocaleDateString(locale, {
     year: "numeric",
     month: "long",
     day: "numeric",
