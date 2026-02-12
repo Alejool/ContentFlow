@@ -328,7 +328,6 @@ class PublicationController extends Controller
       return $this->successResponse(null, 'Publication deleted successfully');
     } catch (\Exception $e) {
       return $this->errorResponse('Deletion failed: ' . $e->getMessage(), 500);
-
     }
   }
 
@@ -601,50 +600,47 @@ class PublicationController extends Controller
   public function getPublishedPlatforms(Publication $publication)
   {
     $id = $publication->id;
-    // Cache for 30 seconds to prevent repeated queries when opening publish modal
-    // This dramatically improves performance when user clicks publish multiple times
-    return cache()->remember("publication_{$id}_platforms", 30, function () use ($id) {
-      $publication = Publication::where('workspace_id', Auth::user()->current_workspace_id)->findOrFail($id);
 
-      $scheduledAccountIds = ScheduledPost::where('publication_id', $publication->id)
-        ->where('status', 'pending')
-        ->pluck('social_account_id')
-        ->unique()
-        ->toArray();
+    $publication = Publication::where('workspace_id', Auth::user()->current_workspace_id)->findOrFail($id);
 
-      $latestLogs = SocialPostLog::where('publication_id', $publication->id)
-        ->select('social_account_id', 'status')
-        ->whereIn('id', function ($query) use ($publication) {
-          $query->selectRaw('MAX(id)')
-            ->from('social_post_logs')
-            ->where('publication_id', $publication->id)
-            ->groupBy('social_account_id');
-        })
-        ->get();
+    $scheduledAccountIds = ScheduledPost::where('publication_id', $publication->id)
+      ->where('status', 'pending')
+      ->pluck('social_account_id')
+      ->unique()
+      ->toArray();
 
-      $statusGroups = ['published' => [], 'failed' => [], 'publishing' => [], 'removed_platforms' => []];
+    $latestLogs = SocialPostLog::where('publication_id', $publication->id)
+      ->select('social_account_id', 'status')
+      ->whereIn('id', function ($query) use ($publication) {
+        $query->selectRaw('MAX(id)')
+          ->from('social_post_logs')
+          ->where('publication_id', $publication->id)
+          ->groupBy('social_account_id');
+      })
+      ->get();
 
-      foreach ($latestLogs as $log) {
-        if (in_array($log->social_account_id, $scheduledAccountIds))
-          continue;
+    $statusGroups = ['published' => [], 'failed' => [], 'publishing' => [], 'removed_platforms' => []];
 
-        $status = $log->status === 'removed_on_platform' ? 'removed_platforms' : $log->status;
+    foreach ($latestLogs as $log) {
+      if (in_array($log->social_account_id, $scheduledAccountIds))
+        continue;
 
-        if ($status === 'pending') $status = 'publishing';
+      $status = $log->status === 'removed_on_platform' ? 'removed_platforms' : $log->status;
 
-        if (isset($statusGroups[$status])) {
-          $statusGroups[$status][] = $log->social_account_id;
-        }
+      if ($status === 'pending') $status = 'publishing';
+
+      if (isset($statusGroups[$status])) {
+        $statusGroups[$status][] = $log->social_account_id;
       }
+    }
 
-      return response()->json([
-        'published_platforms' => array_values(array_unique($statusGroups['published'])),
-        'failed_platforms' => array_values(array_unique($statusGroups['failed'])),
-        'publishing_platforms' => array_values(array_unique($statusGroups['publishing'])),
-        'removed_platforms' => array_values(array_unique($statusGroups['removed_platforms'])),
-        'scheduled_platforms' => $scheduledAccountIds
-      ]);
-    });
+    return response()->json([
+      'published_platforms' => array_values(array_unique($statusGroups['published'])),
+      'failed_platforms' => array_values(array_unique($statusGroups['failed'])),
+      'publishing_platforms' => array_values(array_unique($statusGroups['publishing'])),
+      'removed_platforms' => array_values(array_unique($statusGroups['removed_platforms'])),
+      'scheduled_platforms' => $scheduledAccountIds
+    ]);
   }
 
   /**

@@ -9,11 +9,14 @@ use App\Models\Social\SocialAccount;
 use App\Services\Media\MediaProcessingService;
 use App\Events\PublicationStatusUpdated;
 use Illuminate\Support\Facades\Log;
+use App\Models\Social\SocialPostLog;
+use App\Services\Publish\PlatformPublishService;
 
 class PublishPublicationAction
 {
   public function __construct(
-    protected MediaProcessingService $mediaService
+    protected MediaProcessingService $mediaService,
+    protected PlatformPublishService $platformPublishService
   ) {}
 
   public function execute(Publication $publication, array $platformIds, array $options = []): void
@@ -98,6 +101,18 @@ class PublishPublicationAction
       ->whereIn('social_account_id', $socialAccounts->pluck('id'))
       ->where('status', 'pending')
       ->update(['status' => 'posted']);
+
+    // Initialize logs using the service to ensure matching data (media_file_id)
+    // This prevents logs from being deleted/recreated by the job later
+    try {
+      $this->platformPublishService->initializeLogs($publication, $socialAccounts);
+    } catch (\Exception $e) {
+      Log::error('Failed to initialize logs in action', ['error' => $e->getMessage()]);
+      // Continue anyway, the job will try again
+    }
+
+    // Clear the cache so getPublishedPlatforms returns fresh data
+    cache()->forget("publication_{$publication->id}_platforms");
 
     Log::info('Dispatching PublishToSocialMedia job', [
       'publication_id' => $publication->id,
