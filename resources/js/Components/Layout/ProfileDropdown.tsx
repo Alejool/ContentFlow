@@ -1,6 +1,10 @@
 import { Avatar } from "@/Components/common/Avatar";
 import Dropdown from "@/Components/common/ui/Dropdown";
-import { ChevronDown, LogOut, User } from "lucide-react";
+import { SOCIAL_PLATFORMS } from "@/Constants/socialPlatformsConfig";
+import axios from "axios";
+import { Check, ChevronDown, LogOut, Palette, User } from "lucide-react";
+import { useState } from "react";
+import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
 interface ProfileDropdownProps {
@@ -18,6 +22,32 @@ export default function ProfileDropdown({
   isProfileActive = false,
 }: ProfileDropdownProps) {
   const { t } = useTranslation();
+  const [currentTheme, setCurrentTheme] = useState(
+    user.theme_color || "orange",
+  );
+
+  const colors = [
+    { name: "orange", value: "orange", bg: "bg-warning-500" },
+    { name: "blue", value: "blue", bg: "bg-blue-500" },
+    { name: "purple", value: "purple", bg: "bg-purple-500" },
+    { name: "green", value: "green", bg: "bg-green-500" },
+    { name: "pink", value: "pink", bg: "bg-pink-500" },
+  ];
+
+  const handleThemeChange = async (color: string) => {
+    setCurrentTheme(color);
+    document.documentElement.setAttribute("data-theme-color", color);
+
+    try {
+      await axios.patch(route("api.v1.profile.theme.update"), {
+        theme_color: color,
+      });
+      toast.success(t("profile.theme.success_message") || "Tema actualizado");
+    } catch (error) {
+      console.error("Theme update failed:", error);
+      toast.error(t("common.error") || "Error al actualizar el tema");
+    }
+  };
 
   return (
     <Dropdown>
@@ -84,6 +114,38 @@ export default function ProfileDropdown({
             </div>
           </div>
         </div>
+
+        <div className="px-5 pb-2">
+          <div className="flex items-center gap-2 mb-2">
+            <Palette className="w-3.5 h-3.5 text-gray-500 dark:text-gray-400" />
+            <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              {t("profile.theme.title") || "Tema"}
+            </span>
+          </div>
+          <div className="flex items-center justify-between gap-2 p-1">
+            {colors.map((color) => (
+              <button
+                key={color.value}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleThemeChange(color.value);
+                }}
+                className={`group relative w-6 h-6 rounded-full flex items-center justify-center transition-all ${
+                  currentTheme === color.value
+                    ? "ring-2 ring-offset-2 ring-primary-500 dark:ring-offset-neutral-900 scale-110"
+                    : "hover:scale-110 opacity-70 hover:opacity-100"
+                } ${color.bg}`}
+                title={t(`colors.${color.name}`) || color.name}
+              >
+                {currentTheme === color.value && (
+                  <Check className="w-3 h-3 text-white" />
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+
+
 
         <div className="px-2 space-y-1">
           <Dropdown.Link
