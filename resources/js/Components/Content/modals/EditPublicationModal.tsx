@@ -1,8 +1,10 @@
 import PlatformSettingsModal from "@/Components/ConfigSocialMedia/PlatformSettingsModal";
+import { CommentsSection } from "@/Components/Content/Publication/comments/CommentsSection";
 import ApprovalHistoryCompacto from "@/Components/Content/Publication/common/ApprovalHistoryCompacto";
 import TimelineCompacto from "@/Components/Content/Publication/common/TimelineCompacto";
 import SocialAccountsSection from "@/Components/Content/Publication/common/add/SocialAccountsSection";
 import ContentSection from "@/Components/Content/Publication/common/edit/ContentSection";
+import { LivePreviewSection } from "@/Components/Content/Publication/common/edit/LivePreviewSection";
 import MediaUploadSection from "@/Components/Content/Publication/common/edit/MediaUploadSection";
 import MediaUploadSkeleton from "@/Components/Content/Publication/common/edit/MediaUploadSkeleton";
 import ModalFooter from "@/Components/Content/modals/common/ModalFooter";
@@ -13,6 +15,7 @@ import { usePublicationForm } from "@/Hooks/publication/usePublicationForm";
 import { usePublicationLock } from "@/Hooks/usePublicationLock";
 import { useCampaignStore } from "@/stores/campaignStore";
 import { useAccountsStore } from "@/stores/socialAccountsStore";
+import { useUploadQueue } from "@/stores/uploadQueueStore";
 import { Publication } from "@/types/Publication";
 import { usePage } from "@inertiajs/react";
 import { AlertCircle, Lock, Save } from "lucide-react";
@@ -112,12 +115,38 @@ const EditPublicationModal = ({
     remoteLock,
     publishedAccountIds,
     publishingAccountIds,
+    updateFile: baseUpdateFile,
+    uploadFile,
   } = usePublicationForm({
     publication,
     onClose,
     onSubmitSuccess: onSubmit,
     isOpen,
   });
+
+  const updateFile = async (tempId: string, file: File) => {
+    // 1. Update the store immediately with the new local URL for preview
+    const localUrl = URL.createObjectURL(file);
+    baseUpdateFile(tempId, {
+      file,
+      url: localUrl,
+      status: "uploading",
+      isNew: true,
+    });
+
+    // 2. Trigger the S3 upload
+    try {
+      const result = await uploadFile(file, tempId);
+      // If it's an existing publication, ensure it's linked
+      if (publication?.id) {
+        const { linkUploadToPublication } = useUploadQueue.getState();
+        linkUploadToPublication(tempId, publication.id, publication.title);
+      }
+      return result;
+    } catch (err) {
+      console.error("Failed to upload cropped image", err);
+    }
+  };
 
   const { register } = form;
 
@@ -129,6 +158,7 @@ const EditPublicationModal = ({
   const goal = useWatch({ control, name: "goal" });
   const hashtags = useWatch({ control, name: "hashtags" });
   const campaign_id = useWatch({ control, name: "campaign_id" });
+  const description = useWatch({ control, name: "description" });
 
   const watched = useMemo(
     () => ({
@@ -139,6 +169,7 @@ const EditPublicationModal = ({
       goal,
       hashtags,
       campaign_id,
+      description,
     }),
     [
       selectedSocialAccounts,
@@ -274,7 +305,7 @@ const EditPublicationModal = ({
                           : t("publications.modal.edit.lockedByOther") ||
                             "En cola de espera"}
                       </p>
-                      <p className="opacity-80">
+                      <div className="opacity-80">
                         {lockInfo?.locked_by === "session" ? (
                           <>
                             <Trans
@@ -311,7 +342,7 @@ const EditPublicationModal = ({
                             </p>
                           </>
                         )}
-                      </p>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -391,6 +422,7 @@ const EditPublicationModal = ({
                     uploadStats={uploadStats}
                     uploadErrors={uploadErrors}
                     lockedBy={remoteLock}
+                    onUpdateFile={updateFile}
                   />
                 )}
 
@@ -483,7 +515,7 @@ const EditPublicationModal = ({
                 )}
               </div>
 
-              <div className="space-y-6">
+              <div className="space-y-6 h-full flex flex-col">
                 <ContentSection
                   register={register}
                   setValue={setValue}
@@ -495,6 +527,23 @@ const EditPublicationModal = ({
                   onHashtagChange={handleHashtagChange}
                   disabled={hasPublishedPlatform || isContentSectionDisabled}
                 />
+
+                <LivePreviewSection
+                  content={`${watched.description || ""}\n\n${watched.hashtags || ""}`}
+                  mediaUrls={stabilizedMediaPreviews.map((m) => m.url)}
+                  user={{
+                    name: auth.user.name,
+                    username: auth.user.email.split("@")[0],
+                    avatar: auth.user.photo_url,
+                  }}
+                />
+
+                {publication?.id && (
+                  <CommentsSection
+                    publicationId={publication.id}
+                    currentUser={auth.user}
+                  />
+                )}
 
                 {publication?.approval_logs &&
                   publication.approval_logs.length > 0 && (

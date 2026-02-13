@@ -66,11 +66,32 @@ export default function AddPublicationModal({
     uploadStats,
     uploadErrors,
     uploadFile,
+    updateFile: baseUpdateFile,
   } = usePublicationForm({
     onClose,
     onSubmitSuccess: onSubmit,
     isOpen,
   });
+
+  const updateFile = async (tempId: string, file: File) => {
+    // 1. Update the store immediately with the new local URL for preview
+    const localUrl = URL.createObjectURL(file);
+    baseUpdateFile(tempId, {
+      file,
+      url: localUrl,
+      status: "uploading",
+      isNew: true,
+    });
+
+    // 2. Trigger the S3 upload
+    try {
+      const result = await uploadFile(file, tempId);
+      // Since it's a new publication, we don't need to link it yet (it will be linked on save)
+      return result;
+    } catch (err) {
+      console.error("Failed to upload cropped image", err);
+    }
+  };
 
   const { register } = form; // Keep existing destructuring
 
@@ -181,6 +202,7 @@ export default function AddPublicationModal({
                   uploadErrors={uploadErrors}
                   lockedBy={remoteLock}
                   videoMetadata={videoMetadata}
+                  onUpdateFile={updateFile}
                 />
 
                 <SocialAccountsSection

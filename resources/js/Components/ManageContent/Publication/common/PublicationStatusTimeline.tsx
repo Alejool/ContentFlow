@@ -200,17 +200,27 @@ const PublicationStatusTimeline = ({
       // Recommendation: Show next logical steps as upcoming
       // Draft -> Pending Review -> Approved
       // But we don't assume Scheduled.
-      steps.push({ ...stepTemplates.pending_review, state: "upcoming" });
-      steps.push({ ...stepTemplates.approved, state: "upcoming" });
+      if (!steps.some((s) => s.key === "pending_review")) {
+        steps.push({ ...stepTemplates.pending_review, state: "upcoming" });
+      }
+      if (!steps.some((s) => s.key === "approved")) {
+        steps.push({ ...stepTemplates.approved, state: "upcoming" });
+      }
     } else if (currentStatus === "pending_review") {
-      steps.push({ ...stepTemplates.approved, state: "upcoming" });
+      if (!steps.some((s) => s.key === "approved")) {
+        steps.push({ ...stepTemplates.approved, state: "upcoming" });
+      }
     } else if (currentStatus === "approved" && !showScheduled) {
       // If approved and not scheduled, unlikely to imply scheduled.
       // Could show "Publishing" or just "Published" as upcoming?
       // Let's show Published as the goal.
-      steps.push({ ...stepTemplates.published, state: "upcoming" });
+      if (!steps.some((s) => s.key === "published")) {
+        steps.push({ ...stepTemplates.published, state: "upcoming" });
+      }
     } else if (currentStatus === "scheduled") {
-      steps.push({ ...stepTemplates.published, state: "upcoming" });
+      if (!steps.some((s) => s.key === "published")) {
+        steps.push({ ...stepTemplates.published, state: "upcoming" });
+      }
     }
 
     return steps;

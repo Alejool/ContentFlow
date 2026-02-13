@@ -66,11 +66,31 @@ export default function AddPublicationModal({
     publishingAccountIds,
     publishedAccountIds,
     publication,
+    updateFile: baseUpdateFile,
   } = usePublicationForm({
     onClose,
     onSubmitSuccess: onSubmit,
     isOpen,
   });
+
+  const updateFile = async (tempId: string, file: File) => {
+    // 1. Update the store immediately with the new local URL for preview
+    const localUrl = URL.createObjectURL(file);
+    baseUpdateFile(tempId, {
+      file,
+      url: localUrl,
+      status: "uploading",
+      isNew: true,
+    });
+
+    // 2. Trigger the S3 upload
+    try {
+      const result = await uploadFile(file, tempId);
+      return result;
+    } catch (err) {
+      console.error("Failed to upload cropped image", err);
+    }
+  };
 
   const { confirm, ConfirmDialog } = useConfirm();
 
@@ -309,6 +329,7 @@ export default function AddPublicationModal({
                     handleFileChange(e.dataTransfer.files);
                   }}
                   lockedBy={remoteLock}
+                  onUpdateFile={updateFile}
                 />
 
                 <SocialAccountsSection

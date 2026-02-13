@@ -45,6 +45,7 @@ export const usePublicationForm = ({
   const mediaFiles = useMediaStore((s) => s.mediaFiles);
   const addFiles = useMediaStore((s) => s.addFiles);
   const removeFile = useMediaStore((s) => s.removeFile);
+  const updateFile = useMediaStore((s) => s.updateFile);
   const clearMedia = useMediaStore((s) => s.clear);
   const setMediaFiles = useMediaStore((s) => s.setMediaFiles);
   const setVideoMetadata = useMediaStore((s) => s.setVideoMetadata);
@@ -983,6 +984,7 @@ export const usePublicationForm = ({
     uploadErrors,
     publishingAccountIds,
     publishedAccountIds,
+    updateFile,
     isAnyMediaProcessing:
       mediaFiles.some(
         (m) =>

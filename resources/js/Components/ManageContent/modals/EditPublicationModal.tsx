@@ -1,8 +1,10 @@
 import PlatformSettingsModal from "@/Components/ConfigSocialMedia/PlatformSettingsModal";
+import { CommentsSection } from "@/Components/ManageContent/Publication/comments/CommentsSection";
 import ApprovalHistoryCompacto from "@/Components/ManageContent/Publication/common/ApprovalHistoryCompacto";
 import TimelineCompacto from "@/Components/ManageContent/Publication/common/TimelineCompacto";
 import SocialAccountsSection from "@/Components/ManageContent/Publication/common/add/SocialAccountsSection";
 import ContentSection from "@/Components/ManageContent/Publication/common/edit/ContentSection";
+import { LivePreviewSection } from "@/Components/ManageContent/Publication/common/edit/LivePreviewSection";
 import MediaUploadSection from "@/Components/ManageContent/Publication/common/edit/MediaUploadSection";
 import MediaUploadSkeleton from "@/Components/ManageContent/Publication/common/edit/MediaUploadSkeleton";
 import ModalFooter from "@/Components/ManageContent/modals/common/ModalFooter";
@@ -14,6 +16,7 @@ import { usePublicationLock } from "@/Hooks/usePublicationLock";
 import { useCampaignStore } from "@/stores/campaignStore";
 import { usePublicationStore } from "@/stores/publicationStore";
 import { useAccountsStore } from "@/stores/socialAccountsStore";
+import { useUploadQueue } from "@/stores/uploadQueueStore";
 import { Publication } from "@/types/Publication";
 import { usePage } from "@inertiajs/react";
 import { AlertCircle, Lock, Save } from "lucide-react";
@@ -90,9 +93,9 @@ const EditPublicationModal = ({
     thumbnails,
     setThumbnail,
     clearThumbnail,
-    setVideoMetadata,
     handleFileChange,
     handleRemoveMedia,
+
     handleHashtagChange,
     handleAccountToggle,
     handleClose,
@@ -114,12 +117,38 @@ const EditPublicationModal = ({
     isAnyMediaProcessing,
     remoteLock,
     durationErrors,
+    updateFile: baseUpdateFile,
+    uploadFile,
   } = usePublicationForm({
     publication,
     onClose,
     onSubmitSuccess: onSubmit,
     isOpen,
   });
+
+  const updateFile = async (tempId: string, file: File) => {
+    // 1. Update the store immediately with the new local URL for preview
+    const localUrl = URL.createObjectURL(file);
+    baseUpdateFile(tempId, {
+      file,
+      url: localUrl,
+      status: "uploading",
+      isNew: true,
+    });
+
+    // 2. Trigger the S3 upload
+    try {
+      const result = await uploadFile(file, tempId);
+      // If it's an existing publication, ensure it's linked
+      if (publication?.id) {
+        const { linkUploadToPublication } = useUploadQueue.getState();
+        linkUploadToPublication(tempId, publication.id, publication.title);
+      }
+      return result;
+    } catch (err) {
+      console.error("Failed to upload cropped image", err);
+    }
+  };
 
   const { register } = form;
 
@@ -128,6 +157,7 @@ const EditPublicationModal = ({
   const scheduledAt = useWatch({ control, name: "scheduled_at" });
   const useGlobalSchedule = useWatch({ control, name: "use_global_schedule" });
   const title = useWatch({ control, name: "title" });
+  const description = useWatch({ control, name: "description" });
   const goal = useWatch({ control, name: "goal" });
   const hashtags = useWatch({ control, name: "hashtags" });
   const campaign_id = useWatch({ control, name: "campaign_id" });
@@ -138,6 +168,7 @@ const EditPublicationModal = ({
       scheduled_at: scheduledAt,
       use_global_schedule: useGlobalSchedule,
       title,
+      description,
       goal,
       hashtags,
       campaign_id,
@@ -147,6 +178,7 @@ const EditPublicationModal = ({
       scheduledAt,
       useGlobalSchedule,
       title,
+      description,
       goal,
       hashtags,
       campaign_id,
@@ -242,6 +274,14 @@ const EditPublicationModal = ({
   // 2. Editor (!canPublish): Allowed if publication is Approved (regardless of ownership)
   const allowConfiguration = canPublish || isApprovedStatus;
 
+  const previewContent = useMemo(() => {
+    let text = watched.description || "";
+    if (watched.hashtags) {
+      text += `\n\n${watched.hashtags}`;
+    }
+    return text;
+  }, [watched.description, watched.hashtags]);
+
   return (
     <div
       className={`fixed inset-0 z-50 flex items-center justify-center sm:p-6 text-gray-900 dark:text-white transition-opacity duration-200 ${isOpen ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"}`}
@@ -251,7 +291,7 @@ const EditPublicationModal = ({
         onClick={handleClose}
       />
 
-      <div className="relative w-full max-w-4xl bg-white dark:bg-neutral-800 rounded-lg shadow-2xl flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300">
+      <div className="relative w-full max-w-6xl bg-white dark:bg-neutral-800 rounded-lg shadow-2xl flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300">
         <ModalHeader
           t={t}
           onClose={handleClose}
@@ -307,139 +347,217 @@ const EditPublicationModal = ({
             className="space-y-8"
           >
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-8">
-              <div className="space-y-6">
-                {!isLockedByMe && isLockedByOther && (
-                  <div className="p-4 mb-6 rounded-lg border border-amber-500 bg-amber-50 dark:bg-amber-900/20 flex gap-3 text-sm text-amber-700 dark:text-amber-300 animate-in shake duration-500">
-                    <AlertCircle className="w-5 h-5 shrink-0 text-amber-500" />
-                    <div>
-                      <p className="font-semibold mb-1">
-                        {lockInfo?.locked_by === "session"
-                          ? t("publications.modal.edit.lockedBySession") ||
-                            "Sesión Duplicada"
-                          : t("publications.modal.edit.lockedByOther") ||
-                            "En cola de espera"}
-                      </p>
-                      <p className="opacity-80">
-                        {lockInfo?.locked_by === "session" ? (
-                          <>
-                            <Trans
-                              i18nKey="publications.modal.edit.locking.sessionMessage"
-                              values={{
-                                browser: parseUserAgent(lockInfo?.user_agent),
-                              }}
-                              components={{
-                                1: <span className="font-medium" />,
-                              }}
-                            />
-                            {lockInfo?.ip_address && (
-                              <span className="text-xs opacity-70">
-                                {" "}
-                                ({maskIpAddress(lockInfo.ip_address)})
-                              </span>
-                            )}
-                          </>
-                        ) : (
-                          <>
-                            <Trans
-                              i18nKey="publications.modal.edit.locking.userMessage"
-                              values={{
-                                user: lockInfo?.user_name,
-                                browser: parseUserAgent(lockInfo?.user_agent),
-                              }}
-                              components={{
-                                1: <span className="font-medium" />,
-                              }}
-                            />
-                            <p className="mt-1 font-medium text-amber-600 dark:text-amber-400">
-                              Tomarás el control automáticamente cuando se
-                              libere.
-                            </p>
-                          </>
-                        )}
+              {/* Left Column: Media & Content */}
+              <div className="space-y-8">
+                {/* Media Section */}
+                <div>
+                  {!isLockedByMe && isLockedByOther && (
+                    <div className="p-4 mb-6 rounded-lg border border-amber-500 bg-amber-50 dark:bg-amber-900/20 flex gap-3 text-sm text-amber-700 dark:text-amber-300 animate-in shake duration-500">
+                      <AlertCircle className="w-5 h-5 shrink-0 text-amber-500" />
+                      <div>
+                        <p className="font-semibold mb-1">
+                          {lockInfo?.locked_by === "session"
+                            ? t("publications.modal.edit.lockedBySession") ||
+                              "Sesión Duplicada"
+                            : t("publications.modal.edit.lockedByOther") ||
+                              "En cola de espera"}
+                        </p>
+                        <div className="opacity-80">
+                          {lockInfo?.locked_by === "session" ? (
+                            <>
+                              <Trans
+                                i18nKey="publications.modal.edit.locking.sessionMessage"
+                                values={{
+                                  browser: parseUserAgent(lockInfo?.user_agent),
+                                }}
+                                components={{
+                                  1: <span className="font-medium" />,
+                                }}
+                              />
+                              {lockInfo?.ip_address && (
+                                <span className="text-xs opacity-70">
+                                  {" "}
+                                  ({maskIpAddress(lockInfo.ip_address)})
+                                </span>
+                              )}
+                            </>
+                          ) : (
+                            <>
+                              <Trans
+                                i18nKey="publications.modal.edit.locking.userMessage"
+                                values={{
+                                  user: lockInfo?.user_name,
+                                  browser: parseUserAgent(lockInfo?.user_agent),
+                                }}
+                                components={{
+                                  1: <span className="font-medium" />,
+                                }}
+                              />
+                              <p className="mt-1 font-medium text-amber-600 dark:text-amber-400">
+                                Tomarás el control automáticamente cuando se
+                                libere.
+                              </p>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {isLockedByMe && activeUsers.length > 1 && (
+                    <div className="p-3 mb-6 rounded-lg border border-blue-500 bg-blue-50 dark:bg-blue-900/20 flex gap-2 text-xs text-blue-700 dark:text-blue-300">
+                      <Lock className="w-4 h-4 shrink-0" />
+                      <p>
+                        <strong>Eres el editor actual.</strong> Hay{" "}
+                        {activeUsers.length - 1} usuario(s) en espera para
+                        cuando termines.
                       </p>
                     </div>
-                  </div>
-                )}
+                  )}
 
-                {isLockedByMe && activeUsers.length > 1 && (
-                  <div className="p-3 mb-6 rounded-lg border border-blue-500 bg-blue-50 dark:bg-blue-900/20 flex gap-2 text-xs text-blue-700 dark:text-blue-300">
-                    <Lock className="w-4 h-4 shrink-0" />
-                    <p>
-                      <strong>Eres el editor actual.</strong> Hay{" "}
-                      {activeUsers.length - 1} usuario(s) en espera para cuando
-                      termines.
-                    </p>
-                  </div>
-                )}
-
-                {(hasPublishedPlatform || !allowConfiguration) && (
-                  <div
-                    className={`p-4 mb-6 rounded-lg border flex gap-3 text-sm animate-in fade-in slide-in-from-top-4 ${
-                      hasPublishedPlatform
-                        ? "border-blue-500 bg-blue-50/50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300"
-                        : "border-amber-500 bg-amber-50/50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300"
-                    }`}
-                  >
-                    <AlertCircle
-                      className={`w-5 h-5 shrink-0 ${
+                  {(hasPublishedPlatform || !allowConfiguration) && (
+                    <div
+                      className={`p-4 mb-6 rounded-lg border flex gap-3 text-sm animate-in fade-in slide-in-from-top-4 ${
                         hasPublishedPlatform
-                          ? "text-blue-500"
-                          : "text-amber-500"
+                          ? "border-blue-500 bg-blue-50/50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300"
+                          : "border-amber-500 bg-amber-50/50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300"
                       }`}
-                    />
-                    <div>
-                      <p className="font-semibold mb-1">
-                        {hasPublishedPlatform
-                          ? t("publications.modal.edit.contentLocked") ||
-                            "Publication partially live"
-                          : t("publications.modal.edit.configurationLocked") ||
-                            "Configuración Bloqueada"}
-                      </p>
-                      <p className="opacity-80">
-                        {hasPublishedPlatform
-                          ? t("publications.modal.edit.contentLockedHint") ||
-                            "This publication is live on some platforms. Changes will apply to pending and future uploads."
-                          : t(
-                              "publications.modal.edit.configurationLockedHint",
-                            ) ||
-                            "Necesitas aprobación para configurar las redes y la programación. Solicita una revisión primero."}
-                      </p>
+                    >
+                      <AlertCircle
+                        className={`w-5 h-5 shrink-0 ${
+                          hasPublishedPlatform
+                            ? "text-blue-500"
+                            : "text-amber-500"
+                        }`}
+                      />
+                      <div>
+                        <p className="font-semibold mb-1">
+                          {hasPublishedPlatform
+                            ? t("publications.modal.edit.contentLocked") ||
+                              "Publication partially live"
+                            : t(
+                                "publications.modal.edit.configurationLocked",
+                              ) || "Configuración Bloqueada"}
+                        </p>
+                        <p className="opacity-80">
+                          {hasPublishedPlatform
+                            ? t("publications.modal.edit.contentLockedHint") ||
+                              "This publication is live on some platforms. Changes will apply to pending and future uploads."
+                            : t(
+                                "publications.modal.edit.configurationLockedHint",
+                              ) ||
+                              "Necesitas aprobación para configurar las redes y la programación. Solicita una revisión primero."}
+                        </p>
+                      </div>
                     </div>
+                  )}
+
+                  {!isDataReady ? (
+                    <MediaUploadSkeleton />
+                  ) : (
+                    <MediaUploadSection
+                      mediaPreviews={stabilizedMediaPreviews}
+                      thumbnails={thumbnails}
+                      imageError={imageError}
+                      isDragOver={isDragOver}
+                      t={t}
+                      onFileChange={handleFileChange}
+                      onRemoveMedia={handleRemoveMedia}
+                      onSetThumbnail={(tempId, file) =>
+                        setThumbnail(tempId, file)
+                      }
+                      onClearThumbnail={(tempId) => clearThumbnail(tempId)}
+                      onUpdateFile={updateFile}
+                      onDragOver={() => setIsDragOver(true)}
+                      onDragLeave={() => setIsDragOver(false)}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        setIsDragOver(false);
+                        handleFileChange(e.dataTransfer.files);
+                      }}
+                      disabled={hasPublishedPlatform || isMediaSectionDisabled}
+                      isAnyMediaProcessing={isAnyMediaProcessing}
+                      uploadProgress={uploadProgress}
+                      uploadStats={uploadStats}
+                      uploadErrors={uploadErrors}
+                      lockedBy={remoteLock}
+                      videoMetadata={videoMetadata}
+                    />
+                  )}
+
+                  {hasYouTubeAccount && (
+                    <div className="mt-6">
+                      <YouTubeThumbnailUploader
+                        videoId={
+                          mediaFiles.find((m) => m.type === "video")?.id || 0
+                        }
+                        videoPreviewUrl={
+                          mediaFiles.find((m) => m.type === "video")?.url
+                        }
+                        videoFileName={
+                          publication?.media_files?.find(
+                            (m) =>
+                              m.file_type === "video" ||
+                              m.mime_type?.startsWith("video/"),
+                          )?.file_name
+                        }
+                        existingThumbnail={(() => {
+                          const video = mediaFiles.find(
+                            (m) => m.type === "video",
+                          );
+                          return video?.thumbnailUrl
+                            ? { url: video.thumbnailUrl, id: video.id || 0 }
+                            : null;
+                        })()}
+                        onThumbnailChange={(file: File | null) => {
+                          const video = mediaFiles.find(
+                            (m) => m.type === "video",
+                          );
+                          if (video) {
+                            if (file) {
+                              setThumbnail(video.tempId, file);
+                            } else {
+                              clearThumbnail(video.tempId);
+                            }
+                          }
+                        }}
+                        onThumbnailDelete={() => {
+                          const video = mediaFiles.find(
+                            (m) => m.type === "video",
+                          );
+                          if (video) clearThumbnail(video.tempId);
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Content Section */}
+                <ContentSection
+                  register={register}
+                  setValue={setValue}
+                  errors={errors}
+                  watched={watched}
+                  t={t}
+                  campaigns={campaigns}
+                  publication={publication}
+                  onHashtagChange={handleHashtagChange}
+                  disabled={hasPublishedPlatform || isContentSectionDisabled}
+                />
+
+                {/* Comments Section */}
+                {publication?.id && (
+                  <div className="pt-6 border-t border-gray-200 dark:border-neutral-700">
+                    <CommentsSection
+                      publicationId={publication.id}
+                      currentUser={auth.user}
+                    />
                   </div>
                 )}
+              </div>
 
-                {!isDataReady ? (
-                  <MediaUploadSkeleton />
-                ) : (
-                  <MediaUploadSection
-                    mediaPreviews={stabilizedMediaPreviews}
-                    thumbnails={thumbnails}
-                    imageError={imageError}
-                    isDragOver={isDragOver}
-                    t={t}
-                    onFileChange={handleFileChange}
-                    onRemoveMedia={handleRemoveMedia}
-                    onSetThumbnail={(tempId, file) =>
-                      setThumbnail(tempId, file)
-                    }
-                    onClearThumbnail={(tempId) => clearThumbnail(tempId)}
-                    onDragOver={() => setIsDragOver(true)}
-                    onDragLeave={() => setIsDragOver(false)}
-                    onDrop={(e) => {
-                      e.preventDefault();
-                      setIsDragOver(false);
-                      handleFileChange(e.dataTransfer.files);
-                    }}
-                    disabled={hasPublishedPlatform || isMediaSectionDisabled}
-                    isAnyMediaProcessing={isAnyMediaProcessing}
-                    uploadProgress={uploadProgress}
-                    uploadStats={uploadStats}
-                    uploadErrors={uploadErrors}
-                    lockedBy={remoteLock}
-                    videoMetadata={videoMetadata}
-                  />
-                )}
-
+              {/* Right Column: Social, Schedule, Preview, History */}
+              <div className="space-y-8">
                 <div
                   className={`transition-opacity duration-200 ${!allowConfiguration || isContentSectionDisabled ? "opacity-50 pointer-events-none grayscale-[0.5]" : ""}`}
                 >
@@ -474,100 +592,62 @@ const EditPublicationModal = ({
                     disabled={isContentSectionDisabled || !allowConfiguration}
                   />
 
-                  <ScheduleSection
-                    scheduledAt={watched.scheduled_at ?? undefined}
-                    t={t}
-                    onScheduleChange={(date) => setValue("scheduled_at", date)}
-                    useGlobalSchedule={watched.use_global_schedule}
-                    onGlobalScheduleToggle={(val) =>
-                      setValue("use_global_schedule", val)
-                    }
-                    error={errors.scheduled_at?.message as string}
-                    disabled={isContentSectionDisabled || !allowConfiguration}
+                  <div className="mt-8">
+                    <ScheduleSection
+                      scheduledAt={watched.scheduled_at ?? undefined}
+                      t={t}
+                      onScheduleChange={(date) =>
+                        setValue("scheduled_at", date)
+                      }
+                      useGlobalSchedule={watched.use_global_schedule}
+                      onGlobalScheduleToggle={(val) =>
+                        setValue("use_global_schedule", val)
+                      }
+                      error={errors.scheduled_at?.message as string}
+                      disabled={isContentSectionDisabled || !allowConfiguration}
+                    />
+                  </div>
+                </div>
+
+                {/* Live Preview */}
+                <div className="pt-6 border-t border-gray-200 dark:border-neutral-700">
+                  <LivePreviewSection
+                    content={previewContent}
+                    mediaUrls={stabilizedMediaPreviews.map((m) => m.url)}
+                    user={{
+                      name: auth.user.name,
+                      username: "username", // TODO: Get username from linked account
+                      avatar: auth.user.photo_url,
+                    }}
                   />
                 </div>
 
-                {hasYouTubeAccount && (
-                  <div className="mt-6">
-                    <YouTubeThumbnailUploader
-                      videoId={
-                        mediaFiles.find((m) => m.type === "video")?.id || 0
-                      }
-                      videoPreviewUrl={
-                        mediaFiles.find((m) => m.type === "video")?.url
-                      }
-                      videoFileName={
-                        publication?.media_files?.find(
-                          (m) =>
-                            m.file_type === "video" ||
-                            m.mime_type?.startsWith("video/"),
-                        )?.file_name
-                      }
-                      existingThumbnail={(() => {
-                        const video = mediaFiles.find(
-                          (m) => m.type === "video",
-                        );
-                        return video?.thumbnailUrl
-                          ? { url: video.thumbnailUrl, id: video.id || 0 }
-                          : null;
-                      })()}
-                      onThumbnailChange={(file: File | null) => {
-                        const video = mediaFiles.find(
-                          (m) => m.type === "video",
-                        );
-                        if (video) {
-                          if (file) {
-                            setThumbnail(video.tempId, file);
-                          } else {
-                            clearThumbnail(video.tempId);
-                          }
+                {/* History & Timeline */}
+                <div className="pt-6 border-t border-gray-200 dark:border-neutral-700 space-y-6">
+                  {publication?.approval_logs &&
+                    publication.approval_logs.length > 0 && (
+                      <ApprovalHistoryCompacto
+                        logs={publication.approval_logs}
+                        isExpanded={isApprovalHistoryExpanded}
+                        onToggle={() =>
+                          setIsApprovalHistoryExpanded(
+                            !isApprovalHistoryExpanded,
+                          )
                         }
-                      }}
-                      onThumbnailDelete={() => {
-                        const video = mediaFiles.find(
-                          (m) => m.type === "video",
-                        );
-                        if (video) clearThumbnail(video.tempId);
-                      }}
-                    />
-                  </div>
-                )}
-              </div>
+                      />
+                    )}
 
-              <div className="space-y-6">
-                <ContentSection
-                  register={register}
-                  setValue={setValue}
-                  errors={errors}
-                  watched={watched}
-                  t={t}
-                  campaigns={campaigns}
-                  publication={publication}
-                  onHashtagChange={handleHashtagChange}
-                  disabled={hasPublishedPlatform || isContentSectionDisabled}
-                />
-
-                {publication?.approval_logs &&
-                  publication.approval_logs.length > 0 && (
-                    <ApprovalHistoryCompacto
-                      logs={publication.approval_logs}
-                      isExpanded={isApprovalHistoryExpanded}
-                      onToggle={() =>
-                        setIsApprovalHistoryExpanded(!isApprovalHistoryExpanded)
-                      }
-                    />
-                  )}
-
-                {publication?.activities &&
-                  publication.activities.length > 0 && (
-                    <TimelineCompacto
-                      activities={publication.activities}
-                      isExpanded={isTimelineExpanded}
-                      onToggle={() =>
-                        setIsTimelineExpanded(!isTimelineExpanded)
-                      }
-                    />
-                  )}
+                  {publication?.activities &&
+                    publication.activities.length > 0 && (
+                      <TimelineCompacto
+                        activities={publication.activities}
+                        isExpanded={isTimelineExpanded}
+                        onToggle={() =>
+                          setIsTimelineExpanded(!isTimelineExpanded)
+                        }
+                      />
+                    )}
+                </div>
               </div>
             </div>
           </form>
