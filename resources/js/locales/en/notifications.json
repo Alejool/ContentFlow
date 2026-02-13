@@ -36,6 +36,29 @@
         "system": "System",
         "analytics": "Analytics"
       }
+    },
+    "admin": {
+      "page_title": "System Notifications",
+      "card_title": "Send Global Notification",
+      "card_description": "This notification will be sent to ALL system users in real-time and will be saved in their history.",
+      "form": {
+        "title": "Title",
+        "title_placeholder": "e.g., Scheduled Maintenance",
+        "type": "Notification Type",
+        "icon": "Icon (Lucide name)",
+        "icon_placeholder": "Bell, Info, AlertTriangle...",
+        "message": "Main Message",
+        "message_placeholder": "The short message that will appear in the toast and notification header.",
+        "description": "Extended Description (Optional)",
+        "description_placeholder": "Additional details about the notification.",
+        "submit": "Send to all users",
+        "types": {
+          "info": "Information",
+          "success": "Success",
+          "warning": "Warning",
+          "error": "Error"
+        }
+      }
     }
   }
 }

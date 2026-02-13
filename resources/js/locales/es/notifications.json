@@ -36,6 +36,29 @@
         "system": "Sistema",
         "analytics": "Analíticas"
       }
+    },
+    "admin": {
+      "page_title": "Notificaciones del Sistema",
+      "card_title": "Enviar Notificación Global",
+      "card_description": "Esta notificación será enviada a TODOS los usuarios del sistema en tiempo real y se guardará en su historial.",
+      "form": {
+        "title": "Título",
+        "title_placeholder": "Ej: Mantenimiento Programado",
+        "type": "Tipo de Notificación",
+        "icon": "Icono (Lucide name)",
+        "icon_placeholder": "Bell, Info, AlertTriangle...",
+        "message": "Mensaje Principal",
+        "message_placeholder": "El mensaje corto que aparecerá en el toast y en la cabecera de la notificación.",
+        "description": "Descripción Extendida (Opcional)",
+        "description_placeholder": "Detalles adicionales sobre la notificación.",
+        "submit": "Enviar a todos los usuarios",
+        "types": {
+          "info": "Información",
+          "success": "Éxito",
+          "warning": "Advertencia",
+          "error": "Error"
+        }
+      }
     }
   }
 }

@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Artisan;
 use App\Models\Role\Role;
 use App\Models\Workspace\Workspace;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Admin\SystemNotificationController;
 
 Broadcast::routes();
 
@@ -141,6 +142,12 @@ Route::middleware('auth')->group(function () {
   Route::prefix('social-accounts')->name('social-accounts.')->group(function () {
     Route::get('/', [SocialAccountController::class, 'index'])->name('index');
     Route::get('auth-url/{platform}', [SocialAccountController::class, 'getAuthUrl'])->name('auth-url');
+  });
+
+  // Admin Routes
+  Route::prefix('admin')->name('admin.')->middleware('super-admin')->group(function () {
+    Route::get('/notifications', [SystemNotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/send', [SystemNotificationController::class, 'send'])->name('notifications.send');
   });
 });
 
