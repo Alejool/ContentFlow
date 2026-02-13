@@ -63,7 +63,7 @@ export const LivePreviewSection = ({
         })}
       </div>
 
-      <div className="bg-gray-50 dark:bg-neutral-900/50 rounded-xl p-6 min-h-[400px] flex items-center justify-center border border-gray-200 dark:border-neutral-800">
+      <div className="bg-gray-50 dark:bg-neutral-900/50 rounded-lg p-6 min-h-[400px] flex items-center justify-center border border-gray-200 dark:border-neutral-800">
         {activePlatform === "twitter" && (
           <TwitterPreview content={content} mediaUrls={mediaUrls} user={user} />
         )}

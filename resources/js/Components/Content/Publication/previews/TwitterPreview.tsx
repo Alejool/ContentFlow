@@ -23,7 +23,7 @@ export const TwitterPreview = ({
 }: TwitterPreviewProps) => {
   return (
     <div
-      className={`bg-white dark:bg-black border border-gray-200 dark:border-gray-800 rounded-xl p-4 max-w-[500px] w-full font-sans ${className}`}
+      className={`bg-white dark:bg-black border border-gray-200 dark:border-gray-800 rounded-lg p-4 max-w-[500px] w-full font-sans ${className}`}
     >
       <div className="flex gap-3">
         <div className="flex-shrink-0">
@@ -54,7 +54,7 @@ export const TwitterPreview = ({
 
           {mediaUrls.length > 0 && (
             <div
-              className={`mt-3 grid gap-0.5 rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-800 ${
+              className={`mt-3 grid gap-0.5 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-800 ${
                 mediaUrls.length === 1
                   ? "grid-cols-1"
                   : mediaUrls.length === 2

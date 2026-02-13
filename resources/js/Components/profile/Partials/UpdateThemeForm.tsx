@@ -80,7 +80,7 @@ export default function UpdateThemeForm({ user }: UpdateThemeFormProps) {
               key={color.value}
               type="button"
               onClick={() => applyTheme(color.value)}
-              className={`group relative flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all duration-200 ${
+              className={`group relative flex flex-col items-center justify-center p-4 rounded-lg border-2 transition-all duration-200 ${
                 data.theme_color === color.value
                   ? "border-primary-500 bg-primary-50 dark:bg-primary-900/10"
                   : "border-gray-200 dark:border-neutral-700 hover:border-gray-300 dark:hover:border-neutral-600 bg-white dark:bg-neutral-800"

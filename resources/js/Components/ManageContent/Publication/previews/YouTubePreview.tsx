@@ -21,7 +21,7 @@ export const YouTubePreview = memo(
     );
 
     return (
-      <div className="w-full max-w-[640px] bg-white dark:bg-[#0f0f0f] rounded-xl overflow-hidden shadow-sm border border-gray-200 dark:border-neutral-800 text-gray-900 dark:text-white">
+      <div className="w-full max-w-[640px] bg-white dark:bg-[#0f0f0f] rounded-lg overflow-hidden shadow-sm border border-gray-200 dark:border-neutral-800 text-gray-900 dark:text-white">
         {/* Video Player Area */}
         <div className="aspect-video bg-black relative flex items-center justify-center">
           {videoUrl ? (
@@ -114,7 +114,7 @@ export const YouTubePreview = memo(
           </div>
 
           {/* Description Box */}
-          <div className="bg-gray-100 dark:bg-neutral-800 rounded-xl p-3 text-[13px] hover:bg-gray-200 dark:hover:bg-neutral-700 transition-colors cursor-pointer">
+          <div className="bg-gray-100 dark:bg-neutral-800 rounded-lg p-3 text-[13px] hover:bg-gray-200 dark:hover:bg-neutral-700 transition-colors cursor-pointer">
             <div className="font-bold mb-1">0 views Oct 13, 2025</div>
             <div className="whitespace-pre-wrap line-clamp-3">
               {content || "Your video description will appear here..."}

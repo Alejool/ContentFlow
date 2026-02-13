@@ -519,14 +519,14 @@ export default function Dashboard({
             <Link
               key={idx}
               href={action.href}
-              className={`group relative overflow-hidden rounded-xl p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${
+              className={`group relative overflow-hidden rounded-lg p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${
                 theme === "dark"
                   ? "bg-neutral-800/40 backdrop-blur-md border border-neutral-700/50 hover:bg-neutral-800/60"
                   : "bg-white border border-gray-100 shadow-sm hover:border-gray-200"
               }`}
             >
               <div
-                className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110 ${
+                className={`w-12 h-12 rounded-lg flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110 ${
                   theme === "dark"
                     ? `bg-${action.color}-900/20 text-${action.color}-400`
                     : `bg-${action.color}-50 text-${action.color}-600`

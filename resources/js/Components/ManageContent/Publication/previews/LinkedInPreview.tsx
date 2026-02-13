@@ -31,7 +31,7 @@ export const LinkedInPreview = ({
 }: LinkedInPreviewProps) => {
   return (
     <div
-      className={`bg-white border text-black border-gray-200 rounded-xl overflow-hidden max-w-[500px] w-full font-sans ${className}`}
+      className={`bg-white border text-black border-gray-200 rounded-lg overflow-hidden max-w-[500px] w-full font-sans ${className}`}
     >
       {/* Header */}
       <div className="flex items-start justify-between p-3 pb-2">

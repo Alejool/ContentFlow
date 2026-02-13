@@ -29,7 +29,7 @@ export const InstagramPreview = ({
 }: InstagramPreviewProps) => {
   return (
     <div
-      className={`bg-white border text-black border-gray-200 rounded-xl overflow-hidden max-w-[400px] w-full font-sans mx-auto ${className}`}
+      className={`bg-white border text-black border-gray-200 rounded-lg overflow-hidden max-w-[400px] w-full font-sans mx-auto ${className}`}
     >
       {/* Header */}
       <div className="flex items-center justify-between p-3">

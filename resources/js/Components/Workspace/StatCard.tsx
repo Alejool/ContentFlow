@@ -70,7 +70,7 @@ export default function StatCard({
 
   return (
     <div
-      className={`relative overflow-hidden rounded-xl transition-all duration-300 hover:shadow-lg group
+      className={`relative overflow-hidden rounded-lg transition-all duration-300 hover:shadow-lg group
         ${
           isDark
             ? `bg-neutral-800/40 backdrop-blur-md border ${colors.border} hover:bg-neutral-800/60`
@@ -88,7 +88,7 @@ export default function StatCard({
         <div className="flex items-start justify-between">
           <div>
             <div
-              className={`h-12 w-12 rounded-xl bg-gradient-to-br ${colors.gradient} flex items-center justify-center mb-4 shadow-lg shadow-black/5 ring-1 ring-black/5`}
+              className={`h-12 w-12 rounded-lg bg-gradient-to-br ${colors.gradient} flex items-center justify-center mb-4 shadow-lg shadow-black/5 ring-1 ring-black/5`}
             >
               <Icon className="h-6 w-6 text-white" />
             </div>

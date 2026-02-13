@@ -304,7 +304,7 @@ export default function GeneralSettingsTab({
             </div>
           </div>
 
-          <div className="flex items-center justify-between p-4 bg-white dark:bg-neutral-900 rounded-xl border border-red-100 dark:border-red-900/30">
+          <div className="flex items-center justify-between p-4 bg-white dark:bg-neutral-900 rounded-lg border border-red-100 dark:border-red-900/30">
             <div>
               <h4 className="font-medium text-gray-900 dark:text-white">
                 {t("workspace.delete_workspace") || "Delete this workspace"}
