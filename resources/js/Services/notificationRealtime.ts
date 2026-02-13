@@ -1,4 +1,7 @@
+import { ICON_MAP } from "@/Components/Notifications/DynamicIcon";
+import { ToastService } from "@/Services/ToastService";
 import { useNotificationStore } from "@/stores/notificationStore";
+import React from "react";
 
 export function initNotificationRealtime(userId: number) {
   if (window.Echo) {
@@ -7,20 +10,26 @@ export function initNotificationRealtime(userId: number) {
       (e: any) => {
         // Show toast immediately
         if (e.title || e.message) {
-          const toastId = `notification-${e.id || Date.now()}`;
-          // We use hot-toast via the existing global configuration if possible, 
-          // but here we can just import it or use a custom event.
-          // For now, let's assume we want a fresh fetch.
+          const title = e.title || "Nueva notificación";
+          const message = e.message || "";
 
-          // If it's an approval request, we might want to refresh publications
-          if (e.type?.includes('PublicationAwaitingApproval') || e.publication_id) {
-            // We can't easily access publicationStore here without importing it
-            // but fetchNotifications is already refreshing the bell icon.
+          let icon = undefined;
+          if (e.icon && ICON_MAP[e.icon]) {
+            const IconComp = ICON_MAP[e.icon];
+            icon = React.createElement(IconComp, { className: "w-5 h-5" });
+          }
+
+          if (e.type === "error" || e.status === "failed") {
+            ToastService.error(`${title}: ${message}`, { icon });
+          } else if (e.type === "warning") {
+            ToastService.warning(`${title}: ${message}`, { icon });
+          } else {
+            ToastService.success(`${title}: ${message}`, { icon });
           }
         }
 
         useNotificationStore.getState().fetchNotifications();
-      }
+      },
     );
   }
 }

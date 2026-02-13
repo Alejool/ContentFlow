@@ -8,10 +8,8 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 
-class PlaylistProcessedNotification extends Notification implements ShouldQueue
+class PlaylistProcessedNotification extends BaseNotification
 {
-  use Queueable;
-
   protected $queueItem;
   protected $playlistName;
   protected $videoTitle;
@@ -23,19 +21,7 @@ class PlaylistProcessedNotification extends Notification implements ShouldQueue
     $this->videoTitle = $videoTitle;
   }
 
-  public function via(object $notifiable): array
-  {
-    $channels = [ExtendedDatabaseChannel::class];
-
-    // Only broadcast if using redis or reverb
-    if (in_array(config('broadcasting.default'), ['redis', 'reverb'])) {
-      $channels[] = 'broadcast';
-    }
-
-    return $channels;
-  }
-
-  public function toDatabase(object $notifiable): array
+  public function toArray($notifiable): array
   {
     $locale = method_exists($notifiable, 'preferredLocale') ? $notifiable->preferredLocale() : app()->getLocale();
     $message = trans('notifications.playlist_processed', ['platform' => 'YouTube'], $locale);
@@ -54,10 +40,5 @@ class PlaylistProcessedNotification extends Notification implements ShouldQueue
       'video_title' => $this->videoTitle,
       'campaign_id' => $this->queueItem->campaign_id,
     ];
-  }
-
-  public function toBroadcast(object $notifiable): array
-  {
-    return $this->toDatabase($notifiable);
   }
 }

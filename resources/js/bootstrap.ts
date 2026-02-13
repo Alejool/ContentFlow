@@ -30,12 +30,14 @@ window.Pusher = Pusher;
 window.Echo = new Echo<"reverb">({
   broadcaster: "reverb",
   key: import.meta.env.VITE_REVERB_APP_KEY as string,
-  wsHost: import.meta.env.VITE_REVERB_HOST ?? window.location.hostname,
-  wsPort: import.meta.env.VITE_REVERB_PORT_WS ?? 80,
-  wssPort: import.meta.env.VITE_REVERB_PORT_WSS ?? 443,
+  wsHost: import.meta.env.VITE_REVERB_HOST || window.location.hostname,
+  wsPort:
+    parseInt(import.meta.env.VITE_REVERB_PORT_WS as string) ||
+    (window.location.protocol === "https:" ? 443 : 80),
+  wssPort: parseInt(import.meta.env.VITE_REVERB_PORT_WSS as string) || 443,
   forceTLS:
-    (import.meta.env.VITE_REVERB_SCHEME ?? "https") === "https" ||
-    window.location.protocol === "https:",
+    (import.meta.env.VITE_REVERB_SCHEME ??
+      (window.location.protocol === "https:" ? "https" : "http")) === "https",
   enabledTransports: ["ws", "wss"],
   authEndpoint: "/broadcasting/auth",
   autoConnect: true,

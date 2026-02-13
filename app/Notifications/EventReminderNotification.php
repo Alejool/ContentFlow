@@ -8,34 +8,14 @@ use Illuminate\Notifications\Notification;
 use App\Models\User\UserCalendarEvent;
 use App\Channels\ExtendedDatabaseChannel;
 
-class EventReminderNotification extends Notification
+class EventReminderNotification extends BaseNotification
 {
-    use Queueable;
-
     /**
      * Create a new notification instance.
      */
     public function __construct(public UserCalendarEvent $event)
     {
-        //
-    }
-
-    /**
-     * Get the notification's delivery channels.
-     *
-     * @return array<int, string>
-     */
-    public function via(object $notifiable): array
-    {
-        return [ExtendedDatabaseChannel::class];
-    }
-
-    /**
-     * Get the category of the notification.
-     */
-    public function getCategory(): string
-    {
-        return 'event';
+        $this->category = 'event';
     }
 
     /**
@@ -43,7 +23,7 @@ class EventReminderNotification extends Notification
      *
      * @return array<string, mixed>
      */
-    public function toArray(object $notifiable): array
+    public function toArray($notifiable): array
     {
         return [
             'type' => 'event_reminder',
@@ -52,7 +32,6 @@ class EventReminderNotification extends Notification
             'description' => $this->event->description ?? 'Recordatorio de evento',
             'start_date' => $this->event->start_date->toIso8601String(),
             'workspace_id' => $this->event->workspace_id,
-            'category' => 'event',
             'message' => "Recordatorio: {$this->event->title}",
         ];
     }

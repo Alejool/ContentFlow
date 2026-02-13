@@ -66,12 +66,16 @@ abstract class BaseNotification extends Notification implements ShouldQueue
     $channels = [EnhancedDatabaseChannel::class, 'broadcast'];
 
     // If the notifiable (usually User) has a current workspace with webhooks
-    if (isset($notifiable->currentWorkspace)) {
-      if ($notifiable->currentWorkspace->slack_webhook_url) {
-        $channels[] = 'slack';
-      }
-      if ($notifiable->currentWorkspace->discord_webhook_url) {
-        $channels[] = 'discord'; // Custom logic for Discord
+    if (isset($notifiable->current_workspace_id)) {
+      // We might need to load the workspace if it's not present
+      $workspace = $notifiable->currentWorkspace;
+      if ($workspace) {
+        if ($workspace->slack_webhook_url) {
+          $channels[] = 'slack';
+        }
+        if ($workspace->discord_webhook_url) {
+          $channels[] = 'discord'; // Custom logic for Discord
+        }
       }
     }
 
@@ -83,7 +87,7 @@ abstract class BaseNotification extends Notification implements ShouldQueue
    */
   public function routeNotificationForSlack($notification)
   {
-    return $this->currentWorkspace->slack_webhook_url ?? null;
+    return $this->notifiable->currentWorkspace->slack_webhook_url ?? null;
   }
 
   /**
@@ -152,6 +156,7 @@ abstract class BaseNotification extends Notification implements ShouldQueue
     $data = $this->toArray($notifiable);
 
     // Add metadata
+    $data['id'] = $this->id;
     $data['priority'] = $this->priority;
     $data['category'] = $this->category;
 

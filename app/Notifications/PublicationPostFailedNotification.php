@@ -7,32 +7,18 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 
-class PublicationPostFailedNotification extends Notification implements ShouldQueue
+class PublicationPostFailedNotification extends BaseNotification
 {
-    use Queueable;
-
     public function __construct(
         public $platform,
         public $error,
         public $publicationTitle
-    ) {}
-
-    public function via(object $notifiable): array
-    {
-        return ['broadcast', 'database'];
+    ) {
+        $this->priority = self::PRIORITY_HIGH;
+        $this->platform = $platform;
     }
 
-    public function toBroadcast(object $notifiable): BroadcastMessage
-    {
-        return new BroadcastMessage([
-            'title' => 'Publication Failed',
-            'message' => "Failed to publish to {$this->platform}: {$this->error}",
-            'platform' => $this->platform,
-            'type' => 'error',
-        ]);
-    }
-
-    public function toArray(object $notifiable): array
+    public function toArray($notifiable): array
     {
         return [
             'title' => 'Publication Failed',

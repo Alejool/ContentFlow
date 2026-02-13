@@ -9,10 +9,8 @@ use Illuminate\Notifications\Notification;
 
 use App\Channels\ExtendedDatabaseChannel;
 
-class PublicationStatusUpdate extends Notification
+class PublicationStatusUpdate extends BaseNotification
 {
-    use Queueable;
-
     /**
      * Create a new notification instance.
      */
@@ -22,29 +20,11 @@ class PublicationStatusUpdate extends Notification
     }
 
     /**
-     * Get the notification's delivery channels.
-     *
-     * @return array<int, string>
-     */
-    public function via(object $notifiable): array
-    {
-        return [ExtendedDatabaseChannel::class];
-    }
-
-    /**
-     * Get the category of the notification.
-     */
-    public function getCategory(): string
-    {
-        return 'application';
-    }
-
-    /**
      * Get the array representation of the notification.
      *
      * @return array<string, mixed>
      */
-    public function toArray(object $notifiable): array
+    public function toArray($notifiable): array
     {
         $publication = $this->log->publication;
         $campaign = $publication ? $publication->campaigns->first() : null;
@@ -65,7 +45,6 @@ class PublicationStatusUpdate extends Notification
             'campaign_id' => $campaign ? $campaign->id : null,
             'campaign_name' => $campaign ? $campaign->name : null,
             'account_name' => $account ? $account->name : 'Unknown Account',
-            'category' => 'application',
         ];
     }
 }
