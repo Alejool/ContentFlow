@@ -38,6 +38,7 @@ class User extends Model implements Authenticatable, MustVerifyEmail, CanResetPa
     'password',
     'provider',
     'provider_id',
+    'is_super_admin',
     'photo_url',
     'email_verified_at',
     'locale',
@@ -64,6 +65,7 @@ class User extends Model implements Authenticatable, MustVerifyEmail, CanResetPa
   protected $casts = [
     'email_verified_at' => 'datetime',
     'password' => 'hashed',
+    'is_super_admin' => 'boolean',
     'global_platform_settings' => 'array',
     'ai_settings' => 'array',
     'known_devices' => 'array',

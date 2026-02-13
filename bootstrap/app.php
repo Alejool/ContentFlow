@@ -11,6 +11,7 @@ use App\Http\Middleware\HandleWorkspaceContext;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use App\Http\Middleware\SecurityHeaders;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use App\Http\Middleware\IsSuperAdmin;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -38,6 +39,9 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         $middleware->api(append: [
             SecurityHeaders::class,
+        ]);
+        $middleware->alias([
+            'super-admin' => IsSuperAdmin::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

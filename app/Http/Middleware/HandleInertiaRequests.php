@@ -57,6 +57,7 @@ class HandleInertiaRequests extends Middleware
           'ai_settings' => $user->ai_settings ?? [],
           'current_workspace_id' => $user->current_workspace_id,
           'theme_color' => $user->theme_color,
+          'is_super_admin' => $user->is_super_admin,
         ] : null,
         'workspaces' => function () use ($user) {
           try {
