@@ -11,8 +11,8 @@ interface TextareaProps<T extends FieldValues = FieldValues> extends Omit<
   label?: string;
   error?: string;
   success?: string;
-  register: UseFormRegister<T>;
-  name: Path<T>;
+  register?: UseFormRegister<T>;
+  name?: Path<T>;
   containerClassName?: string;
   icon?: any;
   hint?: string;
@@ -89,13 +89,28 @@ export default function Textarea<T extends FieldValues>({
     return `${base} border-gray-300/50 dark:border-neutral-700/50 bg-white dark:bg-neutral-800/50 text-gray-900 dark:text-white`;
   };
 
-  const { onChange, ...registerRest } = register(name);
+  const {
+    value: propValue,
+    onChange: propOnChange,
+    onFocus: propOnFocus,
+    onBlur: propOnBlur,
+    ...restProps
+  } = props as any;
+
+  const fieldName = name || (id as any);
+  const registerResult = register ? register(fieldName) : null;
+  const { onChange: registerOnChange, ...registerProps } = registerResult || {};
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     if (showCharCount) {
       setCharCount(e.target.value.length);
     }
-    onChange(e);
+    if (registerOnChange) {
+      registerOnChange(e);
+    }
+    if (propOnChange) {
+      propOnChange(e);
+    }
   };
 
   return (
@@ -129,15 +144,16 @@ export default function Textarea<T extends FieldValues>({
           id={id}
           rows={rows}
           disabled={disabled}
-          {...registerRest}
+          {...registerProps}
+          {...(propValue !== undefined ? { value: propValue } : {})}
           onChange={handleChange}
           onFocus={(e) => {
             setIsFocused(true);
-            props.onFocus?.(e);
+            propOnFocus?.(e);
           }}
           onBlur={(e) => {
             setIsFocused(false);
-            props.onBlur?.(e);
+            propOnBlur?.(e);
           }}
           placeholder={placeholder}
           className={`${getTextareaStyles()} ${className}`}
@@ -158,7 +174,7 @@ export default function Textarea<T extends FieldValues>({
           }
           maxLength={maxLength}
           aria-invalid={!!error}
-          {...props}
+          {...restProps}
         />
 
         {error && (

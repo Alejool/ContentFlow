@@ -510,9 +510,9 @@ export default function Select<T extends FieldValues>({
                 ${getTriggerStyles()} ${className}
                 ${
                   isSolidActive
-                    ? "bg-[rgb(var(--active-bg-rgb))]/70 border-transparent text-white"
+                    ? "text-white"
                     : isOpen && activeColor
-                      ? "border-[rgb(var(--active-bg-rgb))] ring-[rgb(var(--active-bg-rgb))]"
+                      ? "ring-2 ring-offset-2"
                       : ""
                 }
               `}
@@ -526,6 +526,14 @@ export default function Select<T extends FieldValues>({
                     ? {
                         "--active-bg-rgb": activeColorRGB,
                         "--tw-ring-color": `rgb(${activeColorRGB})`,
+                        backgroundColor: isSolidActive
+                          ? `rgb(${activeColorRGB} / 0.7)`
+                          : undefined,
+                        borderColor: isSolidActive
+                          ? "transparent"
+                          : isOpen
+                            ? `rgb(${activeColorRGB})`
+                            : `rgb(${activeColorRGB} / 0.4)`,
                       }
                     : {}),
                 } as React.CSSProperties
@@ -649,12 +657,14 @@ export default function Select<T extends FieldValues>({
                         className={`
                           ${getOptionStyles(isSelected, !!option.disabled)}
                           ${option.disabled ? "cursor-not-allowed" : ""}
-                          ${
-                            isSelected && activeColor
-                              ? "bg-[rgb(var(--active-bg-rgb))]/70 hover:bg-[rgb(var(--active-bg-rgb))]/80 text-white"
-                              : ""
-                          }
                         `}
+                        style={
+                          isSelected && activeColor
+                            ? {
+                                backgroundColor: `rgb(${activeColorRGB} / 0.7)`,
+                              }
+                            : {}
+                        }
                         role="option"
                         aria-selected={isSelected}
                         aria-disabled={option.disabled}

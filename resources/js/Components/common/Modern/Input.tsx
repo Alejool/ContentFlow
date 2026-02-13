@@ -235,10 +235,10 @@ const Input = forwardRef<HTMLInputElement, InputProps<any>>(
               ${
                 activeColor
                   ? isSolidActive
-                    ? "bg-[rgb(var(--active-bg-rgb))]/70 border-transparent text-white"
+                    ? "text-white"
                     : isFocused
-                      ? "border-[rgb(var(--active-bg-rgb))] ring-[rgb(var(--active-bg-rgb))]"
-                      : "border-[rgb(var(--active-bg-rgb))]/40"
+                      ? "ring-2 ring-offset-2"
+                      : ""
                   : ""
               }
             `}
@@ -260,6 +260,14 @@ const Input = forwardRef<HTMLInputElement, InputProps<any>>(
                   ? {
                       "--active-bg-rgb": activeColorRGB,
                       "--tw-ring-color": `rgb(${activeColorRGB})`,
+                      backgroundColor: isSolidActive
+                        ? `rgb(${activeColorRGB} / 0.7)`
+                        : undefined,
+                      borderColor: isFocused
+                        ? `rgb(${activeColorRGB})`
+                        : activeColor
+                          ? `rgb(${activeColorRGB} / 0.4)`
+                          : undefined,
                     }
                   : {}),
                 ...props.style,
