@@ -178,6 +178,17 @@
         "publication": "Publicación",
         "actions": "Acciones"
       },
+      "comments": {
+        "title": "Comentarios Internos",
+        "placeholder": "Escribe un comentario...",
+        "noComments": "No hay comentarios aún. ¡Inicia la conversación!",
+        "loading": "Cargando comentarios...",
+        "deleteConfirm": "¿Estás seguro de que quieres eliminar este comentario?",
+        "deleteSuccess": "Comentario eliminado",
+        "deleteError": "Error al eliminar el comentario",
+        "postError": "Error al publicar el comentario",
+        "delete": "Eliminar"
+      },
       "manageContent": {
         "configureNetworks": "Configura tus publicaciones programadas"
       },
@@ -235,7 +246,8 @@
         }
       },
       "preview": {
-        "title": "Vista Previa",
+        "title": "Vistas Previas en Vivo",
+        "disclaimer": "La vista previa es una aproximación. El aspecto real puede variar según la plataforma.",
         "simulated": "Simulado",
         "real": "Real",
         "realInfo": "Vista Previa Real",

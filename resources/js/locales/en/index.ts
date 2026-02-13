@@ -11,6 +11,7 @@ import dashboard from "./dashboard.json";
 import legal from "./legal.json";
 import logs from "./logs.json";
 import manageContent from "./manageContent.json";
+import media from "./media.json";
 import nav from "./nav.json";
 import notifications from "./notifications.json";
 import pagination from "./pagination.json";
@@ -43,6 +44,7 @@ export default {
   ...ai,
   ...notifications,
   ...manageContent,
+  ...media,
   ...legal,
   ...activity,
   ...validation,
