@@ -1,13 +1,15 @@
 import Label from "@/Components/common/Modern/Label";
 import {
   AlertTriangle,
+  Crop,
   FileImage,
   Loader2,
   Upload,
   Video,
   X,
 } from "lucide-react";
-import React, { memo, useRef } from "react";
+import React, { memo, useRef, useState } from "react";
+import ImageCropper from "./ImageCropper";
 
 interface MediaUploadSectionProps {
   mediaPreviews: {
@@ -28,6 +30,7 @@ interface MediaUploadSectionProps {
   onRemoveMedia: (index: number) => void;
   onSetThumbnail: (tempId: string, file: File) => void;
   onClearThumbnail: (tempId: string) => void;
+  onUpdateFile?: (tempId: string, file: File) => void;
   onDragOver: (e: React.DragEvent<HTMLDivElement>) => void;
   onDragLeave: (e: React.DragEvent<HTMLDivElement>) => void;
   onDrop: (e: React.DragEvent<HTMLDivElement>) => void;
@@ -55,6 +58,7 @@ const MediaUploadSection = memo(
     onRemoveMedia,
     onSetThumbnail,
     onClearThumbnail,
+    onUpdateFile,
     onDragOver,
     onDragLeave,
     onDrop,
@@ -66,6 +70,21 @@ const MediaUploadSection = memo(
     lockedBy,
   }: MediaUploadSectionProps) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const [croppingImage, setCroppingImage] = useState<{
+      tempId: string;
+      url: string;
+    } | null>(null);
+
+    const handleCropComplete = (croppedBlob: Blob) => {
+      if (!croppingImage || !onUpdateFile) return;
+
+      const file = new File([croppedBlob], "cropped-image.jpg", {
+        type: "image/jpeg",
+      });
+
+      onUpdateFile(croppingImage.tempId, file);
+      setCroppingImage(null);
+    };
 
     const getUploadAreaStyles = () => {
       if (disabled || isAnyMediaProcessing || (lockedBy && !lockedBy.isSelf)) {
@@ -81,125 +100,139 @@ const MediaUploadSection = memo(
     };
 
     return (
-      <div
-        className={`space-y-4 ${disabled ? "pointer-events-none select-none" : ""}`}
-      >
-        <Label
-          htmlFor="media-upload"
-          icon={FileImage}
-          required
-          variant="bold"
-          size="lg"
-        >
-          Media
-        </Label>
-
+      <>
         <div
-          className={`relative group transition-all duration-300 ${
-            isDragOver && !disabled
-              ? "scale-[1.02] ring-2 ring-primary-500 dark:ring-primary-400 ring-offset-2"
-              : ""
-          } ${disabled ? "cursor-not-allowed" : "cursor-pointer"}`}
-          onDrop={disabled ? undefined : onDrop}
-          onDragOver={disabled ? undefined : onDragOver}
-          onDragLeave={disabled ? undefined : onDragLeave}
-          onClick={(e) => {
-            if (
-              !disabled &&
-              !isAnyMediaProcessing &&
-              mediaPreviews.length === 0
-            ) {
-              fileInputRef.current?.click();
-            }
-          }}
+          className={`space-y-4 ${disabled ? "pointer-events-none select-none" : ""}`}
         >
-          <div
-            className={`min-h-[200px] rounded-lg border-2 border-dashed flex flex-col items-center justify-center p-6 text-center transition-colors overflow-hidden ${getUploadAreaStyles()}`}
+          <Label
+            htmlFor="media-upload"
+            icon={FileImage}
+            required
+            variant="bold"
+            size="lg"
           >
-            {mediaPreviews.length > 0 ? (
-              <div className="grid grid-cols-2 gap-4 w-full">
-                {mediaPreviews.map((preview, index) => (
-                  <MediaPreviewItem
-                    key={preview.tempId}
-                    preview={preview}
-                    index={index}
-                    thumbnail={thumbnails[preview.tempId]}
-                    onRemove={() => onRemoveMedia(index)}
-                    onSetThumbnail={(file) =>
-                      onSetThumbnail(preview.tempId, file)
-                    }
-                    onClearThumbnail={() => onClearThumbnail(preview.tempId)}
-                    disabled={disabled || isAnyMediaProcessing}
-                    progress={uploadProgress?.[preview.file?.name || ""]}
-                    stats={uploadStats?.[preview.file?.name || ""]}
-                    error={uploadErrors?.[preview.file?.name || ""]}
-                    isExternalProcessing={preview.status === "processing"}
-                  />
-                ))}
-                {!disabled && !isAnyMediaProcessing && (
-                  <AddMoreButton
-                    onClick={(e: any) => {
-                      e.stopPropagation();
-                      fileInputRef.current?.click();
-                    }}
-                  />
-                )}
-              </div>
-            ) : (
-              <EmptyUploadState
-                t={t}
-                isProcessing={isAnyMediaProcessing}
-                lockedBy={lockedBy}
-              />
-            )}
+            Media
+          </Label>
 
-            {/* Global Processing Indicator for the whole area */}
-            {isAnyMediaProcessing && (
-              <div className="absolute inset-x-0 bottom-0 py-1.5 px-4 bg-primary-500/10 backdrop-blur-md border-t border-primary-500/20 animate-in slide-in-from-bottom-2">
-                <div className="flex items-center gap-3">
-                  <div className="flex-1 h-1.5 bg-gray-200 dark:bg-neutral-800 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-primary-500 transition-all duration-500 ease-out"
-                      style={{
-                        width: `${
-                          Object.values(uploadProgress || {}).length > 0
-                            ? Object.values(uploadProgress || {}).reduce(
-                                (a, b) => a + b,
-                                0,
-                              ) / Object.values(uploadProgress || {}).length
-                            : 100
-                        }%`,
+          <div
+            className={`relative group transition-all duration-300 ${
+              isDragOver && !disabled
+                ? "scale-[1.02] ring-2 ring-primary-500 dark:ring-primary-400 ring-offset-2"
+                : ""
+            } ${disabled ? "cursor-not-allowed" : "cursor-pointer"}`}
+            onDrop={disabled ? undefined : onDrop}
+            onDragOver={disabled ? undefined : onDragOver}
+            onDragLeave={disabled ? undefined : onDragLeave}
+            onClick={(e) => {
+              if (
+                !disabled &&
+                !isAnyMediaProcessing &&
+                mediaPreviews.length === 0
+              ) {
+                fileInputRef.current?.click();
+              }
+            }}
+          >
+            <div
+              className={`min-h-[200px] rounded-lg border-2 border-dashed flex flex-col items-center justify-center p-6 text-center transition-colors overflow-hidden ${getUploadAreaStyles()}`}
+            >
+              {mediaPreviews.length > 0 ? (
+                <div className="grid grid-cols-2 gap-4 w-full">
+                  {mediaPreviews.map((preview, index) => (
+                    <MediaPreviewItem
+                      key={preview.tempId}
+                      preview={preview}
+                      index={index}
+                      thumbnail={thumbnails[preview.tempId]}
+                      onRemove={() => onRemoveMedia(index)}
+                      onSetThumbnail={(file) =>
+                        onSetThumbnail(preview.tempId, file)
+                      }
+                      onCrop={(tempId, url) =>
+                        setCroppingImage({ tempId, url })
+                      }
+                      onClearThumbnail={() => onClearThumbnail(preview.tempId)}
+                      disabled={disabled || isAnyMediaProcessing}
+                      progress={uploadProgress?.[preview.file?.name || ""]}
+                      stats={uploadStats?.[preview.file?.name || ""]}
+                      error={uploadErrors?.[preview.file?.name || ""]}
+                      isExternalProcessing={preview.status === "processing"}
+                    />
+                  ))}
+                  {!disabled && !isAnyMediaProcessing && (
+                    <AddMoreButton
+                      onClick={(e: any) => {
+                        e.stopPropagation();
+                        fileInputRef.current?.click();
                       }}
                     />
-                  </div>
-                  <span className="text-[10px] font-bold text-primary-600 dark:text-primary-400 uppercase whitespace-nowrap">
-                    {Object.values(uploadProgress || {}).length > 0
-                      ? "Subiendo..."
-                      : "Procesando S3..."}
-                  </span>
+                  )}
                 </div>
-              </div>
+              ) : (
+                <EmptyUploadState
+                  t={t}
+                  isProcessing={isAnyMediaProcessing}
+                  lockedBy={lockedBy}
+                />
+              )}
+
+              {/* Global Processing Indicator for the whole area */}
+              {isAnyMediaProcessing && (
+                <div className="absolute inset-x-0 bottom-0 py-1.5 px-4 bg-primary-500/10 backdrop-blur-md border-t border-primary-500/20 animate-in slide-in-from-bottom-2">
+                  <div className="flex items-center gap-3">
+                    <div className="flex-1 h-1.5 bg-gray-200 dark:bg-neutral-800 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-primary-500 transition-all duration-500 ease-out"
+                        style={{
+                          width: `${
+                            Object.values(uploadProgress || {}).length > 0
+                              ? Object.values(uploadProgress || {}).reduce(
+                                  (a, b) => a + b,
+                                  0,
+                                ) / Object.values(uploadProgress || {}).length
+                              : 100
+                          }%`,
+                        }}
+                      />
+                    </div>
+                    <span className="text-[10px] font-bold text-primary-600 dark:text-primary-400 uppercase whitespace-nowrap">
+                      {Object.values(uploadProgress || {}).length > 0
+                        ? "Subiendo..."
+                        : "Procesando S3..."}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+            {!disabled && !isAnyMediaProcessing && (
+              <input
+                ref={fileInputRef}
+                type="file"
+                className="hidden"
+                multiple
+                accept="image/*,video/*"
+                onChange={(e) => onFileChange(e.target.files)}
+              />
             )}
           </div>
-          {!disabled && !isAnyMediaProcessing && (
-            <input
-              ref={fileInputRef}
-              type="file"
-              className="hidden"
-              multiple
-              accept="image/*,video/*"
-              onChange={(e) => onFileChange(e.target.files)}
-            />
+
+          {imageError && (
+            <div className="mt-2 flex items-center gap-2 text-sm text-primary-500 animate-in slide-in-from-left-1">
+              <AlertTriangle className="w-4 h-4" />
+              {imageError}
+            </div>
           )}
         </div>
 
-        {imageError && (
-          <div className="mt-2 flex items-center gap-2 text-sm text-primary-500 animate-in slide-in-from-left-1">
-            <AlertTriangle className="w-4 h-4" />
-            {imageError}
-          </div>
+        {croppingImage && (
+          <ImageCropper
+            isOpen={true}
+            onClose={() => setCroppingImage(null)}
+            image={croppingImage.url}
+            onCropComplete={handleCropComplete}
+          />
         )}
-      </div>
+      </>
     );
   },
 );
@@ -211,6 +244,7 @@ const MediaPreviewItem = memo(
     thumbnail,
     onRemove,
     onSetThumbnail,
+    onCrop,
     onClearThumbnail,
     disabled,
     progress,
@@ -223,6 +257,7 @@ const MediaPreviewItem = memo(
     thumbnail?: File;
     onRemove: () => void;
     onSetThumbnail: (file: File) => void;
+    onCrop: (tempId: string, url: string) => void;
     onClearThumbnail: () => void;
     disabled?: boolean;
     progress?: number;
@@ -320,6 +355,20 @@ const MediaPreviewItem = memo(
             className="absolute top-2 right-2 p-1.5 bg-red-500/80 text-white rounded-full hover:bg-red-600 transition-colors opacity-0 group-hover/item:opacity-100 backdrop-blur-sm z-30"
           >
             <X className="w-3 h-3" />
+          </button>
+        )}
+
+        {!disabled && !preview.type.includes("video") && !isProcessing && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onCrop(preview.tempId, preview.url);
+            }}
+            className="absolute top-2 right-10 p-1.5 bg-black/60 text-white rounded-full hover:bg-black/80 transition-colors opacity-0 group-hover/item:opacity-100 backdrop-blur-sm z-30"
+            title="Crop Image"
+          >
+            <Crop className="w-3 h-3" />
           </button>
         )}
       </div>
