@@ -19,6 +19,7 @@ use App\Models\User;
 use App\Models\Campaigns\CampaignAnalytics;
 use App\Models\Social\ScheduledPost;
 use App\Models\Campaigns\Campaign;
+use App\Models\Publications\PublicationComment;
 
 
 
@@ -341,5 +342,10 @@ class Publication extends Model
       'type' => $type,
       'details' => $details,
     ]);
+  }
+
+  public function comments(): HasMany
+  {
+    return $this->hasMany(PublicationComment::class)->orderBy('created_at', 'asc');
   }
 }

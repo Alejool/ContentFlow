@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Publications\PublicationController;
 use App\Http\Controllers\Publications\PublicationLockController;
+use App\Http\Controllers\Publications\PublicationCommentController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -30,5 +31,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/{publication}/lock', [PublicationLockController::class, 'lock'])->name('lock')->whereNumber('publication');
     Route::post('/{publication}/unlock', [PublicationLockController::class, 'unlock'])->name('unlock')->whereNumber('publication');
     Route::get('/{publication}/lock', [PublicationLockController::class, 'status'])->name('status')->whereNumber('publication');
+
+    // Comments API
+    Route::get('/{publication}/comments', [PublicationCommentController::class, 'index'])->name('comments.index')->whereNumber('publication');
+    Route::post('/{publication}/comments', [PublicationCommentController::class, 'store'])->name('comments.store')->whereNumber('publication');
+    Route::delete('/{publication}/comments/{comment}', [PublicationCommentController::class, 'destroy'])->name('comments.destroy')->whereNumber('publication')->whereNumber('comment');
   });
 });
