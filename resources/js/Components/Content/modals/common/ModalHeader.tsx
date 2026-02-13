@@ -51,7 +51,7 @@ const ModalHeader: React.FC<ModalHeaderProps> = ({
           </p>
         )}
       </div>
-      <div className="flex items-center gap-4">
+      <div className="flex py-4 items-center gap-4">
         {rightElement}
         <button
           onClick={onClose}

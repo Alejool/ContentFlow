@@ -266,7 +266,7 @@ const EditPublicationModal = ({
               : "publications.modal.show.subtitle"
           }
           rightElement={
-            <div className="flex -space-x-2 overflow-hidden mr-4">
+            <div className="flex -space-x-2 overflow-hidden mr-4 p-3">
               {activeUsers.map((user: any) => {
                 const isTheLocker = lockInfo?.user_id === user.id;
                 return (

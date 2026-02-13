@@ -21,19 +21,27 @@ export default function GlobalUploadIndicator() {
   const [dismissedPublicationIds, setDismissedPublicationIds] = useState<
     number[]
   >([]);
+  const [isFetching, setIsFetching] = useState(false);
   const { t } = useTranslation();
   const props = usePage().props as any;
 
   const uploads = Object.values(queue);
 
   // Fetch publications in 'processing', 'publishing', or recently 'failed' state
-  const fetchProcessingItems = async () => {
+  const fetchProcessingItems = async (signal?: AbortSignal) => {
+    // Prevent concurrent calls
+    if (isFetching) {
+      return;
+    }
+
     try {
+      setIsFetching(true);
       const response = await axios.get(route("api.v1.publications.index"), {
         params: {
           status: "processing,publishing,failed,published",
           simplified: "true",
         },
+        signal, // Pass abort signal for cancellation
       });
       if (response.data?.success && response.data?.publications) {
         const items: Publication[] = Array.isArray(response.data.publications)
@@ -60,41 +68,69 @@ export default function GlobalUploadIndicator() {
         setProcessingItems(filtered);
       }
     } catch (err) {
+      // Ignore abort errors
+      if (axios.isCancel(err) || (err as any)?.name === "CanceledError") {
+        return;
+      }
       console.error("Failed to fetch processing items", err);
+    } finally {
+      setIsFetching(false);
     }
   };
 
   useEffect(() => {
-    fetchProcessingItems();
-    // Poll every 10 seconds for more responsive updates
-    const interval = setInterval(fetchProcessingItems, 10000);
+    const abortController = new AbortController();
 
-    // Listen for real-time status updates
-    if (props.auth?.user?.id) {
+    // Initial fetch
+    fetchProcessingItems(abortController.signal);
+
+    // Only poll if WebSocket is NOT available
+    // When WebSocket is active, real-time events handle updates
+    let interval: NodeJS.Timeout | null = null;
+
+    if (!props.auth?.user?.id || !window.Echo) {
+      // No WebSocket available, use polling as fallback
+      interval = setInterval(() => {
+        fetchProcessingItems(abortController.signal);
+      }, 30000); // 30 seconds polling interval
+    }
+
+    // Listen for real-time status updates via WebSocket
+    if (props.auth?.user?.id && window.Echo) {
       const channel = window.Echo.private(`users.${props.auth.user.id}`);
       channel.listen(".PublicationStatusUpdated", () => {
-        fetchProcessingItems();
+        fetchProcessingItems(abortController.signal);
       });
 
       return () => {
-        clearInterval(interval);
+        if (interval) clearInterval(interval);
+        abortController.abort();
         channel.stopListening(".PublicationStatusUpdated");
       };
     }
 
-    return () => clearInterval(interval);
-  }, [props.auth?.user?.id]);
+    return () => {
+      if (interval) clearInterval(interval);
+      abortController.abort();
+    };
+  }, [props.auth?.user?.id, dismissedPublicationIds]);
 
   useEffect(() => {
+    const abortController = new AbortController();
+
     const handlePublicationStarted = () => {
-      fetchProcessingItems();
+      fetchProcessingItems(abortController.signal);
     };
+
     window.addEventListener("publication-started", handlePublicationStarted);
-    return () =>
+
+    return () => {
+      abortController.abort();
       window.removeEventListener(
         "publication-started",
         handlePublicationStarted,
       );
+    };
   }, []);
 
   // Filter out dismissed items for rendering
@@ -160,7 +196,9 @@ export default function GlobalUploadIndicator() {
 
     try {
       await axios.post(route("api.v1.publications.cancel", id));
-      fetchProcessingItems();
+      // Fetch immediately after cancellation
+      const abortController = new AbortController();
+      fetchProcessingItems(abortController.signal);
     } catch (err) {
       console.error("Failed to cancel publication", err);
     }

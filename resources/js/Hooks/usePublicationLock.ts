@@ -166,16 +166,15 @@ export const usePublicationLock = (
 
   // Release lock function
   const releaseLock = useCallback(async () => {
-    // Local cleanup: immediately visible block removal for self
-    if (publicationId) {
-      useLockStore.getState().updateLock(publicationId, null);
-    }
+    if (!publicationId) return;
 
-    if (!publicationId || !isLockedByMeRef.current) return;
-
+    // Always clean up local state immediately for responsive UI
     setLockedByMeInternal(false);
     setLockInfo(null);
+    useLockStore.getState().updateLock(publicationId, null);
 
+    // Always try to release the lock on the backend
+    // Even if we think we don't have it, attempt to release to ensure cleanup
     try {
       await usePublicationStore.getState().releaseLock(publicationId);
     } catch (e) {
@@ -231,7 +230,7 @@ export const usePublicationLock = (
             new Map(users.map((u) => [u.id, u])).values(),
           );
           setActiveUsers(uniqueUsers);
-          acquireLock();
+          // Don't call acquireLock() here - it's already called on line 220
         });
 
         channel.joining((user: User) => {
