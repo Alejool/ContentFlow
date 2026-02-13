@@ -318,7 +318,7 @@ export default function Select<T extends FieldValues>({
     }
 
     const ringColorClass = activeColor
-      ? "" // We'll apply it via style
+      ? ""
       : "focus:ring-primary-500/20 dark:focus:ring-primary-500/30";
 
     if (variant === "outlined") {
@@ -408,6 +408,23 @@ export default function Select<T extends FieldValues>({
     }
   };
 
+  const getRGBValues = (color: string) => {
+    if (!color) return "";
+    if (color.startsWith("primary-")) return `var(--${color})`;
+    if (color.startsWith("#")) {
+      const hex =
+        color.length === 4
+          ? `#${color[1]}${color[1]}${color[2]}${color[2]}${color[3]}${color[3]}`
+          : color;
+      const r = parseInt(hex.slice(1, 3), 16);
+      const g = parseInt(hex.slice(3, 5), 16);
+      const b = parseInt(hex.slice(5, 7), 16);
+      return `${r} ${g} ${b}`;
+    }
+    return color;
+  };
+
+  const activeColorRGB = activeColor ? getRGBValues(activeColor) : "";
   const isSolidActive =
     activeColor && value !== undefined && value !== "" && value !== null;
 
@@ -489,7 +506,16 @@ export default function Select<T extends FieldValues>({
               type="button"
               onClick={handleTriggerClick}
               disabled={disabled || loading}
-              className={`${getTriggerStyles()} ${className}`}
+              className={`
+                ${getTriggerStyles()} ${className}
+                ${
+                  isSolidActive
+                    ? "bg-[rgb(var(--active-bg-rgb))]/70 border-transparent text-white"
+                    : isOpen && activeColor
+                      ? "border-[rgb(var(--active-bg-rgb))] ring-[rgb(var(--active-bg-rgb))]"
+                      : ""
+                }
+              `}
               aria-expanded={isOpen}
               aria-haspopup="listbox"
               aria-labelledby={`${id}-label`}
@@ -498,22 +524,8 @@ export default function Select<T extends FieldValues>({
                 {
                   ...(activeColor
                     ? {
-                        "--tw-ring-color": activeColor.startsWith("primary-")
-                          ? `rgb(var(--${activeColor}))`
-                          : activeColor,
-                        borderColor: isSolidActive
-                          ? "transparent"
-                          : isOpen
-                            ? activeColor.startsWith("primary-")
-                              ? `rgb(var(--${activeColor}))`
-                              : activeColor
-                            : undefined,
-                        backgroundColor: isSolidActive
-                          ? activeColor.startsWith("primary-")
-                            ? `rgb(var(--${activeColor}))`
-                            : activeColor
-                          : undefined,
-                        color: isSolidActive ? "#ffffff" : undefined,
+                        "--active-bg-rgb": activeColorRGB,
+                        "--tw-ring-color": `rgb(${activeColorRGB})`,
                       }
                     : {}),
                 } as React.CSSProperties
@@ -586,6 +598,16 @@ export default function Select<T extends FieldValues>({
               aria-labelledby={`${id}-label`}
               data-select-dropdown="true"
               className="w-full"
+              style={
+                {
+                  ...(activeColor
+                    ? {
+                        "--active-bg-rgb": activeColorRGB,
+                        "--tw-ring-color": `rgb(${activeColorRGB})`,
+                      }
+                    : {}),
+                } as React.CSSProperties
+              }
             >
               {searchable && (
                 <div className="sticky top-0 bg-inherit border-b border-inherit">
@@ -624,22 +646,15 @@ export default function Select<T extends FieldValues>({
                           !option.disabled && handleSelect(option.value)
                         }
                         disabled={option.disabled}
-                        className={`${getOptionStyles(
-                          isSelected,
-                          !!option.disabled,
-                        )} ${option.disabled ? "cursor-not-allowed" : ""}`}
-                        style={
-                          isSelected && activeColor
-                            ? ({
-                                backgroundColor: activeColor.startsWith(
-                                  "primary-",
-                                )
-                                  ? `rgb(var(--${activeColor}))`
-                                  : activeColor,
-                                color: "#ffffff",
-                              } as React.CSSProperties)
-                            : {}
-                        }
+                        className={`
+                          ${getOptionStyles(isSelected, !!option.disabled)}
+                          ${option.disabled ? "cursor-not-allowed" : ""}
+                          ${
+                            isSelected && activeColor
+                              ? "bg-[rgb(var(--active-bg-rgb))]/70 hover:bg-[rgb(var(--active-bg-rgb))]/80 text-white"
+                              : ""
+                          }
+                        `}
                         role="option"
                         aria-selected={isSelected}
                         aria-disabled={option.disabled}
@@ -651,7 +666,13 @@ export default function Select<T extends FieldValues>({
                           {option.label}
                         </span>
                         {isSelected && (
-                          <Check className="w-4 h-4 flex-shrink-0 text-primary-500 dark:text-primary-400" />
+                          <Check
+                            className={`w-4 h-4 flex-shrink-0 ${
+                              activeColor
+                                ? "text-white"
+                                : "text-primary-500 dark:text-primary-400"
+                            }`}
+                          />
                         )}
                       </button>
                     );

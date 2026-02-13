@@ -21,18 +21,34 @@ registerLocale("en", enUS);
 
 const getColor = (color: string, alpha: string = "1") => {
   if (!color) return color;
+
+  const alphaMap: Record<string, string> = {
+    dd: "0.86",
+    "60": "0.37",
+    "10": "0.06",
+    "05": "0.03",
+    "20": "0.12",
+    "50": "0.5",
+    "70": "0.7",
+  };
+  const a = alphaMap[alpha] || alpha;
+
   if (color.startsWith("primary-")) {
-    const alphaMap: Record<string, string> = {
-      dd: "0.86",
-      "60": "0.37",
-      "10": "0.06",
-      "05": "0.03",
-      "20": "0.12",
-    };
-    const a = alphaMap[alpha] || alpha;
     return `rgb(var(--${color}) / ${a})`;
   }
-  return alpha !== "1" ? `${color}${alpha}` : color;
+
+  if (color.startsWith("#") && a !== "1") {
+    const hex =
+      color.length === 4
+        ? `#${color[1]}${color[1]}${color[2]}${color[2]}${color[3]}${color[3]}`
+        : color;
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `rgba(${r}, ${g}, ${b}, ${a})`;
+  }
+
+  return color;
 };
 
 interface DatePickerProps<T extends FieldValues> {
@@ -679,10 +695,10 @@ const DatePickerModern = <T extends FieldValues>({
 
           .react-datepicker__day--selected,
           .react-datepicker__day--keyboard-selected {
-            background: ${getColor(activeColor)} !important;
+            background: ${getColor(activeColor, "70")} !important;
             color: white !important;
             font-weight: 700 !important;
-            box-shadow: 0 4px 6px -1px ${getColor(activeColor, "60")};
+            box-shadow: 0 4px 6px -1px ${getColor(activeColor, "20")};
             transform: scale(1.05);
           }
 

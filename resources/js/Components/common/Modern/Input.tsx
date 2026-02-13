@@ -146,6 +146,24 @@ const Input = forwardRef<HTMLInputElement, InputProps<any>>(
       propValue !== undefined && propValue !== "" && propValue !== null;
     const isSolidActive = activeColor && hasValue;
 
+    const getRGBValues = (color: string) => {
+      if (!color) return "";
+      if (color.startsWith("primary-")) return `var(--${color})`;
+      if (color.startsWith("#")) {
+        const hex =
+          color.length === 4
+            ? `#${color[1]}${color[1]}${color[2]}${color[2]}${color[3]}${color[3]}`
+            : color;
+        const r = parseInt(hex.slice(1, 3), 16);
+        const g = parseInt(hex.slice(3, 5), 16);
+        const b = parseInt(hex.slice(5, 7), 16);
+        return `${r} ${g} ${b}`;
+      }
+      return color;
+    };
+
+    const activeColorRGB = activeColor ? getRGBValues(activeColor) : "";
+
     return (
       <div className={`${containerClassName}`}>
         {(label || hint) && (
@@ -211,7 +229,19 @@ const Input = forwardRef<HTMLInputElement, InputProps<any>>(
             type={inputType}
             disabled={disabled}
             placeholder={placeholder}
-            className={`${getInputStyles()} ${className} ${isSolidActive ? "!placeholder-white/70" : ""}`}
+            className={`
+              ${getInputStyles()} ${className}
+              ${isSolidActive ? "!placeholder-white/70" : ""}
+              ${
+                activeColor
+                  ? isSolidActive
+                    ? "bg-[rgb(var(--active-bg-rgb))]/70 border-transparent text-white"
+                    : isFocused
+                      ? "border-[rgb(var(--active-bg-rgb))] ring-[rgb(var(--active-bg-rgb))]"
+                      : "border-[rgb(var(--active-bg-rgb))]/40"
+                  : ""
+              }
+            `}
             {...(!register ? { name: fieldName } : {})}
             {...registerProps}
             onFocus={(e) => {
@@ -228,24 +258,8 @@ const Input = forwardRef<HTMLInputElement, InputProps<any>>(
               {
                 ...(activeColor
                   ? {
-                      "--tw-ring-color": activeColor.startsWith("primary-")
-                        ? `rgb(var(--${activeColor}))`
-                        : activeColor,
-                      borderColor: isSolidActive
-                        ? "transparent"
-                        : isFocused
-                          ? activeColor.startsWith("primary-")
-                            ? `rgb(var(--${activeColor}))`
-                            : activeColor
-                          : activeColor.startsWith("primary-")
-                            ? `rgb(var(--${activeColor}) / 0.4)`
-                            : `${activeColor}40`,
-                      backgroundColor: isSolidActive
-                        ? activeColor.startsWith("primary-")
-                          ? `rgb(var(--${activeColor}))`
-                          : activeColor
-                        : undefined,
-                      color: isSolidActive ? "#ffffff" : undefined,
+                      "--active-bg-rgb": activeColorRGB,
+                      "--tw-ring-color": `rgb(${activeColorRGB})`,
                     }
                   : {}),
                 ...props.style,
