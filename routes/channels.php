@@ -24,6 +24,6 @@ Broadcast::channel('publication.{id}', function ($user, $id) {
         return false;
 
     return $user->workspaces()->where('workspaces.id', $publication->workspace_id)->exists()
-        ? ['id' => $user->id, 'name' => $user->name, 'avatar' => $user->profile_photo_url]
+        ? ['id' => $user->id, 'name' => $user->name, 'avatar' => $user->photo_url]
         : false;
 });
