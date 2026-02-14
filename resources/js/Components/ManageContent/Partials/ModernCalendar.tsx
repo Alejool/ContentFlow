@@ -8,6 +8,15 @@ import {
 import { useCalendar } from "@/Hooks/calendar/useCalendar";
 import { formatTime } from "@/Utils/formatDate";
 import { useLockStore } from "@/stores/lockStore";
+import {
+  DndContext,
+  DragEndEvent,
+  PointerSensor,
+  useDraggable,
+  useDroppable,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
 import { usePage } from "@inertiajs/react";
 import {
   eachDayOfInterval,
@@ -81,6 +90,129 @@ const PlatformIcon = ({
   return <Icon className={`${config.textColor} ${className}`} />;
 };
 
+const DraggableEvent = ({
+  event,
+  onClick,
+  onDelete,
+  currentUser,
+  remoteLocks,
+}: {
+  event: CalendarEvent;
+  onClick: (e: React.MouseEvent) => void;
+  onDelete: (e: React.MouseEvent, event: CalendarEvent) => void;
+  currentUser: any;
+  remoteLocks: Record<number, any>;
+}) => {
+  const isDraggable =
+    event.type !== "user_event" ||
+    (event.user?.id && Number(event.user.id) === Number(currentUser?.id)) ||
+    (!event.user?.id && event.extendedProps?.user_name === currentUser?.name);
+
+  const { attributes, listeners, setNodeRef, transform, isDragging } =
+    useDraggable({
+      id: event.id,
+      disabled: !isDraggable,
+      data: {
+        event,
+      },
+    });
+
+  const style = transform
+    ? {
+        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+        zIndex: 50,
+      }
+    : undefined;
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...listeners}
+      {...attributes}
+      onClick={onClick}
+      className={`flex items-center gap-1.5 px-1.5 py-1 rounded-md text-[10px] font-medium border border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 truncate transition-transform hover:scale-[1.02] shadow-sm ${isDragging ? "opacity-50 cursor-grabbing" : "cursor-pointer"}`}
+    >
+      <div
+        className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+        style={{ backgroundColor: event.color }}
+      />
+      {remoteLocks[
+        event.extendedProps.publication_id || Number(event.resourceId)
+      ] && <Lock className="w-2.5 h-2.5 text-amber-500 flex-shrink-0" />}
+      <span className="truncate text-gray-700 dark:text-gray-200">
+        {event.title}
+      </span>
+    </div>
+  );
+};
+
+const DroppableDay = ({
+  day,
+  children,
+  isSelected,
+  currentMonth,
+  isTodayDay,
+  onSelect,
+  onAddClick,
+}: {
+  day: Date;
+  children: React.ReactNode;
+  isSelected: boolean;
+  currentMonth: Date;
+  isTodayDay: boolean;
+  onSelect: () => void;
+  onAddClick: (e: React.MouseEvent) => void;
+}) => {
+  const { setNodeRef, isOver } = useDroppable({
+    id: day.toISOString(),
+    data: {
+      date: day,
+    },
+  });
+
+  return (
+    <div
+      ref={setNodeRef}
+      onClick={onSelect}
+      className={`
+        relative h-24 sm:h-32 lg:h-40 p-2 transition-all cursor-pointer group overflow-hidden
+        ${isSelected ? "bg-primary-50/30 dark:bg-primary-900/10 z-10" : "bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800/50"}
+        ${!isSameMonth(day, currentMonth) ? "opacity-40" : ""}
+        ${isOver ? "ring-2 ring-primary-500 ring-inset bg-primary-50/50 dark:bg-primary-900/20" : ""}
+      `}
+    >
+      <div className="flex justify-between items-start mb-1">
+        <span
+          className={`
+            flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 text-xs sm:text-sm font-bold rounded-lg transition-all
+            ${
+              isTodayDay
+                ? "bg-primary-500 text-white shadow-lg shadow-primary-500/30"
+                : isSelected
+                  ? "text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/30"
+                  : "text-gray-700 dark:text-gray-300 group-hover:bg-gray-100 dark:group-hover:bg-gray-800"
+            }
+          `}
+        >
+          {format(day, "d")}
+        </span>
+
+        <button
+          onClick={onAddClick}
+          className="opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-all text-gray-400 hover:text-primary-500"
+        >
+          <CalendarIcon className="w-3.5 h-3.5" />
+        </button>
+      </div>
+
+      <div className="hidden sm:flex flex-col gap-1 overflow-y-auto scrollbar-none max-h-[calc(100%-2rem)]">
+        {children}
+      </div>
+    </div>
+  );
+};
+
 export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
   const { t, i18n } = useTranslation();
   const {
@@ -107,7 +239,6 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
   const currentUser = auth.user;
   const { remoteLocks } = useLockStore();
 
-  const [draggedEvent, setDraggedEvent] = useState<CalendarEvent | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [showEventModal, setShowEventModal] = useState(false);
   const [selectedEventForModal, setSelectedEventForModal] = useState<
@@ -118,6 +249,14 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
     event: CalendarEvent | null;
   }>({ isOpen: false, event: null });
   const [showMonthPicker, setShowMonthPicker] = useState(false);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+  );
 
   // Close month picker when clicking outside
   useEffect(() => {
@@ -140,44 +279,24 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
   const firstDayOfMonth = startOfMonth(currentMonth).getDay();
   const startingEmptySlots = Array.from({ length: firstDayOfMonth });
 
-  const handleDragStart = (e: React.DragEvent, event: CalendarEvent) => {
-    if (
-      event.type === "user_event" &&
-      !(
-        (event.user?.id && Number(event.user.id) === Number(currentUser?.id)) ||
-        (!event.user?.id &&
-          event.extendedProps?.user_name === currentUser?.name)
-      )
-    ) {
-      e.preventDefault();
-      return;
-    }
-    setDraggedEvent(event);
-    e.dataTransfer.effectAllowed = "move";
-    e.dataTransfer.setData("text/plain", event.id);
-  };
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
 
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = "move";
-  };
+    if (!over) return;
 
-  const onDrop = async (e: React.DragEvent, date: Date) => {
-    e.preventDefault();
-    if (!draggedEvent) return;
+    const eventData = active.data.current?.event as CalendarEvent;
+    const dropDate = over.data.current?.date as Date;
 
-    if (isBefore(startOfDay(date), startOfDay(new Date()))) {
+    if (!eventData || !dropDate) return;
+
+    if (isBefore(startOfDay(dropDate), startOfDay(new Date()))) {
       toast.error(t("calendar.userEvents.modal.validation.pastDate"));
-      setDraggedEvent(null);
       return;
     }
 
-    await handleEventDrop(
-      draggedEvent.id,
-      date.toISOString(),
-      draggedEvent.type,
-    );
-    setDraggedEvent(null);
+    if (isSameDay(parseISO(eventData.start), dropDate)) return;
+
+    await handleEventDrop(eventData.id, dropDate.toISOString(), eventData.type);
   };
 
   const handleDeleteEvent = (e: React.MouseEvent, event: CalendarEvent) => {
@@ -356,78 +475,54 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                 ))}
               </div>
 
-              <div className="grid grid-cols-7 bg-gray-200 dark:bg-gray-800 gap-[1px]">
-                {startingEmptySlots.map((_, i) => (
-                  <div
-                    key={`empty-${i}`}
-                    className="bg-gray-50/50 dark:bg-gray-900/40 h-24 sm:h-32 lg:h-40"
-                  />
-                ))}
-
-                {days.map((day) => {
-                  const dayEvents = filteredEvents.filter((e) =>
-                    isSameDay(parseISO(e.start), day),
-                  );
-                  const isTodayDay = isToday(day);
-                  const isSelected = isSameDay(day, selectedDate);
-
-                  return (
+              <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+                <div className="grid grid-cols-7 bg-gray-200 dark:bg-gray-800 gap-[1px]">
+                  {startingEmptySlots.map((_, i) => (
                     <div
-                      key={day.toString()}
-                      onClick={() => setSelectedDate(day)}
-                      onDragOver={handleDragOver}
-                      onDrop={(e) => onDrop(e, day)}
-                      className={`
-                        relative h-24 sm:h-32 lg:h-40 p-2 transition-all cursor-pointer group overflow-hidden
-                        ${isSelected ? "bg-primary-50/30 dark:bg-primary-900/10 z-10" : "bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800/50"}
-                        ${!isSameMonth(day, currentMonth) ? "opacity-40" : ""}
-                      `}
-                    >
-                      <div className="flex justify-between items-start mb-1">
-                        <span
-                          className={`
-                            flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 text-xs sm:text-sm font-bold rounded-lg transition-all
-                            ${
-                              isTodayDay
-                                ? "bg-primary-500 text-white shadow-lg shadow-primary-500/30"
-                                : isSelected
-                                  ? "text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/30"
-                                  : "text-gray-700 dark:text-gray-300 group-hover:bg-gray-100 dark:group-hover:bg-gray-800"
-                            }
-                          `}
-                        >
-                          {format(day, "d")}
-                        </span>
+                      key={`empty-${i}`}
+                      className="bg-gray-50/50 dark:bg-gray-900/40 h-24 sm:h-32 lg:h-40"
+                    />
+                  ))}
 
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (
-                              isBefore(startOfDay(day), startOfDay(new Date()))
-                            ) {
-                              toast.error(
-                                t(
-                                  "calendar.userEvents.modal.validation.pastDate",
-                                ),
-                              );
-                              return;
-                            }
-                            setSelectedDate(day);
-                            setSelectedEventForModal(undefined);
-                            setShowEventModal(true);
-                          }}
-                          className="opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-all text-gray-400 hover:text-primary-500"
-                        >
-                          <CalendarIcon className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
+                  {days.map((day) => {
+                    const dayEvents = filteredEvents.filter((e) =>
+                      isSameDay(parseISO(e.start), day),
+                    );
+                    const isTodayDay = isToday(day);
+                    const isSelected = isSameDay(day, selectedDate);
 
-                      <div className="hidden sm:flex flex-col gap-1 overflow-y-auto scrollbar-none max-h-[calc(100%-2rem)]">
+                    return (
+                      <DroppableDay
+                        key={day.toString()}
+                        day={day}
+                        isSelected={isSelected}
+                        currentMonth={currentMonth}
+                        isTodayDay={isTodayDay}
+                        onSelect={() => setSelectedDate(day)}
+                        onAddClick={(e) => {
+                          e.stopPropagation();
+                          if (
+                            isBefore(startOfDay(day), startOfDay(new Date()))
+                          ) {
+                            toast.error(
+                              t(
+                                "calendar.userEvents.modal.validation.pastDate",
+                              ),
+                            );
+                            return;
+                          }
+                          setSelectedDate(day);
+                          setSelectedEventForModal(undefined);
+                          setShowEventModal(true);
+                        }}
+                      >
                         {dayEvents.slice(0, 3).map((event) => (
-                          <div
+                          <DraggableEvent
                             key={event.id}
-                            draggable
-                            onDragStart={(e) => handleDragStart(e, event)}
+                            event={event}
+                            currentUser={currentUser}
+                            remoteLocks={remoteLocks}
+                            onDelete={handleDeleteEvent}
                             onClick={(e) => {
                               e.stopPropagation();
                               if (event.type === "user_event") {
@@ -441,43 +536,27 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                                   onEventClick?.(pubId, event.type, event);
                               }
                             }}
-                            className="flex items-center gap-1.5 px-1.5 py-1 rounded-md text-[10px] font-medium border border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 truncate transition-transform hover:scale-[1.02] shadow-sm"
-                          >
-                            <div
-                              className="w-1.5 h-1.5 rounded-full flex-shrink-0"
-                              style={{ backgroundColor: event.color }}
-                            />
-                            {remoteLocks[
-                              event.extendedProps.publication_id ||
-                                Number(event.resourceId)
-                            ] && (
-                              <Lock className="w-2.5 h-2.5 text-amber-500 flex-shrink-0" />
-                            )}
-                            <span className="truncate text-gray-700 dark:text-gray-200">
-                              {event.title}
-                            </span>
-                          </div>
+                          />
                         ))}
                         {dayEvents.length > 3 && (
                           <div className="text-[10px] text-gray-400 font-bold px-1.5">
                             + {dayEvents.length - 3}
                           </div>
                         )}
-                      </div>
-
-                      <div className="flex sm:hidden flex-wrap gap-0.5 mt-1">
-                        {dayEvents.slice(0, 4).map((event) => (
-                          <div
-                            key={event.id}
-                            className="w-1.5 h-1.5 rounded-full"
-                            style={{ backgroundColor: event.color }}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+                        <div className="flex sm:hidden flex-wrap gap-0.5 mt-1">
+                          {dayEvents.slice(0, 4).map((event) => (
+                            <div
+                              key={event.id}
+                              className="w-1.5 h-1.5 rounded-full"
+                              style={{ backgroundColor: event.color }}
+                            />
+                          ))}
+                        </div>
+                      </DroppableDay>
+                    );
+                  })}
+                </div>
+              </DndContext>
             </div>
           </div>
 
