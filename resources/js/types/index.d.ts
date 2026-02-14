@@ -16,3 +16,5 @@ export type PageProps<
     user: User | null;
   };
 };
+
+export * from "./Publication";

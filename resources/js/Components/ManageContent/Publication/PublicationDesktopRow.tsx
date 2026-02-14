@@ -74,6 +74,8 @@ const PublicationRow = memo(
     const [isEditing, setIsEditing] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
 
+
+
     const publishingPlatforms = usePublicationStore((s) =>
       s.getPublishingPlatforms(item.id),
     );
@@ -384,6 +386,7 @@ const PublicationRow = memo(
                 <Clock className="w-4 h-4" />
               </button>
             ) : null}
+
             {/* View Details button - Always visible for all users */}
             {!permissions?.includes("manage-content") && (
               <button

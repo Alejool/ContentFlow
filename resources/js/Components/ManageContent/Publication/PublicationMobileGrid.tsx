@@ -157,6 +157,7 @@ const PublicationMobileGrid = memo(
                       <Edit className="w-3.5 h-3.5" />
                       {t("common.edit")}
                     </button>
+
                     <button
                       onClick={(e) => {
                         e.stopPropagation();

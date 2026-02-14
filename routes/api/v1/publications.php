@@ -3,6 +3,7 @@
 use App\Http\Controllers\Publications\PublicationController;
 use App\Http\Controllers\Publications\PublicationLockController;
 use App\Http\Controllers\Publications\PublicationCommentController;
+use App\Http\Controllers\Publications\ClientPortalController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -26,6 +27,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/{publication}/attach-media', [PublicationController::class, 'attachMedia'])->name('attach-media');
     Route::post('/{publication}/lock-media', [PublicationController::class, 'lockMedia'])->name('lock-media');
     Route::get('/stats/all', [PublicationController::class, 'stats'])->name('stats_all');
+    Route::post('/{publication}/portal-token', [ClientPortalController::class, 'generateToken'])->name('portal-token');
 
     // Locking API
     Route::post('/{publication}/lock', [PublicationLockController::class, 'lock'])->name('lock')->whereNumber('publication');

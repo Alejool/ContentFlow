@@ -356,6 +356,7 @@ const PublicationRow = memo(
                 <Clock className="w-4 h-4" />
               </button>
             ) : null}
+
             {/* View Details button - Always visible for all users */}
             {!permissions?.includes("manage-content") && (
               <button

@@ -48,6 +48,10 @@ export type Publication = {
   rejected_by?: number;
   rejected_at?: string;
   rejection_reason?: string;
+  workspace?: {
+    id: number;
+    name: string;
+  };
   publisher?: {
     id: number;
     name: string;
