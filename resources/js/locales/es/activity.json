@@ -25,7 +25,9 @@
         "statusChanged": "Estado cambiado",
         "pending": "Pendiente",
         "scheduled": "Programado",
-        "draft": "Borrador"
+        "draft": "Borrador",
+        "scheduled_time_changed": "Hora programada cambiada",
+        "cancelled": "Cancelado"
       }
     }
   }

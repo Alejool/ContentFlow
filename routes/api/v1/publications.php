@@ -38,5 +38,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/{publication}/comments', [PublicationCommentController::class, 'index'])->name('comments.index')->whereNumber('publication');
     Route::post('/{publication}/comments', [PublicationCommentController::class, 'store'])->name('comments.store')->whereNumber('publication');
     Route::delete('/{publication}/comments/{comment}', [PublicationCommentController::class, 'destroy'])->name('comments.destroy')->whereNumber('publication')->whereNumber('comment');
+
+    // Activities API
+    Route::get('/{publication}/activities', [PublicationController::class, 'activities'])->name('activities')->whereNumber('publication');
   });
 });

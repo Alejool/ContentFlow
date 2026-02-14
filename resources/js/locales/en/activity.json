@@ -23,7 +23,9 @@
         "statusChanged": "Status changed",
         "pending": "Pending",
         "scheduled": "Scheduled",
-        "draft": "Draft"
+        "draft": "Draft",
+        "scheduled_time_changed": "Scheduled time changed",
+        "cancelled": "Cancelled"
       }
     }
   }

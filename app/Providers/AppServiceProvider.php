@@ -8,8 +8,10 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Notifications\DatabaseNotification;
 use App\Observers\NotificationObserver;
 use App\Observers\UserObserver;
+use App\Observers\PublicationObserver;
 
 use App\Models\User;
+use App\Models\Publications\Publication;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -37,5 +39,6 @@ class AppServiceProvider extends ServiceProvider
 
     DatabaseNotification::observe(NotificationObserver::class);
     User::observe(UserObserver::class);
+    Publication::observe(PublicationObserver::class);
   }
 }

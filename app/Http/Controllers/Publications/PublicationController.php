@@ -150,12 +150,23 @@ class PublicationController extends Controller
       $data = $request->validated();
       // Normalize scheduled_at to UTC using client's timezone header
       if (!empty($data['scheduled_at'])) {
-        try {
-          $tz = $request->header('X-User-Timezone');
-          $dt = $tz ? Carbon::parse($data['scheduled_at'], $tz)->setTimezone('UTC') : Carbon::parse($data['scheduled_at'])->setTimezone('UTC');
-          $data['scheduled_at'] = $dt->toIso8601String();
-        } catch (\Exception $e) {
-          // If parsing fails, keep original value and let deeper validation handle it
+        if (!Auth::user()->hasPermission('publish', $workspaceId)) {
+          // User cannot schedule, so we ignore the scheduled_at date and force draft
+          unset($data['scheduled_at']);
+          $data['status'] = 'draft';
+        } else {
+          try {
+            $tz = $request->header('X-User-Timezone');
+            $dt = $tz ? Carbon::parse($data['scheduled_at'], $tz)->setTimezone('UTC') : Carbon::parse($data['scheduled_at'])->setTimezone('UTC');
+            $data['scheduled_at'] = $dt->toIso8601String();
+          } catch (\Exception $e) {
+            // If parsing fails, keep original value and let deeper validation handle it
+          }
+        }
+      } else {
+        // If no schedule date, ensure they aren't trying to force a published/scheduled status without permission
+        if (!Auth::user()->hasPermission('publish', $workspaceId) && in_array($data['status'] ?? '', ['published', 'scheduled'])) {
+          $data['status'] = 'draft';
         }
       }
 
@@ -236,6 +247,21 @@ class PublicationController extends Controller
 
     try {
       $data = $request->validated();
+
+      // RBAC ENDFORCEMENT: Check for publish permission
+      if (!Auth::user()->hasPermission('publish', $publication->workspace_id)) {
+        // If trying to set scheduled_at, remove it
+        if (!empty($data['scheduled_at'])) {
+          unset($data['scheduled_at']);
+        }
+
+        // If trying to change status to restricted values
+        if (isset($data['status']) && in_array($data['status'], ['scheduled', 'published'])) {
+          // Revert to draft or keep current if safe
+          $data['status'] = 'draft';
+        }
+      }
+
       // Normalize scheduled_at to UTC using client's timezone header
       if (!empty($data['scheduled_at'])) {
         try {
@@ -806,6 +832,30 @@ class PublicationController extends Controller
       Log::error('❌ Failed to attach media', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
       return $this->errorResponse('Failed to attach media: ' . $e->getMessage(), 500);
     }
+  }
+
+  /**
+   * Get activities for a publication
+   */
+  public function activities(Publication $publication)
+  {
+    if (!Auth::user()->hasPermission('manage-content', $publication->workspace_id) && !Auth::user()->hasPermission('view-content', $publication->workspace_id)) {
+      return $this->errorResponse('You do not have permission to view this publication.', 403);
+    }
+
+    $activities = $publication->activities()
+      ->with('user:id,name,photo_url')
+      ->latest()
+      ->paginate(20);
+
+    // Add descriptions to each activity
+    $activities->getCollection()->transform(function ($activity) {
+      $activity->description = $activity->getDescription();
+      $activity->formatted_changes = $activity->getFormattedChanges();
+      return $activity;
+    });
+
+    return $this->successResponse(['activities' => $activities]);
   }
 
   private function clearPublicationCache($workspaceId)
