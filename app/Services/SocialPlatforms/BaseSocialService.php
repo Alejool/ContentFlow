@@ -46,4 +46,13 @@ abstract class BaseSocialService implements SocialPlatformInterface
   abstract public function getAccountInfo(): array;
 
   abstract public function validateCredentials(): bool;
+
+  /**
+   * Get comments for a specific post
+   *
+   * @param string $postId Platform-specific post ID
+   * @param int $limit Maximum number of comments to fetch
+   * @return array Normalized array of comments
+   */
+  abstract public function getPostComments(string $postId, int $limit = 100): array;
 }

@@ -740,4 +740,52 @@ class YouTubeService extends BaseSocialService
       return ['exists' => false, 'error' => $e->getMessage()];
     }
   }
+
+  /**
+   * Get comments for a YouTube video
+   *
+   * @param string $postId
+   * @param int $limit
+   * @return array
+   */
+  public function getPostComments(string $postId, int $limit = 100): array
+  {
+    if (empty($postId)) {
+      return [];
+    }
+
+    try {
+      $endpoint = "https://www.googleapis.com/youtube/v3/commentThreads";
+      $response = $this->client->get($endpoint, [
+        'headers' => [
+          'Authorization' => "Bearer {$this->accessToken}",
+        ],
+        'query' => [
+          'part' => 'snippet',
+          'videoId' => $postId,
+          'maxResults' => min($limit, 100),
+          'order' => 'relevance'
+        ]
+      ]);
+
+      $data = json_decode($response->getBody(), true);
+      $items = $data['items'] ?? [];
+
+      return array_map(function ($item) {
+        $snippet = $item['snippet']['topLevelComment']['snippet'] ?? [];
+        return [
+          'id' => $item['id'] ?? '',
+          'author' => $snippet['authorDisplayName'] ?? 'Unknown',
+          'text' => $snippet['textDisplay'] ?? '',
+          'created_at' => $snippet['publishedAt'] ?? now()->toIso8601String()
+        ];
+      }, $items);
+    } catch (\Exception $e) {
+      Log::error('YouTube getPostComments failed', [
+        'postId' => $postId,
+        'error' => $e->getMessage()
+      ]);
+      return [];
+    }
+  }
 }

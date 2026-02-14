@@ -257,4 +257,23 @@ class TikTokService extends BaseSocialService
 
     throw new \Exception("TikTok API Error: {$message}");
   }
+
+  /**
+   * Get comments for a TikTok post
+   * Note: TikTok API has very limited comment access
+   *
+   * @param string $postId
+   * @param int $limit
+   * @return array
+   */
+  public function getPostComments(string $postId, int $limit = 100): array
+  {
+    // TikTok API doesn't provide comment access in standard API tiers
+    Log::info('TikTok getPostComments called but not available', [
+      'postId' => $postId,
+      'note' => 'Requires Research API access'
+    ]);
+
+    return [];
+  }
 }

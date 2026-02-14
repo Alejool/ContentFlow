@@ -137,4 +137,43 @@ class InstagramService extends BaseSocialService
 
     return $metrics;
   }
+
+  /**
+   * Get comments for an Instagram post
+   *
+   * @param string $postId
+   * @param int $limit
+   * @return array
+   */
+  public function getPostComments(string $postId, int $limit = 100): array
+  {
+    if (empty($postId)) {
+      return [];
+    }
+
+    try {
+      $endpoint = "https://graph.facebook.com/v18.0/{$postId}/comments";
+      $response = $this->client->get($endpoint, [
+        'query' => [
+          'access_token' => $this->accessToken,
+          'limit' => $limit,
+          'fields' => 'id,username,text,timestamp'
+        ]
+      ]);
+
+      $data = json_decode($response->getBody(), true);
+      $comments = $data['data'] ?? [];
+
+      return array_map(function ($comment) {
+        return [
+          'id' => $comment['id'] ?? '',
+          'author' => $comment['username'] ?? 'Unknown',
+          'text' => $comment['text'] ?? '',
+          'created_at' => $comment['timestamp'] ?? now()->toIso8601String()
+        ];
+      }, $comments);
+    } catch (\Exception $e) {
+      return [];
+    }
+  }
 }

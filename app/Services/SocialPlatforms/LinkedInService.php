@@ -40,4 +40,17 @@ class LinkedInService extends BaseSocialService
   {
     return false;
   }
+
+  /**
+   * Get comments for a LinkedIn post
+   *
+   * @param string $postId
+   * @param int $limit
+   * @return array
+   */
+  public function getPostComments(string $postId, int $limit = 100): array
+  {
+    // LinkedIn service not fully implemented yet
+    return [];
+  }
 }

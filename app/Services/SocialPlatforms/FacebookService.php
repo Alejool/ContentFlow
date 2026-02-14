@@ -250,4 +250,58 @@ class FacebookService extends BaseSocialService
 
     throw new \Exception("Facebook API Error: " . $message);
   }
+
+  /**
+   * Get comments for a Facebook post
+   *
+   * @param string $postId
+   * @param int $limit
+   * @return array
+   */
+  public function getPostComments(string $postId, int $limit = 100): array
+  {
+    if (empty($postId)) {
+      return [];
+    }
+
+    try {
+      $endpoint = "https://graph.facebook.com/" . self::API_VERSION . "/{$postId}/comments";
+      $response = $this->client->get($endpoint, [
+        'query' => [
+          'access_token' => $this->accessToken,
+          'limit' => $limit,
+          'fields' => 'id,from,message,created_time'
+        ]
+      ]);
+
+      $data = json_decode($response->getBody(), true);
+      $comments = $data['data'] ?? [];
+
+      return $this->normalizeComments($comments);
+    } catch (\Exception $e) {
+      Log::error('Facebook getPostComments failed', [
+        'postId' => $postId,
+        'error' => $e->getMessage()
+      ]);
+      return [];
+    }
+  }
+
+  /**
+   * Normalize Facebook comments to standard format
+   *
+   * @param array $comments
+   * @return array
+   */
+  protected function normalizeComments(array $comments): array
+  {
+    return array_map(function ($comment) {
+      return [
+        'id' => $comment['id'] ?? '',
+        'author' => $comment['from']['name'] ?? 'Unknown',
+        'text' => $comment['message'] ?? '',
+        'created_at' => $comment['created_time'] ?? now()->toIso8601String()
+      ];
+    }, $comments);
+  }
 }

@@ -799,4 +799,25 @@ class TwitterService extends BaseSocialService
 
     return isset($data['data']['deleted']) && $data['data']['deleted'] === true;
   }
+
+  /**
+   * Get comments/replies for a Twitter post
+   * Note: Twitter API v2 has limited access to replies
+   *
+   * @param string $postId
+   * @param int $limit
+   * @return array
+   */
+  public function getPostComments(string $postId, int $limit = 100): array
+  {
+    // Twitter API v2 doesn't provide easy access to replies without elevated access
+    // Would need to search for tweets mentioning the original tweet
+    // For now, return empty array - can be implemented with elevated API access
+    Log::info('Twitter getPostComments called but not fully implemented', [
+      'postId' => $postId,
+      'note' => 'Requires elevated API access for reply search'
+    ]);
+
+    return [];
+  }
 }
