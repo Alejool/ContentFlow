@@ -21,8 +21,11 @@ use App\Models\Role\Role;
 use App\Models\Workspace\Workspace;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Admin\SystemNotificationController;
+use App\Http\Controllers\Publications\ClientPortalController;
 
 Broadcast::routes();
+
+Route::get('/portal/{token}', [\App\Http\Controllers\Publications\ClientPortalController::class, 'renderPortal'])->name('portal.view');
 
 Route::middleware('guest')->group(function () {
   Route::get('/up', fn() => response('OK'));
@@ -40,6 +43,7 @@ Route::middleware('guest')->group(function () {
   Route::get('/terms', fn() => Inertia::render('TermsOfService'))->name('terms');
   Route::get('/contact', fn() => Inertia::render('Contact'))->name('contact');
   Route::get('/approvals/history-test', fn() => response()->json(['message' => 'History route is reachable outside middleware']));
+
 
   /*
 |--------------------------------------------------------------------------

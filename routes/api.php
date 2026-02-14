@@ -11,6 +11,10 @@ Route::post('/webhooks/youtube', [YouTubeWebhookController::class, 'handle']);
 Route::get('/webhooks/youtube', [YouTubeWebhookController::class, 'handle']);
 
 
+Route::prefix('v1')->name('api.v1.')->group(function () {
+  require __DIR__ . '/api/v1/portal.php';
+});
+
 Route::middleware(['auth:sanctum'])->group(function () {
 
   Route::prefix('v1')->name('api.v1.')->group(function () {

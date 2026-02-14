@@ -88,6 +88,7 @@ class Publication extends Model
     'rejected_by',
     'rejected_at',
     'rejection_reason',
+    'portal_token',
   ];
 
   protected $appends = ['platform_status_summary', 'media_locked_by'];
