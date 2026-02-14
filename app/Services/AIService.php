@@ -379,6 +379,17 @@ class AIService
       $prompt .= "Campos requeridos en suggestion.data: title, description, goal, hashtags.\n";
     }
 
+    if (isset($context['project_type']) && $context['project_type'] === 'sentiment_analysis') {
+      $prompt = "Eres un experto en moderación de contenido de redes sociales.\n\n";
+      $prompt .= "TAREA: Clasifica el siguiente comentario en una de estas tres categorías:\n\n";
+      $prompt .= "1. **positive**: Comentarios de apoyo, apreciativos o con retroalimentación constructiva\n";
+      $prompt .= "2. **inquiry**: Preguntas, solicitudes de información o aclaraciones\n";
+      $prompt .= "3. **hate_speech**: Contenido ofensivo, discriminatorio, amenazante o dañino\n\n";
+      $prompt .= "IMPORTANTE: Responde ÚNICAMENTE con JSON válido en esta estructura exacta:\n";
+      $prompt .= "{\n  \"sentiment\": \"positive|inquiry|hate_speech\",\n  \"confidence\": 0.95,\n  \"reasoning\": \"breve explicación en español\"\n}\n\n";
+      $prompt .= "NO agregues texto adicional fuera del JSON. NO uses markdown. Solo JSON puro.\n";
+    }
+
     return $prompt;
   }
 

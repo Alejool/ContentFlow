@@ -51,6 +51,7 @@ class SocialPostLog extends Model
     'post_metadata',
     'platform_settings',
     'workspace_id',
+    'comment_sentiment_data',
   ];
 
   protected $casts = [
@@ -66,6 +67,7 @@ class SocialPostLog extends Model
     'platform_settings' => 'array',
     'retry_count' => 'integer',
     'last_retry_at' => 'timestamp',
+    'comment_sentiment_data' => 'array',
   ];
 
   public function user(): BelongsTo
@@ -180,5 +182,64 @@ class SocialPostLog extends Model
   public function scopeByMediaFile($query, $mediaFileId)
   {
     return $query->where('media_file_id', $mediaFileId);
+  }
+
+  /**
+   * Get comments filtered by sentiment
+   *
+   * @param string $sentiment positive|inquiry|hate_speech
+   * @return array
+   */
+  public function getCommentsBySentiment(string $sentiment): array
+  {
+    $data = $this->comment_sentiment_data ?? [];
+    $comments = $data['comments'] ?? [];
+
+    return array_filter($comments, fn($c) => ($c['sentiment'] ?? '') === $sentiment);
+  }
+
+  /**
+   * Get all comments with sentiment data
+   *
+   * @return array
+   */
+  public function getAllComments(): array
+  {
+    $data = $this->comment_sentiment_data ?? [];
+    return $data['comments'] ?? [];
+  }
+
+  /**
+   * Get sentiment summary statistics
+   *
+   * @return array
+   */
+  public function getSentimentSummary(): array
+  {
+    $data = $this->comment_sentiment_data ?? [];
+    return $data['summary'] ?? [
+      'total' => 0,
+      'positive' => 0,
+      'inquiry' => 0,
+      'hate_speech' => 0,
+      'last_synced_at' => null
+    ];
+  }
+
+  /**
+   * Update comment sentiment data
+   *
+   * @param array $comments
+   * @param array $summary
+   * @return bool
+   */
+  public function updateCommentSentimentData(array $comments, array $summary): bool
+  {
+    $this->comment_sentiment_data = [
+      'comments' => $comments,
+      'summary' => $summary
+    ];
+
+    return $this->save();
   }
 }
