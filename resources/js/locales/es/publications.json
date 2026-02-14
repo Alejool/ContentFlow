@@ -184,10 +184,13 @@
         "noComments": "No hay comentarios aún. ¡Inicia la conversación!",
         "loading": "Cargando comentarios...",
         "deleteConfirm": "¿Estás seguro de que quieres eliminar este comentario?",
+        "deleteConfirmTitle": "Eliminar Comentario",
+        "deleteConfirmMessage": "¿Estás seguro de que deseas eliminar este comentario? Esta acción no se puede deshacer.",
         "deleteSuccess": "Comentario eliminado",
         "deleteError": "Error al eliminar el comentario",
         "postError": "Error al publicar el comentario",
-        "delete": "Eliminar"
+        "delete": "Eliminar",
+        "replyingTo": "Respondiendo a"
       },
       "manageContent": {
         "configureNetworks": "Configura tus publicaciones programadas"

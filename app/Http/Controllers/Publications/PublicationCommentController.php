@@ -14,7 +14,9 @@ class PublicationCommentController extends Controller
     {
         return response()->json(
             $publication->comments()
-                ->with('user:id,name,photo_url')
+                ->whereNull('parent_id')
+                ->with(['user:id,name,photo_url', 'replies.user:id,name,photo_url'])
+                ->latest()
                 ->get()
         );
     }
@@ -23,11 +25,13 @@ class PublicationCommentController extends Controller
     {
         $validated = $request->validate([
             'content' => 'required|string|max:1000',
+            'parent_id' => 'nullable|exists:publication_comments,id',
         ]);
 
         $comment = $publication->comments()->create([
             'user_id' => Auth::id(),
             'content' => $validated['content'],
+            'parent_id' => $validated['parent_id'] ?? null,
         ]);
 
         return response()->json(

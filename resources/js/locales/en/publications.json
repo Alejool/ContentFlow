@@ -184,10 +184,13 @@
         "noComments": "No comments yet. Start the conversation!",
         "loading": "Loading comments...",
         "deleteConfirm": "Are you sure you want to delete this comment?",
+        "deleteConfirmTitle": "Delete Comment",
+        "deleteConfirmMessage": "Are you sure you want to delete this comment? This action cannot be undone.",
         "deleteSuccess": "Comment deleted",
         "deleteError": "Failed to delete comment",
         "postError": "Failed to post comment",
-        "delete": "Delete"
+        "delete": "Delete",
+        "replyingTo": "Replying to"
       },
       "publish": {
         "title": "Publish",

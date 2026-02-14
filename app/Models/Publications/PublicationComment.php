@@ -11,7 +11,17 @@ class PublicationComment extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['publication_id', 'user_id', 'content'];
+    protected $fillable = ['publication_id', 'user_id', 'content', 'parent_id'];
+
+    public function parent()
+    {
+        return $this->belongsTo(PublicationComment::class, 'parent_id');
+    }
+
+    public function replies()
+    {
+        return $this->hasMany(PublicationComment::class, 'parent_id')->orderBy('created_at', 'asc');
+    }
 
     public function publication()
     {
