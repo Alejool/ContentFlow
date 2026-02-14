@@ -86,7 +86,7 @@ export default function MobileNavbar({
           </div>
 
           <div className="flex-1 flex justify-center">
-            <img src={Logo} alt="Logo" className="h-10 w-auto object-contain" />
+            <img src={Logo} alt="Logo" className="h-20 w-auto object-contain" />
           </div>
 
           <div className="flex items-center gap-2">
