@@ -127,27 +127,43 @@ export default function ContentList(props: ContentListProps) {
               {t("common.filters.title") || "Filtros"}
             </Button>
 
-            <div className="bg-gray-100 dark:bg-gray-800 p-1 rounded-lg flex items-center gap-1">
-              <button
+            <div className="bg-gray-100/80 dark:bg-neutral-900/80 p-1 rounded-xl flex items-center gap-1 border border-white/20 dark:border-white/5 ring-1 ring-black/5 dark:ring-white/5 backdrop-blur-sm shadow-inner">
+              <Button
+                variant="ghost"
+                buttonStyle="ghost"
+                size="sm"
+                shadow="none"
                 onClick={() => {
                   setSmoothLoading(true);
                   startTransition(() => setViewMode("grid"));
                 }}
-                className={`p-1.5 rounded-md transition-all ${viewMode === "grid" ? "bg-white dark:bg-gray-700 shadow-sm text-primary-600" : "text-gray-400 hover:text-gray-600"}`}
+                className={`p-2 rounded-lg transition-all duration-300 ease-out border-0 ${
+                  viewMode === "grid"
+                    ? "bg-white dark:bg-neutral-800 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.1)] ring-1 ring-black/5 dark:ring-white/10 text-primary-600 dark:text-primary-400 scale-[1.05]"
+                    : "text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 hover:bg-white/50 dark:hover:bg-neutral-700/30"
+                }`}
                 title={t("common.gridView")}
               >
                 <LayoutGrid className="w-4 h-4" />
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="ghost"
+                buttonStyle="ghost"
+                size="sm"
+                shadow="none"
                 onClick={() => {
                   setSmoothLoading(true);
                   startTransition(() => setViewMode("list"));
                 }}
-                className={`p-1.5 rounded-md transition-all ${viewMode === "list" ? "bg-white dark:bg-gray-700 shadow-sm text-primary-600" : "text-gray-400 hover:text-gray-600"}`}
+                className={`p-2 rounded-lg transition-all duration-300 ease-out border-0 ${
+                  viewMode === "list"
+                    ? "bg-white dark:bg-neutral-800 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.1)] ring-1 ring-black/5 dark:ring-white/10 text-primary-600 dark:text-primary-400 scale-[1.05]"
+                    : "text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 hover:bg-white/50 dark:hover:bg-neutral-700/30"
+                }`}
                 title={t("common.listView")}
               >
                 <ListIcon className="w-4 h-4" />
-              </button>
+              </Button>
             </div>
           </div>
         </div>

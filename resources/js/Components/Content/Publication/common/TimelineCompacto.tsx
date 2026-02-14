@@ -111,7 +111,7 @@ const TimelineCompacto = ({
       </button>
 
       {isExpanded && (
-        <div className="border-t border-gray-200 dark:border-neutral-600 p-4">
+        <div className="border-t border-gray-200  max-h-96 overflow-y-auto pr-2 custom-scrollbar dark:border-neutral-600 p-4">
           <PublicationTimeline activities={activities} />
         </div>
       )}

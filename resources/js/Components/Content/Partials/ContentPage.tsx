@@ -295,70 +295,70 @@ export default function ContentPage() {
           </div>
 
           <div className="mb-8">
-            <div className="inline-flex items-center p-1.5 rounded-lg bg-white dark:bg-neutral-800 backdrop-blur-sm border border-gray-200/60 dark:border-neutral-700/60 gap-1 overflow-x-auto max-w-full shadow-sm">
+            <div className="inline-flex items-center p-1 rounded-lg bg-gray-100 dark:bg-neutral-800/50 gap-1 overflow-x-auto max-w-full">
               <button
                 onClick={() => handleTabChange("publications")}
-                className={`flex items-center justify-center gap-2 py-2.5 px-5 rounded-lg text-sm font-bold transition-all duration-200 whitespace-nowrap ${
+                className={`flex items-center justify-center gap-2 py-2 px-4 rounded-md text-sm font-bold transition-all duration-200 whitespace-nowrap ${
                   activeTab === "publications"
-                    ? "bg-primary-600 text-white shadow-md shadow-primary-500/20 ring-1 ring-primary-500/50"
-                    : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-700/50"
+                    ? "bg-white dark:bg-neutral-800 text-primary-600 shadow-sm ring-1 ring-black/5 dark:ring-white/10"
+                    : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-white/50 dark:hover:bg-neutral-700/50"
                 }`}
               >
                 <Folder
-                  className={`w-4 h-4 ${activeTab === "publications" ? "text-white" : "opacity-70"}`}
+                  className={`w-4 h-4 ${activeTab === "publications" ? "text-primary-600 dark:text-primary-400" : "opacity-70"}`}
                 />
                 <span>{t("content.tabs.publications")}</span>
               </button>
               <button
                 onClick={() => handleTabChange("campaigns")}
-                className={`flex items-center justify-center gap-2 py-2.5 px-5 rounded-lg text-sm font-bold transition-all duration-200 whitespace-nowrap ${
+                className={`flex items-center justify-center gap-2 py-2 px-4 rounded-md text-sm font-bold transition-all duration-200 whitespace-nowrap ${
                   activeTab === "campaigns"
-                    ? "bg-primary-600 text-white shadow-md shadow-primary-500/20 ring-1 ring-primary-500/50"
-                    : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-700/50"
+                    ? "bg-white dark:bg-neutral-800 text-primary-600 shadow-sm ring-1 ring-black/5 dark:ring-white/10"
+                    : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-white/50 dark:hover:bg-neutral-700/50"
                 }`}
               >
                 <Target
-                  className={`w-4 h-4 ${activeTab === "campaigns" ? "text-white" : "opacity-70"}`}
+                  className={`w-4 h-4 ${activeTab === "campaigns" ? "text-primary-600 dark:text-primary-400" : "opacity-70"}`}
                 />
                 <span>{t("content.tabs.campaigns")}</span>
               </button>
               <button
                 onClick={() => handleTabChange("calendar")}
-                className={`flex items-center justify-center gap-2 py-2.5 px-5 rounded-lg text-sm font-bold transition-all duration-200 whitespace-nowrap ${
+                className={`flex items-center justify-center gap-2 py-2 px-4 rounded-md text-sm font-bold transition-all duration-200 whitespace-nowrap ${
                   activeTab === "calendar"
-                    ? "bg-primary-600 text-white shadow-md shadow-primary-500/20 ring-1 ring-primary-500/50"
-                    : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-700/50"
+                    ? "bg-white dark:bg-neutral-800 text-primary-600 shadow-sm ring-1 ring-black/5 dark:ring-white/10"
+                    : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-white/50 dark:hover:bg-neutral-700/50"
                 }`}
               >
                 <CalendarIcon
-                  className={`w-4 h-4 ${activeTab === "calendar" ? "text-white" : "opacity-70"}`}
+                  className={`w-4 h-4 ${activeTab === "calendar" ? "text-primary-600 dark:text-primary-400" : "opacity-70"}`}
                 />
                 <span>{t("content.tabs.calendar")}</span>
               </button>
               <button
                 onClick={() => handleTabChange("logs")}
-                className={`flex items-center justify-center gap-2 py-2.5 px-5 rounded-lg text-sm font-bold transition-all duration-200 whitespace-nowrap ${
+                className={`flex items-center justify-center gap-2 py-2 px-4 rounded-md text-sm font-bold transition-all duration-200 whitespace-nowrap ${
                   activeTab === "logs"
-                    ? "bg-primary-600 text-white shadow-md shadow-primary-500/20 ring-1 ring-primary-500/50"
-                    : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-700/50"
+                    ? "bg-white dark:bg-neutral-800 text-primary-600 shadow-sm ring-1 ring-black/5 dark:ring-white/10"
+                    : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-white/50 dark:hover:bg-neutral-700/50"
                 }`}
               >
                 <FileText
-                  className={`w-4 h-4 ${activeTab === "logs" ? "text-white" : "opacity-70"}`}
+                  className={`w-4 h-4 ${activeTab === "logs" ? "text-primary-600 dark:text-primary-400" : "opacity-70"}`}
                 />
                 <span>{t("content.tabs.logs")}</span>
               </button>
               {permissions.includes("approve") && (
                 <button
                   onClick={() => handleTabChange("approvals")}
-                  className={`flex items-center justify-center gap-2 py-2.5 px-5 rounded-lg text-sm font-bold transition-all duration-200 whitespace-nowrap relative ${
+                  className={`flex items-center justify-center gap-2 py-2 px-4 rounded-md text-sm font-bold transition-all duration-200 whitespace-nowrap relative ${
                     activeTab === "approvals"
-                      ? "bg-primary-600 text-white shadow-md shadow-primary-500/20 ring-1 ring-primary-500/50"
-                      : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-700/50"
+                      ? "bg-white dark:bg-neutral-800 text-primary-600 shadow-sm ring-1 ring-black/5 dark:ring-white/10"
+                      : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-white/50 dark:hover:bg-neutral-700/50"
                   }`}
                 >
                   <CheckCircle
-                    className={`w-4 h-4 ${activeTab === "approvals" ? "text-white" : "opacity-70"}`}
+                    className={`w-4 h-4 ${activeTab === "approvals" ? "text-primary-600 dark:text-primary-400" : "opacity-70"}`}
                   />
                   <span>{t("content.tabs.approvals")}</span>
                   {publications.filter((p) => p.status === "pending_review")
@@ -366,8 +366,8 @@ export default function ContentPage() {
                     <span
                       className={`ml-1 px-1.5 py-0.5 text-[10px] font-bold rounded-full ${
                         activeTab === "approvals"
-                          ? "bg-white/20 text-white"
-                          : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+                          ? "bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400"
+                          : "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-400"
                       }`}
                     >
                       {

@@ -40,6 +40,8 @@ class RolesAndPermissionsSeeder extends Seeder
       'Owner' => ['publish', 'approve', 'view-analytics', 'manage-accounts', 'manage-team', 'manage-content', 'manage-campaigns', 'view-content'],
       'Admin' => ['publish', 'approve', 'view-analytics', 'manage-accounts', 'manage-content', 'manage-campaigns', 'view-content'],
       'Editor' => ['view-analytics', 'manage-content', 'manage-campaigns', 'view-content'],
+      'Draft Editor' => ['manage-content', 'view-content'],
+      'Publisher' => ['publish', 'approve', 'view-analytics', 'manage-campaigns', 'manage-content', 'view-content'],
       'Viewer' => ['view-analytics', 'view-content'],
     ];
 

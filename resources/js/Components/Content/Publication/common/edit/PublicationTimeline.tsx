@@ -18,6 +18,15 @@ import { useTranslation } from "react-i18next";
 interface PublicationActivity {
   id: number;
   type: string;
+  description?: string;
+  formatted_changes?: {
+    has_comparison: boolean;
+    before?: any;
+    after?: any;
+    data?: any;
+    added?: any[];
+    removed?: any[];
+  };
   details: any;
   created_at: string;
   user?: {
@@ -121,64 +130,131 @@ export default function PublicationTimeline({
         {t("activity.timeline.title") || "Timeline"}
       </h3>
 
-      <div className="relative pl-8 border-l-2 border-gray-200 dark:border-neutral-700 space-y-6">
-        {activities.map((activity) => (
-          <div key={activity.id} className="relative group">
-            <div className="absolute -left-[39px] top-1.5 flex items-center justify-center w-8 h-8 bg-white dark:bg-neutral-800 rounded-full border border-gray-200 dark:border-neutral-600 shadow-sm z-10">
-              {getActivityIcon(activity.type)}
-            </div>
-
-            <div className="flex flex-col gap-1">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-                <span className="font-bold text-sm text-gray-900 dark:text-gray-100">
-                  {formatActivityType(activity.type)}
-                </span>
-                <time className="text-xs text-gray-500 dark:text-gray-400 font-medium">
-                  {format(new Date(activity.created_at), "PPp", { locale })}
-                </time>
+      <div className="max-h-96 overflow-y-auto pr-2 custom-scrollbar pl-2">
+        <div className="relative pl-8 border-l-2 border-gray-200 dark:border-neutral-700 space-y-6">
+          {activities.map((activity) => (
+            <div key={activity.id} className="relative group">
+              <div className="absolute -left-[39px] top-1.5 flex items-center justify-center w-8 h-8 bg-white dark:bg-neutral-800 rounded-full border border-gray-200 dark:border-neutral-600 shadow-sm z-10">
+                {getActivityIcon(activity.type)}
               </div>
 
-              <div className="text-xs text-gray-600 dark:text-gray-400 space-y-2">
-                <div className="flex items-center gap-1.5 opacity-80">
-                  <User className="w-3.5 h-3.5" />
-                  <span className="font-medium">
-                    {activity.user?.name || t("activity.timeline.system")}
+              <div className="flex flex-col gap-1">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                  <span className="font-bold text-sm text-gray-900 dark:text-gray-100">
+                    {formatActivityType(activity.type)}
                   </span>
+                  <time className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                    {format(new Date(activity.created_at), "PPp", { locale })}
+                  </time>
                 </div>
 
-                {/* {activity.details && (
-                  <div className="bg-gray-50 dark:bg-neutral-900/50 p-2.5 rounded-lg border border-gray-100 dark:border-neutral-700/50">
-                    {activity.type === "updated" && activity.details.changes ? (
-                      <p>
-                        <span className="font-medium">{t("activity.timeline.status.updated")}:</span>{" "}
-                        {Array.isArray(activity.details.changes)
-                          ? activity.details.changes.join(", ")
-                          : JSON.stringify(activity.details.changes)}
-                      </p>
-                    ) : activity.type === "rejected" &&
-                      activity.details.reason ? (
-                      <p className="text-rose-600">
-                        {t("activity.timeline.status.rejected")}:{" "}{activity.details.reason}
-                      </p>
-                    ) : activity.type === "published" &&
-                      activity.details.platforms ? (
-                      <p>
-                        {t("activity.timeline.status.published")}:{" "}
-                        {Array.isArray(activity.details.platforms)
-                          ? activity.details.platforms.join(", ")
-                          : JSON.stringify(activity.details.platforms)}
-                      </p>
-                    ) : (
-                      <pre className="whitespace-pre-wrap overflow-hidden text-[10px] opacity-70 font-mono">
-                        {JSON.stringify(activity.details, null, 2)}
-                      </pre>
-                    )}
+                <div className="text-xs text-gray-600 dark:text-gray-400 space-y-2">
+                  <div className="flex items-center gap-1.5 opacity-80">
+                    <User className="w-3.5 h-3.5" />
+                    <span className="font-medium">
+                      {activity.user?.name || t("activity.timeline.system")}
+                    </span>
                   </div>
-                )} */}
+
+                  {/* Enhanced Comparisons */}
+                  {activity.formatted_changes?.has_comparison && (
+                    <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                      <div className="bg-red-50 dark:bg-red-900/10 rounded p-2 border border-red-100 dark:border-red-900/30">
+                        <div className="font-medium text-red-700 dark:text-red-400 mb-1">
+                          {t("activity.timeline.before", "Antes")}:
+                        </div>
+                        <div className="text-gray-700 dark:text-gray-300 break-words font-mono text-[10px] leading-tight">
+                          {typeof activity.formatted_changes.before === "object"
+                            ? JSON.stringify(
+                                activity.formatted_changes.before,
+                                null,
+                                2,
+                              )
+                            : activity.formatted_changes.before || "(vacío)"}
+                        </div>
+                      </div>
+                      <div className="bg-green-50 dark:bg-green-900/10 rounded p-2 border border-green-100 dark:border-green-900/30">
+                        <div className="font-medium text-green-700 dark:text-green-400 mb-1">
+                          {t("activity.timeline.after", "Después")}:
+                        </div>
+                        <div className="text-gray-700 dark:text-gray-300 break-words font-mono text-[10px] leading-tight">
+                          {typeof activity.formatted_changes.after === "object"
+                            ? JSON.stringify(
+                                activity.formatted_changes.after,
+                                null,
+                                2,
+                              )
+                            : activity.formatted_changes.after || "(vacío)"}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Added/Removed Arrays */}
+                  {((activity.formatted_changes?.added &&
+                    activity.formatted_changes.added.length > 0) ||
+                    (activity.formatted_changes?.removed &&
+                      activity.formatted_changes.removed.length > 0)) && (
+                    <div className="mt-2 text-xs space-y-2">
+                      {activity.formatted_changes?.added &&
+                        activity.formatted_changes.added.length > 0 && (
+                          <div className="flex flex-wrap gap-1">
+                            <span className="text-green-600 dark:text-green-400 font-medium mr-1">
+                              Agregado:
+                            </span>
+                            {activity.formatted_changes.added.map(
+                              (item: any, i: number) => (
+                                <span
+                                  key={i}
+                                  className="px-1.5 py-0.5 rounded-full bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300"
+                                >
+                                  {typeof item === "string"
+                                    ? item
+                                    : JSON.stringify(item)}
+                                </span>
+                              ),
+                            )}
+                          </div>
+                        )}
+
+                      {activity.formatted_changes?.removed &&
+                        activity.formatted_changes.removed.length > 0 && (
+                          <div className="flex flex-wrap gap-1">
+                            <span className="text-red-600 dark:text-red-400 font-medium mr-1">
+                              Eliminado:
+                            </span>
+                            {activity.formatted_changes.removed.map(
+                              (item: any, i: number) => (
+                                <span
+                                  key={i}
+                                  className="px-1.5 py-0.5 rounded-full bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300"
+                                >
+                                  {typeof item === "string"
+                                    ? item
+                                    : JSON.stringify(item)}
+                                </span>
+                              ),
+                            )}
+                          </div>
+                        )}
+                    </div>
+                  )}
+
+                  {/* Fallback for generic details if not formatted */}
+                  {!activity.formatted_changes?.has_comparison &&
+                    !activity.formatted_changes?.added?.length &&
+                    !activity.formatted_changes?.removed?.length &&
+                    activity.details &&
+                    Object.keys(activity.details).length > 0 && (
+                      <div className="mt-2">
+                        {/* You can display generic details here if needed, or hide them */}
+                      </div>
+                    )}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );

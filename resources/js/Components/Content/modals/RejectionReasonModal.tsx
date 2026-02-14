@@ -121,7 +121,7 @@ export default function RejectionReasonModal({
               <Button
                 type="submit"
                 variant="danger"
-                buttonStyle="gradient"
+                buttonStyle="solid"
                 loading={isSubmitting}
                 className="px-6"
                 icon={AlertCircle}

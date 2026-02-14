@@ -629,7 +629,7 @@ export default function PublishPublicationModal({
                   type="button"
                   onClick={handleRequestApproval}
                   disabled={publishing || isPendingReview}
-                  className="flex-[2] px-4 py-3 rounded-lg font-medium bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="flex-[2] px-4 py-3 rounded-lg font-medium bg-gradient-to-r from-primary-500 to-primary-500 hover:from-primary-600 hover:to-primary-600 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {isPendingReview ? (
                     <>

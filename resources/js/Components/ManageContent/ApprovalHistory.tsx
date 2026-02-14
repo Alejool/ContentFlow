@@ -1,3 +1,4 @@
+import ApprovalHistorySkeleton from "@/Components/ManageContent/ApprovalHistorySkeleton";
 import AdvancedPagination from "@/Components/common/ui/AdvancedPagination";
 import TableContainer from "@/Components/common/ui/TableContainer";
 import { getDateFnsLocale } from "@/Utils/dateLocales";
@@ -135,14 +136,6 @@ export default function ApprovalHistory({
     );
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
-      </div>
-    );
-  }
-
   const headerActions = (
     <div className="flex items-center gap-4">
       {/* Action Filter */}
@@ -183,36 +176,31 @@ export default function ApprovalHistory({
           <thead className="bg-gray-50/50 dark:bg-neutral-900/50 border-b border-gray-100 dark:border-neutral-700">
             <tr className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
               {!publicationId && (
-                <th className="px-6 py-4 text-left font-bold">
+                <th className="px-6 py-4 text-left font-bold w-[30%]">
                   {t("approvals.historyTable.publication")}
                 </th>
               )}
-              <th className="px-6 py-4 text-left font-bold">
+              <th className="px-6 py-4 text-left font-bold w-[20%]">
                 {t("approvals.historyTable.requestedBy")}
               </th>
-              <th className="px-6 py-4 text-left font-bold">
+              <th className="px-6 py-4 text-left font-bold w-[20%]">
                 {t("approvals.historyTable.requestedAt")}
               </th>
-              <th className="px-6 py-4 text-left font-bold">
+              <th className="px-6 py-4 text-left font-bold w-[20%]">
                 {t("approvals.historyTable.reviewedBy")}
               </th>
-              <th className="px-6 py-4 text-left font-bold">
+              <th className="px-6 py-4 text-left font-bold w-[10%]">
                 {t("approvals.historyTable.action")}
               </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50 dark:divide-neutral-700/50">
             {isLoading ? (
-              <tr>
-                <td colSpan={publicationId ? 4 : 5} className="px-6 py-12">
-                  <div className="flex justify-center flex-col items-center gap-3">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
-                    <span className="text-sm text-gray-500">
-                      {t("common.loading")}
-                    </span>
-                  </div>
-                </td>
-              </tr>
+              <>
+                {[...Array(perPage)].map((_, i) => (
+                  <ApprovalHistorySkeleton key={i} />
+                ))}
+              </>
             ) : logs.length === 0 ? (
               <tr>
                 <td

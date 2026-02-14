@@ -74,7 +74,7 @@ const ClientPortal: React.FC<Props> = ({ publication, token }) => {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gray-50 dark:bg-zinc-950">
         <Head title="Contenido Procesado - ContentFlow" />
-        <div className="w-full max-w-md p-8 text-center bg-white border border-gray-100 shadow-xl dark:bg-zinc-900 rounded-2xl dark:border-zinc-800">
+        <div className="w-full max-w-md p-8 text-center bg-white border border-gray-100 shadow-xl dark:bg-zinc-900 rounded-lg dark:border-zinc-800">
           <div className="flex items-center justify-center w-16 h-16 mx-auto mb-6 text-green-600 bg-green-100 rounded-full dark:bg-green-900/30 dark:text-green-400">
             <Check className="w-8 h-8" />
           </div>
@@ -130,7 +130,7 @@ const ClientPortal: React.FC<Props> = ({ publication, token }) => {
 
       <main className="max-w-4xl px-4 mx-auto mt-8">
         {/* Why am I here? Info box */}
-        <div className="flex gap-3 p-4 mb-6 border border-blue-100 rounded-xl bg-blue-50 dark:bg-blue-900/10 dark:border-blue-800/20 items-start">
+        <div className="flex gap-3 p-4 mb-6 border border-blue-100 rounded-lg bg-blue-50 dark:bg-blue-900/10 dark:border-blue-800/20 items-start">
           <Info className="flex-shrink-0 w-5 h-5 text-blue-500 mt-0.5" />
           <div className="text-sm text-blue-800 dark:text-blue-300">
             <p className="font-bold mb-0.5">Revisión de Contenido</p>
@@ -141,7 +141,7 @@ const ClientPortal: React.FC<Props> = ({ publication, token }) => {
           </div>
         </div>
 
-        <div className="overflow-hidden bg-white border border-gray-100 shadow-sm dark:bg-zinc-900 rounded-2xl dark:border-zinc-800">
+        <div className="overflow-hidden bg-white border border-gray-100 shadow-sm dark:bg-zinc-900 rounded-lg dark:border-zinc-800">
           {/* Status and Meta */}
           <div className="flex flex-wrap items-center justify-between gap-4 px-6 py-4 border-b border-gray-100 bg-gray-50/50 dark:bg-zinc-900/50 dark:border-zinc-800">
             <div className="flex items-center gap-2">
@@ -193,7 +193,7 @@ const ClientPortal: React.FC<Props> = ({ publication, token }) => {
 
             {/* Media Preview */}
             {publication.media_files && publication.media_files.length > 0 && (
-              <div className="mb-8 rounded-2xl overflow-hidden bg-gray-100 dark:bg-zinc-800 shadow-inner flex items-center justify-center relative group min-h-[300px]">
+              <div className="mb-8 rounded-lg overflow-hidden bg-gray-100 dark:bg-zinc-800 shadow-inner flex items-center justify-center relative group min-h-[300px]">
                 {publication.media_files[0].file_type.startsWith("image/") ? (
                   <img
                     src={publication.media_files[0].file_path}
@@ -226,7 +226,7 @@ const ClientPortal: React.FC<Props> = ({ publication, token }) => {
                 <MessageSquare className="w-4 h-4" />
                 Cuerpo del Mensaje
               </h3>
-              <div className="p-6 bg-gray-50 dark:bg-zinc-950/50 rounded-2xl border border-gray-100 dark:border-zinc-800/50">
+              <div className="p-6 bg-gray-50 dark:bg-zinc-950/50 rounded-lg border border-gray-100 dark:border-zinc-800/50">
                 <div className="text-lg font-medium leading-relaxed text-gray-700 whitespace-pre-wrap dark:text-zinc-300">
                   {publication.description}
                 </div>
@@ -241,7 +241,7 @@ const ClientPortal: React.FC<Props> = ({ publication, token }) => {
                 <Button
                   onClick={handleApprove}
                   disabled={processing}
-                  className="flex-[2] bg-green-600 hover:bg-green-700 text-white h-16 text-lg font-bold rounded-2xl shadow-lg shadow-green-500/20 active:scale-95 transition-all"
+                  className="flex-[2] bg-green-600 hover:bg-green-700 text-white h-16 text-lg font-bold rounded-lg shadow-lg shadow-green-500/20 active:scale-95 transition-all"
                   icon={<Check className="w-6 h-6" />}
                 >
                   {processing ? (
@@ -255,7 +255,7 @@ const ClientPortal: React.FC<Props> = ({ publication, token }) => {
                   disabled={processing}
                   variant="secondary"
                   buttonStyle="outline"
-                  className="flex-1 border-gray-200 dark:border-zinc-700 hover:bg-red-50 dark:hover:bg-red-950/20 hover:text-red-600 hover:border-red-200 h-16 text-lg font-bold rounded-2xl active:scale-95 transition-all"
+                  className="flex-1 border-gray-200 dark:border-zinc-700 hover:bg-red-50 dark:hover:bg-red-950/20 hover:text-red-600 hover:border-red-200 h-16 text-lg font-bold rounded-lg active:scale-95 transition-all"
                   icon={<X className="w-6 h-6" />}
                 >
                   Solicitar Cambios
@@ -273,7 +273,7 @@ const ClientPortal: React.FC<Props> = ({ publication, token }) => {
                 <textarea
                   value={data.reason}
                   onChange={(e) => setData("reason", e.target.value)}
-                  className="w-full h-40 p-5 text-lg transition-all border-gray-200 shadow-inner rounded-2xl dark:border-zinc-700 dark:bg-zinc-850 focus:ring-2 focus:ring-red-500 focus:border-red-500 text-gray-700 dark:text-zinc-200"
+                  className="w-full h-40 p-5 text-lg transition-all border-gray-200 shadow-inner rounded-lg dark:border-zinc-700 dark:bg-zinc-850 focus:ring-2 focus:ring-red-500 focus:border-red-500 text-gray-700 dark:text-zinc-200"
                   placeholder="Por favor, describe detalladamente qué cambios te gustaría ver..."
                   required
                 />
@@ -281,7 +281,7 @@ const ClientPortal: React.FC<Props> = ({ publication, token }) => {
                   <Button
                     type="submit"
                     disabled={processing}
-                    className="flex-[2] bg-red-600 hover:bg-red-700 text-white h-14 font-bold rounded-xl shadow-lg shadow-red-500/20"
+                    className="flex-[2] bg-red-600 hover:bg-red-700 text-white h-14 font-bold rounded-lg shadow-lg shadow-red-500/20"
                   >
                     {processing ? (
                       <Loader2 className="animate-spin" />
@@ -293,7 +293,7 @@ const ClientPortal: React.FC<Props> = ({ publication, token }) => {
                     type="button"
                     variant="ghost"
                     onClick={() => setShowRejectReason(false)}
-                    className="flex-1 h-14 font-bold rounded-xl hover:bg-gray-100 dark:hover:bg-zinc-800"
+                    className="flex-1 h-14 font-bold rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800"
                   >
                     Volver
                   </Button>

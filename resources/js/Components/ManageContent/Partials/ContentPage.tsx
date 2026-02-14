@@ -314,7 +314,7 @@ export default function ManageContentPage() {
           onClick={() => handleTabChange(id)}
           variant={isActive ? "primary" : "ghost"}
           buttonStyle={isActive ? "solid" : "ghost"}
-          size="md"
+          size="lg"
           {...attributes}
           {...listeners}
           className={`flex items-center justify-center p-0 rounded-lg text-sm font-bold transition-all duration-200 select-none border-0 ${
@@ -378,7 +378,7 @@ export default function ManageContentPage() {
                   <Dropdown.Content
                     align="right"
                     width="auto"
-                    contentClasses="py-1 bg-white dark:bg-neutral-800 shadow-xl rounded-lg border border-gray-200 dark:border-neutral-700 min-w-[220px]"
+                    contentClasses="py-1 bg-white dark:bg-neutral-800 shadow-xl rounded-lg min-w-[220px]"
                   >
                     <div className="p-1">
                       <Button
@@ -423,7 +423,7 @@ export default function ManageContentPage() {
               collisionDetection={closestCenter}
               onDragEnd={handleDragEnd}
             >
-              <div className="inline-flex items-center p-1.5 rounded-lg bg-white dark:bg-neutral-800 backdrop-blur-sm border border-gray-200/60 dark:border-neutral-700/60 gap-1 overflow-x-auto max-w-full shadow-sm">
+              <div className="inline-flex items-center p-2 rounded-lg bg-white dark:bg-neutral-800 backdrop-blur-sm gap-1 overflow-x-auto max-w-full shadow-sm">
                 <SortableContext
                   items={tabOrder}
                   strategy={horizontalListSortingStrategy}

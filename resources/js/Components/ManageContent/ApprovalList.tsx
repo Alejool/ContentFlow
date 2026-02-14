@@ -1,6 +1,7 @@
 import ApprovalSuccessModal from "@/Components/ManageContent/modals/ApprovalSuccessModal";
 import RejectionReasonModal from "@/Components/ManageContent/modals/RejectionReasonModal";
 import Button from "@/Components/common/Modern/Button";
+import AdvancedPagination from "@/Components/common/ui/AdvancedPagination";
 import EmptyState from "@/Components/common/ui/EmptyState";
 import { getDateFnsLocale } from "@/Utils/dateLocales";
 import { Publication } from "@/types/Publication";
@@ -34,6 +35,10 @@ export default function ApprovalList({
     approverName: string;
     approvedAt: string;
   } | null>(null);
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [perPage, setPerPage] = useState(10);
 
   const handleApprove = async (publication: Publication) => {
     try {
@@ -105,8 +110,32 @@ export default function ApprovalList({
 
   if (isLoading) {
     return (
-      <div className="flex justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
+      <div className="space-y-4">
+        {[1, 2, 3].map((i) => (
+          <div
+            key={i}
+            className="bg-white dark:bg-neutral-800 rounded-lg p-4 border border-gray-200 dark:border-neutral-700 shadow-sm"
+          >
+            <div className="flex flex-col sm:flex-row justify-between gap-4">
+              <div className="flex-1 min-w-0 space-y-3">
+                <div className="flex items-center gap-2">
+                  <div className="h-5 w-24 bg-gray-200 dark:bg-neutral-700 rounded animate-pulse" />
+                  <div className="h-4 w-32 bg-gray-200 dark:bg-neutral-700 rounded animate-pulse" />
+                </div>
+                <div className="h-6 w-3/4 bg-gray-200 dark:bg-neutral-700 rounded animate-pulse" />
+                <div className="flex items-center gap-2">
+                  <div className="h-4 w-4 bg-gray-200 dark:bg-neutral-700 rounded-full animate-pulse" />
+                  <div className="h-4 w-20 bg-gray-200 dark:bg-neutral-700 rounded animate-pulse" />
+                </div>
+              </div>
+              <div className="flex items-center gap-3 sm:self-center">
+                <div className="h-10 w-10 bg-gray-200 dark:bg-neutral-700 rounded-lg animate-pulse" />
+                <div className="h-10 w-24 bg-gray-200 dark:bg-neutral-700 rounded-lg animate-pulse" />
+                <div className="h-10 w-24 bg-gray-200 dark:bg-neutral-700 rounded-lg animate-pulse" />
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
     );
   }
@@ -120,10 +149,19 @@ export default function ApprovalList({
     );
   }
 
+  // Calculate pagination
+  const totalItems = publications.length;
+  const totalPages = Math.ceil(totalItems / perPage);
+  const startIndex = (currentPage - 1) * perPage;
+  const displayedPublications = publications.slice(
+    startIndex,
+    startIndex + perPage,
+  );
+
   return (
     <>
       <div className="space-y-4">
-        {publications.map((pub) => (
+        {displayedPublications.map((pub) => (
           <div
             key={pub.id}
             className="bg-white dark:bg-neutral-800 rounded-lg p-4 border border-gray-200 dark:border-neutral-700 shadow-sm hover:shadow-md transition-shadow"
@@ -180,7 +218,7 @@ export default function ApprovalList({
                   variant="success"
                   buttonStyle="gradient"
                   onClick={() => handleApprove(pub)}
-                  className="px-6"
+                  className="px-6 text-white"
                   icon={Check}
                   rounded="lg"
                 >
@@ -190,7 +228,7 @@ export default function ApprovalList({
                   variant="danger"
                   buttonStyle="gradient"
                   onClick={() => handleRejectClick(pub)}
-                  className="px-6"
+                  className="px-6 text-white"
                   icon={X}
                   rounded="lg"
                 >
@@ -200,6 +238,21 @@ export default function ApprovalList({
             </div>
           </div>
         ))}
+      </div>
+
+      <div className="mt-6">
+        <AdvancedPagination
+          currentPage={currentPage}
+          lastPage={totalPages}
+          total={totalItems}
+          perPage={perPage}
+          onPageChange={setCurrentPage}
+          onPerPageChange={(val) => {
+            setPerPage(val);
+            setCurrentPage(1);
+          }}
+          t={t}
+        />
       </div>
 
       {/* Rejection Reason Modal */}

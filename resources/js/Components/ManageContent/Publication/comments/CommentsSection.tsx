@@ -223,7 +223,7 @@ export const CommentsSection = ({
                           size="sm"
                         />
                         <div className="flex-1">
-                          <div className="bg-gray-100 dark:bg-neutral-900 rounded-2xl px-4 py-2">
+                          <div className="bg-gray-100 dark:bg-neutral-900 rounded-lg px-4 py-2">
                             <div className="flex items-center justify-between mb-0.5">
                               <span className="text-[12px] font-bold text-gray-900 dark:text-gray-100">
                                 {reply.user.name}
