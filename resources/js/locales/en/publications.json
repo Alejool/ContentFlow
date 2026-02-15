@@ -201,7 +201,7 @@
         "connectAccounts": "Please connect your accounts first.",
         "published": "Published",
         "loading": "Loading...",
-        "publishing": "Publishing (Wait...)",
+        "publishing": "Publishing...",
         "platforms": "Platforms",
         "failed": "Failed",
         "scheduled": "scheduled",
@@ -209,6 +209,7 @@
         "youtube": "YouTube",
         "youtubeThumbnails": "YouTube Thumbnails",
         "author": "@Alejandro Olarte",
+        "unpublishing": "Unpublishing...",
         "dragDrop": {
           "title": "Drag and drop to add",
           "subtitle": "PNG, JPG, WebP (max 2MB)"
@@ -217,7 +218,8 @@
           "title": "Unpublish ",
           "message": "Are you sure you want to unpublish? This will remove the publication from this platform.",
           "confirmText": "Unpublish",
-          "cancelText": "Cancel"
+          "cancelText": "Cancel",
+          "unpublishing": "Unpublishing..."
         },
         "button": {
           "publish": "Publish",

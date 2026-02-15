@@ -19,7 +19,7 @@ use App\Models\YouTube\YouTubePlaylistQueue;
 use App\Models\Publications\Publication;
 use App\Models\Social\SocialAccount;
 use App\Models\Social\SocialPostLog;
-use App\Services\Logs\SocialPostLogService;
+use App\Services\Log\SocialPostLogService;
 
 use App\Events\PublicationStatusUpdated;
 use App\Jobs\VerifyYouTubeVideoStatus;
@@ -27,6 +27,8 @@ use App\Jobs\VerifyYouTubeVideoStatus;
 use App\DTOs\SocialPostDTO;
 
 use App\Notifications\PublicationPostFailedNotification;
+use App\Notifications\PublicationResultNotification;
+
 
 class PlatformPublishService
 {
@@ -141,6 +143,12 @@ class PlatformPublishService
 
         $publication->user->notify(new VideoUploadedNotification($postLog));
 
+        // Notify Workspace via Webhooks
+        if ($publication->workspace) {
+          $publication->workspace->notify(new PublicationResultNotification($postLog, 'published'));
+        }
+
+
         return [
           'success' => true,
           'log' => $postLog,
@@ -148,6 +156,12 @@ class PlatformPublishService
         ];
       } else {
         $this->logService->markAsFailed($postLog, $result->errorMessage);
+
+        // Notify Workspace via Webhooks
+        if ($publication->workspace) {
+          $publication->workspace->notify(new PublicationResultNotification($postLog, 'failed', $result->errorMessage));
+        }
+
         return [
           'success' => false,
           'error' => $result->errorMessage,
@@ -157,6 +171,12 @@ class PlatformPublishService
     } catch (\Throwable $e) {
       Log::error('Publication failed', ['account' => $socialAccount->platform, 'error' => $e->getMessage()]);
       $this->logService->markAsFailed($postLog, $e->getMessage());
+
+      // Notify Workspace via Webhooks
+      if ($publication->workspace) {
+        $publication->workspace->notify(new PublicationResultNotification($postLog, 'failed', $e->getMessage()));
+      }
+
       return [
         'success' => false,
         'log' => $postLog->fresh(),

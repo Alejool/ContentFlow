@@ -119,14 +119,17 @@
       "sent": "Sent",
       "failed": "Failed",
       "response": "Response",
-      "empty": "No recent notification activity found."
+      "empty": "No recent notification activity found.",
+      "all_channels": "All Channels",
+      "all_statuses": "All Statuses"
     },
     "tabs": {
       "overview": "Overview",
       "general": "General",
       "members": "Members",
       "roles": "Roles",
-      "integrations": "Integrations"
+      "integrations": "Integrations",
+      "notifications": "Notifications"
     },
     "roles_management": {
       "title": "Roles & Permissions",

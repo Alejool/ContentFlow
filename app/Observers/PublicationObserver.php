@@ -110,8 +110,11 @@ class PublicationObserver
    */
   private function formatPlatformsChange($oldPlatforms, $newPlatforms): array
   {
-    $old = is_array($oldPlatforms) ? $oldPlatforms : json_decode($oldPlatforms ?? '[]', true);
-    $new = is_array($newPlatforms) ? $newPlatforms : json_decode($newPlatforms ?? '[]', true);
+    $oldRaw = is_array($oldPlatforms) ? $oldPlatforms : json_decode($oldPlatforms ?? '[]', true);
+    $old = is_array($oldRaw) ? $oldRaw : [];
+
+    $newRaw = is_array($newPlatforms) ? $newPlatforms : json_decode($newPlatforms ?? '[]', true);
+    $new = is_array($newRaw) ? $newRaw : [];
 
     $added = array_diff($new, $old);
     $removed = array_diff($old, $new);
@@ -129,8 +132,11 @@ class PublicationObserver
    */
   private function formatHashtagsChange($oldHashtags, $newHashtags): array
   {
-    $old = is_array($oldHashtags) ? $oldHashtags : json_decode($oldHashtags ?? '[]', true);
-    $new = is_array($newHashtags) ? $newHashtags : json_decode($newHashtags ?? '[]', true);
+    $oldRaw = is_array($oldHashtags) ? $oldHashtags : json_decode($oldHashtags ?? '[]', true);
+    $old = is_array($oldRaw) ? $oldRaw : [];
+
+    $newRaw = is_array($newHashtags) ? $newHashtags : json_decode($newHashtags ?? '[]', true);
+    $new = is_array($newRaw) ? $newRaw : [];
 
     return [
       'before' => $old,

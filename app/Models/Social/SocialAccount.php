@@ -89,7 +89,7 @@ class SocialAccount extends Model
     ]);
   }
 
-  public function markAsInactive(string $reason = null): void
+  public function markAsInactive(?string $reason = null): void
   {
     $this->update([
       'is_active' => false,

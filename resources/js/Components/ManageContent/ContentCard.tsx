@@ -259,8 +259,7 @@ export default function ContentCard({
                 <span className="capitalize">{lockedByFirstName}</span>
               </span>
             </div>
-          )}{" "}
-          as any
+          )}
         </div>
       )}
 

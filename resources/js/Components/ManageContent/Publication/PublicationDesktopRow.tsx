@@ -74,8 +74,6 @@ const PublicationRow = memo(
     const [isEditing, setIsEditing] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
 
-
-
     const publishingPlatforms = usePublicationStore((s) =>
       s.getPublishingPlatforms(item.id),
     );
@@ -153,6 +151,8 @@ const PublicationRow = memo(
                 {item.description || "Sin descripción"}
               </p>
               {item.platform_settings &&
+                typeof item.platform_settings === "object" &&
+                !Array.isArray(item.platform_settings) &&
                 Object.keys(item.platform_settings).length > 0 && (
                   <div className="flex flex-wrap gap-1 mt-1">
                     {Object.entries(item.platform_settings)
@@ -444,6 +444,7 @@ const PublicationRow = memo(
                       ? "bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed dark:bg-gray-800 dark:border-gray-700 dark:text-gray-600"
                       : "text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20"
                 } rounded-lg disabled:opacity-70 transition-all`}
+                data-testid={`edit-publication-${item.id}`}
                 title={
                   remoteLock
                     ? `${t("publications.table.lockedBy") || "Editando por"} ${lockedByName}`

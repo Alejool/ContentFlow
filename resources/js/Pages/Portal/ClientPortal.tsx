@@ -62,7 +62,13 @@ const ClientPortal: React.FC<Props> = ({ publication, token }) => {
 
   // Helper to extract platforms from platform_settings
   const getTargetPlatforms = () => {
-    if (!publication.platform_settings) return [];
+    if (
+      !publication.platform_settings ||
+      typeof publication.platform_settings !== "object" ||
+      Array.isArray(publication.platform_settings)
+    ) {
+      return [];
+    }
     return Object.keys(publication.platform_settings).map((key) =>
       getPlatformConfig(key),
     );

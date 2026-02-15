@@ -25,7 +25,7 @@ use App\Http\Controllers\Publications\ClientPortalController;
 
 Broadcast::routes();
 
-Route::get('/portal/{token}', [\App\Http\Controllers\Publications\ClientPortalController::class, 'renderPortal'])->name('portal.view');
+Route::get('/portal/{token}', [ClientPortalController::class, 'renderPortal'])->name('portal.view');
 
 Route::middleware('guest')->group(function () {
   Route::get('/up', fn() => response('OK'));

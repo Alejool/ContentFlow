@@ -23,7 +23,7 @@ const CampaignDateFields: React.FC<CampaignDateFieldsProps> = ({
   disabled = false,
 }) => {
 
-  const activeColor = "gray-500";
+  const activeColor = "primary-500";
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div className="form-group">

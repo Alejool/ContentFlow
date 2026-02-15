@@ -119,14 +119,17 @@
       "sent": "Enviado",
       "failed": "Fallido",
       "response": "Respuesta",
-      "empty": "No se encontró actividad de notificación reciente."
+      "empty": "No se encontró actividad de notificación reciente.",
+      "all_channels": "Todos los canales",
+      "all_statuses": "Todos los estados"
     },
     "tabs": {
       "overview": "Vista General",
       "general": "General",
       "members": "Miembros",
       "roles": "Roles",
-      "integrations": "Integraciones"
+      "integrations": "Integraciones",
+      "notifications": "Notificaciones"
     },
     "roles_management": {
       "title": "Roles y Permisos",

@@ -12,10 +12,13 @@ use App\Models\User;
 use App\Models\Social\SocialAccount;
 use App\Models\MediaFiles\MediaFile;
 use App\Models\Campaigns\Campaign;
+use Illuminate\Notifications\Notifiable;
+
 
 class Workspace extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, Notifiable;
+
 
     protected $fillable = [
         'name',
@@ -84,5 +87,21 @@ class Workspace extends Model
     public function mediaFiles()
     {
         return $this->hasMany(MediaFile::class);
+    }
+
+    /**
+     * Route notifications for the Slack channel.
+     */
+    public function routeNotificationForSlack()
+    {
+        return $this->slack_webhook_url;
+    }
+
+    /**
+     * Route notifications for the Discord channel.
+     */
+    public function routeNotificationForDiscord()
+    {
+        return $this->discord_webhook_url;
     }
 }

@@ -528,6 +528,8 @@ const PublicationMobileRow = memo(
 
                       {/* Platform badges */}
                       {item.platform_settings &&
+                        typeof item.platform_settings === "object" &&
+                        !Array.isArray(item.platform_settings) &&
                         Object.keys(item.platform_settings).length > 0 && (
                           <div>
                             <h4 className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-2">

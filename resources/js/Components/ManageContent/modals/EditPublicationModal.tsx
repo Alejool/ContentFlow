@@ -610,7 +610,10 @@ const EditPublicationModal = ({
                 </div>
 
                 {/* Live Preview */}
-                <div className="pt-6 border-t border-gray-200 dark:border-neutral-700">
+                <div
+                  className="pt-6 border-t border-gray-200 dark:border-neutral-700"
+                  data-testid="live-preview-section"
+                >
                   <LivePreviewSection
                     content={previewContent}
                     mediaUrls={stabilizedMediaPreviews.map((m) => m.url)}

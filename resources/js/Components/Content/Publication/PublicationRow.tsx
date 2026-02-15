@@ -56,6 +56,8 @@ export default function PublicationRow({
               {item.description || "No description"}
             </p>
             {item.platform_settings &&
+              typeof item.platform_settings === "object" &&
+              !Array.isArray(item.platform_settings) &&
               Object.keys(item.platform_settings).length > 0 && (
                 <div className="flex flex-wrap gap-1 mt-1">
                   {Object.entries(item.platform_settings).map(

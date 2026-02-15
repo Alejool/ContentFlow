@@ -212,6 +212,7 @@
         "youtube": "YouTube",
         "youtubeThumbnails": "Thumbnails de YouTube",
         "author": "@Alejandro Olarte",
+        "unpublishing": "Despublicando...",
         "dragDrop": {
           "title": "Arrastra y suelta para agregar",
           "subtitle": "PNG, JPG, WebP (max 2MB)"
@@ -220,7 +221,8 @@
           "title": "Despublicar",
           "message": "¿Estás seguro de despublicar? Esto eliminará la publicación de esta plataforma.",
           "confirmText": "Despublicar",
-          "cancelText": "Cancelar"
+          "cancelText": "Cancelar",
+          "unpublishing": "Despublicando..."
         },
         "button": {
           "publish": "Publicar",
