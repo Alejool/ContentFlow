@@ -17,6 +17,8 @@ class DatabaseSeeder extends Seeder
   {
     // Schema::disableForeignKeyConstraints();
 
+    $this->call(RolesAndPermissionsSeeder::class);
+
     User::factory(10)
       ->has(Publication::factory()->count(10))
       ->create();

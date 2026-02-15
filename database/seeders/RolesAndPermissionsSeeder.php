@@ -67,7 +67,7 @@ class RolesAndPermissionsSeeder extends Seeder
       Log::info("Owner role verified with permissions: " . implode(', ', $ownerPerms));
 
       if (count($ownerPerms) !== 8) {
-        Log::warning("Owner role has " . count($ownerPerms) . " permissions, expected 7!");
+        Log::warning("Owner role has " . count($ownerPerms) . " permissions, expected 8!");
       }
     } else {
       Log::error("Owner role not found after seeding!");

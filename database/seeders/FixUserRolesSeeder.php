@@ -58,6 +58,8 @@ class FixUserRolesSeeder extends Seeder
       ['name' => 'Owner', 'slug' => 'owner', 'description' => 'Workspace owner with full permissions'],
       ['name' => 'Admin', 'slug' => 'admin', 'description' => 'Administrator with most permissions'],
       ['name' => 'Editor', 'slug' => 'editor', 'description' => 'Can create and edit content'],
+      ['name' => 'Draft Editor', 'slug' => 'draft-editor', 'description' => 'Can edit content but not publish'],
+      ['name' => 'Publisher', 'slug' => 'publisher', 'description' => 'Can publish and approve content'],
       ['name' => 'Viewer', 'slug' => 'viewer', 'description' => 'Read-only access'],
     ];
 
