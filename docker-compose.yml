@@ -102,7 +102,7 @@ services:
     container_name: contentflow_queue
     restart: unless-stopped
     working_dir: /var/www/html
-    command: php artisan queue:work --queue=publishing,publishing:notify,notifications,emails,high,default,low --tries=3 --timeout=90
+    command: sh -c "if [ \"$$QUEUE_CONNECTION\" = \"redis\" ]; then php artisan horizon; else php artisan queue:work --queue=publishing,publishing:notify,notifications,emails,high,default,low --tries=3; fi"
     volumes:
       - ./:/var/www/html
       - cf_vendor_v2:/var/www/html/vendor

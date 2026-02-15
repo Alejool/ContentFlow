@@ -1,4 +1,4 @@
-FROM php:8.3-alpine AS production
+FROM php:8.4-alpine AS production
 
 # ----------------------------------------------------
 # 1. System dependencies + PHP build dependencies
@@ -42,6 +42,7 @@ RUN pecl install redis swoole \
         zip \
         opcache \
         pcntl \
+        posix \
         xsl \
         bcmath \
         sockets
