@@ -17,6 +17,36 @@ class PublicationFailedNotification extends BaseNotification
     $this->platform = strtolower($platformName);
   }
 
+  public function via($notifiable): array
+  {
+    return ['database', 'broadcast', 'mail'];
+  }
+
+  public function toMail($notifiable)
+  {
+    $platformName = $this->getPlatformName($this->platform);
+    $locale = method_exists($notifiable, 'preferredLocale') ? $notifiable->preferredLocale() : app()->getLocale();
+
+    return (new \Illuminate\Notifications\Messages\MailMessage)
+      ->subject(trans('notifications.failed.subject', ['platform' => $platformName], $locale))
+      ->view('emails.notification', [
+        'title' => trans('notifications.failed.title', [], $locale),
+        'level' => 'error',
+        'introLines' => [
+          trans('notifications.failed.intro', [
+            'title' => $this->publication->title,
+            'platform' => $platformName
+          ], $locale),
+          "<strong>" . trans('notifications.failed.error_label', [], $locale) . "</strong> {$this->errorMessage}"
+        ],
+        'actionText' => trans('notifications.failed.action', [], $locale),
+        'actionUrl' => route('api.v1.publications.update', $this->publication->id),
+        'outroLines' => [
+          trans('notifications.failed.outro', [], $locale)
+        ]
+      ]);
+  }
+
   public function toArray($notifiable): array
   {
     $platformName = $this->getPlatformName($this->platform);
@@ -24,8 +54,8 @@ class PublicationFailedNotification extends BaseNotification
     $campaign = $this->publication->campaigns->first();
 
     return [
-      'title' => 'Publication Failed',
-      'message' => trans('notifications.publication_failed', ['platform' => $platformName], $locale),
+      'title' => trans('notifications.failed.title', [], $locale),
+      'message' => trans('notifications.failed.message_app', ['platform' => $platformName], $locale),
       'description' => $this->errorMessage,
       'status' => 'error',
       'icon' => $this->getPlatformIcon($this->platform),
@@ -35,8 +65,8 @@ class PublicationFailedNotification extends BaseNotification
       'campaign_name' => $campaign ? $campaign->name : null,
       'error' => $this->errorMessage,
       'action' => $this->createAction(
-        'Retry',
-        route('publications.edit', $this->publication->id)
+        trans('notifications.failed.action', [], $locale),
+        route('api.v1.publications.update', $this->publication->id)
       ),
     ];
   }

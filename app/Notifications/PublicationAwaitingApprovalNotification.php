@@ -12,8 +12,7 @@ class PublicationAwaitingApprovalNotification extends BaseNotification
     public function __construct(
         protected $publication,
         protected $requester
-    ) {
-    }
+    ) {}
 
     public function toArray($notifiable): array
     {
@@ -27,7 +26,7 @@ class PublicationAwaitingApprovalNotification extends BaseNotification
             'publication_title' => $this->publication->title,
             'action' => $this->createAction(
                 'Revisar',
-                route('publications.show', $this->publication->id)
+                route('api.v1.publications.show', $this->publication->id)
             ),
         ];
     }

@@ -16,10 +16,10 @@ class VerifyEmailNotification extends BaseVerifyEmail
     public function toMail($notifiable): MailMessage
     {
         $verificationUrl = $this->verificationUrl($notifiable);
-        
+
         // Use user's preferred locale from database, fallback to app locale
         $locale = $notifiable->locale ?? app()->getLocale();
-        
+
         return (new MailMessage)
             ->subject(__('verification.subject', [], $locale))
             ->view('emails.verify-email', [

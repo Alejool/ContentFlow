@@ -15,6 +15,10 @@
     "normal_priority": "Normal priority",
     "low_priority": "Low priority",
     "all": "All",
+    "video_uploaded": "Video uploaded successfully to {{platform}}",
+    "video_deleted": "Video deleted from {{platform}}",
+    "status_update": "Status update",
+    "status_update_description": "{{type}} {{platform}}",
     "modal": {
       "title": "Notifications",
       "new": "new",

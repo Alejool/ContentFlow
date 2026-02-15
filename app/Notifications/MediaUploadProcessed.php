@@ -31,7 +31,7 @@ class MediaUploadProcessed extends BaseNotification
       'status' => $this->status,
       'action' => $this->createAction(
         'View Publication',
-        route('publications.show', $this->publication->id)
+        route('api.v1.publications.show', $this->publication->id)
       ),
     ];
   }

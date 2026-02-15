@@ -41,7 +41,7 @@ class VideoUploadedNotification extends BaseNotification
             'platform_post_id' => $this->log->platform_post_id,
             'action' => $this->createAction(
                 trans('notifications.view_publication', [], $notifiable->preferredLocale()),
-                route('publications.show', $this->log->publication_id)
+                route('api.v1.publications.show', $this->log->publication_id)
             ),
         ];
     }
