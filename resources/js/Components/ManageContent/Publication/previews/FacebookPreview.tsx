@@ -9,10 +9,11 @@ interface FacebookPreviewProps {
     name: string;
     avatar?: string;
   };
+  publishedAt?: string;
 }
 
 export const FacebookPreview = memo(
-  ({ content, mediaUrls, user }: FacebookPreviewProps) => {
+  ({ content, mediaUrls, user, publishedAt }: FacebookPreviewProps) => {
     return (
       <div className="w-full max-w-[500px] bg-white dark:bg-[#242526] rounded-lg shadow-sm border border-gray-200 dark:border-[#3e4042] overflow-hidden text-gray-900 dark:text-[#e4e6eb]">
         {/* Header */}
@@ -24,7 +25,11 @@ export const FacebookPreview = memo(
                 {user?.name || "ContentFlow User"}
               </div>
               <div className="text-[13px] text-gray-500 dark:text-[#b0b3b8] leading-tight flex items-center gap-1">
-                Just now ·{" "}
+                {publishedAt ? (
+                  new Date(publishedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                ) : (
+                  'Just now'
+                )} ·{" "}
                 <span className="inline-block w-3 h-3 bg-gray-400 dark:bg-[#b0b3b8] rounded-full" />
               </div>
             </div>

@@ -127,6 +127,8 @@ interface LivePreviewSectionProps {
   };
   publishedLinks?: Record<string, string>;
   className?: string;
+  title?: string;
+  publishedAt?: string;
 }
 
 type Platform =
@@ -143,6 +145,8 @@ export const LivePreviewSection = ({
   user,
   publishedLinks,
   className,
+  title,
+  publishedAt,
 }: LivePreviewSectionProps) => {
   const { t } = useTranslation();
 
@@ -251,13 +255,20 @@ export const LivePreviewSection = ({
                 content={content}
                 mediaUrls={mediaUrls}
                 user={user}
+                publishedAt={publishedAt}
               />
             )}
             {activePlatform === "tiktok" && (
               <TikTokPreview content={content} mediaUrls={mediaUrls} user={user} />
             )}
             {activePlatform === "youtube" && (
-              <YouTubePreview content={content} mediaUrls={mediaUrls} user={user} />
+              <YouTubePreview 
+                content={content} 
+                mediaUrls={mediaUrls} 
+                user={user}
+                title={title}
+                publishedAt={publishedAt}
+              />
             )}
           </div>
         )}

@@ -9,10 +9,12 @@ interface YouTubePreviewProps {
     name: string;
     avatar?: string;
   };
+  title?: string;
+  publishedAt?: string;
 }
 
 export const YouTubePreview = memo(
-  ({ content, mediaUrls, user }: YouTubePreviewProps) => {
+  ({ content, mediaUrls, user, title, publishedAt }: YouTubePreviewProps) => {
     const videoUrl = mediaUrls.find(
       (url) => url.includes("video") || url.includes(".mp4"),
     );
@@ -51,8 +53,7 @@ export const YouTubePreview = memo(
         {/* Info Area */}
         <div className="p-4 space-y-3">
           <h1 className="text-lg font-bold leading-tight line-clamp-2">
-            {content.split("\n")[0] ||
-              "Your YouTube video title will appear here..."}
+            {title || "Your YouTube video title will appear here..."}
           </h1>
 
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -115,7 +116,9 @@ export const YouTubePreview = memo(
 
           {/* Description Box */}
           <div className="bg-gray-100 dark:bg-neutral-800 rounded-lg p-3 text-[13px] hover:bg-gray-200 dark:hover:bg-neutral-700 transition-colors cursor-pointer">
-            <div className="font-bold mb-1">0 views Oct 13, 2025</div>
+            <div className="font-bold mb-1">
+              0 views {publishedAt ? new Date(publishedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Not published yet'}
+            </div>
             <div className="whitespace-pre-wrap line-clamp-3">
               {content || "Your video description will appear here..."}
             </div>
