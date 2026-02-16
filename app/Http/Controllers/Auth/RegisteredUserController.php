@@ -3,15 +3,21 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rules;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Password;
+use App\Mail\PasswordRecoveryMail;
 
-use App\Models\User;
 
 class RegisteredUserController extends Controller
 {
@@ -33,7 +39,7 @@ class RegisteredUserController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|max:255',
+            'password' =>'required|string|min:8|max:255',
             'provider' => 'nullable|string',
             'provider_id' => 'nullable|string',
             'photo_url' => 'nullable|string',
@@ -52,16 +58,16 @@ class RegisteredUserController extends Controller
             'provider' => $request->provider,
             'provider_id' => $request->provider_id,
             'password' => Hash::make($request->password),
-            'locale' => $request->locale ?? 'es',
-            'created_ip' => $request->ip(),
+            'locale' => $request->locale ?? 'es', // Default to Spanish
         ]);
 
         event(new Registered($user));
-
+        
+        // Log in and regenerate session
         Auth::login($user);
-        $user->updateLoginStats();
         $request->session()->regenerate();
 
+        // Send email verification notification
         try {
             $user->sendEmailVerificationNotification();
             Log::info('Email verification sent to: ' . $user->email);
@@ -78,3 +84,5 @@ class RegisteredUserController extends Controller
         ]);
     }
 }
+
+

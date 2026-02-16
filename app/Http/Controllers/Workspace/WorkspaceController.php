@@ -378,18 +378,27 @@ class WorkspaceController extends Controller
   /**
    * Get recent workspace activity (webhook logs)
    */
-  public function activity(Workspace $workspace)
+  public function activity(Request $request, Workspace $workspace)
   {
     if (!Auth::user()->workspaces()->where('workspaces.id', $workspace->id)->exists()) {
       abort(403);
     }
 
-    $logs = WebhookLog::where('workspace_id', $workspace->id)
-      ->orderBy('created_at', 'desc')
-      ->limit(50)
-      ->get();
+    $query = WebhookLog::where('workspace_id', $workspace->id)
+      ->orderBy('created_at', 'desc');
 
-    return $this->successResponse($logs);
+    if ($request->has('channel') && (string)$request->channel !== 'all' && (string)$request->channel !== '') {
+      $query->where('channel', $request->channel);
+    }
+
+    if ($request->has('status') && (string)$request->status !== 'all' && (string)$request->status !== '') {
+      $success = $request->status === 'sent' || $request->status === 'success';
+      $query->where('success', $success);
+    }
+
+    $logs = $query->paginate($request->input('per_page', 15));
+
+    return $this->successResponse($logs->toArray());
   }
 
   /**

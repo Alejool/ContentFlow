@@ -51,7 +51,7 @@ class CalendarController extends Controller
         'id' => "pub_{$pub->id}",
         'resourceId' => $pub->id,
         'type' => 'publication',
-        'title' => $pub->title, // Remove [PUB] prefix
+        'title' => $pub->title,
         'start' => $pub->scheduled_at ? $pub->scheduled_at->copy()->setTimezone('UTC')->toIso8601String() : null,
         'status' => $pub->status,
         'color' => $this->getStatusColor($pub->status),
@@ -63,38 +63,6 @@ class CalendarController extends Controller
         'extendedProps' => [
           'slug' => $pub->slug,
           'thumbnail' => $pub->mediaFiles->first()?->file_path,
-        ]
-      ];
-    });
-
-    // 2. Format Scheduled Posts as separate events for more granular view
-    $posts = ScheduledPost::whereHas('publication', function ($q) use ($workspaceId) {
-      $q->where('workspace_id', $workspaceId);
-    })
-      ->with([
-        'socialAccount:id,platform,account_name',
-        'publication.user:id,name,photo_url'
-      ])
-      ->whereBetween('scheduled_at', [$start ?? now()->startOfMonth()->setTimezone('UTC'), $end ?? now()->endOfMonth()->setTimezone('UTC')])
-      ->get();
-
-    $postEvents = $posts->map(function ($post) {
-      return [
-        'id' => "post_{$post->id}",
-        'resourceId' => $post->id,
-        'type' => 'post',
-        'title' => $post->socialAccount->account_name,
-        'start' => $post->scheduled_at ? $post->scheduled_at->copy()->setTimezone('UTC')->toIso8601String() : null,
-        'status' => $post->status,
-        'color' => $this->getStatusColor($post->status, true),
-        'user' => $post->publication->user ? [
-          'id' => $post->publication->user->id,
-          'name' => $post->publication->user->name,
-          'photo_url' => $post->publication->user->photo_url,
-        ] : null,
-        'extendedProps' => [
-          'publication_id' => $post->publication_id,
-          'platform' => $post->socialAccount->platform,
         ]
       ];
     });
@@ -134,7 +102,7 @@ class CalendarController extends Controller
       ];
     });
 
-    return $this->successResponse($events->concat($postEvents)->concat($manualEvents));
+    return $this->successResponse($events->concat($manualEvents));
   }
 
   /**

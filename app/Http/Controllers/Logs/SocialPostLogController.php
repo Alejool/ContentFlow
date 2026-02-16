@@ -22,8 +22,12 @@ class SocialPostLogController extends Controller
       $query->where('platform', $request->platform);
     }
 
-    if ($request->has('date_start') && $request->has('date_end')) {
-      $query->whereBetween('created_at', [$request->date_start, $request->date_end]);
+    if ($request->has('date_start') && $request->date_start) {
+      $query->where('created_at', '>=', $request->date_start . ' 00:00:00');
+    }
+
+    if ($request->has('date_end') && $request->date_end) {
+      $query->where('created_at', '<=', $request->date_end . ' 23:59:59');
     }
 
     $logs = $query->orderBy('updated_at', 'desc')->paginate($request->query('per_page', 10));

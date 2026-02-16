@@ -49,10 +49,6 @@ class ApprovalController extends Controller
    */
   public function history(Request $request)
   {
-    \Illuminate\Support\Facades\Log::info('ENTERED ApprovalController::history', [
-      'user_id' => Auth::id(),
-      'query' => $request->all()
-    ]);
     try {
       $workspaceId = Auth::user()->current_workspace_id ?? Auth::user()->workspaces()->first()?->id;
 
@@ -73,7 +69,9 @@ class ApprovalController extends Controller
           'requester:id,name,email,photo_url',
           'reviewer:id,name,email,photo_url'
         ])
-        ->orderBy('requested_at', 'desc');
+        ->whereNotNull('action')
+        ->whereNotNull('reviewed_at')
+        ->orderBy('reviewed_at', 'desc');
 
       // Filter by action (approved/rejected)
       if ($request->has('action') && in_array($request->action, ['approved', 'rejected'])) {
@@ -101,7 +99,6 @@ class ApprovalController extends Controller
 
       return $this->successResponse(['logs' => $logs]);
     } catch (\Throwable $e) {
-      \Illuminate\Support\Facades\Log::error('Approval History Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
       return $this->errorResponse('Server Error: ' . $e->getMessage(), 500);
     }
   }
