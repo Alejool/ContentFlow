@@ -30,8 +30,23 @@ export const useLogStore = create<LogState>((set) => ({
   fetchLogs: async (filters = {}, page = 1) => {
     set({ isLoading: true, error: null });
     try {
+      // Limpiar filtros vacíos
+      const cleanFilters = Object.entries(filters).reduce((acc, [key, value]) => {
+        if (Array.isArray(value) && value.length > 0) {
+          acc[key] = value;
+        } else if (value && !Array.isArray(value) && value !== 'all') {
+          acc[key] = value;
+        }
+        return acc;
+      }, {} as any);
+
+      console.log('Sending filters to backend:', cleanFilters);
+
       const response = await axios.get("/api/v1/logs", {
-        params: { ...filters, page },
+        params: { ...cleanFilters, page },
+        paramsSerializer: {
+          indexes: null // Envía arrays como platform[]=youtube&platform[]=facebook
+        }
       });
       if (response.data.success) {
         set({

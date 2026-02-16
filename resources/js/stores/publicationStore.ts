@@ -107,8 +107,21 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
     get().clearPageData();
 
     try {
+      // Limpiar filtros vacíos
+      const cleanFilters = Object.entries(filters).reduce((acc, [key, value]) => {
+        if (Array.isArray(value) && value.length > 0) {
+          acc[key] = value;
+        } else if (value && !Array.isArray(value) && value !== 'all') {
+          acc[key] = value;
+        }
+        return acc;
+      }, {} as any);
+
       const response = await axios.get(route("api.v1.publications.index"), {
-        params: { ...filters, page },
+        params: { ...cleanFilters, page },
+        paramsSerializer: {
+          indexes: null
+        }
       });
 
       const data = response.data.publications;
