@@ -25,6 +25,7 @@ const CampaignList = memo(
     onPerPageChange,
     onEditRequest,
     connectedAccounts = [],
+    onResetFilters,
   }: CampaignListProps) => {
     const { t } = useTranslation();
     const { theme } = useTheme();
@@ -81,6 +82,7 @@ const CampaignList = memo(
             dateStart={dateStart}
             dateEnd={dateEnd}
             handleFilterChange={handleFilterChange}
+            onResetFilters={onResetFilters}
           />
         )}
 

@@ -23,4 +23,5 @@ export type CampaignListProps = {
   onEditRequest?: (item: any) => void;
   connectedAccounts?: any[];
   onForceRefresh?: () => void;
+  onResetFilters?: () => void;
 };

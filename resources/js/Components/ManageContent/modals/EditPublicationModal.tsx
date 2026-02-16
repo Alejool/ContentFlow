@@ -622,6 +622,8 @@ const EditPublicationModal = ({
                       username: "username",
                       avatar: auth.user.photo_url,
                     }}
+                    title={watched.title}
+                    publishedAt={publication?.published_at}
                     publishedLinks={publication?.social_post_logs?.reduce((acc: Record<string, string>, log: any) => {
                       if (log.status === 'published' && log.post_url && log.platform) {
                         acc[log.platform.toLowerCase()] = log.post_url;

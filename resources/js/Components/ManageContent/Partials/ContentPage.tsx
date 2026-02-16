@@ -61,6 +61,7 @@ export default function ManageContentPage() {
     t,
     handleFilterChange,
     handleSingleFilterChange,
+    handleResetFilters,
     handlePageChange,
     handlePerPageChange,
     handleRefresh,
@@ -535,6 +536,7 @@ export default function ManageContentPage() {
                   onPerPageChange={handlePerPageChange}
                   onRefresh={handleRefresh}
                   onFilterChange={handleSingleFilterChange}
+                  onResetFilters={handleResetFilters}
                   filters={filters}
                   search={search}
                   onSearchChange={setSearch}
@@ -585,6 +587,7 @@ export default function ManageContentPage() {
                   onToggleFilters={setShowFilters}
                   filters={filters}
                   onFilterChange={handleSingleFilterChange}
+                  onResetFilters={handleResetFilters}
                   search={search}
                   onSearchChange={setSearch}
                 />
