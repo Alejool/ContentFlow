@@ -1,8 +1,9 @@
 import { DatePicker as DatePickerModern } from "@/Components/common/Modern/DatePicker";
 import Input from "@/Components/common/Modern/Input";
 import Select from "@/Components/common/Modern/Select";
+import { getPlatformOptions } from "@/Constants/socialPlatforms";
 import { format, parseISO } from "date-fns";
-import { Filter, Search } from "lucide-react";
+import { Filter, Search, RotateCcw } from "lucide-react";
 
 interface FilterSectionProps {
   mode: "campaigns" | "publications" | "logs" | "approvals" | "integrations";
@@ -10,11 +11,12 @@ interface FilterSectionProps {
   search: string;
   setSearch: (value: string) => void;
   statusFilter: string;
-  platformFilter?: string;
+  platformFilter?: string | string[];
   sortFilter?: string;
   dateStart?: string;
   dateEnd?: string;
-  handleFilterChange: (key: string, value: string) => void;
+  handleFilterChange: (key: string, value: string | string[]) => void;
+  onResetFilters?: () => void;
 }
 
 export default function FilterSection({
@@ -28,6 +30,7 @@ export default function FilterSection({
   dateStart,
   dateEnd,
   handleFilterChange,
+  onResetFilters,
 }: FilterSectionProps) {
   const statusCampaignsOptions = [
     { value: "all", label: t("campaigns.filters.all") },
@@ -88,6 +91,8 @@ export default function FilterSection({
     { value: "tiktok", label: "TikTok" },
   ];
 
+  const activePlatformOptions = getPlatformOptions();
+
   const sortOptions = [
     { value: "newest", label: t("common.sort.newest") || "Más recientes" },
     { value: "oldest", label: t("common.sort.oldest") || "Más antiguos" },
@@ -103,6 +108,24 @@ export default function FilterSection({
 
   return (
     <div className="bg-white dark:bg-neutral-800/50 p-4 rounded-lg border border-gray-100 dark:border-neutral-700 shadow-sm mt-4">
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+          <Filter className="w-4 h-4" />
+          Filtros
+        </h3>
+        {onResetFilters && (
+          <button
+            onClick={() => {
+              onResetFilters();
+              setSearch("");
+            }}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-100 dark:hover:bg-neutral-700 rounded-lg transition-colors"
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+            Reiniciar
+          </button>
+        )}
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
         <div className="md:col-span-2 lg:col-span-3 xl:col-span-2">
           <Input
@@ -185,15 +208,15 @@ export default function FilterSection({
           <div>
             <Select<any>
               id="platform-filter"
-              options={platformOptions}
-              value={platformFilter || ""}
+              options={activePlatformOptions}
+              value={Array.isArray(platformFilter) ? platformFilter : platformFilter ? [platformFilter] : []}
               variant="outlined"
-              onChange={(val) => {
-                handleFilterChange("platform", String(val));
-              }}
+              onChange={(val) => handleFilterChange("platform", val)}
               size="md"
               placeholder={t("common.platform.title") || "Plataforma"}
               activeColor={activeColor}
+              multiple
+              clearable
             />
           </div>
         )}

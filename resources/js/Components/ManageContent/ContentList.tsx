@@ -36,6 +36,7 @@ interface ContentListProps {
   onToggleFilters?: (show: boolean) => void;
   filters?: any;
   onFilterChange?: (key: string, val: any) => void;
+  onResetFilters?: () => void;
   search?: string;
   onSearchChange?: (val: string) => void;
 }
@@ -177,7 +178,7 @@ export default function ContentList(props: ContentListProps) {
             search={props.search || ""}
             setSearch={props.onSearchChange || (() => {})}
             statusFilter={props.filters?.status || "all"}
-            platformFilter={props.filters?.platform || "all"}
+            platformFilter={props.filters?.platform || []}
             sortFilter={props.filters?.sort || "newest"}
             dateStart={props.filters?.date_start || ""}
             dateEnd={props.filters?.date_end || ""}
@@ -188,6 +189,7 @@ export default function ContentList(props: ContentListProps) {
                   }
                 : () => {}
             }
+            onResetFilters={props.onResetFilters}
           />
         </div>
       )}
