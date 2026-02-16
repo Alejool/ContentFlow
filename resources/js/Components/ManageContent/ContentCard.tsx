@@ -532,7 +532,7 @@ export default function ContentCard({
                 e.stopPropagation();
                 onDuplicate?.(item.id);
               }}
-              className="flex items-center justify-center px-3 py-2 bg-white hover:bg-purple-50 text-gray-400 hover:text-purple-600 border border-gray-200 hover:border-purple-200 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 rounded-lg transition-colors shadow-sm"
+              className="flex items-center justify-center px-3 py-2 bg-white hover:bg-primary-50 text-gray-400 hover:text-primary-600 border border-gray-200 hover:border-primary-200 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 rounded-lg transition-colors shadow-sm"
               title="Duplicar"
             >
               <Copy className="w-4 h-4" />

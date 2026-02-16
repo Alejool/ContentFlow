@@ -11,6 +11,7 @@ import {
   XCircle,
 } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 interface NotificationItemProps {
   notification: any;
@@ -21,6 +22,7 @@ export default function NotificationItem({
   notification,
   onMarkAsRead,
 }: NotificationItemProps) {
+  const { t } = useTranslation();
   const { theme } = useTheme();
   const { data, created_at, read_at } = notification;
   const isRead = !!read_at;
@@ -118,7 +120,7 @@ export default function NotificationItem({
                 theme === "dark" ? "text-gray-200" : "text-gray-800"
               }`}
             >
-              {data.message || data.title}
+              {t(data.message || data.title, { platform: data.platform })}
             </p>
 
             {(data.message || data.title).length > 100 && (

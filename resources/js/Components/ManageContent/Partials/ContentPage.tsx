@@ -112,22 +112,32 @@ export default function ManageContentPage() {
 
   const [isTabPending, startTransition] = useTransition();
   const [showFilters, setShowFilters] = useState(true);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(() => {
+    const saved = localStorage.getItem(`contentPage_search_${activeTab}`);
+    return saved || "";
+  });
 
   useEffect(() => {
+    localStorage.setItem(`contentPage_search_${activeTab}`, search);
     const timer = setTimeout(() => {
       handleFilterChange({ ...filters, search: search || undefined });
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [search]);
+  }, [search, activeTab]);
 
   const handleTabChange = useCallback(
     (tab: ContentTab) => {
       startTransition(() => {
         setActiveTab(tab);
-        setSearch("");
-        handleFilterChange({});
+        const savedSearch = localStorage.getItem(`contentPage_search_${tab}`);
+        setSearch(savedSearch || "");
+        const savedFilters = localStorage.getItem(`contentPage_filters_${tab}`);
+        if (savedFilters) {
+          handleFilterChange(JSON.parse(savedFilters));
+        } else {
+          handleFilterChange({});
+        }
       });
     },
     [setActiveTab, handleFilterChange],

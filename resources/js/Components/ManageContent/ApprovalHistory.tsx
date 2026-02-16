@@ -1,10 +1,10 @@
 import ApprovalHistorySkeleton from "@/Components/ManageContent/ApprovalHistorySkeleton";
+import FilterSection from "@/Components/Content/common/FilterSection";
 import AdvancedPagination from "@/Components/common/ui/AdvancedPagination";
 import TableContainer from "@/Components/common/ui/TableContainer";
 import { getDateFnsLocale } from "@/Utils/dateLocales";
 import axios from "axios";
 import { format } from "date-fns";
-import { Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -136,41 +136,21 @@ export default function ApprovalHistory({
     );
   };
 
-  const headerActions = (
-    <div className="flex items-center gap-4">
-      {/* Action Filter */}
-      <select
-        value={filters.action}
-        onChange={(e) => handleFilterChange("action", e.target.value)}
-        className="px-4 py-2 rounded-lg border border-gray-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-sm focus:ring-2 focus:ring-primary-500 transition-colors"
-      >
-        <option value="all">{t("approvals.filters.all")}</option>
-        <option value="approved">{t("approvals.filters.approved")}</option>
-        <option value="rejected">{t("approvals.filters.rejected")}</option>
-      </select>
-
-      {/* Search */}
-      <div className="relative min-w-[200px]">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-        <input
-          type="text"
-          placeholder={t("approvals.searchPlaceholder") || "Search..."}
-          value={filters.search}
-          onChange={(e) => handleFilterChange("search", e.target.value)}
-          className="w-full pl-9 pr-4 py-2 rounded-lg border border-gray-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-sm focus:ring-2 focus:ring-primary-500 transition-colors"
-        />
-      </div>
-    </div>
-  );
-
   return (
     <TableContainer
       title={t("approvals.historyTitle") || "Historial de Aprobaciones"}
       subtitle={
         t("approvals.historySubtitle") || "Registros de estados y revisiones"
       }
-      actions={headerActions}
     >
+      <FilterSection
+        mode="approvals"
+        t={t}
+        search={filters.search}
+        setSearch={(value) => handleFilterChange("search", value)}
+        statusFilter={filters.action}
+        handleFilterChange={handleFilterChange}
+      />
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead className="bg-gray-50/50 dark:bg-neutral-900/50 border-b border-gray-100 dark:border-neutral-700">
