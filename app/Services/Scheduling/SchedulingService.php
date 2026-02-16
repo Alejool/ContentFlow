@@ -64,9 +64,12 @@ class SchedulingService
     // Auto-revert to draft if no pending schedules and no global date
     $hasPending = $publication->scheduled_posts()->where('status', 'pending')->exists();
     if (!$hasPending && empty($publication->scheduled_at)) {
-      $publication->update(['status' => 'draft']);
+      if ($publication->status !== 'draft') {
+        $publication->update(['status' => 'draft']);
+      }
     } elseif (($hasPending || !empty($publication->scheduled_at)) && $publication->status === 'draft') {
       // If it has schedules and it's currently a draft, mark it as scheduled
+      $publication->logActivity('scheduled');
       $publication->update(['status' => 'scheduled']);
     }
   }

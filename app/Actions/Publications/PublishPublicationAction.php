@@ -83,18 +83,31 @@ class PublishPublicationAction
       $publication->update(['platform_settings' => $options['platform_settings']]);
     }
 
+    $publication->logActivity('publishing', ['platforms' => $platformIds]);
+
     $publication->update([
       'status' => 'publishing',
       'published_by' => auth()->id(),
       'published_at' => now(),
     ]);
 
-    // Notify immediately that publishing has started
+    // Notify immediately that publishing has started (Broadcast)
     event(new PublicationStatusUpdated(
       userId: $publication->user_id,
       publicationId: $publication->id,
       status: 'publishing'
     ));
+
+    // Notify user and workspace (Persistent / Webhooks)
+    try {
+      $notification = new \App\Notifications\PublicationProcessingStartedNotification($publication);
+      $publication->user->notify($notification);
+      if ($publication->workspace) {
+        $publication->workspace->notify($notification);
+      }
+    } catch (\Exception $e) {
+      Log::error("Error sending start notification: " . $e->getMessage());
+    }
 
     // Mark any pending scheduled posts for these platforms as 'posted'
     ScheduledPost::where('publication_id', $publication->id)
@@ -119,6 +132,9 @@ class PublishPublicationAction
       'platform_count' => $socialAccounts->count()
     ]);
 
-    PublishToSocialMedia::dispatch($publication, $socialAccounts)->onQueue('publishing');
+    PublishToSocialMedia::dispatch(
+      $publication->id,
+      $socialAccounts->pluck('id')->toArray()
+    )->onQueue('publishing');
   }
 }
