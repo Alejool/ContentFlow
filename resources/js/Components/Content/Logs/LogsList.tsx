@@ -161,6 +161,7 @@ const LogsList = memo(
               search={search}
               setSearch={onSearchChange || (() => {})}
               statusFilter={filters.status || "all"}
+              platformFilter={filters.platform || []}
               dateStart={filters.date_start || ""}
               dateEnd={filters.date_end || ""}
               handleFilterChange={onFilterChange || (() => {})}

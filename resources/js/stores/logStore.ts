@@ -45,7 +45,18 @@ export const useLogStore = create<LogState>((set) => ({
       const response = await axios.get("/api/v1/logs", {
         params: { ...cleanFilters, page },
         paramsSerializer: {
-          indexes: null // Envía arrays como platform[]=youtube&platform[]=facebook
+          indexes: null,
+          serialize: (params) => {
+            const searchParams = new URLSearchParams();
+            Object.entries(params).forEach(([key, value]) => {
+              if (Array.isArray(value)) {
+                value.forEach(v => searchParams.append(`${key}[]`, String(v)));
+              } else if (value !== null && value !== undefined) {
+                searchParams.append(key, String(value));
+              }
+            });
+            return searchParams.toString();
+          }
         }
       });
       if (response.data.success) {

@@ -230,8 +230,9 @@ export const usePublications = () => {
   const handleSingleFilterChange = useCallback(
     (key: string, value: any) => {
       const newFilters = { ...filters, [key]: value };
-      // Si el valor es un array vacío o undefined, remover la key
-      if (Array.isArray(value) && value.length === 0) {
+      // Si el valor es undefined o null, remover la key
+      // Pero si es un array vacío, mantenerlo (significa "sin filtro de plataforma")
+      if (value === undefined || value === null) {
         delete newFilters[key];
       }
       setFilters(newFilters);

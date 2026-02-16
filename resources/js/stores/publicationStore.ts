@@ -120,7 +120,18 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
       const response = await axios.get(route("api.v1.publications.index"), {
         params: { ...cleanFilters, page },
         paramsSerializer: {
-          indexes: null
+          indexes: null,
+          serialize: (params) => {
+            const searchParams = new URLSearchParams();
+            Object.entries(params).forEach(([key, value]) => {
+              if (Array.isArray(value)) {
+                value.forEach(v => searchParams.append(`${key}[]`, String(v)));
+              } else if (value !== null && value !== undefined) {
+                searchParams.append(key, String(value));
+              }
+            });
+            return searchParams.toString();
+          }
         }
       });
 
