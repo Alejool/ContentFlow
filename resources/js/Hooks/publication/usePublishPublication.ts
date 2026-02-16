@@ -97,19 +97,6 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
     (s) => s.unpublishPublication,
   );
 
-  /* ----------------------------- Derived state ----------------------------- */
-
-  const activeAccounts = useMemo(
-    () =>
-      accounts
-        .filter((account) => account.is_active)
-        .map((account) => ({
-          ...account,
-          account_name: account.account_name,
-        })),
-    [accounts],
-  );
-
   /* ------------------------------- Local state ------------------------------ */
 
   const [selectedPlatforms, setSelectedPlatforms] = useState<number[]>([]);
@@ -127,6 +114,19 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
   >(null);
   const [hasAtteptedInitialFetch, setHasAttemptedInitialFetch] =
     useState(false);
+
+  /* ----------------------------- Derived state ----------------------------- */
+
+  const activeAccounts = useMemo(
+    () =>
+      accounts
+        .filter((account) => account.is_active)
+        .map((account) => ({
+          ...account,
+          account_name: account.account_name,
+        })),
+    [accounts],
+  );
 
   /* ------------------------------ Side effects ------------------------------ */
 

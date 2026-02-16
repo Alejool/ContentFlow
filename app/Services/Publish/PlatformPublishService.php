@@ -15,7 +15,8 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Artisan;
 
 
-use App\Models\YouTube\YouTubePlaylistQueue;
+use App\Jobs\ProcessYouTubePlaylistItem;
+use App\Models\Youtube\YouTubePlaylistQueue;
 use App\Models\Publications\Publication;
 use App\Models\Social\SocialAccount;
 use App\Models\Social\SocialPostLog;
@@ -246,7 +247,7 @@ class PlatformPublishService
       return;
 
     try {
-      YouTubePlaylistQueue::create([
+      $queueItem = YouTubePlaylistQueue::create([
         'social_post_log_id' => $postLog->id,
         'campaign_id' => $campaignGroup->id,
         'video_id' => $uploadedPostId,
@@ -254,7 +255,8 @@ class PlatformPublishService
         'playlist_name' => $campaignGroup->name,
         'status' => 'pending',
       ]);
-      Artisan::queue('youtube:process-playlist-queue');
+      
+      ProcessYouTubePlaylistItem::dispatch($queueItem)->delay(now()->addMinutes(2));
     } catch (\Exception $e) {
       Log::warning('Failed to queue playlist operation', ['video_id' => $uploadedPostId, 'error' => $e->getMessage()]);
     }

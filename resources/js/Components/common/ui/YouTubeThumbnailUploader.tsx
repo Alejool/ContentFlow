@@ -1,6 +1,6 @@
 import { useTheme } from "@/Hooks/useTheme";
 import { Trash2, Upload, X, ZoomIn } from "lucide-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 interface YouTubeThumbnailUploaderProps {
@@ -33,22 +33,37 @@ export default function YouTubeThumbnailUploader({
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const validateThumbnail = (file: File): string | null => {
-    // Check file type
-    if (!file.type.startsWith("image/")) {
-      return "Only image files are allowed";
-    }
+  useEffect(() => {
+    setPreview(existingThumbnail?.url || null);
+  }, [existingThumbnail]);
 
-    // Check file size (max 2MB)
-    if (file.size > 2 * 1024 * 1024) {
-      return "Image must be smaller than 2MB";
-    }
+  const validateThumbnail = (file: File): Promise<string | null> => {
+    return new Promise((resolve) => {
+      if (!file.type.startsWith("image/")) {
+        resolve("Only image files are allowed");
+        return;
+      }
 
-    return null;
+      if (file.size > 2 * 1024 * 1024) {
+        resolve("Image must be smaller than 2MB");
+        return;
+      }
+
+      const img = new Image();
+      img.onload = () => {
+        if (img.width < 1280 || img.height < 720) {
+          resolve("Image must be at least 1280x720 pixels");
+        } else {
+          resolve(null);
+        }
+      };
+      img.onerror = () => resolve("Failed to load image");
+      img.src = URL.createObjectURL(file);
+    });
   };
 
-  const handleFileSelect = (file: File) => {
-    const validationError = validateThumbnail(file);
+  const handleFileSelect = async (file: File) => {
+    const validationError = await validateThumbnail(file);
     if (validationError) {
       setError(validationError);
       return;
