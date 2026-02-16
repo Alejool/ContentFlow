@@ -230,6 +230,10 @@ export const usePublications = () => {
   const handleSingleFilterChange = useCallback(
     (key: string, value: any) => {
       const newFilters = { ...filters, [key]: value };
+      // Si el valor es un array vacío o undefined, remover la key
+      if (Array.isArray(value) && value.length === 0) {
+        delete newFilters[key];
+      }
       setFilters(newFilters);
       localStorage.setItem(
         `contentPage_filters_${activeTab}`,
@@ -238,6 +242,11 @@ export const usePublications = () => {
     },
     [filters, activeTab],
   );
+
+  const handleResetFilters = useCallback(() => {
+    setFilters({});
+    localStorage.removeItem(`contentPage_filters_${activeTab}`);
+  }, [activeTab]);
 
   const handleRefresh = useCallback(async () => {
     await fetchData(pagination.current_page);
@@ -376,6 +385,7 @@ export const usePublications = () => {
       filters,
       handleFilterChange,
       handleSingleFilterChange,
+      handleResetFilters,
       selectedItem,
       setSelectedItem,
       items,
@@ -417,6 +427,7 @@ export const usePublications = () => {
       filters,
       handleFilterChange,
       handleSingleFilterChange,
+      handleResetFilters,
       selectedItem,
       setSelectedItem,
       items,
