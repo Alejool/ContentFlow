@@ -39,11 +39,11 @@ export const publicationSchema = (t: any) =>
             if (!val) return true;
             const scheduledDate = new Date(val);
             const now = new Date();
-            // Requiere al menos 5 minutos en el futuro
-            return scheduledDate.getTime() >= now.getTime() + 300000;
+            // Requiere al menos 2 minutos en el futuro
+            return scheduledDate.getTime() >= now.getTime() + 120000;
           },
           t("publications.modal.validation.scheduledMinDifference") ||
-            "La fecha debe ser al menos 5 minutos después de la actual",
+            "La fecha debe ser al menos 2 minutos después de la actual",
         ),
       social_accounts: z.array(z.number()).optional().default([]),
       status: z

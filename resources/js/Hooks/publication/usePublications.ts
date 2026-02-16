@@ -115,7 +115,10 @@ export const usePublications = () => {
     })),
   );
 
-  const [filters, setFilters] = useState<any>({});
+  const [filters, setFilters] = useState<any>(() => {
+    const saved = localStorage.getItem(`contentPage_filters_${activeTab}`);
+    return saved ? JSON.parse(saved) : {};
+  });
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
   // Use a ref to prevent loops from effect triggers
@@ -218,14 +221,22 @@ export const usePublications = () => {
 
   const handleFilterChange = useCallback((newFilters: any) => {
     setFilters(newFilters);
-  }, []);
+    localStorage.setItem(
+      `contentPage_filters_${activeTab}`,
+      JSON.stringify(newFilters),
+    );
+  }, [activeTab]);
 
   const handleSingleFilterChange = useCallback(
     (key: string, value: any) => {
       const newFilters = { ...filters, [key]: value };
       setFilters(newFilters);
+      localStorage.setItem(
+        `contentPage_filters_${activeTab}`,
+        JSON.stringify(newFilters),
+      );
     },
-    [filters],
+    [filters, activeTab],
   );
 
   const handleRefresh = useCallback(async () => {
