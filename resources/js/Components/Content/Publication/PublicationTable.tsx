@@ -18,6 +18,7 @@ interface PublicationTableProps {
   onPublish: (item: Publication) => void;
   onEditRequest?: (item: Publication) => void;
   onViewDetails?: (item: Publication) => void;
+  onDuplicate?: (id: number) => void;
   isLoading?: boolean;
   permissions?: string[];
   pagination?: any;
@@ -47,6 +48,7 @@ const PublicationTable = memo(
     onPublish,
     onEditRequest,
     onViewDetails,
+    onDuplicate,
     isLoading,
     permissions,
     pagination,
@@ -176,6 +178,7 @@ const PublicationTable = memo(
                               onPublish={onPublish}
                               onEditRequest={onEditRequest}
                               onViewDetails={onViewDetails}
+                              onDuplicate={onDuplicate}
                               remoteLock={remoteLocks[item.id]}
                               permissions={permissions || []}
                               onPreviewMedia={onPreviewMedia}
@@ -232,6 +235,7 @@ const PublicationTable = memo(
                     onPublish={onPublish}
                     onEditRequest={onEditRequest}
                     onViewDetails={onViewDetails}
+                    onDuplicate={onDuplicate}
                     remoteLocks={remoteLocks}
                     permissions={permissions}
                     onPreviewMedia={onPreviewMedia}

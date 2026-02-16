@@ -5,7 +5,7 @@ import { format, parseISO } from "date-fns";
 import { Filter, Search } from "lucide-react";
 
 interface FilterSectionProps {
-  mode: "campaigns" | "publications" | "logs";
+  mode: "campaigns" | "publications" | "logs" | "approvals" | "integrations";
   t: (key: string) => string;
   search: string;
   setSearch: (value: string) => void;
@@ -42,9 +42,9 @@ export default function FilterSection({
     { value: "all", label: t("publications.filters.all") },
     { value: "published", label: t("publications.filters.published") },
     { value: "draft", label: t("publications.filters.draft") },
-    { value: "scheduled", label: t("publications.status.scheduled") },
-    { value: "pending_review", label: t("publications.status.pending_review") },
-    { value: "failed", label: t("publications.status.failed") },
+    { value: "scheduled", label: t("publications.filters.scheduled") },
+    { value: "pending_review", label: t("publications.filters.pending_review") },
+    { value: "failed", label: t("publications.filters.failed") },
   ];
 
   const statusLogsOptions = [
@@ -62,6 +62,32 @@ export default function FilterSection({
     label: t(`logs.status.${status}`),
   }));
 
+  const statusApprovalsOptions = [
+    { value: "all", label: t("approvals.filters.all") },
+    { value: "approved", label: t("approvals.filters.approved") },
+    { value: "rejected", label: t("approvals.filters.rejected") },
+  ];
+
+  const statusIntegrationsOptions = [
+    { value: "", label: t("workspace.activity.all_statuses") },
+    { value: "success", label: t("common.success") },
+    { value: "failed", label: t("common.failed") },
+  ];
+
+  const channelIntegrationsOptions = [
+    { value: "", label: t("workspace.activity.all_channels") },
+    { value: "slack", label: "Slack" },
+    { value: "discord", label: "Discord" },
+  ];
+
+  const platformOptions = [
+    { value: "facebook", label: "Facebook" },
+    { value: "instagram", label: "Instagram" },
+    { value: "twitter", label: "Twitter" },
+    { value: "youtube", label: "YouTube" },
+    { value: "tiktok", label: "TikTok" },
+  ];
+
   const sortOptions = [
     { value: "newest", label: t("common.sort.newest") || "Más recientes" },
     { value: "oldest", label: t("common.sort.oldest") || "Más antiguos" },
@@ -73,11 +99,12 @@ export default function FilterSection({
   ];
 
   const activeColor = "primary-500";
+  const showPlatformFilter = mode === "publications" || mode === "logs";
 
   return (
-    <div className="flex flex-col gap-4 bg-white dark:bg-neutral-800/50 p-4 rounded-lg border border-gray-100 dark:border-neutral-700 shadow-sm mt-4">
-      <div className="flex flex-col md:flex-row gap-3 items-between">
-        <div className="flex-1 w-full">
+    <div className="bg-white dark:bg-neutral-800/50 p-4 rounded-lg border border-gray-100 dark:border-neutral-700 shadow-sm mt-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        <div className="lg:col-span-2">
           <Input
             id="search"
             placeholder={t("common.search")}
@@ -85,12 +112,12 @@ export default function FilterSection({
             onChange={(e) => setSearch(e.target.value)}
             icon={Search}
             sizeType="md"
-            className="w-full cursor-pointer"
+            className="w-full"
             activeColor={activeColor}
           />
         </div>
 
-        <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+        {mode !== "integrations" && (
           <div>
             <Select<any>
               id="status-filter"
@@ -99,12 +126,17 @@ export default function FilterSection({
                   ? statusCampaignsOptions
                   : mode === "logs"
                     ? statusLogsOptions
-                    : statusPublicationsOptions
+                    : mode === "approvals"
+                      ? statusApprovalsOptions
+                      : statusPublicationsOptions
               }
               value={statusFilter}
               variant="outlined"
               onChange={(val) => {
-                handleFilterChange("status", String(val));
+                handleFilterChange(
+                  mode === "approvals" ? "action" : "status",
+                  String(val),
+                );
               }}
               size="md"
               icon={Filter}
@@ -112,67 +144,118 @@ export default function FilterSection({
               activeColor={activeColor}
             />
           </div>
+        )}
 
-          {mode !== "logs" && (
+        {mode === "integrations" && (
+          <>
             <div>
               <Select<any>
-                id="sort-filter"
-                options={sortOptions}
-                value={sortFilter}
+                id="channel-filter"
+                options={channelIntegrationsOptions}
+                value={platformFilter || ""}
                 variant="outlined"
                 onChange={(val) => {
-                  handleFilterChange("sort", String(val));
+                  handleFilterChange("channel", String(val));
                 }}
                 size="md"
-                placeholder={t("common.sort.title") || "Ordenar"}
+                icon={Filter}
+                placeholder={t("workspace.activity.all_channels")}
                 activeColor={activeColor}
               />
             </div>
-          )}
-
-          {mode !== "logs" && (
-            <div className="flex items-center gap-2">
-              <div className="w-32">
-                <DatePickerModern
-                  isClearable
-                  allowPastDates={true}
-                  selected={dateStart ? parseISO(dateStart) : null}
-                  dateFormat="dd/MM/yyyy HH:mm"
-                  onChange={(d) =>
-                    handleFilterChange(
-                      "date_start",
-                      d ? format(d, "yyyy-MM-dd") : "",
-                    )
-                  }
-                  placeholder="Inicio"
-                  withPortal
-                  variant="outlined"
-                  size="md"
-                  activeColor={activeColor}
-                />
-              </div>
-              <span className="text-gray-400">-</span>
-              <div className="w-32">
-                <DatePickerModern
-                  selected={dateEnd ? parseISO(dateEnd) : null}
-                  allowPastDates={true}
-                  dateFormat="dd/MM/yyyy HH:mm"
-                  onChange={(d) =>
-                    handleFilterChange(
-                      "date_end",
-                      d ? format(d, "yyyy-MM-dd") : "",
-                    )
-                  }
-                  placeholder="Fin"
-                  withPortal
-                  activeColor={activeColor}
-                  size="md"
-                  isClearable
-                />
-              </div>
+            <div>
+              <Select<any>
+                id="status-filter"
+                options={statusIntegrationsOptions}
+                value={statusFilter}
+                variant="outlined"
+                onChange={(val) => {
+                  handleFilterChange("status", String(val));
+                }}
+                size="md"
+                icon={Filter}
+                placeholder={t("workspace.activity.all_statuses")}
+                activeColor={activeColor}
+              />
             </div>
-          )}
-        </div>
+          </>
+        )}
+
+        {showPlatformFilter && (
+          <div>
+            <Select<any>
+              id="platform-filter"
+              options={platformOptions}
+              value={platformFilter || ""}
+              variant="outlined"
+              onChange={(val) => {
+                handleFilterChange("platform", String(val));
+              }}
+              size="md"
+              placeholder={t("common.platform.title") || "Plataforma"}
+              activeColor={activeColor}
+            />
+          </div>
+        )}
+
+        {mode !== "approvals" && mode !== "integrations" && (
+          <div>
+            <Select<any>
+              id="sort-filter"
+              options={sortOptions}
+              value={sortFilter}
+              variant="outlined"
+              onChange={(val) => {
+                handleFilterChange("sort", String(val));
+              }}
+              size="md"
+              placeholder={t("common.sort.title") || "Ordenar"}
+              activeColor={activeColor}
+            />
+          </div>
+        )}
+
+        {mode !== "approvals" && mode !== "integrations" && (
+          <>
+            <div>
+              <DatePickerModern
+                isClearable
+                allowPastDates={true}
+                selected={dateStart ? parseISO(dateStart) : null}
+                dateFormat="dd/MM/yyyy HH:mm"
+                onChange={(d) =>
+                  handleFilterChange(
+                    "date_start",
+                    d ? format(d, "yyyy-MM-dd") : "",
+                  )
+                }
+                placeholder="Inicio"
+                withPortal
+                variant="outlined"
+                size="md"
+                activeColor={activeColor}
+              />
+            </div>
+            <div>
+              <DatePickerModern
+                selected={dateEnd ? parseISO(dateEnd) : null}
+                allowPastDates={true}
+                dateFormat="dd/MM/yyyy HH:mm"
+                onChange={(d) =>
+                  handleFilterChange(
+                    "date_end",
+                    d ? format(d, "yyyy-MM-dd") : "",
+                  )
+                }
+                placeholder="Fin"
+                withPortal
+                activeColor={activeColor}
+                size="md"
+                isClearable
+              />
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
