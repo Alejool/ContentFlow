@@ -1,5 +1,6 @@
 import StatCard from "@/Components/Workspace/StatCard";
 import Button from "@/Components/common/Modern/Button";
+import Select from "@/Components/common/Modern/Select";
 import AdvancedPagination from "@/Components/common/ui/AdvancedPagination";
 import axios from "axios";
 import {
@@ -7,6 +8,7 @@ import {
   Bell,
   CheckCircle,
   ExternalLink,
+  Filter,
   RefreshCw,
   Server,
   Share2,
@@ -32,28 +34,33 @@ export default function NotificationsSettingsTab({
     per_page: 15,
   });
   const [loadingActivity, setLoadingActivity] = useState(false);
+  const [channelFilter, setChannelFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
 
   const fetchActivity = useCallback(
-    async (page = 1, perPage = 15) => {
+    async (page = 1, perPage = 15, channel = "all", status = "all") => {
       try {
         setLoadingActivity(true);
         const response = await axios.get(
           route("api.v1.workspaces.activity", workspace.id),
           {
-            params: { page, per_page: perPage },
+            params: {
+              page,
+              per_page: perPage,
+              channel: channel !== "all" ? channel : undefined,
+              status: status !== "all" ? status : undefined,
+            },
           },
         );
-        // Laravel pagination structure is in response.data.data (the paginator object from ApiResponse trait)
-        // Assuming successResponse returns the paginator in .data
-        setActivityData(
-          response.data.data || {
-            data: [],
-            current_page: 1,
-            last_page: 1,
-            total: 0,
-            per_page: perPage,
-          },
-        );
+        // Correctly handle the paginated response structure from ApiResponse trait
+        const data = response.data;
+        setActivityData({
+          data: data.data || [],
+          current_page: data.current_page || 1,
+          last_page: data.last_page || 1,
+          total: data.total || 0,
+          per_page: data.per_page || perPage,
+        });
       } catch (error) {
         console.error("Failed to fetch activity", error);
         toast.error(t("workspace.failed_to_fetch_activity"));
@@ -65,8 +72,8 @@ export default function NotificationsSettingsTab({
   );
 
   useEffect(() => {
-    fetchActivity();
-  }, [fetchActivity]);
+    fetchActivity(1, activityData.per_page, channelFilter, statusFilter);
+  }, [fetchActivity, channelFilter, statusFilter]);
 
   return (
     <div className="space-y-8">
@@ -96,21 +103,58 @@ export default function NotificationsSettingsTab({
               {t("workspace.recent_webhook_activity")}
             </p>
           </div>
-          <Button
-            variant="secondary"
-            buttonStyle="outline"
-            size="sm"
-            onClick={() =>
-              fetchActivity(activityData.current_page, activityData.per_page)
-            }
-            loading={loadingActivity}
-            className="gap-2"
-          >
-            <RefreshCw
-              className={`h-4 w-4 ${loadingActivity ? "animate-spin" : ""}`}
-            />
-            {t("common.refresh")}
-          </Button>
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="min-w-[140px]">
+              <Select
+                id="channel-filter"
+                options={[
+                  { value: "all", label: t("workspace.activity.all_channels") },
+                  { value: "slack", label: "Slack" },
+                  { value: "discord", label: "Discord" },
+                ]}
+                value={channelFilter}
+                onChange={(val) => setChannelFilter(String(val))}
+                size="sm"
+                icon={Filter}
+                variant="outlined"
+              />
+            </div>
+            <div className="min-w-[140px]">
+              <Select
+                id="status-filter"
+                options={[
+                  { value: "all", label: t("workspace.activity.all_statuses") },
+                  { value: "sent", label: t("workspace.activity.sent") },
+                  { value: "failed", label: t("workspace.activity.failed") },
+                ]}
+                value={statusFilter}
+                onChange={(val) => setStatusFilter(String(val))}
+                size="sm"
+                icon={Filter}
+                variant="outlined"
+              />
+            </div>
+            <Button
+              variant="secondary"
+              buttonStyle="outline"
+              size="sm"
+              onClick={() =>
+                fetchActivity(
+                  1,
+                  activityData.per_page,
+                  channelFilter,
+                  statusFilter,
+                )
+              }
+              loading={loadingActivity}
+              className="gap-2"
+            >
+              <RefreshCw
+                className={`h-4 w-4 ${loadingActivity ? "animate-spin" : ""}`}
+              />
+              {t("common.refresh")}
+            </Button>
+          </div>
         </div>
 
         <div className="overflow-x-auto">
@@ -246,8 +290,17 @@ export default function NotificationsSettingsTab({
           lastPage={activityData.last_page}
           total={activityData.total}
           perPage={activityData.per_page}
-          onPageChange={(page) => fetchActivity(page, activityData.per_page)}
-          onPerPageChange={(perPage) => fetchActivity(1, perPage)}
+          onPageChange={(page) =>
+            fetchActivity(
+              page,
+              activityData.per_page,
+              channelFilter,
+              statusFilter,
+            )
+          }
+          onPerPageChange={(perPage) =>
+            fetchActivity(1, perPage, channelFilter, statusFilter)
+          }
           t={t}
           isLoading={loadingActivity}
         />

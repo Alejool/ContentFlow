@@ -1,17 +1,17 @@
 import StatCard from "@/Components/Workspace/StatCard";
 import Button from "@/Components/common/Modern/Button";
 import Input from "@/Components/common/Modern/Input";
-import Select from "@/Components/common/Modern/Select";
+import FilterSection from "@/Components/Content/common/FilterSection";
 import AdvancedPagination from "@/Components/common/ui/AdvancedPagination";
 import { router } from "@inertiajs/react";
 import axios from "axios";
 import {
   Activity,
+  AlertCircle,
   Bell,
   CheckCircle,
   ChevronRight,
   ExternalLink,
-  Filter,
   Key,
   RefreshCw,
   Server,
@@ -47,12 +47,13 @@ export default function IntegrationsSettingsTab({
     current_page: 1,
     last_page: 1,
     total: 0,
-    per_page: 15,
+    per_page: 5,
   });
   const [loadingActivity, setLoadingActivity] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [channelFilter, setChannelFilter] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<string>("");
+  const [searchFilter, setSearchFilter] = useState<string>("");
 
   const { register, handleSubmit, setValue, getValues } = useForm({
     defaultValues: {
@@ -69,10 +70,22 @@ export default function IntegrationsSettingsTab({
     setValue("webhook_secret", secret);
     toast.success(t("workspace.secret_generated"));
   };
+
+  const handleFilterChange = (key: string, value: string) => {
+    if (key === "channel") {
+      setChannelFilter(value);
+      fetchActivity(1, activityData?.per_page || 5, value, statusFilter);
+    } else if (key === "status") {
+      setStatusFilter(value);
+      fetchActivity(1, activityData?.per_page || 5, channelFilter, value);
+    } else if (key === "search") {
+      setSearchFilter(value);
+    }
+  };
   const fetchActivity = useCallback(
     async (
       page = 1,
-      perPage = 15,
+      perPage = 5,
       channelOverride?: string,
       statusOverride?: string,
     ) => {
@@ -97,21 +110,14 @@ export default function IntegrationsSettingsTab({
         );
 
         const payload = response.data;
-        // Handle both merged and wrapped paginator structures
-        const dataArray = Array.isArray(payload.data)
-          ? payload.data
-          : payload.data?.data && Array.isArray(payload.data.data)
-            ? payload.data.data
-            : [];
-
-        const meta = Array.isArray(payload.data) ? payload : payload.data || {};
-
+        // ApiResponse merges the paginator if toArray() was called in backend
+        // So payload will have current_page, total, and data (the items)
         setActivityData({
-          data: dataArray,
-          current_page: meta.current_page || 1,
-          last_page: meta.last_page || 1,
-          total: meta.total || 0,
-          per_page: meta.per_page || perPage,
+          data: payload.data || [],
+          current_page: payload.current_page || 1,
+          last_page: payload.last_page || 1,
+          total: payload.total || 0,
+          per_page: payload.per_page || perPage,
         });
       } catch (error) {
         console.error("Failed to fetch activity", error);
@@ -186,7 +192,7 @@ export default function IntegrationsSettingsTab({
     if (activeSubTab === "activity") {
       fetchActivity(
         1,
-        activityData?.per_page || 15,
+        activityData?.per_page || 5,
         channelFilter,
         statusFilter,
       );
@@ -195,7 +201,7 @@ export default function IntegrationsSettingsTab({
 
   useEffect(() => {
     // Also load initial stats/count
-    fetchActivity(1, 15);
+    fetchActivity(1, 5);
   }, [workspace.id, fetchActivity]);
 
   const IntegrationCard = ({
@@ -209,6 +215,7 @@ export default function IntegrationsSettingsTab({
       type === "slack" ? "slack_webhook_url" : "discord_webhook_url",
     );
     const isConnected = !!currentUrl;
+    const isDiscord = type === "discord";
 
     return (
       <div
@@ -242,6 +249,26 @@ export default function IntegrationsSettingsTab({
           )}
         </div>
 
+        {isDiscord && (
+          <div className="mb-4 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 rounded-lg">
+            <div className="flex items-start gap-2">
+              <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+              <div className="text-xs text-amber-800 dark:text-amber-300">
+                <p className="font-bold mb-1">
+                  {t("workspace.integrations.discord_webhook_help") ||
+                    "Usa Webhook URL, no link de invitación"}
+                </p>
+                <p className="mb-2">
+                  ❌ NO: <code className="bg-amber-100 dark:bg-amber-900/30 px-1 rounded">discord.gg/...</code>
+                </p>
+                <p>
+                  ✅ SÍ: <code className="bg-amber-100 dark:bg-amber-900/30 px-1 rounded">discord.com/api/webhooks/...</code>
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="space-y-4">
           <Input
             id={type === "slack" ? "slack_webhook_url" : "discord_webhook_url"}
@@ -251,7 +278,7 @@ export default function IntegrationsSettingsTab({
             placeholder={
               type === "slack"
                 ? t("workspace.integrations.slack_placeholder")
-                : t("workspace.integrations.discord_placeholder")
+                : "https://discord.com/api/webhooks/..."
             }
             className="bg-white dark:bg-neutral-900"
           />
@@ -435,7 +462,7 @@ export default function IntegrationsSettingsTab({
         </div>
       ) : (
         <div className="bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-950 border border-gray-200 dark:border-neutral-800 rounded-lg overflow-hidden shadow-sm animate-in fade-in slide-in-from-bottom-2 duration-300">
-          <div className="p-6 border-b border-gray-100 dark:border-neutral-800 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div className="p-6 border-b border-gray-100 dark:border-neutral-800 flex flex-col gap-4">
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-lg bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center">
                 <Activity className="h-5 w-5 text-primary-500" />
@@ -450,80 +477,34 @@ export default function IntegrationsSettingsTab({
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-              <div className="w-full sm:w-44">
-                <Select
-                  id="channel-filter"
-                  placeholder={t("workspace.activity.all_channels")}
-                  value={channelFilter}
-                  onChange={(val) => {
-                    const newVal = String(val);
-                    setChannelFilter(newVal);
-                    fetchActivity(
-                      1,
-                      activityData?.per_page || 15,
-                      newVal,
-                      statusFilter,
-                    );
-                  }}
-                  options={[
-                    { value: "", label: t("workspace.activity.all_channels") },
-                    { value: "slack", label: "Slack" },
-                    { value: "discord", label: "Discord" },
-                  ]}
-                  size="sm"
-                  icon={Filter}
-                />
-              </div>
-              <div className="w-full sm:w-44">
-                <Select
-                  id="status-filter"
-                  placeholder={t("workspace.activity.all_statuses")}
-                  value={statusFilter}
-                  onChange={(val) => {
-                    const newVal = String(val);
-                    setStatusFilter(newVal);
-                    fetchActivity(
-                      1,
-                      activityData?.per_page || 15,
-                      channelFilter,
-                      newVal,
-                    );
-                  }}
-                  options={[
-                    { value: "", label: t("workspace.activity.all_statuses") },
-                    { value: "success", label: t("common.success") },
-                    { value: "failed", label: t("common.failed") },
-                  ]}
-                  size="sm"
-                  icon={
-                    statusFilter === "success"
-                      ? CheckCircle
-                      : statusFilter === "failed"
-                        ? XCircle
-                        : Filter
-                  }
-                />
-              </div>
+            <div className="flex items-center justify-end">
               <Button
                 variant="secondary"
                 buttonStyle="outline"
-                size="sm"
+                size="lg"
                 onClick={() =>
                   fetchActivity(
                     activityData?.current_page || 1,
-                    activityData?.per_page || 15,
+                    activityData?.per_page || 5,
                   )
                 }
                 loading={loadingActivity}
-                className="gap-2 h-9"
+                icon={RefreshCw}
+                className="gap-2"
               >
-                <RefreshCw
-                  className={`h-4 w-4 ${loadingActivity ? "animate-spin" : ""}`}
-                />
                 {t("common.refresh")}
               </Button>
             </div>
+
+            <FilterSection
+              mode="integrations"
+              t={t}
+              search={searchFilter}
+              setSearch={(value) => handleFilterChange("search", value)}
+              statusFilter={statusFilter}
+              platformFilter={channelFilter}
+              handleFilterChange={handleFilterChange}
+            />
           </div>
 
           <div className="overflow-x-auto">
@@ -548,7 +529,7 @@ export default function IntegrationsSettingsTab({
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-neutral-800">
                 {loadingActivity ? (
-                  <ActivityLogSkeleton rows={activityData?.per_page || 15} />
+                  <ActivityLogSkeleton rows={activityData?.per_page || 5} />
                 ) : (activityData?.data || []).length > 0 ? (
                   activityData.data.map((log: any) => (
                     <tr
@@ -659,9 +640,9 @@ export default function IntegrationsSettingsTab({
             currentPage={activityData?.current_page || 1}
             lastPage={activityData?.last_page || 1}
             total={activityData?.total || 0}
-            perPage={activityData?.per_page || 15}
+            perPage={activityData?.per_page || 5}
             onPageChange={(page) =>
-              fetchActivity(page, activityData?.per_page || 15)
+              fetchActivity(page, activityData?.per_page || 5)
             }
             onPerPageChange={(perPage) => fetchActivity(1, perPage)}
             t={t}
