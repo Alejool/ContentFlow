@@ -249,25 +249,7 @@ export default function IntegrationsSettingsTab({
           )}
         </div>
 
-        {isDiscord && (
-          <div className="mb-4 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 rounded-lg">
-            <div className="flex items-start gap-2">
-              <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
-              <div className="text-xs text-amber-800 dark:text-amber-300">
-                <p className="font-bold mb-1">
-                  {t("workspace.integrations.discord_webhook_help") ||
-                    "Usa Webhook URL, no link de invitación"}
-                </p>
-                <p className="mb-2">
-                  ❌ NO: <code className="bg-amber-100 dark:bg-amber-900/30 px-1 rounded">discord.gg/...</code>
-                </p>
-                <p>
-                  ✅ SÍ: <code className="bg-amber-100 dark:bg-amber-900/30 px-1 rounded">discord.com/api/webhooks/...</code>
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
+
 
         <div className="space-y-4">
           <Input
@@ -381,20 +363,24 @@ export default function IntegrationsSettingsTab({
               )}
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <IntegrationCard
-                title="Slack"
-                description={t("workspace.integrations.slack_description")}
-                icon={Share2}
-                type="slack"
-                color="from-purple-500 to-pink-500"
-              />
+            <div className="grid grid-cols-1 gap-6">
               <IntegrationCard
                 title="Discord"
                 description={t("workspace.integrations.discord_description")}
                 icon={Server}
                 type="discord"
                 color="from-blue-500 to-indigo-500"
+              />
+            </div>
+            
+            {/* Slack integration hidden but logic preserved */}
+            <div className="hidden">
+              <IntegrationCard
+                title="Slack"
+                description={t("workspace.integrations.slack_description")}
+                icon={Share2}
+                type="slack"
+                color="from-purple-500 to-pink-500"
               />
             </div>
           </div>

@@ -301,7 +301,7 @@ export default function ViewCampaignModal({
                                     <div className="flex items-center gap-2">
                                       <span className="capitalize font-medium text-sm">
                                         {post?.social_account?.platform ||
-                                          t("common.platform")}
+                                          t("common.platformConnect")}
                                       </span>
                                       {post.status && (
                                         <span

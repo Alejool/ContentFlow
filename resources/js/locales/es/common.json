@@ -68,7 +68,7 @@
     "save_changes": "Guardar Cambios",
     "noCreditCard": "No requiere tarjeta de crédito",
     "unknown": "Desconocido",
-    "platform": "Plataforma",
+    "platformConnect": "Plataforma",
     "close": "Cerrar",
     "copy": "Copiar",
     "created": "Creado",
@@ -118,6 +118,9 @@
       "oldest": "Más antiguos",
       "title_asc": "Título (A-Z)",
       "title_desc": "Título (Z-A)"
+    },
+    "platform":{
+      "title": "Todas la plataformas"
     },
     "errors": {
       "checkFormErrors": "Por favor, revisa los errores en el formulario",

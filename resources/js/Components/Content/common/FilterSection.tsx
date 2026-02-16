@@ -103,8 +103,8 @@ export default function FilterSection({
 
   return (
     <div className="bg-white dark:bg-neutral-800/50 p-4 rounded-lg border border-gray-100 dark:border-neutral-700 shadow-sm mt-4">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-        <div className="lg:col-span-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+        <div className="md:col-span-2 lg:col-span-3 xl:col-span-2">
           <Input
             id="search"
             placeholder={t("common.search")}
