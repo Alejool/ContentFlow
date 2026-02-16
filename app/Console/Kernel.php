@@ -5,16 +5,14 @@ namespace App\Console;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
-
-
-
 class Kernel extends ConsoleKernel
 {
-  protected $middleware = [];
-  protected function schedule(Schedule $schedule)
+  protected function schedule(Schedule $schedule): void
   {
     // Procesar posts programados cada minuto
-    $schedule->command('social:process-scheduled')->everyMinute();
+    $schedule->command('social:process-scheduled')
+      ->everyMinute()
+      ->withoutOverlapping();
 
     // Sincronizar estadísticas cada hora
     $schedule->command('social:sync-analytics')->hourly();
