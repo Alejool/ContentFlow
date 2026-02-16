@@ -188,19 +188,23 @@ export default function SocialConfig({
 
           <div className="bg-white dark:bg-neutral-900 p-4 rounded-lg border border-gray-200 dark:border-neutral-800">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-yellow-50 dark:bg-yellow-900/10 rounded-lg">
-                <Settings2 className="w-5 h-5 text-yellow-500" />
+              <div className="p-2 bg-primary-50 dark:bg-primary-900/10 rounded-lg">
+                <Settings2 className="w-5 h-5 text-primary-500" />
               </div>
               <div>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {t("common.totalSettings")}
+                  {t("platformSettings.progress")}
                 </p>
-                <p className="text-lg font-bold text-gray-900 dark:text-white">
-                  {Object.values(globalSettings).reduce(
-                    (acc, settings) => acc + Object.keys(settings || {}).length,
-                    0,
-                  )}
-                </p>
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 h-2 bg-gray-200 dark:bg-neutral-800 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-primary-500 transition-all duration-300"
+                      style={{
+                        width: `${(platforms.filter((p) => Object.keys(globalSettings[p.id.toLowerCase()] || {}).length > 0).length / platforms.length) * 100}%`,
+                      }}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           </div>

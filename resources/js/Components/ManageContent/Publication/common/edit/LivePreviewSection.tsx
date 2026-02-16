@@ -16,7 +16,7 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-const renderEmbeddedPost = (platform: string, url: string) => {
+const EmbeddedPost = ({ platform, url }: { platform: string; url: string }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -224,7 +224,7 @@ export const LivePreviewSection = ({
               </div>
             </div>
             <div className="flex items-center justify-center bg-white dark:bg-neutral-800 rounded-lg p-4 min-h-[500px]">
-              {renderEmbeddedPost(activePlatform, publishedLinks[activePlatform])}
+              <EmbeddedPost platform={activePlatform} url={publishedLinks[activePlatform]} />
             </div>
           </div>
         ) : (

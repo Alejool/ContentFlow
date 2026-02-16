@@ -12,6 +12,7 @@ import {
   AlertCircle,
   CheckCircle,
   Clock,
+  Loader2,
   Settings as SettingsIcon,
   Share2,
   X,
@@ -340,12 +341,11 @@ export default function PublishPublicationModal({
                         <div
                           onClick={() =>
                             !isPublished &&
-                            !isPublishing &&
                             !isScheduled &&
                             togglePlatform(account.id)
                           }
                           className={`w-full flex items-center gap-3 p-4 rounded-lg border-2 transition-all pt-6 relative ${
-                            !isPublished && !isPublishing && !isScheduled
+                            !isPublished && !isScheduled
                               ? "cursor-pointer"
                               : "cursor-default"
                           } ${
@@ -364,6 +364,52 @@ export default function PublishPublicationModal({
                                         : "bg-white dark:bg-neutral-900/30 border-primary-200 dark:border-neutral-700 hover:border-primary-300 dark:hover:border-neutral-600"
                           }`}
                         >
+                          {/* Publishing Overlay */}
+                          {isPublishing && (
+                            <div className="absolute inset-0 z-20 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-sm flex items-center justify-center rounded-lg animate-in fade-in duration-300">
+                              <div className="flex items-center gap-3 px-4">
+                                <div className="relative flex-shrink-0">
+                                  <div className="w-8 h-8 border-3 border-yellow-200 dark:border-yellow-900 rounded-full" />
+                                  <div className="absolute inset-0 w-8 h-8 border-3 border-yellow-500 border-t-transparent rounded-full animate-spin" />
+                                </div>
+                                
+                                <div className="flex flex-col gap-1">
+                                  <span className="text-xs font-bold text-yellow-800 dark:text-yellow-300 uppercase tracking-wide">
+                                    {t("publications.modal.publish.publishing")}
+                                  </span>
+                                  <span className="text-[10px] font-medium text-yellow-600 dark:text-yellow-400">
+                                    @{account.account_name}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Unpublishing Overlay */}
+                          {isUnpublishing && (
+                            <div className="absolute inset-0 z-20 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-sm flex items-center justify-center rounded-lg animate-in fade-in duration-300">
+                              <div className="flex items-center gap-2">
+                                <Loader2 className="w-5 h-5 animate-spin text-amber-600 dark:text-amber-400" />
+                                <span className="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wide">
+                                  {t("publications.modal.publish.unpublishing") ||
+                                    "Despublicando..."}
+                                </span>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Published Overlay */}
+                          {isPublished && !isUnpublishing && (
+                            <div className="absolute inset-0 z-10 bg-green-50/70 dark:bg-green-900/20 backdrop-blur-[1px] flex items-center justify-center rounded-lg pointer-events-none">
+                              <div className="flex items-center gap-2">
+                                <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
+                                <span className="text-xs font-bold text-green-600 dark:text-green-400 uppercase tracking-wide">
+                                  {t("publications.modal.publish.published")}
+                                </span>
+                              </div>
+                            </div>
+                          )}
+
                           <div className="w-12 h-12 rounded-lg  flex items-center justify-center flex-shrink-0 ">
                             <img src={iconSrc} alt={account.platform} />
                           </div>
@@ -393,9 +439,9 @@ export default function PublishPublicationModal({
                           )}
                           {isPublishing && (
                             <div className="flex items-center gap-2">
-                              <span className="flex items-center gap-1 text-xs font-medium text-yellow-600 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-900/30 px-2 py-1 rounded-full">
+                              <span className="flex items-center gap-1.5 text-xs font-medium text-yellow-600 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-900/30 px-2.5 py-1.5 rounded-full">
                                 <div className="w-3 h-3 border-2 border-yellow-600 border-t-transparent rounded-full animate-spin" />
-                                {t("publications.modal.publish.publishing")}
+                                <span className="font-bold">{t("publications.modal.publish.publishing")}</span>
                               </span>
                             </div>
                           )}
@@ -448,7 +494,7 @@ export default function PublishPublicationModal({
                             )}
 
                           <div className="flex items-center gap-1 ml-auto">
-                            {!isPublished && !isPublishing && !isScheduled && (
+                            {!isPublished && !isScheduled && (
                               <button
                                 type="button"
                                 onClick={(e) => {
@@ -480,8 +526,8 @@ export default function PublishPublicationModal({
                               );
                             }}
                             disabled={isUnpublishing}
-                            className="absolute top-2 right-2 p-1.5 bg-red-500/80 hover:bg-red-600 text-white rounded-full transition-colors disabled:opacity-50"
-                            title="Unpublish to allow re-publishing"
+                            className="absolute top-2 right-2 z-20 p-1.5 bg-red-500/90 hover:bg-red-600 text-white rounded-full transition-colors disabled:opacity-50 shadow-lg"
+                            title="Despublicar"
                           >
                             {isUnpublishing ? (
                               <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -593,13 +639,7 @@ export default function PublishPublicationModal({
                     }
                     disabled={
                       publishing ||
-                      (isPendingReview && !hasPublishPermission && false) || // placeholder to match logic
-                      (!isPendingReview &&
-                        !isApproved &&
-                        selectedPlatforms.length === 0) ||
-                      (isApproved &&
-                        selectedPlatforms.length === 0 &&
-                        !isPendingReview)
+                      selectedPlatforms.length === 0
                     }
                     className="flex-[2] px-4 py-3 rounded-lg font-medium bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >

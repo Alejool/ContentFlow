@@ -223,7 +223,7 @@ export default function GlobalUploadIndicator() {
       >
         <div className="flex items-center gap-2">
           {totalActiveTasks > 0 ? (
-            <Loader2 className="w-4 h-4 text-blue-500 animate-spin" />
+            <Loader2 className="w-4 h-4 text-primary animate-spin" />
           ) : errorUploads.length > 0 || failedItems.length > 0 ? (
             <AlertTriangle className="w-4 h-4 text-red-500" />
           ) : (
@@ -314,7 +314,7 @@ export default function GlobalUploadIndicator() {
                             ? "bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]"
                             : upload.status === "completed"
                               ? "bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]"
-                              : "bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]"
+                              : "bg-primary shadow-[0_0_8px_rgba(99,102,241,0.5)]"
                         }`}
                         style={{ width: `${upload.progress}%` }}
                       />
@@ -376,7 +376,7 @@ export default function GlobalUploadIndicator() {
                       <AlertTriangle className="w-3 h-3 text-red-500" />
                     ) : item.status === "publishing" ||
                       item.status === "processing" ? (
-                      <Loader2 className="w-3 h-3 text-blue-500 animate-spin" />
+                      <Loader2 className="w-3 h-3 text-primary animate-spin" />
                     ) : (
                       <CheckCircle2 className="w-3 h-3 text-green-500" />
                     )}
@@ -412,7 +412,7 @@ export default function GlobalUploadIndicator() {
                         )
                       )}
                       {item.status === "publishing" && (
-                        <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 font-bold uppercase tracking-wider">
+                        <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-light font-bold uppercase tracking-wider">
                           {t("common.publishing") || "Publicando"}
                         </span>
                       )}
@@ -431,119 +431,86 @@ export default function GlobalUploadIndicator() {
                   <div className="flex flex-col gap-1 text-[10px] text-gray-400 dark:text-neutral-500">
                     {(item as any).platform_status_summary ? (
                       <div className="space-y-2 mt-2">
-                        {/* Progress Bar for Publication */}
-                        {(() => {
-                          const platforms = Object.values(
-                            (item as any).platform_status_summary,
-                          );
-                          const total = platforms.length;
-                          const completed = platforms.filter(
-                            (p: any) =>
-                              p.status === "published" || p.status === "failed",
-                          ).length;
-                          const progress =
-                            total > 0
-                              ? Math.round((completed / total) * 100)
-                              : 0;
-                          const isInProgress =
-                            item.status === "publishing" ||
-                            item.status === "processing";
+                        {Object.values((item as any).platform_status_summary)
+                          .filter((platform: any) => {
+                            const logDate = platform.published_at
+                              ? new Date(platform.published_at)
+                              : new Date(item.updated_at || "");
+                            const fiveMinsAgo = new Date(
+                              Date.now() - 5 * 60 * 1000,
+                            );
 
-                          return (
-                            <div className="space-y-1">
-                              <div className="flex justify-between items-center text-[9px] uppercase tracking-wider font-bold">
-                                <span className="text-blue-500 dark:text-blue-400">
-                                  {t("common.progress") || "Progreso"}
-                                </span>
-                                <span className="text-neutral-500 dark:text-neutral-400">
-                                  {completed}/{total}
-                                </span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <div className="flex-1 bg-gray-100 dark:bg-neutral-700 h-1.5 rounded-full overflow-hidden">
-                                  <div
-                                    className={`h-full transition-all duration-500 ease-out shadow-[0_0_8px_rgba(59,130,246,0.5)] ${item.status === "failed" ? "bg-red-500" : "bg-blue-500"} ${isInProgress && progress < 100 ? "animate-shimmer bg-gradient-to-r from-blue-500 via-blue-400 to-blue-500 bg-[length:200%_100%]" : ""}`}
-                                    style={{
-                                      width: `${item.status === "failed" ? 100 : progress}%`,
-                                    }}
-                                  />
-                                </div>
-                                <span className="w-8 text-right font-medium">
-                                  {item.status === "failed"
-                                    ? "100%"
-                                    : isInProgress && progress < 100
-                                      ? ""
-                                      : `${progress}%`}
-                                </span>
-                              </div>
-                            </div>
-                          );
-                        })()}
-
-                        <div className="space-y-1.5 pt-1 border-t border-gray-50 dark:border-neutral-700/50">
-                          {Object.values((item as any).platform_status_summary)
-                            .filter((platform: any) => {
-                              // SMART FILTER: Only show platforms that were part of this publishing attempt.
-                              // A platform is relevant if it's currently publishing, failed, or was published recently.
-                              // We use 5 minutes as a safety margin for "recent" status.
-                              const logDate = platform.published_at
-                                ? new Date(platform.published_at)
-                                : new Date(item.updated_at || "");
-                              const fiveMinsAgo = new Date(
-                                Date.now() - 5 * 60 * 1000,
-                              );
-
-                              return (
-                                platform.status === "publishing" ||
-                                platform.status === "pending" ||
-                                logDate > fiveMinsAgo
-                              );
-                            })
-                            .map((platform: any, idx) => {
-                              const isDone = platform.status === "published";
-                              const isFailed = platform.status === "failed";
-                              return (
-                                <div
-                                  key={idx}
-                                  className="flex items-center justify-between"
-                                >
-                                  <span className="capitalize text-neutral-600 dark:text-neutral-400">
-                                    {platform.platform}:
-                                  </span>
-                                  <div className="flex items-center gap-1.5">
-                                    {platform.status === "publishing" ||
-                                    platform.status === "pending" ? (
-                                      <Loader2 className="w-2.5 h-2.5 animate-spin text-blue-500" />
+                            return (
+                              platform.status === "publishing" ||
+                              platform.status === "pending" ||
+                              logDate > fiveMinsAgo
+                            );
+                          })
+                          .map((platform: any, idx) => {
+                            const isDone = platform.status === "published";
+                            const isFailed = platform.status === "failed";
+                            const isPublishing = platform.status === "publishing" || platform.status === "pending";
+                            const progress = isDone ? 100 : isFailed ? 100 : isPublishing ? 50 : 0;
+                            
+                            return (
+                              <div
+                                key={idx}
+                                className="space-y-1.5 p-2 rounded-lg bg-gray-50/80 dark:bg-neutral-700/40 border border-gray-100 dark:border-neutral-600/50"
+                              >
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-2">
+                                    {isPublishing ? (
+                                      <Loader2 className="w-3.5 h-3.5 animate-spin text-primary" />
                                     ) : isDone ? (
-                                      <CheckCircle2 className="w-2.5 h-2.5 text-green-500" />
+                                      <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
                                     ) : (
-                                      <AlertTriangle className="w-2.5 h-2.5 text-red-500" />
+                                      <AlertTriangle className="w-3.5 h-3.5 text-red-500" />
                                     )}
-                                    <span
-                                      className={`font-medium ${
-                                        isDone
-                                          ? "text-green-600 dark:text-green-400"
-                                          : isFailed
-                                            ? "text-red-500 dark:text-red-400"
-                                            : "text-blue-500 dark:text-blue-400"
-                                      }`}
-                                    >
-                                      {isDone
-                                        ? "Enviado"
-                                        : isFailed
-                                          ? "Falló"
-                                          : "Enviando..."}
+                                    <span className="capitalize font-semibold text-[11px] text-neutral-800 dark:text-neutral-200">
+                                      {platform.platform}
                                     </span>
                                   </div>
+                                  <span
+                                    className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                                      isDone
+                                        ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400"
+                                        : isFailed
+                                          ? "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400"
+                                          : "bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-light"
+                                    }`}
+                                  >
+                                    {isDone
+                                      ? "Enviado"
+                                      : isFailed
+                                        ? "Falló"
+                                        : "Enviando"}
+                                  </span>
                                 </div>
-                              );
-                            })}
-                        </div>
+                                <div className="flex items-center gap-2">
+                                  <div className="flex-1 bg-gray-200 dark:bg-neutral-600 h-1.5 rounded-full overflow-hidden">
+                                    <div
+                                      className={`h-full transition-all duration-500 ease-out ${
+                                        isFailed
+                                          ? "bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]"
+                                          : isDone
+                                            ? "bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]"
+                                            : "bg-primary shadow-[0_0_8px_rgba(99,102,241,0.5)]"
+                                      } ${isPublishing ? "animate-pulse" : ""}`}
+                                      style={{ width: `${progress}%` }}
+                                    />
+                                  </div>
+                                  <span className="text-[10px] font-bold text-neutral-600 dark:text-neutral-300 w-10 text-right">
+                                    {isDone || isFailed ? "100%" : "..."}
+                                  </span>
+                                </div>
+                              </div>
+                            );
+                          })}
                       </div>
                     ) : (
                       <div className="space-y-2 mt-2">
                         <div className="flex-1 bg-gray-100 dark:bg-neutral-700 h-1.5 rounded-full overflow-hidden">
-                          <div className="h-full bg-blue-400/50 animate-pulse w-full" />
+                          <div className="h-full bg-primary/50 animate-pulse w-full" />
                         </div>
                         <span className="block text-center italic opacity-70">
                           {item.status === "publishing"

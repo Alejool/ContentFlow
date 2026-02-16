@@ -72,3 +72,6 @@ verify_db.php
 
 recommendations.md
 test_relationships.php
+test_relationships.php
+verify_db.php
+start-queue.bat

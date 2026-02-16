@@ -8,11 +8,16 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
 
 class SyncSocialAnalyticsJob implements ShouldQueue
 {
-  use Batchable, Queueable;
+  use Batchable, Queueable, InteractsWithQueue, Dispatchable;
+
+  public $tries = 3;
+  public $timeout = 120;
+  public $backoff = [60, 120, 300];
 
   public function __construct(
     public SocialAccount $account,
@@ -21,7 +26,13 @@ class SyncSocialAnalyticsJob implements ShouldQueue
 
   public function handle(SocialAnalyticsService $analyticsService)
   {
+    if ($this->batch()?->cancelled()) {
+      return;
+    }
+
     try {
+      Log::info("Iniciando sincronización para cuenta {$this->account->id} ({$this->account->platform})");
+
       // 1. Sincronizar métricas de la cuenta (seguidores, posts, etc.)
       $analyticsService->fetchAccountMetrics($this->account);
 
@@ -38,6 +49,12 @@ class SyncSocialAnalyticsJob implements ShouldQueue
     } catch (\Exception $e) {
       Log::error("Error syncing analytics for account {$this->account->id}: " . $e->getMessage());
       $this->account->increment('failure_count');
+      
+      if ($this->attempts() < $this->tries) {
+        $this->release($this->backoff[$this->attempts() - 1] ?? 60);
+      } else {
+        $this->fail($e);
+      }
     }
   }
 }
