@@ -19,7 +19,33 @@ class PublicationFailedNotification extends BaseNotification
 
   public function via($notifiable): array
   {
-    return ['database', 'broadcast', 'mail'];
+    $channels = ['database', 'broadcast', 'mail'];
+    
+    // Add workspace notification channels
+    $workspace = $this->getWorkspace($notifiable);
+    if ($workspace) {
+      if ($workspace->discord_webhook_url) {
+        $channels[] = \App\Channels\CustomDiscordChannel::class;
+      }
+      if ($workspace->slack_webhook_url) {
+        $channels[] = \App\Channels\CustomSlackChannel::class;
+      }
+    }
+    
+    return $channels;
+  }
+  
+  protected function getWorkspace($notifiable)
+  {
+    if ($notifiable instanceof \App\Models\Workspace\Workspace) {
+      return $notifiable;
+    }
+    
+    if (isset($notifiable->currentWorkspace)) {
+      return $notifiable->currentWorkspace;
+    }
+    
+    return null;
   }
 
   public function toMail($notifiable)
