@@ -19,6 +19,11 @@
     "video_deleted": "Video deleted from {{platform}}",
     "status_update": "Status update",
     "status_update_description": "{{type}} {{platform}}",
+    "playlist_processed": "Video added to {{platform}} playlist",
+    "playlist_failed": "Failed to add video to {{platform}} playlist",
+    "playlist_failed_description": "Could not add '{{video_title}}' to playlist '{{playlist_name}}' on account {{account}}",
+    "retry_max_reached": "Maximum retry attempts reached.",
+    "retry_auto": "Will retry automatically.",
     "modal": {
       "title": "Notifications",
       "new": "new",

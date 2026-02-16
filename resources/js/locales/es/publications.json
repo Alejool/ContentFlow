@@ -253,7 +253,7 @@
       },
       "preview": {
         "title": "Vistas Previas en Vivo",
-        "disclaimer": "La vista previa es una aproximacin. El aspecto real puede variar segn la plataforma.",
+        "disclaimer": "La vista previa es una aproximación. El aspecto real puede variar segn la plataforma.",
         "simulated": "Simulado",
         "real": "Real",
         "realInfo": "Vista Previa Real",
@@ -302,7 +302,7 @@
       "cancel_confirmation": {
         "title": "Cancelar publicación",
         "message": "¿Estás seguro de que deseas cancelar esta publicación? El envo a redes se detendr.",
-        "confirm": "S, cancelar",
+        "confirm": "Si, cancelar",
         "cancel": "No, continuar"
       }
     },

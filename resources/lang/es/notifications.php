@@ -63,4 +63,8 @@ return [
   'video_updated' => 'Tu video ha sido actualizado en :platform.',
   'video_uploaded' => 'Tu video ha sido subido a :platform.',
   'status_update' => 'El estado de tu video ha sido actualizado en :platform.',
+  'playlist_failed' => 'Error al agregar video a playlist de :platform',
+  'playlist_failed_description' => 'No se pudo agregar ":video_title" a la playlist ":playlist_name" en la cuenta :account.',
+  'retry_auto' => 'Se reintentará automáticamente.',
+  'retry_max_reached' => 'Se alcanzó el máximo de reintentos.',
 ];
