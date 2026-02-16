@@ -2,7 +2,7 @@
 
 namespace App\Notifications;
 
-use App\Models\YouTube\YouTubePlaylistQueue;
+use App\Models\Youtube\YouTubePlaylistQueue;
 
 class PlaylistProcessFailedNotification extends BaseNotification
 {
