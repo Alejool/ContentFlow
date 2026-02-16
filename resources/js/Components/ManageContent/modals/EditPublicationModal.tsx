@@ -619,9 +619,15 @@ const EditPublicationModal = ({
                     mediaUrls={stabilizedMediaPreviews.map((m) => m.url)}
                     user={{
                       name: auth.user.name,
-                      username: "username", // TODO: Get username from linked account
+                      username: "username",
                       avatar: auth.user.photo_url,
                     }}
+                    publishedLinks={publication?.social_post_logs?.reduce((acc: Record<string, string>, log: any) => {
+                      if (log.status === 'published' && log.post_url && log.platform) {
+                        acc[log.platform.toLowerCase()] = log.post_url;
+                      }
+                      return acc;
+                    }, {})}
                   />
                 </div>
 
