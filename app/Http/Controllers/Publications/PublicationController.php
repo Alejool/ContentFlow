@@ -96,20 +96,17 @@ class PublicationController extends Controller
         $query->where('title', 'LIKE', '%' . $request->search . '%');
       }
 
-      if ($request->has('platform') && !empty($request->platform)) {
-        $platform = $request->platform;
-        $query->where(function ($q) use ($platform) {
-          $q->whereHas('scheduled_posts', function ($subQ) use ($platform) {
-            $subQ->whereHas('socialAccount', function ($accQ) use ($platform) {
-              $accQ->where('platform', $platform);
-            });
+      if ($request->has('platform') && is_array($request->platform) && count($request->platform) > 0) {
+        $platforms = $request->platform;
+        
+        $query->where(function ($q) use ($platforms) {
+          $q->whereHas('scheduled_posts.socialAccount', function ($accQ) use ($platforms) {
+            $accQ->whereIn('platform', $platforms);
           })
-            ->orWhereHas('socialPostLogs', function ($subQ) use ($platform) {
-              $subQ->whereIn('status', ['published', 'success'])
-                ->whereHas('socialAccount', function ($accQ) use ($platform) {
-                  $accQ->where('platform', $platform);
-                });
-            });
+          ->orWhereHas('socialPostLogs', function ($logQ) use ($platforms) {
+            $logQ->whereIn('status', ['published', 'success'])
+              ->whereIn('platform', $platforms);
+          });
         });
       }
 
