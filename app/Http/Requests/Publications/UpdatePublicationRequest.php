@@ -55,7 +55,7 @@ class UpdatePublicationRequest extends FormRequest
           $existing = $publication->scheduled_at;
           if ($value) {
             $scheduledDate = Carbon::parse($value);
-            $now = Carbon::now('UTC')->addMinutes(5);
+            $now = Carbon::now('UTC')->addMinutes(2);
 
             if ($scheduledDate->lt($now)) {
               $fail(__('publications.validation.scheduledMinDifference'));
@@ -83,7 +83,7 @@ class UpdatePublicationRequest extends FormRequest
             $existing = $existingPost?->scheduled_at;
 
             $scheduledDate = Carbon::parse($value);
-            $now = Carbon::now('UTC')->addMinutes(5);
+            $now = Carbon::now('UTC')->addMinutes(2);
 
             if ($scheduledDate->lt($now)) {
               $fail(__('publications.validation.scheduledMinDifference'));
@@ -105,7 +105,7 @@ class UpdatePublicationRequest extends FormRequest
 
             if ($globalSchedule) {
               $scheduledDate = Carbon::parse($globalSchedule);
-              $now = Carbon::now('UTC')->addMinutes(5);
+              $now = Carbon::now('UTC')->addMinutes(2);
 
               if ($scheduledDate->lt($now)) {
                 $fail(__('publications.validation.scheduledMinDifference'));

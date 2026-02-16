@@ -44,6 +44,15 @@ return Application::configure(basePath: dirname(__DIR__))
             'super-admin' => IsSuperAdmin::class,
         ]);
     })
+    ->withSchedule(function ($schedule) {
+        $schedule->command('social:process-scheduled')
+            ->everyMinute()
+            ->withoutOverlapping();
+        $schedule->command('social:sync-analytics')->hourly();
+        $schedule->command('social:cleanup-tokens')->daily();
+        $schedule->command('youtube:process-playlist-queue')->everyFiveMinutes();
+        $schedule->command('app:send-event-reminders')->everyMinute();
+    })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->render(function (MethodNotAllowedHttpException $e, $request) {
             Log::error('405 Method Not Allowed', [
