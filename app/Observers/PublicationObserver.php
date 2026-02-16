@@ -77,7 +77,6 @@ class PublicationObserver
       'content' => PublicationActivity::TYPE_CONTENT_CHANGED,
       'caption' => PublicationActivity::TYPE_CAPTION_CHANGED,
       'scheduled_at' => PublicationActivity::TYPE_SCHEDULED_TIME_CHANGED,
-      'status' => PublicationActivity::TYPE_STATUS_CHANGED,
       'platforms' => PublicationActivity::TYPE_PLATFORMS_CHANGED,
       'hashtags' => PublicationActivity::TYPE_HASHTAGS_CHANGED,
       default => null, // Don't track this field
@@ -141,8 +140,8 @@ class PublicationObserver
     return [
       'before' => $old,
       'after' => $new,
-      'added' => array_diff($new, $old),
-      'removed' => array_diff($old, $new),
+      'added' => array_values(array_diff($new, $old)),
+      'removed' => array_values(array_diff($old, $new)),
     ];
   }
 }

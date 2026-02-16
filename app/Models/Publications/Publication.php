@@ -99,6 +99,7 @@ class Publication extends Model
     'end_date' => 'date',
     'publish_date' => 'date',
     'scheduled_at' => 'datetime',
+    'hashtags' => 'array',
     'platform_settings' => 'array',
     'workspace_id' => 'integer',
     'approved_by' => 'integer',

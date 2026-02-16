@@ -24,6 +24,14 @@ class PublicationActivity extends Model
   const TYPE_PLATFORMS_CHANGED = 'platforms_changed';
   const TYPE_MEDIA_CHANGED = 'media_changed';
   const TYPE_HASHTAGS_CHANGED = 'hashtags_changed';
+  const TYPE_REQUESTED_APPROVAL = 'requested_approval';
+  const TYPE_APPROVED = 'approved';
+  const TYPE_REJECTED = 'rejected';
+  const TYPE_SCHEDULED = 'scheduled';
+  const TYPE_PUBLISHING = 'publishing';
+  const TYPE_PUBLISHED = 'published';
+  const TYPE_FAILED = 'failed';
+  const TYPE_CANCELLED = 'cancelled';
 
   protected $fillable = [
     'publication_id',
@@ -103,6 +111,22 @@ class PublicationActivity extends Model
 
       self::TYPE_HASHTAGS_CHANGED => "{$userName} modificó los hashtags",
 
+      self::TYPE_REQUESTED_APPROVAL => "{$userName} solicitó revisión",
+
+      self::TYPE_APPROVED => "{$userName} aprobó la publicación",
+
+      self::TYPE_REJECTED => "{$userName} rechazó la publicación" . (isset($details['reason']) ? ": {$details['reason']}" : ""),
+
+      self::TYPE_SCHEDULED => "{$userName} programó la publicación",
+
+      self::TYPE_PUBLISHING => "{$userName} inició la publicación",
+
+      self::TYPE_PUBLISHED => "{$userName} completó la publicación",
+
+      self::TYPE_FAILED => "{$userName} falló al publicar",
+
+      self::TYPE_CANCELLED => "{$userName} canceló la publicación",
+
       default => "{$userName} actualizó la publicación",
     };
   }
@@ -155,6 +179,7 @@ class PublicationActivity extends Model
       'draft' => 'borrador',
       'scheduled' => 'programada',
       'published' => 'publicada',
+      'publishing' => 'publicando',
       'failed' => 'fallida',
       'pending_review' => 'pendiente de revisión',
       'approved' => 'aprobada',
