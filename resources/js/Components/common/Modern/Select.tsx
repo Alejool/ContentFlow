@@ -134,14 +134,15 @@ interface SelectProps<T extends FieldValues = FieldValues> {
   size?: "sm" | "md" | "lg";
   variant?: "default" | "outlined" | "filled";
   required?: boolean;
-  value?: string | number;
-  onChange?: (value: string | number) => void;
+  value?: string | number | string[];
+  onChange?: (value: string | number | string[]) => void;
   searchable?: boolean;
   clearable?: boolean;
   loading?: boolean;
   dropdownPosition?: "down" | "up" | "auto";
   usePortal?: boolean;
   activeColor?: string;
+  multiple?: boolean;
 }
 
 export default function Select<T extends FieldValues>({
@@ -169,6 +170,7 @@ export default function Select<T extends FieldValues>({
   dropdownPosition = "auto",
   usePortal = true,
   activeColor,
+  multiple = false,
   ...props
 }: SelectProps<T>) {
   const [isOpen, setIsOpen] = useState(false);
@@ -215,13 +217,22 @@ export default function Select<T extends FieldValues>({
     : options;
 
   useEffect(() => {
-    if (value !== undefined && value !== null && value !== "") {
+    if (multiple && Array.isArray(value)) {
+      if (value.length === 0) {
+        setSelectedLabel(placeholder);
+      } else if (value.length === 1) {
+        const selected = options.find((option) => option.value === value[0]);
+        setSelectedLabel(selected?.label || placeholder);
+      } else {
+        setSelectedLabel(`${value.length} seleccionadas`);
+      }
+    } else if (value !== undefined && value !== null && value !== "") {
       const selected = options.find((option) => option.value === value);
       setSelectedLabel(selected?.label || placeholder);
     } else {
       setSelectedLabel(placeholder);
     }
-  }, [value, options, placeholder]);
+  }, [value, options, placeholder, multiple]);
 
   useEffect(() => {
     if (isOpen && selectRef.current) {
@@ -370,17 +381,25 @@ export default function Select<T extends FieldValues>({
   const fieldName = name || (id as Path<T>);
 
   const handleSelect = (optionValue: string | number) => {
-    if (onChange) {
-      onChange(optionValue);
+    if (multiple && onChange) {
+      const currentValues = Array.isArray(value) ? value : [];
+      const newValues = currentValues.includes(optionValue)
+        ? currentValues.filter((v) => v !== optionValue)
+        : [...currentValues, optionValue];
+      onChange(newValues);
+    } else {
+      if (onChange) {
+        onChange(optionValue);
+      }
+      setIsOpen(false);
     }
-    setIsOpen(false);
     setSearchTerm("");
   };
 
   const handleClear = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (onChange) {
-      onChange("");
+      onChange(multiple ? [] : "");
     }
     setSelectedLabel(placeholder);
   };
@@ -426,7 +445,7 @@ export default function Select<T extends FieldValues>({
 
   const activeColorRGB = activeColor ? getRGBValues(activeColor) : "";
   const isSolidActive =
-    activeColor && value !== undefined && value !== "" && value !== null;
+    activeColor && !multiple && value !== undefined && value !== "" && value !== null;
 
   return (
     <>
@@ -484,9 +503,9 @@ export default function Select<T extends FieldValues>({
               disabled={disabled}
               {...(register ? register(fieldName) : {})}
               className="sr-only"
-              value={value}
+              value={multiple ? undefined : value}
               onChange={(e) => {
-                if (onChange) {
+                if (onChange && !multiple) {
                   const val = e.target.value;
                   const isNumeric = !isNaN(Number(val)) && val !== "";
                   onChange(isNumeric ? Number(val) : val);
@@ -552,8 +571,8 @@ export default function Select<T extends FieldValues>({
 
               <div className="flex items-center gap-1 ml-2 flex-shrink-0">
                 {clearable &&
-                  value &&
-                  value !== "" &&
+                  ((multiple && Array.isArray(value) && value.length > 0) ||
+                    (!multiple && value && value !== "")) &&
                   !disabled &&
                   !loading && (
                     <div
@@ -644,7 +663,9 @@ export default function Select<T extends FieldValues>({
                   </div>
                 ) : (
                   filteredOptions.map((option) => {
-                    const isSelected = option.value === value;
+                    const isSelected = multiple
+                      ? Array.isArray(value) && value.includes(option.value)
+                      : option.value === value;
 
                     return (
                       <button
