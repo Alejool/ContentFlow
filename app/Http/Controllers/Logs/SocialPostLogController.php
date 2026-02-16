@@ -18,8 +18,10 @@ class SocialPostLogController extends Controller
       $query->where('status', $request->status);
     }
 
-    if ($request->has('platform') && $request->platform !== 'all') {
-      $query->where('platform', $request->platform);
+    if ($request->has('platform') && $request->platform !== 'all' && !empty($request->platform)) {
+      $platforms = is_array($request->platform) ? $request->platform : [$request->platform];
+      \Log::info('Platform filter:', ['platforms' => $platforms, 'raw' => $request->platform]);
+      $query->whereIn('platform', $platforms);
     }
 
     if ($request->has('date_start') && $request->date_start) {
