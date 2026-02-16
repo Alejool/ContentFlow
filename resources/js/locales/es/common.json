@@ -1,4 +1,4 @@
-{
+﻿{
   "common": {
     "deleteConfirmTitle": "Confirmar eliminación",
     "deleteConfirm": "¿Estás seguro de que deseas eliminar este elemento? Esta acción no se puede deshacer.",
@@ -11,6 +11,7 @@
     "more": "Más",
     "confirm": "Confirmar",
     "progress": "Progreso",
+    "dismiss": "Descartar",
     "viewAll": "Ver todo",
     "new": "Nuevo",
     "saving": "Guardando...",
@@ -94,6 +95,7 @@
     "show_advanced": "Mostrar Avanzado",
     "hide_advanced": "Ocultar Avanzado",
     "item": "Elemento",
+    "files": "Archivos",
     "publications": "Publicaciones",
     "vistas": "Vistas",
     "clics": "Clics",

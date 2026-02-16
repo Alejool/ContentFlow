@@ -27,7 +27,24 @@
         "scheduled": "Programado",
         "draft": "Borrador",
         "scheduled_time_changed": "Hora programada cambiada",
-        "cancelled": "Cancelado"
+        "cancelled": "Cancelado",
+        "title_changed": "Título cambiado",
+        "content_changed": "Contenido cambiado",
+        "caption_changed": "Pie de foto cambiado",
+        "scheduled_time_changed_type": "Hora programada cambiada",
+        "status_changed": "Estado cambiado",
+        "platforms_changed": "Plataformas cambiadas",
+        "media_changed": "Multimedia cambiada",
+        "hashtags_changed": "Hashtags cambiados"
+      },
+      "before": "Antes",
+      "after": "Después",
+      "added": "Agregado",
+      "removed": "Eliminado",
+      "labels": {
+        "title": "Título",
+        "platforms": "Plataformas",
+        "status": "Estado"
       }
     }
   }

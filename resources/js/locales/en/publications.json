@@ -11,7 +11,8 @@
         "backgroundUpload": "Saved! Media is uploading in the background."
       },
       "upload": {
-        "uploadingFiles": "Uploading {{count}} file(s)...",
+        "activeTasks": "Files and Publications ({{count}})...",
+        "uploadingFiles": "Uploading files ({{count}})...",
         "uploadFailed": "Upload Failed",
         "uploadsCompleted": "Uploads Completed",
         "publishingSocial": "Publishing to social ({{count}})...",
@@ -280,7 +281,7 @@
         "scheduledAtRequired": "Scheduled date is required when you select social networks",
         "socialAccountsRequired": "Please select at least one social media account",
         "singleVideo": "You can only upload one video per publication.",
-        "scheduledMinDifference": "The date must be at least 5 minutes after the current time"
+        "scheduledMinDifference": "The date must be at least 2 minutes after the current time"
       },
       "cancel_confirmation": {
         "title": "Cancel Publication",
