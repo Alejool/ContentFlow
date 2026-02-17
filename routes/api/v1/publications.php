@@ -4,6 +4,7 @@ use App\Http\Controllers\Publications\PublicationController;
 use App\Http\Controllers\Publications\PublicationLockController;
 use App\Http\Controllers\Publications\PublicationCommentController;
 use App\Http\Controllers\Publications\ClientPortalController;
+use App\Http\Controllers\Publications\PublicationPreviewController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -20,6 +21,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/{publication}/request-review', [PublicationController::class, 'requestReview'])->name('request-review')->whereNumber('publication');
     Route::post('/{publication}/approve', [PublicationController::class, 'approve'])->name('approve')->whereNumber('publication');
     Route::get('/{publication}/published-platforms', [PublicationController::class, 'getPublishedPlatforms'])->name('published-platforms')->whereNumber('publication');
+    Route::post('/{publication}/validate', [PublicationController::class, 'validateContent'])->name('validate')->whereNumber('publication');
+    Route::post('/{publication}/preview', [PublicationPreviewController::class, 'preview'])->name('preview')->whereNumber('publication');
+    Route::post('/{publication}/auto-optimize', [PublicationPreviewController::class, 'autoOptimize'])->name('auto-optimize')->whereNumber('publication');
+    Route::put('/{publication}/platform-config/{accountId}', [PublicationPreviewController::class, 'updatePlatformConfig'])->name('platform-config.update')->whereNumber('publication')->whereNumber('accountId');
+    Route::get('/{publication}/saved-configurations', [PublicationPreviewController::class, 'getSavedConfigurations'])->name('saved-configurations')->whereNumber('publication');
+    Route::post('/{publication}/generate-thumbnail', [PublicationPreviewController::class, 'generateThumbnail'])->name('generate-thumbnail')->whereNumber('publication');
     Route::post('/{publication}/publish', [PublicationController::class, 'publish'])->name('publish');
     Route::post('/{publication}/unpublish', [PublicationController::class, 'unpublish'])->name('unpublish');
     Route::post('/{publication}/reject', [PublicationController::class, 'reject'])->name('reject');

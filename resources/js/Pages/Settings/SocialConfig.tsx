@@ -1,63 +1,22 @@
-import IconFacebook from "@/../assets/Icons/facebook.svg";
-import IconTiktok from "@/../assets/Icons/tiktok.svg";
-import IconTwitter from "@/../assets/Icons/x.svg";
-import IconYoutube from "@/../assets/Icons/youtube.svg";
 import PlatformSettingsModal from "@/Components/ConfigSocialMedia/PlatformSettingsModal";
+import Button from "@/Components/common/Modern/Button";
+import { SOCIAL_PLATFORMS } from "@/Constants/socialPlatformsConfig";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head, router } from "@inertiajs/react";
-import { CheckCircle, Save, Settings2, XCircle } from "lucide-react";
+import { Head } from "@inertiajs/react";
+import { Save, Settings2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
+import axios from "axios";
 
 interface SocialConfigProps {
   settings: Record<string, any>;
 }
 
-const platforms = [
-  {
-    id: "youtube",
-    name: "YouTube",
-    icon: IconYoutube,
-    color: "text-red-500",
-    bgColor: "bg-red-50 dark:bg-red-900/10",
-    borderColor: "border-red-100 dark:border-red-900/20",
-    buttonColor: "bg-red-500 hover:bg-red-600",
-    ringColor: "ring-red-200 dark:ring-red-900/30",
-  },
-  {
-    id: "facebook",
-    name: "Facebook",
-    icon: IconFacebook,
-    color: "text-blue-600",
-    bgColor: "bg-blue-50 dark:bg-blue-900/10",
-    borderColor: "border-blue-100 dark:border-blue-900/20",
-    buttonColor: "bg-blue-500 hover:bg-blue-600",
-    ringColor: "ring-blue-200 dark:ring-blue-900/30",
-  },
-  {
-    id: "twitter",
-    name: "X (Twitter)",
-    icon: IconTwitter,
-    color: "text-gray-900 dark:text-white",
-    bgColor: "bg-gray-50 dark:bg-gray-800/20",
-    borderColor: "border-gray-100 dark:border-gray-800/30",
-    buttonColor:
-      "bg-gray-900 hover:bg-black dark:bg-white dark:hover:bg-gray-200 dark:text-gray-900",
-    ringColor: "ring-gray-200 dark:ring-gray-800/30",
-  },
-  {
-    id: "tiktok",
-    name: "TikTok",
-    icon: IconTiktok,
-    color: "text-gray-900 dark:text-white",
-    bgColor: "bg-gray-100 dark:bg-neutral-800/30",
-    borderColor: "border-gray-200 dark:border-neutral-700/30",
-    buttonColor:
-      "bg-gradient-to-r from-gray-900 via-gray-800 to-pink-900 hover:from-gray-900 hover:via-gray-700 hover:to-pink-800",
-    ringColor: "ring-gray-300 dark:ring-neutral-700/30",
-  },
-];
+// Filtrar solo las plataformas activas
+const activePlatforms = Object.values(SOCIAL_PLATFORMS).filter(
+  (platform) => platform.active
+);
 
 export default function SocialConfig({
   settings: initialSettings,
@@ -83,24 +42,18 @@ export default function SocialConfig({
     }));
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setIsSaving(true);
-    router.patch(
-      route("settings.social.update"),
-      {
+    try {
+      await axios.patch(route("api.v1.profile.social-settings.update"), {
         settings: globalSettings,
-      },
-      {
-        onSuccess: () => {
-          toast.success(t("platformSettings.success"));
-          setIsSaving(false);
-        },
-        onError: () => {
-          toast.error(t("platformSettings.error"));
-          setIsSaving(false);
-        },
-      },
-    );
+      });
+      toast.success(t("platformSettings.success") || "Configuración guardada");
+      setIsSaving(false);
+    } catch (error) {
+      toast.error(t("platformSettings.error") || "Error al guardar");
+      setIsSaving(false);
+    }
   };
 
   const hasChanges =
@@ -109,278 +62,152 @@ export default function SocialConfig({
   return (
     <AuthenticatedLayout
       header={
-        <div className="flex flex-col mt-10 sm:flex-row sm:items-center justify-between gap-6">
-          <div className="space-y-2">
-            <div className="flex items-center gap-3">
-              <div className="p-2.5 bg-primary-50 dark:bg-primary-500/10 rounded-lg">
-                <Settings2 className="w-6 h-6 text-primary-500" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {t("platformSettings.title")}
-                </h1>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {t("platformSettings.subtitle")}
-                </p>
-              </div>
-            </div>
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-lg bg-primary-100 dark:bg-primary-900/30">
+            <Settings2 className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+              {t("platformSettings.title")}
+            </h2>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              {t("platformSettings.subtitle")}
+            </p>
           </div>
         </div>
       }
     >
       <Head title={t("platformSettings.title")} />
 
-      <div className="px-4 sm:px-6 mb-6">
-        <div className="flex justify-end">
-          <button
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-8 flex justify-end">
+          <Button
             onClick={handleSave}
-            disabled={isSaving || !hasChanges}
-            className={`
-              inline-flex items-center gap-3 px-6 py-3
-              rounded-lg font-semibold transition-all
-              ${
-                hasChanges
-                  ? "bg-primary-600 hover:bg-primary-700 text-white shadow-lg shadow-primary-500/30 hover:shadow-xl"
-                  : "bg-gray-100 dark:bg-neutral-800 text-gray-500 dark:text-gray-400 cursor-not-allowed"
-              }
-              disabled:opacity-50 disabled:cursor-not-allowed
-            `}
+            disabled={isSaving}
+            loading={isSaving}
+            icon={Save}
+            loadingText={t("common.saving")}
+            className="shadow-md hover:shadow-lg"
+            size="lg"
           >
-            <Save className={`w-5 h-5 ${isSaving ? "animate-spin" : ""}`} />
-            <span className="whitespace-nowrap">
-              {isSaving ? t("common.processing") : t("platformSettings.save")}
-            </span>
-            {hasChanges && (
-              <span className="ml-2 px-2 py-1 text-xs font-bold bg-white/20 rounded-full">
-                {t("common.new")}
-              </span>
-            )}
-          </button>
+            {t("common.save")}
+          </Button>
         </div>
-      </div>
-
-      <div className="px-4 sm:px-6">
-        <div className="mb-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="bg-white dark:bg-neutral-900 p-4 rounded-lg border border-gray-200 dark:border-neutral-800">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-green-50 dark:bg-green-900/10 rounded-lg">
-                <CheckCircle className="w-5 h-5 text-green-500" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {t("platformSettings.configured")}
-                </p>
-                <p className="text-lg font-bold text-gray-900 dark:text-white">
-                  {
-                    platforms.filter(
-                      (p) =>
-                        Object.keys(globalSettings[p.id.toLowerCase()] || {})
-                          .length > 0,
-                    ).length
-                  }
-                  <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
-                    /{platforms.length}
-                  </span>
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white dark:bg-neutral-900 p-4 rounded-lg border border-gray-200 dark:border-neutral-800">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-primary-50 dark:bg-primary-900/10 rounded-lg">
-                <Settings2 className="w-5 h-5 text-primary-500" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {t("platformSettings.progress")}
-                </p>
-                <div className="flex items-center gap-2">
-                  <div className="flex-1 h-2 bg-gray-200 dark:bg-neutral-800 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-primary-500 transition-all duration-300"
-                      style={{
-                        width: `${(platforms.filter((p) => Object.keys(globalSettings[p.id.toLowerCase()] || {}).length > 0).length / platforms.length) * 100}%`,
-                      }}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white dark:bg-neutral-900 p-4 rounded-lg border border-gray-200 dark:border-neutral-800">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-50 dark:bg-blue-900/10 rounded-lg">
-                <div className="w-5 h-5 flex items-center justify-center">
-                  <div
-                    className={`w-2 h-2 rounded-full ${
-                      hasChanges
-                        ? "bg-primary-500 animate-pulse"
-                        : "bg-green-500"
-                    }`}
-                  />
-                </div>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {t("platformSettings.status")}
-                </p>
-                <p
-                  className={`text-sm font-bold ${
-                    hasChanges ? "text-primary-500" : "text-green-500"
-                  }`}
-                >
-                  {hasChanges
-                    ? t("common.unsavedChanges")
-                    : t("common.allSaved")}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5">
-          {platforms.map((platform) => {
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {activePlatforms.map((platform) => {
             const platformSettings =
-              globalSettings[platform.id.toLowerCase()] || {};
+              globalSettings[platform.key.toLowerCase()] || {};
             const hasSettings = Object.keys(platformSettings).length > 0;
-            const settingsCount = Object.keys(platformSettings).length;
 
             return (
               <div
-                key={platform.id}
-                onClick={() => handleOpenSettings(platform.id)}
-                className="group cursor-pointer"
+                key={platform.key}
+                onClick={() => handleOpenSettings(platform.key)}
+                className="bg-white dark:bg-neutral-900 rounded-lg border-2 border-gray-200 dark:border-neutral-700 p-6 cursor-pointer hover:border-primary-500 dark:hover:border-primary-600 hover:shadow-lg transition-all flex flex-col h-full"
               >
-                <div
-                  className={`
-                  bg-white dark:bg-neutral-900
-                  rounded-lg border ${platform.borderColor}
-                  p-5 transition-all duration-200
-                  hover:shadow-lg hover:-translate-y-0.5
-                  hover:border-opacity-50 dark:hover:border-opacity-50
-                  h-full flex flex-col
-                  ${hasSettings ? `ring-1 ${platform.ringColor}` : ""}
-                `}
-                >
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-3">
+                <div className="flex items-start gap-4 mb-5">
+                  <div className="p-3 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-neutral-800 dark:to-neutral-700 rounded-lg shadow-sm">
+                    <img
+                      src={platform.logo}
+                      alt={platform.name}
+                      className="w-8 h-8"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-bold text-gray-900 dark:text-white text-base mb-2 truncate">
+                      {platform.name}
+                    </h3>
+                    <div
+                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold ${
+                        hasSettings
+                          ? "bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400"
+                          : "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400"
+                      }`}
+                    >
                       <div
-                        className={`
-                        p-2.5 rounded-lg
-                        transition-transform group-hover:scale-105
-                      `}
-                      >
-                        <img
-                          src={platform.icon}
-                          alt={platform.name}
-                          className="w-6 h-6"
-                        />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-gray-900 dark:text-white text-sm">
-                          {platform.name}
-                        </h3>
-                        <div className="flex items-center gap-2 mt-0.5">
-                          <span
-                            className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-                              hasSettings
-                                ? "bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                                : "bg-gray-100 text-gray-600 dark:bg-neutral-800 dark:text-gray-400"
-                            }`}
-                          >
-                            {hasSettings
-                              ? t("common.configured")
-                              : t("common.notConfigured")}
-                          </span>
-                        </div>
-                      </div>
+                        className={`w-2 h-2 rounded-full ${
+                          hasSettings ? "bg-primary-600" : "bg-amber-500"
+                        }`}
+                      />
+                      {hasSettings
+                        ? t("common.configured")
+                        : t("common.notConfigured")}
                     </div>
-                    {hasSettings && (
-                      <div className="text-xs font-medium text-gray-500 dark:text-gray-400">
-                        {settingsCount}
-                      </div>
-                    )}
                   </div>
-
-                  <div className="flex-1 mb-4">
-                    {hasSettings ? (
-                      <div className="space-y-2">
-                        {Object.entries(platformSettings)
-                          .slice(0, 2)
-                          .map(([key, value]) => {
-                            const label = t(
-                              `modal.platformSettings.labels.${key}`,
-                              { defaultValue: key.replace(/_/g, " ") },
-                            );
-
-                            let displayValue = String(value);
-                            if (typeof value === "boolean") {
-                              displayValue = value
-                                ? t("common.yes")
-                                : t("common.no");
-                            } else if (typeof value === "string") {
-                              const platformTranslation = t(
-                                `modal.platformSettings.${platform.id}.${value}`,
-                              );
-                              if (
-                                platformTranslation !==
-                                `modal.platformSettings.${platform.id}.${value}`
-                              ) {
-                                displayValue = platformTranslation;
-                              }
-                            }
-
-                            return (
-                              <div
-                                key={key}
-                                className="flex items-center justify-between"
-                              >
-                                <span className="text-xs text-gray-600 dark:text-gray-400 truncate max-w-[60%]">
-                                  {label}:
-                                </span>
-                                <span className="text-xs font-medium text-gray-900 dark:text-white truncate max-w-[40%] text-right">
-                                  {displayValue}
-                                </span>
-                              </div>
-                            );
-                          })}
-                        {settingsCount > 2 && (
-                          <div className="pt-2">
-                            <div className="text-xs text-gray-500 dark:text-gray-400">
-                              +{settingsCount - 2} {t("common.more")}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="flex flex-col items-center justify-center h-full py-4">
-                        <div className="p-2 bg-gray-50 dark:bg-neutral-800 rounded-lg mb-2">
-                          <XCircle className="w-5 h-5 text-gray-400" />
-                        </div>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-                          {t("platformSettings.clickToConfigure")}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleOpenSettings(platform.id);
-                    }}
-                    className={`
-                      w-full py-2 px-3 rounded-lg text-xs font-medium
-                      transition-all flex items-center justify-center gap-1
-                      ${platform.buttonColor} text-white
-                      hover:scale-[1.02] active:scale-[0.98]
-                    `}
-                  >
-                    {hasSettings ? t("common.edit") : t("common.configure")}
-                  </button>
                 </div>
+                <div className="flex-1 mb-5">
+                  {hasSettings ? (
+                    <div className="space-y-3">
+                      {Object.entries(platformSettings)
+                        .slice(0, 3)
+                        .map(([key, value]) => {
+                          const label = t(
+                            `modal.platformSettings.labels.${key}`,
+                            { defaultValue: key.replace(/_/g, " ") },
+                          );
+
+                          let displayValue = String(value);
+                          
+                          // Traducir valores booleanos
+                          if (typeof value === "boolean") {
+                            displayValue = value
+                              ? t("common.yes")
+                              : t("common.no");
+                          } 
+                          // Traducir valores específicos de plataforma
+                          else if (typeof value === "string") {
+                            const translationKey = `platformSettings.${platform.key}.${value}`;
+                            const translated = t(translationKey);
+                            // Solo usar la traducción si existe (no devuelve la key)
+                            if (translated !== translationKey) {
+                              displayValue = translated;
+                            }
+                          }
+
+                          return (
+                            <div
+                              key={key}
+                              className="flex items-start justify-between gap-2 p-2.5 rounded-lg bg-gray-50 dark:bg-neutral-800/50"
+                            >
+                              <span className="text-xs font-medium text-gray-600 dark:text-gray-400 truncate">
+                                {label}
+                              </span>
+                              <span className="text-xs font-bold text-gray-900 dark:text-white truncate">
+                                {displayValue}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      {Object.keys(platformSettings).length > 3 && (
+                        <div className="text-xs font-medium text-gray-500 dark:text-gray-400 text-center pt-1">
+                          +{Object.keys(platformSettings).length - 3} más
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center h-full min-h-[120px] p-4 rounded-lg border-2 border-dashed border-amber-200 dark:border-amber-800/30 bg-amber-50/50 dark:bg-amber-900/10">
+                      <div className="w-12 h-12 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center mb-3">
+                        <Settings2 className="w-6 h-6 text-amber-600 dark:text-amber-400" />
+                      </div>
+                      <p className="text-sm font-semibold text-amber-700 dark:text-amber-400 text-center mb-1">
+                        {t("common.notConfigured")}
+                      </p>
+                      <p className="text-xs text-amber-600 dark:text-amber-500 text-center">
+                        {t("platformSettings.clickToConfigure")}
+                      </p>
+                    </div>
+                  )}
+                </div>
+                <Button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleOpenSettings(platform.key);
+                  }}
+                  className="w-full shadow-sm hover:shadow-md"
+                  size="md"
+                >
+                  {hasSettings ? t("common.edit") : t("common.configure")}
+                </Button>
               </div>
             );
           })}

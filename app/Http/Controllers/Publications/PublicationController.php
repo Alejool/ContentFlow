@@ -34,6 +34,7 @@ use App\Models\MediaFiles\MediaFile;
 
 use App\Models\User;
 use App\Models\Publications\PublicationLock;
+use App\Services\Validation\ContentValidationService;
 
 class PublicationController extends Controller
 {
@@ -875,6 +876,33 @@ class PublicationController extends Controller
     });
 
     return $this->successResponse(['activities' => $activities]);
+  }
+
+  /**
+   * Valida el contenido de una publicación antes de publicar
+   */
+  public function validateContent(Request $request, Publication $publication, ContentValidationService $validationService)
+  {
+    $request->validate([
+      'platform_ids' => 'required|array',
+      'platform_ids.*' => 'integer|exists:social_accounts,id',
+    ]);
+
+    try {
+      $result = $validationService->validatePublication(
+        $publication,
+        $request->input('platform_ids')
+      );
+
+      return $this->successResponse($result->toArray());
+    } catch (\Exception $e) {
+      Log::error('Content validation failed', [
+        'publication_id' => $publication->id,
+        'error' => $e->getMessage()
+      ]);
+
+      return $this->errorResponse('Error al validar el contenido: ' . $e->getMessage(), 500);
+    }
   }
 
   private function clearPublicationCache($workspaceId)
