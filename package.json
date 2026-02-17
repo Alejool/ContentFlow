@@ -4,6 +4,7 @@
   "scripts": {
     "build": "vite build && vite build --ssr",
     "dev": "vite",
+    "dev:fast": "vite --host 0.0.0.0 --strictPort",
     "test": "vitest"
   },
   "devDependencies": {
