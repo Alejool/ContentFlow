@@ -16,9 +16,8 @@ class ProfileUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['sometimes', 'required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
             'email' => [
-                'sometimes',
                 'required',
                 'string',
                 'lowercase',
@@ -74,6 +73,19 @@ class ProfileUpdateRequest extends FormRequest
             'bio' => ['nullable', 'string', 'max:1000'],
             'global_platform_settings' => ['nullable', 'array'],
             'ai_settings' => ['nullable', 'array'],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'name.required' => __('The name field is required.'),
+            'name.max' => __('The name may not be greater than 255 characters.'),
+            'email.required' => __('The email field is required.'),
+            'email.email' => __('The email must be a valid email address.'),
+            'email.unique' => __('The email has already been taken.'),
+            'phone.regex' => __('The phone number format is invalid.'),
+            'bio.max' => __('The bio may not be greater than 1000 characters.'),
         ];
     }
 }

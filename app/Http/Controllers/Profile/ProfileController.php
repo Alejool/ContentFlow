@@ -68,6 +68,14 @@ class ProfileController extends Controller
             $user = User::find(Auth::id());
             $validated = $request->validated();
 
+            // Remove global_platform_settings and ai_settings from update if empty
+            if (isset($validated['global_platform_settings']) && empty($validated['global_platform_settings'])) {
+                unset($validated['global_platform_settings']);
+            }
+            if (isset($validated['ai_settings']) && empty($validated['ai_settings'])) {
+                unset($validated['ai_settings']);
+            }
+
             $user->fill($validated);
 
             if ($user->isDirty('email')) {
@@ -84,12 +92,17 @@ class ProfileController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Profile updated successfully',
+                'message' => __('Profile updated successfully'),
                 'user' => $userData,
-                'debug_received' => $validated
             ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => __('Validation failed'),
+                'errors' => $e->errors()
+            ], 422);
         } catch (\Exception $e) {
-            return $this->errorResponse('Error updating profile: ' . $e->getMessage(), 500);
+            return $this->errorResponse(__('Error updating profile: ') . $e->getMessage(), 500);
         }
     }
 

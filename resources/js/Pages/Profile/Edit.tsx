@@ -1,23 +1,18 @@
 import Button from "@/Components/common/Modern/Button";
 import AccountStatistics from "@/Components/profile/Partials/AccountStatistics";
 import AiConfigSection from "@/Components/profile/Partials/AiConfigSection";
-import ConnectedAccounts from "@/Components/profile/Partials/ConnectedAccounts";
 import UpdatePasswordForm from "@/Components/profile/Partials/UpdatePasswordForm";
 import UpdateProfileInformationForm from "@/Components/profile/Partials/UpdateProfileInformationForm";
-import UpdateThemeForm from "@/Components/profile/Partials/UpdateThemeForm";
-import { useTheme } from "@/Hooks/useTheme";
+
 import { useUser } from "@/Hooks/useUser";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { useUserStore } from "@/stores/userStore";
 import { Head, usePage } from "@inertiajs/react";
 import {
   BrainCircuit,
-  ChevronRight,
   Info,
   Lock,
-  Palette,
   Save,
-  Share2,
   User,
 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -30,20 +25,10 @@ interface EditProps {
 
 export default function Edit({ mustVerifyEmail, status }: EditProps) {
   const { t } = useTranslation();
-  const { theme } = useTheme();
   const user = usePage<any>().props.auth.user;
   const setUser = useUserStore((state) => state.setUser);
-  const storedUser = useUserStore((state) => state.user);
 
   const [activeTab, setActiveTab] = useState("profile");
-  const [showStats, setShowStats] = useState(true);
-
-  // Auto-collapse stats on mobile on mount
-  useEffect(() => {
-    if (window.innerWidth < 1024) {
-      setShowStats(false);
-    }
-  }, []);
 
   useEffect(() => {
     if (user) {
@@ -60,19 +45,9 @@ export default function Edit({ mustVerifyEmail, status }: EditProps) {
       hidden: user.provider !== null,
     },
     {
-      id: "accounts",
-      name: t("profile.tabs.accounts") || "Conexiones",
-      icon: Share2,
-    },
-    {
       id: "ai",
       name: t("profile.tabs.ai") || "Inteligencia Artificial",
       icon: BrainCircuit,
-    },
-    {
-      id: "appearance",
-      name: t("profile.tabs.appearance") || "Apariencia",
-      icon: Palette,
     },
   ];
 
@@ -124,51 +99,21 @@ export default function Edit({ mustVerifyEmail, status }: EditProps) {
             </div>
           </div>
 
-          {/* Statistics Section (Collapsible) - Full Width */}
+          {/* Statistics Section */}
           <div className="mb-8">
-            <div
-              className={`rounded-lg border shadow-sm overflow-hidden transition-all duration-300 dark:bg-neutral-900 darkborder-neutral-800 bg-white border-gray-100"
-              }`}
-            >
-              <button
-                onClick={() => setShowStats(!showStats)}
-                className="w-full flex items-center justify-between p-4 bg-gray-50/50 dark:bg-neutral-800/50 hover:bg-gray-100 dark:hover:bg-neutral-800 transition-colors"
-              >
-                <div className="flex items-center gap-2">
-                  <div className="p-1.5 rounded-md bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
-                    <ChevronRight
-                      className={`w-4 h-4 transition-transform duration-300 ${
-                        showStats ? "rotate-90" : ""
-                      }`}
-                    />
-                  </div>
-                  <span className="text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-neutral-400">
-                    {t("profile.statistics.title")}
-                  </span>
-                </div>
-              </button>
-              <div
-                className={`transition-all duration-300 ease-in-out ${
-                  showStats
-                    ? "max-h-[1000px] opacity-100 border-t border-gray-100 dark:border-neutral-800"
-                    : "max-h-0 opacity-0 overflow-hidden"
-                }`}
-              >
-                <div className="p-6">
-                  <AccountStatistics status={status} />
-                </div>
-              </div>
+            <div className="rounded-lg border shadow-sm bg-white dark:bg-neutral-900 border-gray-100 dark:border-neutral-800 p-6">
+              <AccountStatistics status={status} />
             </div>
           </div>
 
           {/* Main Content Area */}
           <div className="w-full">
             <div
-              className={`rounded-lg p-6 md:p-10 border shadow-sm dark:bg-neutral-900 dark:border-neutral-800"bg-white border-gray-100"
+              className={`rounded-lg p-6 md:p-10 shadow-sm dark:bg-neutral-900 dark:border-neutral-800"bg-white border-gray-100"
               }`}
             >
               {activeTab === "profile" && (
-                <div className="animate-in fade-in slide-in-from-right-4 duration-500">
+                <div>
                   <UpdateProfileInformationForm
                     mustVerifyEmail={mustVerifyEmail}
                     user={user}
@@ -178,28 +123,14 @@ export default function Edit({ mustVerifyEmail, status }: EditProps) {
               )}
 
               {activeTab === "password" && (
-                <div className="animate-in fade-in slide-in-from-right-4 duration-500">
+                <div>
                   <UpdatePasswordForm user={user} />
                 </div>
               )}
 
-              {activeTab === "accounts" && (
-                <div className="animate-in fade-in slide-in-from-right-4 duration-500">
-                  <div className="space-y-8">
-                    <ConnectedAccounts />
-                  </div>
-                </div>
-              )}
-
               {activeTab === "ai" && (
-                <div className="animate-in fade-in slide-in-from-right-4 duration-500">
+                <div>
                   <AiConfigSectionWrapper user={user} />
-                </div>
-              )}
-
-              {activeTab === "appearance" && (
-                <div className="animate-in fade-in slide-in-from-right-4 duration-500">
-                  <UpdateThemeForm user={user} />
                 </div>
               )}
             </div>

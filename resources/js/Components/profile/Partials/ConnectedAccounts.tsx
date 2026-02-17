@@ -2,10 +2,9 @@ import IconFacebook from "@/../assets/Icons/facebook.svg";
 import IconTiktok from "@/../assets/Icons/tiktok.svg";
 import IconTwitter from "@/../assets/Icons/x.svg";
 import IconYoutube from "@/../assets/Icons/youtube.svg";
-import ModernCard from "@/Components/common/Modern/Card";
 import { Link } from "@inertiajs/react";
 import axios from "axios";
-import { Settings, Share2 } from "lucide-react";
+import { Settings } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -90,17 +89,19 @@ export default function ConnectedAccounts({ className = "", header = true }) {
   };
 
   return (
-    <ModernCard
-      title={t("profile.connectedAccounts.title")}
-      description={t("profile.connectedAccounts.description")}
-      icon={Share2}
-      headerColor="purple"
-      className={className}
-      header={header}
-    >
+    <div className={className}>
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+          {t("profile.connectedAccounts.title")}
+        </h2>
+        <p className="text-sm text-gray-600 dark:text-gray-400">
+          {t("profile.connectedAccounts.description")}
+        </p>
+      </div>
+
       {loading ? (
         <div className="flex justify-center py-8">
-          <div className="w-10 h-10 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-10 h-10 border-4 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -108,16 +109,15 @@ export default function ConnectedAccounts({ className = "", header = true }) {
             <div
               key={account.id}
               className={`
-                group relative flex items-center p-4 rounded-lg border transition-all duration-300
+                flex items-center p-4 rounded-lg border
                 ${
                   account.isConnected
-                    ? "bg-purple-50/50 dark:bg-purple-900/10 border-purple-100 dark:border-purple-800/30 shadow-sm"
-                    : "bg-gray-50/50 dark:bg-neutral-800/40 border-gray-100 dark:border-neutral-700/50 opacity-60 grayscale hover:grayscale-0 hover:opacity-100 dark:opacity-40 dark:hover:opacity-100"
+                    ? "bg-primary-50/50 dark:bg-primary-900/10 border-primary-200 dark:border-primary-800/30"
+                    : "bg-gray-50 dark:bg-neutral-800 border-gray-200 dark:border-neutral-700 opacity-60"
                 }
-                hover:shadow-md hover:scale-[1.02]
               `}
             >
-              <div className="p-2 bg-white dark:bg-neutral-800 rounded-lg shadow-sm group-hover:scale-110 transition-transform mr-4">
+              <div className="p-2 bg-white dark:bg-neutral-700 rounded-lg mr-4">
                 <img
                   src={account.logo}
                   alt={account.name}
@@ -126,11 +126,11 @@ export default function ConnectedAccounts({ className = "", header = true }) {
               </div>
 
               <div className="flex-1 min-w-0">
-                <h4 className="font-bold text-gray-900 dark:text-gray-100 text-sm truncate uppercase tracking-tight">
+                <h4 className="font-semibold text-gray-900 dark:text-gray-100 text-sm truncate">
                   {account.name}
                 </h4>
                 <p
-                  className={`text-[10px] font-bold uppercase tracking-wider ${
+                  className={`text-xs ${
                     account.isConnected
                       ? "text-green-600 dark:text-green-400"
                       : "text-gray-500 dark:text-gray-500"
@@ -146,12 +146,12 @@ export default function ConnectedAccounts({ className = "", header = true }) {
                 <div className="flex items-center gap-2">
                   <Link
                     href={route("settings.social")}
-                    className="p-1.5 rounded-lg bg-white dark:bg-neutral-800 border border-purple-100 dark:border-purple-800 text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors shadow-sm"
+                    className="p-1.5 rounded-lg bg-white dark:bg-neutral-700 border border-gray-200 dark:border-neutral-600 text-primary-600 dark:text-primary-400 hover:bg-gray-50 dark:hover:bg-neutral-600"
                     title={t("platformSettings.title")}
                   >
                     <Settings className="w-4 h-4" />
                   </Link>
-                  <div className="w-2.5 h-2.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)] animate-pulse" />
+                  <div className="w-2 h-2 rounded-full bg-green-500" />
                 </div>
               )}
             </div>
@@ -159,17 +159,14 @@ export default function ConnectedAccounts({ className = "", header = true }) {
         </div>
       )}
 
-      <div className="mt-8 pt-6 border-t border-gray-100 dark:border-neutral-800/50 flex justify-center">
+      <div className="mt-6 pt-6 border-t border-gray-200 dark:border-neutral-700 flex justify-center">
         <a
-          href="/content"
-          className="group flex items-center gap-2 text-sm font-bold text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors uppercase tracking-widest"
+          href="/settings/social"
+          className="text-sm font-medium text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300"
         >
-          {t("profile.connectedAccounts.manageLink")}
-          <span className="group-hover:translate-x-1 transition-transform">
-            &rarr;
-          </span>
+          {t("profile.connectedAccounts.manageLink")} →
         </a>
       </div>
-    </ModernCard>
+    </div>
   );
 }
