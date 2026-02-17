@@ -58,7 +58,7 @@ class AnalyticsController extends Controller
             'totalReach' => $overview['total_reach'] ?? 0,
             'totalEngagement' => $overview['total_engagement'] ?? 0,
             'avgEngagementRate' => $overview['avg_engagement_rate'] ?? 0,
-            'campaigns' => $campaigns, // Keep the raw structure from StatisticsService
+            'campaigns' => $campaigns,
             'engagementTrends' => $engagementTrends->map(function ($trend) {
                 return [
                     'date' => Carbon::parse($trend['date'])->format('M d'),
@@ -71,8 +71,8 @@ class AnalyticsController extends Controller
                     'saves' => $trend['saves'],
                 ];
             })->toArray(),
-            'platformData' => $socialMedia, // Keep the raw structure from StatisticsService
-            'platformComparison' => $this->statisticsService->getPlatformComparison($workspaceId),
+            'platformData' => $socialMedia,
+            'platformComparison' => $this->statisticsService->getPlatformComparison($workspaceId, $days),
         ];
 
         return Inertia::render('Dashboard', [
@@ -122,7 +122,9 @@ class AnalyticsController extends Controller
 
         return Inertia::render('Analytics/Index', [
             'stats' => array_merge($stats, [
-                'platformComparison' => $this->statisticsService->getPlatformComparison($workspaceId)
+                'platformComparison' => $this->statisticsService->getPlatformComparison($workspaceId, $days),
+                'detailedPlatforms' => $this->statisticsService->getDetailedPlatformAnalytics($workspaceId, $days),
+                'detailedPublications' => $this->statisticsService->getDetailedPublicationPerformance($workspaceId, $days),
             ]),
             'period' => $days,
         ]);

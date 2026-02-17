@@ -355,13 +355,14 @@ class StatisticsService
   /**
    * Get platform comparison data
    */
-  public function getPlatformComparison(int $workspaceId)
+  public function getPlatformComparison(int $workspaceId, int $days = 30)
   {
+    $startDate = now()->subDays($days);
     $socialAccounts = SocialAccount::where('workspace_id', $workspaceId)->get();
 
-    return $socialAccounts->map(function ($account) {
+    return $socialAccounts->map(function ($account) use ($startDate) {
       $metrics = $account->metrics()
-        ->whereBetween('date', [now()->subDays(30), now()])
+        ->whereBetween('date', [$startDate, now()])
         ->get();
 
       return [
@@ -376,6 +377,116 @@ class StatisticsService
         'follower_growth' => ($metrics->isNotEmpty())
           ? ($metrics->last()->followers - $metrics->first()->followers)
           : 0,
+      ];
+    });
+  }
+
+  /**
+   * Get detailed platform analytics with daily breakdown
+   */
+  public function getDetailedPlatformAnalytics(int $workspaceId, int $days = 30)
+  {
+    $startDate = now()->subDays($days);
+    $socialAccounts = SocialAccount::where('workspace_id', $workspaceId)->get();
+
+    return $socialAccounts->map(function ($account) use ($startDate) {
+      $metrics = $account->metrics()
+        ->whereBetween('date', [$startDate, now()])
+        ->orderBy('date')
+        ->get();
+
+      $dailyMetrics = $metrics->map(function ($m) {
+        return [
+          'date' => $m->date->format('Y-m-d'),
+          'followers' => $m->followers,
+          'following' => $m->following,
+          'posts_count' => $m->posts_count,
+          'reach' => $m->reach,
+          'impressions' => $m->impressions ?? 0,
+          'engagement' => $m->total_likes + $m->total_comments + $m->total_shares + $m->total_saves,
+          'engagement_rate' => round($m->engagement_rate, 2),
+          'followers_gained' => $m->followers_gained,
+          'followers_lost' => $m->followers_lost,
+        ];
+      });
+
+      return [
+        'id' => $account->id,
+        'platform' => $account->platform,
+        'account_name' => $account->account_name,
+        'current_followers' => $metrics->last()?->followers ?? 0,
+        'total_engagement' => $metrics->sum(function ($m) {
+          return $m->total_likes + $m->total_comments + $m->total_shares + $m->total_saves;
+        }),
+        'avg_engagement_rate' => round($metrics->avg('engagement_rate'), 2),
+        'total_reach' => $metrics->sum('reach'),
+        'follower_growth' => ($metrics->isNotEmpty())
+          ? ($metrics->last()->followers - $metrics->first()->followers)
+          : 0,
+        'daily_metrics' => $dailyMetrics,
+      ];
+    });
+  }
+
+  /**
+   * Get detailed publication performance
+   */
+  public function getDetailedPublicationPerformance(int $workspaceId, int $days = 30)
+  {
+    $startDate = now()->subDays($days);
+    $publications = Publication::where('workspace_id', $workspaceId)
+      ->where('status', 'published')
+      ->with(['analytics' => function ($query) use ($startDate) {
+        $query->whereBetween('date', [$startDate, now()]);
+      }])
+      ->get();
+
+    return $publications->map(function ($publication) {
+      $analytics = $publication->analytics;
+
+      $platformBreakdown = $analytics->groupBy('platform')->map(function ($platformAnalytics, $platform) {
+        return [
+          'platform' => $platform,
+          'views' => $platformAnalytics->sum('views'),
+          'clicks' => $platformAnalytics->sum('clicks'),
+          'conversions' => $platformAnalytics->sum('conversions'),
+          'reach' => $platformAnalytics->sum('reach'),
+          'impressions' => $platformAnalytics->sum('impressions'),
+          'engagement' => $platformAnalytics->sum(function ($a) {
+            return $a->likes + $a->comments + $a->shares + $a->saves;
+          }),
+          'avg_engagement_rate' => round($platformAnalytics->avg('engagement_rate'), 2),
+        ];
+      })->values();
+
+      $dailyPerformance = $analytics->groupBy(function ($a) {
+        return $a->date->format('Y-m-d');
+      })->map(function ($dayAnalytics, $date) {
+        return [
+          'date' => $date,
+          'views' => $dayAnalytics->sum('views'),
+          'clicks' => $dayAnalytics->sum('clicks'),
+          'engagement' => $dayAnalytics->sum(function ($a) {
+            return $a->likes + $a->comments + $a->shares + $a->saves;
+          }),
+          'reach' => $dayAnalytics->sum('reach'),
+        ];
+      })->values();
+
+      return [
+        'id' => $publication->id,
+        'title' => $publication->title,
+        'published_at' => $publication->published_at?->format('Y-m-d H:i'),
+        'total_views' => $analytics->sum('views'),
+        'total_clicks' => $analytics->sum('clicks'),
+        'total_conversions' => $analytics->sum('conversions'),
+        'total_engagement' => $analytics->sum(function ($a) {
+          return $a->likes + $a->comments + $a->shares + $a->saves;
+        }),
+        'total_reach' => $analytics->sum('reach'),
+        'avg_engagement_rate' => round($analytics->avg('engagement_rate'), 2),
+        'platform_breakdown' => $platformBreakdown,
+        'daily_performance' => $dailyPerformance,
       ];
     });
   }
