@@ -20,6 +20,7 @@ import profile from "./profile.json";
 import publications from "./publications.json";
 import settings from "./settings.json";
 import validation from "./validation.json";
+import videoValidation from "./videoValidation.json";
 import welcome from "./welcome.json";
 import workspace from "./workspace.json";
 
@@ -48,4 +49,5 @@ export default {
   ...legal,
   ...activity,
   ...validation,
+  ...videoValidation,
 };

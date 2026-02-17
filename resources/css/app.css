@@ -391,7 +391,7 @@
 }
 
 ::view-transition-new(root) {
-  animation: 500ms cubic-bezier(0.4, 0, 0.2, 1) reveal-theme;
+  animation: 800ms cubic-bezier(0.4, 0, 0.2, 1) reveal-theme;
 }
 
 [data-theme-transition="true"] {
@@ -409,4 +409,28 @@
 
 .animate-shimmer {
   animation: shimmer 2s infinite linear;
+}
+
+/* Theme transition wipe animation from corner - slower and smoother */
+@keyframes wipe-in {
+  from {
+    clip-path: circle(0% at 100% 0);
+  }
+  to {
+    clip-path: circle(150% at 100% 0);
+  }
+}
+
+@keyframes wipe-out {
+  from {
+    clip-path: circle(150% at 100% 0);
+  }
+  to {
+    clip-path: circle(0% at 100% 0);
+  }
+}
+
+.theme-wipe-overlay {
+  animation: wipe-in 600ms cubic-bezier(0.4, 0, 0.2, 1) forwards,
+             wipe-out 600ms cubic-bezier(0.4, 0, 0.2, 1) 600ms forwards;
 }
