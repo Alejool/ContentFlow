@@ -46,30 +46,14 @@ class PublicationUpdated implements ShouldBroadcast
 
   public function broadcastWith()
   {
-    // Load only essential relationships to keep payload small
-    // Activities and approval logs should be fetched separately when needed
-    $this->publication->load([
-      'mediaFiles' => fn($q) => $q->select('media_files.id', 'media_files.file_path', 'media_files.file_type', 'media_files.file_name', 'media_files.size', 'media_files.mime_type')->limit(5),
-      'mediaFiles.thumbnail' => fn($q) => $q->select('id', 'media_file_id', 'file_path', 'file_name', 'derivative_type'),
-      'scheduled_posts' => fn($q) => $q->select('id', 'publication_id', 'social_account_id', 'status', 'scheduled_at'),
-      'scheduled_posts.socialAccount' => fn($q) => $q->select('id', 'platform', 'account_name'),
-      'socialPostLogs' => fn($q) => $q->select('id', 'publication_id', 'social_account_id', 'status', 'published_at'),
-      'campaigns' => fn($q) => $q->select('campaigns.id', 'campaigns.name', 'campaigns.status'),
-      'user' => fn($q) => $q->select('users.id', 'users.name', 'users.email', 'users.photo_url'),
-      'publisher' => fn($q) => $q->select('users.id', 'users.name', 'users.photo_url'),
-      'rejector' => fn($q) => $q->select('users.id', 'users.name', 'users.photo_url'),
-    ]);
-
-    // Append media lock info
-    $mediaLockUserId = cache()->get("publication:{$this->publication->id}:media_lock");
-    $mediaLockedBy = null;
-    if ($mediaLockUserId) {
-      $mediaLockedBy = User::find($mediaLockUserId)?->only(['id', 'name', 'photo_url']);
-    }
-    $this->publication->media_locked_by = $mediaLockedBy;
-
     return [
-      'publication' => $this->publication,
+      'publication' => [
+        'id' => $this->publication->id,
+        'title' => $this->publication->title,
+        'status' => $this->publication->status,
+        'workspace_id' => $this->publication->workspace_id,
+        'updated_at' => $this->publication->updated_at,
+      ],
     ];
   }
 }

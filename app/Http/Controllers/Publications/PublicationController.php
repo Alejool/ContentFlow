@@ -18,6 +18,7 @@ use App\Actions\Publications\DeletePublicationAction;
 use App\Notifications\PublicationAwaitingApprovalNotification;
 use App\Notifications\PublicationApprovedNotification;
 use App\Notifications\PublicationRejectedNotification;
+use App\Notifications\PublicationCancelledNotification;
 use App\Events\Publications\PublicationUpdated;
 use App\Events\PublicationStatusUpdated;
 use Carbon\Carbon;
@@ -605,7 +606,6 @@ class PublicationController extends Controller
 
     $oldStatus = $publication->status;
 
-    // We only allow cancelling if it's in a state that means it's "in flight"
     $allowedStatuses = ['publishing', 'processing', 'scheduled', 'pending_review'];
     if (!in_array($oldStatus, $allowedStatuses)) {
       return $this->errorResponse('This publication cannot be cancelled in its current state.', 422);
@@ -625,6 +625,12 @@ class PublicationController extends Controller
       ]);
 
     $publication->logActivity('cancelled', ['previous_status' => $oldStatus]);
+
+    $publication->user->notify(new PublicationCancelledNotification($publication));
+    
+    if ($publication->workspace) {
+      $publication->workspace->notify(new PublicationCancelledNotification($publication));
+    }
 
     broadcast(new PublicationStatusUpdated(Auth::id(), $publication->id, 'failed'))->toOthers();
     broadcast(new PublicationUpdated($publication))->toOthers();
