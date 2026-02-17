@@ -39,7 +39,9 @@
         "created": "Creado",
         "lastUpdated": "ltima Actualizacin",
         "selectSocialAccounts": "Seleccionar Cuentas",
+        "associatedPublicationsRequired": "Publicaciones Asociadas es requerida",
         "lockedBySession": "Bloqueado por sesión",
+        "noCampaigns":"No hay campañas",
         "dragDrop": {
           "title": "Arrastra y suelta para ordenar",
           "subtitle": "Sube tus archivos multimedia aquí"
@@ -94,6 +96,7 @@
         "creating": "Creando",
         "optionalSchedule": "Programación Opcional",
         "selectSocialAccounts": "Seleccionar Cuentas",
+        "noCampaigns":"No hay campañas",
         "dragDrop": {
           "title": "Arrastra y suelta para ordenar",
           "subtitle": "Sube tus archivos multimedia aquí"
@@ -232,8 +235,15 @@
           "approve": "Aprobar",
           "reject": "Rechazar",
           "cancel": "Cancelar",
+          "cancelPublication": "Cancelar Publicación",
           "change": "Cambiar",
           "preview": "Vista Previa"
+        },
+        "cancelConfirm": {
+          "title": "¿Cancelar publicación?",
+          "message": "¿Estás seguro de que deseas cancelar esta publicación? Las plataformas que ya se publicaron no se verán afectadas.",
+          "confirm": "Sí, cancelar",
+          "cancel": "No"
         },
         "pendingReviewBanner": {
           "title": "publicación en revisión",

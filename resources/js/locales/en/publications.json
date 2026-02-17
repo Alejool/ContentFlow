@@ -87,6 +87,8 @@
         "optionalSchedule": "Optional Schedule",
         "selectSocialAccounts": "Select Accounts",
         "associatedPublicationsRequired": "Associated Publications is required",
+        "lockedBySession": "Locked by Session",
+        "noCampaigns":"no campaign",
         "dragDrop": {
           "title": "Drag and drop to sort",
           "subtitle": "Upload your multimedia files here"
@@ -229,7 +231,14 @@
           "approve": "Approve",
           "reject": "Reject",
           "cancel": "Cancel",
+          "cancelPublication": "Cancel Publication",
           "change": "Change"
+        },
+        "cancelConfirm": {
+          "title": "Cancel publication?",
+          "message": "Are you sure you want to cancel this publication? Platforms that have already been published will not be affected.",
+          "confirm": "Yes, cancel",
+          "cancel": "No"
         },
         "pendingReviewBanner": {
           "title": "Publication Under Review",
