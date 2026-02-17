@@ -1,0 +1,28 @@
+FROM php:8.4-alpine
+
+RUN apk add --no-cache \
+    bash curl git unzip \
+    icu-dev libzip-dev oniguruma-dev postgresql-dev \
+    linux-headers openssl-dev autoconf pkgconf make g++ gcc libc-dev \
+    brotli-dev zstd-dev
+
+RUN pecl install redis swoole \
+    && docker-php-ext-enable redis swoole \
+    && docker-php-ext-install pdo pdo_pgsql pgsql intl zip opcache pcntl posix bcmath sockets
+
+COPY docker/php/custom.ini /usr/local/etc/php/conf.d/99-custom.ini
+COPY docker/start-app.sh /start.sh
+RUN chmod +x /start.sh
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+WORKDIR /var/www/html
+
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist
+
+COPY . .
+RUN composer dump-autoload --optimize
+
+EXPOSE 8080 6001
+
+CMD ["php", "artisan", "octane:start", "--server=swoole", "--host=0.0.0.0", "--port=8080", "--watch"]
