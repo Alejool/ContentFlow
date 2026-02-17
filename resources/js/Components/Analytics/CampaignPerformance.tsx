@@ -109,7 +109,7 @@ export default function CampaignPerformance({
         <div>
           <h2
             className={`text-xl font-bold flex items-center gap-2
-                    ${theme === "dark" ? "text-gray-100" : "text-gray-900"}`}
+                    text-gray-900 dark:text-gray-100`}
           >
             <TrendingUp className="w-5 h-5 text-primary-500" />
             {title || t("analytics.charts.topCampaignPerformance")}

@@ -27,16 +27,12 @@ export default function SocialMediaAccounts({
   return (
     <div
       className={`rounded-lg p-6 transition-colors duration-300
-            ${
-              theme === "dark"
-                ? "bg-neutral-800/50 backdrop-blur-sm border border-neutral-700/50"
-                : "bg-white shadow-lg border border-gray-100"
-            }`}
+            bg-white shadow-lg border border-gray-100 dark:bg-neutral-800/50 dark:backdrop-blur-sm dark:border-neutral-700/50`}
     >
       <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
         <h2
           className={`text-xl font-bold
-                  ${theme === "dark" ? "text-gray-100" : "text-gray-900"}`}
+                  text-gray-900 dark:text-gray-100`}
         >
           {t("analytics.socialMedia.title")}
         </h2>
@@ -46,7 +42,7 @@ export default function SocialMediaAccounts({
         <div className="mb-10">
           <h3
             className={`text-sm font-semibold mb-4 uppercase tracking-wider
-                    ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}
+                    text-gray-500 dark:text-gray-400`}
           >
             {t("analytics.charts.followersByPlatform")}
           </h3>
