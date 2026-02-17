@@ -267,12 +267,16 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
           if (scheduledIds.has(log.social_account_id)) return;
 
           const status = log.status;
+          const attempts = log.attempts || 0;
+          const maxAttempts = log.max_attempts || 3;
+
           if (status === "published" || status === "success") {
             published.push(log.social_account_id);
-          } else if (status === "failed") {
+          } else if (status === "failed" || (status === "pending" && attempts >= maxAttempts)) {
+            // Mark as failed if explicitly failed OR if all retry attempts exhausted
             failed.push(log.social_account_id);
-          } else if (status === "publishing" || status === "pending") {
-            // Include 'pending' as publishing because it means it's in the queue or initializing
+          } else if ((status === "publishing" || status === "pending") && attempts < maxAttempts) {
+            // Only show as publishing if actively in progress and retries remain
             publishing.push(log.social_account_id);
           } else if (status === "removed_on_platform" || status === "deleted") {
             removed.push(log.social_account_id);

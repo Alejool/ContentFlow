@@ -182,7 +182,8 @@ export default function PublishPublicationModal({
     const success = await handlePublish(publication, platformSettings);
     if (success) {
       if (onSuccess) onSuccess();
-      onClose(publication.id);
+      // Don't close modal immediately - let user see the progress
+      // Modal will stay open showing publishing status
     }
   };
 
@@ -368,8 +369,8 @@ export default function PublishPublicationModal({
                                         : "bg-white dark:bg-neutral-900/30 border-primary-200 dark:border-neutral-700 hover:border-primary-300 dark:hover:border-neutral-600"
                           }`}
                         >
-                          {/* Publishing Overlay */}
-                          {isPublishing && (
+                          {/* Publishing Overlay - Only show if actively publishing and not failed */}
+                          {isPublishing && !isFailed && (
                             <div className="absolute inset-0 z-20 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-sm flex items-center justify-center rounded-lg animate-in fade-in duration-300">
                               <div className="flex items-center gap-3 px-4">
                                 <div className="relative flex-shrink-0">

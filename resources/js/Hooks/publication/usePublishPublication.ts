@@ -146,6 +146,20 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
     hasAtteptedInitialFetch,
   ]);
 
+  useEffect(() => {
+    if (!currentPublicationId) return;
+
+    const handlePublicationUpdate = () => {
+      fetchPublishedPlatformsFromStore(currentPublicationId);
+    };
+
+    window.addEventListener('publication-started', handlePublicationUpdate);
+    
+    return () => {
+      window.removeEventListener('publication-started', handlePublicationUpdate);
+    };
+  }, [currentPublicationId]);
+
   /* ----------------------------- Store selectors ---------------------------- */
 
   const publishedPlatforms = useMemo(() => {
