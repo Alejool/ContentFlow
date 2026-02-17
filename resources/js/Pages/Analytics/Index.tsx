@@ -19,6 +19,12 @@ const CampaignPerformance = lazy(
 const SocialMediaAccounts = lazy(
   () => import("../../Components/Analytics/SocialMediaAccounts"),
 );
+const DetailedPlatformChart = lazy(
+  () => import("../../Components/Analytics/DetailedPlatformChart"),
+);
+const DetailedPublicationPerformance = lazy(
+  () => import("../../Components/Analytics/DetailedPublicationPerformance"),
+);
 
 interface OverviewStats {
   total_views: number;
@@ -60,6 +66,8 @@ interface AnalyticsProps {
     campaigns: CampaignStat[];
     social_media: SocialMediaAccount[];
     engagement_trends: EngagementTrend[];
+    detailedPlatforms?: any[];
+    detailedPublications?: any[];
   };
   period: number;
 }
@@ -68,11 +76,14 @@ export default function Index({ stats, period }: AnalyticsProps) {
   const { t } = useTranslation();
   const { theme } = useTheme() as { theme: "light" | "dark" | undefined };
   const [loading, setLoading] = useState(false);
+  const isDark = theme === 'dark';
 
   const overview = stats?.overview || {};
   const campaigns = stats?.campaigns || [];
   const socialMedia = stats?.social_media || [];
   const engagementTrends = stats?.engagement_trends || [];
+  const detailedPlatforms = stats?.detailedPlatforms || [];
+  const detailedPublications = stats?.detailedPublications || [];
 
   const handlePeriodChange = (days: number) => {
     setLoading(true);
@@ -249,6 +260,70 @@ export default function Index({ stats, period }: AnalyticsProps) {
                 theme={theme}
                 showChart={true}
               />
+            </Suspense>
+          </div>
+        )}
+
+        {detailedPlatforms.length > 0 && (
+          <div className="mb-8">
+            <div
+              className={`rounded-lg p-6 mb-4 transition-colors duration-300
+                        ${
+                          theme === "dark"
+                            ? "bg-neutral-800/50 backdrop-blur-sm border border-neutral-700/50"
+                            : "bg-white shadow-lg border border-gray-100"
+                        }`}
+            >
+              <h2
+                className={`text-xl font-bold
+                            ${
+                              theme === "dark"
+                                ? "text-gray-100"
+                                : "text-gray-900"
+                            }`}
+              >
+                {t("analytics.charts.detailedPlatforms", "Análisis Detallado por Plataforma")}
+              </h2>
+              <p className={`text-sm mt-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                Métricas diarias actualizadas por cron jobs
+              </p>
+            </div>
+            <Suspense
+              fallback={<Skeleton className="h-[400px] w-full rounded-lg" />}
+            >
+              <DetailedPlatformChart platforms={detailedPlatforms} theme={theme} />
+            </Suspense>
+          </div>
+        )}
+
+        {detailedPublications.length > 0 && (
+          <div className="mb-8">
+            <div
+              className={`rounded-lg p-6 mb-4 transition-colors duration-300
+                        ${
+                          theme === "dark"
+                            ? "bg-neutral-800/50 backdrop-blur-sm border border-neutral-700/50"
+                            : "bg-white shadow-lg border border-gray-100"
+                        }`}
+            >
+              <h2
+                className={`text-xl font-bold
+                            ${
+                              theme === "dark"
+                                ? "text-gray-100"
+                                : "text-gray-900"
+                            }`}
+              >
+                {t("analytics.charts.detailedPublications", "Rendimiento Detallado de Publicaciones")}
+              </h2>
+              <p className={`text-sm mt-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                Desglose por plataforma y evolución diaria
+              </p>
+            </div>
+            <Suspense
+              fallback={<Skeleton className="h-[400px] w-full rounded-lg" />}
+            >
+              <DetailedPublicationPerformance publications={detailedPublications} theme={theme} />
             </Suspense>
           </div>
         )}
