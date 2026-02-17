@@ -399,7 +399,7 @@ export default function ManageContentPage() {
                   <Dropdown.Trigger>
                     <Button
                       variant="primary"
-                      size="md"
+                      size="lg"
                       icon={Plus}
                       className="gap-2 uppercase tracking-wider font-bold text-xs"
                     >
@@ -416,7 +416,7 @@ export default function ManageContentPage() {
                         onClick={() => openAddModal("publication")}
                         variant="ghost"
                         buttonStyle="ghost"
-                        size="md"
+                        size="lg"
                         icon={FileText}
                         iconPosition="left"
                         fullWidth
@@ -429,7 +429,7 @@ export default function ManageContentPage() {
                         onClick={() => openAddModal("campaign")}
                         variant="ghost"
                         buttonStyle="ghost"
-                        size="md"
+                        size="lg"
                         icon={Target}
                         iconPosition="left"
                         fullWidth

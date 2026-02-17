@@ -38,14 +38,14 @@ export default function EditorialCalendar() {
     <div className="flex flex-col sm:flex-row items-center justify-between mb-6 sm:mb-8 gap-4">
       <div className="flex items-center gap-3">
         <div
-          className={`p-2 rounded-lg ${theme === "dark" ? "bg-primary-900/20" : "bg-primary-100"}`}
+          className={`p-2 rounded-lg bg-primary-100 dark:bg-primary-900/20`}
         >
           <CalendarIcon
-            className={`w-5 h-5 sm:w-6 sm:h-6 ${theme === "dark" ? "text-primary-400" : "text-primary-600"}`}
+            className={`w-5 h-5 sm:w-6 sm:h-6 text-primary-600 dark:text-primary-400`}
           />
         </div>
         <h2
-          className={`text-xl sm:text-2xl font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+          className={`text-xl sm:text-2xl font-bold text-gray-900 dark:text-white`}
         >
           {format(currentMonth, "MMMM yyyy")}
         </h2>

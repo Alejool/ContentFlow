@@ -170,8 +170,13 @@ const SocialMediaAccounts = memo(() => {
     const platformCards: Account[] = [];
 
     Object.entries(SOCIAL_PLATFORMS)
-      .filter(([_, config]) => config.active)
+      .filter(([_, config]) => config && config.active)
       .forEach(([key, config]) => {
+        if (!config || !config.gradient) {
+          console.warn(`Invalid config for platform: ${key}`, config);
+          return;
+        }
+
         const filtered = connectedAccounts.filter(
           (ca) => ca.platform.toLowerCase() === key.toLowerCase(),
         );

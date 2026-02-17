@@ -247,7 +247,7 @@ export default function ContentPage() {
                   <Dropdown.Trigger>
                     <Button
                       variant="primary"
-                      size="md"
+                      size="lg"
                       icon={Plus}
                       className="gap-2"
                     >
@@ -264,7 +264,7 @@ export default function ContentPage() {
                       onClick={() => openAddModal("publication")}
                       variant="ghost"
                       buttonStyle="ghost"
-                      size="md"
+                      size="lg"
                       icon={FileText}
                       iconPosition="left"
                       fullWidth
@@ -276,7 +276,7 @@ export default function ContentPage() {
                       onClick={() => openAddModal("campaign")}
                       variant="ghost"
                       buttonStyle="ghost"
-                      size="md"
+                      size="lg"
                       icon={Target}
                       iconPosition="left"
                       fullWidth
