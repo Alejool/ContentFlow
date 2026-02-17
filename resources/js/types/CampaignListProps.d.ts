@@ -21,6 +21,7 @@ export type CampaignListProps = {
   onPageChange: (page: number) => void;
   onPerPageChange?: (perPage: number) => void;
   onEditRequest?: (item: any) => void;
+  onDuplicate?: (id: number) => void;
   connectedAccounts?: any[];
   onForceRefresh?: () => void;
   onResetFilters?: () => void;
