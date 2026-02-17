@@ -31,6 +31,24 @@ export const SOCIAL_PLATFORMS = {
     maxVideoCount: 10,
     active: true,
   },
+  // instagram: {
+  //   id: 2,
+  //   key: "instagram",
+  //   name: "Instagram",
+  //   logo: IconInstagram,
+  //   icon: FaInstagram,
+  //   color: "bg-pink-600",
+  //   textColor: "text-pink-700",
+  //   borderColor: "border-pink-100",
+  //   darkColor: "dark:bg-pink-900/20",
+  //   darkTextColor: "dark:text-pink-400",
+  //   darkBorderColor: "dark:border-pink-900/30",
+  //   gradient: "from-pink-500 via-purple-500 to-orange-500",
+  //   bgClass: "bg-pink-50",
+  //   maxVideoDuration: 90, // 90 seconds for reels
+  //   maxVideoCount: 1,
+  //   active: true,
+  // },
   tiktok: {
     id: 3,
     key: "tiktok",
@@ -85,4 +103,22 @@ export const SOCIAL_PLATFORMS = {
     maxVideoCount: 1,
     active: true,
   },
+  // linkedin: {
+  //   id: 6,
+  //   key: "linkedin",
+  //   name: "LinkedIn",
+  //   logo: IconInstagram, // Temporal, necesitas agregar el logo de LinkedIn
+  //   icon: FaLinkedin,
+  //   color: "bg-blue-700",
+  //   textColor: "text-blue-800",
+  //   borderColor: "border-blue-100",
+  //   darkColor: "dark:bg-blue-900/20",
+  //   darkTextColor: "dark:text-blue-400",
+  //   darkBorderColor: "dark:border-blue-900/30",
+  //   gradient: "from-blue-600 to-blue-800",
+  //   bgClass: "bg-blue-50",
+  //   maxVideoDuration: 600, // 10 minutes
+  //   maxVideoCount: 1,
+  //   active: false, // Desactivado por defecto hasta que esté completamente implementado
+  // },
 } as const;

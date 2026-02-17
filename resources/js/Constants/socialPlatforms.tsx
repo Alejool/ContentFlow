@@ -25,6 +25,26 @@ export const SOCIAL_PLATFORMS: Record<string, SocialPlatformConfig> =
   SOCIAL_PLATFORMS_DATA as any;
 
 export const getPlatformConfig = (platform: string): SocialPlatformConfig => {
+  if (!platform) {
+    console.warn('getPlatformConfig called with empty platform');
+    return {
+      id: 0,
+      key: "social",
+      name: "Social",
+      logo: "",
+      icon: CalendarIcon,
+      color: "bg-gray-500",
+      textColor: "text-gray-600",
+      borderColor: "border-gray-200",
+      darkColor: "dark:bg-gray-800",
+      darkTextColor: "dark:text-gray-400",
+      darkBorderColor: "dark:border-gray-700",
+      gradient: "from-gray-500 to-gray-700",
+      bgClass: "bg-gray-50",
+      active: true,
+    };
+  }
+
   const key = platform.toLowerCase();
 
   // Try exact match, then check for 'twitter' mapping to 'x' or 'x' mapping to its config
@@ -35,6 +55,8 @@ export const getPlatformConfig = (platform: string): SocialPlatformConfig => {
 
   if (config) return config;
 
+  console.warn(`Platform config not found for: ${platform}, using fallback`);
+  
   return {
     id: 0,
     key: "social",
