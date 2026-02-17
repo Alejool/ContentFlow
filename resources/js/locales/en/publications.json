@@ -263,7 +263,7 @@
         "descRequired": "Description is required",
         "nameRequired": "Name is required",
         "descMin": "Description must be at least 10 characters long",
-        "descMax": "Description cannot exceed 200 characters",
+        "descMax": "Description cannot exceed 700 characters",
         "objMin": "Objective must be at least 5 characters long",
         "objMax": "Objective cannot exceed 200 characters",
         "objRequired": "Objective is required",
@@ -290,7 +290,7 @@
         "scheduledAtRequired": "Scheduled date is required when you select social networks",
         "socialAccountsRequired": "Please select at least one social media account",
         "singleVideo": "You can only upload one video per publication.",
-        "scheduledMinDifference": "The date must be at least 2 minutes after the current time"
+        "scheduledMinDifference": "The date must be at least 1 minute after the current time"
       },
       "cancel_confirmation": {
         "title": "Cancel Publication",

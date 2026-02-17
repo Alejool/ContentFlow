@@ -272,7 +272,7 @@
       },
       "validation": {
         "descMin": "descripción debe tener al menos 10 caracteres",
-        "descMax": "descripción debe tener menos de 200 caracteres",
+        "descMax": "descripción debe tener menos de 700 caracteres",
         "objMin": "Objetivo debe tener al menos 5 caracteres",
         "objMax": "Objetivo debe tener menos de 200 caracteres",
         "objRequired": "Objetivo es requerido",
@@ -304,7 +304,7 @@
         "socialAccountsRequired": "Por favor, selecciona al menos una red social",
         "allSchedulesRequired": "Todas las redes deben tener una fecha o activa la fecha global",
         "singleVideo": "Solo puedes subir un video por publicación.",
-        "scheduledMinDifference": "La fecha debe ser al menos 2 minutos después de la actual",
+        "scheduledMinDifference": "La fecha debe ser al menos 1 minuto después de la actual",
         "videoTooLong": "Video demasiado largo para {{platform}} (mx {{max}})",
         "videoComplies": "Cumple con la duracin para {{platform}}",
         "durationErrors": "Por favor, corrige los errores de duracin antes de guardar."

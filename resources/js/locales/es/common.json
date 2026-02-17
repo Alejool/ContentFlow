@@ -43,7 +43,9 @@
       "get_suggestions": "Obtener sugerencias con IA",
       "idea_prompt": "Prompt de Idea (IA)",
       "idea_prompt_placeholder": "Describe tu idea para autocompletar el formulario...",
-      "generate": "Generar todo"
+      "generate": "Generar todo",
+      "prompt_min": "El prompt debe tener al menos 10 caracteres",
+      "prompt_max": "El prompt no puede exceder 500 caracteres"
     },
     "note": "Nota",
     "warning": "Advertencia",

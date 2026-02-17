@@ -76,7 +76,7 @@
         "placeholders": {
           "name": "Ej: Campaña de Verano",
           "description": "Breve descripción de la campaña",
-          "description_hint": "Máximo 200 caracteres",
+          "description_hint": "Máximo 500 caracteres",
           "goal": "Ej: Aumentar el alcance en redes sociales",
           "budget": "Ej: 1000.00",
           "startDate": "Seleccionar fecha de inicio",

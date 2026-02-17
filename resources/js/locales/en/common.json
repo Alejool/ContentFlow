@@ -41,7 +41,9 @@
       "get_suggestions": "Get suggestions with AI",
       "idea_prompt": "Idea Prompt (AI)",
       "idea_prompt_placeholder": "Describe your idea to autocomplete the form...",
-      "generate": "Generate all"
+      "generate": "Generate all",
+      "prompt_min": "Prompt must be at least 10 characters long",
+      "prompt_max": "Prompt cannot exceed 500 characters"
     },
     "note": "Note",
     "warning": "Warning",

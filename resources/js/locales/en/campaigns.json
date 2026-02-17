@@ -76,7 +76,7 @@
         "placeholders": {
           "name": "e.g. Summer Campaign",
           "description": "Brief campaign description",
-          "description_hint": "Maximum 200 characters",
+          "description_hint": "Maximum 500 characters",
           "goal": "e.g. Increase social media reach",
           "budget": "e.g. 1000.00",
           "startDate": "Select start date",
