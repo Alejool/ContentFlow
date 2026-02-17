@@ -2,9 +2,9 @@ import { useTheme } from "@/Hooks/useTheme";
 import { Toaster } from "react-hot-toast";
 
 export default function ThemedToaster() {
-  const { theme } = useTheme();
+  const { actualTheme } = useTheme();
 
-  const isDark = theme === "dark";
+  const isDark = actualTheme === "dark";
 
   return (
     <Toaster
