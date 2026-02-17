@@ -14,18 +14,13 @@ class Kernel extends ConsoleKernel
       ->everyMinute()
       ->withoutOverlapping();
 
-    // Sincronizar estadísticas cada hora
-    $schedule->command('social:sync-analytics')
-      ->hourly()
-      ->withoutOverlapping();
-
     // Sincronizar analytics detallados cada 6 horas
     $schedule->command('analytics:sync --days=7')
       ->everySixHours()
       ->withoutOverlapping();
 
-    // Limpiar tokens expirados diariamente
-    $schedule->command('social:cleanup-tokens')->daily();
+    // Verificar tokens expirados diariamente
+    $schedule->command('social:check-tokens')->daily();
 
     // Procesar cola de playlists de YouTube cada 5 minutos
     $schedule->command('youtube:process-playlist-queue')->everyFiveMinutes();
