@@ -4,6 +4,9 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Webhooks\YouTubeWebhookController;
+use App\Http\Controllers\HealthController;
+
+Route::get('/health', [HealthController::class, 'check']);
 
 Route::post('/auth/google', [AuthController::class, 'handleGoogleAuth']);
 
