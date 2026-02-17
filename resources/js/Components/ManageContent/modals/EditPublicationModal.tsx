@@ -205,6 +205,11 @@ const EditPublicationModal = ({
     (s) => s.fetchPublishedPlatforms,
   );
 
+  const { auth } = usePage<any>().props;
+  const user = auth.user;
+  const canManage =
+    auth.current_workspace?.permissions?.includes("manage-content");
+
   // Fetch published platforms when modal opens
   useEffect(() => {
     if (isOpen && publication?.id) {
@@ -240,14 +245,35 @@ const EditPublicationModal = ({
     return Array.from(new Set([...fromStore, ...fromLogs]));
   }, [publication, failedPlatforms]);
 
+  const selectedPlatforms = useMemo(() => {
+    return Array.from(
+      new Set(
+        selectedSocialAccounts
+          .map((id: number) => {
+            const account = socialAccounts.find((a) => a.id === id);
+            return account?.platform;
+          })
+          .filter(Boolean),
+      ),
+    );
+  }, [selectedSocialAccounts, socialAccounts]);
+
+  const allPlatformSettings = useMemo(() => {
+    const settings: Record<string, any> = {};
+    selectedPlatforms.forEach((platform) => {
+      const platformKey = platform.toLowerCase();
+      settings[platformKey] = 
+        platformSettings[platformKey] || 
+        user?.global_platform_settings?.[platformKey] || 
+        {};
+    });
+    return settings;
+  }, [selectedPlatforms, platformSettings, user?.global_platform_settings]);
+
   const hasYouTubeAccount = selectedSocialAccounts.some((id: number) => {
     const account = socialAccounts.find((a) => a.id === id);
     return account?.platform?.toLowerCase() === "youtube";
   });
-
-  const { auth } = usePage<any>().props;
-  const canManage =
-    auth.current_workspace?.permissions?.includes("manage-content");
 
   // Partial locking:
   // - Global lock: only if another user has the lock
@@ -698,16 +724,33 @@ const EditPublicationModal = ({
           onClose={() => setActivePlatformSettings(null)}
           platform={activePlatformSettings || ""}
           settings={
-            platformSettings[activePlatformSettings?.toLowerCase() || ""] || {}
+            activePlatformSettings?.toLowerCase() === "all"
+              ? {}
+              : platformSettings[activePlatformSettings?.toLowerCase() || ""] || 
+                user?.global_platform_settings?.[activePlatformSettings?.toLowerCase() || ""] || 
+                {}
           }
           onSettingsChange={(newSettings) => {
-            if (activePlatformSettings) {
+            if (activePlatformSettings && activePlatformSettings.toLowerCase() !== "all") {
               setPlatformSettings((prev) => ({
                 ...prev,
                 [activePlatformSettings.toLowerCase()]: newSettings,
               }));
             }
           }}
+          allPlatforms={activePlatformSettings?.toLowerCase() === "all" ? selectedPlatforms : []}
+          allSettings={activePlatformSettings?.toLowerCase() === "all" ? allPlatformSettings : {}}
+          onAllSettingsChange={(platform, newSettings) => {
+            setPlatformSettings((prev) => ({
+              ...prev,
+              [platform]: newSettings,
+            }));
+          }}
+          videoMetadata={
+            mediaFiles.find((m) => m.type === "video")
+              ? videoMetadata[mediaFiles.find((m) => m.type === "video")!.tempId]
+              : undefined
+          }
         />
       </div>
     </div>

@@ -236,8 +236,8 @@ export default function PublishPublicationModal({
         />
 
         <div className="fixed inset-0 flex items-center justify-center p-4">
-          <DialogPanel className="w-full max-w-2xl rounded-lg p-8 shadow-2xl overflow-y-auto max-h-[90vh] custom-scrollbar bg-white dark:bg-neutral-800 dark:border dark:border-neutral-700">
-            <div className="flex items-center justify-between mb-6">
+          <DialogPanel className="w-full max-w-2xl rounded-lg shadow-2xl flex flex-col max-h-[90vh] bg-white dark:bg-neutral-800 dark:border dark:border-neutral-700">
+            <div className="flex items-center justify-between p-8 pb-6 border-b border-gray-200 dark:border-neutral-700 sticky top-0 z-20 bg-white dark:bg-neutral-800 backdrop-blur-sm bg-opacity-95 dark:bg-opacity-95">
               <DialogTitle className="text-2xl font-bold text-gray-900 dark:text-white">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-gradient-to-r from-primary-500 to-primary-600 rounded-lg">
@@ -254,6 +254,7 @@ export default function PublishPublicationModal({
               </button>
             </div>
 
+            <div className="flex-1 overflow-y-auto custom-scrollbar p-8 pt-6">
             {isPendingReview && (
               <div className="mb-6 p-4 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 flex items-start gap-3">
                 <Clock className="w-5 h-5 text-yellow-600 dark:text-yellow-400 mt-0.5" />
@@ -345,8 +346,7 @@ export default function PublishPublicationModal({
                   </p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                  {" "}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {connectedAccounts.map((account) => {
                     const iconSrc = getPlatformIcon(account.platform);
                     const isSelected = selectedPlatforms.includes(account.id);
@@ -364,7 +364,7 @@ export default function PublishPublicationModal({
                     return (
                       <div
                         key={account.id}
-                        className="relative w-full sm:flex-1"
+                        className="relative w-full"
                       >
                         <div
                           onClick={() =>
@@ -372,7 +372,7 @@ export default function PublishPublicationModal({
                             !isScheduled &&
                             togglePlatform(account.id)
                           }
-                          className={`w-full flex items-center gap-3 p-4 rounded-lg border-2 transition-all pt-6 relative ${
+                          className={`w-full h-[120px] flex items-start gap-3 p-4 rounded-lg border-2 transition-all relative ${
                             !isPublished && !isScheduled
                               ? "cursor-pointer"
                               : "cursor-default"
@@ -659,8 +659,9 @@ export default function PublishPublicationModal({
                 )}
               </div>
             )}
+            </div>
 
-            <div className="flex gap-3 mt-8">
+            <div className="flex gap-3 p-6 border-t border-gray-200 dark:border-neutral-700 sticky bottom-0 z-20 bg-white dark:bg-neutral-800 backdrop-blur-sm bg-opacity-95 dark:bg-opacity-95">
               <button
                 type="button"
                 onClick={async () => {

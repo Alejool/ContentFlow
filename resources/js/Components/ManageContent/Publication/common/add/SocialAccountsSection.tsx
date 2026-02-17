@@ -2,7 +2,7 @@ import DatePickerModern from "@/Components/common/Modern/DatePicker";
 import { validateVideoDuration } from "@/Utils/validationUtils";
 import { parseISO } from "date-fns";
 import { AlertTriangle, Check, Clock, Settings, Target, X } from "lucide-react";
-import React, { memo, useState } from "react";
+import React, { memo, useState, useMemo } from "react";
 
 interface SocialAccount {
   id: number;
@@ -239,7 +239,7 @@ const SocialAccountItem = memo(
 
     return (
       <div
-        className={`relative flex items-center p-3 rounded-lg border transition-all ${
+        className={`relative flex items-start p-3 rounded-lg border transition-all min-h-[80px] ${
           isInternalDisabled ? "opacity-80 cursor-default" : ""
         } ${
           isFailed || durationError
@@ -337,34 +337,17 @@ const SocialAccountItem = memo(
                   )}
                 </div>
               )}
-            {isPublished && (
-              <div className="flex flex-col gap-1.5 pt-1">
-                <div className="flex items-center gap-1.5">
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onPlatformSettingsClick();
-                    }}
-                    className="p-1.5 rounded-lg transition-all hover:bg-gray-100 text-gray-500 hover:text-primary-600 dark:hover:bg-neutral-700 dark:text-gray-400 dark:hover:text-white"
-                    title={t("platformSettings.configure") || "Configurar red"}
-                  >
-                    <Settings className="w-4 h-4" />
-                  </button>
+            {!customSchedule &&
+              !globalSchedule &&
+              !isPublished &&
+              !isPublishing &&
+              isChecked && (
+                <div className="flex items-center gap-1 text-[10px] text-primary-500 font-medium animate-in fade-in slide-in-from-top-1">
+                  <Clock className="w-3 h-3" />
+                  {t("publications.modal.schedule.instantWarning") ||
+                    "Para publicar ahora, usa el botón Publicar después de guardar."}
                 </div>
-
-                {!customSchedule &&
-                  !globalSchedule &&
-                  !isPublished &&
-                  !isPublishing && (
-                    <div className="flex items-center gap-1 text-[10px] text-primary-500 font-medium animate-in fade-in slide-in-from-top-1">
-                      <Clock className="w-3 h-3" />
-                      {t("publications.modal.schedule.instantWarning") ||
-                        "Para publicar ahora, usa el botón Publicar después de guardar."}
-                    </div>
-                  )}
-              </div>
-            )}
+              )}
             {isPublished && (
               <div className="mt-1 flex items-center gap-1 text-[10px] font-medium text-green-600 dark:text-green-400">
                 <Check className="w-3 h-3" />
@@ -425,20 +408,36 @@ const SocialAccountItem = memo(
           </div>
         </div>
 
-        {isCheckedActually && !isInternalDisabled && (
-          <ScheduleButton
-            account={account}
-            customSchedule={customSchedule}
-            activePopover={activePopover}
-            onScheduleClick={(e) => {
-              e.stopPropagation();
-              onScheduleClick();
-            }}
-            onScheduleChange={onScheduleChange}
-            onScheduleRemove={onScheduleRemove}
-            onPopoverClose={onPopoverClose}
-          />
-        )}
+        <div className="flex items-start gap-2 ml-auto pl-2">
+          {isCheckedActually && !isInternalDisabled && (
+            <ScheduleButton
+              account={account}
+              customSchedule={customSchedule}
+              activePopover={activePopover}
+              onScheduleClick={(e) => {
+                e.stopPropagation();
+                onScheduleClick();
+              }}
+              onScheduleChange={onScheduleChange}
+              onScheduleRemove={onScheduleRemove}
+              onPopoverClose={onPopoverClose}
+            />
+          )}
+          
+          {isCheckedActually && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onPlatformSettingsClick();
+              }}
+              className="p-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-gray-500 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400 transition-colors"
+              title={t("platformSettings.configure") || "Configurar red"}
+            >
+              <Settings className="w-4 h-4" />
+            </button>
+          )}
+        </div>
       </div>
     );
   },
@@ -468,6 +467,19 @@ const SocialAccountsSection = memo(
   }: SocialAccountsSectionProps) => {
     const [activePopover, setActivePopover] = useState<number | null>(null);
 
+    const selectedPlatforms = useMemo(() => {
+      return Array.from(
+        new Set(
+          selectedAccounts
+            .map((id) => {
+              const account = socialAccounts.find((a) => a.id === id);
+              return account?.platform;
+            })
+            .filter(Boolean),
+        ),
+      );
+    }, [selectedAccounts, socialAccounts]);
+
     return (
       <div className="space-y-4">
         <div className="flex items-center justify-between">
@@ -476,11 +488,24 @@ const SocialAccountsSection = memo(
             {t("manageContent.configureNetworks") ||
               "Configura tus redes sociales"}
           </label>
-          {error && (
-            <span className="text-xs text-primary-500 font-medium animate-pulse">
-              {error}
-            </span>
-          )}
+          <div className="flex items-center gap-2">
+            {selectedAccounts.length > 1 && (
+              <button
+                type="button"
+                onClick={() => onPlatformSettingsClick("all")}
+                className="text-xs px-3 py-1.5 rounded-lg bg-primary-500 hover:bg-primary-600 text-white font-medium transition-colors flex items-center gap-1.5"
+                title={t("platformSettings.configureAll") || "Configurar todas"}
+              >
+                <Settings className="w-3.5 h-3.5" />
+                {t("platformSettings.configureAll") || "Configurar todas"}
+              </button>
+            )}
+            {error && (
+              <span className="text-xs text-primary-500 font-medium animate-pulse">
+                {error}
+              </span>
+            )}
+          </div>
         </div>
 
         <div className="grid gap-3">

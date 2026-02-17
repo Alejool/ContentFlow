@@ -404,6 +404,11 @@ export default function AddPublicationModal({
               }));
             }
           }}
+          videoMetadata={
+            mediaFiles.find((m) => m.type === "video")
+              ? videoMetadata[mediaFiles.find((m) => m.type === "video")!.tempId]
+              : undefined
+          }
         />
       </div>
     </div>

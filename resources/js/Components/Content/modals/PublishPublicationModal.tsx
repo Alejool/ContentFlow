@@ -4,6 +4,7 @@ import { getPlatformConfig } from "@/Constants/socialPlatforms";
 import { usePublishPublication } from "@/Hooks/publication/usePublishPublication";
 import { useConfirm } from "@/Hooks/useConfirm";
 import { formatDateTime } from "@/Utils/formatDate";
+import { validateVideoDuration } from "@/Utils/validationUtils";
 import { usePublicationStore } from "@/stores/publicationStore";
 import { Publication } from "@/types/Publication";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
@@ -64,6 +65,7 @@ export default function PublishPublicationModal({
     deselectAll,
     isYoutubeSelected,
     handlePublish,
+    handleCancelPublication,
     handleThumbnailChange,
     handleThumbnailDelete,
     handleRequestReview,
@@ -77,7 +79,7 @@ export default function PublishPublicationModal({
   const currentWorkspace = auth.current_workspace;
   const permissions = currentWorkspace?.permissions || [];
   const hasPublishPermission = permissions.includes("publish");
-  const canContent = permissions.includes("content");
+  const canManageContent = permissions.includes("manage-content");
   const isApproved =
     publication?.status === "approved" || publication?.status === "published";
   const canPublishDirectly = hasPublishPermission || isApproved;
@@ -122,7 +124,9 @@ export default function PublishPublicationModal({
   useEffect(() => {
     if (isOpen && publication) {
       fetchPublishedPlatforms(publication.id);
-      fetchPublicationById(publication.id);
+      fetchPublicationById(publication.id).then((fresh) => {
+        if (fresh) loadExistingThumbnails(fresh);
+      });
       loadExistingThumbnails(publication);
       if (publication.platform_settings) {
         setPlatformSettings(publication.platform_settings);
@@ -134,7 +138,7 @@ export default function PublishPublicationModal({
     if (!isOpen) {
       resetState();
     }
-  }, [isOpen, publication]);
+  }, [isOpen, publication?.id]);
 
   // Listen for real-time publication status updates
   useEffect(() => {
@@ -201,7 +205,8 @@ export default function PublishPublicationModal({
     const success = await handlePublish(publication, platformSettings);
     if (success) {
       if (onSuccess) onSuccess();
-      onClose(publication.id);
+      // Don't close modal immediately - let user see the progress
+      // Modal will stay open showing publishing status
     }
   };
 
@@ -231,8 +236,8 @@ export default function PublishPublicationModal({
         />
 
         <div className="fixed inset-0 flex items-center justify-center p-4">
-          <DialogPanel className="w-full max-w-2xl rounded-lg p-8 shadow-2xl overflow-y-auto max-h-[90vh] custom-scrollbar bg-white dark:bg-neutral-800 dark:border dark:border-neutral-700">
-            <div className="flex items-center justify-between mb-6">
+          <DialogPanel className="w-full max-w-2xl rounded-lg shadow-2xl flex flex-col max-h-[90vh] bg-white dark:bg-neutral-800 dark:border dark:border-neutral-700">
+            <div className="flex items-center justify-between p-8 pb-6 border-b border-gray-200 dark:border-neutral-700 sticky top-0 z-20 bg-white dark:bg-neutral-800 backdrop-blur-sm bg-opacity-95 dark:bg-opacity-95">
               <DialogTitle className="text-2xl font-bold text-gray-900 dark:text-white">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-gradient-to-r from-primary-500 to-primary-600 rounded-lg">
@@ -249,6 +254,7 @@ export default function PublishPublicationModal({
               </button>
             </div>
 
+            <div className="flex-1 overflow-y-auto custom-scrollbar p-8 pt-6">
             {isPendingReview && (
               <div className="mb-6 p-4 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 flex items-start gap-3">
                 <Clock className="w-5 h-5 text-yellow-600 dark:text-yellow-400 mt-0.5" />
@@ -340,8 +346,7 @@ export default function PublishPublicationModal({
                   </p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                  {" "}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {connectedAccounts.map((account) => {
                     const iconSrc = getPlatformIcon(account.platform);
                     const isSelected = selectedPlatforms.includes(account.id);
@@ -359,7 +364,7 @@ export default function PublishPublicationModal({
                     return (
                       <div
                         key={account.id}
-                        className="relative w-full sm:flex-1"
+                        className="relative w-full"
                       >
                         <div
                           onClick={() =>
@@ -367,7 +372,7 @@ export default function PublishPublicationModal({
                             !isScheduled &&
                             togglePlatform(account.id)
                           }
-                          className={`w-full flex items-center gap-3 p-4 rounded-lg border-2 transition-all pt-6 relative ${
+                          className={`w-full h-[120px] flex items-start gap-3 p-4 rounded-lg border-2 transition-all relative ${
                             !isPublished && !isScheduled
                               ? "cursor-pointer"
                               : "cursor-default"
@@ -387,8 +392,8 @@ export default function PublishPublicationModal({
                                         : "bg-white dark:bg-neutral-900/30 border-primary-200 dark:border-neutral-700 hover:border-primary-300 dark:hover:border-neutral-600"
                           }`}
                         >
-                          {/* Publishing Overlay */}
-                          {isPublishing && (
+                          {/* Publishing Overlay - Only show if actively publishing and not failed */}
+                          {isPublishing && !isFailed && (
                             <div className="absolute inset-0 z-20 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-sm flex items-center justify-center rounded-lg animate-in fade-in duration-300">
                               <div className="flex items-center gap-3 px-4">
                                 <div className="relative flex-shrink-0">
@@ -408,30 +413,45 @@ export default function PublishPublicationModal({
                             </div>
                           )}
 
-                          {/* Unpublishing Overlay */}
-                          {isUnpublishing && (
-                            <div className="absolute inset-0 z-20 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-sm flex items-center justify-center rounded-lg animate-in fade-in duration-300">
-                              <div className="flex items-center gap-2">
-                                <Loader2 className="w-5 h-5 animate-spin text-amber-600 dark:text-amber-400" />
-                                <span className="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wide">
-                                  {t("publications.modal.publish.unpublishing") ||
-                                    "Despublicando..."}
-                                </span>
-                              </div>
-                            </div>
-                          )}
+                          {!isPublishing && (() => {
+                            const mediaFiles = publication.media_files || [];
+                            const video = mediaFiles.find(
+                              (m: any) =>
+                                m.file_type === "video" ||
+                                m.mime_type?.startsWith("video/"),
+                            );
+                            if (!video) return null;
 
-                          {/* Published Overlay */}
-                          {isPublished && !isUnpublishing && (
-                            <div className="absolute inset-0 z-10 bg-green-50/70 dark:bg-green-900/20 backdrop-blur-[1px] flex items-center justify-center rounded-lg pointer-events-none">
-                              <div className="flex items-center gap-2">
-                                <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
-                                <span className="text-xs font-bold text-green-600 dark:text-green-400 uppercase tracking-wide">
-                                  {t("publications.modal.publish.published")}
+                            const duration = video.metadata?.duration || 0;
+                            const validation = validateVideoDuration(
+                              account.platform,
+                              duration,
+                            );
+
+                            if (validation.maxDuration === Infinity)
+                              return null;
+
+                            return (
+                              <div
+                                className={`absolute top-1 left-1 z-10 flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold border shadow-sm ${
+                                  validation.isValid
+                                    ? "bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800/30"
+                                    : "bg-red-50 text-red-600 border-red-100 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800/30 animate-pulse"
+                                }`}
+                              >
+                                {validation.isValid ? (
+                                  <CheckCircle className="w-2.5 h-2.5" />
+                                ) : (
+                                  <XCircle className="w-2.5 h-2.5" />
+                                )}
+                                <span className="leading-none">
+                                  {validation.isValid
+                                    ? "OK"
+                                    : `MAX ${validation.formattedMax}`}
                                 </span>
                               </div>
-                            </div>
-                          )}
+                            );
+                          })()}
 
                           <div className="w-12 h-12 rounded-lg  flex items-center justify-center flex-shrink-0 ">
                             <img src={iconSrc} alt={account.platform} />
@@ -445,29 +465,49 @@ export default function PublishPublicationModal({
                             </div>
                             {account.user?.name && (
                               <div className="text-[10px] text-primary-500 font-bold uppercase tracking-wider mt-1">
-                                {t("Content.socialMedia.status.connectedBy") ||
-                                  "Conectado por"}
+                                {t(
+                                  "manageContent.socialMedia.status.connectedBy",
+                                ) || "Conectado por"}
                                 : {account.user.name}
                               </div>
                             )}
                           </div>
 
-                          {isPublished && (
-                            <div className="flex items-center gap-2">
-                              <span className="flex items-center gap-1 text-xs font-medium text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/30 px-2 py-1 rounded-full">
-                                <CheckCircle className="w-3 h-3" />
-                                {t("publications.modal.publish.published")}
-                              </span>
+                          {isUnpublishing && (
+                            <div className="absolute inset-0 z-20 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-sm flex items-center justify-center rounded-lg animate-in fade-in duration-300">
+                              <div className="flex items-center gap-2">
+                                <Loader2 className="w-5 h-5 animate-spin text-amber-600 dark:text-amber-400" />
+                                <span className="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wide">
+                                  {t("publications.modal.publish.unpublishing") ||
+                                    "Despublicando..."}
+                                </span>
+                              </div>
                             </div>
                           )}
-                          {isPublishing && (
-                            <div className="flex items-center gap-2">
-                              <span className="flex items-center gap-1.5 text-xs font-medium text-yellow-600 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-900/30 px-2.5 py-1.5 rounded-full">
-                                <div className="w-3 h-3 border-2 border-yellow-600 border-t-transparent rounded-full animate-spin" />
-                                <span className="font-bold">{t("publications.modal.publish.publishing")}</span>
-                              </span>
+
+                          {isFailed &&
+                            !isPublished &&
+                            !isPublishing &&
+                            !isUnpublishing && (
+                              <div className="flex items-center gap-2">
+                                <span className="flex items-center gap-1 text-xs font-medium text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900/30 px-2 py-1 rounded-full">
+                                  <AlertCircle className="w-3 h-3" />
+                                  {t("publications.modal.publish.failed")}
+                                </span>
+                              </div>
+                            )}
+
+                          {isPublished && !isUnpublishing && (
+                            <div className="absolute inset-0 z-10 bg-green-50/70 dark:bg-green-900/20 backdrop-blur-[1px] flex items-center justify-center rounded-lg pointer-events-none">
+                              <div className="flex items-center gap-2">
+                                <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
+                                <span className="text-xs font-bold text-green-600 dark:text-green-400 uppercase tracking-wide">
+                                  {t("publications.modal.publish.published")}
+                                </span>
+                              </div>
                             </div>
                           )}
+
                           {isScheduled && (
                             <div className="flex items-center gap-2">
                               <span className="flex flex-col items-end">
@@ -575,7 +615,7 @@ export default function PublishPublicationModal({
                     alt="YouTube"
                   />
                   <h4 className="font-semibold text-gray-900 dark:text-white">
-                    {t("publications.modal.publish.youtube.youtubeThumbnails")}
+                    {t("publications.modal.publish.youtubeThumbnails")}
                     {isLoadingThumbnails && (
                       <span className="ml-2 text-xs text-gray-500">
                         {t("publications.modal.publish.loading")}
@@ -619,8 +659,9 @@ export default function PublishPublicationModal({
                 )}
               </div>
             )}
+            </div>
 
-            <div className="flex gap-3 mt-8">
+            <div className="flex gap-3 p-6 border-t border-gray-200 dark:border-neutral-700 sticky bottom-0 z-20 bg-white dark:bg-neutral-800 backdrop-blur-sm bg-opacity-95 dark:bg-opacity-95">
               <button
                 type="button"
                 onClick={async () => {
@@ -709,12 +750,12 @@ export default function PublishPublicationModal({
                     )}
                   </button>
                 </div>
-              ) : canContent ? (
+              ) : canManageContent ? (
                 <button
                   type="button"
                   onClick={handleRequestApproval}
                   disabled={publishing || isPendingReview}
-                  className="flex-[2] px-4 py-3 rounded-lg font-medium bg-gradient-to-r from-primary-500 to-primary-500 hover:from-primary-600 hover:to-primary-600 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="flex-[2] px-4 py-3 rounded-lg font-medium bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {isPendingReview ? (
                     <>
