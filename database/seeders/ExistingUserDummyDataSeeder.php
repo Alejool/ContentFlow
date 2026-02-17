@@ -84,28 +84,74 @@ class ExistingUserDummyDataSeeder extends Seeder
 
   private function createPublicationsAndAnalytics($user, $workspaceId)
   {
-    // Delete existing publications for clean slate (optional, maybe dangerous? keeping it additive for now per request "datos de prueba por cada usuario de lso que ya existen")
-    // The user asked "create dummy data... but datso itrreales"
-    // I will just add new data.
-
-    $titles = [
-      'Summer Sale 2025',
-      'Winter Collection Launch',
-      'Tech Gadgets Promo',
-      'Organic Food Awareness',
-      'Fitness Challenge',
-      'Black Friday Deal',
-      'New Year Resolution'
+    // Detailed publication templates with realistic content
+    $publicationTemplates = [
+      [
+        'title' => 'Summer Sale 2025 - Up to 50% Off',
+        'body' => "🌞 ¡El verano está aquí y nuestras ofertas también! 🔥\n\nDisfruta de descuentos increíbles en toda nuestra colección de verano. Desde ropa de playa hasta accesorios frescos, tenemos todo lo que necesitas para brillar esta temporada.\n\n✨ Ofertas destacadas:\n• Trajes de baño: 40% OFF\n• Gafas de sol: 30% OFF\n• Sandalias: 50% OFF\n\n¡No te lo pierdas! Oferta válida hasta fin de mes.",
+        'hashtags' => ['summer', 'sale', 'fashion', 'discount', 'shopping', 'summerstyle', 'beachwear', 'deals'],
+        'goal' => 'Incrementar ventas de verano en un 35%',
+        'url' => 'https://example.com/summer-sale',
+      ],
+      [
+        'title' => 'Winter Collection Launch - New Arrivals',
+        'body' => "❄️ Nueva Colección de Invierno Ya Disponible ❄️\n\nDescubre las últimas tendencias en moda invernal. Diseños exclusivos que combinan estilo y comodidad para mantenerte abrigado con clase.\n\n🧥 Lo nuevo:\n• Abrigos premium de lana\n• Suéteres de cachemira\n• Botas impermeables de diseño\n• Accesorios térmicos elegantes\n\nCompra ahora y recibe envío gratis en pedidos superiores a $100.",
+        'hashtags' => ['winter', 'fashion', 'newcollection', 'winterstyle', 'cozy', 'winterfashion', 'newarrivals', 'style'],
+        'goal' => 'Lanzamiento exitoso con 500+ ventas en primera semana',
+        'url' => 'https://example.com/winter-collection',
+      ],
+      [
+        'title' => 'Tech Gadgets Promo - Smart Living',
+        'body' => "🚀 Tecnología que Transforma tu Vida 📱\n\n¿Listo para actualizar tu setup? Tenemos los gadgets más innovadores del mercado con precios especiales.\n\n💡 Destacados:\n• Smartwatches última generación\n• Auriculares con cancelación de ruido\n• Cargadores inalámbricos rápidos\n• Accesorios gaming profesionales\n\n🎁 BONUS: Garantía extendida gratis en compras mayores a $200\n\n#TechLife #Innovation",
+        'hashtags' => ['tech', 'gadgets', 'technology', 'innovation', 'smartliving', 'electronics', 'techdeals', 'geek'],
+        'goal' => 'Posicionar marca en segmento tech con 1000+ impresiones',
+        'url' => 'https://example.com/tech-promo',
+      ],
+      [
+        'title' => 'Organic Food Awareness Campaign',
+        'body' => "🌱 Alimentación Consciente, Vida Saludable 🥗\n\nÚnete al movimiento de comida orgánica y descubre cómo pequeños cambios en tu dieta pueden transformar tu bienestar.\n\n🍎 Beneficios de lo orgánico:\n✓ Sin pesticidas ni químicos\n✓ Mayor valor nutricional\n✓ Sabor auténtico y natural\n✓ Apoyas agricultura sostenible\n\nVisita nuestra tienda y encuentra productos 100% orgánicos certificados. Tu salud y el planeta te lo agradecerán. 🌍💚",
+        'hashtags' => ['organic', 'healthyfood', 'wellness', 'sustainable', 'eatclean', 'organicfood', 'healthylifestyle', 'nutrition'],
+        'goal' => 'Educar audiencia sobre alimentación orgánica - 5000 alcance',
+        'url' => 'https://example.com/organic-food',
+      ],
+      [
+        'title' => 'Fitness Challenge - 30 Days Transformation',
+        'body' => "💪 Desafío Fitness de 30 Días - ¡Transforma Tu Cuerpo! 🏋️\n\n¿Estás listo para el cambio? Únete a nuestro desafío de transformación y alcanza tus metas fitness.\n\n📋 Incluye:\n• Plan de entrenamiento personalizado\n• Guía nutricional completa\n• Seguimiento diario con coach\n• Comunidad de apoyo 24/7\n• Premios para los mejores resultados\n\n🎯 Comienza HOY y ve resultados reales en 30 días.\n\n¡Tu mejor versión te está esperando!",
+        'hashtags' => ['fitness', 'workout', 'challenge', 'transformation', 'health', 'fitnessmotivation', 'gym', 'healthylifestyle'],
+        'goal' => 'Conseguir 200 participantes en el desafío',
+        'url' => 'https://example.com/fitness-challenge',
+      ],
+      [
+        'title' => 'Black Friday Mega Deal - Limited Time',
+        'body' => "🖤 BLACK FRIDAY ESTÁ AQUÍ 🛍️\n\n¡Las ofertas más esperadas del año! Descuentos de hasta 70% en productos seleccionados.\n\n⚡ OFERTAS RELÁMPAGO:\n• Electrónica: hasta 60% OFF\n• Moda: hasta 70% OFF\n• Hogar: hasta 50% OFF\n• Deportes: hasta 55% OFF\n\n⏰ Solo por 48 horas\n🚚 Envío express gratis\n💳 12 meses sin intereses\n\n¡Corre! Las mejores ofertas se agotan rápido.",
+        'hashtags' => ['blackfriday', 'sale', 'deals', 'shopping', 'discount', 'blackfridaydeals', 'offers', 'savings'],
+        'goal' => 'Maximizar ventas - objetivo $50,000 en 48 horas',
+        'url' => 'https://example.com/black-friday',
+      ],
+      [
+        'title' => 'New Year Resolution - Fresh Start 2025',
+        'body' => "🎆 Nuevo Año, Nueva Tú ✨\n\n2025 es tu año para brillar. Te ayudamos a cumplir tus propósitos con nuestros programas especiales de inicio de año.\n\n🎯 Propósitos más populares:\n• Vida más saludable → Planes wellness\n• Mejor forma física → Membresías gym\n• Desarrollo personal → Cursos online\n• Organización → Planners y apps\n\n🎁 OFERTA ESPECIAL: 30% OFF en todos los programas anuales durante enero.\n\nEmpieza el año con el pie derecho. ¡Tú puedes lograrlo! 💫",
+        'hashtags' => ['newyear', 'resolution', 'goals', 'motivation', 'freshstart', 'newyearnewyou', 'selfimprovement', '2025'],
+        'goal' => 'Engagement alto - 10,000 interacciones en enero',
+        'url' => 'https://example.com/new-year',
+      ],
+      [
+        'title' => 'Sustainable Fashion - Eco Friendly Style',
+        'body' => "🌿 Moda Sostenible: Estilo con Conciencia 👗\n\nLa moda puede ser hermosa Y responsable. Descubre nuestra línea eco-friendly hecha con materiales reciclados y procesos sostenibles.\n\n♻️ Nuestro compromiso:\n• 100% algodón orgánico\n• Tintes naturales biodegradables\n• Packaging compostable\n• Producción ética certificada\n\nCada compra planta un árbol 🌳\n\nViste bien, siente mejor, cuida el planeta.",
+        'hashtags' => ['sustainable', 'ecofriendly', 'sustainablefashion', 'ethical', 'green', 'slowfashion', 'conscious', 'zerowaste'],
+        'goal' => 'Posicionar marca como líder en moda sostenible',
+        'url' => 'https://example.com/sustainable-fashion',
+      ],
     ];
 
     // Create exactly 10 publications per user with richer test data
     $count = 10;
-
-    // Some publications will be grouped into campaigns; use goal field to encode campaign name for compatibility
     $campaignPool = [];
 
     for ($i = 0; $i < $count; $i++) {
-      $title = $titles[array_rand($titles)] . ' - Test ' . Str::random(5);
+      $template = $publicationTemplates[array_rand($publicationTemplates)];
+      
+      $title = $template['title'] . ' - ' . Str::random(4);
       $startDate = Carbon::now()->subDays(rand(10, 90));
       $endDate = $startDate->copy()->addDays(rand(7, 60));
 
@@ -113,7 +159,6 @@ class ExistingUserDummyDataSeeder extends Seeder
       $isCampaign = rand(1, 100) <= 40;
       $campaignName = null;
       if ($isCampaign) {
-        // reuse or create a campaign name
         if (rand(1, 100) <= 60 && !empty($campaignPool)) {
           $campaignName = $campaignPool[array_rand($campaignPool)];
         } else {
@@ -122,20 +167,56 @@ class ExistingUserDummyDataSeeder extends Seeder
         }
       }
 
-      $goal = $isCampaign ? "Campaign: {$campaignName}" : 'Test Goal for Analytics';
-      $description = ($isCampaign ? "Part of campaign {$campaignName}. " : '') . 'Generated test publication for dummy analytics.';
+      $goal = $isCampaign ? "Campaign: {$campaignName} - " . $template['goal'] : $template['goal'];
+      $description = ($isCampaign ? "Parte de la campaña {$campaignName}. " : '') . 
+                     "Publicación de prueba con contenido detallado y hashtags relevantes.";
+
+      // Random status distribution
+      $statusOptions = ['published', 'published', 'published', 'scheduled', 'draft', 'approved'];
+      $status = $statusOptions[array_rand($statusOptions)];
+
+      // Platform settings with detailed configuration
+      $platformSettings = [
+        'facebook' => [
+          'enabled' => rand(0, 1) === 1,
+          'post_type' => ['status', 'photo', 'link'][rand(0, 2)],
+          'target_audience' => ['all', '18-35', '25-45'][rand(0, 2)],
+        ],
+        'instagram' => [
+          'enabled' => rand(0, 1) === 1,
+          'post_type' => ['feed', 'story', 'reel'][rand(0, 2)],
+          'location' => ['New York', 'Los Angeles', 'Miami', null][rand(0, 3)],
+        ],
+        'twitter' => [
+          'enabled' => rand(0, 1) === 1,
+          'thread' => rand(0, 1) === 1,
+          'reply_settings' => ['everyone', 'following', 'mentioned'][rand(0, 2)],
+        ],
+        'linkedin' => [
+          'enabled' => rand(0, 1) === 1,
+          'visibility' => ['public', 'connections'][rand(0, 1)],
+        ],
+      ];
 
       $publication = Publication::create([
         'user_id' => $user->id,
         'workspace_id' => $workspaceId,
         'title' => $title,
         'slug' => Str::slug($title . '-' . Str::random(4)),
-        'status' => 'published',
+        'status' => $status,
         'goal' => $goal,
+        'body' => $template['body'],
         'description' => $description,
+        'hashtags' => $template['hashtags'],
+        'url' => $template['url'],
+        'platform_settings' => $platformSettings,
         'start_date' => $startDate,
         'end_date' => $endDate,
         'publish_date' => $startDate,
+        'published_at' => $status === 'published' ? $startDate : null,
+        'published_by' => $status === 'published' ? $user->id : null,
+        'approved_at' => in_array($status, ['published', 'approved', 'scheduled']) ? $startDate->copy()->subHours(2) : null,
+        'approved_by' => in_array($status, ['published', 'approved', 'scheduled']) ? $user->id : null,
       ]);
 
       // Create an activity record for the publication creation if an activities table exists
@@ -154,8 +235,10 @@ class ExistingUserDummyDataSeeder extends Seeder
         // ignore if activity table has different schema
       }
 
-      // Generate Analytics for this publication
-      $this->generateCampaignAnalytics($publication, $isCampaign);
+      // Generate Analytics for published publications
+      if ($status === 'published') {
+        $this->generateCampaignAnalytics($publication, $isCampaign);
+      }
     }
   }
 

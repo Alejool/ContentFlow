@@ -23,6 +23,8 @@ class DatabaseSeeder extends Seeder
       ->has(Publication::factory()->count(10))
       ->create();
 
+    $this->call(ExistingUserDummyDataSeeder::class);
+
     // Schema::enableForeignKeyConstraints();
   }
 }
