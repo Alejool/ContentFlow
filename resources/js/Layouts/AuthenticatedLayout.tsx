@@ -1,5 +1,6 @@
 import CommandPalette from "@/Components/CommandPalette/CommandPalette";
 import GlobalUploadIndicator from "@/Components/GlobalUploadIndicator";
+import SystemHealthIndicator from "@/Components/SystemHealthIndicator";
 import ActiveWorkspace from "@/Components/Layout/ActiveWorkspace";
 import MobileNavbar from "@/Components/Layout/MobileNavbar";
 import NotificationButton from "@/Components/Layout/NotificationButton";
@@ -131,6 +132,7 @@ export default function AuthenticatedLayout({
         <CommandPalette />
       </div>
       <GlobalUploadIndicator />
+      <SystemHealthIndicator />
     </div>
   );
 }
