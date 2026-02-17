@@ -15,9 +15,8 @@ class ThemeController extends Controller
    */
   public function update(Request $request)
   {
-    // Allow updating either 'theme' (light/dark) or 'theme_color' (primary color)
     $validated = $request->validate([
-      'theme' => ['nullable', Rule::in(['light', 'dark'])],
+      'theme' => ['nullable', Rule::in(['light', 'dark', 'system'])],
       'theme_color' => ['nullable', 'string', 'in:orange,blue,purple,green,yellow,pink,red,indigo,teal,sky'],
     ]);
 

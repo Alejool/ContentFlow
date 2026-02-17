@@ -1,12 +1,13 @@
 import axios from "axios";
 import { ReactNode, createContext, useEffect, useState } from "react";
 
-type Theme = "light" | "dark";
+type Theme = "light" | "dark" | "system";
 
 interface ThemeContextType {
   theme: Theme;
   toggleTheme: () => void;
   setTheme: (theme: Theme) => void;
+  actualTheme: "light" | "dark"; // El tema real aplicado (resuelve "system")
 }
 
 export const ThemeContext = createContext<ThemeContextType | undefined>(
@@ -24,7 +25,22 @@ export function ThemeProvider({
   initialTheme,
   isAuthenticated = false,
 }: ThemeProviderProps) {
-  const [theme, setThemeState] = useState<Theme>(initialTheme || "light");
+  const [theme, setThemeState] = useState<Theme>(initialTheme || "system");
+  const [actualTheme, setActualTheme] = useState<"light" | "dark">("light");
+
+  // Función para obtener el tema del sistema
+  const getSystemTheme = (): "light" | "dark" => {
+    if (typeof window === "undefined") return "light";
+    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  };
+
+  // Resolver el tema actual basado en la preferencia
+  const resolveTheme = (themePreference: Theme): "light" | "dark" => {
+    if (themePreference === "system") {
+      return getSystemTheme();
+    }
+    return themePreference;
+  };
 
   // Inicializar el tema solo en el cliente
   useEffect(() => {
@@ -37,7 +53,7 @@ export function ThemeProvider({
 
       // Priority if guest: 1. localStorage, 2. initialTheme prop, 3. system preference
       const stored = localStorage.getItem("theme") as Theme | null;
-      if (stored === "light" || stored === "dark") {
+      if (stored === "light" || stored === "dark" || stored === "system") {
         setThemeState(stored);
         return;
       }
@@ -48,13 +64,8 @@ export function ThemeProvider({
         return;
       }
 
-      // Detect system preference
-      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-        setThemeState("dark");
-        return;
-      }
-
-      setThemeState("light");
+      // Default to system
+      setThemeState("system");
     };
 
     initializeTheme();
@@ -64,28 +75,31 @@ export function ThemeProvider({
   useEffect(() => {
     if (typeof window === "undefined") return;
 
+    const resolved = resolveTheme(theme);
+    setActualTheme(resolved);
+
     const root = window.document.documentElement;
     root.classList.remove("light", "dark");
-    root.classList.add(theme);
+    root.classList.add(resolved);
     localStorage.setItem("theme", theme);
   }, [theme]);
 
-  // Listen for system theme changes
+  // Listen for system theme changes (only when theme is "system")
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === "undefined" || theme !== "system") return;
 
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-    const handleChange = (e: MediaQueryListEvent) => {
-      // Only auto-switch if user hasn't set a preference
-      const stored = localStorage.getItem("theme");
-      if (!stored) {
-        setThemeState(e.matches ? "dark" : "light");
-      }
+    const handleChange = () => {
+      const resolved = getSystemTheme();
+      setActualTheme(resolved);
+      const root = window.document.documentElement;
+      root.classList.remove("light", "dark");
+      root.classList.add(resolved);
     };
 
     mediaQuery.addEventListener("change", handleChange);
     return () => mediaQuery.removeEventListener("change", handleChange);
-  }, []);
+  }, [theme]);
 
   const setTheme = async (newTheme: Theme) => {
     setThemeState(newTheme);
@@ -101,12 +115,13 @@ export function ThemeProvider({
   };
 
   const toggleTheme = () => {
-    const newTheme = theme === "light" ? "dark" : "light";
+    // Ciclo: light -> dark -> system -> light
+    const newTheme = theme === "light" ? "dark" : theme === "dark" ? "system" : "light";
     setTheme(newTheme);
   };
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, setTheme }}>
+    <ThemeContext.Provider value={{ theme, toggleTheme, setTheme, actualTheme }}>
       {children}
     </ThemeContext.Provider>
   );
