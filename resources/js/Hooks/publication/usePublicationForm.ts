@@ -447,20 +447,44 @@ export const usePublicationForm = ({
 
       if (item.type === "video" && item.file) {
         try {
-          const duration = await getVideoDuration(item.file);
-          const youtubeType = duration <= 60 ? "short" : "video";
-          setVideoMetadata(item.tempId, { duration, youtubeType });
+          // Obtener metadatos completos del video
+          const video = document.createElement("video");
+          video.preload = "metadata";
+          
+          await new Promise<void>((resolve, reject) => {
+            video.onloadedmetadata = () => resolve();
+            video.onerror = () => reject(new Error("Error loading video"));
+            video.src = URL.createObjectURL(item.file!);
+          });
 
-          setPlatformSettings((prev) => {
-            const updated = { ...prev };
-            if (!updated.youtube) updated.youtube = {};
-            updated.youtube.type = youtubeType;
-            if (!updated.instagram) updated.instagram = {};
-            if (!updated.instagram.type) updated.instagram.type = "reel";
-            return updated;
+          const duration = Math.floor(video.duration);
+          const width = video.videoWidth;
+          const height = video.videoHeight;
+          const aspectRatio = width / height;
+          
+          URL.revokeObjectURL(video.src);
+
+          // Guardar metadatos extendidos
+          setVideoMetadata(item.tempId, {
+            duration,
+            width,
+            height,
+            aspectRatio,
+            youtubeType: duration <= 60 && aspectRatio < 1 ? "short" : "video",
+          });
+
+          // NO configurar automáticamente - dejar que el usuario elija manualmente
+          // Solo sugerir basado en las características del video
+          console.info("Video metadata:", {
+            duration,
+            width,
+            height,
+            aspectRatio,
+            isVertical: aspectRatio < 1,
+            suggestedForShort: duration <= 60 && aspectRatio < 1,
           });
         } catch (e) {
-          console.error("Video duration error", e);
+          console.error("Video metadata error", e);
         }
       }
     }

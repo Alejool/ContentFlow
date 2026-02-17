@@ -15,7 +15,13 @@ interface MediaState {
   mediaFiles: MediaFile[];
   videoMetadata: Record<
     string,
-    { duration: number; youtubeType: "short" | "video" }
+    {
+      duration: number;
+      width?: number;
+      height?: number;
+      aspectRatio?: number;
+      youtubeType: "short" | "video";
+    }
   >;
   thumbnails: Record<string, File>;
   removedThumbnailIds: number[];
@@ -27,7 +33,13 @@ interface MediaState {
   updateFile: (tempId: string, updates: Partial<MediaFile>) => void;
   setVideoMetadata: (
     tempId: string,
-    metadata: { duration: number; youtubeType: "short" | "video" },
+    metadata: {
+      duration: number;
+      width?: number;
+      height?: number;
+      aspectRatio?: number;
+      youtubeType: "short" | "video";
+    }
   ) => void;
   setThumbnail: (tempId: string, file: File) => void;
   clearThumbnail: (tempId: string) => void;
