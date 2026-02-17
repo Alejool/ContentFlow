@@ -1,7 +1,5 @@
 import Logo from "@/../assets/logo.png";
-import LanguageSwitcher from "@/Components/common/ui/LanguageSwitcher";
 import NavLink from "@/Components/common/ui/NavLink";
-import ThemeSwitcher from "@/Components/common/ui/ThemeSwitcher";
 import WorkspaceSwitcher from "@/Components/Workspace/WorkspaceSwitcher";
 import { useTheme } from "@/Hooks/useTheme";
 import { Link, usePage } from "@inertiajs/react";
@@ -49,7 +47,7 @@ export default function Sidebar({
   setIsSidebarOpen,
 }: SidebarProps) {
   const { t } = useTranslation();
-  const { theme } = useTheme();
+  const { actualTheme } = useTheme();
   const { auth } = usePage().props as any;
 
   const isRouteActive = (routeName: string): boolean => {
@@ -85,7 +83,7 @@ export default function Sidebar({
     return routeUrls[routeName] || `/${routeName.replace(".", "/")}`;
   };
 
-  const isDark = theme === "dark";
+  const isDark = actualTheme === "dark";
 
   const classes = {
     sidebarBg: isDark ? "bg-neutral-900" : "bg-white",
@@ -238,25 +236,6 @@ export default function Sidebar({
               );
             })}
           </nav>
-
-          <div className="mt-auto">
-            <div
-              className={`p-4 border-t ${classes.borderColor} ${
-                isSidebarOpen
-                  ? "flex items-center justify-between"
-                  : "flex flex-col items-center gap-3"
-              }`}
-            >
-              <div
-                className={`flex items-center justify-center gap-2 w-full ${
-                  isSidebarOpen ? "flex-row" : "flex-col"
-                }`}
-              >
-                <ThemeSwitcher />
-                <LanguageSwitcher />
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </>

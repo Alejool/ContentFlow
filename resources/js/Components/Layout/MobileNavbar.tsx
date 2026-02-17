@@ -1,7 +1,5 @@
 import Logo from "@/../assets/logo-with-name.png";
-import LanguageSwitcher from "@/Components/common/ui/LanguageSwitcher";
 import ResponsiveNavLink from "@/Components/common/ui/ResponsiveNavLink";
-import ThemeSwitcher from "@/Components/common/ui/ThemeSwitcher";
 import { useTheme } from "@/Hooks/useTheme";
 import {
   BarChart3,
@@ -47,7 +45,7 @@ export default function MobileNavbar({
   setShowingNavigationDropdown,
 }: MobileNavbarProps) {
   const { t } = useTranslation();
-  const { theme } = useTheme();
+  const { actualTheme } = useTheme();
 
   const isProfileActive = !!route().current("profile.edit");
 
@@ -55,7 +53,7 @@ export default function MobileNavbar({
     <nav
       className={`w-full lg:hidden sticky top-0 z-50 transition-all duration-300 shadow-lg backdrop-blur-2xl
         ${
-          theme === "dark"
+          actualTheme === "dark"
             ? "bg-neutral-900/90 border-b border-neutral-800"
             : "bg-white/90 border-b border-gray-200"
         }`}
@@ -69,7 +67,7 @@ export default function MobileNavbar({
               }
               className={`inline-flex items-center justify-center p-2 rounded-lg transition-colors duration-200
                 ${
-                  theme === "dark"
+                  actualTheme === "dark"
                     ? "text-gray-400 hover:text-white hover:bg-neutral-800"
                     : "text-gray-700 hover:text-primary-600 hover:bg-gray-100"
                 }`}
@@ -99,7 +97,7 @@ export default function MobileNavbar({
 
       <div
         className={`${showingNavigationDropdown ? "block" : "hidden"} border-t ${
-          theme === "dark"
+          actualTheme === "dark"
             ? "border-neutral-800 bg-neutral-900"
             : "border-gray-100 bg-white"
         }`}
@@ -117,7 +115,7 @@ export default function MobileNavbar({
                     isActive
                       ? `bg-primary-600 text-white shadow-sm`
                       : `${
-                          theme === "dark"
+                          actualTheme === "dark"
                             ? "text-gray-300 hover:bg-neutral-800 hover:text-primary-400"
                             : "text-gray-700 hover:bg-gray-50 hover:text-primary-600"
                         }`
@@ -135,29 +133,22 @@ export default function MobileNavbar({
           })}
 
           <div
-            className={`pt-4 mt-4 border-t ${theme === "dark" ? "border-neutral-800" : "border-gray-100"}`}
+            className={`pt-4 mt-4 border-t ${actualTheme === "dark" ? "border-neutral-800" : "border-gray-100"}`}
           >
-            <div className="flex items-center justify-between gap-4">
-              <ResponsiveNavLink
-                href={route("logout")}
-                method="post"
-                as="button"
-                className={`flex-1 flex items-center justify-center space-x-3 px-4 py-3 rounded-lg border transition-all duration-300 font-bold
-                    ${
-                      theme === "dark"
-                        ? "bg-neutral-800 border-neutral-700 text-red-400 hover:bg-red-900/20"
-                        : "bg-gray-50 border-gray-200 text-red-600 hover:bg-red-50"
-                    }`}
-              >
-                <LogOut className="h-5 w-5" />
-                <span>{t("nav.logout")}</span>
-              </ResponsiveNavLink>
-
-              <div className="flex items-center bg-gray-100 dark:bg-neutral-800 rounded-lg p-1">
-                <ThemeSwitcher />
-                <LanguageSwitcher />
-              </div>
-            </div>
+            <ResponsiveNavLink
+              href={route("logout")}
+              method="post"
+              as="button"
+              className={`w-full flex items-center justify-center space-x-3 px-4 py-3 rounded-lg border transition-all duration-300 font-bold
+                  ${
+                    actualTheme === "dark"
+                      ? "bg-neutral-800 border-neutral-700 text-red-400 hover:bg-red-900/20"
+                      : "bg-gray-50 border-gray-200 text-red-600 hover:bg-red-50"
+                  }`}
+            >
+              <LogOut className="h-5 w-5" />
+              <span>{t("nav.logout")}</span>
+            </ResponsiveNavLink>
           </div>
         </div>
       </div>
