@@ -157,10 +157,7 @@ class PlatformPublishService
       } else {
         $this->logService->markAsFailed($postLog, $result->errorMessage);
 
-        // Notify Workspace via Webhooks
-        if ($publication->workspace) {
-          $publication->workspace->notify(new PublicationResultNotification($postLog, 'failed', $result->errorMessage));
-        }
+        // Don't notify here - Job will handle notification after all retries
 
         return [
           'success' => false,
@@ -172,10 +169,7 @@ class PlatformPublishService
       Log::error('Publication failed', ['account' => $socialAccount->platform, 'error' => $e->getMessage()]);
       $this->logService->markAsFailed($postLog, $e->getMessage());
 
-      // Notify Workspace via Webhooks
-      if ($publication->workspace) {
-        $publication->workspace->notify(new PublicationResultNotification($postLog, 'failed', $e->getMessage()));
-      }
+      // Don't notify here - Job will handle notification after all retries
 
       return [
         'success' => false,

@@ -129,14 +129,29 @@ class FacebookService extends BaseSocialService
       'videoUrl' => $videoUrl
     ]);
 
-    $response = $this->client->post($endpoint, ['form_params' => $params]);
-    $result = json_decode($response->getBody(), true);
+    try {
+      // Use extended timeout for video uploads (5 minutes)
+      $response = $this->client->post($endpoint, [
+        'form_params' => $params,
+        'timeout' => 300,
+        'connect_timeout' => 30
+      ]);
+      $result = json_decode($response->getBody(), true);
 
-    if (!isset($result['id'])) {
-      throw new \Exception("Failed to get Video ID from Facebook: " . json_encode($result));
+      if (!isset($result['id'])) {
+        throw new \Exception("Failed to get Video ID from Facebook: " . json_encode($result));
+      }
+
+      return $result['id'];
+    } catch (\Exception $e) {
+      // Log the full error for debugging
+      Log::error('Facebook video upload failed', [
+        'error' => $e->getMessage(),
+        'pageId' => $pageId,
+        'videoUrl' => $videoUrl
+      ]);
+      throw $e;
     }
-
-    return $result['id'];
   }
 
   /**

@@ -38,7 +38,7 @@ class PublicationProcessingStartedNotification extends BaseNotification implemen
       $description .= "\n";
     }
     
-    $description .= "Hora de inicio: " . now()->format('d/m/Y - h:i A') . "\n";
+    $description .= "Hora de inicio: " . \Carbon\Carbon::now()->format('d/m/Y - H:i') . "\n";
     $description .= "Estado: Publicando\n\n";
     $description .= "Tu contenido está siendo enviado a las plataformas seleccionadas.\n";
     $description .= "Recibirás una notificación cuando el proceso finalice.";

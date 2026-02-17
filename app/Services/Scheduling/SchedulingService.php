@@ -50,11 +50,20 @@ class SchedulingService
       }
     }
 
-    // Cleanup: Remove accounts that are no longer selected but are still in pending status
-    ScheduledPost::where('publication_id', $publication->id)
-      ->where('status', 'pending')
-      ->whereNotIn('social_account_id', $accountIds)
-      ->delete();
+    // Cleanup: Remove accounts that are no longer selected
+    // Only delete pending scheduled posts to avoid removing published/posted records
+    if (empty($accountIds)) {
+      // If no accounts selected, remove all pending schedules
+      ScheduledPost::where('publication_id', $publication->id)
+        ->where('status', 'pending')
+        ->delete();
+    } else {
+      // Remove pending schedules for accounts that are no longer selected
+      ScheduledPost::where('publication_id', $publication->id)
+        ->where('status', 'pending')
+        ->whereNotIn('social_account_id', $accountIds)
+        ->delete();
+    }
   }
 
   public function syncSchedules(Publication $publication, array $accountIds, array $accountSchedules = []): void

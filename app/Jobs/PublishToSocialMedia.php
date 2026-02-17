@@ -104,7 +104,8 @@ class PublishToSocialMedia implements ShouldQueue
           'publish_date' => now(),
         ]);
         
-        // Only send notification on final success (no more retries needed)
+        // Only send notification once - delete job from queue to prevent retries
+        $this->delete();
         $this->sendSuccessNotification($publication, $platformResults);
       } else {
         $publication->logActivity('failed', [
@@ -112,7 +113,8 @@ class PublishToSocialMedia implements ShouldQueue
           'attempt' => $this->attempts(),
         ], $publisher);
 
-        $publication->update(['status' => 'failed']);
+        // Don't update publication status here - let it stay as 'publishing' until all retries exhausted
+        // The failed() method will update it to 'failed' after all retries
         
         // Throw exception to trigger retry mechanism
         throw new \Exception('All platforms failed: ' . (empty($platformResults) ? ($result['message'] ?? 'Initialization failed') : 'All platforms failed'));
@@ -141,7 +143,8 @@ class PublishToSocialMedia implements ShouldQueue
         'attempt' => $this->attempts()
       ], $publisher);
 
-      $publication->update(['status' => 'failed']);
+      // Don't update publication status here - let it stay as 'publishing' until all retries exhausted
+      // The failed() method will update it to 'failed' after all retries
       
       // Don't send notification here - will be sent in failed() method after all retries
       
@@ -297,7 +300,29 @@ class PublishToSocialMedia implements ShouldQueue
       ];
     }
     
+    // Send notification to user and workspace (includes Discord/Slack)
     $this->sendGeneralFailureNotification($publication, $exception->getMessage(), $platformResults);
+    
+    // Also send individual platform notifications to Discord/Slack for each failed log
+    $failedLogs = \App\Models\Social\SocialPostLog::where('publication_id', $publication->id)
+      ->whereIn('social_account_id', $this->socialAccountIds)
+      ->where('status', 'failed')
+      ->get();
+    
+    foreach ($failedLogs as $log) {
+      try {
+        if ($publication->workspace) {
+          $publication->workspace->notify(
+            new \App\Notifications\PublicationResultNotification($log, 'failed', $log->error_message)
+          );
+        }
+      } catch (\Exception $e) {
+        Log::error('Failed to send platform notification', [
+          'log_id' => $log->id,
+          'error' => $e->getMessage()
+        ]);
+      }
+    }
 
     event(new PublicationStatusUpdated(
       userId: $publication->user_id,

@@ -140,9 +140,15 @@ class UpdatePublicationAction
 
       // Handle Schedules - Always process if social_accounts key exists
       if (array_key_exists('social_accounts', $data)) {
+        // Handle case where social_accounts might be sent as JSON string
+        $socialAccounts = $data['social_accounts'] ?? [];
+        if (is_string($socialAccounts)) {
+          $socialAccounts = json_decode($socialAccounts, true) ?? [];
+        }
+        
         $this->schedulingService->syncSchedules(
           $publication,
-          $data['social_accounts'] ?? [],
+          $socialAccounts,
           $data['social_account_schedules'] ?? $data['account_schedules'] ?? []
         );
       } elseif (!empty($data['scheduled_at']) && $publication->status !== 'scheduled') {
