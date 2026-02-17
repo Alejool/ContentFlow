@@ -700,6 +700,8 @@ export const usePublicationForm = ({
       formData.append("scheduled_at", data.scheduled_at || "");
       formData.append("social_accounts_sync", "true");
 
+      // Always send social_accounts as array format for consistency
+      // When empty, Laravel will receive an empty array
       socialAccounts.forEach((id, index) => {
         formData.append(`social_accounts[${index}]`, id.toString());
         if (id && accountSchedules[id]) {
