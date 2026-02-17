@@ -14,6 +14,16 @@ export default function InstagramSettings({
 }: InstagramSettingsProps) {
   const { t } = useTranslation();
 
+  // Establecer valores por defecto si no existen
+  const defaultSettings = {
+    type: settings?.type || "reel",
+  };
+
+  // Si los settings están vacíos, inicializar con valores por defecto
+  if (Object.keys(settings).length === 0) {
+    onSettingsChange(defaultSettings);
+  }
+
   const handleChange = (key: string, value: any) => {
     onSettingsChange({ ...settings, [key]: value });
   };
@@ -38,7 +48,7 @@ export default function InstagramSettings({
             icon={Video}
             iconColor="text-pink-500"
             iconBgColor="bg-pink-100 dark:bg-pink-900/20"
-            selected={settings?.type === "reel"}
+            selected={settings?.type === "reel" || (!settings?.type && defaultSettings.type === "reel")}
             onSelect={(val) => handleChange("type", val)}
           />
           <PlatformCard

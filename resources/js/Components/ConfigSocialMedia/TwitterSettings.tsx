@@ -15,6 +15,16 @@ export default function TwitterSettings({
 }: TwitterSettingsProps) {
   const { t } = useTranslation();
 
+  // Establecer valores por defecto si no existen
+  const defaultSettings = {
+    type: settings?.type || "tweet",
+  };
+
+  // Si los settings están vacíos, inicializar con valores por defecto
+  if (Object.keys(settings).length === 0) {
+    onSettingsChange(defaultSettings);
+  }
+
   const handleChange = (key: string, value: any) => {
     onSettingsChange({ ...settings, [key]: value });
   };
@@ -38,7 +48,7 @@ export default function TwitterSettings({
             icon={Twitter}
             iconColor="text-sky-500"
             iconBgColor="bg-sky-100 dark:bg-sky-900/20"
-            selected={settings?.type === "tweet"}
+            selected={settings?.type === "tweet" || (!settings?.type && defaultSettings.type === "tweet")}
             onSelect={(val) => handleChange("type", val)}
           />
           <PlatformCard

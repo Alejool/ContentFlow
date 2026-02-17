@@ -24,6 +24,15 @@ interface PlatformSettingsModalProps {
   platform: string;
   settings: any;
   onSettingsChange: (newSettings: any) => void;
+  videoMetadata?: {
+    duration: number;
+    width?: number;
+    height?: number;
+    aspectRatio?: number;
+  };
+  allPlatforms?: string[];
+  allSettings?: Record<string, any>;
+  onAllSettingsChange?: (platform: string, newSettings: any) => void;
 }
 
 export default function PlatformSettingsModal({
@@ -33,45 +42,52 @@ export default function PlatformSettingsModal({
   platform,
   settings,
   onSettingsChange,
+  videoMetadata,
+  allPlatforms = [],
+  allSettings = {},
+  onAllSettingsChange,
 }: PlatformSettingsModalProps) {
   const { t } = useTranslation();
   const { theme } = useTheme();
 
-  const renderContent = () => {
-    switch (platform.toLowerCase()) {
+  const isAllPlatforms = platform.toLowerCase() === "all" || allPlatforms.length > 0;
+
+  const renderPlatformSettings = (platformName: string, platformSettings: any, onChange: (newSettings: any) => void) => {
+    switch (platformName.toLowerCase()) {
       case "youtube":
         return (
           <YoutubeSettings
-            settings={settings}
-            onSettingsChange={onSettingsChange}
+            settings={platformSettings}
+            onSettingsChange={onChange}
+            videoMetadata={videoMetadata}
           />
         );
       case "facebook":
         return (
           <FacebookSettings
-            settings={settings}
-            onSettingsChange={onSettingsChange}
+            settings={platformSettings}
+            onSettingsChange={onChange}
           />
         );
       case "instagram":
         return (
           <InstagramSettings
-            settings={settings}
-            onSettingsChange={onSettingsChange}
+            settings={platformSettings}
+            onSettingsChange={onChange}
           />
         );
       case "tiktok":
         return (
           <TikTokSettings
-            settings={settings}
-            onSettingsChange={onSettingsChange}
+            settings={platformSettings}
+            onSettingsChange={onChange}
           />
         );
       case "twitter":
         return (
           <TwitterSettings
-            settings={settings}
-            onSettingsChange={onSettingsChange}
+            settings={platformSettings}
+            onSettingsChange={onChange}
           />
         );
       default:
@@ -79,20 +95,60 @@ export default function PlatformSettingsModal({
     }
   };
 
-  const getPlatformIcon = () => {
-    switch (platform.toLowerCase()) {
+  const renderContent = () => {
+    if (isAllPlatforms && allPlatforms.length > 0) {
+      return (
+        <div className="space-y-8">
+          {allPlatforms.map((platformName) => (
+            <div
+              key={platformName}
+              className={`p-6 rounded-lg border ${
+                theme === "dark"
+                  ? "bg-neutral-800/50 border-neutral-700"
+                  : "bg-gray-50 border-gray-200"
+              }`}
+            >
+              <div className="flex items-center gap-3 mb-6">
+                {getPlatformIcon(platformName)}
+                <h3 className="text-lg font-bold uppercase">
+                  {t(`platformSettings.${platformName.toLowerCase()}.title`) || platformName}
+                </h3>
+              </div>
+              {renderPlatformSettings(
+                platformName,
+                allSettings[platformName.toLowerCase()] || {},
+                (newSettings) => {
+                  if (onAllSettingsChange) {
+                    onAllSettingsChange(platformName.toLowerCase(), newSettings);
+                  }
+                }
+              )}
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    return renderPlatformSettings(platform, settings, onSettingsChange);
+  };
+
+  const getPlatformIcon = (platformName?: string) => {
+    const targetPlatform = platformName || platform;
+    switch (targetPlatform.toLowerCase()) {
       case "youtube":
         return <Youtube className="w-6 h-6 text-red-500" />;
       case "facebook":
         return <Facebook className="w-6 h-6 text-blue-500" />;
       case "tiktok":
         return (
-          <Video className="w-6 h-6 text-neutral-950 dark:text-neutral-50" />
+          <Video className="w-6 h-6 text-gray-700 dark:text-gray-300" />
         );
       case "twitter":
-        return <Twitter className="w-6 h-6 text-sky-500" />;
+        return <Twitter className="w-6 h-6 text-gray-700 dark:text-gray-300" />;
       case "instagram":
         return <Instagram className="w-6 h-6 text-pink-500" />;
+      case "all":
+        return <Settings2 className="w-6 h-6 text-primary-500" />;
       default:
         return <Settings2 className="w-6 h-6 text-primary-500" />;
     }
@@ -123,10 +179,12 @@ export default function PlatformSettingsModal({
               </div>
               <div>
                 <h2 className="text-2xl font-black tracking-tight uppercase">
-                  {platform && platform.trim()
-                    ? t(`platformSettings.${platform.toLowerCase()}.title`) ||
-                      `${platform} Defaults`
-                    : "Platform Defaults"}
+                  {isAllPlatforms
+                    ? t("platformSettings.all.title") || "All Platforms"
+                    : platform && platform.trim()
+                      ? t(`platformSettings.${platform.toLowerCase()}.title`) ||
+                        `${platform} Defaults`
+                      : "Platform Defaults"}
                 </h2>
                 <p
                   className={`text-sm mt-1 font-medium ${

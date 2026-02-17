@@ -15,6 +15,19 @@ export default function TikTokSettings({
 }: TikTokSettingsProps) {
   const { t } = useTranslation();
 
+  // Establecer valores por defecto si no existen
+  const defaultSettings = {
+    privacy: settings?.privacy || "public",
+    disable_comment: settings?.disable_comment ?? false,
+    disable_duet: settings?.disable_duet ?? false,
+    disable_stitch: settings?.disable_stitch ?? false,
+  };
+
+  // Si los settings están vacíos, inicializar con valores por defecto
+  if (Object.keys(settings).length === 0) {
+    onSettingsChange(defaultSettings);
+  }
+
   const handleChange = (key: string, value: any) => {
     onSettingsChange({ ...settings, [key]: value });
   };
@@ -55,7 +68,7 @@ export default function TikTokSettings({
                 label={label}
                 description={description}
                 icon={Icon}
-                selected={settings?.privacy === value}
+                selected={settings?.privacy === value || (!settings?.privacy && defaultSettings.privacy === value)}
                 onSelect={(val) => handleChange("privacy", val)}
               />
             ))}
