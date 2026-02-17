@@ -12,11 +12,21 @@
     "appearance": "Appearance",
     "settings_description": "Update your personal information and security settings.",
     "theme": {
-      "title": "System Appearance",
+      "title": "Color Theme",
       "description": "Select the primary system color. This will affect buttons, links, and other highlighted elements.",
       "success_title": "Theme Updated!",
       "success_message": "The system color has been updated successfully.",
       "close": "Close"
+    },
+    "appearance": {
+      "title": "Appearance Mode",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    },
+    "language": {
+      "title": "Language",
+      "success_message": "Language updated successfully"
     },
     "editProfile": "Edit Profile",
     "changePassword": "Change Password",

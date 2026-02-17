@@ -11,11 +11,21 @@
     "title": "Perfil",
     "settings_description": "Actualiza tu información personal y ajustes de seguridad.",
     "theme": {
-      "title": "Apariencia del Sistema",
+      "title": "Color del Tema",
       "description": "Selecciona el color principal del sistema. Esto afectará a botones, enlaces y otros elementos destacados.",
       "success_title": "¡Tema actualizado!",
       "success_message": "El color del sistema se ha actualizado correctamente.",
       "close": "Cerrar"
+    },
+    "appearance": {
+      "title": "Modo de Apariencia",
+      "light": "Claro",
+      "dark": "Oscuro",
+      "system": "Sistema"
+    },
+    "language": {
+      "title": "Idioma",
+      "success_message": "Idioma actualizado correctamente"
     },
     "editProfile": "Editar Perfil",
     "changePassword": "Cambiar Contraseña",
