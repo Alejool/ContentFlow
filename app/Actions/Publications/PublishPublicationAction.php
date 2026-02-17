@@ -98,16 +98,27 @@ class PublishPublicationAction
       status: 'publishing'
     ));
 
-    // Notify user and workspace (Persistent / Webhooks)
+    // Send notification with platform details
     try {
-      $notification = new \App\Notifications\PublicationProcessingStartedNotification($publication);
+      $accountsData = $socialAccounts->map(fn($acc) => [
+        'platform' => $acc->platform,
+        'account_name' => $acc->account_name
+      ])->toArray();
+      
+      $notification = new \App\Notifications\PublicationProcessingStartedNotification($publication, $accountsData);
       $publication->user->notify($notification);
+      
       if ($publication->workspace) {
         $publication->workspace->notify($notification);
       }
     } catch (\Exception $e) {
-      Log::error("Error sending start notification: " . $e->getMessage());
+      Log::error('Failed to send processing notification', [
+        'publication_id' => $publication->id,
+        'error' => $e->getMessage()
+      ]);
     }
+
+    // NOTE: Final result notifications will be sent at the end of the job
 
     // Mark any pending scheduled posts for these platforms as 'posted'
     ScheduledPost::where('publication_id', $publication->id)

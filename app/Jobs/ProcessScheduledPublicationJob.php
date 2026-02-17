@@ -4,8 +4,6 @@ namespace App\Jobs;
 
 use App\Models\Social\ScheduledPost;
 use App\Models\Publications\Publication;
-use App\Notifications\PublicationProcessingStartedNotification;
-use App\Notifications\PublicationScheduledNotification;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -64,20 +62,7 @@ class ProcessScheduledPublicationJob implements ShouldQueue
       status: 'publishing'
     ));
 
-    // Notify user
-    try {
-      $notification = new PublicationProcessingStartedNotification($publication);
-      $publication->user->notify($notification);
-      
-      if ($publication->workspace) {
-        $publication->workspace->notify($notification);
-      }
-    } catch (\Exception $e) {
-      Log::error("Failed to send processing notification", [
-        'publication_id' => $publication->id,
-        'error' => $e->getMessage()
-      ]);
-    }
+    // NOTE: No notification sent here - will be sent by PublishToSocialMedia job at the end
 
     // Dispatch publishing job
     PublishToSocialMedia::dispatch(
@@ -97,7 +82,7 @@ class ProcessScheduledPublicationJob implements ShouldQueue
   
   public function failed(\Throwable $exception): void
   {
-    Log::error('ProcessScheduledPublicationJob failed', [
+    Log::error('ProcessScheduledPublicationJob failed permanently', [
       'publication_id' => $this->publicationId,
       'error' => $exception->getMessage()
     ]);
@@ -109,10 +94,12 @@ class ProcessScheduledPublicationJob implements ShouldQueue
     if ($publication) {
       $publication->update(['status' => 'failed']);
       
+      // ONLY send notification here after job completely failed
       try {
         $notification = new \App\Notifications\PublicationPostFailedNotification(
           $publication,
-          'Scheduled processing failed: ' . $exception->getMessage()
+          'Scheduled processing failed: ' . $exception->getMessage(),
+          []
         );
         
         $publication->user->notify($notification);

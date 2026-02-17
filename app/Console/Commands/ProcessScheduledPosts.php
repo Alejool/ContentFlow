@@ -69,7 +69,12 @@ class ProcessScheduledPosts extends Command
 
         // Notify user
         try {
-          $notification = new PublicationProcessingStartedNotification($publication);
+          $accountsData = $socialAccounts->map(fn($acc) => [
+            'platform' => $acc->platform,
+            'account_name' => $acc->account_name
+          ])->toArray();
+          
+          $notification = new PublicationProcessingStartedNotification($publication, $accountsData);
           $publication->user->notify($notification);
           
           if ($publication->workspace) {
