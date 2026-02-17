@@ -19,6 +19,11 @@ class Kernel extends ConsoleKernel
       ->hourly()
       ->withoutOverlapping();
 
+    // Sincronizar analytics detallados cada 6 horas
+    $schedule->command('analytics:sync --days=7')
+      ->everySixHours()
+      ->withoutOverlapping();
+
     // Limpiar tokens expirados diariamente
     $schedule->command('social:cleanup-tokens')->daily();
 
