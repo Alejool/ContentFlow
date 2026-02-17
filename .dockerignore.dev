@@ -1,0 +1,66 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Tests (no necesarios en imagen)
+/tests
+/phpunit.xml
+/.phpunit.result.cache
+
+# Documentation
+/docs
+README.md
+CHANGELOG.md
+DOCKER-DEV.md
+
+# CI/CD
+.github
+.gitlab-ci.yml
+
+# Logs (se generan en runtime)
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Cache (se genera en runtime)
+/bootstrap/cache/*
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/logs/*
+
+# Misc
+.editorconfig
+.styleci.yml
+
+# Docker files
+docker-compose.yml
+docker-compose.dev.yml
+Dockerfile
+Dockerfile.dev
+.dockerignore
+.dockerignore.dev
+
+# Scripts
+Makefile.dev
+dev-start.bat
+dev-stop.bat
+
+# Environment (se monta como volumen)
+.env
+.env.backup
+.env.production
+.env.docker

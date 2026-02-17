@@ -1,28 +1,82 @@
-FROM php:8.4-alpine
+FROM php:8.4-alpine AS development
 
+# ----------------------------------------------------
+# 1. System dependencies + PHP build dependencies (igual que producción)
+# ----------------------------------------------------
 RUN apk add --no-cache \
-    bash curl git unzip \
-    icu-dev libzip-dev oniguruma-dev postgresql-dev \
-    linux-headers openssl-dev autoconf pkgconf make g++ gcc libc-dev \
-    brotli-dev zstd-dev
+    bash \
+    curl \
+    git \
+    unzip \
+    icu-dev \
+    libzip-dev \
+    oniguruma-dev \
+    libxslt-dev \
+    postgresql-dev \
+    nodejs \
+    npm \
+    linux-headers \
+    openssl-dev \
+    brotli-dev \
+    zstd-dev \
+    libxml2-dev \
+    autoconf \
+    pkgconf \
+    make \
+    g++ \
+    gcc \
+    libc-dev \
+    re2c \
+    file
 
+# ----------------------------------------------------
+# 2. PHP extensions (Redis, Swoole, PostgreSQL, etc.) - igual que producción
+# ----------------------------------------------------
 RUN pecl install redis swoole \
     && docker-php-ext-enable redis swoole \
-    && docker-php-ext-install pdo pdo_pgsql pgsql intl zip opcache pcntl posix bcmath sockets
+    && docker-php-ext-install \
+        pdo \
+        pdo_pgsql \
+        pgsql \
+        intl \
+        zip \
+        opcache \
+        pcntl \
+        posix \
+        xsl \
+        bcmath \
+        sockets
 
-COPY docker/php/custom.ini /usr/local/etc/php/conf.d/99-custom.ini
-COPY docker/start-app.sh /start.sh
-RUN chmod +x /start.sh
+# ----------------------------------------------------
+# 3. PHP configuration para DEV (sin opcache para hot-reload)
+# ----------------------------------------------------
+RUN echo "memory_limit=512M" > /usr/local/etc/php/conf.d/99-dev.ini \
+    && echo "display_errors=On" >> /usr/local/etc/php/conf.d/99-dev.ini \
+    && echo "error_reporting=E_ALL" >> /usr/local/etc/php/conf.d/99-dev.ini \
+    && echo "opcache.enable=0" >> /usr/local/etc/php/conf.d/99-dev.ini \
+    && echo "opcache.validate_timestamps=1" >> /usr/local/etc/php/conf.d/99-dev.ini
+
+# ----------------------------------------------------
+# 4. Install Composer
+# ----------------------------------------------------
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
+# ----------------------------------------------------
+# 5. Application setup
+# ----------------------------------------------------
 WORKDIR /var/www/html
 
-COPY composer.json composer.lock ./
-RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist
+# NO copiar código (se monta como volumen para hot-reload)
+# Solo preparar permisos
+RUN mkdir -p storage bootstrap/cache \
+    && chmod -R 777 storage bootstrap/cache
 
-COPY . .
-RUN composer dump-autoload --optimize
+# ----------------------------------------------------
+# 6. Expose ports (mismo que producción)
+# ----------------------------------------------------
+EXPOSE 8080 6001 5173
 
-EXPOSE 8080 6001
-
+# ----------------------------------------------------
+# 7. Start Laravel Octane con --watch para hot-reload
+# ----------------------------------------------------
 CMD ["php", "artisan", "octane:start", "--server=swoole", "--host=0.0.0.0", "--port=8080", "--watch"]

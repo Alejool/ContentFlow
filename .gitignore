@@ -75,3 +75,10 @@ test_relationships.php
 test_relationships.php
 verify_db.php
 start-queue.bat
+
+
+rebuild.bat
+makefile.dev
+DOCKER-DEV.md
+
+INICIO-RAPIDO.md

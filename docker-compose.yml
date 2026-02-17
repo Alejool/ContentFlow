@@ -10,7 +10,7 @@ services:
         VITE_REVERB_HOST: "${VITE_REVERB_HOST}"
         VITE_REVERB_PORT: "${REVERB_PORT}"
         VITE_REVERB_SCHEME: "${REVERB_SCHEME}"
-    container_name: contentflow_app
+    container_name: contentflow_app_prod
     restart: unless-stopped
     working_dir: /var/www/html
     volumes:
@@ -40,7 +40,7 @@ services:
   # Nginx Reverse Proxy
   nginx:
     image: nginx:alpine
-    container_name: contentflow_nginx
+    container_name: contentflow_nginx_prod
     restart: unless-stopped
     ports:
       - "80:80"
@@ -56,7 +56,7 @@ services:
   # PostgreSQL
   pgsql:
     image: postgres:15-alpine
-    container_name: contentflow_pgsql
+    container_name: contentflow_pgsql_prod
     restart: unless-stopped
     ports:
       - "5432:5432"
@@ -79,7 +79,7 @@ services:
   # Redis
   redis:
     image: redis:7-alpine
-    container_name: contentflow_redis
+    container_name: contentflow_redis_prod
     restart: unless-stopped
     ports:
       - "6379:6379"
@@ -99,7 +99,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: production
-    container_name: contentflow_queue
+    container_name: contentflow_queue_prod
     restart: unless-stopped
     working_dir: /var/www/html
     command: sh -c "if [ \"$$QUEUE_CONNECTION\" = \"redis\" ]; then php artisan horizon; else php artisan queue:work --queue=publishing,publishing:notify,notifications,emails,high,default,low --tries=3; fi"
@@ -122,7 +122,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: production
-    container_name: contentflow_reverb
+    container_name: contentflow_reverb_prod
     restart: unless-stopped
     working_dir: /var/www/html
     command: php artisan reverb:start --host=0.0.0.0 --port=8080
@@ -147,7 +147,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: production
-    container_name: contentflow_scheduler
+    container_name: contentflow_scheduler_prod
     restart: unless-stopped
     working_dir: /var/www/html
     command: sh -c "while true; do php artisan schedule:run --no-interaction; sleep 60; done"
@@ -167,7 +167,7 @@ services:
   # Redis Commander (Web UI)
   redis-commander:
     image: rediscommander/redis-commander:latest
-    container_name: contentflow_redis_commander
+    container_name: contentflow_redis_commander_prod
     restart: unless-stopped
     environment:
       - REDIS_HOSTS=local:redis:6379
@@ -181,7 +181,7 @@ services:
   # vite
   vite:
     image: node:20-alpine
-    container_name: contentflow_vite
+    container_name: contentflow_vite_prod
     working_dir: /var/www/html
     command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
     ports:
@@ -197,11 +197,17 @@ services:
 
 networks:
   laravel:
+    name: contentflow_network_prod
     driver: bridge
 
 volumes:
   pgsql_data:
+    name: contentflow_pgsql_data_prod
   redis_data:
+    name: contentflow_redis_data_prod
   cf_vendor_v2:
+    name: contentflow_vendor_prod
   cf_node_modules_v2:
+    name: contentflow_node_modules_prod
   cf_public_build:
+    name: contentflow_public_build_prod
