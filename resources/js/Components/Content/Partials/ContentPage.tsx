@@ -249,26 +249,26 @@ export default function ContentPage() {
                       variant="primary"
                       size="md"
                       icon={Plus}
-                      className="gap-2 flex-end"
+                      className="gap-2"
                     >
                       {t("manageContent.createNew")}
                     </Button>
                   </Dropdown.Trigger>
                   <Dropdown.Content
                     align="left"
-                    className="md:!left-auto md:!right-0 md:!origin-top-right"
+                    className="lg:!left-auto lg:!right-0 lg:!origin-top-right"
                     width="auto"
-                    contentClasses="py-1 bg-white dark:bg-neutral-800 shadow-xl rounded-lg border border-gray-200 dark:border-neutral-700 min-w-[200px]"
+                    contentClasses="py-2 bg-white dark:bg-neutral-800 shadow-lg rounded-xl border border-gray-100 dark:border-neutral-700 min-w-[220px]"
                   >
                     <Button
                       onClick={() => openAddModal("publication")}
                       variant="ghost"
                       buttonStyle="ghost"
-                      size="lg"
+                      size="md"
                       icon={FileText}
                       iconPosition="left"
                       fullWidth
-                      className="justify-start hover:bg-gray-50 dark:hover:bg-neutral-700/50 rounded-none border-0"
+                      className="justify-start hover:bg-gray-50 dark:hover:bg-neutral-700/50 rounded-lg mx-2 text-gray-700 dark:text-gray-200"
                     >
                       {t("manageContent.tabs.publications")}
                     </Button>
@@ -276,11 +276,11 @@ export default function ContentPage() {
                       onClick={() => openAddModal("campaign")}
                       variant="ghost"
                       buttonStyle="ghost"
-                      size="lg"
+                      size="md"
                       icon={Target}
                       iconPosition="left"
                       fullWidth
-                      className="justify-start hover:bg-gray-50 dark:hover:bg-neutral-700/50 rounded-none border-t border-gray-100 dark:border-neutral-700/50"
+                      className="justify-start hover:bg-gray-50 dark:hover:bg-neutral-700/50 rounded-lg mx-2 text-gray-700 dark:text-gray-200"
                     >
                       {t("manageContent.tabs.campaigns")}
                     </Button>

@@ -7,6 +7,7 @@ import {
   Calendar,
   ChevronDown,
   ChevronRight,
+  Copy,
   DollarSign,
   Edit,
   Eye,
@@ -25,6 +26,7 @@ interface CampaignMobileTableProps {
   onDelete: (id: number) => void;
   onEditRequest?: (item: Campaign) => void;
   onViewDetails: (item: Campaign) => void;
+  onDuplicate?: (id: number) => void;
   getStatusColor: (status?: string) => string;
 }
 
@@ -37,11 +39,13 @@ export default function CampaignMobileTable({
   onDelete,
   onEditRequest,
   onViewDetails,
+  onDuplicate,
   getStatusColor,
 }: CampaignMobileTableProps) {
   const { auth } = usePage<any>().props;
-  const canContent =
-    auth.current_workspace?.permissions?.includes("content");
+const canManageContent =
+    auth.current_workspace?.permissions?.includes("manage-content");
+  
   const { i18n } = useTranslation();
   const locale = getDateFnsLocale(i18n.language);
 
@@ -59,8 +63,10 @@ export default function CampaignMobileTable({
                   <h3 className="font-medium text-gray-900 dark:text-gray-100">
                     {item.name}
                   </h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 break-words line-clamp-2">
-                    {item.description}
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">
+                    {item.description && item.description.length > 100
+                      ? `${item.description.substring(0, 100)}...`
+                      : item.description || "Sin descripción"}
                   </p>
                 </div>
                 <div
@@ -159,8 +165,15 @@ export default function CampaignMobileTable({
                   >
                     <Eye className="w-4 h-4" />
                   </button>
-                  {canContent && (
+                  {canManageContent && (
                     <>
+                      <button
+                        onClick={() => onDuplicate?.(item.id)}
+                        className="p-2 text-purple-500 hover:bg-white dark:hover:bg-neutral-800 rounded-lg transition-all"
+                        title="Duplicar"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
                       <button
                         onClick={() => onEdit(item)}
                         className="p-2 text-blue-500 hover:bg-white dark:hover:bg-neutral-800 rounded-lg transition-all"

@@ -6,6 +6,7 @@ import {
   Calendar,
   ChevronDown,
   ChevronRight,
+  Copy,
   DollarSign,
   Edit,
   Eye,
@@ -25,6 +26,7 @@ interface CampaignRowProps {
   onDelete: (id: number) => void;
   onEditRequest?: (item: Campaign) => void;
   onViewDetails: (item: Campaign) => void;
+  onDuplicate?: (id: number) => void;
 }
 
 const CampaignRow = memo(
@@ -37,13 +39,13 @@ const CampaignRow = memo(
     onDelete,
     onEditRequest,
     onViewDetails,
+    onDuplicate,
   }: CampaignRowProps) => {
     const { t, i18n } = useTranslation();
     const locale = getDateFnsLocale(i18n.language);
     const { auth } = usePage<any>().props;
-    const canManage =
-      auth.current_workspace?.permissions?.includes("content");
-
+     const canManage =
+      auth.current_workspace?.permissions?.includes("manage-content");
     return (
       <tr
         data-campaign-id={item.id}
@@ -78,8 +80,10 @@ const CampaignRow = memo(
               <h3 className="font-medium text-sm text-gray-900 dark:text-white truncate">
                 {item.name}
               </h3>
-              <p className="text-xs mt-0.5 break-words line-clamp-1 text-gray-500 dark:text-gray-400">
-                {item.description || "No description"}
+              <p className="text-xs mt-0.5 text-gray-500 dark:text-gray-400 truncate max-w-md">
+                {item.description && item.description.length > 80
+                  ? `${item.description.substring(0, 80)}...`
+                  : item.description || "No description"}
               </p>
 
               {/* Goal & Dates */}
@@ -185,6 +189,15 @@ const CampaignRow = memo(
                 >
                   <Edit className="w-4 h-4" />
                 </button>
+                {onDuplicate && (
+                  <button
+                    onClick={() => onDuplicate(item.id)}
+                    className="p-2 text-purple-500 hover:bg-purple-50 rounded-lg dark:hover:bg-purple-900/20"
+                    title="Duplicate"
+                  >
+                    <Copy className="w-4 h-4" />
+                  </button>
+                )}
                 <button
                   onClick={() => onDelete(item.id)}
                   className="p-2 text-red-500 hover:bg-red-50 rounded-lg dark:hover:bg-red-900/20"

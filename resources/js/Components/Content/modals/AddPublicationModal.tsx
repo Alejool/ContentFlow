@@ -427,11 +427,11 @@ export default function AddPublicationModal({
                   icon={FileText}
                   variant="filled"
                   size="lg"
-                  rows={4}
-                  maxLength={200}
+                  rows={6}
+                  maxLength={700}
                   required
                   showCharCount
-                  hint="Maximum 200 characters"
+                  hint="Maximum 700 characters"
                 />
 
                 <Input

@@ -24,6 +24,7 @@ const CampaignList = memo(
     onPageChange,
     onPerPageChange,
     onEditRequest,
+    onDuplicate,
     connectedAccounts = [],
   }: CampaignListProps) => {
     const { t } = useTranslation();
@@ -96,6 +97,7 @@ const CampaignList = memo(
             onDelete={onDelete}
             onEditRequest={onEditRequest}
             onViewDetails={onViewDetails}
+            onDuplicate={onDuplicate}
           />
         ) : (
           <PublicationTable

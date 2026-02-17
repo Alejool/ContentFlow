@@ -14,6 +14,7 @@ interface CampaignFormFieldsProps {
   t: (key: string) => string;
   mode?: "add" | "edit";
   disabled?: boolean;
+  showAiPrompt?: boolean;
 }
 
 const CampaignFormFields: React.FC<CampaignFormFieldsProps> = ({
@@ -24,6 +25,7 @@ const CampaignFormFields: React.FC<CampaignFormFieldsProps> = ({
   t,
   mode = "add",
   disabled = false,
+  showAiPrompt = true,
 }) => {
   const handleAiSuggestion = (data: any) => {
     if (data.name || data.title) {
@@ -41,6 +43,24 @@ const CampaignFormFields: React.FC<CampaignFormFieldsProps> = ({
     if (data.goal) {
       setValue("goal", data.goal, { shouldValidate: true, shouldDirty: true });
     }
+    if (data.budget !== undefined) {
+      setValue("budget", data.budget.toString(), {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+    }
+    if (data.start_date) {
+      setValue("start_date", data.start_date, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+    }
+    if (data.end_date) {
+      setValue("end_date", data.end_date, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+    }
   };
 
   const goalPlaceholder =
@@ -55,11 +75,13 @@ const CampaignFormFields: React.FC<CampaignFormFieldsProps> = ({
 
   return (
     <>
-      <AiPromptSection
-        type="campaign"
-        currentFields={watched}
-        onSuggest={handleAiSuggestion}
-      />
+      {showAiPrompt && (
+        <AiPromptSection
+          type="campaign"
+          currentFields={watched}
+          onSuggest={handleAiSuggestion}
+        />
+      )}
       <div className="flex justify-between items-end mb-4 px-1">
         <AiFieldSuggester
           fields={watched}
@@ -94,7 +116,7 @@ const CampaignFormFields: React.FC<CampaignFormFieldsProps> = ({
           variant="filled"
           rows={4}
           size="lg"
-          maxLength={200}
+          maxLength={500}
           showCharCount
           hint={t("campaigns.modal.add.placeholders.description_hint")}
           disabled={disabled}

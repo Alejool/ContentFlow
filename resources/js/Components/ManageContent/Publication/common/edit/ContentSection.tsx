@@ -1,5 +1,4 @@
 import AiFieldSuggester from "@/Components/AiAssistant/AiFieldSuggester";
-import AiPromptSection from "@/Components/AiAssistant/AiPromptSection";
 import CampaignSelector from "@/Components/ManageContent/Publication/common/CampaignSelector";
 import Input from "@/Components/common/Modern/Input";
 import Textarea from "@/Components/common/Modern/Textarea";
@@ -58,12 +57,6 @@ const ContentSection = memo(
 
     return (
       <div className={`space-y-6 ${disabled ? "opacity-75" : ""}`}>
-        <AiPromptSection
-          type="publication"
-          currentFields={watched}
-          onSuggest={handleAiSuggestion}
-          disabled={disabled}
-        />
         <div className="flex justify-between items-end px-1">
           <AiFieldSuggester
             fields={watched}
@@ -99,10 +92,10 @@ const ContentSection = memo(
           variant="filled"
           size="lg"
           required
-          rows={4}
-          maxLength={200}
+          rows={6}
+          maxLength={700}
           showCharCount
-          hint="Maximum 200 characters"
+          hint="Maximum 700 characters"
           disabled={disabled}
         />
 

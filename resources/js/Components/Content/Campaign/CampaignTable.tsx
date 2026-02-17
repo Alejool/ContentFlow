@@ -19,6 +19,7 @@ interface CampaignTableProps {
   onDelete: (id: number) => void;
   onEditRequest?: (item: Campaign) => void;
   onViewDetails: (item: Campaign) => void;
+  onDuplicate?: (id: number) => void;
   isLoading?: boolean;
   pagination?: any;
   onPageChange?: (page: number) => void;
@@ -35,6 +36,7 @@ const CampaignTable = memo(
     onDelete,
     onEditRequest,
     onViewDetails,
+    onDuplicate,
     isLoading,
     pagination,
     onPageChange,
@@ -118,6 +120,7 @@ const CampaignTable = memo(
                           onDelete={onDelete}
                           onEditRequest={onEditRequest}
                           onViewDetails={onViewDetails}
+                          onDuplicate={onDuplicate}
                         />
                         {expandedCampaigns.includes(item.id) && (
                           <CampaignPublications
@@ -177,6 +180,7 @@ const CampaignTable = memo(
                   onDelete={onDelete}
                   onEditRequest={onEditRequest}
                   onViewDetails={onViewDetails}
+                  onDuplicate={onDuplicate}
                   getStatusColor={getStatusColor}
                 />
               </div>

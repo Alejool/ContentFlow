@@ -87,10 +87,10 @@ const ContentSection = memo(
           variant="filled"
           size="lg"
           required
-          rows={4}
-          maxLength={200}
+          rows={6}
+          maxLength={700}
           showCharCount
-          hint="Maximum 200 characters"
+          hint="Maximum 700 characters"
           disabled={disabled}
         />
 

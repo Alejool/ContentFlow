@@ -81,8 +81,10 @@ const CampaignRow = memo(
               <h3 className="font-medium text-sm text-gray-900 dark:text-white truncate">
                 {item.name}
               </h3>
-              <p className="text-xs mt-0.5 break-words line-clamp-1 text-gray-500 dark:text-gray-400">
-                {item.description || "No description"}
+              <p className="text-xs mt-0.5 text-gray-500 dark:text-gray-400 truncate max-w-md">
+                {item.description && item.description.length > 80
+                  ? `${item.description.substring(0, 80)}...`
+                  : item.description || "No description"}
               </p>
 
               <div className="flex items-center gap-3 mt-1.5 flex-wrap">

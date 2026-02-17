@@ -59,7 +59,7 @@ const CampaignFormFields: React.FC<CampaignFormFieldsProps> = ({
           variant="filled"
           rows={4}
           size="lg"
-          maxLength={200}
+          maxLength={500}
           showCharCount
           hint={t("campaigns.modal.add.placeholders.description_hint")}
           disabled={disabled}

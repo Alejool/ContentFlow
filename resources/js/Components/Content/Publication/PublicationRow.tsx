@@ -2,7 +2,8 @@ import CampaignTags from "@/Components/Content/Publication/CampaignTags";
 import PublicationThumbnail from "@/Components/Content/Publication/PublicationThumbnail";
 import SocialAccountsDisplay from "@/Components/Content/Publication/SocialAccountsDisplay";
 import { Publication } from "@/types/Publication";
-import { Edit, Eye, Image, Rocket, Trash2, Video } from "lucide-react";
+import { usePage } from "@inertiajs/react";
+import { Copy, Edit, Eye, Image, Rocket, Trash2, Video } from "lucide-react";
 
 interface PublicationRowProps {
   item: Publication;
@@ -13,6 +14,8 @@ interface PublicationRowProps {
   onDelete: (id: number) => void;
   onPublish: (item: Publication) => void;
   onEditRequest?: (item: Publication) => void;
+  onViewDetails?: (item: Publication) => void;
+  onDuplicate?: (id: number) => void;
 }
 
 export default function PublicationRow({
@@ -24,7 +27,13 @@ export default function PublicationRow({
   onDelete,
   onPublish,
   onEditRequest,
+  onViewDetails,
+  onDuplicate,
 }: PublicationRowProps) {
+  const { auth } = usePage<any>().props;
+  const canContent =
+    auth.current_workspace?.permissions?.includes("content");
+
   const countMediaFiles = (pub: Publication) => {
     if (!pub.media_files || pub.media_files.length === 0) {
       return { images: 0, videos: 0, total: 0 };
@@ -145,43 +154,57 @@ export default function PublicationRow({
       </td>
       <td className="px-6 py-4 text-right">
         <div className="flex items-center justify-end gap-2">
-          {item.status === "published" && (
+          {onViewDetails && (
             <button
-              onClick={() => onPublish(item)}
-              className="p-2 text-primary-500 hover:bg-primary-50 rounded-lg dark:hover:bg-primary-900/20"
-              title="View Real Status / Preview"
+              onClick={() => onViewDetails(item)}
+              className="p-2 text-gray-500 hover:bg-gray-50 rounded-lg dark:hover:bg-gray-700/20"
+              title="Ver detalles"
             >
               <Eye className="w-4 h-4" />
             </button>
           )}
-          <button
-            onClick={() => onPublish(item)}
-            className="p-2 text-green-500 hover:bg-green-50 rounded-lg dark:hover:bg-green-900/20"
-            title="Publish / Manage Platforms"
-          >
-            <Rocket className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => {
-              if (onEditRequest) {
-                onEditRequest(item);
-              } else {
-                onEdit(item);
-              }
-            }}
-            className={`p-2 ${
-              item.status === "published" ? "text-amber-500" : "text-blue-500"
-            } hover:bg-blue-50 rounded-lg dark:hover:bg-blue-900/20`}
-            title={item.status === "published" ? "Unpublish to Edit" : "Edit"}
-          >
-            <Edit className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => onDelete(item.id)}
-            className="p-2 text-red-500 hover:bg-red-50 rounded-lg dark:hover:bg-red-900/20"
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
+          {canContent && (
+            <>
+              <button
+                onClick={() => onPublish(item)}
+                className="p-2 text-green-500 hover:bg-green-50 rounded-lg dark:hover:bg-green-900/20"
+                title="Publish / Manage Platforms"
+              >
+                <Rocket className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => {
+                  if (onEditRequest) {
+                    onEditRequest(item);
+                  } else {
+                    onEdit(item);
+                  }
+                }}
+                className={`p-2 ${
+                  item.status === "published" ? "text-amber-500" : "text-blue-500"
+                } hover:bg-blue-50 rounded-lg dark:hover:bg-blue-900/20`}
+                title={item.status === "published" ? "Unpublish to Edit" : "Edit"}
+              >
+                <Edit className="w-4 h-4" />
+              </button>
+              {onDuplicate && (
+                <button
+                  onClick={() => onDuplicate(item.id)}
+                  className="p-2 text-purple-500 hover:bg-purple-50 rounded-lg dark:hover:bg-purple-900/20"
+                  title="Duplicar"
+                >
+                  <Copy className="w-4 h-4" />
+                </button>
+              )}
+              <button
+                onClick={() => onDelete(item.id)}
+                className="p-2 text-red-500 hover:bg-red-50 rounded-lg dark:hover:bg-red-900/20"
+                title="Eliminar"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </>
+          )}
         </div>
       </td>
     </tr>

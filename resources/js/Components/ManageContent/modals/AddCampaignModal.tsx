@@ -62,6 +62,24 @@ export default function AddCampaignModal({
     if (data.goal) {
       setValue("goal", data.goal, { shouldValidate: true, shouldDirty: true });
     }
+    if (data.budget !== undefined) {
+      setValue("budget", data.budget.toString(), {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+    }
+    if (data.start_date) {
+      setValue("start_date", data.start_date, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+    }
+    if (data.end_date) {
+      setValue("end_date", data.end_date, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+    }
   };
 
   const onFormSubmit = async (data: any) => {

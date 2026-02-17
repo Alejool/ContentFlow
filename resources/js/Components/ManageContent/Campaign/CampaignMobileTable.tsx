@@ -61,8 +61,10 @@ export default function CampaignMobileTable({
                   <h3 className="font-medium text-gray-900 dark:text-gray-100">
                     {item.name}
                   </h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 break-words line-clamp-2">
-                    {item.description}
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">
+                    {item.description && item.description.length > 100
+                      ? `${item.description.substring(0, 100)}...`
+                      : item.description || "Sin descripción"}
                   </p>
                 </div>
                 <div

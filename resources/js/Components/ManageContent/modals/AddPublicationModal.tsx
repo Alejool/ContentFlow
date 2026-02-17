@@ -127,6 +127,7 @@ export default function AddPublicationModal({
   );
 
   const handleAiSuggestion = (data: any) => {
+    console.log("Received AI Suggestion Data:", data);
     if (data.title)
       setValue("title", data.title, {
         shouldValidate: true,
@@ -146,6 +147,12 @@ export default function AddPublicationModal({
       });
       handleHashtagChange(data.hashtags);
     }
+    console.log("Form values after AI suggestion:", {
+      title: data.title,
+      description: data.description,
+      goal: data.goal,
+      hashtags: data.hashtags
+    });
   };
 
   const stabilizedMediaPreviews = useMemo(() => {
@@ -283,11 +290,11 @@ export default function AddPublicationModal({
                   icon={FileText}
                   variant="filled"
                   size="lg"
-                  rows={4}
-                  maxLength={200}
+                  rows={6}
+                  maxLength={700}
                   required
                   showCharCount
-                  hint="Maximum 200 characters"
+                  hint="Maximum 700 characters"
                 />
 
                 <Input

@@ -161,6 +161,7 @@ export default function EditCampaignModal({
               t={t}
               mode="edit"
               disabled={isDisabled}
+              showAiPrompt={false}
             />
 
             <CampaignDateFields

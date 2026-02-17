@@ -34,6 +34,7 @@ export default function ViewCampaignModal({
   const { t } = useTranslation();
   const { auth } = usePage<any>().props;
   const [activeTab, setActiveTab] = useState("overview");
+  const [hashtagsExpanded, setHashtagsExpanded] = useState(false);
   const canEdit =
     auth.current_workspace?.permissions?.includes("content");
 
@@ -247,9 +248,23 @@ export default function ViewCampaignModal({
                               {t("campaigns.modal.view.hashtags")}
                             </span>
                           </div>
-                          <p className="text-sm text-gray-900 dark:text-white">
+                          <div
+                            className={`text-sm text-gray-900 dark:text-white ${
+                              !hashtagsExpanded ? "line-clamp-2" : ""
+                            } break-words cursor-pointer hover:text-primary-600 dark:hover:text-primary-400 transition-colors`}
+                            onClick={() => setHashtagsExpanded(!hashtagsExpanded)}
+                            title={hashtagsExpanded ? "Click para contraer" : "Click para expandir"}
+                          >
                             {(item as any).hashtags}
-                          </p>
+                          </div>
+                          {(item as any).hashtags.length > 100 && (
+                            <button
+                              onClick={() => setHashtagsExpanded(!hashtagsExpanded)}
+                              className="text-xs text-primary-600 dark:text-primary-400 hover:underline mt-2"
+                            >
+                              {hashtagsExpanded ? "Ver menos" : "Ver más"}
+                            </button>
+                          )}
                         </div>
                       )}
 
