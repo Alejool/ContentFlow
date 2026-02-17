@@ -167,10 +167,7 @@ export default function Welcome({ auth, canLogin, canRegister }: WelcomeProps) {
                   </span>
                 </div>
 
-                <h1
-                  className={`text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl
-                  ${theme === "dark" ? "text-white" : "text-gray-900"}`}
-                >
+                <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl text-gray-900 dark:text-white">
                   {t("welcome.title") || "Transforma tu contenido"}
                   <span className="text-primary-600 mt-3 flex items-center justify-center gap-2">
                     <Zap className="w-8 h-8" />
@@ -179,10 +176,7 @@ export default function Welcome({ auth, canLogin, canRegister }: WelcomeProps) {
                   </span>
                 </h1>
 
-                <p
-                  className={`mx-auto mt-6 max-w-2xl text-lg
-                  ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
-                >
+                <p className="mx-auto mt-6 max-w-2xl text-lg text-gray-700 dark:text-gray-300">
                   {t("welcome.subtitle") ||
                     "La plataforma todo en uno para crear, programar y optimizar contenido en redes sociales. Impulsado por IA."}
                 </p>
@@ -237,19 +231,11 @@ export default function Welcome({ auth, canLogin, canRegister }: WelcomeProps) {
               </div>
 
               <div className="mt-20">
-                <h2
-                  className={`text-3xl font-bold text-center ${
-                    theme === "dark" ? "text-white" : "text-gray-900"
-                  }`}
-                >
+                <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white">
                   {t("welcome.featuresTitle") ||
                     "Todo lo que necesitas en una plataforma"}
                 </h2>
-                <p
-                  className={`mt-4 text-center ${
-                    theme === "dark" ? "text-gray-300" : "text-gray-600"
-                  }`}
-                >
+                <p className="mt-4 text-center text-gray-600 dark:text-gray-300">
                   {t("welcome.featuresSubtitle") ||
                     "Gestiona todo tu contenido social desde un solo lugar"}
                 </p>

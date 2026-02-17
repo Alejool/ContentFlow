@@ -39,7 +39,7 @@ export default function AuthenticatedLayout({
     useState<boolean>(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(true);
 
-  const { theme } = useTheme();
+  const { theme, actualTheme } = useTheme();
   useWorkspaceLocks();
 
   useEffect(() => {
@@ -63,10 +63,7 @@ export default function AuthenticatedLayout({
       max-w-full min-w-0 overflow-x-hidden"
       >
         <div
-          className={`
-            absolute inset-0
-            ${theme === "dark" ? "bg-neutral-900" : "bg-white"}
-          `}
+          className="absolute inset-0 bg-white dark:bg-neutral-900"
         />
 
         <Sidebar

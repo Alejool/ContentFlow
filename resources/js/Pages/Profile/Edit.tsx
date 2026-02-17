@@ -127,10 +127,7 @@ export default function Edit({ mustVerifyEmail, status }: EditProps) {
           {/* Statistics Section (Collapsible) - Full Width */}
           <div className="mb-8">
             <div
-              className={`rounded-lg border shadow-sm overflow-hidden transition-all duration-300 ${
-                theme === "dark"
-                  ? "bg-neutral-900 border-neutral-800"
-                  : "bg-white border-gray-100"
+              className={`rounded-lg border shadow-sm overflow-hidden transition-all duration-300 dark:bg-neutral-900 darkborder-neutral-800 bg-white border-gray-100"
               }`}
             >
               <button
@@ -167,10 +164,7 @@ export default function Edit({ mustVerifyEmail, status }: EditProps) {
           {/* Main Content Area */}
           <div className="w-full">
             <div
-              className={`rounded-lg p-6 md:p-10 border shadow-sm ${
-                theme === "dark"
-                  ? "bg-neutral-900 border-neutral-800"
-                  : "bg-white border-gray-100"
+              className={`rounded-lg p-6 md:p-10 border shadow-sm dark:bg-neutral-900 dark:border-neutral-800"bg-white border-gray-100"
               }`}
             >
               {activeTab === "profile" && (

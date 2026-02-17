@@ -103,30 +103,13 @@ export default function Index({ stats, period }: AnalyticsProps) {
     <AuthenticatedLayout>
       <Head title={t("analytics.title")} />
 
-      <div
-        className={`py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto transition-colors duration-300
-                ${theme === "dark" ? "text-gray-100" : "text-gray-900"}`}
-      >
-        <div
-          className={`rounded-lg p-8 mb-8 shadow-sm transition-colors duration-300 flex flex-col md:flex-row items-center justify-between gap-6 ${
-            theme === "dark"
-              ? "bg-gradient-to-r from-black/90 to-black/95 border border-black/70"
-              : "bg-gradient-to-r from-white/90 to-white/95 border border-white/70"
-          }`}
-        >
+      <div className="py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto transition-colors duration-300 text-gray-900 dark:text-gray-100">
+        <div className="rounded-lg p-8 mb-8 shadow-sm transition-colors duration-300 flex flex-col md:flex-row items-center justify-between gap-6 bg-gradient-to-r from-white/90 to-white/95 border border-white/70 dark:from-black/90 dark:to-black/95 dark:border-black/70">
           <div>
-            <h1
-              className={`text-3xl font-bold mb-2 ${
-                theme === "dark" ? "text-white" : "text-gray-900"
-              }`}
-            >
+            <h1 className="text-3xl font-bold mb-2 text-gray-900 dark:text-white">
               {t("analytics.title")}
             </h1>
-            <p
-              className={`text-lg ${
-                theme === "dark" ? "text-gray-400" : "text-gray-600"
-              }`}
-            >
+            <p className="text-lg text-gray-600 dark:text-gray-400">
               {t("analytics.subtitle")}
             </p>
           </div>
@@ -216,22 +199,8 @@ export default function Index({ stats, period }: AnalyticsProps) {
         </div>
 
         <div className="grid grid-cols-1 gap-6 mb-8">
-          <div
-            className={`rounded-lg p-6 transition-colors duration-300
-                        ${
-                          theme === "dark"
-                            ? "bg-neutral-800/50 backdrop-blur-sm border border-neutral-700/50"
-                            : "bg-white shadow-lg border border-gray-100"
-                        }`}
-          >
-            <h2
-              className={`text-xl font-bold mb-4
-                            ${
-                              theme === "dark"
-                                ? "text-gray-100"
-                                : "text-gray-900"
-                            }`}
-            >
+          <div className="rounded-lg p-6 transition-colors duration-300 bg-white shadow-lg border border-gray-100 dark:bg-neutral-800/50 dark:backdrop-blur-sm dark:border-neutral-700/50">
+            <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-gray-100">
               {t("analytics.charts.engagementTrends")}
             </h2>
             <Suspense
@@ -266,22 +235,8 @@ export default function Index({ stats, period }: AnalyticsProps) {
 
         {detailedPlatforms.length > 0 && (
           <div className="mb-8">
-            <div
-              className={`rounded-lg p-6 mb-4 transition-colors duration-300
-                        ${
-                          theme === "dark"
-                            ? "bg-neutral-800/50 backdrop-blur-sm border border-neutral-700/50"
-                            : "bg-white shadow-lg border border-gray-100"
-                        }`}
-            >
-              <h2
-                className={`text-xl font-bold
-                            ${
-                              theme === "dark"
-                                ? "text-gray-100"
-                                : "text-gray-900"
-                            }`}
-              >
+            <div className="rounded-lg p-6 mb-4 transition-colors duration-300 bg-white shadow-lg border border-gray-100 dark:bg-neutral-800/50 dark:backdrop-blur-sm dark:border-neutral-700/50">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
                 {t("analytics.charts.detailedPlatforms", "Análisis Detallado por Plataforma")}
               </h2>
               <p className={`text-sm mt-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
@@ -298,22 +253,8 @@ export default function Index({ stats, period }: AnalyticsProps) {
 
         {detailedPublications.length > 0 && (
           <div className="mb-8">
-            <div
-              className={`rounded-lg p-6 mb-4 transition-colors duration-300
-                        ${
-                          theme === "dark"
-                            ? "bg-neutral-800/50 backdrop-blur-sm border border-neutral-700/50"
-                            : "bg-white shadow-lg border border-gray-100"
-                        }`}
-            >
-              <h2
-                className={`text-xl font-bold
-                            ${
-                              theme === "dark"
-                                ? "text-gray-100"
-                                : "text-gray-900"
-                            }`}
-              >
+            <div className="rounded-lg p-6 mb-4 transition-colors duration-300 bg-white shadow-lg border border-gray-100 dark:bg-neutral-800/50 dark:backdrop-blur-sm dark:border-neutral-700/50">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
                 {t("analytics.charts.detailedPublications", "Rendimiento Detallado de Publicaciones")}
               </h2>
               <p className={`text-sm mt-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
