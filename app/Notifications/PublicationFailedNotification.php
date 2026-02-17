@@ -3,6 +3,10 @@
 namespace App\Notifications;
 
 use App\Notifications\BaseNotification;
+use App\Channels\CustomDiscordChannel;
+use App\Channels\CustomSlackChannel;
+use App\Models\Workspace\Workspace;
+use Illuminate\Notifications\Messages\MailMessage;
 
 class PublicationFailedNotification extends BaseNotification
 {
@@ -19,16 +23,16 @@ class PublicationFailedNotification extends BaseNotification
 
   public function via($notifiable): array
   {
-    $channels = ['database', 'broadcast', 'mail'];
+    $channels = ['database', 'broadcast'];
     
     // Add workspace notification channels
     $workspace = $this->getWorkspace($notifiable);
     if ($workspace) {
       if ($workspace->discord_webhook_url) {
-        $channels[] = \App\Channels\CustomDiscordChannel::class;
+        $channels[] = CustomDiscordChannel::class;
       }
       if ($workspace->slack_webhook_url) {
-        $channels[] = \App\Channels\CustomSlackChannel::class;
+        $channels[] = CustomSlackChannel::class;
       }
     }
     
@@ -37,7 +41,7 @@ class PublicationFailedNotification extends BaseNotification
   
   protected function getWorkspace($notifiable)
   {
-    if ($notifiable instanceof \App\Models\Workspace\Workspace) {
+    if ($notifiable instanceof Workspace) {
       return $notifiable;
     }
     
@@ -53,7 +57,7 @@ class PublicationFailedNotification extends BaseNotification
     $platformName = $this->getPlatformName($this->platform);
     $locale = method_exists($notifiable, 'preferredLocale') ? $notifiable->preferredLocale() : app()->getLocale();
 
-    return (new \Illuminate\Notifications\Messages\MailMessage)
+    return (new MailMessage)
       ->subject(trans('notifications.failed.subject', ['platform' => $platformName], $locale))
       ->view('emails.notification', [
         'title' => trans('notifications.failed.title', [], $locale),
@@ -78,18 +82,26 @@ class PublicationFailedNotification extends BaseNotification
     $platformName = $this->getPlatformName($this->platform);
     $locale = method_exists($notifiable, 'preferredLocale') ? $notifiable->preferredLocale() : app()->getLocale();
     $campaign = $this->publication->campaigns->first();
+    
+    $description = "❌ Fallo al publicar \"{$this->publication->title}\"\n\n";
+    $description .= "📱 Plataforma: {$platformName}\n";
+    $description .= "📊 Estado: Fallido\n\n";
+    $description .= "💡 La publicación no pudo completarse en {$platformName}.\n";
+    $description .= "Por favor, verifica la configuración de la cuenta o intenta nuevamente.\n";
+    $description .= "Si el problema persiste, contacta a soporte.";
 
     return [
       'title' => trans('notifications.failed.title', [], $locale),
       'message' => trans('notifications.failed.message_app', ['platform' => $platformName], $locale),
-      'description' => $this->errorMessage,
+      'description' => $description,
       'status' => 'error',
       'icon' => $this->getPlatformIcon($this->platform),
       'publication_id' => $this->publication->id,
       'publication_title' => $this->publication->title,
       'campaign_id' => $campaign ? $campaign->id : null,
       'campaign_name' => $campaign ? $campaign->name : null,
-      'error' => $this->errorMessage,
+      'platform' => $platformName,
+      'failed_at' => now()->toIso8601String(),
       'action' => $this->createAction(
         trans('notifications.failed.action', [], $locale),
         route('api.v1.publications.update', $this->publication->id)

@@ -29,8 +29,9 @@ class CustomDiscordChannel
     $workspace = $this->getWorkspace($notifiable);
 
     try {
-      // Send the webhook
-      $response = Http::timeout(10)
+      // Send the webhook with reduced timeout and async behavior
+      $response = Http::timeout(5)
+        ->retry(2, 100)
         ->withoutVerifying()
         ->post($url, [
           'content' => $message,
@@ -41,36 +42,40 @@ class CustomDiscordChannel
       $responseBody = $response->body();
       $statusCode = $response->status();
 
-      // Log the attempt
+      // Log the attempt asynchronously
       if ($workspace) {
-        WebhookLog::create([
-          'workspace_id' => $workspace->id,
-          'channel' => 'discord',
-          'event_type' => class_basename($notification),
-          'payload' => [
-            'content' => $message,
-            'url' => $url
-          ],
-          'response' => $responseBody ?: 'No response body',
-          'status_code' => $statusCode,
-          'success' => $success,
-        ]);
+        dispatch(function () use ($workspace, $message, $url, $responseBody, $statusCode, $success, $notification) {
+          WebhookLog::create([
+            'workspace_id' => $workspace->id,
+            'channel' => 'discord',
+            'event_type' => class_basename($notification),
+            'payload' => [
+              'content' => $message,
+              'url' => $url
+            ],
+            'response' => $responseBody ?: 'No response body',
+            'status_code' => $statusCode,
+            'success' => $success,
+          ]);
+        })->afterResponse();
       }
     } catch (\Exception $e) {
-      // Log the failure
+      // Log the failure asynchronously
       if ($workspace) {
-        WebhookLog::create([
-          'workspace_id' => $workspace->id,
-          'channel' => 'discord',
-          'event_type' => class_basename($notification),
-          'payload' => [
-            'content' => $message,
-            'url' => $url
-          ],
-          'response' => "EXCEPTIÓN: " . $e->getMessage(),
-          'status_code' => 0,
-          'success' => false,
-        ]);
+        dispatch(function () use ($workspace, $message, $url, $e, $notification) {
+          WebhookLog::create([
+            'workspace_id' => $workspace->id,
+            'channel' => 'discord',
+            'event_type' => class_basename($notification),
+            'payload' => [
+              'content' => $message,
+              'url' => $url
+            ],
+            'response' => "EXCEPTIÓN: " . $e->getMessage(),
+            'status_code' => 0,
+            'success' => false,
+          ]);
+        })->afterResponse();
       }
     }
   }

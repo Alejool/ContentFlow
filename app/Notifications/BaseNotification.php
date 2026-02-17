@@ -59,9 +59,6 @@ abstract class BaseNotification extends Notification implements ShouldQueue
   /**
    * Get the notification's delivery channels.
    */
-  /**
-   * Get the notification's delivery channels.
-   */
   public function via($notifiable): array
   {
     $channels = [EnhancedDatabaseChannel::class, 'broadcast'];
