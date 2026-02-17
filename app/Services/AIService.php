@@ -77,26 +77,51 @@ class AIService
 
   /**
    * Get list of enabled and configured providers
+   * Returns providers in the order they appear in user's ai_settings (if user has settings)
+   * Otherwise returns providers in default order
    */
   public function getEnabledProviders(User $user = null): array
   {
     $user = $user ?? Auth::user();
     $enabled = [];
-    foreach ($this->providers as $provider) {
-      if ($this->isProviderEnabled($provider, $user)) {
-        $enabled[] = $provider;
+    
+    // If user has ai_settings, use the order from their settings
+    if ($user && !empty($user->ai_settings)) {
+      foreach ($user->ai_settings as $provider => $settings) {
+        if (in_array($provider, $this->providers) && $this->isProviderEnabled($provider, $user)) {
+          $enabled[] = $provider;
+        }
       }
     }
+    
+    // If no enabled providers from user settings, check global config in default order
+    if (empty($enabled)) {
+      foreach ($this->providers as $provider) {
+        if ($this->isProviderEnabled($provider, $user)) {
+          $enabled[] = $provider;
+        }
+      }
+    }
+    
     return $enabled;
   }
 
   /**
    * Generate specific field suggestions for publications or campaigns
    */
-  public function generateFieldSuggestions(array $currentFields, string $type, string $language, User $user = null): array
+  public function generateFieldSuggestions(array $currentFields, string $type, string $language, User $user = null, array $fieldLimits = null): array
   {
     $user = $user ?? Auth::user();
     $enabledProviders = $this->getEnabledProviders($user);
+
+    Log::info('AI Field Suggestion Request', [
+      'user_id' => $user?->id,
+      'type' => $type,
+      'has_ai_prompt' => isset($currentFields['ai_prompt']) && !empty($currentFields['ai_prompt']),
+      'ai_prompt' => $currentFields['ai_prompt'] ?? null,
+      'field_limits' => $fieldLimits,
+      'enabled_providers' => $enabledProviders
+    ]);
 
     if (empty($enabledProviders)) {
       throw new \Exception('No AI providers are enabled. Please configure an API key for Gemini or DeepSeek.');
@@ -107,16 +132,25 @@ class AIService
       'current_fields' => $currentFields,
       'user_locale' => $language,
       'project_type' => 'field_suggestion',
-      'suggestion_type' => $type
+      'suggestion_type' => $type,
+      'field_limits' => $fieldLimits
     ];
 
     try {
-      // Prefer DeepSeek or Gemini for suggestions if available
-      $provider = in_array('deepseek', $enabledProviders)
-        ? 'deepseek'
-        : (in_array('gemini', $enabledProviders) ? 'gemini' : $enabledProviders[0]);
+      // Use the first enabled provider from user settings
+      // The order is determined by getEnabledProviders which respects user configuration
+      $provider = $enabledProviders[0];
 
-      return $this->callProvider($provider, $context, $user);
+      $result = $this->callProvider($provider, $context, $user);
+      
+      Log::info('AI Field Suggestion Success', [
+        'user_id' => $user?->id,
+        'provider' => $provider,
+        'has_suggestion_data' => isset($result['suggestion']['data']),
+        'suggestion_type' => $result['suggestion']['type'] ?? null
+      ]);
+      
+      return $result;
     } catch (\Exception $e) {
       Log::error("Field suggestion failed: " . $e->getMessage());
       return $this->getDefaultResponse("Field suggestion failure", $context);
@@ -365,18 +399,122 @@ class AIService
     $prompt = "Eres un Asistente Experto en Gestión de Redes Sociales para la plataforma ContentFlow.\n";
     $prompt .= "IDIOMA MANDATORIO: Debes responder siempre en {$language}.\n\n";
 
-    $prompt .= "REGLAS DE FORMATO:\n";
-    $prompt .= "1. NO uses asteriscos (*) para negritas o énfasis. Usa texto limpio.\n";
-    $prompt .= "2. Para listas, usa números (1. 2. 3.) con una línea en blanco entre puntos.\n";
-    $prompt .= "3. Responde SIEMPRE en formato JSON válido.\n\n";
+    $prompt .= "REGLAS DE FORMATO JSON CRÍTICAS:\n";
+    $prompt .= "1. Responde ÚNICAMENTE con JSON válido puro.\n";
+    $prompt .= "2. NO uses markdown, NO uses backticks (```), NO uses ```json.\n";
+    $prompt .= "3. NO escribas NADA antes o después del JSON.\n";
+    $prompt .= "4. NO expliques, NO saludes, NO des contexto.\n";
+    $prompt .= "5. El campo 'message' SIEMPRE debe ser exactamente: \"OK\"\n";
+    $prompt .= "6. COMPLETA todos los campos hasta el final (no los dejes a medias).\n";
+    $prompt .= "7. El JSON DEBE tener exactamente esta estructura, sin excepciones.\n\n";
 
-    $prompt .= "ESTRUCTURA JSON REQUERIDA:\n";
-    $prompt .= "{\n  \"message\": \"Texto de tu respuesta aquí\",\n  \"suggestion\": {\n    \"type\": \"suggestion_type\",\n    \"data\": { ... }\n  }\n}\n\n";
+    $prompt .= "ESTRUCTURA JSON EXACTA REQUERIDA:\n";
+    $prompt .= "{\n";
+    $prompt .= "  \"message\": \"OK\",\n";
+    $prompt .= "  \"suggestion\": {\n";
+    $prompt .= "    \"type\": \"tipo_aqui\",\n";
+    $prompt .= "    \"data\": { campos_aqui }\n";
+    $prompt .= "  }\n";
+    $prompt .= "}\n\n";
 
     if (isset($context['project_type']) && $context['project_type'] === 'field_suggestion') {
-      $prompt .= "MODO: SUGERENCIA DE CAMPOS.\n";
-      $prompt .= "Debes completar los campos del formulario basados en la idea del usuario.\n";
-      $prompt .= "Campos requeridos en suggestion.data: title, description, goal, hashtags.\n";
+      $prompt .= "TAREA: GENERAR CAMPOS DE FORMULARIO\n\n";
+      
+      $currentFields = $context['current_fields'] ?? [];
+      $suggestionType = $context['suggestion_type'] ?? 'publication';
+      $fieldLimits = $context['field_limits'] ?? [];
+      
+      // Check if user provided an ai_prompt (idea)
+      if (isset($currentFields['ai_prompt']) && !empty($currentFields['ai_prompt'])) {
+        $prompt .= "IDEA DEL USUARIO: \"{$currentFields['ai_prompt']}\"\n";
+        $prompt .= "Genera contenido basado en esta idea específica del usuario.\n\n";
+      } else {
+        $prompt .= "El usuario no proporcionó una idea específica. Genera contenido genérico profesional.\n\n";
+      }
+      
+      if ($suggestionType === 'publication') {
+        $titleMax = $fieldLimits['title']['max'] ?? 70;
+        $descMin = $fieldLimits['description']['min'] ?? 10;
+        $descMax = $fieldLimits['description']['max'] ?? 700;
+        $goalMin = $fieldLimits['goal']['min'] ?? 5;
+        $goalMax = $fieldLimits['goal']['max'] ?? 200;
+        $hashtagsMax = $fieldLimits['hashtags']['max'] ?? 10;
+        
+        $prompt .= "TIPO DE SUGGESTION: \"publication_field_suggestion\"\n\n";
+        $prompt .= "CAMPOS REQUERIDOS EN suggestion.data:\n";
+        $prompt .= "- title: string (máximo {$titleMax} caracteres, CORTO Y DIRECTO)\n";
+        $prompt .= "- description: string (entre {$descMin} y {$descMax} caracteres, CONCISO, SIN EXAGERAR)\n";
+        $prompt .= "- goal: string (entre {$goalMin} y {$goalMax} caracteres, SIMPLE Y CLARO)\n";
+        $prompt .= "- hashtags: string (5-{$hashtagsMax} hashtags separados por espacios, ejemplo: \"#tag1 #tag2 #tag3\")\n\n";
+        
+        $prompt .= "ESTILO DE CONTENIDO:\n";
+        $prompt .= "- Usa lenguaje SIMPLE y DIRECTO\n";
+        $prompt .= "- NO uses palabras exageradas como 'increíble', 'espectacular', 'revolucionario'\n";
+        $prompt .= "- NO uses emojis excesivos\n";
+        $prompt .= "- Sé BREVE y PROFESIONAL\n";
+        $prompt .= "- Evita frases largas y complejas\n\n";
+        
+        $prompt .= "EJEMPLO DE RESPUESTA VÁLIDA:\n";
+        $prompt .= "{\n";
+        $prompt .= "  \"message\": \"OK\",\n";
+        $prompt .= "  \"suggestion\": {\n";
+        $prompt .= "    \"type\": \"publication_field_suggestion\",\n";
+        $prompt .= "    \"data\": {\n";
+        $prompt .= "      \"title\": \"Título claro y breve\",\n";
+        $prompt .= "      \"description\": \"Descripción concisa sin exageraciones\",\n";
+        $prompt .= "      \"goal\": \"Objetivo simple\",\n";
+        $prompt .= "      \"hashtags\": \"#tag1 #tag2 #tag3 #tag4 #tag5\"\n";
+        $prompt .= "    }\n";
+        $prompt .= "  }\n";
+        $prompt .= "}\n\n";
+        
+      } else if ($suggestionType === 'campaign') {
+        $nameMax = $fieldLimits['name']['max'] ?? 100;
+        $descMax = $fieldLimits['description']['max'] ?? 500;
+        $goalMax = $fieldLimits['goal']['max'] ?? 200;
+        
+        $today = date('Y-m-d');
+        $twoDaysLater = date('Y-m-d', strtotime('+2 days'));
+        
+        $prompt .= "TIPO DE SUGGESTION: \"campaign_field_suggestion\"\n\n";
+        $prompt .= "CAMPOS REQUERIDOS EN suggestion.data:\n";
+        $prompt .= "- name: string (máximo {$nameMax} caracteres, CORTO Y DIRECTO)\n";
+        $prompt .= "- description: string (máximo {$descMax} caracteres, CONCISO, SIN EXAGERAR)\n";
+        $prompt .= "- goal: string (máximo {$goalMax} caracteres, SIMPLE Y CLARO)\n";
+        $prompt .= "- budget: string (siempre \"0\")\n";
+        $prompt .= "- start_date: string (formato YYYY-MM-DD, usar \"{$today}\")\n";
+        $prompt .= "- end_date: string (formato YYYY-MM-DD, usar \"{$twoDaysLater}\")\n\n";
+        
+        $prompt .= "ESTILO DE CONTENIDO:\n";
+        $prompt .= "- Usa lenguaje SIMPLE y DIRECTO\n";
+        $prompt .= "- NO uses palabras exageradas como 'increíble', 'espectacular', 'revolucionario'\n";
+        $prompt .= "- NO uses emojis excesivos\n";
+        $prompt .= "- Sé BREVE y PROFESIONAL\n";
+        $prompt .= "- Evita frases largas y complejas\n\n";
+        
+        $prompt .= "EJEMPLO DE RESPUESTA VÁLIDA:\n";
+        $prompt .= "{\n";
+        $prompt .= "  \"message\": \"OK\",\n";
+        $prompt .= "  \"suggestion\": {\n";
+        $prompt .= "    \"type\": \"campaign_field_suggestion\",\n";
+        $prompt .= "    \"data\": {\n";
+        $prompt .= "      \"name\": \"Nombre breve\",\n";
+        $prompt .= "      \"description\": \"Descripción concisa\",\n";
+        $prompt .= "      \"goal\": \"Objetivo simple\",\n";
+        $prompt .= "      \"budget\": \"0\",\n";
+        $prompt .= "      \"start_date\": \"{$today}\",\n";
+        $prompt .= "      \"end_date\": \"{$twoDaysLater}\"\n";
+        $prompt .= "    }\n";
+        $prompt .= "  }\n";
+        $prompt .= "}\n\n";
+      }
+      
+      $prompt .= "INSTRUCCIONES FINALES:\n";
+      $prompt .= "- Contenido BREVE, SIMPLE y PROFESIONAL\n";
+      $prompt .= "- SIN palabras exageradas o marketing excesivo\n";
+      $prompt .= "- COMPLETA todos los campos\n";
+      $prompt .= "- NO excedas los límites de caracteres\n";
+      $prompt .= "- Responde SOLO con el JSON exacto como en el ejemplo\n";
     }
 
     if (isset($context['project_type']) && $context['project_type'] === 'sentiment_analysis') {
@@ -398,24 +536,154 @@ class AIService
    */
   protected function parseAIResponse(string $content, string $provider, string $model = 'default'): array
   {
-    $cleanContent = preg_replace('/^```json\s*|\s*```$/', '', trim($content));
+    Log::info('Parsing AI Response', [
+      'provider' => $provider,
+      'model' => $model,
+      'raw_content_length' => strlen($content),
+      'raw_content_preview' => substr($content, 0, 500)
+    ]);
+    
+    // Remove markdown code blocks more aggressively
+    $cleanContent = preg_replace('/^```(?:json)?\s*|\s*```$/m', '', trim($content));
+    $cleanContent = trim($cleanContent);
+    
+    // Try to extract only the JSON part if there's extra text
+    if (preg_match('/\{[\s\S]*"suggestion"[\s\S]*\}/s', $cleanContent, $matches)) {
+      $cleanContent = $matches[0];
+    }
+    
     $parsed = json_decode($cleanContent, true);
 
     if (json_last_error() !== JSON_ERROR_NONE) {
+      Log::warning('JSON decode failed, attempting extraction', [
+        'error' => json_last_error_msg(),
+        'content_preview' => substr($cleanContent, 0, 300)
+      ]);
+      
+      // Try to extract JSON from the content
       if (preg_match('/\{.*\}/s', $content, $matches)) {
         $parsed = json_decode($matches[0], true);
       }
     }
 
-    if (!$parsed || !isset($parsed['message'])) {
-      $parsed = [
-        'message' => $content,
-        'suggestion' => null
-      ];
+    if (!$parsed || !isset($parsed['suggestion'])) {
+      Log::error('Failed to parse AI response - no suggestion found', [
+        'provider' => $provider,
+        'content_preview' => substr($content, 0, 500),
+        'parsed' => $parsed
+      ]);
+      
+      // Return error instead of empty suggestion
+      throw new \Exception('AI response does not contain valid suggestion data');
     }
 
+    // Validate that suggestion has data
+    if (!isset($parsed['suggestion']['data']) || empty($parsed['suggestion']['data'])) {
+      Log::error('AI response has empty suggestion data', [
+        'provider' => $provider,
+        'suggestion' => $parsed['suggestion'] ?? null
+      ]);
+      
+      throw new \Exception('AI response contains empty suggestion data');
+    }
+
+    // ALWAYS force message to "OK" for field suggestions
+    $parsed['message'] = 'OK';
+
+    // Clean hashtags if they exist - replace commas with spaces
+    if (isset($parsed['suggestion']['data']['hashtags'])) {
+      $hashtags = $parsed['suggestion']['data']['hashtags'];
+      // Replace commas (with or without spaces) with single space
+      $hashtags = preg_replace('/,\s*/', ' ', $hashtags);
+      // Remove multiple spaces
+      $hashtags = preg_replace('/\s+/', ' ', $hashtags);
+      // Trim
+      $hashtags = trim($hashtags);
+      $parsed['suggestion']['data']['hashtags'] = $hashtags;
+    }
+
+    // Validate and fix campaign data if present
+    if (isset($parsed['suggestion']['data'])) {
+      $data = &$parsed['suggestion']['data'];
+      
+      // For campaigns, ensure all required fields are present
+      if (isset($parsed['suggestion']['type']) && 
+          (strpos($parsed['suggestion']['type'], 'campaign') !== false)) {
+        
+        // Rename 'title' to 'name' if present
+        if (isset($data['title']) && !isset($data['name'])) {
+          $data['name'] = $data['title'];
+          unset($data['title']);
+        }
+        
+        // Remove hashtags field if present (not for campaigns)
+        if (isset($data['hashtags'])) {
+          unset($data['hashtags']);
+        }
+        
+        // Truncate description if too long (500 chars for campaigns)
+        if (isset($data['description']) && strlen($data['description']) > 500) {
+          $data['description'] = substr($data['description'], 0, 497) . '...';
+        }
+        
+        // Truncate name if too long
+        if (isset($data['name']) && strlen($data['name']) > 100) {
+          $data['name'] = substr($data['name'], 0, 97) . '...';
+        }
+        
+        // Truncate goal if too long
+        if (isset($data['goal']) && strlen($data['goal']) > 200) {
+          $data['goal'] = substr($data['goal'], 0, 197) . '...';
+        }
+        
+        // Add default budget if missing or invalid (default: 0)
+        if (!isset($data['budget']) || empty($data['budget']) || !is_numeric($data['budget'])) {
+          $data['budget'] = '0';
+        }
+        
+        // Ensure budget is string without symbols
+        $data['budget'] = preg_replace('/[^0-9.]/', '', $data['budget']);
+        
+        // Add default dates if missing (default: today and +2 days)
+        if (!isset($data['start_date']) || empty($data['start_date'])) {
+          $data['start_date'] = date('Y-m-d');
+        }
+        
+        if (!isset($data['end_date']) || empty($data['end_date'])) {
+          $data['end_date'] = date('Y-m-d', strtotime('+2 days'));
+        }
+      }
+      
+      // For publications, ensure title field exists
+      if (isset($parsed['suggestion']['type']) && 
+          (strpos($parsed['suggestion']['type'], 'publication') !== false)) {
+        
+        // Truncate description if too long (700 chars for publications)
+        if (isset($data['description']) && strlen($data['description']) > 700) {
+          $data['description'] = substr($data['description'], 0, 697) . '...';
+        }
+        
+        // Truncate title if too long
+        if (isset($data['title']) && strlen($data['title']) > 70) {
+          $data['title'] = substr($data['title'], 0, 67) . '...';
+        }
+        
+        // Truncate goal if too long
+        if (isset($data['goal']) && strlen($data['goal']) > 200) {
+          $data['goal'] = substr($data['goal'], 0, 197) . '...';
+        }
+      }
+    }
+
+    Log::info('AI Response Parsed Successfully', [
+      'provider' => $provider,
+      'has_suggestion' => isset($parsed['suggestion']),
+      'suggestion_type' => $parsed['suggestion']['type'] ?? null,
+      'data_keys' => isset($parsed['suggestion']['data']) ? array_keys($parsed['suggestion']['data']) : []
+    ]);
+
     return [
-      'message' => str_replace(['**', '*'], '', $parsed['message']),
+      'message' => 'OK',  // Always return "OK"
       'suggestion' => $parsed['suggestion'] ?? null,
       'provider' => $provider,
       'model' => $model

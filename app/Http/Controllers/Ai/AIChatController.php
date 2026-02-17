@@ -130,7 +130,8 @@ class AIChatController extends Controller
         $request->validate([
             'fields' => 'required|array',
             'type' => 'required|string|in:publication,campaign',
-            'language' => 'nullable|string'
+            'language' => 'nullable|string',
+            'field_limits' => 'nullable|array'
         ]);
 
         try {
@@ -150,8 +151,15 @@ class AIChatController extends Controller
                 $request->input('fields'),
                 $request->input('type'),
                 $language,
-                $user
+                $user,
+                $request->input('field_limits')
             );
+
+            Log::info('AI Field Suggestion Response', [
+                'user_id' => $user->id,
+                'type' => $request->input('type'),
+                'response' => $aiResponse
+            ]);
 
             return response()->json([
                 'success' => true,
@@ -161,12 +169,27 @@ class AIChatController extends Controller
         } catch (\Exception $e) {
             Log::error('AI Field Suggestion Error', [
                 'user_id' => Auth::id(),
-                'error' => $e->getMessage()
+                'type' => $request->input('type'),
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
             ]);
+
+            $errorMessage = $e->getMessage();
+            
+            // Provide user-friendly error messages
+            if (strpos($errorMessage, 'does not contain valid suggestion data') !== false) {
+                $errorMessage = $language === 'es' 
+                    ? 'La IA no pudo generar sugerencias válidas. Por favor, intenta de nuevo con un prompt más específico.'
+                    : 'AI could not generate valid suggestions. Please try again with a more specific prompt.';
+            } elseif (strpos($errorMessage, 'empty suggestion data') !== false) {
+                $errorMessage = $language === 'es'
+                    ? 'La IA devolvió datos vacíos. Por favor, intenta de nuevo.'
+                    : 'AI returned empty data. Please try again.';
+            }
 
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to generate suggestions'
+                'message' => $errorMessage
             ], 500);
         }
     }

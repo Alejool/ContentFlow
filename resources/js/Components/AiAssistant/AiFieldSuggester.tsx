@@ -1,9 +1,10 @@
 import { usePage } from "@inertiajs/react";
 import axios from "axios";
-import { Loader2, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import React, { useMemo, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
+import Button from "@/Components/common/Modern/Button";
 
 interface AiFieldSuggesterProps {
   fields: Record<string, any>;
@@ -37,10 +38,25 @@ const AiFieldSuggester: React.FC<AiFieldSuggesterProps> = ({
 
     setLoading(true);
     try {
+      // Define field limits based on type
+      const fieldLimits = type === "publication" 
+        ? {
+            title: { min: 1, max: 70 },
+            description: { min: 10, max: 700 },
+            goal: { min: 5, max: 200 },
+            hashtags: { min: 1, max: 10 }
+          }
+        : {
+            name: { min: 1, max: 100 },
+            description: { min: 1, max: 500 },
+            goal: { min: 1, max: 200 }
+          };
+
       const response = await axios.post(route("api.v1.ai.suggest-fields"), {
         fields,
         type,
         language: auth.user?.locale || "es",
+        field_limits: fieldLimits,
       });
 
       if (response.data.success && response.data.data) {
@@ -71,30 +87,23 @@ const AiFieldSuggester: React.FC<AiFieldSuggesterProps> = ({
   if (!isAiConfigured) return null;
 
   return (
-    <button
+    <Button
       type="button"
       onClick={handleSuggest}
       disabled={disabled || loading}
-      className={`group relative flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-full transition-all duration-300 shadow-sm
-                ${
-                  loading
-                    ? "bg-gray-100 dark:bg-neutral-800 text-gray-400 cursor-not-allowed"
-                    : "bg-gradient-to-r from-primary-50 to-indigo-50 dark:from-primary-900/20 dark:to-indigo-900/20 text-primary-700 dark:text-primary-300 hover:from-primary-100 hover:to-indigo-100 dark:hover:from-primary-900/30 dark:hover:to-indigo-900/30 border border-primary-200/60 dark:border-primary-700/30"
-                } ${className}`}
-      title={t("common.ai.get_suggestions") || "Obtener sugerencias con IA"}
+      variant="primary"
+      buttonStyle="gradient"
+      size="sm"
+      loading={loading}
+      loadingText={t("common.ai.thinking")}
+      icon={Sparkles}
+      iconPosition="left"
+      rounded="full"
+      shadow="sm"
+      className={className}
     >
-      <div className="absolute inset-0 bg-gradient-to-r from-primary-400/10 to-indigo-400/10 rounded-full blur-sm opacity-0 group-hover:opacity-100 transition-opacity" />
-      {loading ? (
-        <Loader2 className="w-3.5 h-3.5 animate-spin relative z-10" />
-      ) : (
-        <Sparkles className="w-3.5 h-3.5 relative z-10 text-primary-500 group-hover:scale-110 transition-transform" />
-      )}
-      <span className="relative z-10">
-        {loading
-          ? t("common.ai.thinking") || "Pensando..."
-          : t("common.ai.improve") || "Mejorar con IA"}
-      </span>
-    </button>
+      {t("common.ai.improve") || "Mejorar con IA"}
+    </Button>
   );
 };
 
