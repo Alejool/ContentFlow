@@ -47,6 +47,14 @@ class PublicationPostFailedNotification extends BaseNotification
       return $notifiable;
     }
     
+    // If notifiable is a User, load currentWorkspace if not already loaded
+    if ($notifiable instanceof \App\Models\User) {
+      if (!$notifiable->relationLoaded('currentWorkspace')) {
+        $notifiable->load('currentWorkspace');
+      }
+      return $notifiable->currentWorkspace;
+    }
+    
     if (isset($notifiable->currentWorkspace)) {
       return $notifiable->currentWorkspace;
     }

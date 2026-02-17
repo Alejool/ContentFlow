@@ -45,6 +45,14 @@ class PublicationPublishedNotification extends BaseNotification
       return $notifiable;
     }
     
+    // If notifiable is a User, load currentWorkspace if not already loaded
+    if ($notifiable instanceof \App\Models\User) {
+      if (!$notifiable->relationLoaded('currentWorkspace')) {
+        $notifiable->load('currentWorkspace');
+      }
+      return $notifiable->currentWorkspace;
+    }
+    
     if (isset($notifiable->currentWorkspace)) {
       return $notifiable->currentWorkspace;
     }
@@ -68,8 +76,27 @@ class PublicationPublishedNotification extends BaseNotification
     
     if ($successCount > 0) {
       $description .= "📱 Publicado exitosamente en:\n";
+      
+      // Get platform status to include URLs
+      $platformStatus = $this->publication->platform_status_summary;
+      
       foreach ($this->successPlatforms as $platform) {
-        $description .= "  • " . ucfirst($platform) . "\n";
+        $description .= "  • " . ucfirst($platform);
+        
+        // Find the URL for this platform
+        $platformUrl = null;
+        foreach ($platformStatus as $status) {
+          if (strtolower($status['platform']) === strtolower($platform) && !empty($status['url'])) {
+            $platformUrl = $status['url'];
+            break;
+          }
+        }
+        
+        if ($platformUrl) {
+          $description .= " - " . $platformUrl;
+        }
+        
+        $description .= "\n";
       }
       $description .= "\n";
     }
@@ -82,7 +109,7 @@ class PublicationPublishedNotification extends BaseNotification
       $description .= "\n";
     }
     
-    $description .= "Fecha y hora: " . now()->format('d/m/Y - h:i A') . "\n";
+    $description .= "Fecha: " . now()->format('d/m/Y') . "\n";
     $description .= "Estado: " . ($failedCount > 0 ? 'Completado con errores' : 'Completado exitosamente');
 
     return [

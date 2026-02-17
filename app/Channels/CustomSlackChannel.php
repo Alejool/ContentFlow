@@ -23,7 +23,10 @@ class CustomSlackChannel
 
     // Get the notification data
     $data = $notification->toArray($notifiable);
-    $message = "*" . ($data['title'] ?? 'Notification') . "*\n" . ($data['message'] ?? '');
+    
+    // Use description if available (contains detailed info), otherwise use message
+    $content = $data['description'] ?? $data['message'] ?? '';
+    $message = "*" . ($data['title'] ?? 'Notification') . "*\n" . $content;
 
     // Get workspace for logging
     $workspace = $this->getWorkspace($notifiable);
