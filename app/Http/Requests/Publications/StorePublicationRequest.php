@@ -48,9 +48,10 @@ class StorePublicationRequest extends FormRequest
         function ($attribute, $value, $fail) {
           if ($value) {
             $scheduledDate = Carbon::parse($value);
-            $now = Carbon::now('UTC')->addMinutes(2);
-
-            if ($scheduledDate->lt($now)) {
+            $now = Carbon::now();
+            
+            // Check if scheduled date is more than 1 minute in the future
+            if ($scheduledDate->diffInSeconds($now, false) >= -60) {
               $fail(__('publications.validation.scheduledMinDifference'));
             }
           }
@@ -65,9 +66,10 @@ class StorePublicationRequest extends FormRequest
         function ($attribute, $value, $fail) {
           if ($value) {
             $scheduledDate = Carbon::parse($value);
-            $now = Carbon::now('UTC')->addMinutes(2);
-
-            if ($scheduledDate->lt($now)) {
+            $now = Carbon::now();
+            
+            // Check if scheduled date is more than 1 minute in the future
+            if ($scheduledDate->diffInSeconds($now, false) >= -60) {
               $fail(__('publications.validation.scheduledMinDifference'));
             }
           }

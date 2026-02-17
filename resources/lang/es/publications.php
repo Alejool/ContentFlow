@@ -19,6 +19,6 @@ return [
     'accountMissingText' => 'Esta publicación fue publicada en una cuenta (:account) que ya no está conectada. Editarla creará una nueva versión para tus cuentas actuales. ¿Proceder?',
   ],
   'validation' => [
-    'scheduledMinDifference' => 'La fecha debe ser al menos 2 minutos después de la actual.',
+    'scheduledMinDifference' => 'La fecha debe ser al menos 1 minuto después de la actual.',
   ],
 ];

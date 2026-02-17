@@ -10,7 +10,7 @@ export const publicationSchema = (t: any) =>
       description: z
         .string()
         .min(10, t("publications.modal.validation.descMin"))
-        .max(200, t("publications.modal.validation.descMax")),
+        .max(700, t("publications.modal.validation.descMax")),
       goal: z
         .string()
         .min(5, t("publications.modal.validation.objRequired"))
@@ -39,11 +39,12 @@ export const publicationSchema = (t: any) =>
             if (!val) return true;
             const scheduledDate = new Date(val);
             const now = new Date();
-            // Requiere al menos 2 minutos en el futuro
-            return scheduledDate.getTime() >= now.getTime() + 120000;
+            // Check if scheduled date is more than 1 minute (60 seconds) in the future
+            const diffInSeconds = (scheduledDate.getTime() - now.getTime()) / 1000;
+            return diffInSeconds > 60;
           },
           t("publications.modal.validation.scheduledMinDifference") ||
-            "La fecha debe ser al menos 2 minutos después de la actual",
+            "La fecha debe ser al menos 1 minuto después de la actual",
         ),
       social_accounts: z.array(z.number()).optional().default([]),
       status: z
