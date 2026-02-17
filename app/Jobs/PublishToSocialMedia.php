@@ -90,12 +90,6 @@ class PublishToSocialMedia implements ShouldQueue
               'platform' => $platform,
               'error' => $pResult['errors'][0]['message'] ?? 'Unknown platform error',
             ], $publisher);
-            
-            $this->sendFailureNotification(
-              $publication,
-              $platform,
-              $pResult['errors'][0]['message'] ?? 'Unknown platform error'
-            );
           }
         }
       }
@@ -109,17 +103,19 @@ class PublishToSocialMedia implements ShouldQueue
           'status' => 'published',
           'publish_date' => now(),
         ]);
+        
+        // Only send notification on final success (no more retries needed)
+        $this->sendSuccessNotification($publication, $platformResults);
       } else {
         $publication->logActivity('failed', [
           'reason' => empty($platformResults) ? ($result['message'] ?? 'Initialization failed') : 'All platforms failed',
+          'attempt' => $this->attempts(),
         ], $publisher);
 
         $publication->update(['status' => 'failed']);
         
-        $this->sendGeneralFailureNotification(
-          $publication,
-          empty($platformResults) ? ($result['message'] ?? 'Initialization failed') : 'All platforms failed'
-        );
+        // Throw exception to trigger retry mechanism
+        throw new \Exception('All platforms failed: ' . (empty($platformResults) ? ($result['message'] ?? 'Initialization failed') : 'All platforms failed'));
       }
     } catch (\Throwable $e) {
       Log::error('Publishing job crashed', [
@@ -147,7 +143,7 @@ class PublishToSocialMedia implements ShouldQueue
 
       $publication->update(['status' => 'failed']);
       
-      $this->sendGeneralFailureNotification($publication, 'Job crashed: ' . $e->getMessage());
+      // Don't send notification here - will be sent in failed() method after all retries
       
       throw $e;
     }
@@ -167,13 +163,27 @@ class PublishToSocialMedia implements ShouldQueue
     }
   }
   
-  private function sendFailureNotification(Publication $publication, string $platform, string $error): void
+  private function sendSuccessNotification(Publication $publication, array $platformResults): void
   {
     try {
-      $notification = new \App\Notifications\PublicationFailedNotification(
+      $successPlatforms = [];
+      $failedPlatforms = [];
+      
+      foreach ($platformResults as $platform => $result) {
+        if ($result['success']) {
+          $successPlatforms[] = $platform;
+        } else {
+          $failedPlatforms[] = [
+            'platform' => $platform,
+            'error' => $result['errors'][0]['message'] ?? 'Unknown error'
+          ];
+        }
+      }
+      
+      $notification = new \App\Notifications\PublicationPublishedNotification(
         $publication,
-        $platform,
-        $error
+        $successPlatforms,
+        $failedPlatforms
       );
       
       $publication->user->notify($notification);
@@ -182,20 +192,32 @@ class PublishToSocialMedia implements ShouldQueue
         $publication->workspace->notify($notification);
       }
     } catch (\Exception $e) {
-      Log::error('Failed to send failure notification', [
+      Log::error('Failed to send success notification', [
         'publication_id' => $publication->id,
-        'platform' => $platform,
         'error' => $e->getMessage()
       ]);
     }
   }
   
-  private function sendGeneralFailureNotification(Publication $publication, string $reason): void
+  private function sendGeneralFailureNotification(Publication $publication, string $reason, array $platformResults = []): void
   {
     try {
+      $failedPlatforms = [];
+      
+      foreach ($platformResults as $platform => $result) {
+        $errorMessage = $result['errors'][0]['message'] ?? 'Error desconocido';
+        $failedPlatforms[] = [
+          'platform' => ucfirst($platform),
+          'error' => $this->sanitizeErrorMessage($errorMessage)
+        ];
+      }
+      
+      $errorMsg = $this->sanitizeErrorMessage($reason);
+      
       $notification = new \App\Notifications\PublicationPostFailedNotification(
         $publication,
-        $reason
+        $errorMsg,
+        $failedPlatforms
       );
       
       $publication->user->notify($notification);
@@ -211,9 +233,39 @@ class PublishToSocialMedia implements ShouldQueue
     }
   }
   
+  private function sanitizeErrorMessage(string $error): string
+  {
+    // Check for technical errors that should be hidden from users
+    $technicalPatterns = [
+      '/App\\\\[^:]+/',
+      '/Argument #\d+/',
+      '/must be of type/',
+      '/given, called in/',
+      '/Stack trace:/',
+      '/in \/[^\s]+\.php/',
+      '/on line \d+/',
+      '/__construct\(\)/',
+      '/Illuminate\\\\[^\s]+/',
+      '/vendor\/[^\s]+/',
+    ];
+    
+    foreach ($technicalPatterns as $pattern) {
+      if (preg_match($pattern, $error)) {
+        return 'No se pudo completar la publicación. Verifica la configuración de la cuenta o intenta nuevamente.';
+      }
+    }
+    
+    // If error is too long or empty, use generic message
+    if (empty(trim($error)) || strlen($error) > 150) {
+      return 'No se pudo completar la publicación. Verifica la configuración de la cuenta o intenta nuevamente.';
+    }
+    
+    return trim($error);
+  }
+  
   public function failed(\Throwable $exception): void
   {
-    Log::error('PublishToSocialMedia job failed permanently', [
+    Log::error('PublishToSocialMedia job failed permanently after all retries', [
       'publication_id' => $this->publicationId,
       'error' => $exception->getMessage(),
       'attempts' => $this->attempts()
@@ -235,10 +287,17 @@ class PublishToSocialMedia implements ShouldQueue
       'attempts' => $this->attempts()
     ], $publisher);
 
-    $this->sendGeneralFailureNotification(
-      $publication,
-      'Max attempts exceeded: ' . $exception->getMessage()
-    );
+    // ONLY send notification here after ALL retries exhausted
+    $socialAccounts = \App\Models\Social\SocialAccount::whereIn('id', $this->socialAccountIds)->get();
+    $platformResults = [];
+    foreach ($socialAccounts as $account) {
+      $platformResults[$account->platform] = [
+        'success' => false,
+        'errors' => [['message' => $exception->getMessage()]]
+      ];
+    }
+    
+    $this->sendGeneralFailureNotification($publication, $exception->getMessage(), $platformResults);
 
     event(new PublicationStatusUpdated(
       userId: $publication->user_id,

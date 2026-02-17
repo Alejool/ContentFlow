@@ -27,7 +27,6 @@ use App\Jobs\VerifyYouTubeVideoStatus;
 
 use App\DTOs\SocialPostDTO;
 
-use App\Notifications\PublicationPostFailedNotification;
 use App\Notifications\PublicationResultNotification;
 
 
@@ -335,11 +334,7 @@ class PlatformPublishService
           Log::info('Errors occurred, committing logs anyway', ['errors' => count($platformErrors)]);
           DB::commit();
 
-          $publication->user->notify(new PublicationPostFailedNotification(
-            $socialAccount->platform,
-            $platformErrors[0]['message'] ?? 'Unknown error',
-            $publication->title
-          ));
+          // Don't notify here - Job will handle notification after all retries
 
           $platformResults[$socialAccount->platform] = [
             'success' => false,
@@ -433,13 +428,7 @@ class PlatformPublishService
           'trace' => $e->getTraceAsString(),
         ]);
 
-
-        // Notify about failure
-        $publication->user->notify(new PublicationPostFailedNotification(
-          $socialAccount->platform,
-          $e->getMessage(),
-          $publication->title
-        ));
+        // Don't notify here - Job will handle notification after all retries
 
         $platformResults[$socialAccount->platform] = [
           'success' => false,
