@@ -529,7 +529,13 @@ const EditPublicationModal = ({
                 />
 
                 <LivePreviewSection
-                  content={`${watched.description || ""}\n\n${watched.hashtags || ""}`}
+                  content={`${watched.description || ""}\n\n${
+                    watched.hashtags
+                      ? Array.isArray(watched.hashtags)
+                        ? watched.hashtags.join(' ')
+                        : watched.hashtags
+                      : ""
+                  }`}
                   mediaUrls={stabilizedMediaPreviews.map((m) => m.url)}
                   user={{
                     name: auth.user.name,

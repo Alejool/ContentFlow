@@ -140,6 +140,29 @@ export default function PublishPublicationModal({
     }
   }, [isOpen, publication?.id]);
 
+  // Listen for real-time publication status updates
+  useEffect(() => {
+    if (!isOpen || !publication || !auth.user?.id || !window.Echo) {
+      return;
+    }
+
+    const channel = window.Echo.private(`users.${auth.user.id}`);
+
+    const handleStatusUpdate = (event: any) => {
+      if (event.publicationId === publication.id) {
+        // Refresh published platforms and publication data
+        fetchPublishedPlatforms(publication.id);
+        fetchPublicationById(publication.id);
+      }
+    };
+
+    channel.listen(".PublicationStatusUpdated", handleStatusUpdate);
+
+    return () => {
+      channel.stopListening(".PublicationStatusUpdated", handleStatusUpdate);
+    };
+  }, [isOpen, publication?.id, auth.user?.id]);
+
   const handleUnpublishWithConfirm = async (
     accountId: number,
     platform: string,
@@ -640,10 +663,32 @@ export default function PublishPublicationModal({
             <div className="flex gap-3 mt-8">
               <button
                 type="button"
-                onClick={() => onClose(publication.id)}
+                onClick={async () => {
+                  // If publication is actively publishing, cancel it
+                  if (publishing || publication.status === "publishing") {
+                    const confirmed = await confirm({
+                      title: t("publications.modal.publish.cancelConfirm.title") || "¿Cancelar publicación?",
+                      message: t("publications.modal.publish.cancelConfirm.message") || "¿Estás seguro de que deseas cancelar esta publicación? Las plataformas que ya se publicaron no se verán afectadas.",
+                      confirmText: t("publications.modal.publish.cancelConfirm.confirm") || "Sí, cancelar",
+                      cancelText: t("publications.modal.publish.cancelConfirm.cancel") || "No",
+                      type: "warning",
+                    });
+                    
+                    if (confirmed) {
+                      await handleCancelPublication(publication.id);
+                      if (onSuccess) onSuccess();
+                      onClose(publication.id);
+                    }
+                  } else {
+                    onClose(publication.id);
+                  }
+                }}
                 className="flex-1 px-4 py-3 rounded-lg font-medium transition-colors bg-gray-100 dark:bg-neutral-700 hover:bg-gray-200 dark:hover:bg-neutral-600 text-gray-700 dark:text-white"
               >
-                {t("publications.modal.publish.button.cancel")}
+                {publishing || publication.status === "publishing" 
+                  ? t("publications.modal.publish.button.cancelPublication") || "Cancelar Publicación"
+                  : t("publications.modal.publish.button.cancel") || "Cerrar"
+                }
               </button>
               {canPublishDirectly ? (
                 <div className="flex-[2] flex gap-3">

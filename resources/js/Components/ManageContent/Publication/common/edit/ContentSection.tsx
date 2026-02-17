@@ -137,9 +137,13 @@ const ContentSection = memo(
           sizeType="lg"
           hint={`${
             watched.hashtags
-              ? watched.hashtags
-                  .split(" ")
-                  .filter((tag: string) => tag.startsWith("#")).length
+              ? typeof watched.hashtags === 'string'
+                ? watched.hashtags
+                    .split(" ")
+                    .filter((tag: string) => tag.startsWith("#")).length
+                : Array.isArray(watched.hashtags)
+                ? watched.hashtags.length
+                : 0
               : 0
           }/10 hashtags`}
           disabled={disabled}

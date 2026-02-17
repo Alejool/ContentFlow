@@ -277,7 +277,10 @@ const EditPublicationModal = ({
   const previewContent = useMemo(() => {
     let text = watched.description || "";
     if (watched.hashtags) {
-      text += `\n\n${watched.hashtags}`;
+      const formattedHashtags = Array.isArray(watched.hashtags)
+        ? watched.hashtags.join(' ')
+        : watched.hashtags;
+      text += `\n\n${formattedHashtags}`;
     }
     return text;
   }, [watched.description, watched.hashtags]);

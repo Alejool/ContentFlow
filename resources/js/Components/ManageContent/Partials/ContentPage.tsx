@@ -186,6 +186,26 @@ export default function ManageContentPage() {
     setActiveTab,
   ]);
 
+  // Listen for real-time publication status updates
+  useEffect(() => {
+    if (!auth.user?.id || !window.Echo) {
+      return;
+    }
+
+    const channel = window.Echo.private(`users.${auth.user.id}`);
+
+    const handleStatusUpdate = (event: any) => {
+      // Refresh the current list when any publication status changes
+      handleRefresh();
+    };
+
+    channel.listen(".PublicationStatusUpdated", handleStatusUpdate);
+
+    return () => {
+      channel.stopListening(".PublicationStatusUpdated", handleStatusUpdate);
+    };
+  }, [auth.user?.id, handleRefresh]);
+
   const [approvalTab, setApprovalTab] = useState("pending");
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
