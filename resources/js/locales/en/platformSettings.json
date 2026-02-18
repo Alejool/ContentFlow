@@ -8,19 +8,25 @@
     "title": "Global Platform Settings",
     "subtitle": "Define default settings for each social network.",
     "clickToConfigure": "Click to configure",
+    "configure": "Configure Network",
+    "configureAll": "Configure All",
     "messages": {
       "success": "Configuration saved successfully ",
       "error": "Error saving configuration "
     },
-    "configure": "Configure Network",
     "preview": {
       "view": "View Preview"
     },
     "button": {
       "save": "Save Changes"
     },
+    "all": {
+      "title": "Global Platform Configuration",
+      "subtitle": "Adjust specific options for all platforms"
+    },
     "youtube": {
       "title": "YouTube",
+      "subtitle": "Adjust YouTube-specific options",
       "type": "Video Type",
       "video": "Video Normal",
       "videoStandard": "Standard video",
@@ -35,6 +41,7 @@
     },
     "facebook": {
       "title": "Facebook",
+      "subtitle": "Adjust Facebook-specific options",
       "type": "Publication Type",
       "feed": "Wall Publication",
       "feedDescription": "Wall Publication",
@@ -43,6 +50,7 @@
     },
     "instagram": {
       "title": "Instagram",
+      "subtitle": "Adjust Instagram-specific options",
       "type": "Publication Type",
       "feed": "Feed Publication",
       "feedDescription": "Feed Publication",
@@ -53,6 +61,7 @@
     },
     "tiktok": {
       "title": "TikTok",
+      "subtitle": "Adjust TikTok-specific options",
       "privacy": "Privacy",
       "public": "Public",
       "friends": "Friends Only",
@@ -71,6 +80,7 @@
     },
     "twitter": {
       "title": "Twitter (X)",
+      "subtitle": "Adjust Twitter-specific options",
       "type": "Post Type",
       "tweet": "Standard Tweet",
       "thread": "Thread (Split text)",
@@ -83,8 +93,7 @@
       "1h": "1 Hour",
       "24h": "24 Hours",
       "3d": "3 Days",
-      "7d": "7 Days",
-      "subtitle": "Adjust platform-specific options"
+      "7d": "7 Days"
     },
     "labels": {
       "type": "Post Type",

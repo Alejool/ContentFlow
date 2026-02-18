@@ -9,6 +9,7 @@
     "subtitle": "Define las configuraciones predeterminadas para cada red social.",
     "clickToConfigure": "Haz clic para configurar",
     "configure": "Configurar red",
+    "configureAll": "Configurar todas",
     "messages": {
       "success": "Configuración guardada exitosamente ",
       "error": "Error al guardar la configuración "
@@ -19,8 +20,13 @@
     "button": {
       "save": "Guardar Cambios"
     },
+    "all": {
+      "title": "Configuración Global de Plataformas",
+      "subtitle": "Ajustar opciones específicas para todas las plataformas"
+    },
     "youtube": {
       "title": "YouTube",
+      "subtitle": "Ajustar opciones específicas de YouTube",
       "type": "Tipo de Video",
       "video": "Video Normal",
       "videoStandard": "Video estándar",
@@ -35,6 +41,7 @@
     },
     "facebook": {
       "title": "Facebook",
+      "subtitle": "Ajustar opciones específicas de Facebook",
       "type": "Tipo de Publicación",
       "feed": "Publicación del Muro",
       "feedDescription": "Publicación del Muro",
@@ -43,6 +50,7 @@
     },
     "instagram": {
       "title": "Instagram",
+      "subtitle": "Ajustar opciones específicas de Instagram",
       "type": "Tipo de Publicación",
       "feed": "Publicación del Feed",
       "feedDescription": "Publicación del Feed",
@@ -53,6 +61,7 @@
     },
     "tiktok": {
       "title": "TikTok",
+      "subtitle": "Ajustar opciones específicas de TikTok",
       "privacy": "Privacidad",
       "public": "Público",
       "publicDescription": "Todos pueden ver",
@@ -71,6 +80,7 @@
     },
     "twitter": {
       "title": "Twitter (X)",
+      "subtitle": "Ajustar opciones específicas de Twitter",
       "type": "Tipo de Post",
       "tweet": "Tweet Estándar",
       "thread": "Hilo (Dividir texto)",
@@ -83,8 +93,7 @@
       "1h": "1 Hora",
       "24h": "24 Horas",
       "3d": "3 Días",
-      "7d": "7 Días",
-      "subtitle": "Ajustar opciones específicas de la plataforma"
+      "7d": "7 Días"
     },
     "labels": {
       "type": "Tipo de Publicación",
