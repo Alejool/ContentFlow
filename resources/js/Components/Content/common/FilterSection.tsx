@@ -1,6 +1,7 @@
 import { DatePicker as DatePickerModern } from "@/Components/common/Modern/DatePicker";
 import Input from "@/Components/common/Modern/Input";
 import Select from "@/Components/common/Modern/Select";
+import Button from "@/Components/common/Modern/Button";
 import { getPlatformOptions } from "@/Constants/socialPlatforms";
 import { format, parseISO } from "date-fns";
 import { Filter, Search, RotateCcw } from "lucide-react";
@@ -114,16 +115,20 @@ export default function FilterSection({
           Filtros
         </h3>
         {onResetFilters && (
-          <button
+          <Button
             onClick={() => {
               onResetFilters();
               setSearch("");
             }}
+            variant="ghost"
+            buttonStyle="ghost"
+            size="xs"
+            icon={RotateCcw}
+            iconPosition="left"
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-100 dark:hover:bg-neutral-700 rounded-lg transition-colors"
           >
-            <RotateCcw className="w-3.5 h-3.5" />
             Reiniciar
-          </button>
+          </Button>
         )}
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">

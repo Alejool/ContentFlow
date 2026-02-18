@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 
 import PublicationThumbnail from "@/Components/Content/Publication/PublicationThumbnail";
+import Button from "@/Components/common/Modern/Button";
 
 interface CampaignMobileTableProps {
   items: Campaign[];
@@ -129,65 +130,84 @@ const canManageContent =
               <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-gray-100 dark:border-neutral-700/50 mt-2">
                 <div className="flex-1 min-w-[140px]">
                   {(item.publications?.length || 0) > 0 ? (
-                    <button
+                    <Button
                       onClick={() => toggleExpand(item.id)}
+                      variant={expandedCampaigns.includes(item.id) ? "primary" : "ghost"}
+                      buttonStyle="ghost"
+                      size="sm"
                       className={`flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold uppercase rounded-lg transition-all active:scale-95 ${
                         expandedCampaigns.includes(item.id)
                           ? "bg-primary-50 text-primary-700 dark:bg-primary-900/40 dark:text-primary-400 ring-1 ring-primary-200 dark:ring-primary-800"
                           : "bg-gray-50 text-gray-600 hover:bg-gray-100 dark:bg-neutral-800 dark:text-gray-300 dark:hover:bg-neutral-700 ring-1 ring-gray-100 dark:ring-neutral-700"
                       }`}
+                      icon={expandedCampaigns.includes(item.id) ? ChevronDown : ChevronRight}
+                      iconPosition="left"
                     >
                       {expandedCampaigns.includes(item.id) ? (
                         <>
-                          <ChevronDown className="w-3 h-3" />
                           {t("campaigns.actions.hidePublications")}
                         </>
                       ) : (
                         <>
-                          <ChevronRight className="w-3 h-3" />
                           {t("campaigns.actions.showPublications")}
                           <span className="ml-0.5 opacity-60">
                             ({item.publications?.length})
                           </span>
                         </>
                       )}
-                    </button>
+                    </Button>
                   ) : (
                     <div className="h-8" />
                   )}
                 </div>
 
                 <div className="flex items-center gap-1.5 bg-gray-50/50 dark:bg-neutral-800/30 p-1 rounded-lg border border-gray-100 dark:border-neutral-700/50">
-                  <button
+                  <Button
                     onClick={() => onViewDetails(item)}
+                    variant="ghost"
+                    buttonStyle="icon"
+                    size="lg"
                     className="p-2 text-gray-500 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-white dark:hover:bg-neutral-800 rounded-lg transition-all"
                     title={t("common.view")}
+                    icon={Eye}
                   >
-                    <Eye className="w-4 h-4" />
-                  </button>
+                    
+                  </Button>
                   {canManageContent && (
                     <>
-                      <button
+                      <Button
                         onClick={() => onDuplicate?.(item.id)}
+                        variant="ghost"
+                        buttonStyle="icon"
+                        size="lg"
                         className="p-2 text-purple-500 hover:bg-white dark:hover:bg-neutral-800 rounded-lg transition-all"
                         title="Duplicar"
+                        icon={Copy}
                       >
-                        <Copy className="w-4 h-4" />
-                      </button>
-                      <button
+                        
+                      </Button>
+                      <Button
                         onClick={() => onEdit(item)}
+                        variant="ghost"
+                        buttonStyle="icon"
+                        size="lg"
                         className="p-2 text-blue-500 hover:bg-white dark:hover:bg-neutral-800 rounded-lg transition-all"
                         title={t("common.edit")}
+                        icon={Edit}
                       >
-                        <Edit className="w-4 h-4" />
-                      </button>
-                      <button
+                        
+                      </Button>
+                      <Button
                         onClick={() => onDelete(item.id)}
+                        variant="ghost"
+                        buttonStyle="icon"
+                        size="lg"
                         className="p-2 text-rose-500 hover:bg-white dark:hover:bg-neutral-800 rounded-lg transition-all"
                         title={t("common.delete")}
+                        icon={Trash2}
                       >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                        
+                      </Button>
                     </>
                   )}
                 </div>

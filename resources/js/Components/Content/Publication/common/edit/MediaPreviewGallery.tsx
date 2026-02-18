@@ -1,3 +1,4 @@
+import Button from "@/Components/common/Modern/Button";
 import MediaLightbox from "@/Components/common/ui/MediaLightbox";
 import { ChevronDown, ChevronUp, FileImage, Play, X } from "lucide-react";
 import { memo, useState } from "react";
@@ -36,9 +37,14 @@ const MediaPreviewGallery = memo(
 
     return (
       <div className="border-t border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-neutral-800/50 rounded-lg overflow-hidden mt-6">
-        <button
+        <Button
+          buttonStyle="ghost"
+          variant="ghost"
+          size="lg"
+          icon={isOpen ? ChevronUp : ChevronDown}
           onClick={() => setIsOpen(!isOpen)}
-          className="w-full flex items-center justify-between p-4 hover:bg-gray-100 dark:hover:bg-neutral-800 transition-colors"
+          fullWidth
+          className="justify-between"
         >
           <div className="flex items-center gap-2">
             <span className="font-semibold text-gray-700 dark:text-gray-300">
@@ -48,12 +54,7 @@ const MediaPreviewGallery = memo(
               {mediaItems.length}
             </span>
           </div>
-          {isOpen ? (
-            <ChevronUp className="w-5 h-5 text-gray-500" />
-          ) : (
-            <ChevronDown className="w-5 h-5 text-gray-500" />
-          )}
-        </button>
+        </Button>
 
         {isOpen && (
           <div className="p-4 space-y-6 animate-in slide-in-from-top-2 duration-200">
@@ -136,12 +137,14 @@ const MediaPreviewGallery = memo(
                       }
                       className="w-full h-full object-cover"
                     />
-                    <button
+                    <Button
+                      buttonStyle="icon"
+                      variant="danger"
+                      size="xs"
+                      icon={X}
                       onClick={() => onClearThumbnail(activeItem.tempId)}
-                      className="absolute top-0 right-0 p-0.5 bg-red-500 text-white hover:bg-red-600"
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
+                      className="absolute top-0 right-0"
+                    />
                   </div>
                 )}
             </div>
@@ -149,10 +152,13 @@ const MediaPreviewGallery = memo(
             {/* Thumbnail Strip */}
             <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600">
               {mediaItems.map((item, index) => (
-                <button
+                <Button
                   key={item.tempId}
+                  buttonStyle="ghost"
+                  variant="ghost"
+                  size="sm"
                   onClick={() => setActiveIndex(index)}
-                  className={`relative flex-shrink-0 w-24 aspect-video rounded-md overflow-hidden border-2 transition-all ${
+                  className={`relative flex-shrink-0 w-24 aspect-video rounded-md overflow-hidden border-2 transition-all p-0 ${
                     activeIndex === index
                       ? "border-primary-500 ring-2 ring-primary-500/20"
                       : "border-transparent opacity-60 hover:opacity-100"
@@ -175,7 +181,7 @@ const MediaPreviewGallery = memo(
                       className="w-full h-full object-cover"
                     />
                   )}
-                </button>
+                </Button>
               ))}
             </div>
           </div>

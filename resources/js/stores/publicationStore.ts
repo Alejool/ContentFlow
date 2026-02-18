@@ -67,6 +67,7 @@ interface PublicationState {
   setRemovedPlatforms: (publicationId: number, accountIds: number[]) => void;
   setPublishingPlatforms: (publicationId: number, accountIds: number[]) => void;
   setScheduledPlatforms: (publicationId: number, accountIds: number[]) => void;
+  clearPublicationPlatformStates: (publicationId: number) => void;
 
   clearPageData: () => void;
   clearError: () => void;
@@ -492,6 +493,29 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
     set((state) => ({
       scheduledPlatforms: { ...state.scheduledPlatforms, [id]: accounts },
     })),
+
+  clearPublicationPlatformStates: (id) =>
+    set((state) => {
+      const newPublished = { ...state.publishedPlatforms };
+      const newFailed = { ...state.failedPlatforms };
+      const newPublishing = { ...state.publishingPlatforms };
+      const newScheduled = { ...state.scheduledPlatforms };
+      const newRemoved = { ...state.removedPlatforms };
+      
+      delete newPublished[id];
+      delete newFailed[id];
+      delete newPublishing[id];
+      delete newScheduled[id];
+      delete newRemoved[id];
+      
+      return {
+        publishedPlatforms: newPublished,
+        failedPlatforms: newFailed,
+        publishingPlatforms: newPublishing,
+        scheduledPlatforms: newScheduled,
+        removedPlatforms: newRemoved,
+      };
+    }),
 
   clearPageData: () =>
     set((state) => ({

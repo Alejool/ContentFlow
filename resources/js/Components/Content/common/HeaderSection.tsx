@@ -1,4 +1,5 @@
 import { Filter, Plus, RotateCcw } from "lucide-react";
+import Button from "@/Components/common/Modern/Button";
 
 interface HeaderSectionProps {
   mode: "campaigns" | "publications";
@@ -37,8 +38,11 @@ export default function HeaderSection({
           </p>
         </div>
         <div className="flex gap-2">
-          <button
+          <Button
             onClick={() => setShowFilters(!showFilters)}
+            variant={showFilters ? "primary" : "ghost"}
+            buttonStyle={showFilters ? "solid" : "ghost"}
+            size="md"
             className={`p-2 rounded-lg transition-colors ${showFilters
                 ? "bg-primary-500 text-white"
                 : "hover:bg-gray-100 dark:hover:bg-neutral-700"
@@ -48,27 +52,36 @@ export default function HeaderSection({
                 ? t("campaigns.filters.title") || "Campaign Filters"
                 : t("publications.filters.title") || "Publication Filters"
             }
+            icon={Filter}
           >
-            <Filter className="w-4 h-4" />
-          </button>
+            
+          </Button>
           {onRefresh && (
-            <button
+            <Button
               onClick={onRefresh}
+              variant="ghost"
+              buttonStyle="ghost"
+              size="md"
               className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-700 transition-colors"
               title={t("common.refresh") || "Refresh"}
+              icon={RotateCcw}
             >
-              <RotateCcw className="w-4 h-4" />
-            </button>
+              
+            </Button>
           )}
-          <button
+          <Button
             onClick={onAdd}
-            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-700 hover:to-primary-600 text-white rounded-lg font-medium transition-all shadow-md hover:shadow-lg active:scale-95"
+            variant="primary"
+            buttonStyle="gradient"
+            size="md"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all shadow-md hover:shadow-lg active:scale-95"
+            icon={Plus}
+            iconPosition="left"
           >
-            <Plus className="w-4 h-4" />
             {mode === "campaigns"
               ? t("campaigns.button.add") || "Save Campaign"
               : t("publications.button.add") || "Save Publication"}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

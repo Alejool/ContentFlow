@@ -19,6 +19,7 @@ import {
 import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
+import Button from "@/Components/common/Modern/Button";
 
 interface ContentCardProps {
   item: any;
@@ -421,76 +422,96 @@ export default function ContentCard({
           {type === "publication" && canManageContent && (
             <>
               {canPublish || item.status === "approved" ? (
-                <button
+                <Button
                   onClick={(e) => {
                     e.stopPropagation();
                     onPublish?.(item);
                   }}
-                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg transition-all shadow-sm shadow-orange-200 dark:shadow-none text-sm font-semibold"
+                  variant="primary"
+                  buttonStyle="gradient"
+                  size="sm"
+                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg transition-all shadow-sm shadow-orange-200 dark:shadow-none text-sm font-semibold"
                   title="Publicar ahora"
+                  icon={Rocket}
+                  iconPosition="left"
                 >
-                  <Rocket className="w-4 h-4" />
-                  <span className="hidden sm:inline">Publicar</span>
-                </button>
+                  <span >Publicar</span>
+                </Button>
               ) : !canPublish &&
                 ["draft", "failed", "rejected"].includes(
                   item.status || "draft",
                 ) ? (
-                <button
+                <Button
                   onClick={(e) => {
                     e.stopPropagation();
                     onPublish?.(item);
                   }}
-                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors text-sm font-semibold shadow-sm"
+                  variant="primary"
+                  buttonStyle="solid"
+                  size="sm"
+                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg transition-colors text-sm font-semibold shadow-sm"
                   title="Solicitar aprobación"
+                  icon={Clock}
+                  iconPosition="left"
                 >
-                  <Clock className="w-4 h-4" />
                   <span className="hidden sm:inline">Solicitar</span>
-                </button>
+                </Button>
               ) : item.status === "published" ? (
-                <button
+                <Button
                   onClick={(e) => {
                     e.stopPropagation();
                     onViewDetails?.(item);
                   }}
-                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-white hover:bg-orange-50 text-gray-700 hover:text-orange-700 border border-gray-200 hover:border-orange-200 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 rounded-lg transition-all text-sm font-semibold shadow-sm"
+                  variant="ghost"
+                  buttonStyle="outline"
+                  size="sm"
+                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg transition-all text-sm font-semibold shadow-sm"
                   title="Ver detalles"
+                  icon={Eye}
+                  iconPosition="left"
                 >
-                  <Eye className="w-4 h-4" />
                   <span className="hidden sm:inline">Ver</span>
-                </button>
+                </Button>
               ) : (
-                <button
+                <Button
                   onClick={(e) => {
                     e.stopPropagation();
                     onViewDetails?.(item);
                   }}
-                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-white hover:bg-orange-50 text-gray-700 hover:text-orange-700 border border-gray-200 hover:border-orange-200 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 rounded-lg transition-all text-sm font-semibold shadow-sm"
+                  variant="ghost"
+                  buttonStyle="outline"
+                  size="sm"
+                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg transition-all text-sm font-semibold shadow-sm"
                   title="Ver detalles"
+                  icon={Eye}
+                  iconPosition="left"
                 >
-                  <Eye className="w-4 h-4" />
                   <span className="hidden sm:inline">Ver</span>
-                </button>
+                </Button>
               )}
             </>
           )}
 
           {(!canManageContent || type === "campaign") && (
-            <button
+            <Button
               onClick={(e) => {
                 e.stopPropagation();
                 onViewDetails?.(item);
               }}
-              className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-white hover:bg-orange-50 text-gray-700 hover:text-orange-700 border border-gray-200 hover:border-orange-200 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 rounded-lg transition-all text-sm font-semibold shadow-sm"
+              variant="ghost"
+              buttonStyle="outline"
+              size="sm"
+              className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg transition-all text-sm font-semibold shadow-sm"
               title="Ver detalles"
+              icon={Eye}
+              iconPosition="left"
             >
-              <Eye className="w-4 h-4" />
               Detalles
-            </button>
+            </Button>
           )}
 
           {canManageContent && (
-            <button
+            <Button
               onClick={(e) => {
                 e.stopPropagation();
                 if (remoteLock) {
@@ -501,10 +522,13 @@ export default function ContentCard({
                 }
                 onEdit(item);
               }}
+              variant="ghost"
+              buttonStyle={remoteLock ? "solid" : "outline"}
+              size="sm"
               className={`flex items-center justify-center gap-2 px-3 py-2 rounded-lg transition-colors shadow-sm ${
                 remoteLock
                   ? "bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed dark:bg-gray-800 dark:border-gray-700 dark:text-gray-600"
-                  : "bg-white hover:bg-orange-50 text-gray-500 hover:text-orange-600 border border-gray-200 hover:border-orange-200 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700"
+                  : ""
               }`}
               disabled={!!remoteLock}
               title={
@@ -512,44 +536,48 @@ export default function ContentCard({
                   ? `${t("publications.table.lockedBy") || "Editando por"} ${lockedByName}`
                   : "Editar"
               }
+              icon={remoteLock ? Lock : Edit}
             >
-              {remoteLock ? (
-                <>
-                  <Lock className="w-4 h-4" />
-                  <span className="text-xs font-medium">
-                    {lockedByFirstName}
-                  </span>
-                </>
-              ) : (
-                <Edit className="w-4 h-4" />
+              {remoteLock && (
+                <span className="text-xs font-medium">
+                  {lockedByFirstName}
+                </span>
               )}
-            </button>
+            </Button>
           )}
 
           {canManageContent && (
-            <button
+            <Button
               onClick={(e) => {
                 e.stopPropagation();
                 onDuplicate?.(item.id);
               }}
-              className="flex items-center justify-center px-3 py-2 bg-white hover:bg-primary-50 text-gray-400 hover:text-primary-600 border border-gray-200 hover:border-primary-200 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 rounded-lg transition-colors shadow-sm"
+              variant="ghost"
+              buttonStyle="icon"
+              size="lg"
+              className="flex items-center justify-center px-3 py-2  text-gray-600 hover:text-primary-600 border border-gray-200 hover:border-primary-200 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 rounded-lg transition-colors shadow-sm"
               title="Duplicar"
+              icon={Copy}
             >
-              <Copy className="w-4 h-4" />
-            </button>
+              
+            </Button>
           )}
 
           {canManageContent && (
-            <button
+            <Button
               onClick={(e) => {
                 e.stopPropagation();
                 onDelete(item.id);
               }}
-              className="flex items-center justify-center px-3 py-2 bg-white hover:bg-red-50 text-gray-400 hover:text-red-600 border border-gray-200 hover:border-red-200 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 rounded-lg transition-colors shadow-sm"
+              variant="ghost"
+              buttonStyle="icon"
+              size="lg"
+              className="flex items-center justify-center px-3 py-2 hover:bg-red-50 text-gray-400 hover:text-red-600 border border-gray-200 hover:border-red-200 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 rounded-lg transition-colors shadow-sm"
               title="Eliminar"
+              icon={Trash2}
             >
-              <Trash2 className="w-4 h-4" />
-            </button>
+              
+            </Button>
           )}
         </div>
       </div>

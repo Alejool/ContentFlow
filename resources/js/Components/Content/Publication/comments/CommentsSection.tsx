@@ -5,6 +5,7 @@ import { Send, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
+import Button from "@/Components/common/Modern/Button";
 
 interface Comment {
   id: number;
@@ -169,26 +170,31 @@ export const CommentsSection = ({
                       {comment.content}
                     </p>
                   </div>
-                  <div className="flex items-center gap-3 mt-1">
-                    <button
+                  <div className="flex items-center gap-4 mt-1.5">
+                    <Button
                       type="button"
                       onClick={() => {
                         setReplyTo(comment);
                         setNewComment(`@${comment.user.name} `);
                       }}
-                      className="text-[11px] font-semibold text-blue-600 hover:text-blue-700 transition-colors"
+                      buttonStyle="ghost"
+                      variant="ghost"
+                      size="xs"
+                      className="text-xs font-semibold text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 p-0 h-auto min-h-0"
                     >
                       {t("common.reply") || "Reply"}
-                    </button>
+                    </Button>
                     {currentUser.id === comment.user.id && (
-                      <button
+                      <Button
                         type="button"
                         onClick={() => handleDelete(comment.id)}
-                        className="text-xs text-red-500 hover:text-red-700 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1"
+                        buttonStyle="ghost"
+                        variant="ghost"
+                        size="xs"
+                        className="text-xs font-semibold text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all p-0 h-auto min-h-0"
                       >
-                        <Trash className="w-3 h-3" />{" "}
                         {t("publications.modal.comments.delete") || "Delete"}
-                      </button>
+                      </Button>
                     )}
                   </div>
                 </div>
@@ -223,15 +229,18 @@ export const CommentsSection = ({
                             </p>
                           </div>
                           {currentUser.id === reply.user.id && (
-                            <button
+                            <Button
                               type="button"
                               onClick={() => handleDelete(reply.id)}
-                              className="text-[10px] text-red-500 hover:text-red-700 mt-1 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1"
+                              buttonStyle="ghost"
+                              variant="danger"
+                              size="xs"
+                              icon={Trash}
+                              className="mt-1 opacity-0 group-hover:opacity-100"
                             >
-                              <Trash className="w-2.5 h-2.5" />{" "}
                               {t("publications.modal.comments.delete") ||
                                 "Delete"}
-                            </button>
+                            </Button>
                           )}
                         </div>
                       </div>
@@ -251,7 +260,7 @@ export const CommentsSection = ({
               {t("publications.modal.comments.replyingTo") || "Replying to"}{" "}
               <span className="font-semibold">{replyTo.user.name}</span>
             </span>
-            <button
+            <Button
               onClick={() => {
                 setReplyTo(null);
                 if (newComment.startsWith(`@${replyTo.user.name}`)) {
@@ -260,10 +269,13 @@ export const CommentsSection = ({
                   );
                 }
               }}
+              buttonStyle="ghost"
+              variant="ghost"
+              size="xs"
               className="hover:text-primary-900"
             >
               {t("common.cancel") || "Cancel"}
-            </button>
+            </Button>
           </div>
         )}
 
@@ -276,7 +288,7 @@ export const CommentsSection = ({
                   m.id !== currentUser.id,
               )
               .map((member) => (
-                <button
+                <Button
                   key={member.id}
                   type="button"
                   onClick={() => {
@@ -285,13 +297,16 @@ export const CommentsSection = ({
                     setNewComment(parts.join("@") + `@${member.name} `);
                     setShowMentions(false);
                   }}
-                  className="w-full flex items-center gap-2 px-3 py-2 hover:bg-gray-50 dark:hover:bg-neutral-800 text-left transition-colors"
+                  buttonStyle="ghost"
+                  variant="ghost"
+                  fullWidth
+                  className="flex items-center gap-2 px-3 py-2 text-left"
                 >
                   <Avatar src={member.photo_url} name={member.name} size="xs" />
                   <span className="text-xs font-medium text-gray-900 dark:text-gray-100">
                     {member.name}
                   </span>
-                </button>
+                </Button>
               ))}
           </div>
         )}
@@ -323,13 +338,14 @@ export const CommentsSection = ({
           className={`w-full pl-4 pr-10 py-2 text-sm bg-white dark:bg-black border border-gray-200 dark:border-neutral-800 rounded-lg focus:ring-primary-500 focus:border-primary-500 ${replyTo ? "rounded-t-none" : ""}`}
           disabled={submitting}
         />
-        <button
+        <Button
           type="submit"
           disabled={!newComment.trim() || submitting}
-          className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-md disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        >
-          <Send className="w-4 h-4" />
-        </button>
+          buttonStyle="icon"
+          variant="primary"
+          icon={Send}
+          className="absolute right-2 top-1/2 -translate-y-1/2"
+        />
       </div>
     </div>
   );

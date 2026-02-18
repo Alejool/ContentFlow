@@ -2,6 +2,7 @@ import DatePickerModern from "@/Components/common/Modern/DatePicker";
 import { parseISO } from "date-fns";
 import { Check, Clock, Loader2, Settings, Target, X } from "lucide-react";
 import React, { memo, useState } from "react";
+import Button from "@/Components/common/Modern/Button";
 
 interface SocialAccount {
   id: number;
@@ -75,9 +76,7 @@ const SchedulePopoverContent = memo(
           <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
             Schedule for {account.platform}
           </h4>
-          <button type="button" onClick={onClose}>
-            <X className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-          </button>
+          <Button type="button" onClick={onClose} buttonStyle="icon" variant="ghost" icon={X} />
         </div>
 
         <DatePickerModern
@@ -95,13 +94,15 @@ const SchedulePopoverContent = memo(
         />
 
         <div className="flex justify-end gap-2 mt-4">
-          <button
+          <Button
             type="button"
             onClick={onClose}
-            className="text-xs bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors font-medium shadow-sm"
+            buttonStyle="solid"
+            variant="primary"
+            size="sm"
           >
             Done
-          </button>
+          </Button>
         </div>
       </>
     );
@@ -350,34 +351,36 @@ const SocialAccountItem = memo(
                     )}
                   </span>
                   {customSchedule && (
-                    <button
+                    <Button
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
                         onScheduleRemove();
                       }}
-                      className="p-1 rounded-full hover:bg-primary-100 dark:hover:bg-primary-900/40 text-primary-500 transition-colors"
+                      buttonStyle="icon"
+                      variant="danger"
+                      size="xs"
+                      icon={X}
                       title={t("common.remove") || "Eliminar programación"}
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
+                    />
                   )}
                 </div>
               )}
             {isPublished && (
               <div className="flex flex-col gap-1.5 pt-1">
                 <div className="flex items-center gap-1.5">
-                  <button
+                  <Button
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
                       onPlatformSettingsClick();
                     }}
-                    className="p-1.5 rounded-lg transition-all hover:bg-gray-100 text-gray-500 hover:text-primary-600 dark:hover:bg-neutral-700 dark:text-gray-400 dark:hover:text-white"
+                    buttonStyle="icon"
+                    variant="ghost"
+                    size="sm"
+                    icon={Settings}
                     title={t("platformSettings.configure") || "Configurar red"}
-                  >
-                    <Settings className="w-4 h-4" />
-                  </button>
+                  />
                 </div>
 
                 {!customSchedule &&

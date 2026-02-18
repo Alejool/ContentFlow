@@ -1,3 +1,4 @@
+import Button from "@/Components/common/Modern/Button";
 import { AlertTriangle, FileImage, X } from "lucide-react";
 import React, { useState } from "react";
 
@@ -82,36 +83,32 @@ const VideoPreviewItem: React.FC<VideoPreviewItemProps> = ({
         </div>
       )}
 
-      <button
-        type="button"
+      <Button
+        buttonStyle="icon"
+        variant="danger"
+        size="sm"
+        icon={X}
         onClick={(e) => {
           e.stopPropagation();
           onRemove();
         }}
-        className="absolute top-2 right-2 p-1.5 bg-red-500/80 text-white rounded-full hover:bg-red-600 transition-colors opacity-0 group-hover/item:opacity-100 backdrop-blur-sm"
-      >
-        <X className="w-3 h-3" />
-      </button>
+        className="absolute top-2 right-2 opacity-0 group-hover/item:opacity-100 backdrop-blur-sm"
+      />
 
       {duration && (
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2 space-y-1">
           <div className="flex items-center justify-between text-xs text-white">
             <span className="font-medium">{formatDuration(duration)}</span>
             <div className="flex gap-1">
-              <button
-                type="button"
+              <Button
+                buttonStyle="solid"
+                variant={youtubeType === "short" ? "primary" : "ghost"}
+                size="xs"
                 onClick={(e) => {
                   e.stopPropagation();
                   handleTypeChange("short");
                 }}
                 disabled={duration > 60}
-                className={`px-2 py-0.5 rounded text-[10px] font-medium transition-colors ${
-                  youtubeType === "short"
-                    ? "bg-primary-500 text-white"
-                    : duration > 60
-                    ? "bg-gray-600/50 text-gray-400 cursor-not-allowed"
-                    : "bg-white/20 text-white hover:bg-white/30"
-                }`}
                 title={
                   duration > 60
                     ? `Video too long for Short (${duration}s > 60s)`
@@ -119,21 +116,18 @@ const VideoPreviewItem: React.FC<VideoPreviewItemProps> = ({
                 }
               >
                 Short
-              </button>
-              <button
-                type="button"
+              </Button>
+              <Button
+                buttonStyle="solid"
+                variant={youtubeType === "video" ? "primary" : "ghost"}
+                size="xs"
                 onClick={(e) => {
                   e.stopPropagation();
                   handleTypeChange("video");
                 }}
-                className={`px-2 py-0.5 rounded text-[10px] font-medium transition-colors ${
-                  youtubeType === "video"
-                    ? "bg-primary-500 text-white"
-                    : "bg-white/20 text-white hover:bg-white/30"
-                }`}
               >
                 Video
-              </button>
+              </Button>
             </div>
           </div>
           {isTooLong && (

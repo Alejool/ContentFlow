@@ -1,5 +1,6 @@
 import LanguageSwitcher from "@/Components/common/ui/LanguageSwitcher";
 import ThemeSwitcher from "@/Components/common/ui/ThemeSwitcher";
+import Button from "@/Components/common/Modern/Button";
 import { Link } from "@inertiajs/react";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
@@ -63,16 +64,18 @@ export default function ThemeLanguageContainer({
       {/* Mobile con menú hamburguesa */}
       <div className="md:hidden">
         <div className="flex items-center space-x-2">
-          <button
+          <Button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            variant="ghost"
+            buttonStyle="ghost"
+            className="!p-2 !rounded-lg hover:!bg-gray-100 dark:hover:!bg-gray-800 !shadow-none"
           >
             {isMobileMenuOpen ? (
               <X className="w-5 h-5 text-gray-700 dark:text-gray-300" />
             ) : (
               <Menu className="w-5 h-5 text-gray-700 dark:text-gray-300" />
             )}
-          </button>
+          </Button>
 
           {/* Menú desplegable */}
           {isMobileMenuOpen && (

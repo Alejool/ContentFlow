@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { memo } from "react";
 import { useTranslation } from "react-i18next";
+import Button from "@/Components/common/Modern/Button";
 
 interface CampaignRowProps {
   item: Campaign;
@@ -56,20 +57,20 @@ const CampaignRow = memo(
         }`}
       >
         <td className="px-2 py-4 text-center">
-          <button
+          <Button
             data-expand="true"
             data-expanded={
               expandedCampaigns.includes(item.id) ? "true" : "false"
             }
             onClick={() => toggleExpand(item.id)}
+            variant="ghost"
+            buttonStyle="icon"
+            size="lg"
             className="p-1 rounded-full transition-colors hover:bg-black/5 dark:hover:bg-white/10"
+            icon={expandedCampaigns.includes(item.id) ? ChevronDown : ChevronRight}
           >
-            {expandedCampaigns.includes(item.id) ? (
-              <ChevronDown className="w-4 h-4 text-gray-500" />
-            ) : (
-              <ChevronRight className="w-4 h-4 text-gray-500" />
-            )}
-          </button>
+            
+          </Button>
         </td>
         <td className="px-6 py-4">
           <div className="flex items-center gap-4">
@@ -167,16 +168,20 @@ const CampaignRow = memo(
         </td>
         <td className="px-6 py-4 text-right">
           <div className="flex items-center justify-end gap-2">
-            <button
+            <Button
               onClick={() => onViewDetails(item)}
+              variant="ghost"
+              buttonStyle="icon"
+              size="lg"
               className="p-2 text-gray-500 hover:bg-gray-50 rounded-lg dark:hover:bg-gray-700/20"
               title="View Details"
+              icon={Eye}
             >
-              <Eye className="w-4 h-4" />
-            </button>
+              
+            </Button>
             {canManage && (
               <>
-                <button
+                <Button
                   onClick={() => {
                     if (onEditRequest) {
                       onEditRequest(item);
@@ -184,27 +189,39 @@ const CampaignRow = memo(
                       onEdit(item);
                     }
                   }}
+                  variant="ghost"
+                  buttonStyle="icon"
+                  size="lg"
                   className={`p-2 text-blue-500 hover:bg-blue-50 rounded-lg dark:hover:bg-blue-900/20`}
                   title="Edit"
+                  icon={Edit}
                 >
-                  <Edit className="w-4 h-4" />
-                </button>
+                  
+                </Button>
                 {onDuplicate && (
-                  <button
+                  <Button
                     onClick={() => onDuplicate(item.id)}
+                    variant="ghost"
+                    buttonStyle="icon"
+                    size="lg"
                     className="p-2 text-purple-500 hover:bg-purple-50 rounded-lg dark:hover:bg-purple-900/20"
                     title="Duplicate"
+                    icon={Copy}
                   >
-                    <Copy className="w-4 h-4" />
-                  </button>
+                    
+                  </Button>
                 )}
-                <button
+                <Button
                   onClick={() => onDelete(item.id)}
+                  variant="ghost"
+                  buttonStyle="icon"
+                  size="lg"
                   className="p-2 text-red-500 hover:bg-red-50 rounded-lg dark:hover:bg-red-900/20"
                   title="Eliminar"
+                  icon={Trash2}
                 >
-                  <Trash2 className="w-4 h-4" />
-                </button>
+                  
+                </Button>
               </>
             )}
           </div>

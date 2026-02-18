@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import Button from "@/Components/common/Modern/Button";
 
 interface ExpandableTextProps {
   text: string;
@@ -25,8 +26,11 @@ export default function ExpandableText({
     : `${text.substring(0, maxLength)}${needsTruncation ? "…" : ""}`;
 
   return (
-    <button
+    <Button
       onClick={() => needsTruncation && setIsExpanded(!isExpanded)}
+      variant="ghost"
+      buttonStyle="ghost"
+      size="sm"
       className={`text-left focus:outline-none focus:ring-2 rounded ${
         needsTruncation
           ? "cursor-pointer hover:opacity-80 transition-opacity"
@@ -47,6 +51,6 @@ export default function ExpandableText({
           {isExpanded ? t("logs.table.clickLess") : t("logs.table.clickMore")}
         </span>
       )}
-    </button>
+    </Button>
   );
 }

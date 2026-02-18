@@ -1,5 +1,6 @@
 import { Sparkles } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import Button from "@/Components/common/Modern/Button";
 
 interface FloatingButtonProps {
   theme: "dark" | "light";
@@ -19,9 +20,11 @@ export default function FloatingButton({
   };
 
   return (
-    <button
+    <Button
       onClick={onClick}
-      className={`fixed bottom-6 right-6 w-14 h-14 ${getButtonBg()} text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center z-50 group`}
+      variant="primary"
+      buttonStyle="gradient"
+      className={`!fixed !bottom-6 !right-6 !w-14 !h-14 !rounded-full !shadow-lg hover:!shadow-xl !z-50 group !p-0`}
     >
       <Sparkles className="w-6 h-6 group-hover:scale-110 transition-transform" />
       <span
@@ -40,6 +43,6 @@ export default function FloatingButton({
           theme === "dark" ? "bg-primary-600/30" : "bg-primary-600/30"
         }`}
       ></div>
-    </button>
+    </Button>
   );
 }

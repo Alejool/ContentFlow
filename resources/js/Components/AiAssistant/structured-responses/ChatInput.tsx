@@ -1,6 +1,7 @@
 import { Send, Zap } from "lucide-react";
 import { FormEvent } from "react";
 import { useTranslation } from "react-i18next";
+import Button from "@/Components/common/Modern/Button";
 
 interface ChatInputProps {
   theme: "dark" | "light";
@@ -41,17 +42,15 @@ export default function ChatInput({
           placeholder={t("aiAssistant.askPlaceholder")}
           className={`flex-1 px-4 py-3 rounded-lg focus:outline-none focus:ring-2 transition-all text-sm ${getInputBg()}`}
         />
-        <button
+        <Button
           type="submit"
           disabled={!inputValue.trim() || isLoading}
-          className={`p-3 rounded-lg transition-all duration-300 shadow-sm ${
-            theme === "dark"
-              ? "bg-gradient-to-r from-primary-600 to-primary-700 text-white hover:from-primary-700 hover:to-primary-800 disabled:opacity-50 disabled:cursor-not-allowed"
-              : "bg-gradient-to-r from-primary-600 to-primary-600 text-white hover:from-primary-700 hover:to-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          }`}
+          variant="primary"
+          buttonStyle="gradient"
+          className="!p-3 !rounded-lg !shadow-sm"
         >
           <Send className="w-4 h-4" />
-        </button>
+        </Button>
       </form>
 
       <div

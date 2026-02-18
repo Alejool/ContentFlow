@@ -1,6 +1,7 @@
 import PublicationTimeline from "@/Components/Content/Publication/common/edit/PublicationTimeline";
 import { ChevronDown, ChevronUp, History } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import Button from "@/Components/common/Modern/Button";
 
 interface TimelineCompactoProps {
   activities: any[];
@@ -71,10 +72,13 @@ const TimelineCompacto = ({
 
   return (
     <div className="bg-gray-50 dark:bg-neutral-700/30 rounded-lg border border-gray-200 dark:border-neutral-600 overflow-hidden">
-      <button
+      <Button
         type="button"
         onClick={onToggle}
-        className="w-full p-4 flex items-center justify-between hover:bg-gray-100 dark:hover:bg-neutral-600/30 transition-colors"
+        buttonStyle="ghost"
+        variant="ghost"
+        fullWidth
+        className="p-4 flex items-center justify-between hover:bg-gray-100 dark:hover:bg-neutral-600/30 transition-colors"
       >
         <div className="flex items-center gap-3">
           <div className="p-2 bg-white dark:bg-neutral-600 rounded-lg border border-gray-200 dark:border-neutral-500">
@@ -108,7 +112,7 @@ const TimelineCompacto = ({
             <ChevronDown className="w-5 h-5 text-gray-500 dark:text-gray-400" />
           )}
         </div>
-      </button>
+      </Button>
 
       {isExpanded && (
         <div className="border-t border-gray-200  max-h-96 overflow-y-auto pr-2 custom-scrollbar dark:border-neutral-600 p-4">

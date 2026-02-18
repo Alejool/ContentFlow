@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import Button from "@/Components/common/Modern/Button";
 
 interface ViewCampaignModalProps {
   isOpen: boolean;
@@ -97,12 +98,16 @@ export default function ViewCampaignModal({
                 ? t("publications.modal.show.title")
                 : t("campaigns.modal.view.title")}
             </DialogTitle>
-            <button
+            <Button
               onClick={onClose}
+              variant="ghost"
+              buttonStyle="icon"
+              size="sm"
               className="p-2 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-neutral-700 text-gray-500 dark:text-gray-400"
+              icon={X}
             >
-              <X className="w-5 h-5" />
-            </button>
+              
+            </Button>
           </div>
 
           <div className="flex-1 overflow-y-auto p-6">
@@ -202,9 +207,12 @@ export default function ViewCampaignModal({
                 <div className="mt-8 border-b border-gray-200 dark:border-neutral-700 mb-6">
                   <nav className="-mb-px flex space-x-8" aria-label="Tabs">
                     {["overview", "activity", "approvals"].map((tab) => (
-                      <button
+                      <Button
                         key={tab}
                         onClick={() => setActiveTab(tab)}
+                        variant="ghost"
+                        buttonStyle="ghost"
+                        size="sm"
                         className={`
                           whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm capitalize
                           ${
@@ -215,7 +223,7 @@ export default function ViewCampaignModal({
                         `}
                       >
                         {t(`common.tabs.${tab}`, tab)}
-                      </button>
+                      </Button>
                     ))}
                   </nav>
                 </div>
@@ -258,12 +266,15 @@ export default function ViewCampaignModal({
                             {(item as any).hashtags}
                           </div>
                           {(item as any).hashtags.length > 100 && (
-                            <button
+                            <Button
                               onClick={() => setHashtagsExpanded(!hashtagsExpanded)}
+                              variant="ghost"
+                              buttonStyle="ghost"
+                              size="xs"
                               className="text-xs text-primary-600 dark:text-primary-400 hover:underline mt-2"
                             >
                               {hashtagsExpanded ? "Ver menos" : "Ver más"}
-                            </button>
+                            </Button>
                           )}
                         </div>
                       )}
@@ -400,23 +411,30 @@ export default function ViewCampaignModal({
 
           <div className="flex-shrink-0 flex justify-end gap-3 p-6 border-t border-gray-100 dark:border-neutral-700">
             {onEdit && canEdit && (
-              <button
+              <Button
                 onClick={() => {
                   onClose();
                   onEdit(item);
                 }}
-                className="px-6 py-2.5 rounded-lg font-bold transition-all bg-primary-600 hover:bg-primary-700 text-white flex items-center gap-2 shadow-lg shadow-primary-500/20 active:scale-95"
+                variant="primary"
+                buttonStyle="solid"
+                size="md"
+                className="px-6 py-2.5 rounded-lg font-bold transition-all shadow-lg shadow-primary-500/20 active:scale-95"
+                icon={Edit}
+                iconPosition="left"
               >
-                <Edit className="w-4 h-4" />
                 {t("common.editInPanel")}
-              </button>
+              </Button>
             )}
-            <button
+            <Button
               onClick={onClose}
-              className="px-6 py-2.5 rounded-lg font-medium transition-colors bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:text-white"
+              variant="secondary"
+              buttonStyle="solid"
+              size="md"
+              className="px-6 py-2.5 rounded-lg font-medium transition-colors"
             >
               {t("common.close")}
-            </button>
+            </Button>
           </div>
         </DialogPanel>
       </div>

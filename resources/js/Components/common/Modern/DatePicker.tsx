@@ -1,5 +1,6 @@
 import Input from "@/Components/common/Modern/Input";
 import Select from "@/Components/common/Modern/Select";
+import Button from "@/Components/common/Modern/Button";
 import { enUS, es } from "date-fns/locale";
 import {
   Calendar,
@@ -190,13 +191,15 @@ const CustomTimeSelector = ({
       </div>
       <div className="time-selector-body">
         <div className="time-input-group">
-          <button
+          <Button
             type="button"
-            className="time-spinner-btn"
+            variant="ghost"
+            buttonStyle="solid"
+            className="time-spinner-btn !p-0"
             onClick={incrementHours}
           >
             <ChevronUp className="w-4 h-4" />
-          </button>
+          </Button>
           <Input
             id="time-hours"
             type="text"
@@ -209,26 +212,30 @@ const CustomTimeSelector = ({
             maxLength={2}
             activeColor={activeColor}
           />
-          <button
+          <Button
             type="button"
-            className="time-spinner-btn"
+            variant="ghost"
+            buttonStyle="solid"
+            className="time-spinner-btn !p-0"
             onClick={decrementHours}
           >
             <ChevronDown className="w-4 h-4" />
-          </button>
+          </Button>
           <span className="time-label">
             {currentLocale === "es" ? "Horas" : "Hours"}
           </span>
         </div>
         <div className="time-separator">:</div>
         <div className="time-input-group">
-          <button
+          <Button
             type="button"
-            className="time-spinner-btn"
+            variant="ghost"
+            buttonStyle="solid"
+            className="time-spinner-btn !p-0"
             onClick={incrementMinutes}
           >
             <ChevronUp className="w-4 h-4" />
-          </button>
+          </Button>
           <Input
             id="time-minutes"
             type="text"
@@ -241,13 +248,15 @@ const CustomTimeSelector = ({
             maxLength={2}
             activeColor={activeColor}
           />
-          <button
+          <Button
             type="button"
-            className="time-spinner-btn"
+            variant="ghost"
+            buttonStyle="solid"
+            className="time-spinner-btn !p-0"
             onClick={decrementMinutes}
           >
             <ChevronDown className="w-4 h-4" />
-          </button>
+          </Button>
           <span className="time-label">
             {currentLocale === "es" ? "Minutos" : "Minutes"}
           </span>
@@ -1024,14 +1033,16 @@ const DatePickerModern = <T extends FieldValues>({
 
           return (
             <div className="custom-header-container">
-              <button
+              <Button
                 type="button"
-                className="header-nav-btn"
+                variant="ghost"
+                buttonStyle="solid"
+                className="header-nav-btn !p-0"
                 onClick={decreaseMonth}
                 disabled={prevMonthButtonDisabled}
               >
                 <ChevronLeft className="w-4 h-4" />
-              </button>
+              </Button>
 
               <div className="flex gap-2 items-center justify-center flex-1">
                 <div className="w-[130px]">
@@ -1056,14 +1067,16 @@ const DatePickerModern = <T extends FieldValues>({
                 </div>
               </div>
 
-              <button
+              <Button
                 type="button"
-                className="header-nav-btn"
+                variant="ghost"
+                buttonStyle="solid"
+                className="header-nav-btn !p-0"
                 onClick={increaseMonth}
                 disabled={nextMonthButtonDisabled}
               >
                 <ChevronRight className="w-4 h-4" />
-              </button>
+              </Button>
             </div>
           );
         }}
@@ -1118,19 +1131,21 @@ const DatePickerModern = <T extends FieldValues>({
                     </span>
                   </div>
                   {isClearable && selected && (
-                    <button
+                    <Button
                       type="button"
+                      variant="ghost"
+                      buttonStyle="solid"
                       onClick={(e) => {
                         e.stopPropagation();
                         onChange(null);
                         setIsOpen(false);
                       }}
-                      className="react-datepicker__footer-clear"
+                      icon={X}
+                      className="p-2 react-datepicker__footer-clear"
                       title={currentLocale === "es" ? "Limpiar" : "Clear"}
                     >
-                      <X className="w-4 h-4" />
                       {currentLocale === "es" ? "Limpiar" : "Clear"}
-                    </button>
+                    </Button>
                   )}
                 </div>
               </div>

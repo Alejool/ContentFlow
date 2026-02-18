@@ -2,6 +2,7 @@ import { useTheme } from "@/Hooks/useTheme";
 import { Moon, Sun, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { flushSync } from "react-dom";
+import Button from "@/Components/common/Modern/Button";
 
 export default function ThemeSwitcher() {
   const { theme, toggleTheme } = useTheme();
@@ -45,8 +46,11 @@ export default function ThemeSwitcher() {
   const nextTheme = isDark ? "Light" : "Dark";
 
   return (
-    <button
+    <Button
       onClick={handleToggle}
+      variant="ghost"
+      buttonStyle="ghost"
+      size="md"
       className="relative p-2 rounded-lg text-gray-600 dark:text-gray-300
        transition-all duration-300 group
        border border-gray-300/50 dark:border-gray-600/50
@@ -81,6 +85,6 @@ export default function ThemeSwitcher() {
           bg-primary-500 dark:bg-primary-400 
           opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       </div>
-    </button>
+    </Button>
   );
 }

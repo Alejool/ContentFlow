@@ -1,3 +1,4 @@
+import Button from "@/Components/common/Modern/Button";
 import DatePickerModern from "@/Components/common/Modern/DatePicker";
 import { validateVideoDuration } from "@/Utils/validationUtils";
 import { parseISO } from "date-fns";
@@ -80,9 +81,13 @@ const SchedulePopoverContent = memo(
           <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
             Schedule for {account.platform}
           </h4>
-          <button type="button" onClick={onClose}>
-            <X className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-          </button>
+          <Button
+            buttonStyle="icon"
+            variant="ghost"
+            size="sm"
+            icon={X}
+            onClick={onClose}
+          />
         </div>
 
         <DatePickerModern
@@ -100,13 +105,14 @@ const SchedulePopoverContent = memo(
         />
 
         <div className="flex justify-end gap-2 mt-4">
-          <button
-            type="button"
+          <Button
+            buttonStyle="solid"
+            variant="primary"
+            size="sm"
             onClick={onClose}
-            className="text-xs bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors font-medium shadow-sm"
           >
             Done
-          </button>
+          </Button>
         </div>
       </>
     );
@@ -323,17 +329,17 @@ const SocialAccountItem = memo(
                     )}
                   </span>
                   {customSchedule && (
-                    <button
-                      type="button"
+                    <Button
+                      buttonStyle="icon"
+                      variant="ghost"
+                      size="xs"
+                      icon={X}
                       onClick={(e) => {
                         e.stopPropagation();
                         onScheduleRemove();
                       }}
-                      className="p-1 rounded-full hover:bg-primary-100 dark:hover:bg-primary-900/40 text-primary-500 transition-colors"
                       title={t("common.remove") || "Eliminar programación"}
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
+                    />
                   )}
                 </div>
               )}
@@ -362,16 +368,17 @@ const SocialAccountItem = memo(
                   {account.platform}
                 </div>
                 {onCancel && (
-                  <button
-                    type="button"
+                  <Button
+                    buttonStyle="solid"
+                    variant="danger"
+                    size="xs"
                     onClick={(e) => {
                       e.stopPropagation();
                       onCancel();
                     }}
-                    className="px-2 py-0.5 rounded bg-red-100 hover:bg-red-200 dark:bg-red-900/30 dark:hover:bg-red-900/50 text-red-700 dark:text-red-400 font-bold uppercase transition-colors"
                   >
                     {t("common.cancel") || "Cancelar"}
-                  </button>
+                  </Button>
                 )}
               </div>
             )}
@@ -425,17 +432,17 @@ const SocialAccountItem = memo(
           )}
           
           {isCheckedActually && (
-            <button
-              type="button"
+            <Button
+              buttonStyle="icon"
+              variant="ghost"
+              size="sm"
+              icon={Settings}
               onClick={(e) => {
                 e.stopPropagation();
                 onPlatformSettingsClick();
               }}
-              className="p-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-gray-500 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400 transition-colors"
               title={t("platformSettings.configure") || "Configurar red"}
-            >
-              <Settings className="w-4 h-4" />
-            </button>
+            />
           )}
         </div>
       </div>
@@ -490,15 +497,16 @@ const SocialAccountsSection = memo(
           </label>
           <div className="flex items-center gap-2">
             {selectedAccounts.length > 1 && (
-              <button
-                type="button"
+              <Button
+                buttonStyle="solid"
+                variant="primary"
+                size="sm"
+                icon={Settings}
                 onClick={() => onPlatformSettingsClick("all")}
-                className="text-xs px-3 py-1.5 rounded-lg bg-primary-500 hover:bg-primary-600 text-white font-medium transition-colors flex items-center gap-1.5"
                 title={t("platformSettings.configureAll") || "Configurar todas"}
               >
-                <Settings className="w-3.5 h-3.5" />
                 {t("platformSettings.configureAll") || "Configurar todas"}
-              </button>
+              </Button>
             )}
             {error && (
               <span className="text-xs text-primary-500 font-medium animate-pulse">

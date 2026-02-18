@@ -1,3 +1,4 @@
+import Button from "@/Components/common/Modern/Button";
 import Label from "@/Components/common/Modern/Label";
 import {
   AlertTriangle,
@@ -352,30 +353,32 @@ const MediaPreviewItem = memo(
         )}
 
         {!disabled && (
-          <button
-            type="button"
+          <Button
+            buttonStyle="icon"
+            variant="danger"
+            size="sm"
+            icon={X}
             onClick={(e) => {
               e.stopPropagation();
               onRemove();
             }}
-            className="absolute top-2 right-2 p-1.5 bg-red-500/80 text-white rounded-full hover:bg-red-600 transition-colors opacity-0 group-hover/item:opacity-100 backdrop-blur-sm z-30"
-          >
-            <X className="w-3 h-3" />
-          </button>
+            className="absolute top-2 right-2 opacity-0 group-hover/item:opacity-100 backdrop-blur-sm z-30"
+          />
         )}
 
         {!disabled && !preview.type.includes("video") && !isProcessing && (
-          <button
-            type="button"
+          <Button
+            buttonStyle="icon"
+            variant="ghost"
+            size="sm"
+            icon={Crop}
             onClick={(e) => {
               e.stopPropagation();
               onCrop(preview.tempId, preview.url);
             }}
-            className="absolute top-2 right-10 p-1.5 bg-black/60 text-white rounded-full hover:bg-black/80 transition-colors opacity-0 group-hover/item:opacity-100 backdrop-blur-sm z-30"
+            className="absolute top-2 right-10 opacity-0 group-hover/item:opacity-100 backdrop-blur-sm z-30"
             title="Crop Image"
-          >
-            <Crop className="w-3 h-3" />
-          </button>
+          />
         )}
       </div>
     );
@@ -430,17 +433,18 @@ const VideoPreview = memo(
             {thumbnail || preview.thumbnailUrl ? "Change Thumb" : "Set Thumb"}
           </label>
           {(thumbnail || preview.thumbnailUrl) && !disabled && (
-            <button
-              type="button"
+            <Button
+              buttonStyle="icon"
+              variant="danger"
+              size="xs"
+              icon={X}
               onClick={(e) => {
                 e.stopPropagation();
                 onClearThumbnail();
               }}
-              className="bg-red-500/80 hover:bg-red-600 text-white p-1.5 rounded-full backdrop-blur-sm transition-colors border border-red-400/50 shadow-lg"
+              className="bg-red-500/80 hover:bg-red-600 backdrop-blur-sm border border-red-400/50 shadow-lg"
               title="Remove Thumbnail"
-            >
-              <X className="w-3 h-3" />
-            </button>
+            />
           )}
         </div>
       </div>

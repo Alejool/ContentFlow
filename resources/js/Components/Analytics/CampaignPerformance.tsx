@@ -1,5 +1,6 @@
 import BarChart from "@/Components/Statistics/BarChart";
 import Input from "@/Components/common/Modern/Input";
+import Button from "@/Components/common/Modern/Button";
 import { Search, TrendingUp } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -132,17 +133,20 @@ export default function CampaignPerformance({
               className="h-10"
             />
           </div>
-          <button
+          <Button
             onClick={() => setIsDetailModalOpen(true)}
-            className={`text-sm font-bold px-4 py-2 rounded-lg transition-all active:scale-95 shrink-0
+            variant="primary"
+            buttonStyle="solid"
+            size="sm"
+            className={`!text-sm !font-bold !shrink-0
                 ${
                   theme === "dark"
-                    ? "bg-primary-900/30 text-primary-400 hover:bg-primary-900/50"
-                    : "bg-primary-50 text-primary-600 hover:bg-primary-100"
+                    ? "!bg-primary-900/30 !text-primary-400 hover:!bg-primary-900/50"
+                    : "!bg-primary-50 !text-primary-600 hover:!bg-primary-100"
                 }`}
           >
             {t("common.viewAll") || "Ver todo"}
-          </button>
+          </Button>
         </div>
       </div>
 

@@ -70,12 +70,16 @@ export default function RejectionReasonModal({
               <AlertCircle className="w-6 h-6 text-red-500" />
               {t("approvals.rejectPublication") || "Rechazar Publicación"}
             </DialogTitle>
-            <button
+            <Button
               onClick={handleClose}
+              variant="ghost"
+              buttonStyle="icon"
+              size="sm"
               className="p-2 rounded-lg transition-all hover:bg-gray-100 dark:hover:bg-neutral-700 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
+              icon={X}
             >
-              <X className="w-5 h-5" />
-            </button>
+              
+            </Button>
           </div>
 
           <form onSubmit={handleSubmit(onFormSubmit)}>

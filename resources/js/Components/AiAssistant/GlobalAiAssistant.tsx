@@ -14,6 +14,7 @@ import {
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
+import Button from "@/Components/common/Modern/Button";
 
 interface Message {
   id: number;
@@ -149,9 +150,11 @@ export default function GlobalAiAssistant() {
 
   if (!isOpen) {
     return (
-      <button
+      <Button
         onClick={() => setIsOpen(true)}
-        className={`fixed bottom-6 right-6 w-14 h-14 ${getButtonBg()} text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center z-50 group`}
+        variant="primary"
+        buttonStyle="gradient"
+        className={`!fixed !bottom-6 !right-6 !w-14 !h-14 !rounded-full !shadow-lg hover:!shadow-xl !z-50 group !p-0`}
       >
         <Sparkles className="w-6 h-6 group-hover:scale-110 transition-transform" />
         <span
@@ -170,7 +173,7 @@ export default function GlobalAiAssistant() {
             theme === "dark" ? "bg-primary-600/30" : "bg-primary-600/30"
           }`}
         ></div>
-      </button>
+      </Button>
     );
   }
 
@@ -206,16 +209,18 @@ export default function GlobalAiAssistant() {
           </div>
         </div>
         <div className="flex items-center gap-1">
-          <button
+          <Button
             onClick={(e) => {
               e.stopPropagation();
               setIsMinimized(!isMinimized);
             }}
-            className={`p-2 rounded transition-colors
+            variant="ghost"
+            buttonStyle="ghost"
+            className={`!p-2 !rounded !transition-colors !shadow-none
               ${
                 theme === "dark"
-                  ? "hover:bg-primary-800/40"
-                  : "hover:bg-white/20"
+                  ? "hover:!bg-primary-800/40"
+                  : "hover:!bg-white/20"
               }
               `}
           >
@@ -224,18 +229,20 @@ export default function GlobalAiAssistant() {
             ) : (
               <Minimize2 className="w-4 h-4" />
             )}
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={(e) => {
               e.stopPropagation();
               setIsOpen(false);
             }}
-            className={`p-2 rounded transition-colors ${
-              theme === "dark" ? "hover:bg-primary-800/40" : "hover:bg-white/20"
+            variant="ghost"
+            buttonStyle="ghost"
+            className={`!p-2 !rounded !transition-colors !shadow-none ${
+              theme === "dark" ? "hover:!bg-primary-800/40" : "hover:!bg-white/20"
             }`}
           >
             <X className="w-4 h-4" />
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -342,17 +349,15 @@ export default function GlobalAiAssistant() {
                 placeholder={t("aiAssistant.askPlaceholder")}
                 className={`flex-1 px-4 py-3 rounded-lg focus:outline-none focus:ring-2 transition-all text-sm ${getInputBg()}`}
               />
-              <button
+              <Button
                 type="submit"
                 disabled={!inputValue.trim() || isLoading}
-                className={`p-3 rounded-lg transition-all duration-300 shadow-sm ${
-                  theme === "dark"
-                    ? "bg-gradient-to-r from-primary-600 to-primary-700 text-white hover:from-primary-700 hover:to-primary-800 disabled:opacity-50 disabled:cursor-not-allowed"
-                    : "bg-gradient-to-r from-primary-600 to-primary-600 text-white hover:from-primary-700 hover:to-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                }`}
+                variant="primary"
+                buttonStyle="gradient"
+                className="!p-3 !rounded-lg !shadow-sm"
               >
                 <Send className="w-4 h-4" />
-              </button>
+              </Button>
             </form>
 
             {/* Quick Tips */}

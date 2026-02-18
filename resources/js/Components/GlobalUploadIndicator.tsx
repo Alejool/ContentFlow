@@ -8,6 +8,7 @@ import { UploadItem } from "./Upload/UploadItem";
 import { PublicationItem } from "./Upload/PublicationItem";
 import { usePublicationStatus } from "@/Hooks/usePublicationStatus";
 import { useUploadWarning } from "@/Hooks/useUploadWarning";
+import Button from "@/Components/common/Modern/Button";
 
 export default function GlobalUploadIndicator() {
   const queue = useUploadQueue((state) => state.queue);
@@ -104,9 +105,12 @@ export default function GlobalUploadIndicator() {
     <>
       <div className="fixed bottom-4 right-4 z-[100] w-80 bg-white dark:bg-neutral-800 rounded-lg shadow-2xl border border-gray-200 dark:border-neutral-700 overflow-hidden">
         {/* Header */}
-        <button
+        <Button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="w-full flex items-center justify-between p-3 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-neutral-700/50 dark:to-neutral-700/30 hover:from-gray-100 hover:to-gray-50 dark:hover:from-neutral-700/70 dark:hover:to-neutral-700/50 transition-colors"
+          variant="ghost"
+          buttonStyle="ghost"
+          fullWidth
+          className="!justify-between !p-3 !bg-gradient-to-r !from-gray-50 !to-gray-100 dark:!from-neutral-700/50 dark:!to-neutral-700/30 hover:!from-gray-100 hover:!to-gray-50 dark:hover:!from-neutral-700/70 dark:hover:!to-neutral-700/50 !transition-colors !rounded-none !shadow-none"
         >
           <div className="flex items-center gap-2.5">
             {getHeaderIcon()}
@@ -126,7 +130,7 @@ export default function GlobalUploadIndicator() {
               <ChevronUp className="w-4 h-4 text-gray-500 dark:text-neutral-400" />
             )}
           </div>
-        </button>
+        </Button>
 
         {/* Content */}
         {isExpanded && (

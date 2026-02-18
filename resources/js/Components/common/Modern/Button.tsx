@@ -8,7 +8,7 @@ import {
 } from "react";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  children: ReactNode;
+  children?: ReactNode;
   variant?:
     | "primary"
     | "danger"
@@ -16,7 +16,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     | "success"
     | "ghost"
     | "warning";
-  buttonStyle?: "solid" | "outline" | "gradient" | "ghost";
+  buttonStyle?: "solid" | "outline" | "gradient" | "ghost" | "icon";
   size?: "xs" | "sm" | "md" | "lg" | "xl";
   loading?: boolean;
   loadingText?: string;
@@ -142,6 +142,17 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const colors = variantColors[variant] || variantColors.primary;
 
     const getStyleClasses = () => {
+      // Icon-only style: no background, no border, just the icon
+      if (buttonStyle === "icon") {
+        return `
+          bg-transparent
+          border-0
+          p-0
+          hover:opacity-80
+          transition-opacity
+        `;
+      }
+
       switch (buttonStyle) {
         case "gradient":
           return `
@@ -216,16 +227,18 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       focus:outline-none focus:ring-2 focus:ring-offset-2
       active:scale-[0.98]
       ${fullWidth ? "w-full" : ""}
-      ${sizeClasses[size]}
+      ${buttonStyle === "icon" ? "" : sizeClasses[size]}
       ${getStyleClasses()}
-      ${roundedClasses[rounded]}
-      ${shadowClasses[shadow]}
+      ${buttonStyle === "icon" ? "" : roundedClasses[rounded]}
+      ${buttonStyle === "icon" ? "" : shadowClasses[shadow]}
       ${animationClasses[animation]}
-      ${colors.focusRing}
+      ${buttonStyle === "icon" ? "" : colors.focusRing}
       ${
-        currentTheme === "dark"
-          ? "focus:ring-offset-gray-900"
-          : "focus:ring-offset-white"
+        buttonStyle === "icon"
+          ? ""
+          : currentTheme === "dark"
+            ? "focus:ring-offset-gray-900"
+            : "focus:ring-offset-white"
       }
     `;
 
@@ -272,12 +285,15 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         {isActuallyLoading ? (
           <>
             <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
-            <span>{displayLoadingText}</span>
+            {children && <span>{displayLoadingText}</span>}
           </>
+        ) : buttonStyle === "icon" && icon ? (
+          // Icon-only mode: just render the icon
+          renderIcon("left") || renderIcon("right")
         ) : (
           <>
             {renderIcon("left")}
-            <span>{children}</span>
+            {children && <span>{children}</span>}
             {renderIcon("right")}
           </>
         )}

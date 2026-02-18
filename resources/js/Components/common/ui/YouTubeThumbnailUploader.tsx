@@ -2,6 +2,7 @@ import { useTheme } from "@/Hooks/useTheme";
 import { Trash2, Upload, X, ZoomIn } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import Button from "@/Components/common/Modern/Button";
 
 interface YouTubeThumbnailUploaderProps {
   videoId: number;
@@ -160,33 +161,45 @@ export default function YouTubeThumbnailUploader({
 
             {/* Overlay with actions */}
             <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
-              <button
+              <Button
                 type="button"
                 onClick={() => setShowFullSize(true)}
+                variant="ghost"
+                buttonStyle="solid"
+                size="sm"
                 className="p-2 bg-white/90 hover:bg-white rounded-full transition-colors"
                 title="View full size"
+                icon={ZoomIn}
               >
-                <ZoomIn className="w-4 h-4 text-gray-900" />
-              </button>
-              <button
+                
+              </Button>
+              <Button
                 type="button"
                 onClick={handleDelete}
+                variant="danger"
+                buttonStyle="solid"
+                size="sm"
                 className="p-2 bg-red-500/90 hover:bg-red-500 rounded-full transition-colors"
                 title="Delete thumbnail"
+                icon={Trash2}
               >
-                <Trash2 className="w-4 h-4 text-white" />
-              </button>
+                
+              </Button>
             </div>
           </div>
 
           {/* Change button */}
-          <button
+          <Button
             type="button"
             onClick={() => fileInputRef.current?.click()}
+            variant="ghost"
+            buttonStyle="ghost"
+            size="sm"
+            fullWidth
             className={`w-full px-3 py-2 text-sm rounded-lg border ${borderColor} ${bgColor} hover:bg-opacity-80 transition-colors ${textColor}`}
           >
             {t("publications.modal.publish.button.change")}
-          </button>
+          </Button>
         </div>
       ) : (
         <div
@@ -239,12 +252,16 @@ export default function YouTubeThumbnailUploader({
           onClick={() => setShowFullSize(false)}
         >
           <div className="relative max-w-4xl max-h-[90vh]">
-            <button
+            <Button
               onClick={() => setShowFullSize(false)}
+              variant="ghost"
+              buttonStyle="ghost"
+              size="md"
               className="absolute -top-10 right-0 p-2 text-white hover:text-gray-300"
+              icon={X}
             >
-              <X className="w-6 h-6" />
-            </button>
+              
+            </Button>
             <img
               src={preview}
               alt="YouTube Thumbnail Full Size"

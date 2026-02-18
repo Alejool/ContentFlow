@@ -9,6 +9,7 @@ import {
 import { FieldValues, Path, UseFormRegister } from "react-hook-form";
 
 import Label from "@/Components/common/Modern/Label";
+import Button from "@/Components/common/Modern/Button";
 
 interface InputProps<T extends FieldValues = FieldValues> extends Omit<
   InputHTMLAttributes<HTMLInputElement>,
@@ -287,10 +288,12 @@ const Input = forwardRef<HTMLInputElement, InputProps<any>>(
               {suffix}
 
               {showPasswordToggle && !disabled && (
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
+                  buttonStyle="ghost"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="transition-colors rounded-lg p-1 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-700/50"
+                  className="!transition-colors !rounded-lg !p-1 !text-gray-500 dark:!text-gray-400 hover:!text-gray-700 dark:hover:!text-gray-300 hover:!bg-gray-100 dark:hover:!bg-neutral-700/50 !shadow-none"
                   aria-label={
                     showPassword ? "Ocultar contraseña" : "Mostrar contraseña"
                   }
@@ -301,7 +304,7 @@ const Input = forwardRef<HTMLInputElement, InputProps<any>>(
                   ) : (
                     <Eye className={currentSize.icon} />
                   )}
-                </button>
+                </Button>
               )}
             </div>
           )}

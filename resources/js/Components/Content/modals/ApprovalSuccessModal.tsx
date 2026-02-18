@@ -35,12 +35,16 @@ export default function ApprovalSuccessModal({
               <CheckCircle className="w-6 h-6 text-green-500" />
               {t("approvals.approvalSuccess") || "¡Publicación Aprobada!"}
             </DialogTitle>
-            <button
+            <Button
               onClick={onClose}
+              variant="ghost"
+              buttonStyle="icon"
+              size="sm"
               className="p-2 rounded-lg transition-all hover:bg-gray-100 dark:hover:bg-neutral-700 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
+              icon={X}
             >
-              <X className="w-5 h-5" />
-            </button>
+              
+            </Button>
           </div>
 
           <div className="p-6">

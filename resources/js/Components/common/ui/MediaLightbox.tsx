@@ -1,6 +1,7 @@
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import Button from "@/Components/common/Modern/Button";
 
 interface MediaItem {
   url: string;
@@ -68,27 +69,39 @@ export default function MediaLightbox({
 
   return createPortal(
     <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/95 backdrop-blur-md animate-in fade-in duration-300">
-      <button
+      <Button
         onClick={onClose}
+        variant="ghost"
+        buttonStyle="ghost"
+        size="md"
         className="absolute top-6 right-6 p-2.5 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 rounded-full transition-all z-50 hover:scale-110 active:scale-95"
+        icon={X}
       >
-        <X className="w-6 h-6" />
-      </button>
+        
+      </Button>
 
       {mediaArray.length > 1 && (
         <>
-          <button
+          <Button
             onClick={handlePrev}
+            variant="ghost"
+            buttonStyle="ghost"
+            size="lg"
             className="absolute left-6 p-3 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 rounded-full transition-all z-50 hover:scale-110 active:scale-95 group"
+            icon={ChevronLeft}
           >
-            <ChevronLeft className="w-8 h-8 group-hover:-translate-x-0.5 transition-transform" />
-          </button>
-          <button
+            
+          </Button>
+          <Button
             onClick={handleNext}
+            variant="ghost"
+            buttonStyle="ghost"
+            size="lg"
             className="absolute right-6 p-3 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 rounded-full transition-all z-50 hover:scale-110 active:scale-95 group"
+            icon={ChevronRight}
           >
-            <ChevronRight className="w-8 h-8 group-hover:translate-x-0.5 transition-transform" />
-          </button>
+            
+          </Button>
         </>
       )}
 
@@ -119,7 +132,7 @@ export default function MediaLightbox({
         {mediaArray.length > 1 && (
           <div className="absolute bottom-10 flex gap-2.5 z-50 p-2 rounded-full bg-black/20 backdrop-blur-sm">
             {mediaArray.map((_, idx) => (
-              <button
+              <Button
                 key={idx}
                 onClick={() => {
                   if (idx !== currentIndex) {
@@ -128,12 +141,17 @@ export default function MediaLightbox({
                     setTimeout(() => setIsAnimating(false), 300);
                   }
                 }}
+                variant="ghost"
+                buttonStyle="ghost"
+                size="xs"
                 className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
                   idx === currentIndex
                     ? "bg-primary-500 w-8"
                     : "bg-white/40 hover:bg-white/60"
                 }`}
-              />
+              >
+                
+              </Button>
             ))}
           </div>
         )}

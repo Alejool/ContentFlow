@@ -1,5 +1,6 @@
 import { Brain, Maximize2, Minimize2, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import Button from "@/Components/common/Modern/Button";
 
 interface ChatHeaderProps {
   isMinimized: boolean;
@@ -31,28 +32,32 @@ export default function ChatHeader({
         </div>
       </div>
       <div className="flex items-center gap-1">
-        <button
+        <Button
           onClick={(e) => {
             e.stopPropagation();
             onMinimize();
           }}
-          className="p-2 rounded transition-colors hover:bg-white/20 dark:hover:bg-primary-800/40"
+          variant="ghost"
+          buttonStyle="ghost"
+          className="!p-2 !rounded !transition-colors hover:!bg-white/20 dark:hover:!bg-primary-800/40 !shadow-none"
         >
           {isMinimized ? (
             <Maximize2 className="w-4 h-4" />
           ) : (
             <Minimize2 className="w-4 h-4" />
           )}
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={(e) => {
             e.stopPropagation();
             onClose();
           }}
-          className="p-2 rounded transition-colors hover:bg-white/20 dark:hover:bg-primary-800/40"
+          variant="ghost"
+          buttonStyle="ghost"
+          className="!p-2 !rounded !transition-colors hover:!bg-white/20 dark:hover:!bg-primary-800/40 !shadow-none"
         >
           <X className="w-4 h-4" />
-        </button>
+        </Button>
       </div>
     </div>
   );

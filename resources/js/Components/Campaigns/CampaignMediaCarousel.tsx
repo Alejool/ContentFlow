@@ -10,6 +10,7 @@ import {
   X,
 } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
+import Button from "@/Components/common/Modern/Button";
 
 interface MediaFile {
   id: number;
@@ -387,32 +388,38 @@ function ModernCarousel({
 
       {mediaFiles.length > slidesToShow && (
         <>
-          <button
+          <Button
             aria-label="Previous slide"
-            className="absolute left-0 top-1/2 transform -translate-y-1/2 p-3 rounded-full bg-white/90 dark:bg-gray-800 shadow-lg z-10 hover:bg-white dark:hover:bg-gray-700 transition-all opacity-0 group-hover:opacity-100 -translate-x-4 group-hover:translate-x-0 duration-300"
+            variant="ghost"
+            buttonStyle="solid"
+            className="!absolute !left-0 !top-1/2 !transform !-translate-y-1/2 !p-3 !rounded-full !bg-white/90 dark:!bg-gray-800 !shadow-lg !z-10 hover:!bg-white dark:hover:!bg-gray-700 !opacity-0 group-hover:!opacity-100 !-translate-x-4 group-hover:!translate-x-0 !duration-300"
             onClick={prevSlide}
           >
             <ChevronLeft className="w-5 h-5" />
-          </button>
-          <button
+          </Button>
+          <Button
             aria-label="Next slide"
-            className="absolute right-0 top-1/2 transform -translate-y-1/2 p-3 rounded-full bg-white/90 dark:bg-gray-800 shadow-lg z-10 hover:bg-white dark:hover:bg-gray-700 transition-all opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 duration-300"
+            variant="ghost"
+            buttonStyle="solid"
+            className="!absolute !right-0 !top-1/2 !transform !-translate-y-1/2 !p-3 !rounded-full !bg-white/90 dark:!bg-gray-800 !shadow-lg !z-10 hover:!bg-white dark:hover:!bg-gray-700 !opacity-0 group-hover:!opacity-100 !translate-x-4 group-hover:!translate-x-0 !duration-300"
             onClick={nextSlide}
           >
             <ChevronRight className="w-5 h-5" />
-          </button>
+          </Button>
         </>
       )}
 
       {totalSlides > 1 && (
         <div className="flex justify-center mt-6 gap-2">
           {Array.from({ length: totalSlides }).map((_, idx) => (
-            <button
+            <Button
               key={idx}
-              className={`w-8 h-2 rounded-full transition-all duration-300 ${
+              variant="ghost"
+              buttonStyle="solid"
+              className={`!w-8 !h-2 !rounded-full !transition-all !duration-300 !p-0 !shadow-none ${
                 idx === Math.floor(currentIndex / slidesToShow)
-                  ? "bg-blue-500 dark:bg-blue-400"
-                  : "bg-gray-200 dark:bg-gray-700"
+                  ? "!bg-blue-500 dark:!bg-blue-400"
+                  : "!bg-gray-200 dark:!bg-gray-700"
               }`}
               onClick={() => setCurrentIndex(idx * slidesToShow)}
             />
@@ -486,21 +493,25 @@ function Lightbox({
           className="relative w-full max-w-6xl max-h-[90vh] bg-transparent"
           onClick={(e) => e.stopPropagation()}
         >
-          <button
+          <Button
             onClick={onClose}
-            className="absolute -top-12 right-0 p-2 text-white hover:text-gray-300 transition-colors z-20"
+            variant="ghost"
+            buttonStyle="ghost"
+            className="!absolute !-top-12 !right-0 !p-2 !text-white hover:!text-gray-300 !z-20 !shadow-none"
           >
             <X className="w-8 h-8" />
-          </button>
+          </Button>
 
           <div className="relative h-full">
-            <button
+            <Button
               aria-label="Previous image"
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 p-4 rounded-full bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 transition-colors z-10"
+              variant="ghost"
+              buttonStyle="solid"
+              className="!absolute !left-4 !top-1/2 !transform !-translate-y-1/2 !p-4 !rounded-full !bg-white/10 !backdrop-blur-sm !text-white hover:!bg-white/20 !z-10 !shadow-none"
               onClick={prevSlide}
             >
               <ChevronLeft className="w-8 h-8" />
-            </button>
+            </Button>
 
             <div className="flex flex-col items-center justify-center h-full">
               {isImage ? (
@@ -538,25 +549,29 @@ function Lightbox({
               </div>
             </div>
 
-            <button
+            <Button
               aria-label="Next image"
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 p-4 rounded-full bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 transition-colors z-10"
+              variant="ghost"
+              buttonStyle="solid"
+              className="!absolute !right-4 !top-1/2 !transform !-translate-y-1/2 !p-4 !rounded-full !bg-white/10 !backdrop-blur-sm !text-white hover:!bg-white/20 !z-10 !shadow-none"
               onClick={nextSlide}
             >
               <ChevronRight className="w-8 h-8" />
-            </button>
+            </Button>
           </div>
 
           {/* Miniaturas en la parte inferior */}
           {mediaFiles.length > 1 && (
             <div className="flex justify-center gap-2 mt-8 overflow-x-auto py-2">
               {mediaFiles.map((media, idx) => (
-                <button
+                <Button
                   key={media.id}
-                  className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all duration-200 ${
+                  variant="ghost"
+                  buttonStyle="ghost"
+                  className={`!flex-shrink-0 !w-20 !h-20 !rounded-lg !overflow-hidden !border-2 !transition-all !duration-200 !p-0 !shadow-none ${
                     idx === selectedIndex
-                      ? "border-blue-500 dark:border-blue-400 scale-105"
-                      : "border-transparent hover:border-gray-400"
+                      ? "!border-blue-500 dark:!border-blue-400 !scale-105"
+                      : "!border-transparent hover:!border-gray-400"
                   }`}
                   onClick={() => setSelectedIndex(idx)}
                 >
@@ -569,7 +584,7 @@ function Lightbox({
                         "https://images.unsplash.com/photo-1579546929662-711aa81148cf?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80";
                     }}
                   />
-                </button>
+                </Button>
               ))}
             </div>
           )}

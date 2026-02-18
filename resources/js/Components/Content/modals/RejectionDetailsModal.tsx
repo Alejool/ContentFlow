@@ -5,6 +5,7 @@ import { es } from "date-fns/locale";
 import { formatDateTime } from "@/Utils/formatDate";
 import { Edit, User, X, XCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import Button from "@/Components/common/Modern/Button";
 
 interface RejectionDetailsModalProps {
   isOpen: boolean;
@@ -42,12 +43,16 @@ export default function RejectionDetailsModal({
               <XCircle className="w-6 h-6 text-rose-500" />
               {t("approvals.publicationRejected") || "Publicación Rechazada"}
             </DialogTitle>
-            <button
+            <Button
               onClick={onClose}
+              variant="ghost"
+              buttonStyle="icon"
+              size="sm"
               className="p-2 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-neutral-700 text-gray-500 dark:text-gray-400"
+              icon={X}
             >
-              <X className="w-5 h-5" />
-            </button>
+              
+            </Button>
           </div>
 
           <div className="p-6">
@@ -105,20 +110,27 @@ export default function RejectionDetailsModal({
           </div>
 
           <div className="flex justify-end gap-3 p-6 border-t border-gray-100 dark:border-neutral-700">
-            <button
+            <Button
               onClick={onClose}
-              className="px-6 py-2.5 rounded-lg font-medium transition-colors bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:text-white"
+              variant="secondary"
+              buttonStyle="solid"
+              size="md"
+              className="px-6 py-2.5 rounded-lg font-medium transition-colors"
             >
               {t("common.close")}
-            </button>
+            </Button>
             {onEdit && (
-              <button
+              <Button
                 onClick={handleEdit}
-                className="px-6 py-2.5 rounded-lg font-bold transition-all bg-primary-600 hover:bg-primary-700 text-white flex items-center gap-2 shadow-lg shadow-primary-600/20 active:scale-95"
+                variant="primary"
+                buttonStyle="solid"
+                size="md"
+                className="px-6 py-2.5 rounded-lg font-bold transition-all shadow-lg shadow-primary-600/20 active:scale-95"
+                icon={Edit}
+                iconPosition="left"
               >
-                <Edit className="w-4 h-4" />
                 {t("approvals.editPublication") || "Editar Publicación"}
-              </button>
+              </Button>
             )}
           </div>
         </DialogPanel>

@@ -21,6 +21,7 @@ import {
   Layers,
   Share2,
 } from "lucide-react";
+import Button from "@/Components/common/Modern/Button";
 
 export default function EditorialCalendar() {
   const { actualTheme } = useTheme();
@@ -51,24 +52,28 @@ export default function EditorialCalendar() {
         </h2>
       </div>
       <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
-        <button
+        <Button
           onClick={prevMonth}
-          className={`p-2 rounded-lg transition-colors ${actualTheme === "dark" ? "hover:bg-neutral-800 text-gray-400" : "hover:bg-gray-100 text-gray-600"}`}
-        >
-          <ChevronLeft className="w-5 h-5" />
-        </button>
-        <button
+          buttonStyle="ghost"
+          variant="ghost"
+          size="sm"
+          icon={ChevronLeft}
+        />
+        <Button
           onClick={goToToday}
-          className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${actualTheme === "dark" ? "bg-neutral-800 text-white hover:bg-neutral-700" : "bg-white text-gray-700 border border-gray-200 hover:bg-gray-50"}`}
+          buttonStyle="ghost"
+          variant="ghost"
+          size="sm"
         >
           Today
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={nextMonth}
-          className={`p-2 rounded-lg transition-colors ${actualTheme === "dark" ? "hover:bg-neutral-800 text-gray-400" : "hover:bg-gray-100 text-gray-600"}`}
-        >
-          <ChevronRight className="w-5 h-5" />
-        </button>
+          buttonStyle="ghost"
+          variant="ghost"
+          size="sm"
+          icon={ChevronRight}
+        />
       </div>
     </div>
   );

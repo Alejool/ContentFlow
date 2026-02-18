@@ -1,3 +1,4 @@
+import Button from "@/Components/common/Modern/Button";
 import { FacebookPreview } from "@/Components/ManageContent/Publication/previews/FacebookPreview";
 import { InstagramPreview } from "@/Components/ManageContent/Publication/previews/InstagramPreview";
 import { LinkedInPreview } from "@/Components/ManageContent/Publication/previews/LinkedInPreview";
@@ -183,22 +184,17 @@ export const LivePreviewSection = ({
           const Icon = tab.icon;
           const hasPublishedLink = publishedLinks && publishedLinks[tab.id];
           return (
-            <button
+            <Button
               key={tab.id}
-              type="button"
+              buttonStyle={activePlatform === tab.id ? "solid" : "ghost"}
+              variant={activePlatform === tab.id ? "primary" : "secondary"}
+              size="sm"
+              icon={Icon}
               onClick={() => setActivePlatform(tab.id)}
-              className={`relative flex-1 flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
-                activePlatform === tab.id
-                  ? "bg-white dark:bg-neutral-700 text-primary-600 dark:text-primary-400 shadow-sm"
-                  : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-              }`}
+              className={`relative flex-1 ${hasPublishedLink ? "after:absolute after:-top-1 after:-right-1 after:w-2 after:h-2 after:bg-green-500 after:rounded-full after:border-2 after:border-white dark:after:border-neutral-800" : ""}`}
             >
-              <Icon className="w-4 h-4" />
               <span className="hidden sm:inline">{tab.label}</span>
-              {hasPublishedLink && (
-                <span className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full border-2 border-white dark:border-neutral-800" />
-              )}
-            </button>
+            </Button>
           );
         })}
       </div>

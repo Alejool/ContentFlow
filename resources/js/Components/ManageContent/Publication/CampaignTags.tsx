@@ -1,5 +1,6 @@
 import React, { memo } from "react";
 import { Publication } from "@/types/Publication";
+import Button from "@/Components/common/Modern/Button";
 
 interface CampaignTagsProps {
   publication: Publication;
@@ -51,14 +52,17 @@ const CampaignTags = memo(({
   return (
     <div className="flex flex-wrap gap-1">
       {campaigns.map((campaign) => (
-        <button
+        <Button
           key={campaign.id}
           onClick={() => handleCampaignClick(campaign.id)}
-          className="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-medium transition-all bg-primary-100 text-primary-800 hover:bg-primary-200 dark:bg-primary-900/30 dark:text-primary-400 dark:hover:bg-primary-900/50"
+          buttonStyle="solid"
+          variant="primary"
+          size="xs"
+          className="inline-flex items-center transition-all bg-primary-100 text-primary-800 hover:bg-primary-200 dark:bg-primary-900/30 dark:text-primary-400 dark:hover:bg-primary-900/50"
           title={`Click to view ${campaign.name || campaign.title}`}
         >
           {campaign.name || campaign.title}
-        </button>
+        </Button>
       ))}
     </div>
   );

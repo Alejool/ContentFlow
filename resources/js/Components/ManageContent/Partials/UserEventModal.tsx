@@ -4,6 +4,7 @@ import DatePickerModern from "@/Components/common/Modern/DatePicker";
 import Input from "@/Components/common/Modern/Input";
 import Textarea from "@/Components/common/Modern/Textarea";
 import Modal from "@/Components/common/ui/Modal";
+import Button from "@/Components/common/Modern/Button";
 import { useCalendar } from "@/Hooks/calendar/useCalendar";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { usePage } from "@inertiajs/react";
@@ -406,13 +407,16 @@ export default function UserEventModal({
               control={control}
               render={({ field }) => (
                 <div className="flex gap-2">
-                  <button
+                  <Button
                     type="button"
                     onClick={() => field.onChange(true)}
-                    className={`flex-1 flex flex-col items-center justify-center gap-1.5 px-4 py-4 rounded-lg font-bold text-xs transition-all duration-300 border-2 ${
+                    buttonStyle={field.value ? "solid" : "ghost"}
+                    variant={field.value ? "primary" : "ghost"}
+                    size="md"
+                    className={`flex-1 flex flex-col items-center justify-center gap-1.5 ${
                       field.value
                         ? "shadow-sm translate-y-[-2px]"
-                        : "bg-gray-50/50 dark:bg-gray-800/30 text-gray-400 dark:text-gray-500 border-gray-100 dark:border-neutral-800 hover:bg-gray-100 dark:hover:bg-gray-700"
+                        : ""
                     }`}
                     style={
                       (field.value
@@ -431,14 +435,17 @@ export default function UserEventModal({
                     <span>
                       {t("calendar.userEvents.modal.visibility.public")}
                     </span>
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="button"
                     onClick={() => field.onChange(false)}
-                    className={`flex-1 flex flex-col items-center justify-center gap-1.5 px-4 py-4 rounded-lg font-bold text-xs transition-all duration-300 border-2 ${
+                    buttonStyle={!field.value ? "solid" : "ghost"}
+                    variant={!field.value ? "primary" : "ghost"}
+                    size="md"
+                    className={`flex-1 flex flex-col items-center justify-center gap-1.5 ${
                       !field.value
                         ? "shadow-sm translate-y-[-2px]"
-                        : "bg-gray-50/50 dark:bg-gray-800/30 text-gray-400 dark:text-gray-500 border-gray-100 dark:border-neutral-800 hover:bg-gray-100 dark:hover:bg-gray-700"
+                        : ""
                     }`}
                     style={
                       (!field.value
@@ -457,7 +464,7 @@ export default function UserEventModal({
                     <span>
                       {t("calendar.userEvents.modal.visibility.private")}
                     </span>
-                  </button>
+                  </Button>
                 </div>
               )}
             />
@@ -497,13 +504,14 @@ export default function UserEventModal({
               className={`flex flex-wrap gap-3 ${isReadOnly ? "opacity-70 pointer-events-none" : ""}`}
             >
               {tailwindColors.map((color) => (
-                <button
+                <Button
                   key={color.value}
                   type="button"
                   onClick={() => {
                     setValue("color", color.value);
                     setSelectedColor(color.value);
                   }}
+                  buttonStyle="icon"
                   className={`
                     w-9 h-9 rounded-full border-3 transition-all duration-300
                     hover:scale-125 active:scale-95 shadow-md hover:shadow-lg

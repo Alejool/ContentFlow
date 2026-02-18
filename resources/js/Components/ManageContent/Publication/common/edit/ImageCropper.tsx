@@ -1,3 +1,4 @@
+import Button from "@/Components/common/Modern/Button";
 import { Dialog, Transition } from "@headlessui/react";
 import { Check, X, ZoomIn, ZoomOut } from "lucide-react";
 import { Fragment, useCallback, useState } from "react";
@@ -130,12 +131,13 @@ export default function ImageCropper({
                   className="text-lg font-medium leading-6 text-gray-900 dark:text-white flex justify-between items-center mb-4"
                 >
                   {t("media.crop.title") || "Crop Image"}
-                  <button
+                  <Button
+                    buttonStyle="icon"
+                    variant="ghost"
+                    size="sm"
+                    icon={X}
                     onClick={onClose}
-                    className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
+                  />
                 </Dialog.Title>
 
                 <div className="relative w-full h-[400px] bg-gray-900 rounded-lg overflow-hidden mb-6">
@@ -166,19 +168,23 @@ export default function ImageCropper({
                 </div>
 
                 <div className="flex justify-end gap-3">
-                  <button
+                  <Button
+                    buttonStyle="outline"
+                    variant="secondary"
+                    size="md"
                     onClick={onClose}
-                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 focus-visible:ring-offset-2 dark:bg-neutral-800 dark:text-gray-300 dark:hover:bg-neutral-700 transition-colors"
                   >
                     {t("common.cancel") || "Cancel"}
-                  </button>
-                  <button
+                  </Button>
+                  <Button
+                    buttonStyle="solid"
+                    variant="primary"
+                    size="md"
+                    icon={Check}
                     onClick={handleSave}
-                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-md hover:bg-primary-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 transition-colors"
                   >
-                    <Check className="w-4 h-4" />
                     {t("common.apply") || "Apply"}
-                  </button>
+                  </Button>
                 </div>
               </Dialog.Panel>
             </Transition.Child>

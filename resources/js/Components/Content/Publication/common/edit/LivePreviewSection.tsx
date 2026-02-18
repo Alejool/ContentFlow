@@ -4,6 +4,7 @@ import { TwitterPreview } from "@/Components/Content/Publication/previews/Twitte
 import { Instagram, Linkedin, Twitter } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import Button from "@/Components/common/Modern/Button";
 
 const EmbeddedPost = ({ platform, url }: { platform: string; url: string }) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -118,10 +119,13 @@ export const LivePreviewSection = ({
           const Icon = tab.icon;
           const hasPublishedLink = publishedLinks && publishedLinks[tab.id];
           return (
-            <button
+            <Button
               key={tab.id}
               onClick={() => setActivePlatform(tab.id)}
-              className={`relative flex-1 flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
+              buttonStyle="ghost"
+              variant="ghost"
+              size="sm"
+              className={`relative flex-1 ${
                 activePlatform === tab.id
                   ? "bg-white dark:bg-neutral-700 text-primary-600 dark:text-primary-400 shadow-sm"
                   : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
@@ -132,7 +136,7 @@ export const LivePreviewSection = ({
               {hasPublishedLink && (
                 <span className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full border-2 border-white dark:border-neutral-800" />
               )}
-            </button>
+            </Button>
           );
         })}
       </div>

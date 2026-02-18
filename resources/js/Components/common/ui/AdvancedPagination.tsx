@@ -1,5 +1,6 @@
 import Select from "@/Components/common/Modern/Select";
 import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react";
+import Button from "@/Components/common/Modern/Button";
 
 interface AdvancedPaginationProps {
   currentPage: number;
@@ -86,14 +87,18 @@ export default function AdvancedPagination({
       </div>
 
       <div className="flex items-center gap-1">
-        <button
+        <Button
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1 || isLoading}
           className="p-2 rounded-lg border border-gray-200 dark:border-neutral-700 hover:bg-gray-50 dark:hover:bg-neutral-700 disabled:opacity-50 text-gray-800 dark:text-white transition-colors"
           title={t("common.previous")}
+          variant="ghost"
+          buttonStyle="ghost"
+          size="sm"
+          icon={ChevronLeft}
         >
-          <ChevronLeft className="w-4 h-4" />
-        </button>
+          
+        </Button>
 
         <div className="flex items-center gap-1 mx-2">
           {getPageNumbers().map((page, idx) => {
@@ -105,7 +110,7 @@ export default function AdvancedPagination({
               );
             }
             return (
-              <button
+              <Button
                 key={page}
                 onClick={() => onPageChange(page)}
                 disabled={isLoading}
@@ -114,21 +119,28 @@ export default function AdvancedPagination({
                     ? "bg-primary-500 text-white shadow-lg shadow-primary-500/30"
                     : "hover:bg-gray-100 dark:hover:bg-neutral-700 text-gray-600 dark:text-gray-400"
                 }`}
+                variant={currentPage === page ? "primary" : "ghost"}
+                buttonStyle={currentPage === page ? "solid" : "ghost"}
+                size="sm"
               >
                 {page}
-              </button>
+              </Button>
             );
           })}
         </div>
 
-        <button
+        <Button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === lastPage || isLoading}
           className="p-2 rounded-lg border border-gray-200 dark:border-neutral-700 hover:bg-gray-50 dark:hover:bg-neutral-700 disabled:opacity-50 text-gray-800 dark:text-white  transition-colors"
           title={t("common.next")}
+          variant="ghost"
+          buttonStyle="ghost"
+          size="sm"
+          icon={ChevronRight}
         >
-          <ChevronRight className="w-4 h-4" />
-        </button>
+          
+        </Button>
       </div>
     </div>
   );

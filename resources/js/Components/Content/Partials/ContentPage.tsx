@@ -115,6 +115,8 @@ export default function ContentPage() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const tab = params.get("tab") as ContentTab;
+    
+    // Only set tab from URL if explicitly provided, otherwise use stored tab
     if (
       tab &&
       ["publications", "campaigns", "calendar", "logs", "approvals"].includes(
@@ -296,70 +298,80 @@ export default function ContentPage() {
 
           <div className="mb-8">
             <div className="inline-flex items-center p-1 rounded-lg bg-gray-100 dark:bg-neutral-800/50 gap-1 overflow-x-auto max-w-full">
-              <button
+              <Button
                 onClick={() => handleTabChange("publications")}
+                variant="ghost"
+                buttonStyle="ghost"
+                size="sm"
                 className={`flex items-center justify-center gap-2 py-2 px-4 rounded-md text-sm font-bold transition-all duration-200 whitespace-nowrap ${
                   activeTab === "publications"
                     ? "bg-white dark:bg-neutral-800 text-primary-600 shadow-sm ring-1 ring-black/5 dark:ring-white/10"
                     : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-white/50 dark:hover:bg-neutral-700/50"
                 }`}
+                icon={Folder}
+                iconPosition="left"
               >
-                <Folder
-                  className={`w-4 h-4 ${activeTab === "publications" ? "text-primary-600 dark:text-primary-400" : "opacity-70"}`}
-                />
                 <span>{t("content.tabs.publications")}</span>
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => handleTabChange("campaigns")}
+                variant="ghost"
+                buttonStyle="ghost"
+                size="sm"
                 className={`flex items-center justify-center gap-2 py-2 px-4 rounded-md text-sm font-bold transition-all duration-200 whitespace-nowrap ${
                   activeTab === "campaigns"
                     ? "bg-white dark:bg-neutral-800 text-primary-600 shadow-sm ring-1 ring-black/5 dark:ring-white/10"
                     : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-white/50 dark:hover:bg-neutral-700/50"
                 }`}
+                icon={Target}
+                iconPosition="left"
               >
-                <Target
-                  className={`w-4 h-4 ${activeTab === "campaigns" ? "text-primary-600 dark:text-primary-400" : "opacity-70"}`}
-                />
                 <span>{t("content.tabs.campaigns")}</span>
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => handleTabChange("calendar")}
+                variant="ghost"
+                buttonStyle="ghost"
+                size="sm"
                 className={`flex items-center justify-center gap-2 py-2 px-4 rounded-md text-sm font-bold transition-all duration-200 whitespace-nowrap ${
                   activeTab === "calendar"
                     ? "bg-white dark:bg-neutral-800 text-primary-600 shadow-sm ring-1 ring-black/5 dark:ring-white/10"
                     : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-white/50 dark:hover:bg-neutral-700/50"
                 }`}
+                icon={CalendarIcon}
+                iconPosition="left"
               >
-                <CalendarIcon
-                  className={`w-4 h-4 ${activeTab === "calendar" ? "text-primary-600 dark:text-primary-400" : "opacity-70"}`}
-                />
                 <span>{t("content.tabs.calendar")}</span>
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => handleTabChange("logs")}
+                variant="ghost"
+                buttonStyle="ghost"
+                size="sm"
                 className={`flex items-center justify-center gap-2 py-2 px-4 rounded-md text-sm font-bold transition-all duration-200 whitespace-nowrap ${
                   activeTab === "logs"
                     ? "bg-white dark:bg-neutral-800 text-primary-600 shadow-sm ring-1 ring-black/5 dark:ring-white/10"
                     : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-white/50 dark:hover:bg-neutral-700/50"
                 }`}
+                icon={FileText}
+                iconPosition="left"
               >
-                <FileText
-                  className={`w-4 h-4 ${activeTab === "logs" ? "text-primary-600 dark:text-primary-400" : "opacity-70"}`}
-                />
                 <span>{t("content.tabs.logs")}</span>
-              </button>
+              </Button>
               {permissions.includes("approve") && (
-                <button
+                <Button
                   onClick={() => handleTabChange("approvals")}
+                  variant="ghost"
+                  buttonStyle="ghost"
+                  size="sm"
                   className={`flex items-center justify-center gap-2 py-2 px-4 rounded-md text-sm font-bold transition-all duration-200 whitespace-nowrap relative ${
                     activeTab === "approvals"
                       ? "bg-white dark:bg-neutral-800 text-primary-600 shadow-sm ring-1 ring-black/5 dark:ring-white/10"
                       : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-white/50 dark:hover:bg-neutral-700/50"
                   }`}
+                  icon={CheckCircle}
+                  iconPosition="left"
                 >
-                  <CheckCircle
-                    className={`w-4 h-4 ${activeTab === "approvals" ? "text-primary-600 dark:text-primary-400" : "opacity-70"}`}
-                  />
                   <span>{t("content.tabs.approvals")}</span>
                   {publications.filter((p) => p.status === "pending_review")
                     .length > 0 && (
@@ -377,7 +389,7 @@ export default function ContentPage() {
                       }
                     </span>
                   )}
-                </button>
+                </Button>
               )}
             </div>
           </div>
@@ -396,8 +408,11 @@ export default function ContentPage() {
                 <div className="bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 overflow-hidden shadow-sm">
                   <div className="border-b border-gray-200 dark:border-neutral-700 flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 bg-gray-50/50 dark:bg-neutral-800/50">
                     <div className="flex bg-gray-200/50 dark:bg-neutral-700/50 p-1 rounded-lg w-fit">
-                      <button
+                      <Button
                         onClick={() => setApprovalTab("pending")}
+                        variant="ghost"
+                        buttonStyle="ghost"
+                        size="sm"
                         className={`px-6 py-2 rounded-lg font-bold text-sm transition-all ${
                           approvalTab === "pending"
                             ? "bg-white dark:bg-neutral-800 text-primary-600 dark:text-primary-400 shadow-sm ring-1 ring-black/5"
@@ -405,9 +420,12 @@ export default function ContentPage() {
                         }`}
                       >
                         {t("approvals.tabs.pending")}
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         onClick={() => setApprovalTab("history")}
+                        variant="ghost"
+                        buttonStyle="ghost"
+                        size="sm"
                         className={`px-6 py-2 rounded-lg font-bold text-sm transition-all ${
                           approvalTab === "history"
                             ? "bg-white dark:bg-neutral-800 text-primary-600 dark:text-primary-400 shadow-sm ring-1 ring-black/5"
@@ -415,7 +433,7 @@ export default function ContentPage() {
                         }`}
                       >
                         {t("approvals.tabs.history")}
-                      </button>
+                      </Button>
                     </div>
                   </div>
 

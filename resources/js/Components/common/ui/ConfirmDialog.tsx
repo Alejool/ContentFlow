@@ -1,5 +1,6 @@
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { AlertTriangle, X } from "lucide-react";
+import Button from "@/Components/common/Modern/Button";
 
 interface ConfirmDialogProps {
   isOpen: boolean;
@@ -83,27 +84,39 @@ export default function ConfirmDialog({
               </p>
             </div>
 
-            <button
+            <Button
               onClick={onClose}
+              variant="ghost"
+              buttonStyle="ghost"
+              size="sm"
               className="flex-shrink-0 p-1 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-neutral-700 text-gray-500 dark:text-gray-400"
+              icon={X}
             >
-              <X className="w-5 h-5" />
-            </button>
+              
+            </Button>
           </div>
 
           <div className="flex gap-3 mt-6">
-            <button
+            <Button
               onClick={onClose}
-              className="flex-1 px-4 py-2.5 rounded-lg font-medium transition-colors bg-gray-100 dark:bg-neutral-700 hover:bg-gray-200 dark:hover:bg-neutral-600 text-gray-700 dark:text-white"
+              variant="secondary"
+              buttonStyle="solid"
+              size="md"
+              fullWidth
+              className="flex-1 px-4 py-2.5 rounded-lg font-medium transition-colors"
             >
               {cancelText}
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={handleConfirm}
-              className={`flex-1 px-4 py-2.5 rounded-lg font-medium transition-colors ${styles.confirmBtn}`}
+              variant={type === "info" ? "primary" : "danger"}
+              buttonStyle="solid"
+              size="md"
+              fullWidth
+              className="flex-1 px-4 py-2.5 rounded-lg font-medium transition-colors"
             >
               {confirmText}
-            </button>
+            </Button>
           </div>
         </DialogPanel>
       </div>

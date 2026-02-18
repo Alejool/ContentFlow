@@ -4,6 +4,7 @@ import { usePage } from "@inertiajs/react";
 import axios from "axios";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import Button from "@/Components/common/Modern/Button";
 
 export default function LanguageSwitcher() {
   const { i18n } = useTranslation();
@@ -45,8 +46,11 @@ export default function LanguageSwitcher() {
   };
 
   return (
-    <button
+    <Button
       onClick={toggleLanguage}
+      variant="ghost"
+      buttonStyle="ghost"
+      size="sm"
       className="relative p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-neutral-800 transition-all duration-300
         group overflow-hidden border border-gray-200 dark:border-neutral-700 hover:border-indigo-300 min-w-[44px]"
       aria-label={`Switch to ${nextLanguage.code.toUpperCase()}`}
@@ -79,6 +83,6 @@ export default function LanguageSwitcher() {
           →
         </span>
       </div>
-    </button>
+    </Button>
   );
 }

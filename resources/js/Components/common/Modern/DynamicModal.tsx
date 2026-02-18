@@ -8,6 +8,7 @@ import {
 } from "@headlessui/react";
 import { X } from "lucide-react";
 import React, { ReactNode } from "react";
+import Button from "@/Components/common/Modern/Button";
 
 interface DynamicModalProps {
   isOpen: boolean;
@@ -91,12 +92,14 @@ export const DynamicModal = ({
                       {title}
                     </DialogTitle>
                   )}
-                  <button
+                  <Button
                     onClick={onClose}
-                    className="p-2 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-neutral-800 text-gray-500 dark:text-gray-400"
+                    variant="ghost"
+                    buttonStyle="ghost"
+                    className="!p-2 !rounded-lg hover:!bg-gray-100 dark:hover:!bg-neutral-800 !text-gray-500 dark:!text-gray-400 !shadow-none"
                   >
                     <X className="w-5 h-5" />
-                  </button>
+                  </Button>
                 </div>
                 <div className="p-6">{children}</div>
               </DialogPanel>

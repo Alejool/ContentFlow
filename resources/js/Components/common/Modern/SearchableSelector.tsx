@@ -1,5 +1,6 @@
 import { Search, X } from "lucide-react";
 import React, { useMemo, useState } from "react";
+import Button from "./Button";
 
 interface SearchableSelectorProps<T> {
   items: T[];
@@ -99,13 +100,17 @@ export default function SearchableSelector<T>({
           disabled={disabled}
         />
         {searchQuery && (
-          <button
+          <Button
             type="button"
             onClick={clearSearch}
+            variant="ghost"
+            buttonStyle="ghost"
+            size="sm"
             className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+            icon={X}
           >
-            <X className="h-4 w-4" />
-          </button>
+            
+          </Button>
         )}
       </div>
 

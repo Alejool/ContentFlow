@@ -1,6 +1,7 @@
 import ModalFooter from "@/Components/Content/modals/common/ModalFooter";
 import ModalHeader from "@/Components/Content/modals/common/ModalHeader";
 import Modal from "@/Components/common/ui/Modal";
+import Button from "@/Components/common/Modern/Button";
 import {
   getActivePlatformKeys,
   getPlatformConfig,
@@ -198,12 +199,14 @@ const DroppableDay = ({
           {format(day, "d")}
         </span>
 
-        <button
+        <Button
           onClick={onAddClick}
-          className="opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-all text-gray-400 hover:text-primary-500"
-        >
-          <CalendarIcon className="w-3.5 h-3.5" />
-        </button>
+          buttonStyle="icon"
+          variant="ghost"
+          size="sm"
+          icon={CalendarIcon}
+          className="opacity-0 group-hover:opacity-100"
+        />
       </div>
 
       <div className="hidden sm:flex flex-col gap-1 overflow-y-auto scrollbar-none max-h-[calc(100%-2rem)]">
@@ -331,8 +334,10 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
         <div className="flex flex-col sm:flex-row justify-between items-center mb-6 sm:mb-8 gap-4 sm:gap-6">
           <div className="flex items-center gap-4">
             <div className="relative month-picker-container">
-              <button
+              <Button
                 onClick={() => setShowMonthPicker(!showMonthPicker)}
+                buttonStyle="ghost"
+                variant="ghost"
                 className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white capitalize flex items-center gap-3 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
               >
                 {new Intl.DateTimeFormat(i18n.language || undefined, {
@@ -345,53 +350,53 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                 {isLoading && (
                   <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin text-primary-500" />
                 )}
-              </button>
+              </Button>
 
               {showMonthPicker && (
                 <div className="absolute top-full left-0 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 p-4 min-w-[280px]">
                   <div className="grid grid-cols-3 gap-2 mb-4">
                     {Array.from({ length: 12 }, (_, i) => (
-                      <button
+                      <Button
                         key={i}
                         onClick={() => goToMonth(i, currentMonth.getFullYear())}
-                        className={`p-2 text-sm rounded-lg transition-colors ${
-                          currentMonth.getMonth() === i
-                            ? "bg-primary-500 text-white"
-                            : "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
-                        }`}
+                        buttonStyle={currentMonth.getMonth() === i ? "solid" : "ghost"}
+                        variant={currentMonth.getMonth() === i ? "primary" : "ghost"}
+                        size="sm"
                       >
                         {new Intl.DateTimeFormat(i18n.language || undefined, {
                           month: "short",
                         }).format(new Date(2024, i, 1))}
-                      </button>
+                      </Button>
                     ))}
                   </div>
                   <div className="flex items-center justify-between gap-2">
-                    <button
+                    <Button
                       onClick={() =>
                         goToMonth(
                           currentMonth.getMonth(),
                           currentMonth.getFullYear() - 1,
                         )
                       }
-                      className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                    >
-                      <ChevronLeft className="w-4 h-4" />
-                    </button>
+                      buttonStyle="ghost"
+                      variant="ghost"
+                      size="sm"
+                      icon={ChevronLeft}
+                    />
                     <span className="font-semibold text-gray-900 dark:text-white">
                       {currentMonth.getFullYear()}
                     </span>
-                    <button
+                    <Button
                       onClick={() =>
                         goToMonth(
                           currentMonth.getMonth(),
                           currentMonth.getFullYear() + 1,
                         )
                       }
-                      className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                    >
-                      <ChevronRight className="w-4 h-4" />
-                    </button>
+                      buttonStyle="ghost"
+                      variant="ghost"
+                      size="sm"
+                      icon={ChevronRight}
+                    />
                   </div>
                 </div>
               )}
@@ -401,10 +406,13 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
           <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto justify-center sm:justify-end">
             <div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-lg p-1 overflow-x-auto scrollbar-subtle max-w-full sm:max-w-none">
               {platforms.map((p) => (
-                <button
+                <Button
                   key={p}
                   onClick={() => setPlatformFilter(p)}
-                  className={`p-1.5 sm:p-2 rounded-md transition-all ${platformFilter === p ? "bg-white dark:bg-gray-700 shadow text-primary-600" : "text-gray-400 hover:text-gray-600"}`}
+                  buttonStyle="ghost"
+                  variant="ghost"
+                  size="sm"
+                  className={`${platformFilter === p ? "bg-white dark:bg-gray-700 shadow text-primary-600" : "text-gray-400 hover:text-gray-600"}`}
                   title={
                     p === "all"
                       ? t("calendar.filters.all")
@@ -412,40 +420,42 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                         ? t("calendar.filters.events")
                         : getPlatformConfig(p).name
                   }
-                >
-                  {p === "all" ? (
-                    <Filter className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                  ) : p === "user_event" ? (
-                    <CalendarIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary-500" />
-                  ) : (
-                    <PlatformIcon
-                      platform={p}
-                      className="w-3.5 h-3.5 sm:w-4 sm:h-4"
-                    />
-                  )}
-                </button>
+                  icon={
+                    p === "all" ? (
+                      Filter
+                    ) : p === "user_event" ? (
+                      CalendarIcon
+                    ) : (
+                      () => <PlatformIcon platform={p} className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                    )
+                  }
+                />
               ))}
             </div>
 
             <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg border border-gray-200 dark:border-gray-700">
-              <button
+              <Button
                 onClick={prevMonth}
-                className="p-1.5 sm:p-2 hover:bg-white dark:hover:bg-gray-700 rounded-lg transition-all text-gray-600 dark:text-gray-300"
-              >
-                <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
-              </button>
-              <button
+                buttonStyle="ghost"
+                variant="ghost"
+                size="sm"
+                icon={ChevronLeft}
+              />
+              <Button
                 onClick={goToToday}
-                className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold hover:bg-white dark:hover:bg-gray-700 rounded-lg transition-all text-gray-700 dark:text-gray-200"
+                buttonStyle="ghost"
+                variant="ghost"
+                size="sm"
               >
                 {t("calendar.actions.today")}
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={nextMonth}
-                className="p-1.5 sm:p-2 hover:bg-white dark:hover:bg-gray-700 rounded-lg transition-all text-gray-600 dark:text-gray-300"
-              >
-                <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
-              </button>
+                buttonStyle="ghost"
+                variant="ghost"
+                size="sm"
+                icon={ChevronRight}
+              />
             </div>
           </div>
         </div>
@@ -665,13 +675,14 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                               (!event.user?.id &&
                                 event.extendedProps?.user_name ===
                                   currentUser?.name)) && (
-                              <button
+                              <Button
                                 onClick={(e) => handleDeleteEvent(e, event)}
-                                className="p-2 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-500 transition-all"
+                                buttonStyle="solid"
+                                variant="danger"
+                                size="sm"
+                                icon={Trash2}
                                 title={t("common.delete")}
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </button>
+                              />
                             )}
                           <div
                             className="w-1.5 h-10 rounded-full opacity-50 group-hover:opacity-100 transition-opacity"

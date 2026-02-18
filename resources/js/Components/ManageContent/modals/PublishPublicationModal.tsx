@@ -1,3 +1,4 @@
+import Button from "@/Components/common/Modern/Button";
 import PlatformSettingsModal from "@/Components/ConfigSocialMedia/PlatformSettingsModal";
 import YouTubeThumbnailUploader from "@/Components/common/ui/YouTubeThumbnailUploader";
 import { getPlatformConfig } from "@/Constants/socialPlatforms";
@@ -19,8 +20,9 @@ import {
   X,
   XCircle,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
+import { toast } from "react-hot-toast";
 
 interface PublishPublicationModalProps {
   isOpen: boolean;
@@ -85,6 +87,14 @@ export default function PublishPublicationModal({
   const canPublishDirectly = hasPublishPermission || isApproved;
   const isPendingReview = publication?.status === "pending_review";
 
+  const handleCloseModal = useCallback(() => {
+    // Force close even if publishing
+    resetState();
+    setPlatformSettings({});
+    setActivePlatformSettings(null);
+    onClose(publication?.id);
+  }, [publication?.id, onClose, resetState]);
+
   const handleRequestApproval = async () => {
     if (!publication) return;
     const success = await handleRequestReview(publication.id, platformSettings);
@@ -123,6 +133,9 @@ export default function PublishPublicationModal({
 
   useEffect(() => {
     if (isOpen && publication) {
+      // Reset state first to clear any stale data
+      resetState();
+      
       fetchPublishedPlatforms(publication.id);
       fetchPublicationById(publication.id).then((fresh) => {
         if (fresh) loadExistingThumbnails(fresh);
@@ -137,6 +150,8 @@ export default function PublishPublicationModal({
 
     if (!isOpen) {
       resetState();
+      setPlatformSettings({});
+      setActivePlatformSettings(null);
     }
   }, [isOpen, publication?.id]);
 
@@ -227,7 +242,7 @@ export default function PublishPublicationModal({
     <>
       <Dialog
         open={isOpen}
-        onClose={() => onClose(publication.id)}
+        onClose={handleCloseModal}
         className="relative z-50"
       >
         <div
@@ -246,12 +261,13 @@ export default function PublishPublicationModal({
                   {t("publications.modal.publish.title")}
                 </div>
               </DialogTitle>
-              <button
-                onClick={() => onClose(publication.id)}
-                className="p-2 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-neutral-700 text-gray-500 dark:text-gray-400"
-              >
-                <X className="w-5 h-5" />
-              </button>
+              <Button
+                buttonStyle="icon"
+                variant="ghost"
+                size="md"
+                icon={X}
+                onClick={handleCloseModal}
+              />
             </div>
 
             <div className="flex-1 overflow-y-auto custom-scrollbar p-8 pt-6">
@@ -321,19 +337,23 @@ export default function PublishPublicationModal({
             <div className="mb-6">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex gap-2">
-                  <button
+                  <Button
+                    buttonStyle="solid"
+                    variant="primary"
+                    size="sm"
                     onClick={selectAll}
-                    className="text-sm text-primary-500 hover:text-primary-600 font-medium"
                   >
                     {t("publications.modal.publish.selectAll")}
-                  </button>
+                  </Button>
                   <span className="text-gray-400 dark:text-gray-600">|</span>
-                  <button
+                  <Button
+                    buttonStyle="solid"
+                    variant="primary"    
+                    size="sm"
                     onClick={deselectAll}
-                    className="text-sm text-primary-500 hover:text-primary-600 font-medium"
                   >
                     {t("publications.modal.publish.deselectAll")}
-                  </button>
+                  </Button>
                 </div>
               </div>
 
@@ -390,7 +410,7 @@ export default function PublishPublicationModal({
                                       ? "border-[3px] border-gray-500 bg-gray-50 dark:bg-gray-900/20"
                                       : isSelected
                                         ? "border-[3px] border-primary-600 bg-primary-50 dark:bg-primary-900/30 shadow-xl shadow-primary-500/30 ring-2 ring-primary-400/50 dark:ring-primary-500/50"
-                                        : "border-2 bg-white dark:bg-neutral-900/30 border-gray-300 dark:border-neutral-700 hover:border-primary-400 dark:hover:border-primary-600 hover:shadow-md"
+                                        : "border bg-white dark:bg-neutral-900/30 border-gray-300 dark:border-neutral-700 hover:border-primary-400 dark:hover:border-primary-600 hover:shadow-md"
                           }`}
                         >
                           {/* Publishing Overlay */}
@@ -411,17 +431,6 @@ export default function PublishPublicationModal({
                                   </span>
                                 </div>
                               </div>
-                              
-                              {/* Cancel button for individual platform */}
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  // Add cancel logic here if needed
-                                }}
-                                className="mt-3 text-xs text-yellow-700 dark:text-yellow-400 hover:text-yellow-900 dark:hover:text-yellow-200 underline"
-                              >
-                                Cancelar
-                              </button>
                             </div>
                           )}
 
@@ -515,16 +524,17 @@ export default function PublishPublicationModal({
                           <div className="absolute top-3 right-3 flex items-center gap-1.5 z-10">
                             {!isPublished && !isScheduled && !isPublishing && !isUnpublishing && (
                               <>
-                                <button
-                                  type="button"
+                                <Button
+                                  buttonStyle="icon"
+                                  variant="ghost"
+                                  size="sm"
+                                  icon={SettingsIcon}
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     setActivePlatformSettings(account.platform);
                                   }}
-                                  className="p-1.5 rounded-md transition-all bg-white/90 dark:bg-neutral-800/90 backdrop-blur-sm hover:bg-white dark:hover:bg-neutral-700 text-gray-600 dark:text-gray-400 shadow-sm border border-gray-200 dark:border-neutral-700"
-                                >
-                                  <SettingsIcon className="w-4 h-4" />
-                                </button>
+                                  className="bg-white/90 dark:bg-neutral-800/90 backdrop-blur-sm shadow-sm border border-gray-200 dark:border-neutral-700"
+                                />
                                 {isSelected && (
                                   <div className="p-1.5 rounded-md bg-primary-500 shadow-sm">
                                     <CheckCircle className="w-4 h-4 text-white" />
@@ -539,7 +549,7 @@ export default function PublishPublicationModal({
                         {isScheduled && !isPublishing && !isUnpublishing && (
                           <div className="absolute -top-3 right-2 z-40">
                             <div className="flex flex-col items-end gap-1">
-                              <span className="flex items-center gap-1.5 text-xs font-bold text-white bg-gradient-to-r from-blue-600 to-blue-700 px-3 py-1.5 rounded-full shadow-lg border-2 border-white dark:border-neutral-800">
+                              <span className="flex items-center gap-1.5 text-xs font-bold text-white bg-gradient-to-r from-blue-600 to-blue-700 px-3 py-1.5 rounded-full shadow-lg border border-white dark:border-neutral-800">
                                 <Clock className="w-3.5 h-3.5" />
                                 PROGRAMADO
                               </span>
@@ -567,7 +577,7 @@ export default function PublishPublicationModal({
                         {/* Removed Badge - Outside the card */}
                         {isRemovedPlatform && !isPublishing && !isUnpublishing && !isPublished && (
                           <div className="absolute -top-3 right-2 z-40">
-                            <span className="flex items-center gap-1.5 text-xs font-bold text-white bg-gradient-to-r from-gray-600 to-gray-700 px-3 py-1.5 rounded-full shadow-lg border-2 border-white dark:border-neutral-800">
+                            <span className="flex items-center gap-1.5 text-xs font-bold text-white bg-gradient-to-r from-gray-600 to-gray-700 px-3 py-1.5 rounded-full shadow-lg border border-white dark:border-neutral-800">
                               <XCircle className="w-3.5 h-3.5" />
                               REMOVIDO
                             </span>
@@ -581,7 +591,7 @@ export default function PublishPublicationModal({
                           !isPublishing &&
                           !isUnpublishing && (
                             <div className="absolute -top-3 right-2 z-40">
-                              <span className="flex items-center gap-1.5 text-xs font-bold text-white bg-gradient-to-r from-red-600 to-red-700 px-3 py-1.5 rounded-full shadow-lg border-2 border-white dark:border-neutral-800">
+                              <span className="flex items-center gap-1.5 text-xs font-bold text-white bg-gradient-to-r from-red-600 to-red-700 px-3 py-1.5 rounded-full shadow-lg border border-white dark:border-neutral-800">
                                 <AlertCircle className="w-3.5 h-3.5" />
                                 FALLÓ
                               </span>
@@ -590,7 +600,11 @@ export default function PublishPublicationModal({
 
                         {/* Unpublish Button */}
                         {isPublished && !isUnpublishing && (
-                          <button
+                          <Button
+                            buttonStyle="icon"
+                            variant="danger"
+                            size="md"
+                            icon={X}
                             onClick={(e) => {
                               e.stopPropagation();
                               handleUnpublishWithConfirm(
@@ -599,11 +613,9 @@ export default function PublishPublicationModal({
                               );
                             }}
                             disabled={isUnpublishing}
-                            className="absolute top-3 right-3 z-30 p-2 bg-red-500 hover:bg-red-600 text-white rounded-full transition-colors disabled:opacity-50 shadow-lg"
+                            className="absolute top-3 right-3 z-30 shadow-lg"
                             title="Despublicar"
-                          >
-                            <X className="w-4 h-4" />
-                          </button>
+                          />
                         )}
                       </div>
                     );
@@ -667,11 +679,23 @@ export default function PublishPublicationModal({
             )}
             </div>
 
-            <div className="flex gap-3 p-6 border-t border-gray-200 dark:border-neutral-700 sticky bottom-0 z-20 bg-white dark:bg-neutral-800 backdrop-blur-sm bg-opacity-95 dark:bg-opacity-95">
-              <button
-                type="button"
+            <div className="flex gap-3 justify-end p-6 border-t border-gray-200 dark:border-neutral-700 sticky bottom-0 z-20 bg-white dark:bg-neutral-800 backdrop-blur-sm bg-opacity-95 dark:bg-opacity-95">
+              <Button
+                buttonStyle="outline"
+                variant="secondary"
+                size="lg"
                 onClick={async () => {
-                  // If publication is actively publishing, cancel it
+                  // Don't allow cancellation if platforms are actively publishing
+                  if (publishingPlatforms.length > 0) {
+                    toast.error(
+                      t("publications.modal.publish.cannotCancelWhilePublishing") || 
+                      "No se puede cancelar mientras las plataformas están publicando. Por favor espere a que termine."
+                    );
+                    return;
+                  }
+                  
+                  // If publication status is "publishing" but no platforms are actively publishing,
+                  // allow cancellation with confirmation
                   if (publishing || publication.status === "publishing") {
                     const confirmed = await confirm({
                       title: t("publications.modal.publish.cancelConfirm.title") || "¿Cancelar publicación?",
@@ -684,46 +708,51 @@ export default function PublishPublicationModal({
                     if (confirmed) {
                       await handleCancelPublication(publication.id);
                       if (onSuccess) onSuccess();
-                      onClose(publication.id);
+                      handleCloseModal();
                     }
                   } else {
-                    onClose(publication.id);
+                    handleCloseModal();
                   }
                 }}
-                className="flex-1 px-4 py-3 rounded-lg font-medium transition-colors bg-gray-100 dark:bg-neutral-700 hover:bg-gray-200 dark:hover:bg-neutral-600 text-gray-700 dark:text-white"
+
               >
                 {publishing || publication.status === "publishing" 
                   ? t("publications.modal.publish.button.cancelPublication") || "Cancelar Publicación"
                   : t("publications.modal.publish.button.cancel") || "Cerrar"
                 }
-              </button>
+              </Button>
               {canPublishDirectly ? (
-                <div className="flex-[2] flex gap-3">
+                <div className=" flex gap-3">
                   {isPendingReview && hasPublishPermission && (
-                    <button
-                      type="button"
+                    <Button
+                      buttonStyle="solid"
+                      variant="success"
+                      size="lg"
+                      icon={CheckCircle}
                       onClick={handleApproveRequest}
-                      className="flex-1 px-4 py-3 rounded-lg font-medium bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors flex items-center justify-center gap-2"
                       title="Aprobar sin publicar ahora"
                     >
-                      <CheckCircle className="w-4 h-4" />
                       {t("publications.modal.publish.button.approve") ||
                         "Aprobar"}
-                    </button>
+                    </Button>
                   )}
                   {isPendingReview && !hasPublishPermission && (
-                    <button
-                      type="button"
+                    <Button
+                      buttonStyle="solid"
+                      variant="danger"
+                      size="lg"
+                      icon={XCircle}
                       onClick={handleRejectRequest}
-                      className="flex-1 px-4 py-3 rounded-lg font-medium bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors flex items-center justify-center gap-2"
                     >
-                      <XCircle className="w-4 h-4" />
                       {t("publications.modal.publish.button.reject") ||
                         "Rechazar"}
-                    </button>
+                    </Button>
                   )}
-                  <button
-                    type="button"
+                  <Button
+                    buttonStyle="gradient"
+                    variant="primary"
+                    size="lg"
+                    icon={isPendingReview && !hasPublishPermission ? CheckCircle : Share2}
                     onClick={
                       isPendingReview && !hasPublishPermission
                         ? handleApproveRequest
@@ -733,48 +762,36 @@ export default function PublishPublicationModal({
                       publishing ||
                       selectedPlatforms.length === 0
                     }
-                    className="flex-[2] px-4 py-3 rounded-lg font-medium bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    loading={publishing || publication.status === "publishing"}
                   >
                     {publishing || publication.status === "publishing" ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                        {t("publications.modal.publish.publishing")}
-                      </>
+                      t("publications.modal.publish.publishing")
                     ) : isPendingReview && !hasPublishPermission ? (
-                      <>
-                        <CheckCircle className="w-4 h-4" />
-                        {t("publications.modal.publish.button.approve") ||
-                          "Aprobar"}
-                      </>
+                      t("publications.modal.publish.button.approve") || "Aprobar"
                     ) : (
                       <>
-                        <Share2 className="w-4 h-4" />
                         {t("publications.modal.publish.button.publish")}{" "}
                         {selectedPlatforms.length > 0 &&
                           `(${selectedPlatforms.length})`}
                       </>
                     )}
-                  </button>
+                  </Button>
                 </div>
               ) : canManageContent ? (
-                <button
-                  type="button"
+                <Button
+                  buttonStyle="gradient"
+                  variant="primary"
+                  size="lg"
+                  icon={isPendingReview ? Clock : CheckCircle}
                   onClick={handleRequestApproval}
                   disabled={publishing || isPendingReview}
-                  className="flex-[2] px-4 py-3 rounded-lg font-medium bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {isPendingReview ? (
-                    <>
-                      <Clock className="w-4 h-4" />
-                      {t("publications.modal.publish.button.pendingReview")}
-                    </>
+                    t("publications.modal.publish.button.pendingReview")
                   ) : (
-                    <>
-                      <CheckCircle className="w-4 h-4" />
-                      {t("publications.modal.publish.button.requestApproval")}
-                    </>
+                    t("publications.modal.publish.button.requestApproval")
                   )}
-                </button>
+                </Button>
               ) : null}
             </div>
 

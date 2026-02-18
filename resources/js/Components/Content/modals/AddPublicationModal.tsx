@@ -8,6 +8,7 @@ import ModalHeader from "@/Components/Content/modals/common/ModalHeader";
 import ScheduleSection from "@/Components/Content/modals/common/ScheduleSection";
 import Input from "@/Components/common/Modern/Input";
 import Textarea from "@/Components/common/Modern/Textarea";
+import Button from "@/Components/common/Modern/Button";
 import { useCampaigns } from "@/Hooks/campaign/useCampaigns";
 import { usePublicationForm } from "@/Hooks/publication/usePublicationForm";
 import { useConfirm } from "@/Hooks/useConfirm";
@@ -546,7 +547,7 @@ export default function AddPublicationModal({
                     {t("publish.publishing") || "Publicando en redes..."}
                   </span>
                 </div>
-                <button
+                <Button
                   type="button"
                   onClick={async () => {
                     const isConfirmed = await confirm({
@@ -580,13 +581,17 @@ export default function AddPublicationModal({
                       }
                     }
                   }}
-                  className="flex items-center gap-1.5 px-3 py-1 rounded-md bg-red-50 hover:bg-red-100 text-red-600 dark:bg-red-900/20 dark:hover:bg-red-900/30 dark:text-red-400 transition-colors border border-red-100 dark:border-red-900/50 group"
+                  variant="danger"
+                  buttonStyle="solid"
+                  size="xs"
+                  className="flex items-center gap-1.5 px-3 py-1 rounded-md transition-colors border border-red-100 dark:border-red-900/50 group"
+                  icon={X}
+                  iconPosition="left"
                 >
-                  <X className="w-3.5 h-3.5 group-hover:rotate-90 transition-transform" />
                   <span className="text-[11px] font-black uppercase tracking-tighter">
                     {t("common.cancel") || "Cancelar Publicación"}
                   </span>
-                </button>
+                </Button>
               </div>
             </div>
           )}
