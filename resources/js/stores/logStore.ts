@@ -39,9 +39,6 @@ export const useLogStore = create<LogState>((set) => ({
         }
         return acc;
       }, {} as any);
-
-      console.log('Sending filters to backend:', cleanFilters);
-
       const response = await axios.get("/api/v1/logs", {
         params: { ...cleanFilters, page },
         paramsSerializer: {
