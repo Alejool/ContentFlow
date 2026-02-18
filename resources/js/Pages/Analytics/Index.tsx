@@ -74,7 +74,7 @@ interface AnalyticsProps {
 
 export default function Index({ stats, period }: AnalyticsProps) {
   const { t } = useTranslation();
-  const { theme } = useTheme() as { theme: "light" | "dark" | undefined };
+  const { actualTheme: theme } = useTheme();
   const [loading, setLoading] = useState(false);
   const isDark = theme === 'dark';
 

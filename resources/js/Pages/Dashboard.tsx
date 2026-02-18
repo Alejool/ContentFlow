@@ -60,7 +60,7 @@ export default function Dashboard({
   period = 30,
 }: DashboardProps) {
   const { t } = useTranslation();
-  const { theme } = useTheme() as { theme: "light" | "dark" | undefined };
+  const { actualTheme: theme } = useTheme();
   const [pubStats, setPubStats] = useState<Record<string, number>>(
     stats.publicationStats || {},
   );
