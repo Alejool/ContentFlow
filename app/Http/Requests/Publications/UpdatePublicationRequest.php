@@ -14,6 +14,31 @@ class UpdatePublicationRequest extends FormRequest
     return true;
   }
 
+  /**
+   * Prepare the data for validation.
+   */
+  protected function prepareForValidation(): void
+  {
+    // Handle social_accounts if it comes as JSON string
+    if ($this->has('social_accounts')) {
+      $socialAccounts = $this->input('social_accounts');
+      
+      // If it's a string, try to decode it
+      if (is_string($socialAccounts)) {
+        // Handle empty string
+        if ($socialAccounts === '' || $socialAccounts === null) {
+          $this->merge(['social_accounts' => []]);
+        } else {
+          // Try to decode JSON
+          $decoded = json_decode($socialAccounts, true);
+          if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+            $this->merge(['social_accounts' => $decoded]);
+          }
+        }
+      }
+    } 
+  }
+
   public function rules(): array
   {
     $publication = $this->route('publication');
@@ -65,8 +90,8 @@ class UpdatePublicationRequest extends FormRequest
         }
       ],
       'social_accounts' => 'nullable|array',
-      'social_accounts.*' => 'exists:social_accounts,id',
-      'clear_social_accounts' => 'nullable|in:0,1,true,false',
+      'social_accounts.*' => 'integer|exists:social_accounts,id',
+      'clear_social_accounts' => 'nullable',
       'social_account_schedules' => 'nullable|array',
       'social_account_schedules.*' => [
         'nullable',

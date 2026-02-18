@@ -19,19 +19,7 @@ class UpdatePublicationAction
 
   public function execute(Publication $publication, array $data, array $newFiles = []): Publication
   {
-    $start = microtime(true);
-    Log::info("⏱️ Starting UpdatePublicationAction for pub {$publication->id}");
-    
-    // CRITICAL DEBUG
-    Log::info("🔍 DEBUGGING SOCIAL ACCOUNTS", [
-      'has_social_accounts_key' => array_key_exists('social_accounts', $data),
-      'social_accounts_value' => $data['social_accounts'] ?? 'NOT SET',
-      'has_clear_flag' => array_key_exists('clear_social_accounts', $data),
-      'clear_flag_value' => $data['clear_social_accounts'] ?? 'NOT SET',
-      'all_data_keys' => array_keys($data)
-    ]);
-
-    return DB::transaction(function () use ($publication, $data, $newFiles, $start) {
+    return DB::transaction(function () use ($publication, $data, $newFiles) {
       // Determine status based on scheduled_at and current state
       $currentStatus = $publication->status;
       $newStatus = $data['status'] ?? $currentStatus;
@@ -96,7 +84,6 @@ class UpdatePublicationAction
       }
 
       $publication->update($updateData);
-      Log::info("⏱️ Pub basic update took: " . (microtime(true) - $start) . "s");
 
       if (isset($data['campaign_id'])) {
         if (empty($data['campaign_id'])) {
@@ -107,7 +94,6 @@ class UpdatePublicationAction
       }
 
       if (!empty($data['removed_media_ids'])) {
-        Log::info("🗑️ Removing media files from publication {$publication->id}", ['ids' => $data['removed_media_ids']]);
         $publication->mediaFiles()->whereIn('media_files.id', $data['removed_media_ids'])->get()->each(function ($mediaFile) {
           $this->mediaService->deleteMediaFile($mediaFile);
         });
@@ -144,17 +130,19 @@ class UpdatePublicationAction
           'durations' => $data['durations_new'] ?? [],
           'thumbnails' => $data['thumbnails'] ?? [],
         ]);
-        Log::info("⏱️ ProcessUploads took: " . (microtime(true) - $start) . "s");
       }
 
-      // Handle Schedules - ALWAYS process to ensure sync
-      // This ensures that when all accounts are removed, schedules are properly deleted
+      // Handle Schedules
       $socialAccounts = [];
+      $shouldSyncSchedules = false;
       
-      if (!empty($data['clear_social_accounts'])) {
-        Log::info("🧹 Clear social accounts flag detected for publication {$publication->id}");
+      // Check if we should clear all social accounts
+      if (array_key_exists('clear_social_accounts', $data) && !empty($data['clear_social_accounts'])) {
         $socialAccounts = [];
-      } elseif (array_key_exists('social_accounts', $data)) {
+        $shouldSyncSchedules = true;
+      } 
+      // Check if social_accounts key exists (even if empty array)
+      elseif (array_key_exists('social_accounts', $data)) {
         // Handle case where social_accounts might be sent as JSON string or array
         $socialAccounts = $data['social_accounts'] ?? [];
         
@@ -178,34 +166,23 @@ class UpdatePublicationAction
             return $id !== null && $id > 0;
           }
         ));
+        
+        $shouldSyncSchedules = true;
       }
       
-      // ALWAYS sync if we have social_accounts key or clear flag
-      if (array_key_exists('social_accounts', $data) || !empty($data['clear_social_accounts'])) {
-        Log::info("📅 Syncing schedules for publication {$publication->id}", [
-          'social_accounts' => $socialAccounts,
-          'account_schedules' => $data['social_account_schedules'] ?? []
-        ]);
+      // Sync schedules if needed
+      if ($shouldSyncSchedules) {
         
         $this->schedulingService->syncSchedules(
           $publication,
           $socialAccounts,
           $data['social_account_schedules'] ?? $data['account_schedules'] ?? []
         );
-        
-        // Verify deletion
-        $remainingSchedules = $publication->scheduled_posts()->where('status', 'pending')->count();
-        Log::info("✅ After sync, publication {$publication->id} has {$remainingSchedules} pending schedules");
       }
-
-      // REMOVED Redundant load - PublicationUpdated broadcast handles this with specific limits
-      // $publication->load(['mediaFiles.derivatives', 'scheduled_posts.socialAccount', 'socialPostLogs.socialAccount', 'campaigns']);
 
       // Broadcast update to other users in the workspace
       PublicationUpdated::dispatch($publication);
-      Log::info("⏱️ Event dispatch took: " . (microtime(true) - $start) . "s");
 
-      Log::info("✅ UpdatePublicationAction completed for pub {$publication->id} in " . (microtime(true) - $start) . "s");
       return $publication;
     });
   }

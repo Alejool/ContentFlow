@@ -244,18 +244,6 @@ class PublicationController extends Controller
 
   public function update(UpdatePublicationRequest $request, Publication $publication, UpdatePublicationAction $action)
   {
-    \Log::info("UPDATE METHOD CALLED FOR PUB: " . $publication->id);
-    
-    // DEBUG: Log raw request data before validation
-    \Log::info("📨 Raw request data received", [
-      'publication_id' => $publication->id,
-      'has_social_accounts' => $request->has('social_accounts'),
-      'social_accounts_raw' => $request->input('social_accounts'),
-      'has_clear_flag' => $request->has('clear_social_accounts'),
-      'clear_flag_raw' => $request->input('clear_social_accounts'),
-      'all_inputs' => array_keys($request->all())
-    ]);
-
     if (!Auth::user()->hasPermission('manage-content', $publication->workspace_id)) {
       return $this->errorResponse('You do not have permission to update this publication.', 403);
     }
@@ -275,16 +263,6 @@ class PublicationController extends Controller
     try {
       $data = $request->validated();
       
-      // DEBUG: Log what we're receiving
-      \Log::info("📥 UpdatePublicationAction received data", [
-        'publication_id' => $publication->id,
-        'has_social_accounts' => array_key_exists('social_accounts', $data),
-        'social_accounts_value' => $data['social_accounts'] ?? 'NOT SET',
-        'has_clear_flag' => array_key_exists('clear_social_accounts', $data),
-        'clear_flag_value' => $data['clear_social_accounts'] ?? 'NOT SET',
-        'all_keys' => array_keys($data)
-      ]);
-
       // RBAC ENDFORCEMENT: Check for publish permission
       if (!Auth::user()->hasPermission('publish', $publication->workspace_id)) {
         // If trying to set scheduled_at, remove it

@@ -11,12 +11,6 @@ class SchedulingService
 {
   public function scheduleForAccounts(Publication $publication, array $accountIds, array $accountSchedules = []): void
   {
-    \Log::info("📋 SchedulingService::scheduleForAccounts called", [
-      'publication_id' => $publication->id,
-      'account_ids' => $accountIds,
-      'account_schedules' => $accountSchedules
-    ]);
-
     $baseSchedule = $publication->scheduled_at;
     $socialAccounts = SocialAccount::whereIn('id', $accountIds)->get()->keyBy('id');
 
@@ -42,7 +36,6 @@ class SchedulingService
           'account_name' => $socialAccount ? $socialAccount->account_name : 'Unknown',
           'platform' => $socialAccount ? $socialAccount->platform : 'unknown',
         ]);
-        \Log::info("✏️ Updated existing scheduled post", ['id' => $existingPost->id]);
       } else {
         $created = ScheduledPost::create([
           'publication_id' => $publication->id,
@@ -54,25 +47,19 @@ class SchedulingService
           'account_name' => $socialAccount ? $socialAccount->account_name : 'Unknown',
           'platform' => $socialAccount ? $socialAccount->platform : 'unknown',
         ]);
-        \Log::info("➕ Created new scheduled post", ['id' => $created->id]);
       }
     }
 
     // Cleanup: Remove accounts that are no longer selected
-    // Only delete pending scheduled posts to avoid removing published/posted records
     if (empty($accountIds)) {
-      // If no accounts selected, remove all pending schedules
-      $deleted = ScheduledPost::where('publication_id', $publication->id)
+      ScheduledPost::where('publication_id', $publication->id)
         ->where('status', 'pending')
         ->delete();
-      \Log::info("🗑️ Deleted ALL pending schedules", ['count' => $deleted]);
     } else {
-      // Remove pending schedules for accounts that are no longer selected
-      $deleted = ScheduledPost::where('publication_id', $publication->id)
+      ScheduledPost::where('publication_id', $publication->id)
         ->where('status', 'pending')
         ->whereNotIn('social_account_id', $accountIds)
         ->delete();
-      \Log::info("🗑️ Deleted schedules not in list", ['count' => $deleted, 'kept_ids' => $accountIds]);
     }
   }
 
@@ -80,14 +67,25 @@ class SchedulingService
   {
     $this->scheduleForAccounts($publication, $accountIds, $accountSchedules);
 
-    // Auto-revert to draft if no pending schedules and no global date
+    // Refresh to get updated scheduled_posts count
+    $publication->refresh();
+    
+    // Check if there are any pending schedules
     $hasPending = $publication->scheduled_posts()->where('status', 'pending')->exists();
-    if (!$hasPending && empty($publication->scheduled_at)) {
-      if ($publication->status !== 'draft') {
-        $publication->update(['status' => 'draft']);
+    
+    // If no pending schedules and no accounts selected, clear scheduled_at and revert to draft
+    if (!$hasPending && empty($accountIds)) {
+      $updateData = ['scheduled_at' => null];
+      
+      // Only change status if it's currently scheduled
+      if (in_array($publication->status, ['scheduled', 'approved'])) {
+        $updateData['status'] = 'draft';
       }
-    } elseif (($hasPending || !empty($publication->scheduled_at)) && $publication->status === 'draft') {
-      // If it has schedules and it's currently a draft, mark it as scheduled
+      
+      $publication->update($updateData);
+    } 
+    // If there are pending schedules or accounts, ensure status is scheduled
+    elseif (($hasPending || !empty($accountIds)) && $publication->status === 'draft') {
       $publication->logActivity('scheduled');
       $publication->update(['status' => 'scheduled']);
     }
