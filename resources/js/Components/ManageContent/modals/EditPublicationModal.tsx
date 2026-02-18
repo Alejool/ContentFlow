@@ -262,13 +262,10 @@ const EditPublicationModal = ({
     const settings: Record<string, any> = {};
     selectedPlatforms.forEach((platform) => {
       const platformKey = platform.toLowerCase();
-      settings[platformKey] = 
-        platformSettings[platformKey] || 
-        user?.global_platform_settings?.[platformKey] || 
-        {};
+      settings[platformKey] = platformSettings[platformKey] || {};
     });
     return settings;
-  }, [selectedPlatforms, platformSettings, user?.global_platform_settings]);
+  }, [selectedPlatforms, platformSettings]);
 
   const hasYouTubeAccount = selectedSocialAccounts.some((id: number) => {
     const account = socialAccounts.find((a) => a.id === id);
@@ -726,9 +723,7 @@ const EditPublicationModal = ({
           settings={
             activePlatformSettings?.toLowerCase() === "all"
               ? {}
-              : platformSettings[activePlatformSettings?.toLowerCase() || ""] || 
-                user?.global_platform_settings?.[activePlatformSettings?.toLowerCase() || ""] || 
-                {}
+              : platformSettings[activePlatformSettings?.toLowerCase() || ""] || {}
           }
           onSettingsChange={(newSettings) => {
             if (activePlatformSettings && activePlatformSettings.toLowerCase() !== "all") {

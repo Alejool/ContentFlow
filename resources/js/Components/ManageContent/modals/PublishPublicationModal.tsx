@@ -370,50 +370,93 @@ export default function PublishPublicationModal({
                           onClick={() =>
                             !isPublished &&
                             !isScheduled &&
+                            !isPublishing &&
                             togglePlatform(account.id)
                           }
-                          className={`w-full h-[120px] flex items-start gap-3 p-4 rounded-lg border-2 transition-all relative ${
-                            !isPublished && !isScheduled
+                          className={`w-full h-[110px] flex flex-col gap-3 p-4 rounded-xl transition-all relative ${
+                            !isPublished && !isScheduled && !isPublishing
                               ? "cursor-pointer"
                               : "cursor-default"
                           } ${
                             isPublishing
-                              ? "border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20"
+                              ? "border-[3px] border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 shadow-lg shadow-yellow-500/20"
                               : isPublished
-                                ? "border-green-500 bg-green-50 dark:bg-green-900/20"
+                                ? "border-[3px] border-green-500 bg-green-50 dark:bg-green-900/20 shadow-lg shadow-green-500/20"
                                 : isScheduled
-                                  ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
+                                  ? "border-[3px] border-blue-500 bg-blue-50 dark:bg-blue-900/20 shadow-lg shadow-blue-500/20"
                                   : isFailed
-                                    ? "border-red-500 bg-red-50 dark:bg-red-900/20"
+                                    ? "border-[3px] border-red-500 bg-red-50 dark:bg-red-900/20 shadow-lg shadow-red-500/20"
                                     : isRemovedPlatform
-                                      ? "border-gray-500 bg-gray-50 dark:bg-gray-900/20"
+                                      ? "border-[3px] border-gray-500 bg-gray-50 dark:bg-gray-900/20"
                                       : isSelected
-                                        ? "p-2 border-primary-500 bg-primary-50 dark:bg-primary-900/20"
-                                        : "bg-white dark:bg-neutral-900/30 border-primary-200 dark:border-neutral-700 hover:border-primary-300 dark:hover:border-neutral-600"
+                                        ? "border-[3px] border-primary-600 bg-primary-50 dark:bg-primary-900/30 shadow-xl shadow-primary-500/30 ring-2 ring-primary-400/50 dark:ring-primary-500/50"
+                                        : "border-2 bg-white dark:bg-neutral-900/30 border-gray-300 dark:border-neutral-700 hover:border-primary-400 dark:hover:border-primary-600 hover:shadow-md"
                           }`}
                         >
-                          {/* Publishing Overlay - Only show if actively publishing and not failed */}
+                          {/* Publishing Overlay */}
                           {isPublishing && !isFailed && (
-                            <div className="absolute inset-0 z-20 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-sm flex items-center justify-center rounded-lg animate-in fade-in duration-300">
-                              <div className="flex items-center gap-3 px-4">
+                            <div className="absolute inset-0 z-30 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-sm flex flex-col items-center justify-center rounded-xl animate-in fade-in duration-300">
+                              <div className="flex flex-col items-center gap-2">
                                 <div className="relative flex-shrink-0">
-                                  <div className="w-8 h-8 border-3 border-yellow-200 dark:border-yellow-900 rounded-full" />
-                                  <div className="absolute inset-0 w-8 h-8 border-3 border-yellow-500 border-t-transparent rounded-full animate-spin" />
+                                  <div className="w-10 h-10 border-3 border-yellow-200 dark:border-yellow-900 rounded-full" />
+                                  <div className="absolute inset-0 w-10 h-10 border-3 border-yellow-500 border-t-transparent rounded-full animate-spin" />
                                 </div>
                                 
-                                <div className="flex flex-col gap-1">
-                                  <span className="text-xs font-bold text-yellow-800 dark:text-yellow-300 uppercase tracking-wide">
+                                <div className="flex flex-col items-center gap-0.5">
+                                  <span className="text-sm font-bold text-yellow-800 dark:text-yellow-300 uppercase tracking-wide capitalize">
+                                    {account.platform}
+                                  </span>
+                                  <span className="text-xs font-medium text-yellow-600 dark:text-yellow-400">
                                     {t("publications.modal.publish.publishing")}
                                   </span>
-                                  <span className="text-[10px] font-medium text-yellow-600 dark:text-yellow-400">
-                                    @{account.account_name}
+                                </div>
+                              </div>
+                              
+                              {/* Cancel button for individual platform */}
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  // Add cancel logic here if needed
+                                }}
+                                className="mt-3 text-xs text-yellow-700 dark:text-yellow-400 hover:text-yellow-900 dark:hover:text-yellow-200 underline"
+                              >
+                                Cancelar
+                              </button>
+                            </div>
+                          )}
+
+                          {/* Unpublishing Overlay */}
+                          {isUnpublishing && (
+                            <div className="absolute inset-0 z-30 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-sm flex flex-col items-center justify-center rounded-xl animate-in fade-in duration-300">
+                              <div className="flex flex-col items-center gap-2">
+                                <Loader2 className="w-10 h-10 animate-spin text-amber-600 dark:text-amber-400" />
+                                <span className="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wide">
+                                  {t("publications.modal.publish.unpublishing") ||
+                                    "Despublicando..."}
+                                </span>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Published Overlay */}
+                          {isPublished && !isUnpublishing && (
+                            <div className="absolute inset-0 z-20 bg-green-50/80 dark:bg-green-900/30 backdrop-blur-[2px] flex flex-col items-center justify-center rounded-xl pointer-events-none">
+                              <div className="flex flex-col items-center gap-2">
+                                <CheckCircle className="w-10 h-10 text-green-600 dark:text-green-400" />
+                                <div className="flex flex-col items-center gap-0.5">
+                                  <span className="text-sm font-bold text-green-800 dark:text-green-300 uppercase tracking-wide capitalize">
+                                    {account.platform}
+                                  </span>
+                                  <span className="text-xs font-medium text-green-600 dark:text-green-400">
+                                    {t("publications.modal.publish.published")}
                                   </span>
                                 </div>
                               </div>
                             </div>
                           )}
 
-                          {!isPublishing && (() => {
+                          {/* Video Duration Warning */}
+                          {!isPublishing && !isUnpublishing && !isPublished && (() => {
                             const mediaFiles = publication.media_files || [];
                             const video = mediaFiles.find(
                               (m: any) =>
@@ -428,158 +471,125 @@ export default function PublishPublicationModal({
                               duration,
                             );
 
-                            if (validation.maxDuration === Infinity)
+                            if (validation.maxDuration === Infinity || validation.isValid)
                               return null;
 
                             return (
                               <div
-                                className={`absolute top-1 left-1 z-10 flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold border shadow-sm ${
-                                  validation.isValid
-                                    ? "bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800/30"
-                                    : "bg-red-50 text-red-600 border-red-100 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800/30 animate-pulse"
-                                }`}
+                                className="absolute top-2 left-2 z-10 flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-bold border shadow-sm bg-red-50 text-red-600 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800/30 animate-pulse"
                               >
-                                {validation.isValid ? (
-                                  <CheckCircle className="w-2.5 h-2.5" />
-                                ) : (
-                                  <XCircle className="w-2.5 h-2.5" />
-                                )}
+                                <XCircle className="w-3 h-3" />
                                 <span className="leading-none">
-                                  {validation.isValid
-                                    ? "OK"
-                                    : `MAX ${validation.formattedMax}`}
+                                  MAX {validation.formattedMax}
                                 </span>
                               </div>
                             );
                           })()}
 
-                          <div className="w-12 h-12 rounded-lg  flex items-center justify-center flex-shrink-0 ">
-                            <img src={iconSrc} alt={account.platform} />
-                          </div>
-                          <div className="flex-1 text-left">
-                            <div className="font-medium capitalize text-sm text-primary-600 dark:text-primary-50">
-                              {account.platform}
+                          {/* Platform Logo and Info */}
+                          <div className="flex items-center gap-3 z-10">
+                            <div className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 bg-white dark:bg-neutral-800 p-2 shadow-sm">
+                              <img src={iconSrc} alt={account.platform} className="w-full h-full object-contain" />
                             </div>
-                            <div className="text-xs text-primary-600 dark:text-primary-400">
-                              @{account.account_name}
-                            </div>
-                            {account.user?.name && (
-                              <div className="text-[10px] text-primary-500 font-bold uppercase tracking-wider mt-1">
-                                {t(
-                                  "manageContent.socialMedia.status.connectedBy",
-                                ) || "Conectado por"}
-                                : {account.user.name}
+                            <div className="flex-1 text-left min-w-0">
+                              <div className="font-bold capitalize text-base text-gray-900 dark:text-white truncate">
+                                {account.platform}
                               </div>
-                            )}
+                              <div className="text-xs text-gray-600 dark:text-gray-400 truncate">
+                                @{account.account_name}
+                              </div>
+                            </div>
                           </div>
 
-                          {isUnpublishing && (
-                            <div className="absolute inset-0 z-20 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-sm flex items-center justify-center rounded-lg animate-in fade-in duration-300">
-                              <div className="flex items-center gap-2">
-                                <Loader2 className="w-5 h-5 animate-spin text-amber-600 dark:text-amber-400" />
-                                <span className="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wide">
-                                  {t("publications.modal.publish.unpublishing") ||
-                                    "Despublicando..."}
-                                </span>
-                              </div>
+                          {/* Connected By Info */}
+                          {account.user?.name && !isPublishing && !isUnpublishing && !isPublished && (
+                            <div className="text-[10px] text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wide truncate z-10">
+                              {t(
+                                "manageContent.socialMedia.status.connectedBy",
+                              ) || "Conectado por"}
+                              : {account.user.name}
                             </div>
                           )}
 
-                          {isFailed &&
-                            !isPublished &&
-                            !isPublishing &&
-                            !isUnpublishing && (
-                              <div className="flex items-center gap-2">
-                                <span className="flex items-center gap-1 text-xs font-medium text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900/30 px-2 py-1 rounded-full">
-                                  <AlertCircle className="w-3 h-3" />
-                                  {t("publications.modal.publish.failed")}
-                                </span>
-                              </div>
+                          {/* Action Buttons */}
+                          <div className="absolute top-3 right-3 flex items-center gap-1.5 z-10">
+                            {!isPublished && !isScheduled && !isPublishing && !isUnpublishing && (
+                              <>
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setActivePlatformSettings(account.platform);
+                                  }}
+                                  className="p-1.5 rounded-md transition-all bg-white/90 dark:bg-neutral-800/90 backdrop-blur-sm hover:bg-white dark:hover:bg-neutral-700 text-gray-600 dark:text-gray-400 shadow-sm border border-gray-200 dark:border-neutral-700"
+                                >
+                                  <SettingsIcon className="w-4 h-4" />
+                                </button>
+                                {isSelected && (
+                                  <div className="p-1.5 rounded-md bg-primary-500 shadow-sm">
+                                    <CheckCircle className="w-4 h-4 text-white" />
+                                  </div>
+                                )}
+                              </>
                             )}
-
-                          {isPublished && !isUnpublishing && (
-                            <div className="absolute inset-0 z-10 bg-green-50/70 dark:bg-green-900/20 backdrop-blur-[1px] flex items-center justify-center rounded-lg pointer-events-none">
-                              <div className="flex items-center gap-2">
-                                <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
-                                <span className="text-xs font-bold text-green-600 dark:text-green-400 uppercase tracking-wide">
-                                  {t("publications.modal.publish.published")}
-                                </span>
-                              </div>
-                            </div>
-                          )}
-
-                          {isScheduled && (
-                            <div className="flex items-center gap-2">
-                              <span className="flex flex-col items-end">
-                                <span className="flex items-center gap-1 text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30 px-2 py-1 rounded-full">
-                                  <Clock className="w-3 h-3" />
-                                  {t("publications.modal.publish.scheduled")}
-                                </span>
-                                {(() => {
-                                  const schedPost =
-                                    publication.scheduled_posts?.find(
-                                      (sp) =>
-                                        sp.social_account_id === account.id,
-                                    );
-                                  return schedPost?.scheduled_at ? (
-                                    <span className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
-                                      {new Date(
-                                        schedPost.scheduled_at,
-                                      ).toLocaleString([], {
-                                        dateStyle: "short",
-                                        timeStyle: "short",
-                                      })}
-                                    </span>
-                                  ) : null;
-                                })()}
-                              </span>
-                            </div>
-                          )}
-                          {isRemovedPlatform && (
-                            <div className="absolute top-1 left-1">
-                              <span className="flex items-center gap-1 text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-900/30 px-2 py-1 rounded-full">
-                                <XCircle className="w-3 h-3" />
-                                {t("publications.modal.publish.removed")}
-                              </span>
-                            </div>
-                          )}
-
-                          {isFailed &&
-                            !isScheduled &&
-                            !isPublished &&
-                            !isPublishing && (
-                              <div className="absolute top-1 left-1">
-                                <span className="flex items-center gap-1 text-xs font-medium text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900/30 px-2 py-1 rounded-full">
-                                  <AlertCircle className="w-3 h-3" />
-                                  {t("publications.modal.publish.failed")}
-                                </span>
-                              </div>
-                            )}
-
-                          <div className="flex items-center gap-1 ml-auto">
-                            {!isPublished && !isScheduled && (
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setActivePlatformSettings(account.platform);
-                                }}
-                                className="p-1.5 rounded-lg transition-all z-10 hover:bg-gray-100 dark:hover:bg-neutral-700 text-gray-500 dark:text-gray-400"
-                              >
-                                <SettingsIcon className="w-4 h-4" />
-                              </button>
-                            )}
-
-                            {isSelected &&
-                              !isPublished &&
-                              !isPublishing &&
-                              !isScheduled && (
-                                <CheckCircle className="w-5 h-5 text-primary-500" />
-                              )}
                           </div>
                         </div>
 
-                        {isPublished && (
+                        {/* Scheduled Badge - Outside the card */}
+                        {isScheduled && !isPublishing && !isUnpublishing && (
+                          <div className="absolute -top-3 right-2 z-40">
+                            <div className="flex flex-col items-end gap-1">
+                              <span className="flex items-center gap-1.5 text-xs font-bold text-white bg-gradient-to-r from-blue-600 to-blue-700 px-3 py-1.5 rounded-full shadow-lg border-2 border-white dark:border-neutral-800">
+                                <Clock className="w-3.5 h-3.5" />
+                                PROGRAMADO
+                              </span>
+                              {(() => {
+                                const schedPost =
+                                  publication.scheduled_posts?.find(
+                                    (sp) =>
+                                      sp.social_account_id === account.id,
+                                  );
+                                return schedPost?.scheduled_at ? (
+                                  <span className="text-[10px] text-gray-600 dark:text-gray-400 bg-white dark:bg-neutral-800 px-2 py-0.5 rounded-full shadow-sm">
+                                    {new Date(
+                                      schedPost.scheduled_at,
+                                    ).toLocaleString([], {
+                                      dateStyle: "short",
+                                      timeStyle: "short",
+                                    })}
+                                  </span>
+                                ) : null;
+                              })()}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Removed Badge - Outside the card */}
+                        {isRemovedPlatform && !isPublishing && !isUnpublishing && !isPublished && (
+                          <div className="absolute -top-3 right-2 z-40">
+                            <span className="flex items-center gap-1.5 text-xs font-bold text-white bg-gradient-to-r from-gray-600 to-gray-700 px-3 py-1.5 rounded-full shadow-lg border-2 border-white dark:border-neutral-800">
+                              <XCircle className="w-3.5 h-3.5" />
+                              REMOVIDO
+                            </span>
+                          </div>
+                        )}
+
+                        {/* Failed Badge - Outside the card */}
+                        {isFailed &&
+                          !isScheduled &&
+                          !isPublished &&
+                          !isPublishing &&
+                          !isUnpublishing && (
+                            <div className="absolute -top-3 right-2 z-40">
+                              <span className="flex items-center gap-1.5 text-xs font-bold text-white bg-gradient-to-r from-red-600 to-red-700 px-3 py-1.5 rounded-full shadow-lg border-2 border-white dark:border-neutral-800">
+                                <AlertCircle className="w-3.5 h-3.5" />
+                                FALLÓ
+                              </span>
+                            </div>
+                        )}
+
+                        {/* Unpublish Button */}
+                        {isPublished && !isUnpublishing && (
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
@@ -589,14 +599,10 @@ export default function PublishPublicationModal({
                               );
                             }}
                             disabled={isUnpublishing}
-                            className="absolute top-2 right-2 z-20 p-1.5 bg-red-500/90 hover:bg-red-600 text-white rounded-full transition-colors disabled:opacity-50 shadow-lg"
+                            className="absolute top-3 right-3 z-30 p-2 bg-red-500 hover:bg-red-600 text-white rounded-full transition-colors disabled:opacity-50 shadow-lg"
                             title="Despublicar"
                           >
-                            {isUnpublishing ? (
-                              <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                            ) : (
-                              <X className="w-3 h-3" />
-                            )}
+                            <X className="w-4 h-4" />
                           </button>
                         )}
                       </div>
