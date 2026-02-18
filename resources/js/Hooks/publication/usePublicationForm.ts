@@ -723,14 +723,11 @@ export const usePublicationForm = ({
       formData.append("scheduled_at", data.scheduled_at || "");
       formData.append("social_accounts_sync", "true");
 
-      // Always send social_accounts as array format for consistency
-      // Use a flag to indicate when we explicitly want to clear all schedules
+      // Always send social_accounts - even if empty
       if (socialAccounts.length === 0) {
-        // Send a flag to indicate we want to clear all social accounts
-        console.log("🧹 Sending clear_social_accounts flag - no accounts selected");
         formData.append("clear_social_accounts", "1");
+        formData.append("social_accounts", JSON.stringify([]));
       } else {
-        console.log("📋 Sending social_accounts:", socialAccounts);
         socialAccounts.forEach((id, index) => {
           formData.append(`social_accounts[${index}]`, id.toString());
           if (id && accountSchedules[id]) {
@@ -828,12 +825,6 @@ export const usePublicationForm = ({
       if (platformSettings) {
         formData.append("platform_settings", JSON.stringify(platformSettings));
       }
-
-      console.log("📤 About to send request", {
-        publication_id: publication?.id,
-        has_clear_flag: formData.has("clear_social_accounts"),
-        has_social_accounts: formData.has("social_accounts[0]")
-      });
 
       let result: any;
       if (publication) {
