@@ -97,7 +97,6 @@ const AiPromptSection: React.FC<AiPromptSectionProps> = ({
       });
 
       if (response.data.success && response.data.data) {
-        console.log("AI Response Data:", response.data.data);
         onSuggest(response.data.data);
         
         // Only show success message if there's actual data
