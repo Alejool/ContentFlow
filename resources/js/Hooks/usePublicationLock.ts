@@ -54,7 +54,9 @@ const refreshPublicationInAllStores = async (
 ) => {
   try {
     let freshData = providedData;
-    if (!freshData || !freshData.media_files) {
+    // Always fetch fresh data if critical relationships are missing
+    // This ensures we have scheduled_posts, media_files, and all other relations
+    if (!freshData || !freshData.media_files || !freshData.scheduled_posts) {
       const { data } = await axios.get(`/api/v1/publications/${pubId}`);
       freshData =
         data.data?.publication || data.publication || data.data || data;

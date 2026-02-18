@@ -201,11 +201,11 @@ export const usePublicationForm = ({
         use_global_schedule: false,
         lock_content: false,
       });
-      setPlatformSettings(user?.global_platform_settings || {});
+      setPlatformSettings({});
       clearMedia();
       setIsDataReady(true);
     }
-  }, [isOpen, publication, user?.global_platform_settings, reset]);
+  }, [isOpen, publication, reset]);
 
   // Phase 1.5: Real-time Lock & Update Listener (Global sync is handled by useWorkspaceLocks)
   useEffect(() => {
@@ -686,7 +686,6 @@ export const usePublicationForm = ({
       );
       return;
     }
-
     setIsSubmitting(true);
     try {
       const formData = new FormData();
@@ -725,16 +724,23 @@ export const usePublicationForm = ({
       formData.append("social_accounts_sync", "true");
 
       // Always send social_accounts as array format for consistency
-      // When empty, Laravel will receive an empty array
-      socialAccounts.forEach((id, index) => {
-        formData.append(`social_accounts[${index}]`, id.toString());
-        if (id && accountSchedules[id]) {
-          formData.append(
-            `social_account_schedules[${id}]`,
-            accountSchedules[id],
-          );
-        }
-      });
+      // Use a flag to indicate when we explicitly want to clear all schedules
+      if (socialAccounts.length === 0) {
+        // Send a flag to indicate we want to clear all social accounts
+        console.log("🧹 Sending clear_social_accounts flag - no accounts selected");
+        formData.append("clear_social_accounts", "1");
+      } else {
+        console.log("📋 Sending social_accounts:", socialAccounts);
+        socialAccounts.forEach((id, index) => {
+          formData.append(`social_accounts[${index}]`, id.toString());
+          if (id && accountSchedules[id]) {
+            formData.append(
+              `social_account_schedules[${id}]`,
+              accountSchedules[id],
+            );
+          }
+        });
+      }
 
       // CRITICAL: Read mediaFiles FRESH from store (not from stale selector)
       // This ensures we get the updated metadata after S3 upload
@@ -823,9 +829,21 @@ export const usePublicationForm = ({
         formData.append("platform_settings", JSON.stringify(platformSettings));
       }
 
+      console.log("📤 About to send request", {
+        publication_id: publication?.id,
+        has_clear_flag: formData.has("clear_social_accounts"),
+        has_social_accounts: formData.has("social_accounts[0]")
+      });
+
       let result: any;
       if (publication) {
         result = await updatePublicationStore(publication.id, formData);
+        
+        // Force refresh the publication to ensure we have the latest data
+        if (result) {
+          console.log("✅ Publication updated, fetching fresh data...");
+          await usePublicationStore.getState().fetchPublicationById(publication.id);
+        }
       } else {
         result = await createPublication(formData);
       }
