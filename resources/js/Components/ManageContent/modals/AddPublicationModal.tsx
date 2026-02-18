@@ -127,7 +127,6 @@ export default function AddPublicationModal({
   );
 
   const handleAiSuggestion = (data: any) => {
-    console.log("Received AI Suggestion Data:", data);
     if (data.title)
       setValue("title", data.title, {
         shouldValidate: true,
@@ -147,12 +146,6 @@ export default function AddPublicationModal({
       });
       handleHashtagChange(data.hashtags);
     }
-    console.log("Form values after AI suggestion:", {
-      title: data.title,
-      description: data.description,
-      goal: data.goal,
-      hashtags: data.hashtags
-    });
   };
 
   const stabilizedMediaPreviews = useMemo(() => {
