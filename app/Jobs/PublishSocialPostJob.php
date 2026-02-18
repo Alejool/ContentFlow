@@ -22,6 +22,14 @@ class PublishSocialPostJob implements ShouldQueue
 
   public function handle(SocialTokenManager $tokenManager)
   {
+    // Verificar si la publicación fue cancelada antes de procesar
+    $this->post->refresh();
+    
+    if ($this->post->status === 'failed') {
+      Log::info("Publication {$this->post->id} was cancelled, skipping job execution");
+      return;
+    }
+    
     $this->post->update(['status' => 'publishing']);
     $responses = [];
 

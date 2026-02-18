@@ -11,9 +11,9 @@ use Illuminate\Notifications\Messages\MailMessage;
 
 class PublicationCancelledNotification extends BaseNotification
 {
-  protected string $priority = self::PRIORITY_MEDIUM;
+  protected string $priority = self::PRIORITY_NORMAL;
   protected string $category = self::CATEGORY_APPLICATION;
-
+  
   public function __construct(
     protected Publication $publication
   ) {
