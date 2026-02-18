@@ -46,6 +46,14 @@ class PublicationUpdated implements ShouldBroadcast
 
   public function broadcastWith()
   {
+    // Load relationships if not already loaded
+    if (!$this->publication->relationLoaded('scheduled_posts')) {
+      $this->publication->load('scheduled_posts.socialAccount');
+    }
+    if (!$this->publication->relationLoaded('socialPostLogs')) {
+      $this->publication->load('socialPostLogs.socialAccount');
+    }
+
     return [
       'publication' => [
         'id' => $this->publication->id,
@@ -53,6 +61,25 @@ class PublicationUpdated implements ShouldBroadcast
         'status' => $this->publication->status,
         'workspace_id' => $this->publication->workspace_id,
         'updated_at' => $this->publication->updated_at,
+        'scheduled_at' => $this->publication->scheduled_at,
+        'scheduled_posts' => $this->publication->scheduled_posts->map(function ($sp) {
+          return [
+            'id' => $sp->id,
+            'social_account_id' => $sp->social_account_id,
+            'scheduled_at' => $sp->scheduled_at,
+            'status' => $sp->status,
+            'platform' => $sp->platform,
+            'account_name' => $sp->account_name,
+          ];
+        }),
+        'social_post_logs' => $this->publication->socialPostLogs->map(function ($log) {
+          return [
+            'id' => $log->id,
+            'social_account_id' => $log->social_account_id,
+            'status' => $log->status,
+            'platform' => $log->platform,
+          ];
+        }),
       ],
     ];
   }

@@ -66,6 +66,7 @@ class UpdatePublicationRequest extends FormRequest
       ],
       'social_accounts' => 'nullable|array',
       'social_accounts.*' => 'exists:social_accounts,id',
+      'clear_social_accounts' => 'nullable|in:0,1,true,false',
       'social_account_schedules' => 'nullable|array',
       'social_account_schedules.*' => [
         'nullable',

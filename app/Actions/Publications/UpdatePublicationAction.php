@@ -21,6 +21,15 @@ class UpdatePublicationAction
   {
     $start = microtime(true);
     Log::info("⏱️ Starting UpdatePublicationAction for pub {$publication->id}");
+    
+    // CRITICAL DEBUG
+    Log::info("🔍 DEBUGGING SOCIAL ACCOUNTS", [
+      'has_social_accounts_key' => array_key_exists('social_accounts', $data),
+      'social_accounts_value' => $data['social_accounts'] ?? 'NOT SET',
+      'has_clear_flag' => array_key_exists('clear_social_accounts', $data),
+      'clear_flag_value' => $data['clear_social_accounts'] ?? 'NOT SET',
+      'all_data_keys' => array_keys($data)
+    ]);
 
     return DB::transaction(function () use ($publication, $data, $newFiles, $start) {
       // Determine status based on scheduled_at and current state
@@ -138,25 +147,55 @@ class UpdatePublicationAction
         Log::info("⏱️ ProcessUploads took: " . (microtime(true) - $start) . "s");
       }
 
-      // Handle Schedules - Always process if social_accounts key exists
-      if (array_key_exists('social_accounts', $data)) {
-        // Handle case where social_accounts might be sent as JSON string
+      // Handle Schedules - ALWAYS process to ensure sync
+      // This ensures that when all accounts are removed, schedules are properly deleted
+      $socialAccounts = [];
+      
+      if (!empty($data['clear_social_accounts'])) {
+        Log::info("🧹 Clear social accounts flag detected for publication {$publication->id}");
+        $socialAccounts = [];
+      } elseif (array_key_exists('social_accounts', $data)) {
+        // Handle case where social_accounts might be sent as JSON string or array
         $socialAccounts = $data['social_accounts'] ?? [];
+        
+        // If it's a string, try to decode it
         if (is_string($socialAccounts)) {
-          $socialAccounts = json_decode($socialAccounts, true) ?? [];
+          $decoded = json_decode($socialAccounts, true);
+          $socialAccounts = is_array($decoded) ? $decoded : [];
         }
+        
+        // Ensure it's an array
+        if (!is_array($socialAccounts)) {
+          $socialAccounts = [];
+        }
+        
+        // Filter out empty strings and null values, then convert to integers
+        $socialAccounts = array_values(array_filter(
+          array_map(function($id) {
+            return $id === '' || $id === null ? null : intval($id);
+          }, $socialAccounts),
+          function($id) {
+            return $id !== null && $id > 0;
+          }
+        ));
+      }
+      
+      // ALWAYS sync if we have social_accounts key or clear flag
+      if (array_key_exists('social_accounts', $data) || !empty($data['clear_social_accounts'])) {
+        Log::info("📅 Syncing schedules for publication {$publication->id}", [
+          'social_accounts' => $socialAccounts,
+          'account_schedules' => $data['social_account_schedules'] ?? []
+        ]);
         
         $this->schedulingService->syncSchedules(
           $publication,
           $socialAccounts,
           $data['social_account_schedules'] ?? $data['account_schedules'] ?? []
         );
-      } elseif (!empty($data['scheduled_at']) && $publication->status !== 'scheduled') {
-        // If there's a scheduled date but no social accounts processing, update status
-        $publication->update(['status' => 'scheduled']);
-      } elseif (empty($data['scheduled_at']) && $publication->status === 'scheduled') {
-        // If scheduled date is removed, revert to draft
-        $publication->update(['status' => 'draft']);
+        
+        // Verify deletion
+        $remainingSchedules = $publication->scheduled_posts()->where('status', 'pending')->count();
+        Log::info("✅ After sync, publication {$publication->id} has {$remainingSchedules} pending schedules");
       }
 
       // REMOVED Redundant load - PublicationUpdated broadcast handles this with specific limits

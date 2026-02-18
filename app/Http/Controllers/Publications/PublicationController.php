@@ -244,6 +244,18 @@ class PublicationController extends Controller
 
   public function update(UpdatePublicationRequest $request, Publication $publication, UpdatePublicationAction $action)
   {
+    \Log::info("UPDATE METHOD CALLED FOR PUB: " . $publication->id);
+    
+    // DEBUG: Log raw request data before validation
+    \Log::info("📨 Raw request data received", [
+      'publication_id' => $publication->id,
+      'has_social_accounts' => $request->has('social_accounts'),
+      'social_accounts_raw' => $request->input('social_accounts'),
+      'has_clear_flag' => $request->has('clear_social_accounts'),
+      'clear_flag_raw' => $request->input('clear_social_accounts'),
+      'all_inputs' => array_keys($request->all())
+    ]);
+
     if (!Auth::user()->hasPermission('manage-content', $publication->workspace_id)) {
       return $this->errorResponse('You do not have permission to update this publication.', 403);
     }
@@ -262,6 +274,16 @@ class PublicationController extends Controller
 
     try {
       $data = $request->validated();
+      
+      // DEBUG: Log what we're receiving
+      \Log::info("📥 UpdatePublicationAction received data", [
+        'publication_id' => $publication->id,
+        'has_social_accounts' => array_key_exists('social_accounts', $data),
+        'social_accounts_value' => $data['social_accounts'] ?? 'NOT SET',
+        'has_clear_flag' => array_key_exists('clear_social_accounts', $data),
+        'clear_flag_value' => $data['clear_social_accounts'] ?? 'NOT SET',
+        'all_keys' => array_keys($data)
+      ]);
 
       // RBAC ENDFORCEMENT: Check for publish permission
       if (!Auth::user()->hasPermission('publish', $publication->workspace_id)) {
@@ -298,6 +320,14 @@ class PublicationController extends Controller
       $publication = $action->execute($publication, $data, $newFiles);
 
       $publication->logActivity('updated', ['changes' => array_keys($data)]);
+
+      // Load updated relationships to ensure frontend gets fresh data
+      $publication->load([
+        'mediaFiles.derivatives',
+        'scheduled_posts.socialAccount',
+        'socialPostLogs.socialAccount',
+        'campaigns'
+      ]);
 
       // Clear cache after updating publication
       $this->clearPublicationCache(Auth::user()->current_workspace_id);
@@ -612,11 +642,13 @@ class PublicationController extends Controller
       return $this->errorResponse('This publication cannot be cancelled in its current state.', 422);
     }
 
+    // Actualizar estado a failed para que los jobs pendientes no se ejecuten
     $publication->update([
       'status' => 'failed',
       'updated_at' => now(),
     ]);
 
+    // Actualizar logs de redes sociales
     $publication->socialPostLogs()
       ->whereIn('status', ['pending', 'publishing'])
       ->update([
@@ -624,6 +656,21 @@ class PublicationController extends Controller
         'error_message' => 'Cancelado por el usuario',
         'updated_at' => now(),
       ]);
+
+    // Eliminar jobs pendientes de la cola
+    try {
+      \Illuminate\Support\Facades\DB::table('jobs')
+        ->where('payload', 'like', '%PublishSocialPostJob%')
+        ->where('payload', 'like', '%"id":' . $publication->id . '%')
+        ->delete();
+      
+      \Illuminate\Support\Facades\DB::table('failed_jobs')
+        ->where('payload', 'like', '%PublishSocialPostJob%')
+        ->where('payload', 'like', '%"id":' . $publication->id . '%')
+        ->delete();
+    } catch (\Exception $e) {
+      \Log::warning("Could not delete queued jobs for publication {$publication->id}: " . $e->getMessage());
+    }
 
     $publication->logActivity('cancelled', ['previous_status' => $oldStatus]);
 

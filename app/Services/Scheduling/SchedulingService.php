@@ -11,6 +11,12 @@ class SchedulingService
 {
   public function scheduleForAccounts(Publication $publication, array $accountIds, array $accountSchedules = []): void
   {
+    \Log::info("📋 SchedulingService::scheduleForAccounts called", [
+      'publication_id' => $publication->id,
+      'account_ids' => $accountIds,
+      'account_schedules' => $accountSchedules
+    ]);
+
     $baseSchedule = $publication->scheduled_at;
     $socialAccounts = SocialAccount::whereIn('id', $accountIds)->get()->keyBy('id');
 
@@ -36,8 +42,9 @@ class SchedulingService
           'account_name' => $socialAccount ? $socialAccount->account_name : 'Unknown',
           'platform' => $socialAccount ? $socialAccount->platform : 'unknown',
         ]);
+        \Log::info("✏️ Updated existing scheduled post", ['id' => $existingPost->id]);
       } else {
-        ScheduledPost::create([
+        $created = ScheduledPost::create([
           'publication_id' => $publication->id,
           'social_account_id' => $accountId,
           'status' => 'pending',
@@ -47,6 +54,7 @@ class SchedulingService
           'account_name' => $socialAccount ? $socialAccount->account_name : 'Unknown',
           'platform' => $socialAccount ? $socialAccount->platform : 'unknown',
         ]);
+        \Log::info("➕ Created new scheduled post", ['id' => $created->id]);
       }
     }
 
@@ -54,15 +62,17 @@ class SchedulingService
     // Only delete pending scheduled posts to avoid removing published/posted records
     if (empty($accountIds)) {
       // If no accounts selected, remove all pending schedules
-      ScheduledPost::where('publication_id', $publication->id)
+      $deleted = ScheduledPost::where('publication_id', $publication->id)
         ->where('status', 'pending')
         ->delete();
+      \Log::info("🗑️ Deleted ALL pending schedules", ['count' => $deleted]);
     } else {
       // Remove pending schedules for accounts that are no longer selected
-      ScheduledPost::where('publication_id', $publication->id)
+      $deleted = ScheduledPost::where('publication_id', $publication->id)
         ->where('status', 'pending')
         ->whereNotIn('social_account_id', $accountIds)
         ->delete();
+      \Log::info("🗑️ Deleted schedules not in list", ['count' => $deleted, 'kept_ids' => $accountIds]);
     }
   }
 
