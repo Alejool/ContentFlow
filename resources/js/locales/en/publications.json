@@ -352,6 +352,7 @@
       "mediaAttached": "Media file attached successfully to '{{title}}' (Background Upload)",
       "deleteSuccess": "Publication deleted successfully!",
       "deleteError": "Error deleting publication",
+      "cancelSuccess": "Publication cancelled successfully",
       "fetchError": "Error fetching campaigns",
       "error": "An unexpected error occurred",
       "confirmDelete": {

@@ -92,6 +92,9 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
   const setPublishedPlatformsInStore = usePublicationStore(
     (s) => s.setPublishedPlatforms,
   );
+  const clearPublicationPlatformStates = usePublicationStore(
+    (s) => s.clearPublicationPlatformStates,
+  );
   const publishPublication = usePublicationStore((s) => s.publishPublication);
   const unpublishPublication = usePublicationStore(
     (s) => s.unpublishPublication,
@@ -199,8 +202,14 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
     setYoutubeThumbnails({});
     setExistingThumbnails({});
     setUnpublishing(null);
+    
+    // Clear platform states for the current publication to avoid stale data
+    if (currentPublicationId) {
+      clearPublicationPlatformStates(currentPublicationId);
+    }
+    
     setCurrentPublicationId(null);
-  }, []);
+  }, [currentPublicationId, clearPublicationPlatformStates]);
 
   /* --------------------------- Thumbnails handling -------------------------- */
 

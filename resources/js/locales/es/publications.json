@@ -377,6 +377,7 @@
       "mediaAttached": "Archivo multimedia adjuntado con éxito a '{{title}}' (Carga en segundo plano)",
       "deleteSuccess": "publicación eliminada eéxitosamente!",
       "deleteError": "Error al eliminar publicación",
+      "cancelSuccess": "Publicación cancelada exitosamente",
       "fetchError": "Error al cargar Campañas",
       "error": "Ha ocurrido un error inesperado",
       "confirmDelete": {

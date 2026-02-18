@@ -44,8 +44,15 @@ export const useManageContentUIStore = create<ManageContentUIState>((set) => {
     ? JSON.parse(savedOrder)
     : ["publications", "campaigns", "calendar", "logs", "approvals"];
 
+  // Try to load saved active tab from localStorage
+  const savedActiveTab =
+    typeof window !== "undefined"
+      ? localStorage.getItem("manage_content_active_tab")
+      : null;
+  const initialActiveTab = (savedActiveTab as ManageContentUIState["activeTab"]) || "publications";
+
   return {
-    activeTab: "publications",
+    activeTab: initialActiveTab,
     tabOrder: initialOrder,
     selectedItem: null,
 
@@ -55,7 +62,12 @@ export const useManageContentUIStore = create<ManageContentUIState>((set) => {
     isPublishModalOpen: false,
     isViewDetailsModalOpen: false,
 
-    setActiveTab: (tab) => set({ activeTab: tab }),
+    setActiveTab: (tab) => {
+      set({ activeTab: tab });
+      if (typeof window !== "undefined") {
+        localStorage.setItem("manage_content_active_tab", tab);
+      }
+    },
     setTabOrder: (order) => {
       set({ tabOrder: order });
       if (typeof window !== "undefined") {
