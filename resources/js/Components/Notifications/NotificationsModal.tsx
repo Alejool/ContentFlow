@@ -35,7 +35,7 @@ export default function NotificationsModal({
   onClose,
 }: NotificationsModalProps) {
   const { t } = useTranslation();
-  const { theme } = useTheme();
+  const { actualTheme } = useTheme();
   const {
     notifications,
     applicationNotifications,
@@ -48,7 +48,7 @@ export default function NotificationsModal({
 
   const [selectedPriority, setSelectedPriority] = useState<string | null>(null);
 
-  const isDark = theme === "dark";
+  const isDark = actualTheme === "dark";
 
   const colors = {
     bg: isDark ? "bg-neutral-900/95" : "bg-white/90",

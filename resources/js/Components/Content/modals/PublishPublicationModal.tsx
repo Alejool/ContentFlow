@@ -373,7 +373,7 @@ export default function PublishPublicationModal({
                             !isPublishing &&
                             togglePlatform(account.id)
                           }
-                          className={`w-full h-[110px] flex flex-col gap-3 p-4 rounded-xl transition-all relative ${
+                          className={`w-full h-[110px] flex flex-col gap-3 p-4 rounded-lg transition-all relative ${
                             !isPublished && !isScheduled && !isPublishing
                               ? "cursor-pointer"
                               : "cursor-default"
@@ -395,7 +395,7 @@ export default function PublishPublicationModal({
                         >
                           {/* Publishing Overlay */}
                           {isPublishing && !isFailed && (
-                            <div className="absolute inset-0 z-30 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-sm flex flex-col items-center justify-center rounded-xl animate-in fade-in duration-300">
+                            <div className="absolute inset-0 z-30 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-sm flex flex-col items-center justify-center rounded-lg animate-in fade-in duration-300">
                               <div className="flex flex-col items-center gap-2">
                                 <div className="relative flex-shrink-0">
                                   <div className="w-10 h-10 border-3 border-yellow-200 dark:border-yellow-900 rounded-full" />
@@ -427,7 +427,7 @@ export default function PublishPublicationModal({
 
                           {/* Unpublishing Overlay */}
                           {isUnpublishing && (
-                            <div className="absolute inset-0 z-30 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-sm flex flex-col items-center justify-center rounded-xl animate-in fade-in duration-300">
+                            <div className="absolute inset-0 z-30 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-sm flex flex-col items-center justify-center rounded-lg animate-in fade-in duration-300">
                               <div className="flex flex-col items-center gap-2">
                                 <Loader2 className="w-10 h-10 animate-spin text-amber-600 dark:text-amber-400" />
                                 <span className="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wide">
@@ -440,7 +440,7 @@ export default function PublishPublicationModal({
 
                           {/* Published Overlay */}
                           {isPublished && !isUnpublishing && (
-                            <div className="absolute inset-0 z-20 bg-green-50/80 dark:bg-green-900/30 backdrop-blur-[2px] flex flex-col items-center justify-center rounded-xl pointer-events-none">
+                            <div className="absolute inset-0 z-20 bg-green-50/80 dark:bg-green-900/30 backdrop-blur-[2px] flex flex-col items-center justify-center rounded-lg pointer-events-none">
                               <div className="flex flex-col items-center gap-2">
                                 <CheckCircle className="w-10 h-10 text-green-600 dark:text-green-400" />
                                 <div className="flex flex-col items-center gap-0.5">

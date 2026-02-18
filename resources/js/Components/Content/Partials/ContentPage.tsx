@@ -258,7 +258,7 @@ export default function ContentPage() {
                     align="left"
                     className="lg:!left-auto lg:!right-0 lg:!origin-top-right"
                     width="auto"
-                    contentClasses="py-2 bg-white dark:bg-neutral-800 shadow-lg rounded-xl border border-gray-100 dark:border-neutral-700 min-w-[220px]"
+                    contentClasses="py-2 bg-white dark:bg-neutral-800 shadow-lg rounded-lg border border-gray-100 dark:border-neutral-700 min-w-[220px]"
                   >
                     <Button
                       onClick={() => openAddModal("publication")}

@@ -6,7 +6,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 export default function NotificationButton() {
-    const { theme } = useTheme();
+    const { actualTheme } = useTheme();
     const { t } = useTranslation();
     const [showNotifications, setShowNotifications] = useState(false);
     const { unreadCount } = useNotifications();
@@ -16,7 +16,7 @@ export default function NotificationButton() {
             <button
                 onClick={() => setShowNotifications(true)}
                 className={`group relative p-2.5 rounded-lg transition-all duration-300
-                    ${theme === "dark"
+                    ${actualTheme === "dark"
                         ? "text-gray-400 hover:text-primary-400 hover:bg-neutral-800"
                         : "text-gray-600 hover:text-primary-600 hover:bg-beige-300"
                     }

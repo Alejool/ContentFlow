@@ -29,27 +29,27 @@ export default function ModernCard({
   hoverEffect = true,
   header = true,
 }: ModernCardProps) {
-  const { theme } = useTheme();
+  const { actualTheme } = useTheme();
 
   const headerColors = {
     blue:
-      theme === "dark"
+      actualTheme === "dark"
         ? "from-blue-700 to-blue-900"
         : "from-blue-600 to-blue-800",
     red:
-      theme === "dark"
+      actualTheme === "dark"
         ? "from-primary-700 to-primary-900"
         : "from-primary-600 to-primary-800",
     green:
-      theme === "dark"
+      actualTheme === "dark"
         ? "from-green-700 to-green-900"
         : "from-green-600 to-green-800",
     orange:
-      theme === "dark"
+      actualTheme === "dark"
         ? "from-primary-600 to-primary-800"
         : "from-primary-600 to-primary-700",
     purple:
-      theme === "dark"
+      actualTheme === "dark"
         ? "from-purple-700 to-purple-900"
         : "from-purple-600 to-purple-800",
     custom: customGradient || "from-primary-600 to-primary-700",

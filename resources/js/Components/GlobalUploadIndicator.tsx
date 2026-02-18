@@ -102,7 +102,7 @@ export default function GlobalUploadIndicator() {
 
   return (
     <>
-      <div className="fixed bottom-4 right-4 z-[100] w-80 bg-white dark:bg-neutral-800 rounded-xl shadow-2xl border border-gray-200 dark:border-neutral-700 overflow-hidden">
+      <div className="fixed bottom-4 right-4 z-[100] w-80 bg-white dark:bg-neutral-800 rounded-lg shadow-2xl border border-gray-200 dark:border-neutral-700 overflow-hidden">
         {/* Header */}
         <button
           onClick={() => setIsExpanded(!isExpanded)}

@@ -15,8 +15,8 @@ export default function StatCard({
   trend,
   color = "blue",
 }: StatCardProps) {
-  const { theme } = useTheme();
-  const isDark = theme === "dark";
+  const { actualTheme } = useTheme();
+  const isDark = actualTheme === "dark";
 
   const colorMap = {
     blue: {

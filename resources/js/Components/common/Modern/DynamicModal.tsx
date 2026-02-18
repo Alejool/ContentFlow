@@ -34,7 +34,7 @@ export const DynamicModal = ({
   children,
   size = "2xl",
 }: DynamicModalProps) => {
-  const { theme } = useTheme();
+  const { actualTheme } = useTheme();
 
   const sizeClasses = {
     sm: "max-w-sm",
@@ -80,7 +80,7 @@ export const DynamicModal = ({
                   sizeClasses[size]
                 }
                 ${
-                  theme === "dark"
+                  actualTheme === "dark"
                     ? "bg-neutral-900 border border-neutral-800"
                     : "bg-white border border-gray-100"
                 }`}

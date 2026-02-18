@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 
 export default function ActiveWorkspace() {
   const { t } = useTranslation();
-  const { theme } = useTheme();
+  const { actualTheme } = useTheme();
   const { props } = usePage();
   const auth = props.auth as any;
 
@@ -15,7 +15,7 @@ export default function ActiveWorkspace() {
       className={`
                 group flex items-center justify-center gap-2 px-4 py-1.5 w-full text-[10px] font-bold uppercase tracking-widest transition-all duration-300
                 ${
-                  theme === "dark"
+                  actualTheme === "dark"
                     ? "bg-primary-900/40 text-primary-200 hover:bg-primary-900/60"
                     : "bg-primary-600 text-white hover:bg-primary-700"
                 }

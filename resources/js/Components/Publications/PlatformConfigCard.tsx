@@ -112,7 +112,7 @@ export default function PlatformConfigCard({
 
   return (
     <div
-      className={`bg-white dark:bg-neutral-900 border-2 rounded-xl overflow-hidden transition-all ${cardBorderClass} hover:shadow-lg`}
+      className={`bg-white dark:bg-neutral-900 border-2 rounded-lg overflow-hidden transition-all ${cardBorderClass} hover:shadow-lg`}
     >
       {/* Header */}
       <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-neutral-800 border-b border-gray-200 dark:border-neutral-700">

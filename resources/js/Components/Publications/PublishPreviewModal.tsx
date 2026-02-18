@@ -222,7 +222,7 @@ export default function PublishPreviewModal({
 
   return (
     <Modal show={show} onClose={handleClose} maxWidth="2xl">
-      <div className="bg-white dark:bg-neutral-900 rounded-xl overflow-hidden max-h-[90vh] flex flex-col">
+      <div className="bg-white dark:bg-neutral-900 rounded-lg overflow-hidden max-h-[90vh] flex flex-col">
         {/* Header */}
         <div className="flex justify-between items-center p-6 border-b border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Previsualización de Publicación</h2>
@@ -246,7 +246,7 @@ export default function PublishPreviewModal({
               {/* Content */}
               <div className="p-6 overflow-y-auto flex-1">
                 {/* Media Info Section */}
-                <div className="flex gap-5 mb-6 p-5 bg-gray-50 dark:bg-neutral-800 rounded-xl">
+                <div className="flex gap-5 mb-6 p-5 bg-gray-50 dark:bg-neutral-800 rounded-lg">
                   <div className="flex-shrink-0">
                     {previewData.main_thumbnail ? (
                       <img

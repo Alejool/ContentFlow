@@ -128,7 +128,7 @@ export default function ContentList(props: ContentListProps) {
               {t("common.filters.title") || "Filtros"}
             </Button>
 
-            <div className="bg-gray-100/80 dark:bg-neutral-900/80 p-1 rounded-xl flex items-center gap-1 border border-white/20 dark:border-white/5 ring-1 ring-black/5 dark:ring-white/5 backdrop-blur-sm shadow-inner">
+            <div className="bg-gray-100/80 dark:bg-neutral-900/80 p-1 rounded-lg flex items-center gap-1 border border-white/20 dark:border-white/5 ring-1 ring-black/5 dark:ring-white/5 backdrop-blur-sm shadow-inner">
               <Button
                 variant="ghost"
                 buttonStyle="ghost"

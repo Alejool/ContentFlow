@@ -309,7 +309,7 @@ export default function IntegrationsSettingsTab({
         />
       </div>
 
-      <div className="flex items-center gap-1 p-1 bg-gray-100 dark:bg-neutral-800/50 rounded-xl w-fit">
+      <div className="flex items-center gap-1 p-1 bg-gray-100 dark:bg-neutral-800/50 rounded-lg w-fit">
         <button
           onClick={() => setActiveSubTab("config")}
           className={`px-6 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${

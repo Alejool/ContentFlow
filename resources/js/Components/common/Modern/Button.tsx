@@ -137,7 +137,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     };
 
     const themeContext = useTheme();
-    const currentTheme = theme || themeContext.theme || "light";
+    const currentTheme = theme || themeContext.actualTheme || "light";
 
     const colors = variantColors[variant] || variantColors.primary;
 

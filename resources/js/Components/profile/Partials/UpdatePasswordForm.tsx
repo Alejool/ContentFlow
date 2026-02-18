@@ -155,7 +155,7 @@ const UpdatePasswordForm = ({
           </div>
         </form>
 
-        <div className="mt-8 md:mt-12 p-5 sm:p-8 rounded-3xl border border-primary-100 dark:border-primary-800/30 bg-primary-50/20 dark:bg-primary-900/10">
+        <div className="mt-8 md:mt-12 p-5 sm:p-8 rounded-lg border border-primary-100 dark:border-primary-800/30 bg-primary-50/20 dark:bg-primary-900/10">
           <div className="flex items-center gap-3 mb-4 md:mb-6">
             <div className="p-2 rounded-lg bg-primary-100 dark:bg-primary-900/40">
               <Shield className="w-5 h-5 text-primary-600 dark:text-primary-400" />
