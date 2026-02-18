@@ -43,10 +43,8 @@ const SocialMediaAccounts = memo(() => {
   const [localSettings, setLocalSettings] = useState<any>({});
 
   useEffect(() => {
-    if (user?.global_platform_settings) {
-      setLocalSettings(user.global_platform_settings);
-    }
-  }, [user?.global_platform_settings]);
+    setLocalSettings({});
+  }, []);
 
   const handleOpenSettings = (platform: string) => {
     setActivePlatform(platform);
