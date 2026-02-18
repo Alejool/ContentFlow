@@ -2,6 +2,7 @@ import PlatformCard from "@/Components/ConfigSocialMedia/PlatformCard";
 import SectionHeader from "@/Components/ConfigSocialMedia/SectionHeader";
 import { Instagram, Video } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useEffect, useRef } from "react";
 
 interface InstagramSettingsProps {
   settings: any;
@@ -13,6 +14,7 @@ export default function InstagramSettings({
   onSettingsChange,
 }: InstagramSettingsProps) {
   const { t } = useTranslation();
+  const isInitialized = useRef(false);
 
   // Establecer valores por defecto si no existen
   const defaultSettings = {
@@ -20,9 +22,12 @@ export default function InstagramSettings({
   };
 
   // Si los settings están vacíos, inicializar con valores por defecto
-  if (Object.keys(settings).length === 0) {
-    onSettingsChange(defaultSettings);
-  }
+  useEffect(() => {
+    if (Object.keys(settings).length === 0 && !isInitialized.current) {
+      isInitialized.current = true;
+      onSettingsChange(defaultSettings);
+    }
+  }, []);
 
   const handleChange = (key: string, value: any) => {
     onSettingsChange({ ...settings, [key]: value });

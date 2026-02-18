@@ -4,6 +4,7 @@ import PlatformVideoSettings from "@/Components/ConfigSocialMedia/PlatformVideoS
 import Switch from "@/Components/common/Modern/Switch";
 import { Globe, Link2, Lock, Video } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useEffect, useRef } from "react";
 
 interface YoutubeSettingsProps {
   settings: any;
@@ -24,6 +25,7 @@ export default function YoutubeSettings({
   videoMetadata,
 }: YoutubeSettingsProps) {
   const { t } = useTranslation();
+  const isInitialized = useRef(false);
 
   // Establecer valores por defecto si no existen
   const defaultSettings = {
@@ -33,9 +35,12 @@ export default function YoutubeSettings({
   };
 
   // Si los settings están vacíos, inicializar con valores por defecto
-  if (Object.keys(settings).length === 0) {
-    onSettingsChange(defaultSettings);
-  }
+  useEffect(() => {
+    if (Object.keys(settings).length === 0 && !isInitialized.current) {
+      isInitialized.current = true;
+      onSettingsChange(defaultSettings);
+    }
+  }, []);
 
   const handleChange = (key: string, value: any) => {
     onSettingsChange({ ...settings, [key]: value });
