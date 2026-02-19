@@ -332,7 +332,12 @@ class VideoClipGeneratorService
 
     $output = shell_exec($command);
     
-    return (float) trim($output ?? '');
+    // Validar input antes de trim() para evitar warning con null
+    if ($output !== null && $output !== '') {
+      return (float) trim($output);
+    }
+    
+    return 0.0;
   }
 
   private function downloadVideo(string $s3Path): string
