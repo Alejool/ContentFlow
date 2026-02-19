@@ -1,26 +1,40 @@
 import { useConfirm } from "@/Hooks/useConfirm";
 import { useUploadQueue } from "@/stores/uploadQueueStore";
+import { useProcessingProgress } from "@/stores/processingProgressStore";
 import axios from "axios";
 import { AlertTriangle, CheckCircle2, ChevronDown, ChevronUp, Loader2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { UploadItem } from "./Upload/UploadItem";
 import { PublicationItem } from "./Upload/PublicationItem";
+import { ProgressDisplay } from "./Upload/ProgressDisplay";
 import { usePublicationStatus } from "@/Hooks/usePublicationStatus";
 import { useUploadWarning } from "@/Hooks/useUploadWarning";
 
 export default function GlobalUploadIndicator() {
   const queue = useUploadQueue((state) => state.queue);
   const removeUpload = useUploadQueue((state) => state.removeUpload);
+  const pauseUpload = useUploadQueue((state) => state.pauseUpload);
+  const resumeUpload = useUploadQueue((state) => state.resumeUpload);
+  const cancelUpload = useUploadQueue((state) => state.cancelUpload);
+  const retryUpload = useUploadQueue((state) => state.retryUpload);
+  
+  const processingJobs = useProcessingProgress((state) => state.jobs);
+  const cancelJob = useProcessingProgress((state) => state.cancelJob);
+  
   const [isExpanded, setIsExpanded] = useState(false);
   const [dismissedIds, setDismissedIds] = useState<number[]>([]);
+  const [uploadProgressUpdates, setUploadProgressUpdates] = useState<Record<string, number>>({});
+  const [processingProgressUpdates, setProcessingProgressUpdates] = useState<Record<string, number>>({});
+  
   const { t } = useTranslation();
   const { confirm, ConfirmDialog } = useConfirm();
 
   const { publications } = usePublicationStatus({ dismissedIds });
   const uploads = Object.values(queue);
+  const jobs = Object.values(processingJobs);
 
-  const activeUploads = uploads.filter((u) => u.status === "uploading" || u.status === "pending");
+  const activeUploads = uploads.filter((u) => u.status === "uploading" || u.status === "pending" || u.status === "paused");
   const errorUploads = uploads.filter((u) => u.status === "error");
 
   const activePublications = publications.filter(
@@ -28,12 +42,40 @@ export default function GlobalUploadIndicator() {
   );
   const failedPublications = publications.filter((p) => p.status === "failed");
   const completedPublications = publications.filter((p) => p.status === "published");
+  
+  const activeJobs = jobs.filter((j) => j.status === "processing" || j.status === "queued");
+  const failedJobs = jobs.filter((j) => j.status === "failed");
 
-  const totalActive = activeUploads.length + activePublications.length;
-  const hasErrors = errorUploads.length > 0 || failedPublications.length > 0;
-  const hasCompleted = completedPublications.length > 0 || uploads.some((u) => u.status === "completed");
+  const totalActive = activeUploads.length + activePublications.length + activeJobs.length;
+  const hasErrors = errorUploads.length > 0 || failedPublications.length > 0 || failedJobs.length > 0;
+  const hasCompleted = completedPublications.length > 0 || uploads.some((u) => u.status === "completed") || jobs.some((j) => j.status === "completed");
 
   useUploadWarning(activeUploads.length > 0);
+  
+  // Progress update responsiveness: 500ms for uploads, 1s for processing
+  useEffect(() => {
+    const uploadInterval = setInterval(() => {
+      const updates: Record<string, number> = {};
+      activeUploads.forEach((upload) => {
+        updates[upload.id] = Date.now();
+      });
+      setUploadProgressUpdates(updates);
+    }, 500); // 500ms for uploads
+
+    return () => clearInterval(uploadInterval);
+  }, [activeUploads.length]);
+
+  useEffect(() => {
+    const processingInterval = setInterval(() => {
+      const updates: Record<string, number> = {};
+      activeJobs.forEach((job) => {
+        updates[job.id] = Date.now();
+      });
+      setProcessingProgressUpdates(updates);
+    }, 1000); // 1s for processing
+
+    return () => clearInterval(processingInterval);
+  }, [activeJobs.length]);
 
   const handleCancelPublication = async (e: React.MouseEvent, id: number) => {
     e.stopPropagation();
@@ -85,8 +127,48 @@ export default function GlobalUploadIndicator() {
     e.stopPropagation();
     setDismissedIds((prev) => [...prev, id]);
   };
+  
+  const handlePauseUpload = (id: string) => {
+    pauseUpload(id);
+  };
+  
+  const handleResumeUpload = (id: string) => {
+    resumeUpload(id);
+  };
+  
+  const handleCancelUpload = async (id: string) => {
+    const isConfirmed = await confirm({
+      title: t("publications.modal.cancel_confirmation.title") || "Cancel Upload",
+      message: t("publications.modal.upload.cancel_message") || "Are you sure you want to cancel this upload?",
+      confirmText: t("publications.modal.cancel_confirmation.confirm") || "Yes, cancel",
+      cancelText: t("publications.modal.cancel_confirmation.cancel") || "No, continue",
+      type: "danger",
+    });
 
-  if (uploads.length === 0 && publications.length === 0) return null;
+    if (!isConfirmed) return;
+    
+    cancelUpload(id);
+  };
+  
+  const handleCancelJob = async (id: string) => {
+    const isConfirmed = await confirm({
+      title: t("publications.modal.cancel_confirmation.title") || "Cancel Processing",
+      message: t("publications.modal.processing.cancel_message") || "Are you sure you want to cancel this processing job?",
+      confirmText: t("publications.modal.cancel_confirmation.confirm") || "Yes, cancel",
+      cancelText: t("publications.modal.cancel_confirmation.cancel") || "No, continue",
+      type: "danger",
+    });
+
+    if (!isConfirmed) return;
+    
+    cancelJob(id);
+  };
+  
+  const handleRetryUpload = (id: string) => {
+    retryUpload(id);
+  };
+
+  if (uploads.length === 0 && publications.length === 0 && jobs.length === 0) return null;
 
   const getHeaderIcon = () => {
     if (totalActive > 0) {
@@ -169,14 +251,79 @@ export default function GlobalUploadIndicator() {
                   </span>
                 </div>
                 {uploads.map((upload) => (
-                  <UploadItem key={upload.id} upload={upload} onRemove={removeUpload} />
+                  <div key={upload.id} className="p-3 border-b border-gray-100 dark:border-neutral-700 last:border-0">
+                    <div className="flex justify-between items-start mb-2">
+                      <span
+                        className="text-xs font-medium truncate max-w-[200px] text-neutral-900 dark:text-neutral-100"
+                        title={upload.file.name}
+                      >
+                        {upload.file.name}
+                      </span>
+                    </div>
+                    <ProgressDisplay
+                      percentage={upload.progress}
+                      eta={upload.stats?.eta}
+                      speed={upload.stats?.speed}
+                      status={upload.status}
+                      onPause={upload.isPausable && upload.status === "uploading" ? () => handlePauseUpload(upload.id) : undefined}
+                      onResume={upload.status === "paused" ? () => handleResumeUpload(upload.id) : undefined}
+                      onCancel={(upload.status === "uploading" || upload.status === "paused") ? () => handleCancelUpload(upload.id) : undefined}
+                      onRetry={upload.status === "error" && upload.canRetry ? () => handleRetryUpload(upload.id) : undefined}
+                      isPausable={upload.isPausable}
+                      isPaused={upload.status === "paused"}
+                      error={upload.error}
+                      retryCount={upload.retryCount}
+                      canRetry={upload.canRetry}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+            
+            {/* Processing Jobs Section */}
+            {jobs.length > 0 && (
+              <div className={uploads.length > 0 ? "border-t-2 border-gray-200 dark:border-neutral-600" : ""}>
+                <div className="bg-gray-50/70 dark:bg-neutral-700/30 px-3 py-2 flex items-center justify-between border-b border-gray-100 dark:border-neutral-700">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400">
+                    {t("common.processing") || "Processing"}
+                  </span>
+                  <span className="text-[10px] font-semibold text-gray-500 dark:text-neutral-400">
+                    {activeJobs.length} {t("common.active") || "active"}
+                  </span>
+                </div>
+                {jobs.map((job) => (
+                  <div key={job.id} className="p-3 border-b border-gray-100 dark:border-neutral-700 last:border-0">
+                    <div className="flex justify-between items-start mb-2">
+                      <div className="flex-1">
+                        <span className="text-xs font-medium text-neutral-900 dark:text-neutral-100 block">
+                          {job.type === "video_processing" && (t("common.video_processing") || "Video Processing")}
+                          {job.type === "reel_generation" && (t("common.reel_generation") || "Reel Generation")}
+                          {job.type === "thumbnail_generation" && (t("common.thumbnail_generation") || "Thumbnail Generation")}
+                        </span>
+                        {job.stats?.currentStep && (
+                          <span className="text-[10px] text-gray-500 dark:text-neutral-400">
+                            {job.stats.currentStep} ({job.stats.completedSteps}/{job.stats.totalSteps})
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <ProgressDisplay
+                      percentage={job.progress}
+                      eta={job.stats?.eta}
+                      status={job.status === "queued" ? "pending" : job.status === "processing" ? "uploading" : job.status}
+                      onCancel={(job.status === "processing" || job.status === "queued") ? () => handleCancelJob(job.id) : undefined}
+                      isPausable={false}
+                      isPaused={false}
+                      error={job.error}
+                    />
+                  </div>
                 ))}
               </div>
             )}
 
             {/* Publications Section */}
             {publications.length > 0 && (
-              <div className={uploads.length > 0 ? "border-t-2 border-gray-200 dark:border-neutral-600" : ""}>
+              <div className={(uploads.length > 0 || jobs.length > 0) ? "border-t-2 border-gray-200 dark:border-neutral-600" : ""}>
                 <div className="bg-gray-50/70 dark:bg-neutral-700/30 px-3 py-2 flex items-center justify-between border-b border-gray-100 dark:border-neutral-700">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400">
                     {t("common.publications") || "Publicaciones"}
