@@ -213,6 +213,11 @@
         "youtubeThumbnails": "YouTube Thumbnails",
         "author": "@Alejandro Olarte",
         "unpublishing": "Unpublishing...",
+        "publishingSocial": "Publishing to social ({{count}})...",
+        "allPublished": "All publications completed",
+        "completed": "completed",
+        "inProgress": "in progress",
+        "sending": "Sending",
         "dragDrop": {
           "title": "Drag and drop to add",
           "subtitle": "PNG, JPG, WebP (max 2MB)"
