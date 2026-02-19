@@ -190,6 +190,7 @@ export default function ContentList(props: ContentListProps) {
                 : () => {}
             }
             onResetFilters={props.onResetFilters}
+            filters={props.filters}
           />
         </div>
       )}

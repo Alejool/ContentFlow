@@ -60,6 +60,28 @@ const CampaignList = memo(
       }
     };
 
+    const handleResetFilters = () => {
+      setSearch("");
+      setStatusFilter("all");
+      setPlatformFilter("all");
+      setDateStart("");
+      setDateEnd("");
+      
+      if (onResetFilters) {
+        onResetFilters();
+      }
+      
+      if (onFilterChange) {
+        onFilterChange({
+          status: "all",
+          platform: "all",
+          date_start: "",
+          date_end: "",
+          search: "",
+        });
+      }
+    };
+
     return (
       <div className="overflow-hidden shadow-lg border transition-all duration-300 backdrop-blur-lg bg-white/95 border-gray-100/95 text-gray-900 dark:bg-black/95 dark:border-black/95 dark:text-white">
         <HeaderSection
@@ -82,7 +104,14 @@ const CampaignList = memo(
             dateStart={dateStart}
             dateEnd={dateEnd}
             handleFilterChange={handleFilterChange}
-            onResetFilters={onResetFilters}
+            onResetFilters={handleResetFilters}
+            filters={{
+              status: statusFilter,
+              platform: platformFilter,
+              date_start: dateStart,
+              date_end: dateEnd,
+              search: search,
+            }}
           />
         )}
 

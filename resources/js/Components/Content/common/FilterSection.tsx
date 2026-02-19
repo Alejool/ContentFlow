@@ -1,6 +1,7 @@
 import { DatePicker as DatePickerModern } from "@/Components/common/Modern/DatePicker";
 import Input from "@/Components/common/Modern/Input";
 import Select from "@/Components/common/Modern/Select";
+import ExportButtons from "@/Components/common/ui/ExportButtons";
 import { getPlatformOptions } from "@/Constants/socialPlatforms";
 import { format, parseISO } from "date-fns";
 import { Filter, Search, RotateCcw } from "lucide-react";
@@ -17,6 +18,7 @@ interface FilterSectionProps {
   dateEnd?: string;
   handleFilterChange: (key: string, value: string | string[]) => void;
   onResetFilters?: () => void;
+  filters?: Record<string, any>;
 }
 
 export default function FilterSection({
@@ -31,6 +33,7 @@ export default function FilterSection({
   dateEnd,
   handleFilterChange,
   onResetFilters,
+  filters = {},
 }: FilterSectionProps) {
   const statusCampaignsOptions = [
     { value: "all", label: t("campaigns.filters.all") },
@@ -106,6 +109,21 @@ export default function FilterSection({
   const activeColor = "primary-500";
   const showPlatformFilter = mode === "publications" || mode === "logs";
 
+  const getExportEndpoint = () => {
+    switch (mode) {
+      case "publications":
+        return "/api/v1/publications/export";
+      case "campaigns":
+        return "/api/v1/campaigns/export";
+      case "logs":
+        return "/api/v1/logs/export";
+      default:
+        return "";
+    }
+  };
+
+  const showExportButtons = ["publications", "campaigns", "logs"].includes(mode);
+
   return (
     <div className="bg-white dark:bg-neutral-800/50 p-4 rounded-lg border border-gray-100 dark:border-neutral-700 shadow-sm mt-4">
       <div className="flex items-center justify-between mb-3">
@@ -113,18 +131,26 @@ export default function FilterSection({
           <Filter className="w-4 h-4" />
           Filtros
         </h3>
-        {onResetFilters && (
-          <button
-            onClick={() => {
-              onResetFilters();
-              setSearch("");
-            }}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-100 dark:hover:bg-neutral-700 rounded-lg transition-colors"
-          >
-            <RotateCcw className="w-3.5 h-3.5" />
-            Reiniciar
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {showExportButtons && (
+            <ExportButtons 
+              endpoint={getExportEndpoint()} 
+              filters={filters}
+            />
+          )}
+          {onResetFilters && (
+            <button
+              onClick={() => {
+                onResetFilters();
+                setSearch("");
+              }}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-100 dark:hover:bg-neutral-700 rounded-lg transition-colors"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              Reiniciar
+            </button>
+          )}
+        </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
         <div className="md:col-span-2 lg:col-span-3 xl:col-span-2">

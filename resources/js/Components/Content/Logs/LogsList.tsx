@@ -51,6 +51,18 @@ const LogsList = memo(
     const [smoothLoading, setSmoothLoading] = useState(isLoading);
     const [showFilters, setShowFilters] = useState(false);
 
+    const handleResetFilters = () => {
+      if (onSearchChange) {
+        onSearchChange("");
+      }
+      if (onFilterChange) {
+        onFilterChange("status", "all");
+        onFilterChange("platform", []);
+        onFilterChange("date_start", "");
+        onFilterChange("date_end", "");
+      }
+    };
+
     useEffect(() => {
       if (isLoading) {
         setSmoothLoading(true);
@@ -165,6 +177,8 @@ const LogsList = memo(
               dateStart={filters.date_start || ""}
               dateEnd={filters.date_end || ""}
               handleFilterChange={onFilterChange || (() => {})}
+              onResetFilters={handleResetFilters}
+              filters={filters}
             />
           </div>
         )}
