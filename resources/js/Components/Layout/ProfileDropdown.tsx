@@ -7,6 +7,7 @@ import { Check, ChevronDown, Globe, LogOut, Moon, Palette, Sun, User } from "luc
 import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
+import { transitionTheme } from "@/Utils/themeTransition";
 import enFlag from "@/../assets/Icons/Flags/en.svg";
 import esFlag from "@/../assets/Icons/Flags/es.svg";
 import { usePage } from "@inertiajs/react";
@@ -48,7 +49,11 @@ export default function ProfileDropdown({
   const getBaseLang = (lang: string) => lang.split("-")[0];
   const currentLangCode = getBaseLang(i18n.resolvedLanguage || i18n.language);
 
-  const handleThemeChange = async (color: string) => {
+  const handleModeChange = (newTheme: "light" | "dark" | "system", e: React.MouseEvent) => {
+    transitionTheme(() => setTheme(newTheme), e);
+  };
+
+  const handleColorChange = async (color: string) => {
     setCurrentTheme(color);
     document.documentElement.setAttribute("data-theme-color", color);
 
@@ -56,7 +61,7 @@ export default function ProfileDropdown({
       await axios.patch(route("api.v1.profile.theme.update"), {
         theme_color: color,
       });
-      toast.success(t("profile.theme.success_message") || "Tema actualizado");
+      // Toast de éxito eliminado - el cambio de color es inmediato y visible
     } catch (error) {
       console.error("Theme update failed:", error);
       toast.error(t("common.error") || "Error al actualizar el tema");
@@ -69,7 +74,7 @@ export default function ProfileDropdown({
     if (auth?.user) {
       try {
         await axios.patch(route("settings.locale"), { locale: langCode });
-        toast.success(t("profile.language.success_message") || "Idioma actualizado");
+        // Toast de éxito eliminado - el cambio de idioma es inmediato y visible
       } catch (error) {
         console.error("Failed to save locale preference:", error);
         toast.error(t("common.error") || "Error al actualizar el idioma");
@@ -156,7 +161,7 @@ export default function ProfileDropdown({
                 key={color.value}
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleThemeChange(color.value);
+                  handleColorChange(color.value);
                 }}
                 className={`group relative w-6 h-6 rounded-full flex items-center justify-center transition-all ${
                   currentTheme === color.value
@@ -190,7 +195,7 @@ export default function ProfileDropdown({
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                setTheme("light");
+                handleModeChange("light", e);
               }}
               className={`flex flex-col items-center justify-center gap-1.5 px-2 py-2.5 rounded-lg text-xs font-medium transition-all ${
                 theme === "light"
@@ -204,7 +209,7 @@ export default function ProfileDropdown({
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                setTheme("dark");
+                handleModeChange("dark", e);
               }}
               className={`flex flex-col items-center justify-center gap-1.5 px-2 py-2.5 rounded-lg text-xs font-medium transition-all ${
                 theme === "dark"
@@ -218,7 +223,7 @@ export default function ProfileDropdown({
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                setTheme("system");
+                handleModeChange("system", e);
               }}
               className={`flex flex-col items-center justify-center gap-1.5 px-2 py-2.5 rounded-lg text-xs font-medium transition-all ${
                 theme === "system"
