@@ -300,8 +300,11 @@ export const usePublicationForm = ({
         });
 
         // Process media files (ALWAYS refesh media files from store)
+        // Filter out reels (files with original_media_id in metadata)
         const existingMedia: any[] =
-          publication.media_files?.map((media: any) => {
+          publication.media_files
+            ?.filter((media: any) => !media.metadata?.original_media_id) // Exclude reels
+            ?.map((media: any) => {
             const isVideo =
               media.file_type === "video" ||
               media.mime_type?.startsWith("video/");
