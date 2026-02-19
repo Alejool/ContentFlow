@@ -18,6 +18,7 @@ import pagination from "./pagination.json";
 import platformSettings from "./platformSettings.json";
 import profile from "./profile.json";
 import publications from "./publications.json";
+import reels from "./reels.json";
 import settings from "./settings.json";
 import validation from "./validation.json";
 import videoValidation from "./videoValidation.json";
@@ -40,6 +41,7 @@ export default {
   ...pagination,
   ...settings,
   ...publications,
+  ...reels,
   ...logs,
   ...auth,
   ...ai,
