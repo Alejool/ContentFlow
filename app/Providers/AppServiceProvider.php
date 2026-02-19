@@ -21,7 +21,17 @@ class AppServiceProvider extends ServiceProvider
    */
   public function register(): void
   {
-    //
+    // Bind OnboardingService interface
+    $this->app->bind(
+      \App\Interfaces\OnboardingServiceInterface::class,
+      \App\Services\OnboardingService::class
+    );
+
+    // Bind OnboardingStateRepository interface
+    $this->app->bind(
+      \App\Interfaces\OnboardingStateRepositoryInterface::class,
+      \App\Repositories\OnboardingStateRepository::class
+    );
   }
 
   /**

@@ -1,5 +1,6 @@
 import CommandPalette from "@/Components/CommandPalette/CommandPalette";
 import GlobalUploadIndicator from "@/Components/GlobalUploadIndicator";
+import { ResumeUploadsPrompt } from "@/Components/Upload/ResumeUploadsPrompt";
 import { LanguageSwitcher } from "@/Components/common/LanguageSwitcher";
 import ActiveWorkspace from "@/Components/Layout/ActiveWorkspace";
 import MobileNavbar from "@/Components/Layout/MobileNavbar";
@@ -7,13 +8,21 @@ import NotificationButton from "@/Components/Layout/NotificationButton";
 import ProfileDropdown from "@/Components/Layout/ProfileDropdown";
 import SearchButton from "@/Components/Layout/SearchButton";
 import Sidebar from "@/Components/Layout/Sidebar";
+import { OnboardingProvider } from "@/Contexts/OnboardingContext";
 import { useWorkspaceLocks } from "@/Hooks/usePublicationLock";
 import { useTheme } from "@/Hooks/useTheme";
+import { useCompletionNotifications } from "@/Hooks/useCompletionNotifications";
 import { initNotificationRealtime } from "@/Services/notificationRealtime";
+import { initProgressRealtime, cleanupProgressRealtime } from "@/Services/progressRealtime";
 import { useNotificationStore } from "@/stores/notificationStore";
+import { useUploadQueue } from "@/stores/uploadQueueStore";
 import { usePage } from "@inertiajs/react";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useState, lazy, Suspense } from "react";
 import { useTranslation } from "react-i18next";
+import type { OnboardingState, TourStep, SocialPlatform, PublicationTemplate } from "@/types/onboarding";
+
+// Lazy load OnboardingFlow to reduce initial bundle size
+const OnboardingFlow = lazy(() => import("@/Components/Onboarding/OnboardingFlow"));
 
 interface AuthenticatedLayoutProps {
   header?: ReactNode;
@@ -42,12 +51,43 @@ export default function AuthenticatedLayout({
 
   const { theme, actualTheme } = useTheme();
   useWorkspaceLocks();
+  
+  // Initialize completion notifications monitoring
+  // Requirements: 8.1, 8.2, 8.3, 8.4, 8.5
+  useCompletionNotifications();
+  
+  // Initialize upload queue store and restore persisted state
+  // Requirements: 7.4, 7.5
+  const initializeStore = useUploadQueue((state) => state.initializeStore);
+  
+  useEffect(() => {
+    // Initialize store on mount to restore persisted uploads
+    initializeStore();
+  }, [initializeStore]);
+
+  // Extract onboarding props
+  const onboardingState = props.onboarding as OnboardingState | undefined;
+  const tourSteps = props.tourSteps as TourStep[] | undefined;
+  const availablePlatforms = props.availablePlatforms as SocialPlatform[] | undefined;
+  const connectedAccounts = props.connectedAccounts as Array<{ platform: string; account_name: string }> | undefined;
+  const templates = props.templates as PublicationTemplate[] | undefined;
+  
+  // Determine if onboarding should be shown
+  const shouldShowOnboarding = user && onboardingState && !onboardingState.completedAt;
 
   useEffect(() => {
     if (user?.id) {
       initNotificationRealtime(user.id);
+      initProgressRealtime(user.id);
       useNotificationStore.getState().fetchNotifications();
     }
+
+    // Cleanup on unmount
+    return () => {
+      if (user?.id) {
+        cleanupProgressRealtime(user.id);
+      }
+    };
   }, [user?.id]);
 
   useEffect(() => {
@@ -57,7 +97,8 @@ export default function AuthenticatedLayout({
 
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden w-full max-w-full">
+    <OnboardingProvider>
+      <div className="h-screen flex flex-col overflow-hidden w-full max-w-full">
       <div
         className="relative flex-1 min-h-0 flex
   w-full
@@ -131,6 +172,20 @@ export default function AuthenticatedLayout({
         <CommandPalette />
       </div>
       <GlobalUploadIndicator />
+      <ResumeUploadsPrompt />
+      
+      {/* Conditionally render OnboardingFlow for incomplete onboarding */}
+      {shouldShowOnboarding && tourSteps && availablePlatforms && templates && (
+        <Suspense fallback={null}>
+          <OnboardingFlow
+            tourSteps={tourSteps}
+            availablePlatforms={availablePlatforms}
+            connectedAccounts={connectedAccounts || []}
+            templates={templates}
+          />
+        </Suspense>
+      )}
     </div>
+    </OnboardingProvider>
   );
 }
