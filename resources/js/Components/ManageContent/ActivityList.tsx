@@ -115,6 +115,24 @@ export default function ActivityList({ activities }: ActivityListProps) {
     if (activity.type === "publication_failed")
       return t("activity.timeline.publication_failed");
 
+    // Handle specific change types
+    if (activity.type === "title_changed")
+      return t("activity.timeline.status.title_changed");
+    if (activity.type === "content_changed")
+      return t("activity.timeline.status.content_changed");
+    if (activity.type === "caption_changed")
+      return t("activity.timeline.status.caption_changed");
+    if (activity.type === "hashtags_changed")
+      return t("activity.timeline.status.hashtags_changed");
+    if (activity.type === "media_changed")
+      return t("activity.timeline.status.media_changed");
+    if (activity.type === "platforms_changed")
+      return t("activity.timeline.status.platforms_changed");
+    if (activity.type === "scheduled_time_changed")
+      return t("activity.timeline.status.scheduled_time_changed");
+    if (activity.type === "status_changed")
+      return t("activity.timeline.status.status_changed");
+
     if (activity.type === "published_on_platform") {
       return t("activity.timeline.status.published_on_platform_detail", {
         platform: activity.details?.platform || "Plataforma",
