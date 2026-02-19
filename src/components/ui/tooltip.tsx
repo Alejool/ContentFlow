@@ -32,6 +32,7 @@ export const Tooltip = React.forwardRef<HTMLDivElement, TooltipProps>(
     const triggerRef = React.useRef<HTMLDivElement>(null);
     const tooltipRef = React.useRef<HTMLDivElement>(null);
     const timeoutRef = React.useRef<NodeJS.Timeout>();
+    const tooltipId = React.useRef(`tooltip-${Math.random().toString(36).substring(2, 11)}`);
 
     const showTooltip = React.useCallback(() => {
       if (disabled) return;
@@ -169,7 +170,7 @@ export const Tooltip = React.forwardRef<HTMLDivElement, TooltipProps>(
           onFocus={showTooltip}
           onBlur={hideTooltip}
           className="inline-flex"
-          aria-describedby={isVisible ? "tooltip-content" : undefined}
+          aria-describedby={isVisible ? tooltipId.current : undefined}
         >
           {children}
         </div>
@@ -186,7 +187,7 @@ export const Tooltip = React.forwardRef<HTMLDivElement, TooltipProps>(
                 }
               }
             }}
-            id="tooltip-content"
+            id={tooltipId.current}
             role="tooltip"
             style={getTooltipStyle()}
             className={`fixed z-[9999] ${getPlacementClasses()} ${contentClassName}`}
