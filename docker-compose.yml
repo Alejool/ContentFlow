@@ -202,9 +202,9 @@ networks:
 
 volumes:
   pgsql_data:
-    name: contentflow_pgsql_data_prod
+    name: contentflow_pgsql_data_shared  # Compartido entre dev y prod
   redis_data:
-    name: contentflow_redis_data_prod
+    name: contentflow_redis_data_shared  # Compartido entre dev y prod
   cf_vendor_v2:
     name: contentflow_vendor_prod
   cf_node_modules_v2:

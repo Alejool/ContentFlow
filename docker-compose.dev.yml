@@ -120,7 +120,7 @@ services:
     container_name: contentflow_reverb_dev
     restart: unless-stopped
     working_dir: /var/www/html
-    command: php artisan reverb:start --host=0.0.0.0 --port=8080
+    command: php artisan reverb:start --host=0.0.0.0 --port=8080 --debug
     volumes:
       - ./:/var/www/html
       - cf_vendor_v2:/var/www/html/vendor
@@ -129,7 +129,7 @@ services:
     env_file:
       - .env.docker
     ports:
-      - "8081:8080"
+      - "8081:8080"  # Puerto externo:Puerto interno del contenedor
     depends_on:
       - app
       - redis
@@ -197,9 +197,9 @@ networks:
 
 volumes:
   pgsql_data:
-    name: contentflow_pgsql_data_dev
+    name: contentflow_pgsql_data_shared  # Compartido entre dev y prod
   redis_data:
-    name: contentflow_redis_data_dev
+    name: contentflow_redis_data_shared  # Compartido entre dev y prod
   cf_vendor_v2:
     name: contentflow_vendor_dev
   cf_node_modules_v2:

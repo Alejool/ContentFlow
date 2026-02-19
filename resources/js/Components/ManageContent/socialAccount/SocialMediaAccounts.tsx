@@ -3,7 +3,7 @@ import DisconnectWarningModal from "@/Components/ManageContent/modals/Disconnect
 import { SOCIAL_PLATFORMS } from "@/Constants/socialPlatforms";
 import { useSocialMediaAuth } from "@/Hooks/useSocialMediaAuth";
 import { getPlatformSchema } from "@/schemas/platformSettings";
-import { Link, router, usePage } from "@inertiajs/react";
+import { Link, router } from "@inertiajs/react";
 import axios from "axios";
 import {
   AlertCircle,
@@ -38,7 +38,6 @@ interface Account {
 const SocialMediaAccounts = memo(() => {
   const { t } = useTranslation();
   const { isLoading, connectAccount, disconnectAccount } = useSocialMediaAuth();
-  const user = usePage<any>().props.auth.user;
   const [activePlatform, setActivePlatform] = useState<string | null>(null);
   const [localSettings, setLocalSettings] = useState<any>({});
 
@@ -102,12 +101,11 @@ const SocialMediaAccounts = memo(() => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const disconnectSocialMedia = (
-    platform: string,
     id: number | null,
     force: boolean = false,
   ) => {
     if (!id) return { success: false };
-    return disconnectAccount(id, force);
+    return disconnectAccount(id as number, force);
   };
 
   const [accounts, setAccounts] = useState<Account[]>([]);
@@ -226,7 +224,6 @@ const SocialMediaAccounts = memo(() => {
     if (account.isConnected) {
       try {
         const result: any = await disconnectSocialMedia(
-          account.platform,
           account.accountId as number,
         );
 
@@ -253,7 +250,6 @@ const SocialMediaAccounts = memo(() => {
 
   const handleForceDisconnect = async (account: Account) => {
     const result = await disconnectSocialMedia(
-      account.platform,
       account.accountId as number,
       true,
     );
@@ -486,6 +482,72 @@ const SocialMediaAccounts = memo(() => {
                       </p>
                     )}
                   </div>
+
+                  {/* API Limits Section */}
+                  {(() => {
+                    const platformConfig = SOCIAL_PLATFORMS[account.platform.toLowerCase()];
+                    const apiLimits = platformConfig?.apiLimits;
+                    
+                    if (!apiLimits) return null;
+
+                    return (
+                      <div className="mb-4 px-3 py-2.5 rounded-lg bg-gray-50/80 dark:bg-neutral-800/50 border border-gray-100 dark:border-neutral-700/50">
+                        <p className="text-[9px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">
+                          {t("manageContent.socialMedia.apiLimits")}
+                        </p>
+                        <div className="space-y-1">
+                          {account.platform.toLowerCase() === 'facebook' && (
+                            <>
+                              <div className="flex justify-between items-center text-[10px]">
+                                <span className="text-gray-600 dark:text-gray-400">{t("manageContent.socialMedia.limits.requestsPerHour")}:</span>
+                                <span className="font-bold text-gray-900 dark:text-gray-100">{apiLimits.requestsPerHour}</span>
+                              </div>
+                              <div className="flex justify-between items-center text-[10px]">
+                                <span className="text-gray-600 dark:text-gray-400">{t("manageContent.socialMedia.limits.requestsPerMinute")}:</span>
+                                <span className="font-bold text-gray-900 dark:text-gray-100">{apiLimits.requestsPerMinute}</span>
+                              </div>
+                            </>
+                          )}
+                          {account.platform.toLowerCase() === 'tiktok' && (
+                            <>
+                              <div className="flex justify-between items-center text-[10px]">
+                                <span className="text-gray-600 dark:text-gray-400">{t("manageContent.socialMedia.limits.requestsPerDay")}:</span>
+                                <span className="font-bold text-gray-900 dark:text-gray-100">{apiLimits.requestsPerDay}</span>
+                              </div>
+                              <div className="flex justify-between items-center text-[10px]">
+                                <span className="text-gray-600 dark:text-gray-400">{t("manageContent.socialMedia.limits.postsPerDay")}:</span>
+                                <span className="font-bold text-gray-900 dark:text-gray-100">{apiLimits.postsPerDay}</span>
+                              </div>
+                            </>
+                          )}
+                          {account.platform.toLowerCase() === 'twitter' && (
+                            <>
+                              <div className="flex justify-between items-center text-[10px]">
+                                <span className="text-gray-600 dark:text-gray-400">{t("manageContent.socialMedia.limits.postsPerThreeHours")}:</span>
+                                <span className="font-bold text-gray-900 dark:text-gray-100">{apiLimits.postsPerThreeHours}</span>
+                              </div>
+                              <div className="flex justify-between items-center text-[10px]">
+                                <span className="text-gray-600 dark:text-gray-400">{t("manageContent.socialMedia.limits.requestsPerDay")}:</span>
+                                <span className="font-bold text-gray-900 dark:text-gray-100">{apiLimits.requestsPerDay}</span>
+                              </div>
+                            </>
+                          )}
+                          {account.platform.toLowerCase() === 'youtube' && (
+                            <>
+                              <div className="flex justify-between items-center text-[10px]">
+                                <span className="text-gray-600 dark:text-gray-400">{t("manageContent.socialMedia.limits.dailyQuota")}:</span>
+                                <span className="font-bold text-gray-900 dark:text-gray-100">{apiLimits.quotaUnitsPerDay} units</span>
+                              </div>
+                              <div className="flex justify-between items-center text-[10px]">
+                                <span className="text-gray-600 dark:text-gray-400">{t("manageContent.socialMedia.limits.uploadCost")}:</span>
+                                <span className="font-bold text-gray-900 dark:text-gray-100">{apiLimits.uploadCost}</span>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })()}
 
                   <div className="flex gap-2 w-full">
                     <button

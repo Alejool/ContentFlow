@@ -22,6 +22,9 @@ docker-compose -f docker-compose.dev.yml exec -T app php artisan cache:forget la
 echo 🐳 Levantando servicios...
 docker-compose -f docker-compose.dev.yml up -d
 
+echo 🔄 Reiniciando Vite para aplicar variables de entorno...
+docker-compose -f docker-compose.dev.yml restart vite
+
 echo ⏳ Esperando servicios...
 timeout /t 5 /nobreak >nul
 
