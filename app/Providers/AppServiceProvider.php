@@ -37,6 +37,17 @@ class AppServiceProvider extends ServiceProvider
       URL::forceScheme('https');
     }
 
+    // Log broadcasting events
+    \Illuminate\Support\Facades\Event::listen(
+      \Illuminate\Broadcasting\BroadcastEvent::class,
+      function ($event) {
+        \Illuminate\Support\Facades\Log::info('Broadcasting event', [
+          'event' => get_class($event->event),
+          'channels' => $event->event->broadcastOn(),
+        ]);
+      }
+    );
+
     DatabaseNotification::observe(NotificationObserver::class);
     User::observe(UserObserver::class);
     Publication::observe(PublicationObserver::class);
