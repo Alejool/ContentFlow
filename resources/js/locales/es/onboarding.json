@@ -1,0 +1,129 @@
+{
+  "tour": {
+    "title": "Tour Guiado",
+    "step": "Paso {{current}} de {{total}}",
+    "close": "Cerrar tour",
+    "skipTour": "Saltar Tour",
+    "next": "Siguiente",
+    "complete": "Completar",
+    "nextStep": "Ir al siguiente paso del tour",
+    "completeTour": "Completar el tour guiado",
+    "skipGuidedTour": "Saltar el tour guiado",
+    "progress": "Progreso del tour"
+  },
+  "wizard": {
+    "title": {
+      "welcome": "Bienvenido a ContentFlow",
+      "platforms": "Conecta tus Cuentas Sociales",
+      "success": "¡Todo Listo!"
+    },
+    "description": {
+      "welcome": "Comencemos con la gestión de redes sociales",
+      "platforms": "Conecta tus cuentas de redes sociales para comenzar a publicar",
+      "success": "Tus cuentas están conectadas y listas para usar"
+    },
+    "close": "Cerrar asistente",
+    "back": "Atrás",
+    "skip": "Saltar",
+    "skipping": "Saltando...",
+    "getStarted": "Comenzar",
+    "continue": "Continuar",
+    "finish": "Finalizar",
+    "previousStep": "Volver al paso anterior",
+    "skipSetup": "Saltar configuración de redes sociales",
+    "getStartedSetup": "Comenzar con la configuración de redes sociales",
+    "nextStep": "Continuar al siguiente paso",
+    "finishSetup": "Finalizar configuración de redes sociales",
+    "navigation": "Navegación del asistente",
+    "welcome": {
+      "heading": "Gestiona Todas tus Redes Sociales en un Solo Lugar",
+      "description": "ContentFlow te ayuda a crear, programar y publicar contenido en múltiples plataformas de redes sociales. Conecta tus cuentas para comenzar con una gestión fluida de redes sociales.",
+      "features": {
+        "schedule": {
+          "title": "Programar Publicaciones",
+          "description": "Planifica y programa tu contenido con anticipación"
+        },
+        "analytics": {
+          "title": "Seguimiento de Analíticas",
+          "description": "Monitorea el rendimiento en todas las plataformas"
+        },
+        "collaborate": {
+          "title": "Colaborar",
+          "description": "Trabaja junto con tu equipo sin problemas"
+        }
+      }
+    },
+    "platforms": {
+      "description": "Selecciona las plataformas de redes sociales que deseas conectar. Siempre puedes agregar más después.",
+      "availablePlatforms": "Plataformas de redes sociales disponibles",
+      "noAccounts": "Aún no hay cuentas conectadas. Haz clic en una plataforma arriba para comenzar."
+    },
+    "success": {
+      "heading": "¡Genial! Tus Cuentas Están Conectadas",
+      "description": "Has conectado exitosamente {{count}} {{accountText}}. Ahora estás listo para comenzar a crear y publicar contenido.",
+      "account": "cuenta",
+      "accounts": "cuentas",
+      "connectedAccounts": "Cuentas Conectadas",
+      "nextStep": "A continuación, te ayudaremos a crear tu primera publicación usando una plantilla."
+    }
+  },
+  "templates": {
+    "title": "Elige una Plantilla",
+    "description": "Comienza rápidamente con una plantilla de publicación prediseñada",
+    "close": "Cerrar galería de plantillas",
+    "search": "Buscar plantillas",
+    "searchPlaceholder": "Buscar plantillas...",
+    "searchByName": "Buscar plantillas por nombre o descripción",
+    "filterByCategory": "Filtrar plantillas por categoría",
+    "filterBy": "Filtrar por categoría {{category}}",
+    "useTemplate": "Usar Esta Plantilla",
+    "selecting": "Seleccionando...",
+    "categories": {
+      "all": "Todas",
+      "promotional": "Promocional",
+      "educational": "Educativa",
+      "engagement": "Interacción"
+    },
+    "noTemplates": {
+      "title": "No se encontraron plantillas",
+      "description": "Intenta ajustar tu búsqueda o filtro para encontrar lo que buscas."
+    },
+    "available": "{{count}} {{templateText}} disponibles",
+    "template": "plantilla",
+    "templates": "plantillas",
+    "skip": "Saltar y Crear en Blanco",
+    "skipping": "Saltando...",
+    "skipAndCreate": "Saltar selección de plantilla y crear publicación en blanco",
+    "list": "Plantillas de publicación",
+    "select": "Seleccionar plantilla {{name}}",
+    "preview": "Vista previa de plantilla {{name}}"
+  },
+  "progress": {
+    "title": "Comenzando",
+    "stages": {
+      "tour": "Tour",
+      "connect": "Conectar",
+      "template": "Plantilla"
+    }
+  },
+  "platform": {
+    "connect": "Conectar",
+    "connecting": "Conectando...",
+    "connected": "Conectado",
+    "connectTo": "Conectar a {{platform}}",
+    "connectedAs": "Conectado como {{account}}"
+  },
+  "errors": {
+    "loadFailed": "Error al cargar la incorporación",
+    "actionFailed": "Error al realizar la acción",
+    "tryAgain": "Por favor, inténtalo de nuevo",
+    "networkError": "Ocurrió un error de red",
+    "retry": "Reintentar"
+  },
+  "settings": {
+    "restart": "Reiniciar Incorporación",
+    "restartDescription": "Volver a realizar el proceso de incorporación",
+    "restartConfirm": "¿Estás seguro de que deseas reiniciar la incorporación?",
+    "restartSuccess": "Incorporación reiniciada exitosamente"
+  }
+}

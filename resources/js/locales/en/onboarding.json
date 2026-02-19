@@ -1,0 +1,129 @@
+{
+  "tour": {
+    "title": "Guided Tour",
+    "step": "Step {{current}} of {{total}}",
+    "close": "Close tour",
+    "skipTour": "Skip Tour",
+    "next": "Next",
+    "complete": "Complete",
+    "nextStep": "Go to next tour step",
+    "completeTour": "Complete the guided tour",
+    "skipGuidedTour": "Skip the guided tour",
+    "progress": "Tour progress"
+  },
+  "wizard": {
+    "title": {
+      "welcome": "Welcome to ContentFlow",
+      "platforms": "Connect Your Social Accounts",
+      "success": "You're All Set!"
+    },
+    "description": {
+      "welcome": "Let's get you started with social media management",
+      "platforms": "Connect your social media accounts to start publishing",
+      "success": "Your accounts are connected and ready to use"
+    },
+    "close": "Close wizard",
+    "back": "Back",
+    "skip": "Skip",
+    "skipping": "Skipping...",
+    "getStarted": "Get Started",
+    "continue": "Continue",
+    "finish": "Finish",
+    "previousStep": "Go back to previous step",
+    "skipSetup": "Skip social media setup",
+    "getStartedSetup": "Get started with social media setup",
+    "nextStep": "Continue to next step",
+    "finishSetup": "Finish social media setup",
+    "navigation": "Wizard navigation",
+    "welcome": {
+      "heading": "Manage All Your Social Media in One Place",
+      "description": "ContentFlow helps you create, schedule, and publish content across multiple social media platforms. Connect your accounts to get started with seamless social media management.",
+      "features": {
+        "schedule": {
+          "title": "Schedule Posts",
+          "description": "Plan and schedule your content in advance"
+        },
+        "analytics": {
+          "title": "Track Analytics",
+          "description": "Monitor performance across all platforms"
+        },
+        "collaborate": {
+          "title": "Collaborate",
+          "description": "Work together with your team seamlessly"
+        }
+      }
+    },
+    "platforms": {
+      "description": "Select the social media platforms you want to connect. You can always add more later.",
+      "availablePlatforms": "Available social media platforms",
+      "noAccounts": "No accounts connected yet. Click on a platform above to get started."
+    },
+    "success": {
+      "heading": "Great! Your Accounts Are Connected",
+      "description": "You've successfully connected {{count}} {{accountText}}. You're now ready to start creating and publishing content.",
+      "account": "account",
+      "accounts": "accounts",
+      "connectedAccounts": "Connected Accounts",
+      "nextStep": "Next, we'll help you create your first publication using a template."
+    }
+  },
+  "templates": {
+    "title": "Choose a Template",
+    "description": "Get started quickly with a pre-made publication template",
+    "close": "Close template gallery",
+    "search": "Search templates",
+    "searchPlaceholder": "Search templates...",
+    "searchByName": "Search templates by name or description",
+    "filterByCategory": "Filter templates by category",
+    "filterBy": "Filter by {{category}} category",
+    "useTemplate": "Use This Template",
+    "selecting": "Selecting...",
+    "categories": {
+      "all": "All",
+      "promotional": "Promotional",
+      "educational": "Educational",
+      "engagement": "Engagement"
+    },
+    "noTemplates": {
+      "title": "No templates found",
+      "description": "Try adjusting your search or filter to find what you're looking for."
+    },
+    "available": "{{count}} {{templateText}} available",
+    "template": "template",
+    "templates": "templates",
+    "skip": "Skip & Create Blank",
+    "skipping": "Skipping...",
+    "skipAndCreate": "Skip template selection and create blank publication",
+    "list": "Publication templates",
+    "select": "Select {{name}} template",
+    "preview": "Preview {{name}} template"
+  },
+  "progress": {
+    "title": "Getting Started",
+    "stages": {
+      "tour": "Tour",
+      "connect": "Connect",
+      "template": "Template"
+    }
+  },
+  "platform": {
+    "connect": "Connect",
+    "connecting": "Connecting...",
+    "connected": "Connected",
+    "connectTo": "Connect to {{platform}}",
+    "connectedAs": "Connected as {{account}}"
+  },
+  "errors": {
+    "loadFailed": "Failed to load onboarding",
+    "actionFailed": "Failed to perform action",
+    "tryAgain": "Please try again",
+    "networkError": "Network error occurred",
+    "retry": "Try Again"
+  },
+  "settings": {
+    "restart": "Restart Onboarding",
+    "restartDescription": "Go through the onboarding process again",
+    "restartConfirm": "Are you sure you want to restart onboarding?",
+    "restartSuccess": "Onboarding restarted successfully"
+  }
+}
