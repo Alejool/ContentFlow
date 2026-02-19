@@ -28,6 +28,6 @@
     "resources/js/**/*.tsx",
     "./vendor/tightenco/ziggy/**/*.js",
     "resources/js/echo.js"
-, "resources/js/Composables/useContentValidation.ts", "resources/js/Composables/usePublishPreview.js"  ],
+, "resources/js/Composables/useContentValidation.ts", "resources/js/Composables/usePublishPreview.js", "tests/Javascript/Utils/emptyStateMapper.test.ts"  ],
   "exclude": ["node_modules"]
 }
