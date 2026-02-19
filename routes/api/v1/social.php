@@ -17,5 +17,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
   Route::prefix('logs')->name('social-logs.')->group(function () {
     Route::get('/', [SocialPostLogController::class, 'index'])->name('index');
+    Route::get('/export', [SocialPostLogController::class, 'export'])->name('export');
   });
 });

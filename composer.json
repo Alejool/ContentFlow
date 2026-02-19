@@ -12,6 +12,7 @@
         "php": "^8.2",
         "abraham/twitteroauth": "^8.1",
         "doctrine/dbal": "^4.4",
+        "dompdf/dompdf": "^3.1",
         "guzzlehttp/guzzle": "^7.10",
         "inertiajs/inertia-laravel": "^2.0",
         "james-heinrich/getid3": "^1.9",
@@ -24,6 +25,7 @@
         "laravel/socialite": "^5.23",
         "laravel/tinker": "^2.9",
         "league/flysystem-aws-s3-v3": "^3.30",
+        "maatwebsite/excel": "^3.1",
         "predis/predis": "^3.3",
         "socialiteproviders/facebook": "^4.1",
         "socialiteproviders/google": "^4.1",
@@ -93,7 +95,8 @@
         },
         "audit": {
             "ignore": [
-                "PKSA-365x-2zjk-pt47"
+                "PKSA-365x-2zjk-pt47",
+                "PKSA-y2cr-5h3j-g3ys"
             ]
         }
     },

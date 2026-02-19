@@ -13,6 +13,7 @@ Route::middleware('auth:sanctum')->group(function () {
   Route::prefix('publications')->name('publications.')->group(function () {
     Route::get('/', [PublicationController::class, 'index'])->name('index');
     Route::get('/stats', [PublicationController::class, 'stats'])->name('stats');
+    Route::get('/export', [PublicationController::class, 'export'])->name('export');
     Route::post('/', [PublicationController::class, 'store'])->name('store');
     Route::get('/{publication}', [PublicationController::class, 'show'])->name('show')->whereNumber('publication');
     Route::put('/{publication}', [PublicationController::class, 'update'])->name('update')->whereNumber('publication');

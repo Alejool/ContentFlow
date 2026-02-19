@@ -8,6 +8,7 @@ use App\Models\Campaigns\Campaign;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
 
 class CampaignController extends Controller
 {
@@ -304,6 +305,29 @@ class CampaignController extends Controller
     $campaign->publications()->detach($validatedData['publication_ids']);
 
     return $this->successResponse(['campaign' => $campaign->load('publications')], 'Publications removed from campaign');
+  }
+
+  public function export(Request $request)
+  {
+    $workspaceId = Auth::user()->current_workspace_id;
+    $format = $request->input('format', 'xlsx');
+    $filters = $request->only(['status', 'search', 'date_start', 'date_end']);
+
+    try {
+      $export = new \App\Exports\CampaignsExport($filters);
+      $filename = 'campañas_' . date('Y-m-d_His') . '.' . $format;
+
+      if ($format === 'pdf') {
+        return Excel::download($export, $filename, \Maatwebsite\Excel\Excel::DOMPDF);
+      }
+
+      return Excel::download($export, $filename);
+    } catch (\Exception $e) {
+      return response()->json([
+        'success' => false,
+        'message' => 'Export failed: ' . $e->getMessage()
+      ], 500);
+    }
   }
 
   /**

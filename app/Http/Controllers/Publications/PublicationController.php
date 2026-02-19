@@ -35,6 +35,7 @@ use App\Models\MediaFiles\MediaFile;
 use App\Models\User;
 use App\Models\Publications\PublicationLock;
 use App\Services\Validation\ContentValidationService;
+use Maatwebsite\Excel\Facades\Excel;
 
 class PublicationController extends Controller
 {
@@ -987,6 +988,31 @@ class PublicationController extends Controller
       ]);
 
       return $this->errorResponse('Error al validar el contenido: ' . $e->getMessage(), 500);
+    }
+  }
+
+  public function export(Request $request)
+  {
+    $workspaceId = Auth::user()->current_workspace_id;
+    
+    if (!Auth::user()->hasPermission('manage-content', $workspaceId) && !Auth::user()->hasPermission('view-content', $workspaceId)) {
+      return $this->errorResponse('You do not have permission to export publications.', 403);
+    }
+
+    $format = $request->input('format', 'xlsx');
+    $filters = $request->only(['status', 'search', 'date_start', 'date_end', 'platform']);
+
+    try {
+      $export = new \App\Exports\PublicationsExport($filters);
+      $filename = 'publicaciones_' . date('Y-m-d_His') . '.' . $format;
+
+      if ($format === 'pdf') {
+        return Excel::download($export, $filename, \Maatwebsite\Excel\Excel::DOMPDF);
+      }
+
+      return Excel::download($export, $filename);
+    } catch (\Exception $e) {
+      return $this->errorResponse('Export failed: ' . $e->getMessage(), 500);
     }
   }
 

@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->group(function () {
   Route::prefix('campaigns')->name('campaigns.')->group(function () {
     Route::get('/', [CampaignController::class, 'index'])->name('index');
+    Route::get('/export', [CampaignController::class, 'export'])->name('export');
     Route::post('/', [CampaignController::class, 'store'])->name('store');
     Route::get('/{campaign}', [CampaignController::class, 'show'])->name('show');
     Route::put('/{campaign}', [CampaignController::class, 'update'])->name('update');

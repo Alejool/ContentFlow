@@ -6,6 +6,7 @@ use App\Models\Social\SocialPostLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use Maatwebsite\Excel\Facades\Excel;
 
 class SocialPostLogController extends Controller
 {
@@ -42,5 +43,28 @@ class SocialPostLogController extends Controller
       'success' => true,
       'logs' => $logs,
     ]);
+  }
+
+  public function export(Request $request)
+  {
+    $workspaceId = Auth::user()->current_workspace_id;
+    $format = $request->input('format', 'xlsx');
+    $filters = $request->only(['status', 'platform', 'date_start', 'date_end']);
+
+    try {
+      $export = new \App\Exports\SocialPostLogsExport($filters);
+      $filename = 'logs_' . date('Y-m-d_His') . '.' . $format;
+
+      if ($format === 'pdf') {
+        return Excel::download($export, $filename, \Maatwebsite\Excel\Excel::DOMPDF);
+      }
+
+      return Excel::download($export, $filename);
+    } catch (\Exception $e) {
+      return response()->json([
+        'success' => false,
+        'message' => 'Export failed: ' . $e->getMessage()
+      ], 500);
+    }
   }
 }
