@@ -29,6 +29,11 @@ export const SOCIAL_PLATFORMS = {
     bgClass: "bg-blue-50",
     maxVideoDuration: 14400, // 4 hours
     maxVideoCount: 10,
+    apiLimits: {
+      requestsPerHour: 200, // per user
+      requestsPerMinute: 600, // per app
+      postsPerDay: "Unlimited",
+    },
     active: true,
   },
   // instagram: {
@@ -65,6 +70,11 @@ export const SOCIAL_PLATFORMS = {
     bgClass: "bg-gray-100",
     maxVideoDuration: 600, // 10 minutes
     maxVideoCount: 1,
+    apiLimits: {
+      requestsPerDay: 1000,
+      recordsPerDay: 100000,
+      postsPerDay: "1-3 recommended",
+    },
     active: true,
   },
   twitter: {
@@ -83,6 +93,11 @@ export const SOCIAL_PLATFORMS = {
     bgClass: "bg-gray-50",
     maxVideoDuration: 140, // 2m 20s for non-premium
     maxVideoCount: 4,
+    apiLimits: {
+      postsPerThreeHours: 300,
+      requestsPerDay: 2400,
+      pricing: "Pay-as-you-go",
+    },
     active: true,
   },
   youtube: {
@@ -101,6 +116,11 @@ export const SOCIAL_PLATFORMS = {
     bgClass: "bg-red-50",
     maxVideoDuration: 43200, // 12 hours
     maxVideoCount: 1,
+    apiLimits: {
+      quotaUnitsPerDay: 10000,
+      uploadCost: "1600 units",
+      note: "Quota resets at midnight PT",
+    },
     active: true,
   },
   // linkedin: {

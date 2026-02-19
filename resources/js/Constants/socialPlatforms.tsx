@@ -18,6 +18,18 @@ export interface SocialPlatformConfig {
   bgClass: string;
   maxVideoDuration?: number;
   maxVideoCount?: number;
+  apiLimits?: {
+    requestsPerHour?: number;
+    requestsPerMinute?: number;
+    requestsPerDay?: number;
+    postsPerDay?: string | number;
+    postsPerThreeHours?: number;
+    quotaUnitsPerDay?: number;
+    uploadCost?: string;
+    recordsPerDay?: number;
+    pricing?: string;
+    note?: string;
+  };
   active: boolean;
 }
 
