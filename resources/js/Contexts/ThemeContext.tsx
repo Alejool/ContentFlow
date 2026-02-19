@@ -76,9 +76,18 @@ export function ThemeProvider({
     setActualTheme(resolved);
 
     const root = window.document.documentElement;
+    
+    // Aplicar transición suave
+    root.style.setProperty('transition', 'background-color 0.3s ease-in-out, color 0.3s ease-in-out');
+    
     root.classList.remove("light", "dark");
     root.classList.add(resolved);
     localStorage.setItem("theme", theme);
+    
+    // Limpiar la transición después de aplicarla
+    setTimeout(() => {
+      root.style.removeProperty('transition');
+    }, 300);
   }, [theme]);
 
   // Listen for system theme changes (only when theme is "system")
@@ -90,8 +99,17 @@ export function ThemeProvider({
       const resolved = getSystemTheme();
       setActualTheme(resolved);
       const root = window.document.documentElement;
+      
+      // Aplicar transición suave
+      root.style.setProperty('transition', 'background-color 0.3s ease-in-out, color 0.3s ease-in-out');
+      
       root.classList.remove("light", "dark");
       root.classList.add(resolved);
+      
+      // Limpiar la transición después de aplicarla
+      setTimeout(() => {
+        root.style.removeProperty('transition');
+      }, 300);
     };
 
     mediaQuery.addEventListener("change", handleChange);

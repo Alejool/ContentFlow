@@ -366,6 +366,7 @@
   }
 }
 
+/* View Transition API - Circular Reveal Effect */
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation: none;
@@ -377,25 +378,68 @@
 }
 
 ::view-transition-new(root) {
-  z-index: 9999;
+  z-index: 2;
+  animation: reveal-circular 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-@keyframes reveal-theme {
+/* Animación de expansión circular desde el cursor */
+@keyframes reveal-circular {
   from {
-    clip-path: circle(0% at var(--x) var(--y));
+    clip-path: circle(0% at var(--x, 50%) var(--y, 50%));
   }
-
   to {
-    clip-path: circle(150% at var(--x) var(--y));
+    clip-path: circle(150% at var(--x, 50%) var(--y, 50%));
   }
 }
 
-::view-transition-new(root) {
-  animation: 800ms cubic-bezier(0.4, 0, 0.2, 1) reveal-theme;
+/* Fallback para navegadores sin View Transition API */
+@supports not (view-transition-name: root) {
+  html {
+    transition: background-color 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  body {
+    transition: background-color 0.6s cubic-bezier(0.4, 0, 0.2, 1), 
+                color 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
 }
 
-[data-theme-transition="true"] {
-  view-transition-name: root;
+/* Transiciones suaves globales para todos los elementos al cambiar de tema */
+*,
+*::before,
+*::after {
+  transition-property: background-color, border-color, color, fill, stroke, box-shadow, opacity;
+  transition-duration: 0.2s;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Excepciones para elementos que no deben tener transición */
+*:where(
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  .no-transition,
+  input[type="range"],
+  progress,
+  video,
+  audio,
+  canvas,
+  iframe,
+  img,
+  svg
+) {
+  transition: none !important;
+}
+
+/* Transiciones específicas para elementos interactivos */
+button,
+a,
+input,
+textarea,
+select {
+  transition-property: background-color, border-color, color, fill, stroke, box-shadow, opacity, transform;
+  transition-duration: 0.15s;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @keyframes shimmer {
@@ -409,28 +453,4 @@
 
 .animate-shimmer {
   animation: shimmer 2s infinite linear;
-}
-
-/* Theme transition wipe animation from corner - slower and smoother */
-@keyframes wipe-in {
-  from {
-    clip-path: circle(0% at 100% 0);
-  }
-  to {
-    clip-path: circle(150% at 100% 0);
-  }
-}
-
-@keyframes wipe-out {
-  from {
-    clip-path: circle(150% at 100% 0);
-  }
-  to {
-    clip-path: circle(0% at 100% 0);
-  }
-}
-
-.theme-wipe-overlay {
-  animation: wipe-in 600ms cubic-bezier(0.4, 0, 0.2, 1) forwards,
-             wipe-out 600ms cubic-bezier(0.4, 0, 0.2, 1) 600ms forwards;
 }
