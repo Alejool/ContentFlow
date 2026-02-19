@@ -345,7 +345,7 @@ const SocialAccountItem = memo(
                 <div className="flex items-center gap-1 text-[10px] text-primary-500 font-medium animate-in fade-in slide-in-from-top-1">
                   <Clock className="w-3 h-3" />
                   {t("publications.modal.schedule.instantWarning") ||
-                    "Para publicar ahora, usa el botón Publicar después de guardar."}
+                    "Para publicar inmediatamente, configura la fecha desde el modal de programación."}
                 </div>
               )}
             {isPublished && (

@@ -173,7 +173,7 @@ export default function FilterSection({
           <>
             <div>
               <Select<any>
-                id="channel-filter"
+                id="integrations-channel-filter"
                 options={channelIntegrationsOptions}
                 value={platformFilter || ""}
                 variant="outlined"
@@ -188,7 +188,7 @@ export default function FilterSection({
             </div>
             <div>
               <Select<any>
-                id="status-filter"
+                id="integrations-status-filter"
                 options={statusIntegrationsOptions}
                 value={statusFilter}
                 variant="outlined"
