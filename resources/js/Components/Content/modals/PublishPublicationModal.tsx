@@ -233,25 +233,25 @@ export default function PublishPublicationModal({
         />
 
         <div className="fixed inset-0 flex items-center justify-center p-4">
-          <DialogPanel className="w-full max-w-2xl rounded-lg shadow-2xl flex flex-col max-h-[90vh] bg-white dark:bg-neutral-800 dark:border dark:border-neutral-700">
-            <div className="flex items-center justify-between p-8 pb-6 border-b border-gray-200 dark:border-neutral-700 sticky top-0 z-20 bg-white dark:bg-neutral-800 backdrop-blur-sm bg-opacity-95 dark:bg-opacity-95">
-              <DialogTitle className="text-2xl font-bold text-gray-900 dark:text-white">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-gradient-to-r from-primary-500 to-primary-600 rounded-lg">
-                    <Share2 className="w-6 h-6 text-white" />
+          <DialogPanel className="w-full max-w-xl rounded-lg shadow-2xl flex flex-col max-h-[90vh] bg-white dark:bg-neutral-800 dark:border dark:border-neutral-700">
+            <div className="flex items-center justify-between p-6 pb-4 border-b border-gray-200 dark:border-neutral-700 sticky top-0 z-20 bg-white dark:bg-neutral-800 backdrop-blur-sm bg-opacity-95 dark:bg-opacity-95">
+              <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white">
+                <div className="flex items-center gap-2">
+                  <div className="p-1.5 bg-gradient-to-r from-primary-500 to-primary-600 rounded-lg">
+                    <Share2 className="w-5 h-5 text-white" />
                   </div>
                   {t("publications.modal.publish.title")}
                 </div>
               </DialogTitle>
               <button
                 onClick={() => onClose(publication.id)}
-                className="p-2 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-neutral-700 text-gray-500 dark:text-gray-400"
+                className="p-1.5 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-neutral-700 text-gray-500 dark:text-gray-400"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto custom-scrollbar p-8 pt-6">
+            <div className="flex-1 overflow-y-auto custom-scrollbar p-6 pt-4">
             {isPendingReview && (
               <div className="mb-6 p-4 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 flex items-start gap-3">
                 <Clock className="w-5 h-5 text-yellow-600 dark:text-yellow-400 mt-0.5" />
@@ -676,7 +676,7 @@ export default function PublishPublicationModal({
             )}
             </div>
 
-            <div className="flex gap-3 p-6 border-t border-gray-200 dark:border-neutral-700 sticky bottom-0 z-20 bg-white dark:bg-neutral-800 backdrop-blur-sm bg-opacity-95 dark:bg-opacity-95">
+            <div className="flex gap-3 p-4 border-t border-gray-200 dark:border-neutral-700 sticky bottom-0 z-20 bg-white dark:bg-neutral-800 backdrop-blur-sm bg-opacity-95 dark:bg-opacity-95">
               <button
                 type="button"
                 onClick={async () => {
