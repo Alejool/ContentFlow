@@ -508,6 +508,8 @@ const EditPublicationModal = ({
                       uploadErrors={uploadErrors}
                       lockedBy={remoteLock}
                       videoMetadata={videoMetadata}
+                      publicationId={publication?.id}
+                      allMediaFiles={publication?.media_files || []}
                     />
                   )}
 

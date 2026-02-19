@@ -1,4 +1,5 @@
 import Label from "@/Components/common/Modern/Label";
+import VideoReelButton from "@/Components/ManageContent/VideoReelButton";
 import {
   AlertTriangle,
   Crop,
@@ -46,6 +47,8 @@ interface MediaUploadSectionProps {
     isSelf: boolean;
   } | null;
   videoMetadata?: Record<string, { duration: number; youtubeType: string }>;
+  publicationId?: number;
+  allMediaFiles?: any[];
 }
 
 const MediaUploadSection = memo(
@@ -70,6 +73,8 @@ const MediaUploadSection = memo(
     uploadErrors,
     lockedBy,
     videoMetadata,
+    publicationId,
+    allMediaFiles = [],
   }: MediaUploadSectionProps) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [croppingImage, setCroppingImage] = useState<{
@@ -141,26 +146,42 @@ const MediaUploadSection = memo(
               {mediaPreviews.length > 0 ? (
                 <div className="grid grid-cols-2 gap-4 w-full">
                   {mediaPreviews.map((preview, index) => (
-                    <MediaPreviewItem
-                      key={preview.tempId}
-                      preview={preview}
-                      index={index}
-                      thumbnail={thumbnails[preview.tempId]}
-                      onRemove={() => onRemoveMedia(index)}
-                      onSetThumbnail={(file) =>
-                        onSetThumbnail(preview.tempId, file)
-                      }
-                      onCrop={(tempId, url) =>
-                        setCroppingImage({ tempId, url })
-                      }
-                      onClearThumbnail={() => onClearThumbnail(preview.tempId)}
-                      disabled={disabled || isAnyMediaProcessing}
-                      progress={uploadProgress?.[preview.file?.name || ""]}
-                      stats={uploadStats?.[preview.file?.name || ""]}
-                      error={uploadErrors?.[preview.file?.name || ""]}
-                      isExternalProcessing={preview.status === "processing"}
-                      metadata={videoMetadata?.[preview.tempId]}
-                    />
+                    <div key={preview.tempId} className="space-y-2">
+                      <MediaPreviewItem
+                        preview={preview}
+                        index={index}
+                        thumbnail={thumbnails[preview.tempId]}
+                        onRemove={() => onRemoveMedia(index)}
+                        onSetThumbnail={(file) =>
+                          onSetThumbnail(preview.tempId, file)
+                        }
+                        onCrop={(tempId, url) =>
+                          setCroppingImage({ tempId, url })
+                        }
+                        onClearThumbnail={() => onClearThumbnail(preview.tempId)}
+                        disabled={disabled || isAnyMediaProcessing}
+                        progress={uploadProgress?.[preview.file?.name || ""]}
+                        stats={uploadStats?.[preview.file?.name || ""]}
+                        error={uploadErrors?.[preview.file?.name || ""]}
+                        isExternalProcessing={preview.status === "processing"}
+                        metadata={videoMetadata?.[preview.tempId]}
+                      />
+                      {/* Video Reel Generator Button */}
+                      {preview.type.includes("video") && preview.id && publicationId && (
+                        <VideoReelButton
+                          videoFile={{
+                            id: preview.id,
+                            file_name: preview.file?.name || '',
+                            file_path: preview.url,
+                            file_type: 'video',
+                            status: preview.status || 'completed',
+                          }}
+                          publicationId={publicationId}
+                          allMediaFiles={allMediaFiles}
+                          compact
+                        />
+                      )}
+                    </div>
                   ))}
                   {!disabled && !isAnyMediaProcessing && (
                     <AddMoreButton

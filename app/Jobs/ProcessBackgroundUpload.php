@@ -100,6 +100,22 @@ class ProcessBackgroundUpload implements ShouldQueue
           'size' => Storage::disk('s3')->size($this->mediaFile->getRawOriginal('file_path'))
         ]);
 
+        // Auto-generate reels if enabled, it's a video, and AI is configured
+        if ($this->mediaFile->file_type === 'video' 
+            && config('media.reels.auto_generate', false)
+            && $this->hasAIConfigured()) {
+          Log::info('Auto-generating reels for video', ['media_file_id' => $this->mediaFile->id]);
+          \App\Jobs\GenerateReelsFromVideo::dispatch(
+            $this->mediaFile->id,
+            $this->publication->id,
+            [
+              'platforms' => config('media.reels.default_platforms'),
+              'add_subtitles' => config('media.reels.add_subtitles'),
+              'language' => config('media.reels.default_language'),
+            ]
+          );
+        }
+
         // Notify user
         $this->publication->user->notify(new MediaUploadProcessed($this->publication, $this->mediaFile, 'success'));
 
@@ -189,5 +205,16 @@ class ProcessBackgroundUpload implements ShouldQueue
         ]);
       }
     }
+  }
+
+  /**
+   * Check if AI is configured for reel generation
+   */
+  private function hasAIConfigured(): bool
+  {
+    return !empty(config('services.openai.api_key'))
+      || !empty(config('services.anthropic.api_key'))
+      || !empty(config('services.gemini.api_key'))
+      || !empty(config('services.deepseek.api_key'));
   }
 }
