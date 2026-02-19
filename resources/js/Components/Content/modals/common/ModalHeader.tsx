@@ -25,9 +25,9 @@ const ModalHeader: React.FC<ModalHeaderProps> = ({
   rightElement,
 }) => {
   const sizeClasses = {
-    sm: { title: "text-lg", icon: "w-4 h-4" },
-    md: { title: "text-xl", icon: "w-5 h-5" },
-    lg: { title: "text-2xl", icon: "w-6 h-6" },
+    sm: { title: "text-base", icon: "w-4 h-4" },
+    md: { title: "text-lg", icon: "w-5 h-5" },
+    lg: { title: "text-xl", icon: "w-5 h-5" },
     xl: { title: "text-2xl", icon: "w-6 h-6" },
   };
 
@@ -35,7 +35,7 @@ const ModalHeader: React.FC<ModalHeaderProps> = ({
 
   return (
     <div
-      className="px-8 py-6 border-b border-gray-100 dark:border-neutral-700 bg-gradient-to-r from-gray-50 to-white dark:from-neutral-900 dark:to-neutral-800 flex items-center justify-between sticky top-0 z-10"
+      className="px-6 py-4 border-b border-gray-100 dark:border-neutral-700 bg-gradient-to-r from-gray-50 to-white dark:from-neutral-900 dark:to-neutral-800 flex items-center justify-between sticky top-0 z-10"
       style={style}
     >
       <div>
@@ -46,7 +46,7 @@ const ModalHeader: React.FC<ModalHeaderProps> = ({
           {t(title) || title}
         </h2>
         {subtitle && (
-          <p className="text-gray-500 dark:text-gray-400 mt-1">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
             {t(subtitle) || subtitle}
           </p>
         )}
@@ -55,9 +55,9 @@ const ModalHeader: React.FC<ModalHeaderProps> = ({
         {rightElement}
         <button
           onClick={onClose}
-          className="p-2 hover:bg-gray-100 dark:hover:bg-neutral-700 rounded-lg transition-colors text-gray-400 dark:text-gray-500"
+          className="p-1.5 hover:bg-gray-100 dark:hover:bg-neutral-700 rounded-lg transition-colors text-gray-400 dark:text-gray-500"
         >
-          <X className="w-6 h-6" />
+          <X className="w-5 h-5" />
         </button>
       </div>
     </div>

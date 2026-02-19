@@ -67,7 +67,7 @@ export default function ModalFooter({
 }: ModalFooterProps) {
   return (
     <div
-      className="bg-gradient-to-r from-gray-50 to-white dark:from-neutral-900 dark:to-neutral-800 border-t border-gray-100 dark:border-neutral-700 p-6 sticky bottom-0 z-20 backdrop-blur-sm bg-opacity-95 dark:bg-opacity-95 flex items-center justify-between gap-4"
+      className="bg-gradient-to-r from-gray-50 to-white dark:from-neutral-900 dark:to-neutral-800 border-t border-gray-100 dark:border-neutral-700 p-4 sticky bottom-0 z-20 backdrop-blur-sm bg-opacity-95 dark:bg-opacity-95 flex items-center justify-between gap-4"
       style={style}
     >
       <div className="flex flex-col flex-1 gap-4 overflow-x-auto">

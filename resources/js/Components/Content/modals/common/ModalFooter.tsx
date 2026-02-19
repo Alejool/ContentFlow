@@ -67,7 +67,7 @@ export default function ModalFooter({
 }: ModalFooterProps) {
   return (
     <div
-      className="bg-gradient-to-r from-gray-50 to-white dark:from-neutral-900 dark:to-neutral-800 border-t border-gray-100 dark:border-neutral-700 p-6 sticky bottom-0 flex justify-end gap-3"
+      className="bg-gradient-to-r from-gray-50 to-white dark:from-neutral-900 dark:to-neutral-800 border-t border-gray-100 dark:border-neutral-700 p-4 sticky bottom-0 flex justify-end gap-3"
       style={style}
     >
       {onClose && (
