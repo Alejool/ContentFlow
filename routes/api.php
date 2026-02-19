@@ -35,5 +35,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::prefix('uploads')->name('uploads.')->group(function () {
       require __DIR__ . '/api/v1/uploads.php';
     });
+    require __DIR__ . '/api/v1/reels.php';
   });
 });

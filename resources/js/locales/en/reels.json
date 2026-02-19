@@ -1,0 +1,17 @@
+{
+  "reels": {
+    "button": {
+      "generate": "Generate Reels with AI",
+      "generating": "Generating..."
+    },
+    "messages": {
+      "generating": "🎬 Generating reels. We'll notify you when they're ready.",
+      "error": "Error generating reels",
+      "noAiConfigured": "⚠️ Configure an AI API key to use this feature"
+    },
+    "list": {
+      "reelsGenerated": "{{count}} reel generated",
+      "reelsGenerated_plural": "{{count}} reels generated"
+    }
+  }
+}
