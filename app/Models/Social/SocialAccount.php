@@ -36,7 +36,7 @@ class SocialAccount extends Model
     'workspace_id' => 'integer',
     'token_expires_at' => 'datetime',
     'is_active' => 'boolean',
-    'last_failed_at' => 'timestamp',
+    'last_failed_at' => 'datetime',
     'failure_count' => 'integer',
     'account_metadata' => 'array',
   ];

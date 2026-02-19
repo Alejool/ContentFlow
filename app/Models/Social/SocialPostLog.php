@@ -61,12 +61,12 @@ class SocialPostLog extends Model
     'social_account_id' => 'integer',
     'scheduled_post_id' => 'integer',
     'media_urls' => 'array',
-    'published_at' => 'timestamp',
+    'published_at' => 'datetime',
     'engagement_data' => 'array',
     'post_metadata' => 'array',
     'platform_settings' => 'array',
     'retry_count' => 'integer',
-    'last_retry_at' => 'timestamp',
+    'last_retry_at' => 'datetime',
     'comment_sentiment_data' => 'array',
   ];
 

@@ -21,7 +21,7 @@ class PostLog extends Model
     protected $casts = [
         'id' => 'integer',
         'scheduled_post_id' => 'integer',
-        'posted_at' => 'timestamp',
+        'posted_at' => 'datetime',
     ];
 
     public function scheduledPost(): BelongsTo
