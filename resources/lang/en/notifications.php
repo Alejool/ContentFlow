@@ -45,6 +45,7 @@ return [
   ],
   'social_account_connected' => ':platform account connected successfully.',
   'social_account_disconnected' => ':platform account disconnected successfully.',
+  'try_account_disconnected' => 'Cannot disconnect :account_name (:platform). This account has :uniqueActivePosts active publication(s). Please delete or reassign them first.',
   'greeting' => 'Hello!',
   'rights_reserved' => 'All rights reserved.',
   'email_footer' => 'This is an automated email, please do not reply to this message.',

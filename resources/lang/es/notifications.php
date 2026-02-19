@@ -45,6 +45,7 @@ return [
   ],
   'social_account_connected' => 'Cuenta de :platform conectada correctamente.',
   'social_account_disconnected' => 'Cuenta de :platform desconectada correctamente.',
+  'try_account_disconnected' => 'No se puede desconectar :account_name (:platform). Esta cuenta tiene :uniqueActivePosts publicación(es) activa(s). Por favor elimínalas o reasígnalas primero.',
   'greeting' => '¡Hola!',
   'rights_reserved' => 'Todos los derechos reservados.',
   'email_footer' => 'Este es un correo automático, por favor no respondas a este mensaje.',

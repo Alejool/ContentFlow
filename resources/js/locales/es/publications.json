@@ -228,6 +228,12 @@
           "cancelText": "Cancelar",
           "unpublishing": "Despublicando..."
         },
+        "unpublish": {
+          "title": "¿Despublicar de {{platform}}?",
+          "message": "¿Estás seguro de que deseas despublicar este contenido de {{platform}}? Esta acción no se puede deshacer.",
+          "confirm": "Sí, despublicar",
+          "cancel": "Cancelar"
+        },
         "button": {
           "publish": "Publicar",
           "requestApproval": "Solicitar aprobación",
@@ -236,6 +242,7 @@
           "reject": "Rechazar",
           "cancel": "Cancelar",
           "cancelPublication": "Cancelar Publicación",
+          "cancelAll": "Cancelar Todas ({{count}})",
           "change": "Cambiar",
           "preview": "Vista Previa"
         },
@@ -311,9 +318,27 @@
       },
       "cancel_confirmation": {
         "title": "Cancelar publicación",
-        "message": "¿Estás seguro de que deseas cancelar esta publicación? El envo a redes se detendr.",
-        "confirm": "Si, cancelar",
+        "message": "¿Estás seguro de que deseas cancelar esta publicación? El envío a redes se detendrá.",
+        "confirm": "Sí, cancelar",
         "cancel": "No, continuar"
+      },
+      "cancel_platform": {
+        "title": "¿Cancelar {{platform}}?",
+        "message": "¿Estás seguro de que deseas cancelar la publicación en {{platform}}? Se detendrán todos los reintentos para esta plataforma.",
+        "confirm": "Sí, cancelar",
+        "cancel": "No"
+      },
+      "cancelAllConfirm": {
+        "title": "¿Cancelar TODAS las plataformas?",
+        "message": "¿Estás seguro de que deseas cancelar la publicación en TODAS las plataformas ({{count}})? Se detendrán todos los reintentos. Las plataformas que ya se publicaron no se verán afectadas.",
+        "confirm": "Sí, cancelar todas",
+        "cancel": "No"
+      },
+      "unpublish": {
+        "title": "¿Despublicar de {{platform}}?",
+        "message": "¿Estás seguro de que deseas despublicar este contenido de {{platform}}? Esta acción no se puede deshacer.",
+        "confirm": "Sí, despublicar",
+        "cancel": "Cancelar"
       }
     },
     "status": {

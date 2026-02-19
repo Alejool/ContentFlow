@@ -54,6 +54,16 @@
         "disconnect": "Desconectar",
         "processing": "Procesando..."
       },
+      "apiLimits": "Límites API",
+      "limits": {
+        "requestsPerHour": "Peticiones/hora",
+        "requestsPerMinute": "Peticiones/min (app)",
+        "requestsPerDay": "Peticiones/día",
+        "postsPerDay": "Posts recomendados",
+        "postsPerThreeHours": "Posts/3 horas",
+        "dailyQuota": "Cuota diaria",
+        "uploadCost": "Costo subida"
+      },
       "validation": {
         "facebook": {
           "typeRequired": "Debes seleccionar un tipo de publicación para Facebook",

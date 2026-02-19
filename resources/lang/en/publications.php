@@ -21,4 +21,10 @@ return [
   'validation' => [
     'scheduledMinDifference' => 'The scheduled date must be at least 1 minute after the current time.',
   ],
+  'status' => [
+    'publishingProgress' => ':current/:total publishing',
+    'partialSuccess' => ':success/:total published',
+    'allPublished' => ':total/:total published',
+  ],
+  'viewPost' => 'View post',
 ];

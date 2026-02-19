@@ -49,6 +49,16 @@
         "disconnect": "Disconnect",
         "processing": "Processing..."
       },
+      "apiLimits": "API Limits",
+      "limits": {
+        "requestsPerHour": "Requests/hour",
+        "requestsPerMinute": "Requests/min (app)",
+        "requestsPerDay": "Requests/day",
+        "postsPerDay": "Recommended posts",
+        "postsPerThreeHours": "Posts/3 hours",
+        "dailyQuota": "Daily quota",
+        "uploadCost": "Upload cost"
+      },
       "disconnectModal": {
         "title": "Disconnect Account",
         "warning": "Account has pending posts",

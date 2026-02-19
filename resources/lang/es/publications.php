@@ -21,4 +21,10 @@ return [
   'validation' => [
     'scheduledMinDifference' => 'La fecha debe ser al menos 1 minuto después de la actual.',
   ],
+  'status' => [
+    'publishingProgress' => ':current/:total publicando',
+    'partialSuccess' => ':success/:total publicado',
+    'allPublished' => ':total/:total publicado',
+  ],
+  'viewPost' => 'Ver publicación',
 ];
