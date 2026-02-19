@@ -106,6 +106,17 @@ class PublicationLockController extends Controller
             Log::info("🔓 Lock released successfully: pub {$publication->id}, user {$user->id}");
             $lock->delete();
             broadcast(new PublicationLockChanged($publication->id, null, $user->current_workspace_id))->toOthers();
+            
+            // Notify other workspace users that the publication is now available
+            if ($user->current_workspace_id) {
+                $workspaceUsers = \App\Models\User::where('current_workspace_id', $user->current_workspace_id)
+                    ->where('id', '!=', $user->id) // Exclude the user who unlocked
+                    ->get();
+                
+                foreach ($workspaceUsers as $workspaceUser) {
+                    $workspaceUser->notify(new \App\Notifications\PublicationUnlockedNotification($publication, $user));
+                }
+            }
         } else {
             Log::warning("⚠️ Unlock failed - lock not found for user: pub {$publication->id}, user {$user->id}");
         }

@@ -43,6 +43,12 @@ return [
     'message' => 'Tu publicación ":title" ha sido programada para :time',
     'action' => 'Ver Publicación',
   ],
+  'unlocked' => [
+    'title' => 'Publicación Disponible',
+    'message' => '":title" ya está disponible',
+    'description' => ':user ha terminado de editar',
+    'action' => 'Ver Publicación',
+  ],
   'social_account_connected' => 'Cuenta de :platform conectada correctamente.',
   'social_account_disconnected' => 'Cuenta de :platform desconectada correctamente.',
   'try_account_disconnected' => 'No se puede desconectar :account_name (:platform). Esta cuenta tiene :uniqueActivePosts publicación(es) activa(s). Por favor elimínalas o reasígnalas primero.',

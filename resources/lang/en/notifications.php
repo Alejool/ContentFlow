@@ -43,6 +43,12 @@ return [
     'message' => 'Your publication ":title" has been scheduled for :time',
     'action' => 'View Publication',
   ],
+  'unlocked' => [
+    'title' => 'Publication Available',
+    'message' => '":title" is now available',
+    'description' => ':user has finished editing',
+    'action' => 'View Publication',
+  ],
   'social_account_connected' => ':platform account connected successfully.',
   'social_account_disconnected' => ':platform account disconnected successfully.',
   'try_account_disconnected' => 'Cannot disconnect :account_name (:platform). This account has :uniqueActivePosts active publication(s). Please delete or reassign them first.',
