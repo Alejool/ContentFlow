@@ -175,9 +175,9 @@ export default function AddPublicationModal({
           <form
             id="add-publication-form"
             onSubmit={handleSubmit}
-            className="space-y-8 p-6"
+            className="space-y-6 p-6"
           >
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="space-y-6">
                 <MediaUploadSection
                   mediaPreviews={stabilizedMediaPreviews}
@@ -257,7 +257,7 @@ export default function AddPublicationModal({
                   />
                 </div>
                 <Input
-                  id="title"
+                  id="add-publication-title"
                   label={t("publications.modal.add.titleField")}
                   type="text"
                   register={register}
@@ -272,7 +272,7 @@ export default function AddPublicationModal({
                 />
 
                 <Textarea
-                  id="description"
+                  id="add-publication-description"
                   label={t("publications.modal.add.description")}
                   register={register}
                   name="description"
@@ -291,7 +291,7 @@ export default function AddPublicationModal({
                 />
 
                 <Input
-                  id="goal"
+                  id="add-publication-goal"
                   label={t("publications.modal.add.goal")}
                   type="text"
                   register={register}
@@ -306,7 +306,7 @@ export default function AddPublicationModal({
                 />
 
                 <Input
-                  id="hashtags"
+                  id="add-publication-hashtags"
                   label={t("publications.modal.add.hashtags")}
                   type="text"
                   register={register}

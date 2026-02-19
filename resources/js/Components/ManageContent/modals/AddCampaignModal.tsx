@@ -179,7 +179,7 @@ export default function AddCampaignModal({
 
             <div className="form-group">
               <Input
-                id="name"
+                id="manage-add-campaign-name"
                 label={t("campaigns.modal.add.name") || "Campaign Name"}
                 register={register}
                 name="name"
@@ -196,7 +196,7 @@ export default function AddCampaignModal({
 
             <div className="form-group">
               <Textarea
-                id="description"
+                id="manage-add-campaign-description"
                 label={t("campaigns.modal.add.description")}
                 register={register}
                 name="description"

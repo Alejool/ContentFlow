@@ -252,13 +252,13 @@ const EditPublicationModal = ({
               : "publications.modal.show.subtitle"
           }
           rightElement={
-            <div className="flex -space-x-2 overflow-hidden mr-4 p-3">
+            <div className="flex -space-x-2 overflow-hidden mr-2 p-2">
               {activeUsers.map((user: any) => {
                 const isTheLocker = lockInfo?.user_id === user.id;
                 return (
                   <div
                     key={user.id}
-                    className={`inline-block h-8 w-8 rounded-full ring-2 ${isTheLocker ? "ring-primary-500 z-10" : "ring-white dark:ring-neutral-800"} bg-gray-200 dark:bg-neutral-700 flex-shrink-0 relative`}
+                    className={`inline-block h-7 w-7 rounded-full ring-2 ${isTheLocker ? "ring-primary-500 z-10" : "ring-white dark:ring-neutral-800"} bg-gray-200 dark:bg-neutral-700 flex-shrink-0 relative`}
                     title={
                       user.name + (isTheLocker ? " (Editando)" : " (Viendo)")
                     }
@@ -275,7 +275,7 @@ const EditPublicationModal = ({
                       </div>
                     )}
                     {isTheLocker && (
-                      <div className="absolute -bottom-1 -right-1 bg-amber-500 rounded-full p-0.5 shadow-sm">
+                      <div className="absolute -bottom-0.5 -right-0.5 bg-amber-500 rounded-full p-0.5 shadow-sm">
                         <Lock className="w-2 h-2 text-white" />
                       </div>
                     )}
@@ -292,7 +292,7 @@ const EditPublicationModal = ({
             onSubmit={handleSubmit}
             className="space-y-8"
           >
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 p-6">
               <div className="space-y-6">
                 {!isLockedByMe && isLockedByOther && (
                   <div className="p-4 mb-6 rounded-lg border border-amber-500 bg-amber-50 dark:bg-amber-900/20 flex gap-3 text-sm text-amber-700 dark:text-amber-300 animate-in shake duration-500">

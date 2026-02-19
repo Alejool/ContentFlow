@@ -1,6 +1,7 @@
 import CampaignMediaCarousel from "@/Components/Campaigns/CampaignMediaCarousel";
 import ActivityList from "@/Components/ManageContent/ActivityList";
 import ApprovalHistory from "@/Components/ManageContent/ApprovalHistory";
+import ApprovalHistorySection from "@/Components/ManageContent/Publication/common/edit/ApprovalHistorySection";
 import { Campaign } from "@/types/Campaign";
 import { Publication } from "@/types/Publication";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
@@ -387,11 +388,20 @@ export default function ViewCampaignModal({
 
                 {/* Approvals Tab */}
                 {activeTab === "approvals" && isActuallyPublication && (
-                  <div className="max-h-96 overflow-y-auto pr-2">
-                    <ApprovalHistory
-                      logs={(item as any).approval_logs || []}
-                      publicationId={item.id}
-                    />
+                  <div className="max-h-[500px] overflow-y-auto pr-2 space-y-4">
+                    {(item as any).approval_logs &&
+                    (item as any).approval_logs.length > 0 ? (
+                      <ApprovalHistorySection
+                        logs={(item as any).approval_logs || []}
+                      />
+                    ) : (
+                      <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+                        <p>
+                          {t("approvals.noHistory") ||
+                            "No hay historial de aprobaciones"}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

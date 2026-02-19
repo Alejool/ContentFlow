@@ -5,6 +5,7 @@ import SocialAccountsSection from "@/Components/Content/Publication/common/add/S
 import MediaUploadSection from "@/Components/Content/Publication/common/edit/MediaUploadSection";
 import ModalFooter from "@/Components/Content/modals/common/ModalFooter";
 import ModalHeader from "@/Components/Content/modals/common/ModalHeader";
+import PublicationStatusSection from "@/Components/Content/modals/common/PublicationStatusSection";
 import ScheduleSection from "@/Components/Content/modals/common/ScheduleSection";
 import Input from "@/Components/common/Modern/Input";
 import Textarea from "@/Components/common/Modern/Textarea";
@@ -307,9 +308,9 @@ export default function AddPublicationModal({
           <form
             id="add-publication-form"
             onSubmit={handleUploadAndSubmit}
-            className="space-y-8 p-6"
+            className="space-y-6 p-6"
           >
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="space-y-6">
                 <MediaUploadSection
                   mediaPreviews={stabilizedMediaPreviews}
@@ -401,7 +402,7 @@ export default function AddPublicationModal({
                 </div>
 
                 <Input
-                  id="title"
+                  id="content-add-publication-title"
                   label={t("publications.modal.add.titleField")}
                   type="text"
                   register={register}
@@ -416,7 +417,7 @@ export default function AddPublicationModal({
                 />
 
                 <Textarea
-                  id="description"
+                  id="content-add-publication-description"
                   label={t("publications.modal.add.description")}
                   register={register}
                   name="description"
@@ -435,7 +436,7 @@ export default function AddPublicationModal({
                 />
 
                 <Input
-                  id="goal"
+                  id="content-add-publication-goal"
                   label={t("publications.modal.add.goal")}
                   type="text"
                   register={register}
@@ -450,7 +451,7 @@ export default function AddPublicationModal({
                 />
 
                 <Input
-                  id="hashtags"
+                  id="content-add-publication-hashtags"
                   label={t("publications.modal.add.hashtags")}
                   type="text"
                   register={register}
@@ -537,58 +538,46 @@ export default function AddPublicationModal({
             </div>
           )}
 
-          {publishingAccountIds && publishingAccountIds.length > 0 && (
-            <div className="px-6 pb-4">
-              <div className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/10 rounded-lg border border-blue-100 dark:border-blue-900/30">
-                <div className="flex items-center gap-2">
-                  <Loader2 className="w-4 h-4 text-blue-500 animate-spin" />
-                  <span className="text-xs font-bold text-blue-700 dark:text-blue-300 uppercase tracking-tight">
-                    {t("publish.publishing") || "Publicando en redes..."}
-                  </span>
-                </div>
-                <button
-                  type="button"
-                  onClick={async () => {
-                    const isConfirmed = await confirm({
-                      title:
-                        t("publications.modal.cancel_confirmation.title") ||
-                        "Cancelar Publicación",
-                      message:
-                        t("publications.modal.cancel_confirmation.message") ||
-                        "¿Estás seguro de que deseas cancelar esta publicación? El envío a redes se detendrá.",
-                      confirmText:
-                        t("publications.modal.cancel_confirmation.confirm") ||
-                        "Sí, cancelar",
-                      cancelText:
-                        t("publications.modal.cancel_confirmation.cancel") ||
-                        "No, continuar",
-                      type: "danger",
-                    });
+          {((publishingAccountIds && publishingAccountIds.length > 0) ||
+            (publishedAccountIds && publishedAccountIds.length > 0)) && (
+            <PublicationStatusSection
+              publishingAccountIds={publishingAccountIds || []}
+              publishedAccountIds={publishedAccountIds || []}
+              socialAccounts={socialAccounts as any}
+              t={t}
+              onCancel={async () => {
+                const isConfirmed = await confirm({
+                  title:
+                    t("publications.modal.cancel_confirmation.title") ||
+                    "Cancelar Publicación",
+                  message:
+                    t("publications.modal.cancel_confirmation.message") ||
+                    "¿Estás seguro de que deseas cancelar esta publicación? El envío a redes se detendrá.",
+                  confirmText:
+                    t("publications.modal.cancel_confirmation.confirm") ||
+                    "Sí, cancelar",
+                  cancelText:
+                    t("publications.modal.cancel_confirmation.cancel") ||
+                    "No, continuar",
+                  type: "danger",
+                });
 
-                    if (isConfirmed) {
-                      try {
-                        const id = (publication as any)?.id;
-                        if (id) {
-                          await axios.post(
-                            route("api.v1.publications.cancel", id),
-                          );
-                          toast.success("Publicación cancelada");
-                          handleClose();
-                        }
-                      } catch (err) {
-                        console.error("Failed to cancel", err);
-                      }
+                if (isConfirmed) {
+                  try {
+                    const id = (publication as any)?.id;
+                    if (id) {
+                      await axios.post(
+                        route("api.v1.publications.cancel", id),
+                      );
+                      toast.success("Publicación cancelada");
+                      handleClose();
                     }
-                  }}
-                  className="flex items-center gap-1.5 px-3 py-1 rounded-md bg-red-50 hover:bg-red-100 text-red-600 dark:bg-red-900/20 dark:hover:bg-red-900/30 dark:text-red-400 transition-colors border border-red-100 dark:border-red-900/50 group"
-                >
-                  <X className="w-3.5 h-3.5 group-hover:rotate-90 transition-transform" />
-                  <span className="text-[11px] font-black uppercase tracking-tighter">
-                    {t("common.cancel") || "Cancelar Publicación"}
-                  </span>
-                </button>
-              </div>
-            </div>
+                  } catch (err) {
+                    console.error("Failed to cancel", err);
+                  }
+                }
+              }}
+            />
           )}
         </div>
 
