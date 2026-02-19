@@ -620,7 +620,67 @@ class PublicationController extends Controller
       return $this->errorResponse('This publication cannot be cancelled in its current state.', 422);
     }
 
-    // Actualizar estado a failed para que los jobs pendientes no se ejecuten
+    // Check if specific platform(s) should be cancelled
+    $platformIds = $request->input('platform_ids', []);
+    
+    \Log::info('Cancel publication request', [
+      'publication_id' => $publication->id,
+      'platform_ids' => $platformIds,
+      'platform_ids_type' => gettype($platformIds),
+      'platform_ids_empty' => empty($platformIds),
+      'request_all' => $request->all()
+    ]);
+    
+    if (!empty($platformIds) && is_array($platformIds) && count($platformIds) > 0) {
+      \Log::info('Canceling specific platforms', ['platform_ids' => $platformIds]);
+      
+      // Cancel only specific platforms
+      $updated = $publication->socialPostLogs()
+        ->whereIn('social_account_id', $platformIds)
+        ->whereIn('status', ['pending', 'publishing'])
+        ->update([
+          'status' => 'failed',
+          'error_message' => 'Cancelado por el usuario',
+          'updated_at' => now(),
+        ]);
+        
+      \Log::info('Updated social post logs', ['count' => $updated, 'platform_ids' => $platformIds]);
+
+      // Try to delete specific platform jobs from queue
+      try {
+        foreach ($platformIds as $platformId) {
+          \Illuminate\Support\Facades\DB::table('jobs')
+            ->where('payload', 'like', '%PublishSocialPostJob%')
+            ->where('payload', 'like', '%"id":' . $publication->id . '%')
+            ->where('payload', 'like', '%"social_account_id":' . $platformId . '%')
+            ->delete();
+          
+          \Illuminate\Support\Facades\DB::table('failed_jobs')
+            ->where('payload', 'like', '%PublishSocialPostJob%')
+            ->where('payload', 'like', '%"id":' . $publication->id . '%')
+            ->where('payload', 'like', '%"social_account_id":' . $platformId . '%')
+            ->delete();
+        }
+      } catch (\Exception $e) {
+        \Log::warning("Could not delete queued jobs for platforms in publication {$publication->id}: " . $e->getMessage());
+      }
+
+      $publication->logActivity('platform_cancelled', [
+        'platform_ids' => $platformIds,
+        'previous_status' => $oldStatus
+      ]);
+
+      broadcast(new PublicationStatusUpdated(Auth::id(), $publication->id, $publication->status))->toOthers();
+      broadcast(new PublicationUpdated($publication))->toOthers();
+
+      $this->clearPublicationCache($publication->workspace_id);
+
+      return $this->successResponse([
+        'publication' => $publication->load(['socialPostLogs', 'mediaFiles'])
+      ], 'Plataforma(s) cancelada(s) correctamente.');
+    }
+
+    // Cancel all platforms (original behavior)
     $publication->update([
       'status' => 'failed',
       'updated_at' => now(),
@@ -654,7 +714,7 @@ class PublicationController extends Controller
 
     $publication->user->notify(new PublicationCancelledNotification($publication));
     
-    if ($publication->workspace) {
+    if ($publication->workspace && ($publication->workspace->discord_webhook_url || $publication->workspace->slack_webhook_url)) {
       $publication->workspace->notify(new PublicationCancelledNotification($publication));
     }
 
