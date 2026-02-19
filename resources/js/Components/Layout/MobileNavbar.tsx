@@ -1,4 +1,5 @@
 import Logo from "@/../assets/logo-with-name.png";
+import { LanguageSwitcher } from "@/Components/common/LanguageSwitcher";
 import ResponsiveNavLink from "@/Components/common/ui/ResponsiveNavLink";
 import { useTheme } from "@/Hooks/useTheme";
 import {
@@ -135,6 +136,9 @@ export default function MobileNavbar({
           <div
             className={`pt-4 mt-4 border-t ${actualTheme === "dark" ? "border-neutral-800" : "border-gray-100"}`}
           >
+            <div className="mb-4">
+              <LanguageSwitcher />
+            </div>
             <ResponsiveNavLink
               href={route("logout")}
               method="post"
