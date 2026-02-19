@@ -3,6 +3,7 @@ import AccountStatistics from "@/Components/profile/Partials/AccountStatistics";
 import AiConfigSection from "@/Components/profile/Partials/AiConfigSection";
 import UpdatePasswordForm from "@/Components/profile/Partials/UpdatePasswordForm";
 import UpdateProfileInformationForm from "@/Components/profile/Partials/UpdateProfileInformationForm";
+import OnboardingSection from "@/Components/profile/Partials/OnboardingSection";
 
 import { useUser } from "@/Hooks/useUser";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
@@ -14,6 +15,7 @@ import {
   Lock,
   Save,
   User,
+  RotateCcw,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -48,6 +50,11 @@ export default function Edit({ mustVerifyEmail, status }: EditProps) {
       id: "ai",
       name: t("profile.tabs.ai") || "Inteligencia Artificial",
       icon: BrainCircuit,
+    },
+    {
+      id: "onboarding",
+      name: t("profile.tabs.onboarding") || "Onboarding",
+      icon: RotateCcw,
     },
   ];
 
@@ -131,6 +138,12 @@ export default function Edit({ mustVerifyEmail, status }: EditProps) {
               {activeTab === "ai" && (
                 <div>
                   <AiConfigSectionWrapper user={user} />
+                </div>
+              )}
+
+              {activeTab === "onboarding" && (
+                <div>
+                  <OnboardingSection />
                 </div>
               )}
             </div>
