@@ -44,7 +44,7 @@ class PublicationActivity extends Model
     'details' => 'array',
   ];
 
-  protected $appends = ['formatted_changes', 'description'];
+  protected $appends = ['formatted_changes'];
 
   public function getFormattedChangesAttribute()
   {
