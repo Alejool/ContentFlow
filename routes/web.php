@@ -142,6 +142,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/', [ContentController::class, 'index'])->name('index');
   });
 
+  Route::get('/reels', function () {
+    return inertia('Reels/AiReelsGallery');
+  })->name('reels.gallery');
+
   Route::get('/calendar', [CalendarViewController::class, 'index'])->name('calendar.index');
 
   Route::prefix('social-accounts')->name('social-accounts.')->group(function () {

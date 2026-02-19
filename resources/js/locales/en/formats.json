@@ -1,0 +1,47 @@
+{
+  "currency": {
+    "default": "USD",
+    "symbol": "$",
+    "format": "{{currency}}{{amount}}"
+  },
+  "number": {
+    "decimal": ".",
+    "thousands": ",",
+    "precision": 2
+  },
+  "date": {
+    "formats": {
+      "short": "MM/DD/YYYY",
+      "medium": "MMM D, YYYY",
+      "long": "MMMM D, YYYY",
+      "full": "dddd, MMMM D, YYYY"
+    },
+    "time": {
+      "short": "h:mm A",
+      "medium": "h:mm:ss A",
+      "long": "h:mm:ss A z"
+    }
+  },
+  "relative": {
+    "future": "in {{time}}",
+    "past": "{{time}} ago",
+    "s": "a few seconds",
+    "m": "a minute",
+    "mm": "{{count}} minutes",
+    "h": "an hour",
+    "hh": "{{count}} hours",
+    "d": "a day",
+    "dd": "{{count}} days",
+    "M": "a month",
+    "MM": "{{count}} months",
+    "y": "a year",
+    "yy": "{{count}} years"
+  },
+  "units": {
+    "byte": "B",
+    "kilobyte": "KB",
+    "megabyte": "MB",
+    "gigabyte": "GB",
+    "terabyte": "TB"
+  }
+}

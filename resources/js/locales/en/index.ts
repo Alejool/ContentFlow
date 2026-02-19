@@ -8,6 +8,7 @@ import campaigns from "./campaigns.json";
 import colors from "./colors.json";
 import common from "./common.json";
 import dashboard from "./dashboard.json";
+import formats from "./formats.json";
 import legal from "./legal.json";
 import logs from "./logs.json";
 import manageContent from "./manageContent.json";
@@ -52,4 +53,5 @@ export default {
   ...activity,
   ...validation,
   ...videoValidation,
+  formats,
 };

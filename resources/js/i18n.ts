@@ -8,6 +8,30 @@ import { makeZodErrorMap } from "./Utils/zodErrorMap";
 import en from "./locales/en";
 import es from "./locales/es";
 
+// Configuración mejorada de detección de idioma
+const languageDetectorOptions = {
+  order: [
+    "querystring",      // ?lng=es
+    "cookie",           // cookie i18next
+    "localStorage",     // localStorage i18nextLng
+    "sessionStorage",   // sessionStorage i18nextLng
+    "navigator",        // navegador del usuario
+    "htmlTag",          // html lang attribute
+    "path",             // /es/page
+    "subdomain",        // es.domain.com
+  ],
+  lookupQuerystring: "lng",
+  lookupCookie: "i18next",
+  lookupLocalStorage: "i18nextLng",
+  lookupSessionStorage: "i18nextLng",
+  lookupFromPathIndex: 0,
+  lookupFromSubdomainIndex: 0,
+  caches: ["localStorage", "cookie"],
+  excludeCacheFor: ["cimode"],
+  cookieMinutes: 10080, // 7 días
+  cookieDomain: window.location.hostname,
+};
+
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
@@ -16,17 +40,28 @@ i18n
       en: { translation: en },
       es: { translation: es },
     },
-    fallbackLng: "es", // Default to Spanish if language not detected/supported
+    fallbackLng: "es",
     supportedLngs: ["en", "es"],
     load: "languageOnly",
     debug: false,
     interpolation: {
       escapeValue: false,
+      // Formatos personalizados para interpolación
+      format: (value, format, lng) => {
+        if (format === "uppercase") return value.toUpperCase();
+        if (format === "lowercase") return value.toLowerCase();
+        if (format === "capitalize") {
+          return value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+        }
+        return value;
+      },
     },
-    detection: {
-      order: ["navigator", "localStorage", "path", "subdomain"],
-      caches: ["localStorage"],
-      lookupLocalStorage: "i18nextLng",
+    detection: languageDetectorOptions,
+    // Reaccionar a cambios de idioma del navegador
+    react: {
+      useSuspense: false,
+      bindI18n: "languageChanged loaded",
+      bindI18nStore: "added removed",
     },
   });
 

@@ -9,16 +9,53 @@
       "fri": "Vie",
       "sat": "Sáb"
     },
+    "views": {
+      "month": "Mes",
+      "week": "Semana",
+      "day": "Día"
+    },
     "actions": {
-      "today": "Hoy"
+      "today": "Hoy",
+      "export": "Exportar",
+      "selectAll": "Seleccionar todos",
+      "clearSelection": "Limpiar selección",
+      "moveEvents": "Mover eventos",
+      "bulkMove": "Mover seleccionados"
     },
     "filters": {
       "all": "Todos",
-      "events": "Solo Eventos"
+      "events": "Solo Eventos",
+      "platform": "Plataforma",
+      "status": "Estado",
+      "campaign": "Campaña"
+    },
+    "export": {
+      "title": "Exportar calendario",
+      "google": "Google Calendar",
+      "outlook": "Outlook Calendar",
+      "description": "El archivo .ics se puede importar en cualquier aplicación de calendario compatible",
+      "success": "Calendario exportado exitosamente",
+      "error": "Error al exportar el calendario",
+      "eventsCount": "eventos"
+    },
+    "bulkActions": {
+      "selected": "seleccionado",
+      "selectedPlural": "seleccionados",
+      "event": "evento",
+      "eventPlural": "eventos",
+      "of": "de",
+      "total": "total",
+      "moveTitle": "Mover eventos seleccionados",
+      "moveDescription": "Selecciona la nueva fecha y hora para mover los {count} eventos seleccionados.",
+      "moveSuccess": "Eventos movidos exitosamente",
+      "moveError": "Error al mover los eventos",
+      "cancel": "Cancelar",
+      "move": "Mover"
     },
     "events": {
       "count": "Eventos",
-      "empty": "No hay eventos para este día"
+      "empty": "No hay eventos para este día",
+      "noScheduled": "Sin eventos programados"
     },
     "userEvents": {
       "modal": {
