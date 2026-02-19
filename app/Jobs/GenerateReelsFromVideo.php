@@ -24,6 +24,9 @@ class GenerateReelsFromVideo implements ShouldQueue
   public $uniqueFor = 3600; // Prevent duplicate jobs for 1 hour
   public $maxExceptions = 1; // Fail after 1 exception
 
+  private float $startTime;
+  private int $totalSteps = 3;
+
   public function __construct(
     private int $mediaFileId,
     private ?int $publicationId = null,
@@ -70,12 +73,14 @@ class GenerateReelsFromVideo implements ShouldQueue
     VideoClipGeneratorService $clipGenerator,
     VideoAnalysisService $analysisService
   ): void {
-    $startTime = microtime(true);
+    $this->startTime = microtime(true);
+    $jobId = $this->job?->getJobId() ?? uniqid('job_', true);
+    
     Log::info('🎬 Starting reel generation job', [
       'media_file_id' => $this->mediaFileId,
       'publication_id' => $this->publicationId,
       'options' => $this->options,
-      'job_id' => $this->job?->getJobId()
+      'job_id' => $jobId
     ]);
 
     $mediaFile = MediaFile::find($this->mediaFileId);
@@ -85,11 +90,18 @@ class GenerateReelsFromVideo implements ShouldQueue
       return;
     }
 
+    $userId = $mediaFile->user_id;
+
     try {
       $mediaFile->update(['status' => 'processing']);
+      
+      // Initialize progress tracking
+      $this->updateProgress($jobId, $userId, 5, 'Starting reel generation', 0);
 
       // Step 1: Download and analyze video content
       $stepStart = microtime(true);
+      $this->updateProgress($jobId, $userId, 15, 'Downloading and analyzing video', 1);
+      
       Log::info('📥 Step 1/3: Downloading and analyzing video', ['media_file_id' => $this->mediaFileId]);
       
       $s3Path = $mediaFile->getRawOriginal('file_path');
@@ -103,11 +115,15 @@ class GenerateReelsFromVideo implements ShouldQueue
         'duration_seconds' => $stepDuration,
         'analysis_keys' => array_keys($analysis ?? [])
       ]);
+      
+      $this->updateProgress($jobId, $userId, 35, 'Analysis complete', 1);
 
       // Step 2: Generate optimized reels for each platform
       $stepStart = microtime(true);
       // OPTIMIZED: Generate only 1 reel by default for speed
       $platforms = $this->options['platforms'] ?? ['instagram'];
+      $this->updateProgress($jobId, $userId, 40, 'Generating reels for platforms', 2);
+      
       Log::info("🎥 Step 2/3: Generating reels for platforms", [
         'platforms' => $platforms,
         'count' => count($platforms)
@@ -117,6 +133,11 @@ class GenerateReelsFromVideo implements ShouldQueue
 
       foreach ($platforms as $index => $platform) {
         $platformStart = microtime(true);
+        
+        // Update progress for each platform
+        $platformProgress = 40 + (($index + 1) / count($platforms)) * 30;
+        $this->updateProgress($jobId, $userId, (int) $platformProgress, "Generating {$platform} reel", 2);
+        
         Log::info("🔄 Processing platform {$platform} (" . ($index + 1) . "/" . count($platforms) . ")", [
           'media_file_id' => $this->mediaFileId
         ]);
@@ -198,6 +219,8 @@ class GenerateReelsFromVideo implements ShouldQueue
       // Step 3: Generate highlight clips if requested
       if ($this->options['generate_clips'] ?? false) {
         $stepStart = microtime(true);
+        $this->updateProgress($jobId, $userId, 75, 'Generating highlight clips', 3);
+        
         Log::info('✂️ Step 3/3: Generating highlight clips', ['media_file_id' => $this->mediaFileId]);
         
         $clips = $clipGenerator->generateClipsFromVideo($mediaFile, [
@@ -245,8 +268,11 @@ class GenerateReelsFromVideo implements ShouldQueue
           'duration_seconds' => $stepDuration,
           'clips_generated' => count($clips)
         ]);
+        
+        $this->updateProgress($jobId, $userId, 95, 'Clips generated', 3);
       } else {
         Log::info('⏭️ Step 3 skipped: Clip generation not requested');
+        $this->updateProgress($jobId, $userId, 95, 'Finalizing', 3);
       }
 
       $mediaFile->update([
@@ -257,6 +283,12 @@ class GenerateReelsFromVideo implements ShouldQueue
           'generated_at' => now()->toIso8601String(),
         ]),
       ]);
+      
+      // Complete progress
+      $this->updateProgress($jobId, $userId, 100, 'Completed', 3);
+      
+      // Clear progress cache
+      \Illuminate\Support\Facades\Cache::forget("processing_progress:{$jobId}");
 
       // Notify user
       if ($mediaFile->user) {
@@ -267,8 +299,13 @@ class GenerateReelsFromVideo implements ShouldQueue
           $this->publicationId
         ));
       }
+      
+      // Broadcast completion
+      if ($this->publicationId) {
+        broadcast(new \App\Events\VideoProcessingCompleted($userId, $this->publicationId, 'completed'));
+      }
 
-      $totalDuration = round(microtime(true) - $startTime, 2);
+      $totalDuration = round(microtime(true) - $this->startTime, 2);
       Log::info('🎉 Reels generation completed successfully', [
         'media_file_id' => $this->mediaFileId,
         'platforms' => array_keys($generatedReels),
@@ -277,7 +314,7 @@ class GenerateReelsFromVideo implements ShouldQueue
       ]);
 
     } catch (\Exception $e) {
-      $totalDuration = round(microtime(true) - $startTime, 2);
+      $totalDuration = round(microtime(true) - $this->startTime, 2);
       Log::error('❌ Reels generation failed', [
         'media_file_id' => $this->mediaFileId,
         'error' => $e->getMessage(),
@@ -291,6 +328,15 @@ class GenerateReelsFromVideo implements ShouldQueue
         'status' => 'failed',
         'processing_error' => $e->getMessage()
       ]);
+      
+      // Update progress with error
+      $jobId = $this->job?->getJobId() ?? uniqid('job_', true);
+      $this->updateProgressError($jobId, $userId, $e->getMessage());
+      
+      // Broadcast failure
+      if ($this->publicationId) {
+        broadcast(new \App\Events\VideoProcessingCompleted($userId, $this->publicationId, 'failed', $e->getMessage()));
+      }
       
       throw $e;
     }
@@ -308,10 +354,84 @@ class GenerateReelsFromVideo implements ShouldQueue
 
     $mediaFile = MediaFile::find($this->mediaFileId);
     if ($mediaFile) {
+      $userId = $mediaFile->user_id;
+      
       $mediaFile->update([
         'status' => 'failed',
         'processing_error' => $exception->getMessage()
       ]);
+      
+      // Clear progress cache
+      $jobId = $this->job?->getJobId() ?? uniqid('job_', true);
+      \Illuminate\Support\Facades\Cache::forget("processing_progress:{$jobId}");
+      
+      // Broadcast failure
+      if ($this->publicationId) {
+        broadcast(new \App\Events\VideoProcessingCompleted($userId, $this->publicationId, 'failed', $exception->getMessage()));
+      }
+    }
+  }
+
+  /**
+   * Update processing progress and broadcast to frontend
+   */
+  private function updateProgress(
+    string $jobId,
+    int $userId,
+    int $percentage,
+    string $currentStep,
+    int $completedSteps
+  ): void {
+    $key = "processing_progress:{$jobId}";
+    
+    // Calculate ETA based on elapsed time and progress
+    $elapsedTime = microtime(true) - $this->startTime;
+    $eta = null;
+    
+    if ($percentage > 0 && $percentage < 100) {
+      $estimatedTotalTime = ($elapsedTime / $percentage) * 100;
+      $eta = (int) round($estimatedTotalTime - $elapsedTime);
+    }
+    
+    $data = [
+      'progress' => $percentage,
+      'current_step' => $currentStep,
+      'completed_steps' => $completedSteps,
+      'total_steps' => $this->totalSteps,
+      'eta' => $eta,
+      'updated_at' => now()->timestamp,
+    ];
+    
+    // Store in Redis cache with 2-hour expiry
+    \Illuminate\Support\Facades\Cache::put($key, $data, now()->addHours(2));
+    
+    // Broadcast via WebSocket
+    if ($this->publicationId) {
+      broadcast(new \App\Events\ProcessingProgressUpdated($userId, $jobId, $this->publicationId, $data));
+    }
+  }
+
+  /**
+   * Update progress with error state
+   */
+  private function updateProgressError(string $jobId, int $userId, string $errorMessage): void
+  {
+    $key = "processing_progress:{$jobId}";
+    
+    $data = [
+      'progress' => 0,
+      'current_step' => 'Failed: ' . $errorMessage,
+      'completed_steps' => 0,
+      'total_steps' => $this->totalSteps,
+      'eta' => null,
+      'updated_at' => now()->timestamp,
+      'error' => $errorMessage,
+    ];
+    
+    \Illuminate\Support\Facades\Cache::put($key, $data, now()->addHours(2));
+    
+    if ($this->publicationId) {
+      broadcast(new \App\Events\ProcessingProgressUpdated($userId, $jobId, $this->publicationId, $data));
     }
   }
 
