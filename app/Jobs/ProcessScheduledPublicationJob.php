@@ -104,7 +104,7 @@ class ProcessScheduledPublicationJob implements ShouldQueue
         
         $publication->user->notify($notification);
         
-        if ($publication->workspace) {
+        if ($publication->workspace && ($publication->workspace->discord_webhook_url || $publication->workspace->slack_webhook_url)) {
           $publication->workspace->notify($notification);
         }
       } catch (\Exception $e) {

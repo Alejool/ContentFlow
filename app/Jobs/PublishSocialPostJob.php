@@ -25,8 +25,9 @@ class PublishSocialPostJob implements ShouldQueue
     // Verificar si la publicación fue cancelada antes de procesar
     $this->post->refresh();
     
-    if ($this->post->status === 'failed') {
-      Log::info("Publication {$this->post->id} was cancelled, skipping job execution");
+    if (in_array($this->post->status, ['failed', 'cancelled'])) {
+      Log::info("Publication {$this->post->id} was cancelled or failed, skipping job execution");
+      $this->delete(); // Eliminar el job de la cola para evitar reintentos
       return;
     }
     
@@ -34,10 +35,28 @@ class PublishSocialPostJob implements ShouldQueue
     $responses = [];
 
     foreach ($this->post->platform_targets as $accountId) {
+      // Verificar nuevamente antes de cada plataforma
+      $this->post->refresh();
+      if (in_array($this->post->status, ['failed', 'cancelled'])) {
+        Log::info("Publication {$this->post->id} was cancelled during processing, stopping");
+        $this->delete();
+        return;
+      }
+      
       try {
         $account = SocialAccount::find($accountId);
 
         if (!$account || !$account->is_active) {
+          continue;
+        }
+
+        // Verificar si esta plataforma específica fue cancelada
+        $log = $this->post->socialPostLogs()
+          ->where('social_account_id', $accountId)
+          ->first();
+          
+        if ($log && $log->status === 'failed' && $log->error_message === 'Cancelado por el usuario') {
+          Log::info("Platform {$accountId} for publication {$this->post->id} was cancelled, skipping");
           continue;
         }
 

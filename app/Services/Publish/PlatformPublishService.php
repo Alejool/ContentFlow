@@ -141,12 +141,8 @@ class PlatformPublishService
           $this->handleYouTubePlaylist($publication, $postLog, $result->postId);
         }
 
-        $publication->user->notify(new VideoUploadedNotification($postLog));
-
-        // Notify Workspace via Webhooks
-        if ($publication->workspace) {
-          $publication->workspace->notify(new PublicationResultNotification($postLog, 'published'));
-        }
+        // NOTE: Notifications are sent by PublishToSocialMedia job after all platforms complete
+        // This prevents duplicate notifications for each platform
 
 
         return [

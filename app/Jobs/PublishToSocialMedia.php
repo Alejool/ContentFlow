@@ -31,7 +31,7 @@ class PublishToSocialMedia implements ShouldQueue
 
   public function handle(PlatformPublishService $publishService): void
   {
-    $publication = Publication::find($this->publicationId);
+    $publication = Publication::with(['user.currentWorkspace', 'workspace'])->find($this->publicationId);
     
     if (!$publication) {
       Log::error('Publication not found', ['id' => $this->publicationId]);
@@ -189,10 +189,20 @@ class PublishToSocialMedia implements ShouldQueue
         $failedPlatforms
       );
       
-      $publication->user->notify($notification);
-      
+      // Notify all workspace members except the one who published
       if ($publication->workspace) {
-        $publication->workspace->notify($notification);
+        $workspaceUsers = $publication->workspace->users()
+          ->where('users.id', '!=', $publication->published_by)
+          ->get();
+        
+        foreach ($workspaceUsers as $user) {
+          $user->notify($notification);
+        }
+        
+        // Also notify workspace directly if it has webhooks configured (Discord/Slack)
+        if ($publication->workspace->discord_webhook_url || $publication->workspace->slack_webhook_url) {
+          $publication->workspace->notify($notification);
+        }
       }
     } catch (\Exception $e) {
       Log::error('Failed to send success notification', [
@@ -223,10 +233,20 @@ class PublishToSocialMedia implements ShouldQueue
         $failedPlatforms
       );
       
-      $publication->user->notify($notification);
-      
+      // Notify all workspace members except the one who published
       if ($publication->workspace) {
-        $publication->workspace->notify($notification);
+        $workspaceUsers = $publication->workspace->users()
+          ->where('users.id', '!=', $publication->published_by)
+          ->get();
+        
+        foreach ($workspaceUsers as $user) {
+          $user->notify($notification);
+        }
+        
+        // Also notify workspace directly if it has webhooks configured (Discord/Slack)
+        if ($publication->workspace->discord_webhook_url || $publication->workspace->slack_webhook_url) {
+          $publication->workspace->notify($notification);
+        }
       }
     } catch (\Exception $e) {
       Log::error('Failed to send general failure notification', [

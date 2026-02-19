@@ -106,10 +106,21 @@ class PublishPublicationAction
       ])->toArray();
       
       $notification = new \App\Notifications\PublicationProcessingStartedNotification($publication, $accountsData);
-      $publication->user->notify($notification);
       
+      // Notify all workspace members except the one who published
       if ($publication->workspace) {
-        $publication->workspace->notify($notification);
+        $workspaceUsers = $publication->workspace->users()
+          ->where('users.id', '!=', auth()->id())
+          ->get();
+        
+        foreach ($workspaceUsers as $user) {
+          $user->notify($notification);
+        }
+        
+        // Also notify workspace directly if it has webhooks configured (Discord/Slack)
+        if ($publication->workspace->discord_webhook_url || $publication->workspace->slack_webhook_url) {
+          $publication->workspace->notify($notification);
+        }
       }
     } catch (\Exception $e) {
       Log::error('Failed to send processing notification', [
