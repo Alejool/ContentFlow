@@ -33,8 +33,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
     require __DIR__ . '/api/v1/profile.php';
     require __DIR__ . '/api/v1/calendar.php';
     require __DIR__ . '/api/v1/localization.php';
+    require __DIR__ . '/api/v1/onboarding.php';
     Route::prefix('uploads')->name('uploads.')->group(function () {
       require __DIR__ . '/api/v1/uploads.php';
+    });
+    Route::prefix('progress')->name('progress.')->group(function () {
+      require __DIR__ . '/api/v1/progress.php';
     });
     require __DIR__ . '/api/v1/reels.php';
   });
