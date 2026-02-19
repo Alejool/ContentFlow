@@ -34,7 +34,7 @@ export default function VideoReelButton({
 }: VideoReelButtonProps) {
   const { t } = useTranslation();
   const [generating, setGenerating] = useState(false);
-  const [showReels, setShowReels] = useState(false);
+  const [showReels, setShowReels] = useState(true);
 
   // Filter reels generated from this video
   const generatedReels = allMediaFiles.filter(
@@ -95,30 +95,42 @@ export default function VideoReelButton({
       </Button>
 
       {generatedReels.length > 0 && (
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           <button
             onClick={() => setShowReels(!showReels)}
-            className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
+            className="text-xs font-medium text-purple-600 hover:text-purple-700 flex items-center gap-1.5 w-full"
           >
-            {showReels ? '▼' : '▶'} {generatedReels.length} {t('reels.list.reelsGenerated', { count: generatedReels.length })}
+            {showReels ? '▼' : '▶'} 
+            <span className="flex-1 text-left">
+              {generatedReels.length} {t('reels.list.reelsGenerated', { count: generatedReels.length })}
+            </span>
           </button>
 
           {showReels && (
-            <div className="space-y-1 pl-3 border-l-2 border-purple-200">
+            <div className="space-y-1.5 pl-2 border-l-2 border-purple-300">
               {generatedReels.map((reel) => (
                 <div
                   key={reel.id}
-                  className="flex items-center justify-between text-xs p-1.5 rounded hover:bg-accent"
+                  className="flex items-center justify-between text-xs p-2 rounded-md bg-purple-50 hover:bg-purple-100 border border-purple-200 transition-colors"
                 >
-                  <div className="flex items-center gap-1.5 flex-1 min-w-0">
-                    <span>{getPlatformIcon(reel.metadata?.platform || '')}</span>
-                    <span className="truncate">{reel.metadata?.platform}</span>
+                  <div className="flex items-center gap-2 flex-1 min-w-0">
+                    <span className="text-base">{getPlatformIcon(reel.metadata?.platform || '')}</span>
+                    <div className="flex flex-col flex-1 min-w-0">
+                      <span className="font-medium text-gray-700 capitalize truncate">
+                        {reel.metadata?.platform || 'Reel'}
+                      </span>
+                      {reel.metadata?.duration && (
+                        <span className="text-[10px] text-gray-500">
+                          {Math.floor(reel.metadata.duration)}s
+                        </span>
+                      )}
+                    </div>
                   </div>
 
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1.5">
                     {reel.status === 'completed' && (
                       <>
-                        <CheckCircle2 className="h-3 w-3 text-green-500" />
+                        <CheckCircle2 className="h-3.5 w-3.5 text-green-600" />
                         <button
                           onClick={() => {
                             const url = reel.file_path.startsWith('http') 
@@ -126,17 +138,24 @@ export default function VideoReelButton({
                               : `/storage/${reel.file_path}`;
                             window.open(url, '_blank');
                           }}
-                          className="p-0.5 hover:bg-accent rounded"
+                          className="p-1 hover:bg-purple-200 rounded transition-colors"
+                          title="Ver reel"
                         >
-                          <ExternalLink className="h-3 w-3" />
+                          <ExternalLink className="h-3.5 w-3.5 text-purple-600" />
                         </button>
                       </>
                     )}
                     {reel.status === 'processing' && (
-                      <Loader2 className="h-3 w-3 animate-spin text-blue-500" />
+                      <div className="flex items-center gap-1">
+                        <Loader2 className="h-3.5 w-3.5 animate-spin text-blue-600" />
+                        <span className="text-[10px] text-blue-600 font-medium">Procesando</span>
+                      </div>
                     )}
                     {reel.status === 'failed' && (
-                      <AlertCircle className="h-3 w-3 text-red-500" />
+                      <div className="flex items-center gap-1">
+                        <AlertCircle className="h-3.5 w-3.5 text-red-600" />
+                        <span className="text-[10px] text-red-600 font-medium">Error</span>
+                      </div>
                     )}
                   </div>
                 </div>
