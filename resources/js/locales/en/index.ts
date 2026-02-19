@@ -15,6 +15,7 @@ import manageContent from "./manageContent.json";
 import media from "./media.json";
 import nav from "./nav.json";
 import notifications from "./notifications.json";
+import onboarding from "./onboarding.json";
 import pagination from "./pagination.json";
 import platformSettings from "./platformSettings.json";
 import profile from "./profile.json";
@@ -53,5 +54,6 @@ export default {
   ...activity,
   ...validation,
   ...videoValidation,
+  ...onboarding,
   formats,
 };

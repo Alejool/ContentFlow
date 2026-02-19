@@ -145,6 +145,62 @@
         "overview": "Resumen",
         "activity": "Actividad",
         "approvals": "Aprobaciones"
+    },
+    "upload": {
+      "progress": "Progreso de carga",
+      "percentage": "{{percentage}}% completado",
+      "eta": "Tiempo estimado restante",
+      "speed": "Velocidad de carga",
+      "left": "restante",
+      "pending": "Pendiente",
+      "uploading": "Cargando",
+      "paused": "Pausado",
+      "completed": "Completado",
+      "cancelled": "Cancelado",
+      "processing": "Procesando",
+      "done": "Listo",
+      "pause": "Pausar",
+      "resume": "Reanudar",
+      "retry": "Reintentar",
+      "dismiss": "Descartar",
+      "retryAttempt": "Intento {{count}} de 3",
+      "maxRetriesReached": "Se alcanzó el máximo de intentos. Por favor verifica tu conexión o intenta cargar un archivo más pequeño.",
+      "networkError": "Error de red. Por favor verifica tu conexión e intenta nuevamente.",
+      "validationError": "Falló la validación del archivo. Por favor verifica el archivo e intenta nuevamente.",
+      "uploadFailed": "Falló la carga. Por favor intenta nuevamente.",
+      "processingFailed": "Falló el procesamiento. Por favor intenta nuevamente."
+    },
+    "emptyState": {
+      "reels": {
+        "title": "Aún no hay reels",
+        "description": "Crea tu primer reel para comenzar a interactuar con tu audiencia a través de contenido de video corto.",
+        "action": "Crear Reel"
+      },
+      "scheduledPosts": {
+        "title": "No hay publicaciones programadas",
+        "description": "Programa tu contenido con anticipación para mantener un calendario de publicación consistente en todas las plataformas.",
+        "action": "Programar Publicación"
+      },
+      "analytics": {
+        "title": "No hay datos de analíticas disponibles",
+        "description": "Las analíticas aparecerán aquí una vez que comiences a publicar contenido y recopilar datos de interacción.",
+        "action": "Crear Primera Publicación"
+      },
+      "searchResults": {
+        "title": "No se encontraron resultados",
+        "description": "Intenta ajustar tus términos de búsqueda o filtros para encontrar lo que buscas.",
+        "action": "Limpiar Filtros"
+      },
+      "calendarView": {
+        "title": "No hay contenido programado",
+        "description": "Tu calendario está vacío. Comienza a programar contenido para verlo aparecer aquí.",
+        "action": "Programar Contenido"
+      },
+      "content": {
+        "title": "Aún no hay contenido",
+        "description": "Comienza a crear contenido para gestionar y programar tus publicaciones en redes sociales.",
+        "action": "Crear Contenido"
+      }
     }
   }
 }

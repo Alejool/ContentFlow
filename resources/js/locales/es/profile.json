@@ -6,7 +6,8 @@
       "security": "Seguridad",
       "accounts": "Conexiones",
       "ai": "Inteligencia Artificial",
-      "appearance": "Apariencia"
+      "appearance": "Apariencia",
+      "onboarding": "Incorporación"
     },
     "title": "Perfil",
     "settings_description": "Actualiza tu información personal y ajustes de seguridad.",
@@ -131,6 +132,20 @@
       "get_key": "Obtener Clave",
       "api_key_label": "Clave API",
       "secured_storage": "Almacenamiento Seguro Encriptado"
+    },
+    "onboarding": {
+      "title": "Incorporación",
+      "description": "Administra tu experiencia de incorporación y recorrido guiado",
+      "confirmTitle": "¿Reiniciar Incorporación?",
+      "confirmMessage": "Esto restablecerá tu progreso de incorporación y reiniciará el recorrido guiado. Los datos y configuraciones de tu cuenta no se verán afectados.",
+      "confirmButton": "Reiniciar",
+      "infoTitle": "¿Qué sucede cuando reinicias?",
+      "infoPoint1": "Tu progreso de incorporación se restablecerá",
+      "infoPoint2": "El recorrido guiado se reiniciará desde el principio",
+      "infoPoint3": "Los datos y configuraciones de tu cuenta permanecen sin cambios",
+      "restartLabel": "Reiniciar Recorrido de Incorporación",
+      "restartHint": "Revisa las características de la plataforma y el proceso de configuración nuevamente",
+      "restartButton": "Reiniciar"
     }
   }
 }

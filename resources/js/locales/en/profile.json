@@ -6,7 +6,8 @@
       "security": "Security",
       "accounts": "Connected Accounts",
       "ai": "Artificial Intelligence",
-      "appearance": "Appearance"
+      "appearance": "Appearance",
+      "onboarding": "Onboarding"
     },
     "title": "Profile",
     "appearance": "Appearance",
@@ -132,6 +133,20 @@
       "get_key": "Get Key",
       "api_key_label": "API Key",
       "secured_storage": "Secure Encrypted Storage"
+    },
+    "onboarding": {
+      "title": "Onboarding",
+      "description": "Manage your onboarding experience and guided tour",
+      "confirmTitle": "Restart Onboarding?",
+      "confirmMessage": "This will reset your onboarding progress and restart the guided tour. Your account data and settings will not be affected.",
+      "confirmButton": "Restart",
+      "infoTitle": "What happens when you restart?",
+      "infoPoint1": "Your onboarding progress will be reset",
+      "infoPoint2": "The guided tour will restart from the beginning",
+      "infoPoint3": "Your account data and settings remain unchanged",
+      "restartLabel": "Restart Onboarding Tour",
+      "restartHint": "Review the platform features and setup process again",
+      "restartButton": "Restart"
     }
   }
 }

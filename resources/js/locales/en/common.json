@@ -136,6 +136,62 @@
       "show": "Show",
       "entries": "entries",
       "info": "Showing {{from}} to {{to}} of {{total}} results"
+    },
+    "upload": {
+      "progress": "Upload progress",
+      "percentage": "{{percentage}}% complete",
+      "eta": "Estimated time remaining",
+      "speed": "Upload speed",
+      "left": "remaining",
+      "pending": "Pending",
+      "uploading": "Uploading",
+      "paused": "Paused",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "processing": "Processing",
+      "done": "Done",
+      "pause": "Pause",
+      "resume": "Resume",
+      "retry": "Retry",
+      "dismiss": "Dismiss",
+      "retryAttempt": "Retry attempt {{count}} of 3",
+      "maxRetriesReached": "Maximum retry attempts reached. Please check your connection or try uploading a smaller file.",
+      "networkError": "Network error occurred. Please check your connection and try again.",
+      "validationError": "File validation failed. Please check the file and try again.",
+      "uploadFailed": "Upload failed. Please try again.",
+      "processingFailed": "Processing failed. Please try again."
+    },
+    "emptyState": {
+      "reels": {
+        "title": "No reels yet",
+        "description": "Create your first reel to start engaging with your audience through short-form video content.",
+        "action": "Create Reel"
+      },
+      "scheduledPosts": {
+        "title": "No scheduled posts",
+        "description": "Schedule your content in advance to maintain a consistent posting schedule across all platforms.",
+        "action": "Schedule Post"
+      },
+      "analytics": {
+        "title": "No analytics data available",
+        "description": "Analytics will appear here once you start publishing content and gathering engagement data.",
+        "action": "Create First Post"
+      },
+      "searchResults": {
+        "title": "No results found",
+        "description": "Try adjusting your search terms or filters to find what you're looking for.",
+        "action": "Clear Filters"
+      },
+      "calendarView": {
+        "title": "No content scheduled",
+        "description": "Your calendar is empty. Start scheduling content to see it appear here.",
+        "action": "Schedule Content"
+      },
+      "content": {
+        "title": "No content yet",
+        "description": "Start creating content to manage and schedule your social media posts.",
+        "action": "Create Content"
+      }
     }
   }
 }
