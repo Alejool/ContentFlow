@@ -71,6 +71,8 @@
     "platformConnect": "Platform",
     "close": "Close",
     "copy": "Copy",
+    "download": "Download",
+    "openInNewTab": "Open in new tab",
     "created": "Created",
     "creator": "Creator",
     "me": "Me",

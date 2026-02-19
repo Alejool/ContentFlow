@@ -71,7 +71,7 @@
         "title": "Fecha para todas las redes",
         "description": "Define una fecha única para publicar en todas las redes sociales seleccionadas a la vez.",
         "placeholder": "Seleccionar fecha y hora",
-        "instantWarning": "Para publicar ahora, usa el botón Publicar después de guardar.",
+        "instantWarning": "Para publicar inmediatamente, usa el botón Publicar del modal.",
         "useGlobal": "Programación Global"
       },
       "add": {

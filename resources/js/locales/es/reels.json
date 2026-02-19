@@ -8,13 +8,36 @@
     "messages": {
       "generating": "🎬 Generando reels. Te notificaremos cuando estén listos.",
       "error": "Error al generar reels",
-      "noAiConfigured": "⚠️ Configura una API key de IA para usar esta función"
+      "noAiConfigured": "⚠️ Configura una API key de IA para usar esta función",
+      "noVideo": "No hay video seleccionado",
+      "deleted": "Reels eliminados correctamente",
+      "deleteError": "Error al eliminar los reels",
+      "deletedWithVideo": "Video y reels asociados eliminados",
+      "alreadyGenerated": "Ya existen reels generados. Elimínalos primero para generar nuevos.",
+      "alreadyProcessing": "Ya hay reels en proceso de generación. Por favor espera a que terminen.",
+      "confirmRegenerate": "Ya existen reels generados. ¿Deseas eliminarlos y generar nuevos?",
+      "confirmDelete": "¿Estás seguro de que deseas eliminar este reel?",
+      "reelDeleted": "Reel eliminado correctamente"
+    },
+    "actions": {
+      "delete": "Eliminar reel",
+      "download": "Descargar reel",
+      "openInNewTab": "Abrir en nueva pestaña"
     },
     "list": {
       "title": "Reels generados",
       "reelsGenerated": "{{count}} reel generado",
       "reelsGenerated_plural": "{{count}} reels generados",
       "noReels": "No hay reels generados aún"
+    },
+    "section": {
+      "title": "Reels Generados con IA",
+      "description": "{{count}} reels optimizados para diferentes plataformas",
+      "empty": "No hay reels generados",
+      "emptyDescription": "Genera reels optimizados automáticamente desde tu video para Instagram, TikTok y YouTube Shorts",
+      "deleteAll": "Eliminar todos",
+      "generated": "{{count}} Reels Generados",
+      "generatedDescription": "Optimizados para redes sociales"
     },
     "status": {
       "completed": "Completado",
