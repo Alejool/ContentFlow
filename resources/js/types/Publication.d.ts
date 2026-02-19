@@ -73,6 +73,16 @@ export type Publication = {
     photo_url?: string;
   } | null;
   approval_logs?: ApprovalLog[];
+  platform_status_summary?: Record<
+    string,
+    {
+      platform: string;
+      status: "published" | "failed" | "pending" | "publishing";
+      published_at?: string;
+      error?: string;
+      url?: string;
+    }
+  >;
 };
 
 export type ApprovalLog = {
