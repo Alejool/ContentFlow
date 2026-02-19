@@ -7,32 +7,77 @@ interface PublicationItemProps {
   publication: Publication;
   onCancel: (e: React.MouseEvent, id: number) => void;
   onDismiss: (e: React.MouseEvent, id: number) => void;
+  onCancelPlatform?: (publicationId: number, platformId: number, platformName: string) => void;
 }
 
-export function PublicationItem({ publication, onCancel, onDismiss }: PublicationItemProps) {
+export function PublicationItem({ publication, onCancel, onDismiss, onCancelPlatform }: PublicationItemProps) {
   const { t } = useTranslation();
 
+  // Calculate platform statistics
+  const getPlatformStats = () => {
+    const platformSummary = publication.platform_status_summary;
+    if (!platformSummary) return null;
+
+    const platforms = Object.values(platformSummary);
+    const total = platforms.length;
+    const published = platforms.filter((p) => p.status === "published").length;
+    const failed = platforms.filter((p) => p.status === "failed").length;
+    const publishing = platforms.filter((p) => p.status === "publishing" || p.status === "pending").length;
+
+    return { total, published, failed, publishing };
+  };
+
   const getStatusIcon = () => {
+    const stats = getPlatformStats();
+    
     switch (publication.status) {
       case "failed":
         return <AlertTriangle className="w-3.5 h-3.5 text-red-500" />;
       case "publishing":
       case "processing":
         return <Loader2 className="w-3.5 h-3.5 text-primary animate-spin" />;
+      case "published":
+        // Show warning icon if some platforms failed
+        if (stats && stats.failed > 0) {
+          return <AlertTriangle className="w-3.5 h-3.5 text-orange-500" />;
+        }
+        return <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />;
       default:
         return <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />;
     }
   };
 
   const getStatusBadge = () => {
+    const stats = getPlatformStats();
+
     const badges = {
       publishing: {
-        text: t("common.publishing") || "Publicando",
+        text: stats
+          ? t("publications.status.publishingProgress", {
+              current: stats.published,
+              total: stats.total,
+              defaultValue: `${stats.published}/${stats.total}`,
+            })
+          : t("common.publishing") || "Publicando",
         className: "bg-primary/10 text-primary dark:bg-primary/20",
       },
       published: {
-        text: t("common.success") || "Éxito",
-        className: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300",
+        text: stats
+          ? stats.failed > 0
+            ? t("publications.status.partialSuccess", {
+                success: stats.published,
+                total: stats.total,
+                defaultValue: `${stats.published}/${stats.total} publicado`,
+              })
+            : t("publications.status.allPublished", {
+                total: stats.total,
+                defaultValue: `${stats.total}/${stats.total} publicado`,
+              })
+          : t("common.success") || "Éxito",
+        className:
+          stats && stats.failed > 0
+            ? "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300"
+            : "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300",
       },
       failed: {
         text: t("common.failed") || "Falló",
@@ -86,7 +131,7 @@ export function PublicationItem({ publication, onCancel, onDismiss }: Publicatio
         </div>
       </div>
 
-      <PlatformProgress publication={publication} />
+      <PlatformProgress publication={publication} onCancelPlatform={onCancelPlatform} />
     </div>
   );
 }

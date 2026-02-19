@@ -55,6 +55,32 @@ export default function GlobalUploadIndicator() {
     }
   };
 
+  const handleCancelPlatform = async (publicationId: number, platformId: number, platformName: string) => {
+    const isConfirmed = await confirm({
+      title: t("publications.modal.cancel_platform.title", { platform: platformName }) || "¿Cancelar " + platformName + "?",
+      message: t("publications.modal.cancel_platform.message", { platform: platformName }) || "¿Estás seguro de que deseas cancelar la publicación en " + platformName + "? Se detendrán todos los reintentos para esta plataforma.",
+      confirmText: t("publications.modal.cancel_platform.confirm") || "Sí, cancelar",
+      cancelText: t("publications.modal.cancel_platform.cancel") || "No",
+      type: "warning",
+    });
+
+    if (!isConfirmed) return;
+
+    try {
+      await axios.post(route("api.v1.publications.cancel", publicationId), {
+        platform_ids: [platformId]
+      });
+      
+      // Force refresh of publication status after canceling
+      // This will trigger a re-fetch of the publication data
+      window.dispatchEvent(new CustomEvent('publication-cancelled', { 
+        detail: { publicationId, platformId } 
+      }));
+    } catch (err) {
+      console.error("Failed to cancel platform", err);
+    }
+  };
+
   const handleDismissPublication = (e: React.MouseEvent, id: number) => {
     e.stopPropagation();
     setDismissedIds((prev) => [...prev, id]);
@@ -165,6 +191,7 @@ export default function GlobalUploadIndicator() {
                     publication={publication}
                     onCancel={handleCancelPublication}
                     onDismiss={handleDismissPublication}
+                    onCancelPlatform={handleCancelPlatform}
                   />
                 ))}
               </div>
