@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\CalendarController;
+use App\Http\Controllers\Api\CalendarExportController;
 use App\Http\Controllers\Api\UserCalendarEventController;
 use Illuminate\Support\Facades\Route;
 
@@ -12,4 +13,12 @@ Route::middleware('auth:sanctum')->prefix('calendar')->name('calendar.')->group(
 
   Route::get('events', [CalendarController::class, 'index'])->name('events');
   Route::patch('events/{id}', [CalendarController::class, 'update'])->name('update');
+  
+  // Bulk operations
+  Route::post('events/bulk-update', [CalendarExportController::class, 'bulkUpdate'])->name('bulk-update');
+  
+  // Export functionality
+  Route::post('export/google', [CalendarExportController::class, 'exportToGoogle'])->name('export.google');
+  Route::post('export/outlook', [CalendarExportController::class, 'exportToOutlook'])->name('export.outlook');
+  Route::get('download/{filename}', [CalendarExportController::class, 'download'])->name('download');
 });

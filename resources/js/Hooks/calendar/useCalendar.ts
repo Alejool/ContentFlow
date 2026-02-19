@@ -11,22 +11,48 @@ export const useCalendar = () => {
     currentMonth,
     isLoading,
     platformFilter,
+    statusFilter,
+    campaignFilter,
+    view,
+    selectedEvents,
     setCurrentMonth,
     setPlatformFilter,
+    setStatusFilter,
+    setCampaignFilter,
+    setView,
+    toggleEventSelection,
+    clearSelection,
+    selectAll,
     fetchEvents,
     updateEvent,
+    bulkUpdateEvents,
     deleteEvent,
+    exportToGoogleCalendar,
+    exportToOutlook,
   } = useCalendarStore(
     useShallow((s) => ({
       events: s.events,
       currentMonth: s.currentMonth,
       isLoading: s.isLoading,
       platformFilter: s.platformFilter,
+      statusFilter: s.statusFilter,
+      campaignFilter: s.campaignFilter,
+      view: s.view,
+      selectedEvents: s.selectedEvents,
       setCurrentMonth: s.setCurrentMonth,
       setPlatformFilter: s.setPlatformFilter,
+      setStatusFilter: s.setStatusFilter,
+      setCampaignFilter: s.setCampaignFilter,
+      setView: s.setView,
+      toggleEventSelection: s.toggleEventSelection,
+      clearSelection: s.clearSelection,
+      selectAll: s.selectAll,
       fetchEvents: s.fetchEvents,
       updateEvent: s.updateEvent,
+      bulkUpdateEvents: s.bulkUpdateEvents,
       deleteEvent: s.deleteEvent,
+      exportToGoogleCalendar: s.exportToGoogleCalendar,
+      exportToOutlook: s.exportToOutlook,
     })),
   );
 
@@ -38,11 +64,21 @@ export const useCalendar = () => {
 
   const filteredEvents = useMemo(() => {
     return events.filter((e) => {
-      if (platformFilter === "all") return true;
-      if (platformFilter === "user_event") return e.type === "user_event";
-      return e.extendedProps.platform?.toLowerCase() === platformFilter;
+      // Platform filter
+      if (platformFilter !== "all") {
+        if (platformFilter === "user_event" && e.type !== "user_event") return false;
+        if (platformFilter !== "user_event" && e.extendedProps.platform?.toLowerCase() !== platformFilter) return false;
+      }
+
+      // Status filter
+      if (statusFilter !== "all" && e.status !== statusFilter) return false;
+
+      // Campaign filter
+      if (campaignFilter && e.extendedProps.campaign_id !== campaignFilter) return false;
+
+      return true;
     });
-  }, [events, platformFilter]);
+  }, [events, platformFilter, statusFilter, campaignFilter]);
 
   const nextMonth = useCallback(() => {
     setCurrentMonth(addMonths(currentMonth, 1));
@@ -131,20 +167,41 @@ export const useCalendar = () => {
     [openEditModal, openViewDetailsModal],
   );
 
+  const handleBulkMove = useCallback(
+    async (newDate: Date) => {
+      const selectedIds = Array.from(selectedEvents);
+      return await bulkUpdateEvents(selectedIds, newDate.toISOString());
+    },
+    [selectedEvents, bulkUpdateEvents],
+  );
+
   return {
     events,
     filteredEvents,
     currentMonth,
     isLoading,
     platformFilter,
+    statusFilter,
+    campaignFilter,
+    view,
+    selectedEvents,
     setPlatformFilter,
+    setStatusFilter,
+    setCampaignFilter,
+    setView,
+    toggleEventSelection,
+    clearSelection,
+    selectAll,
     nextMonth,
     prevMonth,
     goToToday,
     goToMonth,
     handleEventDrop,
     handleEventClick,
+    handleBulkMove,
     deleteEvent,
+    exportToGoogleCalendar,
+    exportToOutlook,
     refreshEvents: fetchEvents,
   };
 };

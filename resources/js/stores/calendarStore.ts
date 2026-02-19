@@ -27,23 +27,38 @@ interface CalendarEvent {
   };
 }
 
+type CalendarView = "month" | "week" | "day";
+
 interface CalendarState {
   events: CalendarEvent[];
   currentMonth: Date;
   isLoading: boolean;
   error: string | null;
   platformFilter: string;
+  statusFilter: string;
+  campaignFilter: string | null;
+  view: CalendarView;
+  selectedEvents: Set<string>;
 
   setCurrentMonth: (date: Date) => void;
   setPlatformFilter: (platform: string) => void;
+  setStatusFilter: (status: string) => void;
+  setCampaignFilter: (campaign: string | null) => void;
+  setView: (view: CalendarView) => void;
+  toggleEventSelection: (eventId: string) => void;
+  clearSelection: () => void;
+  selectAll: () => void;
   fetchEvents: () => Promise<void>;
   updateEvent: (id: string, newDate: string, type: string) => Promise<boolean>;
+  bulkUpdateEvents: (eventIds: string[], newDate: string) => Promise<boolean>;
   updateEventByResourceId: (
     resourceId: number,
     type: "publication" | "post" | "user_event",
     updates: Partial<CalendarEvent>,
   ) => void;
   deleteEvent: (id: string) => Promise<boolean>;
+  exportToGoogleCalendar: () => Promise<void>;
+  exportToOutlook: () => Promise<void>;
 }
 
 export const useCalendarStore = create<CalendarState>((set, get) => ({
@@ -52,9 +67,33 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
   isLoading: false,
   error: null,
   platformFilter: "all",
+  statusFilter: "all",
+  campaignFilter: null,
+  view: "month",
+  selectedEvents: new Set(),
 
   setCurrentMonth: (date) => set({ currentMonth: date }),
   setPlatformFilter: (platform) => set({ platformFilter: platform }),
+  setStatusFilter: (status) => set({ statusFilter: status }),
+  setCampaignFilter: (campaign) => set({ campaignFilter: campaign }),
+  setView: (view) => set({ view }),
+  
+  toggleEventSelection: (eventId) => {
+    const selectedEvents = new Set(get().selectedEvents);
+    if (selectedEvents.has(eventId)) {
+      selectedEvents.delete(eventId);
+    } else {
+      selectedEvents.add(eventId);
+    }
+    set({ selectedEvents });
+  },
+
+  clearSelection: () => set({ selectedEvents: new Set() }),
+  
+  selectAll: () => {
+    const allEventIds = get().events.map(e => e.id);
+    set({ selectedEvents: new Set(allEventIds) });
+  },
 
   fetchEvents: async () => {
     const { currentMonth } = get();
@@ -129,6 +168,37 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
     }));
   },
 
+  bulkUpdateEvents: async (eventIds, newDate) => {
+    try {
+      const promises = eventIds.map(id => {
+        const event = get().events.find(e => e.id === id);
+        if (!event) return Promise.resolve();
+        
+        const resourceId = id.split("_").pop();
+        return axios.patch(`/api/v1/calendar/events/${resourceId}`, {
+          scheduled_at: newDate,
+          type: event.type,
+        });
+      });
+
+      await Promise.all(promises);
+
+      // Update local state
+      const events = get().events.map((ev) =>
+        eventIds.includes(ev.id) ? { ...ev, start: newDate } : ev,
+      );
+      set({ events, selectedEvents: new Set() });
+
+      return true;
+    } catch (error: any) {
+      set({
+        error: error.message ?? "Failed to bulk update events",
+      });
+      get().fetchEvents();
+      return false;
+    }
+  },
+
   deleteEvent: async (id) => {
     try {
       const resourceId = id.includes("_") ? id.split("_")[2] : id;
@@ -142,6 +212,50 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
         error: error.message ?? "Failed to delete event",
       });
       return false;
+    }
+  },
+
+  exportToGoogleCalendar: async () => {
+    try {
+      const { events } = get();
+      const response = await axios.post('/api/v1/calendar/export/google', {
+        events: events.map(e => ({
+          title: e.title,
+          start: e.start,
+          end: e.end,
+          description: `Status: ${e.status}`,
+        })),
+      });
+      
+      if (response.data.url) {
+        window.open(response.data.url, '_blank');
+      }
+    } catch (error: any) {
+      set({
+        error: error.message ?? "Failed to export to Google Calendar",
+      });
+    }
+  },
+
+  exportToOutlook: async () => {
+    try {
+      const { events } = get();
+      const response = await axios.post('/api/v1/calendar/export/outlook', {
+        events: events.map(e => ({
+          title: e.title,
+          start: e.start,
+          end: e.end,
+          description: `Status: ${e.status}`,
+        })),
+      });
+      
+      if (response.data.url) {
+        window.open(response.data.url, '_blank');
+      }
+    } catch (error: any) {
+      set({
+        error: error.message ?? "Failed to export to Outlook",
+      });
     }
   },
 }));
