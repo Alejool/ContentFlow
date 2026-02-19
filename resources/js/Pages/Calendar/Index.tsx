@@ -3,6 +3,8 @@ import { DynamicModal } from "@/Components/common/Modern/DynamicModal";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { formatTime } from "@/Utils/formatDate";
 import { Head } from "@inertiajs/react";
+import EmptyState from "@/Components/common/EmptyState";
+import { getEmptyStateByKey } from "@/Utils/emptyStateMapper";
 import {
   addMonths,
   eachDayOfInterval,
@@ -358,6 +360,9 @@ export default function CalendarIndex({ auth }: { auth: any }) {
               </div>
 
               {/* Calendar Grid */}
+              {!loading && filteredEvents.length === 0 ? (
+                <EmptyState config={getEmptyStateByKey('calendarView', t)!} />
+              ) : (
               <div className="border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden shadow-sm bg-gray-50 dark:bg-black/50">
                 {/* Weekday Headers - Desktop Only */}
                 <div className="hidden lg:grid grid-cols-7 bg-white dark:bg-black border-b border-gray-200 dark:border-gray-800">
@@ -525,6 +530,7 @@ export default function CalendarIndex({ auth }: { auth: any }) {
                   })}
                 </div>
               </div>
+              )}
             </div>
           </div>
         </div>

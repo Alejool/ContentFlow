@@ -6,6 +6,8 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import ReelCardSkeleton from '@/Components/common/ui/skeletons/ReelCardSkeleton';
+import EmptyState from '@/Components/common/EmptyState';
+import { getEmptyStateByKey } from '@/Utils/emptyStateMapper';
 
 interface MediaFile {
   id: number;
@@ -158,17 +160,7 @@ export default function AiReelsGallery() {
               ))}
             </div>
           ) : reels.length === 0 ? (
-            <div className="text-center py-20">
-              <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 flex items-center justify-center">
-                <Film className="w-10 h-10 text-purple-500" />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                No hay reels generados
-              </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Genera tu primer reel desde una publicación con video
-              </p>
-            </div>
+            <EmptyState config={getEmptyStateByKey('reels', t)!} />
           ) : (
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

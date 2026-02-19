@@ -6,7 +6,8 @@ import { Head, router } from "@inertiajs/react";
 import { Eye, Heart, MousePointer2, TrendingUp, Users } from "lucide-react";
 import { Suspense, lazy, useState } from "react";
 import { useTranslation } from "react-i18next";
-import EmptyState from "../../Components/Analytics/EmptyState";
+import EmptyState from "@/Components/common/EmptyState";
+import { getEmptyStateByKey } from "@/Utils/emptyStateMapper";
 import { CampaignStat } from "../../Components/Analytics/PerformanceTable";
 import PeriodSelector from "../../Components/Analytics/PeriodSelector";
 
@@ -270,11 +271,7 @@ export default function Index({ stats, period }: AnalyticsProps) {
         )}
 
         {campaigns.length === 0 && socialMedia.length === 0 && (
-          <EmptyState
-            theme={theme}
-            title={t("analytics.emptyState.title")}
-            description={t("analytics.emptyState.description")}
-          />
+          <EmptyState config={getEmptyStateByKey('analytics', t)!} />
         )}
       </div>
     </AuthenticatedLayout>

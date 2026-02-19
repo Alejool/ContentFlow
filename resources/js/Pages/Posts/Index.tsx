@@ -2,6 +2,9 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head } from "@inertiajs/react";
 import { Line } from "@ant-design/plots";
 import { PartyPopper, TrendingUp, Calendar, BarChart3 } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import EmptyState from "@/Components/common/EmptyState";
+import { getEmptyStateByKey } from "@/Utils/emptyStateMapper";
 
 const postStats = [
   { time: "08:00", instagram: 200, twitter: 150, facebook: 180 },
@@ -97,6 +100,8 @@ function ContentCard({ post }: { post: Post }) {
 }
 
 export default function SchedulePosts() {
+  const { t } = useTranslation();
+  
   return (
     <AuthenticatedLayout>
       <Head title="Schedule Posts" />
@@ -127,11 +132,15 @@ export default function SchedulePosts() {
             <h3 className="text-xl font-semibold text-gray-800">
               Recent Posts
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
-              {posts.map((post) => (
-                <ContentCard key={post.id} post={post} />
-              ))}
-            </div>
+            {posts.length === 0 ? (
+              <EmptyState config={getEmptyStateByKey('scheduledPosts', t)!} />
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+                {posts.map((post) => (
+                  <ContentCard key={post.id} post={post} />
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
