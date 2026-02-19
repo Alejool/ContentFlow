@@ -43,6 +43,7 @@ export interface UsePublishPublicationReturn extends PublishPublicationState {
     platformSettings?: Record<string, any>,
   ) => Promise<boolean>;
   handleCancelPublication: (publicationId: number) => Promise<void>;
+  handleCancelPlatform: (publicationId: number, platformId: number) => Promise<void>;
   setYoutubeThumbnails: React.Dispatch<
     React.SetStateAction<Record<number, File | null>>
   >;
@@ -520,6 +521,39 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
     }
   }, []);
 
+  const handleCancelPlatform = useCallback(async (publicationId: number, platformId: number) => {
+    try {
+      const payload = {
+        platform_ids: [platformId]
+      };
+      
+      console.log('handleCancelPlatform called with:', {
+        publicationId,
+        platformId,
+        payload,
+        route: route("api.v1.publications.cancel", publicationId)
+      });
+      
+      const response = await axios.post(route("api.v1.publications.cancel", publicationId), payload);
+      
+      console.log('Cancel platform response:', response.data);
+      
+      toast.success("Plataforma cancelada");
+      
+      // Dispatch event to update UI
+      window.dispatchEvent(new CustomEvent('publication-cancelled', { 
+        detail: { publicationId, platformId } 
+      }));
+      
+      await fetchPublishedPlatformsFromStore(publicationId);
+      usePublicationStore.getState().fetchPublicationById(publicationId);
+    } catch (err: any) {
+      console.error("Failed to cancel platform", err);
+      console.error("Error response:", err.response?.data);
+      toast.error("Error al cancelar la plataforma");
+    }
+  }, [fetchPublishedPlatformsFromStore]);
+
   /* ------------------------------- RETURN ----------------------------------- */
 
   return {
@@ -547,6 +581,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
     isYoutubeSelected,
     handlePublish,
     handleCancelPublication,
+    handleCancelPlatform,
     handleRequestReview,
     handleApprove,
     handleReject,

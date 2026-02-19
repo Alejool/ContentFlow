@@ -153,7 +153,10 @@ export const usePublicationLock = (
           // Handover sync: ensure we have absolute latest data from API
           if (!wasAlreadyLockedByMe || force) {
             await refreshPublicationInAllStores(publicationId);
-            if (force) toast.success("Has tomado el control de la edición.");
+            if (force)
+              toast.success("Has tomado el control de la edición.", {
+                id: `lock-takeover-${publicationId}`,
+              });
           }
         } else if (data?.details) {
           setLockInfo(data.details);
@@ -358,7 +361,9 @@ export const useWorkspaceLocks = () => {
             .getState()
             .publications.find((p) => p.id === pubId);
           if (pub) {
-            toast.success(`"${pub.title}" ya está disponible.`);
+            toast.success(`"${pub.title}" ya está disponible.`, {
+              id: `unlock-${pubId}`,
+            });
           }
         });
       }

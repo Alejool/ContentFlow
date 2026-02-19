@@ -31,15 +31,15 @@ export const useSocialMediaAuth = () => {
         );
 
         if (response.data.success && response.data.url) {
-          const width = 400;
-          const height = 600;
+          const width = 600;
+          const height = 700;
           const left = window.screen.width / 2 - width / 2;
           const top = window.screen.height / 2 - height / 2;
 
           const authWindow = window.open(
             response.data.url,
             `${platform}Auth`,
-            `width=${width},height=${height},left=${left},top=${top}`,
+            `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`,
           );
 
           if (!authWindow) {
@@ -56,6 +56,10 @@ export const useSocialMediaAuth = () => {
               (event.data?.type === "social_auth_callback" &&
                 event.data?.success === true);
 
+            const isErrorEvent =
+              event.data?.type === "social_auth_callback" &&
+              event.data?.success === false;
+
             if (isSuccessEvent) {
               window.removeEventListener("message", handleMessage);
               authWindow.close();
@@ -65,6 +69,21 @@ export const useSocialMediaAuth = () => {
               setLoading(false);
               toast.success("Cuenta conectada exitosamente");
               resolve(true);
+            } else if (isErrorEvent) {
+              window.removeEventListener("message", handleMessage);
+              authWindow.close();
+              
+              setLoading(false);
+              const errorMsg = event.data?.message || "Error al conectar la cuenta";
+              
+              // Detectar errores específicos de rate limit
+              if (errorMsg.includes("429") || errorMsg.toLowerCase().includes("rate limit") || errorMsg.toLowerCase().includes("too many requests")) {
+                toast.error("Twitter/X: Límite de solicitudes excedido. Por favor, intenta de nuevo en unos minutos.");
+              } else {
+                toast.error(errorMsg);
+              }
+              
+              resolve(false);
             }
           };
 

@@ -96,12 +96,18 @@ export function usePublicationStatus({ dismissedIds }: UsePublicationStatusOptio
     const handlePublicationStarted = () => {
       fetchPublications(abortController.signal);
     };
+    
+    const handlePublicationCancelled = () => {
+      fetchPublications(abortController.signal);
+    };
 
     window.addEventListener("publication-started", handlePublicationStarted);
+    window.addEventListener("publication-cancelled", handlePublicationCancelled);
 
     return () => {
       abortController.abort();
       window.removeEventListener("publication-started", handlePublicationStarted);
+      window.removeEventListener("publication-cancelled", handlePublicationCancelled);
     };
   }, []);
 

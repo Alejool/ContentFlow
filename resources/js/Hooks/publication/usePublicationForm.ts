@@ -844,6 +844,7 @@ export const usePublicationForm = ({
           publication
             ? t("publications.messages.updateSuccess")
             : t("publications.messages.createSuccess"),
+          { id: publication ? `pub-update-${publication.id}` : "pub-create" }
         );
       }
 
