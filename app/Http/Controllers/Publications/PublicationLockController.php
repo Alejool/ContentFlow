@@ -107,16 +107,8 @@ class PublicationLockController extends Controller
             $lock->delete();
             broadcast(new PublicationLockChanged($publication->id, null, $user->current_workspace_id))->toOthers();
             
-            // Notify other workspace users that the publication is now available
-            if ($user->current_workspace_id) {
-                $workspaceUsers = \App\Models\User::where('current_workspace_id', $user->current_workspace_id)
-                    ->where('id', '!=', $user->id) // Exclude the user who unlocked
-                    ->get();
-                
-                foreach ($workspaceUsers as $workspaceUser) {
-                    $workspaceUser->notify(new \App\Notifications\PublicationUnlockedNotification($publication, $user));
-                }
-            }
+            // Note: Notification removed to prevent spam. Frontend already shows toast via WebSocket.
+            // Database notifications were accumulating and causing repeated alerts.
         } else {
             Log::warning("⚠️ Unlock failed - lock not found for user: pub {$publication->id}, user {$user->id}");
         }
