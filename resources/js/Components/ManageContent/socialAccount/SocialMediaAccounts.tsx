@@ -21,6 +21,7 @@ import {
 import { memo, useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
+import SocialAccountCardSkeleton from "@/Components/common/ui/skeletons/SocialAccountCardSkeleton";
 
 interface Account {
   id: number; // For connected accounts, this is the DB ID. For unconnected, it might be platform index.
@@ -382,11 +383,10 @@ const SocialMediaAccounts = memo(() => {
           </div>
 
           {loading ? (
-            <div className="flex flex-col items-center justify-center py-12 rounded-lg border transition-colors duration-300 bg-white border-gray-100 dark:bg-neutral-800/50 dark:border-neutral-700/50">
-              <Loader2 className="w-10 h-10 animate-spin mb-4 text-primary-600 dark:text-primary-400" />
-              <p className="font-bold text-gray-500 dark:text-gray-400 uppercase text-xs tracking-widest">
-                {t("common.loading")}
-              </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {Array.from({ length: 4 }).map((_, index) => (
+                <SocialAccountCardSkeleton key={index} />
+              ))}
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">

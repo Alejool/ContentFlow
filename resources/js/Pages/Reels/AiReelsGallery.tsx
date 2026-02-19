@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Head } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Sparkles, Film, Download, ExternalLink, Play, Filter, Loader2 } from 'lucide-react';
+import { Sparkles, Film, Download, ExternalLink, Play, Filter } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import ReelCardSkeleton from '@/Components/common/ui/skeletons/ReelCardSkeleton';
 
 interface MediaFile {
   id: number;
@@ -151,8 +152,10 @@ export default function AiReelsGallery() {
 
           {/* Reels Grid */}
           {loading ? (
-            <div className="flex items-center justify-center py-20">
-              <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {Array.from({ length: 8 }).map((_, index) => (
+                <ReelCardSkeleton key={index} />
+              ))}
             </div>
           ) : reels.length === 0 ? (
             <div className="text-center py-20">
