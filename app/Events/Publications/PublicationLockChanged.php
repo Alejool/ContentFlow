@@ -18,6 +18,7 @@ class PublicationLockChanged implements ShouldBroadcast
   public $publicationId;
   public $lock;
   public $workspaceId;
+  public $broadcastQueue = 'notifications';
 
   /**
    * Create a new event instance.
