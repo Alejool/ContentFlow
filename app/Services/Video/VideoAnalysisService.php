@@ -40,7 +40,8 @@ class VideoAnalysisService
    */
   public function analyzeVideoContent(string $videoPath): array
   {
-    Log::info('Analyzing video content (basic mode)');
+    $startTime = microtime(true);
+    Log::info('🔍 Analyzing video content (basic mode)', ['video_path' => $videoPath]);
     
     $analysis = [
       'objects' => ['video', 'content'],
@@ -53,6 +54,9 @@ class VideoAnalysisService
       'suggested_hashtags' => ['#video', '#content', '#social', '#viral'],
     ];
 
+    $duration = round(microtime(true) - $startTime, 3);
+    Log::info('✅ Video analysis completed', ['duration_seconds' => $duration]);
+
     return $analysis;
   }
 
@@ -61,6 +65,9 @@ class VideoAnalysisService
    */
   public function generateContentSuggestions(array $videoAnalysis, string $platform): array
   {
+    $startTime = microtime(true);
+    Log::info('🤖 Generating AI content suggestions', ['platform' => $platform]);
+    
     try {
       $context = [
         [
@@ -73,11 +80,19 @@ class VideoAnalysisService
         ]
       ];
 
+      Log::info('📡 Calling AI service for content suggestions');
       $response = $this->aiService->chat($context);
+      
+      $duration = round(microtime(true) - $startTime, 2);
+      Log::info('✅ AI suggestions generated', ['duration_seconds' => $duration]);
       
       return $this->parseAISuggestions($response['content'] ?? '');
     } catch (\Exception $e) {
-      Log::warning('AI suggestions failed, using defaults', ['error' => $e->getMessage()]);
+      $duration = round(microtime(true) - $startTime, 2);
+      Log::warning('⚠️ AI suggestions failed, using defaults', [
+        'error' => $e->getMessage(),
+        'duration_seconds' => $duration
+      ]);
       
       return [
         'title' => 'Video destacado',

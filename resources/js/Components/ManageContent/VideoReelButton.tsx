@@ -42,6 +42,19 @@ export default function VideoReelButton({
   );
 
   const handleGenerate = async () => {
+    // Check if there are reels currently processing
+    const hasProcessingReels = generatedReels.some(reel => reel.status === 'processing');
+    if (hasProcessingReels) {
+      toast.error(t('reels.messages.alreadyProcessing'));
+      return;
+    }
+
+    // If reels already exist, ask for confirmation to regenerate
+    if (generatedReels.length > 0) {
+      const confirmed = confirm(t('reels.messages.confirmRegenerate'));
+      if (!confirmed) return;
+    }
+
     setGenerating(true);
 
     try {
@@ -79,19 +92,23 @@ export default function VideoReelButton({
 
   if (videoFile.file_type !== 'video') return null;
 
+  // Check if there are reels currently processing
+  const hasProcessingReels = generatedReels.some(reel => reel.status === 'processing');
+  const isButtonDisabled = generating || hasProcessingReels;
+
   return (
     <div className="space-y-2">
       <Button
         onClick={handleGenerate}
-        disabled={generating}
+        disabled={isButtonDisabled}
         buttonStyle="outline"
         variant="primary"
         size={compact ? "sm" : "md"}
         className="w-full gap-2 border-purple-200 hover:bg-purple-50 hover:border-purple-300 text-purple-700"
-        icon={generating ? Loader2 : Sparkles}
-        loading={generating}
+        icon={generating || hasProcessingReels ? Loader2 : Sparkles}
+        loading={generating || hasProcessingReels}
       >
-        {generating ? t('reels.button.generating') : t('reels.button.generate')}
+        {generating || hasProcessingReels ? t('reels.button.generating') : t('reels.button.generate')}
       </Button>
 
       {generatedReels.length > 0 && (

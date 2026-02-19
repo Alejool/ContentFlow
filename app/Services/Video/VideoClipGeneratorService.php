@@ -21,7 +21,9 @@ class VideoClipGeneratorService
     $specs = $this->getPlatformSpecs($platform);
     
     try {
-      $videoPath = $this->downloadVideo($mediaFile->file_path);
+      // Use getRawOriginal to get the actual S3 path, not the URL
+      $s3Path = $mediaFile->getRawOriginal('file_path');
+      $videoPath = $this->downloadVideo($s3Path);
       
       if (!file_exists($videoPath)) {
         throw new \Exception("Downloaded video file not found: {$videoPath}");
@@ -50,25 +52,80 @@ class VideoClipGeneratorService
         
         // Fallback: Just copy the file without processing
         Log::warning('FFmpeg not available, copying original file');
+        
+        // Validate input file before copying
+        $inputSize = filesize($videoPath);
+        if ($inputSize === 0 || $inputSize === false) {
+          throw new \Exception("Input video file is empty, cannot process: {$videoPath}");
+        }
+        
         copy($videoPath, $outputPath);
         
         if (!file_exists($outputPath)) {
           throw new \Exception('Failed to copy video file');
         }
+        
+        // Validate copied file
+        $outputSize = filesize($outputPath);
+        if ($outputSize === 0 || $outputSize === false) {
+          throw new \Exception("Copied video file is empty: {$outputPath}");
+        }
       } else {
-        // FFmpeg is available, process the video
-        // Ultra-simple command for maximum compatibility
+        // FFmpeg is available, process the video with effects
+        // OPTIMIZED FOR SPEED: Using config-based settings
+        $preset = config('reels.encoding.preset', 'veryfast');
+        $crf = config('reels.encoding.crf', 26);
+        $audioBitrate = config('reels.encoding.audio_bitrate', '96k');
+        
+        $videoFilters = [];
+        
+        // 1. Scale and pad to platform dimensions
+        $videoFilters[] = sprintf(
+          'scale=%d:%d:force_original_aspect_ratio=decrease,pad=%d:%d:(ow-iw)/2:(oh-ih)/2:black',
+          $specs['width'],
+          $specs['height'],
+          $specs['width'],
+          $specs['height']
+        );
+        
+        // 2. Enhance colors for more eye-catching video (if enabled)
+        if (config('reels.effects.color_enhancement', true)) {
+          $videoFilters[] = 'eq=contrast=1.15:brightness=0.03:saturation=1.2';
+        }
+        
+        // 3. Add clickbait text if requested (if enabled)
+        if (($options['add_subtitles'] ?? false) && config('reels.effects.clickbait_text', true)) {
+          $language = $options['language'] ?? 'es';
+          $clickbaitText = config("reels.text_overlay.{$language}", '¡MIRA ESTO! 👀');
+          
+          // Simplified text overlay (no animation for faster processing)
+          $videoFilters[] = sprintf(
+            "drawtext=fontfile=/Windows/Fonts/arial.ttf:text='%s':fontcolor=white:fontsize=50:box=1:boxcolor=black@0.6:boxborderw=8:x=(w-text_w)/2:y=40",
+            $clickbaitText
+          );
+        }
+        
+        $filterComplex = implode(',', $videoFilters);
+        
+        // SPEED OPTIMIZED: Using configurable preset and CRF
         $command = sprintf(
-          '%s -i %s -vf "scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:black" -c:v libx264 -preset ultrafast -crf 28 -c:a copy -movflags +faststart -y %s 2>&1',
+          '%s -i %s -vf "%s" -c:v libx264 -preset %s -crf %d -c:a aac -b:a %s -movflags +faststart -y %s 2>&1',
           escapeshellcmd($ffmpegPath),
           escapeshellarg($videoPath),
+          $filterComplex,
+          $preset,
+          $crf,
+          $audioBitrate,
           escapeshellarg($outputPath)
         );
 
-        Log::info('Executing FFmpeg command', [
+        Log::info('Executing FFmpeg command (speed optimized)', [
           'command' => $command,
           'input' => $videoPath,
-          'output' => $outputPath
+          'output' => $outputPath,
+          'filters_applied' => count($videoFilters),
+          'preset' => $preset,
+          'crf' => $crf
         ]);
         
         exec($command, $output, $returnCode);
@@ -82,12 +139,30 @@ class VideoClipGeneratorService
           
           // Fallback: Just copy the file
           Log::warning('FFmpeg failed, copying original file as fallback');
+          
+          // Validate input file before copying
+          $inputSize = filesize($videoPath);
+          if ($inputSize === 0 || $inputSize === false) {
+            throw new \Exception("Input video file is empty, cannot process: {$videoPath}");
+          }
+          
           copy($videoPath, $outputPath);
+          
+          // Validate copied file
+          if (!file_exists($outputPath) || filesize($outputPath) === 0) {
+            throw new \Exception("Fallback copy failed or resulted in empty file: {$outputPath}");
+          }
         }
       }
 
       if (!file_exists($outputPath)) {
         throw new \Exception("Output file not created: {$outputPath}");
+      }
+
+      // Validate output file size
+      $outputSize = filesize($outputPath);
+      if ($outputSize === 0 || $outputSize === false) {
+        throw new \Exception("Output video file is empty: {$outputPath}");
       }
 
       Log::info('Video processed successfully', [
@@ -135,7 +210,9 @@ class VideoClipGeneratorService
     $maxClips = $options['max_clips'] ?? 5;
 
     try {
-      $videoPath = $this->downloadVideo($mediaFile->file_path);
+      // Use getRawOriginal to get the actual S3 path, not the URL
+      $s3Path = $mediaFile->getRawOriginal('file_path');
+      $videoPath = $this->downloadVideo($s3Path);
       $videoDuration = $this->getVideoDuration($videoPath);
 
       $highlights = $this->analysisService->detectHighlights($videoPath, $videoDuration);
@@ -171,6 +248,17 @@ class VideoClipGeneratorService
       exec($command, $output, $returnCode);
 
       if ($returnCode === 0 && file_exists($outputPath)) {
+        // Validate clip file size
+        $clipSize = filesize($outputPath);
+        if ($clipSize === 0 || $clipSize === false) {
+          Log::warning('Generated clip is empty, skipping', [
+            'index' => $index,
+            'output_path' => $outputPath
+          ]);
+          @unlink($outputPath);
+          continue;
+        }
+
         $s3Path = $this->uploadToS3($outputPath, 'clips');
         
         $clips[] = [
@@ -182,6 +270,12 @@ class VideoClipGeneratorService
         ];
 
         @unlink($outputPath);
+      } else {
+        Log::warning('Failed to generate clip', [
+          'index' => $index,
+          'return_code' => $returnCode,
+          'output' => implode("\n", $output)
+        ]);
       }
     }
 
@@ -238,14 +332,47 @@ class VideoClipGeneratorService
 
     $output = shell_exec($command);
     
-    return (float) trim($output);
+    return (float) trim($output ?? '');
   }
 
   private function downloadVideo(string $s3Path): string
   {
+    // Validate S3 file exists and has content
+    if (!Storage::exists($s3Path)) {
+      throw new \Exception("Video file not found in S3: {$s3Path}");
+    }
+
+    $fileSize = Storage::size($s3Path);
+    if ($fileSize === 0 || $fileSize === false) {
+      throw new \Exception("Video file is empty or inaccessible in S3: {$s3Path} (size: {$fileSize})");
+    }
+
+    Log::info('Downloading video from S3', [
+      's3_path' => $s3Path,
+      'file_size' => $fileSize,
+      'file_size_mb' => round($fileSize / 1024 / 1024, 2)
+    ]);
+
     $tempPath = sys_get_temp_dir() . '/' . Str::uuid() . '.mp4';
     $content = Storage::get($s3Path);
+    
+    if (empty($content)) {
+      throw new \Exception("Downloaded video content is empty from S3: {$s3Path}");
+    }
+
     file_put_contents($tempPath, $content);
+    
+    // Verify downloaded file
+    if (!file_exists($tempPath) || filesize($tempPath) === 0) {
+      throw new \Exception("Failed to download video or file is empty: {$tempPath}");
+    }
+
+    Log::info('Video downloaded successfully', [
+      'temp_path' => $tempPath,
+      'downloaded_size' => filesize($tempPath),
+      'downloaded_size_mb' => round(filesize($tempPath) / 1024 / 1024, 2)
+    ]);
+
     return $tempPath;
   }
 
@@ -261,10 +388,45 @@ class VideoClipGeneratorService
 
   private function uploadToS3(string $localPath, string $folder): string
   {
+    // Validate local file before upload
+    if (!file_exists($localPath)) {
+      throw new \Exception("Local file not found for upload: {$localPath}");
+    }
+
+    $fileSize = filesize($localPath);
+    if ($fileSize === 0 || $fileSize === false) {
+      throw new \Exception("Local file is empty, cannot upload: {$localPath}");
+    }
+
+    Log::info('Uploading video to S3', [
+      'local_path' => $localPath,
+      'file_size' => $fileSize
+    ]);
+
     $filename = basename($localPath);
     $s3Path = "reels/{$folder}/" . Str::uuid() . '_' . $filename;
     
-    Storage::put($s3Path, file_get_contents($localPath));
+    $content = file_get_contents($localPath);
+    if (empty($content)) {
+      throw new \Exception("Failed to read file content for upload: {$localPath}");
+    }
+
+    Storage::put($s3Path, $content);
+    
+    // Verify upload
+    if (!Storage::exists($s3Path)) {
+      throw new \Exception("File upload failed, not found in S3: {$s3Path}");
+    }
+
+    $uploadedSize = Storage::size($s3Path);
+    if ($uploadedSize === 0 || $uploadedSize === false) {
+      throw new \Exception("Uploaded file is empty in S3: {$s3Path}");
+    }
+
+    Log::info('Video uploaded successfully to S3', [
+      's3_path' => $s3Path,
+      'uploaded_size' => $uploadedSize
+    ]);
     
     return $s3Path;
   }
