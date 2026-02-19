@@ -61,7 +61,9 @@ abstract class BaseNotification extends Notification implements ShouldQueue
    */
   public function via($notifiable): array
   {
-    $channels = [EnhancedDatabaseChannel::class, 'broadcast'];
+    // Solo usar el canal de base de datos para alertas internas
+    // No enviar notificaciones push ni broadcast
+    $channels = [EnhancedDatabaseChannel::class];
 
     $workspace = null;
 

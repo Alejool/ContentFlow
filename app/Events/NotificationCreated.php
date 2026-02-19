@@ -9,7 +9,8 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class NotificationCreated implements ShouldBroadcast
+// Evento deshabilitado para broadcast - solo alertas internas
+class NotificationCreated
 {
   use Dispatchable, InteractsWithSockets, SerializesModels;
 
