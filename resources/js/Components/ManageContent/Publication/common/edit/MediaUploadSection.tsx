@@ -1,5 +1,4 @@
 import Label from "@/Components/common/Modern/Label";
-import VideoReelButton from "@/Components/ManageContent/VideoReelButton";
 import {
   AlertTriangle,
   Crop,
@@ -166,21 +165,6 @@ const MediaUploadSection = memo(
                         isExternalProcessing={preview.status === "processing"}
                         metadata={videoMetadata?.[preview.tempId]}
                       />
-                      {/* Video Reel Generator Button */}
-                      {preview.type.includes("video") && preview.id && publicationId && (
-                        <VideoReelButton
-                          videoFile={{
-                            id: preview.id,
-                            file_name: preview.file?.name || '',
-                            file_path: preview.url,
-                            file_type: 'video',
-                            status: preview.status || 'completed',
-                          }}
-                          publicationId={publicationId}
-                          allMediaFiles={allMediaFiles}
-                          compact
-                        />
-                      )}
                     </div>
                   ))}
                   {!disabled && !isAnyMediaProcessing && (
@@ -482,7 +466,7 @@ const VideoPreview = memo(
 const AddMoreButton = memo(
   ({ onClick }: { onClick: (e: React.MouseEvent) => void }) => (
     <div
-      className="flex items-center justify-center aspect-video border-2 border-dashed border-gray-300 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+      className="flex items-center justify-center aspect-video border-2 border-dashed border-gray-300 rounded-lg hover:bg-primary-100 transition-colors cursor-pointer"
       onClick={onClick}
     >
       <div className="text-center">

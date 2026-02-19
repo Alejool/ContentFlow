@@ -4,6 +4,7 @@ import FilterSection from "@/Components/Content/common/FilterSection";
 import Button from "@/Components/common/Modern/Button";
 import AdvancedPagination from "@/Components/common/ui/AdvancedPagination";
 import EmptyState from "@/Components/common/ui/EmptyState";
+import { VirtualGrid } from "@/Components/common/ui/VirtualList";
 import { useLockStore } from "@/stores/lockStore";
 import { Filter, LayoutGrid, List as ListIcon, RotateCcw } from "lucide-react";
 import { useEffect, useState, useTransition } from "react";
@@ -204,23 +205,29 @@ export default function ContentList(props: ContentListProps) {
       ) : viewMode === "grid" ? (
         <div className="grid grid-cols-1 grid-rows-1">
           <div
-            className={`col-start-1 row-start-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 transition-all duration-500 ${smoothLoading ? "invisible opacity-0" : "visible opacity-100"}`}
+            className={`col-start-1 row-start-1 transition-all duration-500 ${smoothLoading ? "invisible opacity-0" : "visible opacity-100"}`}
+            style={{ height: "calc(100vh - 400px)", minHeight: "600px" }}
           >
-            {items.map((item) => (
-              <ContentCard
-                key={item.id}
-                item={item}
-                type={mode === "campaigns" ? "campaign" : "publication"}
-                onEdit={props.onEdit}
-                onDelete={props.onDelete}
-                onViewDetails={props.onViewDetails}
-                onPublish={props.onPublish}
-                permissions={props.permissions}
-                remoteLock={remoteLocks[item.id]}
-                onPreviewMedia={handlePreviewMedia}
-                onDuplicate={props.onDuplicate}
-              />
-            ))}
+            <VirtualGrid
+              items={items}
+              columns={4}
+              overscan={2}
+              renderItem={(item) => (
+                <ContentCard
+                  key={item.id}
+                  item={item}
+                  type={mode === "campaigns" ? "campaign" : "publication"}
+                  onEdit={props.onEdit}
+                  onDelete={props.onDelete}
+                  onViewDetails={props.onViewDetails}
+                  onPublish={props.onPublish}
+                  permissions={props.permissions}
+                  remoteLock={remoteLocks[item.id]}
+                  onPreviewMedia={handlePreviewMedia}
+                  onDuplicate={props.onDuplicate}
+                />
+              )}
+            />
           </div>
 
           {smoothLoading && (

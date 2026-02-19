@@ -7,6 +7,7 @@ import ContentSection from "@/Components/ManageContent/Publication/common/edit/C
 import { LivePreviewSection } from "@/Components/ManageContent/Publication/common/edit/LivePreviewSection";
 import MediaUploadSection from "@/Components/ManageContent/Publication/common/edit/MediaUploadSection";
 import MediaUploadSkeleton from "@/Components/ManageContent/Publication/common/edit/MediaUploadSkeleton";
+import ReelsSection from "@/Components/ManageContent/ReelsSection";
 import ModalFooter from "@/Components/ManageContent/modals/common/ModalFooter";
 import ModalHeader from "@/Components/ManageContent/modals/common/ModalHeader";
 import ScheduleSection from "@/Components/ManageContent/modals/common/ScheduleSection";
@@ -148,6 +149,33 @@ const EditPublicationModal = ({
     } catch (err) {
       console.error("Failed to upload cropped image", err);
     }
+  };
+
+  // Delete reels when video is removed
+  const handleRemoveMediaWithReels = async (index: number) => {
+    const mediaToRemove = mediaFiles[index];
+    const isVideo = mediaToRemove.type === 'video';
+    
+    if (isVideo && publication?.id && mediaToRemove.id) {
+      // Find and delete associated reels
+      const reelsToDelete = publication.media_files?.filter(
+        m => m.metadata?.original_media_id === mediaToRemove.id
+      ) || [];
+      
+      if (reelsToDelete.length > 0) {
+        try {
+          await Promise.all(
+            reelsToDelete.map(reel => axios.delete(`/api/v1/media/${reel.id}`))
+          );
+          toast.success(t('reels.messages.deletedWithVideo'));
+        } catch (error) {
+          console.error('Error deleting reels:', error);
+        }
+      }
+    }
+    
+    // Call original remove handler
+    handleRemoveMedia(index);
   };
 
   const { register } = form;
@@ -488,7 +516,7 @@ const EditPublicationModal = ({
                       isDragOver={isDragOver}
                       t={t}
                       onFileChange={handleFileChange}
-                      onRemoveMedia={handleRemoveMedia}
+                      onRemoveMedia={handleRemoveMediaWithReels}
                       onSetThumbnail={(tempId, file) =>
                         setThumbnail(tempId, file)
                       }
@@ -510,6 +538,21 @@ const EditPublicationModal = ({
                       videoMetadata={videoMetadata}
                       publicationId={publication?.id}
                       allMediaFiles={publication?.media_files || []}
+                    />
+                  )}
+
+                  {/* Reels Section - Independent from media */}
+                  {publication?.id && mediaFiles.find(m => m.type === 'video') && (
+                    <ReelsSection
+                      videoFile={publication.media_files?.find(
+                        m => m.file_type === 'video' || m.mime_type?.startsWith('video/')
+                      )}
+                      publicationId={publication.id}
+                      allMediaFiles={publication.media_files || []}
+                      onReelsDeleted={() => {
+                        // Refresh publication data
+                        usePublicationStore.getState().fetchPublicationById(publication.id);
+                      }}
                     />
                   )}
 

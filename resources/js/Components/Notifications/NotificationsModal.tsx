@@ -1,5 +1,6 @@
 import { useNotifications } from "@/Hooks/useNotifications";
 import { useTheme } from "@/Hooks/useTheme";
+import { VirtualList } from "@/Components/common/ui/VirtualList";
 import {
   Dialog,
   DialogPanel,
@@ -217,38 +218,43 @@ export default function NotificationsModal({
 
                         <TabPanels className="flex-1 min-h-0">
                           <TabPanel className="h-full">
-                            <div className="h-full overflow-y-auto custom-scrollbar">
+                            <div className="h-full">
                               {notifications.length > 0 ? (
-                                <div className="divide-y ">
-                                  {notifications
-                                    .slice(0, 100)
-                                    .map((notification) => (
-                                      <NotificationItem
-                                        key={notification.id}
-                                        notification={notification}
-                                        onMarkAsRead={() =>
-                                          markAsRead(notification.id)
-                                        }
-                                      />
-                                    ))}
-                                  {notifications.length > 100 && (
-                                    <div
-                                      className={`p-4 text-center ${theme === "dark"
-                                        ? "text-gray-500"
-                                        : "text-gray-400"
-                                        }`}
-                                    >
-                                      <p className="text-sm">
-                                        Showing 100 of {notifications.length}{" "}
-                                        notifications
-                                      </p>
-                                      <p className="text-xs mt-1">
-                                        Older notifications are automatically
-                                        archived
-                                      </p>
-                                    </div>
+                                <VirtualList
+                                  items={notifications.slice(0, 100)}
+                                  estimatedItemSize={80}
+                                  overscan={5}
+                                  style={{ height: "100%" }}
+                                  renderItem={(notification) => (
+                                    <NotificationItem
+                                      key={notification.id}
+                                      notification={notification}
+                                      onMarkAsRead={() =>
+                                        markAsRead(notification.id)
+                                      }
+                                    />
                                   )}
-                                </div>
+                                  footer={
+                                    notifications.length > 100 ? (
+                                      <div
+                                        className={`p-4 text-center ${
+                                          isDark
+                                            ? "text-gray-500"
+                                            : "text-gray-400"
+                                        }`}
+                                      >
+                                        <p className="text-sm">
+                                          Showing 100 of {notifications.length}{" "}
+                                          notifications
+                                        </p>
+                                        <p className="text-xs mt-1">
+                                          Older notifications are automatically
+                                          archived
+                                        </p>
+                                      </div>
+                                    ) : undefined
+                                  }
+                                />
                               ) : (
                                 <EmptyState
                                   t={t}
@@ -327,33 +333,38 @@ export default function NotificationsModal({
                                     : applicationNotifications;
 
                                   return filteredNotifications.length > 0 ? (
-                                    <div className="divide-y divide-transparent">
-                                      {filteredNotifications
-                                        .slice(0, 100)
-                                        .map((notification) => (
-                                          <NotificationItem
-                                            key={notification.id}
-                                            notification={notification}
-                                            onMarkAsRead={() =>
-                                              markAsRead(notification.id)
-                                            }
-                                          />
-                                        ))}
-                                      {filteredNotifications.length > 100 && (
-                                        <div
-                                          className={`p-4 text-center ${theme === "dark"
-                                            ? "text-gray-500"
-                                            : "text-gray-400"
-                                            }`}
-                                        >
-                                          <p className="text-sm">
-                                            Showing 100 of{" "}
-                                            {filteredNotifications.length}{" "}
-                                            notifications
-                                          </p>
-                                        </div>
+                                    <VirtualList
+                                      items={filteredNotifications.slice(0, 100)}
+                                      estimatedItemSize={80}
+                                      overscan={5}
+                                      style={{ height: "100%" }}
+                                      renderItem={(notification) => (
+                                        <NotificationItem
+                                          key={notification.id}
+                                          notification={notification}
+                                          onMarkAsRead={() =>
+                                            markAsRead(notification.id)
+                                          }
+                                        />
                                       )}
-                                    </div>
+                                      footer={
+                                        filteredNotifications.length > 100 ? (
+                                          <div
+                                            className={`p-4 text-center ${
+                                              isDark
+                                                ? "text-gray-500"
+                                                : "text-gray-400"
+                                            }`}
+                                          >
+                                            <p className="text-sm">
+                                              Showing 100 of{" "}
+                                              {filteredNotifications.length}{" "}
+                                              notifications
+                                            </p>
+                                          </div>
+                                        ) : undefined
+                                      }
+                                    />
                                   ) : (
                                     <div className="flex flex-col items-center justify-center h-full text-center p-4">
                                       <div
@@ -391,35 +402,40 @@ export default function NotificationsModal({
                           </TabPanel>
 
                           <TabPanel className="h-full">
-                            <div className="h-full overflow-y-auto custom-scrollbar">
+                            <div className="h-full">
                               {systemNotifications.length > 0 ? (
-                                <div className="divide-y divide-transparent">
-                                  {systemNotifications
-                                    .slice(0, 100)
-                                    .map((notification) => (
-                                      <NotificationItem
-                                        key={notification.id}
-                                        notification={notification}
-                                        onMarkAsRead={() =>
-                                          markAsRead(notification.id)
-                                        }
-                                      />
-                                    ))}
-                                  {systemNotifications.length > 100 && (
-                                    <div
-                                      className={`p-4 text-center ${theme === "dark"
-                                        ? "text-gray-500"
-                                        : "text-gray-400"
-                                        }`}
-                                    >
-                                      <p className="text-sm">
-                                        Showing 100 of{" "}
-                                        {systemNotifications.length}{" "}
-                                        notifications
-                                      </p>
-                                    </div>
+                                <VirtualList
+                                  items={systemNotifications.slice(0, 100)}
+                                  estimatedItemSize={80}
+                                  overscan={5}
+                                  style={{ height: "100%" }}
+                                  renderItem={(notification) => (
+                                    <NotificationItem
+                                      key={notification.id}
+                                      notification={notification}
+                                      onMarkAsRead={() =>
+                                        markAsRead(notification.id)
+                                      }
+                                    />
                                   )}
-                                </div>
+                                  footer={
+                                    systemNotifications.length > 100 ? (
+                                      <div
+                                        className={`p-4 text-center ${
+                                          isDark
+                                            ? "text-gray-500"
+                                            : "text-gray-400"
+                                        }`}
+                                      >
+                                        <p className="text-sm">
+                                          Showing 100 of{" "}
+                                          {systemNotifications.length}{" "}
+                                          notifications
+                                        </p>
+                                      </div>
+                                    ) : undefined
+                                  }
+                                />
                               ) : (
                                 <EmptyState
                                   t={t}

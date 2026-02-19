@@ -1,4 +1,5 @@
 import CampaignMediaCarousel from "@/Components/Campaigns/CampaignMediaCarousel";
+import ReelsCarousel from "@/Components/ManageContent/ReelsCarousel";
 import ActivityList from "@/Components/ManageContent/ActivityList";
 import ApprovalHistory from "@/Components/ManageContent/ApprovalHistory";
 import ApprovalHistorySection from "@/Components/ManageContent/Publication/common/edit/ApprovalHistorySection";
@@ -51,6 +52,10 @@ export default function ViewCampaignModal({
   const desc = item.description || "No description provided.";
   const media = (item as any).media_files || [];
   const publications = (item as any).publications || [];
+
+  // Separate reels from regular media
+  const reels = media.filter((m: any) => m.metadata?.original_media_id);
+  const regularMedia = media.filter((m: any) => !m.metadata?.original_media_id);
 
   const getStatusColor = (status?: string) => {
     switch (status) {
@@ -108,9 +113,24 @@ export default function ViewCampaignModal({
 
           <div className="flex-1 overflow-y-auto p-6">
             <div className="space-y-6">
-              {media.length > 0 && (
+              {regularMedia.length > 0 && (
                 <div className="relative w-full h-64 rounded-lg overflow-hidden bg-gray-100 dark:bg-neutral-900">
-                  <CampaignMediaCarousel mediaFiles={media} />
+                  <CampaignMediaCarousel mediaFiles={regularMedia} />
+                </div>
+              )}
+
+              {/* Reels Section */}
+              {reels.length > 0 && (
+                <div className="border-2 border-purple-200 dark:border-purple-800 rounded-lg p-4 bg-purple-50/50 dark:bg-purple-900/10">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                      <FileText className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                    </div>
+                    <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                      {t('reels.section.title')} ({reels.length})
+                    </h3>
+                  </div>
+                  <ReelsCarousel reels={reels} />
                 </div>
               )}
 

@@ -451,7 +451,7 @@ const VideoPreview = memo(
 const AddMoreButton = memo(
   ({ onClick }: { onClick: (e: React.MouseEvent) => void }) => (
     <div
-      className="flex items-center justify-center aspect-video border-2 border-dashed border-gray-300 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+      className="flex items-center justify-center aspect-video border-2 border-dashed border-gray-300 rounded-lg hover:bg-primary-50 transition-colors cursor-pointer"
       onClick={onClick}
     >
       <div className="text-center">
