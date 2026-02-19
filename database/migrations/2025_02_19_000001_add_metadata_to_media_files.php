@@ -8,6 +8,11 @@ return new class extends Migration
 {
   public function up(): void
   {
+    // Check if table exists before attempting to modify it
+    if (!Schema::hasTable('media_files')) {
+      return;
+    }
+
     Schema::table('media_files', function (Blueprint $table) {
       // Add metadata column if it doesn't exist
       if (!Schema::hasColumn('media_files', 'metadata')) {
