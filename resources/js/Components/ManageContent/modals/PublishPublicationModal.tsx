@@ -66,6 +66,7 @@ export default function PublishPublicationModal({
     isYoutubeSelected,
     handlePublish,
     handleCancelPublication,
+    handleCancelPlatform,
     handleThumbnailChange,
     handleThumbnailDelete,
     handleRequestReview,
@@ -168,21 +169,17 @@ export default function PublishPublicationModal({
     platform: string,
   ) => {
     if (!publication) return;
-    const allPublished = connectedAccounts.every((acc) =>
-      publishedPlatforms.includes(acc.id),
-    );
+    
+    // Siempre pedir confirmación al despublicar
+    const confirmed = await confirm({
+      title: t("publications.modal.publish.unpublish.title", { platform }) || "¿Despublicar de " + platform + "?",
+      message: t("publications.modal.publish.unpublish.message", { platform }) || "¿Estás seguro de que deseas despublicar este contenido de " + platform + "? Esta acción no se puede deshacer.",
+      confirmText: t("publications.modal.publish.unpublish.confirm") || "Sí, despublicar",
+      cancelText: t("publications.modal.publish.unpublish.cancel") || "Cancelar",
+      type: "warning",
+    });
 
-    if (allPublished) {
-      const confirmed = await confirm({
-        title: t("publications.modal.publish.modal.title", { platform }),
-        message: t("publications.modal.publish.modal.message", { platform }),
-        confirmText: t("publications.modal.publish.modal.confirmText"),
-        cancelText: t("publications.modal.publish.modal.cancelText"),
-        type: "warning",
-      });
-
-      if (!confirmed) return;
-    }
+    if (!confirmed) return;
 
     setUnpublishing(accountId);
     try {
@@ -379,18 +376,18 @@ export default function PublishPublicationModal({
                               : "cursor-default"
                           } ${
                             isPublishing
-                              ? "border-[3px] border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 shadow-lg shadow-yellow-500/20"
+                              ? "border border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20"
                               : isPublished
-                                ? "border-[3px] border-green-500 bg-green-50 dark:bg-green-900/20 shadow-lg shadow-green-500/20"
+                                ? "border border-green-500 bg-green-50 dark:bg-green-900/20"
                                 : isScheduled
-                                  ? "border-[3px] border-blue-500 bg-blue-50 dark:bg-blue-900/20 shadow-lg shadow-blue-500/20"
+                                  ? "border border-blue-500 bg-blue-50 dark:bg-blue-900/20"
                                   : isFailed
-                                    ? "border-[3px] border-red-500 bg-red-50 dark:bg-red-900/20 shadow-lg shadow-red-500/20"
+                                    ? "border border-red-500 bg-red-50 dark:bg-red-900/20"
                                     : isRemovedPlatform
-                                      ? "border-[3px] border-gray-500 bg-gray-50 dark:bg-gray-900/20"
+                                      ? "border border-gray-500 bg-gray-50 dark:bg-gray-900/20"
                                       : isSelected
-                                        ? "border-[3px] border-primary-600 bg-primary-50 dark:bg-primary-900/30 shadow-xl shadow-primary-500/30 ring-2 ring-primary-400/50 dark:ring-primary-500/50"
-                                        : "border-2 bg-white dark:bg-neutral-900/30 border-gray-300 dark:border-neutral-700 hover:border-primary-400 dark:hover:border-primary-600 hover:shadow-md"
+                                        ? "border border-primary-600 bg-primary-50 dark:bg-primary-900/30 ring-2 ring-primary-400/50 dark:ring-primary-500/50"
+                                        : "border bg-white dark:bg-neutral-900/30 border-gray-300 dark:border-neutral-700 hover:border-primary-400 dark:hover:border-primary-600 hover:shadow-md"
                           }`}
                         >
                           {/* Publishing Overlay */}
@@ -398,8 +395,8 @@ export default function PublishPublicationModal({
                             <div className="absolute inset-0 z-30 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-sm flex flex-col items-center justify-center rounded-lg animate-in fade-in duration-300">
                               <div className="flex flex-col items-center gap-2">
                                 <div className="relative flex-shrink-0">
-                                  <div className="w-10 h-10 border-3 border-yellow-200 dark:border-yellow-900 rounded-full" />
-                                  <div className="absolute inset-0 w-10 h-10 border-3 border-yellow-500 border-t-transparent rounded-full animate-spin" />
+                                  <div className="w-10 h-10 border border-yellow-200 dark:border-yellow-900 rounded-full" />
+                                  <div className="absolute inset-0 w-10 h-10 border border-yellow-500 border-t-transparent rounded-full animate-spin" />
                                 </div>
                                 
                                 <div className="flex flex-col items-center gap-0.5">
@@ -414,13 +411,31 @@ export default function PublishPublicationModal({
                               
                               {/* Cancel button for individual platform */}
                               <button
-                                onClick={(e) => {
+                                onClick={async (e) => {
                                   e.stopPropagation();
-                                  // Add cancel logic here if needed
+                                  if (!publication) return;
+                                  
+                                  console.log('Canceling platform:', {
+                                    publicationId: publication.id,
+                                    accountId: account.id,
+                                    platform: account.platform
+                                  });
+                                  
+                                  const confirmed = await confirm({
+                                    title: t("publications.modal.cancel_platform.title", { platform: account.platform }) || `¿Cancelar ${account.platform}?`,
+                                    message: t("publications.modal.cancel_platform.message", { platform: account.platform }) || `¿Estás seguro de que deseas cancelar la publicación en ${account.platform}? Se detendrán todos los reintentos para esta plataforma.`,
+                                    confirmText: t("publications.modal.cancel_platform.confirm") || "Sí, cancelar",
+                                    cancelText: t("publications.modal.cancel_platform.cancel") || "No",
+                                    type: "warning",
+                                  });
+                                  
+                                  if (confirmed) {
+                                    await handleCancelPlatform(publication.id, account.id);
+                                  }
                                 }}
-                                className="mt-3 text-xs text-yellow-700 dark:text-yellow-400 hover:text-yellow-900 dark:hover:text-yellow-200 underline"
+                                className="mt-3 px-3 py-1.5 text-xs font-medium text-yellow-700 dark:text-yellow-400 hover:text-yellow-900 dark:hover:text-yellow-200 bg-white dark:bg-neutral-800 hover:bg-yellow-50 dark:hover:bg-neutral-700 border border-yellow-300 dark:border-yellow-700 rounded-md transition-colors"
                               >
-                                Cancelar
+                                {t("common.cancel") || "Cancelar"}
                               </button>
                             </div>
                           )}
@@ -488,7 +503,7 @@ export default function PublishPublicationModal({
 
                           {/* Platform Logo and Info */}
                           <div className="flex items-center gap-3 z-10">
-                            <div className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 bg-white dark:bg-neutral-800 p-2 shadow-sm">
+                            <div className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0  p-1">
                               <img src={iconSrc} alt={account.platform} className="w-full h-full object-contain" />
                             </div>
                             <div className="flex-1 text-left min-w-0">
@@ -539,9 +554,9 @@ export default function PublishPublicationModal({
                         {isScheduled && !isPublishing && !isUnpublishing && (
                           <div className="absolute -top-3 right-2 z-40">
                             <div className="flex flex-col items-end gap-1">
-                              <span className="flex items-center gap-1.5 text-xs font-bold text-white bg-gradient-to-r from-blue-600 to-blue-700 px-3 py-1.5 rounded-full shadow-lg border-2 border-white dark:border-neutral-800">
+                              <span className="flex items-center gap-1.5 text-xs font-bold text-white bg-gradient-to-r from-blue-600 to-blue-700 px-3 py-1.5 rounded-full shadow-lg border border-white dark:border-neutral-800">
                                 <Clock className="w-3.5 h-3.5" />
-                                PROGRAMADO
+                                {t("publications.status.scheduled")?.toUpperCase() || "PROGRAMADO"}
                               </span>
                               {(() => {
                                 const schedPost =
@@ -567,25 +582,21 @@ export default function PublishPublicationModal({
                         {/* Removed Badge - Outside the card */}
                         {isRemovedPlatform && !isPublishing && !isUnpublishing && !isPublished && (
                           <div className="absolute -top-3 right-2 z-40">
-                            <span className="flex items-center gap-1.5 text-xs font-bold text-white bg-gradient-to-r from-gray-600 to-gray-700 px-3 py-1.5 rounded-full shadow-lg border-2 border-white dark:border-neutral-800">
+                            <span className="flex items-center gap-1.5 text-xs font-bold text-white bg-gradient-to-r from-gray-600 to-gray-700 px-3 py-1.5 rounded-full shadow-lg border border-white dark:border-neutral-800">
                               <XCircle className="w-3.5 h-3.5" />
-                              REMOVIDO
+                              {t("publications.modal.publish.removed")?.toUpperCase() || "REMOVIDO"}
                             </span>
                           </div>
                         )}
 
-                        {/* Failed Badge - Outside the card */}
-                        {isFailed &&
-                          !isScheduled &&
-                          !isPublished &&
-                          !isPublishing &&
-                          !isUnpublishing && (
-                            <div className="absolute -top-3 right-2 z-40">
-                              <span className="flex items-center gap-1.5 text-xs font-bold text-white bg-gradient-to-r from-red-600 to-red-700 px-3 py-1.5 rounded-full shadow-lg border-2 border-white dark:border-neutral-800">
-                                <AlertCircle className="w-3.5 h-3.5" />
-                                FALLÓ
-                              </span>
-                            </div>
+                        {/* Failed Badge - Discrete corner badge */}
+                        {isFailed && !isScheduled && !isPublished && !isPublishing && !isUnpublishing && (
+                          <div className="absolute top-2 left-2 z-10">
+                            <span className="flex items-center gap-1 text-[10px] font-bold text-red-700 dark:text-red-400 bg-red-100 dark:bg-red-900/40 px-2 py-1 rounded-md shadow-sm border border-red-300 dark:border-red-800">
+                              <XCircle className="w-3 h-3" />
+                              {t("publications.modal.publish.failed") || "Falló"}
+                            </span>
+                          </div>
                         )}
 
                         {/* Unpublish Button */}
@@ -669,16 +680,16 @@ export default function PublishPublicationModal({
 
             <div className="flex gap-3 p-6 border-t border-gray-200 dark:border-neutral-700 sticky bottom-0 z-20 bg-white dark:bg-neutral-800 backdrop-blur-sm bg-opacity-95 dark:bg-opacity-95">
               <button
-                type="button"
+                type="button" 
                 onClick={async () => {
-                  // If publication is actively publishing, cancel it
-                  if (publishing || publication.status === "publishing") {
+                  // If publication is actively publishing, ask for confirmation to cancel ALL
+                  if (publishing || publication.status === "publishing" || publishingPlatforms.length > 0) {
                     const confirmed = await confirm({
-                      title: t("publications.modal.publish.cancelConfirm.title") || "¿Cancelar publicación?",
-                      message: t("publications.modal.publish.cancelConfirm.message") || "¿Estás seguro de que deseas cancelar esta publicación? Las plataformas que ya se publicaron no se verán afectadas.",
-                      confirmText: t("publications.modal.publish.cancelConfirm.confirm") || "Sí, cancelar",
-                      cancelText: t("publications.modal.publish.cancelConfirm.cancel") || "No",
-                      type: "warning",
+                      title: t("publications.modal.cancelAllConfirm.title") || "¿Cancelar TODAS las plataformas?",
+                      message: t("publications.modal.cancelAllConfirm.message", { count: publishingPlatforms.length }) || `¿Estás seguro de que deseas cancelar la publicación en TODAS las plataformas (${publishingPlatforms.length})? Se detendrán todos los reintentos. Las plataformas que ya se publicaron no se verán afectadas.`,
+                      confirmText: t("publications.modal.cancelAllConfirm.confirm") || "Sí, cancelar todas",
+                      cancelText: t("publications.modal.cancelAllConfirm.cancel") || "No",
+                      type: "danger",
                     });
                     
                     if (confirmed) {
@@ -690,10 +701,11 @@ export default function PublishPublicationModal({
                     onClose(publication.id);
                   }
                 }}
-                className="flex-1 px-4 py-3 rounded-lg font-medium transition-colors bg-gray-100 dark:bg-neutral-700 hover:bg-gray-200 dark:hover:bg-neutral-600 text-gray-700 dark:text-white"
+                disabled={unpublishing !== null}
+                className="flex-1 px-4 py-3 rounded-lg font-medium transition-colors bg-gray-100 dark:bg-neutral-700 hover:bg-gray-200 dark:hover:bg-neutral-600 text-gray-700 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {publishing || publication.status === "publishing" 
-                  ? t("publications.modal.publish.button.cancelPublication") || "Cancelar Publicación"
+                {publishing || publication.status === "publishing" || publishingPlatforms.length > 0
+                  ? t("publications.modal.publish.button.cancelAll", { count: publishingPlatforms.length }) || `Cancelar Todas (${publishingPlatforms.length})`
                   : t("publications.modal.publish.button.cancel") || "Cerrar"
                 }
               </button>
