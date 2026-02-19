@@ -105,9 +105,10 @@ const AiPromptSection: React.FC<AiPromptSectionProps> = ({
           toast.success(
             t("common.ai.suggestions_generated") ||
               "Sugerencias generadas con éxito",
+            { id: "ai-suggestions" }
           );
         } else {
-          toast.success(message);
+          toast.success(message, { id: "ai-suggestions" });
         }
         
         setPrompt("");

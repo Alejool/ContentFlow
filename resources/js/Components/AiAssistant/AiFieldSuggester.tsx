@@ -64,6 +64,7 @@ const AiFieldSuggester: React.FC<AiFieldSuggesterProps> = ({
         toast.success(
           t("common.ai.suggestions_generated") ||
             "Sugerencias generadas con éxito",
+          { id: "ai-suggestions" }
         );
       } else {
         toast.error(
