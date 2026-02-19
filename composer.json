@@ -30,6 +30,7 @@
         "socialiteproviders/facebook": "^4.1",
         "socialiteproviders/google": "^4.1",
         "socialiteproviders/twitter": "^4.1",
+        "spatie/icalendar-generator": "^2.8",
         "spatie/laravel-backup": "^9.3",
         "spatie/laravel-queueable-action": "^2.16",
         "spatie/laravel-schedule-monitor": "^4.1",

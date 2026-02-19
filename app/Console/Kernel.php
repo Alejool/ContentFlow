@@ -27,5 +27,10 @@ class Kernel extends ConsoleKernel
 
     // Enviar recordatorios de calendario cada minuto
     $schedule->command('app:send-event-reminders')->everyMinute();
+    
+    // Limpiar caché antiguo diariamente a las 3 AM
+    $schedule->command('cache:clear')
+      ->daily()
+      ->at('03:00');
   }
 }

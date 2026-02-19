@@ -12,6 +12,8 @@ use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use App\Http\Middleware\SecurityHeaders;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use App\Http\Middleware\IsSuperAdmin;
+use App\Http\Middleware\ThrottleReelGeneration;
+use Illuminate\Routing\Middleware\CacheResponse;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -42,14 +44,16 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         $middleware->alias([
             'super-admin' => IsSuperAdmin::class,
+            'throttle.reel' => ThrottleReelGeneration::class,
+            'cache.response' => CacheResponse::class,
         ]);
     })
     ->withSchedule(function ($schedule) {
         $schedule->command('social:process-scheduled')
             ->everyMinute()
             ->withoutOverlapping();
-        $schedule->command('social:sync-analytics')->hourly();
-        $schedule->command('social:cleanup-tokens')->daily();
+        $schedule->command('analytics:sync --days=7')->hourly();
+        $schedule->command('social:check-tokens')->daily();
         $schedule->command('youtube:process-playlist-queue')->everyFiveMinutes();
         $schedule->command('app:send-event-reminders')->everyMinute();
     })
