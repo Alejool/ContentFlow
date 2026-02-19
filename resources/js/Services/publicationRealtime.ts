@@ -15,28 +15,18 @@ export function initPublicationsRealtime(userId: number, workspaceId?: number) {
 
       // Show toast notifications for final statuses
       if (status === "published") {
-        toast.success("Publication published successfully!");
+        toast.success("Publication published successfully!", {
+          id: `pub-published-${publicationId}`,
+        });
       } else if (status === "failed") {
-        toast.error("Publication failed to publish.");
+        toast.error("Publication failed to publish.", {
+          id: `pub-failed-${publicationId}`,
+        });
       }
     },
   );
 
   // NEW: Workspace channel listener (Global data sync is now handled in usePublicationLock.ts)
-  if (workspaceId) {
-    window.Echo.private(`workspace.${workspaceId}`).listen(
-      ".publication.updated",
-      (e: any) => {
-        const { publication } = e;
-        if (
-          publication &&
-          (publication.status === "approved" || publication.status === "draft")
-        ) {
-          // We only keep the toast here to notify about processing completion
-          // The actual store updates are handled in useWorkspaceLocks
-          toast.success(`Procesado completado: ${publication.title}`);
-        }
-      },
-    );
-  }
+  // Note: Toast notifications for publication updates are handled in useWorkspaceLocks
+  // to avoid duplicate notifications
 }
