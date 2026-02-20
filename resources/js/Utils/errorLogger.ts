@@ -106,8 +106,7 @@ class ErrorLogger {
       try {
         this.config.onError(errorLog);
       } catch (handlerError) {
-        console.error('[ErrorLogger] Error in custom error handler:', handlerError);
-      }
+        }
     }
 
     return errorLog;
@@ -120,24 +119,12 @@ class ErrorLogger {
     const emoji = log.severity === 'error' ? '❌' : log.severity === 'warning' ? '⚠️' : 'ℹ️';
     const color = log.severity === 'error' ? '#ef4444' : log.severity === 'warning' ? '#f59e0b' : '#3b82f6';
 
-    console.group(`%c${emoji} [${log.type.toUpperCase()}] ${log.message}`, `color: ${color}; font-weight: bold;`);
-    console.log('Timestamp:', new Date(log.timestamp).toISOString());
-    console.log('ID:', log.id);
+    }] ${log.message}`, `color: ${color}; font-weight: bold;`);
+    .toISOString());
+    if (log.operation) if (log.resource) if (log.resourceId) if (log.code) if (log.status) if (log.data) if (log.context) if (log.stackTrace && this.isDevelopment) {
+      }
     
-    if (log.operation) console.log('Operation:', log.operation);
-    if (log.resource) console.log('Resource:', log.resource);
-    if (log.resourceId) console.log('Resource ID:', log.resourceId);
-    if (log.code) console.log('Code:', log.code);
-    if (log.status) console.log('Status:', log.status);
-    if (log.data) console.log('Data:', log.data);
-    if (log.context) console.log('Context:', log.context);
-    if (log.stackTrace && this.isDevelopment) {
-      console.log('Stack Trace:');
-      console.log(log.stackTrace);
     }
-    
-    console.groupEnd();
-  }
 
   /**
    * Get all error logs
@@ -220,8 +207,7 @@ class ErrorLogger {
       try {
         localStorage.removeItem(this.STORAGE_KEY);
       } catch (error) {
-        console.error('[ErrorLogger] Failed to clear logs from storage:', error);
-      }
+        }
     }
   }
 
@@ -245,8 +231,7 @@ class ErrorLogger {
       const serialized = JSON.stringify(this.logs);
       localStorage.setItem(this.STORAGE_KEY, serialized);
     } catch (error) {
-      console.error('[ErrorLogger] Failed to persist logs:', error);
-    }
+      }
   }
 
   /**
@@ -259,12 +244,10 @@ class ErrorLogger {
         this.logs = JSON.parse(stored);
         
         if (this.isDevelopment) {
-          console.log(`[ErrorLogger] Restored ${this.logs.length} error logs from storage`);
-        }
+          }
       }
     } catch (error) {
-      console.error('[ErrorLogger] Failed to restore logs:', error);
-    }
+      }
   }
 
   /**

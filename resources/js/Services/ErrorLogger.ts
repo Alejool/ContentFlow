@@ -29,8 +29,7 @@ class ErrorLoggerClass {
 
       // Log to console in development
       if (import.meta.env.DEV) {
-        console.error("Error logged:", entry);
-      }
+        }
 
       // Send to backend (don't await to avoid blocking)
       fetch(this.endpoint, {
@@ -42,12 +41,10 @@ class ErrorLoggerClass {
         body: JSON.stringify(entry),
       }).catch((err) => {
         // Silently fail if logging fails
-        console.error("Failed to send error log:", err);
-      });
+        });
     } catch (err) {
       // Don't throw errors from the error logger
-      console.error("Error in ErrorLogger:", err);
-    }
+      }
   }
 
   /**

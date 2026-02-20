@@ -45,8 +45,7 @@ export function getInertiaPageComponent(): string | null {
       return parsed.component || null;
     }
   } catch (error) {
-    console.error('[InertiaOptimisticSync] Failed to get page component:', error);
-  }
+    }
   
   return null;
 }
@@ -70,8 +69,7 @@ export function getInertiaPageProps(): Record<string, any> | null {
       return parsed.props || null;
     }
   } catch (error) {
-    console.error('[InertiaOptimisticSync] Failed to get page props:', error);
-  }
+    }
   
   return null;
 }
@@ -140,13 +138,7 @@ export function syncWithInertia(
   
   // Log in development mode
   if (import.meta.env.DEV) {
-    console.log('[InertiaOptimisticSync] Syncing operation:', {
-      id: operation.id,
-      resource: operation.resource,
-      type: operation.type,
-      status,
-    });
-  }
+    }
   
   // Handle based on status
   switch (status) {
@@ -170,8 +162,7 @@ export function syncWithInertia(
         } as any);
         
         if (import.meta.env.DEV) {
-          console.log('[InertiaOptimisticSync] Reloading props:', propsToReload);
-        }
+          }
       }
       break;
       
@@ -195,8 +186,7 @@ export function syncWithInertia(
           }, 500);
           
           if (import.meta.env.DEV) {
-            console.log('[InertiaOptimisticSync] Reloading props after failure:', propsToReload);
-          }
+            }
         }
       }
       break;

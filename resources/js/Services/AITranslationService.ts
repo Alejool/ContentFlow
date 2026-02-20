@@ -53,7 +53,6 @@ export class AITranslationService {
 
       return response.data;
     } catch (error) {
-      console.error("Translation error:", error);
       // Fallback: devolver el texto original
       return {
         translatedText: text,
@@ -81,7 +80,6 @@ export class AITranslationService {
 
       return response.data.translations;
     } catch (error) {
-      console.error("Batch translation error:", error);
       return texts; // Fallback
     }
   }
@@ -98,7 +96,6 @@ export class AITranslationService {
 
       return response.data.language;
     } catch (error) {
-      console.error("Language detection error:", error);
       return "unknown";
     }
   }

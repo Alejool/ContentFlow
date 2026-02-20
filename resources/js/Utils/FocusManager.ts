@@ -47,7 +47,6 @@ class FocusManagerClass {
    */
   setFocus(element: HTMLElement, options: FocusOptions = {}): void {
     if (!element || !this.isFocusable(element)) {
-      console.warn('FocusManager: Attempted to focus non-focusable element', element);
       return;
     }
 
@@ -114,7 +113,6 @@ class FocusManagerClass {
    */
   trapFocus(container: HTMLElement): FocusTrapCleanup {
     if (!container) {
-      console.warn('FocusManager: Cannot trap focus in null container');
       return () => {};
     }
 

@@ -39,15 +39,13 @@ class IndexedDBQueue {
       const request = indexedDB.open(DB_NAME, DB_VERSION);
 
       request.onerror = () => {
-        console.error('[IndexedDBQueue] Failed to open database:', request.error);
         reject(request.error);
       };
 
       request.onsuccess = () => {
         this.db = request.result;
         if (import.meta.env.DEV) {
-          console.log('[IndexedDBQueue] Database opened successfully');
-        }
+          }
         resolve();
       };
 
@@ -65,8 +63,7 @@ class IndexedDBQueue {
           objectStore.createIndex('priority', 'priority', { unique: false });
           
           if (import.meta.env.DEV) {
-            console.log('[IndexedDBQueue] Object store created');
-          }
+            }
         }
       };
     });
@@ -105,15 +102,13 @@ class IndexedDBQueue {
           completed++;
           if (completed + errors === batch.length) {
             if (import.meta.env.DEV) {
-              console.log(`[IndexedDBQueue] Batch processed: ${completed} succeeded, ${errors} failed`);
-            }
+              }
             resolve();
           }
         };
         
         request.onerror = () => {
           errors++;
-          console.error('[IndexedDBQueue] Failed to add operation in batch:', request.error);
           if (completed + errors === batch.length) {
             resolve(); // Still resolve to continue processing
           }
@@ -169,14 +164,12 @@ class IndexedDBQueue {
           completed++;
           if (completed === operations.length) {
             if (import.meta.env.DEV) {
-              console.log(`[IndexedDBQueue] Batch added: ${operations.length} operations`);
-            }
+              }
             resolve();
           }
         };
         
         request.onerror = () => {
-          console.error('[IndexedDBQueue] Failed to add operation in batch:', request.error);
           reject(request.error);
         };
       }
@@ -204,7 +197,6 @@ class IndexedDBQueue {
       };
 
       request.onerror = () => {
-        console.error('[IndexedDBQueue] Failed to get operations:', request.error);
         reject(request.error);
       };
     });
@@ -232,7 +224,6 @@ class IndexedDBQueue {
       };
 
       request.onerror = () => {
-        console.error('[IndexedDBQueue] Failed to get operations by status:', request.error);
         reject(request.error);
       };
     });
@@ -256,13 +247,11 @@ class IndexedDBQueue {
 
       request.onsuccess = () => {
         if (import.meta.env.DEV) {
-          console.log('[IndexedDBQueue] Operation updated:', operation.id);
-        }
+          }
         resolve();
       };
 
       request.onerror = () => {
-        console.error('[IndexedDBQueue] Failed to update operation:', request.error);
         reject(request.error);
       };
     });
@@ -286,13 +275,11 @@ class IndexedDBQueue {
 
       request.onsuccess = () => {
         if (import.meta.env.DEV) {
-          console.log('[IndexedDBQueue] Operation removed:', id);
-        }
+          }
         resolve();
       };
 
       request.onerror = () => {
-        console.error('[IndexedDBQueue] Failed to remove operation:', request.error);
         reject(request.error);
       };
     });
@@ -316,13 +303,11 @@ class IndexedDBQueue {
 
       request.onsuccess = () => {
         if (import.meta.env.DEV) {
-          console.log('[IndexedDBQueue] Queue cleared');
-        }
+          }
         resolve();
       };
 
       request.onerror = () => {
-        console.error('[IndexedDBQueue] Failed to clear queue:', request.error);
         reject(request.error);
       };
     });
@@ -349,7 +334,6 @@ class IndexedDBQueue {
       };
 
       request.onerror = () => {
-        console.error('[IndexedDBQueue] Failed to count operations:', request.error);
         reject(request.error);
       };
     });
@@ -365,8 +349,7 @@ class IndexedDBQueue {
       this.initPromise = null;
       
       if (import.meta.env.DEV) {
-        console.log('[IndexedDBQueue] Database closed');
-      }
+        }
     }
   }
 }

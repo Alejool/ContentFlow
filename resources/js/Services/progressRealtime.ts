@@ -24,10 +24,8 @@ export function initProgressRealtime(userId: number) {
   isWebSocketAvailable = !!window.Echo;
 
   if (isWebSocketAvailable) {
-    console.log("Initializing WebSocket listeners for progress updates");
     initWebSocketListeners(userId);
   } else {
-    console.warn("WebSocket not available, falling back to polling");
     initPollingFallback();
   }
 }
@@ -67,8 +65,6 @@ function initWebSocketListeners(userId: number) {
 
   // Handle WebSocket connection errors - fallback to polling
   channel.error((error: any) => {
-    console.error("WebSocket channel error:", error);
-    console.log("Falling back to polling due to WebSocket error");
     isWebSocketAvailable = false;
     initPollingFallback();
   });
@@ -267,8 +263,7 @@ async function pollUploadProgress() {
       }
     });
   } catch (error) {
-    console.error("Failed to poll upload progress:", error);
-  }
+    }
 }
 
 /**
@@ -319,8 +314,7 @@ async function pollProcessingProgress() {
       }
     });
   } catch (error) {
-    console.error("Failed to poll processing progress:", error);
-  }
+    }
 }
 
 /**
@@ -351,7 +345,6 @@ export function cleanupProgressRealtime(userId: number) {
     try {
       window.Echo.leave(`users.${userId}`);
     } catch (error) {
-      console.error("Failed to leave WebSocket channel:", error);
-    }
+      }
   }
 }

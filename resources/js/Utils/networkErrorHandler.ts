@@ -249,7 +249,6 @@ class OfflineQueue {
         try {
           await action();
         } catch (error) {
-          console.error('Failed to process queued action:', error);
           // Re-queue if it's a network error
           const networkError = error as NetworkError;
           if (networkError.isNetworkError && networkError.isRetryable) {

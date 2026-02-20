@@ -19,7 +19,6 @@ class FocusVisibleManagerClass {
    */
   initialize(): void {
     if (this.isInitialized) {
-      console.warn('FocusVisibleManager: Already initialized');
       return;
     }
 
