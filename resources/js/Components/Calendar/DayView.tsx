@@ -2,17 +2,7 @@ import { formatTime } from "@/Utils/formatDate";
 import { format, parseISO } from "date-fns";
 import { Clock, Trash2 } from "lucide-react";
 import React from "react";
-
-interface CalendarEvent {
-  id: string;
-  resourceId: number;
-  type: "publication" | "post" | "user_event" | "event";
-  title: string;
-  start: string;
-  status: string;
-  color: string;
-  extendedProps: any;
-}
+import { CalendarEvent } from "@/types/calendar";
 
 interface DayViewProps {
   currentDate: Date;

@@ -10,17 +10,7 @@ import {
 } from "date-fns";
 import { Clock } from "lucide-react";
 import React from "react";
-
-interface CalendarEvent {
-  id: string;
-  resourceId: number;
-  type: "publication" | "post" | "user_event" | "event";
-  title: string;
-  start: string;
-  status: string;
-  color: string;
-  extendedProps: any;
-}
+import { CalendarEvent } from "@/types/calendar";
 
 interface WeekViewProps {
   currentDate: Date;
