@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Reset Onboarding</title>
+</head>
+<body>
+    <h1>Reset Onboarding</h1>
+    <p>Click the button below to clear all onboarding data and refresh the page.</p>
+    <button onclick="resetOnboarding()">Reset Onboarding</button>
+    <div id="status"></div>
+    
+    <script>
+        function resetOnboarding() {
+            const status = document.getElementById('status');
+            
+            // Clear all onboarding related data from localStorage
+            localStorage.removeItem('onboarding_state_cache');
+            localStorage.removeItem('onboarding_state_cache_timestamp');
+            
+            // Clear any other potential onboarding keys
+            const keys = Object.keys(localStorage);
+            keys.forEach(key => {
+                if (key.includes('onboarding') || key.includes('tour')) {
+                    localStorage.removeItem(key);
+                }
+            });
+            
+            status.innerHTML = '<p style="color: green;">Onboarding data cleared! Redirecting to dashboard...</p>';
+            
+            // Redirect to dashboard after 1 second
+            setTimeout(() => {
+                window.location.href = '/dashboard';
+            }, 1000);
+        }
+    </script>
+</body>
+</html>

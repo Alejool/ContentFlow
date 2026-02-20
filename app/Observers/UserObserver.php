@@ -42,7 +42,15 @@ class UserObserver
      */
     public function updated(User $user): void
     {
-        //
+        // Detectar cambios en is_super_admin (rol de administrador)
+        if ($user->isDirty('is_super_admin')) {
+            event(new \App\Events\RoleChanged(
+                action: 'super_admin_changed',
+                auditable: $user,
+                oldValues: ['is_super_admin' => $user->getOriginal('is_super_admin')],
+                newValues: ['is_super_admin' => $user->is_super_admin],
+            ));
+        }
     }
 
     /**
@@ -50,7 +58,11 @@ class UserObserver
      */
     public function deleted(User $user): void
     {
-        //
+        event(new \App\Events\CriticalDataDeleted(
+            action: 'user_deleted',
+            auditable: $user,
+            oldValues: $user->toArray(),
+        ));
     }
 
     /**

@@ -13,6 +13,8 @@ interface OnboardingServiceInterface
     
     public function completeTourStep(User $user, string $stepId): void;
     
+    public function updateTourStep(User $user, int $step): void;
+    
     public function dismissTooltip(User $user, string $tooltipId): void;
     
     public function completeWizardStep(User $user, string $stepId, array $data = []): void;

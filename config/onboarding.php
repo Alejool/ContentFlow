@@ -9,7 +9,7 @@ return [
     | Configuration for the guided tour feature
     |
     */
-    'tour_steps' => env('ONBOARDING_TOUR_STEPS', 5),
+    'tour_steps' => env('ONBOARDING_TOUR_STEPS', 6),
 
     /*
     |--------------------------------------------------------------------------

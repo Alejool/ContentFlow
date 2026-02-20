@@ -100,15 +100,36 @@ class OnboardingService implements OnboardingServiceInterface
             $duration = $this->analyticsService->calculateDuration($state->started_at);
         }
 
+        // Parse step number from stepId (e.g., "step-1" -> 1)
+        $stepNumber = $this->parseStepNumber($stepId);
+        
+        $totalSteps = $this->getTotalTourSteps();
+        $completedCount = count($completedSteps);
+        
+        // Check if this is the last step (regardless of how many steps were completed)
+        $isLastStep = $stepNumber >= $totalSteps;
+
+        Log::info("Tour step completion check", [
+            'user_id' => $user->id,
+            'step_id' => $stepId,
+            'step_number' => $stepNumber,
+            'completed_steps' => $completedSteps,
+            'completed_count' => $completedCount,
+            'total_steps' => $totalSteps,
+            'is_last_step' => $isLastStep,
+            'should_complete' => $completedCount >= $totalSteps || $isLastStep,
+        ]);
+
         // Update state
         $updateData = [
             'tour_completed_steps' => $completedSteps,
+            'tour_current_step' => $stepNumber, // Update current step
         ];
 
-        // Check if this was the last step to mark tour as completed
-        // This is a simple implementation - you may want to define total steps elsewhere
-        if (count($completedSteps) >= $this->getTotalTourSteps()) {
+        // Check if this was the last step OR if all steps are completed
+        if ($completedCount >= $totalSteps || $isLastStep) {
             $updateData['tour_completed'] = true;
+            Log::info("Marking tour as completed for user {$user->id}");
             $this->checkAndMarkOnboardingComplete($user, $state);
         }
 
@@ -120,6 +141,22 @@ class OnboardingService implements OnboardingServiceInterface
         })->afterResponse();
 
         Log::info("Tour step {$stepId} completed for user {$user->id}");
+    }
+
+    /**
+     * Update current tour step (for navigation tracking)
+     * 
+     * @param User $user
+     * @param int $step
+     * @return void
+     */
+    public function updateTourStep(User $user, int $step): void
+    {
+        $this->repository->update($user->id, [
+            'tour_current_step' => $step,
+        ]);
+
+        Log::info("Tour step updated to {$step} for user {$user->id}");
     }
 
     /**
@@ -166,8 +203,13 @@ class OnboardingService implements OnboardingServiceInterface
     {
         $state = $this->getOnboardingState($user);
 
-        // Parse step number from stepId (e.g., "step-1" -> 1)
-        $stepNumber = $this->parseStepNumber($stepId);
+        // Handle special case for "complete" stepId
+        if ($stepId === 'complete') {
+            $stepNumber = $this->getTotalWizardSteps();
+        } else {
+            // Parse step number from stepId (e.g., "step-1" -> 1)
+            $stepNumber = $this->parseStepNumber($stepId);
+        }
 
         // Calculate duration
         $duration = $this->analyticsService->calculateDuration($state->started_at);
