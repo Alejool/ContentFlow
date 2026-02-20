@@ -28,9 +28,18 @@ class SocialTokenManager
       if ($newToken) {
         return $newToken;
       }
+      
+      // If refresh failed, mark as inactive and throw exception
+      $account->update([
+        'is_active' => false,
+        'last_failed_at' => now(),
+        'failure_count' => $account->failure_count + 1
+      ]);
+      
+      throw new \Exception("Failed to refresh token for {$account->platform}, reconnection required.");
     }
 
-    // Mark as inactive for reconnection
+    // No refresh token available, mark as inactive for reconnection
     $account->update([
       'is_active' => false,
       'last_failed_at' => now(),

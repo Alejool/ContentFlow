@@ -216,14 +216,8 @@ class CalendarController extends Controller
   /**
    * Bulk update events (move multiple events to a new date)
    */
-  public function bulkUpdate(Request $request)
+  public function bulkUpdate(\App\Http\Requests\BulkUpdateRequest $request)
   {
-    $request->validate([
-      'event_ids' => 'required|array|min:1',
-      'event_ids.*' => 'required|string',
-      'new_date' => 'required|date',
-      'operation' => 'required|in:move,delete',
-    ]);
 
     $workspaceId = Auth::user()->current_workspace_id;
     
