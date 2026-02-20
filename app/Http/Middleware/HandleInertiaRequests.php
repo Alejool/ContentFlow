@@ -218,55 +218,82 @@ class HandleInertiaRequests extends Middleware
         try {
           $user = $request->user();
           if (!$user) {
-            return null;
+            return [];
           }
 
-          // Return tour steps configuration
+          $onboardingService = app(OnboardingService::class);
+          $state = $onboardingService->getOnboardingState($user);
+          
+          // Only return tour steps if onboarding is not complete
+          if ($state->completed_at) {
+            return [];
+          }
+
+          // Return tour steps configuration with navigation routes
           return [
             [
               'id' => 'step-1',
+              'version' => '1.1', // Version to force cache refresh
               'title' => 'Welcome to ContentFlow',
-              'description' => "Let's take a quick tour of the platform. We'll show you the key features to help you get started with social media management.",
-              'targetSelector' => '#dashboard',
+              'description' => "Welcome! ContentFlow helps you manage and schedule social media content across multiple platforms. Let's take a quick tour of the key features.",
+              'targetSelector' => 'main',
               'position' => 'bottom',
               'highlightPadding' => 8,
+              'route' => '/dashboard',
             ],
             [
               'id' => 'step-2',
-              'title' => 'Navigation Sidebar',
+              'version' => '1.1',
+              'title' => 'Navigation Menu',
               'description' => 'Use the sidebar to navigate between different sections: Dashboard, Publications, Calendar, Analytics, and more.',
-              'targetSelector' => 'aside nav',
+              'targetSelector' => 'nav[aria-label="Main navigation"], aside, .lg\\:block.fixed',
               'position' => 'right',
               'highlightPadding' => 8,
+              'route' => '/dashboard',
             ],
             [
               'id' => 'step-3',
+              'version' => '2.0',
               'title' => 'Create Publications',
               'description' => 'Click here to create new social media posts. You can schedule them for multiple platforms at once.',
-              'targetSelector' => '[href*="publications/create"]',
-              'position' => 'right',
+              'targetSelector' => '#create-publication',
+              'position' => 'bottom',
               'highlightPadding' => 8,
+              'route' => '/content',
             ],
             [
               'id' => 'step-4',
+              'version' => '2.1',
               'title' => 'Calendar View',
-              'description' => 'View and manage all your scheduled posts in a calendar format. Drag and drop to reschedule.',
-              'targetSelector' => '[href*="calendar"]',
-              'position' => 'right',
+              'description' => 'The Calendar gives you a visual overview of all your scheduled posts. You can drag and drop to reschedule posts.',
+              'targetSelector' => '#calendar',
+              'position' => 'bottom',
               'highlightPadding' => 8,
+              'route' => '/content',
             ],
             [
               'id' => 'step-5',
+              'version' => '1.1',
               'title' => 'Analytics Dashboard',
-              'description' => 'Track your social media performance with detailed analytics and insights across all connected platforms.',
-              'targetSelector' => '[href*="analytics"]',
-              'position' => 'right',
+              'description' => 'Track your social media performance with detailed analytics. See engagement metrics, reach, and insights across all platforms.',
+              'targetSelector' => 'a[href*="/analytics"], nav a[href="/analytics"], [class*="analytics"], [class*="chart"], main',
+              'position' => 'bottom',
               'highlightPadding' => 8,
+              'route' => '/analytics',
+            ],
+            [
+              'id' => 'step-6',
+              'title' => 'Ready to Start!',
+              'description' => "Great! You've seen the main features. Now let's connect your social media accounts so you can start creating and publishing content.",
+              'targetSelector' => 'main',
+              'position' => 'bottom',
+              'highlightPadding' => 8,
+              'route' => '/dashboard',
             ],
           ];
         } catch (\Exception $e) {
           Log::error('Inertia Tour Steps Share Error: ' . $e->getMessage());
-          return null;
+          return [];
         }
       },
       
@@ -274,43 +301,23 @@ class HandleInertiaRequests extends Middleware
         try {
           $user = $request->user();
           if (!$user) {
-            return null;
+            return [];
           }
 
-          // Return available social platforms
-          return [
-            [
-              'id' => 'facebook',
-              'name' => 'Facebook',
-              'icon' => 'facebook',
-              'color' => '#1877F2',
-              'description' => 'Connect your Facebook pages and groups',
-            ],
-            [
-              'id' => 'twitter',
-              'name' => 'Twitter',
-              'icon' => 'twitter',
-              'color' => '#1DA1F2',
-              'description' => 'Share updates with your Twitter followers',
-            ],
-            [
-              'id' => 'instagram',
-              'name' => 'Instagram',
-              'icon' => 'instagram',
-              'color' => '#E4405F',
-              'description' => 'Post photos and stories to Instagram',
-            ],
-            [
-              'id' => 'linkedin',
-              'name' => 'LinkedIn',
-              'icon' => 'linkedin',
-              'color' => '#0A66C2',
-              'description' => 'Share professional content on LinkedIn',
-            ],
-          ];
+          $onboardingService = app(OnboardingService::class);
+          $state = $onboardingService->getOnboardingState($user);
+          
+          // Only return platforms if onboarding is not complete
+          if ($state->completed_at) {
+            return [];
+          }
+
+          // Return empty array - frontend will use SOCIAL_PLATFORMS constant
+          // which is synced with the active platforms configuration
+          return [];
         } catch (\Exception $e) {
           Log::error('Inertia Available Platforms Share Error: ' . $e->getMessage());
-          return null;
+          return [];
         }
       },
       
@@ -318,7 +325,7 @@ class HandleInertiaRequests extends Middleware
         try {
           $user = $request->user();
           if (!$user) {
-            return null;
+            return [];
           }
 
           // Get connected social accounts for current workspace
@@ -344,7 +351,15 @@ class HandleInertiaRequests extends Middleware
         try {
           $user = $request->user();
           if (!$user) {
-            return null;
+            return [];
+          }
+
+          $onboardingService = app(OnboardingService::class);
+          $state = $onboardingService->getOnboardingState($user);
+          
+          // Only return templates if onboarding is not complete
+          if ($state->completed_at) {
+            return [];
           }
 
           // Get active publication templates

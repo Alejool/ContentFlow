@@ -154,7 +154,7 @@ Route::middleware('auth')->group(function () {
   });
 
   // Admin Routes
-  Route::prefix('admin')->name('admin.')->middleware('super-admin')->group(function () {
+  Route::prefix('admin')->name('admin.')->middleware(['super-admin', 'require.2fa'])->group(function () {
     Route::get('/notifications', [SystemNotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/send', [SystemNotificationController::class, 'send'])->name('notifications.send');
   });
