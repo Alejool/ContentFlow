@@ -50,13 +50,20 @@ export default function MultiSelect({
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-neutral-600 bg-white dark:bg-neutral-800 text-gray-700 dark:text-gray-300 flex items-center justify-between hover:border-primary-400 dark:hover:border-primary-500 transition-colors"
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
+        aria-label={`Select options. ${selected.length} of ${options.length} selected`}
       >
         <span className="truncate">{displayText}</span>
         <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? "rotate-180" : ""}`} />
       </button>
 
       {isOpen && (
-        <div className="absolute z-50 mt-1 w-full bg-white dark:bg-neutral-800 border border-gray-300 dark:border-neutral-600 rounded-lg shadow-lg max-h-60 overflow-auto">
+        <div 
+          className="absolute z-50 mt-1 w-full bg-white dark:bg-neutral-800 border border-gray-300 dark:border-neutral-600 rounded-lg shadow-lg max-h-60 overflow-auto"
+          role="listbox"
+          aria-multiselectable="true"
+        >
           {options.map((option) => {
             const isSelected = selected.includes(option.value);
             return (
@@ -65,6 +72,8 @@ export default function MultiSelect({
                 type="button"
                 onClick={() => toggleOption(option.value)}
                 className="w-full px-3 py-2 text-sm text-left hover:bg-gray-100 dark:hover:bg-neutral-700 flex items-center justify-between transition-colors"
+                role="option"
+                aria-selected={isSelected}
               >
                 <span className="capitalize">{option.label}</span>
                 {isSelected && <Check className="w-4 h-4 text-primary-500" />}

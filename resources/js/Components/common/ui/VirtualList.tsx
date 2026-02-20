@@ -1,4 +1,3 @@
-import { Virtuoso, VirtuosoGrid } from "react-virtuoso";
 import { ReactNode, CSSProperties } from "react";
 
 interface VirtualListProps<T> {
@@ -16,8 +15,6 @@ interface VirtualListProps<T> {
 export function VirtualList<T>({
   items,
   renderItem,
-  estimatedItemSize = 100,
-  overscan = 5,
   className,
   emptyState,
   header,
@@ -29,18 +26,13 @@ export function VirtualList<T>({
   }
 
   return (
-    <Virtuoso
-      style={style}
-      className={className}
-      data={items}
-      overscan={overscan}
-      defaultItemHeight={estimatedItemSize}
-      itemContent={(index, item) => renderItem(item, index)}
-      components={{
-        Header: header ? () => <>{header}</> : undefined,
-        Footer: footer ? () => <>{footer}</> : undefined,
-      }}
-    />
+    <div style={style} className={`overflow-y-auto ${className || ""}`}>
+      {header && <div>{header}</div>}
+      {items.map((item, index) => (
+        <div key={index}>{renderItem(item, index)}</div>
+      ))}
+      {footer && <div>{footer}</div>}
+    </div>
   );
 }
 
@@ -59,7 +51,6 @@ export function VirtualGrid<T>({
   items,
   renderItem,
   columns = 4,
-  overscan = 5,
   className,
   emptyState,
   itemClassName,
@@ -70,14 +61,14 @@ export function VirtualGrid<T>({
   }
 
   return (
-    <VirtuosoGrid
-      style={style}
-      className={className}
-      data={items}
-      overscan={overscan}
-      listClassName={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-${columns} gap-6`}
-      itemClassName={itemClassName}
-      itemContent={(index, item) => renderItem(item, index)}
-    />
+    <div style={style} className={`overflow-y-auto ${className || ""}`}>
+      <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-${columns} gap-6`}>
+        {items.map((item, index) => (
+          <div key={index} className={itemClassName}>
+            {renderItem(item, index)}
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }

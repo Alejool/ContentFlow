@@ -252,7 +252,7 @@ const PublicationTable = memo(
           </div>
         </div>
 
-        {pagination && (
+        {pagination && pagination.total > 0 && (
           <AdvancedPagination
             currentPage={pagination.current_page}
             lastPage={pagination.last_page}

@@ -215,6 +215,8 @@ export default function GlobalUploadIndicator() {
         <button
           onClick={() => setIsExpanded(!isExpanded)}
           className="w-full flex items-center justify-between p-3 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-neutral-700/50 dark:to-neutral-700/30 hover:from-gray-100 hover:to-gray-50 dark:hover:from-neutral-700/70 dark:hover:to-neutral-700/50 transition-colors"
+          aria-label={isExpanded ? t("common.collapse", { defaultValue: "Collapse upload indicator" }) : t("common.expand", { defaultValue: "Expand upload indicator" })}
+          aria-expanded={isExpanded}
         >
           <div className="flex items-center gap-2.5">
             {getHeaderIcon()}

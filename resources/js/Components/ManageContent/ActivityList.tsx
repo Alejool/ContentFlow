@@ -183,7 +183,7 @@ export default function ActivityList({ activities }: ActivityListProps) {
   }
 
   return (
-    <div className="flow-root" style={{ height: "500px" }}>
+    <div className="flow-root overflow-y-auto" style={{ height: "500px" }}>
       <VirtualList
         items={activities}
         estimatedItemSize={100}

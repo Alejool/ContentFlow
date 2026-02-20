@@ -86,6 +86,7 @@ export default function ConfirmDialog({
             <button
               onClick={onClose}
               className="flex-shrink-0 p-1 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-neutral-700 text-gray-500 dark:text-gray-400"
+              aria-label="Close dialog"
             >
               <X className="w-5 h-5" />
             </button>

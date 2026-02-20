@@ -91,6 +91,7 @@ export default function AdvancedPagination({
           disabled={currentPage === 1 || isLoading}
           className="p-2 rounded-lg border border-gray-200 dark:border-neutral-700 hover:bg-gray-50 dark:hover:bg-neutral-700 disabled:opacity-50 text-gray-800 dark:text-white transition-colors"
           title={t("common.previous")}
+          aria-label={t("common.previous", { defaultValue: "Previous page" })}
         >
           <ChevronLeft className="w-4 h-4" />
         </button>
@@ -114,6 +115,8 @@ export default function AdvancedPagination({
                     ? "bg-primary-500 text-white shadow-lg shadow-primary-500/30"
                     : "hover:bg-gray-100 dark:hover:bg-neutral-700 text-gray-600 dark:text-gray-400"
                 }`}
+                aria-label={`${t("common.page", { defaultValue: "Page" })} ${page}`}
+                aria-current={currentPage === page ? "page" : undefined}
               >
                 {page}
               </button>
@@ -126,6 +129,7 @@ export default function AdvancedPagination({
           disabled={currentPage === lastPage || isLoading}
           className="p-2 rounded-lg border border-gray-200 dark:border-neutral-700 hover:bg-gray-50 dark:hover:bg-neutral-700 disabled:opacity-50 text-gray-800 dark:text-white  transition-colors"
           title={t("common.next")}
+          aria-label={t("common.next", { defaultValue: "Next page" })}
         >
           <ChevronRight className="w-4 h-4" />
         </button>

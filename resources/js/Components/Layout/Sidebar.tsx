@@ -136,7 +136,7 @@ export default function Sidebar({
               >
                 <img
                   src={Logo}
-                  alt="logo"
+                  alt="ContentFlow logo"
                   className="w-16 h-16 object-contain"
                 />
               </div>
@@ -162,6 +162,8 @@ export default function Sidebar({
             <button
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
               className={`p-2 rounded-lg transition-colors duration-200 ${classes.buttonHoverBg} ${classes.textColor}`}
+              aria-label={isSidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
+              aria-expanded={isSidebarOpen}
             >
               {isSidebarOpen ? (
                 <ChevronLeft
@@ -185,7 +187,7 @@ export default function Sidebar({
 
           <WorkspaceSwitcher isSidebarOpen={isSidebarOpen} />
 
-          <nav className="flex-1 px-4 py-6 space-y-2">
+          <nav className="flex-1 px-4 py-6 space-y-2" aria-label="Main navigation">
             {navigationItems.map((item) => {
               const isActive = !!route().current(item.href);
               return (

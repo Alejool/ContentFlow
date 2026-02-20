@@ -161,12 +161,13 @@ export default function ApprovalList({
 
   return (
     <>
-      <div style={{ height: "calc(100vh - 300px)", minHeight: "400px" }}>
-        <VirtualList
-          items={displayedPublications}
-          estimatedItemSize={120}
-          overscan={3}
-          renderItem={(pub) => (
+      <div className="flex flex-col" style={{ height: "calc(100vh - 300px)", minHeight: "400px" }}>
+        <div className="flex-1 overflow-y-auto">
+          <VirtualList
+            items={displayedPublications}
+            estimatedItemSize={120}
+            overscan={3}
+            renderItem={(pub) => (
             <div
               key={pub.id}
               className="bg-white dark:bg-neutral-800 rounded-lg p-4 border border-gray-200 dark:border-neutral-700 shadow-sm hover:shadow-md transition-shadow mb-4"
@@ -250,13 +251,13 @@ export default function ApprovalList({
             />
           }
         />
-      </div>
+        </div>
 
-      <div className="mt-6">
-        <AdvancedPagination
-          currentPage={currentPage}
-          lastPage={totalPages}
-          total={totalItems}
+        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900">
+          <AdvancedPagination
+            currentPage={currentPage}
+            lastPage={totalPages}
+            total={totalItems}
           perPage={perPage}
           onPageChange={setCurrentPage}
           onPerPageChange={(val) => {
@@ -265,6 +266,7 @@ export default function ApprovalList({
           }}
           t={t}
         />
+        </div>
       </div>
 
       {/* Rejection Reason Modal */}

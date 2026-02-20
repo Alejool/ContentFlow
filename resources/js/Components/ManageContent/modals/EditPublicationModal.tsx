@@ -12,6 +12,7 @@ import ModalFooter from "@/Components/ManageContent/modals/common/ModalFooter";
 import ModalHeader from "@/Components/ManageContent/modals/common/ModalHeader";
 import ScheduleSection from "@/Components/ManageContent/modals/common/ScheduleSection";
 import YouTubeThumbnailUploader from "@/Components/common/ui/YouTubeThumbnailUploader";
+import { useModalFocusTrap } from "@/Hooks/useModalFocusTrap";
 import { usePublicationForm } from "@/Hooks/publication/usePublicationForm";
 import { usePublicationLock } from "@/Hooks/usePublicationLock";
 import { useCampaignStore } from "@/stores/campaignStore";
@@ -77,6 +78,10 @@ const EditPublicationModal = ({
   const [isTimelineExpanded, setIsTimelineExpanded] = useState(false);
   const [isApprovalHistoryExpanded, setIsApprovalHistoryExpanded] =
     useState(false);
+
+  // Integrate focus trap for modal accessibility
+  // Requirements: 5.5
+  const modalRef = useModalFocusTrap(isOpen);
 
   const { isLockedByMe, isLockedByOther, lockInfo, activeUsers } =
     usePublicationLock(publication?.id ?? null, isOpen);
@@ -345,7 +350,10 @@ const EditPublicationModal = ({
         onClick={handleClose}
       />
 
-      <div className="relative w-full max-w-5xl bg-white dark:bg-neutral-800 rounded-lg shadow-2xl flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300">
+      <div 
+        ref={modalRef as React.RefObject<HTMLDivElement>}
+        className="relative w-full max-w-5xl bg-white dark:bg-neutral-800 rounded-lg shadow-2xl flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300"
+      >
         <ModalHeader
           t={t}
           onClose={handleClose}

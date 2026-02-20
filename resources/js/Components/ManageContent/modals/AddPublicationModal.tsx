@@ -10,6 +10,7 @@ import ScheduleSection from "@/Components/ManageContent/modals/common/ScheduleSe
 import Input from "@/Components/common/Modern/Input";
 import Textarea from "@/Components/common/Modern/Textarea";
 import { useCampaigns } from "@/Hooks/campaign/useCampaigns";
+import { useModalFocusTrap } from "@/Hooks/useModalFocusTrap";
 import { usePublicationForm } from "@/Hooks/publication/usePublicationForm";
 import { useAccountsStore } from "@/stores/socialAccountsStore";
 import { FileText, Hash, Save, Target } from "lucide-react";
@@ -29,6 +30,10 @@ export default function AddPublicationModal({
 }: AddPublicationModalProps) {
   const { campaigns } = useCampaigns();
   const { accounts: socialAccounts } = useAccountsStore();
+
+  // Integrate focus trap for modal accessibility
+  // Requirements: 5.5
+  const modalRef = useModalFocusTrap(isOpen);
 
   const {
     t,
@@ -164,7 +169,10 @@ export default function AddPublicationModal({
         onClick={handleClose}
       />
 
-      <div className="relative w-full max-w-4xl bg-white dark:bg-neutral-800 rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300">
+      <div 
+        ref={modalRef as React.RefObject<HTMLDivElement>}
+        className="relative w-full max-w-4xl bg-white dark:bg-neutral-800 rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300"
+      >
         <ModalHeader
           t={t}
           onClose={handleClose}

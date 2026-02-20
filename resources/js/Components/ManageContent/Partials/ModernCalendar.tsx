@@ -177,7 +177,7 @@ const DroppableDay = ({
       onClick={onSelect}
       className={`
         relative h-24 sm:h-32 lg:h-40 p-2 transition-all cursor-pointer group overflow-hidden
-        ${isSelected ? "bg-primary-50/30 dark:bg-primary-900/10 z-10" : "bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800/50"}
+        ${isSelected ? "bg-primary-50/50 dark:bg-primary-900/20 ring-2 ring-primary-500 ring-inset z-10" : "bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800/50"}
         ${!isSameMonth(day, currentMonth) ? "opacity-40" : ""}
         ${isOver ? "ring-2 ring-primary-500 ring-inset bg-primary-50/50 dark:bg-primary-900/20" : ""}
       `}
@@ -452,8 +452,8 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
 
         <div className="flex flex-col xl:flex-row gap-8">
           <div className="flex-1 min-w-0">
-            <div className="w-full border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden shadow-sm bg-gray-50 dark:bg-gray-900/50">
-              <div className="grid grid-cols-7 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
+            <div id="calendar" className="w-full border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden shadow-sm bg-gray-50 dark:bg-gray-900/50">
+              <div id="calendar" className="grid grid-cols-7 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
                 {[
                   { key: "sun", label: t("calendar.weekdays.sun") },
                   { key: "mon", label: t("calendar.weekdays.mon") },

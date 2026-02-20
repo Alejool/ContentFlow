@@ -11,6 +11,7 @@ import PublicationSelector from "@/Components/ManageContent/Campaign/common/Publ
 import ModalHeader from "@/Components/ManageContent/modals/common/ModalHeader";
 
 import { useEditCampaignForm } from "@/Hooks/campaign/useEditCampaignForm";
+import { useModalFocusTrap } from "@/Hooks/useModalFocusTrap";
 import { usePublicationsForCampaignEdit } from "@/Hooks/campaign/usePublicationsForCampaignEdit";
 import { usePage } from "@inertiajs/react";
 import ModalFooter from "./common/ModalFooter";
@@ -35,6 +36,10 @@ export default function EditCampaignModal({
   const canManage =
     auth.current_workspace?.permissions?.includes("manage-content");
   const isDisabled = !canManage;
+
+  // Integrate focus trap for modal accessibility
+  // Requirements: 5.5
+  const modalRef = useModalFocusTrap(isOpen);
 
   const { register, handleSubmit, setValue, watch, reset, errors } =
     useEditCampaignForm(t, campaign);
@@ -128,7 +133,10 @@ export default function EditCampaignModal({
         onClick={handleClose}
       />
 
-      <div className="relative w-full max-w-2xl bg-white dark:bg-neutral-800 rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300">
+      <div 
+        ref={modalRef as React.RefObject<HTMLDivElement>}
+        className="relative w-full max-w-2xl bg-white dark:bg-neutral-800 rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300"
+      >
         <ModalHeader
           t={t}
           onClose={handleClose}

@@ -398,6 +398,7 @@ export default function ManageContentPage() {
                 <Dropdown>
                   <Dropdown.Trigger>
                     <Button
+                      id="create-publication"
                       variant="primary"
                       size="lg"
                       icon={Plus}

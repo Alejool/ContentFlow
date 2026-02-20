@@ -203,40 +203,57 @@ export default function ContentList(props: ContentListProps) {
           className="mt-4"
         />
       ) : viewMode === "grid" ? (
-        <div className="grid grid-cols-1 grid-rows-1">
-          <div
-            className={`col-start-1 row-start-1 transition-all duration-500 ${smoothLoading ? "invisible opacity-0" : "visible opacity-100"}`}
-            style={{ height: "calc(100vh - 400px)", minHeight: "600px" }}
-          >
-            <VirtualGrid
-              items={items}
-              columns={4}
-              overscan={2}
-              renderItem={(item) => (
-                <ContentCard
-                  key={item.id}
-                  item={item}
-                  type={mode === "campaigns" ? "campaign" : "publication"}
-                  onEdit={props.onEdit}
-                  onDelete={props.onDelete}
-                  onViewDetails={props.onViewDetails}
-                  onPublish={props.onPublish}
-                  permissions={props.permissions}
-                  remoteLock={remoteLocks[item.id]}
-                  onPreviewMedia={handlePreviewMedia}
-                  onDuplicate={props.onDuplicate}
+        <div className="flex flex-col" style={{ height: "calc(100vh - 400px)", minHeight: "600px" }}>
+          <div className="flex-1 overflow-hidden">
+            <div className="grid grid-cols-1 grid-rows-1 h-full">
+              <div
+                className={`col-start-1 row-start-1 transition-all duration-500 overflow-y-auto ${smoothLoading ? "invisible opacity-0" : "visible opacity-100"}`}
+              >
+                <VirtualGrid
+                  items={items}
+                  columns={4}
+                  overscan={2}
+                  renderItem={(item) => (
+                    <ContentCard
+                      key={item.id}
+                      item={item}
+                      type={mode === "campaigns" ? "campaign" : "publication"}
+                      onEdit={props.onEdit}
+                      onDelete={props.onDelete}
+                      onViewDetails={props.onViewDetails}
+                      onPublish={props.onPublish}
+                      permissions={props.permissions}
+                      remoteLock={remoteLocks[item.id]}
+                      onPreviewMedia={handlePreviewMedia}
+                      onDuplicate={props.onDuplicate}
+                    />
+                  )}
                 />
+              </div>
+
+              {smoothLoading && (
+                <div className="col-start-1 row-start-1 bg-gray-50 dark:bg-neutral-900 animate-out fade-out duration-500 fill-mode-forwards z-20 overflow-y-auto">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {[...Array(8)].map((_, i) => (
+                      <ContentCardSkeleton key={i} />
+                    ))}
+                  </div>
+                </div>
               )}
-            />
+            </div>
           </div>
 
-          {smoothLoading && (
-            <div className="col-start-1 row-start-1 bg-gray-50 dark:bg-neutral-900 animate-out fade-out duration-500 fill-mode-forwards z-20">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {[...Array(8)].map((_, i) => (
-                  <ContentCardSkeleton key={i} />
-                ))}
-              </div>
+          {props.pagination && (
+            <div className="mt-4 pt-4 border-t border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900">
+              <AdvancedPagination
+                currentPage={props.pagination.current_page}
+                lastPage={props.pagination.last_page}
+                total={props.pagination.total}
+                perPage={props.pagination.per_page || 12}
+                onPageChange={props.onPageChange}
+                onPerPageChange={props.onPerPageChange || (() => {})}
+                t={t}
+              />
             </div>
           )}
         </div>
@@ -277,18 +294,6 @@ export default function ContentList(props: ContentListProps) {
             />
           )}
         </div>
-      )}
-
-      {viewMode === "grid" && props.pagination && (
-        <AdvancedPagination
-          currentPage={props.pagination.current_page}
-          lastPage={props.pagination.last_page}
-          total={props.pagination.total}
-          perPage={props.pagination.per_page || 12}
-          onPageChange={props.onPageChange}
-          onPerPageChange={props.onPerPageChange || (() => {})}
-          t={t}
-        />
       )}
 
       <MediaLightbox

@@ -246,6 +246,7 @@ export default function ContentPage() {
                 <Dropdown>
                   <Dropdown.Trigger>
                     <Button
+                     id="create-publication"
                       variant="primary"
                       size="lg"
                       icon={Plus}
@@ -323,6 +324,7 @@ export default function ContentPage() {
                 <span>{t("content.tabs.campaigns")}</span>
               </button>
               <button
+                id="calendar"
                 onClick={() => handleTabChange("calendar")}
                 className={`flex items-center justify-center gap-2 py-2 px-4 rounded-md text-sm font-bold transition-all duration-200 whitespace-nowrap ${
                   activeTab === "calendar"

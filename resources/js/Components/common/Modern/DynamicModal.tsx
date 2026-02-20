@@ -7,7 +7,8 @@ import {
   TransitionChild,
 } from "@headlessui/react";
 import { X } from "lucide-react";
-import React, { ReactNode } from "react";
+import React, { ReactNode, useEffect, useRef } from "react";
+import { FocusManager } from "@/Utils/FocusManager";
 
 interface DynamicModalProps {
   isOpen: boolean;
@@ -35,6 +36,7 @@ export const DynamicModal = ({
   size = "2xl",
 }: DynamicModalProps) => {
   const { actualTheme } = useTheme();
+  const dialogPanelRef = useRef<HTMLDivElement>(null);
 
   const sizeClasses = {
     sm: "max-w-sm",
@@ -48,6 +50,20 @@ export const DynamicModal = ({
     "6xl": "max-w-6xl",
     "7xl": "max-w-7xl",
   };
+
+  // Integrate FocusManager trapFocus when modal opens
+  // Requirements: 5.5
+  useEffect(() => {
+    if (isOpen && dialogPanelRef.current) {
+      // Trap focus when modal opens
+      const cleanup = FocusManager.trapFocus(dialogPanelRef.current);
+      
+      // Restore focus when modal closes
+      return () => {
+        cleanup();
+      };
+    }
+  }, [isOpen]);
 
   return (
     <Transition show={isOpen} as={React.Fragment}>
@@ -76,6 +92,7 @@ export const DynamicModal = ({
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
               <DialogPanel
+                ref={dialogPanelRef}
                 className={`relative transform overflow-hidden rounded-lg text-left shadow-2xl transition-all sm:my-8 w-full ${
                   sizeClasses[size]
                 }
