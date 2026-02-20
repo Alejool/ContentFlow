@@ -71,9 +71,6 @@ class PerformanceValidator {
           for (const entry of list.getEntries()) {
             if (entry.name === 'first-contentful-paint') {
               this.metrics.firstContentfulPaint = entry.startTime;
-              if (this.isDevelopment) {
-                console.log(`[Performance] FCP: ${entry.startTime.toFixed(2)}ms`);
-              }
             }
           }
         });
@@ -84,9 +81,6 @@ class PerformanceValidator {
           const entries = list.getEntries();
           const lastEntry = entries[entries.length - 1];
           this.metrics.largestContentfulPaint = lastEntry.startTime;
-          if (this.isDevelopment) {
-            console.log(`[Performance] LCP: ${lastEntry.startTime.toFixed(2)}ms`);
-          }
         });
         lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });
 
@@ -102,7 +96,7 @@ class PerformanceValidator {
         });
         clsObserver.observe({ entryTypes: ['layout-shift'] });
       } catch (error) {
-        console.error('[Performance] Failed to initialize observers:', error);
+        // Failed to initialize observers
       }
     }
   }
@@ -117,11 +111,6 @@ class PerformanceValidator {
 
     this.metrics.optimisticUpdateTime = duration;
 
-    if (this.isDevelopment) {
-      const status = duration < PERFORMANCE_TARGETS.OPTIMISTIC_UPDATE_TIME ? '✓' : '✗';
-      console.log(`[Performance] ${status} Optimistic update: ${duration.toFixed(2)}ms (target: ${PERFORMANCE_TARGETS.OPTIMISTIC_UPDATE_TIME}ms)`);
-    }
-
     return result;
   }
 
@@ -134,11 +123,6 @@ class PerformanceValidator {
     const duration = performance.now() - start;
 
     this.metrics.optimisticUpdateTime = duration;
-
-    if (this.isDevelopment) {
-      const status = duration < PERFORMANCE_TARGETS.OPTIMISTIC_UPDATE_TIME ? '✓' : '✗';
-      console.log(`[Performance] ${status} Optimistic update: ${duration.toFixed(2)}ms (target: ${PERFORMANCE_TARGETS.OPTIMISTIC_UPDATE_TIME}ms)`);
-    }
 
     return result;
   }
@@ -157,14 +141,8 @@ class PerformanceValidator {
 
       this.metrics.cacheResponseTime = duration;
 
-      if (this.isDevelopment) {
-        const status = duration < PERFORMANCE_TARGETS.CACHE_RESPONSE_TIME ? '✓' : '✗';
-        console.log(`[Performance] ${status} Cache response: ${duration.toFixed(2)}ms (target: ${PERFORMANCE_TARGETS.CACHE_RESPONSE_TIME}ms)`);
-      }
-
       return response || null;
     } catch (error) {
-      console.error('[Performance] Cache measurement failed:', error);
       return null;
     }
   }
@@ -287,21 +265,7 @@ class PerformanceValidator {
    * Log performance report to console
    */
   private logReport(report: PerformanceReport): void {
-    console.group('📊 Performance Validation Report');
-    console.log(`Overall Score: ${report.overallScore.toFixed(1)}% ${report.passed ? '✓' : '✗'}`);
-    console.log(`Timestamp: ${new Date(report.timestamp).toISOString()}`);
-    console.log('\nMetrics:');
-
-    for (const validation of report.validations) {
-      const status = validation.passed ? '✓' : '✗';
-      const percentage = ((validation.target - validation.value) / validation.target * 100).toFixed(1);
-      console.log(
-        `${status} ${validation.metric}: ${validation.value.toFixed(2)}${validation.unit} ` +
-        `(target: ${validation.target}${validation.unit}, ${percentage}% ${validation.passed ? 'under' : 'over'})`
-      );
-    }
-
-    console.groupEnd();
+    // Logging disabled
   }
 
   /**
@@ -344,14 +308,6 @@ class PerformanceValidator {
 
     const installable = hasServiceWorker && hasManifest && isSecure;
 
-    if (this.isDevelopment) {
-      console.log('[Performance] PWA Installability Check:');
-      console.log(`  Service Worker: ${hasServiceWorker ? '✓' : '✗'}`);
-      console.log(`  Manifest: ${hasManifest ? '✓' : '✗'}`);
-      console.log(`  Secure Context: ${isSecure ? '✓' : '✗'}`);
-      console.log(`  Installable: ${installable ? '✓' : '✗'}`);
-    }
-
     return installable;
   }
 
@@ -360,16 +316,8 @@ class PerformanceValidator {
    */
   async runLighthouseAudit(): Promise<any> {
     if (typeof window === 'undefined') {
-      console.warn('[Performance] Lighthouse audit can only run in browser');
       return null;
     }
-
-    console.log('[Performance] To run Lighthouse audit:');
-    console.log('1. Open Chrome DevTools');
-    console.log('2. Go to Lighthouse tab');
-    console.log('3. Select "Progressive Web App" category');
-    console.log('4. Click "Generate report"');
-    console.log('5. Target PWA score: > 90');
 
     return null;
   }

@@ -103,25 +103,7 @@ class PerformanceMetricsTracker {
    * Log metric to console
    */
   private logMetric(metric: PerformanceMetric): void {
-    const emoji = metric.success ? '✅' : '❌';
-    const color = metric.success ? '#10b981' : '#ef4444';
-
-    console.group(`%c${emoji} [PERFORMANCE] ${metric.operation} ${metric.resource}`, `color: ${color}; font-weight: bold;`);
-    console.log('Optimistic Update Time:', `${metric.optimisticUpdateTime}ms`);
-    console.log('Server Response Time:', `${metric.serverResponseTime}ms`);
-    console.log('Time Saved:', `${metric.timeSaved}ms`);
-    console.log('Total Time:', `${metric.totalTime}ms`);
-    console.log('Success:', metric.success);
-    
-    if (metric.retryCount > 0) {
-      console.log('Retry Count:', metric.retryCount);
-    }
-    
-    if (metric.error) {
-      console.log('Error:', metric.error);
-    }
-    
-    console.groupEnd();
+    // Logging disabled
   }
 
   /**
@@ -394,7 +376,7 @@ class PerformanceMetricsTracker {
       try {
         localStorage.removeItem(this.STORAGE_KEY);
       } catch (error) {
-        console.error('[PerformanceMetrics] Failed to clear metrics from storage:', error);
+        // Failed to clear metrics from storage
       }
     }
   }
@@ -419,7 +401,7 @@ class PerformanceMetricsTracker {
       const serialized = JSON.stringify(this.metrics);
       localStorage.setItem(this.STORAGE_KEY, serialized);
     } catch (error) {
-      console.error('[PerformanceMetrics] Failed to persist metrics:', error);
+      // Failed to persist metrics
     }
   }
 
@@ -431,13 +413,9 @@ class PerformanceMetricsTracker {
       const stored = localStorage.getItem(this.STORAGE_KEY);
       if (stored) {
         this.metrics = JSON.parse(stored);
-        
-        if (this.isDevelopment) {
-          console.log(`[PerformanceMetrics] Restored ${this.metrics.length} performance metrics from storage`);
-        }
       }
     } catch (error) {
-      console.error('[PerformanceMetrics] Failed to restore metrics:', error);
+      // Failed to restore metrics
     }
   }
 
@@ -482,44 +460,7 @@ class PerformanceMetricsTracker {
    * Print summary to console
    */
   printSummary(resource?: string): void {
-    if (!this.isDevelopment) {
-      return;
-    }
-
-    const stats = this.getStats(resource);
-    const insights = this.getInsights();
-
-    const title = resource 
-      ? `📊 Performance Summary - ${resource}`
-      : '📊 Overall Performance Summary';
-
-    console.group(`%c${title}`, 'color: #3b82f6; font-weight: bold; font-size: 14px;');
-    console.log('Total Operations:', stats.totalOperations);
-    console.log('Success Rate:', `${stats.successRate.toFixed(2)}%`);
-    console.log('');
-    console.log('Timing:');
-    console.log(`  Optimistic Update: ${stats.averageOptimisticTime}ms (avg)`);
-    console.log(`  Server Response: ${stats.averageServerTime}ms (avg)`);
-    console.log(`  Time Saved: ${stats.averageTimeSaved}ms (avg)`);
-    console.log(`  Total Time Saved: ${(stats.totalTimeSaved / 1000).toFixed(2)}s`);
-    console.log('');
-    console.log('By Operation:');
-    Object.entries(stats.byOperation).forEach(([op, data]) => {
-      console.log(`  ${op}:`);
-      console.log(`    Count: ${data.count}`);
-      console.log(`    Success Rate: ${data.successRate.toFixed(2)}%`);
-      console.log(`    Avg Server Time: ${data.avgServerTime}ms`);
-      console.log(`    Avg Time Saved: ${data.avgTimeSaved}ms`);
-    });
-    console.log('');
-    console.log('Insights:');
-    console.log(`  Fastest Operation: ${insights.fastestOperation}`);
-    console.log(`  Slowest Operation: ${insights.slowestOperation}`);
-    console.log(`  Most Reliable: ${insights.mostReliableOperation}`);
-    console.log(`  Least Reliable: ${insights.leastReliableOperation}`);
-    console.log(`  Avg Retry Count: ${insights.averageRetryCount}`);
-    console.log(`  Performance Improvement: ${insights.performanceImprovement.toFixed(2)}%`);
-    console.groupEnd();
+    // Logging disabled
   }
 }
 
