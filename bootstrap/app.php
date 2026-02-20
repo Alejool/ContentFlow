@@ -13,6 +13,8 @@ use App\Http\Middleware\SecurityHeaders;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use App\Http\Middleware\IsSuperAdmin;
 use App\Http\Middleware\ThrottleReelGeneration;
+use App\Http\Middleware\CustomRateLimiter;
+use App\Http\Middleware\Require2FA;
 use Illuminate\Routing\Middleware\CacheResponse;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -46,6 +48,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'super-admin' => IsSuperAdmin::class,
             'throttle.reel' => ThrottleReelGeneration::class,
             'cache.response' => CacheResponse::class,
+            'rate.limit' => CustomRateLimiter::class,
+            'require.2fa' => Require2FA::class,
         ]);
     })
     ->withSchedule(function ($schedule) {
