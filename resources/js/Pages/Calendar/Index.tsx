@@ -108,6 +108,7 @@ export default function CalendarIndex({ auth }: { auth: any }) {
     bulkUpdateEvents,
     bulkDeleteEvents,
     undoBulkOperation,
+    isUndoAvailable,
   } = useCalendarStore(
     useShallow((s) => ({
       events: s.events,
@@ -132,6 +133,7 @@ export default function CalendarIndex({ auth }: { auth: any }) {
       bulkUpdateEvents: s.bulkUpdateEvents,
       bulkDeleteEvents: s.bulkDeleteEvents,
       undoBulkOperation: s.undoBulkOperation,
+      isUndoAvailable: s.isUndoAvailable,
     })),
   );
 
@@ -166,6 +168,20 @@ export default function CalendarIndex({ auth }: { auth: any }) {
     fetchEvents();
     fetchCampaigns();
   }, [currentDate]);
+
+  // Timer to check if undo is still available (within 5 minutes)
+  useEffect(() => {
+    if (!canUndo) return;
+
+    const interval = setInterval(() => {
+      if (!isUndoAvailable()) {
+        // Manually update the store to disable undo
+        useCalendarStore.setState({ canUndo: false, lastBulkOperation: null, lastBulkOperationTime: null });
+      }
+    }, 10000); // Check every 10 seconds
+
+    return () => clearInterval(interval);
+  }, [canUndo, isUndoAvailable]);
 
   // Navigation
   const nextMonth = () => setCurrentDate(addMonths(currentDate, 1));

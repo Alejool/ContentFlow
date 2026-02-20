@@ -16,6 +16,7 @@ interface CalendarState {
   filters: CalendarFilters;
   canUndo: boolean;
   lastBulkOperation: any | null;
+  lastBulkOperationTime: Date | null;
 
   setCurrentMonth: (date: Date) => void;
   setPlatformFilter: (platform: string) => void;
@@ -33,6 +34,7 @@ interface CalendarState {
   bulkUpdateEvents: (eventIds: string[], newDate: string) => Promise<boolean>;
   bulkDeleteEvents: (eventIds: string[]) => Promise<boolean>;
   undoBulkOperation: () => Promise<boolean>;
+  isUndoAvailable: () => boolean;
   updateEventByResourceId: (
     resourceId: number,
     type: "publication" | "post" | "user_event",
@@ -60,6 +62,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
   },
   canUndo: false,
   lastBulkOperation: null,
+  lastBulkOperationTime: null,
 
   setCurrentMonth: (date) => set({ currentMonth: date }),
   setPlatformFilter: (platform) => set({ platformFilter: platform }),
@@ -238,6 +241,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
           selectedEvents: new Set(),
           canUndo: true,
           lastBulkOperation: response.data.data,
+          lastBulkOperationTime: new Date(),
         });
         
         return true;
@@ -269,6 +273,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
           selectedEvents: new Set(),
           canUndo: true,
           lastBulkOperation: response.data.data,
+          lastBulkOperationTime: new Date(),
         });
         
         return true;
@@ -294,6 +299,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
         set({ 
           canUndo: false,
           lastBulkOperation: null,
+          lastBulkOperationTime: null,
         });
         
         return true;
@@ -306,6 +312,20 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
       });
       return false;
     }
+  },
+
+  isUndoAvailable: () => {
+    const state = get();
+    if (!state.canUndo || !state.lastBulkOperationTime) {
+      return false;
+    }
+    
+    // Check if operation is within 5 minutes
+    const now = new Date();
+    const operationTime = new Date(state.lastBulkOperationTime);
+    const diffInMinutes = (now.getTime() - operationTime.getTime()) / (1000 * 60);
+    
+    return diffInMinutes < 5;
   },
 
   deleteEvent: async (id) => {

@@ -51,7 +51,7 @@ class BulkOperationHistory extends Model
     }
 
     /**
-     * Check if this operation can be undone (within 1 hour).
+     * Check if this operation can be undone (within 5 minutes).
      */
     public function canUndo(): bool
     {
@@ -59,7 +59,7 @@ class BulkOperationHistory extends Model
             return false;
         }
 
-        // Can only undo operations from the last hour
-        return $this->created_at->diffInHours(Carbon::now()) < 1;
+        // Can only undo operations from the last 5 minutes
+        return $this->created_at->diffInMinutes(Carbon::now()) < 5;
     }
 }
