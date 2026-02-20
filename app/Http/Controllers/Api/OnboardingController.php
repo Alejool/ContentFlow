@@ -95,6 +95,46 @@ class OnboardingController extends Controller
     }
 
     /**
+     * Update current tour step (for navigation tracking)
+     * 
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function updateTourStep(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'step' => 'required|integer|min:0',
+        ]);
+
+        try {
+            $user = $request->user();
+            
+            if (!$user) {
+                return response()->json([
+                    'message' => 'User not authenticated',
+                ], 401);
+            }
+
+            // Update the current tour step
+            $this->onboardingService->updateTourStep($user, $validated['step']);
+            
+            $state = $this->onboardingService->getOnboardingState($user);
+
+            return response()->json([
+                'message' => 'Tour step updated successfully',
+                'state' => $this->formatOnboardingState($state),
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error('Error updating tour step: ' . $e->getMessage());
+            
+            return response()->json([
+                'message' => 'Failed to update tour step',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
      * Skip the tour
      * 
      * @param Request $request
@@ -360,20 +400,20 @@ class OnboardingController extends Controller
     protected function formatOnboardingState($state): array
     {
         return [
-            'tour_completed' => $state->tour_completed,
-            'tour_skipped' => $state->tour_skipped,
-            'tour_current_step' => $state->tour_current_step,
-            'tour_completed_steps' => $state->tour_completed_steps ?? [],
-            'wizard_completed' => $state->wizard_completed,
-            'wizard_skipped' => $state->wizard_skipped,
-            'wizard_current_step' => $state->wizard_current_step,
-            'template_selected' => $state->template_selected,
-            'template_id' => $state->template_id,
-            'dismissed_tooltips' => $state->dismissed_tooltips ?? [],
-            'completed_at' => $state->completed_at?->toIso8601String(),
-            'started_at' => $state->started_at?->toIso8601String(),
-            'completion_percentage' => $state->getCompletionPercentage(),
-            'is_complete' => $this->onboardingService->isOnboardingComplete($state->user),
+            'tourCompleted' => $state->tour_completed,
+            'tourSkipped' => $state->tour_skipped,
+            'tourCurrentStep' => $state->tour_current_step,
+            'tourCompletedSteps' => $state->tour_completed_steps ?? [],
+            'wizardCompleted' => $state->wizard_completed,
+            'wizardSkipped' => $state->wizard_skipped,
+            'wizardCurrentStep' => $state->wizard_current_step,
+            'templateSelected' => $state->template_selected,
+            'templateId' => $state->template_id,
+            'dismissedTooltips' => $state->dismissed_tooltips ?? [],
+            'completedAt' => $state->completed_at?->toIso8601String(),
+            'startedAt' => $state->started_at?->toIso8601String(),
+            'completionPercentage' => $state->getCompletionPercentage(),
+            'isComplete' => $this->onboardingService->isOnboardingComplete($state->user),
         ];
     }
 

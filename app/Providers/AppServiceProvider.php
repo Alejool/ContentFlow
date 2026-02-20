@@ -61,5 +61,27 @@ class AppServiceProvider extends ServiceProvider
     DatabaseNotification::observe(NotificationObserver::class);
     User::observe(UserObserver::class);
     Publication::observe(PublicationObserver::class);
+
+    // Register audit event listeners
+    \Illuminate\Support\Facades\Event::listen(
+      \App\Events\ConfigurationChanged::class,
+      \App\Listeners\AuditLogger::class
+    );
+    \Illuminate\Support\Facades\Event::listen(
+      \App\Events\RoleChanged::class,
+      \App\Listeners\AuditLogger::class
+    );
+    \Illuminate\Support\Facades\Event::listen(
+      \App\Events\SocialTokenAccessed::class,
+      \App\Listeners\AuditLogger::class
+    );
+    \Illuminate\Support\Facades\Event::listen(
+      \App\Events\AuthenticationFailed::class,
+      \App\Listeners\AuditLogger::class
+    );
+    \Illuminate\Support\Facades\Event::listen(
+      \App\Events\CriticalDataDeleted::class,
+      \App\Listeners\AuditLogger::class
+    );
   }
 }

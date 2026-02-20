@@ -32,5 +32,10 @@ class Kernel extends ConsoleKernel
     $schedule->command('cache:clear')
       ->daily()
       ->at('03:00');
+
+    // Limpiar logs de auditoría antiguos (>90 días) diariamente a las 2 AM
+    $schedule->command('audit:clean')
+      ->daily()
+      ->at('02:00');
   }
 }
