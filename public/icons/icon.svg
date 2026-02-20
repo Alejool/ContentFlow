@@ -1,0 +1,27 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background with theme color -->
+  <rect width="512" height="512" rx="115" fill="#4F46E5"/>
+  
+  <!-- Safe zone for maskable icon (80% of size, centered) -->
+  <g transform="translate(51.2, 51.2)">
+    <!-- Content icon - Social media/content management symbol -->
+    <!-- Calendar/Grid icon representing content management -->
+    <rect x="80" y="100" width="250" height="210" rx="20" fill="white" opacity="0.2"/>
+    
+    <!-- Main content squares -->
+    <rect x="100" y="140" width="70" height="70" rx="10" fill="white"/>
+    <rect x="190" y="140" width="70" height="70" rx="10" fill="white"/>
+    <rect x="280" y="140" width="30" height="70" rx="10" fill="white" opacity="0.6"/>
+    
+    <rect x="100" y="230" width="70" height="60" rx="10" fill="white" opacity="0.8"/>
+    <rect x="190" y="230" width="70" height="60" rx="10" fill="white" opacity="0.8"/>
+    <rect x="280" y="230" width="30" height="60" rx="10" fill="white" opacity="0.4"/>
+    
+    <!-- Social media indicator - small circles -->
+    <circle cx="125" cy="175" r="8" fill="#4F46E5"/>
+    <circle cx="215" cy="175" r="8" fill="#4F46E5"/>
+    
+    <!-- Checkmark/success indicator -->
+    <path d="M 110 255 L 120 265 L 140 245" stroke="#4F46E5" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+</svg>

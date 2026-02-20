@@ -1,0 +1,79 @@
+<svg width="750" height="1334" viewBox="0 0 750 1334" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="750" height="1334" fill="#F9FAFB"/>
+  
+  <!-- Status bar -->
+  <rect width="750" height="44" fill="#4F46E5"/>
+  <text x="30" y="28" font-family="Arial, sans-serif" font-size="14" fill="white">9:41</text>
+  <circle cx="680" cy="22" r="8" fill="white" opacity="0.8"/>
+  <circle cx="710" cy="22" r="8" fill="white" opacity="0.8"/>
+  
+  <!-- App header -->
+  <rect y="44" width="750" height="80" fill="white"/>
+  <text x="30" y="95" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#111827">Content Manager</text>
+  
+  <!-- Offline indicator (showing PWA offline capability) -->
+  <rect x="30" y="140" width="690" height="60" rx="12" fill="#FEF3C7"/>
+  <circle cx="60" cy="170" r="12" fill="#F59E0B"/>
+  <text x="85" y="165" font-family="Arial, sans-serif" font-size="14" fill="#92400E">Offline Mode</text>
+  <text x="85" y="185" font-family="Arial, sans-serif" font-size="12" fill="#92400E">3 changes will sync when online</text>
+  
+  <!-- Stats cards -->
+  <rect x="30" y="220" width="330" height="140" rx="12" fill="white"/>
+  <text x="50" y="255" font-family="Arial, sans-serif" font-size="14" fill="#6B7280">Publications</text>
+  <text x="50" y="295" font-family="Arial, sans-serif" font-size="42" font-weight="bold" fill="#4F46E5">1,234</text>
+  
+  <rect x="390" y="220" width="330" height="140" rx="12" fill="white"/>
+  <text x="410" y="255" font-family="Arial, sans-serif" font-size="14" fill="#6B7280">Campaigns</text>
+  <text x="410" y="295" font-family="Arial, sans-serif" font-size="42" font-weight="bold" fill="#10B981">42</text>
+  
+  <!-- Recent posts section -->
+  <text x="30" y="405" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#111827">Recent Posts</text>
+  
+  <!-- Post card 1 -->
+  <rect x="30" y="430" width="690" height="180" rx="12" fill="white"/>
+  <rect x="50" y="450" width="120" height="120" rx="8" fill="#EEF2FF"/>
+  <text x="190" y="475" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#111827">Summer Campaign</text>
+  <text x="190" y="500" font-family="Arial, sans-serif" font-size="14" fill="#6B7280">Launch announcement for new</text>
+  <text x="190" y="520" font-family="Arial, sans-serif" font-size="14" fill="#6B7280">summer collection</text>
+  <rect x="190" y="540" width="80" height="24" rx="12" fill="#D1FAE5"/>
+  <text x="200" y="557" font-family="Arial, sans-serif" font-size="12" fill="#065F46">Published</text>
+  <circle cx="290" cy="552" r="8" fill="#1DA1F2"/>
+  <circle cx="315" cy="552" r="8" fill="#E4405F"/>
+  
+  <!-- Post card 2 (with optimistic update indicator) -->
+  <rect x="30" y="630" width="690" height="180" rx="12" fill="white"/>
+  <rect x="50" y="650" width="120" height="120" rx="8" fill="#FEF3C7"/>
+  <text x="190" y="675" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#111827">Product Launch</text>
+  <text x="190" y="700" font-family="Arial, sans-serif" font-size="14" fill="#6B7280">New product announcement</text>
+  <text x="190" y="720" font-family="Arial, sans-serif" font-size="14" fill="#6B7280">coming next week</text>
+  <rect x="190" y="740" width="80" height="24" rx="12" fill="#DBEAFE"/>
+  <text x="200" y="757" font-family="Arial, sans-serif" font-size="12" fill="#1E40AF">Saving...</text>
+  <circle cx="290" cy="752" r="8" fill="#0A66C2"/>
+  <!-- Optimistic update spinner -->
+  <circle cx="650" cy="720" r="16" stroke="#4F46E5" stroke-width="3" fill="none" opacity="0.3"/>
+  <path d="M 650 704 A 16 16 0 0 1 666 720" stroke="#4F46E5" stroke-width="3" fill="none" stroke-linecap="round">
+    <animateTransform attributeName="transform" type="rotate" from="0 650 720" to="360 650 720" dur="1s" repeatCount="indefinite"/>
+  </path>
+  
+  <!-- Post card 3 -->
+  <rect x="30" y="830" width="690" height="180" rx="12" fill="white"/>
+  <rect x="50" y="850" width="120" height="120" rx="8" fill="#DBEAFE"/>
+  <text x="190" y="875" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#111827">Weekly Newsletter</text>
+  <text x="190" y="900" font-family="Arial, sans-serif" font-size="14" fill="#6B7280">Weekly update for our</text>
+  <text x="190" y="920" font-family="Arial, sans-serif" font-size="14" fill="#6B7280">subscribers</text>
+  <rect x="190" y="940" width="60" height="24" rx="12" fill="#F3F4F6"/>
+  <text x="200" y="957" font-family="Arial, sans-serif" font-size="12" fill="#6B7280">Draft</text>
+  <circle cx="270" cy="952" r="8" fill="#25D366"/>
+  
+  <!-- Bottom navigation -->
+  <rect y="1254" width="750" height="80" fill="white"/>
+  <circle cx="150" cy="1294" r="24" fill="#4F46E5"/>
+  <circle cx="375" cy="1294" r="24" fill="#E5E7EB"/>
+  <circle cx="600" cy="1294" r="24" fill="#E5E7EB"/>
+  
+  <!-- PWA install hint (subtle) -->
+  <rect x="250" y="1040" width="250" height="60" rx="30" fill="white" opacity="0.95"/>
+  <text x="375" y="1065" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#4F46E5" text-anchor="middle">Install App</text>
+  <text x="375" y="1085" font-family="Arial, sans-serif" font-size="11" fill="#6B7280" text-anchor="middle">Works offline</text>
+</svg>
