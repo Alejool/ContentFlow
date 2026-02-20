@@ -465,22 +465,17 @@ export function getGlobalToaster() {
   if (!globalToaster) {
     const fallbackToaster = {
       toast: (options: Omit<ToastProps, "id">) => {
-        console.log("Toast (fallback):", options);
+        :", options);
       },
       success: (title: string, description?: string) => {
-        console.log("Success toast:", title, description);
-      },
+        },
       error: (title: string, description?: string) => {
-        console.log("Error toast:", title, description);
-      },
+        },
       warning: (title: string, description?: string) => {
-        console.log("Warning toast:", title, description);
-      },
+        },
       info: (title: string, description?: string) => {
-        console.log("Info toast:", title, description);
-      },
+        },
       loading: (title: string, description?: string) => {
-        console.log("Loading toast:", title, description);
         return "fallback-id";
       },
       updateLoading: () => {},

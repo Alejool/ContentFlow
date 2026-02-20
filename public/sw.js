@@ -12,7 +12,6 @@ const IMAGE_CACHE = `images-${CACHE_VERSION}`;
 
 // Initialize Workbox
 if (workbox) {
-  console.log('[SW] Workbox loaded successfully');
   
   // Enable navigation preload
   workbox.navigationPreload.enable();
@@ -30,16 +29,14 @@ if (workbox) {
   workbox.core.clientsClaim();
   
 } else {
-  console.error('[SW] Workbox failed to load');
+  // Workbox failed to load
 }
 
 // Install event - precache static resources
 self.addEventListener('install', (event) => {
-  console.log('[SW] Installing service worker...');
   
   event.waitUntil(
     caches.open(STATIC_CACHE).then((cache) => {
-      console.log('[SW] Precaching static assets');
       return cache.addAll([
         '/',
         '/favicon.ico',
@@ -51,7 +48,6 @@ self.addEventListener('install', (event) => {
 
 // Activate event - clean up old caches
 self.addEventListener('activate', (event) => {
-  console.log('[SW] Activating service worker...');
   
   event.waitUntil(
     caches.keys().then((cacheNames) => {
@@ -64,7 +60,6 @@ self.addEventListener('activate', (event) => {
             cacheName !== IMAGE_CACHE &&
             !cacheName.includes('workbox')
           ) {
-            console.log('[SW] Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
         })
@@ -121,7 +116,6 @@ async function handleFetchRequest(request) {
     return await networkFirst(request, DYNAMIC_CACHE);
     
   } catch (error) {
-    console.error('[SW] Fetch error:', error);
     
     // Return offline fallback if available
     return await getOfflineFallback(request);
@@ -134,11 +128,9 @@ async function cacheFirst(request, cacheName) {
   const cached = await cache.match(request);
   
   if (cached) {
-    console.log('[SW] Cache hit:', request.url);
     return cached;
   }
   
-  console.log('[SW] Cache miss, fetching:', request.url);
   const response = await fetch(request);
   
   if (response.ok) {
@@ -157,14 +149,12 @@ async function networkFirst(request, cacheName, timeout = 5000) {
     const response = await fetchWithTimeout(request, timeout);
     
     if (response.ok) {
-      console.log('[SW] Network success, caching:', request.url);
       cache.put(request, response.clone());
     }
     
     return response;
     
   } catch (error) {
-    console.log('[SW] Network failed, trying cache:', request.url);
     const cached = await cache.match(request);
     
     if (cached) {
@@ -190,12 +180,10 @@ async function staleWhileRevalidate(request, cacheName) {
   
   // Return cached version immediately if available
   if (cached) {
-    console.log('[SW] Serving stale, revalidating:', request.url);
     return cached;
   }
   
   // Otherwise wait for network
-  console.log('[SW] No cache, waiting for network:', request.url);
   return fetchPromise;
 }
 
@@ -257,7 +245,6 @@ async function getOfflineFallback(request) {
 
 // Message event - handle messages from clients
 self.addEventListener('message', (event) => {
-  console.log('[SW] Message received:', event.data);
   
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
@@ -276,7 +263,6 @@ self.addEventListener('message', (event) => {
 
 // Background sync event (for offline operations)
 self.addEventListener('sync', (event) => {
-  console.log('[SW] Background sync:', event.tag);
   
   if (event.tag === 'sync-operations') {
     event.waitUntil(syncOfflineOperations(event.tag));
@@ -285,7 +271,6 @@ self.addEventListener('sync', (event) => {
 
 // Sync offline operations using BackgroundSyncManager
 async function syncOfflineOperations(tag) {
-  console.log('[SW] Syncing offline operations...');
   
   try {
     // Initialize BackgroundSyncManager in Service Worker context
@@ -294,9 +279,7 @@ async function syncOfflineOperations(tag) {
     // Execute sync operations in FIFO order
     await syncManager.executeSync(tag);
     
-    console.log('[SW] Sync completed successfully');
   } catch (error) {
-    console.error('[SW] Sync failed:', error);
     throw error; // Retry sync
   }
 }
@@ -347,11 +330,9 @@ async function initBackgroundSyncManager() {
       });
       
       if (operations.length === 0) {
-        console.log('[SW] No operations to sync');
         return;
       }
       
-      console.log(`[SW] Processing ${operations.length} operations...`);
       
       // Execute operations in FIFO order
       for (const operation of operations) {
@@ -377,10 +358,8 @@ async function initBackgroundSyncManager() {
             request.onerror = () => reject(request.error);
           });
           
-          console.log('[SW] Operation completed:', operation.id);
           
         } catch (error) {
-          console.error('[SW] Operation failed:', operation.id, error);
           
           // Handle retry with exponential backoff
           const maxRetries = 3;
@@ -400,7 +379,6 @@ async function initBackgroundSyncManager() {
               request.onerror = () => reject(request.error);
             });
             
-            console.error('[SW] Max retries reached for operation:', operation.id);
             
             // Notify clients about failed operation
             const clients = await self.clients.matchAll();
@@ -429,11 +407,6 @@ async function initBackgroundSyncManager() {
             // Calculate exponential backoff delay: 1s, 2s, 4s
             const delay = Math.pow(2, updatedOperation.retryCount - 1) * 1000;
             
-            console.log(
-              `[SW] Retry ${updatedOperation.retryCount}/${maxRetries} for operation:`,
-              operation.id,
-              `(delay: ${delay}ms)`
-            );
             
             // Schedule retry
             setTimeout(() => {
@@ -441,7 +414,7 @@ async function initBackgroundSyncManager() {
                 navigator.serviceWorker.ready.then((registration) => {
                   return registration.sync.register('sync-operations');
                 }).catch((err) => {
-                  console.error('[SW] Failed to schedule retry:', err);
+                  // Failed to schedule retry
                 });
               }
             }, delay);
@@ -451,5 +424,3 @@ async function initBackgroundSyncManager() {
     }
   };
 }
-
-console.log('[SW] Service Worker loaded');

@@ -17,7 +17,6 @@
                     messageData.errorType = '{{ $errorType ?? 'unknown' }}';
                 @endif
 
-                console.log('Sending OAuth callback message:', messageData);
                 window.opener.postMessage(messageData, window.location.origin);
                 
                 // Aumentar el tiempo para ver el error (3 segundos)
