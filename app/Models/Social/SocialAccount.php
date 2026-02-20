@@ -2,6 +2,7 @@
 
 namespace App\Models\Social;
 
+use App\Casts\EncryptedToken;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -34,6 +35,9 @@ class SocialAccount extends Model
     'id' => 'integer',
     'user_id' => 'integer',
     'workspace_id' => 'integer',
+    'account_id' => 'string',
+    'access_token' => EncryptedToken::class,
+    'refresh_token' => EncryptedToken::class,
     'token_expires_at' => 'datetime',
     'is_active' => 'boolean',
     'last_failed_at' => 'datetime',
@@ -49,6 +53,16 @@ class SocialAccount extends Model
   public function workspace(): BelongsTo
   {
     return $this->belongsTo(Workspace::class);
+  }
+
+  /**
+   * Get the provider attribute (alias for platform).
+   *
+   * @return string|null
+   */
+  public function getProviderAttribute(): ?string
+  {
+    return $this->platform;
   }
 
   public function scheduledPosts(): HasMany
