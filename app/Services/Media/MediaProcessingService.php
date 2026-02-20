@@ -58,12 +58,28 @@ class MediaProcessingService
   public function uploadAndCreateMediaFile(Publication $publication, $file, array $metadata = []): MediaFile
   {
     if ($file instanceof UploadedFile) {
+      // Validate file before processing
+      $validator = app(\App\Services\FileValidatorService::class);
+      $allowedMimeTypes = [
+        'image/jpeg',
+        'image/png',
+        'image/gif',
+        'video/mp4',
+        'application/pdf',
+      ];
+      
+      $validationResult = $validator->validate($file, $allowedMimeTypes);
+      
+      if (!$validationResult->success) {
+        throw new \InvalidArgumentException($validationResult->message);
+      }
+      
       $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
       $path = 'publications/' . $filename;
 
       $fileType = str_starts_with($file->getClientMimeType(), 'video/') ? 'video' : 'image';
       $fileSize = $file->getSize();
-      $mimeType = $file->getClientMimeType();
+      $mimeType = $validationResult->detectedMimeType ?? $file->getClientMimeType();
       $originalName = $file->getClientOriginalName();
       $isLargeFile = $fileSize > 20 * 1024 * 1024; // 20MB
     } else {
@@ -141,6 +157,16 @@ class MediaProcessingService
 
   public function createThumbnail(MediaFile $mediaFile, UploadedFile $thumbFile, string $platform = 'all'): MediaDerivative
   {
+    // Validate thumbnail file
+    $validator = app(\App\Services\FileValidatorService::class);
+    $allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
+    
+    $validationResult = $validator->validate($thumbFile, $allowedMimeTypes);
+    
+    if (!$validationResult->success) {
+      throw new \InvalidArgumentException($validationResult->message);
+    }
+    
     $thumbFilename = Str::uuid() . '_thumb.' . $thumbFile->getClientOriginalExtension();
     $thumbPath = $thumbFile->storeAs('derivatives/thumbnails', $thumbFilename, 's3');
 

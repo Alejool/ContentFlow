@@ -626,35 +626,48 @@ class SocialAccountController extends Controller
   private function saveAccount($data)
   {
     $workspaceId = Auth::user()->current_workspace_id;
+    
+    // Ensure account_id is a string
+    $data['account_id'] = (string) $data['account_id'];
+    
+    \Log::info('SaveAccount - Processing account', [
+      'platform' => $data['platform'],
+      'account_id' => $data['account_id'],
+      'workspace_id' => $workspaceId
+    ]);
+
+    // Check if account exists (including soft deleted)
     $existingAccount = SocialAccount::withTrashed()
-      ->where('workspace_id', $workspaceId)
       ->where('platform', $data['platform'])
       ->where('account_id', $data['account_id'])
+      ->where('workspace_id', $workspaceId)
       ->first();
-
-    $accountData = [
-      'account_id' => $data['account_id'],
-      'access_token' => $data['access_token'],
-      'refresh_token' => $data['refresh_token'] ?? null,
-      'token_expires_at' => $data['token_expires_at'] ?? null,
-    ];
-
-    if (isset($data['account_name'])) {
-      $accountData['account_name'] = $data['account_name'];
-    }
-
-    if (isset($data['account_metadata'])) {
-      $accountData['account_metadata'] = $data['account_metadata'];
-    }
 
     $isNewConnection = false;
     $wasReconnection = false;
 
+    // Prepare account data
+    $accountData = [
+      'access_token' => $data['access_token'],
+      'refresh_token' => $data['refresh_token'] ?? null,
+      'token_expires_at' => $data['token_expires_at'] ?? null,
+      'account_name' => $data['account_name'] ?? null,
+      'account_metadata' => $data['account_metadata'] ?? null,
+      'user_id' => Auth::id(),
+      'workspace_id' => $workspaceId,
+      'is_active' => true,
+      'failure_count' => 0,
+      'last_failed_at' => null,
+    ];
+
     if ($existingAccount) {
+      // Account exists - update it
       if ($existingAccount->trashed()) {
+        \Log::info('SaveAccount - Restoring soft-deleted account', ['id' => $existingAccount->id]);
         $existingAccount->restore();
         $wasReconnection = true;
 
+        // Restore orphaned posts
         SocialPostLog::where('social_account_id', $existingAccount->id)
           ->where('status', 'orphaned')
           ->update([
@@ -663,14 +676,27 @@ class SocialAccountController extends Controller
           ]);
       }
 
+      \Log::info('SaveAccount - Updating existing account', ['id' => $existingAccount->id]);
       $existingAccount->update($accountData);
       $account = $existingAccount;
     } else {
-      $accountData['user_id'] = Auth::id();
-      $accountData['workspace_id'] = $workspaceId;
+      // Account doesn't exist - use updateOrCreate to handle race conditions
       $accountData['platform'] = $data['platform'];
-      $account = SocialAccount::create($accountData);
-      $isNewConnection = true;
+      $accountData['account_id'] = $data['account_id'];
+      
+      \Log::info('SaveAccount - Creating new account with updateOrCreate');
+      
+      // Use the unique constraint fields (platform, account_id, workspace_id) to find or create
+      $account = SocialAccount::updateOrCreate(
+        [
+          'platform' => $data['platform'],
+          'account_id' => $data['account_id'],
+          'workspace_id' => $workspaceId,
+        ],
+        $accountData
+      );
+      
+      $isNewConnection = $account->wasRecentlyCreated;
     }
 
     $identifier = $data['account_name'] ?? $data['account_id'];
@@ -693,11 +719,12 @@ class SocialAccountController extends Controller
     return $account;
   }
 
-  private function handleOAuthError($message)
+  private function handleOAuthError($message, $errorType = 'unknown')
   {
     return view('oauth.callback', [
       'success' => false,
-      'message' => $message
+      'message' => $message,
+      'errorType' => $errorType
     ]);
   }
 

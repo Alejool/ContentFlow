@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Services\AIService;
+use App\Services\ContentSanitizerService;
 use App\Http\Controllers\Controller;
 
 use App\Models\Campaign\Campaign;
@@ -16,10 +17,14 @@ class AIChatController extends Controller
 {
     protected AIService $aiService;
 
-    public function __construct(AIService $aiService)
-    {
-        $this->aiService = $aiService;
-    }
+    public function __construct(
+            AIService $aiService,
+            protected \App\Services\ContentSanitizerService $sanitizer
+        )
+        {
+            $this->aiService = $aiService;
+        }
+
 
     /**
      * Process chat message
@@ -87,6 +92,10 @@ class AIChatController extends Controller
             $endTime = microtime(true);
             $duration = $endTime - $startTime;
 
+            // Sanitize AI-generated content before returning
+            $sanitizationResult = $this->sanitizer->sanitize($aiResponse['message']);
+            $sanitizedMessage = $sanitizationResult->content;
+
             // Log successful request
             Log::info('AI Chat Request Processed', [
                 'user_id' => $user->id,
@@ -94,12 +103,13 @@ class AIChatController extends Controller
                 'message_length' => strlen($request->input('message')),
                 'has_context' => $includeContext,
                 'campaign_count' => count($campaigns),
-                'processing_time_seconds' => round($duration, 4)
+                'processing_time_seconds' => round($duration, 4),
+                'content_was_sanitized' => $sanitizationResult->wasModified
             ]);
 
             return response()->json([
                 'success' => true,
-                'message' => $aiResponse['message'],
+                'message' => $sanitizedMessage,
                 'suggestion' => $aiResponse['suggestion'] ?? null,
                 'provider' => $aiResponse['provider'] ?? 'default',
                 'model' => $aiResponse['model'] ?? 'default',
@@ -155,6 +165,24 @@ class AIChatController extends Controller
                 $request->input('field_limits')
             );
 
+            // Sanitize AI-generated field suggestions
+            $sanitizedData = $aiResponse['suggestion']['data'] ?? null;
+            if ($sanitizedData && is_array($sanitizedData)) {
+                foreach ($sanitizedData as $key => $value) {
+                    if (is_string($value)) {
+                        $sanitizationResult = $this->sanitizer->sanitize($value);
+                        $sanitizedData[$key] = $sanitizationResult->content;
+                    }
+                }
+            }
+
+            // Sanitize message if present
+            $sanitizedMessage = $aiResponse['message'] ?? '';
+            if ($sanitizedMessage) {
+                $sanitizationResult = $this->sanitizer->sanitize($sanitizedMessage);
+                $sanitizedMessage = $sanitizationResult->content;
+            }
+
             Log::info('AI Field Suggestion Response', [
                 'user_id' => $user->id,
                 'type' => $request->input('type'),
@@ -163,8 +191,8 @@ class AIChatController extends Controller
 
             return response()->json([
                 'success' => true,
-                'data' => $aiResponse['suggestion']['data'] ?? null,
-                'message' => $aiResponse['message'] ?? ''
+                'data' => $sanitizedData,
+                'message' => $sanitizedMessage
             ]);
         } catch (\Exception $e) {
             Log::error('AI Field Suggestion Error', [

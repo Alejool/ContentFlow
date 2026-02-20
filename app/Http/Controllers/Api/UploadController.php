@@ -24,6 +24,37 @@ class UploadController extends Controller
 
     $filename = $request->input('filename');
     $contentType = $request->input('content_type');
+    
+    // Validate content type against allowed types
+    $allowedMimeTypes = [
+      'image/jpeg',
+      'image/png',
+      'image/gif',
+      'video/mp4',
+      'application/pdf',
+    ];
+    
+    if (!in_array($contentType, $allowedMimeTypes)) {
+      return response()->json([
+        'error' => 'File type not allowed. Allowed types: ' . implode(', ', $allowedMimeTypes)
+      ], 400);
+    }
+    
+    // Check for executable extensions
+    $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+    $executableExtensions = ['exe', 'bat', 'cmd', 'com', 'pif', 'scr', 'vbs', 'js', 'jar', 'sh', 'php', 'py'];
+    
+    if (in_array($extension, $executableExtensions)) {
+      \Log::warning('Executable file upload attempt via presigned URL', [
+        'filename' => $filename,
+        'ip' => $request->ip(),
+        'user_id' => auth()->id(),
+      ]);
+      
+      return response()->json([
+        'error' => 'Executable files are not allowed'
+      ], 400);
+    }
 
     $uuid = Str::uuid();
     $extension = pathinfo($filename, PATHINFO_EXTENSION);

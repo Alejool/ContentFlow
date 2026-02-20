@@ -63,6 +63,11 @@ class RegisteredUserController extends Controller
 
         event(new Registered($user));
         
+        // Initialize onboarding for new users
+        $onboardingService = app(\App\Services\OnboardingService::class);
+        $onboardingService->initializeOnboarding($user);
+        Log::info('Onboarding initialized for new user', ['user_id' => $user->id]);
+        
         // Log in and regenerate session
         Auth::login($user);
         $request->session()->regenerate();

@@ -29,6 +29,7 @@ class AuthController extends Controller
       Log::info('Google Callback: User received', ['email' => $googleUser->getEmail()]);
 
       $user = User::where('email', $googleUser->getEmail())->first();
+      $isNewUser = false;
 
       if ($user) {
         $user->update([
@@ -39,6 +40,7 @@ class AuthController extends Controller
           'email_verified_at' => $user->email_verified_at ?? now(),
         ]);
       } else {
+        $isNewUser = true;
         $user = User::create([
           'name' => $googleUser->getName(),
           'email' => $googleUser->getEmail(),
@@ -51,10 +53,16 @@ class AuthController extends Controller
           'theme' => 'light',
           'created_ip' => request()->ip(),
         ]);
+        
+        // Initialize onboarding for new users
+        $onboardingService = app(\App\Services\OnboardingService::class);
+        $onboardingService->initializeOnboarding($user);
+        Log::info('Google Callback: Onboarding initialized for new user', ['user_id' => $user->id]);
       }
+      
       Auth::login($user, true);
       $user->updateLoginStats();
-      Log::info('Google Callback: User logged in', ['id' => $user->id]);
+      Log::info('Google Callback: User logged in', ['id' => $user->id, 'is_new' => $isNewUser]);
 
       // request()->session()->regenerate(); // Potentially causing race conditions in Docker/mixed content
       request()->session()->save();
