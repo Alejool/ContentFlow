@@ -7,11 +7,24 @@ import { createInertiaApp } from "@inertiajs/react";
 import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
 import { createRoot } from "react-dom/client";
 import { lazy, Suspense } from "react";
+import { ServiceWorkerUpdate } from "./components/ServiceWorkerUpdate";
+import { AnimatedPage } from "@/Components/common/motion/AnimatedPage";
+import { InertiaProgressIndicator } from "@/Components/common/motion/InertiaProgressIndicator";
+import { FocusVisibleManager } from "@/Utils/FocusVisibleManager";
+import { FocusManager } from "@/Utils/FocusManager";
+import { ariaAnnouncer } from "@/Utils/ARIAAnnouncer";
 import "../css/app.css";
 import "./bootstrap";
 import "./i18n";
 
 ErrorInterceptor.initialize();
+
+// Initialize focus management utilities
+FocusVisibleManager.initialize();
+FocusManager.initialize();
+
+// Initialize ARIA announcer for screen reader support
+ariaAnnouncer.initialize();
 
 const appName = import.meta.env.VITE_APP_NAME || "contentFlow";
 
@@ -46,18 +59,20 @@ createInertiaApp<PageProps>({
         <ThemeProvider
           isAuthenticated={!!user}
           initialTheme={user?.theme as "light" | "dark" | undefined}
+          workspaceId={user?.current_workspace_id}
         >
           <Suspense fallback={<div className="flex items-center justify-center min-h-screen">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
           </div>}>
-            <App {...props} />
+            <AnimatedPage variant="fade" pageKey={props.initialPage.url}>
+              <App {...props} />
+            </AnimatedPage>
           </Suspense>
           <ThemedToaster />
+          <ServiceWorkerUpdate />
+          <InertiaProgressIndicator color="#ad421e" />
         </ThemeProvider>
       </ErrorBoundary>
     );
-  },
-  progress: {
-    color: "#ad421e",
   },
 });

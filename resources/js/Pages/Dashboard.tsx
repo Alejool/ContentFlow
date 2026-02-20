@@ -144,12 +144,13 @@ export default function Dashboard({
       <Head title={t("dashboard.title")} />
 
       <div
+        id="dashboard"
         className={`py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto
           min-h-screen transition-colors duration-300 `}
       >
         <div
           data-theme-color={auth.user.theme_color}
-          className="rounded-lg p-8 mb-8 shadow-sm transition-colors duration-300 flex flex-col md:flex-row items-center justify-between gap-6 bg-gradient-to-r from-white/90 to-white/95 border border-white/70 dark:from-black/90 dark:to-black/95 dark:border-black/70"
+          className="rounded-lg p-8 mb-8 shadow-sm transition-colors duration-300 flex flex-col md:flex-row items-center justify-between gap-6 bg-gradient-to-r from-white/90 to-white/95 border border-white/70 dark:bg-gradient-to-r dark:from-neutral-800 dark:to-neutral-900 dark:border-neutral-700"
         >
           <div>
             <h1 className="text-3xl font-bold mb-2 text-gray-900 dark:text-white">
@@ -167,7 +168,7 @@ export default function Dashboard({
                 onClick={() => handlePeriodChange(days)}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
                   period === days
-                    ? "bg-white dark:bg-neutral-700 shadow-sm text-gray-900 dark:text-white"
+                    ? "bg-white dark:bg-neutral-900 shadow-sm text-gray-900 dark:text-white"
                     : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
                 }`}
               >
@@ -178,7 +179,7 @@ export default function Dashboard({
         </div>
 
         {!auth.user.email_verified_at && showBanner && (
-          <div className="mb-8 rounded-lg p-6 shadow-sm transition-colors duration-300 bg-white border border-gray-200 dark:bg-gradient-to-r dark:from-neutral-800/80 dark:to-neutral-900/80 dark:border-neutral-700">
+          <div className="mb-8 rounded-lg p-6 shadow-sm transition-colors duration-300 bg-white border border-gray-200 dark:bg-gradient-to-r dark:from-neutral-800 dark:to-neutral-900 dark:border-neutral-700">
             <div className="flex items-start justify-between">
               <div className="flex items-start gap-4 flex-1">
                 <div className="flex-shrink-0">

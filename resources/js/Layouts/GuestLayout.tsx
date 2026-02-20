@@ -28,7 +28,7 @@ export default function GuestLayout({ children, section }: GuestLayoutProps) {
           <div className="relative h-full flex flex-col items-center justify-center p-8 text-white">
             <div className="text-center max-w-xl">
               <div className="mb-8">
-                <img src={Logo} alt="logo" className="w-36 h-36 mx-auto" />
+                <img src={Logo} alt="ContentFlow logo" className="w-36 h-36 mx-auto" />
                 <h1 className="text-4xl font-bold  mb-4">
                   {section
                     ? t(`auth.${section}.welcome`, {

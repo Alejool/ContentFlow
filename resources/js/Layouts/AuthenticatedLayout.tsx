@@ -75,6 +75,24 @@ export default function AuthenticatedLayout({
   // Determine if onboarding should be shown
   const shouldShowOnboarding = user && onboardingState && !onboardingState.completedAt;
 
+  // Debug logging
+  useEffect(() => {
+    if (user) {
+      console.log('Onboarding Debug:', {
+        hasUser: !!user,
+        hasOnboardingState: !!onboardingState,
+        onboardingState,
+        hasTourSteps: !!tourSteps,
+        tourStepsLength: tourSteps?.length,
+        hasAvailablePlatforms: !!availablePlatforms,
+        platformsLength: availablePlatforms?.length,
+        hasTemplates: !!templates,
+        templatesLength: templates?.length,
+        shouldShowOnboarding,
+      });
+    }
+  }, [user, onboardingState, tourSteps, availablePlatforms, templates, shouldShowOnboarding]);
+
   useEffect(() => {
     if (user?.id) {
       initNotificationRealtime(user.id);
@@ -124,6 +142,8 @@ export default function AuthenticatedLayout({
             className={`flex-1 min-w-0 max-w-full overflow-y-auto overflow-x-hidden transition-all duration-500  ease-in-out ${
               isSidebarOpen ? "lg:ml-80" : "lg:ml-32"
             }`}
+            role="main"
+            aria-label="Main content"
           >
             <header
               className="border-b border-gray-200/50
@@ -144,7 +164,7 @@ export default function AuthenticatedLayout({
                 </div>
                 <div className="flex-shrink-0 min-w-0 flex items-center gap-3">
                   <div className="hidden md:flex items-center gap-2">
-                    <LanguageSwitcher />
+                    {/* <LanguageSwitcher /> */}
                     <div className="h-6 w-px bg-gray-200 dark:bg-neutral-800 mx-1"></div>
                     <NotificationButton />
                     <div className="h-6 w-px bg-gray-200 dark:bg-neutral-800 mx-1"></div>
@@ -184,6 +204,28 @@ export default function AuthenticatedLayout({
             templates={templates}
           />
         </Suspense>
+      )}
+      
+      {/* Debug: Show why onboarding is not showing */}
+      {!shouldShowOnboarding && user && (
+        <div style={{ display: 'none' }}>
+          OnboardingFlow not showing: shouldShowOnboarding={String(shouldShowOnboarding)}
+        </div>
+      )}
+      {shouldShowOnboarding && !tourSteps && (
+        <div style={{ display: 'none' }}>
+          OnboardingFlow not showing: no tourSteps
+        </div>
+      )}
+      {shouldShowOnboarding && !availablePlatforms && (
+        <div style={{ display: 'none' }}>
+          OnboardingFlow not showing: no availablePlatforms
+        </div>
+      )}
+      {shouldShowOnboarding && !templates && (
+        <div style={{ display: 'none' }}>
+          OnboardingFlow not showing: no templates
+        </div>
       )}
     </div>
     </OnboardingProvider>
