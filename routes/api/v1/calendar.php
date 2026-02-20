@@ -15,7 +15,8 @@ Route::middleware('auth:sanctum')->prefix('calendar')->name('calendar.')->group(
   Route::patch('events/{id}', [CalendarController::class, 'update'])->name('update');
   
   // Bulk operations
-  Route::post('events/bulk-update', [CalendarExportController::class, 'bulkUpdate'])->name('bulk-update');
+  Route::post('bulk-update', [CalendarController::class, 'bulkUpdate'])->name('bulk-update');
+  Route::post('bulk-undo', [CalendarController::class, 'undoBulkOperation'])->name('bulk-undo');
   
   // Export functionality
   Route::post('export/google', [CalendarExportController::class, 'exportToGoogle'])->name('export.google');

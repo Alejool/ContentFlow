@@ -1,33 +1,7 @@
 import axios from "axios";
 import { endOfMonth, endOfWeek, startOfMonth, startOfWeek } from "date-fns";
 import { create } from "zustand";
-
-interface CalendarEvent {
-  id: string;
-  resourceId: number;
-  type: "publication" | "post" | "user_event";
-  title: string;
-  start: string;
-  end?: string;
-  status: string;
-  color: string;
-  user?: {
-    id: number;
-    name: string;
-  };
-  extendedProps: {
-    slug?: string;
-    thumbnail?: string;
-    publication_id?: number;
-    platform?: string;
-    description?: string;
-    remind_at?: string;
-    is_public?: boolean;
-    user_name?: string;
-  };
-}
-
-type CalendarView = "month" | "week" | "day";
+import { CalendarEvent, CalendarView, CalendarFilters } from "@/types/calendar";
 
 interface CalendarState {
   events: CalendarEvent[];
@@ -39,18 +13,26 @@ interface CalendarState {
   campaignFilter: string | null;
   view: CalendarView;
   selectedEvents: Set<string>;
+  filters: CalendarFilters;
+  canUndo: boolean;
+  lastBulkOperation: any | null;
 
   setCurrentMonth: (date: Date) => void;
   setPlatformFilter: (platform: string) => void;
   setStatusFilter: (status: string) => void;
   setCampaignFilter: (campaign: string | null) => void;
   setView: (view: CalendarView) => void;
+  setFilters: (filters: CalendarFilters) => void;
+  applyFilters: (events: CalendarEvent[]) => CalendarEvent[];
+  getFilteredEvents: () => CalendarEvent[];
   toggleEventSelection: (eventId: string) => void;
   clearSelection: () => void;
   selectAll: () => void;
   fetchEvents: () => Promise<void>;
   updateEvent: (id: string, newDate: string, type: string) => Promise<boolean>;
   bulkUpdateEvents: (eventIds: string[], newDate: string) => Promise<boolean>;
+  bulkDeleteEvents: (eventIds: string[]) => Promise<boolean>;
+  undoBulkOperation: () => Promise<boolean>;
   updateEventByResourceId: (
     resourceId: number,
     type: "publication" | "post" | "user_event",
@@ -71,12 +53,69 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
   campaignFilter: null,
   view: "month",
   selectedEvents: new Set(),
+  filters: {
+    platforms: [],
+    campaigns: [],
+    statuses: [],
+  },
+  canUndo: false,
+  lastBulkOperation: null,
 
   setCurrentMonth: (date) => set({ currentMonth: date }),
   setPlatformFilter: (platform) => set({ platformFilter: platform }),
   setStatusFilter: (status) => set({ statusFilter: status }),
   setCampaignFilter: (campaign) => set({ campaignFilter: campaign }),
-  setView: (view) => set({ view }),
+  setView: (view) => {
+    // Persist view preference to localStorage
+    localStorage.setItem('calendar_preferred_view', view);
+    set({ view });
+  },
+  
+  setFilters: (filters) => {
+    set({ filters });
+    // Trigger a re-fetch with the new filters
+    get().fetchEvents();
+  },
+
+  applyFilters: (events) => {
+    const { filters } = get();
+    
+    // If no filters are active, return all events
+    if (
+      filters.platforms.length === 0 &&
+      filters.campaigns.length === 0 &&
+      filters.statuses.length === 0
+    ) {
+      return events;
+    }
+
+    // Apply AND logic: event must match ALL active filter types
+    return events.filter((event) => {
+      // Platform filter
+      const platformMatch =
+        filters.platforms.length === 0 ||
+        (event.platform && filters.platforms.includes(event.platform)) ||
+        (event.extendedProps?.platform && filters.platforms.includes(event.extendedProps.platform));
+
+      // Campaign filter
+      const campaignMatch =
+        filters.campaigns.length === 0 ||
+        (event.campaign && filters.campaigns.includes(event.campaign));
+
+      // Status filter
+      const statusMatch =
+        filters.statuses.length === 0 ||
+        filters.statuses.includes(event.status);
+
+      // Return true only if ALL filter types match (AND logic)
+      return platformMatch && campaignMatch && statusMatch;
+    });
+  },
+
+  getFilteredEvents: () => {
+    const { events } = get();
+    return get().applyFilters(events);
+  },
   
   toggleEventSelection: (eventId) => {
     const selectedEvents = new Set(get().selectedEvents);
@@ -91,20 +130,33 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
   clearSelection: () => set({ selectedEvents: new Set() }),
   
   selectAll: () => {
-    const allEventIds = get().events.map(e => e.id);
+    const allEventIds = get().getFilteredEvents().map(e => e.id);
     set({ selectedEvents: new Set(allEventIds) });
   },
 
   fetchEvents: async () => {
-    const { currentMonth } = get();
+    const { currentMonth, filters } = get();
     set({ isLoading: true, error: null });
 
     try {
       const start = startOfWeek(startOfMonth(currentMonth)).toISOString();
       const end = endOfWeek(endOfMonth(currentMonth)).toISOString();
 
+      // Build query params with filters
+      const params: any = { start, end };
+      
+      if (filters.platforms.length > 0) {
+        params.platforms = filters.platforms.join(',');
+      }
+      if (filters.campaigns.length > 0) {
+        params.campaigns = filters.campaigns.join(',');
+      }
+      if (filters.statuses.length > 0) {
+        params.statuses = filters.statuses.join(',');
+      }
+
       const response = await axios.get(route("api.v1.calendar.events"), {
-        params: { start, end },
+        params,
       });
 
       set({
@@ -170,31 +222,88 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
 
   bulkUpdateEvents: async (eventIds, newDate) => {
     try {
-      const promises = eventIds.map(id => {
-        const event = get().events.find(e => e.id === id);
-        if (!event) return Promise.resolve();
-        
-        const resourceId = id.split("_").pop();
-        return axios.patch(`/api/v1/calendar/events/${resourceId}`, {
-          scheduled_at: newDate,
-          type: event.type,
-        });
+      const response = await axios.post('/api/v1/calendar/bulk-update', {
+        event_ids: eventIds,
+        new_date: newDate,
+        operation: 'move',
       });
 
-      await Promise.all(promises);
-
-      // Update local state
-      const events = get().events.map((ev) =>
-        eventIds.includes(ev.id) ? { ...ev, start: newDate } : ev,
-      );
-      set({ events, selectedEvents: new Set() });
-
-      return true;
+      if (response.data.success) {
+        // Update local state
+        const events = get().events.map((ev) =>
+          eventIds.includes(ev.id) ? { ...ev, start: newDate } : ev,
+        );
+        set({ 
+          events, 
+          selectedEvents: new Set(),
+          canUndo: true,
+          lastBulkOperation: response.data.data,
+        });
+        
+        return true;
+      }
+      
+      return false;
     } catch (error: any) {
       set({
-        error: error.message ?? "Failed to bulk update events",
+        error: error.response?.data?.message ?? "Failed to bulk update events",
       });
       get().fetchEvents();
+      return false;
+    }
+  },
+
+  bulkDeleteEvents: async (eventIds) => {
+    try {
+      const response = await axios.post('/api/v1/calendar/bulk-update', {
+        event_ids: eventIds,
+        new_date: new Date().toISOString(), // Not used for delete
+        operation: 'delete',
+      });
+
+      if (response.data.success) {
+        // Remove deleted events from local state
+        const events = get().events.filter((ev) => !eventIds.includes(ev.id));
+        set({ 
+          events, 
+          selectedEvents: new Set(),
+          canUndo: true,
+          lastBulkOperation: response.data.data,
+        });
+        
+        return true;
+      }
+      
+      return false;
+    } catch (error: any) {
+      set({
+        error: error.response?.data?.message ?? "Failed to bulk delete events",
+      });
+      get().fetchEvents();
+      return false;
+    }
+  },
+
+  undoBulkOperation: async () => {
+    try {
+      const response = await axios.post('/api/v1/calendar/bulk-undo');
+
+      if (response.data.success) {
+        // Refresh events to get the restored state
+        await get().fetchEvents();
+        set({ 
+          canUndo: false,
+          lastBulkOperation: null,
+        });
+        
+        return true;
+      }
+      
+      return false;
+    } catch (error: any) {
+      set({
+        error: error.response?.data?.message ?? "Failed to undo operation",
+      });
       return false;
     }
   },
