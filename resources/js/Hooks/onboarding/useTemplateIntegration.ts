@@ -27,29 +27,23 @@ export function useTemplateIntegration() {
   const applyTemplate = useCallback(
     async (template: PublicationTemplate, onSuccess?: () => void) => {
       try {
-        console.log('Applying template:', template);
-        
         // Store template in session for retrieval in publication editor
         storeTemplateInSession(template);
 
         // Track template selection in onboarding state (don't wait for it)
         selectTemplate(template.id).catch(err => {
-          console.warn('Failed to track template selection:', err);
-        });
+          });
 
         // Navigate to content page immediately
         router.visit('/content', {
           preserveState: false,
           onSuccess: () => {
-            console.log('Navigated to content page');
             onSuccess?.();
           },
           onError: (errors) => {
-            console.error('Failed to navigate to content page:', errors);
-          },
+            },
         });
       } catch (error) {
-        console.error("Failed to apply template:", error);
         throw error;
       }
     },

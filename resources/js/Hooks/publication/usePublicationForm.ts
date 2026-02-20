@@ -135,8 +135,7 @@ export const usePublicationForm = ({
   // Unified logging for errors
   useEffect(() => {
     if (Object.keys(errors).length > 0) {
-      console.warn("Publication Form Errors:", errors);
-    }
+      }
   }, [errors]);
 
   // Duration Validation Effect
@@ -434,9 +433,7 @@ export const usePublicationForm = ({
     for (const item of newMediaItems) {
       // Auto-start upload immediately
       if (item.file) {
-        uploadFile(item.file, item.tempId).catch((err) =>
-          console.error("Auto-upload failed", err),
-        );
+        
         // CRITICAL FIX: If editing an existing publication, link immediately
         // so attachMedia gets called when upload completes
         if (publication?.id) {
@@ -478,17 +475,8 @@ export const usePublicationForm = ({
 
           // NO configurar automáticamente - dejar que el usuario elija manualmente
           // Solo sugerir basado en las características del video
-          console.info("Video metadata:", {
-            duration,
-            width,
-            height,
-            aspectRatio,
-            isVertical: aspectRatio < 1,
-            suggestedForShort: duration <= 60 && aspectRatio < 1,
-          });
-        } catch (e) {
-          console.error("Video metadata error", e);
-        }
+          } catch (e) {
+          }
       }
     }
   };
@@ -653,7 +641,6 @@ export const usePublicationForm = ({
       // Optionally reload or sync store
       usePublicationStore.getState().fetchPublicationById(publication.id);
     } catch (err) {
-      console.error("Failed to cancel publication", err);
       toast.error(
         t("publications.messages.cancelError") ||
           "Error al cancelar la publicación",
@@ -835,7 +822,6 @@ export const usePublicationForm = ({
         
         // Force refresh the publication to ensure we have the latest data
         if (result) {
-          console.log("✅ Publication updated, fetching fresh data...");
           await usePublicationStore.getState().fetchPublicationById(publication.id);
         }
       } else {
@@ -865,8 +851,7 @@ export const usePublicationForm = ({
         try {
           await axios.post(route("api.v1.publications.lock-media", pubId));
         } catch (err) {
-          console.error("Failed to lock media", err);
-        }
+          }
 
         // 2.b Link in Store and handle already completed
         const uploadQueueState = useUploadQueue.getState();
@@ -908,8 +893,7 @@ export const usePublicationForm = ({
               // removeUpload(media.tempId); // REMOVED: Keep in queue so user sees completion
               attachedImmediately = true;
             } catch (e) {
-              console.error("Failed to attach completed media", e);
-            }
+              }
           } else {
             // Otherwise, link it so useS3Upload attaches it when done
             linkUploadToPublication(media.tempId, pubId, pubTitle);
@@ -940,10 +924,6 @@ export const usePublicationForm = ({
       handleClose();
       if (onSubmitSuccess) onSubmitSuccess(true);
     } catch (error: any) {
-      console.error(
-        "Submission error details:",
-        error.response?.data || error.message,
-      );
       toast.error(
         error.response?.data?.message || t("publications.messages.error"),
       );
@@ -953,8 +933,6 @@ export const usePublicationForm = ({
   };
 
   const onInvalidSubmit = (errs: any) => {
-    console.error("Form Validation Errors:", errs);
-
     const errorFields = Object.keys(errs)
       .map((key) => t(`publications.modal.add.${key}`) || key)
       .join(", ");

@@ -76,11 +76,7 @@ export function useInertiaOptimistic(options: OptimisticOptions) {
   
   // Log Inertia context in development mode
   if (import.meta.env.DEV && isInertia) {
-    console.log('[useInertiaOptimistic] Inertia context:', {
-      resource: options.resource,
-      pageComponent,
-      hasResourceProps,
-      propsKeys: page.props ? Object.keys(page.props) : [],
+    : [],
     });
   }
   

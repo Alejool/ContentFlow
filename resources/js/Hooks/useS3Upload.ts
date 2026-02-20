@@ -256,8 +256,6 @@ export const useS3Upload = () => {
           // Auto-retry with exponential backoff if error is retryable
           if (canRetry) {
             const delay = getRetryDelay(retryCount);
-            console.log(`Retrying upload in ${delay}ms (attempt ${retryCount + 1}/${MAX_RETRIES})`);
-            
             setTimeout(async () => {
               // Check if upload wasn't cancelled during delay
               const upload = useUploadQueue.getState().queue[tempId];
@@ -703,8 +701,6 @@ export const useS3Upload = () => {
         // Auto-retry again if still within limits
         if (canRetry) {
           const delay = getRetryDelay(retryCount);
-          console.log(`Retrying upload again in ${delay}ms (attempt ${retryCount + 1}/${MAX_RETRIES})`);
-          
           setTimeout(async () => {
             const upload = useUploadQueue.getState().queue[id];
             if (upload && upload.status === "error") {

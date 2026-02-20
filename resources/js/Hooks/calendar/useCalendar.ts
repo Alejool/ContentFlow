@@ -113,7 +113,6 @@ export const useCalendar = () => {
         const resourceId = event.id.split("_").pop();
 
         if (!resourceId || resourceId === "undefined") {
-          console.error("Invalid resource ID in event", event);
           return;
         }
 
@@ -126,10 +125,6 @@ export const useCalendar = () => {
         if (type === "post") {
           const pubId = event.extendedProps?.publication_id;
           if (!pubId) {
-            console.error(
-              "No publication_id found in event extendedProps",
-              event,
-            );
             return;
           }
           const response = await axios.get(`/api/v1/publications/${pubId}`);
@@ -161,8 +156,7 @@ export const useCalendar = () => {
           openViewDetailsModal(data);
         }
       } catch (error) {
-        console.error("Failed to load event details", error);
-      }
+        }
     },
     [openEditModal, openViewDetailsModal],
   );

@@ -37,8 +37,7 @@ export const useLocalization = () => {
           body: JSON.stringify({ locale: lng }),
         });
       } catch (error) {
-        console.error("Error updating user locale:", error);
-      }
+        }
     },
     [i18n]
   );

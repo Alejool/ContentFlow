@@ -37,7 +37,6 @@ export function usePublishPreview() {
       setPreviewData(response.data.data);
       return response.data.data;
     } catch (err) {
-      console.error('Error generating preview:', err);
       const axiosError = err as AxiosError<{ message?: string }>;
       setError(axiosError.response?.data?.message || 'Error al generar la previsualización');
       return null;
@@ -67,7 +66,6 @@ export function usePublishPreview() {
       setPreviewData(response.data.data.preview);
       return response.data.data.preview;
     } catch (err) {
-      console.error('Error auto-optimizing:', err);
       const axiosError = err as AxiosError<{ message?: string }>;
       setError(axiosError.response?.data?.message || 'Error al optimizar automáticamente');
       return null;
@@ -113,7 +111,6 @@ export function usePublishPreview() {
 
       return response.data.data;
     } catch (err) {
-      console.error('Error updating platform config:', err);
       const axiosError = err as AxiosError<{ message?: string }>;
       setError(axiosError.response?.data?.message || 'Error al actualizar la configuración');
       throw err;
@@ -142,7 +139,6 @@ export function usePublishPreview() {
 
       return response.data;
     } catch (err) {
-      console.error('Error publishing:', err);
       const axiosError = err as AxiosError<{ message?: string }>;
       setError(axiosError.response?.data?.message || 'Error al publicar');
       return null;
@@ -164,7 +160,6 @@ export function usePublishPreview() {
 
       return response.data.data.platform_settings;
     } catch (err) {
-      console.error('Error getting saved configurations:', err);
       return null;
     }
   };
@@ -188,7 +183,6 @@ export function usePublishPreview() {
 
       return response.data.data.thumbnail_url;
     } catch (err) {
-      console.error('Error generating thumbnail:', err);
       return null;
     }
   };

@@ -32,8 +32,7 @@ const syncAllUIStores = async (pubId: number, freshData: Publication) => {
       store.setSelectedItem(freshData);
     }
   } catch (e) {
-    console.warn("Failed to sync store useContentUIStore:", e);
-  }
+    }
 
   // 2. Sync useManageContentUIStore
   try {
@@ -44,8 +43,7 @@ const syncAllUIStores = async (pubId: number, freshData: Publication) => {
       store.setSelectedItem(freshData);
     }
   } catch (e) {
-    console.warn("Failed to sync store useManageContentUIStore:", e);
-  }
+    }
 };
 
 const refreshPublicationInAllStores = async (
@@ -90,8 +88,7 @@ const refreshPublicationInAllStores = async (
       }
     }
   } catch (err) {
-    console.error(`Failed to refresh all stores for pub ${pubId}:`, err);
-  }
+    }
 };
 
 export const usePublicationLock = (
@@ -163,8 +160,7 @@ export const usePublicationLock = (
           setLockedByMeInternal(false);
         }
       } catch (err) {
-        console.error("Exception in acquireLock:", err);
-      }
+        }
     },
     [publicationId, userId, userName],
   );
@@ -183,8 +179,7 @@ export const usePublicationLock = (
     try {
       await usePublicationStore.getState().releaseLock(publicationId);
     } catch (e) {
-      console.error("Release lock failed", e);
-    }
+      }
   }, [publicationId]);
 
   useEffect(() => {
@@ -209,8 +204,7 @@ export const usePublicationLock = (
             setLockedByMeInternal(false);
           }
         } catch (err) {
-          console.error("Polling lock failed", err);
-        }
+          }
       }, 5000);
     };
 
@@ -269,11 +263,9 @@ export const usePublicationLock = (
         });
 
         channel.error((error: any) => {
-          console.error("Presence channel error:", error);
           startPolling();
         });
       } catch (err) {
-        console.error("Presence join failed:", err);
         startPolling();
       }
 
@@ -398,8 +390,7 @@ export const useWorkspaceLocks = () => {
         });
         setRemoteLocks(lockMap);
       } catch (error) {
-        console.error("Failed to fetch initial locks", error);
-      }
+        }
     };
 
     fetchLocks();

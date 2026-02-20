@@ -47,7 +47,6 @@ export function useOnboardingNavigation() {
    */
   const navigateToOnboardingStep = useCallback(
     (path: string, stepId?: string, stepType?: 'tour' | 'wizard' | 'template') => {
-      console.log('Navigating to onboarding step:', { path, stepId, stepType });
       navigateToStep(path, stepId, stepType);
     },
     [navigateToStep]
@@ -59,7 +58,6 @@ export function useOnboardingNavigation() {
   const navigateToTourStep = useCallback(
     (path: string, stepId: string) => {
       if (!tourNavigationEnabled) {
-        console.warn('Tour navigation is disabled');
         return;
       }
 

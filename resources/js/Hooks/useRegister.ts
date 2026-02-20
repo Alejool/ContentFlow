@@ -28,8 +28,7 @@ export const useRegister = () => {
         });
       }
     } catch (e) {
-      console.warn("Could not set Inertia errors directly", e);
-    }
+      }
   };
 
   const submitRegister = async (payload: {
@@ -72,8 +71,6 @@ export const useRegister = () => {
         reset("name", "email", "password", "password_confirmation");
       }
     } catch (backendError: any) {
-      console.error("Registration error:", backendError);
-
       if (
         backendError.response?.status === 422 &&
         backendError.response?.data?.errors

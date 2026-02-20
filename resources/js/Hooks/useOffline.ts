@@ -31,7 +31,6 @@ export function useOffline(options?: OfflineOptions) {
       const pending = operations.filter(op => op.status === 'queued' || op.status === 'syncing');
       setPendingCount(pending.length);
     } catch (error) {
-      console.error('[useOffline] Failed to update pending count:', error);
       setPendingCount(0);
     }
   }, []);
@@ -43,8 +42,7 @@ export function useOffline(options?: OfflineOptions) {
       setIsOnline(true);
       
       if (import.meta.env.DEV) {
-        console.log('[useOffline] Connection restored');
-      }
+        }
       
       // Execute onOnline callback
       options?.onOnline?.();
@@ -59,8 +57,7 @@ export function useOffline(options?: OfflineOptions) {
       setIsOnline(false);
       
       if (import.meta.env.DEV) {
-        console.log('[useOffline] Connection lost');
-      }
+        }
       
       // Execute onOffline callback
       options?.onOffline?.();
@@ -103,14 +100,8 @@ export function useOffline(options?: OfflineOptions) {
       await updatePendingCount();
       
       if (import.meta.env.DEV) {
-        console.log('[useOffline] Operation queued:', {
-          id: queuedOp.id,
-          resource: queuedOp.resource,
-          method: queuedOp.method,
-        });
-      }
+        }
     } catch (error) {
-      console.error('[useOffline] Failed to queue operation:', error);
       throw error;
     }
   }, [updatePendingCount]);
@@ -126,7 +117,6 @@ export function useOffline(options?: OfflineOptions) {
       // Sort by timestamp (FIFO)
       return operations.sort((a, b) => a.timestamp - b.timestamp);
     } catch (error) {
-      console.error('[useOffline] Failed to get queued operations:', error);
       return [];
     }
   }, []);
@@ -138,8 +128,7 @@ export function useOffline(options?: OfflineOptions) {
   const syncNow = useCallback(async (): Promise<void> => {
     if (!isOnline) {
       if (import.meta.env.DEV) {
-        console.warn('[useOffline] Cannot sync while offline');
-      }
+        }
       return;
     }
 
@@ -149,14 +138,12 @@ export function useOffline(options?: OfflineOptions) {
       
       if (operations.length === 0) {
         if (import.meta.env.DEV) {
-          console.log('[useOffline] No operations to sync');
-        }
+          }
         return;
       }
 
       if (import.meta.env.DEV) {
-        console.log('[useOffline] Starting sync:', operations.length, 'operations');
-      }
+        }
 
       // Import axios dynamically to avoid circular dependencies
       const { default: axiosInstance } = await import('../config/axios');
@@ -182,11 +169,8 @@ export function useOffline(options?: OfflineOptions) {
           await indexedDBQueue.remove(operation.id);
 
           if (import.meta.env.DEV) {
-            console.log('[useOffline] Operation synced successfully:', operation.id);
-          }
+            }
         } catch (error) {
-          console.error('[useOffline] Failed to sync operation:', operation.id, error);
-
           // Increment retry count
           const updatedOp: QueuedOperation = {
             ...operation,
@@ -202,16 +186,14 @@ export function useOffline(options?: OfflineOptions) {
             await indexedDBQueue.update(updatedOp);
 
             if (import.meta.env.DEV) {
-              console.error('[useOffline] Operation failed after max retries:', operation.id);
-            }
+              }
           } else {
             // Reset to queued for retry
             updatedOp.status = 'queued';
             await indexedDBQueue.update(updatedOp);
 
             if (import.meta.env.DEV) {
-              console.log('[useOffline] Operation queued for retry:', operation.id, 
-                `(${updatedOp.retryCount}/${updatedOp.maxRetries})`);
+              `);
             }
           }
         }
@@ -221,10 +203,8 @@ export function useOffline(options?: OfflineOptions) {
       await updatePendingCount();
 
       if (import.meta.env.DEV) {
-        console.log('[useOffline] Sync completed');
-      }
+        }
     } catch (error) {
-      console.error('[useOffline] Sync failed:', error);
       throw error;
     }
   }, [isOnline, updatePendingCount]);
@@ -239,8 +219,7 @@ export function useOffline(options?: OfflineOptions) {
       const failedOps = await indexedDBQueue.getByStatus('failed');
       
       if (import.meta.env.DEV) {
-        console.log('[useOffline] Clearing failed operations:', failedOps.length);
-      }
+        }
 
       // Remove each failed operation
       for (const op of failedOps) {
@@ -251,10 +230,8 @@ export function useOffline(options?: OfflineOptions) {
       await updatePendingCount();
 
       if (import.meta.env.DEV) {
-        console.log('[useOffline] Failed operations cleared');
-      }
+        }
     } catch (error) {
-      console.error('[useOffline] Failed to clear failed operations:', error);
       throw error;
     }
   }, [updatePendingCount]);

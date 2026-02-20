@@ -30,8 +30,7 @@ export const usePublicationsForCampaignEdit = (
         setAvailablePublications(response.data);
       }
     } catch (error) {
-      console.error("Error fetching publications:", error);
-    } finally {
+      } finally {
       setLoading(false);
     }
   };

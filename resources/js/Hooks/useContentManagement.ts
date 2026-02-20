@@ -157,7 +157,6 @@ export function useContentManagement() {
       toast.success(t("campaigns.messages.updateSuccess"));
       return true;
     } catch (error) {
-      console.error(error);
       toast.error(t("campaigns.messages.updateError"));
       return false;
     }

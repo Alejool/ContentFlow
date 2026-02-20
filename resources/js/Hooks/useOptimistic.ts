@@ -83,8 +83,8 @@ function isRetryableError(errorType: string, status?: number): boolean {
  * ```tsx
  * const { execute, pending, hasPending, metrics } = useOptimistic({
  *   resource: 'publications',
- *   onSuccess: (data) => console.log('Success:', data),
- *   onError: (error) => console.error('Error:', error),
+ *   onSuccess: (data) => ,
+ *   onError: (error) => ,
  *   maxRetries: 3,
  * });
  * 
@@ -95,9 +95,7 @@ function isRetryableError(errorType: string, status?: number): boolean {
  * );
  * 
  * // Check performance metrics
- * console.log('Average response time:', metrics.averageResponseTime);
- * console.log('Success rate:', metrics.successRate);
- * ```
+ * * * ```
  */
 export function useOptimistic(options: OptimisticOptions) {
   // Connect to optimistic store
@@ -193,13 +191,8 @@ export function useOptimistic(options: OptimisticOptions) {
     // Log operation start in development mode
     // Requirements: 10.1
     if (import.meta.env.DEV) {
-      console.group(`[useOptimistic] Starting ${operationType} operation`);
-      console.log('ID:', id);
-      console.log('Resource:', options.resource);
-      console.log('Optimistic Data:', optimisticData);
-      console.log('Timestamp:', new Date().toISOString());
-      console.groupEnd();
-    }
+      .toISOString());
+      }
     
     // Add optimistic operation to store
     // This immediately updates the UI with optimistic data
@@ -246,18 +239,7 @@ export function useOptimistic(options: OptimisticOptions) {
         // Log success in development mode
         // Requirements: 10.1, 10.5
         if (import.meta.env.DEV) {
-          console.group(`[useOptimistic] ✓ Operation succeeded`);
-          console.log('ID:', id);
-          console.log('Duration:', `${duration}ms`);
-          console.log('Retries:', retryCount);
-          console.log('Result:', result);
-          console.log('Performance:', {
-            optimisticUpdateTime: '< 1ms',
-            serverResponseTime: `${duration}ms`,
-            timeSaved: `${duration - 1}ms`,
-          });
-          console.groupEnd();
-        }
+          }
         
         // Confirm operation with server data
         store.confirmOperation(id, result);
@@ -275,16 +257,7 @@ export function useOptimistic(options: OptimisticOptions) {
         // Log error in development mode
         // Requirements: 10.1
         if (import.meta.env.DEV) {
-          console.group(`[useOptimistic] ✗ Operation failed`);
-          console.log('ID:', id);
-          console.log('Error:', lastError.message);
-          console.log('Error Type:', errorType);
-          console.log('Status:', status);
-          console.log('Retry Count:', retryCount);
-          console.log('Duration:', `${duration}ms`);
-          console.log('Stack Trace:', lastError.stack);
-          console.groupEnd();
-        }
+          }
         
         // Check if error is retryable
         const shouldRetry = options.retryOnError !== false && 
@@ -299,12 +272,7 @@ export function useOptimistic(options: OptimisticOptions) {
           const delay = Math.min(1000 * Math.pow(2, retryCount - 1), 10000);
           
           if (import.meta.env.DEV) {
-            console.log('[useOptimistic] Retrying operation:', {
-              id,
-              attempt: retryCount,
-              delay,
-            });
-          }
+            }
           
           // Wait before retrying
           await new Promise(resolve => setTimeout(resolve, delay));
@@ -317,11 +285,7 @@ export function useOptimistic(options: OptimisticOptions) {
         // Move to failed operations queue if max retries exceeded
         if (retryCount >= maxRetries && errorType === 'network') {
           if (import.meta.env.DEV) {
-            console.error('[useOptimistic] Max retries exceeded, moving to failed queue:', {
-              id,
-              retries: retryCount,
-            });
-          }
+            }
         }
         
         // Track performance metrics for failed operation

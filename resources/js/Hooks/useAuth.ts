@@ -67,8 +67,6 @@ export const useAuth = () => {
         window.location.href = "/dashboard";
       }
     } catch (err: any) {
-      console.error("Login error:", err);
-
       if (err.response?.status === 422 && err.response?.data?.errors) {
         const errorData = err.response.data.errors;
         // If using interactively via handleEmailLogin, update Inertia errors
@@ -113,7 +111,6 @@ export const useAuth = () => {
 
       window.location.href = url;
     } catch (err) {
-      console.error("Ziggy route error:", err);
       // Fallback
       window.location.href = "/auth/google/redirect";
     }

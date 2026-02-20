@@ -163,7 +163,6 @@ export const useUser = (initialUser: any) => {
   };
 
   const onInvalid = (errors: any) => {
-    console.error("Form Validation Errors:", errors);
     toast.error(
       t("validation.check_errors") ||
         "Por favor, revisa los errores en el formulario",

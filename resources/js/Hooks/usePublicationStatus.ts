@@ -51,8 +51,7 @@ export function usePublicationStatus({ dismissedIds }: UsePublicationStatusOptio
       if (axios.isCancel(err) || (err as any)?.name === "CanceledError") {
         return;
       }
-      console.error("Failed to fetch publications", err);
-    } finally {
+      } finally {
       setIsFetching(false);
     }
   };

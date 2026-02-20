@@ -64,8 +64,7 @@ export function useCompletionNotifications() {
         return { ...DEFAULT_PREFERENCES, ...parsed };
       }
     } catch (error) {
-      console.error('Failed to load notification preferences:', error);
-    }
+      }
     return DEFAULT_PREFERENCES;
   }, []);
 
@@ -77,8 +76,7 @@ export function useCompletionNotifications() {
     try {
       localStorage.setItem(PREFERENCES_KEY, JSON.stringify(preferences));
     } catch (error) {
-      console.error('Failed to save notification preferences:', error);
-    }
+      }
   }, []);
 
   /**
@@ -87,7 +85,6 @@ export function useCompletionNotifications() {
    */
   const requestBrowserNotificationPermission = useCallback(async (): Promise<boolean> => {
     if (typeof Notification === 'undefined') {
-      console.warn('Browser notifications not supported');
       return false;
     }
 
@@ -106,7 +103,6 @@ export function useCompletionNotifications() {
       browserNotificationPermission.current = permission;
       return permission === 'granted';
     } catch (error) {
-      console.error('Failed to request notification permission:', error);
       return false;
     }
   }, []);
@@ -143,8 +139,7 @@ export function useCompletionNotifications() {
         // Auto-close after 5 seconds
         setTimeout(() => notification.close(), 5000);
       } catch (error) {
-        console.error('Failed to show browser notification:', error);
-      }
+        }
     },
     []
   );

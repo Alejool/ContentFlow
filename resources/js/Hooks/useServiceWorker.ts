@@ -35,19 +35,15 @@ export function useServiceWorker(): UseServiceWorkerReturn {
     // Register service worker
     registerServiceWorker({
       onSuccess: () => {
-        console.log('[useServiceWorker] Service worker registered successfully');
         checkStatus();
       },
       onUpdate: () => {
-        console.log('[useServiceWorker] Service worker update available');
         setHasUpdate(true);
       },
       onOnline: () => {
-        console.log('[useServiceWorker] Back online');
-      },
+        },
       onOffline: () => {
-        console.log('[useServiceWorker] Gone offline');
-      },
+        },
     });
 
     // Check if running as standalone PWA

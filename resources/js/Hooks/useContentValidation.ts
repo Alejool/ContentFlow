@@ -34,7 +34,6 @@ export function useContentValidation() {
       setValidationResult(response.data.data);
       return response.data.data;
     } catch (error) {
-      console.error('Error validating content:', error);
       const axiosError = error as AxiosError<{ message?: string }>;
       setValidationError(axiosError.response?.data?.message || 'Error al validar el contenido');
       return null;

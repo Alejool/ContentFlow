@@ -15,8 +15,7 @@ export const useCampaigns = () => {
         setCampaigns(response.data.campaigns);
       }
     } catch (error) {
-      console.error("Failed to fetch campaigns", error);
-    } finally {
+      } finally {
       setLoading(false);
     }
   };

@@ -27,8 +27,7 @@ export const usePublicationsForCampaign = (isOpen: boolean) => {
         setAvailablePublications(response.data);
       }
     } catch (error) {
-      console.error("Error fetching publications:", error);
-    } finally {
+      } finally {
       setLoading(false);
     }
   };
