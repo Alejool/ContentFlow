@@ -21,13 +21,13 @@
       "@/*": ["resources/js/*"],
       "ziggy-js": ["./vendor/tightenco/ziggy"]
     },
-    "types": ["vite/client", "node"]
+    "types": ["vite/client", "node", "vite-plugin-pwa/client"]
   },
   "include": [
     "resources/js/**/*.ts",
     "resources/js/**/*.tsx",
     "./vendor/tightenco/ziggy/**/*.js",
     "resources/js/echo.js"
-, "resources/js/Composables/useContentValidation.ts", "resources/js/Composables/usePublishPreview.js", "tests/Javascript/Utils/emptyStateMapper.test.ts"  ],
+, "resources/js/Composables/useContentValidation.ts", "resources/js/Composables/usePublishPreview.js", "tests/Javascript/Utils/emptyStateMapper.test.ts", "tests/Javascript/Hooks/useOptimistic.test.ts", "tests/Javascript/Utils/errorLogger.test.ts", "tests/Javascript/Utils/cacheLogger.test.ts", "tests/Javascript/Utils/performanceMetrics.test.ts"  ],
   "exclude": ["node_modules"]
 }
