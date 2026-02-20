@@ -117,12 +117,9 @@ export class CacheManager {
             });
             
             if (this.isDevelopment) {
-              console.log(`[CacheManager] Cached static asset: ${url}`);
-            }
+              }
           }
         } catch (error) {
-          console.error(`[CacheManager] Failed to cache ${url}:`, error);
-          
           // Log comprehensive error
           // Requirements: 3.5, 10.3
           errorLogger.logError(error as Error, {
@@ -135,8 +132,6 @@ export class CacheManager {
         }
       }
     } catch (error) {
-      console.error('[CacheManager] Failed to open static cache:', error);
-      
       // Log comprehensive error
       errorLogger.logError(error as Error, {
         type: 'cache',
@@ -172,14 +167,11 @@ export class CacheManager {
       });
       
       if (this.isDevelopment) {
-        console.log(`[CacheManager] Cached dynamic content: ${url}`);
-      }
+        }
       
       // Check cache size and evict if necessary
       await this.checkAndEvict(CACHE_NAMES.DYNAMIC, CACHE_SIZE_LIMITS.DYNAMIC);
     } catch (error) {
-      console.error('[CacheManager] Failed to cache dynamic content:', error);
-      
       // Log comprehensive error
       // Requirements: 3.5, 10.3
       errorLogger.logError(error as Error, {
@@ -215,7 +207,7 @@ export class CacheManager {
           }
           
           if (this.isDevelopment) {
-            console.log(`[CacheManager] Cache hit: ${url} (${cacheName})`);
+            `);
           }
           
           return response;
@@ -223,12 +215,10 @@ export class CacheManager {
       }
       
       if (this.isDevelopment) {
-        console.log(`[CacheManager] Cache miss: ${url}`);
-      }
+        }
       
       return null;
     } catch (error) {
-      console.error('[CacheManager] Failed to get from cache:', error);
       return null;
     }
   }
@@ -330,18 +320,17 @@ export class CacheManager {
         evictedCount++;
         
         if (this.isDevelopment) {
-          console.log(`[CacheManager] Evicted (LRU): ${entry.url} (accessed: ${entry.accessCount}x, age: ${Math.round((Date.now() - entry.lastAccessed) / 1000)}s)`);
+          : ${entry.url} (accessed: ${entry.accessCount}x, age: ${Math.round((Date.now() - entry.lastAccessed) / 1000)}s)`);
         }
       }
       
       if (evictedCount > 0) {
         const evictedMB = (evictedSize / (1024 * 1024)).toFixed(2);
         const remainingMB = ((totalSize - evictedSize) / (1024 * 1024)).toFixed(2);
-        console.log(`[CacheManager] Evicted ${evictedCount} entries (${evictedMB}MB) from ${cacheName}. Remaining: ${remainingMB}MB`);
+        from ${cacheName}. Remaining: ${remainingMB}MB`);
       }
     } catch (error) {
-      console.error('[CacheManager] Failed to evict LRU:', error);
-    }
+      }
   }
 
   /**
@@ -384,7 +373,6 @@ export class CacheManager {
         newestEntry,
       };
     } catch (error) {
-      console.error('[CacheManager] Failed to get cache stats:', error);
       return {
         entryCount: 0,
         totalSize: 0,
@@ -416,7 +404,6 @@ export class CacheManager {
       
       const cacheName = cacheNameMap[type];
       if (!cacheName) {
-        console.error(`[CacheManager] Invalid cache type: ${type}`);
         return;
       }
       
@@ -432,11 +419,9 @@ export class CacheManager {
           this.metadataStore.delete(request.url);
         }
         
-        console.log(`[CacheManager] Invalidated cache type: ${type}`);
-      }
+        }
     } catch (error) {
-      console.error('[CacheManager] Failed to invalidate cache by type:', error);
-    }
+      }
   }
 
   /**
@@ -463,18 +448,15 @@ export class CacheManager {
             deletedCount++;
             
             if (this.isDevelopment) {
-              console.log(`[CacheManager] Invalidated: ${request.url}`);
-            }
+              }
           }
         }
       }
       
       if (deletedCount > 0) {
-        console.log(`[CacheManager] Invalidated ${deletedCount} entries matching pattern`);
-      }
+        }
     } catch (error) {
-      console.error('[CacheManager] Failed to invalidate by URL:', error);
-    }
+      }
   }
 
   /**
@@ -489,8 +471,7 @@ export class CacheManager {
       
       await this.invalidateByUrl(pattern);
     } catch (error) {
-      console.error('[CacheManager] Failed to invalidate by resource:', error);
-    }
+      }
   }
 
   /**
@@ -508,10 +489,9 @@ export class CacheManager {
       // Clear all metadata
       this.metadataStore.clear();
       
-      console.log(`[CacheManager] Cleared all caches (${cacheNames.length} caches)`);
+      `);
     } catch (error) {
-      console.error('[CacheManager] Failed to clear all caches:', error);
-    }
+      }
   }
 
   /**
@@ -544,7 +524,7 @@ export class CacheManager {
               deletedCount++;
               
               if (this.isDevelopment) {
-                console.log(`[CacheManager] Expired: ${request.url} (age: ${Math.round(age / (24 * 60 * 60 * 1000))} days)`);
+                )} days)`);
               }
             }
           }
@@ -552,11 +532,9 @@ export class CacheManager {
       }
       
       if (deletedCount > 0) {
-        console.log(`[CacheManager] Invalidated ${deletedCount} expired entries`);
-      }
+        }
     } catch (error) {
-      console.error('[CacheManager] Failed to invalidate expired entries:', error);
-    }
+      }
   }
 
   /**
@@ -569,12 +547,10 @@ export class CacheManager {
       for (const cacheName of cacheNames) {
         if (!currentCaches.includes(cacheName)) {
           await caches.delete(cacheName);
-          console.log(`[CacheManager] Deleted old cache: ${cacheName}`);
-        }
+          }
       }
     } catch (error) {
-      console.error('[CacheManager] Failed to clear old caches:', error);
-    }
+      }
   }
 
   /**
@@ -607,7 +583,7 @@ export class CacheManager {
         
         if (this.isDevelopment) {
           const duration = Date.now() - startTime;
-          console.log(`[CacheManager] cache-first HIT: ${request.url} (${duration}ms)`);
+          `);
         }
         return cachedResponse;
       }
@@ -645,7 +621,7 @@ export class CacheManager {
       
       if (this.isDevelopment) {
         const duration = Date.now() - startTime;
-        console.log(`[CacheManager] cache-first MISS: ${request.url} (${duration}ms)`);
+        `);
       }
       
       return networkResponse;
@@ -662,7 +638,6 @@ export class CacheManager {
         error: (error as Error).message,
       });
       
-      console.error('[CacheManager] cache-first failed:', error);
       throw error;
     }
   }
@@ -698,7 +673,7 @@ export class CacheManager {
         
         if (this.isDevelopment) {
           const duration = Date.now() - startTime;
-          console.log(`[CacheManager] network-first SUCCESS: ${request.url} (${duration}ms)`);
+          `);
         }
       }
       
@@ -724,7 +699,7 @@ export class CacheManager {
         
         if (this.isDevelopment) {
           const duration = Date.now() - startTime;
-          console.log(`[CacheManager] network-first FALLBACK: ${request.url} (${duration}ms)`);
+          `);
         }
         return cachedResponse;
       }
@@ -739,7 +714,7 @@ export class CacheManager {
         error: (error as Error).message,
       });
       
-      console.error('[CacheManager] network-first failed (no cache):', error);
+      :', error);
       throw error;
     }
   }
@@ -775,12 +750,10 @@ export class CacheManager {
           });
           
           if (this.isDevelopment) {
-            console.log(`[CacheManager] stale-while-revalidate UPDATED: ${request.url}`);
-          }
+            }
         }
         return networkResponse;
       }).catch((error) => {
-        console.error('[CacheManager] stale-while-revalidate background update failed:', error);
         return null;
       });
       
@@ -803,7 +776,7 @@ export class CacheManager {
         
         if (this.isDevelopment) {
           const duration = Date.now() - startTime;
-          console.log(`[CacheManager] stale-while-revalidate CACHE: ${request.url} (${duration}ms)`);
+          `);
         }
         return cachedResponse;
       }
@@ -827,7 +800,7 @@ export class CacheManager {
         
         if (this.isDevelopment) {
           const duration = Date.now() - startTime;
-          console.log(`[CacheManager] stale-while-revalidate NETWORK: ${request.url} (${duration}ms)`);
+          `);
         }
         return networkResponse;
       }
@@ -846,7 +819,6 @@ export class CacheManager {
         error: (error as Error).message,
       });
       
-      console.error('[CacheManager] stale-while-revalidate failed:', error);
       throw error;
     }
   }

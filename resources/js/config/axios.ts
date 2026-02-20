@@ -32,8 +32,8 @@ export default axiosInstance;
  *   optimistic: true,
  *   optimisticData: { id: 'temp-123', ...data },
  *   resource: 'publications',
- *   onSuccess: (serverData) => console.log('Success!', serverData),
- *   onError: (error) => console.error('Failed!', error),
- *   onRollback: () => console.log('Rolled back'),
+ *   onSuccess: (serverData) => ,
+ *   onError: (error) => ,
+ *   onRollback: () => ,
  * });
  */

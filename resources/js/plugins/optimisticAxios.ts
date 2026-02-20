@@ -120,14 +120,7 @@ export function setupOptimisticInterceptor(axiosInstance: AxiosInstance): () => 
         
         // Log in development mode
         if (import.meta.env.DEV) {
-          console.log('[OptimisticAxios] Request intercepted:', {
-            operationId,
-            type: operationType,
-            resource: config.resource,
-            url: config.url,
-            method: config.method,
-          });
-        }
+          }
       }
       
       return config;
@@ -154,12 +147,7 @@ export function setupOptimisticInterceptor(axiosInstance: AxiosInstance): () => 
         
         // Log in development mode
         if (import.meta.env.DEV) {
-          console.log('[OptimisticAxios] Response success:', {
-            operationId,
-            status: response.status,
-            url: response.config.url,
-          });
-        }
+          }
       }
       
       return response;
@@ -182,13 +170,7 @@ export function setupOptimisticInterceptor(axiosInstance: AxiosInstance): () => 
           
           // Log in development mode
           if (import.meta.env.DEV) {
-            console.error('[OptimisticAxios] Response error:', {
-              operationId,
-              status: error.response?.status,
-              message: error.message,
-              url: error.config?.url,
-            });
-          }
+            }
         }
       }
       

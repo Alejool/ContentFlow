@@ -39,15 +39,13 @@ class BackgroundSyncManager {
       const request = indexedDB.open(DB_NAME, DB_VERSION);
 
       request.onerror = () => {
-        console.error('[BackgroundSyncManager] Failed to open database:', request.error);
         reject(request.error);
       };
 
       request.onsuccess = () => {
         this.db = request.result;
         if (import.meta.env.DEV) {
-          console.log('[BackgroundSyncManager] Database opened successfully');
-        }
+          }
         resolve();
       };
 
@@ -63,8 +61,7 @@ class BackgroundSyncManager {
           objectStore.createIndex('retryCount', 'retryCount', { unique: false });
           
           if (import.meta.env.DEV) {
-            console.log('[BackgroundSyncManager] Object store created');
-          }
+            }
         }
       };
     });
@@ -97,19 +94,16 @@ class BackgroundSyncManager {
 
       request.onsuccess = () => {
         if (import.meta.env.DEV) {
-          console.log('[BackgroundSyncManager] Operation registered:', operation.id);
-        }
+          }
         
         // Register Service Worker sync if available
         this.registerServiceWorkerSync().catch((error) => {
-          console.warn('[BackgroundSyncManager] Failed to register SW sync:', error);
-        });
+          });
         
         resolve();
       };
 
       request.onerror = () => {
-        console.error('[BackgroundSyncManager] Failed to register operation:', request.error);
         reject(request.error);
       };
     });
@@ -128,10 +122,8 @@ class BackgroundSyncManager {
         await registration.sync.register('sync-operations');
         
         if (import.meta.env.DEV) {
-          console.log('[BackgroundSyncManager] SW sync registered');
-        }
+          }
       } catch (error) {
-        console.error('[BackgroundSyncManager] Failed to register SW sync:', error);
         throw error;
       }
     }
@@ -167,7 +159,6 @@ class BackgroundSyncManager {
       };
 
       request.onerror = () => {
-        console.error('[BackgroundSyncManager] Failed to get pending syncs:', request.error);
         reject(request.error);
       };
     });
@@ -192,13 +183,11 @@ class BackgroundSyncManager {
 
       request.onsuccess = () => {
         if (import.meta.env.DEV) {
-          console.log('[BackgroundSyncManager] Operation removed:', id);
-        }
+          }
         resolve();
       };
 
       request.onerror = () => {
-        console.error('[BackgroundSyncManager] Failed to remove operation:', request.error);
         reject(request.error);
       };
     });
@@ -223,13 +212,11 @@ class BackgroundSyncManager {
 
       request.onsuccess = () => {
         if (import.meta.env.DEV) {
-          console.log('[BackgroundSyncManager] Operation updated:', operation.id);
-        }
+          }
         resolve();
       };
 
       request.onerror = () => {
-        console.error('[BackgroundSyncManager] Failed to update operation:', request.error);
         reject(request.error);
       };
     });
@@ -252,15 +239,13 @@ class BackgroundSyncManager {
     }
 
     if (import.meta.env.DEV) {
-      console.log('[BackgroundSyncManager] Executing sync...');
-    }
+      }
 
     const operations = await this.getPendingSyncs();
 
     if (operations.length === 0) {
       if (import.meta.env.DEV) {
-        console.log('[BackgroundSyncManager] No operations to sync');
-      }
+        }
       return;
     }
 
@@ -271,19 +256,15 @@ class BackgroundSyncManager {
         await this.removeOperation(operation.id);
         
         if (import.meta.env.DEV) {
-          console.log('[BackgroundSyncManager] Operation completed:', operation.id);
-        }
+          }
       } catch (error) {
-        console.error('[BackgroundSyncManager] Operation failed:', operation.id, error);
-        
         // Handle retry logic
         await this.handleOperationFailure(operation, error as Error);
       }
     }
 
     if (import.meta.env.DEV) {
-      console.log('[BackgroundSyncManager] Sync completed');
-    }
+      }
   }
 
   /**
@@ -328,12 +309,6 @@ class BackgroundSyncManager {
 
     if (updatedOperation.retryCount >= maxRetries) {
       // Max retries reached - mark as failed and remove from queue
-      console.error(
-        '[BackgroundSyncManager] Max retries reached for operation:',
-        operation.id,
-        error
-      );
-      
       await this.removeOperation(operation.id);
       
       // Notify about failed operation (could be stored in a failed operations store)
@@ -346,18 +321,14 @@ class BackgroundSyncManager {
       const delay = Math.pow(2, updatedOperation.retryCount - 1) * 1000;
       
       if (import.meta.env.DEV) {
-        console.log(
-          `[BackgroundSyncManager] Retry ${updatedOperation.retryCount}/${maxRetries} for operation:`,
-          operation.id,
-          `(delay: ${delay}ms)`
+        `
         );
       }
       
       // Schedule retry by re-registering SW sync
       setTimeout(() => {
         this.registerServiceWorkerSync().catch((err) => {
-          console.error('[BackgroundSyncManager] Failed to schedule retry:', err);
-        });
+          });
       }, delay);
     }
   }
@@ -414,8 +385,7 @@ class BackgroundSyncManager {
     await this.registerServiceWorkerSync();
     
     if (import.meta.env.DEV) {
-      console.log('[BackgroundSyncManager] Failed operations retry initiated');
-    }
+      }
   }
 
   /**
@@ -437,13 +407,11 @@ class BackgroundSyncManager {
 
       request.onsuccess = () => {
         if (import.meta.env.DEV) {
-          console.log('[BackgroundSyncManager] All operations cleared');
-        }
+          }
         resolve();
       };
 
       request.onerror = () => {
-        console.error('[BackgroundSyncManager] Failed to clear operations:', request.error);
         reject(request.error);
       };
     });
@@ -459,8 +427,7 @@ class BackgroundSyncManager {
       this.initPromise = null;
       
       if (import.meta.env.DEV) {
-        console.log('[BackgroundSyncManager] Database closed');
-      }
+        }
     }
   }
 }

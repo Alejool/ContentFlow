@@ -33,10 +33,8 @@ export async function registerSimpleSyncOperation() {
 
   try {
     await backgroundSyncManager.registerSync(operation);
-    console.log('Operation queued for background sync:', operation.id);
-  } catch (error) {
-    console.error('Failed to register sync operation:', error);
-  }
+    } catch (error) {
+    }
 }
 
 /**
@@ -79,10 +77,8 @@ export async function registerMultipleOperations() {
   for (const operation of operations) {
     try {
       await backgroundSyncManager.registerSync(operation);
-      console.log('Queued:', operation.id);
-    } catch (error) {
-      console.error('Failed to queue:', operation.id, error);
-    }
+      } catch (error) {
+      }
   }
 }
 
@@ -94,10 +90,8 @@ export async function registerMultipleOperations() {
 export async function getPendingOperations() {
   try {
     const pending = await backgroundSyncManager.getPendingSyncs();
-    console.log(`Found ${pending.length} pending operations:`, pending);
     return pending;
   } catch (error) {
-    console.error('Failed to get pending operations:', error);
     return [];
   }
 }
@@ -110,10 +104,8 @@ export async function getPendingOperations() {
 export async function retryFailedOperations() {
   try {
     await backgroundSyncManager.retryFailed();
-    console.log('Retry initiated for failed operations');
-  } catch (error) {
-    console.error('Failed to retry operations:', error);
-  }
+    } catch (error) {
+    }
 }
 
 /**
@@ -127,9 +119,6 @@ export function listenForSyncFailures() {
     navigator.serviceWorker.addEventListener('message', (event) => {
       if (event.data && event.data.type === 'SYNC_OPERATION_FAILED') {
         const { operation, error } = event.data;
-        
-        console.error('Sync operation failed:', operation.id);
-        console.error('Error:', error.message);
         
         // Show user notification
         showNotification(
@@ -149,10 +138,8 @@ export function listenForSyncFailures() {
 export async function clearAllOperations() {
   try {
     await backgroundSyncManager.clearAll();
-    console.log('All sync operations cleared');
-  } catch (error) {
-    console.error('Failed to clear operations:', error);
-  }
+    } catch (error) {
+    }
 }
 
 /**
@@ -166,8 +153,7 @@ function showNotification(title: string, message: string) {
     });
   } else {
     // Fallback to console or UI notification
-    console.log(`[Notification] ${title}: ${message}`);
-  }
+    }
 }
 
 /**
@@ -191,7 +177,6 @@ export async function createPublicationWithSync(publicationData: any) {
 
   if (!navigator.onLine) {
     // Offline - queue for background sync
-    console.log('Offline detected, queueing operation for sync');
     await backgroundSyncManager.registerSync(operation);
     return { queued: true, id: operation.id };
   } else {
@@ -209,7 +194,6 @@ export async function createPublicationWithSync(publicationData: any) {
 
       return await response.json();
     } catch (error) {
-      console.error('Immediate execution failed, queueing for sync:', error);
       await backgroundSyncManager.registerSync(operation);
       return { queued: true, id: operation.id };
     }
