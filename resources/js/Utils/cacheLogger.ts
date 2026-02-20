@@ -103,50 +103,7 @@ class CacheLogger {
    * Output cache decision to console with formatting
    */
   private outputToConsole(log: CacheDecisionLog): void {
-    const resultEmoji = {
-      'cache-hit': '✅',
-      'cache-miss': '❌',
-      'network-success': '🌐',
-      'network-error': '⚠️',
-      'fallback': '🔄',
-    };
-
-    const strategyColor = {
-      'cache-first': '#10b981',
-      'network-first': '#3b82f6',
-      'stale-while-revalidate': '#f59e0b',
-      'network-only': '#6b7280',
-    };
-
-    const emoji = resultEmoji[log.result] || '📝';
-    const color = strategyColor[log.strategy] || '#6b7280';
-
-    console.group(
-      `%c${emoji} [CACHE] ${log.strategy} → ${log.result}`,
-      `color: ${color}; font-weight: bold;`
-    );
-    console.log('URL:', log.url);
-    console.log('Method:', log.method);
-    console.log('Response Time:', `${log.responseTime}ms`);
-    
-    if (log.cacheAge !== undefined) {
-      const ageSeconds = Math.round(log.cacheAge / 1000);
-      const ageMinutes = Math.round(ageSeconds / 60);
-      const ageDisplay = ageMinutes > 0 ? `${ageMinutes}m` : `${ageSeconds}s`;
-      console.log('Cache Age:', ageDisplay);
-    }
-    
-    if (log.size !== undefined) {
-      const sizeKB = (log.size / 1024).toFixed(2);
-      console.log('Size:', `${sizeKB} KB`);
-    }
-    
-    if (log.error) {
-      console.log('Error:', log.error);
-    }
-    
-    console.log('Timestamp:', new Date(log.timestamp).toISOString());
-    console.groupEnd();
+    // Logging disabled
   }
 
   /**
@@ -295,7 +252,7 @@ class CacheLogger {
       try {
         localStorage.removeItem(this.STORAGE_KEY);
       } catch (error) {
-        console.error('[CacheLogger] Failed to clear logs from storage:', error);
+        // Failed to clear logs from storage
       }
     }
   }
@@ -320,7 +277,7 @@ class CacheLogger {
       const serialized = JSON.stringify(this.logs);
       localStorage.setItem(this.STORAGE_KEY, serialized);
     } catch (error) {
-      console.error('[CacheLogger] Failed to persist logs:', error);
+      // Failed to persist logs
     }
   }
 
@@ -332,10 +289,9 @@ class CacheLogger {
       const stored = localStorage.getItem(this.STORAGE_KEY);
       if (stored) {
         this.logs = JSON.parse(stored);
-        console.log(`[CacheLogger] Restored ${this.logs.length} cache decision logs from storage`);
       }
     } catch (error) {
-      console.error('[CacheLogger] Failed to restore logs:', error);
+      // Failed to restore logs
     }
   }
 
@@ -374,35 +330,7 @@ class CacheLogger {
    * Print summary to console
    */
   printSummary(): void {
-    if (!this.isDevelopment) {
-      return;
-    }
-
-    const stats = this.getStats();
-    const insights = this.getPerformanceInsights();
-
-    console.group('%c📊 Cache Performance Summary', 'color: #3b82f6; font-weight: bold; font-size: 14px;');
-    console.log('Total Requests:', stats.total);
-    console.log('Cache Hit Rate:', `${stats.cacheHitRate.toFixed(2)}%`);
-    console.log('Network Error Rate:', `${stats.networkErrorRate.toFixed(2)}%`);
-    console.log('Average Response Time:', `${stats.averageResponseTime}ms`);
-    console.log('');
-    console.log('By Strategy:');
-    Object.entries(stats.byStrategy).forEach(([strategy, count]) => {
-      const avg = insights.averageByStrategy[strategy] || 0;
-      console.log(`  ${strategy}: ${count} requests (avg: ${avg}ms)`);
-    });
-    console.log('');
-    console.log('By Result:');
-    Object.entries(stats.byResult).forEach(([result, count]) => {
-      console.log(`  ${result}: ${count}`);
-    });
-    console.log('');
-    console.log('Performance Insights:');
-    console.log(`  Fastest Strategy: ${insights.fastestStrategy} (${insights.averageByStrategy[insights.fastestStrategy]}ms)`);
-    console.log(`  Slowest Strategy: ${insights.slowestStrategy} (${insights.averageByStrategy[insights.slowestStrategy]}ms)`);
-    console.log(`  Cache Efficiency: ${insights.cacheEfficiency.toFixed(2)}%`);
-    console.groupEnd();
+    // Logging disabled
   }
 }
 
