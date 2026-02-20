@@ -89,8 +89,7 @@ export default function AddPublicationModal({
       const result = await uploadFile(file, tempId);
       return result;
     } catch (err) {
-      console.error("Failed to upload cropped image", err);
-    }
+      }
   };
 
   const { confirm, ConfirmDialog } = useConfirm();
@@ -177,7 +176,6 @@ export default function AddPublicationModal({
 
         // Making "Direct Upload" work seamlessly requires changes in how the form data is prepared.
       } catch (e) {
-        console.error("Upload error", e);
         return;
       }
     }
@@ -237,7 +235,6 @@ export default function AddPublicationModal({
         // Proceed with normal submit
         handleSubmit(e);
       } catch (err) {
-        console.error("❌ [S3 UPLOAD] Upload failed", err);
         // Show error
       }
     } else {
@@ -573,8 +570,7 @@ export default function AddPublicationModal({
                       handleClose();
                     }
                   } catch (err) {
-                    console.error("Failed to cancel", err);
-                  }
+                    }
                 }
               }}
             />

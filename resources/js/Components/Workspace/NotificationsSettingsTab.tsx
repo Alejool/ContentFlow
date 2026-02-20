@@ -62,7 +62,6 @@ export default function NotificationsSettingsTab({
           per_page: data.per_page || perPage,
         });
       } catch (error) {
-        console.error("Failed to fetch activity", error);
         toast.error(t("workspace.failed_to_fetch_activity"));
       } finally {
         setLoadingActivity(false);

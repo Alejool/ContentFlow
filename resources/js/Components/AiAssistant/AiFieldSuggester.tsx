@@ -74,7 +74,6 @@ const AiFieldSuggester: React.FC<AiFieldSuggesterProps> = ({
         );
       }
     } catch (error: any) {
-      console.error("AI Suggestion Error:", error);
       toast.error(
         error.response?.data?.message ||
           t("common.error") ||

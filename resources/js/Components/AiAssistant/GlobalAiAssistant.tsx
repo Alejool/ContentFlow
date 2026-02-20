@@ -87,7 +87,6 @@ export default function GlobalAiAssistant() {
         setMessages((prev) => [...prev, aiMessage]);
       }
     } catch (error) {
-      console.error("AI Chat Error:", error);
       toast.error(t("common.error"));
       setMessages((prev) => [
         ...prev,

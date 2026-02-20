@@ -144,8 +144,7 @@ const EditPublicationModal = ({
       }
       return result;
     } catch (err) {
-      console.error("Failed to upload cropped image", err);
-    }
+      }
   };
 
   const { register } = form;

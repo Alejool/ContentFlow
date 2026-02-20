@@ -40,7 +40,6 @@ export default function MembersManagement({
       );
       setMembers(response.data.members || []);
     } catch (error) {
-      console.error("Failed to fetch members", error);
       toast.error(t("workspace.invite_modal.messages.error"));
     } finally {
       setIsLoading(false);
@@ -85,7 +84,6 @@ export default function MembersManagement({
       toast.success(t("workspace.invite_modal.messages.success"));
       fetchMembers();
     } catch (error) {
-      console.error("Failed to update role", error);
       toast.error(t("workspace.invite_modal.messages.error"));
     }
   };
@@ -112,7 +110,6 @@ export default function MembersManagement({
         fetchMembers();
       }
     } catch (error) {
-      console.error("Failed to remove member", error);
       toast.error(t("workspace.invite_modal.messages.error"));
     } finally {
       setUserToRemove(null);

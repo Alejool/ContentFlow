@@ -311,7 +311,6 @@ const PublicationMobileRow = memo(
                                   onDelete(item.id);
                                 }
                               } catch (error) {
-                                console.error("Delete failed", error);
                                 toast.error("Error al eliminar");
                               } finally {
                                 setLoadingStates((prev) => ({
@@ -722,7 +721,6 @@ const PublicationMobileRow = memo(
                                   await onDelete(item.id);
                                 }
                               } catch (error) {
-                                console.error("Delete failed", error);
                                 toast.error("Error al eliminar");
                               } finally {
                                 setLoadingStates((prev) => ({

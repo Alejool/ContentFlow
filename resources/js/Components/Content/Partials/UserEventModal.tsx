@@ -216,7 +216,6 @@ export default function UserEventModal({
       onSuccess();
       onClose();
     } catch (error: any) {
-      console.error(error);
       toast.error(
         error.response?.data?.message ||
           t("calendar.userEvents.modal.messages.errorSave"),

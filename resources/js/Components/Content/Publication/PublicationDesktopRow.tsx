@@ -489,7 +489,6 @@ const PublicationRow = memo(
                       await onDelete(item.id);
                     }
                   } catch (error) {
-                    console.error("Delete failed", error);
                     toast.error("Error al eliminar");
                   } finally {
                     setIsDeleting(false);

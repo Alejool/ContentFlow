@@ -93,8 +93,7 @@ export default function GlobalUploadIndicator() {
     try {
       await axios.post(route("api.v1.publications.cancel", id));
     } catch (err) {
-      console.error("Failed to cancel publication", err);
-    }
+      }
   };
 
   const handleCancelPlatform = async (publicationId: number, platformId: number, platformName: string) => {
@@ -119,8 +118,7 @@ export default function GlobalUploadIndicator() {
         detail: { publicationId, platformId } 
       }));
     } catch (err) {
-      console.error("Failed to cancel platform", err);
-    }
+      }
   };
 
   const handleDismissPublication = (e: React.MouseEvent, id: number) => {

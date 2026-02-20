@@ -50,8 +50,7 @@ export default function TemplateGallery({
         });
       }
     } catch (error) {
-      console.error("Failed to select template:", error);
-    }
+      }
   };
 
   // Extract unique categories from templates
@@ -80,8 +79,7 @@ export default function TemplateGallery({
     try {
       await onSkip();
     } catch (error) {
-      console.error("Failed to skip template selection:", error);
-    } finally {
+      } finally {
       setIsSkipping(false);
     }
   };

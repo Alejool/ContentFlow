@@ -114,7 +114,6 @@ const AiPromptSection: React.FC<AiPromptSectionProps> = ({
         setPrompt("");
         setError("");
       } else {
-        console.error("AI Response Error:", response.data);
         toast.error(
           response.data.message ||
             t("common.ai.suggestion_failed") ||
@@ -122,7 +121,6 @@ const AiPromptSection: React.FC<AiPromptSectionProps> = ({
         );
       }
     } catch (error: any) {
-      console.error("AI Generation Error:", error);
       toast.error(
         error.response?.data?.message ||
           t("common.error") ||

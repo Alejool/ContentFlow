@@ -25,8 +25,7 @@ export const LocalizationExamples = () => {
       });
       setTranslatedText(result.translatedText);
     } catch (error) {
-      console.error("Translation failed:", error);
-    } finally {
+      } finally {
       setIsTranslating(false);
     }
   };

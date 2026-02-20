@@ -88,7 +88,6 @@ export default function InviteMemberModal({
       onSuccess();
       onClose();
     } catch (error: any) {
-      console.error("Invite error", error);
       if (error.response?.data?.errors) {
         // Get the first error message from the validation errors object
         const firstErrorField = Object.keys(error.response.data.errors)[0];

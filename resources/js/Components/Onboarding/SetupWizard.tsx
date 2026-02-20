@@ -34,8 +34,7 @@ export default function SetupWizard({
 
   // Log when connected accounts change
   useEffect(() => {
-    console.log('SetupWizard - Connected accounts updated:', connectedAccounts);
-  }, [connectedAccounts]);
+    }, [connectedAccounts]);
 
   // ALWAYS use SOCIAL_PLATFORMS constant, ignore props
   const availablePlatforms = useMemo(() => {
@@ -52,7 +51,6 @@ export default function SetupWizard({
         }),
       }));
     
-    console.log('SetupWizard - Available platforms:', platforms);
     return platforms;
   }, [t]);
 
@@ -84,23 +82,19 @@ export default function SetupWizard({
       await skipWizard();
       onComplete?.();
     } catch (error) {
-      console.error("Failed to skip wizard:", error);
-    } finally {
+      } finally {
       setIsSkipping(false);
     }
   };
 
   const handleComplete = async () => {
-    console.log('SetupWizard: handleComplete called');
     try {
       // Send the final step number (3) to properly mark wizard as completed
       await completeWizardStep("step-3");
-      console.log('SetupWizard: completeWizardStep finished');
       // Don't call onComplete - let the state change trigger the transition
       // onComplete?.();
     } catch (error) {
-      console.error("Failed to complete wizard:", error);
-    }
+      }
   };
 
   // Keyboard navigation (Requirement 7.5, 7.6)

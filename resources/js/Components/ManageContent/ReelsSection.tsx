@@ -142,8 +142,7 @@ export default function ReelsSection({
         toast.error(errorMessage);
       }
       
-      console.error('Error generating reel:', error);
-    } finally {
+      } finally {
       setGenerating(false);
     }
   };

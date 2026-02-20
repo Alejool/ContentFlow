@@ -61,8 +61,7 @@ export default function ConnectedAccounts({ className = "", header = true }) {
         updateAccountsStatus(response.data.accounts);
       }
     } catch (error) {
-      console.error("Error loading social accounts:", error);
-    } finally {
+      } finally {
       setLoading(false);
     }
   };

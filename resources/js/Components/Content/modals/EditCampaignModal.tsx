@@ -91,7 +91,6 @@ export default function EditCampaignModal({
         );
       }
     } catch (error) {
-      console.error("Error updating campaign:", error);
       toast.error(
         t("campaigns.messages.updateError") || "Failed to update campaign",
       );

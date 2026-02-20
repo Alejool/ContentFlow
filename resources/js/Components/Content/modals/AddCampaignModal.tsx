@@ -71,7 +71,6 @@ export default function AddCampaignModal({
         }
       }
     } catch (error: any) {
-      console.error("Error submitting campaign:", error);
       toast.error(
         error.response?.data?.message || t("campaigns.messages.error"),
       );

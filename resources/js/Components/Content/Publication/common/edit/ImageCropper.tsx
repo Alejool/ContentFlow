@@ -94,8 +94,7 @@ export default function ImageCropper({
         onCropComplete(croppedImage);
         onClose();
       } catch (e) {
-        console.error(e);
-      }
+        }
     }
   };
 

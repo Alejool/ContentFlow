@@ -415,12 +415,6 @@ export default function PublishPublicationModal({
                                   e.stopPropagation();
                                   if (!publication) return;
                                   
-                                  console.log('Canceling platform:', {
-                                    publicationId: publication.id,
-                                    accountId: account.id,
-                                    platform: account.platform
-                                  });
-                                  
                                   const confirmed = await confirm({
                                     title: t("publications.modal.cancel_platform.title", { platform: account.platform }) || `¿Cancelar ${account.platform}?`,
                                     message: t("publications.modal.cancel_platform.message", { platform: account.platform }) || `¿Estás seguro de que deseas cancelar la publicación en ${account.platform}? Se detendrán todos los reintentos para esta plataforma.`,

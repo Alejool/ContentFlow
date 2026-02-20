@@ -152,8 +152,7 @@ const EditPublicationModal = ({
       }
       return result;
     } catch (err) {
-      console.error("Failed to upload cropped image", err);
-    }
+      }
   };
 
   // Delete reels when video is removed
@@ -174,8 +173,7 @@ const EditPublicationModal = ({
           );
           toast.success(t('reels.messages.deletedWithVideo'));
         } catch (error) {
-          console.error('Error deleting reels:', error);
-        }
+          }
       }
     }
     

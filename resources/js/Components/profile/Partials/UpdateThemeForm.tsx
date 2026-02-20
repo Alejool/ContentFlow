@@ -44,7 +44,6 @@ export default function UpdateThemeForm({ user }: UpdateThemeFormProps) {
         toast.error(response.data.message || t("common.error"));
       }
     } catch (error: any) {
-      console.error("Theme update failed:", error);
       const errorMessage = error.response?.data?.message || t("common.error");
       toast.error(errorMessage);
     } finally {

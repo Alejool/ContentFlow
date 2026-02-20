@@ -120,8 +120,7 @@ export default function IntegrationsSettingsTab({
           per_page: payload.per_page || perPage,
         });
       } catch (error) {
-        console.error("Failed to fetch activity", error);
-      } finally {
+        } finally {
         setLoadingActivity(false);
       }
     },

@@ -94,8 +94,7 @@ export default function AddPublicationModal({
       // Since it's a new publication, we don't need to link it yet (it will be linked on save)
       return result;
     } catch (err) {
-      console.error("Failed to upload cropped image", err);
-    }
+      }
   };
 
   const { register } = form; // Keep existing destructuring

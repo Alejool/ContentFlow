@@ -44,8 +44,7 @@ export class OnboardingErrorBoundary extends Component<Props, State> {
   private logErrorToService(error: Error, errorInfo: ErrorInfo): void {
     // Log to console in development
     if (import.meta.env.DEV) {
-      console.error('Onboarding Error Boundary caught an error:', error, errorInfo);
-    }
+      }
 
     // In production, send to error tracking service
     // Example: Sentry.captureException(error, { contexts: { react: errorInfo } });
@@ -73,8 +72,7 @@ export class OnboardingErrorBoundary extends Component<Props, State> {
       });
     } catch (loggingError) {
       // Don't let logging errors break the error boundary
-      console.error('Failed to log error:', loggingError);
-    }
+      }
   }
 
   private handleReset = (): void => {

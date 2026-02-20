@@ -110,8 +110,7 @@ export default function ApprovalHistory({
         }
       }
     } catch (error) {
-      console.error("Error fetching approval history:", error);
-    } finally {
+      } finally {
       setIsLoading(false);
     }
   };

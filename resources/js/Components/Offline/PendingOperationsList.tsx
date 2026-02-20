@@ -45,8 +45,7 @@ export const PendingOperationsList: React.FC = () => {
       const ops = await getQueuedOperations();
       setOperations(ops);
     } catch (error) {
-      console.error('[PendingOperationsList] Failed to load operations:', error);
-    } finally {
+      } finally {
       setIsLoading(false);
     }
   };
@@ -61,8 +60,7 @@ export const PendingOperationsList: React.FC = () => {
       await syncNow();
       await loadOperations();
     } catch (error) {
-      console.error('[PendingOperationsList] Retry failed:', error);
-    } finally {
+      } finally {
       setRetryingId(null);
     }
   };
@@ -72,8 +70,7 @@ export const PendingOperationsList: React.FC = () => {
       await clearFailed();
       await loadOperations();
     } catch (error) {
-      console.error('[PendingOperationsList] Clear failed:', error);
-    }
+      }
   };
 
   const getResourceIcon = (resource: string) => {

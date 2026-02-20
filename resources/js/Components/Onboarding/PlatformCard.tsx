@@ -194,7 +194,6 @@ export default function PlatformCard({
         throw new Error(data.message || "Failed to get OAuth URL");
       }
     } catch (err: any) {
-      console.error("Failed to initiate OAuth:", err);
       cleanupOAuthFlow();
       
       // Provide user-friendly error messages

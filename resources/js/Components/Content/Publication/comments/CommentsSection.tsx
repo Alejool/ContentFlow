@@ -53,8 +53,7 @@ export const CommentsSection = ({
       );
       setMembers(response.data.members || []);
     } catch (error) {
-      console.error("Failed to fetch members", error);
-    }
+      }
   };
 
   const fetchComments = async () => {
@@ -65,8 +64,7 @@ export const CommentsSection = ({
       );
       setComments(response.data);
     } catch (error) {
-      console.error("Failed to fetch comments", error);
-    } finally {
+      } finally {
       setLoading(false);
     }
   };

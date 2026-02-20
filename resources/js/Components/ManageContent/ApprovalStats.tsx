@@ -34,8 +34,7 @@ export default function ApprovalStats({ refreshTrigger }: ApprovalStatsProps) {
         setStats(stats);
       }
     } catch (error) {
-      console.error("Error fetching approval stats:", error);
-    } finally {
+      } finally {
       setIsLoading(false);
     }
   };

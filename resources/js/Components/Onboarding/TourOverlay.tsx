@@ -48,13 +48,7 @@ export default function TourOverlay({
 
   // Debug: Log step information
   useEffect(() => {
-    console.log('TourOverlay: Step info:', {
-      currentStepId: currentStep.id,
-      totalSteps,
-      expectedLastStepId: `step-${totalSteps}`,
-      isLastStep,
-    });
-  }, [currentStep.id, totalSteps, isLastStep]);
+    }, [currentStep.id, totalSteps, isLastStep]);
 
   // Enable tour navigation on mount
   useEffect(() => {
@@ -64,11 +58,9 @@ export default function TourOverlay({
   // Wrapped handlers to prevent multiple calls
   const handleNext = useCallback(() => {
     if (isProcessing) {
-      console.log('TourOverlay: Already processing, ignoring next call');
       return;
     }
     setIsProcessing(true);
-    console.log('TourOverlay: handleNext called');
     onNext();
     // Reset after a short delay
     setTimeout(() => setIsProcessing(false), 500);
@@ -76,11 +68,9 @@ export default function TourOverlay({
 
   const handleComplete = useCallback(() => {
     if (isProcessing) {
-      console.log('TourOverlay: Already processing, ignoring complete call');
       return;
     }
     setIsProcessing(true);
-    console.log('TourOverlay: handleComplete called');
     onComplete();
     // Reset after a short delay
     setTimeout(() => setIsProcessing(false), 500);
@@ -88,11 +78,9 @@ export default function TourOverlay({
 
   const handleSkip = useCallback(() => {
     if (isProcessing) {
-      console.log('TourOverlay: Already processing, ignoring skip call');
       return;
     }
     setIsProcessing(true);
-    console.log('TourOverlay: handleSkip called');
     onSkip();
     // Reset after a short delay
     setTimeout(() => setIsProcessing(false), 500);
@@ -118,15 +106,7 @@ export default function TourOverlay({
       // Error checking selectors
     }
     
-    console.log('TourOverlay mounted:', {
-      currentStep,
-      totalSteps,
-      isLastStep,
-      expectedLastStepId: `step-${totalSteps}`,
-      actualStepId: currentStep.id,
-      targetSelector: currentStep.targetSelector,
-      targetExists,
-      route: (currentStep as any).route,
+    .route,
     });
   }, [currentStep, isLastStep]);
 
@@ -192,11 +172,8 @@ export default function TourOverlay({
         
         targetElement = document.querySelector(selector);
         
-        console.log('TourOverlay: Trying selector:', selector, 'Found:', targetElement);
-        
         if (targetElement) break;
       } catch (error) {
-        console.warn('Invalid selector:', selector, error);
         continue;
       }
     }
@@ -279,7 +256,6 @@ export default function TourOverlay({
       
       // Check if we need to navigate first
       if (stepRoute && currentPath !== stepRoute) {
-        console.log('TourOverlay: Need to navigate from', currentPath, 'to', stepRoute);
         setShouldNavigate(true);
         return;
       }
@@ -289,22 +265,17 @@ export default function TourOverlay({
         const mobileMenuButton = document.querySelector('nav.lg\\:hidden button');
         const mobileMenuContent = document.querySelector('nav.lg\\:hidden > div:last-child');
         
-        console.log(`TourOverlay: ${currentStep.id} mobile check:`, {
-          hasButton: !!mobileMenuButton,
-          hasContent: !!mobileMenuContent,
-          isHidden: mobileMenuContent?.classList.contains('hidden'),
+        ,
         });
         
         // Check if menu is closed (hidden class)
         if (mobileMenuButton && mobileMenuContent && mobileMenuContent.classList.contains('hidden')) {
-          console.log('TourOverlay: Opening mobile menu for', currentStep.id);
           // Click the button to open the menu
           (mobileMenuButton as HTMLButtonElement).click();
           
           // Wait for menu to open and animate before calculating position
           setTimeout(() => {
             const targetPos = calculateTargetPosition();
-            console.log('TourOverlay: Target position after opening menu:', targetPos);
             if (targetPos) {
               setTargetPosition(targetPos);
               setShouldNavigate(false);
@@ -314,7 +285,6 @@ export default function TourOverlay({
               }, 0);
             } else {
               // Menu opened but couldn't find target, show without spotlight
-              console.log('TourOverlay: Menu opened but no target found');
               setTargetPosition(null);
               setShouldNavigate(false);
             }
@@ -336,7 +306,6 @@ export default function TourOverlay({
       } else {
         // Target not found but we're on the correct route
         // Show card without spotlight
-        console.log('TourOverlay: Target not found on correct route, showing without spotlight');
         setTargetPosition(null);
         setShouldNavigate(false);
       }
@@ -361,7 +330,6 @@ export default function TourOverlay({
     if (shouldNavigate) {
       const stepRoute = (currentStep as any).route;
       if (stepRoute) {
-        console.log('TourOverlay: Starting navigation to', stepRoute, 'for step', currentStep.id);
         navigateToTourStep(stepRoute, currentStep.id);
       }
     }

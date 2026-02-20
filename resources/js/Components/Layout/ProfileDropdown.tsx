@@ -63,7 +63,6 @@ export default function ProfileDropdown({
       });
       // Toast de éxito eliminado - el cambio de color es inmediato y visible
     } catch (error) {
-      console.error("Theme update failed:", error);
       toast.error(t("common.error") || "Error al actualizar el tema");
     }
   };
@@ -76,7 +75,6 @@ export default function ProfileDropdown({
         await axios.patch(route("settings.locale"), { locale: langCode });
         // Toast de éxito eliminado - el cambio de idioma es inmediato y visible
       } catch (error) {
-        console.error("Failed to save locale preference:", error);
         toast.error(t("common.error") || "Error al actualizar el idioma");
       }
     }

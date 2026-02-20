@@ -149,7 +149,6 @@ const SocialMediaAccounts = memo(() => {
         updateAccountsStatus(response.data.accounts);
       }
     } catch (error: any) {
-      console.error("Error loading social accounts:", error);
       if (error.response?.status === 401) {
         toast.error(t("manageContent.socialMedia.messages.unauthorized"));
       } else {
@@ -170,7 +169,6 @@ const SocialMediaAccounts = memo(() => {
       .filter(([_, config]) => config && config.active)
       .forEach(([key, config]) => {
         if (!config || !config.gradient) {
-          console.warn(`Invalid config for platform: ${key}`, config);
           return;
         }
 
@@ -238,14 +236,12 @@ const SocialMediaAccounts = memo(() => {
           });
         }
       } catch (error: any) {
-        console.error("Disconnect error", error);
-      }
+        }
     } else {
       try {
         await connectAccount(account.platform);
       } catch (error: any) {
-        console.error("Error connecting to social network:", error);
-      }
+        }
     }
   };
 

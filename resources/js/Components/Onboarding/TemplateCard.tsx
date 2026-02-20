@@ -55,7 +55,6 @@ export default function TemplateCard({
     try {
       await onSelect(template.id);
     } catch (error) {
-      console.error("Failed to select template:", error);
       setIsSelecting(false);
     }
   };

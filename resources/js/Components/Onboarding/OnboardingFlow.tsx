@@ -60,33 +60,13 @@ export default function OnboardingFlow({
 
   // Debug logging
   useEffect(() => {
-    console.log('OnboardingFlow mounted:', {
-      tourStepsLength: tourSteps.length,
-      availablePlatformsLength: availablePlatforms.length,
-      templatesLength: templates.length,
-      state,
-      currentStage,
-    });
-  }, []);
+    }, []);
 
   // Determine current onboarding stage based on state
   useEffect(() => {
     const stage = determineCurrentStage();
-    console.log('OnboardingFlow stage determination:', { 
-      oldStage: currentStage, 
-      newStage: stage,
-      state: {
-        tourCompleted: state.tourCompleted,
-        tourSkipped: state.tourSkipped,
-        wizardCompleted: state.wizardCompleted,
-        wizardSkipped: state.wizardSkipped,
-        templateSelected: state.templateSelected,
-      }
-    });
-    
     // Only update if stage actually changed
     if (stage !== currentStage) {
-      console.log('OnboardingFlow: Stage changed from', currentStage, 'to', stage);
       setCurrentStage(stage);
     }
   }, [
@@ -103,13 +83,10 @@ export default function OnboardingFlow({
    * Handles tour completion
    */
   const handleTourComplete = async () => {
-    console.log('OnboardingFlow: handleTourComplete called');
     const lastStep = tourSteps[tourSteps.length - 1];
-    console.log('OnboardingFlow: Last step:', lastStep);
     if (lastStep) {
       await completeTourStep(lastStep.id);
-      console.log('OnboardingFlow: completeTourStep finished');
-    }
+      }
     // Stage will automatically transition via useEffect
   };
 
@@ -125,13 +102,11 @@ export default function OnboardingFlow({
    * Handles wizard completion
    */
   const handleWizardComplete = () => {
-    console.log('OnboardingFlow: handleWizardComplete called');
     // Wizard component handles its own completion
     // The state change will trigger the useEffect to transition stages
     // Force a re-check of the stage after a short delay to ensure state has updated
     setTimeout(() => {
       const newStage = determineCurrentStage();
-      console.log('OnboardingFlow: Force stage check after wizard complete:', newStage);
       if (newStage !== currentStage) {
         setCurrentStage(newStage);
       }
@@ -148,11 +123,8 @@ export default function OnboardingFlow({
 
   // Don't render anything if onboarding is complete
   if (currentStage === "complete") {
-    console.log('OnboardingFlow: Stage is complete, not rendering');
     return null;
   }
-
-  console.log('OnboardingFlow: Rendering with stage:', currentStage);
 
   return (
     <OnboardingErrorBoundary>

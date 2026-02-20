@@ -89,8 +89,7 @@ export default function PublishPreviewModal({
       });
       setPreviewData(response.data);
     } catch (error) {
-      console.error('Error loading preview:', error);
-    } finally {
+      } finally {
       setIsLoading(false);
     }
   };
@@ -103,8 +102,7 @@ export default function PublishPreviewModal({
       });
       setPreviewData(response.data);
     } catch (error) {
-      console.error('Error optimizing:', error);
-    } finally {
+      } finally {
       setIsOptimizing(false);
     }
   };
@@ -118,8 +116,7 @@ export default function PublishPreviewModal({
       });
       setPreviewData(response.data);
     } catch (error) {
-      console.error('Error updating platform config:', error);
-    }
+      }
   };
 
   const handlePublish = async () => {

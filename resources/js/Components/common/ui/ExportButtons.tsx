@@ -42,7 +42,6 @@ export default function ExportButtons({ endpoint, filters = {}, className = "" }
             link.remove();
             window.URL.revokeObjectURL(url);
         } catch (error) {
-            console.error('Export failed:', error);
             toast.error('Error al exportar. Por favor, intenta de nuevo.');
         } finally {
             setIsExporting(false);
