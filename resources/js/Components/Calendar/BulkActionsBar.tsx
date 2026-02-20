@@ -1,30 +1,39 @@
 import Button from "@/Components/common/Modern/Button";
 import { DynamicModal } from "@/Components/common/Modern/DynamicModal";
-import { Calendar, X } from "lucide-react";
+import { Calendar, X, Undo2, Trash2 } from "lucide-react";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+import { DateTimePicker } from "./DateTimePicker";
 
 interface BulkActionsBarProps {
   selectedCount: number;
   onClearSelection: () => void;
   onBulkMove: (newDate: Date) => Promise<void>;
+  onBulkDelete?: (eventIds: string[]) => Promise<void>;
+  onUndo?: () => void;
+  canUndo?: boolean;
   onSelectAll: () => void;
   totalEvents: number;
+  selectedEventIds?: string[];
 }
 
 export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
   selectedCount,
   onClearSelection,
   onBulkMove,
+  onBulkDelete,
+  onUndo,
+  canUndo = false,
   onSelectAll,
   totalEvents,
+  selectedEventIds = [],
 }) => {
   const { t } = useTranslation();
   const [showMoveModal, setShowMoveModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [isMoving, setIsMoving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleBulkMove = async () => {
     setIsMoving(true);
@@ -33,6 +42,18 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
       setShowMoveModal(false);
     } finally {
       setIsMoving(false);
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (!onBulkDelete) return;
+    
+    setIsDeleting(true);
+    try {
+      await onBulkDelete(selectedEventIds);
+      setShowDeleteModal(false);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -74,6 +95,19 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
                 </Button>
               )}
 
+              {canUndo && onUndo && (
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={onUndo}
+                  className="whitespace-nowrap"
+                  title="Deshacer última operación"
+                >
+                  <Undo2 className="w-4 h-4 mr-2" />
+                  Deshacer
+                </Button>
+              )}
+
               <Button
                 variant="primary"
                 size="sm"
@@ -83,6 +117,18 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
                 <Calendar className="w-4 h-4 mr-2" />
                 Mover eventos
               </Button>
+
+              {onBulkDelete && (
+                <Button
+                  variant="danger"
+                  size="sm"
+                  onClick={() => setShowDeleteModal(true)}
+                  className="whitespace-nowrap"
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Eliminar
+                </Button>
+              )}
 
               <button
                 onClick={onClearSelection}
@@ -109,18 +155,11 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
               eventos seleccionados.
             </p>
 
-            <div className="flex justify-center">
-              <DatePicker
-                selected={selectedDate}
-                onChange={(date) => date && setSelectedDate(date)}
-                showTimeSelect
-                timeFormat="HH:mm"
-                timeIntervals={15}
-                dateFormat="MMMM d, yyyy h:mm aa"
-                inline
-                className="border border-gray-300 dark:border-gray-600 rounded-lg"
-              />
-            </div>
+            <DateTimePicker
+              selectedDate={selectedDate}
+              onChange={setSelectedDate}
+              showWarningForPastDates={true}
+            />
           </div>
 
           <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
@@ -138,6 +177,40 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
               isLoading={isMoving}
             >
               Mover {selectedCount} evento{selectedCount !== 1 ? "s" : ""}
+            </Button>
+          </div>
+        </div>
+      </DynamicModal>
+
+      <DynamicModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        title="Eliminar eventos seleccionados"
+        size="md"
+      >
+        <div className="space-y-6">
+          <div>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+              ¿Estás seguro de que deseas eliminar los {selectedCount} eventos seleccionados? 
+              Esta acción no se puede deshacer.
+            </p>
+          </div>
+
+          <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <Button
+              variant="secondary"
+              onClick={() => setShowDeleteModal(false)}
+              disabled={isDeleting}
+            >
+              Cancelar
+            </Button>
+            <Button
+              variant="danger"
+              onClick={handleBulkDelete}
+              disabled={isDeleting}
+              isLoading={isDeleting}
+            >
+              Eliminar {selectedCount} evento{selectedCount !== 1 ? "s" : ""}
             </Button>
           </div>
         </div>

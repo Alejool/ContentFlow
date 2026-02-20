@@ -40,22 +40,13 @@ import {
   FaTwitter,
   FaYoutube,
 } from "react-icons/fa";
-
-interface CalendarEvent {
-  id: string;
-  resourceId: number;
-  type: "publication" | "post" | "user_event" | "event";
-  title: string;
-  start: string;
-  status: string;
-  color: string;
-  extendedProps: {
-    slug?: string;
-    thumbnail?: string;
-    publication_id?: number;
-    platform?: string;
-  };
-}
+import { CalendarViewSelector } from "@/Components/Calendar/CalendarViewSelector";
+import { MonthView } from "@/Components/Calendar/MonthView";
+import { WeekView } from "@/Components/Calendar/WeekView";
+import { DayView } from "@/Components/Calendar/DayView";
+import { FilterPanel } from "@/Components/Calendar/FilterPanel";
+import { CalendarEvent } from "@/types/calendar";
+import { useCampaignStore } from "@/stores/campaignStore";
 
 const PlatformIcon = ({
   platform,
@@ -89,6 +80,7 @@ const PlatformIcon = ({
 
 import { useCalendarStore } from "@/stores/calendarStore";
 import { useShallow } from "zustand/react/shallow";
+import { BulkActionsBar } from "@/Components/Calendar/BulkActionsBar";
 
 export default function CalendarIndex({ auth }: { auth: any }) {
   const { t, i18n } = useTranslation();
@@ -98,22 +90,55 @@ export default function CalendarIndex({ auth }: { auth: any }) {
     currentDate,
     loading,
     platformFilter,
+    view,
+    selectedEvents,
+    filters,
+    canUndo,
     setCurrentDate,
     setPlatformFilter,
+    setView,
+    setFilters,
+    getFilteredEvents,
+    toggleEventSelection,
+    clearSelection,
+    selectAll,
     fetchEvents,
     updateEvent,
     deleteEvent,
+    bulkUpdateEvents,
+    bulkDeleteEvents,
+    undoBulkOperation,
   } = useCalendarStore(
     useShallow((s) => ({
       events: s.events,
       currentDate: s.currentMonth,
       loading: s.isLoading,
       platformFilter: s.platformFilter,
+      view: s.view,
+      selectedEvents: s.selectedEvents,
+      filters: s.filters,
+      canUndo: s.canUndo,
       setCurrentDate: s.setCurrentMonth,
       setPlatformFilter: s.setPlatformFilter,
+      setView: s.setView,
+      setFilters: s.setFilters,
+      getFilteredEvents: s.getFilteredEvents,
+      toggleEventSelection: s.toggleEventSelection,
+      clearSelection: s.clearSelection,
+      selectAll: s.selectAll,
       fetchEvents: s.fetchEvents,
       updateEvent: s.updateEvent,
       deleteEvent: s.deleteEvent,
+      bulkUpdateEvents: s.bulkUpdateEvents,
+      bulkDeleteEvents: s.bulkDeleteEvents,
+      undoBulkOperation: s.undoBulkOperation,
+    })),
+  );
+
+  const { campaigns, fetchCampaigns } = useCampaignStore(
+    useShallow((s) => ({
+      campaigns: s.campaigns,
+      fetchCampaigns: s.fetchCampaigns,
     })),
   );
 
@@ -139,6 +164,7 @@ export default function CalendarIndex({ auth }: { auth: any }) {
 
   useEffect(() => {
     fetchEvents();
+    fetchCampaigns();
   }, [currentDate]);
 
   // Navigation
@@ -159,13 +185,8 @@ export default function CalendarIndex({ auth }: { auth: any }) {
   const firstDayOfMonth = startOfMonth(currentDate).getDay();
   const startingEmptySlots = Array.from({ length: firstDayOfMonth });
 
-  // Filter Events
-  const filteredEvents = events.filter((e) => {
-    if (platformFilter === "all") return true;
-    if (platformFilter === "events")
-      return String(e.type) === "user_event" || String(e.type) === "event";
-    return e.extendedProps.platform?.toLowerCase() === platformFilter;
-  });
+  // Filter Events - use the store's filtering logic
+  const filteredEvents = getFilteredEvents();
 
   // Drag and Drop Handlers
   const handleDragStart = (e: React.DragEvent, event: any) => {
@@ -309,6 +330,12 @@ export default function CalendarIndex({ auth }: { auth: any }) {
                 </div>
 
                 <div className="flex flex-wrap items-center gap-3 w-full md:w-auto justify-center md:justify-end">
+                  {/* View Selector */}
+                  <CalendarViewSelector
+                    currentView={view}
+                    onViewChange={setView}
+                  />
+
                   <div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-lg p-1 mr-2 flex-wrap gap-1">
                     {platforms.map((p) => (
                       <button
@@ -363,173 +390,67 @@ export default function CalendarIndex({ auth }: { auth: any }) {
               {!loading && filteredEvents.length === 0 ? (
                 <EmptyState config={getEmptyStateByKey('calendarView', t)!} />
               ) : (
-              <div className="border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden shadow-sm bg-gray-50 dark:bg-black/50">
-                {/* Weekday Headers - Desktop Only */}
-                <div className="hidden lg:grid grid-cols-7 bg-white dark:bg-black border-b border-gray-200 dark:border-gray-800">
-                  {["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"].map(
-                    (day) => (
-                      <div
-                        key={day}
-                        className="py-4 text-center text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500"
-                      >
-                        {day}
-                      </div>
-                    ),
+                <>
+                  {/* Filter Panel */}
+                  <div className="mb-6">
+                    <FilterPanel
+                      filters={filters}
+                      onFiltersChange={setFilters}
+                      campaigns={campaigns}
+                      totalEvents={events.length}
+                      filteredCount={filteredEvents.length}
+                    />
+                  </div>
+
+                  {view === 'month' && (
+                    <MonthView
+                      currentDate={currentDate}
+                      events={filteredEvents}
+                      onEventDragStart={handleDragStart}
+                      onDayDragOver={handleDragOver}
+                      onDayDrop={handleDrop}
+                      onEventDelete={handleDeleteEvent}
+                      PlatformIcon={PlatformIcon}
+                      currentUser={auth.user}
+                    />
                   )}
-                </div>
-
-                {/* Days */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 auto-rows-fr min-h-[700px] bg-gray-200 dark:bg-gray-800 gap-px">
-                  {/* Empty Slots - Desktop Only */}
-                  {startingEmptySlots.map((_, i) => (
-                    <div
-                      key={`empty-${i}`}
-                      className="hidden lg:block bg-gray-50/50 dark:bg-black/50 p-2"
-                    ></div>
-                  ))}
-
-                  {/* Actual Days */}
-                  {days.map((day) => {
-                    const dayEvents = filteredEvents.filter((e) =>
-                      isSameDay(parseISO(e.start), day),
-                    );
-                    const isCurrentMonth = isSameMonth(day, currentDate);
-                    const isTodayDay = isToday(day);
-
-                    return (
-                      <div
-                        key={day.toISOString()}
-                        onDragOver={handleDragOver}
-                        onDrop={(e) => handleDrop(e, day)}
-                        className={`
-                                                    relative p-2 min-h-[140px] transition-all group
-                                                    ${isCurrentMonth ? "bg-white dark:bg-black" : "bg-gray-50/30 dark:bg-black/30"}
-                                                    ${isTodayDay ? "bg-primary-50/10 dark:bg-primary-900/5" : ""}
-                                                    hover:bg-gray-50 dark:hover:bg-gray-800/50
-                                                `}
-                      >
-                        {/* Date Header */}
-                        <div className="flex justify-between items-start mb-2">
-                          <div className="flex items-center gap-2">
-                            <span
-                              className={`
-                                    text-sm font-medium w-8 h-8 flex items-center justify-center rounded-full transition-colors
-                                    ${
-                                      isTodayDay
-                                        ? "bg-primary-600 text-white shadow-lg shadow-primary-500/30"
-                                        : "text-gray-500 dark:text-gray-400 group-hover:bg-gray-100 dark:group-hover:bg-gray-800"
-                                    }
-                                `}
-                            >
-                              {format(day, "d")}
-                            </span>
-                            {/* Show weekday on mobile/tablet */}
-                            <span className="lg:hidden text-xs font-medium text-gray-400 uppercase">
-                              {format(day, "EEE", {
-                                locale:
-                                  i18n.language === "es"
-                                    ? undefined
-                                    : undefined,
-                              })}
-                            </span>
-                          </div>
-
-                          {isTodayDay && (
-                            <span className="text-[10px] font-bold text-primary-600 dark:text-primary-400">
-                              HOY
-                            </span>
-                          )}
-                        </div>
-
-                        {/* Events Stack with Scroll */}
-                        <div className="flex flex-col gap-2 relative z-10 max-h-[120px] overflow-y-auto pr-1 custom-scrollbar">
-                          {dayEvents.map((event) => (
-                            <div
-                              key={event.id}
-                              draggable
-                              onDragStart={(e) =>
-                                handleDragStart(
-                                  e as unknown as React.DragEvent,
-                                  event,
-                                )
-                              }
-                              className={`
-                                                                relative overflow-hidden
-                                                                rounded-lg border border-gray-100 dark:border-gray-700/50
-                                                                bg-white dark:bg-gray-800 shadow-sm hover:shadow-md
-                                                                cursor-grab active:cursor-grabbing transition-all hover:-translate-y-0.5
-                                                                group/card
-                                                            `}
-                            >
-                              {/* Status Indicator Bar */}
-                              <div
-                                className="absolute left-0 top-0 bottom-0 w-1"
-                                style={{ backgroundColor: event.color }}
-                              />
-
-                              <div className="p-2 pl-3 flex items-start gap-2">
-                                {/* Icon */}
-                                <div className="mt-0.5 flex-shrink-0 text-gray-400 dark:text-gray-500">
-                                  <PlatformIcon
-                                    platform={
-                                      ["user_event", "event"].includes(
-                                        String(event.type),
-                                      )
-                                        ? "user_event"
-                                        : event.extendedProps.platform
-                                    }
-                                    className="w-3.5 h-3.5"
-                                  />
-                                </div>
-
-                                {/* Content */}
-                                <div className="min-w-0 flex-1">
-                                  <div className="text-xs font-semibold text-gray-700 dark:text-gray-200 truncate leading-tight">
-                                    {event.title}
-                                  </div>
-                                  <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1">
-                                    <span className="text-[10px] text-gray-400 dark:text-gray-500 flex items-center gap-0.5">
-                                      <Clock className="w-3 h-3" />
-                                      {formatTime(event.start)}
-                                    </span>
-                                    {event.status && (
-                                      <span className="text-[9px] px-1 rounded-sm bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 capitalize">
-                                        {event.status}
-                                      </span>
-                                    )}
-                                  </div>
-                                </div>
-
-                                {/* Delete button - only show for user's own events */}
-                                {["user_event", "event"].includes(
-                                  String(event.type),
-                                ) &&
-                                  // Only show delete button for events created by current user
-                                  // We can determine this by checking if the event ID contains the user's events
-                                  // or by checking user_name if available
-                                  (!event.extendedProps?.is_public ||
-                                    event.extendedProps?.user_name ===
-                                      auth.user.name) && (
-                                    <button
-                                      onClick={(ev) => {
-                                        ev.stopPropagation();
-                                        handleDeleteEvent(event);
-                                      }}
-                                      className="flex-shrink-0 p-1 rounded-md text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all self-start"
-                                      title="Eliminar evento"
-                                    >
-                                      <Trash2 className="w-3.5 h-3.5" />
-                                    </button>
-                                  )}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
+                  
+                  {view === 'week' && (
+                    <WeekView
+                      currentDate={currentDate}
+                      events={filteredEvents}
+                      onEventDrop={async (event, newDate) => {
+                        await updateEvent(event.id, newDate.toISOString(), event.type);
+                      }}
+                      onEventClick={(event) => {
+                        // Handle event click - could open a modal
+                        console.log('Event clicked:', event);
+                      }}
+                      selectedEvents={selectedEvents}
+                      onToggleSelection={toggleEventSelection}
+                      PlatformIcon={PlatformIcon}
+                    />
+                  )}
+                  
+                  {view === 'day' && (
+                    <DayView
+                      currentDate={currentDate}
+                      events={filteredEvents}
+                      onEventDrop={async (event, newDate) => {
+                        await updateEvent(event.id, newDate.toISOString(), event.type);
+                      }}
+                      onEventClick={(event) => {
+                        // Handle event click - could open a modal
+                        console.log('Event clicked:', event);
+                      }}
+                      onDeleteEvent={handleDeleteEvent}
+                      selectedEvents={selectedEvents}
+                      onToggleSelection={toggleEventSelection}
+                      PlatformIcon={PlatformIcon}
+                      auth={auth}
+                    />
+                  )}
+                </>
               )}
             </div>
           </div>
@@ -566,6 +487,43 @@ export default function CalendarIndex({ auth }: { auth: any }) {
           </div>
         </div>
       </DynamicModal>
+
+      {/* Bulk Actions Bar */}
+      <BulkActionsBar
+        selectedCount={selectedEvents.size}
+        totalEvents={filteredEvents.length}
+        selectedEventIds={Array.from(selectedEvents)}
+        onClearSelection={clearSelection}
+        onSelectAll={selectAll}
+        onBulkMove={async (newDate) => {
+          const success = await bulkUpdateEvents(
+            Array.from(selectedEvents),
+            newDate.toISOString()
+          );
+          if (success) {
+            toast.success(`${selectedEvents.size} eventos movidos exitosamente`);
+          } else {
+            toast.error('Error al mover eventos');
+          }
+        }}
+        onBulkDelete={async (eventIds) => {
+          const success = await bulkDeleteEvents(eventIds);
+          if (success) {
+            toast.success(`${eventIds.length} eventos eliminados exitosamente`);
+          } else {
+            toast.error('Error al eliminar eventos');
+          }
+        }}
+        onUndo={async () => {
+          const success = await undoBulkOperation();
+          if (success) {
+            toast.success('Operación deshecha exitosamente');
+          } else {
+            toast.error('Error al deshacer operación');
+          }
+        }}
+        canUndo={canUndo}
+      />
     </AuthenticatedLayout>
   );
 }
