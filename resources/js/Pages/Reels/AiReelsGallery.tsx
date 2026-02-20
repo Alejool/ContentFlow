@@ -60,8 +60,7 @@ export default function AiReelsGallery() {
       setPagination(response.data.data.pagination);
     } catch (error) {
       toast.error('Error al cargar los reels');
-      console.error(error);
-    } finally {
+      } finally {
       setLoading(false);
     }
   };

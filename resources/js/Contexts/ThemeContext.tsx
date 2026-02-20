@@ -63,8 +63,7 @@ export function ThemeProvider({
             return;
           }
         } catch (error) {
-          console.warn('Failed to load workspace theme preference', error);
-        }
+          }
       }
 
       // Fallback to initialTheme if provided
@@ -160,8 +159,7 @@ export function ThemeProvider({
       try {
         await themeStorage.saveThemePreference(workspaceIdStr, newTheme);
       } catch (error) {
-        console.error('Failed to save workspace theme preference', error);
-      }
+        }
     } else {
       // Fallback to localStorage for backward compatibility
       localStorage.setItem("theme", newTheme);
@@ -172,8 +170,7 @@ export function ThemeProvider({
       try {
         await axios.patch(route("api.v1.profile.theme.update"), { theme: newTheme });
       } catch (error) {
-        console.error("Failed to save theme preference to backend:", error);
-      }
+        }
     }
   };
 

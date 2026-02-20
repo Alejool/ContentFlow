@@ -61,15 +61,7 @@ export function OnboardingProvider({ children }: OnboardingProviderProps) {
       const propsStep = onboardingProps.tourCurrentStep;
       const currentTourCompleted = store.tourCompleted;
       const propsTourCompleted = onboardingProps.tourCompleted;
-      
-      console.log('OnboardingContext: Props received:', {
-        propsStep,
-        currentStep,
-        propsTourCompleted,
-        currentTourCompleted,
-        willUpdate: propsStep > currentStep || (propsTourCompleted && !currentTourCompleted),
-      });
-      
+
       // Update if:
       // 1. Backend has a higher step (user progressed on another device)
       // 2. We don't have local state yet (currentStep === 0)

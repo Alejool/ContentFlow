@@ -424,8 +424,7 @@ export default function CalendarIndex({ auth }: { auth: any }) {
                       }}
                       onEventClick={(event) => {
                         // Handle event click - could open a modal
-                        console.log('Event clicked:', event);
-                      }}
+                        }}
                       selectedEvents={selectedEvents}
                       onToggleSelection={toggleEventSelection}
                       PlatformIcon={PlatformIcon}
@@ -441,8 +440,7 @@ export default function CalendarIndex({ auth }: { auth: any }) {
                       }}
                       onEventClick={(event) => {
                         // Handle event click - could open a modal
-                        console.log('Event clicked:', event);
-                      }}
+                        }}
                       onDeleteEvent={handleDeleteEvent}
                       selectedEvents={selectedEvents}
                       onToggleSelection={toggleEventSelection}

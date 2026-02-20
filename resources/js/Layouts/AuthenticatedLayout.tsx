@@ -85,21 +85,7 @@ export default function AuthenticatedLayout({
       const isRecentUser = user?.created_at 
         ? (new Date().getTime() - new Date(user.created_at).getTime()) / (1000 * 60 * 60 * 24) <= 7
         : false;
-      console.log('Onboarding Debug:', {
-        hasUser: !!user,
-        userCreatedAt: user.created_at,
-        isRecentUser,
-        hasOnboardingState: !!onboardingState,
-        onboardingState,
-        hasTourSteps: !!tourSteps,
-        tourStepsLength: tourSteps?.length,
-        hasAvailablePlatforms: !!availablePlatforms,
-        platformsLength: availablePlatforms?.length,
-        hasTemplates: !!templates,
-        templatesLength: templates?.length,
-        shouldShowOnboarding,
-      });
-    }
+      }
   }, [user, onboardingState, tourSteps, availablePlatforms, templates, shouldShowOnboarding]);
 
   useEffect(() => {

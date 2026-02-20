@@ -38,7 +38,6 @@ export const SOCIAL_PLATFORMS: Record<string, SocialPlatformConfig> =
 
 export const getPlatformConfig = (platform: string): SocialPlatformConfig => {
   if (!platform) {
-    console.warn('getPlatformConfig called with empty platform');
     return {
       id: 0,
       key: "social",
@@ -67,8 +66,6 @@ export const getPlatformConfig = (platform: string): SocialPlatformConfig => {
 
   if (config) return config;
 
-  console.warn(`Platform config not found for: ${platform}, using fallback`);
-  
   return {
     id: 0,
     key: "social",

@@ -92,8 +92,7 @@ export default function Dashboard({
         .then((res) => setPubStats(res.data || {}))
         .catch((error) => {
           if (error.response?.status !== 401) {
-            console.error("Failed to fetch publication stats", error);
-          }
+            }
         })
         .finally(() => setLoadingPubStats(false));
     }
@@ -110,8 +109,7 @@ export default function Dashboard({
         .then((res) => setPubStats(res.data || {}))
         .catch((error) => {
           if (error.response?.status !== 401) {
-            console.error("Failed to refresh publication stats", error);
-          }
+            }
         });
     };
 

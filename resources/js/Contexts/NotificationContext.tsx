@@ -74,8 +74,7 @@ export const NotificationProvider = ({
       setUnreadCount(response.data.unread_count);
       setLoading(false);
     } catch (error) {
-      console.error("Failed to fetch notifications", error);
-    }
+      }
   }, []);
 
   const markAsRead = async (id: string) => {
@@ -88,8 +87,7 @@ export const NotificationProvider = ({
       );
       setUnreadCount((prev) => Math.max(0, prev - 1));
     } catch (error) {
-      console.error("Failed to mark notification as read", error);
-    }
+      }
   };
 
   const markAllAsRead = async () => {
@@ -100,8 +98,7 @@ export const NotificationProvider = ({
       );
       setUnreadCount(0);
     } catch (error) {
-      console.error("Failed to mark all notifications as read", error);
-    }
+      }
   };
 
   const deleteNotification = async (id: string) => {
@@ -113,8 +110,7 @@ export const NotificationProvider = ({
         setUnreadCount((prev) => Math.max(0, prev - 1));
       }
     } catch (error) {
-      console.error("Failed to delete notification", error);
-    }
+      }
   };
 
   const deleteAllRead = async () => {
@@ -122,8 +118,7 @@ export const NotificationProvider = ({
       await axios.delete("/api/v1/notifications/read");
       setNotifications((prev) => prev.filter((n) => !n.read_at));
     } catch (error) {
-      console.error("Failed to delete read notifications", error);
-    }
+      }
   };
 
   const filterByPlatform = (platform: string | null): NotificationData[] => {

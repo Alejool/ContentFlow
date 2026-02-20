@@ -49,7 +49,6 @@ export function useReelGeneration() {
     const signature = getRequestSignature(params);
     
     if (lastRequestSignature.value === signature) {
-      console.warn('🚫 Duplicate request detected', params);
       return true;
     }
     
@@ -73,11 +72,7 @@ export function useReelGeneration() {
       // Store request signature
       lastRequestSignature.value = getRequestSignature(params);
 
-      console.log('🎬 Starting reel generation', params);
-
       const response = await axios.post('/api/reels/generate', params);
-
-      console.log('✅ Reel generation started', response.data);
 
       // Simulate progress (actual progress would come from websockets/polling)
       simulateProgress();
@@ -85,8 +80,6 @@ export function useReelGeneration() {
       return response.data;
 
     } catch (err) {
-      console.error('❌ Reel generation failed', err);
-      
       error.value = err.response?.data?.error || err.message || 'Error al generar reels';
       
       // Handle rate limiting
@@ -129,7 +122,6 @@ export function useReelGeneration() {
     } catch (err) {
       // Handle debounce/throttle errors gracefully
       if (err.message.includes('debounced') || err.message.includes('wait')) {
-        console.warn('⏳ Request blocked by rate limiting');
         error.value = 'Por favor espera antes de enviar otra solicitud.';
       }
       throw err;
