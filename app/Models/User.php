@@ -228,4 +228,12 @@ class User extends Model implements Authenticatable, MustVerifyEmail, CanResetPa
       'known_devices' => $knownDevices,
     ])->save();
   }
+
+  /**
+   * Get the user's onboarding state.
+   */
+  public function onboardingState()
+  {
+    return $this->hasOne(\App\Models\OnboardingState::class);
+  }
 }
