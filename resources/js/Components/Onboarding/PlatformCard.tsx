@@ -38,6 +38,20 @@ export default function PlatformCard({
   const popupRef = useRef<Window | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const checkIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const isConnectingRef = useRef(false);
+
+  // Keep ref in sync with state
+  useEffect(() => {
+    isConnectingRef.current = isConnecting;
+  }, [isConnecting]);
+
+  // Clear error and connecting state when connection is successful
+  useEffect(() => {
+    if (isConnected) {
+      setIsConnecting(false);
+      setError(null);
+    }
+  }, [isConnected]);
 
   // Cleanup function for OAuth flow
   const cleanupOAuthFlow = () => {
@@ -82,6 +96,9 @@ export default function PlatformCard({
           
           const errorMessage = event.data.message || "Failed to connect account";
           const errorType = event.data.errorType;
+
+          // Reload accounts even on error (account might have been partially created)
+          router.reload({ only: ["connectedAccounts"] });
 
           switch (errorType) {
             case "denied":
@@ -154,7 +171,7 @@ export default function PlatformCard({
 
         // Set timeout for OAuth flow
         timeoutRef.current = setTimeout(() => {
-          if (isConnecting) {
+          if (isConnectingRef.current) {
             cleanupOAuthFlow();
             setIsConnecting(false);
             setError("Authentication timed out. Please try again.");
@@ -167,12 +184,10 @@ export default function PlatformCard({
             cleanupOAuthFlow();
             
             // If still connecting after popup closed, assume it was cancelled
-            setTimeout(() => {
-              if (isConnecting) {
-                setIsConnecting(false);
-                setError("Authentication was cancelled. Click Connect to try again.");
-              }
-            }, 500);
+            if (isConnectingRef.current) {
+              setIsConnecting(false);
+              setError("Authentication was cancelled. Click Connect to try again.");
+            }
           }
         }, POPUP_CHECK_INTERVAL);
       } else {
@@ -208,7 +223,7 @@ export default function PlatformCard({
       className={`relative p-6 border-2 rounded-xl transition-all ${
         isConnected
           ? "border-green-500 bg-green-50 dark:bg-green-900/10"
-          : "border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 hover:border-primary-500 hover:shadow-md"
+          : "border-gray-200 dark:border-neutral-900 bg-white dark:bg-gradient-to-b dark:from-neutral-800 dark:to-neutral-900 dark:border-neutral-700 hover:border-primary-500 hover:shadow-md"
       }`}
     >
       {/* Platform Icon */}
@@ -259,7 +274,7 @@ export default function PlatformCard({
         <div className="space-y-2">
           <div className="flex items-center gap-2 text-green-600 dark:text-green-400">
             <Check className="w-5 h-5" />
-            <span className="font-medium">{t('onboarding.platform.connected')}</span>
+            <span className="font-medium">{t('platform.connected')}</span>
           </div>
           {connectedAccount && (
             <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -273,15 +288,15 @@ export default function PlatformCard({
             onClick={handleConnect}
             disabled={isConnecting}
             className="w-full px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 min-h-[44px]"
-            aria-label={t('onboarding.platform.connectTo', { platform: platform.name })}
+            aria-label={t('platform.connectTo', { platform: platform.name })}
           >
             {isConnecting ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                {t('onboarding.platform.connecting')}
+                {t('platform.connecting')}
               </>
             ) : (
-              t('onboarding.platform.connect')
+              t('platform.connect')
             )}
           </button>
 
@@ -296,7 +311,7 @@ export default function PlatformCard({
                 className="w-full px-3 py-1.5 text-sm text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 border border-red-300 dark:border-red-700 rounded-lg transition-colors"
                 aria-label={`Retry connecting ${platform.name}`}
               >
-                {t('onboarding.errors.retry')}
+                {t('errors.retry')}
               </button>
             </div>
           )}

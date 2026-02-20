@@ -106,17 +106,17 @@ export default function TemplateGallery({
         <div className="bg-white dark:bg-neutral-800 border-b border-gray-200 dark:border-neutral-700 px-4 md:px-6 py-3 md:py-4 flex items-start md:items-center justify-between gap-2 md:gap-4">
           <div className="flex-1 min-w-0">
             <h2 id="template-gallery-title" className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white truncate">
-              {t('onboarding.templates.title')}
+              {t('templates.title')}
             </h2>
             <p id="template-gallery-description" className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">
-              {t('onboarding.templates.description')}
+              {t('templates.description')}
             </p>
           </div>
           <button
             onClick={handleSkip}
             disabled={isSkipping}
             className="flex-shrink-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-2 min-w-[44px] min-h-[44px] flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 rounded-md"
-            aria-label={t('onboarding.templates.close')}
+            aria-label={t('templates.close')}
           >
             <X className="w-5 h-5 md:w-6 md:h-6" />
           </button>
@@ -127,21 +127,21 @@ export default function TemplateGallery({
           <div className="flex flex-col sm:flex-row gap-4">
             {/* Search Input */}
             <div className="flex-1 relative">
-              <label htmlFor="template-search" className="sr-only">{t('onboarding.templates.search')}</label>
+              <label htmlFor="template-search" className="sr-only">{t('templates.search')}</label>
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" aria-hidden="true" />
               <input
                 id="template-search"
                 type="text"
-                placeholder={t('onboarding.templates.searchPlaceholder')}
+                placeholder={t('templates.searchPlaceholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 bg-white dark:bg-neutral-800 border border-gray-300 dark:border-neutral-600 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                aria-label={t('onboarding.templates.searchByName')}
+                aria-label={t('templates.searchByName')}
               />
             </div>
 
             {/* Category Filter - Horizontal scroll on mobile */}
-            <div className="flex gap-2 overflow-x-auto pb-2 sm:pb-0 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-neutral-600" role="group" aria-label={t('onboarding.templates.filterByCategory')}>
+            <div className="flex gap-2 overflow-x-auto pb-2 sm:pb-0 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-neutral-600" role="group" aria-label={t('templates.filterByCategory')}>
               {categories.map((category) => (
                 <button
                   key={category}
@@ -152,7 +152,7 @@ export default function TemplateGallery({
                       : "bg-white dark:bg-neutral-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-700 border border-gray-300 dark:border-neutral-600"
                   }`}
                   aria-pressed={selectedCategory === category}
-                  aria-label={t('onboarding.templates.filterBy', { category })}
+                  aria-label={t('templates.filterBy', { category })}
                 >
                   {t(`onboarding.templates.categories.${category}`, category.charAt(0).toUpperCase() + category.slice(1))}
                 </button>
@@ -164,7 +164,7 @@ export default function TemplateGallery({
         {/* Template Grid - Responsive columns (Requirement 7.1, 7.2) */}
         <div className="flex-1 overflow-y-auto px-4 md:px-6 py-4 md:py-6">
           {filteredTemplates.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6" role="list" aria-label={t('onboarding.templates.list')}>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6" role="list" aria-label={t('templates.list')}>
               {filteredTemplates.map((template) => (
                 <TemplateCard
                   key={template.id}
@@ -181,20 +181,20 @@ export default function TemplateGallery({
         {/* Footer - Responsive layout (Requirement 7.1) */}
         <div className="bg-gray-50 dark:bg-neutral-900 border-t border-gray-200 dark:border-neutral-700 px-4 md:px-6 py-3 md:py-4 flex flex-col md:flex-row items-center justify-between gap-2 md:gap-0">
           <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 text-center md:text-left" role="status" aria-live="polite" aria-atomic="true">
-            {t('onboarding.templates.available', { 
+            {t('templates.available', { 
               count: filteredTemplates.length,
               templateText: filteredTemplates.length === 1 
-                ? t('onboarding.templates.template') 
-                : t('onboarding.templates.templates')
+                ? t('templates.template') 
+                : t('templates.templates')
             })}
           </p>
           <button
             onClick={handleSkip}
             disabled={isSkipping}
             className="w-full md:w-auto px-6 py-2 min-h-[44px] text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 rounded-lg"
-            aria-label={t('onboarding.templates.skipAndCreate')}
+            aria-label={t('templates.skipAndCreate')}
           >
-            {isSkipping ? t('onboarding.templates.skipping') : t('onboarding.templates.skip')}
+            {isSkipping ? t('templates.skipping') : t('templates.skip')}
           </button>
         </div>
       </div>

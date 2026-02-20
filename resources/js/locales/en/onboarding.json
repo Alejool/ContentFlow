@@ -111,7 +111,13 @@
     "connecting": "Connecting...",
     "connected": "Connected",
     "connectTo": "Connect to {{platform}}",
-    "connectedAs": "Connected as {{account}}"
+    "connectedAs": "Connected as {{account}}",
+    "facebook": "Connect your Facebook pages and groups",
+    "twitter": "Share updates with your Twitter followers",
+    "instagram": "Post photos and stories to Instagram",
+    "tiktok": "Share short videos on TikTok",
+    "youtube": "Upload videos to your YouTube channel",
+    "linkedin": "Share professional content on LinkedIn"
   },
   "errors": {
     "loadFailed": "Failed to load onboarding",

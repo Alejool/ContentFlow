@@ -55,7 +55,31 @@ export function OnboardingProvider({ children }: OnboardingProviderProps) {
   // Initialize state from Inertia props on mount
   useEffect(() => {
     if (onboardingProps) {
-      store.setState(onboardingProps);
+      // Only update state if it's more recent than our local state
+      // This prevents overwriting local progress during navigation
+      const currentStep = store.tourCurrentStep;
+      const propsStep = onboardingProps.tourCurrentStep;
+      const currentTourCompleted = store.tourCompleted;
+      const propsTourCompleted = onboardingProps.tourCompleted;
+      
+      console.log('OnboardingContext: Props received:', {
+        propsStep,
+        currentStep,
+        propsTourCompleted,
+        currentTourCompleted,
+        willUpdate: propsStep > currentStep || (propsTourCompleted && !currentTourCompleted),
+      });
+      
+      // Update if:
+      // 1. Backend has a higher step (user progressed on another device)
+      // 2. We don't have local state yet (currentStep === 0)
+      // 3. Tour was completed on backend but not locally
+      if (currentStep === 0 || propsStep > currentStep || (propsTourCompleted && !currentTourCompleted)) {
+        console.log('OnboardingContext: Updating state from props');
+        store.setState(onboardingProps);
+      } else {
+        console.log('OnboardingContext: Keeping local state (more recent)');
+      }
     }
   }, [onboardingProps]);
 

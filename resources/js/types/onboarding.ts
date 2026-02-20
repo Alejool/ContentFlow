@@ -35,6 +35,7 @@ export interface TourStep {
   targetSelector: string;
   position: 'top' | 'bottom' | 'left' | 'right';
   highlightPadding: number;
+  route?: string; // Optional route to navigate to if element not found
 }
 
 /**

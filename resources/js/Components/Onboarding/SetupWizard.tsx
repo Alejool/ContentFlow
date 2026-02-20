@@ -1,13 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useOnboarding } from "@/Contexts/OnboardingContext";
 import type { SocialPlatform } from "@/types/onboarding";
+import { SOCIAL_PLATFORMS } from "@/Constants/socialPlatforms";
 import PlatformCard from "./PlatformCard";
 import { ArrowRight, ArrowLeft, X } from "lucide-react";
-import { useEffect } from "react";
 
 interface SetupWizardProps {
-  availablePlatforms: SocialPlatform[];
+  availablePlatforms?: SocialPlatform[];
   connectedAccounts?: Array<{ platform: string; account_name: string }>;
   onComplete?: () => void;
 }
@@ -23,7 +23,7 @@ type WizardStep = "welcome" | "platforms" | "success";
  * 3. Success confirmation with connected accounts
  */
 export default function SetupWizard({
-  availablePlatforms,
+  availablePlatforms: propsPlatforms,
   connectedAccounts = [],
   onComplete,
 }: SetupWizardProps) {
@@ -32,13 +32,40 @@ export default function SetupWizard({
   const [currentStep, setCurrentStep] = useState<WizardStep>("welcome");
   const [isSkipping, setIsSkipping] = useState(false);
 
+  // Log when connected accounts change
+  useEffect(() => {
+    console.log('SetupWizard - Connected accounts updated:', connectedAccounts);
+  }, [connectedAccounts]);
+
+  // ALWAYS use SOCIAL_PLATFORMS constant, ignore props
+  const availablePlatforms = useMemo(() => {
+    // Convert SOCIAL_PLATFORMS to SocialPlatform format
+    const platforms = Object.values(SOCIAL_PLATFORMS)
+      .filter((platform) => platform.active)
+      .map((platform) => ({
+        id: platform.key,
+        name: platform.name,
+        icon: platform.logo,
+        color: platform.color,
+        description: t(`platform.${platform.key}`, {
+          defaultValue: `Connect your ${platform.name} account`,
+        }),
+      }));
+    
+    console.log('SetupWizard - Available platforms:', platforms);
+    return platforms;
+  }, [t]);
+
   const handleNext = () => {
     if (currentStep === "welcome") {
       setCurrentStep("platforms");
     } else if (currentStep === "platforms") {
-      // Check if at least one account is connected
+      // Allow continuing even without connected accounts
       if (connectedAccounts.length > 0) {
         setCurrentStep("success");
+      } else {
+        // Skip success screen and complete directly
+        handleComplete();
       }
     }
   };
@@ -64,9 +91,13 @@ export default function SetupWizard({
   };
 
   const handleComplete = async () => {
+    console.log('SetupWizard: handleComplete called');
     try {
-      await completeWizardStep("complete");
-      onComplete?.();
+      // Send the final step number (3) to properly mark wizard as completed
+      await completeWizardStep("step-3");
+      console.log('SetupWizard: completeWizardStep finished');
+      // Don't call onComplete - let the state change trigger the transition
+      // onComplete?.();
     } catch (error) {
       console.error("Failed to complete wizard:", error);
     }
@@ -110,31 +141,31 @@ export default function SetupWizard({
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-2 md:p-4" role="dialog" aria-modal="true" aria-labelledby="wizard-title" aria-describedby="wizard-description">
       <div className="bg-white dark:bg-neutral-800 rounded-xl shadow-2xl w-full max-w-4xl max-h-[95vh] md:max-h-[90vh] overflow-y-auto">
         {/* Header - Responsive layout (Requirement 7.1, 7.2) */}
-        <div className="sticky top-0 bg-white dark:bg-neutral-800 border-b border-gray-200 dark:border-neutral-700 px-4 md:px-6 py-3 md:py-4 flex items-start md:items-center justify-between gap-2 md:gap-4">
+        <div className="sticky top-0 z-10 bg-white dark:bg-neutral-800 border-b border-gray-200 dark:border-neutral-700 px-4 md:px-6 py-3 md:py-4 flex items-start md:items-center justify-between gap-2 md:gap-4">
           <div className="flex-1 min-w-0">
             <h2 id="wizard-title" className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white truncate">
-              {currentStep === "welcome" && t('onboarding.wizard.title.welcome')}
-              {currentStep === "platforms" && t('onboarding.wizard.title.platforms')}
-              {currentStep === "success" && t('onboarding.wizard.title.success')}
+              {currentStep === "welcome" && t('wizard.title.welcome')}
+              {currentStep === "platforms" && t('wizard.title.platforms')}
+              {currentStep === "success" && t('wizard.title.success')}
             </h2>
             <p id="wizard-description" className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">
-              {currentStep === "welcome" && t('onboarding.wizard.description.welcome')}
-              {currentStep === "platforms" && t('onboarding.wizard.description.platforms')}
-              {currentStep === "success" && t('onboarding.wizard.description.success')}
+              {currentStep === "welcome" && t('wizard.description.welcome')}
+              {currentStep === "platforms" && t('wizard.description.platforms')}
+              {currentStep === "success" && t('wizard.description.success')}
             </p>
           </div>
           <button
             onClick={handleSkip}
             disabled={isSkipping || state.isLoading}
             className="flex-shrink-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-2 min-w-[44px] min-h-[44px] flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 rounded-md"
-            aria-label={t('onboarding.wizard.close')}
+            aria-label={t('wizard.close')}
           >
             <X className="w-5 h-5 md:w-6 md:h-6" />
           </button>
         </div>
 
         {/* Content - Responsive padding (Requirement 7.1) */}
-        <div className="px-4 md:px-6 py-6 md:py-8">
+        <div className="px-4 md:px-6 py-6 dark:bg-neutral-900">
           {currentStep === "welcome" && (
             <WelcomeScreen onNext={handleNext} onSkip={handleSkip} />
           )}
@@ -155,26 +186,26 @@ export default function SetupWizard({
         </div>
 
         {/* Footer Navigation - Responsive layout (Requirement 7.1) */}
-        <div className="sticky bottom-0 bg-gray-50 dark:bg-neutral-900 border-t border-gray-200 dark:border-neutral-700 px-4 md:px-6 py-3 md:py-4 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+        <div className="sticky bottom-0 z-10 bg-gray-50 dark:bg-neutral-900 border-t border-gray-200 dark:border-neutral-700 px-4 md:px-6 py-3 md:py-4 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
           <button
             onClick={handleBack}
             disabled={currentStep === "welcome" || state.isLoading}
             className="flex items-center justify-center gap-2 px-4 py-2 min-h-[44px] text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors order-2 md:order-1 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 rounded-lg"
-            aria-label={t('onboarding.wizard.previousStep')}
+            aria-label={t('wizard.previousStep')}
           >
             <ArrowLeft className="w-4 h-4" />
-            <span className="md:inline">{t('onboarding.wizard.back')}</span>
+            <span className="md:inline">{t('wizard.back')}</span>
           </button>
 
-          <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 md:gap-3 order-1 md:order-2" role="group" aria-label={t('onboarding.wizard.navigation')}>
+          <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 md:gap-3 order-1 md:order-2" role="group" aria-label={t('wizard.navigation')}>
             {currentStep !== "success" && (
               <button
                 onClick={handleSkip}
                 disabled={isSkipping || state.isLoading}
                 className="px-4 py-2 min-h-[44px] text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-center focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 rounded-lg"
-                aria-label={t('onboarding.wizard.skipSetup')}
+                aria-label={t('wizard.skipSetup')}
               >
-                {isSkipping ? t('onboarding.wizard.skipping') : t('onboarding.wizard.skip')}
+                {isSkipping ? t('wizard.skipping') : t('wizard.skip')}
               </button>
             )}
 
@@ -183,9 +214,9 @@ export default function SetupWizard({
                 onClick={handleNext}
                 disabled={state.isLoading}
                 className="flex items-center justify-center gap-2 px-6 py-2 min-h-[44px] bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
-                aria-label={t('onboarding.wizard.getStartedSetup')}
+                aria-label={t('wizard.getStartedSetup')}
               >
-                {t('onboarding.wizard.getStarted')}
+                {t('wizard.getStarted')}
                 <ArrowRight className="w-4 h-4" />
               </button>
             )}
@@ -193,12 +224,11 @@ export default function SetupWizard({
             {currentStep === "platforms" && (
               <button
                 onClick={handleNext}
-                disabled={connectedAccounts.length === 0 || state.isLoading}
+                disabled={state.isLoading}
                 className="flex items-center justify-center gap-2 px-6 py-2 min-h-[44px] bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
-                aria-label={t('onboarding.wizard.nextStep')}
-                aria-disabled={connectedAccounts.length === 0}
+                aria-label={t('wizard.nextStep')}
               >
-                {t('onboarding.wizard.continue')}
+                {connectedAccounts.length > 0 ? t('wizard.continue') : t('wizard.continueWithout', 'Continue Without Connecting')}
                 <ArrowRight className="w-4 h-4" />
               </button>
             )}
@@ -208,9 +238,9 @@ export default function SetupWizard({
                 onClick={handleComplete}
                 disabled={state.isLoading}
                 className="flex items-center justify-center gap-2 px-6 py-2 min-h-[44px] bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
-                aria-label={t('onboarding.wizard.finishSetup')}
+                aria-label={t('wizard.finishSetup')}
               >
-                {t('onboarding.wizard.finish')}
+                {t('wizard.finish')}
                 <ArrowRight className="w-4 h-4" />
               </button>
             )}
@@ -254,10 +284,10 @@ function WelcomeScreen({
 
       <div>
         <h3 className="text-lg md:text-xl font-semibold text-gray-900 dark:text-white mb-2 md:mb-3">
-          {t('onboarding.wizard.welcome.heading')}
+          {t('wizard.welcome.heading')}
         </h3>
         <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 leading-relaxed">
-          {t('onboarding.wizard.welcome.description')}
+          {t('wizard.welcome.description')}
         </p>
       </div>
 
@@ -279,10 +309,10 @@ function WelcomeScreen({
             </svg>
           </div>
           <h4 className="font-medium text-gray-900 dark:text-white mb-1">
-            {t('onboarding.wizard.welcome.features.schedule.title')}
+            {t('wizard.welcome.features.schedule.title')}
           </h4>
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            {t('onboarding.wizard.welcome.features.schedule.description')}
+            {t('wizard.welcome.features.schedule.description')}
           </p>
         </div>
 
@@ -303,10 +333,10 @@ function WelcomeScreen({
             </svg>
           </div>
           <h4 className="font-medium text-gray-900 dark:text-white mb-1">
-            {t('onboarding.wizard.welcome.features.analytics.title')}
+            {t('wizard.welcome.features.analytics.title')}
           </h4>
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            {t('onboarding.wizard.welcome.features.analytics.description')}
+            {t('wizard.welcome.features.analytics.description')}
           </p>
         </div>
 
@@ -327,10 +357,10 @@ function WelcomeScreen({
             </svg>
           </div>
           <h4 className="font-medium text-gray-900 dark:text-white mb-1">
-            {t('onboarding.wizard.welcome.features.collaborate.title')}
+            {t('wizard.welcome.features.collaborate.title')}
           </h4>
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            {t('onboarding.wizard.welcome.features.collaborate.description')}
+            {t('wizard.welcome.features.collaborate.description')}
           </p>
         </div>
       </div>
@@ -354,34 +384,42 @@ function PlatformsScreen({
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <p className="text-gray-600 dark:text-gray-400">
-          {t('onboarding.wizard.platforms.description')}
+        <p className="text-gray-600 dark:text-gray-200">
+          {t('wizard.platforms.description')}
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" role="list" aria-label={t('onboarding.wizard.platforms.availablePlatforms')}>
-        {availablePlatforms.map((platform) => {
-          const isConnected = connectedAccounts.some(
-            (acc) => acc.platform.toLowerCase() === platform.id.toLowerCase()
-          );
-          return (
-            <PlatformCard
-              key={platform.id}
-              platform={platform}
-              isConnected={isConnected}
-              connectedAccount={connectedAccounts.find(
-                (acc) =>
-                  acc.platform.toLowerCase() === platform.id.toLowerCase()
-              )}
-            />
-          );
-        })}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" role="list" aria-label={t('wizard.platforms.availablePlatforms')}>
+        {availablePlatforms.length === 0 ? (
+          <div className="col-span-full text-center py-8">
+            <p className="text-gray-500 dark:text-gray-400">
+              No platforms available. Please check your configuration.
+            </p>
+          </div>
+        ) : (
+          availablePlatforms.map((platform) => {
+            const isConnected = connectedAccounts.some(
+              (acc) => acc.platform.toLowerCase() === platform.id.toLowerCase()
+            );
+            return (
+              <PlatformCard
+                key={platform.id}
+                platform={platform}
+                isConnected={isConnected}
+                connectedAccount={connectedAccounts.find(
+                  (acc) =>
+                    acc.platform.toLowerCase() === platform.id.toLowerCase()
+                )}
+              />
+            );
+          })
+        )}
       </div>
 
       {connectedAccounts.length === 0 && (
         <div className="text-center py-8" role="status" aria-live="polite">
           <p className="text-gray-500 dark:text-gray-400">
-            {t('onboarding.wizard.platforms.noAccounts')}
+            {t('wizard.platforms.noAccounts')}
           </p>
         </div>
       )}
@@ -402,8 +440,8 @@ function SuccessScreen({
 }) {
   const { t } = useTranslation();
   const accountText = connectedAccounts.length === 1 
-    ? t('onboarding.wizard.success.account') 
-    : t('onboarding.wizard.success.accounts');
+    ? t('wizard.success.account') 
+    : t('wizard.success.accounts');
   
   return (
     <div className="text-center max-w-2xl mx-auto space-y-4 md:space-y-6">
@@ -425,10 +463,10 @@ function SuccessScreen({
 
       <div>
         <h3 className="text-lg md:text-xl font-semibold text-gray-900 dark:text-white mb-2 md:mb-3">
-          {t('onboarding.wizard.success.heading')}
+          {t('wizard.success.heading')}
         </h3>
         <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 leading-relaxed">
-          {t('onboarding.wizard.success.description', { 
+          {t('wizard.success.description', { 
             count: connectedAccounts.length, 
             accountText 
           })}
@@ -437,13 +475,13 @@ function SuccessScreen({
 
       <div className="bg-gray-50 dark:bg-neutral-900 rounded-lg p-6">
         <h4 className="font-medium text-gray-900 dark:text-white mb-4">
-          {t('onboarding.wizard.success.connectedAccounts')}
+          {t('wizard.success.connectedAccounts')}
         </h4>
         <div className="space-y-3">
           {connectedAccounts.map((account, index) => (
             <div
               key={index}
-              className="flex items-center gap-3 p-3 bg-white dark:bg-neutral-800 rounded-lg"
+              className="flex items-center gap-3 p-3 bg-white dark:bg-neutral-900 rounded-lg"
             >
               <div className="w-10 h-10 bg-primary-100 dark:bg-primary-900/20 rounded-full flex items-center justify-center">
                 <span className="text-primary-600 font-medium text-sm uppercase">
@@ -478,7 +516,7 @@ function SuccessScreen({
 
       <div className="pt-4">
         <p className="text-sm text-gray-500 dark:text-gray-400">
-          {t('onboarding.wizard.success.nextStep')}
+          {t('wizard.success.nextStep')}
         </p>
       </div>
     </div>

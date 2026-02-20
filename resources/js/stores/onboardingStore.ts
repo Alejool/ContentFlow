@@ -31,7 +31,17 @@ function loadCachedState(): Partial<OnboardingState> | null {
     
     // Return cached state if it's still fresh
     if (age < CACHE_DURATION) {
-      return JSON.parse(cached);
+      const state = JSON.parse(cached);
+      
+      // Validate tour step - tour has 6 steps (0-5), anything beyond is corrupted
+      const MAX_TOUR_STEPS = 6;
+      if (state.tourCurrentStep && (state.tourCurrentStep >= MAX_TOUR_STEPS || state.tourCurrentStep < 0)) {
+        console.error('Cached tour step is invalid:', state.tourCurrentStep, 'Valid range: 0-5. Clearing cache...');
+        clearCachedState();
+        return null;
+      }
+      
+      return state;
     }
     
     // Clear stale cache
@@ -115,21 +125,43 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
   // Try to load cached state on initialization
   const cachedState = loadCachedState();
   
+  // Validate and sanitize cached state
+  const MAX_TOUR_STEPS = 6;
+  let sanitizedCachedState = cachedState;
+  
+  if (cachedState && cachedState.tourCurrentStep !== undefined) {
+    // If tour step is invalid, reset it
+    if (cachedState.tourCurrentStep >= MAX_TOUR_STEPS || cachedState.tourCurrentStep < 0) {
+      console.error('Detected corrupted tour step on initialization:', cachedState.tourCurrentStep, 'Resetting to 0');
+      sanitizedCachedState = {
+        ...cachedState,
+        tourCurrentStep: 0,
+        tourCompleted: false,
+        tourSkipped: false,
+        tourCompletedSteps: [],
+      };
+      // Clear the corrupted cache
+      clearCachedState();
+      // Save the sanitized state
+      saveCachedState(sanitizedCachedState);
+    }
+  }
+  
   return {
   // Initial state - use cached state if available
-  tourCompleted: cachedState?.tourCompleted ?? false,
-  tourSkipped: cachedState?.tourSkipped ?? false,
-  tourCurrentStep: cachedState?.tourCurrentStep ?? 0,
-  tourCompletedSteps: cachedState?.tourCompletedSteps ?? [],
-  wizardCompleted: cachedState?.wizardCompleted ?? false,
-  wizardSkipped: cachedState?.wizardSkipped ?? false,
-  wizardCurrentStep: cachedState?.wizardCurrentStep ?? 0,
-  templateSelected: cachedState?.templateSelected ?? false,
-  templateId: cachedState?.templateId ?? null,
-  dismissedTooltips: cachedState?.dismissedTooltips ?? [],
-  completedAt: cachedState?.completedAt ?? null,
-  startedAt: cachedState?.startedAt ?? new Date().toISOString(),
-  completionPercentage: cachedState?.completionPercentage ?? 0,
+  tourCompleted: sanitizedCachedState?.tourCompleted ?? false,
+  tourSkipped: sanitizedCachedState?.tourSkipped ?? false,
+  tourCurrentStep: sanitizedCachedState?.tourCurrentStep ?? 0,
+  tourCompletedSteps: sanitizedCachedState?.tourCompletedSteps ?? [],
+  wizardCompleted: sanitizedCachedState?.wizardCompleted ?? false,
+  wizardSkipped: sanitizedCachedState?.wizardSkipped ?? false,
+  wizardCurrentStep: sanitizedCachedState?.wizardCurrentStep ?? 0,
+  templateSelected: sanitizedCachedState?.templateSelected ?? false,
+  templateId: sanitizedCachedState?.templateId ?? null,
+  dismissedTooltips: sanitizedCachedState?.dismissedTooltips ?? [],
+  completedAt: sanitizedCachedState?.completedAt ?? null,
+  startedAt: sanitizedCachedState?.startedAt ?? new Date().toISOString(),
+  completionPercentage: sanitizedCachedState?.completionPercentage ?? 0,
   isLoading: false,
   error: null,
   isOffline: false,
@@ -167,9 +199,86 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
   },
 
   nextTourStep: () => {
-    set((state) => ({
-      tourCurrentStep: state.tourCurrentStep + 1,
-    }));
+    const currentStep = get().tourCurrentStep;
+    const newStep = currentStep + 1;
+    
+    console.log('nextTourStep: Moving from step', currentStep, 'to', newStep);
+    
+    // Validate step number - should not exceed reasonable bounds
+    // Tour has 6 steps (indices 0-5), so max valid step is 5
+    const MAX_TOUR_STEPS = 6;
+    
+    // Allow moving to the last step, but not beyond it
+    if (currentStep >= MAX_TOUR_STEPS) {
+      console.warn(`Already past last tour step. Current step: ${currentStep}, Max steps: ${MAX_TOUR_STEPS}. Should call completeTour instead.`);
+      // Don't increment beyond the max
+      return;
+    }
+    
+    if (currentStep > 20 || newStep > 20) {
+      console.error('Tour step is corrupted! Resetting via backend. Current:', currentStep, 'New:', newStep);
+      
+      // Clear local cache first
+      clearCachedState();
+      
+      // Call backend to restart onboarding
+      import('axios').then(({ default: axios }) => {
+        axios.post('/api/v1/onboarding/restart')
+          .then((response) => {
+            console.log('Onboarding restarted successfully:', response.data);
+            // Update local state with clean state from backend
+            if (response.data.state) {
+              set({
+                tourCurrentStep: response.data.state.tourCurrentStep || 0,
+                tourCompleted: response.data.state.tourCompleted || false,
+                tourSkipped: response.data.state.tourSkipped || false,
+                tourCompletedSteps: response.data.state.tourCompletedSteps || [],
+                wizardCurrentStep: response.data.state.wizardCurrentStep || 0,
+                wizardCompleted: response.data.state.wizardCompleted || false,
+                wizardSkipped: response.data.state.wizardSkipped || false,
+              });
+              get()._updateCache();
+            }
+            // Reload page to ensure clean state
+            console.log('Reloading page to apply clean state...');
+            setTimeout(() => {
+              window.location.reload();
+            }, 500);
+          })
+          .catch((error) => {
+            console.error('Failed to restart onboarding:', error);
+            // Fallback: just reload the page
+            window.location.reload();
+          });
+      });
+      
+      return;
+    }
+    
+    // If we're at the last step (step 5), allow moving to it but log that it's the final step
+    if (newStep === MAX_TOUR_STEPS - 1) {
+      console.log(`Moving to final tour step: ${newStep}`);
+    }
+    
+    set({
+      tourCurrentStep: newStep,
+    });
+    
+    // Update cache immediately to persist across navigation
+    get()._updateCache();
+    
+    // Optionally sync with backend asynchronously (non-blocking)
+    // This ensures the step is saved even if navigation happens
+    if (!get().isOffline) {
+      // Use axios which is already configured with CSRF token
+      import('axios').then(({ default: axios }) => {
+        axios.post('/api/v1/onboarding/tour/step', { step: newStep })
+          .catch((error) => {
+            console.warn('Failed to sync tour step with backend:', error);
+            // Don't block or rollback - local state is source of truth during tour
+          });
+      });
+    }
   },
 
   skipTour: async () => {
@@ -210,13 +319,23 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
   },
 
   completeTourStep: async (stepId: string) => {
+    // Parse step number to check if this is the last step
+    const stepNumber = parseInt(stepId.match(/\d+/)?.[0] || '0');
+    const MAX_TOUR_STEPS = 6;
+    const isLastStep = stepNumber >= MAX_TOUR_STEPS;
+    
+    console.log('completeTourStep:', { stepId, stepNumber, isLastStep });
+    
     // Optimistic update: update local state immediately
     const previousState = {
       tourCompletedSteps: [...get().tourCompletedSteps],
+      tourCompleted: get().tourCompleted,
     };
     
     set((state) => ({
       tourCompletedSteps: [...state.tourCompletedSteps, stepId],
+      // If this is the last step, mark tour as completed optimistically
+      tourCompleted: isLastStep ? true : state.tourCompleted,
       error: null,
     }));
     
@@ -292,15 +411,32 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
   },
 
   completeWizardStep: async (stepId: string, data?: any) => {
+    console.log('completeWizardStep called with:', { stepId, data });
+    
     // Optimistic update: update local state immediately
     const previousState = {
       wizardCurrentStep: get().wizardCurrentStep,
+      wizardCompleted: get().wizardCompleted,
     };
     
-    set((state) => ({
-      wizardCurrentStep: state.wizardCurrentStep + 1,
-      error: null,
-    }));
+    // Parse step number to check if this is the final step
+    const stepNumber = stepId === 'complete' || stepId === 'step-3' ? 3 : 
+                       parseInt(stepId.match(/\d+/)?.[0] || '0');
+    const totalSteps = 3; // Should match backend config
+    const isLastStep = stepNumber >= totalSteps;
+    
+    console.log('Step analysis:', { stepId, stepNumber, totalSteps, isLastStep });
+    
+    set((state) => {
+      const newState = {
+        wizardCurrentStep: stepNumber,
+        // Optimistically mark as completed if this is the final step
+        wizardCompleted: isLastStep ? true : state.wizardCompleted,
+        error: null,
+      };
+      console.log('Optimistic update applied:', newState);
+      return newState;
+    });
     
     // Update cache immediately
     get()._updateCache();
@@ -315,14 +451,22 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
     try {
       // Sync with backend asynchronously
       await get()._executeAction("completeWizardStep", { stepId, data });
+      console.log('Backend sync completed successfully');
+      
+      // Force a state check after backend sync
+      const currentState = get();
+      console.log('State after backend sync:', {
+        wizardCompleted: currentState.wizardCompleted,
+        wizardCurrentStep: currentState.wizardCurrentStep,
+      });
     } catch (error: any) {
+      console.error("Failed to complete wizard step", error);
       // Rollback on failure with user notification
       get()._rollback(previousState);
       const errorMessage = getErrorMessage(error);
       set({
         error: errorMessage,
       });
-      console.error("Failed to complete wizard step", error);
     }
   },
 
@@ -569,47 +713,69 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
         throw createNetworkError('No internet connection');
       }
 
-      return new Promise<void>((resolve, reject) => {
-        let endpoint = "";
-        let data: any = {};
+      let endpoint = "";
+      let data: any = {};
 
-        switch (type) {
-          case "skipTour":
-            endpoint = "/api/v1/onboarding/tour/skip";
-            break;
-          case "completeTourStep":
-            endpoint = "/api/v1/onboarding/tour/complete";
-            data = { step_id: payload.stepId };
-            break;
-          case "dismissTooltip":
-            endpoint = "/api/v1/onboarding/tooltip/dismiss";
-            data = { tooltip_id: payload.tooltipId };
-            break;
-          case "completeWizardStep":
-            endpoint = "/api/v1/onboarding/wizard/complete";
-            data = { step_id: payload.stepId, data: payload.data };
-            break;
-          case "skipWizard":
-            endpoint = "/api/v1/onboarding/wizard/skip";
-            break;
-          case "selectTemplate":
-            endpoint = "/api/v1/onboarding/template/select";
-            data = { template_id: payload.templateId };
-            break;
-          default:
-            reject(new Error(`Unknown action type: ${type}`));
-            return;
-        }
+      switch (type) {
+        case "skipTour":
+          endpoint = "/api/v1/onboarding/tour/skip";
+          break;
+        case "completeTourStep":
+          endpoint = "/api/v1/onboarding/tour/complete";
+          data = { step_id: payload.stepId };
+          break;
+        case "dismissTooltip":
+          endpoint = "/api/v1/onboarding/tooltip/dismiss";
+          data = { tooltip_id: payload.tooltipId };
+          break;
+        case "completeWizardStep":
+          endpoint = "/api/v1/onboarding/wizard/complete";
+          data = { step_id: payload.stepId, data: payload.data };
+          break;
+        case "skipWizard":
+          endpoint = "/api/v1/onboarding/wizard/skip";
+          break;
+        case "selectTemplate":
+          endpoint = "/api/v1/onboarding/template/select";
+          data = { template_id: payload.templateId };
+          break;
+        default:
+          throw new Error(`Unknown action type: ${type}`);
+      }
 
-        router.post(endpoint, data, {
-          preserveScroll: true,
-          onSuccess: () => resolve(),
-          onError: (errors) => {
-            const errorMessage = getErrorMessage(errors);
-            reject(createNetworkError(errorMessage));
-          },
-        });
-      });
+      // Use axios for API calls instead of Inertia router
+      const axios = (await import('axios')).default;
+      const response = await axios.post(endpoint, data);
+      
+      console.log('Backend response for', type, ':', response.data);
+      
+      // Update state with response data if available
+      if (response.data?.state) {
+        console.log('Raw state from backend:', response.data.state);
+        
+        // Transform snake_case to camelCase
+        const transformedState = {
+          tourCompleted: response.data.state.tourCompleted ?? response.data.state.tour_completed,
+          tourSkipped: response.data.state.tourSkipped ?? response.data.state.tour_skipped,
+          tourCurrentStep: response.data.state.tourCurrentStep ?? response.data.state.tour_current_step,
+          tourCompletedSteps: response.data.state.tourCompletedSteps ?? response.data.state.tour_completed_steps,
+          wizardCompleted: response.data.state.wizardCompleted ?? response.data.state.wizard_completed,
+          wizardSkipped: response.data.state.wizardSkipped ?? response.data.state.wizard_skipped,
+          wizardCurrentStep: response.data.state.wizardCurrentStep ?? response.data.state.wizard_current_step,
+          templateSelected: response.data.state.templateSelected ?? response.data.state.template_selected,
+          templateId: response.data.state.templateId ?? response.data.state.template_id,
+          dismissedTooltips: response.data.state.dismissedTooltips ?? response.data.state.dismissed_tooltips,
+          completedAt: response.data.state.completedAt ?? response.data.state.completed_at,
+          startedAt: response.data.state.startedAt ?? response.data.state.started_at,
+          completionPercentage: response.data.state.completionPercentage ?? response.data.state.completion_percentage,
+        };
+        
+        console.log('Transformed state:', transformedState);
+        set(transformedState);
+        get()._updateCache();
+      } else {
+        console.warn('No state in backend response for', type);
+      }
     }, retryOptions);
   },
 };

@@ -111,7 +111,13 @@
     "connecting": "Conectando...",
     "connected": "Conectado",
     "connectTo": "Conectar a {{platform}}",
-    "connectedAs": "Conectado como {{account}}"
+    "connectedAs": "Conectado como {{account}}",
+    "facebook": "Conecta tus páginas y grupos de Facebook",
+    "twitter": "Comparte actualizaciones con tus seguidores de Twitter",
+    "instagram": "Publica fotos e historias en Instagram",
+    "tiktok": "Comparte videos cortos en TikTok",
+    "youtube": "Sube videos a tu canal de YouTube",
+    "linkedin": "Comparte contenido profesional en LinkedIn"
   },
   "errors": {
     "loadFailed": "Error al cargar la incorporación",

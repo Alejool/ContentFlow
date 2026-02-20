@@ -1,4 +1,4 @@
-import { useEffect, useState, lazy, Suspense } from "react";
+import { useEffect, useState, lazy, Suspense, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useOnboarding } from "@/Contexts/OnboardingContext";
 import { OnboardingErrorBoundary } from "./OnboardingErrorBoundary";
@@ -7,7 +7,7 @@ import type { TourStep, SocialPlatform, PublicationTemplate } from "@/types/onbo
 // Lazy load onboarding components to reduce initial bundle size
 const TourOverlay = lazy(() => import("./TourOverlay"));
 const SetupWizard = lazy(() => import("./SetupWizard"));
-const TemplateGallery = lazy(() => import("./TemplateGallery"));
+// TemplateGallery removed
 
 interface OnboardingFlowProps {
   tourSteps: TourStep[];
@@ -39,25 +39,9 @@ export default function OnboardingFlow({
   templates,
 }: OnboardingFlowProps) {
   const { state, completeTourStep, skipTour, nextTourStep } = useOnboarding();
-  const [currentStage, setCurrentStage] = useState<OnboardingStage>("tour");
-
-  // Determine current onboarding stage based on state
-  useEffect(() => {
-    const stage = determineCurrentStage();
-    setCurrentStage(stage);
-  }, [
-    state.tourCompleted,
-    state.tourSkipped,
-    state.wizardCompleted,
-    state.wizardSkipped,
-    state.templateSelected,
-  ]);
-
-  /**
-   * Determines the current onboarding stage based on completion state.
-   * Follows the sequence: tour → wizard → templates → complete
-   */
-  const determineCurrentStage = (): OnboardingStage => {
+  
+  // Determine initial stage based on current state to avoid flash
+  const determineCurrentStage = useCallback((): OnboardingStage => {
     // If tour not completed or skipped, show tour
     if (!state.tourCompleted && !state.tourSkipped) {
       return "tour";
@@ -68,22 +52,63 @@ export default function OnboardingFlow({
       return "wizard";
     }
 
-    // If template not selected, show templates
-    if (!state.templateSelected) {
-      return "templates";
-    }
-
     // All stages complete
     return "complete";
-  };
+  }, [state.tourCompleted, state.tourSkipped, state.wizardCompleted, state.wizardSkipped]);
+  
+  const [currentStage, setCurrentStage] = useState<OnboardingStage>(() => determineCurrentStage());
+
+  // Debug logging
+  useEffect(() => {
+    console.log('OnboardingFlow mounted:', {
+      tourStepsLength: tourSteps.length,
+      availablePlatformsLength: availablePlatforms.length,
+      templatesLength: templates.length,
+      state,
+      currentStage,
+    });
+  }, []);
+
+  // Determine current onboarding stage based on state
+  useEffect(() => {
+    const stage = determineCurrentStage();
+    console.log('OnboardingFlow stage determination:', { 
+      oldStage: currentStage, 
+      newStage: stage,
+      state: {
+        tourCompleted: state.tourCompleted,
+        tourSkipped: state.tourSkipped,
+        wizardCompleted: state.wizardCompleted,
+        wizardSkipped: state.wizardSkipped,
+        templateSelected: state.templateSelected,
+      }
+    });
+    
+    // Only update if stage actually changed
+    if (stage !== currentStage) {
+      console.log('OnboardingFlow: Stage changed from', currentStage, 'to', stage);
+      setCurrentStage(stage);
+    }
+  }, [
+    state.tourCompleted,
+    state.tourSkipped,
+    state.wizardCompleted,
+    state.wizardSkipped,
+    state.templateSelected,
+    currentStage,
+    determineCurrentStage,
+  ]);
 
   /**
    * Handles tour completion
    */
   const handleTourComplete = async () => {
+    console.log('OnboardingFlow: handleTourComplete called');
     const lastStep = tourSteps[tourSteps.length - 1];
+    console.log('OnboardingFlow: Last step:', lastStep);
     if (lastStep) {
       await completeTourStep(lastStep.id);
+      console.log('OnboardingFlow: completeTourStep finished');
     }
     // Stage will automatically transition via useEffect
   };
@@ -100,8 +125,17 @@ export default function OnboardingFlow({
    * Handles wizard completion
    */
   const handleWizardComplete = () => {
+    console.log('OnboardingFlow: handleWizardComplete called');
     // Wizard component handles its own completion
-    // Stage will automatically transition via useEffect
+    // The state change will trigger the useEffect to transition stages
+    // Force a re-check of the stage after a short delay to ensure state has updated
+    setTimeout(() => {
+      const newStage = determineCurrentStage();
+      console.log('OnboardingFlow: Force stage check after wizard complete:', newStage);
+      if (newStage !== currentStage) {
+        setCurrentStage(newStage);
+      }
+    }, 100);
   };
 
   /**
@@ -114,8 +148,11 @@ export default function OnboardingFlow({
 
   // Don't render anything if onboarding is complete
   if (currentStage === "complete") {
+    console.log('OnboardingFlow: Stage is complete, not rendering');
     return null;
   }
+
+  console.log('OnboardingFlow: Rendering with stage:', currentStage);
 
   return (
     <OnboardingErrorBoundary>
@@ -130,7 +167,7 @@ export default function OnboardingFlow({
         <OnboardingErrorBoundary>
           <Suspense fallback={<OnboardingLoadingFallback />}>
             <TourOverlay
-              currentStep={tourSteps[state.tourCurrentStep] || tourSteps[0]}
+              currentStep={tourSteps[Math.min(state.tourCurrentStep, tourSteps.length - 1)] || tourSteps[0]}
               totalSteps={tourSteps.length}
               onNext={nextTourStep}
               onSkip={handleTourSkip}
@@ -153,17 +190,7 @@ export default function OnboardingFlow({
         </OnboardingErrorBoundary>
       )}
 
-      {/* Templates Stage */}
-      {currentStage === "templates" && (
-        <OnboardingErrorBoundary>
-          <Suspense fallback={<OnboardingLoadingFallback />}>
-            <TemplateGallery
-              templates={templates}
-              onSkip={handleTemplateSkip}
-            />
-          </Suspense>
-        </OnboardingErrorBoundary>
-      )}
+      {/* Templates Stage - REMOVED */}
     </OnboardingErrorBoundary>
   );
 }
@@ -186,9 +213,9 @@ function OnboardingProgressIndicator({
   }
 
   const stages = [
-    { id: "tour", label: t('onboarding.progress.stages.tour'), icon: "🎯" },
-    { id: "wizard", label: t('onboarding.progress.stages.connect'), icon: "🔗" },
-    { id: "templates", label: t('onboarding.progress.stages.template'), icon: "📝" },
+    { id: "tour", label: t('progress.stages.tour'), icon: "🎯" },
+    { id: "wizard", label: t('progress.stages.connect'), icon: "🔗" },
+    // Templates stage removed
   ];
 
   const currentStageIndex = stages.findIndex((s) => s.id === currentStage);
@@ -197,7 +224,7 @@ function OnboardingProgressIndicator({
     <div className="fixed top-4 right-4 z-40 bg-white dark:bg-neutral-800 rounded-lg shadow-lg p-4 max-w-xs">
       <div className="flex items-center justify-between mb-3">
         <h4 className="text-sm font-semibold text-gray-900 dark:text-white">
-          {t('onboarding.progress.title')}
+          {t('progress.title')}
         </h4>
         <span className="text-xs text-gray-500 dark:text-gray-400">
           {completionPercentage}%

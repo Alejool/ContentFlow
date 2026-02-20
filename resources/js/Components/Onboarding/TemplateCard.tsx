@@ -27,6 +27,29 @@ export default function TemplateCard({
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
 
+  // Category-specific colors
+  const categoryColors = {
+    promotional: 'from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20',
+    educational: 'from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20',
+    engagement: 'from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20',
+  };
+
+  const categoryBorderColors = {
+    promotional: 'border-purple-200 dark:border-purple-700',
+    educational: 'border-blue-200 dark:border-blue-700',
+    engagement: 'border-green-200 dark:border-green-700',
+  };
+
+  const categoryBadgeColors = {
+    promotional: 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-700',
+    educational: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-700',
+    engagement: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-green-200 dark:border-green-700',
+  };
+
+  const bgGradient = categoryColors[template.category as keyof typeof categoryColors] || 'from-gray-50 to-gray-100 dark:from-neutral-900 dark:to-neutral-800';
+  const borderColor = categoryBorderColors[template.category as keyof typeof categoryBorderColors] || 'border-gray-200 dark:border-neutral-700';
+  const badgeColor = categoryBadgeColors[template.category as keyof typeof categoryBadgeColors] || 'bg-white/90 dark:bg-neutral-800/90 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-neutral-600';
+
   const handleSelect = async () => {
     setIsSelecting(true);
     try {
@@ -39,55 +62,37 @@ export default function TemplateCard({
 
   return (
     <div
-      className="group relative bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-[1.02] cursor-pointer"
+      className={`group relative bg-white dark:bg-neutral-800 rounded-lg border ${borderColor} overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-[1.02] cursor-pointer`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={handleSelect}
     >
-      {/* Preview Image */}
-      <div className="relative aspect-video bg-gray-100 dark:bg-neutral-900 overflow-hidden">
-        {template.previewImage && !imageError ? (
-          <>
-            {/* Loading Placeholder */}
-            {!imageLoaded && (
-              <div className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-neutral-900">
-                <div className="w-12 h-12 border-4 border-gray-200 dark:border-neutral-700 border-t-primary-600 rounded-full animate-spin" />
+      {/* Preview Image or Generated Preview */}
+      <div className={`relative aspect-video bg-gradient-to-br ${bgGradient} overflow-hidden`}>
+        {/* Generated Content Preview */}
+        <div className="absolute inset-0 p-6 flex flex-col justify-center">
+          <div className="bg-white dark:bg-neutral-800 rounded-lg shadow-lg p-4 max-h-full overflow-hidden">
+            <p className="text-sm text-gray-700 dark:text-gray-300 line-clamp-6 whitespace-pre-wrap">
+              {template.content.text}
+            </p>
+            {template.content.hashtags && template.content.hashtags.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-1">
+                {template.content.hashtags.slice(0, 4).map((hashtag, index) => (
+                  <span
+                    key={index}
+                    className="text-xs text-primary-600 dark:text-primary-400"
+                  >
+                    {hashtag}
+                  </span>
+                ))}
               </div>
             )}
-            
-            {/* Lazy-loaded Image */}
-            <img
-              src={template.previewImage}
-              alt={template.name}
-              loading="lazy"
-              className={`w-full h-full object-cover transition-all duration-300 group-hover:scale-110 ${
-                imageLoaded ? "opacity-100" : "opacity-0"
-              }`}
-              onLoad={() => setImageLoaded(true)}
-              onError={() => setImageError(true)}
-            />
-          </>
-        ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <svg
-              className="w-16 h-16 text-gray-300 dark:text-neutral-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-              />
-            </svg>
           </div>
-        )}
+        </div>
 
         {/* Category Badge */}
         <div className="absolute top-3 left-3">
-          <span className="px-3 py-1 bg-white/90 dark:bg-neutral-800/90 backdrop-blur-sm text-xs font-medium text-gray-700 dark:text-gray-300 rounded-full border border-gray-200 dark:border-neutral-600">
+          <span className={`px-3 py-1 backdrop-blur-sm text-xs font-medium rounded-full border ${badgeColor}`}>
             {t(`onboarding.templates.categories.${template.category}`, template.category.charAt(0).toUpperCase() + template.category.slice(1))}
           </span>
         </div>
@@ -102,17 +107,17 @@ export default function TemplateCard({
             onClick={handleSelect}
             disabled={isSelecting}
             className="px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-            aria-label={t('onboarding.templates.select', { name: template.name })}
+            aria-label={t('templates.select', { name: template.name })}
           >
             {isSelecting ? (
               <>
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                {t('onboarding.templates.selecting')}
+                {t('templates.selecting')}
               </>
             ) : (
               <>
                 <Check className="w-5 h-5" />
-                {t('onboarding.templates.useTemplate')}
+                {t('templates.useTemplate')}
               </>
             )}
           </button>
