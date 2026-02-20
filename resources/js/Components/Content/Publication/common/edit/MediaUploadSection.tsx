@@ -114,8 +114,9 @@ const MediaUploadSection = memo(
             Media
           </Label>
 
-          <div
-            className={`relative group transition-all duration-300 ${
+          <label
+            htmlFor="media-file-input-content"
+            className={`relative group transition-all duration-300 block ${
               isDragOver && !disabled
                 ? "scale-[1.02] ring-2 ring-primary-500 dark:ring-primary-400 ring-offset-2"
                 : ""
@@ -123,15 +124,6 @@ const MediaUploadSection = memo(
             onDrop={disabled ? undefined : onDrop}
             onDragOver={disabled ? undefined : onDragOver}
             onDragLeave={disabled ? undefined : onDragLeave}
-            onClick={(e) => {
-              if (
-                !disabled &&
-                !isAnyMediaProcessing &&
-                mediaPreviews.length === 0
-              ) {
-                fileInputRef.current?.click();
-              }
-            }}
           >
             <div
               className={`min-h-[200px] rounded-lg border-2 border-dashed flex flex-col items-center justify-center p-6 text-center transition-colors overflow-hidden ${getUploadAreaStyles()}`}
@@ -160,12 +152,7 @@ const MediaUploadSection = memo(
                     />
                   ))}
                   {!disabled && !isAnyMediaProcessing && (
-                    <AddMoreButton
-                      onClick={(e: any) => {
-                        e.stopPropagation();
-                        fileInputRef.current?.click();
-                      }}
-                    />
+                    <AddMoreButton />
                   )}
                 </div>
               ) : (
@@ -207,6 +194,7 @@ const MediaUploadSection = memo(
             {!disabled && !isAnyMediaProcessing && (
               <input
                 ref={fileInputRef}
+                id="media-file-input-content"
                 type="file"
                 className="hidden"
                 multiple
@@ -214,7 +202,7 @@ const MediaUploadSection = memo(
                 onChange={(e) => onFileChange(e.target.files)}
               />
             )}
-          </div>
+          </label>
 
           {imageError && (
             <div className="mt-2 flex items-center gap-2 text-sm text-primary-500 animate-in slide-in-from-left-1">
@@ -448,19 +436,17 @@ const VideoPreview = memo(
   ),
 );
 
-const AddMoreButton = memo(
-  ({ onClick }: { onClick: (e: React.MouseEvent) => void }) => (
-    <div
-      className="flex items-center justify-center aspect-video border-2 border-dashed border-gray-300 rounded-lg hover:bg-primary-50 transition-colors cursor-pointer"
-      onClick={onClick}
-    >
-      <div className="text-center">
-        <Upload className="w-6 h-6 mx-auto text-gray-400" />
-        <span className="text-xs text-gray-500">Add more</span>
-      </div>
+const AddMoreButton = memo(() => (
+  <label
+    htmlFor="media-file-input-content"
+    className="flex items-center justify-center aspect-video border-2 border-dashed border-gray-300 rounded-lg hover:bg-primary-50 transition-colors cursor-pointer"
+  >
+    <div className="text-center">
+      <Upload className="w-6 h-6 mx-auto text-gray-400" />
+      <span className="text-xs text-gray-500">Add more</span>
     </div>
-  ),
-);
+  </label>
+));
 
 const EmptyUploadState = memo(
   ({

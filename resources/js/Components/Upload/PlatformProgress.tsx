@@ -121,7 +121,7 @@ export function PlatformProgress({ publication, onCancelPlatform }: PlatformProg
                 href={platform.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-1.5 text-[10px] text-primary hover:underline flex items-center gap-1"
+                className="mt-1.5 text-[10px] text-primary-500 hover:underline flex items-center gap-1"
               >
                 {t("publications.viewPost", { defaultValue: "Ver publicación" })}
                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

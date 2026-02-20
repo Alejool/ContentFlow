@@ -42,6 +42,7 @@ export default function ReelsSection({
   const generatedReels = videoFile 
     ? allMediaFiles.filter(media => 
         media.file_type === 'reel' && 
+        media.metadata?.ai_generated === true &&
         media.metadata?.original_media_id === videoFile.id
       )
     : [];
