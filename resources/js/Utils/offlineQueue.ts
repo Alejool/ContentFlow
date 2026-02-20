@@ -32,7 +32,6 @@ class OfflineQueueManager {
         this.queue = JSON.parse(stored);
       }
     } catch (error) {
-      console.error("Failed to load offline queue", error);
       this.queue = [];
     }
   }
@@ -44,7 +43,7 @@ class OfflineQueueManager {
     try {
       localStorage.setItem(QUEUE_STORAGE_KEY, JSON.stringify(this.queue));
     } catch (error) {
-      console.error("Failed to save offline queue", error);
+      // Failed to save offline queue
     }
   }
 
@@ -119,16 +118,12 @@ class OfflineQueueManager {
         this.dequeue(action.id);
         successCount++;
       } catch (error) {
-        console.error(`Failed to sync action ${action.id}`, error);
         
         // Increment retry count
         action.retries++;
         
         // Remove if max retries reached
         if (action.retries >= MAX_RETRIES) {
-          console.error(
-            `Action ${action.id} exceeded max retries, removing from queue`
-          );
           this.dequeue(action.id);
           failedCount++;
         } else {

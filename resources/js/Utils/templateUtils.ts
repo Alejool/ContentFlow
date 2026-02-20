@@ -14,7 +14,7 @@ export function storeTemplateInSession(template: PublicationTemplate): void {
   try {
     sessionStorage.setItem("selectedTemplate", JSON.stringify(template));
   } catch (error) {
-    console.error("Failed to store template in session:", error);
+    // Failed to store template in session
   }
 }
 
@@ -29,7 +29,6 @@ export function getTemplateFromSession(): PublicationTemplate | null {
     if (!stored) return null;
     return JSON.parse(stored) as PublicationTemplate;
   } catch (error) {
-    console.error("Failed to retrieve template from session:", error);
     return null;
   }
 }
@@ -41,7 +40,7 @@ export function clearTemplateFromSession(): void {
   try {
     sessionStorage.removeItem("selectedTemplate");
   } catch (error) {
-    console.error("Failed to clear template from session:", error);
+    // Failed to clear template from session
   }
 }
 

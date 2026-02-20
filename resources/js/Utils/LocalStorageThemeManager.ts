@@ -26,7 +26,6 @@ export interface LocalStorageThemeManager {
  */
 function save(workspaceId: string, theme: ThemePreference): void {
   if (!workspaceId) {
-    console.warn('LocalStorageThemeManager: Invalid workspace ID provided');
     return;
   }
 
@@ -41,17 +40,14 @@ function save(workspaceId: string, theme: ThemePreference): void {
     // Handle quota exceeded error
     if (error instanceof DOMException && 
         (error.name === 'QuotaExceededError' || error.name === 'NS_ERROR_DOM_QUOTA_REACHED')) {
-      console.warn('LocalStorageThemeManager: localStorage quota exceeded, attempting cleanup');
       
       try {
         // Clear all workspace themes and retry
         clearAll();
         localStorage.setItem(key, theme);
       } catch (retryError) {
-        console.error('LocalStorageThemeManager: Failed to save theme after cleanup', retryError);
+        // Failed to save theme after cleanup
       }
-    } else {
-      console.error('LocalStorageThemeManager: Failed to save theme preference', error);
     }
   }
 }
@@ -62,7 +58,6 @@ function save(workspaceId: string, theme: ThemePreference): void {
  */
 function load(workspaceId: string): ThemePreference | null {
   if (!workspaceId) {
-    console.warn('LocalStorageThemeManager: Invalid workspace ID provided');
     return null;
   }
 
@@ -77,7 +72,6 @@ function load(workspaceId: string): ThemePreference | null {
     
     return null;
   } catch (error) {
-    console.error('LocalStorageThemeManager: Failed to load theme preference', error);
     return null;
   }
 }
@@ -87,7 +81,6 @@ function load(workspaceId: string): ThemePreference | null {
  */
 function remove(workspaceId: string): void {
   if (!workspaceId) {
-    console.warn('LocalStorageThemeManager: Invalid workspace ID provided');
     return;
   }
 
@@ -96,7 +89,7 @@ function remove(workspaceId: string): void {
   try {
     localStorage.removeItem(key);
   } catch (error) {
-    console.error('LocalStorageThemeManager: Failed to remove theme preference', error);
+    // Failed to remove theme preference
   }
 }
 
@@ -112,7 +105,7 @@ function clearAll(): void {
       localStorage.removeItem(key);
     });
   } catch (error) {
-    console.error('LocalStorageThemeManager: Failed to clear all theme preferences', error);
+    // Failed to clear all theme preferences
   }
 }
 
@@ -133,7 +126,7 @@ function clearOtherWorkspaceThemes(currentWorkspaceId: string): void {
       }
     });
   } catch (error) {
-    console.error('LocalStorageThemeManager: Failed to clear other workspace themes', error);
+    // Failed to clear other workspace themes
   }
 }
 

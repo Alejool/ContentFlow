@@ -48,9 +48,5 @@ export const getErrorMessage = (
   }
 
   // 5. If everything fails, return the raw value but log it if it looks like a key
-  if (raw.includes(".") || raw.length < 30) {
-    console.warn(`[getErrorMessage] No translation found for key: ${raw}`);
-  }
-
   return raw;
 };
