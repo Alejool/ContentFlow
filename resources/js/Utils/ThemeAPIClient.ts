@@ -24,7 +24,6 @@ export interface ThemeAPIClient {
  */
 async function updateTheme(workspaceId: string, theme: ThemePreference): Promise<void> {
   if (!workspaceId) {
-    console.warn('ThemeAPIClient: Invalid workspace ID provided');
     return;
   }
 
@@ -45,7 +44,6 @@ async function updateTheme(workspaceId: string, theme: ThemePreference): Promise
  */
 async function fetchTheme(workspaceId: string): Promise<ThemePreference> {
   if (!workspaceId) {
-    console.warn('ThemeAPIClient: Invalid workspace ID provided');
     return 'system';
   }
 
@@ -75,7 +73,6 @@ async function syncThemes(): Promise<void> {
   try {
     // Future implementation: sync all workspace themes between local and remote
     // For now, this is a no-op as sync happens on individual save/load
-    console.log('ThemeAPIClient: syncThemes called (not yet implemented)');
   } catch (error) {
     handleAPIError('syncThemes', error);
   }
@@ -85,32 +82,7 @@ async function syncThemes(): Promise<void> {
  * Handle API errors with appropriate logging
  */
 function handleAPIError(operation: string, error: unknown): void {
-  if (axios.isAxiosError(error)) {
-    const axiosError = error as AxiosError;
-    
-    if (axiosError.response) {
-      // Server responded with error status
-      console.error(
-        `ThemeAPIClient: ${operation} failed with status ${axiosError.response.status}`,
-        axiosError.response.data
-      );
-    } else if (axiosError.request) {
-      // Request made but no response received (network error)
-      console.error(
-        `ThemeAPIClient: ${operation} failed - no response received (network error)`,
-        axiosError.message
-      );
-    } else {
-      // Error setting up the request
-      console.error(
-        `ThemeAPIClient: ${operation} failed - request setup error`,
-        axiosError.message
-      );
-    }
-  } else {
-    // Non-Axios error
-    console.error(`ThemeAPIClient: ${operation} failed with unexpected error`, error);
-  }
+  // Error handling disabled
 }
 
 // Export the client as a singleton

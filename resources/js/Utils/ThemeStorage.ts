@@ -34,7 +34,6 @@ async function saveThemePreference(
   theme: ThemePreference
 ): Promise<void> {
   if (!workspaceId) {
-    console.warn('ThemeStorage: Invalid workspace ID provided');
     return;
   }
 
@@ -47,10 +46,6 @@ async function saveThemePreference(
   } catch (error) {
     // Backend save failed, but localStorage has the preference
     // This is acceptable - the preference will sync on next successful connection
-    console.warn(
-      'ThemeStorage: Backend save failed, preference saved to localStorage only',
-      error
-    );
   }
 }
 
@@ -64,7 +59,6 @@ async function saveThemePreference(
  */
 async function loadThemePreference(workspaceId: string): Promise<ThemePreference | null> {
   if (!workspaceId) {
-    console.warn('ThemeStorage: Invalid workspace ID provided');
     return null;
   }
 
@@ -87,7 +81,6 @@ async function loadThemePreference(workspaceId: string): Promise<ThemePreference
     return backendTheme;
   } catch (error) {
     // Both localStorage and backend failed
-    console.warn('ThemeStorage: Failed to load theme from both localStorage and backend', error);
     return null;
   }
 }
@@ -97,7 +90,6 @@ async function loadThemePreference(workspaceId: string): Promise<ThemePreference
  */
 async function deleteThemePreference(workspaceId: string): Promise<void> {
   if (!workspaceId) {
-    console.warn('ThemeStorage: Invalid workspace ID provided');
     return;
   }
 
@@ -108,7 +100,7 @@ async function deleteThemePreference(workspaceId: string): Promise<void> {
   try {
     await themeAPIClient.updateTheme(workspaceId, 'system'); // Reset to system default
   } catch (error) {
-    console.warn('ThemeStorage: Failed to delete theme from backend', error);
+    // Failed to delete theme from backend
   }
 }
 
@@ -132,7 +124,7 @@ async function getAllWorkspaceThemes(): Promise<Record<string, ThemePreference>>
       }
     });
   } catch (error) {
-    console.error('ThemeStorage: Failed to get all workspace themes', error);
+    // Failed to get all workspace themes
   }
   
   return themes;

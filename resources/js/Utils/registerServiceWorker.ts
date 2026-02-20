@@ -17,14 +17,12 @@ export interface ServiceWorkerConfig {
 export async function registerServiceWorker(config: ServiceWorkerConfig = {}): Promise<void> {
   // Check if service workers are supported
   if (!('serviceWorker' in navigator)) {
-    console.warn('[SW] Service workers are not supported in this browser');
     return;
   }
 
   // Only register in production or when explicitly enabled
   const isDev = import.meta.env.DEV;
   if (isDev) {
-    console.log('[SW] Service worker disabled in development mode');
     return;
   }
 
@@ -33,8 +31,6 @@ export async function registerServiceWorker(config: ServiceWorkerConfig = {}): P
     const registration = await navigator.serviceWorker.register('/sw.js', {
       scope: '/',
     });
-
-    console.log('[SW] Service worker registered:', registration.scope);
 
     // Check for updates
     registration.addEventListener('updatefound', () => {
@@ -45,7 +41,6 @@ export async function registerServiceWorker(config: ServiceWorkerConfig = {}): P
       newWorker.addEventListener('statechange', () => {
         if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
           // New service worker available
-          console.log('[SW] New service worker available');
           config.onUpdate?.(registration);
         }
       });
@@ -62,17 +57,15 @@ export async function registerServiceWorker(config: ServiceWorkerConfig = {}): P
     }, 60 * 60 * 1000);
 
   } catch (error) {
-    console.error('[SW] Service worker registration failed:', error);
+    // Service worker registration failed
   }
 
   // Listen for online/offline events
   window.addEventListener('online', () => {
-    console.log('[SW] Network connection restored');
     config.onOnline?.();
   });
 
   window.addEventListener('offline', () => {
-    console.log('[SW] Network connection lost');
     config.onOffline?.();
   });
 }
@@ -89,13 +82,8 @@ export async function unregisterServiceWorker(): Promise<boolean> {
     const registration = await navigator.serviceWorker.ready;
     const success = await registration.unregister();
     
-    if (success) {
-      console.log('[SW] Service worker unregistered');
-    }
-    
     return success;
   } catch (error) {
-    console.error('[SW] Service worker unregistration failed:', error);
     return false;
   }
 }
@@ -128,9 +116,8 @@ export async function clearAllCaches(): Promise<void> {
     await Promise.all(
       cacheNames.map((cacheName) => caches.delete(cacheName))
     );
-    console.log('[SW] All caches cleared');
   } catch (error) {
-    console.error('[SW] Failed to clear caches:', error);
+    // Failed to clear caches
   }
 }
 
