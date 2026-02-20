@@ -27,12 +27,21 @@ RUN apk add --no-cache \
     gcc \
     libc-dev \
     re2c \
-    file
+    file \
+    freetype-dev \
+    libjpeg-turbo-dev \
+    libpng-dev \
+    libwebp-dev
 
 # ----------------------------------------------------
 # 2. PHP extensions (Redis, Swoole, PostgreSQL, etc.)
 # ----------------------------------------------------
-RUN pecl install redis swoole \
+# Configure GD with support for JPEG, PNG, WebP, and FreeType
+RUN docker-php-ext-configure gd \
+        --with-freetype \
+        --with-jpeg \
+        --with-webp \
+    && pecl install redis swoole \
     && docker-php-ext-enable redis swoole \
     && docker-php-ext-install \
         pdo \
@@ -45,7 +54,8 @@ RUN pecl install redis swoole \
         posix \
         xsl \
         bcmath \
-        sockets
+        sockets \
+        gd
 
 # ----------------------------------------------------
 # 3. PHP configuration (custom.ini)
