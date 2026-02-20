@@ -107,11 +107,9 @@ class PublishPublicationAction
       
       $notification = new \App\Notifications\PublicationProcessingStartedNotification($publication, $accountsData);
       
-      // Notify all workspace members except the one who published
+      // Notify ALL workspace members (including the one who published)
       if ($publication->workspace) {
-        $workspaceUsers = $publication->workspace->users()
-          ->where('users.id', '!=', auth()->id())
-          ->get();
+        $workspaceUsers = $publication->workspace->users()->get();
         
         foreach ($workspaceUsers as $user) {
           $user->notify($notification);

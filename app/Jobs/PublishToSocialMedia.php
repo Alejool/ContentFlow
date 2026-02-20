@@ -189,11 +189,15 @@ class PublishToSocialMedia implements ShouldQueue
         $failedPlatforms
       );
       
-      // Notify all workspace members except the one who published
+      // Notify ALL workspace members (including the one who published)
       if ($publication->workspace) {
-        $workspaceUsers = $publication->workspace->users()
-          ->where('users.id', '!=', $publication->published_by)
-          ->get();
+        $workspaceUsers = $publication->workspace->users()->get();
+        
+        Log::info('Notifying all workspace members', [
+          'publication_id' => $publication->id,
+          'workspace_id' => $publication->workspace_id,
+          'member_count' => $workspaceUsers->count()
+        ]);
         
         foreach ($workspaceUsers as $user) {
           $user->notify($notification);
@@ -207,7 +211,8 @@ class PublishToSocialMedia implements ShouldQueue
     } catch (\Exception $e) {
       Log::error('Failed to send success notification', [
         'publication_id' => $publication->id,
-        'error' => $e->getMessage()
+        'error' => $e->getMessage(),
+        'trace' => $e->getTraceAsString()
       ]);
     }
   }
@@ -233,11 +238,9 @@ class PublishToSocialMedia implements ShouldQueue
         $failedPlatforms
       );
       
-      // Notify all workspace members except the one who published
+      // Notify ALL workspace members (including the one who published)
       if ($publication->workspace) {
-        $workspaceUsers = $publication->workspace->users()
-          ->where('users.id', '!=', $publication->published_by)
-          ->get();
+        $workspaceUsers = $publication->workspace->users()->get();
         
         foreach ($workspaceUsers as $user) {
           $user->notify($notification);

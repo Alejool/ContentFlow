@@ -73,13 +73,22 @@ export default function AuthenticatedLayout({
   const templates = props.templates as PublicationTemplate[] | undefined;
   
   // Determine if onboarding should be shown
-  const shouldShowOnboarding = user && onboardingState && !onboardingState.completedAt;
+  // Only show onboarding if user was created recently (within 7 days) and hasn't completed it
+  const isRecentUser = user?.created_at 
+    ? (new Date().getTime() - new Date(user.created_at).getTime()) / (1000 * 60 * 60 * 24) <= 7
+    : false;
+  const shouldShowOnboarding = user && onboardingState && !onboardingState.completedAt && isRecentUser;
 
   // Debug logging
   useEffect(() => {
     if (user) {
+      const isRecentUser = user?.created_at 
+        ? (new Date().getTime() - new Date(user.created_at).getTime()) / (1000 * 60 * 60 * 24) <= 7
+        : false;
       console.log('Onboarding Debug:', {
         hasUser: !!user,
+        userCreatedAt: user.created_at,
+        isRecentUser,
         hasOnboardingState: !!onboardingState,
         onboardingState,
         hasTourSteps: !!tourSteps,

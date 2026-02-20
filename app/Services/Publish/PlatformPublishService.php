@@ -536,6 +536,14 @@ class PlatformPublishService
 
   private function getPlatformService(SocialAccount $socialAccount)
   {
+    // Validate that access token exists
+    if (empty($socialAccount->access_token)) {
+      throw new \Exception(
+        "Access token is missing or invalid for {$socialAccount->platform} account (ID: {$socialAccount->id}). " .
+        "Please reconnect the account."
+      );
+    }
+
     return match ($socialAccount->platform) {
       'youtube' => new YouTubeService($socialAccount->access_token, $socialAccount),
       'instagram' => new InstagramService($socialAccount->access_token, $socialAccount),

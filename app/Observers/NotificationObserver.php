@@ -15,14 +15,11 @@ class NotificationObserver
   {
     Log::info('NotificationObserver: created fired', ['id' => $notification->id]);
 
-    // Evento deshabilitado - las notificaciones solo funcionan como alertas internas
-    // No se dispara el evento para evitar broadcast en tiempo real
-    
-    // if ($notification->notifiable_id) {
-    //   Log::info('NotificationObserver: dispatching event for user', ['user_id' => $notification->notifiable_id]);
-    //   event(new NotificationCreated((int) $notification->notifiable_id));
-    // } else {
-    //   Log::warning('NotificationObserver: no notifiable_id found');
-    // }
+    if ($notification->notifiable_id) {
+      Log::info('NotificationObserver: dispatching event for user', ['user_id' => $notification->notifiable_id]);
+      event(new NotificationCreated((int) $notification->notifiable_id));
+    } else {
+      Log::warning('NotificationObserver: no notifiable_id found');
+    }
   }
 }

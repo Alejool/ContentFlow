@@ -264,7 +264,7 @@ export const usePublicationLock = (
                   acquireLock(true);
                 }
               }
-            }, 1000); // Faster handover (1s instead of 3s)
+            }, 500); // Faster handover (500ms for quicker response)
           }
         });
 
@@ -317,7 +317,7 @@ export const usePublicationLock = (
 
     const interval = setInterval(() => {
       acquireLock();
-    }, 20000); // 15-20s refresh for 40s lock
+    }, 5000); // 5s refresh for 20s lock - more frequent to prevent expiration
 
     return () => {
       clearInterval(interval);

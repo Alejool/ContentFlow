@@ -16,6 +16,9 @@ class SocialTokenManager
       !$account->token_expires_at ||
       $account->token_expires_at->gt(now()->addMinutes(5))
     ) {
+      if (!$account->access_token) {
+        throw new \Exception("No access token available for {$account->platform}, reconnection required.");
+      }
       return $account->access_token;
     }
 

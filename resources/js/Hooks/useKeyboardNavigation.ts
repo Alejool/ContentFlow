@@ -1,79 +1,57 @@
-import { useEffect, useCallback, useRef } from 'react';
-
 /**
- * Hook for implementing keyboard shortcuts and navigation
- * Handles Enter, Escape, Arrow keys, Tab, and Shift+Tab
+ * Keyboard Navigation Hook
  * 
- * Requirements: 5.2, 5.3
- * 
- * @example
- * const { handleKeyDown, registerElement } = useKeyboardNavigation({
- *   onEnter: () => console.log('Enter pressed'),
- *   onEscape: () => console.log('Escape pressed'),
- *   onArrowUp: () => console.log('Arrow up pressed'),
- * });
- * 
- * // Use in component
- * <div onKeyDown={handleKeyDown} ref={registerElement}>
- *   Content
- * </div>
+ * Provides keyboard navigation utilities for accessible components
  */
 
-interface UseKeyboardNavigationOptions {
-  onEnter?: () => void;
+import { useEffect, useCallback, RefObject } from 'react';
+
+interface KeyboardNavigationOptions {
   onEscape?: () => void;
+  onEnter?: () => void;
   onArrowUp?: () => void;
   onArrowDown?: () => void;
   onArrowLeft?: () => void;
   onArrowRight?: () => void;
-  onTab?: () => void;
-  onShiftTab?: () => void;
+  onTab?: (shiftKey: boolean) => void;
+  onHome?: () => void;
+  onEnd?: () => void;
   enabled?: boolean;
 }
 
-interface UseKeyboardNavigationReturn {
-  handleKeyDown: (event: React.KeyboardEvent | KeyboardEvent) => void;
-  registerElement: (element: HTMLElement | null) => void;
-}
-
 export function useKeyboardNavigation(
-  options: UseKeyboardNavigationOptions = {}
-): UseKeyboardNavigationReturn {
+  ref: RefObject<HTMLElement>,
+  options: KeyboardNavigationOptions
+): void {
   const {
-    onEnter,
     onEscape,
+    onEnter,
     onArrowUp,
     onArrowDown,
     onArrowLeft,
     onArrowRight,
     onTab,
-    onShiftTab,
+    onHome,
+    onEnd,
     enabled = true,
   } = options;
 
-  const elementRef = useRef<HTMLElement | null>(null);
-
-  /**
-   * Handle keyboard events
-   */
   const handleKeyDown = useCallback(
-    (event: React.KeyboardEvent | KeyboardEvent) => {
-      if (!enabled) {
-        return;
-      }
+    (event: KeyboardEvent) => {
+      if (!enabled) return;
 
       switch (event.key) {
-        case 'Enter':
-          if (onEnter) {
-            event.preventDefault();
-            onEnter();
-          }
-          break;
-
         case 'Escape':
           if (onEscape) {
             event.preventDefault();
             onEscape();
+          }
+          break;
+
+        case 'Enter':
+          if (onEnter) {
+            event.preventDefault();
+            onEnter();
           }
           break;
 
@@ -106,65 +84,148 @@ export function useKeyboardNavigation(
           break;
 
         case 'Tab':
-          if (event.shiftKey && onShiftTab) {
+          if (onTab) {
             event.preventDefault();
-            onShiftTab();
-          } else if (!event.shiftKey && onTab) {
-            event.preventDefault();
-            onTab();
+            onTab(event.shiftKey);
           }
           break;
 
-        default:
-          // No action for other keys
+        case 'Home':
+          if (onHome) {
+            event.preventDefault();
+            onHome();
+          }
+          break;
+
+        case 'End':
+          if (onEnd) {
+            event.preventDefault();
+            onEnd();
+          }
           break;
       }
     },
-    [
-      enabled,
-      onEnter,
-      onEscape,
-      onArrowUp,
-      onArrowDown,
-      onArrowLeft,
-      onArrowRight,
-      onTab,
-      onShiftTab,
-    ]
+    [enabled, onEscape, onEnter, onArrowUp, onArrowDown, onArrowLeft, onArrowRight, onTab, onHome, onEnd]
   );
 
-  /**
-   * Register an element for keyboard navigation
-   * This allows the hook to attach event listeners to a specific element
-   */
-  const registerElement = useCallback((element: HTMLElement | null) => {
-    elementRef.current = element;
-  }, []);
-
-  /**
-   * Attach global keyboard listener if no specific element is registered
-   */
   useEffect(() => {
-    if (!enabled || elementRef.current) {
-      return;
-    }
+    const element = ref.current;
+    if (!element || !enabled) return;
 
-    // Add global keyboard listener
-    const handleGlobalKeyDown = (event: KeyboardEvent) => {
-      handleKeyDown(event);
-    };
-
-    window.addEventListener('keydown', handleGlobalKeyDown);
+    element.addEventListener('keydown', handleKeyDown);
 
     return () => {
-      window.removeEventListener('keydown', handleGlobalKeyDown);
+      element.removeEventListener('keydown', handleKeyDown);
     };
-  }, [enabled, handleKeyDown]);
-
-  return {
-    handleKeyDown,
-    registerElement,
-  };
+  }, [ref, handleKeyDown, enabled]);
 }
 
-export default useKeyboardNavigation;
+/**
+ * Focus trap hook for modals and dialogs
+ */
+export function useFocusTrap(
+  containerRef: RefObject<HTMLElement>,
+  enabled: boolean = true
+): void {
+  useEffect(() => {
+    if (!enabled || !containerRef.current) return;
+
+    const container = containerRef.current;
+    const focusableElements = container.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+
+    const handleTabKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') return;
+
+      if (e.shiftKey) {
+        if (document.activeElement === firstElement) {
+          e.preventDefault();
+          lastElement?.focus();
+        }
+      } else {
+        if (document.activeElement === lastElement) {
+          e.preventDefault();
+          firstElement?.focus();
+        }
+      }
+    };
+
+    // Focus first element on mount
+    firstElement?.focus();
+
+    container.addEventListener('keydown', handleTabKey);
+
+    return () => {
+      container.removeEventListener('keydown', handleTabKey);
+    };
+  }, [containerRef, enabled]);
+}
+
+/**
+ * Roving tabindex hook for lists and menus
+ */
+export function useRovingTabIndex(
+  containerRef: RefObject<HTMLElement>,
+  itemSelector: string = '[role="menuitem"], [role="option"]',
+  orientation: 'horizontal' | 'vertical' = 'vertical'
+): void {
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const container = containerRef.current;
+    let currentIndex = 0;
+
+    const updateTabIndex = () => {
+      const items = Array.from(container.querySelectorAll<HTMLElement>(itemSelector));
+      
+      items.forEach((item, index) => {
+        if (index === currentIndex) {
+          item.setAttribute('tabindex', '0');
+        } else {
+          item.setAttribute('tabindex', '-1');
+        }
+      });
+
+      return items;
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const items = updateTabIndex();
+      const nextKey = orientation === 'vertical' ? 'ArrowDown' : 'ArrowRight';
+      const prevKey = orientation === 'vertical' ? 'ArrowUp' : 'ArrowLeft';
+
+      if (e.key === nextKey) {
+        e.preventDefault();
+        currentIndex = (currentIndex + 1) % items.length;
+        updateTabIndex();
+        items[currentIndex]?.focus();
+      } else if (e.key === prevKey) {
+        e.preventDefault();
+        currentIndex = (currentIndex - 1 + items.length) % items.length;
+        updateTabIndex();
+        items[currentIndex]?.focus();
+      } else if (e.key === 'Home') {
+        e.preventDefault();
+        currentIndex = 0;
+        updateTabIndex();
+        items[currentIndex]?.focus();
+      } else if (e.key === 'End') {
+        e.preventDefault();
+        currentIndex = items.length - 1;
+        updateTabIndex();
+        items[currentIndex]?.focus();
+      }
+    };
+
+    updateTabIndex();
+    container.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      container.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [containerRef, itemSelector, orientation]);
+}

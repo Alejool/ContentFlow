@@ -254,8 +254,11 @@ export default function ContentCard({
           </div>
           {remoteLock && (
             <div className="absolute top-3 left-3 z-10">
-              <span className="px-2.5 py-1 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-sm backdrop-blur-md border border-amber-200/50 bg-amber-100/90 text-amber-700 dark:bg-amber-900/80 dark:text-amber-300 dark:border-amber-700/50">
-                <Lock className="w-3 h-3" />
+              <span className="px-2.5 py-1 rounded-full text-xs font-bold flex items-center gap-1.5 shadow-lg backdrop-blur-md border border-amber-200/50 bg-amber-100/90 text-amber-700 dark:bg-amber-900/80 dark:text-amber-300 dark:border-amber-700/50 animate-pulse">
+                <div className="relative">
+                  <Lock className="w-3 h-3" />
+                  <div className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-amber-500 rounded-full animate-ping" />
+                </div>
                 <span className="capitalize">{lockedByFirstName}</span>
               </span>
             </div>

@@ -82,7 +82,7 @@ class PublicationLockController extends Controller
                 'session_id' => $sessionId,
                 'ip_address' => $request->ip(),
                 'user_agent' => $request->userAgent(),
-                'expires_at' => now()->addSeconds(40),
+                'expires_at' => now()->addSeconds(20), // Reduced to 20s for faster handovers
             ]
         );
 

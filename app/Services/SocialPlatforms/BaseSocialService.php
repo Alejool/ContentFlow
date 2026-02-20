@@ -15,6 +15,10 @@ abstract class BaseSocialService implements SocialPlatformInterface
 
   public function __construct(string $accessToken, ?SocialAccount $socialAccount = null)
   {
+    if (empty($accessToken)) {
+      throw new \InvalidArgumentException('Access token cannot be empty');
+    }
+
     $this->accessToken = $accessToken;
     $this->socialAccount = $socialAccount;
     $this->client = new Client([
