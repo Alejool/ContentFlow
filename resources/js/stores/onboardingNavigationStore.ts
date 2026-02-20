@@ -72,7 +72,6 @@ export const useOnboardingNavigationStore = create<OnboardingNavigationState>((s
     
     // Don't navigate if already on the target path
     if (state.currentPath === path) {
-      console.log('Already on target path, skipping navigation');
       state.setNavigating(false);
       return;
     }
@@ -88,20 +87,16 @@ export const useOnboardingNavigationStore = create<OnboardingNavigationState>((s
     // Set navigating state
     state.setNavigating(true);
 
-    console.log('Navigating to:', path, 'with preserveState: true');
-
     // Navigate using Inertia with preserveState to keep onboarding state
     router.visit(path, {
       preserveState: true,
       preserveScroll: false,
       replace: false,
       onSuccess: () => {
-        console.log('Navigation successful to:', path);
         state.setCurrentPath(path);
         state.setNavigating(false);
       },
       onError: (errors) => {
-        console.error('Navigation failed:', errors);
         state.setNavigating(false);
       },
     });

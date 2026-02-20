@@ -78,7 +78,6 @@ export const useProcessingProgress = create<ProcessingProgressState>(
 // WebSocket listener initialization
 export function initProcessingProgressRealtime(userId: number) {
   if (!window.Echo) {
-    console.warn("Echo not available, processing progress updates disabled");
     return;
   }
 

@@ -280,8 +280,7 @@ export const useUploadQueue = create<UploadQueueState>((set, get) => ({
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(persistedState));
     } catch (error) {
-      console.error("Failed to persist upload state:", error);
-    }
+      }
   },
 
   restoreState: () => {
@@ -293,7 +292,6 @@ export const useUploadQueue = create<UploadQueueState>((set, get) => ({
 
       // Validate schema version
       if (persistedState.version !== STATE_VERSION) {
-        console.warn("Upload state schema version mismatch, clearing state");
         localStorage.removeItem(STORAGE_KEY);
         return;
       }
@@ -306,7 +304,6 @@ export const useUploadQueue = create<UploadQueueState>((set, get) => ({
       Object.values(persistedState.uploads).forEach((upload) => {
         // Check if state is expired
         if (now - upload.timestamp > expiryTime) {
-          console.warn(`Upload ${upload.id} state expired, skipping`);
           return;
         }
 
@@ -317,7 +314,6 @@ export const useUploadQueue = create<UploadQueueState>((set, get) => ({
           typeof upload.fileSize !== "number" ||
           typeof upload.progress !== "number"
         ) {
-          console.warn(`Upload ${upload.id} has invalid state, skipping`);
           return;
         }
 
@@ -336,7 +332,6 @@ export const useUploadQueue = create<UploadQueueState>((set, get) => ({
 
       set({ persistedState: restoredUploads });
     } catch (error) {
-      console.error("Failed to restore upload state:", error);
       localStorage.removeItem(STORAGE_KEY);
     }
   },
@@ -356,8 +351,7 @@ export const useUploadQueue = create<UploadQueueState>((set, get) => ({
         return { persistedState: rest };
       });
     } catch (error) {
-      console.error("Failed to clear persisted upload:", error);
-    }
+      }
   },
 
   initializeStore: () => {
@@ -390,7 +384,6 @@ export const useUploadQueue = create<UploadQueueState>((set, get) => ({
       localStorage.removeItem(STORAGE_KEY);
       set({ persistedState: {}, showResumePrompt: false });
     } catch (error) {
-      console.error("Failed to clear all persisted uploads:", error);
-    }
+      }
   },
 }));

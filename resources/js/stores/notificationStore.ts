@@ -78,7 +78,6 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
         isLoading: false,
       });
     } catch (error) {
-      console.error("Failed to fetch notifications", error);
       set({ isLoading: false });
     }
   },
@@ -109,8 +108,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
         };
       });
     } catch (error) {
-      console.error("Failed to mark notification as read", error);
-    }
+      }
   },
 
   markAllAsRead: async () => {
@@ -137,8 +135,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
         };
       });
     } catch (error) {
-      console.error("Failed to mark all notifications as read", error);
-    }
+      }
   },
 
   deleteNotification: async (id: string) => {
@@ -170,8 +167,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
         };
       });
     } catch (error) {
-      console.error("Failed to delete notification", error);
-    }
+      }
   },
 
   filterByPriority: (priority: string | null) => {

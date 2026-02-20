@@ -88,7 +88,6 @@ export const useAccountsStore = create<AccountsStore>((set) => ({
       });
       return processedAccounts;
     } catch (error: any) {
-      console.error("Error fetching social accounts:", error);
       const errorMessage =
         error.response?.data?.message ||
         error.message ||

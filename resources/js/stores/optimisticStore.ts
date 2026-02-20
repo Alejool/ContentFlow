@@ -33,13 +33,7 @@ const useOptimisticStore = create<OptimisticState>((set, get) => ({
       
       // Log in development mode
       if (import.meta.env.DEV) {
-        console.log('[OptimisticStore] Adding operation:', {
-          id: operation.id,
-          type: operation.type,
-          resource: operation.resource,
-          timestamp: operation.timestamp,
-        });
-      }
+        }
       
       return { operations: newOps };
     });
@@ -70,11 +64,7 @@ const useOptimisticStore = create<OptimisticState>((set, get) => ({
         
         // Log in development mode
         if (import.meta.env.DEV) {
-          console.log('[OptimisticStore] Confirming operation:', {
-            id,
-            duration: updatedOp.completedAt - op.timestamp,
-          });
-        }
+          }
         
         // Sync with Inertia.js state (Requirements: 9.4)
         syncWithInertia(updatedOp, 'success', serverData);
@@ -84,8 +74,7 @@ const useOptimisticStore = create<OptimisticState>((set, get) => ({
           try {
             op.onSuccess(serverData);
           } catch (error) {
-            console.error('[OptimisticStore] Error in onSuccess callback:', error);
-          }
+            }
         }
       }
       
@@ -139,12 +128,7 @@ const useOptimisticStore = create<OptimisticState>((set, get) => ({
         
         // Log in development mode
         if (import.meta.env.DEV) {
-          console.error('[OptimisticStore] Rolling back operation:', {
-            id,
-            error: error.message,
-            duration: failedOp.completedAt! - op.timestamp,
-          });
-        }
+          }
         
         // Sync with Inertia.js state (Requirements: 9.4)
         syncWithInertia(failedOp, 'failed');
@@ -154,7 +138,6 @@ const useOptimisticStore = create<OptimisticState>((set, get) => ({
           try {
             op.onError(error);
           } catch (callbackError) {
-            console.error('[OptimisticStore] Error in onError callback:', callbackError);
             errorLogger.logError(callbackError as Error, {
               type: 'optimistic',
               operation: 'callback_error',
@@ -169,7 +152,6 @@ const useOptimisticStore = create<OptimisticState>((set, get) => ({
           try {
             op.onRollback();
           } catch (callbackError) {
-            console.error('[OptimisticStore] Error in onRollback callback:', callbackError);
             errorLogger.logError(callbackError as Error, {
               type: 'optimistic',
               operation: 'callback_error',
@@ -254,14 +236,9 @@ const useOptimisticStore = create<OptimisticState>((set, get) => ({
       localStorage.setItem('optimistic-operations', JSON.stringify(dataToStore));
       
       if (import.meta.env.DEV) {
-        console.log('[OptimisticStore] State persisted:', {
-          operationsCount: serializedOps.length,
-          failedCount: state.failedOperations.length,
-        });
-      }
+        }
     } catch (error) {
-      console.error('[OptimisticStore] Failed to persist state:', error);
-    }
+      }
   },
 
   /**
@@ -293,16 +270,12 @@ const useOptimisticStore = create<OptimisticState>((set, get) => ({
         });
         
         if (import.meta.env.DEV) {
-          console.log('[OptimisticStore] State restored:', {
-            operationsCount: operationsMap.size,
-            failedCount: data.failedOperations?.length || 0,
-            age: Date.now() - data.timestamp,
+          - data.timestamp,
           });
         }
       }
     } catch (error) {
-      console.error('[OptimisticStore] Failed to restore state:', error);
-    }
+      }
   },
 }));
 

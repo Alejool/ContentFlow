@@ -1,5 +1,6 @@
 import { router } from "@inertiajs/react";
 import { create } from "zustand";
+import axios from "axios";
 import type { OnboardingState } from "@/types/onboarding";
 import { offlineQueue, type QueuedAction } from "@/Utils/offlineQueue";
 import {
@@ -8,7 +9,7 @@ import {
   getErrorMessage,
   isOnline,
   type RetryOptions,
-} from "@/utils/networkErrorHandler";
+} from "@/Utils/networkErrorHandler";
 
 // LocalStorage cache key
 const CACHE_KEY = "onboarding_state_cache";
@@ -201,9 +202,6 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
   nextTourStep: () => {
     const currentStep = get().tourCurrentStep;
     const newStep = currentStep + 1;
-    
-    console.log('nextTourStep: Moving from step', currentStep, 'to', newStep);
-    
     // Validate step number - should not exceed reasonable bounds
     // Tour has 6 steps (indices 0-5), so max valid step is 5
     const MAX_TOUR_STEPS = 6;
@@ -222,43 +220,35 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
       clearCachedState();
       
       // Call backend to restart onboarding
-      import('axios').then(({ default: axios }) => {
-        axios.post('/api/v1/onboarding/restart')
-          .then((response) => {
-            console.log('Onboarding restarted successfully:', response.data);
-            // Update local state with clean state from backend
-            if (response.data.state) {
-              set({
-                tourCurrentStep: response.data.state.tourCurrentStep || 0,
-                tourCompleted: response.data.state.tourCompleted || false,
-                tourSkipped: response.data.state.tourSkipped || false,
-                tourCompletedSteps: response.data.state.tourCompletedSteps || [],
-                wizardCurrentStep: response.data.state.wizardCurrentStep || 0,
-                wizardCompleted: response.data.state.wizardCompleted || false,
-                wizardSkipped: response.data.state.wizardSkipped || false,
-              });
-              get()._updateCache();
-            }
-            // Reload page to ensure clean state
-            console.log('Reloading page to apply clean state...');
-            setTimeout(() => {
-              window.location.reload();
-            }, 500);
-          })
-          .catch((error) => {
-            console.error('Failed to restart onboarding:', error);
-            // Fallback: just reload the page
+      axios.post('/api/v1/onboarding/restart')
+        .then((response) => {
+          // Update local state with clean state from backend
+          if (response.data.state) {
+            set({
+              tourCurrentStep: response.data.state.tourCurrentStep || 0,
+              tourCompleted: response.data.state.tourCompleted || false,
+              tourSkipped: response.data.state.tourSkipped || false,
+              tourCompletedSteps: response.data.state.tourCompletedSteps || [],
+              wizardCurrentStep: response.data.state.wizardCurrentStep || 0,
+              wizardCompleted: response.data.state.wizardCompleted || false,
+              wizardSkipped: response.data.state.wizardSkipped || false,
+            });
+            get()._updateCache();
+          }
+          // Reload page to ensure clean state
+          setTimeout(() => {
             window.location.reload();
-          });
-      });
+          }, 500);
+        })
+        .catch((error) => {
+          // Fallback: just reload the page
+          window.location.reload();
+        });
       
       return;
     }
     
     // If we're at the last step (step 5), allow moving to it but log that it's the final step
-    if (newStep === MAX_TOUR_STEPS - 1) {
-      console.log(`Moving to final tour step: ${newStep}`);
-    }
     
     set({
       tourCurrentStep: newStep,
@@ -271,13 +261,10 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
     // This ensures the step is saved even if navigation happens
     if (!get().isOffline) {
       // Use axios which is already configured with CSRF token
-      import('axios').then(({ default: axios }) => {
-        axios.post('/api/v1/onboarding/tour/step', { step: newStep })
-          .catch((error) => {
-            console.warn('Failed to sync tour step with backend:', error);
-            // Don't block or rollback - local state is source of truth during tour
-          });
-      });
+      axios.post('/api/v1/onboarding/tour/step', { step: newStep })
+        .catch(() => {
+          // Don't block or rollback - local state is source of truth during tour
+        });
     }
   },
 
@@ -323,9 +310,7 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
     const stepNumber = parseInt(stepId.match(/\d+/)?.[0] || '0');
     const MAX_TOUR_STEPS = 6;
     const isLastStep = stepNumber >= MAX_TOUR_STEPS;
-    
-    console.log('completeTourStep:', { stepId, stepNumber, isLastStep });
-    
+
     // Optimistic update: update local state immediately
     const previousState = {
       tourCompletedSteps: [...get().tourCompletedSteps],
@@ -364,7 +349,7 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
   },
 
   // Tooltip actions
-  showTooltip: (tooltipId: string) => {
+  showTooltip: () => {
     // This is a local state update only - no API call needed for showing
     // The actual tooltip visibility is managed by the TooltipManager component
     // This could be used to track which tooltip is currently active
@@ -411,7 +396,6 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
   },
 
   completeWizardStep: async (stepId: string, data?: any) => {
-    console.log('completeWizardStep called with:', { stepId, data });
     
     // Optimistic update: update local state immediately
     const previousState = {
@@ -425,8 +409,6 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
     const totalSteps = 3; // Should match backend config
     const isLastStep = stepNumber >= totalSteps;
     
-    console.log('Step analysis:', { stepId, stepNumber, totalSteps, isLastStep });
-    
     set((state) => {
       const newState = {
         wizardCurrentStep: stepNumber,
@@ -434,7 +416,6 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
         wizardCompleted: isLastStep ? true : state.wizardCompleted,
         error: null,
       };
-      console.log('Optimistic update applied:', newState);
       return newState;
     });
     
@@ -451,14 +432,6 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
     try {
       // Sync with backend asynchronously
       await get()._executeAction("completeWizardStep", { stepId, data });
-      console.log('Backend sync completed successfully');
-      
-      // Force a state check after backend sync
-      const currentState = get();
-      console.log('State after backend sync:', {
-        wizardCompleted: currentState.wizardCompleted,
-        wizardCurrentStep: currentState.wizardCurrentStep,
-      });
     } catch (error: any) {
       console.error("Failed to complete wizard step", error);
       // Rollback on failure with user notification
@@ -541,7 +514,6 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
       set({
         error: errorMessage,
       });
-      console.error("Failed to select template", error);
     }
   },
 
@@ -621,9 +593,6 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
 
     set({ queuedActionsCount: offlineQueue.size() });
 
-    if (result.success > 0) {
-      console.log(`Successfully synced ${result.success} queued actions`);
-    }
     if (result.failed > 0) {
       console.error(`Failed to sync ${result.failed} queued actions`);
       set({
@@ -702,9 +671,6 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
       initialDelay: 1000,
       maxDelay: 10000,
       backoffMultiplier: 2,
-      onRetry: (attempt, error) => {
-        console.log(`Retrying ${type} (attempt ${attempt}):`, error.message);
-      },
     };
 
     return retryWithBackoff(async () => {
@@ -744,15 +710,10 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
       }
 
       // Use axios for API calls instead of Inertia router
-      const axios = (await import('axios')).default;
       const response = await axios.post(endpoint, data);
-      
-      console.log('Backend response for', type, ':', response.data);
       
       // Update state with response data if available
       if (response.data?.state) {
-        console.log('Raw state from backend:', response.data.state);
-        
         // Transform snake_case to camelCase
         const transformedState = {
           tourCompleted: response.data.state.tourCompleted ?? response.data.state.tour_completed,
@@ -770,7 +731,6 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
           completionPercentage: response.data.state.completionPercentage ?? response.data.state.completion_percentage,
         };
         
-        console.log('Transformed state:', transformedState);
         set(transformedState);
         get()._updateCache();
       } else {

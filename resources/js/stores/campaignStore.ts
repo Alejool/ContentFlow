@@ -95,7 +95,6 @@ export const useCampaignStore = create<CampaignState>((set, get) => ({
         pagination: paginationData,
       });
     } catch (error: any) {
-      console.error("Error fetching campaigns:", error);
       set({
         error: error.message || "Failed to fetch campaigns",
         isLoading: false,
