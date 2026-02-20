@@ -1,5 +1,8 @@
 import axios from "axios";
 import { ReactNode, createContext, useEffect, useState } from "react";
+import { cssPropertiesManager } from "../utils/CSSCustomPropertiesManager";
+import { transitionTheme, prefersReducedMotion } from "../Utils/themeTransition";
+import { themeStorage } from "../Utils/ThemeStorage";
 
 type Theme = "light" | "dark" | "system";
 
@@ -18,15 +21,18 @@ interface ThemeProviderProps {
   children: ReactNode;
   initialTheme?: Theme;
   isAuthenticated?: boolean;
+  workspaceId?: string | number | null;
 }
 
 export function ThemeProvider({
   children,
   initialTheme,
   isAuthenticated = false,
+  workspaceId = null,
 }: ThemeProviderProps) {
   const [theme, setThemeState] = useState<Theme>(initialTheme || "system");
   const [actualTheme, setActualTheme] = useState<"light" | "dark">("light");
+  const [isInitialized, setIsInitialized] = useState(false);
 
   const getSystemTheme = (): "light" | "dark" => {
     if (typeof window === "undefined") return "light";
@@ -41,90 +47,132 @@ export function ThemeProvider({
   };
 
   useEffect(() => {
-    const initializeTheme = () => {
-      // Priority if authenticated: 1. initialTheme (from DB), 2. localStorage, 3. system preference
-      if (isAuthenticated && initialTheme) {
+    const initializeTheme = async () => {
+      // Convert workspaceId to string for storage
+      const workspaceIdStr = workspaceId ? String(workspaceId) : null;
+
+      // Priority: 1. Workspace-specific preference, 2. initialTheme, 3. system preference
+      if (workspaceIdStr) {
+        try {
+          // Load workspace-specific theme preference
+          const workspaceTheme = await themeStorage.loadThemePreference(workspaceIdStr);
+          
+          if (workspaceTheme) {
+            setThemeState(workspaceTheme);
+            setIsInitialized(true);
+            return;
+          }
+        } catch (error) {
+          console.warn('Failed to load workspace theme preference', error);
+        }
+      }
+
+      // Fallback to initialTheme if provided
+      if (initialTheme) {
         setThemeState(initialTheme);
+        setIsInitialized(true);
         return;
       }
 
-      // Priority if guest: 1. localStorage, 2. initialTheme prop, 3. system preference
+      // Fallback to localStorage (for backward compatibility with non-workspace usage)
       const stored = localStorage.getItem("theme") as Theme | null;
       if (stored === "light" || stored === "dark" || stored === "system") {
         setThemeState(stored);
+        setIsInitialized(true);
         return;
       }
 
-      // Si tenemos initialTheme, usarlo
-      if (initialTheme) {
-        setThemeState(initialTheme);
-        return;
-      }
-
-      // Default to system
+      // Default to system preference
       setThemeState("system");
+      setIsInitialized(true);
     };
 
     initializeTheme();
-  }, [initialTheme, isAuthenticated]);
+  }, [initialTheme, workspaceId]);
 
   // Apply theme to document
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === "undefined" || !isInitialized) return;
 
     const resolved = resolveTheme(theme);
     setActualTheme(resolved);
 
-    const root = window.document.documentElement;
-    
-    // Aplicar transición suave
-    root.style.setProperty('transition', 'background-color 0.3s ease-in-out, color 0.3s ease-in-out');
-    
-    root.classList.remove("light", "dark");
-    root.classList.add(resolved);
-    localStorage.setItem("theme", theme);
-    
-    // Limpiar la transición después de aplicarla
-    setTimeout(() => {
-      root.style.removeProperty('transition');
-    }, 300);
-  }, [theme]);
+    const applyTheme = () => {
+      const root = window.document.documentElement;
+      root.classList.remove("light", "dark");
+      root.classList.add(resolved);
+      
+      // Maintain backward compatibility: save to localStorage
+      localStorage.setItem("theme", theme);
+      
+      // Apply CSS custom properties for the resolved theme
+      cssPropertiesManager.applyThemeProperties(resolved);
+    };
+
+    // Use enhanced transition with reduced motion support
+    // Duration: 250ms (within 200-300ms requirement)
+    transitionTheme(applyTheme, {
+      duration: 250,
+      easing: "cubic-bezier(0.4, 0, 0.2, 1)",
+      respectReducedMotion: true,
+    });
+  }, [theme, isInitialized]);
 
   // Listen for system theme changes (only when theme is "system")
   useEffect(() => {
-    if (typeof window === "undefined" || theme !== "system") return;
+    if (typeof window === "undefined" || theme !== "system" || !isInitialized) return;
 
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
     const handleChange = () => {
       const resolved = getSystemTheme();
       setActualTheme(resolved);
-      const root = window.document.documentElement;
       
-      // Aplicar transición suave
-      root.style.setProperty('transition', 'background-color 0.3s ease-in-out, color 0.3s ease-in-out');
-      
-      root.classList.remove("light", "dark");
-      root.classList.add(resolved);
-      
-      // Limpiar la transición después de aplicarla
-      setTimeout(() => {
-        root.style.removeProperty('transition');
-      }, 300);
+      const applySystemTheme = () => {
+        const root = window.document.documentElement;
+        root.classList.remove("light", "dark");
+        root.classList.add(resolved);
+        
+        // Apply CSS custom properties for the resolved theme
+        cssPropertiesManager.applyThemeProperties(resolved);
+      };
+
+      // Use enhanced transition with reduced motion support
+      // Duration: 250ms (within 200-300ms requirement)
+      transitionTheme(applySystemTheme, {
+        duration: 250,
+        easing: "cubic-bezier(0.4, 0, 0.2, 1)",
+        respectReducedMotion: true,
+      });
     };
 
     mediaQuery.addEventListener("change", handleChange);
     return () => mediaQuery.removeEventListener("change", handleChange);
-  }, [theme]);
+  }, [theme, isInitialized]);
 
   const setTheme = async (newTheme: Theme) => {
     setThemeState(newTheme);
 
-    // Solo sincronizar con el backend si está autenticado
+    // Convert workspaceId to string for storage
+    const workspaceIdStr = workspaceId ? String(workspaceId) : null;
+
+    // Save to workspace-specific storage if workspace ID is available
+    if (workspaceIdStr) {
+      try {
+        await themeStorage.saveThemePreference(workspaceIdStr, newTheme);
+      } catch (error) {
+        console.error('Failed to save workspace theme preference', error);
+      }
+    } else {
+      // Fallback to localStorage for backward compatibility
+      localStorage.setItem("theme", newTheme);
+    }
+
+    // Sync with backend if authenticated (for user-level preference)
     if (isAuthenticated) {
       try {
         await axios.patch(route("api.v1.profile.theme.update"), { theme: newTheme });
       } catch (error) {
-        console.error("Failed to save theme preference:", error);
+        console.error("Failed to save theme preference to backend:", error);
       }
     }
   };

@@ -11,6 +11,27 @@ use App\Http\Controllers\Controller;
 class ThemeController extends Controller
 {
   /**
+   * Fetch the user's theme preference.
+   */
+  public function fetch(Request $request)
+  {
+    $user = Auth::user();
+
+    if ($user) {
+      return response()->json([
+        'success' => true,
+        'theme' => $user->theme ?? 'system',
+        'theme_color' => $user->theme_color ?? 'blue',
+      ]);
+    }
+
+    return response()->json([
+      'success' => false,
+      'message' => 'User not authenticated'
+    ], 401);
+  }
+
+  /**
    * Update the user's theme preference.
    */
   public function update(Request $request)
