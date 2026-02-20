@@ -24,6 +24,8 @@ use App\Models\Social\SocialPostLog;
 use App\Models\MediaFiles\MediaFile;
 use App\Models\Workspace\Workspace;
 use App\Models\Role\Role;
+use App\Models\Calendar\ExternalCalendarConnection;
+use App\Models\Calendar\BulkOperationHistory;
 
 class User extends Model implements Authenticatable, MustVerifyEmail, CanResetPassword, HasLocalePreference
 {
@@ -235,5 +237,21 @@ class User extends Model implements Authenticatable, MustVerifyEmail, CanResetPa
   public function onboardingState()
   {
     return $this->hasOne(\App\Models\OnboardingState::class);
+  }
+
+  /**
+   * Get the user's external calendar connections.
+   */
+  public function externalCalendarConnections(): HasMany
+  {
+    return $this->hasMany(ExternalCalendarConnection::class);
+  }
+
+  /**
+   * Get the user's bulk operation history.
+   */
+  public function bulkOperationHistory(): HasMany
+  {
+    return $this->hasMany(BulkOperationHistory::class);
   }
 }

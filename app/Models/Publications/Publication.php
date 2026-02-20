@@ -20,8 +20,7 @@ use App\Models\Campaigns\CampaignAnalytics;
 use App\Models\Social\ScheduledPost;
 use App\Models\Campaigns\Campaign;
 use App\Models\Publications\PublicationComment;
-
-
+use App\Models\Calendar\ExternalCalendarEvent;
 
 use App\Traits\HandlesUtcDates;
 
@@ -349,5 +348,13 @@ class Publication extends Model
   public function comments(): HasMany
   {
     return $this->hasMany(PublicationComment::class)->orderBy('created_at', 'asc');
+  }
+
+  /**
+   * Get the external calendar events for this publication.
+   */
+  public function externalCalendarEvents(): HasMany
+  {
+    return $this->hasMany(ExternalCalendarEvent::class);
   }
 }

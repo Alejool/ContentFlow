@@ -13,6 +13,8 @@ use App\Models\Social\SocialAccount;
 use App\Models\MediaFiles\MediaFile;
 use App\Models\Campaigns\Campaign;
 use Illuminate\Notifications\Notifiable;
+use App\Models\Calendar\ExternalCalendarConnection;
+use App\Models\Calendar\BulkOperationHistory;
 
 
 class Workspace extends Model
@@ -103,5 +105,21 @@ class Workspace extends Model
     public function routeNotificationForDiscord()
     {
         return $this->discord_webhook_url;
+    }
+
+    /**
+     * Get the external calendar connections for this workspace.
+     */
+    public function externalCalendarConnections()
+    {
+        return $this->hasMany(ExternalCalendarConnection::class);
+    }
+
+    /**
+     * Get the bulk operation history for this workspace.
+     */
+    public function bulkOperationHistory()
+    {
+        return $this->hasMany(BulkOperationHistory::class);
     }
 }
