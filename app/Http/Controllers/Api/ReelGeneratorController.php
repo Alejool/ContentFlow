@@ -10,6 +10,7 @@ use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 
 class ReelGeneratorController extends Controller
 {
@@ -108,7 +109,7 @@ class ReelGeneratorController extends Controller
       
       // Use cache lock to prevent concurrent generations with extended TTL
       $lockKey = "reel_lock_{$jobSignature}";
-      $lock = \Illuminate\Support\Facades\Cache::lock($lockKey, 3600); // 1 hour lock
+      $lock = \Cache::lock($lockKey, 3600); // 1 hour lock
 
       if (!$lock->get()) {
         Log::warning('⚠️ Duplicate job detected - already in queue or processing', [
@@ -120,7 +121,7 @@ class ReelGeneratorController extends Controller
       }
       
       // Store job signature in cache for tracking
-      \Illuminate\Support\Facades\Cache::put("job_tracking_{$jobSignature}", [
+      \Cache::put("job_tracking_{$jobSignature}", [
         'media_file_id' => $mediaFile->id,
         'publication_id' => $validated['publication_id'] ?? null,
         'user_id' => Auth::id(),
@@ -183,6 +184,7 @@ class ReelGeneratorController extends Controller
 
       $query = MediaFile::where('file_type', 'reel')
         ->where('workspace_id', $workspaceId)
+        ->whereJsonContains('metadata->ai_generated', true) // Only AI-generated reels
         ->with(['publication', 'user'])
         ->orderBy('created_at', 'desc');
 

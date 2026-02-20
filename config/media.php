@@ -5,9 +5,14 @@ return [
   |--------------------------------------------------------------------------
   | FFmpeg Configuration
   |--------------------------------------------------------------------------
+  | 
+  | For Windows: Use 'ffmpeg' and 'ffprobe' if they're in PATH
+  | Or specify full path like: 'C:/ffmpeg/bin/ffmpeg.exe'
+  | 
+  | For Linux/Mac: Use '/usr/bin/ffmpeg' or '/usr/local/bin/ffmpeg'
   */
-  'ffmpeg_path' => env('FFMPEG_PATH', '/usr/bin/ffmpeg'),
-  'ffprobe_path' => env('FFPROBE_PATH', '/usr/bin/ffprobe'),
+  'ffmpeg_path' => env('FFMPEG_PATH', PHP_OS_FAMILY === 'Windows' ? 'ffmpeg' : '/usr/bin/ffmpeg'),
+  'ffprobe_path' => env('FFPROBE_PATH', PHP_OS_FAMILY === 'Windows' ? 'ffprobe' : '/usr/bin/ffprobe'),
 
   /*
   |--------------------------------------------------------------------------

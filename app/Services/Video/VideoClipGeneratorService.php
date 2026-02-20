@@ -29,10 +29,15 @@ class VideoClipGeneratorService
         throw new \Exception("Downloaded video file not found: {$videoPath}");
       }
       
+      // Get original video duration
+      $originalDuration = $this->getVideoDuration($videoPath);
+      
       Log::info('Starting reel generation', [
         'platform' => $platform,
         'input_file' => $videoPath,
-        'file_size' => filesize($videoPath)
+        'file_size' => filesize($videoPath),
+        'original_duration' => $originalDuration,
+        'max_duration' => $specs['max_duration']
       ]);
       
       $outputPath = $this->generateOutputPath($platform);
@@ -50,27 +55,43 @@ class VideoClipGeneratorService
           'output' => implode("\n", $checkOutput)
         ]);
         
-        // Fallback: Just copy the file without processing
-        Log::warning('FFmpeg not available, copying original file');
+        throw new \Exception('FFmpeg is required for reel generation. Please install FFmpeg or configure the path in config/media.php');
+      }
+      
+      // Determine clip duration and start time
+      $targetDuration = min($originalDuration, $specs['max_duration']);
+      $startTime = 0;
+      
+      // If video is longer than max duration, try to find the best segment
+      if ($originalDuration > $specs['max_duration']) {
+        Log::info('Video exceeds max duration, selecting best segment', [
+          'original_duration' => $originalDuration,
+          'target_duration' => $targetDuration
+        ]);
         
-        // Validate input file before copying
-        $inputSize = filesize($videoPath);
-        if ($inputSize === 0 || $inputSize === false) {
-          throw new \Exception("Input video file is empty, cannot process: {$videoPath}");
+        // Try to use AI to find the best segment
+        try {
+          $highlights = $this->analysisService->detectHighlights($videoPath, $originalDuration);
+          if (!empty($highlights)) {
+            // Use the first highlight as start point
+            $startTime = max(0, $highlights[0]['timestamp'] - ($targetDuration / 2));
+            // Ensure we don't go past the end
+            if ($startTime + $targetDuration > $originalDuration) {
+              $startTime = max(0, $originalDuration - $targetDuration);
+            }
+            Log::info('Using AI-detected highlight as start point', ['start_time' => $startTime]);
+          } else {
+            // Default: start from beginning
+            $startTime = 0;
+            Log::info('No highlights detected, using beginning of video');
+          }
+        } catch (\Exception $e) {
+          Log::warning('Could not detect highlights, using beginning of video', ['error' => $e->getMessage()]);
+          $startTime = 0;
         }
-        
-        copy($videoPath, $outputPath);
-        
-        if (!file_exists($outputPath)) {
-          throw new \Exception('Failed to copy video file');
-        }
-        
-        // Validate copied file
-        $outputSize = filesize($outputPath);
-        if ($outputSize === 0 || $outputSize === false) {
-          throw new \Exception("Copied video file is empty: {$outputPath}");
-        }
-      } else {
+      }
+      
+      {
         // FFmpeg is available, process the video with effects
         // OPTIMIZED FOR SPEED: Using config-based settings
         $preset = config('reels.encoding.preset', 'veryfast');
@@ -108,10 +129,13 @@ class VideoClipGeneratorService
         $filterComplex = implode(',', $videoFilters);
         
         // SPEED OPTIMIZED: Using configurable preset and CRF
+        // IMPORTANT: Add -ss (start time) and -t (duration) to clip the video
         $command = sprintf(
-          '%s -i %s -vf "%s" -c:v libx264 -preset %s -crf %d -c:a aac -b:a %s -movflags +faststart -y %s 2>&1',
+          '%s -ss %s -i %s -t %s -vf "%s" -c:v libx264 -preset %s -crf %d -c:a aac -b:a %s -movflags +faststart -y %s 2>&1',
           escapeshellcmd($ffmpegPath),
+          $startTime,
           escapeshellarg($videoPath),
+          $targetDuration,
           $filterComplex,
           $preset,
           $crf,
@@ -119,10 +143,12 @@ class VideoClipGeneratorService
           escapeshellarg($outputPath)
         );
 
-        Log::info('Executing FFmpeg command (speed optimized)', [
+        Log::info('Executing FFmpeg command (speed optimized with clipping)', [
           'command' => $command,
           'input' => $videoPath,
           'output' => $outputPath,
+          'start_time' => $startTime,
+          'duration' => $targetDuration,
           'filters_applied' => count($videoFilters),
           'preset' => $preset,
           'crf' => $crf
@@ -137,21 +163,7 @@ class VideoClipGeneratorService
             'command' => $command
           ]);
           
-          // Fallback: Just copy the file
-          Log::warning('FFmpeg failed, copying original file as fallback');
-          
-          // Validate input file before copying
-          $inputSize = filesize($videoPath);
-          if ($inputSize === 0 || $inputSize === false) {
-            throw new \Exception("Input video file is empty, cannot process: {$videoPath}");
-          }
-          
-          copy($videoPath, $outputPath);
-          
-          // Validate copied file
-          if (!file_exists($outputPath) || filesize($outputPath) === 0) {
-            throw new \Exception("Fallback copy failed or resulted in empty file: {$outputPath}");
-          }
+          throw new \Exception('FFmpeg processing failed: ' . implode("\n", array_slice($output, -5)));
         }
       }
 
@@ -165,21 +177,23 @@ class VideoClipGeneratorService
         throw new \Exception("Output video file is empty: {$outputPath}");
       }
 
-      Log::info('Video processed successfully', [
-        'output_file' => $outputPath,
-        'output_size' => filesize($outputPath)
-      ]);
-
-      // Upload to S3
-      $s3Path = $this->uploadToS3($outputPath, $platform);
-
-      // Get duration (with fallback)
+      // Get actual duration of the generated reel
       try {
         $duration = $this->getVideoDuration($outputPath);
       } catch (\Exception $e) {
         Log::warning('Could not get video duration', ['error' => $e->getMessage()]);
-        $duration = 30; // Default fallback
+        $duration = $targetDuration; // Use target duration as fallback
       }
+
+      Log::info('Reel generated successfully', [
+        'output_file' => $outputPath,
+        'output_size' => filesize($outputPath),
+        'final_duration' => $duration,
+        'target_duration' => $targetDuration
+      ]);
+
+      // Upload to S3
+      $s3Path = $this->uploadToS3($outputPath, $platform);
 
       // Cleanup
       @unlink($videoPath);
