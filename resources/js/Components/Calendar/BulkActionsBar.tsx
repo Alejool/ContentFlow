@@ -174,7 +174,7 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
               variant="primary"
               onClick={handleBulkMove}
               disabled={isMoving}
-              isLoading={isMoving}
+              loading={isMoving}
             >
               Mover {selectedCount} evento{selectedCount !== 1 ? "s" : ""}
             </Button>
@@ -208,7 +208,7 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
               variant="danger"
               onClick={handleBulkDelete}
               disabled={isDeleting}
-              isLoading={isDeleting}
+              loading={isDeleting}
             >
               Eliminar {selectedCount} evento{selectedCount !== 1 ? "s" : ""}
             </Button>

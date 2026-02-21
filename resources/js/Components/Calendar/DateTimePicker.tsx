@@ -3,6 +3,7 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { AlertTriangle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { validateDate, DateValidationResult } from '@/Utils/dateValidation';
 
 interface DateTimePickerProps {
   selectedDate: Date;
@@ -20,40 +21,26 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
   className = '',
 }) => {
   const { t } = useTranslation();
-  const [isPastDate, setIsPastDate] = useState(false);
-  const [isInvalidDate, setIsInvalidDate] = useState(false);
+  const [validation, setValidation] = useState<DateValidationResult>({
+    isValid: true,
+    isPastDate: false,
+  });
 
   // Validate date whenever it changes
   useEffect(() => {
-    validateDate(selectedDate);
-  }, [selectedDate]);
-
-  const validateDate = (date: Date) => {
-    // Check if date is valid
-    if (!date || isNaN(date.getTime())) {
-      setIsInvalidDate(true);
-      setIsPastDate(false);
-      return false;
-    }
-
-    setIsInvalidDate(false);
-
-    // Check if date is in the past
-    const now = new Date();
-    if (showWarningForPastDates && date < now) {
-      setIsPastDate(true);
-      return true; // Still valid, just shows warning
-    }
-
-    setIsPastDate(false);
-    return true;
-  };
+    const result = validateDate(selectedDate);
+    setValidation(result);
+  }, [selectedDate, showWarningForPastDates]);
 
   const handleDateChange = (date: Date | null) => {
     if (!date) return;
 
     // Validate the date
-    if (validateDate(date)) {
+    const result = validateDate(date);
+    setValidation(result);
+
+    // Only call onChange if date is valid
+    if (result.isValid) {
       onChange(date);
     }
   };
@@ -76,39 +63,31 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
       </div>
 
       {/* Validation Messages */}
-      {isInvalidDate && (
+      {!validation.isValid && validation.error && (
         <div className="flex items-start gap-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
           <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
           <div className="flex-1">
             <p className="text-sm font-medium text-red-800 dark:text-red-200">
-              Fecha inválida
+              {validation.isPastDate 
+                ? t('calendar.validation.past_date_error', 'Cannot Schedule in the Past')
+                : t('calendar.validation.invalid_date', 'Invalid Date')
+              }
             </p>
             <p className="text-xs text-red-600 dark:text-red-300 mt-1">
-              Por favor selecciona una fecha válida.
-            </p>
-          </div>
-        </div>
-      )}
-
-      {isPastDate && !isInvalidDate && (
-        <div className="flex items-start gap-2 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
-          <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
-          <div className="flex-1">
-            <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
-              Advertencia: Fecha en el pasado
-            </p>
-            <p className="text-xs text-amber-600 dark:text-amber-300 mt-1">
-              Has seleccionado una fecha que ya pasó. ¿Estás seguro de que deseas continuar?
+              {validation.isPastDate 
+                ? t('calendar.validation.past_date_message', 'You cannot schedule events for past dates. Please select a future date and time.')
+                : validation.error
+              }
             </p>
           </div>
         </div>
       )}
 
       {/* Selected Date Display */}
-      {!isInvalidDate && (
+      {validation.isValid && (
         <div className="text-center">
           <p className="text-xs text-gray-500 dark:text-gray-400">
-            Fecha seleccionada:
+            {t('calendar.selected_date', 'Selected date:')}
           </p>
           <p className="text-sm font-medium text-gray-900 dark:text-white mt-1">
             {selectedDate.toLocaleString('es-ES', {
