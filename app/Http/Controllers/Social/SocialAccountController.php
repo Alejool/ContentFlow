@@ -79,38 +79,27 @@ class SocialAccountController extends Controller
 
       case 'x':
       case 'twitter':
-        $consumerKey = config('services.twitter.consumer_key');
-        $consumerSecret = config('services.twitter.consumer_secret');
+        // Iniciar con OAuth 2.0 primero (evita el parpadeo)
+        $codeVerifier = Str::random(128);
+        $codeChallenge = strtr(rtrim(
+          base64_encode(hash('sha256', $codeVerifier, true)),
+          '='
+        ), '+/', '-_');
 
-        if (!$consumerKey || !$consumerSecret) {
-          return response()->json([
-            'success' => false,
-            'message' => 'Twitter Consumer Key/Secret not configured in .env'
-          ], 500);
-        }
+        session([
+          'twitter_code_verifier' => $codeVerifier,
+          'social_auth_state' => $state
+        ]);
 
-        $connection = new TwitterOAuth($consumerKey, $consumerSecret);
-
-        try {
-          $request_token = $connection->oauth('oauth/request_token', [
-            'oauth_callback' => url("/auth/{$platform}/callback-v1")
-          ]);
-
-          session([
-            'oauth_token' => $request_token['oauth_token'],
-            'oauth_token_secret' => $request_token['oauth_token_secret'],
-            'social_auth_state' => $state
-          ]);
-
-          $url = $connection->url('oauth/authorize', [
-            'oauth_token' => $request_token['oauth_token']
-          ]);
-        } catch (\Throwable $e) {
-          return response()->json([
-            'success' => false,
-            'message' => 'Failed to initialize Twitter Login: ' . $e->getMessage()
-          ], 500);
-        }
+        $url = 'https://twitter.com/i/oauth2/authorize?' . http_build_query([
+          'client_id' => config('services.twitter.client_id'),
+          'redirect_uri' => url("/auth/{$platform}/callback"),
+          'response_type' => 'code',
+          'scope' => 'tweet.read tweet.write users.read offline.access',
+          'state' => $state,
+          'code_challenge' => $codeChallenge,
+          'code_challenge_method' => 'S256'
+        ]);
         break;
 
       case 'youtube':
@@ -324,14 +313,12 @@ class SocialAccountController extends Controller
     $cachedToken = session('oauth_token');
     $cachedSecret = session('oauth_token_secret');
 
-    // For Twitter V1, we don't have 'state' in the same way, but we have oauth_token.
-    // However, social_auth_state is still used for the V2 flow later.
     if ($request->oauth_token !== $cachedToken) {
       return $this->handleOAuthError('Twitter V1: Token mismatch');
     }
 
     try {
-      // Exchange for permanent V1 tokens
+      // Intercambiar por tokens permanentes V1
       $connection = new TwitterOAuth(
         config('services.twitter.consumer_key'),
         config('services.twitter.consumer_secret'),
@@ -343,36 +330,22 @@ class SocialAccountController extends Controller
         'oauth_verifier' => $request->oauth_verifier
       ]);
 
-      session([
-        'twitter_v1_creds' => [
-          'oauth_token' => $accessToken['oauth_token'],
-          'oauth_token_secret' => $accessToken['oauth_token_secret']
-        ]
-      ]);
+      $v1Creds = [
+        'oauth_token' => $accessToken['oauth_token'],
+        'oauth_token_secret' => $accessToken['oauth_token_secret']
+      ];
 
-      //Start OAuth 2.0 Flow ===
-      $state = session('social_auth_state');
+      // Recuperar datos de OAuth 2.0 guardados previamente
+      $v2Data = session('twitter_v2_data');
 
-      $codeVerifier = Str::random(128);
-      $codeChallenge = strtr(rtrim(
-        base64_encode(hash('sha256', $codeVerifier, true)),
-        '='
-      ), '+/', '-_');
+      if (!$v2Data) {
+        return $this->handleOAuthError('OAuth 2.0 data not found in session');
+      }
 
-      session(['twitter_code_verifier' => $codeVerifier]);
+      $userInfo = $v2Data['user_info'];
 
-      $platform = request()->is('auth/x/*') ? 'x' : 'twitter';
-      $v2Url = 'https://twitter.com/i/oauth2/authorize?' . http_build_query([
-        'client_id' => config('services.twitter.client_id'),
-        'redirect_uri' => url("/auth/{$platform}/callback"),
-        'response_type' => 'code',
-        'scope' => 'tweet.read tweet.write users.read offline.access media.write',
-        'state' => $state,
-        'code_challenge' => $codeChallenge,
-        'code_challenge_method' => 'S256'
-      ]);
-
-      return redirect($v2Url);
+      // Guardar cuenta con ambos tokens (v1 y v2)
+      return $this->saveTwitterAccountAndClose($userInfo, $v2Data, $v1Creds);
     } catch (\Throwable $e) {
       return $this->handleOAuthError('Twitter V1 Auth Failed: ' . $e->getMessage());
     }
@@ -382,6 +355,12 @@ class SocialAccountController extends Controller
   {
     $this->ensureNotRateLimited('twitter-callback');
 
+    // Manejar caso cuando X/Twitter redirige automáticamente sin mostrar la pantalla
+    if ($request->has('error')) {
+      $errorDescription = $request->get('error_description', 'Authorization denied');
+      return $this->handleOAuthError($errorDescription);
+    }
+
     if (!$this->validateOAuthState($request->state)) {
       return $this->handleOAuthError('Invalid or expired security state');
     }
@@ -390,13 +369,14 @@ class SocialAccountController extends Controller
     }
 
     try {
-
       $codeVerifier = session('twitter_code_verifier');
       if (!$codeVerifier) {
         return $this->handleOAuthError('Code verifier not found');
       }
 
       $platform = request()->is('auth/x/*') ? 'x' : 'twitter';
+      
+      // Paso 1: Obtener tokens OAuth 2.0
       $response = Http::withBasicAuth(
         config('services.twitter.client_id'),
         config('services.twitter.client_secret')
@@ -410,9 +390,11 @@ class SocialAccountController extends Controller
       $data = $response->json();
 
       if (!isset($data['access_token'])) {
-        return $this->handleOAuthError('Could not obtain access token');
+        $errorMsg = $data['error_description'] ?? $data['error'] ?? 'Could not obtain access token';
+        return $this->handleOAuthError($errorMsg);
       }
 
+      // Paso 2: Obtener información del usuario
       $userResponse = Http::withToken($data['access_token'])
         ->get('https://api.twitter.com/2/users/me', [
           'user.fields' => 'profile_image_url,username,name'
@@ -426,42 +408,92 @@ class SocialAccountController extends Controller
 
       $userInfo = $userData['data'];
 
-      // Retrieve V1 credentials from session (from Step 2)
-      $v1Creds = session('twitter_v1_creds');
+      // Guardar tokens OAuth 2.0 en sesión para el siguiente paso
+      session([
+        'twitter_v2_data' => [
+          'access_token' => $data['access_token'],
+          'refresh_token' => $data['refresh_token'] ?? null,
+          'expires_in' => $data['expires_in'] ?? null,
+          'user_info' => $userInfo
+        ]
+      ]);
 
-      $metadata = [
-        'username' => $userInfo['username'] ?? null,
-        'avatar' => $userInfo['profile_image_url'] ?? null,
-      ];
+      // Paso 3: Iniciar OAuth 1.0a para obtener tokens v1.1 (necesarios para subir media)
+      $consumerKey = config('services.twitter.consumer_key');
+      $consumerSecret = config('services.twitter.consumer_secret');
 
-      if ($v1Creds) {
-        $metadata['oauth1_token'] = $v1Creds['oauth_token'];
-        $metadata['secret'] = $v1Creds['oauth_token_secret'];
+      if (!$consumerKey || !$consumerSecret) {
+        // Si no hay credenciales v1, guardar solo con v2
+        return $this->saveTwitterAccountAndClose($userInfo, $data, null);
       }
 
-      $this->saveAccount([
-        'platform' => 'twitter',
-        'account_id' => $userInfo['id'],
-        'account_name' => $userInfo['name'] ?? $userInfo['username'] ?? null,
-        'account_metadata' => $metadata,
-        'access_token' => $data['access_token'],
-        'refresh_token' => $data['refresh_token'] ?? null,
-        'token_expires_at' => isset($data['expires_in'])
-          ? now()->addSeconds($data['expires_in'])
-          : null,
-      ]);
+      $connection = new TwitterOAuth($consumerKey, $consumerSecret);
 
-      session()->forget(['twitter_v1_creds', 'twitter_code_verifier', 'oauth_token', 'oauth_token_secret']);
+      try {
+        $request_token = $connection->oauth('oauth/request_token', [
+          'oauth_callback' => url("/auth/{$platform}/callback-v1")
+        ]);
 
-      return $this->closeWindowWithMessage('success', [
-        'platform' => 'twitter',
-        'account_name' => $userInfo['name'] ?? null,
-        'username' => $userInfo['username'] ?? null,
-        'avatar' => $userInfo['profile_image_url'] ?? null,
-      ]);
+        session([
+          'oauth_token' => $request_token['oauth_token'],
+          'oauth_token_secret' => $request_token['oauth_token_secret']
+        ]);
+
+        // Redirigir a OAuth 1.0a
+        $v1Url = $connection->url('oauth/authorize', [
+          'oauth_token' => $request_token['oauth_token']
+        ]);
+
+        return view('auth.twitter-transition', [
+          'oauth2Url' => $v1Url,
+          'platform' => $platform,
+          'step' => 'v1'
+        ]);
+      } catch (\Throwable $e) {
+        // Si falla OAuth 1.0a, guardar solo con v2
+        \Log::warning('Twitter OAuth 1.0a failed, saving with v2 only: ' . $e->getMessage());
+        return $this->saveTwitterAccountAndClose($userInfo, $data, null);
+      }
     } catch (\Exception $e) {
       return $this->handleOAuthError('Error processing authentication: ' . $e->getMessage());
     }
+  }
+
+  /**
+   * Guardar cuenta de Twitter y cerrar ventana
+   */
+  private function saveTwitterAccountAndClose($userInfo, $v2Data, $v1Creds)
+  {
+    $metadata = [
+      'username' => $userInfo['username'] ?? null,
+      'avatar' => $userInfo['profile_image_url'] ?? null,
+    ];
+
+    if ($v1Creds) {
+      $metadata['oauth1_token'] = $v1Creds['oauth_token'];
+      $metadata['secret'] = $v1Creds['oauth_token_secret'];
+    }
+
+    $this->saveAccount([
+      'platform' => 'twitter',
+      'account_id' => $userInfo['id'],
+      'account_name' => $userInfo['name'] ?? $userInfo['username'] ?? null,
+      'account_metadata' => $metadata,
+      'access_token' => $v2Data['access_token'],
+      'refresh_token' => $v2Data['refresh_token'] ?? null,
+      'token_expires_at' => isset($v2Data['expires_in'])
+        ? now()->addSeconds($v2Data['expires_in'])
+        : null,
+    ]);
+
+    session()->forget(['twitter_v2_data', 'twitter_v1_creds', 'twitter_code_verifier', 'oauth_token', 'oauth_token_secret', 'social_auth_state']);
+
+    return $this->closeWindowWithMessage('success', [
+      'platform' => 'twitter',
+      'account_name' => $userInfo['name'] ?? null,
+      'username' => $userInfo['username'] ?? null,
+      'avatar' => $userInfo['profile_image_url'] ?? null,
+    ]);
   }
 
   public function handleYoutubeCallback(Request $request)

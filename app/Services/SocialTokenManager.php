@@ -4,8 +4,8 @@ namespace App\Services;
 
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Log;
-
 use App\Models\Social\SocialAccount;
+use App\Helpers\LogHelper;
 
 class SocialTokenManager
 {
@@ -75,7 +75,11 @@ class SocialTokenManager
         return $response['access_token'];
       }
     } catch (\Exception $e) {
-      Log::error("Error refreshing token for {$account->platform}: " . $e->getMessage());
+      LogHelper::social('error', "Error refreshing token for {$account->platform}", [
+        'account_id' => $account->id,
+        'platform' => $account->platform,
+        'error' => $e->getMessage()
+      ]);
     }
 
     return null;
@@ -128,7 +132,8 @@ class SocialTokenManager
 
       if ($response->getStatusCode() !== 200) {
         $body = (string)$response->getBody();
-        Log::error("Twitter token refresh failed with status {$response->getStatusCode()}", [
+        LogHelper::social('error', "Twitter token refresh failed", [
+          'status_code' => $response->getStatusCode(),
           'body' => $body,
           'account_id' => $account->id
         ]);
@@ -137,9 +142,10 @@ class SocialTokenManager
 
       return json_decode($response->getBody(), true);
     } catch (\Exception $e) {
-      Log::error("Twitter token refresh exception", [
+      LogHelper::social('error', "Twitter token refresh exception", [
         'error' => $e->getMessage(),
-        'account_id' => $account->id
+        'account_id' => $account->id,
+        'trace' => $e->getTraceAsString()
       ]);
       return null;
     }
