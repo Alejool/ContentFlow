@@ -3,7 +3,6 @@ import ModernCard from "@/Components/common/Modern/Card";
 import Input from "@/Components/common/Modern/Input";
 import Select from "@/Components/common/Modern/Select";
 import Textarea from "@/Components/common/Modern/Textarea";
-import { useTheme } from "@/Hooks/useTheme";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, useForm } from "@inertiajs/react";
 import {
@@ -18,7 +17,6 @@ import { useTranslation } from "react-i18next";
 
 export default function SystemNotifications() {
   const { t } = useTranslation();
-  const { theme } = useTheme();
   const { data, setData, post, processing, errors, reset } = useForm({
     title: "",
     message: "",

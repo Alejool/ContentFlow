@@ -65,10 +65,10 @@ export default function ModernCard({
   return (
     <div
       className={`rounded-lg overflow-hidden transition-all duration-300 mt-4
-        ${theme === "dark" ? "bg-neutral-800/65" : "bg-white/70"}
+        ${actualTheme === "dark" ? "bg-neutral-800/65" : "bg-white/70"}
         ${
           !noBorder &&
-          (theme === "dark"
+          (actualTheme === "dark"
             ? "border border-neutral-700/70"
             : "border border-gray-200")
         }
@@ -113,7 +113,7 @@ export default function ModernCard({
 
       <div
         className={`${padding} ${
-          theme === "dark" ? "bg-neutral-900/20" : "bg-gray-50/50"
+          actualTheme === "dark" ? "bg-neutral-900/20" : "bg-gray-50/50"
         }`}
       >
         {children}

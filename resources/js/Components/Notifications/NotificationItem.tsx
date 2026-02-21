@@ -115,27 +115,37 @@ export default function NotificationItem({
               setIsExpanded(!isExpanded);
             }}
           >
-            <p
-              className={`text-sm mb-1 break-words ${isExpanded ? "" : "line-clamp-2"} ${
-                theme === "dark" ? "text-gray-200" : "text-gray-800"
-              }`}
-            >
-              {t(data.message || data.title, { platform: data.platform })}
-            </p>
+            {/* Show title as heading if available */}
+            {data.title && (
+              <p
+                className={`text-sm font-semibold mb-1 ${
+                  theme === "dark" ? "text-gray-100" : "text-gray-900"
+                }`}
+              >
+                {data.title}
+              </p>
+            )}
+            
+            {/* Show message as main content */}
+            {data.message && (
+              <p
+                className={`text-sm mb-1 break-words ${isExpanded ? "" : "line-clamp-2"} ${
+                  theme === "dark" ? "text-gray-200" : "text-gray-700"
+                }`}
+              >
+                {data.message}
+              </p>
+            )}
 
-            {(data.message || data.title).length > 100 && (
+            {data.message && data.message.length > 100 && (
               <span
                 className={`text-xs hover:underline cursor-pointer ${
                   theme === "dark" ? "text-primary-400" : "text-primary-600"
                 }`}
               >
                 {isExpanded
-                  ? theme === "dark"
-                    ? "Menos"
-                    : "Less"
-                  : theme === "dark"
-                    ? "Leer más"
-                    : "Read more"}
+                  ? t("common.show_less")
+                  : t("common.read_more")}
               </span>
             )}
           </div>
