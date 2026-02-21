@@ -15,11 +15,13 @@ import { useUploadWarning } from "@/Hooks/useUploadWarning";
 export default function GlobalUploadIndicator() {
   const queue = useUploadQueue((state) => state.queue);
   const removeUpload = useUploadQueue((state) => state.removeUpload);
-  const pauseUpload = useUploadQueue((state) => state.pauseUpload);
-  const resumeUpload = useUploadQueue((state) => state.resumeUpload);
   const retryUpload = useUploadQueue((state) => state.retryUpload);
   
-  const { cancelUpload: cancelUploadWithCleanup } = useS3Upload();
+  const { 
+    pauseUpload, 
+    resumeUpload: resumeUploadWithLogic, 
+    cancelUpload: cancelUploadWithCleanup 
+  } = useS3Upload();
   
   const processingJobs = useProcessingProgress((state) => state.jobs);
   const cancelJob = useProcessingProgress((state) => state.cancelJob);
@@ -133,7 +135,7 @@ export default function GlobalUploadIndicator() {
   };
   
   const handleResumeUpload = (id: string) => {
-    resumeUpload(id);
+    resumeUploadWithLogic(id);
   };
   
   const handleCancelUpload = async (id: string) => {
