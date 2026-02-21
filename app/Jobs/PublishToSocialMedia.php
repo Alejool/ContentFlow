@@ -11,39 +11,73 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use App\Events\PublicationStatusUpdated;
-
+use App\Jobs\Middleware\RateLimitPublishing;
+use App\Models\SocialAccount;
+use App\Notifications\PublicationPublishedNotification;
 use App\Models\User;
+use App\Helpers\LogHelper;
 
 class PublishToSocialMedia implements ShouldQueue
 {
   use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-  public $timeout = 300;
-  public $tries = 3;
-  public $backoff = [30, 60, 120];
-  public $maxExceptions = 3;
+  public $timeout = 1800; // 30 minutos para archivos pesados
+  public $tries = 2; // Reducir intentos ya que cada uno toma más tiempo
+  public $backoff = [60, 180]; // Backoff más largo entre reintentos
+  public $maxExceptions = 2;
   public $failOnTimeout = true;
 
+  /**
+   * Get the middleware the job should pass through.
+   */
+  public function middleware(): array
+  {
+    return [new RateLimitPublishing];
+  }
+
   public function __construct(
-    private int $publicationId,
-    private array $socialAccountIds
+    public int $publicationId,
+    public array $socialAccountIds
   ) {}
 
   public function handle(PlatformPublishService $publishService): void
   {
+    $startTime = microtime(true);
+    
     $publication = Publication::with(['user.currentWorkspace', 'workspace'])->find($this->publicationId);
     
     if (!$publication) {
-      Log::error('Publication not found', ['id' => $this->publicationId]);
+      LogHelper::publicationError('Publication not found', [
+        'publication_id' => $this->publicationId,
+        'job_id' => $this->job->uuid()
+      ]);
       $this->delete();
       return;
     }
 
-    $socialAccounts = \App\Models\Social\SocialAccount::whereIn('id', $this->socialAccountIds)
+    // Log file size for monitoring
+    if ($publication->media_path) {
+      $filePath = storage_path('app/' . $publication->media_path);
+      if (file_exists($filePath)) {
+        $fileSize = filesize($filePath);
+        Log::info('Processing publication with media', [
+          'publication_id' => $publication->id,
+          'file_size_mb' => round($fileSize / 1024 / 1024, 2),
+          'timeout' => $this->timeout,
+          'attempt' => $this->attempts()
+        ]);
+      }
+    }
+
+    $socialAccounts = SocialAccount::whereIn('id', $this->socialAccountIds)
       ->get();
 
     if ($socialAccounts->isEmpty()) {
-      Log::error('No social accounts found', ['ids' => $this->socialAccountIds]);
+      LogHelper::publicationError('No social accounts found', [
+        'publication_id' => $publication->id,
+        'social_account_ids' => $this->socialAccountIds,
+        'job_id' => $this->job->uuid()
+      ]);
       $publication->update(['status' => 'failed']);
       $this->delete();
       return;
@@ -59,7 +93,8 @@ class PublishToSocialMedia implements ShouldQueue
 
     Log::info('Starting background publishing', [
       'publication_id' => $publication->id,
-      'attempt' => $this->attempts()
+      'attempt' => $this->attempts(),
+      'platforms' => $socialAccounts->pluck('platform')->toArray()
     ]);
 
     try {
@@ -67,6 +102,13 @@ class PublishToSocialMedia implements ShouldQueue
         $publication,
         $socialAccounts
       );
+      
+      $publishDuration = round(microtime(true) - $startTime, 2);
+      LogHelper::jobInfo('Publishing completed', [
+        'publication_id' => $publication->id,
+        'duration_seconds' => $publishDuration,
+        'job_id' => $this->job->uuid()
+      ]);
 
       $platformResults = $result['platform_results'] ?? [];
       $publisher = User::find($publication->published_by);
@@ -96,18 +138,56 @@ class PublishToSocialMedia implements ShouldQueue
 
       $anySuccess = collect($platformResults)
         ->contains(fn($r) => !empty($r['success']));
+      
+      $allSuccess = collect($platformResults)
+        ->every(fn($r) => !empty($r['success']));
 
-      if ($anySuccess) {
+      if ($allSuccess) {
+        // All platforms succeeded - mark as published and send notification
         $publication->logActivity('published');
         $publication->update([
           'status' => 'published',
           'publish_date' => now(),
         ]);
         
-        // Only send notification once - delete job from queue to prevent retries
+        // Delete job from queue to prevent retries
         $this->delete();
         $this->sendSuccessNotification($publication, $platformResults);
+      } elseif ($anySuccess) {
+        // Partial success - some platforms succeeded, others failed
+        // Check if this is the last attempt
+        if ($this->attempts() >= $this->tries) {
+          // Last attempt - mark as published with warnings
+          $publication->logActivity('published_with_errors', [
+            'successful_platforms' => collect($platformResults)->filter(fn($r) => $r['success'])->keys()->toArray(),
+            'failed_platforms' => collect($platformResults)->filter(fn($r) => !$r['success'])->keys()->toArray(),
+          ], $publisher);
+          
+          $publication->update([
+            'status' => 'published',
+            'publish_date' => now(),
+          ]);
+          
+          // Delete job and send notification with partial success info
+          $this->delete();
+          $this->sendSuccessNotification($publication, $platformResults);
+        } else {
+          // Not the last attempt - throw exception to retry only failed platforms
+          $failedPlatforms = collect($platformResults)
+            ->filter(fn($r) => !$r['success'])
+            ->keys()
+            ->toArray();
+          
+          $publication->logActivity('partial_success_retrying', [
+            'successful_platforms' => collect($platformResults)->filter(fn($r) => $r['success'])->keys()->toArray(),
+            'failed_platforms' => $failedPlatforms,
+            'attempt' => $this->attempts(),
+          ], $publisher);
+          
+          throw new \Exception('Partial failure, retrying failed platforms: ' . implode(', ', $failedPlatforms));
+        }
       } else {
+        // All platforms failed
         $publication->logActivity('failed', [
           'reason' => empty($platformResults) ? ($result['message'] ?? 'Initialization failed') : 'All platforms failed',
           'attempt' => $this->attempts(),
@@ -173,6 +253,11 @@ class PublishToSocialMedia implements ShouldQueue
       $failedPlatforms = [];
       
       foreach ($platformResults as $platform => $result) {
+        // Skip platforms that were already published in a previous attempt
+        if (!empty($result['skipped'])) {
+          continue;
+        }
+        
         if ($result['success']) {
           $successPlatforms[] = $platform;
         } else {
@@ -183,7 +268,15 @@ class PublishToSocialMedia implements ShouldQueue
         }
       }
       
-      $notification = new \App\Notifications\PublicationPublishedNotification(
+      // Only send notification if there are new platforms to report
+      if (empty($successPlatforms) && empty($failedPlatforms)) {
+        Log::info('No new platforms to notify about, skipping notification', [
+          'publication_id' => $publication->id
+        ]);
+        return;
+      }
+      
+      $notification = new PublicationPublishedNotification(
         $publication,
         $successPlatforms,
         $failedPlatforms
@@ -196,7 +289,9 @@ class PublishToSocialMedia implements ShouldQueue
         Log::info('Notifying all workspace members', [
           'publication_id' => $publication->id,
           'workspace_id' => $publication->workspace_id,
-          'member_count' => $workspaceUsers->count()
+          'member_count' => $workspaceUsers->count(),
+          'new_success_platforms' => $successPlatforms,
+          'new_failed_platforms' => count($failedPlatforms)
         ]);
         
         foreach ($workspaceUsers as $user) {
@@ -232,7 +327,7 @@ class PublishToSocialMedia implements ShouldQueue
       
       $errorMsg = $this->sanitizeErrorMessage($reason);
       
-      $notification = new \App\Notifications\PublicationPostFailedNotification(
+      $notification = new PublicationPostFailedNotification(
         $publication,
         $errorMsg,
         $failedPlatforms
@@ -314,7 +409,7 @@ class PublishToSocialMedia implements ShouldQueue
     ], $publisher);
 
     // ONLY send notification here after ALL retries exhausted
-    $socialAccounts = \App\Models\Social\SocialAccount::whereIn('id', $this->socialAccountIds)->get();
+    $socialAccounts = SocialAccount::whereIn('id', $this->socialAccountIds)->get();
     $platformResults = [];
     foreach ($socialAccounts as $account) {
       $platformResults[$account->platform] = [
@@ -327,7 +422,7 @@ class PublishToSocialMedia implements ShouldQueue
     $this->sendGeneralFailureNotification($publication, $exception->getMessage(), $platformResults);
     
     // Also send individual platform notifications to Discord/Slack for each failed log
-    $failedLogs = \App\Models\Social\SocialPostLog::where('publication_id', $publication->id)
+    $failedLogs = SocialPostLog::where('publication_id', $publication->id)
       ->whereIn('social_account_id', $this->socialAccountIds)
       ->where('status', 'failed')
       ->get();
@@ -336,7 +431,7 @@ class PublishToSocialMedia implements ShouldQueue
       try {
         if ($publication->workspace) {
           $publication->workspace->notify(
-            new \App\Notifications\PublicationResultNotification($log, 'failed', $log->error_message)
+            new PublicationResultNotification($log, 'failed', $log->error_message)
           );
         }
       } catch (\Exception $e) {

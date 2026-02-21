@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Artisan;
+use App\Helpers\LogHelper;
 
 
 use App\Jobs\ProcessYouTubePlaylistItem;
@@ -93,7 +94,10 @@ class PlatformPublishService
 
         $preparedLogs[$socialAccount->id] = $accountLogs;
       } catch (\Exception $e) {
-        Log::error('Failed to initialize logs for account', ['account_id' => $socialAccount->id, 'error' => $e->getMessage()]);
+        LogHelper::publicationError('Failed to initialize logs for account', [
+          'account_id' => $socialAccount->id,
+          'error' => $e->getMessage()
+        ]);
         // We can't return logs for this account.
       }
     }
@@ -162,7 +166,12 @@ class PlatformPublishService
         ];
       }
     } catch (\Throwable $e) {
-      Log::error('Publication failed', ['account' => $socialAccount->platform, 'error' => $e->getMessage()]);
+      LogHelper::publicationError('Publication failed', [
+        'account' => $socialAccount->platform,
+        'account_id' => $socialAccount->id,
+        'error' => $e->getMessage(),
+        'trace' => $e->getTraceAsString()
+      ]);
       $this->logService->markAsFailed($postLog, $e->getMessage());
 
       // Don't notify here - Job will handle notification after all retries
@@ -260,20 +269,70 @@ class PlatformPublishService
     $socialAccounts
   ): array {
 
-    Log::info('publishToAllPlatforms', ['publication' => $publication, 'socialAccounts' => $socialAccounts]);
+    LogHelper::publicationInfo('Publishing to all platforms', [
+      'publication_id' => $publication->id,
+      'social_accounts' => $socialAccounts->pluck('id')->toArray(),
+      'platforms' => $socialAccounts->pluck('platform')->toArray()
+    ]);
     $allLogs = [];
     $allErrors = [];
     $platformResults = [];
 
-    // Initialize/Update logs for ALL accounts first (idempotent)
+    // Check for already published platforms to avoid re-publishing
+    $alreadyPublishedPlatforms = [];
+    foreach ($socialAccounts as $socialAccount) {
+      $existingSuccessfulLog = SocialPostLog::where('publication_id', $publication->id)
+        ->where('social_account_id', $socialAccount->id)
+        ->where('status', 'published')
+        ->first();
+      
+      if ($existingSuccessfulLog) {
+        LogHelper::publicationInfo('Platform already published successfully, skipping', [
+          'platform' => $socialAccount->platform,
+          'account_id' => $socialAccount->id,
+          'log_id' => $existingSuccessfulLog->id
+        ]);
+        
+        $alreadyPublishedPlatforms[] = $socialAccount->platform;
+        $platformResults[$socialAccount->platform] = [
+          'success' => true,
+          'published' => 1,
+          'failed' => 0,
+          'logs' => [$existingSuccessfulLog],
+          'skipped' => true, // Mark as skipped to avoid re-notification
+        ];
+        $allLogs[] = $existingSuccessfulLog;
+      }
+    }
+    
+    // Filter out already published accounts
+    $socialAccounts = $socialAccounts->reject(function($account) use ($alreadyPublishedPlatforms) {
+      return in_array($account->platform, $alreadyPublishedPlatforms);
+    });
+    
+    if ($socialAccounts->isEmpty()) {
+      Log::info('All platforms already published, nothing to do');
+      return [
+        'logs' => $allLogs,
+        'errors' => [],
+        'platform_results' => $platformResults,
+        'has_errors' => false,
+      ];
+    }
+
+    // Initialize/Update logs for remaining accounts (idempotent)
     try {
       $preparedLogsMap = $this->initializeLogs($publication, $socialAccounts);
     } catch (\Exception $e) {
-      Log::error('Log initialization failed globally', ['publication_id' => $publication->id, 'error' => $e->getMessage()]);
+      LogHelper::publicationError('Log initialization failed globally', [
+        'publication_id' => $publication->id,
+        'error' => $e->getMessage(),
+        'trace' => $e->getTraceAsString()
+      ]);
       return [
         'success' => false,
         'message' => 'Failed to initialize logs: ' . $e->getMessage(),
-        'platform_results' => [],
+        'platform_results' => $platformResults,
       ];
     }
 
@@ -411,9 +470,10 @@ class PlatformPublishService
           }
         }
 
-        Log::error('Platform publication error (handled)', [
+        LogHelper::publicationError('Platform publication error (handled)', [
           'platform' => $socialAccount->platform,
-          'campaign_id' => $publication->id,
+          'publication_id' => $publication->id,
+          'account_id' => $socialAccount->id,
           'error' => $e->getMessage(),
           'trace' => $e->getTraceAsString(),
         ]);
@@ -473,9 +533,10 @@ class PlatformPublishService
       return $result;
     } catch (\Exception $e) {
       DB::rollBack();
-      Log::error('Post publication failed -----> rollback', [
+      LogHelper::publicationError('Post publication failed -----> rollback', [
         'post_log_id' => $postLog->id,
         'platform' => $postLog->platform,
+        'error' => $e->getMessage(),
         'publication_id' => $postLog->publication_id,
         'error' => $e->getMessage()
       ]);

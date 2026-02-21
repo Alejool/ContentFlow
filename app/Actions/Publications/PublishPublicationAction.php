@@ -11,6 +11,7 @@ use App\Events\PublicationStatusUpdated;
 use Illuminate\Support\Facades\Log;
 use App\Models\Social\SocialPostLog;
 use App\Services\Publish\PlatformPublishService;
+use App\Helpers\LogHelper;
 
 class PublishPublicationAction
 {
@@ -64,7 +65,8 @@ class PublishPublicationAction
 
     // Handle Thumbnails for Publish (if any)
     if (!empty($options['thumbnails'] ?? [])) {
-      Log::info('Processing thumbnails in PublishPublicationAction', [
+      LogHelper::publicationInfo('Processing thumbnails in PublishPublicationAction', [
+        'publication_id' => $publication->id,
         'count' => count($options['thumbnails'])
       ]);
       foreach ($options['thumbnails'] as $mediaId => $thumbnailFile) {
@@ -147,14 +149,99 @@ class PublishPublicationAction
     // Clear the cache so getPublishedPlatforms returns fresh data
     cache()->forget("publication_{$publication->id}_platforms");
 
-    Log::info('Dispatching PublishToSocialMedia job', [
+    // Obtener información de la cola antes de despachar
+    $queueSize = \Illuminate\Support\Facades\Redis::llen('queues:publishing');
+    $estimatedWaitMinutes = $this->estimateWaitTime($queueSize);
+
+    LogHelper::jobInfo('Dispatching PublishToSocialMedia job', [
       'publication_id' => $publication->id,
-      'platform_count' => $socialAccounts->count()
+      'platform_count' => $socialAccounts->count(),
+      'platforms' => $socialAccounts->pluck('platform')->toArray(),
+      'queue_size' => $queueSize,
+      'estimated_wait_minutes' => $estimatedWaitMinutes
     ]);
 
-    PublishToSocialMedia::dispatch(
+    // Determinar prioridad basada en el tamaño del archivo
+    $priority = $this->determineJobPriority($publication);
+    
+    $job = PublishToSocialMedia::dispatch(
       $publication->id,
       $socialAccounts->pluck('id')->toArray()
     )->onQueue('publishing');
+    
+    // Si el archivo es pequeño, darle mayor prioridad
+    if ($priority === 'high') {
+      Log::info('Small file detected, using high priority', [
+        'publication_id' => $publication->id
+      ]);
+    }
+    
+    // Notificar al usuario sobre la posición en cola si hay espera
+    if ($queueSize > 0) {
+      try {
+        $user = auth()->user();
+        if ($user) {
+          $user->notify(new \App\Notifications\PublicationQueuedNotification(
+            $publication,
+            $queueSize + 1,
+            $estimatedWaitMinutes
+          ));
+        }
+      } catch (\Exception $e) {
+        Log::error('Failed to send queue notification', [
+          'publication_id' => $publication->id,
+          'error' => $e->getMessage()
+        ]);
+      }
+    }
+  }
+  
+  /**
+   * Estimar tiempo de espera basado en el tamaño de la cola
+   */
+  private function estimateWaitTime(int $queueSize): int
+  {
+    if ($queueSize === 0) {
+      return 0;
+    }
+    
+    // Estimación: cada job toma aproximadamente 8 minutos en promedio
+    // Con 5 workers simultáneos, dividimos el tiempo
+    $avgJobTimeMinutes = 8;
+    $concurrentWorkers = 5;
+    
+    $estimatedMinutes = ceil(($queueSize * $avgJobTimeMinutes) / $concurrentWorkers);
+    
+    return (int) $estimatedMinutes;
+  }
+  
+  /**
+   * Determinar la prioridad del job basado en el tamaño del archivo
+   */
+  private function determineJobPriority(Publication $publication): string
+  {
+    if (!$publication->media_path) {
+      return 'normal';
+    }
+    
+    $filePath = storage_path('app/' . $publication->media_path);
+    if (!file_exists($filePath)) {
+      return 'normal';
+    }
+    
+    $fileSizeMB = filesize($filePath) / 1024 / 1024;
+    
+    // Archivos menores a 50MB tienen prioridad alta
+    if ($fileSizeMB < 50) {
+      return 'high';
+    }
+    
+    // Archivos entre 50-200MB tienen prioridad normal
+    if ($fileSizeMB < 200) {
+      return 'normal';
+    }
+    
+    // Archivos mayores a 200MB tienen prioridad baja
+    return 'low';
   }
 }
