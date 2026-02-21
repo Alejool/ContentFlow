@@ -14,6 +14,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class GenerateReelsFromVideo implements ShouldQueue
 {
@@ -161,7 +162,8 @@ class GenerateReelsFromVideo implements ShouldQueue
           'file_name' => basename($reel['path']),
           'file_type' => 'reel',
           'mime_type' => 'video/mp4',
-          'size' => \Illuminate\Support\Facades\Storage::size($reel['path']),
+          'size' => 
+          Storage::size($reel['path']),
           'status' => 'completed',
           'metadata' => [
             'platform' => $platform,
@@ -238,7 +240,8 @@ class GenerateReelsFromVideo implements ShouldQueue
             'file_name' => "clip_{$index}_" . basename($clip['path']),
             'file_type' => 'video',
             'mime_type' => 'video/mp4',
-            'size' => \Illuminate\Support\Facades\Storage::size($clip['path']),
+            'size' => 
+            Storage::size($clip['path']),
             'status' => 'completed',
             'metadata' => [
               'type' => 'highlight_clip',
@@ -288,7 +291,8 @@ class GenerateReelsFromVideo implements ShouldQueue
       $this->updateProgress($jobId, $userId, 100, 'Completed', 3);
       
       // Clear progress cache
-      \Illuminate\Support\Facades\Cache::forget("processing_progress:{$jobId}");
+      
+      Cache::forget("processing_progress:{$jobId}");
 
       // Notify user
       if ($mediaFile->user) {
@@ -363,7 +367,8 @@ class GenerateReelsFromVideo implements ShouldQueue
       
       // Clear progress cache
       $jobId = $this->job?->getJobId() ?? uniqid('job_', true);
-      \Illuminate\Support\Facades\Cache::forget("processing_progress:{$jobId}");
+      
+      Cache::forget("processing_progress:{$jobId}");
       
       // Broadcast failure
       if ($this->publicationId) {
@@ -403,7 +408,8 @@ class GenerateReelsFromVideo implements ShouldQueue
     ];
     
     // Store in Redis cache with 2-hour expiry
-    \Illuminate\Support\Facades\Cache::put($key, $data, now()->addHours(2));
+    
+    Cache::put($key, $data, now()->addHours(2));
     
     // Broadcast via WebSocket
     if ($this->publicationId) {
@@ -428,7 +434,8 @@ class GenerateReelsFromVideo implements ShouldQueue
       'error' => $errorMessage,
     ];
     
-    \Illuminate\Support\Facades\Cache::put($key, $data, now()->addHours(2));
+    
+    Cache::put($key, $data, now()->addHours(2));
     
     if ($this->publicationId) {
       broadcast(new \App\Events\ProcessingProgressUpdated($userId, $jobId, $this->publicationId, $data));
@@ -442,11 +449,13 @@ class GenerateReelsFromVideo implements ShouldQueue
   private function downloadVideo(string $s3Path): string
   {
     // Validate S3 file exists and has content
-    if (!\Illuminate\Support\Facades\Storage::exists($s3Path)) {
+    if (!
+    Storage::exists($s3Path)) {
       throw new \Exception("Video file not found in S3: {$s3Path}");
     }
 
-    $fileSize = \Illuminate\Support\Facades\Storage::size($s3Path);
+    $fileSize = 
+    Storage::size($s3Path);
     if ($fileSize === 0 || $fileSize === false) {
       throw new \Exception("Video file is empty or inaccessible in S3: {$s3Path} (size: {$fileSize})");
     }
@@ -465,7 +474,8 @@ class GenerateReelsFromVideo implements ShouldQueue
     
     try {
       // Use streaming to avoid loading entire file into memory
-      $stream = \Illuminate\Support\Facades\Storage::readStream($s3Path);
+      $stream = 
+      Storage::readStream($s3Path);
       
       if ($stream === false) {
         throw new \Exception("Failed to open stream from S3: {$s3Path}");
