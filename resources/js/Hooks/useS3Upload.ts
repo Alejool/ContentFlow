@@ -1,5 +1,5 @@
 import { useMediaStore } from "@/stores/mediaStore";
-import { useUploadQueue } from "@/stores/uploadQueueStore";
+import { useUploadQueue, type UploadStats } from "@/stores/uploadQueueStore";
 import { router } from "@inertiajs/react";
 import axios, { AxiosError } from "axios";
 import { useCallback } from "react";
@@ -277,25 +277,53 @@ export const useS3Upload = () => {
   );
 
   const uploadSingle = async (file: File, id: string, startTime: number) => {
-    const { data: signData } = await axios.post(route("api.v1.uploads.sign"), {
-      filename: file.name,
-      content_type: file.type,
-    });
+    try {
+      const { data: signData } = await axios.post(route("api.v1.uploads.sign"), {
+        filename: file.name,
+        content_type: file.type,
+      });
 
-    const { upload_url, key } = signData;
+      const { upload_url, key } = signData;
 
-    // Get abort controller from store
-    const currentUpload = useUploadQueue.getState().queue[id];
-    const abortController = currentUpload?.abortController;
+      console.log('📤 Starting single file upload', {
+        filename: file.name,
+        size: file.size,
+        type: file.type,
+        key: key,
+      });
 
-    await axios.put(upload_url, file, {
-      headers: { "Content-Type": file.type },
-      withCredentials: false,
-      signal: abortController?.signal,
-      onUploadProgress: (p) => handleProgress(p, id, startTime, 0, file.size),
-    });
+      // Get abort controller from store
+      const currentUpload = useUploadQueue.getState().queue[id];
+      const abortController = currentUpload?.abortController;
 
-    return { key, filename: file.name, mime_type: file.type, size: file.size };
+      await axios.put(upload_url, file, {
+        headers: { "Content-Type": file.type },
+        withCredentials: false,
+        signal: abortController?.signal,
+        onUploadProgress: (p) => handleProgress(p, id, startTime, 0, file.size),
+      });
+
+      console.log('✅ Single file upload completed', {
+        filename: file.name,
+        key: key,
+      });
+
+      return { key, filename: file.name, mime_type: file.type, size: file.size };
+    } catch (error: any) {
+      // Check if error is due to cancellation
+      if (axios.isCancel(error) || error.name === "CanceledError") {
+        console.log('Upload cancelled:', file.name);
+        throw error; // Re-throw to be handled by caller
+      }
+
+      console.error('❌ Single file upload failed', {
+        filename: file.name,
+        error: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+      });
+      throw error;
+    }
   };
 
   const uploadMultipart = async (file: File, id: string, startTime: number) => {
@@ -442,7 +470,7 @@ export const useS3Upload = () => {
       const percent = Math.round((loaded * 100) / total);
       const currentTime = Date.now();
       const elapsedTime = (currentTime - startTime) / 1000;
-      let stats = {};
+      let stats: UploadStats | undefined = undefined;
 
       if (elapsedTime > 1) {
         const speed = loaded / elapsedTime;
@@ -466,22 +494,21 @@ export const useS3Upload = () => {
     if (!upload) return;
 
     try {
-      // If it's a multipart upload, abort it on S3
-      if (upload.uploadId && upload.s3Key) {
-        await axios.post(route("api.v1.uploads.multipart.abort"), {
-          key: upload.s3Key,
-          uploadId: upload.uploadId,
-        });
-      } else if (upload.s3Key) {
-        // For single uploads, delete the partial file
-        await axios.delete(route("api.v1.uploads.delete"), {
-          data: { key: upload.s3Key },
-        });
-      }
+      // Call the cancel endpoint with the upload ID and S3 key
+      await axios.delete(route("api.v1.uploads.cancel", { uploadId: id }), {
+        data: {
+          s3_key: upload.s3Key,
+          multipart_upload_id: upload.uploadId || null,
+        },
+      });
     } catch (error) {
       console.error("Failed to cleanup cancelled upload:", error);
       // Continue anyway - the upload is cancelled from user perspective
     }
+
+    // Update the file status in mediaStore to remove "uploading" state
+    const { updateFile } = useMediaStore.getState();
+    updateFile(id, { status: "failed" }); // Mark as failed so it can be removed or retried
   };
 
   const handlePause = useCallback(

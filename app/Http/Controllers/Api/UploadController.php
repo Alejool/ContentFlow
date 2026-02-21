@@ -61,26 +61,63 @@ class UploadController extends Controller
     $key = "publications/{$uuid}.{$extension}";
 
     if (config('filesystems.default') === 's3') {
-      $client = Storage::disk('s3')->getClient();
-      $bucket = config('filesystems.disks.s3.bucket');
+      try {
+        $client = Storage::disk('s3')->getClient();
+        $bucket = config('filesystems.disks.s3.bucket');
 
-      $cmd = $client->getCommand('PutObject', [
-        'Bucket' => $bucket,
-        'Key' => $key,
-        'ContentType' => $contentType,
-        // 'Body' => '', // Valid for pre-signing? Usually yes.
-        // 'ACL' => 'public-read', // Optional, depends on bucket policy
-      ]);
+        \Log::info('Generating presigned URL', [
+          'key' => $key,
+          'bucket' => $bucket,
+          'content_type' => $contentType,
+          'user_id' => auth()->id(),
+        ]);
 
-      $requestS3 = $client->createPresignedRequest($cmd, '+20 minutes');
-      $presignedUrl = (string)$requestS3->getUri();
+        $cmd = $client->getCommand('PutObject', [
+          'Bucket' => $bucket,
+          'Key' => $key,
+          'ContentType' => $contentType,
+        ]);
 
-      return response()->json([
-        'upload_url' => $presignedUrl,
-        'key' => $key,
-        'uuid' => $uuid,
-        'method' => 'PUT'
-      ]);
+        $requestS3 = $client->createPresignedRequest($cmd, '+20 minutes');
+        $presignedUrl = (string)$requestS3->getUri();
+
+        \Log::info('Presigned URL generated successfully', [
+          'key' => $key,
+          'user_id' => auth()->id(),
+        ]);
+
+        return response()->json([
+          'upload_url' => $presignedUrl,
+          'key' => $key,
+          'uuid' => $uuid,
+          'method' => 'PUT'
+        ]);
+      } catch (S3Exception $e) {
+        \Log::error('S3 error generating presigned URL', [
+          'error' => $e->getMessage(),
+          'aws_error_code' => $e->getAwsErrorCode(),
+          'status_code' => $e->getStatusCode(),
+          'key' => $key,
+          'user_id' => auth()->id(),
+        ]);
+        
+        return response()->json([
+          'error' => 'Failed to generate upload URL. Please check S3 configuration.',
+          'details' => config('app.debug') ? $e->getMessage() : null,
+        ], 500);
+      } catch (\Exception $e) {
+        \Log::error('Unexpected error generating presigned URL', [
+          'error' => $e->getMessage(),
+          'trace' => $e->getTraceAsString(),
+          'key' => $key,
+          'user_id' => auth()->id(),
+        ]);
+        
+        return response()->json([
+          'error' => 'Failed to generate upload URL.',
+          'details' => config('app.debug') ? $e->getMessage() : null,
+        ], 500);
+      }
     } else {
       // Fallback for local driver (if not using S3 in dev)
       // This is tricky for "direct upload" simulation locally without MinIO.

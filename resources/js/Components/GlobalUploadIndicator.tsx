@@ -1,4 +1,5 @@
 import { useConfirm } from "@/Hooks/useConfirm";
+import { useS3Upload } from "@/Hooks/useS3Upload";
 import { useUploadQueue } from "@/stores/uploadQueueStore";
 import { useProcessingProgress } from "@/stores/processingProgressStore";
 import axios from "axios";
@@ -16,8 +17,9 @@ export default function GlobalUploadIndicator() {
   const removeUpload = useUploadQueue((state) => state.removeUpload);
   const pauseUpload = useUploadQueue((state) => state.pauseUpload);
   const resumeUpload = useUploadQueue((state) => state.resumeUpload);
-  const cancelUpload = useUploadQueue((state) => state.cancelUpload);
   const retryUpload = useUploadQueue((state) => state.retryUpload);
+  
+  const { cancelUpload: cancelUploadWithCleanup } = useS3Upload();
   
   const processingJobs = useProcessingProgress((state) => state.jobs);
   const cancelJob = useProcessingProgress((state) => state.cancelJob);
@@ -145,7 +147,8 @@ export default function GlobalUploadIndicator() {
 
     if (!isConfirmed) return;
     
-    cancelUpload(id);
+    // Use the hook's cancelUpload which includes cleanup
+    await cancelUploadWithCleanup(id);
   };
   
   const handleCancelJob = async (id: string) => {
