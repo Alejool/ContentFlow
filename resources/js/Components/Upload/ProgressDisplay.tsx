@@ -172,7 +172,7 @@ export function ProgressDisplay({
           {isPaused && onResume && (
             <button
               onClick={onResume}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-primary hover:bg-primary-dark dark:bg-primary-light dark:hover:bg-primary rounded transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-neutral-800"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white dark:text-white bg-primary-600 hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600 rounded transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-neutral-800"
               aria-label={t("common.upload.resume")}
               type="button"
             >
@@ -199,7 +199,7 @@ export function ProgressDisplay({
         <div className="flex gap-2 pt-1">
           <button
             onClick={onRetry}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-primary hover:bg-primary-dark dark:bg-primary-light dark:hover:bg-primary rounded transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-neutral-800"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white dark:text-white bg-primary-600 hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600 rounded transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-neutral-800"
             aria-label={t("common.upload.retry")}
             type="button"
           >
