@@ -67,7 +67,7 @@ return [
             'driver' => 'redis',
             'connection' => env('REDIS_QUEUE_CONNECTION', 'default'),
             'queue' => env('REDIS_QUEUE', 'default'),
-            'retry_after' => (int) env('REDIS_QUEUE_RETRY_AFTER', 1800),
+            'retry_after' => (int) env('REDIS_QUEUE_RETRY_AFTER', 2100), // 35 minutos, más que el timeout del job
             'block_for' => null,
             'after_commit' => false,
         ],

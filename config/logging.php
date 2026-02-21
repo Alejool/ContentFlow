@@ -73,6 +73,47 @@ return [
             'replace_placeholders' => true,
         ],
 
+        // Logs organizados por contexto
+        'publications' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/publications.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'days' => 30,
+            'replace_placeholders' => true,
+        ],
+
+        'jobs' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/jobs.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'days' => 30,
+            'replace_placeholders' => true,
+        ],
+
+        'auth' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/auth.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'days' => 90, // Mantener más tiempo por seguridad
+            'replace_placeholders' => true,
+        ],
+
+        'social' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/social.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'days' => 30,
+            'replace_placeholders' => true,
+        ],
+
+        'errors' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/errors.log'),
+            'level' => 'error',
+            'days' => 60,
+            'replace_placeholders' => true,
+        ],
+
         'slack' => [
             'driver' => 'slack',
             'url' => env('LOG_SLACK_WEBHOOK_URL'),

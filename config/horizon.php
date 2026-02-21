@@ -97,6 +97,8 @@ return [
     */
 
     'waits' => [
+        'redis:publishing' => 300, // Alerta si espera más de 5 minutos
+        'redis:notifications' => 30, // Alerta si notificaciones esperan más de 30 segundos
         'redis:default' => 60,
     ],
 
@@ -197,33 +199,89 @@ return [
     */
 
     'defaults' => [
-        'supervisor-1' => [
+        // Supervisor dedicado para publicaciones pesadas (videos grandes)
+        'publishing-heavy' => [
             'connection' => 'redis',
-            'queue' => ['publishing', 'publishing:notify', 'notifications', 'emails', 'high', 'default', 'low'],
+            'queue' => ['publishing'],
             'balance' => 'auto',
             'autoScalingStrategy' => 'time',
-            'maxProcesses' => 10,
+            'maxProcesses' => 5, // Máximo 5 publicaciones simultáneas
+            'minProcesses' => 1, // Siempre al menos 1 worker disponible
+            'maxTime' => 0,
+            'maxJobs' => 0,
+            'memory' => 256, // Más memoria para videos grandes
+            'tries' => 2,
+            'timeout' => 2100, // 35 minutos para videos muy grandes
+            'nice' => 0,
+        ],
+        
+        // Supervisor para notificaciones y tareas rápidas
+        'notifications-fast' => [
+            'connection' => 'redis',
+            'queue' => ['publishing:notify', 'notifications', 'emails'],
+            'balance' => 'auto',
+            'autoScalingStrategy' => 'time',
+            'maxProcesses' => 10, // Muchas notificaciones simultáneas
+            'minProcesses' => 2,
             'maxTime' => 0,
             'maxJobs' => 0,
             'memory' => 128,
             'tries' => 3,
-            'timeout' => 1200,
+            'timeout' => 60, // Solo 1 minuto para notificaciones
+            'nice' => 0,
+        ],
+        
+        // Supervisor para tareas generales
+        'general' => [
+            'connection' => 'redis',
+            'queue' => ['high', 'default', 'low'],
+            'balance' => 'auto',
+            'autoScalingStrategy' => 'time',
+            'maxProcesses' => 5,
+            'minProcesses' => 1,
+            'maxTime' => 0,
+            'maxJobs' => 0,
+            'memory' => 128,
+            'tries' => 3,
+            'timeout' => 300,
             'nice' => 0,
         ],
     ],
 
     'environments' => [
         'production' => [
-            'supervisor-1' => [
-                'maxProcesses' => 10,
-                'balanceMaxShift' => 1,
+            'publishing-heavy' => [
+                'maxProcesses' => 8, // Más workers en producción
+                'minProcesses' => 2,
+                'balanceMaxShift' => 2,
+                'balanceCooldown' => 5,
+            ],
+            'notifications-fast' => [
+                'maxProcesses' => 15,
+                'minProcesses' => 3,
+                'balanceMaxShift' => 3,
+                'balanceCooldown' => 1,
+            ],
+            'general' => [
+                'maxProcesses' => 8,
+                'minProcesses' => 2,
+                'balanceMaxShift' => 2,
                 'balanceCooldown' => 3,
             ],
         ],
 
         'local' => [
-            'supervisor-1' => [
+            'publishing-heavy' => [
+                'maxProcesses' => 2,
+                'minProcesses' => 1,
+            ],
+            'notifications-fast' => [
                 'maxProcesses' => 3,
+                'minProcesses' => 1,
+            ],
+            'general' => [
+                'maxProcesses' => 2,
+                'minProcesses' => 1,
             ],
         ],
     ],
