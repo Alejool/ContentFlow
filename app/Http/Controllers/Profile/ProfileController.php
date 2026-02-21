@@ -28,10 +28,14 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): Response
     {
+        $user = $request->user();
+        
         return Inertia::render('Profile/Edit', [
-            'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
+            'mustVerifyEmail' => $user instanceof MustVerifyEmail,
             'status' => session('status'),
-            'globalPlatformSettings' => $request->user()->global_platform_settings ?? [],
+            'globalPlatformSettings' => $user->global_platform_settings ?? [],
+            'twoFactorEnabled' => !is_null($user->two_factor_secret),
+            'twoFactorEnabledAt' => $user->two_factor_enabled_at?->toISOString(),
         ]);
     }
 
