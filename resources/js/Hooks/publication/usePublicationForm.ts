@@ -417,7 +417,7 @@ export const usePublicationForm = ({
 
     const newMediaItems = newFiles.map((file) => ({
       tempId: Math.random().toString(36).substring(7),
-      url: URL.createObjectURL(file), // Still keep for images if possible, but we'll show placeholder if uploading
+      url: URL.createObjectURL(file),
       type: file.type.startsWith("image/") ? "image" : "video",
       isNew: true,
       file,
@@ -430,24 +430,35 @@ export const usePublicationForm = ({
     // Get upload queue functions
     const { linkUploadToPublication } = useUploadQueue.getState();
 
-    for (const item of newMediaItems) {
-      // Auto-start upload immediately
-      if (item.file) {
-        
-        // CRITICAL FIX: If editing an existing publication, link immediately
-        // so attachMedia gets called when upload completes
-        if (publication?.id) {
-          linkUploadToPublication(
-            item.tempId,
-            publication.id,
-            publication.title,
-          );
-        }
+    // Start all uploads in parallel
+    const uploadPromises = newMediaItems.map(async (item) => {
+      if (!item.file) return;
+
+      console.log('🚀 Starting upload for file:', item.file.name, 'tempId:', item.tempId);
+      
+      // CRITICAL FIX: If editing an existing publication, link immediately
+      // so attachMedia gets called when upload completes
+      if (publication?.id) {
+        linkUploadToPublication(
+          item.tempId,
+          publication.id,
+          publication.title,
+        );
       }
 
+      // CRITICAL: Actually start the upload!
+      try {
+        uploadFile(item.file, item.tempId); // Fire and forget - uploadFile handles its own state
+        console.log('✅ Upload initiated for:', item.file.name);
+      } catch (error) {
+        console.error('❌ Failed to start upload for:', item.file.name, error);
+        toast.error(`Failed to upload ${item.file.name}`);
+        updateFile(item.tempId, { status: "failed" });
+      }
+
+      // Extract video metadata in parallel
       if (item.type === "video" && item.file) {
         try {
-          // Obtener metadatos completos del video
           const video = document.createElement("video");
           video.preload = "metadata";
           
@@ -464,7 +475,6 @@ export const usePublicationForm = ({
           
           URL.revokeObjectURL(video.src);
 
-          // Guardar metadatos extendidos
           setVideoMetadata(item.tempId, {
             duration,
             width,
@@ -472,13 +482,14 @@ export const usePublicationForm = ({
             aspectRatio,
             youtubeType: duration <= 60 && aspectRatio < 1 ? "short" : "video",
           });
-
-          // NO configurar automáticamente - dejar que el usuario elija manualmente
-          // Solo sugerir basado en las características del video
-          } catch (e) {
-          }
+        } catch (e) {
+          console.error('Failed to extract video metadata:', e);
+        }
       }
-    }
+    });
+
+    // Wait for all metadata extraction (but not uploads, those run in background)
+    await Promise.allSettled(uploadPromises);
   };
 
   const getVideoDuration = (file: File): Promise<number> => {
@@ -851,7 +862,12 @@ export const usePublicationForm = ({
         try {
           await axios.post(route("api.v1.publications.lock-media", pubId));
         } catch (err) {
-          }
+          console.error("Failed to lock media:", err);
+          toast.error(
+            t("publications.modal.media.lockFailed") ||
+              "Warning: Could not lock media for editing",
+          );
+        }
 
         // 2.b Link in Store and handle already completed
         const uploadQueueState = useUploadQueue.getState();
@@ -893,7 +909,17 @@ export const usePublicationForm = ({
               // removeUpload(media.tempId); // REMOVED: Keep in queue so user sees completion
               attachedImmediately = true;
             } catch (e) {
-              }
+              console.error("Failed to attach media to publication:", e);
+              toast.error(
+                t("publications.modal.media.attachFailed") ||
+                  `Failed to attach ${queueItem.file.name}: ${e instanceof Error ? e.message : "Unknown error"}`,
+              );
+              // Mark upload as failed in queue
+              useUploadQueue.getState().updateUpload(media.tempId, {
+                status: "error",
+                error: "Failed to attach to publication",
+              });
+            }
           } else {
             // Otherwise, link it so useS3Upload attaches it when done
             linkUploadToPublication(media.tempId, pubId, pubTitle);
@@ -1003,15 +1029,31 @@ export const usePublicationForm = ({
     publishedAccountIds,
     updateFile,
     isAnyMediaProcessing:
-      mediaFiles.some(
-        (m) =>
-          m.status === "uploading" ||
-          m.status === "processing" ||
-          (uploadingFiles.has(m.tempId) && !m.id),
-      ) ||
+      mediaFiles.some((m) => {
+        // Check if file is in mediaStore with uploading/processing status
+        if (m.status === "uploading" || m.status === "processing") {
+          // Double-check with uploadQueue to see if it's actually cancelled
+          const queueItem = useUploadQueue.getState().queue[m.tempId];
+          if (queueItem && queueItem.status === "cancelled") {
+            return false; // Ignore cancelled uploads
+          }
+          return true;
+        }
+        return uploadingFiles.has(m.tempId) && !m.id;
+      }) ||
       (publication?.status as string) === "processing" ||
       (!!publication?.media_locked_by &&
         (publication.media_locked_by as any).id !== user?.id),
-    isS3Uploading: mediaFiles.some((m) => m.status === "uploading"),
+    isS3Uploading: mediaFiles.some((m) => {
+      if (m.status === "uploading") {
+        // Double-check with uploadQueue to see if it's actually cancelled
+        const queueItem = useUploadQueue.getState().queue[m.tempId];
+        if (queueItem && queueItem.status === "cancelled") {
+          return false; // Ignore cancelled uploads
+        }
+        return true;
+      }
+      return false;
+    }),
   };
 };

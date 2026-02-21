@@ -408,10 +408,19 @@ const EditPublicationModal = ({
                       setThumbnail(tempId, file)
                     }
                     onClearThumbnail={(tempId) => clearThumbnail(tempId)}
-                    onDragOver={() => setIsDragOver(true)}
-                    onDragLeave={() => setIsDragOver(false)}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setIsDragOver(true);
+                    }}
+                    onDragLeave={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setIsDragOver(false);
+                    }}
                     onDrop={(e) => {
                       e.preventDefault();
+                      e.stopPropagation();
                       setIsDragOver(false);
                       handleFileChange(e.dataTransfer.files);
                     }}

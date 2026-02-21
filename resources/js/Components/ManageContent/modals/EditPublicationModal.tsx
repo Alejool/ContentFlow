@@ -528,10 +528,19 @@ const EditPublicationModal = ({
                       }
                       onClearThumbnail={(tempId) => clearThumbnail(tempId)}
                       onUpdateFile={updateFile}
-                      onDragOver={() => setIsDragOver(true)}
-                      onDragLeave={() => setIsDragOver(false)}
+                      onDragOver={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setIsDragOver(true);
+                      }}
+                      onDragLeave={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setIsDragOver(false);
+                      }}
                       onDrop={(e) => {
                         e.preventDefault();
+                        e.stopPropagation();
                         setIsDragOver(false);
                         handleFileChange(e.dataTransfer.files);
                       }}
@@ -546,22 +555,6 @@ const EditPublicationModal = ({
                       allMediaFiles={publication?.media_files || []}
                     />
                   )}
-
-                  {/* Reels Section - Independent from media */}
-                  {publication?.id && mediaFiles.find(m => m.type === 'video') && (
-                    <ReelsSection
-                      videoFile={publication.media_files?.find(
-                        m => m.file_type === 'video' || m.mime_type?.startsWith('video/')
-                      )}
-                      publicationId={publication.id}
-                      allMediaFiles={publication.media_files || []}
-                      onReelsDeleted={() => {
-                        // Refresh publication data
-                        usePublicationStore.getState().fetchPublicationById(publication.id);
-                      }}
-                    />
-                  )}
-
                   {hasYouTubeAccount && (
                     <div className="mt-6">
                       <YouTubeThumbnailUploader

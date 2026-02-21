@@ -25,7 +25,7 @@ class BulkUpdateRequest extends FormRequest
         return [
             'event_ids' => 'required|array|min:1',
             'event_ids.*' => 'required|string',
-            'new_date' => 'required|date',
+            'new_date' => 'required|date|after:now',
             'operation' => 'required|in:move,delete',
         ];
     }
@@ -45,6 +45,7 @@ class BulkUpdateRequest extends FormRequest
             'event_ids.*.string' => 'Each event ID must be a string.',
             'new_date.required' => 'A new date is required for the operation.',
             'new_date.date' => 'The new date must be a valid date.',
+            'new_date.after' => 'Cannot schedule for a past date. Please select a future date.',
             'operation.required' => 'An operation type is required.',
             'operation.in' => 'The operation must be either "move" or "delete".',
         ];

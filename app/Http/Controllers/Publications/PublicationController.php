@@ -23,6 +23,7 @@ use App\Events\Publications\PublicationUpdated;
 use App\Events\PublicationStatusUpdated;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 use App\Models\Social\ScheduledPost;
 use App\Models\Social\SocialPostLog;
@@ -888,6 +889,38 @@ class PublicationController extends Controller
         'size' => $request->size
       ]);
 
+      // Verify S3 file exists before creating database record
+      $path = $request->key;
+      $pathTrimmed = ltrim($path, '/');
+      
+      $fileExists = false;
+      try {
+        if (Storage::disk('s3')->exists($path)) {
+          $fileExists = true;
+        } elseif (Storage::disk('s3')->exists($pathTrimmed)) {
+          $fileExists = true;
+          $path = $pathTrimmed;
+        }
+      } catch (\Exception $s3Error) {
+        Log::error('❌ S3 connection error in attachMedia', [
+          'error' => $s3Error->getMessage(),
+          'path' => $path,
+          'publication_id' => $publication->id
+        ]);
+        return $this->errorResponse('Failed to verify file in storage: ' . $s3Error->getMessage(), 500);
+      }
+
+      if (!$fileExists) {
+        Log::warning('⚠️ File not found in S3', [
+          'path' => $path,
+          'pathTrimmed' => $pathTrimmed,
+          'publication_id' => $publication->id
+        ]);
+        return $this->errorResponse('File not found in storage. Please try uploading again.', 404);
+      }
+
+      Log::info('✅ S3 file verified', ['path' => $path]);
+
       // Calculate next order
       // Using generic DB query to avoid loading all models if possible, or use relationship
       $maxOrder = $publication->mediaFiles()->max('order') ?? -1;
@@ -899,7 +932,7 @@ class PublicationController extends Controller
       $mediaFile = MediaFile::create([
         'workspace_id' => $publication->workspace_id,
         'publication_id' => $publication->id, // Redundant if pivot used, but good for direct belonging
-        'file_path' => $request->key,
+        'file_path' => $path,
         'file_name' => $request->filename,
         'file_type' => str_starts_with($request->mime_type, 'video') ? 'video' : 'image',
         'mime_type' => $request->mime_type,
