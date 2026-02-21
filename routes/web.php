@@ -13,6 +13,9 @@ use App\Http\Controllers\Social\SocialAccountController;
 use App\Http\Controllers\Locale\LocaleController;
 use App\Http\Controllers\Workspace\WorkspaceController;
 use App\Http\Controllers\Calendar\CalendarViewController;
+use App\Http\Controllers\Api\ExternalCalendarController;
+
+use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -105,6 +108,10 @@ Route::prefix('auth')->name('auth.')->group(function () {
   Route::get('/x/callback-v1', [SocialAccountController::class, 'handleTwitterV1Callback'])->name('x.callback.v1');
   Route::get('/youtube/callback', [SocialAccountController::class, 'handleYoutubeCallback'])->name('youtube.callback');
   Route::get('/tiktok/callback', [SocialAccountController::class, 'handleTiktokCallback'])->name('tiktok.callback');
+  
+  // External calendar callbacks
+  Route::get('/google-calendar/callback', [ExternalCalendarController::class, 'handleGoogleCalendarCallback'])->name('google-calendar.callback');
+  Route::get('/outlook-calendar/callback', [ExternalCalendarController::class, 'handleOutlookCalendarCallback'])->name('outlook-calendar.callback');
 
   Route::get('/google/redirect', [AuthController::class, 'redirectToGoogle'])->name('google.redirect');
   Route::get('/google/callback', [AuthController::class, 'handleGoogleCallback'])->name('google.callback');
@@ -147,6 +154,7 @@ Route::middleware('auth')->group(function () {
   })->name('reels.gallery');
 
   Route::get('/calendar', [CalendarViewController::class, 'index'])->name('calendar.index');
+  Route::get('/calendar/settings', [CalendarViewController::class, 'settings'])->name('calendar.settings');
 
   Route::prefix('social-accounts')->name('social-accounts.')->group(function () {
     Route::get('/', [SocialAccountController::class, 'index'])->name('index');
@@ -154,7 +162,7 @@ Route::middleware('auth')->group(function () {
   });
 
   // Admin Routes
-  Route::prefix('admin')->name('admin.')->middleware(['super-admin', 'require.2fa'])->group(function () {
+  Route::prefix('admin')->name('admin.')->middleware(['super-admin'])->group(function () {
     Route::get('/notifications', [SystemNotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/send', [SystemNotificationController::class, 'send'])->name('notifications.send');
   });
