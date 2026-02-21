@@ -17,6 +17,19 @@ class InstagramService extends BaseSocialService
     }
 
     try {
+      $rawPath = $post->mediaPaths[0] ?? null;
+      
+      if ($rawPath) {
+        $isVideo = str_contains($rawPath, '.mp4') || str_contains($rawPath, '.mov') || str_contains($rawPath, '.avi') || str_contains($rawPath, '.m4v');
+        
+        LogHelper::social('info', 'Instagram publish starting', [
+          'account_id' => $accountId,
+          'has_media' => true,
+          'is_video' => $isVideo,
+          'media_url' => $rawPath
+        ]);
+      }
+      
       // Step 1: Create media container
       $containerEndpoint = "https://graph.facebook.com/v18.0/{$accountId}/media";
       $containerData = [
@@ -24,7 +37,6 @@ class InstagramService extends BaseSocialService
         'access_token' => $this->accessToken,
       ];
 
-      $rawPath = $post->mediaPaths[0] ?? null;
       if ($rawPath) {
         $isVideo = str_contains($rawPath, '.mp4') || str_contains($rawPath, '.mov') || str_contains($rawPath, '.avi') || str_contains($rawPath, '.m4v');
         if ($isVideo) {
@@ -36,24 +48,50 @@ class InstagramService extends BaseSocialService
         }
       }
 
-      $containerResponse = $this->client->post($containerEndpoint, ['form_params' => $containerData]);
+      // Timeout aumentado para videos grandes
+      $timeout = isset($isVideo) && $isVideo ? 600 : 120; // 10 min para videos, 2 min para imágenes
+
+      $containerResponse = $this->client->post($containerEndpoint, [
+        'form_params' => $containerData,
+        'timeout' => $timeout,
+        'connect_timeout' => 60
+      ]);
+      
       $containerResult = json_decode($containerResponse->getBody(), true);
 
       if (!isset($containerResult['id'])) {
+        LogHelper::social('error', 'Instagram container creation failed', [
+          'account_id' => $accountId,
+          'response' => $containerResult
+        ]);
         return PostResultDTO::failure('Failed to create Instagram media container');
       }
+      
+      Log::info('Instagram media container created', [
+        'container_id' => $containerResult['id']
+      ]);
 
-      // Step 2: Publish the container
+      // Step 2: Publish the container (puede tardar si es video)
+      // Para videos grandes, Instagram puede tardar en procesar
+      $publishTimeout = isset($isVideo) && $isVideo ? 900 : 300; // 15 min para videos, 5 min para imágenes
+      
       $publishEndpoint = "https://graph.facebook.com/v18.0/{$accountId}/media_publish";
       $publishResponse = $this->client->post($publishEndpoint, [
         'form_params' => [
           'creation_id' => $containerResult['id'],
           'access_token' => $this->accessToken,
         ],
+        'timeout' => $publishTimeout,
+        'connect_timeout' => 60
       ]);
 
       $publishResult = json_decode($publishResponse->getBody(), true);
       $postId = $publishResult['id'];
+      
+      LogHelper::social('info', 'Instagram publish completed', [
+        'post_id' => $postId,
+        'account_id' => $accountId
+      ]);
 
       return PostResultDTO::success(
         postId: $postId,
@@ -61,6 +99,12 @@ class InstagramService extends BaseSocialService
         rawData: ['platform' => 'instagram']
       );
     } catch (\Exception $e) {
+      LogHelper::social('error', 'Instagram publish failed', [
+        'error' => $e->getMessage(),
+        'account_id' => $accountId,
+        'trace' => $e->getTraceAsString()
+      ]);
+      
       return PostResultDTO::failure($e->getMessage());
     }
   }

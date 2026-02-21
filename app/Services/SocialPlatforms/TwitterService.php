@@ -148,7 +148,11 @@ class TwitterService extends BaseSocialService
         usleep(500000); // 0.5s
 
       } catch (\Exception $e) {
-        Log::error('Failed to publish thread segment', ['index' => $index, 'error' => $e->getMessage()]);
+        LogHelper::social('error', 'Failed to publish thread segment', [
+          'index' => $index,
+          'account_id' => $this->socialAccount->id,
+          'error' => $e->getMessage()
+        ]);
         // If the first one failed, the whole thing fails.
         // If a middle one fails, we have a partial thread.
         throw new \Exception("Thread publication failed at segment " . ($index + 1) . ": " . $e->getMessage());
@@ -314,7 +318,11 @@ class TwitterService extends BaseSocialService
           }
 
           // Log failure
-          Log::error('Twitter V1 League Upload Failed', ['body' => $body, 'status' => $response->getStatusCode()]);
+          LogHelper::social('error', 'Twitter V1 League Upload Failed', [
+            'account_id' => $this->socialAccount->id,
+            'body' => $body,
+            'status' => $response->getStatusCode()
+          ]);
 
           if (isset($media->errors)) {
             throw new \Exception('Twitter V1 Error: ' . json_encode($media->errors));
@@ -384,6 +392,13 @@ class TwitterService extends BaseSocialService
    */
   private function uploadLargeMediaV2(string $mediaPath, string $mimeType, string $category): string
   {
+    $fileSize = filesize($mediaPath);
+    
+    Log::info('Twitter large media upload starting', [
+      'file_size_mb' => round($fileSize / 1024 / 1024, 2),
+      'category' => $category
+    ]);
+    
     // Check for OAuth 1.0a credentials in metadata
     $accountInfo = $this->getAccountInfoFromDb();
     $oauthToken = $accountInfo['account_metadata']['oauth1_token'] ?? null;
@@ -406,13 +421,13 @@ class TwitterService extends BaseSocialService
       // Custom Client (SSL Bypass)
       $clientOptions = [
         'verify' => config('app.debug') ? false : true,
-        'connect_timeout' => 30,
-        'timeout' => 300,
+        'connect_timeout' => 60,
+        'timeout' => 0, // Sin timeout para streaming
+        'read_timeout' => 1800
       ];
       $customClient = new Client($clientOptions);
 
       try {
-        $fileSize = filesize($mediaPath);
         $initHeaders = $server->getHeaders($tokenCredentials, 'POST', $uploadUrl, [
           'command' => 'INIT',
           'total_bytes' => $fileSize,
@@ -432,10 +447,14 @@ class TwitterService extends BaseSocialService
         $initData = json_decode($initResponse->getBody(), true);
         if (!isset($initData['media_id_string'])) throw new \Exception('V1 INIT Failed: ' . ($initData['error'] ?? json_encode($initData)));
         $mediaId = $initData['media_id_string'];
+        
+        Log::info('Twitter upload initialized', ['media_id' => $mediaId]);
 
         $chunkSize = 2 * 1024 * 1024;
         $handle = fopen($mediaPath, 'rb');
         $segmentIndex = 0;
+        $uploadedBytes = 0;
+        
         while (!feof($handle)) {
           $chunk = fread($handle, $chunkSize);
           if (!$chunk) break;
@@ -451,9 +470,22 @@ class TwitterService extends BaseSocialService
               ['name' => 'media', 'contents' => $chunk]
             ]
           ]);
+          
+          $uploadedBytes += strlen($chunk);
+          $progress = round(($uploadedBytes / $fileSize) * 100, 1);
+          
+          if ($segmentIndex % 5 == 0) { // Log cada 5 chunks
+            Log::info('Twitter upload progress', [
+              'progress' => "{$progress}%",
+              'uploaded_mb' => round($uploadedBytes / 1024 / 1024, 2)
+            ]);
+          }
+          
           $segmentIndex++;
         }
         fclose($handle);
+        
+        Log::info('Twitter upload chunks completed', ['segments' => $segmentIndex]);
 
         $finHeaders = $server->getHeaders($tokenCredentials, 'POST', $uploadUrl, [
           'command' => 'FINALIZE',
@@ -466,18 +498,17 @@ class TwitterService extends BaseSocialService
         $finData = json_decode($finResponse->getBody(), true);
 
         if (isset($finData['media_id_string'])) {
+          Log::info('Twitter upload completed', ['media_id' => $finData['media_id_string']]);
           return $finData['media_id_string'];
         }
         throw new \Exception('V1 FINALIZE Failed: ' . json_encode($finData));
       } catch (\Throwable $e) {
-        Log::warning('Twitter V1 Chunked Upload Failed: ' . $e->getMessage());
+        Log::error('Twitter V1 Chunked Upload Failed', ['error' => $e->getMessage()]);
         throw new \Exception("Twitter Auth V1 Video Upload Failed. Details: " . $e->getMessage());
       }
     }
 
-    $fileSize = filesize($mediaPath);
-
-
+    // OAuth 2.0 flow
     $initResponse = $this->client->post('https://upload.twitter.com/1.1/media/upload.json', [
       'headers' => [
         'Authorization' => "Bearer {$this->accessToken}",
@@ -488,6 +519,7 @@ class TwitterService extends BaseSocialService
         'media_type' => $mimeType,
         'media_category' => $category,
       ],
+      'timeout' => 60
     ]);
 
     $initData = json_decode($initResponse->getBody(), true);
@@ -498,9 +530,12 @@ class TwitterService extends BaseSocialService
     }
 
     $mediaId = $initData['media_id_string'];
+    Log::info('Twitter upload initialized (OAuth2)', ['media_id' => $mediaId]);
+    
     $chunkSize = 2 * 1024 * 1024;
     $handle = fopen($mediaPath, 'rb');
     $segmentIndex = 0;
+    $uploadedBytes = 0;
 
     try {
       while (!feof($handle)) {
@@ -517,13 +552,28 @@ class TwitterService extends BaseSocialService
             ['name' => 'segment_index', 'contents' => $segmentIndex],
             ['name' => 'media', 'contents' => $chunk],
           ],
+          'timeout' => 300
         ]);
 
+        $uploadedBytes += strlen($chunk);
+        $progress = round(($uploadedBytes / $fileSize) * 100, 1);
+        
+        if ($segmentIndex % 5 == 0) {
+          Log::info('Twitter upload progress', [
+            'progress' => "{$progress}%",
+            'uploaded_mb' => round($uploadedBytes / 1024 / 1024, 2)
+          ]);
+        }
+        
         $segmentIndex++;
       }
     } finally {
-      fclose($handle);
+      if (is_resource($handle)) {
+        fclose($handle);
+      }
     }
+    
+    Log::info('Twitter upload chunks completed', ['segments' => $segmentIndex]);
 
     $finalizeResponse = $this->client->post('https://upload.twitter.com/1.1/media/upload.json', [
       'headers' => [
@@ -533,6 +583,7 @@ class TwitterService extends BaseSocialService
         'command' => 'FINALIZE',
         'media_id' => $mediaId,
       ],
+      'timeout' => 120
     ]);
 
     $finalizeData = json_decode($finalizeResponse->getBody(), true);
@@ -542,6 +593,7 @@ class TwitterService extends BaseSocialService
       throw new \Exception('FINALIZE failed: ' . $errorMsg);
     }
 
+    Log::info('Twitter upload completed', ['media_id' => $finalizeData['media_id_string']]);
     return $finalizeData['media_id_string'];
   }
 
@@ -659,8 +711,34 @@ class TwitterService extends BaseSocialService
   private function downloadMedia(string $url): string
   {
     $tempFile = tempnam(sys_get_temp_dir(), 'twitter_media_');
-    file_put_contents($tempFile, fopen($url, 'r'));
-    return $tempFile;
+    
+    Log::info('Twitter: Downloading media', ['url' => $url]);
+    
+    try {
+      $this->client->get($url, [
+        'sink' => $tempFile,
+        'timeout' => 0,
+        'read_timeout' => 600, // 10 minutos
+        'connect_timeout' => 60,
+        'verify' => false
+      ]);
+      
+      $fileSizeMB = round(filesize($tempFile) / 1024 / 1024, 2);
+      Log::info('Twitter media downloaded', ['size_mb' => $fileSizeMB]);
+      
+      return $tempFile;
+    } catch (\Exception $e) {
+      if (file_exists($tempFile)) {
+        @unlink($tempFile);
+      }
+      
+      Log::error('Twitter media download failed', [
+        'url' => $url,
+        'error' => $e->getMessage()
+      ]);
+      
+      throw new \Exception("Failed to download media for Twitter: " . $e->getMessage());
+    }
   }
 
   /**

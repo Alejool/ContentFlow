@@ -106,31 +106,48 @@ class YouTubeService extends BaseSocialService
   {
     $tempFile = tempnam(sys_get_temp_dir(), 'youtube_upload_');
 
-    Log::info('Downloading video', ['temp_file' => $tempFile]);
+    Log::info('Downloading video for YouTube', [
+      'url' => $videoUrl,
+      'temp_file' => $tempFile
+    ]);
 
     try {
-      $videoStream = fopen($videoUrl, 'r');
-      $tempStream = fopen($tempFile, 'w');
-
-      if ($videoStream === false || $tempStream === false) {
-        throw new \Exception('Failed to open video streams');
-      }
-
-      stream_copy_to_stream($videoStream, $tempStream);
-
-      fclose($videoStream);
-      fclose($tempStream);
+      // Usar Guzzle con streaming para mejor manejo
+      $response = $this->client->get($videoUrl, [
+        'sink' => $tempFile,
+        'timeout' => 0, // Sin timeout para streaming
+        'read_timeout' => 1800, // 30 minutos para leer
+        'connect_timeout' => 60,
+        'verify' => false,
+        'progress' => function ($downloadTotal, $downloadedBytes) {
+          if ($downloadTotal > 0) {
+            $progress = round(($downloadedBytes / $downloadTotal) * 100, 1);
+            if ($progress % 20 == 0 && $progress > 0) { // Log cada 20%
+              Log::info('YouTube download progress', [
+                'progress' => "{$progress}%",
+                'downloaded_mb' => round($downloadedBytes / 1024 / 1024, 2)
+              ]);
+            }
+          }
+        }
+      ]);
 
       $fileSize = filesize($tempFile);
-      Log::info('Video downloaded successfully', [
-        'size' => number_format($fileSize / 1024 / 1024, 2) . ' MB'
+      Log::info('Video downloaded successfully for YouTube', [
+        'size_mb' => round($fileSize / 1024 / 1024, 2)
       ]);
 
       return $tempFile;
     } catch (\Exception $e) {
       if (file_exists($tempFile)) {
-        unlink($tempFile);
+        @unlink($tempFile);
       }
+      
+      Log::error('Failed to download video for YouTube', [
+        'url' => $videoUrl,
+        'error' => $e->getMessage()
+      ]);
+      
       throw new \Exception("Failed to download video: {$e->getMessage()}");
     }
   }
@@ -271,9 +288,10 @@ class YouTubeService extends BaseSocialService
   {
     try {
       $videoSize = filesize($tempFile);
+      $fileSizeMB = round($videoSize / 1024 / 1024, 2);
 
       Log::info('Initiating YouTube Resumable Upload', [
-        'file_size' => number_format($videoSize / 1024 / 1024, 2) . ' MB'
+        'file_size_mb' => $fileSizeMB
       ]);
 
       // 1. Initiate the resumable session
@@ -289,6 +307,7 @@ class YouTubeService extends BaseSocialService
           'uploadType' => 'resumable',
         ],
         'json' => $metadata,
+        'timeout' => 60
       ]);
 
       if ($initResponse->getStatusCode() !== 200) {
@@ -301,14 +320,56 @@ class YouTubeService extends BaseSocialService
         throw new \Exception("YouTube API did not return an upload URL");
       }
 
-      // 2. Upload the video content using a stream
-      Log::info('Streaming video content to YouTube', ['upload_url' => $uploadUrl]);
+      Log::info('YouTube upload session initialized', ['upload_url' => $uploadUrl]);
 
-      $handle = fopen($tempFile, 'r');
-      if (!$handle) {
-        throw new \Exception('Failed to open temporary video file for streaming');
+      // 2. Upload en chunks para archivos grandes (mejor control y progreso)
+      if ($fileSizeMB > 100) {
+        $result = $this->uploadInChunks($tempFile, $uploadUrl, $videoSize);
+      } else {
+        // Para archivos pequeños, subir de una vez
+        $result = $this->uploadComplete($tempFile, $uploadUrl, $videoSize);
       }
 
+      // Limpiar archivo temporal
+      if (file_exists($tempFile)) {
+        @unlink($tempFile);
+      }
+
+      if (!isset($result['id'])) {
+        throw new \Exception('YouTube API response missing video ID after resumable upload');
+      }
+
+      Log::info('YouTube resumable upload completed', [
+        'video_id' => $result['id'],
+        'size_mb' => $fileSizeMB
+      ]);
+
+      return $result;
+    } catch (\Exception $e) {
+      // Asegurarse de limpiar el archivo temporal
+      if (file_exists($tempFile)) {
+        @unlink($tempFile);
+      }
+      
+      Log::error('YouTube upload failed', [
+        'error' => $e->getMessage()
+      ]);
+      
+      throw $e;
+    }
+  }
+
+  /**
+   * Subir archivo completo de una vez (para archivos pequeños)
+   */
+  private function uploadComplete(string $tempFile, string $uploadUrl, int $videoSize): array
+  {
+    $handle = fopen($tempFile, 'r');
+    if (!$handle) {
+      throw new \Exception('Failed to open temporary video file for streaming');
+    }
+
+    try {
       $response = $this->client->put($uploadUrl, [
         'headers' => [
           'Authorization' => "Bearer {$this->accessToken}",
@@ -316,36 +377,126 @@ class YouTubeService extends BaseSocialService
           'Content-Type' => 'video/*',
         ],
         'body' => $handle,
-        'timeout' => 1200, // 20 minutes for large files
+        'timeout' => 0,
+        'read_timeout' => 3600,
+        'connect_timeout' => 60
       ]);
-
-      // Ensure handle is closed
-      if (is_resource($handle)) {
-        fclose($handle);
-      }
-
-      // Limpiar archivo temporal
-      if (file_exists($tempFile)) {
-        unlink($tempFile);
-      }
 
       if ($response->getStatusCode() !== 200 && $response->getStatusCode() !== 201) {
         throw new \Exception("YouTube API returned status {$response->getStatusCode()} during content upload");
       }
 
-      $result = json_decode($response->getBody()->getContents(), true);
+      return json_decode($response->getBody()->getContents(), true);
+    } finally {
+      if (is_resource($handle)) {
+        fclose($handle);
+      }
+    }
+  }
 
-      if (!isset($result['id'])) {
-        throw new \Exception('YouTube API response missing video ID after resumable upload');
+  /**
+   * Subir archivo en chunks con progreso (para archivos grandes)
+   */
+  private function uploadInChunks(string $tempFile, string $uploadUrl, int $videoSize): array
+  {
+    $chunkSize = 1024 * 1024 * 10; // 10MB chunks
+    $handle = fopen($tempFile, 'r');
+    
+    if (!$handle) {
+      throw new \Exception('Failed to open temporary video file');
+    }
+
+    try {
+      $offset = 0;
+      $chunkNumber = 0;
+      $totalChunks = ceil($videoSize / $chunkSize);
+
+      Log::info('YouTube chunked upload starting', [
+        'chunk_size_mb' => 10,
+        'total_chunks' => $totalChunks
+      ]);
+
+      while (!feof($handle)) {
+        $chunk = fread($handle, $chunkSize);
+        $chunkLength = strlen($chunk);
+        
+        if ($chunkLength === 0) {
+          break;
+        }
+
+        $chunkNumber++;
+        $endByte = $offset + $chunkLength - 1;
+        
+        // Subir chunk con reintentos
+        $maxRetries = 3;
+        $retryCount = 0;
+        $uploaded = false;
+
+        while (!$uploaded && $retryCount < $maxRetries) {
+          try {
+            $response = $this->client->put($uploadUrl, [
+              'headers' => [
+                'Authorization' => "Bearer {$this->accessToken}",
+                'Content-Length' => $chunkLength,
+                'Content-Range' => "bytes {$offset}-{$endByte}/{$videoSize}",
+                'Content-Type' => 'video/*',
+              ],
+              'body' => $chunk,
+              'timeout' => 600,
+              'connect_timeout' => 30
+            ]);
+
+            $statusCode = $response->getStatusCode();
+            
+            // 308 = Resume Incomplete (continuar), 200/201 = Success
+            if ($statusCode === 308 || $statusCode === 200 || $statusCode === 201) {
+              $uploaded = true;
+              
+              // Si es el último chunk y retorna 200/201, obtener resultado
+              if (($statusCode === 200 || $statusCode === 201) && feof($handle)) {
+                fclose($handle);
+                return json_decode($response->getBody()->getContents(), true);
+              }
+            } else {
+              throw new \Exception("Unexpected status code: {$statusCode}");
+            }
+
+          } catch (\Exception $e) {
+            $retryCount++;
+            
+            if ($retryCount >= $maxRetries) {
+              throw new \Exception("Failed to upload chunk {$chunkNumber} after {$maxRetries} attempts: " . $e->getMessage());
+            }
+            
+            Log::warning('YouTube chunk upload failed, retrying', [
+              'chunk' => $chunkNumber,
+              'attempt' => $retryCount,
+              'error' => $e->getMessage()
+            ]);
+            
+            usleep(500000 * $retryCount); // 0.5s, 1s, 1.5s
+          }
+        }
+
+        $offset += $chunkLength;
+        
+        // Log progreso cada 10 chunks
+        if ($chunkNumber % 10 === 0 || $chunkNumber === $totalChunks) {
+          $progress = round(($chunkNumber / $totalChunks) * 100, 1);
+          Log::info('YouTube upload progress', [
+            'progress' => "{$progress}%",
+            'chunk' => "{$chunkNumber}/{$totalChunks}",
+            'uploaded_mb' => round($offset / 1024 / 1024, 2)
+          ]);
+        }
       }
 
-      Log::info('Resumable video upload completed', ['video_id' => $result['id']]);
+      fclose($handle);
+      throw new \Exception('Upload completed but no final response received');
 
-      return $result;
     } catch (\Exception $e) {
-      // Asegurarse de limpiar el archivo temporal
-      if (file_exists($tempFile)) {
-        unlink($tempFile);
+      if (is_resource($handle)) {
+        fclose($handle);
       }
       throw $e;
     }

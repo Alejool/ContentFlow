@@ -15,15 +15,28 @@ class TikTokService extends BaseSocialService
     $this->ensureValidToken();
     $rawPath = $post->mediaPaths[0] ?? null;
 
-    if (!$rawPath || !file_exists($rawPath)) {
-      return PostResultDTO::failure('TikTok requires a valid local video file path');
+    if (!$rawPath) {
+      return PostResultDTO::failure('TikTok requires a video file');
     }
 
     try {
+      // Si es una URL, descargar temporalmente
+      $isUrl = str_starts_with($rawPath, 'http://') || str_starts_with($rawPath, 'https://');
+      $localPath = $rawPath;
+      $tempFile = null;
+      
+      if ($isUrl) {
+        Log::info('TikTok: Downloading video from URL', ['url' => $rawPath]);
+        $tempFile = $this->downloadVideoFromUrl($rawPath);
+        $localPath = $tempFile;
+      } elseif (!file_exists($rawPath)) {
+        return PostResultDTO::failure('TikTok video file not found');
+      }
+
       // Step 1: Initialize Upload
       $uploadParams = [
         'content' => $post->content,
-        'video_path' => $rawPath,
+        'video_path' => $localPath,
         'platform_settings' => $post->platformSettings,
       ];
       $uploadInfo = $this->initializeUpload($uploadParams);
@@ -31,7 +44,12 @@ class TikTokService extends BaseSocialService
       $uploadUrl = $uploadInfo['upload_url'];
 
       // Step 2: Upload Video File
-      $this->uploadVideoFile($uploadUrl, $rawPath);
+      $this->uploadVideoFile($uploadUrl, $localPath);
+      
+      // Limpiar archivo temporal si existe
+      if ($tempFile && file_exists($tempFile)) {
+        @unlink($tempFile);
+      }
 
       return PostResultDTO::success(
         postId: $publishId,
@@ -39,7 +57,52 @@ class TikTokService extends BaseSocialService
         rawData: ['status' => 'processing', 'platform' => 'tiktok']
       );
     } catch (\Exception $e) {
+      // Limpiar archivo temporal si existe
+      if (isset($tempFile) && $tempFile && file_exists($tempFile)) {
+        @unlink($tempFile);
+      }
+      
       return PostResultDTO::failure($e->getMessage());
+    }
+  }
+
+  /**
+   * Download video from URL for TikTok upload
+   */
+  private function downloadVideoFromUrl(string $url): string
+  {
+    $tempFile = tempnam(sys_get_temp_dir(), 'tiktok_upload_');
+    
+    try {
+      $response = $this->client->get($url, [
+        'sink' => $tempFile,
+        'timeout' => 0,
+        'read_timeout' => 1800,
+        'connect_timeout' => 60,
+        'verify' => false,
+        'progress' => function ($downloadTotal, $downloadedBytes) {
+          if ($downloadTotal > 0) {
+            $progress = round(($downloadedBytes / $downloadTotal) * 100, 1);
+            if ($progress % 20 == 0 && $progress > 0) {
+              Log::info('TikTok download progress', [
+                'progress' => "{$progress}%",
+                'downloaded_mb' => round($downloadedBytes / 1024 / 1024, 2)
+              ]);
+            }
+          }
+        }
+      ]);
+      
+      Log::info('TikTok video downloaded', [
+        'size_mb' => round(filesize($tempFile) / 1024 / 1024, 2)
+      ]);
+      
+      return $tempFile;
+    } catch (\Exception $e) {
+      if (file_exists($tempFile)) {
+        @unlink($tempFile);
+      }
+      throw new \Exception("Failed to download video for TikTok: " . $e->getMessage());
     }
   }
 
@@ -105,32 +168,161 @@ class TikTokService extends BaseSocialService
 
   private function uploadVideoFile(string $uploadUrl, string $filePath): void
   {
-    Log::info('Uploading video to TikTok URL');
+    $fileSize = filesize($filePath);
+    $fileSizeMB = round($fileSize / 1024 / 1024, 2);
+    
+    Log::info('Uploading video to TikTok', [
+      'file_size_mb' => $fileSizeMB
+    ]);
 
-    // TikTok requires PUT for the video content
-    // We use a fresh client to avoid default headers messing with the raw upload
     $uploadClient = new \GuzzleHttp\Client();
 
+    // Para archivos grandes, subir en chunks
+    if ($fileSizeMB > 100) {
+      $this->uploadTikTokInChunks($uploadClient, $uploadUrl, $filePath, $fileSize);
+    } else {
+      // Para archivos pequeños, subir de una vez
+      $this->uploadTikTokComplete($uploadClient, $uploadUrl, $filePath, $fileSize);
+    }
+    
+    Log::info('TikTok video upload completed', [
+      'file_size_mb' => $fileSizeMB
+    ]);
+  }
+
+  /**
+   * Subir archivo completo a TikTok
+   */
+  private function uploadTikTokComplete(\GuzzleHttp\Client $client, string $uploadUrl, string $filePath, int $fileSize): void
+  {
     $fileStream = fopen($filePath, 'r');
     if (!$fileStream) {
       throw new \Exception('Failed to open video file for reading');
     }
 
     try {
-      $response = $uploadClient->put($uploadUrl, [
+      $response = $client->put($uploadUrl, [
         'headers' => [
-          'Content-Type' => 'video/mp4', // Adjust based on actual file type if needed
-          'Content-Length' => filesize($filePath),
+          'Content-Type' => 'video/mp4',
+          'Content-Length' => $fileSize,
         ],
         'body' => $fileStream,
-        'timeout' => 600, // 10 minutes
+        'timeout' => 0,
+        'read_timeout' => 3600,
+        'connect_timeout' => 60
       ]);
 
       if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300) {
-        throw new \Exception("Upload failed with status {$response->getStatusCode()}");
+        throw new \Exception("TikTok upload failed with status {$response->getStatusCode()}");
       }
     } finally {
-      fclose($fileStream);
+      if (is_resource($fileStream)) {
+        fclose($fileStream);
+      }
+    }
+  }
+
+  /**
+   * Subir archivo en chunks a TikTok
+   */
+  private function uploadTikTokInChunks(\GuzzleHttp\Client $client, string $uploadUrl, string $filePath, int $fileSize): void
+  {
+    $chunkSize = 1024 * 1024 * 10; // 10MB chunks
+    $handle = fopen($filePath, 'r');
+    
+    if (!$handle) {
+      throw new \Exception('Failed to open video file');
+    }
+
+    try {
+      $offset = 0;
+      $chunkNumber = 0;
+      $totalChunks = ceil($fileSize / $chunkSize);
+
+      Log::info('TikTok chunked upload starting', [
+        'chunk_size_mb' => 10,
+        'total_chunks' => $totalChunks
+      ]);
+
+      while (!feof($handle)) {
+        $chunk = fread($handle, $chunkSize);
+        $chunkLength = strlen($chunk);
+        
+        if ($chunkLength === 0) {
+          break;
+        }
+
+        $chunkNumber++;
+        $endByte = $offset + $chunkLength - 1;
+        
+        // Subir chunk con reintentos
+        $maxRetries = 3;
+        $retryCount = 0;
+        $uploaded = false;
+
+        while (!$uploaded && $retryCount < $maxRetries) {
+          try {
+            $response = $client->put($uploadUrl, [
+              'headers' => [
+                'Content-Type' => 'video/mp4',
+                'Content-Length' => $chunkLength,
+                'Content-Range' => "bytes {$offset}-{$endByte}/{$fileSize}",
+              ],
+              'body' => $chunk,
+              'timeout' => 600,
+              'connect_timeout' => 30
+            ]);
+
+            $statusCode = $response->getStatusCode();
+            
+            if ($statusCode >= 200 && $statusCode < 300) {
+              $uploaded = true;
+            } else {
+              throw new \Exception("Unexpected status code: {$statusCode}");
+            }
+
+          } catch (\Exception $e) {
+            $retryCount++;
+            
+            if ($retryCount >= $maxRetries) {
+              throw new \Exception("Failed to upload chunk {$chunkNumber} after {$maxRetries} attempts: " . $e->getMessage());
+            }
+            
+            Log::warning('TikTok chunk upload failed, retrying', [
+              'chunk' => $chunkNumber,
+              'attempt' => $retryCount,
+              'error' => $e->getMessage()
+            ]);
+            
+            usleep(500000 * $retryCount);
+          }
+        }
+
+        $offset += $chunkLength;
+        
+        // Log progreso cada 10 chunks
+        if ($chunkNumber % 10 === 0 || $chunkNumber === $totalChunks) {
+          $progress = round(($chunkNumber / $totalChunks) * 100, 1);
+          Log::info('TikTok upload progress', [
+            'progress' => "{$progress}%",
+            'chunk' => "{$chunkNumber}/{$totalChunks}",
+            'uploaded_mb' => round($offset / 1024 / 1024, 2)
+          ]);
+        }
+      }
+
+      fclose($handle);
+
+    } catch (\Exception $e) {
+      if (is_resource($handle)) {
+        fclose($handle);
+      }
+      
+      Log::error('TikTok chunked upload failed', [
+        'error' => $e->getMessage()
+      ]);
+      
+      throw $e;
     }
   }
 
