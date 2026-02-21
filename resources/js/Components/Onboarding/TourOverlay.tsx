@@ -105,9 +105,6 @@ export default function TourOverlay({
     } catch (e) {
       // Error checking selectors
     }
-    
-    .route,
-    });
   }, [currentStep, isLastStep]);
 
   // Calculate target element position
@@ -264,10 +261,7 @@ export default function TourOverlay({
       if ((currentStep.id === 'step-2' || currentStep.id === 'step-4' || currentStep.id === 'step-5') && isMobile) {
         const mobileMenuButton = document.querySelector('nav.lg\\:hidden button');
         const mobileMenuContent = document.querySelector('nav.lg\\:hidden > div:last-child');
-        
-        ,
-        });
-        
+      
         // Check if menu is closed (hidden class)
         if (mobileMenuButton && mobileMenuContent && mobileMenuContent.classList.contains('hidden')) {
           // Click the button to open the menu

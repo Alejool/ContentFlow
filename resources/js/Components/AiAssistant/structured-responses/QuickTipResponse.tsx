@@ -265,12 +265,7 @@ function StepsList({ steps, theme }: StepsListProps) {
               </span>
             </div>
             <div>
-              <p
-                className="text-sm"
-                dangerouslySetInnerHTML={{
-                  __html: step.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>"),
-                }}
-              />
+              <p className="text-sm">{step}</p>
             </div>
           </div>
         ))}
