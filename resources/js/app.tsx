@@ -13,6 +13,7 @@ import { InertiaProgressIndicator } from "@/Components/common/motion/InertiaProg
 import { FocusVisibleManager } from "@/Utils/FocusVisibleManager";
 import { FocusManager } from "@/Utils/FocusManager";
 import { ariaAnnouncer } from "@/Utils/ARIAAnnouncer";
+import { QueryProvider } from "@/providers/QueryProvider";
 import "../css/app.css";
 import "./bootstrap";
 import "./i18n";
@@ -56,22 +57,24 @@ createInertiaApp<PageProps>({
 
     root.render(
       <ErrorBoundary>
-        <ThemeProvider
-          isAuthenticated={!!user}
-          initialTheme={user?.theme as "light" | "dark" | undefined}
-          workspaceId={user?.current_workspace_id}
-        >
-          <Suspense fallback={<div className="flex items-center justify-center min-h-screen">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-          </div>}>
-            <AnimatedPage variant="fade" pageKey={props.initialPage.url}>
-              <App {...props} />
-            </AnimatedPage>
-          </Suspense>
-          <ThemedToaster />
-          <ServiceWorkerUpdate />
-          <InertiaProgressIndicator color="#ad421e" />
-        </ThemeProvider>
+        <QueryProvider>
+          <ThemeProvider
+            isAuthenticated={!!user}
+            initialTheme={user?.theme as "light" | "dark" | undefined}
+            workspaceId={user?.current_workspace_id}
+          >
+            <Suspense fallback={<div className="flex items-center justify-center min-h-screen">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+            </div>}>
+              <AnimatedPage variant="fade" pageKey={props.initialPage.url}>
+                <App {...props} />
+              </AnimatedPage>
+            </Suspense>
+            <ThemedToaster />
+            <ServiceWorkerUpdate />
+            <InertiaProgressIndicator color="#ad421e" />
+          </ThemeProvider>
+        </QueryProvider>
       </ErrorBoundary>
     );
   },
