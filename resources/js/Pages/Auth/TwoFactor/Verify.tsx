@@ -1,4 +1,4 @@
-import GuestLayout from "@/Layouts/GuestLayout";
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Head, router } from "@inertiajs/react";
 import { useForm } from "react-hook-form";
@@ -50,9 +50,9 @@ export default function Verify() {
   };
 
   return (
-    <GuestLayout section="2fa-verify">
+    <AuthenticatedLayout>
       <Head title="Two-Factor Authentication" />
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-8">
+      <div className="min-h-screen bg-gray-50 dark:bg-neutral-900 flex items-center justify-center py-8 px-4 sm:px-6 lg:px-8">
         <div className="w-full max-w-md">
           <div className="mb-8 text-center">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary-100 dark:bg-primary-900/30 mb-4">
@@ -116,6 +116,6 @@ export default function Verify() {
           </form>
         </div>
       </div>
-    </GuestLayout>
+    </AuthenticatedLayout>
   );
 }

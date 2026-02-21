@@ -1,0 +1,53 @@
+{
+  "setup": {
+    "title": "Configurar Autenticación de Dos Factores",
+    "subtitle": "Asegura tu cuenta de administrador con 2FA",
+    "securityWarning": {
+      "title": "⚠️ Importante: Mantén este código privado",
+      "description": "Solo escanea este código QR en TU dispositivo personal. Cualquier persona que escanee este código podrá generar códigos de acceso para tu cuenta. Recibirás un email de confirmación cuando se active 2FA."
+    },
+    "step1": {
+      "title": "Paso 1: Escanear Código QR",
+      "description": "Escanea este código QR con tu aplicación de autenticación (Google Authenticator, Authy, etc.)",
+      "manualEntry": "¿No puedes escanear? Ingresa este código manualmente:",
+      "troubleshooting": "Si tienes problemas, asegúrate de que la hora de tu dispositivo esté sincronizada correctamente."
+    },
+    "step2": {
+      "title": "Paso 2: Guardar Códigos de Respaldo",
+      "warning": {
+        "title": "Importante: Guarda estos códigos de respaldo",
+        "description": "Almacena estos códigos en un lugar seguro. Puedes usarlos para acceder a tu cuenta si pierdes tu dispositivo de autenticación."
+      }
+    },
+    "step3": {
+      "title": "Paso 3: Verificar Configuración",
+      "description": "Ingresa el código de 6 dígitos de tu aplicación de autenticación para completar la configuración",
+      "verificationCode": "Código de Verificación",
+      "placeholder": "000000",
+      "enableButton": "Activar 2FA",
+      "verifying": "Verificando...",
+      "hint": "El código cambia cada 30 segundos. Asegúrate de ingresar el código actual."
+    },
+    "copy": "Copiar",
+    "copied": "¡Copiado!"
+  },
+  "verify": {
+    "title": "Verificación de Dos Factores",
+    "description": "Ingresa el código de 6 dígitos de tu aplicación de autenticación",
+    "verificationCode": "Código de Verificación",
+    "placeholder": "000000",
+    "verifyButton": "Verificar",
+    "verifying": "Verificando...",
+    "useBackupCode": "Usar código de respaldo",
+    "hint": "Esta verificación será válida por 30 días en este dispositivo."
+  },
+  "errors": {
+    "invalidCode": "Código de verificación inválido. Por favor verifica tu aplicación de autenticación e intenta nuevamente.",
+    "codeMustBe6Digits": "El código debe tener 6 dígitos",
+    "codeOnlyNumbers": "El código debe contener solo números",
+    "sessionExpired": "La sesión ha expirado. Por favor actualiza la página e intenta nuevamente.",
+    "alreadyConfigured": "2FA ya está configurado para tu cuenta",
+    "notConfigured": "2FA no está configurado para tu cuenta",
+    "verificationExpired": "Tu verificación de 2FA ha expirado. Por favor verifica nuevamente."
+  }
+}

@@ -68,6 +68,12 @@ Route::middleware('auth')->group(function () {
     
     Route::post('2fa/verify', [TwoFactorController::class, 'verifyStore'])
         ->name('2fa.verify.store');
+    
+    Route::post('2fa/disable', [TwoFactorController::class, 'disable'])
+        ->name('2fa.disable');
+    
+    Route::post('2fa/regenerate-backup-codes', [TwoFactorController::class, 'regenerateBackupCodes'])
+        ->name('2fa.regenerate-backup-codes');
 
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');

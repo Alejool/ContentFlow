@@ -57,6 +57,9 @@ class User extends Model implements Authenticatable, MustVerifyEmail, CanResetPa
     'last_login_ip',
     'created_ip',
     'known_devices',
+    'two_factor_secret',
+    'two_factor_backup_codes',
+    'two_factor_enabled_at',
   ];
 
   protected $hidden = [
@@ -72,6 +75,7 @@ class User extends Model implements Authenticatable, MustVerifyEmail, CanResetPa
     'ai_settings' => 'array',
     'known_devices' => 'array',
     'last_login_at' => 'datetime',
+    'two_factor_enabled_at' => 'datetime',
   ];
 
   protected $attributes = [

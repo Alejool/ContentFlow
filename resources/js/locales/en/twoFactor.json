@@ -1,0 +1,53 @@
+{
+  "setup": {
+    "title": "Setup Two-Factor Authentication",
+    "subtitle": "Secure your admin account with 2FA",
+    "securityWarning": {
+      "title": "⚠️ Important: Keep this code private",
+      "description": "Only scan this QR code on YOUR personal device. Anyone who scans this code will be able to generate access codes for your account. You will receive a confirmation email when 2FA is activated."
+    },
+    "step1": {
+      "title": "Step 1: Scan QR Code",
+      "description": "Scan this QR code with your authenticator app (Google Authenticator, Authy, etc.)",
+      "manualEntry": "Can't scan? Enter this code manually:",
+      "troubleshooting": "If you're having trouble, make sure your device's time is synchronized correctly."
+    },
+    "step2": {
+      "title": "Step 2: Save Backup Codes",
+      "warning": {
+        "title": "Important: Save these backup codes",
+        "description": "Store these codes in a safe place. You can use them to access your account if you lose your authenticator device."
+      }
+    },
+    "step3": {
+      "title": "Step 3: Verify Setup",
+      "description": "Enter the 6-digit code from your authenticator app to complete setup",
+      "verificationCode": "Verification Code",
+      "placeholder": "000000",
+      "enableButton": "Enable 2FA",
+      "verifying": "Verifying...",
+      "hint": "The code changes every 30 seconds. Make sure to enter the current code."
+    },
+    "copy": "Copy",
+    "copied": "Copied!"
+  },
+  "verify": {
+    "title": "Two-Factor Verification",
+    "description": "Enter the 6-digit code from your authenticator app",
+    "verificationCode": "Verification Code",
+    "placeholder": "000000",
+    "verifyButton": "Verify",
+    "verifying": "Verifying...",
+    "useBackupCode": "Use backup code",
+    "hint": "This verification will be valid for 30 days on this device."
+  },
+  "errors": {
+    "invalidCode": "Invalid verification code. Please check your authenticator app and try again.",
+    "codeMustBe6Digits": "Code must be 6 digits",
+    "codeOnlyNumbers": "Code must contain only numbers",
+    "sessionExpired": "Session expired. Please refresh the page and try again.",
+    "alreadyConfigured": "2FA is already configured for your account",
+    "notConfigured": "2FA is not configured for your account",
+    "verificationExpired": "Your 2FA verification has expired. Please verify again."
+  }
+}
