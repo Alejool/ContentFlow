@@ -1,7 +1,19 @@
 import axios from "axios";
-import { endOfMonth, endOfWeek, startOfMonth, startOfWeek } from "date-fns";
+import { 
+  endOfMonth, 
+  endOfWeek, 
+  startOfMonth, 
+  startOfWeek,
+  addMonths,
+  subMonths,
+  addWeeks,
+  subWeeks,
+  addDays,
+  subDays
+} from "date-fns";
 import { create } from "zustand";
 import { CalendarEvent, CalendarView, CalendarFilters } from "@/types/calendar";
+import { DataConflict } from "@/Components/Calendar/ConflictResolutionModal";
 
 interface CalendarState {
   events: CalendarEvent[];
@@ -17,6 +29,7 @@ interface CalendarState {
   canUndo: boolean;
   lastBulkOperation: any | null;
   lastBulkOperationTime: Date | null;
+  conflict: DataConflict | null;
 
   setCurrentMonth: (date: Date) => void;
   setPlatformFilter: (platform: string) => void;
@@ -30,6 +43,9 @@ interface CalendarState {
   clearSelection: () => void;
   selectAll: () => void;
   fetchEvents: () => Promise<void>;
+  setEvents: (events: CalendarEvent[]) => void;
+  setLoading: (isLoading: boolean) => void;
+  setError: (error: string | null) => void;
   updateEvent: (id: string, newDate: string, type: string) => Promise<boolean>;
   bulkUpdateEvents: (eventIds: string[], newDate: string) => Promise<boolean>;
   bulkDeleteEvents: (eventIds: string[]) => Promise<boolean>;
@@ -43,6 +59,12 @@ interface CalendarState {
   deleteEvent: (id: string) => Promise<boolean>;
   exportToGoogleCalendar: () => Promise<void>;
   exportToOutlook: () => Promise<void>;
+  navigatePrevious: () => void;
+  navigateNext: () => void;
+  navigateToToday: () => void;
+  navigateToDate: (date: Date) => void;
+  setConflict: (conflict: DataConflict | null) => void;
+  resolveConflict: (resolution: 'local' | 'server') => Promise<boolean>;
 }
 
 export const useCalendarStore = create<CalendarState>((set, get) => ({
@@ -63,6 +85,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
   canUndo: false,
   lastBulkOperation: null,
   lastBulkOperationTime: null,
+  conflict: null,
 
   setCurrentMonth: (date) => set({ currentMonth: date }),
   setPlatformFilter: (platform) => set({ platformFilter: platform }),
@@ -76,8 +99,7 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
   
   setFilters: (filters) => {
     set({ filters });
-    // Trigger a re-fetch with the new filters
-    get().fetchEvents();
+    // React Query will handle re-fetching with new filters
   },
 
   applyFilters: (events) => {
@@ -173,9 +195,24 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
       });
     }
   },
+  
+  // Method to set events from React Query (for cache integration)
+  setEvents: (events: CalendarEvent[]) => set({ events, isLoading: false }),
+  
+  // Method to set loading state
+  setLoading: (isLoading: boolean) => set({ isLoading }),
+  
+  // Method to set error state
+  setError: (error: string | null) => set({ error }),
 
   updateEvent: async (id, newDate, type) => {
     try {
+      // Validate that the new date is not in the past
+      const targetDate = new Date(newDate);
+      const now = new Date();
+      
+      // Past dates are NOT allowed - validation will be enforced
+      
       const resourceId = id.split("_").pop();
       let eventType = type;
 
@@ -185,12 +222,16 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
         else if (id.startsWith("user_event_")) eventType = "user_event";
       }
 
+      // Get current event for conflict detection
+      const currentEvent = get().events.find(ev => ev.id === id);
+
       await axios.patch(`/api/v1/calendar/events/${resourceId}`, {
         scheduled_at: newDate,
         type: eventType,
+        current_version: currentEvent?.extendedProps?.version || null,
       });
 
-      // Update local state inmediately
+      // Update local state immediately
       const events = get().events.map((ev) =>
         ev.id === id ? { ...ev, start: newDate } : ev,
       );
@@ -198,6 +239,22 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
 
       return true;
     } catch (error: any) {
+      // Check for conflict error (409)
+      if (error.response?.status === 409 && error.response?.data?.conflict) {
+        const conflictData = error.response.data.conflict;
+        const conflict: DataConflict = {
+          eventId: id,
+          field: conflictData.field || 'start',
+          localValue: newDate,
+          serverValue: conflictData.server_value,
+          localTimestamp: new Date(),
+          serverTimestamp: new Date(conflictData.server_timestamp),
+          serverUser: conflictData.server_user,
+        };
+        set({ conflict });
+        return false;
+      }
+
       set({
         error: error.message ?? "Failed to update event",
       });
@@ -385,6 +442,93 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
       set({
         error: error.message ?? "Failed to export to Outlook",
       });
+    }
+  },
+
+  // Navigation methods
+  navigatePrevious: () => {
+    const { currentMonth, view } = get();
+    let newDate: Date;
+
+    switch (view) {
+      case 'day':
+        newDate = subDays(currentMonth, 1);
+        break;
+      case 'week':
+        newDate = subWeeks(currentMonth, 1);
+        break;
+      case 'month':
+      default:
+        newDate = subMonths(currentMonth, 1);
+        break;
+    }
+
+    set({ currentMonth: newDate });
+    // React Query will handle re-fetching with new date
+  },
+
+  navigateNext: () => {
+    const { currentMonth, view } = get();
+    let newDate: Date;
+
+    switch (view) {
+      case 'day':
+        newDate = addDays(currentMonth, 1);
+        break;
+      case 'week':
+        newDate = addWeeks(currentMonth, 1);
+        break;
+      case 'month':
+      default:
+        newDate = addMonths(currentMonth, 1);
+        break;
+    }
+
+    set({ currentMonth: newDate });
+    // React Query will handle re-fetching with new date
+  },
+
+  navigateToToday: () => {
+    set({ currentMonth: new Date() });
+    // React Query will handle re-fetching with new date
+  },
+
+  navigateToDate: (date: Date) => {
+    set({ currentMonth: date });
+    // React Query will handle re-fetching with new date
+  },
+
+  setConflict: (conflict: DataConflict | null) => {
+    set({ conflict });
+  },
+
+  resolveConflict: async (resolution: 'local' | 'server') => {
+    const { conflict } = get();
+    if (!conflict) return false;
+
+    try {
+      const resourceId = conflict.eventId.split("_").pop();
+      
+      await axios.post(`/api/v1/calendar/events/${resourceId}/resolve-conflict`, {
+        resolution,
+        field: conflict.field,
+        value: resolution === 'local' ? conflict.localValue : conflict.serverValue,
+      });
+
+      // Update local state
+      const events = get().events.map((ev) =>
+        ev.id === conflict.eventId 
+          ? { ...ev, [conflict.field]: resolution === 'local' ? conflict.localValue : conflict.serverValue } 
+          : ev,
+      );
+      
+      set({ events, conflict: null });
+      return true;
+    } catch (error: any) {
+      set({
+        error: error.message ?? "Failed to resolve conflict",
+      });
+      return false;
     }
   },
 }));

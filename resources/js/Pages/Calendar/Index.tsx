@@ -6,7 +6,6 @@ import { Head } from "@inertiajs/react";
 import EmptyState from "@/Components/common/EmptyState";
 import { getEmptyStateByKey } from "@/Utils/emptyStateMapper";
 import {
-  addMonths,
   eachDayOfInterval,
   endOfMonth,
   format,
@@ -14,17 +13,10 @@ import {
   isSameMonth,
   isToday,
   parseISO,
-  setMonth,
-  setYear,
   startOfMonth,
-  subMonths,
 } from "date-fns";
 import {
   Calendar as CalendarIcon,
-  ChevronDown,
-  ChevronLeft,
-  ChevronRight,
-  Clock,
   Filter,
   Loader2,
   Trash2,
@@ -41,10 +33,12 @@ import {
   FaYoutube,
 } from "react-icons/fa";
 import { CalendarViewSelector } from "@/Components/Calendar/CalendarViewSelector";
+import { CalendarNavigation } from "@/Components/Calendar/CalendarNavigation";
 import { MonthView } from "@/Components/Calendar/MonthView";
 import { WeekView } from "@/Components/Calendar/WeekView";
 import { DayView } from "@/Components/Calendar/DayView";
 import { FilterPanel } from "@/Components/Calendar/FilterPanel";
+import { EventDetailsModal } from "@/Components/Calendar/EventDetailsModal";
 import { CalendarEvent } from "@/types/calendar";
 import { useCampaignStore } from "@/stores/campaignStore";
 
@@ -109,6 +103,10 @@ export default function CalendarIndex({ auth }: { auth: any }) {
     bulkDeleteEvents,
     undoBulkOperation,
     isUndoAvailable,
+    navigatePrevious,
+    navigateNext,
+    navigateToToday,
+    navigateToDate,
   } = useCalendarStore(
     useShallow((s) => ({
       events: s.events,
@@ -134,6 +132,10 @@ export default function CalendarIndex({ auth }: { auth: any }) {
       bulkDeleteEvents: s.bulkDeleteEvents,
       undoBulkOperation: s.undoBulkOperation,
       isUndoAvailable: s.isUndoAvailable,
+      navigatePrevious: s.navigatePrevious,
+      navigateNext: s.navigateNext,
+      navigateToToday: s.navigateToToday,
+      navigateToDate: s.navigateToDate,
     })),
   );
 
@@ -144,53 +146,17 @@ export default function CalendarIndex({ auth }: { auth: any }) {
     })),
   );
 
-  const [draggedEvent, setDraggedEvent] = useState<CalendarEvent | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [eventToDelete, setEventToDelete] = useState<CalendarEvent | null>(
     null,
   );
-  const [showMonthPicker, setShowMonthPicker] = useState(false);
-
-  // Close month picker when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as Element;
-      if (showMonthPicker && !target.closest(".month-picker-container")) {
-        setShowMonthPicker(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [showMonthPicker]);
+  const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
+  const [showEventDetailsModal, setShowEventDetailsModal] = useState(false);
 
   useEffect(() => {
     fetchEvents();
     fetchCampaigns();
   }, [currentDate]);
-
-  // Timer to check if undo is still available (within 5 minutes)
-  useEffect(() => {
-    if (!canUndo) return;
-
-    const interval = setInterval(() => {
-      if (!isUndoAvailable()) {
-        // Manually update the store to disable undo
-        useCalendarStore.setState({ canUndo: false, lastBulkOperation: null, lastBulkOperationTime: null });
-      }
-    }, 10000); // Check every 10 seconds
-
-    return () => clearInterval(interval);
-  }, [canUndo, isUndoAvailable]);
-
-  // Navigation
-  const nextMonth = () => setCurrentDate(addMonths(currentDate, 1));
-  const prevMonth = () => setCurrentDate(subMonths(currentDate, 1));
-  const goToToday = () => setCurrentDate(new Date());
-  const goToMonth = (month: number, year: number) => {
-    setCurrentDate(setYear(setMonth(new Date(), month), year));
-    setShowMonthPicker(false);
-  };
 
   // Grid Generation
   const days = eachDayOfInterval({
@@ -203,26 +169,6 @@ export default function CalendarIndex({ auth }: { auth: any }) {
 
   // Filter Events - use the store's filtering logic
   const filteredEvents = getFilteredEvents();
-
-  // Drag and Drop Handlers
-  const handleDragStart = (e: React.DragEvent, event: any) => {
-    setDraggedEvent(event);
-    e.dataTransfer.effectAllowed = "move";
-    e.dataTransfer.setData("text/plain", event.id); // Required for Firefox
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = "move";
-  };
-
-  const handleDrop = async (e: React.DragEvent, date: Date) => {
-    e.preventDefault();
-    if (!draggedEvent) return;
-
-    await updateEvent(draggedEvent.id, date.toISOString(), draggedEvent.type);
-    setDraggedEvent(null);
-  };
 
   // Delete Event Handler
   const handleDeleteEvent = (event: any) => {
@@ -241,6 +187,35 @@ export default function CalendarIndex({ auth }: { auth: any }) {
     }
     setShowDeleteModal(false);
     setEventToDelete(null);
+  };
+
+  // Event Click Handler
+  const handleEventClick = (event: CalendarEvent) => {
+    setSelectedEvent(event);
+    setShowEventDetailsModal(true);
+  };
+
+  const handleUpdateEventDate = async (eventId: string, newDate: Date) => {
+    // Check if dropping to a past date
+    const now = new Date();
+    
+    if (newDate < now) {
+      const confirmed = window.confirm(
+        t('calendar.warnings.pastDate') || 
+        '¿Estás seguro de que quieres mover este evento a una fecha/hora pasada?'
+      );
+      if (!confirmed) {
+        throw new Error('User cancelled');
+      }
+    }
+    
+    const success = await updateEvent(eventId, newDate.toISOString(), '');
+    if (success) {
+      toast.success(t('calendar.messages.eventUpdated') || 'Evento actualizado');
+    } else {
+      toast.error(t('calendar.messages.updateFailed') || 'Error al actualizar evento');
+      throw new Error('Update failed');
+    }
   };
 
   const platforms = [
@@ -271,79 +246,16 @@ export default function CalendarIndex({ auth }: { auth: any }) {
             <div className="p-6">
               {/* Toolbar */}
               <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-6">
-                <div className="flex items-center gap-4">
-                  <div className="relative month-picker-container">
-                    <button
-                      onClick={() => setShowMonthPicker(!showMonthPicker)}
-                      className="text-3xl font-bold text-gray-900 dark:text-white capitalize flex items-center gap-3 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
-                    >
-                      {new Intl.DateTimeFormat(i18n.language || undefined, {
-                        month: "long",
-                        year: "numeric",
-                      }).format(currentDate)}
-                      <ChevronDown
-                        className={`w-5 h-5 transition-transform ${showMonthPicker ? "rotate-180" : ""}`}
-                      />
-                      {loading && (
-                        <Loader2 className="w-5 h-5 animate-spin text-primary-500" />
-                      )}
-                    </button>
-
-                    {showMonthPicker && (
-                      <div className="absolute top-full left-0 mt-2 bg-white dark:bg-black border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 p-4 min-w-[280px]">
-                        <div className="grid grid-cols-3 gap-2 mb-4">
-                          {Array.from({ length: 12 }, (_, i) => (
-                            <button
-                              key={i}
-                              onClick={() =>
-                                goToMonth(i, currentDate.getFullYear())
-                              }
-                              className={`p-2 text-sm rounded-lg transition-colors ${
-                                currentDate.getMonth() === i
-                                  ? "bg-primary-500 text-white"
-                                  : "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
-                              }`}
-                            >
-                              {new Intl.DateTimeFormat(
-                                i18n.language || undefined,
-                                {
-                                  month: "short",
-                                },
-                              ).format(new Date(2024, i, 1))}
-                            </button>
-                          ))}
-                        </div>
-                        <div className="flex items-center justify-between gap-2">
-                          <button
-                            onClick={() =>
-                              goToMonth(
-                                currentDate.getMonth(),
-                                currentDate.getFullYear() - 1,
-                              )
-                            }
-                            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                          >
-                            <ChevronLeft className="w-4 h-4" />
-                          </button>
-                          <span className="font-semibold text-gray-900 dark:text-white">
-                            {currentDate.getFullYear()}
-                          </span>
-                          <button
-                            onClick={() =>
-                              goToMonth(
-                                currentDate.getMonth(),
-                                currentDate.getFullYear() + 1,
-                              )
-                            }
-                            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                          >
-                            <ChevronRight className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
+                {/* Calendar Navigation */}
+                <CalendarNavigation
+                  currentDate={currentDate}
+                  view={view}
+                  onNavigatePrevious={navigatePrevious}
+                  onNavigateNext={navigateNext}
+                  onNavigateToToday={navigateToToday}
+                  onNavigateToDate={navigateToDate}
+                  isLoading={loading}
+                />
 
                 <div className="flex flex-wrap items-center gap-3 w-full md:w-auto justify-center md:justify-end">
                   {/* View Selector */}
@@ -378,27 +290,6 @@ export default function CalendarIndex({ auth }: { auth: any }) {
                       </button>
                     ))}
                   </div>
-
-                  <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg border border-gray-200 dark:border-gray-700">
-                    <button
-                      onClick={prevMonth}
-                      className="p-2 hover:bg-white dark:hover:bg-gray-700 rounded-lg transition-all shadow-sm hover:shadow text-gray-600 dark:text-gray-300"
-                    >
-                      <ChevronLeft className="w-5 h-5" />
-                    </button>
-                    <button
-                      onClick={goToToday}
-                      className="px-4 py-2 text-sm font-semibold hover:bg-white dark:hover:bg-gray-700 rounded-lg transition-all shadow-sm hover:shadow text-gray-700 dark:text-gray-200"
-                    >
-                      Hoy
-                    </button>
-                    <button
-                      onClick={nextMonth}
-                      className="p-2 hover:bg-white dark:hover:bg-gray-700 rounded-lg transition-all shadow-sm hover:shadow text-gray-600 dark:text-gray-300"
-                    >
-                      <ChevronRight className="w-5 h-5" />
-                    </button>
-                  </div>
                 </div>
               </div>
 
@@ -422,10 +313,35 @@ export default function CalendarIndex({ auth }: { auth: any }) {
                     <MonthView
                       currentDate={currentDate}
                       events={filteredEvents}
-                      onEventDragStart={handleDragStart}
-                      onDayDragOver={handleDragOver}
-                      onDayDrop={handleDrop}
+                      onEventDrop={async (eventId, newDate) => {
+                        // Check if dropping to a past date
+                        const now = new Date();
+                        now.setHours(0, 0, 0, 0);
+                        const targetDate = new Date(newDate);
+                        targetDate.setHours(0, 0, 0, 0);
+                        
+                        if (targetDate < now) {
+                          // Show warning for past date
+                          const confirmed = window.confirm(
+                            t('calendar.warnings.pastDate') || 
+                            '¿Estás seguro de que quieres mover este evento a una fecha pasada?'
+                          );
+                          if (!confirmed) {
+                            return; // Cancel the drop
+                          }
+                        }
+                        
+                        const success = await updateEvent(eventId, newDate.toISOString(), '');
+                        if (success) {
+                          toast.success(t('calendar.messages.eventUpdated') || 'Evento actualizado');
+                        } else {
+                          toast.error(t('calendar.messages.updateFailed') || 'Error al actualizar evento');
+                        }
+                      }}
                       onEventDelete={handleDeleteEvent}
+                      onEventClick={handleEventClick}
+                      selectedEvents={selectedEvents}
+                      onToggleSelection={toggleEventSelection}
                       PlatformIcon={PlatformIcon}
                       currentUser={auth.user}
                     />
@@ -436,11 +352,27 @@ export default function CalendarIndex({ auth }: { auth: any }) {
                       currentDate={currentDate}
                       events={filteredEvents}
                       onEventDrop={async (event, newDate) => {
-                        await updateEvent(event.id, newDate.toISOString(), event.type);
+                        // Check if dropping to a past date/time
+                        const now = new Date();
+                        
+                        if (newDate < now) {
+                          const confirmed = window.confirm(
+                            t('calendar.warnings.pastDate') || 
+                            '¿Estás seguro de que quieres mover este evento a una fecha/hora pasada?'
+                          );
+                          if (!confirmed) {
+                            return;
+                          }
+                        }
+                        
+                        const success = await updateEvent(event.id, newDate.toISOString(), event.type);
+                        if (success) {
+                          toast.success(t('calendar.messages.eventUpdated') || 'Evento actualizado');
+                        } else {
+                          toast.error(t('calendar.messages.updateFailed') || 'Error al actualizar evento');
+                        }
                       }}
-                      onEventClick={(event) => {
-                        // Handle event click - could open a modal
-                        }}
+                      onEventClick={handleEventClick}
                       selectedEvents={selectedEvents}
                       onToggleSelection={toggleEventSelection}
                       PlatformIcon={PlatformIcon}
@@ -452,11 +384,27 @@ export default function CalendarIndex({ auth }: { auth: any }) {
                       currentDate={currentDate}
                       events={filteredEvents}
                       onEventDrop={async (event, newDate) => {
-                        await updateEvent(event.id, newDate.toISOString(), event.type);
+                        // Check if dropping to a past date/time
+                        const now = new Date();
+                        
+                        if (newDate < now) {
+                          const confirmed = window.confirm(
+                            t('calendar.warnings.pastDate') || 
+                            '¿Estás seguro de que quieres mover este evento a una fecha/hora pasada?'
+                          );
+                          if (!confirmed) {
+                            return;
+                          }
+                        }
+                        
+                        const success = await updateEvent(event.id, newDate.toISOString(), event.type);
+                        if (success) {
+                          toast.success(t('calendar.messages.eventUpdated') || 'Evento actualizado');
+                        } else {
+                          toast.error(t('calendar.messages.updateFailed') || 'Error al actualizar evento');
+                        }
                       }}
-                      onEventClick={(event) => {
-                        // Handle event click - could open a modal
-                        }}
+                      onEventClick={handleEventClick}
                       onDeleteEvent={handleDeleteEvent}
                       selectedEvents={selectedEvents}
                       onToggleSelection={toggleEventSelection}
@@ -502,6 +450,29 @@ export default function CalendarIndex({ auth }: { auth: any }) {
         </div>
       </DynamicModal>
 
+      {/* Event Details Modal */}
+      <EventDetailsModal
+        event={selectedEvent}
+        isOpen={showEventDetailsModal}
+        onClose={() => {
+          setShowEventDetailsModal(false);
+          setSelectedEvent(null);
+        }}
+        onUpdateDate={handleUpdateEventDate}
+        onDelete={(event) => {
+          setShowEventDetailsModal(false);
+          handleDeleteEvent(event);
+        }}
+        PlatformIcon={PlatformIcon}
+        canEdit={true}
+        canDelete={
+          selectedEvent &&
+          ['user_event', 'event'].includes(String(selectedEvent.type)) &&
+          (!selectedEvent.extendedProps?.is_public ||
+            selectedEvent.extendedProps?.user_name === auth.user?.name)
+        }
+      />
+
       {/* Bulk Actions Bar */}
       <BulkActionsBar
         selectedCount={selectedEvents.size}
@@ -536,7 +507,7 @@ export default function CalendarIndex({ auth }: { auth: any }) {
             toast.error('Error al deshacer operación');
           }
         }}
-        canUndo={canUndo}
+        canUndo={canUndo && isUndoAvailable()}
       />
     </AuthenticatedLayout>
   );
