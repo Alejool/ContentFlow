@@ -31,7 +31,8 @@ RUN apk add --no-cache \
     freetype-dev \
     libjpeg-turbo-dev \
     libpng-dev \
-    libwebp-dev
+    libwebp-dev \
+    ffmpeg
 
 # ----------------------------------------------------
 # 2. PHP extensions (Redis, Swoole, PostgreSQL, etc.)
