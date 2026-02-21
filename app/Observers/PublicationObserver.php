@@ -23,6 +23,27 @@ class PublicationObserver
         'status' => $publication->status,
       ],
     ]);
+
+    // Dispatch event for external calendar sync
+    event(new \App\Events\Publications\PublicationCreated($publication));
+  }
+
+  /**
+   * Handle the Publication "updated" event.
+   */
+  public function updated(Publication $publication): void
+  {
+    // Dispatch event for external calendar sync
+    event(new \App\Events\Publications\PublicationUpdated($publication));
+  }
+
+  /**
+   * Handle the Publication "deleting" event.
+   */
+  public function deleting(Publication $publication): void
+  {
+    // Dispatch event for external calendar sync before deletion
+    event(new \App\Events\Publications\PublicationDeleted($publication));
   }
 
   /**
