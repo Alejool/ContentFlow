@@ -99,7 +99,7 @@ class CalendarController extends Controller
           'photo_url' => $pub->user->photo_url,
         ] : null,
         'extendedProps' => [
-          'slug' => $pub->slug,
+          'slug' => '/content',
           'thumbnail' => $pub->mediaFiles->first()?->file_path,
           'platforms' => $pubPlatforms,
           'campaigns' => $campaignNames,
@@ -151,7 +151,7 @@ class CalendarController extends Controller
   public function update(Request $request, $id)
   {
     $request->validate([
-      'scheduled_at' => 'required|date',
+      'scheduled_at' => 'required|date|after:now',
       'type' => 'nullable|in:publication,post,user_event'
     ]);
 

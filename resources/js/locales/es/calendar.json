@@ -22,6 +22,12 @@
       "moveEvents": "Mover eventos",
       "bulkMove": "Mover seleccionados"
     },
+    "navigation": {
+      "previous": "Anterior",
+      "next": "Siguiente",
+      "today": "Hoy",
+      "selectDate": "Seleccionar fecha"
+    },
     "filters": {
       "all": "Todos",
       "events": "Solo Eventos",
@@ -106,6 +112,104 @@
         "footer": {
           "note": "Nota: Este evento será visible para todos los miembros de tu workspace."
         }
+      }
+    },
+    "external": {
+      "title": "Calendarios Externos",
+      "description": "Sincroniza tus publicaciones programadas con Google Calendar y Outlook",
+      "settings": "Configuración de Calendarios Externos",
+      "connected": "Conectado",
+      "disconnected": "Desconectado",
+      "error": "Error",
+      "connect": "Conectar",
+      "connecting": "Conectando...",
+      "disconnect": "Desconectar",
+      "syncNow": "Sincronizar Ahora",
+      "configure": "Configurar",
+      "lastSync": "Última sincronización",
+      "disconnectConfirm": {
+        "title": "¿Desconectar calendario?",
+        "message": "¿Estás seguro de que deseas desconectar este calendario? Los eventos sincronizados se eliminarán del calendario externo.",
+        "confirm": "Sí, desconectar",
+        "cancel": "Cancelar"
+      },
+      "connectError": "Error al conectar el calendario",
+      "disconnectSuccess": "Calendario desconectado exitosamente",
+      "disconnectError": "Error al desconectar el calendario",
+      "syncSuccess": "Sincronización completada exitosamente",
+      "syncError": "Error al sincronizar el calendario",
+      "fetchError": "Error al obtener el estado de conexión",
+      "connectionSuccess": "Calendario {{provider}} conectado exitosamente",
+      "syncSettings": "Configuración de Sincronización",
+      "enableSync": "Habilitar sincronización automática",
+      "syncCampaigns": "Sincronizar solo estas campañas (dejar vacío para todas)",
+      "syncPlatforms": "Sincronizar solo estas plataformas (dejar vacío para todas)",
+      "syncSettingsSaved": "Configuración guardada exitosamente",
+      "syncSettingsError": "Error al guardar la configuración",
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "retrySuccess": "Sincronización reintentada exitosamente",
+      "retryError": "Error al reintentar la sincronización",
+      "errors": {
+        "invalidState": "Estado de autenticación inválido",
+        "expiredState": "La sesión de autenticación ha expirado",
+        "providerMismatch": "El proveedor no coincide",
+        "noCode": "No se recibió código de autorización",
+        "connectionFailed": "Error al conectar con el calendario",
+        "unknown": "Error desconocido al conectar"
+      }
+    },
+    "error": {
+      "title": "Algo salió mal",
+      "description": "Ocurrió un error al renderizar el calendario. Por favor, intenta de nuevo.",
+      "retry": "Intentar de nuevo",
+      "retry_button": "Reintentar",
+      "persist": "Si el problema persiste, por favor contacta con soporte."
+    },
+    "validation": {
+      "invalid_date": "Fecha Inválida",
+      "past_date_error": "No se Puede Programar en el Pasado",
+      "past_date_message": "No puedes programar eventos para fechas pasadas. Por favor, selecciona una fecha y hora futura.",
+      "date_required": "La fecha es obligatoria",
+      "invalid_format": "Formato de fecha inválido. Por favor, usa una fecha válida."
+    },
+    "selected_date": "Fecha seleccionada:",
+    "sync": {
+      "error": {
+        "title": "Error de Sincronización",
+        "failed": "Error al sincronizar con {provider}",
+        "token_expired": "Tu conexión con {provider} ha expirado. Por favor, reconecta.",
+        "unavailable": "{provider} no está disponible actualmente. Por favor, intenta más tarde.",
+        "unknown": "Ocurrió un error de sincronización desconocido",
+        "dismiss": "Descartar error",
+        "retry": "Reintentar sincronización",
+        "retry_button": "Reintentar",
+        "local_saved": "Tus cambios se han guardado localmente.",
+        "multiple": "{count} errores de sincronización",
+        "dismiss_all": "Descartar todos"
+      }
+    },
+    "conflict": {
+      "title": "Conflicto de Datos Detectado",
+      "description": "Este evento ha sido modificado por otro usuario. Por favor, elige qué versión mantener.",
+      "event": "Evento",
+      "field_label": "Campo en conflicto",
+      "your_version": "Tu Versión",
+      "server_version": "Versión del Servidor",
+      "local": "Local",
+      "server": "Servidor",
+      "select_local": "Seleccionar tu versión",
+      "select_server": "Seleccionar versión del servidor",
+      "info": "La versión que elijas será guardada. La otra versión será descartada.",
+      "cancel": "Cancelar",
+      "resolve": "Aplicar Versión Seleccionada",
+      "field": {
+        "start": "Fecha de Inicio",
+        "end": "Fecha de Fin",
+        "title": "Título",
+        "status": "Estado",
+        "platform": "Plataforma",
+        "campaign": "Campaña"
       }
     }
   }

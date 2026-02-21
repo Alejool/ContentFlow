@@ -48,7 +48,7 @@ class UserCalendarEventController extends Controller
     $validated = $request->validate([
       'title' => 'required|string|max:255',
       'description' => 'nullable|string',
-      'start_date' => 'required|date',
+      'start_date' => 'required|date|after:now',
       'end_date' => 'nullable|date|after_or_equal:start_date',
       'color' => 'nullable|string|max:20',
       'remind_at' => [
@@ -118,7 +118,7 @@ class UserCalendarEventController extends Controller
     $validated = $request->validate([
       'title' => 'sometimes|required|string|max:255',
       'description' => 'nullable|string',
-      'start_date' => 'sometimes|required|date',
+      'start_date' => 'sometimes|required|date|after:now',
       'end_date' => 'nullable|date|after_or_equal:start_date',
       'color' => 'nullable|string|max:20',
       'remind_at' => [

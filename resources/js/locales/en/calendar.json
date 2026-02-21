@@ -12,6 +12,12 @@
     "actions": {
       "today": "Today"
     },
+    "navigation": {
+      "previous": "Previous",
+      "next": "Next",
+      "today": "Today",
+      "selectDate": "Select date"
+    },
     "filters": {
       "all": "All",
       "events": "Events Only"
@@ -69,6 +75,91 @@
         "footer": {
           "note": "Note: This event will be visible to all members of your workspace."
         }
+      }
+    },
+    "validation": {
+      "invalid_date": "Invalid Date",
+      "past_date_error": "Cannot Schedule in the Past",
+      "past_date_message": "You cannot schedule events for past dates. Please select a future date and time.",
+      "date_required": "Date is required",
+      "invalid_format": "Invalid date format. Please use a valid date."
+    },
+    "selected_date": "Selected date:",
+    "external": {
+      "title": "External Calendars",
+      "description": "Sync your scheduled publications with Google Calendar and Outlook",
+      "connected": "Connected",
+      "disconnected": "Disconnected",
+      "error": "Error",
+      "connect": "Connect",
+      "connecting": "Connecting...",
+      "disconnect": "Disconnect",
+      "configure": "Configure",
+      "lastSync": "Last sync",
+      "disconnectConfirm": {
+        "title": "Disconnect calendar?",
+        "message": "Are you sure you want to disconnect this calendar? Synced events will be removed from the external calendar.",
+        "confirm": "Yes, disconnect",
+        "cancel": "Cancel"
+      },
+      "connectError": "Error connecting calendar",
+      "disconnectSuccess": "Calendar disconnected successfully",
+      "disconnectError": "Error disconnecting calendar",
+      "fetchError": "Error fetching connection status",
+      "syncSettings": "Sync Settings",
+      "enableSync": "Enable automatic sync",
+      "syncCampaigns": "Sync only these campaigns (leave empty for all)",
+      "syncPlatforms": "Sync only these platforms (leave empty for all)",
+      "syncSettingsSaved": "Settings saved successfully",
+      "syncSettingsError": "Error saving settings",
+      "save": "Save",
+      "cancel": "Cancel",
+      "retrySuccess": "Sync retried successfully",
+      "retryError": "Error retrying sync"
+    },
+    "error": {
+      "title": "Something went wrong",
+      "description": "An error occurred while rendering the calendar. Please try again.",
+      "retry": "Try again",
+      "retry_button": "Retry",
+      "persist": "If the problem persists, please contact support."
+    },
+    "sync": {
+      "error": {
+        "title": "Sync Error",
+        "failed": "Failed to sync with {provider}",
+        "token_expired": "Your connection with {provider} has expired. Please reconnect.",
+        "unavailable": "{provider} is currently unavailable. Please try again later.",
+        "unknown": "An unknown sync error occurred",
+        "dismiss": "Dismiss error",
+        "retry": "Retry sync",
+        "retry_button": "Retry",
+        "local_saved": "Your changes have been saved locally.",
+        "multiple": "{count} sync errors",
+        "dismiss_all": "Dismiss all"
+      }
+    },
+    "conflict": {
+      "title": "Data Conflict Detected",
+      "description": "This event has been modified by another user. Please choose which version to keep.",
+      "event": "Event",
+      "field_label": "Conflicting field",
+      "your_version": "Your Version",
+      "server_version": "Server Version",
+      "local": "Local",
+      "server": "Server",
+      "select_local": "Select your version",
+      "select_server": "Select server version",
+      "info": "The version you choose will be saved. The other version will be discarded.",
+      "cancel": "Cancel",
+      "resolve": "Apply Selected Version",
+      "field": {
+        "start": "Start Date",
+        "end": "End Date",
+        "title": "Title",
+        "status": "Status",
+        "platform": "Platform",
+        "campaign": "Campaign"
       }
     }
   }

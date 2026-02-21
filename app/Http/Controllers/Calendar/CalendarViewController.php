@@ -11,4 +11,9 @@ class CalendarViewController extends Controller
     {
         return Inertia::render('Calendar/Index');
     }
+
+    public function settings()
+    {
+        return Inertia::render('Calendar/Settings');
+    }
 }

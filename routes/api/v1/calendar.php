@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\CalendarController;
 use App\Http\Controllers\Api\CalendarExportController;
 use App\Http\Controllers\Api\UserCalendarEventController;
+use App\Http\Controllers\Api\ExternalCalendarController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->prefix('calendar')->name('calendar.')->group(function () {
@@ -22,4 +23,13 @@ Route::middleware('auth:sanctum')->prefix('calendar')->name('calendar.')->group(
   Route::post('export/google', [CalendarExportController::class, 'exportToGoogle'])->name('export.google');
   Route::post('export/outlook', [CalendarExportController::class, 'exportToOutlook'])->name('export.outlook');
   Route::get('download/{filename}', [CalendarExportController::class, 'download'])->name('download');
+});
+
+// External calendar integration routes
+Route::prefix('external-calendar')->name('external-calendar.')->middleware('auth:sanctum')->group(function () {
+  Route::post('{provider}/connect', [ExternalCalendarController::class, 'connect'])->name('connect');
+  Route::delete('{provider}/disconnect', [ExternalCalendarController::class, 'disconnect'])->name('disconnect');
+  Route::get('status', [ExternalCalendarController::class, 'status'])->name('status');
+  Route::put('{provider}/sync-settings', [ExternalCalendarController::class, 'configureSyncSettings'])->name('sync-settings');
+  Route::post('{provider}/full-sync', [ExternalCalendarController::class, 'triggerFullSync'])->name('full-sync');
 });
