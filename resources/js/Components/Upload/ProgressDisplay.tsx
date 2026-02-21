@@ -48,8 +48,11 @@ export function ProgressDisplay({
         return "bg-gray-400 dark:bg-neutral-500";
       case "paused":
         return "bg-yellow-500 dark:bg-yellow-600";
+      case "uploading":
+      case "processing":
+        return "bg-gradient-to-r from-primary-400 via-primary-500 to-primary-400 dark:from-primary-500 dark:via-primary-600 dark:to-primary-500 animate-pulse";
       default:
-        return "bg-primary dark:bg-primary-light";
+        return "bg-primary-500 dark:bg-primary-600";
     }
   };
 
@@ -83,7 +86,7 @@ export function ProgressDisplay({
     <div className="space-y-2">
       {/* Progress bar with ARIA live region */}
       <div
-        className="relative h-2 bg-gray-200 dark:bg-neutral-700 rounded-full overflow-hidden"
+        className="relative h-2.5 bg-gray-200 dark:bg-neutral-700 rounded-full overflow-hidden shadow-inner"
         role="progressbar"
         aria-valuenow={validPercentage}
         aria-valuemin={0}
@@ -91,7 +94,9 @@ export function ProgressDisplay({
         aria-label={t("common.upload.progress")}
       >
         <div
-          className={`absolute h-full transition-all duration-300 ${getProgressColor()}`}
+          className={`absolute h-full transition-all duration-300 ${getProgressColor()} ${
+            status === "uploading" || status === "processing" ? "shadow-lg" : ""
+          }`}
           style={{ width: `${validPercentage}%` }}
         />
       </div>
