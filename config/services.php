@@ -61,6 +61,19 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI'),
     ],
 
+    'google_calendar' => [
+        'client_id' => env('GOOGLE_CALENDAR_CLIENT_ID', env('GOOGLE_CLIENT_ID')),
+        'client_secret' => env('GOOGLE_CALENDAR_CLIENT_SECRET', env('GOOGLE_CLIENT_SECRET')),
+        'redirect_uri' => env('GOOGLE_CALENDAR_REDIRECT_URI', env('APP_URL') . '/auth/google-calendar/callback'),
+    ],
+
+    'outlook_calendar' => [
+        'client_id' => env('OUTLOOK_CALENDAR_CLIENT_ID'),
+        'client_secret' => env('OUTLOOK_CALENDAR_CLIENT_SECRET'),
+        'redirect_uri' => env('OUTLOOK_CALENDAR_REDIRECT_URI'),
+        'tenant_id' => env('OUTLOOK_CALENDAR_TENANT_ID', 'common'),
+    ],
+
     'tiktok' => [
         'client_key' => env('TIKTOK_CLIENT_KEY'),
         'client_secret' => env('TIKTOK_CLIENT_SECRET'),
