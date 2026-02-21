@@ -14,6 +14,7 @@
         "doctrine/dbal": "^4.4",
         "dompdf/dompdf": "^3.1",
         "ezyang/htmlpurifier": "^4.19",
+        "google/apiclient": "^2.19",
         "guzzlehttp/guzzle": "^7.10",
         "inertiajs/inertia-laravel": "^2.0",
         "james-heinrich/getid3": "^1.9",
@@ -27,6 +28,7 @@
         "laravel/tinker": "^2.9",
         "league/flysystem-aws-s3-v3": "^3.30",
         "maatwebsite/excel": "^3.1",
+        "microsoft/microsoft-graph": "^2.56",
         "pragmarx/google2fa-laravel": "^2.3",
         "predis/predis": "^3.3",
         "socialiteproviders/facebook": "^4.1",
@@ -95,7 +97,8 @@
         "sort-packages": true,
         "allow-plugins": {
             "pestphp/pest-plugin": true,
-            "php-http/discovery": true
+            "php-http/discovery": true,
+            "tbachert/spi": true
         },
         "audit": {
             "ignore": [
