@@ -18,7 +18,10 @@
         "publishingSocial": "Publishing to social ({{count}})...",
         "done": "Done",
         "pending": "Pending",
-        "left": "left"
+        "left": "left",
+        "paused": "Paused",
+        "cancelled": "Cancelled",
+        "cancel_message": "Are you sure you want to cancel this upload? Partially uploaded files will be deleted."
       },
       "show": {
         "title": "Detailed View",
@@ -296,6 +299,9 @@
         "socialAccountsRequired": "Please select at least one social media account",
         "singleVideo": "You can only upload one video per publication.",
         "scheduledMinDifference": "The date must be at least 1 minute after the current time"
+      },
+      "processing": {
+        "cancel_message": "Are you sure you want to cancel this processing job? The work in progress will be stopped."
       },
       "cancel_confirmation": {
         "title": "Cancel Publication",

@@ -22,6 +22,7 @@ import profile from "./profile.json";
 import publications from "./publications.json";
 import reels from "./reels.json";
 import settings from "./settings.json";
+import twoFactor from "./twoFactor.json";
 import validation from "./validation.json";
 import videoValidation from "./videoValidation.json";
 import welcome from "./welcome.json";
@@ -55,5 +56,6 @@ export default {
   ...validation,
   ...videoValidation,
   ...onboarding,
+  twoFactor,
   formats,
 };

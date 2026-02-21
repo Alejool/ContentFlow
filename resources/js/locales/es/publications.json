@@ -18,7 +18,10 @@
         "publishingSocial": "Publicando en redes ({{count}})...",
         "done": "Listo",
         "pending": "Pendiente",
-        "left": "restante"
+        "left": "restante",
+        "paused": "Pausado",
+        "cancelled": "Cancelado",
+        "cancel_message": "¿Estás seguro de que deseas cancelar esta subida? Los archivos parcialmente subidos serán eliminados."
       },
       "show": {
         "title": "Vista Detallada",
@@ -320,6 +323,9 @@
         "videoTooLong": "Video demasiado largo para {{platform}} (mx {{max}})",
         "videoComplies": "Cumple con la duracin para {{platform}}",
         "durationErrors": "Por favor, corrige los errores de duracin antes de guardar."
+      },
+      "processing": {
+        "cancel_message": "¿Estás seguro de que deseas cancelar este proceso? El trabajo en curso se detendrá."
       },
       "cancel_confirmation": {
         "title": "Cancelar publicación",

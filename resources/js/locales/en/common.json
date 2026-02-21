@@ -159,7 +159,17 @@
       "networkError": "Network error occurred. Please check your connection and try again.",
       "validationError": "File validation failed. Please check the file and try again.",
       "uploadFailed": "Upload failed. Please try again.",
-      "processingFailed": "Processing failed. Please try again."
+      "processingFailed": "Processing failed. Please try again.",
+      "resume_prompt": {
+        "title": "Incomplete Uploads Detected",
+        "description": "You have {{count}} incomplete upload from a previous session.",
+        "description_plural": "You have {{count}} incomplete uploads from a previous session.",
+        "more": "+{{count}} more",
+        "info": "Files cannot be automatically resumed. You'll need to upload them again from the content page.",
+        "go_to_content": "Go to Content",
+        "discard": "Discard All",
+        "discarded": "Incomplete uploads have been discarded"
+      }
     },
     "emptyState": {
       "reels": {

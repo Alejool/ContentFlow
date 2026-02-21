@@ -168,7 +168,17 @@
       "networkError": "Error de red. Por favor verifica tu conexión e intenta nuevamente.",
       "validationError": "Falló la validación del archivo. Por favor verifica el archivo e intenta nuevamente.",
       "uploadFailed": "Falló la carga. Por favor intenta nuevamente.",
-      "processingFailed": "Falló el procesamiento. Por favor intenta nuevamente."
+      "processingFailed": "Falló el procesamiento. Por favor intenta nuevamente.",
+      "resume_prompt": {
+        "title": "Cargas Incompletas Detectadas",
+        "description": "Tienes {{count}} carga incompleta de una sesión anterior.",
+        "description_plural": "Tienes {{count}} cargas incompletas de una sesión anterior.",
+        "more": "+{{count}} más",
+        "info": "Los archivos no se pueden reanudar automáticamente. Deberás cargarlos nuevamente desde la página de contenido.",
+        "go_to_content": "Ir a Contenido",
+        "discard": "Descartar Todo",
+        "discarded": "Las cargas incompletas han sido descartadas"
+      }
     },
     "emptyState": {
       "reels": {
