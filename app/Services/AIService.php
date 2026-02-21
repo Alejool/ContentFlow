@@ -606,6 +606,13 @@ class AIService
     if (isset($parsed['suggestion']['data'])) {
       $data = &$parsed['suggestion']['data'];
       
+      // Strip HTML tags from all text fields
+      foreach ($data as $key => $value) {
+        if (is_string($value)) {
+          $data[$key] = strip_tags($value);
+        }
+      }
+      
       // For campaigns, ensure all required fields are present
       if (isset($parsed['suggestion']['type']) && 
           (strpos($parsed['suggestion']['type'], 'campaign') !== false)) {

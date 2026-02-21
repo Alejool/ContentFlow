@@ -91,4 +91,33 @@ class ContentSanitizerServiceTest extends TestCase
         $this->assertStringNotContainsString('onclick', $result->content);
         $this->assertTrue($result->wasModified);
     }
+
+    public function test_allows_img_tags_with_src_attribute()
+    {
+        $content = '<p>Check this image:</p><img src="https://example.com/image.jpg" alt="Example image">';
+        $result = $this->sanitizer->sanitize($content);
+
+        $this->assertStringContainsString('<img', $result->content);
+        $this->assertStringContainsString('src="https://example.com/image.jpg"', $result->content);
+        $this->assertStringContainsString('alt="Example image"', $result->content);
+    }
+
+    public function test_removes_img_tags_with_javascript_urls()
+    {
+        $content = '<img src="javascript:alert(1)">';
+        $result = $this->sanitizer->sanitize($content);
+
+        $this->assertStringNotContainsString('javascript:', $result->content);
+        $this->assertTrue($result->wasModified);
+    }
+
+    public function test_removes_img_tags_with_data_urls()
+    {
+        $content = '<img src="data:image/svg+xml,<svg>...</svg>">';
+        $result = $this->sanitizer->sanitize($content);
+
+        // Data URLs should be blocked by URI.AllowedSchemes
+        $this->assertStringNotContainsString('data:', $result->content);
+        $this->assertTrue($result->wasModified);
+    }
 }

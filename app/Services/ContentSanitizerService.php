@@ -15,13 +15,17 @@ class ContentSanitizerService
     {
         $config = HTMLPurifier_Config::createDefault();
         
-        // Configuración estricta
-        $config->set('HTML.Allowed', 'p,br,strong,em,u,a[href],ul,ol,li,blockquote,h1,h2,h3,h4');
-        $config->set('HTML.AllowedAttributes', 'a.href');
+        // Disable cache to ensure fresh configuration
+        $config->set('Cache.DefinitionImpl', null);
+        
+        // Configuración estricta - permitir elementos específicos
+        $config->set('HTML.DefinitionID', 'custom-html-def');
+        $config->set('HTML.DefinitionRev', 1);
+        $config->set('HTML.Allowed', 'p,br,strong,em,u,a[href],ul,ol,li,blockquote,h1,h2,h3,h4,img[src|alt|width|height]');
         $config->set('AutoFormat.RemoveEmpty', true);
         $config->set('AutoFormat.AutoParagraph', true);
         $config->set('URI.AllowedSchemes', ['http' => true, 'https' => true]);
-        $config->set('URI.DisableExternalResources', true);
+        $config->set('URI.DisableExternalResources', false); // Allow images from external URLs
         
         $this->purifier = new HTMLPurifier($config);
     }
