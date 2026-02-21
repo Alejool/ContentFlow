@@ -42,6 +42,7 @@ const EmbeddedPost = ({ platform, url }: { platform: string; url: string }) => {
           src={`https://platform.twitter.com/embed/Tweet.html?id=${tweetId}&theme=light`}
           className="w-full max-w-[550px] h-[600px] border-0"
           scrolling="no"
+          sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
         />
       );
 
@@ -52,18 +53,41 @@ const EmbeddedPost = ({ platform, url }: { platform: string; url: string }) => {
           src={`${igUrl}embed`}
           className="w-full max-w-[540px] h-[700px] border-0 overflow-hidden"
           scrolling="no"
-          allowTransparency
+          allowtransparency="true"
+          sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
         />
       );
 
     case "facebook":
       return (
-        <iframe
-          src={`https://www.facebook.com/plugins/post.php?href=${encodeURIComponent(url)}&width=500`}
-          className="w-full max-w-[500px] h-[600px] border-0 overflow-hidden"
-          scrolling="no"
-          allowTransparency
-        />
+        <div className="text-center space-y-3 py-8">
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+              <svg className="w-6 h-6 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              </svg>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Publicación de Facebook
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Facebook no permite previsualizar posts embebidos desde localhost o dominios no verificados
+              </p>
+            </div>
+          </div>
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-[#1877f2] hover:bg-[#166fe5] text-white rounded-lg transition-colors"
+          >
+            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+            </svg>
+            Ver en Facebook
+          </a>
+        </div>
       );
 
     case "youtube":
@@ -73,6 +97,7 @@ const EmbeddedPost = ({ platform, url }: { platform: string; url: string }) => {
           src={`https://www.youtube.com/embed/${videoId}`}
           className="w-full max-w-[640px] aspect-video border-0 rounded-lg"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-presentation"
           allowFullScreen
         />
       );
@@ -83,6 +108,7 @@ const EmbeddedPost = ({ platform, url }: { platform: string; url: string }) => {
           src={`https://www.tiktok.com/embed/v2/${url.split("/video/")[1]?.split("?")[0]}`}
           className="w-full max-w-[325px] h-[730px] border-0"
           scrolling="no"
+          sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
           allowFullScreen
         />
       );

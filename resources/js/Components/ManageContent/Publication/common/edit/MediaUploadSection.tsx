@@ -124,7 +124,7 @@ const MediaUploadSection = memo(
             htmlFor="media-file-input"
             className={`relative group transition-all duration-300 block ${
               isDragOver && !disabled
-                ? "scale-[1.02] ring-2 ring-primary-500 dark:ring-primary-400 ring-offset-2"
+                ? "scale-[1.02] ring-2 ring-primary-500 dark:ring-primary-900 ring-offset-2"
                 : ""
             } ${disabled ? "cursor-not-allowed" : "cursor-pointer"}`}
             onDrop={disabled ? undefined : onDrop}

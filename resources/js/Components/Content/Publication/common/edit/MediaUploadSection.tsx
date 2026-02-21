@@ -88,7 +88,7 @@ const MediaUploadSection = memo(
 
     const getUploadAreaStyles = () => {
       if (disabled || isAnyMediaProcessing || (lockedBy && !lockedBy.isSelf)) {
-        return "bg-gray-100 dark:bg-neutral-800/50 cursor-not-allowed opacity-60 border-gray-300 dark:border-neutral-700";
+        return "bg-gray-100 dark:bg-neutral-900/50 cursor-not-allowed opacity-60 border-gray-300 dark:border-neutral-700";
       }
       if (imageError) {
         return "border-primary-300 dark:border-primary-500 bg-primary-50 dark:bg-primary-900/20";
@@ -96,7 +96,7 @@ const MediaUploadSection = memo(
       if (isDragOver) {
         return "bg-primary-50 dark:bg-primary-900/20 border-primary-500 dark:border-primary-400";
       }
-      return "border-gray-200 dark:border-neutral-600 hover:border-primary-300 dark:hover:border-primary-400 bg-gray-50 dark:bg-neutral-700";
+      return "border-gray-200 dark:border-neutral-600 hover:border-primary-300 dark:hover:border-primary-400 bg-gray-50 dark:bg-neutral-900";
     };
 
     return (
@@ -118,7 +118,7 @@ const MediaUploadSection = memo(
             htmlFor="media-file-input-content"
             className={`relative group transition-all duration-300 block ${
               isDragOver && !disabled
-                ? "scale-[1.02] ring-2 ring-primary-500 dark:ring-primary-400 ring-offset-2"
+                ? "scale-[1.02] ring-2 ring-primary-500 dark:ring-primary-900 ring-offset-2"
                 : ""
             } ${disabled ? "cursor-not-allowed" : "cursor-pointer"}`}
             onDrop={disabled ? undefined : onDrop}
@@ -167,7 +167,7 @@ const MediaUploadSection = memo(
               {isAnyMediaProcessing && (
                 <div className="absolute inset-x-0 bottom-0 py-1.5 px-4 bg-primary-500/10 backdrop-blur-md border-t border-primary-500/20 animate-in slide-in-from-bottom-2">
                   <div className="flex items-center gap-3">
-                    <div className="flex-1 h-1.5 bg-gray-200 dark:bg-neutral-800 rounded-full overflow-hidden">
+                    <div className="flex-1 h-1.5 bg-gray-200 dark:bg-neutral-900 rounded-full overflow-hidden">
                       <div
                         className="h-full bg-primary-500 transition-all duration-500 ease-out"
                         style={{

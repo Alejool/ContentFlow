@@ -31,6 +31,7 @@ const EmbeddedPost = ({ platform, url }: { platform: string; url: string }) => {
           src={`https://platform.twitter.com/embed/Tweet.html?id=${tweetId}&theme=light`}
           className="w-full max-w-[550px] h-[600px] border-0"
           scrolling="no"
+          sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
         />
       );
 
@@ -41,7 +42,8 @@ const EmbeddedPost = ({ platform, url }: { platform: string; url: string }) => {
           src={`${igUrl}embed`}
           className="w-full max-w-[540px] h-[700px] border-0 overflow-hidden"
           scrolling="no"
-          allowTransparency
+          allowtransparency="true"
+          sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
         />
       );
 
