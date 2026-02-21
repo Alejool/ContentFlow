@@ -9,6 +9,7 @@ use App\Services\Calendar\ExternalCalendarSyncService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
+use App\Helpers\LogHelper;
 
 class SyncPublicationToExternalCalendars implements ShouldQueue
 {
@@ -62,7 +63,7 @@ class SyncPublicationToExternalCalendars implements ShouldQueue
                 ]);
             }
         } catch (\Exception $e) {
-            Log::error('Failed to sync created publication to external calendars', [
+            LogHelper::publicationError('Failed to sync created publication to external calendars', [
                 'publication_id' => $event->publication->id,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
@@ -91,7 +92,7 @@ class SyncPublicationToExternalCalendars implements ShouldQueue
                 ]);
             }
         } catch (\Exception $e) {
-            Log::error('Failed to sync updated publication to external calendars', [
+            LogHelper::publicationError('Failed to sync updated publication to external calendars', [
                 'publication_id' => $event->publication->id,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
@@ -118,7 +119,7 @@ class SyncPublicationToExternalCalendars implements ShouldQueue
                 'publication_id' => $publication->id,
             ]);
         } catch (\Exception $e) {
-            Log::error('Failed to sync deleted publication to external calendars', [
+            LogHelper::publicationError('Failed to sync deleted publication to external calendars', [
                 'publication_id' => $event->publication->id,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),

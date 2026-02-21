@@ -4,6 +4,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Support\Facades\Log;
+use App\Helpers\LogHelper;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\SetLocale;
@@ -63,7 +64,7 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->render(function (MethodNotAllowedHttpException $e, $request) {
-            Log::error('405 Method Not Allowed', [
+            LogHelper::error('405 Method Not Allowed', [
                 'url' => $request->fullUrl(),
                 'method' => $request->method(),
                 'allowed_methods' => $e->getHeaders()['Allow'] ?? 'unknown',
