@@ -64,6 +64,8 @@
         },
         "contentLocked": "Contenido Bloqueado",
         "contentLockedHint": "Para editar el contenido (título, descripción o archivos), debes despublicar la publicación de todas las plataformas.",
+        "approvedEditWarning": "Publicación Aprobada",
+        "approvedEditWarningHint": "Esta publicación ya fue aprobada. Si realizas cambios, volverá a estado 'Pendiente' y requerirá una nueva aprobación.",
         "lockedByOther": "publicación bloqueada por otro usuario",
         "locking": {
           "sessionMessage": "Tienes esta publicación abierta en <1>{{browser}}</1>. Cierra la otra sesión para editar aquí.",
@@ -166,6 +168,8 @@
         "configurationLockedHintAdmin": "Debes aprobar la publicación antes de configurar las redes.",
         "contentLocked": "Contenido Bloqueado",
         "contentLockedHint": "Para editar el contenido (título, descripción o archivos), debes despublicar la publicación de todas las plataformas.",
+        "approvedEditWarning": "Publicación Aprobada",
+        "approvedEditWarningHint": "Esta publicación ya fue aprobada. Si realizas cambios, volverá a estado 'Pendiente' y requerirá una nueva aprobación.",
         "lockedByOther": "publicación bloqueada por otro usuario",
         "locking": {
           "sessionMessage": "Tienes esta publicación abierta en <1>{{browser}}</1>. Cierra la otra sesión para editar aquí.",
@@ -375,7 +379,9 @@
       "edit": "Editar publicación",
       "delete": "Eliminar publicación",
       "close": "Cerrar",
-      "save": "Guardar cambios"
+      "save": "Guardar cambios",
+      "approve": "Aprobar",
+      "reject": "Rechazar"
     },
     "table": {
       "name": "Nombre",

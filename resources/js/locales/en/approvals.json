@@ -14,6 +14,10 @@
     "rejectionReasonPlaceholder": "e.g. Content does not meet company policies...",
     "rejectionReasonTooShort": "The reason must have at least 10 characters",
     "rejectionReasonTooLong": "The reason cannot exceed 500 characters",
+    "validation": {
+      "reasonMin": "The reason must have at least 10 characters",
+      "reasonMax": "The reason cannot exceed 500 characters"
+    },
     "approvalSuccess": "Publication Approved!",
     "approvalSuccessMessage": "The publication has been successfully approved and is ready to be published.",
     "approvedBy": "Approved by",

@@ -61,6 +61,8 @@
         },
         "contentLocked": "Content Locked",
         "contentLockedHint": "To edit the content (title, description or files), you must unpublish the post from all platforms.",
+        "approvedEditWarning": "Approved Publication",
+        "approvedEditWarningHint": "This publication has already been approved. If you make changes, it will return to 'Pending' status and require a new approval.",
         "lockedByOther": "Post locked by another user",
         "locking": {
           "sessionMessage": "You have this publication open on <1>{{browser}}</1>. Close the other session to edit here.",
@@ -165,6 +167,8 @@
         "configurationLockedHintAdmin": "You must approve the publication before configuring networks.",
         "contentLocked": "Content Locked",
         "contentLockedHint": "To edit the content (title, description or files), you must unpublish the post from all platforms.",
+        "approvedEditWarning": "Approved Publication",
+        "approvedEditWarningHint": "This publication has already been approved. If you make changes, it will return to 'Pending' status and require a new approval.",
         "lockedByOther": "Post locked by another user",
         "locking": {
           "sessionMessage": "You have this publication open on <1>{{browser}}</1>. Close the other session to edit here.",
@@ -330,7 +334,9 @@
       "add": "Add Publication",
       "edit": "Edit Publication",
       "delete": "Delete Publication",
-      "close": "Close"
+      "close": "Close",
+      "approve": "Approve",
+      "reject": "Reject"
     },
     "table": {
       "name": "Name",

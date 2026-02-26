@@ -88,6 +88,8 @@
     "editInPanel": "Editar en el panel",
     "yes": "Sí",
     "no": "No",
+    "required": "Requerido",
+    "optional": "Opcional",
     "configure": "Configurar",
     "noSettings": "Sin ajustes por defecto",
     "adjustOptions": "Ajustar opciones específicas",
