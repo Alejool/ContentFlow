@@ -27,7 +27,7 @@ class ThemeController extends Controller
 
     return response()->json([
       'success' => false,
-      'message' => 'User not authenticated'
+      'message' => __('messages.auth.not_authenticated')
     ], 401);
   }
 
@@ -56,13 +56,13 @@ class ThemeController extends Controller
 
       return response()->json([
         'success' => true,
-        'message' => 'Theme updated successfully'
+        'message' => __('messages.theme.updated')
       ]);
     }
 
     return response()->json([
       'success' => false,
-      'message' => 'User not authenticated'
+      'message' => __('messages.auth.not_authenticated')
     ], 401);
   }
 }

@@ -23,7 +23,7 @@ class LocaleController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Locale updated successfully',
+            'message' => __('messages.locale.updated'),
         ]);
     }
 }

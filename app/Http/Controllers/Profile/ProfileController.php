@@ -96,13 +96,13 @@ class ProfileController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => __('Profile updated successfully'),
+                'message' => __('messages.profile.updated'),
                 'user' => $userData,
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'success' => false,
-                'message' => __('Validation failed'),
+                'message' => __('messages.profile.validation_failed'),
                 'errors' => $e->errors()
             ], 422);
         } catch (\Exception $e) {
@@ -116,7 +116,7 @@ class ProfileController extends Controller
         if (!Auth::check()) {
             return response()->json([
                 'success' => false,
-                'message' => 'You are not logged in'
+                'message' => __('messages.auth.not_authenticated')
             ]);
         }
         $data = $request->validated();
@@ -125,7 +125,7 @@ class ProfileController extends Controller
         if (!$user) {
             return response()->json([
                 'success' => false,
-                'message' => 'User not found'
+                'message' => __('messages.auth.user_not_found')
             ], 404);
         }
 
@@ -134,7 +134,7 @@ class ProfileController extends Controller
         if (!Hash::check($data['current_password'], $user->password)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Current password is incorrect'
+                'message' => __('messages.profile.current_password_incorrect')
             ]);
         }
         $user->password = Hash::make($data['password']);

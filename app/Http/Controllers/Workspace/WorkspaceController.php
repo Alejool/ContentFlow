@@ -196,7 +196,7 @@ class WorkspaceController extends Controller
     if ($workspace->created_by === $userId) {
       return response()->json([
         'success' => false,
-        'message' => 'Cannot change workspace creator\'s role'
+        'message' => __('messages.workspace.creator_role_change')
       ], 422);
     }
 
@@ -205,7 +205,7 @@ class WorkspaceController extends Controller
     if ($role && $role->slug === 'owner') {
       return response()->json([
         'success' => false,
-        'message' => 'Owner role cannot be assigned. It is reserved for the workspace creator.'
+        'message' => __('messages.workspace.owner_role_assign')
       ], 422);
     }
 
@@ -227,7 +227,7 @@ class WorkspaceController extends Controller
     if ($workspace->created_by === $userId) {
       return response()->json([
         'success' => false,
-        'message' => 'Cannot remove workspace creator'
+        'message' => __('messages.workspace.creator_remove')
       ], 422);
     }
 
@@ -245,7 +245,7 @@ class WorkspaceController extends Controller
 
     return response()->json([
       'success' => true,
-      'message' => 'Member removed successfully',
+      'message' => __('messages.workspace.member_removed'),
       'members' => $workspace->users()->select('users.id', 'users.name', 'users.email', 'users.photo_url', 'users.created_at')
         ->withPivot('role_id', 'created_at')->get()
     ]);
@@ -272,7 +272,7 @@ class WorkspaceController extends Controller
     if ($role && $role->slug === 'owner') {
       return response()->json([
         'success' => false,
-        'message' => 'Owner role cannot be assigned. It is reserved for the workspace creator.',
+        'message' => __('messages.workspace.owner_role_assign'),
       ], 422);
     }
 
@@ -281,14 +281,14 @@ class WorkspaceController extends Controller
     if ($workspace->users()->where('users.id', $user->id)->exists()) {
       return response()->json([
         'success' => false,
-        'message' => 'User is already a member of this workspace',
+        'message' => __('messages.workspace.user_already_member'),
       ], 422);
     }
 
     // Attach user to workspace with role
     $workspace->users()->attach($user->id, ['role_id' => $validated['role_id']]);
 
-    return response()->json(['success' => true, 'message' => 'Member added successfully']);
+    return response()->json(['success' => true, 'message' => __('messages.workspace.member_added')]);
   }
 
   /**

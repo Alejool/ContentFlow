@@ -82,7 +82,7 @@ class RegisteredUserController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'User registered successfully',
+            'message' => __('messages.auth.user_registered'),
             'user' => Auth::user(),
             'redirect' => route('dashboard'),
             'status' => 200

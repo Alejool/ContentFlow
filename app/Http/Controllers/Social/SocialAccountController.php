@@ -138,7 +138,7 @@ class SocialAccountController extends Controller
       default:
         return response()->json([
           'success' => false,
-          'message' => 'Platform not supported'
+          'message' => __('messages.social_account.platform_not_supported')
         ], 400);
     }
 
@@ -820,13 +820,13 @@ class SocialAccountController extends Controller
 
       return response()->json([
         'success' => true,
-        'message' => 'Account connected successfully',
+        'message' => __('messages.social_account.connected'),
         'account' => $account
       ]);
     } catch (\Exception $e) {
       return response()->json([
         'success' => false,
-        'message' => 'Error saving account: ' . $e->getMessage()
+        'message' => __('messages.social_account.connection_error', ['error' => $e->getMessage()])
       ], 500);
     }
   }
@@ -893,7 +893,7 @@ class SocialAccountController extends Controller
         if (!$force) {
           return response()->json([
             'success' => false,
-            'message' => 'Cannot disconnect account. It has ' . $uniquePendingPosts->count() . ' scheduled post(s). Please remove them from campaigns first.',
+            'message' => __('messages.social_account.cannot_disconnect_scheduled', ['count' => $uniquePendingPosts->count()]),
             'posts' => $uniquePendingPosts->map(function ($post) {
               $date = $post->scheduled_at instanceof \DateTimeInterface ? $post->scheduled_at : null;
               if (!$date && $post->created_at instanceof \DateTimeInterface)
@@ -951,13 +951,13 @@ class SocialAccountController extends Controller
 
       return response()->json([
         'success' => true,
-        'message' => 'Account disconnected successfully',
+        'message' => __('messages.social_account.disconnected'),
         'orphaned_posts' => $force ? $activePosts->count() : 0,
       ]);
     } catch (\Exception $e) {
       return response()->json([
         'success' => false,
-        'message' => 'Error disconnecting account: ' . $e->getMessage()
+        'message' => __('messages.social_account.disconnect_error', ['error' => $e->getMessage()])
       ], 500);
     }
   }
