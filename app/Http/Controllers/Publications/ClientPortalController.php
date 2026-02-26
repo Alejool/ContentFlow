@@ -85,7 +85,7 @@ class ClientPortalController extends Controller
 
       DB::commit();
 
-      return $this->successResponse(['message' => 'Publication approved successfully.']);
+      return $this->successResponse(['message' => __('messages.publication.approved')]);
     } catch (\Exception $e) {
       DB::rollBack();
       return $this->errorResponse('Failed to approve publication: ' . $e->getMessage(), 500);
@@ -132,7 +132,7 @@ class ClientPortalController extends Controller
 
       DB::commit();
 
-      return $this->successResponse(['message' => 'Publication rejected successfully.']);
+      return $this->successResponse(['message' => __('messages.publication.rejected')]);
     } catch (\Exception $e) {
       DB::rollBack();
       return $this->errorResponse('Failed to reject publication: ' . $e->getMessage(), 500);

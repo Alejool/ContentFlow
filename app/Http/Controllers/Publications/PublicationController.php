@@ -345,7 +345,7 @@ class PublicationController extends Controller
     } catch (\Exception $e) {
       return response()->json([
         'success' => false,
-        'message' => 'Update failed: ' . $e->getMessage(),
+        'message' => __('messages.publication.update_failed', ['error' => $e->getMessage()]),
         'status' => 500
       ], 500);
     }

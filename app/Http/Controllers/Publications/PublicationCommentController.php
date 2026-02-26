@@ -45,7 +45,7 @@ class PublicationCommentController extends Controller
         if (Auth::id() !== $comment->user_id) {
             // Optional: check for admin/manager role
             // if (!Auth::user()->can('manage-comments')) { ... }
-            return response()->json(['message' => 'Unauthorized'], 403);
+            return response()->json(['message' => __('messages.comment.unauthorized')], 403);
         }
 
         $comment->delete();

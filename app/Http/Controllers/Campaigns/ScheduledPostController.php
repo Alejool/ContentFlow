@@ -18,7 +18,7 @@ class ScheduledPostController extends Controller
       if (!$post) {
         return response()->json([
           'success' => false,
-          'message' => 'Scheduled post not found'
+          'message' => __('messages.scheduled_post.not_found')
         ], 404);
       }
 
@@ -26,12 +26,12 @@ class ScheduledPostController extends Controller
 
       return response()->json([
         'success' => true,
-        'message' => 'Scheduled post deleted successfully'
+        'message' => __('messages.scheduled_post.deleted')
       ]);
     } catch (\Exception $e) {
       return response()->json([
         'success' => false,
-        'message' => 'Error deleting scheduled post: ' . $e->getMessage()
+        'message' => __('messages.scheduled_post.delete_error', ['error' => $e->getMessage()])
       ], 500);
     }
   }

@@ -105,7 +105,7 @@ class PublicationPreviewController extends Controller
             );
 
             return $this->successResponse([
-                'message' => 'Configuración optimizada automáticamente',
+                'message' => __('messages.publication.config_optimized'),
                 'preview' => $preview->toArray()
             ]);
         } catch (\Exception $e) {

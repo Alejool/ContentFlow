@@ -191,8 +191,8 @@ class CampaignController extends Controller
       if ($hasPublishedPosts) {
         return response()->json([
           'success' => false,
-          'message' => 'Cannot change the name of a campaign that has published posts.',
-          'errors' => ['name' => ['Cannot change the name of a campaign that has published posts.']],
+          'message' => __('messages.campaign.cannot_change_name'),
+          'errors' => ['name' => [__('messages.campaign.cannot_change_name')]],
         ], 422);
       }
     }
@@ -325,7 +325,7 @@ class CampaignController extends Controller
     } catch (\Exception $e) {
       return response()->json([
         'success' => false,
-        'message' => 'Export failed: ' . $e->getMessage()
+        'message' => __('messages.campaign.export_failed', ['error' => $e->getMessage()])
       ], 500);
     }
   }
