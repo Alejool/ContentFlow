@@ -10,7 +10,7 @@ Route::middleware('auth:sanctum')->prefix('calendar')->name('calendar.')->group(
   Route::get('user-events', [UserCalendarEventController::class, 'index'])->name('user-events.index');
   Route::post('user-events', [UserCalendarEventController::class, 'store'])->name('user-events.store');
   Route::put('user-events/{id}', [UserCalendarEventController::class, 'update'])->name('user-events.update');
-  Route::delete('user-events/{id}', [UserCalendarEventController::class, 'destroy'])->name('user-events.destroy');
+  // Route::delete('user-events/{id}', [UserCalendarEventController::class, 'destroy'])->name('user-events.destroy'); // Disabled: Events should only be moved, not deleted
 
   Route::get('events', [CalendarController::class, 'index'])->name('events');
   Route::patch('events/{id}', [CalendarController::class, 'update'])->name('update');

@@ -170,6 +170,11 @@ class UserCalendarEventController extends Controller
 
   public function destroy(string $id)
   {
+    // Disabled: Events should only be moved, not deleted
+    // Users should reschedule events instead of deleting them
+    return $this->errorResponse('Event deletion is not allowed. Please move the event to a different date instead.', 403);
+    
+    /* Original code commented out:
     $event = UserCalendarEvent::where('workspace_id', Auth::user()->current_workspace_id)
       ->where('user_id', Auth::id())
       ->findOrFail($id);
@@ -177,5 +182,6 @@ class UserCalendarEventController extends Controller
     $event->delete();
 
     return $this->successResponse(null, 'Event deleted successfully');
+    */
   }
 }
