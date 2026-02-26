@@ -49,4 +49,28 @@ class PublicationTest extends TestCase
     $publication->status = 'draft';
     $this->assertFalse($publication->isApproved());
   }
+
+  public function test_publication_is_locked_for_editing()
+  {
+    $publication = new Publication(['status' => 'pending_review']);
+    $this->assertTrue($publication->isLockedForEditing());
+
+    $publication->status = 'approved';
+    $this->assertTrue($publication->isLockedForEditing());
+
+    $publication->status = 'draft';
+    $this->assertFalse($publication->isLockedForEditing());
+  }
+
+  public function test_publication_can_be_published()
+  {
+    $publication = new Publication(['status' => 'approved']);
+    $this->assertTrue($publication->canBePublished());
+
+    $publication->status = 'draft';
+    $this->assertFalse($publication->canBePublished());
+
+    $publication->status = 'pending_review';
+    $this->assertFalse($publication->canBePublished());
+  }
 }
