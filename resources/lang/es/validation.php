@@ -32,6 +32,12 @@ return [
   'exists' => 'El campo :attribute es inválido.',
   'file' => 'El campo :attribute debe ser un archivo.',
   'filled' => 'El campo :attribute es obligatorio.',
+  
+  // Custom validation messages for rejection reason
+  'rejection_reason_required' => 'Debes proporcionar una razón para el rechazo. Explica qué cambios son necesarios para que la publicación pueda ser aprobada.',
+  'rejection_reason_min' => 'La razón del rechazo debe tener al menos :min caracteres. Por favor, proporciona más detalles.',
+  'rejection_reason_max' => 'La razón del rechazo no puede exceder :max caracteres.',
+  
   'gt' => [
     'numeric' => 'El campo :attribute debe ser mayor que :value.',
     'file' => 'El campo :attribute debe tener más de :value kilobytes.',

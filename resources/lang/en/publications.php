@@ -12,6 +12,8 @@ return [
   ],
   'button' => [
     'addPublication' => 'New Publication',
+    'approve' => 'Approve',
+    'reject' => 'Reject',
   ],
   'noCampaign' => 'No Campaign',
   'edit' => [

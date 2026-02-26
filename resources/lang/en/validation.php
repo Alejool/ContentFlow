@@ -32,6 +32,12 @@ return [
   'exists' => 'The selected :attribute is invalid.',
   'file' => 'The :attribute must be a file.',
   'filled' => 'The :attribute field must have a value.',
+  
+  // Custom validation messages for rejection reason
+  'rejection_reason_required' => 'You must provide a reason for rejection. Explain what changes are needed for the publication to be approved.',
+  'rejection_reason_min' => 'The rejection reason must be at least :min characters. Please provide more details.',
+  'rejection_reason_max' => 'The rejection reason may not exceed :max characters.',
+  
   'gt' => [
     'numeric' => 'The :attribute must be greater than :value.',
     'file' => 'The :attribute must be greater than :value kilobytes.',
