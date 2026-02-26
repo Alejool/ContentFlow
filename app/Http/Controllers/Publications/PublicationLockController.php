@@ -47,6 +47,15 @@ class PublicationLockController extends Controller
             return $this->errorResponse('Unauthorized', 403);
         }
 
+        // Check if publication is locked due to approval workflow
+        if ($publication->isLockedForEditing()) {
+            return $this->errorResponse('This publication is awaiting approval and cannot be edited.', 423, [
+                'locked_by' => 'approval_workflow',
+                'status' => $publication->status,
+                'reason' => 'This publication is awaiting approval and cannot be edited.',
+            ]);
+        }
+
         // Clean up expired locks first
         PublicationLock::where('expires_at', '<', now())->delete();
 
@@ -122,6 +131,18 @@ class PublicationLockController extends Controller
     public function status(Request $request, Publication $publication)
     {
         PublicationLock::where('expires_at', '<', now())->delete();
+
+        // Check if publication is locked due to approval workflow
+        if ($publication->isLockedForEditing()) {
+            return $this->successResponse([
+                'lock' => [
+                    'locked_by' => 'approval_workflow',
+                    'status' => $publication->status,
+                    'reason' => 'This publication is awaiting approval and cannot be edited.',
+                    'publication_id' => $publication->id,
+                ]
+            ]);
+        }
 
         $lock = PublicationLock::where('publication_id', $publication->id)->first();
 

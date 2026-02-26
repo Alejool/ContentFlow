@@ -11,7 +11,55 @@ class UpdatePublicationRequest extends FormRequest
 {
   public function authorize(): bool
   {
+    $publication = $this->route('publication');
+    
+    if (!$publication instanceof Publication) {
+      $publication = Publication::find($publication);
+    }
+
+    // Check if publication is locked for editing
+    if ($publication && $publication->isLockedForEditing()) {
+      // Return false to trigger a 403 response
+      return false;
+    }
+
     return true;
+  }
+
+  /**
+   * Get the validation error messages.
+   */
+  public function messages(): array
+  {
+    return [
+      'scheduled_at.date' => __('publications.validation.scheduledInvalid'),
+    ];
+  }
+
+  /**
+   * Handle a failed authorization attempt.
+   */
+  protected function failedAuthorization()
+  {
+    $publication = $this->route('publication');
+    
+    if (!$publication instanceof Publication) {
+      $publication = Publication::find($publication);
+    }
+
+    if ($publication && $publication->isLockedForEditing()) {
+      $message = 'This publication is locked for editing. ';
+      
+      if ($publication->status === 'pending_review') {
+        $message .= 'It is awaiting approval and cannot be modified until it is approved or rejected.';
+      } elseif ($publication->status === 'approved') {
+        $message .= 'It has been approved and is ready to publish. It cannot be modified unless rejected first.';
+      }
+
+      throw new \Illuminate\Auth\Access\AuthorizationException($message);
+    }
+
+    parent::failedAuthorization();
   }
 
   /**

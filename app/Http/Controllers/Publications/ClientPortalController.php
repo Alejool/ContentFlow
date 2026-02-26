@@ -98,7 +98,7 @@ class ClientPortalController extends Controller
   public function reject(Request $request, $token)
   {
     $request->validate([
-      'reason' => 'required|string|max:1000',
+      'reason' => 'nullable|string|max:1000',
     ]);
 
     $publication = Publication::where('portal_token', $token)->first();

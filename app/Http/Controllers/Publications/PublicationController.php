@@ -236,8 +236,23 @@ class PublicationController extends Controller
       $mediaLockedBy = User::find($mediaLockUserId)?->only(['id', 'name', 'photo_url']);
     }
 
+    // Check for approval workflow lock
+    $approvalLock = null;
+    if ($publication->isLockedForEditing()) {
+      $reason = $publication->status === 'pending_review' 
+        ? 'This publication is awaiting approval and cannot be edited.' 
+        : 'This publication has been approved and is ready to publish. It cannot be edited.';
+      
+      $approvalLock = [
+        'locked_by' => 'approval_workflow',
+        'status' => $publication->status,
+        'reason' => $reason,
+      ];
+    }
+
     // Append to publication object (dynamically)
     $publication->media_locked_by = $mediaLockedBy;
+    $publication->approval_lock = $approvalLock;
 
     return $request->wantsJson()
       ? $this->successResponse(['publication' => $publication])
@@ -248,6 +263,18 @@ class PublicationController extends Controller
   {
     if (!Auth::user()->hasPermission('manage-content', $publication->workspace_id)) {
       return $this->errorResponse('You do not have permission to update this publication.', 403);
+    }
+
+    // Check if publication is locked for editing (only pending_review)
+    if ($publication->isLockedForEditing()) {
+      return $this->errorResponse(
+        'This publication is awaiting approval and cannot be edited. It must be rejected before changes can be made.',
+        423,
+        [
+          'status' => $publication->status,
+          'locked_reason' => 'Publication is awaiting approval'
+        ]
+      );
     }
 
     $lock = PublicationLock::where('publication_id', $publication->id)
@@ -326,6 +353,15 @@ class PublicationController extends Controller
 
   public function publish(Request $request, Publication $publication, PublishPublicationAction $action)
   {
+    // Verify publication is approved before publishing
+    if (!$publication->canBePublished()) {
+      return $this->errorResponse(
+        'Only approved publications can be published. Please request approval first.',
+        422,
+        ['current_status' => $publication->status]
+      );
+    }
+
     // Allow if has publish permission OR if it's already approved
     $canPublish = (Auth::user()->hasPermission('publish', $publication->workspace_id) || $publication->isApproved()) &&
       Auth::user()->hasPermission('manage-content', $publication->workspace_id);
@@ -466,12 +502,20 @@ class PublicationController extends Controller
       return $this->errorResponse('You do not have permission to request review.', 403);
     }
 
-    $allowedStatuses = ['draft', 'failed', 'rejected'];
+    $allowedStatuses = ['draft', 'failed'];
     if (!in_array($publication->status, $allowedStatuses)) {
-      return $this->errorResponse('Only draft, rejected or failed publications can be sent for review.', 422);
+      return $this->errorResponse('Only draft or failed publications can be sent for review.', 422);
     }
 
-    $updateData = ['status' => 'pending_review'];
+    // Lock the publication by changing status to pending_review
+    $updateData = [
+      'status' => 'pending_review',
+      // Clear any previous rejection data
+      'rejected_by' => null,
+      'rejected_at' => null,
+      'rejection_reason' => null,
+    ];
+    
     if ($request->has('platform_settings')) {
       $updateData['platform_settings'] = $request->platform_settings;
     }
@@ -484,7 +528,9 @@ class PublicationController extends Controller
       'requested_at' => now(),
     ]);
 
-    $publication->logActivity('requested_approval');
+    $publication->logActivity('requested_approval', [
+      'note' => 'Publication locked for review - no edits allowed until approved or rejected'
+    ]);
 
     $this->clearPublicationCache(Auth::user()->current_workspace_id);
 
@@ -503,9 +549,20 @@ class PublicationController extends Controller
       $approver->notify(new PublicationAwaitingApprovalNotification($publication, Auth::user()));
     }
 
+    // Broadcast lock change to notify all users in real-time
+    broadcast(new \App\Events\Publications\PublicationLockChanged(
+      $publication->id, 
+      [
+        'locked_by' => 'approval_workflow',
+        'status' => 'pending_review',
+        'reason' => 'This publication is awaiting approval and cannot be edited.'
+      ],
+      $publication->workspace_id
+    ))->toOthers();
+
     broadcast(new PublicationUpdated($publication))->toOthers();
 
-    return $this->successResponse(['publication' => $publication], 'Publication sent for review.');
+    return $this->successResponse(['publication' => $publication], 'Publication sent for review and locked for editing.');
   }
 
   public function approve(Request $request, Publication $publication)
@@ -514,6 +571,15 @@ class PublicationController extends Controller
     if (!Auth::user()->hasPermission('approve', $publication->workspace_id)) {
       return $this->errorResponse('You do not have permission to approve publications.', 403);
     }
+
+    // Only publications in pending_review can be approved
+    if ($publication->status !== 'pending_review') {
+      return $this->errorResponse('Only publications in pending review can be approved.', 422);
+    }
+
+    $request->validate([
+      'comment' => 'nullable|string|max:500',
+    ]);
 
     $publication->update([
       'status' => 'approved',
@@ -535,15 +601,30 @@ class PublicationController extends Controller
         'reviewed_by' => Auth::id(),
         'reviewed_at' => now(),
         'action' => 'approved',
+        'rejection_reason' => $request->input('comment'), // Using rejection_reason field for comments
       ]);
     }
 
-    $publication->logActivity('approved');
+    $publication->logActivity('approved', [
+      'approver' => Auth::user()->name,
+      'comment' => $request->input('comment'),
+      'note' => 'Publication approved and ready to publish'
+    ]);
 
     $this->clearPublicationCache(Auth::user()->current_workspace_id);
 
     // Notify the redactor (publication owner)
-    $publication->user->notify(new PublicationApprovedNotification($publication, Auth::user()));
+    $publication->load('user');
+    if ($publication->user) {
+      $publication->user->notify(new PublicationApprovedNotification($publication, Auth::user()));
+    }
+
+    // Broadcast lock removal to notify all users in real-time (publication is now editable)
+    broadcast(new \App\Events\Publications\PublicationLockChanged(
+      $publication->id, 
+      null, // No lock - publication can be edited (will revert to pending if edited)
+      $publication->workspace_id
+    ))->toOthers();
 
     broadcast(new PublicationUpdated($publication))->toOthers();
 
@@ -552,7 +633,7 @@ class PublicationController extends Controller
 
     return $this->successResponse([
       'publication' => $publication,
-    ], 'Publication approved successfully.');
+    ], 'Publication approved successfully and ready to publish.');
   }
 
   /** @var User $user */
@@ -565,17 +646,28 @@ class PublicationController extends Controller
       return $this->errorResponse('You do not have permission to reject publications.', 403);
     }
 
+    // Only publications in pending_review can be rejected
+    if ($publication->status !== 'pending_review') {
+      return $this->errorResponse('Only publications in pending review can be rejected.', 422);
+    }
+
     $request->validate([
-      'rejection_reason' => 'nullable|string|max:500',
+      'rejection_reason' => 'required|string|min:10|max:500',
+    ], [
+      'rejection_reason.required' => __('validation.rejection_reason_required'),
+      'rejection_reason.min' => __('validation.rejection_reason_min'),
+      'rejection_reason.max' => __('validation.rejection_reason_max'),
     ]);
 
+    // Reject and unlock by changing status to draft
     $publication->update([
-      'status' => 'rejected',
+      'status' => 'draft',
       'rejected_by' => Auth::id(),
       'rejected_at' => now(),
       'rejection_reason' => $request->input('rejection_reason'),
       'approved_by' => null,
       'approved_at' => null,
+      'approved_retries_remaining' => 2,
     ]);
 
     $latestLog = $publication->approvalLogs()
@@ -592,12 +684,26 @@ class PublicationController extends Controller
       ]);
     }
 
-    $publication->logActivity('rejected', ['reason' => $request->input('rejection_reason')]);
+    $publication->logActivity('rejected', [
+      'reason' => $request->input('rejection_reason'),
+      'rejector' => Auth::user()->name,
+      'note' => 'Publication unlocked for editing - changes required before resubmission'
+    ]);
 
     $this->clearPublicationCache(Auth::user()->current_workspace_id);
 
     // Notify the publication owner
-    $publication->user->notify(new PublicationRejectedNotification($publication, Auth::user()));
+    $publication->load('user');
+    if ($publication->user) {
+      $publication->user->notify(new PublicationRejectedNotification($publication, Auth::user()));
+    }
+
+    // Broadcast lock removal to notify all users in real-time
+    broadcast(new \App\Events\Publications\PublicationLockChanged(
+      $publication->id, 
+      null, // No lock
+      $publication->workspace_id
+    ))->toOthers();
 
     broadcast(new PublicationUpdated($publication))->toOthers();
 
@@ -606,7 +712,7 @@ class PublicationController extends Controller
 
     return $this->successResponse([
       'publication' => $publication,
-    ], 'Publication rejected successfully.');
+    ], 'Publication rejected and unlocked for editing.');
   }
 
   public function cancel(Request $request, Publication $publication)
