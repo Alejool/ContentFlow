@@ -101,7 +101,12 @@ export const useCalendar = () => {
 
   const handleEventDrop = useCallback(
     async (id: string, newDate: string, type: string) => {
-      return await updateEvent(id, newDate, type);
+      try {
+        return await updateEvent(id, newDate, type);
+      } catch (error) {
+        // Re-throw the error so it can be caught by the caller
+        throw error;
+      }
     },
     [updateEvent],
   );

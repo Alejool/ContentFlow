@@ -60,7 +60,7 @@ export interface UsePublishPublicationReturn extends PublishPublicationState {
     settings?: any,
   ) => Promise<boolean>;
   handleApprove: (publicationId: number) => Promise<any>;
-  handleReject: (publicationId: number) => Promise<boolean>;
+  handleReject: (publicationId: number, reason?: string) => Promise<boolean>;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -494,10 +494,11 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
     }
   }, []);
 
-  const handleReject = useCallback(async (publicationId: number) => {
+  const handleReject = useCallback(async (publicationId: number, reason?: string) => {
     try {
       const response = await axios.post(
         route("api.v1.publications.reject", publicationId),
+        { rejection_reason: reason }
       );
       if (response.data.success) {
         toast.success("Publication rejected and moved to draft");

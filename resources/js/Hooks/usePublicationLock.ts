@@ -339,7 +339,8 @@ export const useWorkspaceLocks = () => {
       if (data.lock) {
         if (data.lock.user_id !== wsUserId) {
           updateLock(pubId, data.lock);
-          toast(`${data.lock.user_name} ha empezado a editar.`, {
+          const userName = data.lock.user_name || data.lock.user?.name || "Usuario";
+          toast(`${userName} ha empezado a editar.`, {
             icon: "🔒",
             id: `lock-${pubId}`,
           });
