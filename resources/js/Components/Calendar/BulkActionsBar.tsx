@@ -207,7 +207,7 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
 
           <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
             <Button
-              variant="secondary"
+              variant="ghost"
               onClick={() => setShowMoveModal(false)}
               disabled={isMoving}
             >
@@ -218,8 +218,8 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
               onClick={handleBulkMove}
               disabled={isMoving}
               loading={isMoving}
+              icon={Calendar}
             >
-              <Calendar className="w-4 h-4 mr-2" />
               {t("calendar.moveCount", { count: selectedCount })}
             </Button>
           </div>
