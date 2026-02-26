@@ -27,14 +27,25 @@ class PublicationLockChanged implements ShouldBroadcast
   {
     $this->publicationId = $publicationId;
     $currentUserId = auth()->id();
-    $this->lock = $lock ? [
-      'user_name' => $lock->user->name ?? 'Usuario',
-      'user_id' => $lock->user_id,
-      'locked_by' => ($lock->user_id === $currentUserId) ? 'session' : 'user',
-      'ip_address' => $lock->ip_address,
-      'user_agent' => $lock->user_agent,
-      'expires_at' => $lock->expires_at ? $lock->expires_at->toIso8601String() : now()->toIso8601String(),
-    ] : null;
+    
+    // Handle both PublicationLock objects and arrays (for approval_workflow locks)
+    if ($lock === null) {
+      $this->lock = null;
+    } elseif (is_array($lock)) {
+      // Array format (e.g., approval_workflow lock)
+      $this->lock = $lock;
+    } else {
+      // PublicationLock object
+      $this->lock = [
+        'user_name' => $lock->user->name ?? 'Usuario',
+        'user_id' => $lock->user_id,
+        'locked_by' => ($lock->user_id === $currentUserId) ? 'session' : 'user',
+        'ip_address' => $lock->ip_address,
+        'user_agent' => $lock->user_agent,
+        'expires_at' => $lock->expires_at ? $lock->expires_at->toIso8601String() : now()->toIso8601String(),
+      ];
+    }
+    
     $this->workspaceId = $workspaceId;
   }
 

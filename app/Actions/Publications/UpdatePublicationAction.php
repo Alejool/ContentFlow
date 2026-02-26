@@ -20,14 +20,65 @@ class UpdatePublicationAction
   public function execute(Publication $publication, array $data, array $newFiles = []): Publication
   {
     return DB::transaction(function () use ($publication, $data, $newFiles) {
+      // Check if publication is locked for editing
+      if ($publication->isLockedForEditing()) {
+        throw new \Exception('This publication is locked for editing. It must be rejected or published before changes can be made.');
+      }
+
       // Determine status based on scheduled_at and current state
       $currentStatus = $publication->status;
       $newStatus = $data['status'] ?? $currentStatus;
 
+      // Check if content has changed (requires re-approval)
+      $contentChanged = false;
+      if ($currentStatus === 'approved' || $currentStatus === 'scheduled') {
+        $contentChanged = 
+          ($data['title'] !== $publication->title) ||
+          ($data['description'] !== $publication->description) ||
+          (($data['hashtags'] ?? $publication->hashtags) !== $publication->hashtags) ||
+          !empty($newFiles) ||
+          !empty($data['removed_media_ids']);
+        
+        // If content changed, revert to pending for re-approval
+        if ($contentChanged) {
+          $newStatus = 'pending';
+          
+          // Clear approval metadata
+          $data['approved_by'] = null;
+          $data['approved_at'] = null;
+          $data['approved_retries_remaining'] = 2;
+          
+          Log::info('Publication content changed, reverting to pending for re-approval', [
+            'publication_id' => $publication->id,
+            'previous_status' => $currentStatus
+          ]);
+        }
+      }
+
+      // Prevent manual status changes to bypass approval workflow
+      // Only allow specific status transitions
+      if (isset($data['status'])) {
+        $allowedTransitions = [
+          'draft' => ['draft', 'scheduled'],
+          'scheduled' => ['draft', 'scheduled'],
+          'failed' => ['draft', 'scheduled'],
+          'processing' => ['processing'], // Can't change from processing
+          'publishing' => ['publishing'], // Can't change from publishing
+        ];
+
+        $allowedStatuses = $allowedTransitions[$currentStatus] ?? [$currentStatus];
+        
+        if (!in_array($data['status'], $allowedStatuses)) {
+          // Ignore invalid status change attempt
+          unset($data['status']);
+          $newStatus = $currentStatus;
+        }
+      }
+
       // Handle status transitions
       if (!empty($data['scheduled_at'])) {
         // If scheduling and current status allows it
-        if (in_array($currentStatus, ['draft', 'scheduled', 'failed', 'rejected', 'approved'])) {
+        if (in_array($currentStatus, ['draft', 'scheduled', 'failed'])) {
           $newStatus = 'scheduled';
         }
       } elseif (empty($data['scheduled_at']) && $currentStatus === 'scheduled') {
@@ -72,6 +123,17 @@ class UpdatePublicationAction
         'status' => $newStatus,
         'scheduled_at' => $data['scheduled_at'] ?? $publication->scheduled_at,
       ];
+
+      // Add approval fields if they were cleared due to content changes
+      if (isset($data['approved_by'])) {
+        $updateData['approved_by'] = $data['approved_by'];
+      }
+      if (isset($data['approved_at'])) {
+        $updateData['approved_at'] = $data['approved_at'];
+      }
+      if (isset($data['approved_retries_remaining'])) {
+        $updateData['approved_retries_remaining'] = $data['approved_retries_remaining'];
+      }
 
       if (isset($data['platform_settings'])) {
         $updateData['platform_settings'] = is_string($data['platform_settings'])

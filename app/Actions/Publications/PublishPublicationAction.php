@@ -29,25 +29,9 @@ class PublishPublicationAction
       'has_platform_settings' => !empty($options['platform_settings'])
     ]);
 
-    if (!$publication->isApproved()) {
-      // Check if user is authorized to approve (Owner/Admin)
-      $user = auth()->user();
-      if ($user && $user->hasPermission('approve', $publication->workspace_id)) {
-        // Auto-approve
-        $publication->forceFill([
-          'status' => 'approved',
-          'approved_by' => $user->id,
-          'approved_at' => now(),
-          'approved_retries_remaining' => 3, // Set retries on auto-approve too
-        ])->save();
-      } else {
-        throw new \Exception("Publication must be approved before publishing.");
-      }
-    } else {
-      // If it's already approved but failed, and we are retrying, decrement retries
-      if ($publication->status === 'failed' && $publication->approved_retries_remaining > 0) {
-        $publication->decrement('approved_retries_remaining');
-      }
+    // Verify publication is approved before publishing
+    if (!$publication->canBePublished()) {
+      throw new \Exception("Only approved publications can be published. Current status: {$publication->status}");
     }
 
     if (is_string($platformIds)) {
