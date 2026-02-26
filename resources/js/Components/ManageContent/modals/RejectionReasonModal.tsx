@@ -5,6 +5,8 @@ import { AlertCircle, X } from "lucide-react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 
 interface RejectionReasonModalProps {
   isOpen: boolean;
@@ -25,6 +27,13 @@ export default function RejectionReasonModal({
 }: RejectionReasonModalProps) {
   const { t } = useTranslation();
 
+  const rejectionSchema = z.object({
+    reason: z
+      .string()
+      .min(10, t("approvals.validation.reasonMin") || "La razón debe tener al menos 10 caracteres")
+      .max(500, t("approvals.validation.reasonMax") || "La razón no puede exceder 500 caracteres"),
+  });
+
   const {
     register,
     handleSubmit,
@@ -32,6 +41,7 @@ export default function RejectionReasonModal({
     watch,
     formState: { errors, isSubmitting },
   } = useForm<RejectionForm>({
+    resolver: zodResolver(rejectionSchema),
     defaultValues: {
       reason: "",
     },
@@ -86,6 +96,10 @@ export default function RejectionReasonModal({
                 <span className="font-bold text-gray-900 dark:text-white">
                   "{publicationTitle}"
                 </span>
+                {". "}
+                <span className="text-red-500 dark:text-red-400 font-medium">
+                  {t("common.required") || "Requerido"}
+                </span>
               </p>
 
               <div className="space-y-4">
@@ -96,14 +110,14 @@ export default function RejectionReasonModal({
                   register={register}
                   placeholder={
                     t("approvals.rejectionReasonPlaceholder") ||
-                    "Ej. El contenido no cumple con las políticas de la empresa..."
+                    "Ej. El contenido necesita ajustes en el tono, revisa las imágenes y vuelve a enviar para aprobación..."
                   }
-                  required
                   maxLength={500}
                   showCharCount
                   rows={5}
                   error={errors.reason?.message}
                   variant="filled"
+                  required
                 />
               </div>
             </div>
