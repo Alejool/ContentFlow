@@ -658,21 +658,6 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                           </div>
                         </div>
                         <div className="flex flex-col items-center gap-2">
-                          {event.type === "user_event" &&
-                            ((event.user?.id &&
-                              Number(event.user.id) ===
-                                Number(currentUser?.id)) ||
-                              (!event.user?.id &&
-                                event.extendedProps?.user_name ===
-                                  currentUser?.name)) && (
-                              <button
-                                onClick={(e) => handleDeleteEvent(e, event)}
-                                className="p-2 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-500 transition-all"
-                                title={t("common.delete")}
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </button>
-                            )}
                           <div
                             className="w-1.5 h-10 rounded-full opacity-50 group-hover:opacity-100 transition-opacity"
                             style={{ backgroundColor: event.color }}

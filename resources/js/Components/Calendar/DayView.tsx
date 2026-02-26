@@ -88,18 +88,7 @@ const DraggableDayEvent: React.FC<DraggableDayEventProps> = ({
               </h3>
             </div>
 
-            {["user_event", "event"].includes(String(event.type)) &&
-              onDeleteEvent && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onDeleteEvent(event);
-                  }}
-                  className="p-1.5 rounded-md text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              )}
+
           </div>
 
           <div className="flex items-center gap-4 mt-2 text-sm text-gray-500 dark:text-gray-400">

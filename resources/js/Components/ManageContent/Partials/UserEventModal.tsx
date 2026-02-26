@@ -151,8 +151,6 @@ export default function UserEventModal({
     }
   }, [event, selectedDate, show, reset]);
 
-  const { deleteEvent } = useCalendar();
-
   const isOwner =
     !event ||
     (event.user?.id && Number(event.user.id) === Number(currentUser?.id)) ||
@@ -162,32 +160,6 @@ export default function UserEventModal({
     startOfDay(new Date()),
   );
   const isReadOnly = !isOwner || (isPast && !event);
-
-  const handleDelete = async () => {
-    if (!event) return;
-    if (
-      !confirm(
-        t("calendar.userEvents.modal.messages.confirmDelete") ||
-          "¿Estás seguro de que deseas eliminar este evento?",
-      )
-    )
-      return;
-
-    const success = await deleteEvent(event.id);
-    if (success) {
-      toast.success(
-        t("calendar.userEvents.modal.messages.successDelete") ||
-          "Evento eliminado correctamente",
-      );
-      onSuccess();
-      onClose();
-    } else {
-      toast.error(
-        t("calendar.userEvents.modal.messages.errorDelete") ||
-          "Error al eliminar el evento",
-      );
-    }
-  };
 
   const onSubmit = async (data: EventFormValues) => {
     try {
