@@ -52,6 +52,9 @@ class PublicationObserver
    */
   public function updating(Publication $publication): void
   {
+    // Check if approval should be revoked due to content changes
+    $this->checkApprovalRevocation($publication);
+
     $changes = $publication->getDirty();
     $original = $publication->getOriginal();
 
@@ -64,6 +67,48 @@ class PublicationObserver
       }
 
       $this->logFieldChange($publication, $field, $oldValue, $newValue);
+    }
+  }
+
+  /**
+   * Check if approval should be revoked due to content changes
+   */
+  private function checkApprovalRevocation(Publication $publication): void
+  {
+    // Only check if currently approved
+    if ($publication->getOriginal('status') !== 'approved') {
+      return;
+    }
+
+    // Critical fields that require re-approval if changed
+    $criticalFields = ['title', 'body', 'description', 'hashtags', 'platform_settings'];
+    
+    $changes = $publication->getDirty();
+    
+    // Don't revoke if only status is changing (system processes)
+    if (count($changes) === 1 && isset($changes['status'])) {
+      return;
+    }
+
+    $hasCriticalChanges = !empty(array_intersect(array_keys($changes), $criticalFields));
+
+    if ($hasCriticalChanges) {
+      // Revoke approval
+      $publication->status = 'draft';
+      $publication->approved_by = null;
+      $publication->approved_at = null;
+      $publication->approved_retries_remaining = 2;
+
+      // Log the revocation
+      PublicationActivity::create([
+        'publication_id' => $publication->id,
+        'user_id' => Auth::id(),
+        'type' => 'approval_revoked',
+        'details' => [
+          'reason' => 'Content was modified after approval',
+          'modified_fields' => array_keys(array_intersect_key($changes, array_flip($criticalFields))),
+        ],
+      ]);
     }
   }
 
