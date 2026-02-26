@@ -245,12 +245,11 @@ const CalendarConnectionCard = ({
           <>
             <Button
               variant="primary"
-              buttonStyle="outline"
               size="md"
               icon={RefreshCw}
               onClick={onSync}
               loading={isSyncing}
-              className="!text-black"
+              className="dark:!text-black"
             >
               {t('calendar.external.syncNow')}
             </Button>

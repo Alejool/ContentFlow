@@ -211,7 +211,16 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
       const targetDate = new Date(newDate);
       const now = new Date();
       
-      // Past dates are NOT allowed - validation will be enforced
+      // Set both dates to start of day for comparison
+      const targetDay = new Date(targetDate);
+      targetDay.setHours(0, 0, 0, 0);
+      const today = new Date(now);
+      today.setHours(0, 0, 0, 0);
+      
+      // Prevent moving to past dates
+      if (targetDay < today) {
+        throw new Error("No puedes mover eventos a fechas anteriores a hoy");
+      }
       
       const resourceId = id.split("_").pop();
       let eventType = type;
@@ -258,8 +267,9 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
       set({
         error: error.message ?? "Failed to update event",
       });
-      get().fetchEvents();
-      return false;
+      
+      // Re-throw the error so it can be caught by the caller
+      throw error;
     }
   },
 
