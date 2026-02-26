@@ -1,5 +1,7 @@
+import Button from "@/Components/common/Modern/Button";
 import PlatformSettingsModal from "@/Components/ConfigSocialMedia/PlatformSettingsModal";
 import YouTubeThumbnailUploader from "@/Components/common/ui/YouTubeThumbnailUploader";
+import RejectionReasonModal from "@/Components/Content/modals/RejectionReasonModal";
 import { getPlatformConfig } from "@/Constants/socialPlatforms";
 import { usePublishPublication } from "@/Hooks/publication/usePublishPublication";
 import { useConfirm } from "@/Hooks/useConfirm";
@@ -44,6 +46,7 @@ export default function PublishPublicationModal({
   const [platformSettings, setPlatformSettings] = useState<Record<string, any>>(
     {},
   );
+  const [rejectionModalOpen, setRejectionModalOpen] = useState(false);
 
   const {
     connectedAccounts,
@@ -112,9 +115,14 @@ export default function PublishPublicationModal({
   };
 
   const handleRejectRequest = async () => {
+    setRejectionModalOpen(true);
+  };
+
+  const handleRejectSubmit = async (reason: string) => {
     if (!publication) return;
-    const success = await handleReject(publication.id);
+    const success = await handleReject(publication.id, reason);
     if (success) {
+      setRejectionModalOpen(false);
       if (onSuccess) onSuccess();
       onClose(publication.id);
     }
@@ -253,21 +261,78 @@ export default function PublishPublicationModal({
 
             <div className="flex-1 overflow-y-auto custom-scrollbar p-6 pt-4">
             {isPendingReview && (
-              <div className="mb-6 p-4 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 flex items-start gap-3">
-                <Clock className="w-5 h-5 text-yellow-600 dark:text-yellow-400 mt-0.5" />
-                <div>
-                  <h4 className="text-sm font-bold text-yellow-800 dark:text-yellow-200">
-                    {t(
-                      "publications.modal.publish.pendingReviewBanner.title",
-                    ) || "Publicación en Revisión"}
-                  </h4>
-                  <p className="text-xs text-yellow-700 dark:text-yellow-300">
-                    {t(
-                      "publications.modal.publish.pendingReviewBanner.message",
-                    ) ||
-                      "Esta publicación ya ha sido enviada para revisión. Un administrador debe aprobarla antes de que pueda ser publicada."}
-                  </p>
+              <div className="mb-6 p-4 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800">
+                <div className="flex items-start gap-3 mb-4">
+                  <Clock className="w-5 h-5 text-yellow-600 dark:text-yellow-400 mt-0.5 flex-shrink-0" />
+                  <div className="flex-1">
+                    <h4 className="text-sm font-bold text-yellow-800 dark:text-yellow-200">
+                      {t(
+                        "publications.modal.publish.pendingReviewBanner.title",
+                      ) || "Publicación en Revisión"}
+                    </h4>
+                    <p className="text-xs text-yellow-700 dark:text-yellow-300 mt-1">
+                      {t(
+                        "publications.modal.publish.pendingReviewBanner.message",
+                      ) ||
+                        "Esta publicación está esperando aprobación antes de poder ser publicada."}
+                    </p>
+                    
+                    {/* Información del solicitante */}
+                    {publication.approval_logs && publication.approval_logs.length > 0 && (() => {
+                      const latestLog = publication.approval_logs[0]; // Ya viene ordenado por requested_at desc
+                      return latestLog && !latestLog.reviewed_at ? (
+                        <div className="mt-3 flex items-center gap-2 text-xs text-yellow-700 dark:text-yellow-300">
+                          <div className="flex items-center gap-2">
+                            {latestLog.requester?.photo_url ? (
+                              <img
+                                src={latestLog.requester.photo_url}
+                                alt={latestLog.requester.name}
+                                className="w-5 h-5 rounded-full"
+                              />
+                            ) : (
+                              <div className="w-5 h-5 rounded-full bg-yellow-200 dark:bg-yellow-800 flex items-center justify-center text-[10px] font-bold">
+                                {latestLog.requester?.name?.charAt(0) || '?'}
+                              </div>
+                            )}
+                            <span className="font-medium">
+                              {latestLog.requester?.name || 'Usuario'}
+                            </span>
+                          </div>
+                          <span className="opacity-75">•</span>
+                          <span className="opacity-90">
+                            {formatDateTime(latestLog.requested_at)}
+                          </span>
+                        </div>
+                      ) : null;
+                    })()}
+                  </div>
                 </div>
+
+                {/* Botones de aprobar/rechazar (solo si tiene permisos) */}
+                {hasPublishPermission && (
+                  <div className="flex gap-2 mt-4 pt-4 border-t border-yellow-200 dark:border-yellow-800">
+                    <Button
+                      onClick={handleApproveRequest}
+                      variant="success"
+                      buttonStyle="solid"
+                      icon={CheckCircle}
+                      className="flex-1"
+                      rounded="lg"
+                    >
+                      {t("publications.button.approve") || "Aprobar"}
+                    </Button>
+                    <Button
+                      onClick={handleRejectRequest}
+                      variant="danger"
+                      buttonStyle="solid"
+                      icon={XCircle}
+                      className="flex-1"
+                      rounded="lg"
+                    >
+                      {t("publications.button.reject") || "Rechazar"}
+                    </Button>
+                  </div>
+                )}
               </div>
             )}
 
@@ -702,64 +767,29 @@ export default function PublishPublicationModal({
                 }
               </button>
               {canPublishDirectly ? (
-                <div className="flex-[2] flex gap-3">
-                  {isPendingReview && hasPublishPermission && (
-                    <button
-                      type="button"
-                      onClick={handleApproveRequest}
-                      className="flex-1 px-4 py-3 rounded-lg font-medium bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors flex items-center justify-center gap-2"
-                      title="Aprobar sin publicar ahora"
-                    >
-                      <CheckCircle className="w-4 h-4" />
-                      {t("publications.modal.publish.button.approve") ||
-                        "Aprobar"}
-                    </button>
-                  )}
-                  {isPendingReview && !hasPublishPermission && (
-                    <button
-                      type="button"
-                      onClick={handleRejectRequest}
-                      className="flex-1 px-4 py-3 rounded-lg font-medium bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors flex items-center justify-center gap-2"
-                    >
-                      <XCircle className="w-4 h-4" />
-                      {t("publications.modal.publish.button.reject") ||
-                        "Rechazar"}
-                    </button>
-                  )}
-                  <button
-                    type="button"
-                    onClick={
-                      isPendingReview && !hasPublishPermission
-                        ? handleApproveRequest
-                        : handlePublishWithNotifications
-                    }
-                    disabled={
-                      publishing ||
-                      selectedPlatforms.length === 0
-                    }
-                    className="flex-[2] px-4 py-3 rounded-lg font-medium bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                  >
-                    {publishing || publication.status === "publishing" ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                        {t("publications.modal.publish.publishing")}
-                      </>
-                    ) : isPendingReview && !hasPublishPermission ? (
-                      <>
-                        <CheckCircle className="w-4 h-4" />
-                        {t("publications.modal.publish.button.approve") ||
-                          "Aprobar"}
-                      </>
-                    ) : (
-                      <>
-                        <Share2 className="w-4 h-4" />
+                <button
+                  type="button"
+                  onClick={handlePublishWithNotifications}
+                  disabled={
+                    publishing ||
+                    selectedPlatforms.length === 0
+                  }
+                  className="flex-[2] px-4 py-3 rounded-lg font-medium bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {publishing || publication.status === "publishing" ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      {t("publications.modal.publish.publishing")}
+                    </>
+                  ) : (
+                    <>
+                      <Share2 className="w-4 h-4" />
                         {t("publications.modal.publish.button.publish")}{" "}
                         {selectedPlatforms.length > 0 &&
                           `(${selectedPlatforms.length})`}
                       </>
                     )}
                   </button>
-                </div>
               ) : canManageContent ? (
                 <button
                   type="button"
@@ -799,6 +829,15 @@ export default function PublishPublicationModal({
                 }
               }}
             />
+
+            {publication && (
+              <RejectionReasonModal
+                isOpen={rejectionModalOpen}
+                onClose={() => setRejectionModalOpen(false)}
+                onSubmit={handleRejectSubmit}
+                publicationTitle={publication.title}
+              />
+            )}
           </DialogPanel>
         </div>
       </Dialog>

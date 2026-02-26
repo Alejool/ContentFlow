@@ -224,8 +224,9 @@ const EditPublicationModal = ({
 
   // Configuration allowed:
   // 1. Admin/Owner (canPublish): Always allowed
-  // 2. Editor (!canPublish): Only if Approved AND is their own publication
-  const allowConfiguration = canPublish || (isApprovedStatus && isOwner);
+  // 2. Editor (!canPublish): Allowed if publication is Approved (regardless of ownership)
+  // Note: Editing an approved publication will revert it to 'pending' status (handled by backend)
+  const allowConfiguration = canPublish || isApprovedStatus;
 
   return (
     <div
@@ -293,7 +294,7 @@ const EditPublicationModal = ({
           >
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 p-6">
               <div className="space-y-6">
-                {!isLockedByMe && isLockedByOther && (
+                {!isLockedByMe && isLockedByOther && !hasPublishedPlatform && allowConfiguration && publication?.status !== "approved" && (
                   <div className="p-4 mb-6 rounded-lg border border-amber-500 bg-amber-50 dark:bg-amber-900/20 flex gap-3 text-sm text-amber-700 dark:text-amber-300 animate-in shake duration-500">
                     <AlertCircle className="w-5 h-5 shrink-0 text-amber-500" />
                     <div>
@@ -357,37 +358,33 @@ const EditPublicationModal = ({
                   </div>
                 )}
 
-                {(hasPublishedPlatform || !allowConfiguration) && (
-                  <div
-                    className={`p-4 mb-6 rounded-lg border flex gap-3 text-sm animate-in fade-in slide-in-from-top-4 ${
-                      hasPublishedPlatform
-                        ? "border-blue-500 bg-blue-50/50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300"
-                        : "border-amber-500 bg-amber-50/50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300"
-                    }`}
-                  >
-                    <AlertCircle
-                      className={`w-5 h-5 shrink-0 ${
-                        hasPublishedPlatform
-                          ? "text-blue-500"
-                          : "text-amber-500"
-                      }`}
-                    />
+                {publication?.status === "approved" && !hasPublishedPlatform && (
+                  <div className="p-4 mb-6 rounded-lg border border-blue-500 bg-blue-50/50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 flex gap-3 text-sm animate-in fade-in slide-in-from-top-4">
+                    <AlertCircle className="w-5 h-5 shrink-0 text-blue-500" />
                     <div>
                       <p className="font-semibold mb-1">
-                        {hasPublishedPlatform
-                          ? t("publications.modal.edit.contentLocked") ||
-                            "Publication partially live"
-                          : t("publications.modal.edit.configurationLocked") ||
-                            "Configuración Bloqueada"}
+                        {t("publications.modal.edit.approvedEditWarning") ||
+                          "Publicación Aprobada"}
                       </p>
                       <p className="opacity-80">
-                        {hasPublishedPlatform
-                          ? t("publications.modal.edit.contentLockedHint") ||
-                            "This publication is live on some platforms. Changes will apply to pending and future uploads."
-                          : t(
-                              "publications.modal.edit.configurationLockedHint",
-                            ) ||
-                            "Necesitas aprobación para configurar las redes y la programación. Solicita una revisión primero."}
+                        {t("publications.modal.edit.approvedEditWarningHint") ||
+                          "Esta publicación ya fue aprobada. Si realizas cambios, volverá a estado 'Pendiente' y requerirá una nueva aprobación."}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {hasPublishedPlatform && (
+                  <div className="p-4 mb-6 rounded-lg border border-blue-500 bg-blue-50/50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 flex gap-3 text-sm animate-in fade-in slide-in-from-top-4">
+                    <AlertCircle className="w-5 h-5 shrink-0 text-blue-500" />
+                    <div>
+                      <p className="font-semibold mb-1">
+                        {t("publications.modal.edit.contentLocked") ||
+                          "Publication partially live"}
+                      </p>
+                      <p className="opacity-80">
+                        {t("publications.modal.edit.contentLockedHint") ||
+                          "This publication is live on some platforms. Changes will apply to pending and future uploads."}
                       </p>
                     </div>
                   </div>
