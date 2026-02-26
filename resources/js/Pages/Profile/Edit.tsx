@@ -50,12 +50,7 @@ export default function Edit({ mustVerifyEmail, status }: EditProps) {
       id: "ai",
       name: t("profile.tabs.ai") || "Inteligencia Artificial",
       icon: BrainCircuit,
-    },
-    {
-      id: "onboarding",
-      name: t("profile.tabs.onboarding") || "Onboarding",
-      icon: RotateCcw,
-    },
+    }
   ];
 
   return (
