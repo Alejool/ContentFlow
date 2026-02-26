@@ -44,6 +44,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         $middleware->api(append: [
             SecurityHeaders::class,
+            SetLocale::class,
         ]);
         $middleware->alias([
             'super-admin' => IsSuperAdmin::class,
