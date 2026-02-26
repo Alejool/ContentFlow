@@ -127,23 +127,10 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
                 size="sm"
                 onClick={() => setShowMoveModal(true)}
                 className="whitespace-nowrap"
+                icon={Calendar}
               >
-                <Calendar className="w-4 h-4 mr-2" />
                 {t("calendar.moveEvents")}
               </Button>
-
-              {onBulkDelete && (
-                <Button
-                  variant="danger"
-                  size="sm"
-                  onClick={() => setShowDeleteModal(true)}
-                  className="whitespace-nowrap"
-                >
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  {t("calendar.delete")}
-                </Button>
-              )}
-
               <button
                 onClick={onClearSelection}
                 className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
