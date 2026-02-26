@@ -289,7 +289,7 @@ class GoogleCalendarProvider implements ExternalCalendarProvider
         // Add link to system
         $appUrl = config('app.url');
         $lines[] = '';
-        $lines[] = '🔗 Ver en Contenflow: ' . $appUrl . '/content;
+        $lines[] = '🔗 Ver en Contenflow: ' . $appUrl . '/content';
 
         return implode("\n", $lines);
     }
