@@ -27,6 +27,8 @@ interface LogsListProps {
   filters?: any;
   search?: string;
   onSearchChange?: (val: string) => void;
+  showFilters?: boolean;
+  onToggleFilters?: (show: boolean) => void;
 }
 
 import LogCardSkeleton from "@/Components/ManageContent/Logs/LogCardSkeleton";
@@ -45,11 +47,27 @@ const LogsList = memo(
     filters = {},
     search = "",
     onSearchChange,
+    showFilters: showFiltersProp,
+    onToggleFilters,
   }: LogsListProps) => {
     const { t, i18n } = useTranslation();
     const localeLang = i18n.language || undefined;
     const [smoothLoading, setSmoothLoading] = useState(isLoading);
-    const [showFilters, setShowFilters] = useState(false);
+    const [showFilters, setShowFilters] = useState(showFiltersProp ?? false);
+
+    // Sync with prop if provided
+    useEffect(() => {
+      if (showFiltersProp !== undefined) {
+        setShowFilters(showFiltersProp);
+      }
+    }, [showFiltersProp]);
+
+    const handleToggleFilters = (show: boolean) => {
+      setShowFilters(show);
+      if (onToggleFilters) {
+        onToggleFilters(show);
+      }
+    };
 
     const handleResetFilters = () => {
       if (onSearchChange) {
@@ -133,7 +151,7 @@ const LogsList = memo(
           variant="secondary"
           buttonStyle="outline"
           size="sm"
-          onClick={() => setShowFilters(!showFilters)}
+          onClick={() => handleToggleFilters(!showFilters)}
           icon={Filter}
           className={
             showFilters
