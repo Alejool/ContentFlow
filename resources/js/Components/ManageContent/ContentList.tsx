@@ -203,7 +203,7 @@ export default function ContentList(props: ContentListProps) {
           className="mt-4"
         />
       ) : viewMode === "grid" ? (
-        <div className="flex flex-col" style={{ height: "calc(100vh - 400px)", minHeight: "600px" }}>
+        <div className="flex flex-col">
           <div className="flex-1 overflow-hidden">
             <div className="grid grid-cols-1 grid-rows-1 h-full">
               <div
