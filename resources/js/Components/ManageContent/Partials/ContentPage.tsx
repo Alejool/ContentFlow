@@ -94,6 +94,8 @@ export default function ManageContentPage() {
     setActiveTab,
     tabOrder,
     setTabOrder,
+    showFilters,
+    setShowFilters,
     openAddModal,
     openEditModal,
     openPublishModal,
@@ -104,6 +106,8 @@ export default function ManageContentPage() {
       setActiveTab: s.setActiveTab,
       tabOrder: s.tabOrder,
       setTabOrder: s.setTabOrder,
+      showFilters: s.showFilters,
+      setShowFilters: s.setShowFilters,
       openAddModal: s.openAddModal,
       openEditModal: s.openEditModal,
       openPublishModal: s.openPublishModal,
@@ -112,7 +116,6 @@ export default function ManageContentPage() {
   );
 
   const [isTabPending, startTransition] = useTransition();
-  const [showFilters, setShowFilters] = useState(true);
   const [search, setSearch] = useState(() => {
     const saved = localStorage.getItem(`contentPage_search_${activeTab}`);
     return saved || "";
@@ -561,6 +564,8 @@ export default function ManageContentPage() {
                   filters={filters}
                   search={search}
                   onSearchChange={setSearch}
+                  showFilters={showFilters[activeTab] ?? false}
+                  onToggleFilters={(show) => setShowFilters(activeTab, show)}
                 />
               </div>
             )}
@@ -604,8 +609,8 @@ export default function ManageContentPage() {
                   toggleExpand={toggleExpand}
                   permissions={permissions}
                   onPerPageChange={handlePerPageChange}
-                  showFilters={showFilters}
-                  onToggleFilters={setShowFilters}
+                  showFilters={showFilters[activeTab] ?? true}
+                  onToggleFilters={(show) => setShowFilters(activeTab, show)}
                   filters={filters}
                   onFilterChange={handleSingleFilterChange}
                   onResetFilters={handleResetFilters}
