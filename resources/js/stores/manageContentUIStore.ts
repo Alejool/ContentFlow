@@ -8,6 +8,7 @@ interface ManageContentUIState {
   activeTab: "publications" | "campaigns" | "logs" | "calendar" | "approvals";
   tabOrder: string[];
   selectedItem: SelectedItem;
+  showFilters: Record<string, boolean>;
 
   isAddModalOpen: boolean;
   addType: "publication" | "campaign" | null;
@@ -20,6 +21,7 @@ interface ManageContentUIState {
   ) => void;
   setTabOrder: (order: string[]) => void;
   setSelectedItem: (item: SelectedItem) => void;
+  setShowFilters: (tab: string, show: boolean) => void;
 
   openAddModal: (type?: "publication" | "campaign") => void;
   closeAddModal: () => void;
@@ -51,10 +53,24 @@ export const useManageContentUIStore = create<ManageContentUIState>((set) => {
       : null;
   const initialActiveTab = (savedActiveTab as ManageContentUIState["activeTab"]) || "publications";
 
+  // Try to load saved filter visibility from localStorage
+  const savedShowFilters =
+    typeof window !== "undefined"
+      ? localStorage.getItem("manage_content_show_filters")
+      : null;
+  const initialShowFilters = savedShowFilters
+    ? JSON.parse(savedShowFilters)
+    : {
+        publications: true,
+        campaigns: true,
+        logs: false,
+      };
+
   return {
     activeTab: initialActiveTab,
     tabOrder: initialOrder,
     selectedItem: null,
+    showFilters: initialShowFilters,
 
     isAddModalOpen: false,
     addType: null,
@@ -75,6 +91,17 @@ export const useManageContentUIStore = create<ManageContentUIState>((set) => {
       }
     },
     setSelectedItem: (item) => set({ selectedItem: item }),
+    setShowFilters: (tab, show) =>
+      set((state) => {
+        const newShowFilters = { ...state.showFilters, [tab]: show };
+        if (typeof window !== "undefined") {
+          localStorage.setItem(
+            "manage_content_show_filters",
+            JSON.stringify(newShowFilters),
+          );
+        }
+        return { showFilters: newShowFilters };
+      }),
 
     openAddModal: (type) =>
       set({ isAddModalOpen: true, addType: type || null }),
