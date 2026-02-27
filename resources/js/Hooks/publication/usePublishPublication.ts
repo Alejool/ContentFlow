@@ -341,10 +341,11 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
 
   const togglePlatform = useCallback(
     (accountId: number) => {
-      // Prevent toggling if platform is already published, publishing, or scheduled
+      // Prevent toggling if platform is already published or scheduled
+      // Note: We don't check publishingPlatforms here because the modal handles that check
+      // based on the actual publication status
       if (
         publishedPlatforms.includes(accountId) ||
-        publishingPlatforms.includes(accountId) ||
         scheduledPlatforms.includes(accountId)
       ) {
         return;
@@ -356,7 +357,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
           : [...prev, accountId],
       );
     },
-    [publishedPlatforms, publishingPlatforms, scheduledPlatforms],
+    [publishedPlatforms, scheduledPlatforms],
   );
 
   const selectAll = useCallback(() => {
@@ -365,7 +366,6 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
         .filter(
           (acc) =>
             !publishedPlatforms.includes(acc.id) &&
-            !publishingPlatforms.includes(acc.id) &&
             !scheduledPlatforms.includes(acc.id),
         )
         .map((acc) => acc.id),
@@ -373,7 +373,6 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
   }, [
     activeAccounts,
     publishedPlatforms,
-    publishingPlatforms,
     scheduledPlatforms,
   ]);
 

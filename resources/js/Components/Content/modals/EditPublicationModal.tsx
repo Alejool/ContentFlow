@@ -206,12 +206,13 @@ const EditPublicationModal = ({
   // - Global lock: only if another user has the lock
   const isLockedByOtherEditor = isLockedByOther;
 
-  // - Media section lock: if another user has lock OR media is processing
+  // - Media section lock: if another user has lock OR media is processing OR pending review
+  const isPendingReview = publication?.status === "pending_review";
   const isMediaSectionDisabled =
-    isLockedByOtherEditor || isAnyMediaProcessing || !canManage;
+    isLockedByOtherEditor || isAnyMediaProcessing || !canManage || isPendingReview;
 
-  // - Content/Settings section lock: ONLY if another user has lock
-  const isContentSectionDisabled = isLockedByOtherEditor || !canManage;
+  // - Content/Settings section lock: ONLY if another user has lock OR pending review
+  const isContentSectionDisabled = isLockedByOtherEditor || !canManage || isPendingReview;
 
   const canPublish = auth.current_workspace?.permissions?.includes("publish");
 
@@ -355,6 +356,22 @@ const EditPublicationModal = ({
                       {activeUsers.length - 1} usuario(s) en espera para cuando
                       termines.
                     </p>
+                  </div>
+                )}
+
+                {publication?.status === "pending_review" && (
+                  <div className="p-4 mb-6 rounded-lg border border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-300 flex gap-3 text-sm animate-in fade-in slide-in-from-top-4">
+                    <AlertCircle className="w-5 h-5 shrink-0 text-yellow-500" />
+                    <div>
+                      <p className="font-semibold mb-1">
+                        {t("publications.modal.edit.pendingReviewWarning") ||
+                          "Publicación en Revisión"}
+                      </p>
+                      <p className="opacity-90">
+                        {t("publications.modal.edit.pendingReviewWarningHint") ||
+                          "Esta publicación está esperando aprobación. Debes aprobarla o rechazarla antes de poder editarla. Si la rechazas, el creador podrá hacer cambios y volver a solicitar aprobación."}
+                      </p>
+                    </div>
                   </div>
                 )}
 

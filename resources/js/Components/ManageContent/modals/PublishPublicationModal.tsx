@@ -84,9 +84,23 @@ export default function PublishPublicationModal({
   const permissions = currentWorkspace?.permissions || [];
   const hasPublishPermission = permissions.includes("publish");
   const canManageContent = permissions.includes("manage-content");
-  const isApproved =
-    publication?.status === "approved" || publication?.status === "published";
-  const canPublishDirectly = hasPublishPermission || isApproved;
+  
+  // Verificar si el usuario actual tiene una aprobación activa
+  const currentUserId = auth.user?.id;
+  const hasActiveApproval = publication?.approval_logs?.some(
+    (log: any) => 
+      log.requested_by === currentUserId && 
+      log.action === 'approved' && 
+      log.reviewed_at !== null
+  );
+  
+  // Una publicación puede publicarse directamente si:
+  // 1. El usuario tiene permiso "publish", O
+  // 2. El usuario actual tiene una aprobación activa en approval_logs, O
+  // 3. El estado actual es "approved", "failed", "publishing", "published", "scheduled" Y tiene aprobación
+  const wasEverApproved = !!publication?.approved_at;
+  const isInApprovedState = ["approved", "failed", "publishing", "published", "scheduled"].includes(publication?.status || "");
+  const canPublishDirectly = hasPublishPermission || (hasActiveApproval && (wasEverApproved || isInApprovedState));
   const isPendingReview = publication?.status === "pending_review";
 
   const handleRequestApproval = async () => {
@@ -417,9 +431,9 @@ export default function PublishPublicationModal({
                     const isRemovedPlatform = removedPlatforms.includes(
                       account.id,
                     );
-                    const isPublishing = publishingPlatforms.includes(
-                      account.id,
-                    );
+                    // Solo mostrar "publishing" si la publicación está en estado "publishing" Y está en la lista
+                    const isPublishing = publishingPlatforms.includes(account.id) && 
+                      publication?.status === "publishing";
                     const isScheduled = scheduledPlatforms.includes(account.id);
                     const isUnpublishing = unpublishing === account.id;
 
@@ -429,12 +443,12 @@ export default function PublishPublicationModal({
                         className="relative w-full"
                       >
                         <div
-                          onClick={() =>
-                            !isPublished &&
-                            !isScheduled &&
-                            !isPublishing &&
-                            togglePlatform(account.id)
-                          }
+                          onClick={() => {
+                            // Solo permitir toggle si no está publicado, programado, o activamente publicando
+                            if (!isPublished && !isScheduled && !isPublishing) {
+                              togglePlatform(account.id);
+                            }
+                          }}
                           className={`w-full h-[110px] flex flex-col gap-3 p-4 rounded-lg transition-all relative ${
                             !isPublished && !isScheduled && !isPublishing
                               ? "cursor-pointer"
@@ -496,6 +510,23 @@ export default function PublishPublicationModal({
                               >
                                 {t("common.cancel") || "Cancelar"}
                               </button>
+                            </div>
+                          )}
+
+                          {/* Failed Overlay */}
+                          {isFailed && !isPublished && !isScheduled && (
+                            <div className="absolute inset-0 z-30 bg-red-50/95 dark:bg-red-900/30 backdrop-blur-sm flex flex-col items-center justify-center rounded-lg animate-in fade-in duration-300">
+                              <div className="flex flex-col items-center gap-2">
+                                <XCircle className="w-10 h-10 text-red-600 dark:text-red-400" />
+                                <div className="flex flex-col items-center gap-0.5">
+                                  <span className="text-sm font-bold text-red-800 dark:text-red-300 uppercase tracking-wide capitalize">
+                                    {account.platform}
+                                  </span>
+                                  <span className="text-xs font-medium text-red-600 dark:text-red-400">
+                                    {t("publications.modal.publish.failed") || "Falló"}
+                                  </span>
+                                </div>
+                              </div>
                             </div>
                           )}
 
@@ -741,8 +772,10 @@ export default function PublishPublicationModal({
               <button
                 type="button" 
                 onClick={async () => {
-                  // If publication is actively publishing, ask for confirmation to cancel ALL
-                  if (publishing || publication.status === "publishing" || publishingPlatforms.length > 0) {
+                  // Si hay plataformas publicando, preguntar si quiere cancelar
+                  const hasPublishingPlatforms = publishingPlatforms.length > 0 && publication.status === "publishing";
+                  
+                  if (hasPublishingPlatforms) {
                     const confirmed = await confirm({
                       title: t("publications.modal.cancelAllConfirm.title") || "¿Cancelar TODAS las plataformas?",
                       message: t("publications.modal.cancelAllConfirm.message", { count: publishingPlatforms.length }) || `¿Estás seguro de que deseas cancelar la publicación en TODAS las plataformas (${publishingPlatforms.length})? Se detendrán todos los reintentos. Las plataformas que ya se publicaron no se verán afectadas.`,
@@ -763,7 +796,7 @@ export default function PublishPublicationModal({
                 disabled={unpublishing !== null}
                 className="flex-1 px-4 py-3 rounded-lg font-medium transition-colors bg-gray-100 dark:bg-neutral-700 hover:bg-gray-200 dark:hover:bg-neutral-600 text-gray-700 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {publishing || publication.status === "publishing" || publishingPlatforms.length > 0
+                {publishingPlatforms.length > 0 && publication.status === "publishing"
                   ? t("publications.modal.publish.button.cancelAll", { count: publishingPlatforms.length }) || `Cancelar Todas (${publishingPlatforms.length})`
                   : t("publications.modal.publish.button.cancel") || "Cerrar"
                 }
@@ -773,12 +806,11 @@ export default function PublishPublicationModal({
                   type="button"
                   onClick={handlePublishWithNotifications}
                   disabled={
-                    publishing ||
                     selectedPlatforms.length === 0
                   }
                   className="flex-[2] px-4 py-3 rounded-lg font-medium bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
-                  {publishing || publication.status === "publishing" ? (
+                  {publishing ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                       {t("publications.modal.publish.publishing")}
