@@ -170,6 +170,8 @@
         "contentLockedHint": "Para editar el contenido (título, descripción o archivos), debes despublicar la publicación de todas las plataformas.",
         "approvedEditWarning": "Publicación Aprobada",
         "approvedEditWarningHint": "Esta publicación ya fue aprobada. Si realizas cambios, volverá a estado 'Pendiente' y requerirá una nueva aprobación.",
+        "pendingReviewWarning": "En Revisión",
+        "pendingReviewWarningHint": "Esta publicación está esperando aprobación. No puedes editarla hasta que sea aprobada o rechazada.",
         "lockedByOther": "publicación bloqueada por otro usuario",
         "locking": {
           "sessionMessage": "Tienes esta publicación abierta en <1>{{browser}}</1>. Cierra la otra sesión para editar aquí.",
@@ -407,7 +409,8 @@
       "publishingOnMultiple": "Publicando en {{count}} redes",
       "publishingOnBy": "Publicando en {{platform}} por {{user}}",
       "publishingOnMultipleBy": "Publicando en {{count}} redes por {{user}}",
-      "rejectedBy": "Rechazado por"
+      "rejectedBy": "Rechazado por",
+      "pendingAdminReview": "Pendiente de revisión"
     },
     "messages": {
       "addSuccess": "publicación agregada eéxitosamente!",

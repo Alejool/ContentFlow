@@ -169,6 +169,8 @@
         "contentLockedHint": "To edit the content (title, description or files), you must unpublish the post from all platforms.",
         "approvedEditWarning": "Approved Publication",
         "approvedEditWarningHint": "This publication has already been approved. If you make changes, it will return to 'Pending' status and require a new approval.",
+        "pendingReviewWarning": "Under Review",
+        "pendingReviewWarningHint": "This publication is awaiting approval. You cannot edit it until it is approved or rejected.",
         "lockedByOther": "Post locked by another user",
         "locking": {
           "sessionMessage": "You have this publication open on <1>{{browser}}</1>. Close the other session to edit here.",
@@ -357,7 +359,8 @@
       },
       "lockedBy": "Locked by:",
       "publishingBy": "Publishing by",
-      "rejectedBy": "Rejected by"
+      "rejectedBy": "Rejected by",
+      "pendingAdminReview": "Pending review"
     },
     "messages": {
       "addSuccess": "Publication added successfully!",

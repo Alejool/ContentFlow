@@ -23,6 +23,11 @@ return [
   'validation' => [
     'scheduledMinDifference' => 'The scheduled date must be at least 1 minute after the current time.',
   ],
+  'errors' => [
+    'only_draft_failed_rejected_can_request_review' => 'Only draft, failed, or rejected publications can be sent for review.',
+    'not_approved' => 'This publication requires approval before publishing. Please request approval first.',
+    'pending_review' => 'This publication is pending review. It must be approved or rejected before it can be published.',
+  ],
   'status' => [
     'publishingProgress' => ':current/:total publishing',
     'partialSuccess' => ':success/:total published',
