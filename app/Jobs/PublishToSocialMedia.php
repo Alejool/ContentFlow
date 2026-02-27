@@ -12,8 +12,10 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use App\Events\PublicationStatusUpdated;
 use App\Jobs\Middleware\RateLimitPublishing;
-use App\Models\SocialAccount;
+use App\Models\Social\SocialAccount;
 use App\Notifications\PublicationPublishedNotification;
+use App\Notifications\PublicationPostFailedNotification;
+use App\Models\Social\SocialPostLog;
 use App\Models\User;
 use App\Helpers\LogHelper;
 

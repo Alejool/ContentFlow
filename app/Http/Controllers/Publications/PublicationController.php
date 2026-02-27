@@ -353,21 +353,31 @@ class PublicationController extends Controller
 
   public function publish(Request $request, Publication $publication, PublishPublicationAction $action)
   {
-    // Verify publication is approved before publishing
-    if (!$publication->canBePublished()) {
+    // Check permissions first
+    $hasPublishPermission = Auth::user()->hasPermission('publish', $publication->workspace_id);
+    $hasManageContentPermission = Auth::user()->hasPermission('manage-content', $publication->workspace_id);
+    
+    if (!$hasManageContentPermission) {
+      return $this->errorResponse('You do not have permission to manage content.', 403);
+    }
+
+    // Verify publication can be published based on status and permissions
+    if (!$publication->canBePublished($hasPublishPermission)) {
+      // If pending review, show specific message
+      if ($publication->status === 'pending_review') {
+        return $this->errorResponse(
+          __('publications.errors.pending_review'),
+          422,
+          ['current_status' => $publication->status]
+        );
+      }
+      
+      // Otherwise, needs approval
       return $this->errorResponse(
-        'Only approved publications can be published. Please request approval first.',
+        __('publications.errors.not_approved'),
         422,
         ['current_status' => $publication->status]
       );
-    }
-
-    // Allow if has publish permission OR if it's already approved
-    $canPublish = (Auth::user()->hasPermission('publish', $publication->workspace_id) || $publication->isApproved()) &&
-      Auth::user()->hasPermission('manage-content', $publication->workspace_id);
-
-    if (!$canPublish) {
-      return $this->errorResponse('You do not have permission to publish this content.', 403);
     }
 
     try {
@@ -502,9 +512,10 @@ class PublicationController extends Controller
       return $this->errorResponse('You do not have permission to request review.', 403);
     }
 
-    $allowedStatuses = ['draft', 'failed'];
+    // Allow requesting review for draft, failed, or rejected publications
+    $allowedStatuses = ['draft', 'failed', 'rejected'];
     if (!in_array($publication->status, $allowedStatuses)) {
-      return $this->errorResponse('Only draft or failed publications can be sent for review.', 422);
+      return $this->errorResponse(__('publications.errors.only_draft_failed_rejected_can_request_review'), 422);
     }
 
     // Lock the publication by changing status to pending_review

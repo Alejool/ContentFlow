@@ -169,11 +169,31 @@ class Publication extends Model
 
   /**
    * Check if the publication can be published.
-   * Only approved publications can be published.
+   * Can publish if:
+   * - Status is 'approved' (first time publishing)
+   * - Status is 'failed' (retry after failure)
+   * - Status is 'published' (republish to additional platforms)
+   * - Has been approved before (approved_at exists) - allows republishing
+   * - Status is 'draft' or 'rejected' (if user has publish permission)
+   * 
+   * Cannot publish if:
+   * - Status is 'pending_review' (must be approved or rejected first)
    */
-  public function canBePublished(): bool
+  public function canBePublished(bool $hasPublishPermission = false): bool
   {
-    return $this->status === 'approved';
+    // Never allow publishing if pending review
+    if ($this->status === 'pending_review') {
+      return false;
+    }
+    
+    // If user has publish permission, allow any status except pending_review
+    if ($hasPublishPermission) {
+      return true;
+    }
+    
+    // Otherwise, only allow if approved, failed, published, or was previously approved
+    return in_array($this->status, ['approved', 'failed', 'published']) || 
+           !is_null($this->approved_at);
   }
 
   /**

@@ -29,9 +29,15 @@ class PublishPublicationAction
       'has_platform_settings' => !empty($options['platform_settings'])
     ]);
 
-    // Verify publication is approved before publishing
-    if (!$publication->canBePublished()) {
-      throw new \Exception("Only approved publications can be published. Current status: {$publication->status}");
+    // Verify publication can be published
+    // Note: Permission check should be done in controller before calling this action
+    $hasPublishPermission = auth()->check() && auth()->user()->hasPermission('publish', $publication->workspace_id);
+    
+    if (!$publication->canBePublished($hasPublishPermission)) {
+      if ($publication->status === 'pending_review') {
+        throw new \Exception(__('publications.errors.pending_review') . " Current status: {$publication->status}");
+      }
+      throw new \Exception(__('publications.errors.not_approved') . " Current status: {$publication->status}");
     }
 
     if (is_string($platformIds)) {
