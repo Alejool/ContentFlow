@@ -64,13 +64,33 @@ class PublicationTest extends TestCase
 
   public function test_publication_can_be_published()
   {
+    // Without publish permission
     $publication = new Publication(['status' => 'approved']);
-    $this->assertTrue($publication->canBePublished());
+    $this->assertTrue($publication->canBePublished(false));
 
     $publication->status = 'draft';
-    $this->assertFalse($publication->canBePublished());
+    $this->assertFalse($publication->canBePublished(false));
 
     $publication->status = 'pending_review';
-    $this->assertFalse($publication->canBePublished());
+    $this->assertFalse($publication->canBePublished(false));
+    
+    $publication->status = 'failed';
+    $this->assertTrue($publication->canBePublished(false));
+    
+    // With publish permission
+    $publication->status = 'draft';
+    $this->assertTrue($publication->canBePublished(true));
+    
+    $publication->status = 'rejected';
+    $this->assertTrue($publication->canBePublished(true));
+    
+    // Pending review cannot be published even with permission
+    $publication->status = 'pending_review';
+    $this->assertFalse($publication->canBePublished(true));
+    
+    // Previously approved can be republished
+    $publication->status = 'draft';
+    $publication->approved_at = now();
+    $this->assertTrue($publication->canBePublished(false));
   }
 }
