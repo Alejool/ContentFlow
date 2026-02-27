@@ -2,6 +2,8 @@ import PublicationThumbnail from "@/Components/ManageContent/Publication/Publica
 import SocialAccountsDisplay from "@/Components/ManageContent/Publication/SocialAccountsDisplay";
 import { usePublicationStore } from "@/stores/publicationStore";
 import { Publication } from "@/types/Publication";
+import { canUserPublishDirectly } from "@/Utils/publicationPermissions";
+import { usePage } from "@inertiajs/react";
 import axios from "axios";
 import {
   Calendar,
@@ -70,6 +72,9 @@ const PublicationRow = memo(
     permissions,
     onPreviewMedia,
   }: PublicationRowProps) => {
+    const { auth } = usePage<any>().props;
+    const currentUserId = auth.user?.id;
+    
     const [isPublishing, setIsPublishing] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
@@ -77,6 +82,9 @@ const PublicationRow = memo(
     const publishingPlatforms = usePublicationStore((s) =>
       s.getPublishingPlatforms(item.id),
     );
+    
+    // Verificar si el usuario puede publicar directamente
+    const canPublish = canUserPublishDirectly(item, currentUserId, permissions || []);
 
     const mediaCount = React.useMemo(() => {
       if (!item.media_files || item.media_files.length === 0) {
@@ -193,7 +201,7 @@ const PublicationRow = memo(
                     )}
                   </div>
                 )}
-              {remoteLock && (
+              {remoteLock && item.status !== "pending_review" && (
                 <div className="flex items-center gap-2 mt-2 p-1.5 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800/30 w-fit animate-in fade-in slide-in-from-top-1">
                   <div className="relative flex items-center justify-center w-4 h-4 rounded-full bg-amber-100 dark:bg-amber-800 text-amber-600 dark:text-amber-400">
                     <Lock className="w-2.5 h-2.5" />
@@ -204,6 +212,16 @@ const PublicationRow = memo(
                   </div>
                   <span className="text-[10px] font-bold text-amber-700 dark:text-amber-400 uppercase tracking-tight">
                     Editando: {lockedByName}
+                  </span>
+                </div>
+              )}
+              {item.status === "pending_review" && (
+                <div className="flex items-center gap-2 mt-2 p-1.5 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-100 dark:border-yellow-800/30 w-fit animate-in fade-in slide-in-from-top-1">
+                  <div className="relative flex items-center justify-center w-4 h-4 rounded-full bg-yellow-100 dark:bg-yellow-800 text-yellow-600 dark:text-yellow-400">
+                    <Clock className="w-2.5 h-2.5" />
+                  </div>
+                  <span className="text-[10px] font-bold text-yellow-700 dark:text-yellow-400 uppercase tracking-tight">
+                    {t("publications.table.pendingAdminReview") || "Pendiente de revisión"}
                   </span>
                 </div>
               )}
@@ -344,7 +362,7 @@ const PublicationRow = memo(
         </td>
         <td className="px-2 py-4 text-right">
           <div className="flex items-center justify-end gap-1">
-            {(permissions?.includes("publish") || item.status === "approved") &&
+            {(canPublish || permissions?.includes("publish")) &&
             permissions?.includes("manage-content") ? (
               <button
                 onClick={async (e) => {
@@ -372,6 +390,7 @@ const PublicationRow = memo(
               </button>
             ) : permissions?.includes("manage-content") &&
               !permissions?.includes("publish") &&
+              !item.approved_at &&
               ["draft", "failed", "rejected"].includes(
                 item.status || "draft",
               ) ? (

@@ -1,4 +1,6 @@
 import { getDateFnsLocale } from "@/Utils/dateLocales";
+import { canUserPublishDirectly } from "@/Utils/publicationPermissions";
+import { usePage } from "@inertiajs/react";
 import { format } from "date-fns";
 import {
   Calendar,
@@ -56,11 +58,16 @@ export default function ContentCard({
   remoteLock,
   onPreviewMedia,
 }: ContentCardProps) {
+  const { auth } = usePage<any>().props;
+  const currentUserId = auth.user?.id;
+  
   const { t } = useTranslation();
   const { i18n } = useTranslation();
   const locale = getDateFnsLocale(i18n.language);
   const canManageContent = permissions?.includes("manage-content");
-  const canPublish = permissions?.includes("publish");
+  
+  // Verificar si el usuario puede publicar directamente
+  const canPublish = canUserPublishDirectly(item, currentUserId, permissions || []) || permissions?.includes("publish");
 
   const statusColors = {
     published:
@@ -327,7 +334,7 @@ export default function ContentCard({
         </div>
 
         <div className="space-y-2 mt-auto">
-          {remoteLock && (
+          {remoteLock && item.status !== "pending_review" && (
             <div className="flex items-center gap-2 p-2 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800/30">
               <div className="relative flex items-center justify-center w-5 h-5 rounded-full bg-amber-100 dark:bg-amber-800 text-amber-600 dark:text-amber-400">
                 <Lock className="w-3 h-3" />
@@ -338,6 +345,16 @@ export default function ContentCard({
               </div>
               <span className="text-xs font-semibold text-amber-700 dark:text-amber-400">
                 Editando: {lockedByName}
+              </span>
+            </div>
+          )}
+          {item.status === "pending_review" && (
+            <div className="flex items-center gap-2 p-2 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-100 dark:border-yellow-800/30">
+              <div className="relative flex items-center justify-center w-5 h-5 rounded-full bg-yellow-100 dark:bg-yellow-800 text-yellow-600 dark:text-yellow-400">
+                <Clock className="w-3 h-3" />
+              </div>
+              <span className="text-xs font-semibold text-yellow-700 dark:text-yellow-400">
+                {t("publications.table.pendingAdminReview") || "Pendiente de revisión"}
               </span>
             </div>
           )}
@@ -423,7 +440,7 @@ export default function ContentCard({
         <div className="flex items-center gap-2">
           {type === "publication" && canManageContent && (
             <>
-              {canPublish || item.status === "approved" ? (
+              {canPublish ? (
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
@@ -436,6 +453,7 @@ export default function ContentCard({
                   <span className="hidden sm:inline">Publicar</span>
                 </button>
               ) : !canPublish &&
+                !item.approved_at &&
                 ["draft", "failed", "rejected"].includes(
                   item.status || "draft",
                 ) ? (

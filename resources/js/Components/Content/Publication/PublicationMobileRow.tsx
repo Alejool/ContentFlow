@@ -1,6 +1,8 @@
 import SocialAccountsDisplay from "@/Components/Content/Publication/SocialAccountsDisplay";
 import { formatDateTime } from "@/Utils/formatDate";
 import { Publication } from "@/types/Publication";
+import { canUserPublishDirectly } from "@/Utils/publicationPermissions";
+import { usePage } from "@inertiajs/react";
 import axios from "axios";
 import {
   Calendar,
@@ -64,6 +66,9 @@ const PublicationMobileRow = memo(
     permissions,
     onPreviewMedia,
   }: PublicationMobileRowProps) => {
+    const { auth } = usePage<any>().props;
+    const currentUserId = auth.user?.id;
+    
     const [expandedRow, setExpandedRow] = useState<number | null>(null);
     const [loadingStates, setLoadingStates] = useState<
       Record<
@@ -166,6 +171,9 @@ const PublicationMobileRow = memo(
           const lockedByName = lock
             ? lock.user_name || (lock as any).user?.name || "Usuario"
             : "";
+          
+          // Verificar si el usuario puede publicar directamente este item
+          const canPublish = canUserPublishDirectly(item, currentUserId, permissions || []);
 
           return (
             <div
@@ -408,7 +416,7 @@ const PublicationMobileRow = memo(
                   </div>
 
                   {/* Lock indicator */}
-                  {remoteLocks[item.id] && (
+                  {remoteLocks[item.id] && item.status !== "pending_review" && (
                     <div className="flex items-center gap-2 mt-2 p-2 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800/30 w-full animate-in fade-in slide-in-from-top-1">
                       <div className="relative flex items-center justify-center w-5 h-5 rounded-full bg-amber-100 dark:bg-amber-800 text-amber-600 dark:text-amber-400">
                         <Lock className="w-3 h-3" />
@@ -419,6 +427,17 @@ const PublicationMobileRow = memo(
                       </div>
                       <span className="text-xs font-semibold text-amber-700 dark:text-amber-400">
                         Editando: {lockedByName}
+                      </span>
+                    </div>
+                  )}
+                  {/* Pending review indicator */}
+                  {item.status === "pending_review" && (
+                    <div className="flex items-center gap-2 mt-2 p-2 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-100 dark:border-yellow-800/30 w-full animate-in fade-in slide-in-from-top-1">
+                      <div className="relative flex items-center justify-center w-5 h-5 rounded-full bg-yellow-100 dark:bg-yellow-800 text-yellow-600 dark:text-yellow-400">
+                        <Clock className="w-3 h-3" />
+                      </div>
+                      <span className="text-xs font-semibold text-yellow-700 dark:text-yellow-400">
+                        {t("publications.table.pendingAdminReview") || "Pendiente de revisión"}
                       </span>
                     </div>
                   )}
@@ -461,8 +480,7 @@ const PublicationMobileRow = memo(
                 )}
 
                 {/* Publish/Request button */}
-                {(permissions?.includes("publish") ||
-                  item.status === "approved") &&
+                {(canPublish || permissions?.includes("publish")) &&
                 permissions?.includes("manage-content") ? (
                   <button
                     onClick={async (e) => {
@@ -497,6 +515,7 @@ const PublicationMobileRow = memo(
                   </button>
                 ) : permissions?.includes("manage-content") &&
                   !permissions?.includes("publish") &&
+                  !item.approved_at &&
                   ["draft", "failed", "rejected"].includes(
                     item.status || "draft",
                   ) ? (
