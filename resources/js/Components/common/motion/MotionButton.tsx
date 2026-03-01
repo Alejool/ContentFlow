@@ -83,25 +83,27 @@ export const MotionButton = forwardRef<HTMLButtonElement, MotionButtonProps>(
     const tapState = shouldReduceMotion ? 'tapReduced' : 'tap';
 
     return (
-      <motion.button
-        ref={ref}
-        className={className}
-        initial="initial"
-        whileHover={getVariant(selectedHoverVariant, hoverState, shouldReduceMotion)}
-        whileTap={
-          actionFeedback === 'press' 
-            ? getVariant(selectedActionVariant, tapState, shouldReduceMotion)
-            : undefined
-        }
-        transition={getTransition(
-          selectedHoverVariant.transition || { duration: 0.15 },
-          shouldReduceMotion
-        )}
-        {...buttonProps}
-        {...motionProps}
-      >
-        {children}
-      </motion.button>
+      <LazyMotion features={domAnimation}>
+        <m.button
+          ref={ref}
+          className={className}
+          initial="initial"
+          whileHover={getVariant(selectedHoverVariant, hoverState, shouldReduceMotion)}
+          whileTap={
+            actionFeedback === 'press' 
+              ? getVariant(selectedActionVariant, tapState, shouldReduceMotion)
+              : undefined
+          }
+          transition={getTransition(
+            selectedHoverVariant.transition || { duration: 0.15 },
+            shouldReduceMotion
+          )}
+          {...buttonProps}
+          {...motionProps}
+        >
+          {children}
+        </m.button>
+      </LazyMotion>
     );
   }
 );

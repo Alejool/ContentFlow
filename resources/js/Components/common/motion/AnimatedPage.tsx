@@ -78,18 +78,20 @@ export const AnimatedPage: React.FC<AnimatedPageProps> = ({
       };
 
   return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        key={pageKey}
-        initial={initial}
-        animate={animate}
-        exit={exit}
-        transition={transition}
-        style={{ width: '100%', height: '100%' }}
-      >
-        {children}
-      </motion.div>
-    </AnimatePresence>
+    <LazyMotion features={domAnimation}>
+      <AnimatePresence mode="wait">
+        <m.div
+          key={pageKey}
+          initial={initial}
+          animate={animate}
+          exit={exit}
+          transition={transition}
+          style={{ width: '100%', height: '100%' }}
+        >
+          {children}
+        </m.div>
+      </AnimatePresence>
+    </LazyMotion>
   );
 };
 
