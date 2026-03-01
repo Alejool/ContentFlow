@@ -6,6 +6,9 @@ import { getPlatformOptions } from "@/Constants/socialPlatforms";
 import { format, parseISO } from "date-fns";
 import { Filter, Search, RotateCcw } from "lucide-react";
 
+// Constant to avoid creating new object on every render
+const EMPTY_FILTERS = {};
+
 interface FilterSectionProps {
   mode: "campaigns" | "publications" | "logs" | "approvals" | "integrations";
   t: (key: string) => string;
@@ -33,7 +36,7 @@ export default function FilterSection({
   dateEnd,
   handleFilterChange,
   onResetFilters,
-  filters = {},
+  filters = EMPTY_FILTERS,
 }: FilterSectionProps) {
   const statusCampaignsOptions = [
     { value: "all", label: t("campaigns.filters.all") },

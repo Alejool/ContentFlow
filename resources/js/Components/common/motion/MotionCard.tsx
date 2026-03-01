@@ -1,5 +1,5 @@
 import React, { HTMLAttributes, forwardRef } from 'react';
-import { motion, HTMLMotionProps } from 'framer-motion';
+import { LazyMotion, domAnimation, m, HTMLMotionProps } from 'framer-motion';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { hoverVariants, getVariant, getTransition } from '@/config/animationVariants';
 
@@ -68,20 +68,22 @@ export const MotionCard = forwardRef<HTMLDivElement, MotionCardProps>(
     const hoverState = shouldReduceMotion ? 'hoverReduced' : 'hover';
 
     return (
-      <motion.div
-        ref={ref}
-        className={className}
-        initial="initial"
-        whileHover={getVariant(selectedHoverVariant, hoverState, shouldReduceMotion)}
-        transition={getTransition(
-          selectedHoverVariant.transition || { duration: 0.25 },
-          shouldReduceMotion
-        )}
-        {...divProps}
-        {...motionProps}
-      >
-        {children}
-      </motion.div>
+      <LazyMotion features={domAnimation}>
+        <m.div
+          ref={ref}
+          className={className}
+          initial="initial"
+          whileHover={getVariant(selectedHoverVariant, hoverState, shouldReduceMotion)}
+          transition={getTransition(
+            selectedHoverVariant.transition || { duration: 0.25 },
+            shouldReduceMotion
+          )}
+          {...divProps}
+          {...motionProps}
+        >
+          {children}
+        </m.div>
+      </LazyMotion>
     );
   }
 );

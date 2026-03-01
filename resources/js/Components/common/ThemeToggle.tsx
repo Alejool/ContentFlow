@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { LazyMotion, domAnimation, m } from 'framer-motion';
 import { useTheme } from '@/Hooks/useTheme';
 import { useReducedMotion } from '@/Hooks/useReducedMotion';
 
@@ -48,16 +48,18 @@ export const ThemeToggle: React.FC = () => {
             `}
           >
             {isActive && (
-              <motion.div
-                layoutId="theme-toggle-bg"
-                className="absolute inset-0 bg-theme-bg-elevated rounded-md shadow-sm border border-theme-border-default"
-                initial={false}
-                transition={
-                  reducedMotion
-                    ? { duration: 0 }
-                    : { type: 'spring', stiffness: 500, damping: 30 }
-                }
-              />
+              <LazyMotion features={domAnimation}>
+                <m.div
+                  layoutId="theme-toggle-bg"
+                  className="absolute inset-0 bg-theme-bg-elevated rounded-md shadow-sm border border-theme-border-default"
+                  initial={false}
+                  transition={
+                    reducedMotion
+                      ? { duration: 0 }
+                      : { type: 'spring', stiffness: 500, damping: 30 }
+                  }
+                />
+              </LazyMotion>
             )}
             
             <span className="relative flex items-center gap-2">
