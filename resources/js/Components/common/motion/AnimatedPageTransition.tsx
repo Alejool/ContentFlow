@@ -44,17 +44,19 @@ export const AnimatedPageTransition: React.FC<AnimatedPageTransitionProps> = ({
     : variants[variant];
 
   return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        key={pageKey}
-        initial="initial"
-        animate="animate"
-        exit="exit"
-        variants={selectedVariant}
-        transition={{ duration: 0.25, ease: 'easeInOut' }}
-      >
-        {children}
-      </motion.div>
-    </AnimatePresence>
+    <LazyMotion features={domAnimation}>
+      <AnimatePresence mode="wait">
+        <m.div
+          key={pageKey}
+          initial="initial"
+          animate="animate"
+          exit="exit"
+          variants={selectedVariant}
+          transition={{ duration: 0.25, ease: 'easeInOut' }}
+        >
+          {children}
+        </m.div>
+      </AnimatePresence>
+    </LazyMotion>
   );
 };

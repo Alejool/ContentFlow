@@ -79,55 +79,57 @@ export const AnimatedToast: React.FC<ToastProps> = ({
       };
 
   return (
-    <motion.div
-      layout
-      variants={variants}
-      initial="initial"
-      animate="animate"
-      exit="exit"
-      transition={{ duration: 0.25, ease: 'easeInOut' }}
-      className={`
-        flex items-start gap-3 p-4 rounded-lg shadow-lg
-        border-l-4 ${styles.border}
-        ${styles.bg}
-        min-w-[320px] max-w-md
-      `}
-      role="alert"
-      aria-live={type === 'error' ? 'assertive' : 'polite'}
-    >
-      <span className={`text-xl ${styles.text}`} aria-hidden="true">
-        {styles.icon}
-      </span>
-
-      <p className={`flex-1 text-sm font-medium ${styles.text}`}>
-        {message}
-      </p>
-
-      <button
-        onClick={() => onClose(id)}
+    <LazyMotion features={domAnimation}>
+      <m.div
+        layout
+        variants={variants}
+        initial="initial"
+        animate="animate"
+        exit="exit"
+        transition={{ duration: 0.25, ease: 'easeInOut' }}
         className={`
-          p-1 rounded hover:bg-black/10 dark:hover:bg-white/10
-          transition-colors duration-fast
-          focus-ring
-          ${styles.text}
+          flex items-start gap-3 p-4 rounded-lg shadow-lg
+          border-l-4 ${styles.border}
+          ${styles.bg}
+          min-w-[320px] max-w-md
         `}
-        aria-label="Cerrar notificación"
+        role="alert"
+        aria-live={type === 'error' ? 'assertive' : 'polite'}
       >
-        <svg
-          className="w-4 h-4"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
+        <span className={`text-xl ${styles.text}`} aria-hidden="true">
+          {styles.icon}
+        </span>
+
+        <p className={`flex-1 text-sm font-medium ${styles.text}`}>
+          {message}
+        </p>
+
+        <button
+          onClick={() => onClose(id)}
+          className={`
+            p-1 rounded hover:bg-black/10 dark:hover:bg-white/10
+            transition-colors duration-fast
+            focus-ring
+            ${styles.text}
+          `}
+          aria-label="Cerrar notificación"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M6 18L18 6M6 6l12 12"
-          />
-        </svg>
-      </button>
-    </motion.div>
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+      </m.div>
+    </LazyMotion>
   );
 };
 

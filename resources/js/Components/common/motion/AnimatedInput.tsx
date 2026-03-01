@@ -50,90 +50,92 @@ export const AnimatedInput = forwardRef<HTMLInputElement, AnimatedInputProps>(
     `;
 
     return (
-      <div className="w-full">
-        {label && (
-          <motion.label
-            htmlFor={inputId}
-            className="block text-sm font-medium text-theme-text-primary mb-1.5"
-            initial={false}
-            animate={
-              reducedMotion
-                ? {}
-                : {
-                    color: isFocused
-                      ? 'var(--theme-text-primary)'
-                      : 'var(--theme-text-secondary)',
-                  }
-            }
-            transition={{ duration: 0.15 }}
-          >
-            {label}
-            {props.required && (
-              <span className="text-error-500 ml-1" aria-label="requerido">
-                *
-              </span>
-            )}
-          </motion.label>
-        )}
-
-        <div className="relative">
-          {icon && (
-            <div
-              className={`absolute top-1/2 -translate-y-1/2 ${
-                iconPosition === 'left' ? 'left-3' : 'right-3'
-              } text-theme-text-tertiary pointer-events-none`}
-              aria-hidden="true"
+      <LazyMotion features={domAnimation}>
+        <div className="w-full">
+          {label && (
+            <m.label
+              htmlFor={inputId}
+              className="block text-sm font-medium text-theme-text-primary mb-1.5"
+              initial={false}
+              animate={
+                reducedMotion
+                  ? {}
+                  : {
+                      color: isFocused
+                        ? 'var(--theme-text-primary)'
+                        : 'var(--theme-text-secondary)',
+                    }
+              }
+              transition={{ duration: 0.15 }}
             >
-              {icon}
-            </div>
+              {label}
+              {props.required && (
+                <span className="text-error-500 ml-1" aria-label="requerido">
+                  *
+                </span>
+              )}
+            </m.label>
           )}
 
-          <input
-            ref={ref}
-            id={inputId}
-            className={inputClasses}
-            onFocus={(e) => {
-              setIsFocused(true);
-              props.onFocus?.(e);
-            }}
-            onBlur={(e) => {
-              setIsFocused(false);
-              props.onBlur?.(e);
-            }}
-            aria-invalid={!!error}
-            aria-describedby={
-              error
-                ? `${inputId}-error`
-                : helperText
-                ? `${inputId}-helper`
-                : undefined
-            }
-            {...props}
-          />
+          <div className="relative">
+            {icon && (
+              <div
+                className={`absolute top-1/2 -translate-y-1/2 ${
+                  iconPosition === 'left' ? 'left-3' : 'right-3'
+                } text-theme-text-tertiary pointer-events-none`}
+                aria-hidden="true"
+              >
+                {icon}
+              </div>
+            )}
+
+            <input
+              ref={ref}
+              id={inputId}
+              className={inputClasses}
+              onFocus={(e) => {
+                setIsFocused(true);
+                props.onFocus?.(e);
+              }}
+              onBlur={(e) => {
+                setIsFocused(false);
+                props.onBlur?.(e);
+              }}
+              aria-invalid={!!error}
+              aria-describedby={
+                error
+                  ? `${inputId}-error`
+                  : helperText
+                  ? `${inputId}-helper`
+                  : undefined
+              }
+              {...props}
+            />
+          </div>
+
+          {error && (
+            <m.p
+              id={`${inputId}-error`}
+              className="mt-1.5 text-sm text-error-600"
+              role="alert"
+              initial={reducedMotion ? {} : { opacity: 0, y: -4 }}
+              animate={reducedMotion ? {} : { opacity: 1, y: 0 }}
+              transition={{ duration: 0.15 }}
+            >
+              {error}
+            </m.p>
+          )}
+
+          {helperText && !error && (
+            <p
+              id={`${inputId}-helper`}
+              className="mt-1.5 text-sm text-theme-text-tertiary"
+            >
+              {helperText}
+            </p>
+          )}
         </div>
-
-        {error && (
-          <motion.p
-            id={`${inputId}-error`}
-            className="mt-1.5 text-sm text-error-600"
-            role="alert"
-            initial={reducedMotion ? {} : { opacity: 0, y: -4 }}
-            animate={reducedMotion ? {} : { opacity: 1, y: 0 }}
-            transition={{ duration: 0.15 }}
-          >
-            {error}
-          </motion.p>
-        )}
-
-        {helperText && !error && (
-          <p
-            id={`${inputId}-helper`}
-            className="mt-1.5 text-sm text-theme-text-tertiary"
-          >
-            {helperText}
-          </p>
-        )}
-      </div>
+      </LazyMotion>
     );
   }
 );

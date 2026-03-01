@@ -92,18 +92,18 @@ export const InertiaProgressIndicator: React.FC<InertiaProgressIndicatorProps> =
       setProgress(0);
     };
 
-    // Register event listeners
-    router.on('start', startHandler);
-    router.on('finish', finishHandler);
-    router.on('error', errorHandler);
-    router.on('exception', errorHandler);
+    // Register event listeners - router.on() returns cleanup functions
+    const removeStartListener = router.on('start', startHandler);
+    const removeFinishListener = router.on('finish', finishHandler);
+    const removeErrorListener = router.on('error', errorHandler);
+    const removeExceptionListener = router.on('exception', errorHandler);
 
     // Cleanup
     return () => {
-      router.off('start', startHandler);
-      router.off('finish', finishHandler);
-      router.off('error', errorHandler);
-      router.off('exception', errorHandler);
+      removeStartListener();
+      removeFinishListener();
+      removeErrorListener();
+      removeExceptionListener();
       
       // Clear any remaining interval
       if ((window as any).__inertiaProgressInterval) {
@@ -150,11 +150,11 @@ export const InertiaProgressIndicator: React.FC<InertiaProgressIndicatorProps> =
   };
 
   return (
-    <>
+    <LazyMotion features={domAnimation}>
       {/* Progress bar */}
       <AnimatePresence>
         {isLoading && (
-          <motion.div
+          <m.div
             variants={progressBarVariants}
             initial="initial"
             animate="animate"
@@ -177,7 +177,7 @@ export const InertiaProgressIndicator: React.FC<InertiaProgressIndicatorProps> =
       {showSpinner && (
         <AnimatePresence>
           {isLoading && (
-            <motion.div
+            <m.div
               variants={spinnerVariants}
               initial="initial"
               animate="animate"
@@ -199,7 +199,7 @@ export const InertiaProgressIndicator: React.FC<InertiaProgressIndicatorProps> =
                   animation: shouldReduceMotion ? 'none' : 'spin 0.8s linear infinite',
                 }}
               />
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
       )}
@@ -210,7 +210,7 @@ export const InertiaProgressIndicator: React.FC<InertiaProgressIndicatorProps> =
           to { transform: rotate(360deg); }
         }
       `}</style>
-    </>
+    </LazyMotion>
   );
 };
 

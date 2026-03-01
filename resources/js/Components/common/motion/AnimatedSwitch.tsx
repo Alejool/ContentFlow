@@ -75,16 +75,18 @@ export const AnimatedSwitch = forwardRef<HTMLInputElement, AnimatedSwitchProps>(
               }
             `}
           >
-            <motion.span
-              className={`
-                inline-block h-4 w-4 rounded-full bg-white shadow-sm
-              `}
-              initial={false}
-              animate={{
-                x: checked ? 24 : 4,
-              }}
-              transition={reducedMotion ? { duration: 0 } : spring}
-            />
+            <LazyMotion features={domAnimation}>
+              <m.span
+                className={`
+                  inline-block h-4 w-4 rounded-full bg-white shadow-sm
+                `}
+                initial={false}
+                animate={{
+                  x: checked ? 24 : 4,
+                }}
+                transition={reducedMotion ? { duration: 0 } : spring}
+              />
+            </LazyMotion>
           </label>
         </div>
 
