@@ -69,21 +69,28 @@ export default function ContentList(props: ContentListProps) {
   };
 
   // Componente extraído para renderItem
-  const ContentGridItem = ({ item }: { item: any }) => (
-    <ContentCard
-      key={item.id}
-      item={item}
-      type={mode === "campaigns" ? "campaign" : "publication"}
-      onEdit={props.onEdit}
-      onDelete={props.onDelete}
-      onViewDetails={props.onViewDetails}
-      onPublish={props.onPublish}
-      permissions={props.permissions}
-      remoteLock={remoteLocks[item.id]}
-      onPreviewMedia={handlePreviewMedia}
-      onDuplicate={props.onDuplicate}
-    />
-  );
+  const ContentGridItem = ({ item }: { item: any }) => {
+    // Guard against undefined or null items
+    if (!item || !item.id) {
+      return null;
+    }
+    
+    return (
+      <ContentCard
+        key={item.id}
+        item={item}
+        type={mode === "campaigns" ? "campaign" : "publication"}
+        onEdit={props.onEdit}
+        onDelete={props.onDelete}
+        onViewDetails={props.onViewDetails}
+        onPublish={props.onPublish}
+        permissions={props.permissions}
+        remoteLock={remoteLocks[item.id]}
+        onPreviewMedia={handlePreviewMedia}
+        onDuplicate={props.onDuplicate}
+      />
+    );
+  };
 
   useEffect(() => {
     if (isLoading) {
