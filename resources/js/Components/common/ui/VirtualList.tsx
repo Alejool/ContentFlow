@@ -28,9 +28,10 @@ export function VirtualList<T>({
   return (
     <div style={style} className={`overflow-y-auto ${className || ""}`}>
       {header && <div>{header}</div>}
-      {items.map((item, index) => (
-        <div key={index}>{renderItem(item, index)}</div>
-      ))}
+      {items.map((item, index) => {
+        const itemKey = (item as any)?.id || index;
+        return <div key={itemKey}>{renderItem(item, index)}</div>;
+      })}
       {footer && <div>{footer}</div>}
     </div>
   );

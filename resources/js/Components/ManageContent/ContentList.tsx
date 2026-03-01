@@ -49,8 +49,9 @@ export default function ContentList(props: ContentListProps) {
   const { remoteLocks } = useLockStore();
 
   const { items, isLoading, mode, title, onRefresh } = props;
-  const [smoothLoading, setSmoothLoading] = useState(true);
-  const [lightboxMedia, setLightboxMedia] = useState<
+  const [smoothLoading, setSmoothLoading] = useState(isLoading);
+
+ const [lightboxMedia, setLightboxMedia] = useState<
     | {
         url: string;
         type: "image" | "video";
@@ -69,12 +70,12 @@ export default function ContentList(props: ContentListProps) {
   };
 
   // Componente extraído para renderItem
-  const ContentGridItem = ({ item }: { item: any }) => {
+  const ContentGridItem = (item: any, index: number) => {
     // Guard against undefined or null items
     if (!item || !item.id) {
       return null;
     }
-    
+
     return (
       <ContentCard
         key={item.id}
@@ -233,7 +234,7 @@ export default function ContentList(props: ContentListProps) {
               <div
                 className={`col-start-1 row-start-1 transition-all duration-500 overflow-y-auto ${smoothLoading ? "invisible opacity-0" : "visible opacity-100"}`}
               >
-                <VirtualGrid
+               <VirtualGrid
                   items={items}
                   columns={4}
                   overscan={2}
