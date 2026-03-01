@@ -10,8 +10,10 @@ interface PollOptionsProps {
   onDurationChange: (duration: number) => void;
 }
 
+const EMPTY_POLL_OPTIONS: string[] = [];
+
 export default function PollOptions({
-  pollOptions = [],
+  pollOptions = EMPTY_POLL_OPTIONS,
   pollDuration = 1440,
   onOptionsChange,
   onDurationChange,

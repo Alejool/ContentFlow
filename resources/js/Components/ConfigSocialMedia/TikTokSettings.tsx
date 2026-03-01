@@ -10,8 +10,10 @@ interface TikTokSettingsProps {
   onSettingsChange: (settings: any) => void;
 }
 
+const EMPTY_SETTINGS = {};
+
 export default function TikTokSettings({
-  settings = {},
+  settings = EMPTY_SETTINGS,
   onSettingsChange,
 }: TikTokSettingsProps) {
   const { t } = useTranslation();

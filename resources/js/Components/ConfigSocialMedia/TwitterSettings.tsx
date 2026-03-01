@@ -10,8 +10,10 @@ interface TwitterSettingsProps {
   onSettingsChange: (settings: any) => void;
 }
 
+const EMPTY_SETTINGS = {};
+
 export default function TwitterSettings({
-  settings = {},
+  settings = EMPTY_SETTINGS,
   onSettingsChange,
 }: TwitterSettingsProps) {
   const { t } = useTranslation();

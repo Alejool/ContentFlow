@@ -18,9 +18,10 @@ interface YoutubeSettingsProps {
 }
 
 const RotatedVideo = Video;
+const EMPTY_SETTINGS = {};
 
 export default function YoutubeSettings({
-  settings = {},
+  settings = EMPTY_SETTINGS,
   onSettingsChange,
   videoMetadata,
 }: YoutubeSettingsProps) {

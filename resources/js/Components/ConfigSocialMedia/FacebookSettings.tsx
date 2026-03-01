@@ -9,8 +9,10 @@ interface FacebookSettingsProps {
   onSettingsChange: (settings: any) => void;
 }
 
+const EMPTY_SETTINGS = {};
+
 export default function FacebookSettings({
-  settings = {},
+  settings = EMPTY_SETTINGS,
   onSettingsChange,
 }: FacebookSettingsProps) {
   const { t } = useTranslation();

@@ -9,8 +9,10 @@ interface InstagramSettingsProps {
   onSettingsChange: (settings: any) => void;
 }
 
+const EMPTY_SETTINGS = {};
+
 export default function InstagramSettings({
-  settings = {},
+  settings = EMPTY_SETTINGS,
   onSettingsChange,
 }: InstagramSettingsProps) {
   const { t } = useTranslation();
