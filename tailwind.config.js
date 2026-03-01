@@ -1,7 +1,7 @@
 import defaultTheme from 'tailwindcss/defaultTheme.js';
 import forms from '@tailwindcss/forms';
 import { addDynamicIconSelectors } from "@iconify/tailwind";
-import { theme, enhancedTheme } from './resources/js/theme.ts';
+import customTheme, { enhancedTheme } from './resources/js/theme.ts';
 import plugin from 'tailwindcss/plugin.js';
 
 /** @type {import('tailwindcss').Config} */
@@ -17,40 +17,40 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: theme.colors.primary,
-        secondary: theme.colors.secondary,
-        black: theme.colors.black,
-        neutral: theme.colors.neutral,
-        success: theme.colors.success,
-        error: theme.colors.error,
-        warning: theme.colors.warning,
-        info: theme.colors.info,
-        white: theme.colors.white,
+        primary: customTheme.colors.primary,
+        secondary: customTheme.colors.secondary,
+        black: customTheme.colors.black,
+        neutral: customTheme.colors.neutral,
+        success: customTheme.colors.success,
+        error: customTheme.colors.error,
+        warning: customTheme.colors.warning,
+        info: customTheme.colors.info,
+        white: customTheme.colors.white,
 
-        red: theme.colors.primary,
-        orange: theme.colors.primary,
-        blue: theme.colors.accent.blue,
-        purple: theme.colors.accent.purple,
-        green: theme.colors.accent.green,
-        yellow: theme.colors.accent.yellow,
-        pink: theme.colors.accent.pink,
-        gray: theme.colors.gray,
+        red: customTheme.colors.primary,
+        orange: customTheme.colors.primary,
+        blue: customTheme.colors.accent.blue,
+        purple: customTheme.colors.accent.purple,
+        green: customTheme.colors.accent.green,
+        yellow: customTheme.colors.accent.yellow,
+        pink: customTheme.colors.accent.pink,
+        gray: customTheme.colors.gray,
 
         beige: {
-          50: theme.colors.secondary[50],
-          100: theme.colors.secondary[100],
-          200: theme.colors.secondary[200],
-          300: theme.colors.secondary[300],
-          400: theme.colors.secondary[400],
-          500: theme.colors.secondary[500],
+          50: customTheme.colors.secondary[50],
+          100: customTheme.colors.secondary[100],
+          200: customTheme.colors.secondary[200],
+          300: customTheme.colors.secondary[300],
+          400: customTheme.colors.secondary[400],
+          500: customTheme.colors.secondary[500],
         },
 
         accent: {
-          blue: theme.colors.accent.blue,
-          purple: theme.colors.accent.purple,
-          green: theme.colors.accent.green,
-          yellow: theme.colors.accent.yellow,
-          pink: theme.colors.accent.pink,
+          blue: customTheme.colors.accent.blue,
+          purple: customTheme.colors.accent.purple,
+          green: customTheme.colors.accent.green,
+          yellow: customTheme.colors.accent.yellow,
+          pink: customTheme.colors.accent.pink,
         },
 
         // Enhanced theme colors for dark/light modes
@@ -79,13 +79,13 @@ export default {
       },
 
       backgroundImage: {
-        'gradient-primary': theme.gradients.primary,
-        'gradient-secondary': theme.gradients.secondary,
-        'gradient-accent': theme.gradients.accent,
-        'gradient-dark': theme.gradients.dark,
-        'gradient-light': theme.gradients.light,
-        'gradient-warm': theme.gradients.warm,
-        'gradient-cool': theme.gradients.cool,
+        'gradient-primary': customTheme.gradients.primary,
+        'gradient-secondary': customTheme.gradients.secondary,
+        'gradient-accent': customTheme.gradients.accent,
+        'gradient-dark': customTheme.gradients.dark,
+        'gradient-light': customTheme.gradients.light,
+        'gradient-warm': customTheme.gradients.warm,
+        'gradient-cool': customTheme.gradients.cool,
       },
 
       fontFamily: {
@@ -97,8 +97,8 @@ export default {
         mono: ["JetBrains Mono", ...defaultTheme.fontFamily.mono],
       },
 
-      spacing: theme.spacing,
-      borderRadius: theme.borderRadius,
+      spacing: customTheme.spacing,
+      borderRadius: customTheme.borderRadius,
       
       // Enhanced animation timing from enhancedTheme
       transitionDuration: {
