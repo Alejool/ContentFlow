@@ -186,6 +186,9 @@ export default function PublishPublicationModal({
     };
   }, [isOpen, publication?.id, auth.user?.id]);
 
+  // Early return after all hooks
+  if (!publication) return null;
+
   const handleUnpublishWithConfirm = async (
     accountId: number,
     platform: string,
@@ -236,8 +239,6 @@ export default function PublishPublicationModal({
   const getPlatformGradient = (platform: string) => {
     return getPlatformConfig(platform).gradient;
   };
-
-  if (!publication) return null;
 
   const videoFiles =
     publication.media_files?.filter((m) => m.file_type === "video") || [];

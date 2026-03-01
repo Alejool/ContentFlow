@@ -39,6 +39,7 @@ export default function ViewCampaignModal({
   const canEdit =
     auth.current_workspace?.permissions?.includes("content");
 
+  // Early return after all hooks
   if (!item) return null;
 
   const isPublication = (i: any): i is Publication => {

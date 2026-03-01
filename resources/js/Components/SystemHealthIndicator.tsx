@@ -40,6 +40,7 @@ const useHealthCheck = (intervalMs: number = 5000) => {
 export default function SystemHealthIndicator() {
     const { health, isOnline } = useHealthCheck();
 
+    // Early return after all hooks
     if (!health) return null;
 
     const allServicesUp = Object.values(health.services).every(s => s);

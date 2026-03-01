@@ -32,6 +32,7 @@ export default function ContentValidationPanel({
 }: ContentValidationPanelProps) {
   const [mediaInfoExpanded, setMediaInfoExpanded] = useState(false);
 
+  // Early return after all hooks
   if (!validationResult) return null;
 
   const platformResults = validationResult.platform_results || {};

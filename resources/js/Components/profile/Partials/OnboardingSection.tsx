@@ -19,6 +19,7 @@ function ConfirmationDialog({
 }: ConfirmationDialogProps) {
   const { t } = useTranslation();
 
+  // Early return after all hooks
   if (!isOpen) return null;
 
   return (

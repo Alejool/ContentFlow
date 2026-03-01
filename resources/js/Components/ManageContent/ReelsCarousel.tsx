@@ -25,6 +25,7 @@ export default function ReelsCarousel({ reels, onReelDeleted }: ReelsCarouselPro
   const [currentIndex, setCurrentIndex] = useState(0);
   const [deleting, setDeleting] = useState(false);
 
+  // Early return after all hooks
   if (reels.length === 0) return null;
 
   const currentReel = reels[currentIndex];
