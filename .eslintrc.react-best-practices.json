@@ -1,0 +1,42 @@
+{
+  "extends": [
+    "plugin:react/recommended",
+    "plugin:react-hooks/recommended",
+    "plugin:jsx-a11y/recommended"
+  ],
+  "plugins": ["react", "react-hooks", "jsx-a11y"],
+  "rules": {
+    // Prevent array index as key
+    "react/no-array-index-key": "error",
+    
+    // Enforce proper event handlers (not in useEffect)
+    "react-hooks/exhaustive-deps": "warn",
+    
+    // Accessibility rules
+    "jsx-a11y/click-events-have-key-events": "error",
+    "jsx-a11y/no-static-element-interactions": "error",
+    "jsx-a11y/interactive-supports-focus": "error",
+    "jsx-a11y/role-has-required-aria-props": "error",
+    
+    // Prevent inline functions in JSX (performance)
+    "react/jsx-no-bind": [
+      "warn",
+      {
+        "allowArrowFunctions": false,
+        "allowBind": false,
+        "allowFunctions": false
+      }
+    ],
+    
+    // Enforce stable default values
+    "react/no-unstable-nested-components": "error",
+    
+    // Prefer semantic HTML
+    "jsx-a11y/prefer-tag-over-role": "warn"
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  }
+}
