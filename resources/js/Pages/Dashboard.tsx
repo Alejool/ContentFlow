@@ -401,9 +401,9 @@ export default function Dashboard({
               desc: t("dashboard.quickActions.content.description"),
               color: "green",
             },
-          ].map((action, idx) => (
+          ].map((action) => (
             <Link
-              key={idx}
+              key={action.href}
               href={action.href}
               className="group relative overflow-hidden rounded-lg p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 bg-white border border-gray-100 shadow-sm hover:border-gray-200 dark:bg-neutral-800/40 dark:backdrop-blur-md dark:border-neutral-700/50 dark:hover:bg-neutral-800/60"
             >
