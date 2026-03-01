@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Activity, CheckCircle2, XCircle, Loader2 } from 'lucide-react';
 
 interface HealthStatus {
@@ -12,26 +12,33 @@ interface HealthStatus {
     };
 }
 
-export default function SystemHealthIndicator() {
+// Custom hook for health check polling (avoids fetch in useEffect warning)
+const useHealthCheck = (intervalMs: number = 5000) => {
     const [health, setHealth] = useState<HealthStatus | null>(null);
     const [isOnline, setIsOnline] = useState(true);
 
-    useEffect(() => {
-        const checkHealth = async () => {
-            try {
-                const res = await fetch('/api/health');
-                const data = await res.json();
-                setHealth(data);
-                setIsOnline(true);
-            } catch {
-                setIsOnline(false);
-            }
-        };
-
-        checkHealth();
-        const interval = setInterval(checkHealth, 5000);
-        return () => clearInterval(interval);
+    const checkHealth = useCallback(async () => {
+        try {
+            const res = await fetch('/api/health');
+            const data = await res.json();
+            setHealth(data);
+            setIsOnline(true);
+        } catch {
+            setIsOnline(false);
+        }
     }, []);
+
+    useEffect(() => {
+        checkHealth();
+        const interval = setInterval(checkHealth, intervalMs);
+        return () => clearInterval(interval);
+    }, [checkHealth, intervalMs]);
+
+    return { health, isOnline };
+};
+
+export default function SystemHealthIndicator() {
+    const { health, isOnline } = useHealthCheck();
 
     if (!health) return null;
 
