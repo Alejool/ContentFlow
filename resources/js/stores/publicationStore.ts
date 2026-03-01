@@ -104,7 +104,8 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
 
     // CRITICAL: Clear previous page data to prevent memory bloat
     // Only keep data for the current page being viewed
-    get().clearPageData();
+    // TEMPORARILY DISABLED FOR DEBUGGING
+    // get().clearPageData();
 
     try {
       // Limpiar filtros vacíos
@@ -116,6 +117,8 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
         }
         return acc;
       }, {} as any);
+
+      console.log('[publicationStore] Fetching publications with filters:', cleanFilters, 'page:', page);
 
       const response = await axios.get(route("api.v1.publications.index"), {
         params: { ...cleanFilters, page },
@@ -137,6 +140,15 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
 
       const data = response.data.publications;
 
+      console.log('[publicationStore] Received publications:', data.data?.length || 0, 'items');
+      console.log('[publicationStore] Response structure:', {
+        hasData: !!data,
+        hasDataArray: !!data.data,
+        dataLength: data.data?.length,
+        currentPage: data.current_page,
+        total: data.total
+      });
+
       set({
         publications: data.data ?? [],
         pagination: {
@@ -147,7 +159,10 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
         },
         isLoading: false,
       });
+
+      console.log('[publicationStore] State updated, isLoading set to false');
     } catch (error: any) {
+      console.error('[publicationStore] Error fetching publications:', error);
       set({
         error: error.message ?? "Failed to fetch publications",
         isLoading: false,
