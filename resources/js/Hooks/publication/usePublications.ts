@@ -210,7 +210,19 @@ export const usePublications = () => {
     }
   })();
 
-  const isLoading = isPubLoading || isCampLoading || isLogsLoading;
+  const isLoading = (() => {
+    switch (activeTab) {
+      case "publications":
+      case "approvals":
+        return isPubLoading;
+      case "campaigns":
+        return isCampLoading;
+      case "logs":
+        return isLogsLoading;
+      default:
+        return false;
+    }
+  })();
 
   const handlePageChange = useCallback(
     (page: number) => {
