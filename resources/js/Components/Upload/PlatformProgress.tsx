@@ -43,7 +43,7 @@ export function PlatformProgress({ publication, onCancelPlatform }: PlatformProg
 
   return (
     <div className="space-y-2 mt-2">
-      {platforms.map((platform: any, idx) => {
+      {platforms.map((platform: any) => {
         const isDone = platform.status === "published";
         const isFailed = platform.status === "failed";
         const isPublishing = platform.status === "publishing" || platform.status === "pending";
@@ -52,7 +52,7 @@ export function PlatformProgress({ publication, onCancelPlatform }: PlatformProg
 
         return (
           <div
-            key={idx}
+            key={`${platform.platform}-${platform.id || platform.platform_id}`}
             className="p-2 rounded-lg bg-gray-50/80 dark:bg-neutral-700/40 border border-gray-100 dark:border-neutral-600/50 group"
           >
             <div className="flex items-center justify-between mb-1.5">

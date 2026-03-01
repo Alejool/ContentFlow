@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion';
 import { router } from '@inertiajs/react';
-import { useReducedMotion } from '@/hooks/useReducedMotion';
+import { useReducedMotion } from '@/Hooks/useReducedMotion';
 
 /**
  * Enhanced Inertia progress indicator with smooth transitions
@@ -37,7 +37,7 @@ export const InertiaProgressIndicator: React.FC<InertiaProgressIndicatorProps> =
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [progress, setProgress] = useState(0);
-  const { prefersReducedMotion } = useReducedMotion();
+  const prefersReducedMotion = useReducedMotion();
   
   // Determine if animations should be disabled
   const shouldReduceMotion = respectReducedMotion && prefersReducedMotion;
@@ -121,7 +121,7 @@ export const InertiaProgressIndicator: React.FC<InertiaProgressIndicatorProps> =
       opacity: 1,
       transition: shouldReduceMotion 
         ? { duration: 0 }
-        : { duration: 0.3, ease: 'easeOut' }
+        : { duration: 0.3, ease: [0.4, 0, 0.2, 1] }
     },
     exit: { 
       opacity: 0,
