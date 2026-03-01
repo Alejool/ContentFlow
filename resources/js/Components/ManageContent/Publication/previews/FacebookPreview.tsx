@@ -67,7 +67,7 @@ export const FacebookPreview = memo(
                   ) : (
                     <img
                       src={url}
-                      alt=""
+                      alt="Facebook post media"
                       className="w-full h-full object-cover"
                     />
                   )}

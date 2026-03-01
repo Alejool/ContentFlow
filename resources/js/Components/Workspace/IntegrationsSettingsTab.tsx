@@ -31,6 +31,103 @@ interface IntegrationsSettingsTabProps {
   canManageWorkspace: boolean;
 }
 
+interface IntegrationCardProps {
+  title: string;
+  description: string;
+  icon: any;
+  type: "slack" | "discord";
+  color: string;
+  currentUrl: string;
+  isConnected: boolean;
+  canManageWorkspace: boolean;
+  testing: string | null;
+  testConnection: (type: "slack" | "discord") => void;
+  register: any;
+  t: any;
+}
+
+const IntegrationCard = ({
+  title,
+  description,
+  icon: Icon,
+  type,
+  color,
+  currentUrl,
+  isConnected,
+  canManageWorkspace,
+  testing,
+  testConnection,
+  register,
+  t,
+}: IntegrationCardProps) => {
+  const isDiscord = type === "discord";
+
+  return (
+    <div
+      className={`bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-950 border ${
+        isConnected
+          ? "border-emerald-200 dark:border-emerald-800/50"
+          : "border-gray-200 dark:border-neutral-800"
+      } rounded-lg p-6 transition-all duration-300 hover:shadow-lg`}
+    >
+      <div className="flex items-start justify-between mb-4">
+        <div className="flex items-center gap-4">
+          <div
+            className={`h-12 w-12 rounded-lg bg-gradient-to-br ${color} flex items-center justify-center`}
+          >
+            <Icon className="h-6 w-6 text-white" />
+          </div>
+          <div>
+            <h4 className="font-bold text-gray-900 dark:text-white">
+              {title}
+            </h4>
+            <p className="text-sm text-gray-500 dark:text-neutral-500">
+              {description}
+            </p>
+          </div>
+        </div>
+        {isConnected && (
+          <div className="flex items-center gap-2 px-3 py-1 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 text-xs font-bold rounded-full">
+            <CheckCircle className="h-3 w-3" />
+            {t("common.connected")}
+          </div>
+        )}
+      </div>
+
+      <div className="space-y-4">
+        <Input
+          id={type === "slack" ? "slack_webhook_url" : "discord_webhook_url"}
+          label={t("workspace.integrations.webhook_url")}
+          register={register}
+          disabled={!canManageWorkspace}
+          placeholder={
+            type === "slack"
+              ? t("workspace.integrations.slack_placeholder")
+              : "https://discord.com/api/webhooks/..."
+          }
+          className="bg-white dark:bg-neutral-900"
+        />
+        <div className="flex justify-end">
+          <Button
+            type="button"
+            variant="secondary"
+            buttonStyle="outline"
+            onClick={() => testConnection(type)}
+            loading={testing === type}
+            disabled={!canManageWorkspace}
+            className="gap-2"
+          >
+            {isConnected
+              ? t("workspace.integrations.test_connection")
+              : t("common.connect")}
+            <ExternalLink className="h-3.5 w-3.5" />
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default function IntegrationsSettingsTab({
   workspace,
   isOwner,
@@ -203,87 +300,6 @@ export default function IntegrationsSettingsTab({
     fetchActivity(1, 5);
   }, [workspace.id, fetchActivity]);
 
-  const IntegrationCard = ({
-    title,
-    description,
-    icon: Icon,
-    type,
-    color,
-  }: any) => {
-    const currentUrl = getValues(
-      type === "slack" ? "slack_webhook_url" : "discord_webhook_url",
-    );
-    const isConnected = !!currentUrl;
-    const isDiscord = type === "discord";
-
-    return (
-      <div
-        className={`bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-950 border ${
-          isConnected
-            ? "border-emerald-200 dark:border-emerald-800/50"
-            : "border-gray-200 dark:border-neutral-800"
-        } rounded-lg p-6 transition-all duration-300 hover:shadow-lg`}
-      >
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex items-center gap-4">
-            <div
-              className={`h-12 w-12 rounded-lg bg-gradient-to-br ${color} flex items-center justify-center`}
-            >
-              <Icon className="h-6 w-6 text-white" />
-            </div>
-            <div>
-              <h4 className="font-bold text-gray-900 dark:text-white">
-                {title}
-              </h4>
-              <p className="text-sm text-gray-500 dark:text-neutral-500">
-                {description}
-              </p>
-            </div>
-          </div>
-          {isConnected && (
-            <div className="flex items-center gap-2 px-3 py-1 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 text-xs font-bold rounded-full">
-              <CheckCircle className="h-3 w-3" />
-              {t("common.connected")}
-            </div>
-          )}
-        </div>
-
-
-
-        <div className="space-y-4">
-          <Input
-            id={type === "slack" ? "slack_webhook_url" : "discord_webhook_url"}
-            label={t("workspace.integrations.webhook_url")}
-            register={register}
-            disabled={!canManageWorkspace}
-            placeholder={
-              type === "slack"
-                ? t("workspace.integrations.slack_placeholder")
-                : "https://discord.com/api/webhooks/..."
-            }
-            className="bg-white dark:bg-neutral-900"
-          />
-          <div className="flex justify-end">
-            <Button
-              type="button"
-              variant="secondary"
-              buttonStyle="outline"
-              onClick={() => testConnection(type)}
-              loading={testing === type}
-              disabled={!canManageWorkspace}
-              className="gap-2"
-            >
-              {isConnected
-                ? t("workspace.integrations.test_connection")
-                : t("common.connect")}
-              <ExternalLink className="h-3.5 w-3.5" />
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
   if (!workspace) return null;
 
   return (
@@ -369,6 +385,13 @@ export default function IntegrationsSettingsTab({
                 icon={Server}
                 type="discord"
                 color="from-blue-500 to-indigo-500"
+                currentUrl={getValues("discord_webhook_url")}
+                isConnected={!!getValues("discord_webhook_url")}
+                canManageWorkspace={canManageWorkspace}
+                testing={testing}
+                testConnection={testConnection}
+                register={register}
+                t={t}
               />
             </div>
             
@@ -380,6 +403,13 @@ export default function IntegrationsSettingsTab({
                 icon={Share2}
                 type="slack"
                 color="from-purple-500 to-pink-500"
+                currentUrl={getValues("slack_webhook_url")}
+                isConnected={!!getValues("slack_webhook_url")}
+                canManageWorkspace={canManageWorkspace}
+                testing={testing}
+                testConnection={testConnection}
+                register={register}
+                t={t}
               />
             </div>
           </div>

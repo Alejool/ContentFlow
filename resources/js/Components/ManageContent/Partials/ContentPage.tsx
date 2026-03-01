@@ -53,6 +53,85 @@ import {
 import { useManageContentUIStore } from "@/stores/manageContentUIStore";
 import { useShallow } from "zustand/react/shallow";
 
+interface SortableTabProps {
+  id: string;
+  label: string;
+  hasBadge: boolean;
+  badgeCount: number;
+  activeTab: string;
+  handleTabChange: (id: string) => void;
+  getTabIcon: (id: string, active: boolean) => React.ReactNode;
+}
+
+const SortableTab = ({ 
+  id, 
+  label, 
+  hasBadge, 
+  badgeCount, 
+  activeTab, 
+  handleTabChange, 
+  getTabIcon 
+}: SortableTabProps) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 50 : "auto",
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  const isActive = activeTab === id;
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="flex items-center gap-1 group/tab"
+    >
+      <Button
+        onClick={() => handleTabChange(id)}
+        variant={isActive ? "primary" : "ghost"}
+        buttonStyle={isActive ? "solid" : "ghost"}
+        size="lg"
+        {...attributes}
+        {...listeners}
+        className={`flex items-center justify-center p-0 rounded-lg text-sm font-bold transition-all duration-200 select-none border-0 ${
+          isActive
+            ? "bg-primary-600 text-white shadow-md shadow-primary-500/20 ring-1 ring-primary-500/50"
+            : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-700/50"
+        }`}
+      >
+        <div className="flex items-center justify-center gap-2">
+          <GripHorizontal
+            className={`w-3 h-3 opacity-0 group-hover/tab:opacity-40 transition-opacity cursor-grab active:cursor-grabbing mr-[-4px] ${isActive ? "text-white" : ""}`}
+          />
+          {getTabIcon(id, isActive)}
+          <span>{label}</span>
+          {hasBadge && badgeCount > 0 && (
+            <span
+              className={`ml-1 px-1.5 py-0.5 text-[10px] font-bold rounded-full ${
+                isActive
+                  ? "bg-white/20 text-white"
+                  : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+              }`}
+            >
+              {badgeCount}
+            </span>
+          )}
+        </div>
+      </Button>
+    </div>
+  );
+};
+
 export default function ManageContentPage() {
   const { auth } = usePage<any>().props;
   const permissions = auth.current_workspace?.permissions || [];
@@ -319,67 +398,6 @@ export default function ManageContentPage() {
     }
   };
 
-  const SortableTab = ({ id, label, hasBadge, badgeCount }: any) => {
-    const {
-      attributes,
-      listeners,
-      setNodeRef,
-      transform,
-      transition,
-      isDragging,
-    } = useSortable({ id });
-
-    const style = {
-      transform: CSS.Transform.toString(transform),
-      transition,
-      zIndex: isDragging ? 50 : "auto",
-      opacity: isDragging ? 0.5 : 1,
-    };
-
-    const isActive = activeTab === id;
-
-    return (
-      <div
-        ref={setNodeRef}
-        style={style}
-        className="flex items-center gap-1 group/tab"
-      >
-        <Button
-          onClick={() => handleTabChange(id)}
-          variant={isActive ? "primary" : "ghost"}
-          buttonStyle={isActive ? "solid" : "ghost"}
-          size="lg"
-          {...attributes}
-          {...listeners}
-          className={`flex items-center justify-center p-0 rounded-lg text-sm font-bold transition-all duration-200 select-none border-0 ${
-            isActive
-              ? "bg-primary-600 text-white shadow-md shadow-primary-500/20 ring-1 ring-primary-500/50"
-              : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-700/50"
-          }`}
-        >
-          <div className="flex items-center justify-center gap-2">
-            <GripHorizontal
-              className={`w-3 h-3 opacity-0 group-hover/tab:opacity-40 transition-opacity cursor-grab active:cursor-grabbing mr-[-4px] ${isActive ? "text-white" : ""}`}
-            />
-            {getTabIcon(id, isActive)}
-            <span>{label}</span>
-            {hasBadge && badgeCount > 0 && (
-              <span
-                className={`ml-1 px-1.5 py-0.5 text-[10px] font-bold rounded-full ${
-                  isActive
-                    ? "bg-white/20 text-white"
-                    : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
-                }`}
-              >
-                {badgeCount}
-              </span>
-            )}
-          </div>
-        </Button>
-      </div>
-    );
-  };
-
   return (
     <AuthenticatedLayout>
       <Head title={t("manageContent.title")} />
@@ -483,6 +501,9 @@ export default function ManageContentPage() {
                         label={label}
                         hasBadge={hasBadge}
                         badgeCount={badgeCount}
+                        activeTab={activeTab}
+                        handleTabChange={handleTabChange}
+                        getTabIcon={getTabIcon}
                       />
                     );
                   })}

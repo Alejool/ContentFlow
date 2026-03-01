@@ -135,6 +135,7 @@ const MediaPreviewGallery = memo(
                           : activeItem.thumbnailUrl
                       }
                       className="w-full h-full object-cover"
+                      alt="Video thumbnail"
                     />
                     <button
                       onClick={() => onClearThumbnail(activeItem.tempId)}
@@ -173,6 +174,7 @@ const MediaPreviewGallery = memo(
                     <img
                       src={item.url}
                       className="w-full h-full object-cover"
+                      alt="Media thumbnail"
                     />
                   )}
                 </button>

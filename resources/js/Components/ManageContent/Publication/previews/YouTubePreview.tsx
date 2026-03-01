@@ -37,7 +37,7 @@ export const YouTubePreview = memo(
               <img
                 src={imageUrl}
                 className="w-full h-full object-contain"
-                alt=""
+                alt="YouTube video thumbnail"
               />
               <div className="absolute inset-0 flex items-center justify-center bg-black/40">
                 <div className="w-16 h-12 bg-red-600 rounded-lg flex items-center justify-center shadow-lg">
