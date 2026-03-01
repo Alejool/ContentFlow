@@ -5,7 +5,7 @@
  */
 
 import React, { HTMLAttributes } from 'react';
-import { motion, MotionProps } from 'framer-motion';
+import { LazyMotion, domAnimation, m, MotionProps } from 'framer-motion';
 import { prefersReducedMotion } from '@/Utils/themeTransition';
 
 interface AnimatedCardProps extends HTMLAttributes<HTMLDivElement> {
@@ -53,15 +53,17 @@ export const AnimatedCard: React.FC<AnimatedCardProps> = ({
     ${className}
   `;
 
-  const Component = clickable ? motion.button : motion.div;
+  const Component = clickable ? m.button : m.div;
 
   return (
-    <Component
-      className={baseClasses}
-      {...motionProps}
-      {...(props as any)}
-    >
-      {children}
-    </Component>
+    <LazyMotion features={domAnimation}>
+      <Component
+        className={baseClasses}
+        {...motionProps}
+        {...(props as any)}
+      >
+        {children}
+      </Component>
+    </LazyMotion>
   );
 };
