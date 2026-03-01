@@ -11,14 +11,17 @@ class SocialTokenManager
 {
   public function getValidToken(SocialAccount $account): string
   {
+    // Check if token is corrupted or missing
+    if (!$account->access_token) {
+      $this->markAccountForReconnection($account, 'missing_or_corrupted_token');
+      throw new \Exception("No access token available for {$account->platform}, reconnection required.");
+    }
+
     // If it doesn't expire or expires in more than 5 minutes
     if (
       !$account->token_expires_at ||
       $account->token_expires_at->gt(now()->addMinutes(5))
     ) {
-      if (!$account->access_token) {
-        throw new \Exception("No access token available for {$account->platform}, reconnection required.");
-      }
       return $account->access_token;
     }
 
@@ -30,23 +33,36 @@ class SocialTokenManager
       }
       
       // If refresh failed, mark as inactive and throw exception
-      $account->update([
-        'is_active' => false,
-        'last_failed_at' => now(),
-        'failure_count' => $account->failure_count + 1
-      ]);
-      
+      $this->markAccountForReconnection($account, 'refresh_failed');
       throw new \Exception("Failed to refresh token for {$account->platform}, reconnection required.");
     }
 
     // No refresh token available, mark as inactive for reconnection
+    $this->markAccountForReconnection($account, 'no_refresh_token');
+    throw new \Exception("Token expired for {$account->platform}, reconnection required.");
+  }
+
+  /**
+   * Mark account as needing reconnection
+   */
+  private function markAccountForReconnection(SocialAccount $account, string $reason): void
+  {
     $account->update([
       'is_active' => false,
       'last_failed_at' => now(),
-      'failure_count' => $account->failure_count + 1
+      'failure_count' => $account->failure_count + 1,
+      'account_metadata' => array_merge($account->account_metadata ?? [], [
+        'reconnection_reason' => $reason,
+        'last_error_at' => now()->toIso8601String()
+      ])
     ]);
 
-    throw new \Exception("Token expired for {$account->platform}, reconnection required.");
+    LogHelper::social('warning', "Account marked for reconnection", [
+      'account_id' => $account->id,
+      'platform' => $account->platform,
+      'reason' => $reason,
+      'failure_count' => $account->failure_count + 1
+    ]);
   }
 
   public function refreshToken(SocialAccount $account): ?string
