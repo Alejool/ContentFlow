@@ -26,6 +26,24 @@ import { Fragment, useState } from "react";
 import { useTranslation } from "react-i18next";
 import NotificationItem from "@/Components/Notifications/NotificationItem";
 
+// Componente extraído fuera para evitar recreación en cada render
+interface NotificationListItemProps {
+  notification: any;
+  onMarkAsRead: (id: string) => void;
+}
+
+function NotificationListItem({ notification, onMarkAsRead }: NotificationListItemProps) {
+  if (!notification?.id) {
+    return null;
+  }
+  return (
+    <NotificationItem
+      notification={notification}
+      onMarkAsRead={() => onMarkAsRead(notification.id)}
+    />
+  );
+}
+
 interface NotificationsModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -49,18 +67,13 @@ export default function NotificationsModal({
 
   const [selectedPriority, setSelectedPriority] = useState<string | null>(null);
 
-  // Componente extraído para renderItem
-  const NotificationListItem = (notification: any) => {
-    if (!notification?.id) {
-      return null;
-    }
-    return (
-      <NotificationItem
-        notification={notification}
-        onMarkAsRead={() => markAsRead(notification.id)}
-      />
-    );
-  };
+  // Wrapper para renderItem que pasa las props necesarias
+  const renderNotificationItem = (notification: any) => (
+    <NotificationListItem
+      notification={notification}
+      onMarkAsRead={markAsRead}
+    />
+  );
 
   const isDark = actualTheme === "dark";
 
@@ -238,7 +251,7 @@ export default function NotificationsModal({
                                   estimatedItemSize={80}
                                   overscan={5}
                                   style={{ height: "100%" }}
-                                  renderItem={NotificationListItem}
+                                  renderItem={renderNotificationItem}
                                   footer={
                                     notifications.length > 100 ? (
                                       <div
@@ -343,7 +356,7 @@ export default function NotificationsModal({
                                       estimatedItemSize={80}
                                       overscan={5}
                                       style={{ height: "100%" }}
-                                      renderItem={NotificationListItem}
+                                      renderItem={renderNotificationItem}
                                       footer={
                                         filteredNotifications.length > 100 ? (
                                           <div
@@ -406,7 +419,7 @@ export default function NotificationsModal({
                                   estimatedItemSize={80}
                                   overscan={5}
                                   style={{ height: "100%" }}
-                                  renderItem={NotificationListItem}
+                                  renderItem={renderNotificationItem}
                                   footer={
                                     systemNotifications.length > 100 ? (
                                       <div
