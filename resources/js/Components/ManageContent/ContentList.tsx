@@ -68,6 +68,23 @@ export default function ContentList(props: ContentListProps) {
     setLightboxIndex(index);
   };
 
+  // Componente extraído para renderItem
+  const ContentGridItem = ({ item }: { item: any }) => (
+    <ContentCard
+      key={item.id}
+      item={item}
+      type={mode === "campaigns" ? "campaign" : "publication"}
+      onEdit={props.onEdit}
+      onDelete={props.onDelete}
+      onViewDetails={props.onViewDetails}
+      onPublish={props.onPublish}
+      permissions={props.permissions}
+      remoteLock={remoteLocks[item.id]}
+      onPreviewMedia={handlePreviewMedia}
+      onDuplicate={props.onDuplicate}
+    />
+  );
+
   useEffect(() => {
     if (isLoading) {
       setSmoothLoading(true);
@@ -213,21 +230,7 @@ export default function ContentList(props: ContentListProps) {
                   items={items}
                   columns={4}
                   overscan={2}
-                  renderItem={(item) => (
-                    <ContentCard
-                      key={item.id}
-                      item={item}
-                      type={mode === "campaigns" ? "campaign" : "publication"}
-                      onEdit={props.onEdit}
-                      onDelete={props.onDelete}
-                      onViewDetails={props.onViewDetails}
-                      onPublish={props.onPublish}
-                      permissions={props.permissions}
-                      remoteLock={remoteLocks[item.id]}
-                      onPreviewMedia={handlePreviewMedia}
-                      onDuplicate={props.onDuplicate}
-                    />
-                  )}
+                  renderItem={ContentGridItem}
                 />
               </div>
 
