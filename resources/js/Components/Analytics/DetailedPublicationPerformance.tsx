@@ -47,20 +47,28 @@ const PLATFORM_COLORS: Record<string, string> = {
   tiktok: '#000000',
 };
 
+interface StatCardProps {
+  icon: any;
+  label: string;
+  value: number | string;
+  color: string;
+  isDark: boolean;
+}
+
+const StatCard = ({ icon: Icon, label, value, color, isDark }: StatCardProps) => (
+  <div className={`p-3 rounded-lg ${isDark ? 'bg-neutral-700/50' : 'bg-gray-50'}`}>
+    <div className="flex items-center gap-2 mb-1">
+      <Icon className={`w-4 h-4 ${color}`} />
+      <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{label}</span>
+    </div>
+    <p className={`text-lg font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+      {typeof value === 'number' ? value.toLocaleString() : value}
+    </p>
+  </div>
+);
+
 export default function DetailedPublicationPerformance({ publications, theme = 'light' }: Props) {
   const isDark = theme === 'dark';
-
-  const StatCard = ({ icon: Icon, label, value, color }: any) => (
-    <div className={`p-3 rounded-lg ${isDark ? 'bg-neutral-700/50' : 'bg-gray-50'}`}>
-      <div className="flex items-center gap-2 mb-1">
-        <Icon className={`w-4 h-4 ${color}`} />
-        <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{label}</span>
-      </div>
-      <p className={`text-lg font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
-        {typeof value === 'number' ? value.toLocaleString() : value}
-      </p>
-    </div>
-  );
 
   return (
     <div className={`space-y-6 ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>
@@ -83,11 +91,11 @@ export default function DetailedPublicationPerformance({ publications, theme = '
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
-            <StatCard icon={Eye} label="Vistas" value={pub.total_views} color="text-blue-500" />
-            <StatCard icon={MousePointer2} label="Clicks" value={pub.total_clicks} color="text-purple-500" />
-            <StatCard icon={Heart} label="Engagement" value={pub.total_engagement} color="text-pink-500" />
-            <StatCard icon={Users} label="Alcance" value={pub.total_reach} color="text-green-500" />
-            <StatCard icon={TrendingUp} label="Tasa" value={`${pub.avg_engagement_rate}%`} color="text-orange-500" />
+            <StatCard icon={Eye} label="Vistas" value={pub.total_views} color="text-blue-500" isDark={isDark} />
+            <StatCard icon={MousePointer2} label="Clicks" value={pub.total_clicks} color="text-purple-500" isDark={isDark} />
+            <StatCard icon={Heart} label="Engagement" value={pub.total_engagement} color="text-pink-500" isDark={isDark} />
+            <StatCard icon={Users} label="Alcance" value={pub.total_reach} color="text-green-500" isDark={isDark} />
+            <StatCard icon={TrendingUp} label="Tasa" value={`${pub.avg_engagement_rate}%`} color="text-orange-500" isDark={isDark} />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
