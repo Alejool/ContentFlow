@@ -154,9 +154,9 @@ export default function IntegrationsSettingsTab({
 
   const { register, handleSubmit, setValue, getValues } = useForm({
     defaultValues: {
-      slack_webhook_url: workspace.slack_webhook_url || "",
-      discord_webhook_url: workspace.discord_webhook_url || "",
-      webhook_secret: workspace.webhook_secret || "",
+      slack_webhook_url: workspace?.slack_webhook_url || "",
+      discord_webhook_url: workspace?.discord_webhook_url || "",
+      webhook_secret: workspace?.webhook_secret || "",
     },
   });
 
@@ -297,9 +297,12 @@ export default function IntegrationsSettingsTab({
 
   useEffect(() => {
     // Also load initial stats/count
-    fetchActivity(1, 5);
-  }, [workspace.id, fetchActivity]);
+    if (workspace?.id) {
+      fetchActivity(1, 5);
+    }
+  }, [workspace?.id, fetchActivity]);
 
+  // Early return after all hooks
   if (!workspace) return null;
 
   return (

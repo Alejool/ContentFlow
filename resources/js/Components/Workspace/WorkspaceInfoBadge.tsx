@@ -12,6 +12,7 @@ export default function WorkspaceInfoBadge({
   const { t } = useTranslation();
   const { current_workspace, auth } = usePage().props as any;
 
+  // Early return after all hooks
   if (!current_workspace) return null;
 
   const memberCount =

@@ -34,6 +34,7 @@ export default function WorkspaceSwitcher({
     });
   };
 
+  // Early return after all hooks
   if (!current_workspace) return null;
 
   return (
