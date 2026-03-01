@@ -94,79 +94,82 @@ class FacebookService extends BaseSocialService
    */
   private function uploadVideoFromUrl(string $pageId, string $videoUrl, string $description, ?string $title): string
   {
-    Log::info('Facebook resumable upload from URL starting', [
+    Log::info('Facebook resumable upload from URL starting (new API with chunks)', [
       'pageId' => $pageId,
       'url' => $videoUrl
     ]);
 
-    $initEndpoint = "https://graph.facebook.com/" . self::API_VERSION . "/{$pageId}/videos";
-    
     try {
-      // Paso 1: Obtener tamaño del archivo sin descargarlo
-      $headResponse = $this->client->head($videoUrl, ['timeout' => 30]);
-      $fileSize = $headResponse->getHeader('Content-Length')[0] ?? 0;
+      // Paso 1: Descargar el archivo temporalmente
+      $tempFile = $this->downloadToTemp($videoUrl);
       
-      if (!$fileSize) {
-        throw new \Exception("Could not determine file size from URL");
+      if (!file_exists($tempFile)) {
+        throw new \Exception("Failed to download video from URL");
       }
-      
+
+      $fileSize = filesize($tempFile);
       $fileSizeMB = round($fileSize / 1024 / 1024, 2);
-      Log::info('File size determined', [
-        'size_mb' => $fileSizeMB
+      
+      Log::info('File downloaded and size determined', [
+        'size_mb' => $fileSizeMB,
+        'temp_file' => $tempFile
       ]);
 
-      // Paso 2: Inicializar sesión de upload
-      $initParams = [
-        'upload_phase' => 'start',
-        'file_size' => $fileSize,
-        'access_token' => $this->accessToken,
-      ];
-
+      // Paso 2: Inicializar sesión de upload usando la nueva API
+      $appId = config('services.facebook.client_id');
+      $initEndpoint = "https://graph.facebook.com/" . self::API_VERSION . "/{$appId}/uploads";
+      
       $response = $this->client->post($initEndpoint, [
-        'form_params' => $initParams,
+        'query' => [
+          'file_name' => basename($videoUrl),
+          'file_length' => $fileSize,
+          'file_type' => 'video/mp4',
+          'access_token' => $this->accessToken,
+        ],
         'timeout' => 60
       ]);
       
       $initResult = json_decode($response->getBody(), true);
-      $uploadSessionId = $initResult['upload_session_id'] ?? null;
-      $videoId = $initResult['video_id'] ?? null;
+      $uploadSessionId = $initResult['id'] ?? null;
 
       if (!$uploadSessionId) {
+        @unlink($tempFile);
         throw new \Exception("Failed to initialize upload session");
       }
 
-      Log::info('Facebook upload session initialized', [
-        'session_id' => $uploadSessionId,
-        'video_id' => $videoId
+      Log::info('Facebook upload session initialized (new API)', [
+        'session_id' => $uploadSessionId
       ]);
 
-      // Paso 3: Descargar y subir en chunks optimizados
-      // Chunks más grandes = menos requests = más rápido
-      $chunkSize = 1024 * 1024 * 10; // 10MB chunks (aumentado de 5MB)
+      // Paso 3: Subir el archivo por chunks usando la nueva API
+      $uploadEndpoint = "https://graph.facebook.com/" . self::API_VERSION . "/{$uploadSessionId}";
+      
+      // Chunks de 5MB para evitar rate limits (reducido de 10MB)
+      $chunkSize = 1024 * 1024 * 5; // 5MB
+      $totalChunks = ceil($fileSize / $chunkSize);
       
       Log::info('Upload configuration', [
-        'chunk_size_mb' => 10,
-        'estimated_chunks' => ceil($fileSize / $chunkSize)
+        'chunk_size_mb' => 5,
+        'total_chunks' => $totalChunks
       ]);
-
-      // Descargar archivo completo primero (más rápido para leer chunks)
-      $tempFile = $this->downloadToTemp($videoUrl);
       
       $handle = fopen($tempFile, 'rb');
       if (!$handle) {
-        unlink($tempFile);
+        @unlink($tempFile);
         throw new \Exception('Failed to open temporary file for reading');
       }
 
       try {
-        $offset = 0;
+        $fileOffset = 0;
         $chunkNumber = 0;
         $maxRetries = 3;
-        $totalChunks = ceil($fileSize / $chunkSize);
+        $fileHandle = null;
 
-        while (!feof($handle)) {
-          $chunk = fread($handle, $chunkSize);
-          $chunkLength = strlen($chunk);
+        while ($fileOffset < $fileSize) {
+          // Leer el chunk
+          fseek($handle, $fileOffset);
+          $chunkData = fread($handle, $chunkSize);
+          $chunkLength = strlen($chunkData);
           
           if ($chunkLength === 0) {
             break;
@@ -179,29 +182,81 @@ class FacebookService extends BaseSocialService
           // Reintentar subida de chunk si falla
           while (!$chunkUploaded && $retryCount < $maxRetries) {
             try {
-              // Subir chunk a Facebook
-              $transferParams = [
-                'upload_phase' => 'transfer',
-                'upload_session_id' => $uploadSessionId,
-                'start_offset' => $offset,
-                'video_file_chunk' => $chunk,
-                'access_token' => $this->accessToken,
-              ];
-
-              $this->client->post($initEndpoint, [
-                'multipart' => $this->buildMultipart($transferParams),
+              $response = $this->client->post($uploadEndpoint, [
+                'headers' => [
+                  'Authorization' => 'OAuth ' . $this->accessToken,
+                  'file_offset' => (string)$fileOffset,
+                ],
+                'body' => $chunkData,
                 'timeout' => 600,
                 'connect_timeout' => 30
               ]);
 
+              $uploadResult = json_decode($response->getBody(), true);
+              
+              // El último chunk devuelve el file handle
+              if (isset($uploadResult['h'])) {
+                $fileHandle = $uploadResult['h'];
+              }
+
               $chunkUploaded = true;
 
+            } catch (\GuzzleHttp\Exception\ClientException $e) {
+              $retryCount++;
+              $statusCode = $e->getResponse()->getStatusCode();
+              
+              // Manejar error 429 (Rate Limit)
+              if ($statusCode === 429) {
+                $errorBody = json_decode($e->getResponse()->getBody()->getContents(), true);
+                $backoffMs = $errorBody['backoff'] ?? 60000; // Default 60 segundos
+                $backoffSeconds = $backoffMs / 1000;
+                $isRetriable = $errorBody['debug_info']['retriable'] ?? true;
+                
+                Log::warning('Facebook rate limit hit', [
+                  'chunk' => $chunkNumber,
+                  'attempt' => $retryCount,
+                  'backoff_seconds' => $backoffSeconds,
+                  'retriable' => $isRetriable,
+                  'message' => $errorBody['debug_info']['message'] ?? 'Rate limit exceeded'
+                ]);
+                
+                // Si no es retriable según Facebook, lanzar error inmediatamente
+                if (!$isRetriable) {
+                  throw new \Exception("Facebook rate limit error (non-retriable): " . ($errorBody['debug_info']['message'] ?? 'Upload rate limit exceeded'));
+                }
+                
+                // Esperar el tiempo de backoff que Facebook indica
+                Log::info('Waiting for rate limit backoff', [
+                  'seconds' => $backoffSeconds,
+                  'chunk' => $chunkNumber
+                ]);
+                sleep((int)$backoffSeconds);
+                
+              } else {
+                // Otros errores
+                Log::warning('Facebook chunk upload failed, retrying', [
+                  'chunk' => $chunkNumber,
+                  'attempt' => $retryCount,
+                  'offset' => $fileOffset,
+                  'status_code' => $statusCode,
+                  'error' => $e->getMessage()
+                ]);
+                
+                if ($retryCount >= $maxRetries) {
+                  throw new \Exception("Failed to upload chunk {$chunkNumber} after {$maxRetries} attempts: " . $e->getMessage());
+                }
+                
+                // Backoff exponencial para otros errores
+                usleep(500000 * $retryCount); // 0.5s, 1s, 1.5s
+              }
+              
             } catch (\Exception $e) {
               $retryCount++;
               
               Log::warning('Facebook chunk upload failed, retrying', [
                 'chunk' => $chunkNumber,
                 'attempt' => $retryCount,
+                'offset' => $fileOffset,
                 'error' => $e->getMessage()
               ]);
 
@@ -213,55 +268,73 @@ class FacebookService extends BaseSocialService
             }
           }
 
-          $offset += $chunkLength;
+          $fileOffset += $chunkLength;
           
-          // Log progreso cada 10 chunks
+          // Pequeño delay entre chunks para evitar rate limits (200ms)
+          if ($fileOffset < $fileSize) {
+            usleep(200000); // 200ms entre chunks
+          }
+          
+          // Log progreso cada 10 chunks o en el último
           if ($chunkNumber % 10 === 0 || $chunkNumber === $totalChunks) {
-            $progress = round(($chunkNumber / $totalChunks) * 100, 1);
+            $progress = round(($fileOffset / $fileSize) * 100, 1);
             Log::info('Facebook upload progress', [
               'progress' => "{$progress}%",
               'chunk' => "{$chunkNumber}/{$totalChunks}",
-              'uploaded_mb' => round($offset / 1024 / 1024, 2),
+              'uploaded_mb' => round($fileOffset / 1024 / 1024, 2),
               'total_mb' => $fileSizeMB
             ]);
           }
         }
+
+        if (!$fileHandle) {
+          throw new \Exception("Failed to get file handle from upload");
+        }
+
+        Log::info('Facebook file uploaded successfully', [
+          'file_handle' => $fileHandle,
+          'total_chunks' => $chunkNumber
+        ]);
+
       } finally {
-        // Asegurar que siempre se cierre el handle
         if (is_resource($handle)) {
           fclose($handle);
         }
-        // Limpiar archivo temporal
         if (file_exists($tempFile)) {
           @unlink($tempFile);
         }
       }
 
-      // Paso 4: Finalizar upload
-      $finishParams = [
-        'upload_phase' => 'finish',
-        'upload_session_id' => $uploadSessionId,
-        'access_token' => $this->accessToken,
+      // Paso 4: Publicar el video usando el file handle
+      $publishEndpoint = "https://graph.facebook.com/" . self::API_VERSION . "/{$pageId}/videos";
+      
+      $publishParams = [
+        'file_url' => $fileHandle,
         'description' => $description,
+        'access_token' => $this->accessToken,
       ];
 
       if ($title) {
-        $finishParams['title'] = $title;
+        $publishParams['title'] = $title;
       }
 
-      $response = $this->client->post($initEndpoint, [
-        'form_params' => $finishParams,
+      $response = $this->client->post($publishEndpoint, [
+        'form_params' => $publishParams,
         'timeout' => 300
       ]);
 
-      $finishResult = json_decode($response->getBody(), true);
+      $publishResult = json_decode($response->getBody(), true);
+      $videoId = $publishResult['id'] ?? null;
+
+      if (!$videoId) {
+        throw new \Exception("Failed to publish video");
+      }
       
-      Log::info('Facebook resumable upload from URL completed', [
-        'video_id' => $finishResult['id'] ?? $videoId,
-        'success' => $finishResult['success'] ?? false
+      Log::info('Facebook video published successfully', [
+        'video_id' => $videoId
       ]);
 
-      return $finishResult['id'] ?? $videoId;
+      return $videoId;
 
     } catch (\Exception $e) {
       Log::error('Facebook resumable upload from URL failed', [
@@ -331,7 +404,18 @@ class FacebookService extends BaseSocialService
         'sink' => $tempPath,
         'timeout' => 600, // 10 minutos para descargar
         'connect_timeout' => 30,
-        'verify' => false // Para URLs de S3 con certificados
+        'verify' => false, // Para URLs de S3 con certificados
+        'progress' => function ($downloadTotal, $downloadedBytes) {
+          if ($downloadTotal > 0) {
+            $progress = round(($downloadedBytes / $downloadTotal) * 100, 1);
+            if ($progress % 20 == 0 && $progress > 0) { // Log cada 20%
+              Log::info('Facebook download progress', [
+                'progress' => "{$progress}%",
+                'downloaded_mb' => round($downloadedBytes / 1024 / 1024, 2)
+              ]);
+            }
+          }
+        }
       ]);
       
       if (!file_exists($tempPath)) {
