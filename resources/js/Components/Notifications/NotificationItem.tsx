@@ -24,6 +24,12 @@ export default function NotificationItem({
 }: NotificationItemProps) {
   const { t } = useTranslation();
   const { theme } = useTheme();
+  
+  // Guard against undefined notification
+  if (!notification?.id) {
+    return null;
+  }
+  
   const { data, created_at, read_at } = notification;
   const isRead = !!read_at;
   const [imageError, setImageError] = useState<boolean>(false);

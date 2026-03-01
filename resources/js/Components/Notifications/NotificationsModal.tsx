@@ -50,13 +50,17 @@ export default function NotificationsModal({
   const [selectedPriority, setSelectedPriority] = useState<string | null>(null);
 
   // Componente extraído para renderItem
-  const NotificationListItem = ({ notification }: { notification: any }) => (
-    <NotificationItem
-      key={notification.id}
-      notification={notification}
-      onMarkAsRead={() => markAsRead(notification.id)}
-    />
-  );
+  const NotificationListItem = (notification: any) => {
+    if (!notification?.id) {
+      return null;
+    }
+    return (
+      <NotificationItem
+        notification={notification}
+        onMarkAsRead={() => markAsRead(notification.id)}
+      />
+    );
+  };
 
   const isDark = actualTheme === "dark";
 
