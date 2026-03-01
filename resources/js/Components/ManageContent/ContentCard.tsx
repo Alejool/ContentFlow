@@ -58,11 +58,6 @@ export default function ContentCard({
   remoteLock,
   onPreviewMedia,
 }: ContentCardProps) {
-  // Guard against undefined item
-  if (!item) {
-    return null;
-  }
-
   const { auth } = usePage<any>().props;
   const currentUserId = auth.user?.id;
   
@@ -70,6 +65,11 @@ export default function ContentCard({
   const { i18n } = useTranslation();
   const locale = getDateFnsLocale(i18n.language);
   const canManageContent = permissions?.includes("manage-content");
+  
+  // Early return after all hooks
+  if (!item) {
+    return null;
+  }
   
   // Verificar si el usuario puede publicar directamente
   const canPublish = canUserPublishDirectly(item, currentUserId, permissions || []) || permissions?.includes("publish");
