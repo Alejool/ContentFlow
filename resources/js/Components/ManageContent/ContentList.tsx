@@ -14,6 +14,54 @@ import ContentCardSkeleton from "./ContentCardSkeleton";
 
 import MediaLightbox from "@/Components/common/ui/MediaLightbox";
 
+// Componente extraído fuera para evitar recreación en cada render
+interface ContentGridItemProps {
+  item: any;
+  mode: "publications" | "campaigns";
+  onEdit: (item: any) => void;
+  onDelete: (id: number) => void;
+  onDuplicate?: (id: number) => void;
+  onViewDetails?: (item: any) => void;
+  onPublish?: (item: any) => void;
+  permissions?: string[];
+  remoteLock: any;
+  onPreviewMedia: (media: any[], index: number) => void;
+}
+
+function ContentGridItem({
+  item,
+  mode,
+  onEdit,
+  onDelete,
+  onDuplicate,
+  onViewDetails,
+  onPublish,
+  permissions,
+  remoteLock,
+  onPreviewMedia,
+}: ContentGridItemProps) {
+  // Guard against undefined or null items
+  if (!item || !item.id) {
+    return null;
+  }
+
+  return (
+    <ContentCard
+      key={item.id}
+      item={item}
+      type={mode === "campaigns" ? "campaign" : "publication"}
+      onEdit={onEdit}
+      onDelete={onDelete}
+      onViewDetails={onViewDetails}
+      onPublish={onPublish}
+      permissions={permissions}
+      remoteLock={remoteLock}
+      onPreviewMedia={onPreviewMedia}
+      onDuplicate={onDuplicate}
+    />
+  );
+}
+
 interface ContentListProps {
   items: any[];
   mode: "publications" | "campaigns";
@@ -69,29 +117,21 @@ export default function ContentList(props: ContentListProps) {
     setLightboxIndex(index);
   };
 
-  // Componente extraído para renderItem
-  const ContentGridItem = (item: any, index: number) => {
-    // Guard against undefined or null items
-    if (!item || !item.id) {
-      return null;
-    }
-
-    return (
-      <ContentCard
-        key={item.id}
-        item={item}
-        type={mode === "campaigns" ? "campaign" : "publication"}
-        onEdit={props.onEdit}
-        onDelete={props.onDelete}
-        onViewDetails={props.onViewDetails}
-        onPublish={props.onPublish}
-        permissions={props.permissions}
-        remoteLock={remoteLocks[item.id]}
-        onPreviewMedia={handlePreviewMedia}
-        onDuplicate={props.onDuplicate}
-      />
-    );
-  };
+  // Wrapper para renderItem que pasa las props necesarias
+  const renderGridItem = (item: any, index: number) => (
+    <ContentGridItem
+      item={item}
+      mode={mode}
+      onEdit={props.onEdit}
+      onDelete={props.onDelete}
+      onDuplicate={props.onDuplicate}
+      onViewDetails={props.onViewDetails}
+      onPublish={props.onPublish}
+      permissions={props.permissions}
+      remoteLock={remoteLocks[item?.id]}
+      onPreviewMedia={handlePreviewMedia}
+    />
+  );
 
   useEffect(() => {
     if (isLoading) {
@@ -238,7 +278,7 @@ export default function ContentList(props: ContentListProps) {
                   items={items}
                   columns={4}
                   overscan={2}
-                  renderItem={ContentGridItem}
+                  renderItem={renderGridItem}
                 />
               </div>
 

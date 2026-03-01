@@ -7,7 +7,7 @@ import { VirtualList } from "@/Components/common/ui/VirtualList";
 import { getDateFnsLocale } from "@/Utils/dateLocales";
 import { Publication } from "@/types/Publication";
 import axios from "axios";
-import { format, formatDistanceToNow } from "date-fns";
+import { format, formatDistanceToNow, Locale } from "date-fns";
 import { Check, Clock, Eye, User, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
@@ -18,6 +18,105 @@ interface ApprovalListProps {
   isLoading: boolean;
   onRefresh: () => void;
   onViewDetail: (publication: Publication) => void;
+}
+
+// Componente extraído fuera para evitar recreación en cada render
+interface ApprovalPublicationItemProps {
+  pub: Publication;
+  onViewDetail: (publication: Publication) => void;
+  onApprove: (publication: Publication) => void;
+  onReject: (publication: Publication) => void;
+  getStatusColor: (status?: string) => string;
+  t: any;
+  locale: Locale;
+}
+
+function ApprovalPublicationItem({
+  pub,
+  onViewDetail,
+  onApprove,
+  onReject,
+  getStatusColor,
+  t,
+  locale,
+}: ApprovalPublicationItemProps) {
+  return (
+    <div
+      key={pub.id}
+      className="bg-white dark:bg-neutral-800 rounded-lg p-4 border border-gray-200 dark:border-neutral-700 shadow-sm hover:shadow-md transition-shadow mb-4"
+    >
+      <div className="flex flex-col sm:flex-row justify-between gap-4">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-2">
+            <span
+              className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${getStatusColor(pub.status)}`}
+            >
+              {t(`manageContent.status.${pub.status}`) || pub.status}
+            </span>
+            <span
+              className="text-xs text-gray-500 flex items-center gap-1.5"
+              title={format(new Date(pub.updated_at), "PPP HH:mm", {
+                locale,
+              })}
+            >
+              <Clock className="w-3.5 h-3.5" />
+              <span>
+                {format(new Date(pub.updated_at), "HH:mm")} (
+                {formatDistanceToNow(new Date(pub.updated_at), {
+                  addSuffix: true,
+                  locale,
+                })}
+                )
+              </span>
+            </span>
+          </div>
+          <h4 className="font-bold text-gray-900 dark:text-white truncate">
+            {pub.title}
+          </h4>
+          <div className="flex items-center gap-2 mt-2 text-sm text-gray-600 dark:text-gray-400">
+            <User className="w-4 h-4" />
+            <span>{pub.user?.name || "User"}</span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 sm:self-center">
+          <Button
+            variant="ghost"
+            buttonStyle="ghost"
+            onClick={() => onViewDetail(pub)}
+            className="p-2 min-w-0"
+            icon={Eye}
+            title={t("common.view")}
+            rounded="lg"
+            shadow="none"
+          >
+            {""}
+          </Button>
+
+          <Button
+            variant="success"
+            buttonStyle="gradient"
+            onClick={() => onApprove(pub)}
+            className="px-6 text-white"
+            icon={Check}
+            rounded="lg"
+          >
+            {t("approvals.approve")}
+          </Button>
+          <Button
+            variant="danger"
+            buttonStyle="gradient"
+            onClick={() => onReject(pub)}
+            className="px-6 text-white"
+            icon={X}
+            rounded="lg"
+          >
+            {t("approvals.reject") || "Reject"}
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default function ApprovalList({
@@ -159,83 +258,17 @@ export default function ApprovalList({
     startIndex + perPage,
   );
 
-  // Componente extraído para renderItem
-  const ApprovalPublicationItem = ({ pub }: { pub: Publication }) => (
-    <div
-      key={pub.id}
-      className="bg-white dark:bg-neutral-800 rounded-lg p-4 border border-gray-200 dark:border-neutral-700 shadow-sm hover:shadow-md transition-shadow mb-4"
-    >
-      <div className="flex flex-col sm:flex-row justify-between gap-4">
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-2">
-            <span
-              className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${getStatusColor(pub.status)}`}
-            >
-              {t(`manageContent.status.${pub.status}`) || pub.status}
-            </span>
-            <span
-              className="text-xs text-gray-500 flex items-center gap-1.5"
-              title={format(new Date(pub.updated_at), "PPP HH:mm", {
-                locale,
-              })}
-            >
-              <Clock className="w-3.5 h-3.5" />
-              <span>
-                {format(new Date(pub.updated_at), "HH:mm")} (
-                {formatDistanceToNow(new Date(pub.updated_at), {
-                  addSuffix: true,
-                  locale,
-                })}
-                )
-              </span>
-            </span>
-          </div>
-          <h4 className="font-bold text-gray-900 dark:text-white truncate">
-            {pub.title}
-          </h4>
-          <div className="flex items-center gap-2 mt-2 text-sm text-gray-600 dark:text-gray-400">
-            <User className="w-4 h-4" />
-            <span>{pub.user?.name || "User"}</span>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3 sm:self-center">
-          <Button
-            variant="ghost"
-            buttonStyle="ghost"
-            onClick={() => onViewDetail(pub)}
-            className="p-2 min-w-0"
-            icon={Eye}
-            title={t("common.view")}
-            rounded="lg"
-            shadow="none"
-          >
-            {""}
-          </Button>
-
-          <Button
-            variant="success"
-            buttonStyle="gradient"
-            onClick={() => handleApprove(pub)}
-            className="px-6 text-white"
-            icon={Check}
-            rounded="lg"
-          >
-            {t("approvals.approve")}
-          </Button>
-          <Button
-            variant="danger"
-            buttonStyle="gradient"
-            onClick={() => handleRejectClick(pub)}
-            className="px-6 text-white"
-            icon={X}
-            rounded="lg"
-          >
-            {t("approvals.reject") || "Reject"}
-          </Button>
-        </div>
-      </div>
-    </div>
+  // Wrapper para renderItem que pasa las props necesarias
+  const renderItem = (pub: Publication) => (
+    <ApprovalPublicationItem
+      pub={pub}
+      onViewDetail={onViewDetail}
+      onApprove={handleApprove}
+      onReject={handleRejectClick}
+      getStatusColor={getStatusColor}
+      t={t}
+      locale={locale}
+    />
   );
 
   return (
@@ -246,7 +279,7 @@ export default function ApprovalList({
             items={displayedPublications}
             estimatedItemSize={120}
             overscan={3}
-            renderItem={ApprovalPublicationItem}
+            renderItem={renderItem}
           emptyState={
             <EmptyState
               title={t("approvals.noPending")}

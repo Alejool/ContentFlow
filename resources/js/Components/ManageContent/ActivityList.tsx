@@ -339,145 +339,17 @@ export default function ActivityList({ activities }: ActivityListProps) {
     );
   }
 
-  // Componente extraído para renderItem
-  const ActivityTimelineItem = ({ activity, activityIdx }: { activity: ActivityItem; activityIdx: number }) => (
-    <div key={activity.id} className="relative pb-8">
-      {activityIdx !== activities.length - 1 ? (
-        <span
-          className="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200 dark:bg-neutral-700"
-          aria-hidden="true"
-        />
-      ) : null}
-      <div className="relative flex space-x-3">
-        <div className="relative">
-          {activity.user?.photo_url ? (
-            <img
-              src={activity.user.photo_url}
-              className="h-8 w-8 rounded-full bg-gray-400 flex items-center justify-center ring-8 ring-white dark:ring-neutral-800"
-              alt=""
-            />
-          ) : (
-            <div className="h-8 w-8 rounded-full bg-gray-100 dark:bg-neutral-700 flex items-center justify-center ring-8 ring-white dark:ring-neutral-800">
-              {getActivityIcon(activity.type)}
-            </div>
-          )}
-
-          {activity.user?.photo_url && (
-            <span className="absolute -bottom-1 -right-1 bg-white dark:bg-neutral-800 rounded-full p-0.5">
-              {getActivityIcon(activity.type)}
-            </span>
-          )}
-        </div>
-
-        <div className="min-w-0 flex-1 pt-1.5 space-y-2">
-          <div className="flex justify-between space-x-4">
-            <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                {!activity.description && (
-                  <span className="font-medium text-gray-900 dark:text-gray-200">
-                    {activity.type === "publication_failed"
-                      ? t("activity.timeline.system", "Sistema")
-                      : activity.user?.name ||
-                        t("activity.timeline.system", "Sistema")}{" "}
-                  </span>
-                )}
-                {formatActivityText(activity)}
-              </p>
-            </div>
-            <div className="text-right text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">
-              <time dateTime={activity.created_at}>
-                {formatDistanceToNow(new Date(activity.created_at), {
-                  addSuffix: true,
-                  locale: locale,
-                })}
-              </time>
-            </div>
-          </div>
-
-          {activity.formatted_changes?.has_comparison && (
-            <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-              <div className="bg-red-50 dark:bg-red-900/10 rounded p-2 border border-red-100 dark:border-red-900/30">
-                <div className="font-medium text-red-700 dark:text-red-400 mb-1">
-                  {t("activity.timeline.before", "Antes")}:
-                </div>
-                <div className="text-gray-700 dark:text-gray-300 break-words font-mono text-[10px] leading-tight">
-                  {typeof activity.formatted_changes.before === "object"
-                    ? JSON.stringify(
-                        activity.formatted_changes.before,
-                        null,
-                        2,
-                      )
-                    : activity.formatted_changes.before || "(vacío)"}
-                </div>
-              </div>
-              <div className="bg-green-50 dark:bg-green-900/10 rounded p-2 border border-green-100 dark:border-green-900/30">
-                <div className="font-medium text-green-700 dark:text-green-400 mb-1">
-                  {t("activity.timeline.after", "Después")}:
-                </div>
-                <div className="text-gray-700 dark:text-gray-300 break-words font-mono text-[10px] leading-tight">
-                  {typeof activity.formatted_changes.after === "object"
-                    ? JSON.stringify(
-                        activity.formatted_changes.after,
-                        null,
-                        2,
-                      )
-                    : activity.formatted_changes.after || "(vacío)"}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {((activity.formatted_changes?.added &&
-            activity.formatted_changes.added.length > 0) ||
-            (activity.formatted_changes?.removed &&
-              activity.formatted_changes.removed.length > 0)) && (
-            <div className="mt-2 text-xs space-y-2">
-              {activity.formatted_changes?.added &&
-                activity.formatted_changes.added.length > 0 && (
-                  <div className="flex flex-wrap gap-1">
-                    <span className="text-green-600 dark:text-green-400 font-medium mr-1">
-                      Agregado:
-                    </span>
-                    {activity.formatted_changes.added.map(
-                      (item: any, i: number) => (
-                        <span
-                          key={i}
-                          className="px-1.5 py-0.5 rounded-full bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300"
-                        >
-                          {typeof item === "string"
-                            ? item
-                            : JSON.stringify(item)}
-                        </span>
-                      ),
-                    )}
-                  </div>
-                )}
-
-              {activity.formatted_changes?.removed &&
-                activity.formatted_changes.removed.length > 0 && (
-                  <div className="flex flex-wrap gap-1">
-                    <span className="text-red-600 dark:text-red-400 font-medium mr-1">
-                      Eliminado:
-                    </span>
-                    {activity.formatted_changes.removed.map(
-                      (item: any, i: number) => (
-                        <span
-                          key={i}
-                          className="px-1.5 py-0.5 rounded-full bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300"
-                        >
-                          {typeof item === "string"
-                            ? item
-                            : JSON.stringify(item)}
-                        </span>
-                      ),
-                    )}
-                  </div>
-                )}
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
+  // Wrapper para renderItem que pasa las props necesarias
+  const renderItem = (activity: ActivityItem, activityIdx: number) => (
+    <ActivityTimelineItem
+      activity={activity}
+      activityIdx={activityIdx}
+      activitiesLength={activities.length}
+      t={t}
+      locale={locale}
+      getActivityIcon={getActivityIcon}
+      formatActivityText={formatActivityText}
+    />
   );
 
   return (
@@ -486,7 +358,7 @@ export default function ActivityList({ activities }: ActivityListProps) {
         items={activities}
         estimatedItemSize={100}
         overscan={3}
-        renderItem={ActivityTimelineItem}
+        renderItem={renderItem}
       />
     </div>
   );
