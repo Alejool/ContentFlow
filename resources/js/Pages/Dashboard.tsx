@@ -89,6 +89,11 @@ export default function Dashboard({
   const { actualTheme: theme } = useTheme();
   const [showBanner, setShowBanner] = useState(true);
   
+  // Early return if auth or user is not available
+  if (!auth || !auth.user) {
+    return null;
+  }
+  
   // Use custom hook for fetching stats
   const { data: fetchedStats, loading: loadingPubStats, refetch: refetchStats } = useFetchPublicationStats(!stats.publicationStats);
   const pubStats = stats.publicationStats || fetchedStats;
@@ -110,7 +115,7 @@ export default function Dashboard({
   };
 
   useEffect(() => {
-    if (!auth.user?.id) return;
+    if (!auth?.user?.id) return;
 
     const channel = window.Echo.private(`users.${auth.user.id}`);
 
@@ -119,7 +124,7 @@ export default function Dashboard({
     return () => {
       channel.stopListening(".PublicationStatusUpdated");
     };
-  }, [auth.user.id, refetchStats]);
+  }, [auth?.user?.id, refetchStats]);
 
   const handleResendVerification = () => {
     setSending(true);
