@@ -101,7 +101,7 @@ export default function EditorialCalendar() {
       <div
         className={`grid grid-cols-7 border-t border-l ${actualTheme === "dark" ? "border-neutral-800" : "border-gray-100"} rounded-lg overflow-hidden`}
       >
-        {days.map((day, idx) => {
+        {days.map((day) => {
           const dayEvents = events.filter((event) => {
             if (!event.start) return false;
             return isSameDay(parseISO(event.start), day);
@@ -111,7 +111,7 @@ export default function EditorialCalendar() {
 
           return (
             <div
-              key={idx}
+              key={day.toISOString()}
               className={`min-h-[80px] sm:min-h-[140px] p-1 sm:p-2 border-r border-b transition-colors relative ${
                 actualTheme === "dark"
                   ? `${isCurrentMonth ? "bg-neutral-900/30" : "bg-neutral-950/50"} border-neutral-800`
