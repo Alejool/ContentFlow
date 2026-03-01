@@ -30,6 +30,12 @@ class SyncSocialAnalyticsJob implements ShouldQueue
       return;
     }
 
+    // Skip inactive accounts
+    if (!$this->account->is_active) {
+      Log::info("Skipping inactive account {$this->account->id} ({$this->account->platform})");
+      return;
+    }
+
     try {
       Log::info("Iniciando sincronización para cuenta {$this->account->id} ({$this->account->platform})");
 
@@ -47,7 +53,17 @@ class SyncSocialAnalyticsJob implements ShouldQueue
 
       Log::info("Sincronización completada para cuenta {$this->account->id} ({$this->account->platform})");
     } catch (\Exception $e) {
-      Log::error("Error syncing analytics for account {$this->account->id}: " . $e->getMessage());
+      $errorMessage = $e->getMessage();
+      
+      // Don't retry if it's a token/reconnection issue
+      if (str_contains($errorMessage, 'reconnection required') || 
+          str_contains($errorMessage, 'No access token available')) {
+        Log::warning("Account {$this->account->id} needs reconnection, skipping retries: {$errorMessage}");
+        $this->account->increment('failure_count');
+        return; // Don't retry, user needs to reconnect
+      }
+
+      Log::error("Error syncing analytics for account {$this->account->id}: {$errorMessage}");
       $this->account->increment('failure_count');
       
       if ($this->attempts() < $this->tries) {
