@@ -28,24 +28,20 @@ export function CalendarWithCache({ onEventClick }: CalendarWithCacheProps) {
     filters,
   });
 
-  // Sync React Query state with Zustand store
+  // Sync React Query state with Zustand store - using useEffect is necessary here
+  // for external state synchronization between React Query and Zustand
   useEffect(() => {
     if (events) {
       setEvents(events);
     }
-  }, [events, setEvents]);
-
-  useEffect(() => {
     setLoading(isLoading);
-  }, [isLoading, setLoading]);
-
-  useEffect(() => {
+    
     if (isError && error) {
       setError(error instanceof Error ? error.message : 'Failed to fetch calendar events');
     } else {
       setError(null);
     }
-  }, [isError, error, setError]);
+  }, [events, isLoading, isError, error, setEvents, setLoading, setError]);
 
   // Show skeleton during initial load
   if (isLoading && !events) {

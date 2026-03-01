@@ -172,6 +172,7 @@ export default function ViewCampaignModal({
                             <img
                               src={pub.media_files[0].file_path}
                               className="w-8 h-8 rounded object-cover"
+                              alt={pub.title || "Publication media"}
                             />
                           ) : (
                             <div className="w-8 h-8 rounded bg-gray-200 flex items-center justify-center">

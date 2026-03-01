@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useOnlineStatus } from "@/Hooks/useOnlineStatus";
 import { useOnboardingStore } from "@/stores/onboardingStore";
 
@@ -8,12 +8,9 @@ import { useOnboardingStore } from "@/stores/onboardingStore";
  */
 export const OfflineIndicator: React.FC = () => {
   const isOnline = useOnlineStatus();
-  const { isOffline, queuedActionsCount, setOfflineStatus } = useOnboardingStore();
-
-  // Sync offline status with the store
-  useEffect(() => {
-    setOfflineStatus(!isOnline);
-  }, [isOnline, setOfflineStatus]);
+  const { queuedActionsCount } = useOnboardingStore();
+  
+  const isOffline = !isOnline;
 
   // Don't show anything if online and no queued actions
   if (isOnline && queuedActionsCount === 0) {

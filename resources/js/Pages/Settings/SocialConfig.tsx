@@ -26,10 +26,6 @@ export default function SocialConfig({
   const [activePlatform, setActivePlatform] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
-  useEffect(() => {
-    setGlobalSettings(initialSettings || {});
-  }, [initialSettings]);
-
   const handleOpenSettings = (platformId: string) => {
     setActivePlatform(platformId);
   };

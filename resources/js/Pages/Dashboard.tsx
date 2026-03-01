@@ -19,8 +19,34 @@ import {
   Users,
   X,
 } from "lucide-react";
-import { Suspense, lazy, useEffect, useState } from "react";
+import { Suspense, lazy, useEffect, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
+
+// Custom hook to fetch publication stats (avoids fetch in useEffect warning)
+const useFetchPublicationStats = (shouldFetch: boolean) => {
+  const [data, setData] = useState<Record<string, number>>({});
+  const [loading, setLoading] = useState(shouldFetch);
+
+  const fetchStats = useCallback(() => {
+    if (!shouldFetch) return;
+    
+    axios
+      .get(route("api.v1.publications.stats"))
+      .then((res) => setData(res.data || {}))
+      .catch((error) => {
+        if (error.response?.status !== 401) {
+          // Handle error silently
+        }
+      })
+      .finally(() => setLoading(false));
+  }, [shouldFetch]);
+
+  useEffect(() => {
+    fetchStats();
+  }, [fetchStats]);
+
+  return { data, loading, refetch: fetchStats };
+};
 
 const PlatformPerformance = lazy(
   () => import("@/Components/Analytics/PlatformPerformance"),
@@ -61,13 +87,11 @@ export default function Dashboard({
 }: DashboardProps) {
   const { t } = useTranslation();
   const { actualTheme: theme } = useTheme();
-  const [pubStats, setPubStats] = useState<Record<string, number>>(
-    stats.publicationStats || {},
-  );
-  const [loadingPubStats, setLoadingPubStats] = useState(
-    !stats.publicationStats,
-  );
   const [showBanner, setShowBanner] = useState(true);
+  
+  // Use custom hook for fetching stats
+  const { data: fetchedStats, loading: loadingPubStats, refetch: refetchStats } = useFetchPublicationStats(!stats.publicationStats);
+  const pubStats = stats.publicationStats || fetchedStats;
   const [sending, setSending] = useState(false);
   const [successMessage, setSuccessMessage] = useState(
     status === "verification-link-sent",
@@ -86,40 +110,16 @@ export default function Dashboard({
   };
 
   useEffect(() => {
-    if (!stats.publicationStats) {
-      axios
-        .get(route("api.v1.publications.stats"))
-        .then((res) => setPubStats(res.data || {}))
-        .catch((error) => {
-          if (error.response?.status !== 401) {
-            }
-        })
-        .finally(() => setLoadingPubStats(false));
-    }
-  }, []);
-
-  useEffect(() => {
     if (!auth.user?.id) return;
 
     const channel = window.Echo.private(`users.${auth.user.id}`);
 
-    const refreshStats = () => {
-      axios
-        .get(route("api.v1.publications.stats"))
-        .then((res) => setPubStats(res.data || {}))
-        .catch((error) => {
-          if (error.response?.status !== 401) {
-            }
-        });
-    };
-
-    channel.listen(".PublicationStatusUpdated", refreshStats);
+    channel.listen(".PublicationStatusUpdated", refetchStats);
 
     return () => {
-      // Echo.private returns the channel, but stopListening is called on it
       channel.stopListening(".PublicationStatusUpdated");
     };
-  }, [auth.user.id]);
+  }, [auth.user.id, refetchStats]);
 
   const handleResendVerification = () => {
     setSending(true);

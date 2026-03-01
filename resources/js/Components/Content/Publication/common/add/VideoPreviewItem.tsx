@@ -78,6 +78,7 @@ const VideoPreviewItem: React.FC<VideoPreviewItemProps> = ({
           <img
             src={thumbnail ? URL.createObjectURL(thumbnail) : thumbnailUrl}
             className="w-full h-full object-cover"
+            alt="Video thumbnail"
           />
         </div>
       )}
