@@ -118,9 +118,9 @@ export default function MediaLightbox({
 
         {mediaArray.length > 1 && (
           <div className="absolute bottom-10 flex gap-2.5 z-50 p-2 rounded-full bg-black/20 backdrop-blur-sm">
-            {mediaArray.map((_, idx) => (
+            {mediaArray.map((media, idx) => (
               <button
-                key={idx}
+                key={`${media.url}-${idx}`}
                 onClick={() => {
                   if (idx !== currentIndex) {
                     setIsAnimating(true);
@@ -128,6 +128,7 @@ export default function MediaLightbox({
                     setTimeout(() => setIsAnimating(false), 300);
                   }
                 }}
+                aria-label={`Go to media ${idx + 1} of ${mediaArray.length}`}
                 className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
                   idx === currentIndex
                     ? "bg-primary-500 w-8"

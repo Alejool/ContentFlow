@@ -295,19 +295,21 @@ function ModernCarousel({
   );
 
   const nextSlide = () => {
-    if (currentIndex + slidesToShow >= mediaFiles.length) {
-      setCurrentIndex(0);
-    } else {
-      setCurrentIndex(currentIndex + 1);
-    }
+    setCurrentIndex((prev) => {
+      if (prev + slidesToShow >= mediaFiles.length) {
+        return 0;
+      }
+      return prev + 1;
+    });
   };
 
   const prevSlide = () => {
-    if (currentIndex === 0) {
-      setCurrentIndex(mediaFiles.length - slidesToShow);
-    } else {
-      setCurrentIndex(currentIndex - 1);
-    }
+    setCurrentIndex((prev) => {
+      if (prev === 0) {
+        return mediaFiles.length - slidesToShow;
+      }
+      return prev - 1;
+    });
   };
 
   return (
@@ -408,7 +410,8 @@ function ModernCarousel({
         <div className="flex justify-center mt-6 gap-2">
           {Array.from({ length: totalSlides }).map((_, idx) => (
             <button
-              key={idx}
+              key={`slide-${idx}`}
+              aria-label={`Go to slide ${idx + 1} of ${totalSlides}`}
               className={`w-8 h-2 rounded-full transition-all duration-300 ${
                 idx === Math.floor(currentIndex / slidesToShow)
                   ? "bg-blue-500 dark:bg-blue-400"
