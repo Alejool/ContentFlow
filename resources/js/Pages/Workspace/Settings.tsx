@@ -25,9 +25,11 @@ interface WorkspaceSettingsProps {
   current_workspace?: any;
 }
 
+const EMPTY_ROLES: any[] = [];
+
 export default function WorkspaceSettings({
   workspace,
-  roles = [],
+  roles = EMPTY_ROLES,
   auth,
   current_workspace: globalWorkspace,
 }: WorkspaceSettingsProps) {
