@@ -1,4 +1,4 @@
-export const theme = {
+const theme = {
   colors: {
     primary: {
       50: "rgb(var(--primary-50) / <alpha-value>)",
@@ -237,8 +237,6 @@ export const theme = {
   },
 } as const;
 
-export const getGradient = (type: keyof typeof theme.gradients) =>
-  theme.gradients[type];
 export const getColor = (color: string) => {
   const parts = color.split(".");
   let value: any = theme.colors;
@@ -247,8 +245,6 @@ export const getColor = (color: string) => {
   }
   return value;
 };
-
-export type Theme = typeof theme;
 
 // Enhanced theme with WCAG AAA compliant colors
 export const enhancedTheme = {

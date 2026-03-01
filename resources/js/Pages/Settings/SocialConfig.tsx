@@ -4,10 +4,11 @@ import { SOCIAL_PLATFORMS } from "@/Constants/socialPlatformsConfig";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head } from "@inertiajs/react";
 import { Save, Settings2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
+import { useKeyboardClick } from "@/Hooks/useKeyboardClick";
 
 interface SocialConfigProps {
   settings: Record<string, any>;
@@ -52,9 +53,6 @@ export default function SocialConfig({
     }
   };
 
-  const hasChanges =
-    JSON.stringify(initialSettings) !== JSON.stringify(globalSettings);
-
   return (
     <AuthenticatedLayout
       header={
@@ -94,11 +92,12 @@ export default function SocialConfig({
             const platformSettings =
               globalSettings[platform.key.toLowerCase()] || {};
             const hasSettings = Object.keys(platformSettings).length > 0;
+            const keyboardProps = useKeyboardClick(() => handleOpenSettings(platform.key));
 
             return (
               <div
                 key={platform.key}
-                onClick={() => handleOpenSettings(platform.key)}
+                {...keyboardProps}
                 className="bg-white dark:bg-neutral-900 rounded-lg border-2 border-gray-200 dark:border-neutral-700 p-6 cursor-pointer hover:border-primary-500 dark:hover:border-primary-600 hover:shadow-lg transition-all flex flex-col h-full"
               >
                 <div className="flex items-start gap-4 mb-5">
