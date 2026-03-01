@@ -49,6 +49,15 @@ export default function NotificationsModal({
 
   const [selectedPriority, setSelectedPriority] = useState<string | null>(null);
 
+  // Componente extraído para renderItem
+  const NotificationListItem = ({ notification }: { notification: any }) => (
+    <NotificationItem
+      key={notification.id}
+      notification={notification}
+      onMarkAsRead={() => markAsRead(notification.id)}
+    />
+  );
+
   const isDark = actualTheme === "dark";
 
   const colors = {
@@ -225,15 +234,7 @@ export default function NotificationsModal({
                                   estimatedItemSize={80}
                                   overscan={5}
                                   style={{ height: "100%" }}
-                                  renderItem={(notification) => (
-                                    <NotificationItem
-                                      key={notification.id}
-                                      notification={notification}
-                                      onMarkAsRead={() =>
-                                        markAsRead(notification.id)
-                                      }
-                                    />
-                                  )}
+                                  renderItem={NotificationListItem}
                                   footer={
                                     notifications.length > 100 ? (
                                       <div
@@ -338,15 +339,7 @@ export default function NotificationsModal({
                                       estimatedItemSize={80}
                                       overscan={5}
                                       style={{ height: "100%" }}
-                                      renderItem={(notification) => (
-                                        <NotificationItem
-                                          key={notification.id}
-                                          notification={notification}
-                                          onMarkAsRead={() =>
-                                            markAsRead(notification.id)
-                                          }
-                                        />
-                                      )}
+                                      renderItem={NotificationListItem}
                                       footer={
                                         filteredNotifications.length > 100 ? (
                                           <div
@@ -409,15 +402,7 @@ export default function NotificationsModal({
                                   estimatedItemSize={80}
                                   overscan={5}
                                   style={{ height: "100%" }}
-                                  renderItem={(notification) => (
-                                    <NotificationItem
-                                      key={notification.id}
-                                      notification={notification}
-                                      onMarkAsRead={() =>
-                                        markAsRead(notification.id)
-                                      }
-                                    />
-                                  )}
+                                  renderItem={NotificationListItem}
                                   footer={
                                     systemNotifications.length > 100 ? (
                                       <div
