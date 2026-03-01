@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { pageVariants, getVariant, getTransition } from '@/config/animationVariants';
 

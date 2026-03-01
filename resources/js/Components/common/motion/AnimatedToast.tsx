@@ -5,7 +5,7 @@
  */
 
 import React, { useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion';
 import { createPortal } from 'react-dom';
 import { useReducedMotion } from '@/Hooks/useReducedMotion';
 import { useAnnounce } from '../Accessibility/LiveRegion';

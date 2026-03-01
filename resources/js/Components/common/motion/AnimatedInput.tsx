@@ -5,7 +5,7 @@
  */
 
 import React, { InputHTMLAttributes, forwardRef, useState } from 'react';
-import { motion } from 'framer-motion';
+import { LazyMotion, domAnimation, m } from 'framer-motion';
 import { prefersReducedMotion } from '@/Utils/themeTransition';
 
 interface AnimatedInputProps extends InputHTMLAttributes<HTMLInputElement> {

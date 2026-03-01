@@ -5,7 +5,7 @@
  */
 
 import React, { useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion';
 import { createPortal } from 'react-dom';
 import { useFocusTrap, useKeyboardNavigation } from '@/Hooks/useKeyboardNavigation';
 import { useReducedMotion } from '@/Hooks/useReducedMotion';
@@ -96,98 +96,100 @@ export const AnimatedModal: React.FC<AnimatedModalProps> = ({
       };
 
   const modalContent = (
-    <AnimatePresence>
-      {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          {/* Overlay */}
-          <motion.div
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-            variants={overlayVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            transition={{ duration: 0.2 }}
-            onClick={closeOnOverlayClick ? onClose : undefined}
-            aria-hidden="true"
-          />
+    <LazyMotion features={domAnimation}>
+      <AnimatePresence>
+        {isOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            {/* Overlay */}
+            <m.div
+              className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+              variants={overlayVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              transition={{ duration: 0.2 }}
+              onClick={closeOnOverlayClick ? onClose : undefined}
+              aria-hidden="true"
+            />
 
-          {/* Modal */}
-          <motion.div
-            ref={modalRef}
-            className={`
-              relative w-full ${sizeStyles[size]}
-              bg-theme-bg-elevated
-              rounded-xl shadow-2xl
-              border border-theme-border-default
-              overflow-hidden
-            `}
-            variants={modalVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            transition={{ duration: 0.25, ease: 'easeInOut' }}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="modal-title"
-            aria-describedby={description ? 'modal-description' : undefined}
-          >
-            {/* Header */}
-            <div className="px-6 py-4 border-b border-theme-border-default">
-              <div className="flex items-start justify-between">
-                <div>
-                  <h2
-                    id="modal-title"
-                    className="text-xl font-semibold text-theme-text-primary"
-                  >
-                    {title}
-                  </h2>
-                  {description && (
-                    <p
-                      id="modal-description"
-                      className="mt-1 text-sm text-theme-text-secondary"
+            {/* Modal */}
+            <m.div
+              ref={modalRef}
+              className={`
+                relative w-full ${sizeStyles[size]}
+                bg-theme-bg-elevated
+                rounded-xl shadow-2xl
+                border border-theme-border-default
+                overflow-hidden
+              `}
+              variants={modalVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              transition={{ duration: 0.25, ease: 'easeInOut' }}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="modal-title"
+              aria-describedby={description ? 'modal-description' : undefined}
+            >
+              {/* Header */}
+              <div className="px-6 py-4 border-b border-theme-border-default">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h2
+                      id="modal-title"
+                      className="text-xl font-semibold text-theme-text-primary"
                     >
-                      {description}
-                    </p>
-                  )}
-                </div>
+                      {title}
+                    </h2>
+                    {description && (
+                      <p
+                        id="modal-description"
+                        className="mt-1 text-sm text-theme-text-secondary"
+                      >
+                        {description}
+                      </p>
+                    )}
+                  </div>
 
-                <button
-                  onClick={onClose}
-                  className="
-                    ml-4 p-2 rounded-lg
-                    text-theme-text-tertiary
-                    hover:bg-theme-interactive-hover
-                    focus-ring
-                    transition-colors duration-fast
-                  "
-                  aria-label="Cerrar modal"
-                >
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    aria-hidden="true"
+                  <button
+                    onClick={onClose}
+                    className="
+                      ml-4 p-2 rounded-lg
+                      text-theme-text-tertiary
+                      hover:bg-theme-interactive-hover
+                      focus-ring
+                      transition-colors duration-fast
+                    "
+                    aria-label="Cerrar modal"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                </button>
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </button>
+                </div>
               </div>
-            </div>
 
-            {/* Content */}
-            <div className="px-6 py-4 max-h-[calc(100vh-200px)] overflow-y-auto">
-              {children}
-            </div>
-          </motion.div>
-        </div>
-      )}
-    </AnimatePresence>
+              {/* Content */}
+              <div className="px-6 py-4 max-h-[calc(100vh-200px)] overflow-y-auto">
+                {children}
+              </div>
+            </m.div>
+          </div>
+        )}
+      </AnimatePresence>
+    </LazyMotion>
   );
 
   return createPortal(modalContent, document.body);

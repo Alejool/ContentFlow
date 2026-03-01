@@ -1,5 +1,5 @@
 import React, { AnchorHTMLAttributes, forwardRef } from 'react';
-import { motion, HTMLMotionProps } from 'framer-motion';
+import { LazyMotion, domAnimation, m, HTMLMotionProps } from 'framer-motion';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { hoverVariants, getVariant, getTransition } from '@/config/animationVariants';
 
@@ -79,20 +79,22 @@ export const MotionLink = forwardRef<HTMLAnchorElement, MotionLinkProps>(
       : className;
 
     return (
-      <motion.a
-        ref={ref}
-        className={linkClassName}
-        initial="initial"
-        whileHover={getVariant(selectedHoverVariant, hoverState, shouldReduceMotion)}
-        transition={getTransition(
-          selectedHoverVariant.transition || { duration: 0.15 },
-          shouldReduceMotion
-        )}
-        {...anchorProps}
-        {...motionProps}
-      >
-        {children}
-      </motion.a>
+      <LazyMotion features={domAnimation}>
+        <m.a
+          ref={ref}
+          className={linkClassName}
+          initial="initial"
+          whileHover={getVariant(selectedHoverVariant, hoverState, shouldReduceMotion)}
+          transition={getTransition(
+            selectedHoverVariant.transition || { duration: 0.15 },
+            shouldReduceMotion
+          )}
+          {...anchorProps}
+          {...motionProps}
+        >
+          {children}
+        </m.a>
+      </LazyMotion>
     );
   }
 );

@@ -1,5 +1,5 @@
 import React, { ButtonHTMLAttributes, forwardRef } from 'react';
-import { motion, HTMLMotionProps } from 'framer-motion';
+import { LazyMotion, domAnimation, m, HTMLMotionProps } from 'framer-motion';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { hoverVariants, actionVariants, getVariant, getTransition } from '@/config/animationVariants';
 

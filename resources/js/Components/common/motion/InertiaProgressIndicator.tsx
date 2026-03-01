@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion';
 import { router } from '@inertiajs/react';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 

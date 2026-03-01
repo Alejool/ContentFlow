@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion';
 import { useReducedMotion } from '@/Hooks/useReducedMotion';
 
 interface AnimatedPageTransitionProps {
