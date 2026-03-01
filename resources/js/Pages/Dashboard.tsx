@@ -89,30 +89,14 @@ export default function Dashboard({
   const { actualTheme: theme } = useTheme();
   const [showBanner, setShowBanner] = useState(true);
   
-  // Early return if auth or user is not available
-  if (!auth || !auth.user) {
-    return null;
-  }
-  
-  // Use custom hook for fetching stats
-  const { data: fetchedStats, loading: loadingPubStats, refetch: refetchStats } = useFetchPublicationStats(!stats.publicationStats);
+  // Use custom hook for fetching stats - always call hooks unconditionally
+  const shouldFetch = !stats.publicationStats;
+  const { data: fetchedStats, loading: loadingPubStats, refetch: refetchStats } = useFetchPublicationStats(shouldFetch);
   const pubStats = stats.publicationStats || fetchedStats;
   const [sending, setSending] = useState(false);
   const [successMessage, setSuccessMessage] = useState(
     status === "verification-link-sent",
   );
-
-  const handlePeriodChange = (days: number) => {
-    router.get(
-      route("dashboard"),
-      { days },
-      {
-        preserveState: true,
-        preserveScroll: true,
-        only: ["stats", "period"],
-      },
-    );
-  };
 
   useEffect(() => {
     if (!auth?.user?.id) return;
@@ -125,6 +109,23 @@ export default function Dashboard({
       channel.stopListening(".PublicationStatusUpdated");
     };
   }, [auth?.user?.id, refetchStats]);
+  
+  // Early return if auth or user is not available (after all hooks)
+  if (!auth || !auth.user) {
+    return null;
+  }
+
+  const handlePeriodChange = (days: number) => {
+    router.get(
+      route("dashboard"),
+      { days },
+      {
+        preserveState: true,
+        preserveScroll: true,
+        only: ["stats", "period"],
+      },
+    );
+  };
 
   const handleResendVerification = () => {
     setSending(true);
