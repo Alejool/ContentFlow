@@ -303,7 +303,7 @@ const MediaPreviewItem = memo(
             disabled={disabled}
           />
         ) : (
-          <img src={preview.url} className="w-full h-full object-cover" />
+          <img src={preview.url} className="w-full h-full object-cover" alt="Media preview" />
         )}
 
         {/* Upload Overlay (Matching Outside Style) */}
@@ -429,6 +429,7 @@ const VideoPreview = memo(
               thumbnail ? URL.createObjectURL(thumbnail) : preview.thumbnailUrl
             }
             className="w-full h-full object-cover"
+            alt="Video thumbnail"
           />
         </div>
       )}
