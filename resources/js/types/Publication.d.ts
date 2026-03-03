@@ -77,10 +77,14 @@ export type Publication = {
     string,
     {
       platform: string;
-      status: "published" | "failed" | "pending" | "publishing";
+      status: "published" | "failed" | "pending" | "publishing" | "success" | "orphaned";
       published_at?: string;
       error?: string;
       url?: string;
+      account_name?: string;
+      account_id?: string;
+      is_current_account?: boolean;
+      can_unpublish?: boolean;
     }
   >;
 };
