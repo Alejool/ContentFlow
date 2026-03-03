@@ -1,5 +1,6 @@
 import { usePublicationStore } from "@/stores/publicationStore";
 import { toast } from "react-hot-toast";
+import i18n from "@/i18n";
 
 export function initPublicationsRealtime(userId: number, workspaceId?: number) {
   // Existing User channel listener for simple status updates
@@ -15,11 +16,11 @@ export function initPublicationsRealtime(userId: number, workspaceId?: number) {
 
       // Show toast notifications for final statuses
       if (status === "published") {
-        toast.success("Publication published successfully!", {
+        toast.success(i18n.t("publications.toast.publishedSuccess"), {
           id: `pub-published-${publicationId}`,
         });
       } else if (status === "failed") {
-        toast.error("Publication failed to publish.", {
+        toast.error(i18n.t("publications.toast.publishedError"), {
           id: `pub-failed-${publicationId}`,
         });
       }
