@@ -9,6 +9,15 @@ interface SocialAccount {
   platform: string;
   name: string;
   account_name?: string;
+  isDisconnected?: boolean;
+}
+
+interface SocialPostLog {
+  id: number;
+  social_account_id: number;
+  status: string;
+  platform: string;
+  account_name?: string;
 }
 
 interface SocialAccountsSectionProps {
@@ -31,6 +40,7 @@ interface SocialAccountsSectionProps {
   videoMetadata?: Record<string, any>;
   mediaFiles?: any[];
   disabled?: boolean;
+  socialPostLogs?: SocialPostLog[];
 }
 
 const VisualCheckbox = memo(
@@ -263,6 +273,11 @@ const SocialAccountItem = memo(
           <div className="flex flex-col flex-1">
             <div className="flex items-center gap-2">
               <span className="font-medium text-sm">{account.platform}</span>
+              {account.isDisconnected && (
+                <span className="text-[9px] px-1.5 py-0.5 rounded-full font-bold uppercase bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
+                  {t("common.disconnected") || "Desconectada"}
+                </span>
+              )}
               {isCheckedActually && (
                 <span
                   className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold uppercase ${
@@ -464,21 +479,50 @@ const SocialAccountsSection = memo(
     videoMetadata = {},
     mediaFiles = [],
     disabled = false,
+    socialPostLogs = [],
   }: SocialAccountsSectionProps) => {
     const [activePopover, setActivePopover] = useState<number | null>(null);
+
+    // Merge connected accounts with disconnected accounts from social_post_logs
+    const allAccounts = useMemo(() => {
+      const connectedAccounts = [...socialAccounts];
+      const connectedAccountIds = new Set(socialAccounts.map(acc => acc.id));
+      
+      // Find published accounts that are no longer connected
+      const disconnectedPublishedAccounts = socialPostLogs
+        .filter(log => 
+          (log.status === 'published' || log.status === 'publishing' || log.status === 'failed') &&
+          !connectedAccountIds.has(log.social_account_id)
+        )
+        .map(log => ({
+          id: log.social_account_id,
+          platform: log.platform,
+          name: log.account_name || 'Unknown',
+          account_name: log.account_name,
+          isDisconnected: true,
+        }));
+      
+      // Remove duplicates from disconnected accounts
+      const uniqueDisconnected = disconnectedPublishedAccounts.filter(
+        (acc, index, self) => 
+          index === self.findIndex(a => a.id === acc.id)
+      );
+      
+      return [...connectedAccounts, ...uniqueDisconnected];
+    }, [socialAccounts, socialPostLogs]);
 
     const selectedPlatforms = useMemo(() => {
       return Array.from(
         new Set(
           selectedAccounts
             .map((id) => {
-              const account = socialAccounts.find((a) => a.id === id);
+              const account = allAccounts.find((a) => a.id === id);
               return account?.platform;
             })
             .filter(Boolean),
         ),
       );
-    }, [selectedAccounts, socialAccounts]);
+    }, [selectedAccounts, allAccounts]);
 
     return (
       <div className="space-y-4">
@@ -496,7 +540,7 @@ const SocialAccountsSection = memo(
                     "Esta publicación ya está publicada en las siguientes cuentas:"}
                 </p>
                 <div className="mt-1.5 flex flex-wrap gap-1.5">
-                  {socialAccounts
+                  {allAccounts
                     .filter(acc => publishedAccountIds.includes(acc.id))
                     .map(acc => (
                       <span 
@@ -505,6 +549,11 @@ const SocialAccountsSection = memo(
                       >
                         <span className="capitalize">{acc.platform}</span>
                         <span className="opacity-75">@{acc.account_name || acc.name}</span>
+                        {acc.isDisconnected && (
+                          <span className="ml-1 px-1 py-0.5 rounded bg-amber-200 dark:bg-amber-800 text-amber-800 dark:text-amber-200 text-[9px] font-bold">
+                            {t("common.disconnected") || "Desconectada"}
+                          </span>
+                        )}
                       </span>
                     ))
                   }
@@ -545,7 +594,7 @@ const SocialAccountsSection = memo(
         </div>
 
         <div className="grid gap-3">
-          {socialAccounts.map((account) => {
+          {allAccounts.map((account) => {
             const isChecked = selectedAccounts.includes(account.id);
             const customSchedule = accountSchedules[account.id];
             const isPublished = publishedAccountIds?.includes(account.id);
@@ -579,7 +628,7 @@ const SocialAccountsSection = memo(
                 isFailed={isFailed}
                 isUnpublishing={isIndividualUnpublishing}
                 onCancel={onCancel}
-                disabled={disabled}
+                disabled={disabled || account.isDisconnected}
                 durationError={durationErrors[account.id]}
                 videoMetadata={videoMetadata}
                 mediaFiles={mediaFiles}
