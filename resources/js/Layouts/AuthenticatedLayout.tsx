@@ -8,6 +8,7 @@ import NotificationButton from "@/Components/Layout/NotificationButton";
 import ProfileDropdown from "@/Components/Layout/ProfileDropdown";
 import SearchButton from "@/Components/Layout/SearchButton";
 import Sidebar from "@/Components/Layout/Sidebar";
+import KeyboardShortcutsModal from "@/Components/common/ui/KeyboardShortcutsModal";
 import { OnboardingProvider } from "@/Contexts/OnboardingContext";
 import { useWorkspaceLocks } from "@/Hooks/usePublicationLock";
 import { useTheme } from "@/Hooks/useTheme";
@@ -48,6 +49,7 @@ export default function AuthenticatedLayout({
   const [showingNavigationDropdown, setShowingNavigationDropdown] =
     useState<boolean>(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(true);
+  const [showShortcutsModal, setShowShortcutsModal] = useState<boolean>(false);
 
   const { theme, actualTheme } = useTheme();
   useWorkspaceLocks();
@@ -107,6 +109,19 @@ export default function AuthenticatedLayout({
     const color = user?.theme_color || "orange";
     document.documentElement.setAttribute("data-theme-color", color);
   }, [user?.theme_color]);
+
+  // Keyboard shortcut: Ctrl+/ to show shortcuts modal
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && event.key === "/") {
+        event.preventDefault();
+        setShowShortcutsModal(true);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
 
   return (
@@ -188,6 +203,10 @@ export default function AuthenticatedLayout({
       </div>
       <GlobalUploadIndicator />
       <ResumeUploadsPrompt />
+      <KeyboardShortcutsModal 
+        isOpen={showShortcutsModal} 
+        onClose={() => setShowShortcutsModal(false)} 
+      />
       
       {/* Conditionally render OnboardingFlow for incomplete onboarding */}
       {shouldShowOnboarding && tourSteps && availablePlatforms && templates && (
