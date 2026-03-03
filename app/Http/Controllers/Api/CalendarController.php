@@ -44,8 +44,7 @@ class CalendarController extends Controller
       ->with([
         'user:id,name,photo_url',
         'mediaFiles' => fn($q) => $q->select('media_files.id', 'media_files.file_path', 'media_files.file_type'),
-        'campaigns:id,name',
-        'socialPostLogs' => fn($q) => $q->select('id', 'publication_id', 'platform', 'social_account_id', 'status')
+        'campaigns:id,name'
       ]);
 
     if ($start && $end) {
@@ -69,43 +68,117 @@ class CalendarController extends Controller
 
     $publications = $query->get();
 
-    // Apply platform filter in memory (since platforms are in socialPostLogs)
+    // Apply platform filter in memory (since platforms are in platform_settings)
     if (!empty($platforms)) {
       $publications = $publications->filter(function ($pub) use ($platforms) {
-        $pubPlatforms = $pub->socialPostLogs->pluck('platform')->unique()->toArray();
-        return !empty(array_intersect($platforms, $pubPlatforms));
+        $platformSettings = $pub->platform_settings;
+        
+        // Ensure platform_settings is an array
+        if (!is_array($platformSettings)) {
+          if (is_string($platformSettings)) {
+            $platformSettings = json_decode($platformSettings, true);
+          }
+          if (!is_array($platformSettings)) {
+            $platformSettings = [];
+          }
+        }
+        
+        $enabledPlatforms = [];
+        foreach ($platformSettings as $platform => $settings) {
+          if (is_array($settings) && isset($settings['enabled']) && $settings['enabled'] === true) {
+            $enabledPlatforms[] = $platform;
+          }
+        }
+        
+        return !empty(array_intersect($platforms, $enabledPlatforms));
       });
     }
 
-    $events = $publications->map(function ($pub) {
-      $pubPlatforms = $pub->socialPostLogs->pluck('platform')->unique()->toArray();
-      $primaryPlatform = !empty($pubPlatforms) ? $pubPlatforms[0] : null;
+    // Create events - one per platform for each publication
+    $events = collect();
+    
+    foreach ($publications as $pub) {
+      // Get enabled platforms from platform_settings
+      $platformSettings = $pub->platform_settings;
+      
+      // Ensure platform_settings is an array
+      if (!is_array($platformSettings)) {
+        if (is_string($platformSettings)) {
+          $platformSettings = json_decode($platformSettings, true);
+        }
+        if (!is_array($platformSettings)) {
+          $platformSettings = [];
+        }
+      }
+      
+      $enabledPlatforms = [];
+      foreach ($platformSettings as $platform => $settings) {
+        if (is_array($settings) && isset($settings['enabled']) && $settings['enabled'] === true) {
+          $enabledPlatforms[] = $platform;
+        }
+      }
+      
       $campaignNames = $pub->campaigns->pluck('name')->toArray();
       $primaryCampaign = !empty($campaignNames) ? $campaignNames[0] : null;
+      
+      // Determine status color based on whether it has platforms
+      $hasNoPlatforms = empty($enabledPlatforms);
+      $displayStatus = $hasNoPlatforms ? 'no_platform' : $pub->status;
 
-      return [
-        'id' => "pub_{$pub->id}",
-        'resourceId' => $pub->id,
-        'type' => 'publication',
-        'title' => $pub->title,
-        'start' => $pub->scheduled_at ? $pub->scheduled_at->copy()->setTimezone('UTC')->toIso8601String() : null,
-        'status' => $pub->status,
-        'color' => $this->getStatusColor($pub->status),
-        'platform' => $primaryPlatform,
-        'campaign' => $primaryCampaign,
-        'user' => $pub->user ? [
-          'id' => $pub->user->id,
-          'name' => $pub->user->name,
-          'photo_url' => $pub->user->photo_url,
-        ] : null,
-        'extendedProps' => [
-          'slug' => '/content',
-          'thumbnail' => $pub->mediaFiles->first()?->file_path,
-          'platforms' => $pubPlatforms,
-          'campaigns' => $campaignNames,
-        ]
-      ];
-    });
+      if ($hasNoPlatforms) {
+        // If no platforms, create a single event
+        $events->push([
+          'id' => "pub_{$pub->id}",
+          'resourceId' => $pub->id,
+          'type' => 'publication',
+          'title' => $pub->title,
+          'start' => $pub->scheduled_at ? $pub->scheduled_at->copy()->setTimezone('UTC')->toIso8601String() : null,
+          'status' => $pub->status,
+          'color' => $this->getStatusColor($displayStatus),
+          'platform' => null,
+          'campaign' => $primaryCampaign,
+          'hasNoPlatforms' => true,
+          'user' => $pub->user ? [
+            'id' => $pub->user->id,
+            'name' => $pub->user->name,
+            'photo_url' => $pub->user->photo_url,
+          ] : null,
+          'extendedProps' => [
+            'slug' => '/content',
+            'thumbnail' => $pub->mediaFiles->first()?->file_path,
+            'platforms' => [],
+            'campaigns' => $campaignNames,
+          ]
+        ]);
+      } else {
+        // Create one event per enabled platform
+        foreach ($enabledPlatforms as $platform) {
+          $events->push([
+            'id' => "pub_{$pub->id}_{$platform}", // Unique ID per platform
+            'resourceId' => $pub->id,
+            'type' => 'publication',
+            'title' => $pub->title,
+            'start' => $pub->scheduled_at ? $pub->scheduled_at->copy()->setTimezone('UTC')->toIso8601String() : null,
+            'status' => $pub->status,
+            'color' => $this->getStatusColor($displayStatus),
+            'platform' => $platform, // Set specific platform for this card
+            'campaign' => $primaryCampaign,
+            'hasNoPlatforms' => false,
+            'user' => $pub->user ? [
+              'id' => $pub->user->id,
+              'name' => $pub->user->name,
+              'photo_url' => $pub->user->photo_url,
+            ] : null,
+            'extendedProps' => [
+              'slug' => '/content',
+              'thumbnail' => $pub->mediaFiles->first()?->file_path,
+              'platforms' => [$platform], // Only this platform for filtering
+              'campaigns' => $campaignNames,
+            ]
+          ]);
+        }
+      }
+    }
 
     // 3. Format User Calendar Events
     $userEvents = UserCalendarEvent::where('workspace_id', $workspaceId)
@@ -441,7 +514,9 @@ class CalendarController extends Controller
       'pending_review' => '#F59E0B', // amber
       'approved' => '#8B5CF6',   // violet
       'pending' => '#6366F1',    // indigo (for posts)
+      'scheduled' => '#6366F1',  // indigo
       'draft' => '#6B7280',     // gray
+      'no_platform' => '#F97316', // orange - for publications without social networks
     ];
 
     $color = $colors[$status] ?? $colors['draft'];

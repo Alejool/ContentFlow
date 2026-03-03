@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Social;
 
 use App\Models\Social\SocialAccount;
 use App\Models\Social\ScheduledPost;
+use App\Models\Publications\Publication;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
@@ -13,6 +14,8 @@ use App\Notifications\SocialAccountConnectedNotification;
 use App\Notifications\SocialAccountDisconnectedNotification;
 use App\Models\Social\SocialPostLog;
 use Abraham\TwitterOAuth\TwitterOAuth;
+use Carbon\Carbon;
+
 
 class SocialAccountController extends Controller
 {
@@ -847,21 +850,162 @@ class SocialAccountController extends Controller
 
       $force = $request->query('force') === 'true' || $request->input('force') === true;
 
-      $activePosts = SocialPostLog::where('social_account_id', $account->id)
-        ->whereIn('status', ['published', 'pending'])
-        ->with('publication:id,title')
+      // Debug: Log all social post logs for this account
+      $allPostLogs = SocialPostLog::where('social_account_id', $account->id)->get();
+      \Log::info('Disconnect check - ALL SocialPostLogs for account:', [
+        'account_id' => $account->id,
+        'account_name' => $account->account_name,
+        'total_logs' => $allPostLogs->count(),
+        'logs_by_status' => $allPostLogs->groupBy('status')->map->count(),
+        'sample_logs' => $allPostLogs->map(fn($log) => [
+          'id' => $log->id,
+          'status' => $log->status,
+          'publication_id' => $log->publication_id,
+          'platform_post_id' => $log->platform_post_id,
+          'created_at' => $log->created_at,
+          'published_at' => $log->published_at
+        ])
+      ]);
+
+      // PRIORITY 1: Check for publications currently being published (publishing status)
+      // These CANNOT be disconnected - they are in progress
+      $publishingPosts = SocialPostLog::where('social_account_id', $account->id)
+        ->where('status', 'publishing')
+        ->with('publication:id,title,scheduled_at')
         ->get();
 
-      $uniqueActivePosts = $activePosts->unique('publication_id');
-
-      if ($uniqueActivePosts->count() > 0 && !$force) {
+      if ($publishingPosts->count() > 0) {
         return response()->json([
           'success' => false,
           'can_disconnect' => false,
-          'active_posts_count' => $uniqueActivePosts->count(),
-          'account_name' => $account->account_name ?? $account->account_id,
-          'platform' => $account->platform,
-          'posts' => $uniqueActivePosts->map(function ($log) {
+          'reason' => 'publishing',
+          'message' => __('messages.social_account.cannot_disconnect_publishing', ['count' => $publishingPosts->count()]),
+          'posts' => $publishingPosts->map(function ($log) {
+            return [
+              'id' => $log->publication_id,
+              'title' => optional($log->publication)->title ?? 'Untitled',
+              'status' => 'publishing',
+            ];
+          })->values()
+        ], 400);
+      }
+
+      // PRIORITY 2: Check for scheduled publications and pending posts
+      // These MUST be removed before disconnecting - NO EXCEPTIONS
+      $allScheduledPosts = collect();
+
+      // Get scheduled publications (only those with status 'scheduled')
+      $scheduledPublications = Publication::where('workspace_id', Auth::user()->current_workspace_id)
+        ->where('status', 'scheduled')
+        ->whereHas('socialPostLogs', function ($q) use ($account) {
+          $q->where('social_account_id', $account->id)
+            ->where('status', 'pending');
+        })
+        ->get();
+
+      \Log::info('Disconnect check - Scheduled Publications:', [
+        'account_id' => $account->id,
+        'count' => $scheduledPublications->count(),
+        'publications' => $scheduledPublications->map(fn($p) => [
+          'id' => $p->id,
+          'title' => $p->title,
+          'status' => $p->status,
+          'scheduled_at' => $p->scheduled_at
+        ])
+      ]);
+
+      foreach ($scheduledPublications as $pub) {
+        $allScheduledPosts->push([
+          'id' => $pub->id,
+          'title' => $pub->title ?? 'Untitled',
+          'scheduled_at' => $pub->scheduled_at ? $pub->scheduled_at->toIso8601String() : null,
+          'status' => 'scheduled',
+          'type' => 'publication'
+        ]);
+      }
+
+      // Get pending scheduled posts (only those with status 'pending')
+      $pendingPosts = ScheduledPost::where('social_account_id', $account->id)
+        ->where('status', 'pending')
+        ->with(['campaign:id,title', 'publication:id,title'])
+        ->get();
+
+      \Log::info('Disconnect check - Pending ScheduledPosts:', [
+        'account_id' => $account->id,
+        'count' => $pendingPosts->count(),
+        'posts' => $pendingPosts->map(fn($p) => [
+          'id' => $p->id,
+          'status' => $p->status,
+          'scheduled_at' => $p->scheduled_at,
+          'publication_id' => $p->publication_id
+        ])
+      ]);
+
+      foreach ($pendingPosts as $post) {
+        $date = null;
+        
+        // Try to get scheduled_at first
+        if ($post->scheduled_at instanceof \DateTimeInterface) {
+          $date = $post->scheduled_at;
+        } elseif ($post->created_at instanceof \DateTimeInterface) {
+          // Fallback to created_at if scheduled_at is not available
+          $date = $post->created_at;
+        }
+
+        // Validate date is reasonable (after year 2000)
+        if ($date && $date->format('Y') < 2000) {
+          $date = null;
+        }
+
+        $allScheduledPosts->push([
+          'id' => $post->id,
+          'title' => optional($post->publication)->title ?? optional($post->campaign)->title ?? 'Untitled',
+          'scheduled_at' => $date ? $date->toIso8601String() : null,
+          'status' => 'scheduled',
+          'type' => 'scheduled_post'
+        ]);
+      }
+
+      // Remove duplicates based on title and scheduled_at
+      $uniqueScheduledPosts = $allScheduledPosts->unique(function ($item) {
+        return $item['title'] . '_' . $item['scheduled_at'];
+      })->values();
+
+      \Log::info('Disconnect check - Final scheduled posts:', [
+        'account_id' => $account->id,
+        'count' => $uniqueScheduledPosts->count(),
+        'posts' => $uniqueScheduledPosts->toArray()
+      ]);
+
+      if ($uniqueScheduledPosts->count() > 0) {
+        return response()->json([
+          'success' => false,
+          'can_disconnect' => false,
+          'reason' => 'scheduled',
+          'message' => __('messages.social_account.cannot_disconnect_scheduled', [
+            'count' => $uniqueScheduledPosts->count(),
+            'account_name' => $account->account_name ?? $account->account_id,
+            'platform' => $account->platform
+          ]),
+          'posts' => $uniqueScheduledPosts
+        ], 400);
+      }
+
+      // PRIORITY 3: Handle already published posts
+      // These CAN be disconnected - show warning modal with option to proceed
+      $publishedPosts = SocialPostLog::where('social_account_id', $account->id)
+        ->where('status', 'published')
+        ->with('publication:id,title')
+        ->get();
+
+      // If there are published posts and force is not set, show warning modal
+      if ($publishedPosts->count() > 0 && !$force) {
+        return response()->json([
+          'success' => false,
+          'can_disconnect' => true, // Important: CAN disconnect, just needs confirmation
+          'reason' => 'published',
+          'message' => __('messages.social_account.disconnect_warning_published', ['count' => $publishedPosts->count()]),
+          'posts' => $publishedPosts->map(function ($log) {
             $date = $log->published_at instanceof \DateTimeInterface ? $log->published_at : null;
             if (!$date && $log->created_at instanceof \DateTimeInterface)
               $date = $log->created_at;
@@ -874,55 +1018,20 @@ class SocialAccountController extends Controller
               'title' => optional($log->publication)->title ?? 'Untitled',
               'platform_post_id' => $log->platform_post_id,
               'status' => $log->status,
-              'published_at' => $date ? \Carbon\Carbon::instance($date)->toIso8601String() : null,
+              'published_at' => $date ? Carbon::instance($date)->toIso8601String() : null,
             ];
-          })->values(),
-          'message' => trans('notifications.try_account_disconnected', ['account_name' => $account->account_name, 'uniqueActivePosts' => $uniqueActivePosts->count(), 'platform' => $account->platform], $account->user->preferredLocale())
+          })->values()
         ], 400);
       }
 
-      $pendingPosts = ScheduledPost::where('social_account_id', $account->id)
-        ->where('status', 'pending')
-        ->with(['campaign:id,title', 'publication:id,title'])
-        ->get();
-      $uniquePendingPosts = $pendingPosts->unique(function ($item) {
-        return $item->publication_id ? 'p' . $item->publication_id : 'c' . $item->campaign_id . '_' . $item->id;
-      });
-
-      if ($uniquePendingPosts->count() > 0) {
-        if (!$force) {
-          return response()->json([
-            'success' => false,
-            'message' => __('messages.social_account.cannot_disconnect_scheduled', ['count' => $uniquePendingPosts->count()]),
-            'posts' => $uniquePendingPosts->map(function ($post) {
-              $date = $post->scheduled_at instanceof \DateTimeInterface ? $post->scheduled_at : null;
-              if (!$date && $post->created_at instanceof \DateTimeInterface)
-                $date = $post->created_at;
-
-              if ($date && $date->format('Y') < 2000)
-                $date = null;
-
-              return [
-                'id' => $post->id,
-                'title' => optional($post->publication)->title ?? optional($post->campaign)->title ?? 'Untitled',
-                'scheduled_at' => $date ? \Carbon\Carbon::instance($date)->toIso8601String() : null,
-                'status' => $post->status,
-              ];
-            })->values()
-          ], 400);
-        } else {
-          foreach ($pendingPosts as $post) {
-            $post->delete();
-          }
-        }
-      }
-
+      // If force is true or no published posts, proceed with disconnection
       $orphanedPostsList = [];
-      if ($force && $uniqueActivePosts->count() > 0) {
-        $orphanedPostsList = $uniqueActivePosts->map(fn($log) => optional($log->publication)->title ?? 'Untitled')->toArray();
+      if ($publishedPosts->count() > 0) {
+        $orphanedPostsList = $publishedPosts->map(fn($log) => optional($log->publication)->title ?? 'Untitled')->toArray();
 
+        // Mark published posts as orphaned (can no longer be managed)
         SocialPostLog::where('social_account_id', $account->id)
-          ->whereIn('status', ['published', 'pending'])
+          ->where('status', 'published')
           ->update([
             'status' => 'orphaned',
             'error_message' => "Account '{$account->account_name}' was disconnected - cannot manage remotely"
@@ -942,7 +1051,7 @@ class SocialAccountController extends Controller
         $user->notify(new SocialAccountDisconnectedNotification(
           $account->platform,
           $identifier,
-          $uniqueActivePosts->count(),
+          $publishedPosts->count(),
           $orphanedPostsList
         ));
       }
@@ -952,7 +1061,7 @@ class SocialAccountController extends Controller
       return response()->json([
         'success' => true,
         'message' => __('messages.social_account.disconnected'),
-        'orphaned_posts' => $force ? $activePosts->count() : 0,
+        'orphaned_posts' => $publishedPosts->count(),
       ]);
     } catch (\Exception $e) {
       return response()->json([
