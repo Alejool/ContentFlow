@@ -280,6 +280,16 @@
           "title": "publicación Rechazada",
           "message": "Esta publicación ha sido rechazada por {{name}}.",
           "footer": "Realiza los ajustes necesarios y vuelve a solicitar revisión para continuar."
+        },
+        "alreadyPublishedBanner": {
+          "title": "Publicación Activa",
+          "message": "Esta publicación ya está publicada en las siguientes cuentas:",
+          "hint": "Puedes publicar en cuentas adicionales seleccionándolas a continuación."
+        },
+        "publishedInOtherAccountBanner": {
+          "title": "Publicado en Cuenta Diferente",
+          "message": "Esta publicación fue publicada en una cuenta de {{platform}} que ya no está conectada.",
+          "hint": "Puedes publicar en la cuenta actual seleccionándola a continuación. La publicación anterior permanecerá en la cuenta desconectada."
         }
       },
       "preview": {
@@ -373,7 +383,10 @@
       "progress": "Progreso de publicación",
       "current": "Actual",
       "completed": "Completado",
-      "processing": "Procesando"
+      "processing": "Procesando",
+      "waiting": "Esperando",
+      "retrying": "Reintentando"
+
     },
     "scheduled_for": "Programado para",
     "button": {

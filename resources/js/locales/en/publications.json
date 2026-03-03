@@ -262,6 +262,16 @@
           "title": "Publication Rejected",
           "message": "This publication has been rejected by {{name}}.",
           "footer": "Please make the necessary adjustments and resubmit for review."
+        },
+        "alreadyPublishedBanner": {
+          "title": "Active Publication",
+          "message": "This publication is already published on the following accounts:",
+          "hint": "You can publish to additional accounts by selecting them below."
+        },
+        "publishedInOtherAccountBanner": {
+          "title": "Published in Different Account",
+          "message": "This publication was published on a {{platform}} account that is no longer connected.",
+          "hint": "You can publish to the current account by selecting it below. The previous publication will remain on the disconnected account."
         }
       },
       "preview": {
@@ -329,7 +339,9 @@
       "deleted": "Deleted",
       "progress": "Publication Progress",
       "current": "Current",
-      "completed": "Completed"
+      "completed": "Completed",
+      "waiting": "waiting",
+      "retrying": "Retrying"
     },
     "scheduled_for": "Scheduled for",
     "button": {
