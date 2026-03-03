@@ -94,7 +94,7 @@ class FacebookService extends BaseSocialService
    */
   private function uploadVideoFromUrl(string $pageId, string $videoUrl, string $description, ?string $title): string
   {
-    Log::info('Facebook resumable upload from URL starting (new API with chunks)', [
+    Log::info('Facebook resumable upload from URL starting', [
       'pageId' => $pageId,
       'url' => $videoUrl
     ]);
@@ -115,41 +115,41 @@ class FacebookService extends BaseSocialService
         'temp_file' => $tempFile
       ]);
 
-      // Paso 2: Inicializar sesión de upload usando la nueva API
-      $appId = config('services.facebook.client_id');
-      $initEndpoint = "https://graph.facebook.com/" . self::API_VERSION . "/{$appId}/uploads";
+      // Paso 2: Inicializar sesión de upload usando el método correcto de Facebook
+      $initEndpoint = "https://graph.facebook.com/" . self::API_VERSION . "/{$pageId}/videos";
       
       $response = $this->client->post($initEndpoint, [
-        'query' => [
-          'file_name' => basename($videoUrl),
-          'file_length' => $fileSize,
-          'file_type' => 'video/mp4',
+        'form_params' => [
+          'upload_phase' => 'start',
+          'file_size' => $fileSize,
           'access_token' => $this->accessToken,
         ],
         'timeout' => 60
       ]);
       
       $initResult = json_decode($response->getBody(), true);
-      $uploadSessionId = $initResult['id'] ?? null;
+      $uploadSessionId = $initResult['upload_session_id'] ?? null;
+      $videoId = $initResult['video_id'] ?? null;
 
       if (!$uploadSessionId) {
         @unlink($tempFile);
         throw new \Exception("Failed to initialize upload session");
       }
 
-      Log::info('Facebook upload session initialized (new API)', [
-        'session_id' => $uploadSessionId
+      Log::info('Facebook upload session initialized', [
+        'session_id' => $uploadSessionId,
+        'video_id' => $videoId
       ]);
 
-      // Paso 3: Subir el archivo por chunks usando la nueva API
-      $uploadEndpoint = "https://graph.facebook.com/" . self::API_VERSION . "/{$uploadSessionId}";
+      // Paso 3: Subir el archivo por chunks
+      $uploadEndpoint = $initEndpoint; // Mismo endpoint para todas las fases
       
-      // Chunks de 5MB para evitar rate limits (reducido de 10MB)
-      $chunkSize = 1024 * 1024 * 5; // 5MB
+      // Chunks más grandes para reducir número de requests (10MB en lugar de 5MB)
+      $chunkSize = 1024 * 1024 * 10; // 10MB
       $totalChunks = ceil($fileSize / $chunkSize);
       
       Log::info('Upload configuration', [
-        'chunk_size_mb' => 5,
+        'chunk_size_mb' => 10,
         'total_chunks' => $totalChunks
       ]);
       
@@ -163,7 +163,6 @@ class FacebookService extends BaseSocialService
         $fileOffset = 0;
         $chunkNumber = 0;
         $maxRetries = 3;
-        $fileHandle = null;
 
         while ($fileOffset < $fileSize) {
           // Leer el chunk
@@ -182,22 +181,36 @@ class FacebookService extends BaseSocialService
           // Reintentar subida de chunk si falla
           while (!$chunkUploaded && $retryCount < $maxRetries) {
             try {
-              $response = $this->client->post($uploadEndpoint, [
-                'headers' => [
-                  'Authorization' => 'OAuth ' . $this->accessToken,
-                  'file_offset' => (string)$fileOffset,
+              // Facebook requires start_offset as string and proper multipart formatting
+              $multipartData = [
+                [
+                  'name' => 'upload_phase',
+                  'contents' => 'transfer'
                 ],
-                'body' => $chunkData,
+                [
+                  'name' => 'upload_session_id',
+                  'contents' => $uploadSessionId
+                ],
+                [
+                  'name' => 'start_offset',
+                  'contents' => (string)$fileOffset // Cast to string for Facebook API
+                ],
+                [
+                  'name' => 'video_file_chunk',
+                  'contents' => $chunkData,
+                  'filename' => 'chunk.mp4' // Provide filename for binary data
+                ],
+                [
+                  'name' => 'access_token',
+                  'contents' => $this->accessToken
+                ]
+              ];
+
+              $this->client->post($uploadEndpoint, [
+                'multipart' => $multipartData,
                 'timeout' => 600,
                 'connect_timeout' => 30
               ]);
-
-              $uploadResult = json_decode($response->getBody(), true);
-              
-              // El último chunk devuelve el file handle
-              if (isset($uploadResult['h'])) {
-                $fileHandle = $uploadResult['h'];
-              }
 
               $chunkUploaded = true;
 
@@ -211,26 +224,38 @@ class FacebookService extends BaseSocialService
                 $backoffMs = $errorBody['backoff'] ?? 60000; // Default 60 segundos
                 $backoffSeconds = $backoffMs / 1000;
                 $isRetriable = $errorBody['debug_info']['retriable'] ?? true;
+                $message = $errorBody['debug_info']['message'] ?? $errorBody['error']['message'] ?? 'Rate limit exceeded';
                 
                 Log::warning('Facebook rate limit hit', [
                   'chunk' => $chunkNumber,
                   'attempt' => $retryCount,
                   'backoff_seconds' => $backoffSeconds,
                   'retriable' => $isRetriable,
-                  'message' => $errorBody['debug_info']['message'] ?? 'Rate limit exceeded'
+                  'message' => $message
                 ]);
                 
-                // Si no es retriable según Facebook, lanzar error inmediatamente
+                // Si no es retriable, esperar más tiempo antes de fallar
                 if (!$isRetriable) {
-                  throw new \Exception("Facebook rate limit error (non-retriable): " . ($errorBody['debug_info']['message'] ?? 'Upload rate limit exceeded'));
+                  // Para rate limits no retriables, esperar al menos 60 segundos
+                  $waitTime = max(60, $backoffSeconds);
+                  Log::warning('Non-retriable rate limit, waiting longer', [
+                    'wait_seconds' => $waitTime,
+                    'chunk' => $chunkNumber
+                  ]);
+                  sleep((int)$waitTime);
+                  
+                  // Si ya intentamos varias veces, fallar
+                  if ($retryCount >= $maxRetries) {
+                    throw new \Exception("Facebook rate limit error (non-retriable after {$maxRetries} attempts): {$message}");
+                  }
+                } else {
+                  // Esperar el tiempo de backoff que Facebook indica
+                  Log::info('Waiting for rate limit backoff', [
+                    'seconds' => $backoffSeconds,
+                    'chunk' => $chunkNumber
+                  ]);
+                  sleep((int)$backoffSeconds);
                 }
-                
-                // Esperar el tiempo de backoff que Facebook indica
-                Log::info('Waiting for rate limit backoff', [
-                  'seconds' => $backoffSeconds,
-                  'chunk' => $chunkNumber
-                ]);
-                sleep((int)$backoffSeconds);
                 
               } else {
                 // Otros errores
@@ -270,9 +295,10 @@ class FacebookService extends BaseSocialService
 
           $fileOffset += $chunkLength;
           
-          // Pequeño delay entre chunks para evitar rate limits (200ms)
+          // Delay más largo entre chunks para respetar rate limits de Facebook
+          // Facebook permite máximo 10 requests/segundo, así que esperamos al menos 150ms
           if ($fileOffset < $fileSize) {
-            usleep(200000); // 200ms entre chunks
+            usleep(150000); // 150ms entre chunks = máximo ~6.6 chunks/segundo
           }
           
           // Log progreso cada 10 chunks o en el último
@@ -287,12 +313,7 @@ class FacebookService extends BaseSocialService
           }
         }
 
-        if (!$fileHandle) {
-          throw new \Exception("Failed to get file handle from upload");
-        }
-
         Log::info('Facebook file uploaded successfully', [
-          'file_handle' => $fileHandle,
           'total_chunks' => $chunkNumber
         ]);
 
@@ -305,36 +326,43 @@ class FacebookService extends BaseSocialService
         }
       }
 
-      // Paso 4: Publicar el video usando el file handle
-      $publishEndpoint = "https://graph.facebook.com/" . self::API_VERSION . "/{$pageId}/videos";
-      
-      $publishParams = [
-        'file_url' => $fileHandle,
-        'description' => $description,
+      // Paso 4: Finalizar el upload
+      $finishParams = [
+        'upload_phase' => 'finish',
+        'upload_session_id' => $uploadSessionId,
         'access_token' => $this->accessToken,
+        'description' => $description,
       ];
 
       if ($title) {
-        $publishParams['title'] = $title;
+        $finishParams['title'] = $title;
       }
 
-      $response = $this->client->post($publishEndpoint, [
-        'form_params' => $publishParams,
+      Log::info('Finishing video upload', [
+        'session_id' => $uploadSessionId
+      ]);
+
+      $response = $this->client->post($uploadEndpoint, [
+        'form_params' => $finishParams,
         'timeout' => 300
       ]);
 
-      $publishResult = json_decode($response->getBody(), true);
-      $videoId = $publishResult['id'] ?? null;
+      $finishResult = json_decode($response->getBody(), true);
+      $finalVideoId = $finishResult['id'] ?? $videoId;
 
-      if (!$videoId) {
-        throw new \Exception("Failed to publish video");
+      if (!$finalVideoId) {
+        Log::error('Failed to get video ID from finish response', [
+          'response' => $finishResult
+        ]);
+        throw new \Exception("Failed to publish video: " . json_encode($finishResult));
       }
       
       Log::info('Facebook video published successfully', [
-        'video_id' => $videoId
+        'video_id' => $finalVideoId,
+        'response' => $finishResult
       ]);
 
-      return $videoId;
+      return $finalVideoId;
 
     } catch (\Exception $e) {
       Log::error('Facebook resumable upload from URL failed', [
