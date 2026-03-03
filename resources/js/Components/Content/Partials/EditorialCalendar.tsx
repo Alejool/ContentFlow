@@ -21,8 +21,10 @@ import {
   Layers,
   Share2,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function EditorialCalendar() {
+  const { t } = useTranslation();
   const { actualTheme } = useTheme();
   const {
     events,
@@ -61,7 +63,7 @@ export default function EditorialCalendar() {
           onClick={goToToday}
           className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${actualTheme === "dark" ? "bg-neutral-800 text-white hover:bg-neutral-700" : "bg-white text-gray-700 border border-gray-200 hover:bg-gray-50"}`}
         >
-          Today
+          {t("common.today")}
         </button>
         <button
           onClick={nextMonth}
