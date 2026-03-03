@@ -762,32 +762,50 @@ class PublicationController extends Controller
     if (!empty($platformIds) && is_array($platformIds) && count($platformIds) > 0) {
       \Log::info('Canceling specific platforms', ['platform_ids' => $platformIds]);
       
-      // Cancel only specific platforms
+      // Cancel only specific platforms - mark as failed and clear retry flags
       $updated = $publication->socialPostLogs()
         ->whereIn('social_account_id', $platformIds)
-        ->whereIn('status', ['pending', 'publishing'])
+        ->whereIn('status', ['pending', 'publishing', 'failed'])
         ->update([
           'status' => 'failed',
           'error_message' => 'Cancelado por el usuario',
+          'is_retrying' => false,
+          'retry_started_at' => null,
           'updated_at' => now(),
         ]);
         
       \Log::info('Updated social post logs', ['count' => $updated, 'platform_ids' => $platformIds]);
 
-      // Try to delete specific platform jobs from queue
+      // Try to delete specific platform jobs from queue - improved query
       try {
         foreach ($platformIds as $platformId) {
-          \Illuminate\Support\Facades\DB::table('jobs')
-            ->where('payload', 'like', '%PublishSocialPostJob%')
-            ->where('payload', 'like', '%"id":' . $publication->id . '%')
-            ->where('payload', 'like', '%"social_account_id":' . $platformId . '%')
+          // Delete from jobs table
+          $deletedJobs = \Illuminate\Support\Facades\DB::table('jobs')
+            ->where('payload', 'like', '%PublishToSocialMedia%')
+            ->where('payload', 'like', '%"publicationId":' . $publication->id . '%')
+            ->where(function($query) use ($platformId) {
+              $query->where('payload', 'like', '%"socialAccountIds":[' . $platformId . ']%')
+                    ->orWhere('payload', 'like', '%"socialAccountIds":[' . $platformId . ',%')
+                    ->orWhere('payload', 'like', '%"socialAccountIds":,%' . $platformId . '%');
+            })
             ->delete();
           
-          \Illuminate\Support\Facades\DB::table('failed_jobs')
-            ->where('payload', 'like', '%PublishSocialPostJob%')
-            ->where('payload', 'like', '%"id":' . $publication->id . '%')
-            ->where('payload', 'like', '%"social_account_id":' . $platformId . '%')
+          // Delete from failed_jobs table
+          $deletedFailedJobs = \Illuminate\Support\Facades\DB::table('failed_jobs')
+            ->where('payload', 'like', '%PublishToSocialMedia%')
+            ->where('payload', 'like', '%"publicationId":' . $publication->id . '%')
+            ->where(function($query) use ($platformId) {
+              $query->where('payload', 'like', '%"socialAccountIds":[' . $platformId . ']%')
+                    ->orWhere('payload', 'like', '%"socialAccountIds":[' . $platformId . ',%')
+                    ->orWhere('payload', 'like', '%"socialAccountIds":,%' . $platformId . '%');
+            })
             ->delete();
+            
+          \Log::info('Deleted queued jobs for platform', [
+            'platform_id' => $platformId,
+            'deleted_jobs' => $deletedJobs,
+            'deleted_failed_jobs' => $deletedFailedJobs,
+          ]);
         }
       } catch (\Exception $e) {
         \Log::warning("Could not delete queued jobs for platforms in publication {$publication->id}: " . $e->getMessage());
@@ -814,26 +832,34 @@ class PublicationController extends Controller
       'updated_at' => now(),
     ]);
 
-    // Actualizar logs de redes sociales
+    // Actualizar logs de redes sociales - clear retry flags
     $publication->socialPostLogs()
-      ->whereIn('status', ['pending', 'publishing'])
+      ->whereIn('status', ['pending', 'publishing', 'failed'])
       ->update([
         'status' => 'failed',
         'error_message' => 'Cancelado por el usuario',
+        'is_retrying' => false,
+        'retry_started_at' => null,
         'updated_at' => now(),
       ]);
 
-    // Eliminar jobs pendientes de la cola
+    // Eliminar jobs pendientes de la cola - improved query
     try {
-      \Illuminate\Support\Facades\DB::table('jobs')
-        ->where('payload', 'like', '%PublishSocialPostJob%')
-        ->where('payload', 'like', '%"id":' . $publication->id . '%')
+      $deletedJobs = \Illuminate\Support\Facades\DB::table('jobs')
+        ->where('payload', 'like', '%PublishToSocialMedia%')
+        ->where('payload', 'like', '%"publicationId":' . $publication->id . '%')
         ->delete();
       
-      \Illuminate\Support\Facades\DB::table('failed_jobs')
-        ->where('payload', 'like', '%PublishSocialPostJob%')
-        ->where('payload', 'like', '%"id":' . $publication->id . '%')
+      $deletedFailedJobs = \Illuminate\Support\Facades\DB::table('failed_jobs')
+        ->where('payload', 'like', '%PublishToSocialMedia%')
+        ->where('payload', 'like', '%"publicationId":' . $publication->id . '%')
         ->delete();
+        
+      \Log::info('Deleted all queued jobs for publication', [
+        'publication_id' => $publication->id,
+        'deleted_jobs' => $deletedJobs,
+        'deleted_failed_jobs' => $deletedFailedJobs,
+      ]);
     } catch (\Exception $e) {
       \Log::warning("Could not delete queued jobs for publication {$publication->id}: " . $e->getMessage());
     }
@@ -868,8 +894,14 @@ class PublicationController extends Controller
       ->unique()
       ->toArray();
 
+    // Get current active social accounts for this workspace
+    $activeAccountIds = \App\Models\Social\SocialAccount::where('workspace_id', Auth::user()->current_workspace_id)
+      ->whereNull('deleted_at')
+      ->pluck('id')
+      ->toArray();
+
     $latestLogs = SocialPostLog::where('publication_id', $publication->id)
-      ->select('social_account_id', 'status')
+      ->select('social_account_id', 'status', 'retry_count', 'is_retrying')
       ->whereIn('id', function ($query) use ($publication) {
         $query->selectRaw('MAX(id)')
           ->from('social_post_logs')
@@ -879,10 +911,21 @@ class PublicationController extends Controller
       ->get();
 
     $statusGroups = ['published' => [], 'failed' => [], 'publishing' => [], 'removed_platforms' => []];
+    $retryInfo = [];
 
     foreach ($latestLogs as $log) {
       if (in_array($log->social_account_id, $scheduledAccountIds))
         continue;
+
+      // Skip logs for accounts that no longer exist or are disconnected
+      // UNLESS the status is 'published' or 'removed_on_platform' (we want to show these as "removed_platforms")
+      if (!in_array($log->social_account_id, $activeAccountIds)) {
+        if ($log->status === 'published' || $log->status === 'removed_on_platform') {
+          // Mark as removed platform so UI can show it was published elsewhere
+          $statusGroups['removed_platforms'][] = $log->social_account_id;
+        }
+        continue;
+      }
 
       $status = $log->status === 'removed_on_platform' ? 'removed_platforms' : $log->status;
 
@@ -891,6 +934,15 @@ class PublicationController extends Controller
       if (isset($statusGroups[$status])) {
         $statusGroups[$status][] = $log->social_account_id;
       }
+      
+      // Add retry information
+      if ($log->is_retrying || $log->retry_count > 0) {
+        $retryInfo[$log->social_account_id] = [
+          'retry_count' => $log->retry_count,
+          'is_retrying' => $log->is_retrying,
+          'retry_status' => sprintf('%d/3', $log->is_retrying ? $log->retry_count + 1 : $log->retry_count),
+        ];
+      }
     }
 
     return response()->json([
@@ -898,7 +950,8 @@ class PublicationController extends Controller
       'failed_platforms' => array_values(array_unique($statusGroups['failed'])),
       'publishing_platforms' => array_values(array_unique($statusGroups['publishing'])),
       'removed_platforms' => array_values(array_unique($statusGroups['removed_platforms'])),
-      'scheduled_platforms' => $scheduledAccountIds
+      'scheduled_platforms' => $scheduledAccountIds,
+      'retry_info' => $retryInfo,
     ]);
   }
 
