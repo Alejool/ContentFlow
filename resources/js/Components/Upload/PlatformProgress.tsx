@@ -20,9 +20,11 @@ export function PlatformProgress({ publication, onCancelPlatform }: PlatformProg
         <span className="block text-center text-[10px] text-gray-500 dark:text-neutral-400 italic">
           {publication.status === "publishing"
             ? t("publications.gallery.sendingToSocial", { defaultValue: "Iniciando envío..." })
-            : publication.status === "failed"
-              ? "Error en el procesamiento"
-              : t("publications.gallery.processing", { defaultValue: "Procesando..." })}
+            : publication.status === "retrying"
+              ? t("publications.gallery.retrying", { defaultValue: "Reintentando..." })
+              : publication.status === "failed"
+                ? "Error en el procesamiento"
+                : t("publications.gallery.processing", { defaultValue: "Procesando..." })}
         </span>
       </div>
     );
@@ -36,6 +38,7 @@ export function PlatformProgress({ publication, onCancelPlatform }: PlatformProg
 
     return (
       platform.status === "publishing" ||
+      platform.status === "retrying" ||
       platform.status === "pending" ||
       logDate > fiveMinsAgo
     );
@@ -46,7 +49,7 @@ export function PlatformProgress({ publication, onCancelPlatform }: PlatformProg
       {platforms.map((platform: any) => {
         const isDone = platform.status === "published";
         const isFailed = platform.status === "failed";
-        const isPublishing = platform.status === "publishing" || platform.status === "pending";
+        const isPublishing = platform.status === "publishing" || platform.status === "pending" || platform.status === "retrying";
         const progress = isDone ? 100 : isFailed ? 100 : isPublishing ? 50 : 0;
         const canCancel = isPublishing && onCancelPlatform;
 

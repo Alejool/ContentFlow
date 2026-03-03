@@ -22,7 +22,7 @@ export function PublicationItem({ publication, onCancel, onDismiss, onCancelPlat
     const total = platforms.length;
     const published = platforms.filter((p) => p.status === "published").length;
     const failed = platforms.filter((p) => p.status === "failed").length;
-    const publishing = platforms.filter((p) => p.status === "publishing" || p.status === "pending").length;
+    const publishing = platforms.filter((p) => p.status === "publishing" || p.status === "pending" || p.status === "retrying").length;
 
     return { total, published, failed, publishing };
   };
@@ -35,6 +35,7 @@ export function PublicationItem({ publication, onCancel, onDismiss, onCancelPlat
         return <AlertTriangle className="w-3.5 h-3.5 text-red-500" />;
       case "publishing":
       case "processing":
+      case "retrying":
         return <Loader2 className="w-3.5 h-3.5 text-primary animate-spin" />;
       case "published":
         // Show warning icon if some platforms failed
@@ -60,6 +61,16 @@ export function PublicationItem({ publication, onCancel, onDismiss, onCancelPlat
             })
           : t("common.publishing") || "Publicando",
         className: "bg-primary/10 text-primary dark:bg-primary/20",
+      },
+      retrying: {
+        text: stats
+          ? t("publications.status.retryingProgress", {
+              current: stats.published,
+              total: stats.total,
+              defaultValue: `Reintentando ${stats.published}/${stats.total}`,
+            })
+          : t("common.retrying") || "Reintentando",
+        className: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300",
       },
       published: {
         text: stats
@@ -95,7 +106,7 @@ export function PublicationItem({ publication, onCancel, onDismiss, onCancelPlat
     );
   };
 
-  const canCancel = publication.status === "publishing" || publication.status === "processing";
+  const canCancel = publication.status === "publishing" || publication.status === "processing" || publication.status === "retrying";
   const canDismiss = publication.status === "failed" || publication.status === "published";
 
   return (

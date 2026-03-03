@@ -19,7 +19,7 @@ export function usePublicationStatus({ dismissedIds }: UsePublicationStatusOptio
       setIsFetching(true);
       const response = await axios.get(route("api.v1.publications.index"), {
         params: {
-          status: "processing,publishing,failed,published",
+          status: "processing,publishing,retrying,failed,published",
           simplified: "true",
         },
         signal,
@@ -32,7 +32,7 @@ export function usePublicationStatus({ dismissedIds }: UsePublicationStatusOptio
 
         const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
         const filtered = items.filter((item) => {
-          if (item.status === "processing" || item.status === "publishing") {
+          if (item.status === "processing" || item.status === "publishing" || item.status === "retrying") {
             return true;
           }
 

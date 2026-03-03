@@ -82,6 +82,14 @@ const PublicationStatusTimeline = ({
       bgColor: "bg-orange-100 dark:bg-orange-900/30",
       borderColor: "border-orange-300 dark:border-orange-600",
     },
+    retrying: {
+      key: "retrying",
+      label: t("publications.status.retrying") || "Reintentando",
+      icon: Loader2,
+      color: "text-amber-600 dark:text-amber-400",
+      bgColor: "bg-amber-100 dark:bg-amber-900/30",
+      borderColor: "border-amber-300 dark:border-amber-600",
+    },
     published: {
       key: "published",
       label: t("publications.status.published") || "Publicado",
