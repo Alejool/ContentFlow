@@ -43,7 +43,7 @@ class PlaylistProcessFailedNotification extends BaseNotification
     }
 
     return [
-      'title' => 'Playlist Update Failed',
+      'title' => trans('notifications.playlist_failed_title', [], $locale),
       'message' => $message,
       'description' => $description,
       'status' => 'error',

@@ -23,7 +23,7 @@ class VideoDeletedNotification extends BaseNotification
         $campaign = $publication ? $publication->campaigns->first() : null;
 
         return [
-            'title' => 'Video Deleted',
+            'title' => trans('notifications.video_deleted_title', [], $notifiable->preferredLocale()),
             'message' => trans('notifications.video_deleted', ['platform' => $platformName], $notifiable->preferredLocale()),
             'description' => $publication ? $publication->title : 'Untitled',
             'status' => 'info',
