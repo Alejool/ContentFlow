@@ -35,6 +35,13 @@
     "aiChat": "Chat IA",
     "logout": "Cerrar Sesión",
     "localizationExamples": "Ejemplos de Localización",
+    "read_more":"Leer más",
+    "show_less":"Leer menos",
+    "affected_publications": "Publicaciones afectadas:",
+    "more_items": "más...",
+    "today": "Hoy",
+    "optimizing": "Optimizando...",
+    "optimize_automatically": "Optimizar automáticamente",
     "ai": {
       "suggest": "Sugerir con IA",
       "improve": "Mejorar con IA",

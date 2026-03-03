@@ -33,6 +33,13 @@
     "aiChat": "AI Chat",
     "logout": "Logout",
     "localizationExamples": "Localization Examples",
+    "read_more":"Read more",
+    "show_less":"Show less",
+    "affected_publications": "Affected publications:",
+    "more_items": "more...",
+    "today": "Today",
+    "optimizing": "Optimizing...",
+    "optimize_automatically": "Optimize automatically",
     "ai": {
       "suggest": "Suggest with AI",
       "improve": "Improve with AI",
