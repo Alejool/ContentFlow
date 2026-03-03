@@ -23,7 +23,11 @@ return [
         'connection_error' => 'Error al guardar la cuenta: :error',
         'disconnected' => 'Cuenta desconectada exitosamente',
         'disconnect_error' => 'Error al desconectar la cuenta: :error',
-        'cannot_disconnect_scheduled' => 'No se puede desconectar la cuenta. Tiene :count publicación(es) programada(s). Por favor, elimínelas de las campañas primero.',
+        'cannot_disconnect_scheduled' => 'No se puede desconectar :account_name (:platform). Esta cuenta tiene :count publicación(es) programada(s). Por favor, elimínelas o reas
+
+ígnelas primero.',
+        'cannot_disconnect_publishing' => 'No se puede desconectar la cuenta. Tiene :count publicación(es) publicándose en este momento. Por favor, espere a que terminen.',
+        'disconnect_warning_published' => 'Esta cuenta tiene :count publicación(es) ya publicada(s). Si desconectas, ya no podrás gestionarlas remotamente.',
     ],
 
     // Mensajes de Publicación

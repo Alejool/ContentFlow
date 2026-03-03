@@ -131,6 +131,10 @@
     "vistas": "Views",
     "clics": "Clicks",
     "engagement": "Engagement",
+    "understood": "Understood",
+    "untitled": "Untitled",
+    "noDate": "No date",
+    "invalidDate": "Invalid date",
     "filters": {
       "all": "All",
       "title": "Filters"

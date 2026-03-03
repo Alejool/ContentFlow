@@ -8,4 +8,12 @@ return [
   'save' => 'Guardar',
   'delete' => 'Eliminar',
   'edit' => 'Editar',
+  'understood' => 'Entendido',
+  'untitled' => 'Sin título',
+  'noDate' => 'Sin fecha',
+  'invalidDate' => 'Fecha inválida',
+  'note' => 'Nota',
+  'unknown' => 'Desconocido',
+  'processing' => 'Procesando...',
+  'error' => 'Error',
 ];

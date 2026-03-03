@@ -23,7 +23,9 @@ return [
         'connection_error' => 'Error saving account: :error',
         'disconnected' => 'Account disconnected successfully',
         'disconnect_error' => 'Error disconnecting account: :error',
-        'cannot_disconnect_scheduled' => 'Cannot disconnect account. It has :count scheduled post(s). Please remove them from campaigns first.',
+        'cannot_disconnect_scheduled' => 'Cannot disconnect account. It has :count scheduled post(s). Please remove them first.',
+        'cannot_disconnect_publishing' => 'Cannot disconnect account. It has :count post(s) currently being published. Please wait for them to finish.',
+        'disconnect_warning_published' => 'This account has :count published post(s). If you disconnect, you will no longer be able to manage them remotely.',
     ],
 
     // Publication messages
