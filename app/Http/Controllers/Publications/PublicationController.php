@@ -372,6 +372,15 @@ class PublicationController extends Controller
         );
       }
       
+      // If publishing or retrying, show specific message
+      if (in_array($publication->status, ['publishing', 'retrying'])) {
+        return $this->errorResponse(
+          __('publications.errors.already_publishing'),
+          422,
+          ['current_status' => $publication->status]
+        );
+      }
+      
       // Otherwise, needs approval
       return $this->errorResponse(
         __('publications.errors.not_approved'),
