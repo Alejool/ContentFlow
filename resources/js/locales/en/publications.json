@@ -419,6 +419,10 @@
     "gallery": {
       "sendingToSocial": "Sending to social platforms...",
       "processing": "Processing in background..."
+    },
+    "toast": {
+      "publishedSuccess": "Publication published successfully!",
+      "publishedError": "Failed to publish publication."
     }
   }
 }
