@@ -362,6 +362,7 @@ export default function AddPublicationModal({
                   }
                   globalSchedule={watched.scheduled_at ?? undefined}
                   error={errors.social_accounts?.message as string}
+                  socialPostLogs={publication?.social_post_logs}
                 />
 
                 <ScheduleSection

@@ -475,6 +475,7 @@ const EditPublicationModal = ({
                     publishingAccountIds={publishingAccountIds}
                     error={errors.social_accounts?.message as string}
                     disabled={isContentSectionDisabled || !allowConfiguration}
+                    socialPostLogs={publication?.social_post_logs}
                   />
 
                   <ScheduleSection

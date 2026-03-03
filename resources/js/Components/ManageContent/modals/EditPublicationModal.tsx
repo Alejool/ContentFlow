@@ -672,6 +672,7 @@ const EditPublicationModal = ({
                     videoMetadata={videoMetadata}
                     mediaFiles={mediaFiles}
                     disabled={isContentSectionDisabled || !allowConfiguration}
+                    socialPostLogs={publication?.social_post_logs}
                   />
 
                   <div className="mt-8">
