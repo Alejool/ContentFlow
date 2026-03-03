@@ -1,5 +1,6 @@
 import axios from "axios";
 import { ReactNode, createContext, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { cssPropertiesManager } from "../utils/CSSCustomPropertiesManager";
 import { transitionTheme, prefersReducedMotion } from "../Utils/themeTransition";
 import { themeStorage } from "../Utils/ThemeStorage";
@@ -30,9 +31,11 @@ export function ThemeProvider({
   isAuthenticated = false,
   workspaceId = null,
 }: ThemeProviderProps) {
+  const { t } = useTranslation();
   const [theme, setThemeState] = useState<Theme>(initialTheme || "system");
   const [actualTheme, setActualTheme] = useState<"light" | "dark">("light");
   const [isInitialized, setIsInitialized] = useState(false);
+  const [showThemeToast, setShowThemeToast] = useState(false);
 
   const getSystemTheme = (): "light" | "dark" => {
     if (typeof window === "undefined") return "light";
@@ -148,6 +151,26 @@ export function ThemeProvider({
     return () => mediaQuery.removeEventListener("change", handleChange);
   }, [theme, isInitialized]);
 
+  // Keyboard shortcut: Ctrl+Alt+T to toggle theme
+  useEffect(() => {
+    if (typeof window === "undefined" || !isInitialized) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Check for Ctrl+Alt+T (or Cmd+Alt+T on Mac)
+      if ((event.ctrlKey || event.metaKey) && event.altKey && event.key.toLowerCase() === "t") {
+        event.preventDefault();
+        toggleTheme();
+        
+        // Show toast notification
+        setShowThemeToast(true);
+        setTimeout(() => setShowThemeToast(false), 2000);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isInitialized, theme]); // Include theme to ensure toggleTheme has latest state
+
   const setTheme = async (newTheme: Theme) => {
     setThemeState(newTheme);
 
@@ -180,9 +203,62 @@ export function ThemeProvider({
     setTheme(newTheme);
   };
 
+  const getThemeLabel = (themeValue: Theme): string => {
+    return t(`common.theme.${themeValue}`) || themeValue;
+  };
+
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme, setTheme, actualTheme }}>
       {children}
+      
+      {/* Theme change toast notification */}
+      {showThemeToast && (
+        <div
+          className="fixed bottom-6 right-6 z-[9999] animate-in fade-in slide-in-from-bottom-2 duration-300"
+          style={{
+            animation: "slideInUp 0.3s ease-out"
+          }}
+        >
+          <div className={`
+            px-4 py-3 rounded-lg shadow-2xl border backdrop-blur-sm
+            flex items-center gap-3 min-w-[200px]
+            ${actualTheme === "dark" 
+              ? "bg-neutral-800/95 border-neutral-700 text-white" 
+              : "bg-white/95 border-gray-200 text-gray-900"
+            }
+          `}>
+            <div className="flex items-center gap-2 flex-1">
+              <span className="text-2xl">{theme === "light" ? "☀️" : theme === "dark" ? "🌙" : "💻"}</span>
+              <div className="flex flex-col">
+                <span className="text-xs font-medium opacity-70">{t("common.theme.changed")}</span>
+                <span className="text-sm font-bold">{getThemeLabel(theme)}</span>
+              </div>
+            </div>
+            <kbd className={`
+              px-2 py-1 rounded text-[10px] font-mono font-bold
+              ${actualTheme === "dark"
+                ? "bg-neutral-700 text-neutral-300"
+                : "bg-gray-100 text-gray-600"
+              }
+            `}>
+              Ctrl+Alt+T
+            </kbd>
+          </div>
+        </div>
+      )}
+      
+      <style>{`
+        @keyframes slideInUp {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
     </ThemeContext.Provider>
   );
 }
