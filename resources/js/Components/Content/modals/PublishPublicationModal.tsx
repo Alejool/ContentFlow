@@ -60,6 +60,7 @@ export default function PublishPublicationModal({
     unpublishing,
     existingThumbnails,
     isLoadingThumbnails,
+    retryInfo,
     fetchPublishedPlatforms,
     loadExistingThumbnails,
     handleUnpublish,
@@ -395,6 +396,93 @@ export default function PublishPublicationModal({
               </p>
             </div>
 
+            {/* Banner informativo si ya está publicada en algunas cuentas */}
+            {publication.platform_status_summary && Object.keys(publication.platform_status_summary).length > 0 && (() => {
+              // Filtrar cuentas con status que indican que está publicada
+              // 'published' = publicada exitosamente
+              // 'success' = publicada exitosamente (legacy)
+              // 'orphaned' = publicada pero la cuenta fue desconectada
+              const publishedAccounts = Object.entries(publication.platform_status_summary)
+                .filter(([_, status]: [string, any]) => 
+                  status.status === 'published' || 
+                  status.status === 'success' || 
+                  status.status === 'orphaned'
+                )
+                .map(([accountId, _]) => parseInt(accountId));
+              
+              if (publishedAccounts.length === 0) return null;
+              
+              return (
+                <div className="mb-6 p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+                    <div className="flex-1">
+                      <h4 className="text-sm font-bold text-blue-800 dark:text-blue-200">
+                        {t("publications.modal.publish.alreadyPublishedBanner.title") || "Publicación Activa"}
+                      </h4>
+                      <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
+                        {t("publications.modal.publish.alreadyPublishedBanner.message") || 
+                          "Esta publicación ya está publicada en las siguientes cuentas:"}
+                      </p>
+                      
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {publishedAccounts.map(accountId => {
+                          const statusInfo = publication.platform_status_summary?.[accountId];
+                          if (!statusInfo) return null;
+                          
+                          // Verificar si la cuenta está conectada actualmente
+                          const isConnected = connectedAccounts.some(acc => acc.id === accountId);
+                          const connectedAcc = connectedAccounts.find(acc => acc.id === accountId);
+                          
+                          if (isConnected && connectedAcc) {
+                            // Cuenta conectada - fondo azul
+                            return (
+                              <span 
+                                key={accountId}
+                                className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-blue-100 dark:bg-blue-900/40 text-xs font-medium text-blue-800 dark:text-blue-300"
+                              >
+                                <img 
+                                  src={getPlatformIcon(connectedAcc.platform)} 
+                                  alt={connectedAcc.platform}
+                                  className="w-3.5 h-3.5"
+                                />
+                                <span className="capitalize">{connectedAcc.platform}</span>
+                                <span className="opacity-75">@{connectedAcc.account_name}</span>
+                              </span>
+                            );
+                          } else {
+                            // Cuenta desconectada - fondo ámbar con etiqueta
+                            return (
+                              <span 
+                                key={accountId}
+                                className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-amber-100 dark:bg-amber-900/40 text-xs font-medium text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-700"
+                              >
+                                <img 
+                                  src={getPlatformIcon(statusInfo.platform)} 
+                                  alt={statusInfo.platform}
+                                  className="w-3.5 h-3.5"
+                                />
+                                <span className="capitalize">{statusInfo.platform}</span>
+                                <span className="opacity-75">@{statusInfo.account_name}</span>
+                                <span className="ml-1 px-1 py-0.5 rounded bg-amber-200 dark:bg-amber-800 text-amber-900 dark:text-amber-100 text-[9px] font-bold">
+                                  {t("common.disconnected") || "Desconectada"}
+                                </span>
+                              </span>
+                            );
+                          }
+                        })}
+                      </div>
+                      
+                      <p className="text-xs text-blue-600 dark:text-blue-400 mt-2 font-medium">
+                        {t("publications.modal.publish.alreadyPublishedBanner.hint") || 
+                          "Puedes publicar en cuentas adicionales seleccionándolas a continuación."}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+
             <div className="mb-6">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex gap-2">
@@ -432,11 +520,16 @@ export default function PublishPublicationModal({
                     const isRemovedPlatform = removedPlatforms.includes(
                       account.id,
                     );
-                    // Solo mostrar "publishing" si la publicación está en estado "publishing" Y está en la lista
+                    // Mostrar "publishing" si la publicación está en estado "publishing" o "retrying" Y está en la lista
                     const isPublishing = publishingPlatforms.includes(account.id) && 
-                      publication?.status === "publishing";
+                      (publication?.status === "publishing" || publication?.status === "retrying");
                     const isScheduled = scheduledPlatforms.includes(account.id);
                     const isUnpublishing = unpublishing === account.id;
+                    
+                    // Get retry information for this platform
+                    const platformRetryInfo = retryInfo[account.id];
+                    const isRetrying = platformRetryInfo?.is_retrying || false;
+                    const retryStatus = platformRetryInfo?.retry_status || null;
 
                     return (
                       <div
@@ -445,17 +538,17 @@ export default function PublishPublicationModal({
                       >
                         <div
                           onClick={() => {
-                            // Solo permitir toggle si no está publicado, programado, o activamente publicando
-                            if (!isPublished && !isScheduled && !isPublishing) {
+                            // Solo permitir toggle si no está publicado, programado, reintentando, o activamente publicando
+                            if (!isPublished && !isScheduled && !isPublishing && !isRetrying) {
                               togglePlatform(account.id);
                             }
                           }}
                           className={`w-full h-[110px] flex flex-col gap-3 p-4 rounded-lg transition-all relative ${
-                            !isPublished && !isScheduled && !isPublishing
+                            !isPublished && !isScheduled && !isPublishing && !isRetrying
                               ? "cursor-pointer"
                               : "cursor-default"
                           } ${
-                            isPublishing
+                            isPublishing || isRetrying
                               ? "border border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20"
                               : isPublished
                                 ? "border border-green-500 bg-green-50 dark:bg-green-900/20"
@@ -471,7 +564,7 @@ export default function PublishPublicationModal({
                           }`}
                         >
                           {/* Publishing Overlay */}
-                          {isPublishing && !isFailed && (
+                          {(isPublishing || isRetrying) && !isFailed && (
                             <div className="absolute inset-0 z-30 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-sm flex flex-col items-center justify-center rounded-lg animate-in fade-in duration-300">
                               <div className="flex flex-col items-center gap-2">
                                 <div className="relative flex-shrink-0">
@@ -484,7 +577,11 @@ export default function PublishPublicationModal({
                                     {account.platform}
                                   </span>
                                   <span className="text-xs font-medium text-yellow-600 dark:text-yellow-400">
-                                    {t("publications.modal.publish.publishing")}
+                                    {isRetrying && retryStatus
+                                      ? `${t("publications.status.retrying") || "Reintentando"} ${retryStatus}`
+                                      : publication?.status === "retrying" 
+                                        ? t("publications.status.retrying") || "Reintentando"
+                                        : t("publications.modal.publish.publishing")}
                                   </span>
                                 </div>
                               </div>
@@ -619,7 +716,7 @@ export default function PublishPublicationModal({
 
                           {/* Action Buttons */}
                           <div className="absolute top-3 right-3 flex items-center gap-1.5 z-10">
-                            {!isPublished && !isScheduled && !isPublishing && !isUnpublishing && (
+                            {!isPublished && !isScheduled && !isPublishing && !isUnpublishing && !isRetrying && (
                               <>
                                 <button
                                   type="button"
@@ -681,7 +778,7 @@ export default function PublishPublicationModal({
                         )}
 
                         {/* Failed Badge - Discrete corner badge */}
-                        {isFailed && !isScheduled && !isPublished && !isPublishing && !isUnpublishing && (
+                        {isFailed && !isScheduled && !isPublished && !isPublishing && !isUnpublishing && !isRetrying && (
                           <div className="absolute top-2 left-2 z-10">
                             <span className="flex items-center gap-1 text-[10px] font-bold text-red-700 dark:text-red-400 bg-red-100 dark:bg-red-900/40 px-2 py-1 rounded-md shadow-sm border border-red-300 dark:border-red-800">
                               <XCircle className="w-3 h-3" />
@@ -773,8 +870,9 @@ export default function PublishPublicationModal({
               <button
                 type="button" 
                 onClick={async () => {
-                  // Si hay plataformas publicando, preguntar si quiere cancelar
-                  const hasPublishingPlatforms = publishingPlatforms.length > 0 && publication.status === "publishing";
+                  // Si hay plataformas publicando o reintentando, preguntar si quiere cancelar
+                  const hasPublishingPlatforms = publishingPlatforms.length > 0 && 
+                    (publication.status === "publishing" || publication.status === "retrying");
                   
                   if (hasPublishingPlatforms) {
                     const confirmed = await confirm({
@@ -797,7 +895,7 @@ export default function PublishPublicationModal({
                 disabled={unpublishing !== null}
                 className="flex-1 px-4 py-3 rounded-lg font-medium transition-colors bg-gray-100 dark:bg-neutral-700 hover:bg-gray-200 dark:hover:bg-neutral-600 text-gray-700 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {publishingPlatforms.length > 0 && publication.status === "publishing"
+                {publishingPlatforms.length > 0 && (publication.status === "publishing" || publication.status === "retrying")
                   ? t("publications.modal.publish.button.cancelAll", { count: publishingPlatforms.length }) || `Cancelar Todas (${publishingPlatforms.length})`
                   : t("publications.modal.publish.button.cancel") || "Cerrar"
                 }
@@ -807,7 +905,8 @@ export default function PublishPublicationModal({
                   type="button"
                   onClick={handlePublishWithNotifications}
                   disabled={
-                    selectedPlatforms.length === 0
+                    selectedPlatforms.length === 0 || 
+                    publishing
                   }
                   className="flex-[2] px-4 py-3 rounded-lg font-medium bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >

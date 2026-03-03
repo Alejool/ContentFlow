@@ -397,83 +397,91 @@ export default function PublishPublicationModal({
             </div>
 
             {/* Banner informativo si ya está publicada en algunas cuentas */}
-            {publishedPlatforms.length > 0 && (
-              <div className="mb-6 p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
-                <div className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
-                  <div className="flex-1">
-                    <h4 className="text-sm font-bold text-blue-800 dark:text-blue-200">
-                      {t("publications.modal.publish.alreadyPublishedBanner.title") || "Publicación Activa"}
-                    </h4>
-                    <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
-                      {t("publications.modal.publish.alreadyPublishedBanner.message") || 
-                        "Esta publicación ya está publicada en las siguientes cuentas:"}
-                    </p>
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      {connectedAccounts
-                        .filter(acc => publishedPlatforms.includes(acc.id))
-                        .map(acc => (
-                          <span 
-                            key={acc.id}
-                            className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-blue-100 dark:bg-blue-900/40 text-xs font-medium text-blue-800 dark:text-blue-300"
-                          >
-                            <img 
-                              src={getPlatformIcon(acc.platform)} 
-                              alt={acc.platform}
-                              className="w-3.5 h-3.5"
-                            />
-                            <span className="capitalize">{acc.platform}</span>
-                            <span className="opacity-75">@{acc.account_name}</span>
-                          </span>
-                        ))
-                      }
+            {publication.platform_status_summary && Object.keys(publication.platform_status_summary).length > 0 && (() => {
+              // Filtrar cuentas con status que indican que está publicada
+              // 'published' = publicada exitosamente
+              // 'success' = publicada exitosamente (legacy)
+              // 'orphaned' = publicada pero la cuenta fue desconectada
+              const publishedAccounts = Object.entries(publication.platform_status_summary)
+                .filter(([_, status]: [string, any]) => 
+                  status.status === 'published' || 
+                  status.status === 'success' || 
+                  status.status === 'orphaned'
+                )
+                .map(([accountId, _]) => parseInt(accountId));
+              
+              if (publishedAccounts.length === 0) return null;
+              
+              return (
+                <div className="mb-6 p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+                    <div className="flex-1">
+                      <h4 className="text-sm font-bold text-blue-800 dark:text-blue-200">
+                        {t("publications.modal.publish.alreadyPublishedBanner.title") || "Publicación Activa"}
+                      </h4>
+                      <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
+                        {t("publications.modal.publish.alreadyPublishedBanner.message") || 
+                          "Esta publicación ya está publicada en las siguientes cuentas:"}
+                      </p>
+                      
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {publishedAccounts.map(accountId => {
+                          const statusInfo = publication.platform_status_summary?.[accountId];
+                          if (!statusInfo) return null;
+                          
+                          // Verificar si la cuenta está conectada actualmente
+                          const isConnected = connectedAccounts.some(acc => acc.id === accountId);
+                          const connectedAcc = connectedAccounts.find(acc => acc.id === accountId);
+                          
+                          if (isConnected && connectedAcc) {
+                            // Cuenta conectada - fondo azul
+                            return (
+                              <span 
+                                key={accountId}
+                                className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-blue-100 dark:bg-blue-900/40 text-xs font-medium text-blue-800 dark:text-blue-300"
+                              >
+                                <img 
+                                  src={getPlatformIcon(connectedAcc.platform)} 
+                                  alt={connectedAcc.platform}
+                                  className="w-3.5 h-3.5"
+                                />
+                                <span className="capitalize">{connectedAcc.platform}</span>
+                                <span className="opacity-75">@{connectedAcc.account_name}</span>
+                              </span>
+                            );
+                          } else {
+                            // Cuenta desconectada - fondo ámbar con etiqueta
+                            return (
+                              <span 
+                                key={accountId}
+                                className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-amber-100 dark:bg-amber-900/40 text-xs font-medium text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-700"
+                              >
+                                <img 
+                                  src={getPlatformIcon(statusInfo.platform)} 
+                                  alt={statusInfo.platform}
+                                  className="w-3.5 h-3.5"
+                                />
+                                <span className="capitalize">{statusInfo.platform}</span>
+                                <span className="opacity-75">@{statusInfo.account_name}</span>
+                                <span className="ml-1 px-1 py-0.5 rounded bg-amber-200 dark:bg-amber-800 text-amber-900 dark:text-amber-100 text-[9px] font-bold">
+                                  {t("common.disconnected") || "Desconectada"}
+                                </span>
+                              </span>
+                            );
+                          }
+                        })}
+                      </div>
+                      
+                      <p className="text-xs text-blue-600 dark:text-blue-400 mt-2 font-medium">
+                        {t("publications.modal.publish.alreadyPublishedBanner.hint") || 
+                          "Puedes publicar en cuentas adicionales seleccionándolas a continuación."}
+                      </p>
                     </div>
-                    <p className="text-xs text-blue-600 dark:text-blue-400 mt-2 font-medium">
-                      {t("publications.modal.publish.alreadyPublishedBanner.hint") || 
-                        "Puedes publicar en cuentas adicionales seleccionándolas a continuación."}
-                    </p>
                   </div>
                 </div>
-              </div>
-            )}
-
-            {/* Banner informativo si está publicada en cuentas desconectadas */}
-            {removedPlatforms.length > 0 && (
-              <div className="mb-6 p-4 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
-                <div className="flex items-start gap-3">
-                  <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
-                  <div className="flex-1">
-                    <h4 className="text-sm font-bold text-amber-800 dark:text-amber-200">
-                      {t("publications.modal.publish.publishedInOtherAccountBanner.title") || "Publicado en Cuenta Diferente"}
-                    </h4>
-                    <p className="text-xs text-amber-700 dark:text-amber-300 mt-1">
-                      {(() => {
-                        // Get unique platforms from removed accounts
-                        const removedPlatformNames = [...new Set(
-                          publication.platform_status_summary 
-                            ? Object.values(publication.platform_status_summary)
-                                .filter((status: any) => removedPlatforms.includes(status.account_id))
-                                .map((status: any) => status.platform)
-                            : []
-                        )];
-                        
-                        if (removedPlatformNames.length === 1) {
-                          return t("publications.modal.publish.publishedInOtherAccountBanner.message", { 
-                            platform: removedPlatformNames[0] 
-                          }) || `Esta publicación fue publicada en una cuenta de ${removedPlatformNames[0]} que ya no está conectada.`;
-                        } else {
-                          return "Esta publicación fue publicada en cuentas que ya no están conectadas.";
-                        }
-                      })()}
-                    </p>
-                    <p className="text-xs text-amber-600 dark:text-amber-400 mt-2 font-medium">
-                      {t("publications.modal.publish.publishedInOtherAccountBanner.hint") || 
-                        "Puedes publicar en la cuenta actual seleccionándola a continuación. La publicación anterior permanecerá en la cuenta desconectada."}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
+              );
+            })()}
 
             <div className="mb-6">
               <div className="flex items-center justify-between mb-4">
