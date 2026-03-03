@@ -918,9 +918,9 @@ class PublicationController extends Controller
         continue;
 
       // Skip logs for accounts that no longer exist or are disconnected
-      // UNLESS the status is 'published' or 'removed_on_platform' (we want to show these as "removed_platforms")
+      // UNLESS the status is 'published', 'success', or 'removed_on_platform' (we want to show these as "removed_platforms")
       if (!in_array($log->social_account_id, $activeAccountIds)) {
-        if ($log->status === 'published' || $log->status === 'removed_on_platform') {
+        if (in_array($log->status, ['published', 'success', 'removed_on_platform'])) {
           // Mark as removed platform so UI can show it was published elsewhere
           $statusGroups['removed_platforms'][] = $log->social_account_id;
         }
