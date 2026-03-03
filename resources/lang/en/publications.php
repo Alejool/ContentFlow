@@ -27,11 +27,14 @@ return [
     'only_draft_failed_rejected_can_request_review' => 'Only draft, failed, or rejected publications can be sent for review.',
     'not_approved' => 'This publication requires approval before publishing. Please request approval first.',
     'pending_review' => 'This publication is pending review. It must be approved or rejected before it can be published.',
+    'already_publishing' => 'This publication is already being published or retrying. Please wait for the current process to complete.',
   ],
   'status' => [
     'publishingProgress' => ':current/:total publishing',
+    'retryingProgress' => 'Retrying :current/:total',
     'partialSuccess' => ':success/:total published',
     'allPublished' => ':total/:total published',
+    'retrying' => 'Retrying',
   ],
   'viewPost' => 'View post',
 ];
