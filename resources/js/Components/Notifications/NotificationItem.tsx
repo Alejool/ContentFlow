@@ -251,9 +251,7 @@ export default function NotificationItem({
                   theme === "dark" ? "text-gray-300" : "text-gray-700"
                 }`}
               >
-                {theme === "dark"
-                  ? "Publicaciones afectadas:"
-                  : "Affected publications:"}
+                {t("common.affected_publications")}
               </p>
               <ul
                 className={`list-disc list-inside ${
@@ -270,7 +268,7 @@ export default function NotificationItem({
                 {data.orphaned_posts_list.length > 3 && (
                   <li className="list-none pt-1 opacity-75">
                     + {data.orphaned_posts_list.length - 3}{" "}
-                    {theme === "dark" ? "más..." : "more..."}
+                    {t("common.more_items")}
                   </li>
                 )}
               </ul>
