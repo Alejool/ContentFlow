@@ -20,6 +20,8 @@
     "status_update": "Actualización de estado",
     "status_update_description": "{{type}} {{platform}}",
     "playlist_processed": "Video agregado a playlist de {{platform}}",
+    "playlist_processedVideo": "'{{video_title}}' agregado a la playlist '{{playlist_name}}'",
+    "playlist_processedNoVideo": "Agregado a la playlist '{{playlist_name}}'",
     "playlist_failed": "Error al agregar video a playlist de {{platform}}",
     "playlist_failed_description": "No se pudo agregar '{{video_title}}' a la playlist '{{playlist_name}}' en la cuenta {{account}}",
     "retry_max_reached": "Se alcanzó el máximo de intentos.",
