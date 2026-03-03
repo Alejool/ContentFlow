@@ -20,6 +20,7 @@ export interface CalendarEvent {
   color: string;
   platform?: string;
   campaign?: string;
+  hasNoPlatforms?: boolean; // Indicates if publication has no social networks assigned
   user?: {
     id: number;
     name: string;
@@ -29,6 +30,8 @@ export interface CalendarEvent {
     thumbnail?: string;
     publication_id?: number;
     platform?: string;
+    platforms?: string[]; // Array of all platforms for this publication
+    campaigns?: string[]; // Array of all campaigns for this publication
     description?: string;
     remind_at?: string;
     is_public?: boolean;

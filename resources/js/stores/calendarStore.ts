@@ -116,16 +116,20 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
 
     // Apply AND logic: event must match ALL active filter types
     return events.filter((event) => {
-      // Platform filter
+      // Platform filter - check the specific platform field (now each event has one platform)
       const platformMatch =
         filters.platforms.length === 0 ||
         (event.platform && filters.platforms.includes(event.platform)) ||
-        (event.extendedProps?.platform && filters.platforms.includes(event.extendedProps.platform));
+        (event.extendedProps?.platforms && 
+         Array.isArray(event.extendedProps.platforms) &&
+         event.extendedProps.platforms.some((p: string) => filters.platforms.includes(p)));
 
-      // Campaign filter
+      // Campaign filter - check if event's campaign matches any selected campaign
       const campaignMatch =
         filters.campaigns.length === 0 ||
-        (event.campaign && filters.campaigns.includes(event.campaign));
+        (event.extendedProps?.campaigns && 
+         Array.isArray(event.extendedProps.campaigns) &&
+         event.extendedProps.campaigns.some((c: string) => filters.campaigns.includes(c)));
 
       // Status filter
       const statusMatch =

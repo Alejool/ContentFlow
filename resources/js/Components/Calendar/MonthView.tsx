@@ -60,6 +60,11 @@ const DraggableEvent: React.FC<DraggableEventProps> = ({
     data: { event },
   });
 
+  // Check if publication has no platforms assigned
+  const hasNoPlatforms = event.hasNoPlatforms || 
+    (event.type === 'publication' && 
+     (!event.extendedProps?.platforms || event.extendedProps.platforms.length === 0));
+
   return (
     <div
       ref={setNodeRef}
@@ -74,6 +79,7 @@ const DraggableEvent: React.FC<DraggableEventProps> = ({
         group/card
         ${isSelected ? 'ring-2 ring-primary-500' : ''}
         ${isDragging ? 'opacity-50' : ''}
+        ${hasNoPlatforms ? 'border-orange-300 dark:border-orange-700' : ''}
       `}
     >
       {/* Status Indicator Bar */}
@@ -81,6 +87,13 @@ const DraggableEvent: React.FC<DraggableEventProps> = ({
         className="absolute left-0 top-0 bottom-0 w-1"
         style={{ backgroundColor: event.color }}
       />
+
+      {/* Warning indicator for publications without platforms */}
+      {hasNoPlatforms && (
+        <div className="absolute right-1 top-1 bg-orange-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] font-bold" title="Sin redes sociales asignadas">
+          !
+        </div>
+      )}
 
       <div className="p-2 pl-3 flex items-start gap-2">
         {/* Checkbox for selection */}
@@ -120,6 +133,11 @@ const DraggableEvent: React.FC<DraggableEventProps> = ({
             {event.status && (
               <span className="text-[9px] px-1 rounded-sm bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 capitalize">
                 {event.status}
+              </span>
+            )}
+            {hasNoPlatforms && (
+              <span className="text-[9px] px-1 rounded-sm bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400">
+                Sin redes
               </span>
             )}
           </div>
