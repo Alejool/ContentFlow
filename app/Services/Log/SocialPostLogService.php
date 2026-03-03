@@ -83,6 +83,8 @@ class SocialPostLogService
         'title' => $response['title'] ?? null,
       ],
       'error_message' => null,
+      'is_retrying' => false,
+      'retry_started_at' => null,
     ]);
 
     Log::info('Post published successfully', [
@@ -105,6 +107,8 @@ class SocialPostLogService
     $postLog->update([
       'status' => 'failed',
       'error_message' => substr($errorMessage, 0, 65000), // Truncate to avoid DB error
+      'is_retrying' => false,
+      'retry_started_at' => null,
     ]);
 
     Log::error('Post publication failed', [
@@ -135,17 +139,39 @@ class SocialPostLogService
   public function resetForRetry(SocialPostLog $postLog): SocialPostLog
   {
     if (!$postLog->canRetry()) {
-      throw new \Exception('Maximum retry attempts reached');
+      throw new \Exception('Maximum retry attempts reached or already retrying');
     }
 
     $this->incrementRetry($postLog);
 
     $postLog->update([
       'status' => 'pending',
+      'is_retrying' => true,
+      'retry_started_at' => now(),
     ]);
 
     Log::info('Post log reset for retry', [
       'post_log_id' => $postLog->id,
+      'retry_count' => $postLog->retry_count,
+      'is_retrying' => true,
+    ]);
+
+    return $postLog->fresh();
+  }
+  
+  /**
+   * Marks retry as complete (success or failure)
+   */
+  public function completeRetry(SocialPostLog $postLog): SocialPostLog
+  {
+    $postLog->update([
+      'is_retrying' => false,
+      'retry_started_at' => null,
+    ]);
+
+    Log::info('Retry completed', [
+      'post_log_id' => $postLog->id,
+      'final_status' => $postLog->status,
       'retry_count' => $postLog->retry_count,
     ]);
 
@@ -202,6 +228,7 @@ class SocialPostLogService
     return SocialPostLog::where('publication_id', $publicationId)
       ->where('status', 'failed')
       ->where('retry_count', '<', 3)
+      ->where('is_retrying', false)
       ->with(['socialAccount', 'mediaFile'])
       ->get();
   }

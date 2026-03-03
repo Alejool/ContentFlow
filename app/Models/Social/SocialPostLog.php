@@ -47,6 +47,8 @@ class SocialPostLog extends Model
     'notes',
     'retry_count',
     'last_retry_at',
+    'is_retrying',
+    'retry_started_at',
     'engagement_data',
     'post_metadata',
     'platform_settings',
@@ -67,6 +69,8 @@ class SocialPostLog extends Model
     'platform_settings' => 'array',
     'retry_count' => 'integer',
     'last_retry_at' => 'datetime',
+    'is_retrying' => 'boolean',
+    'retry_started_at' => 'datetime',
     'comment_sentiment_data' => 'array',
   ];
 
@@ -115,7 +119,20 @@ class SocialPostLog extends Model
   }
   public function canRetry(): bool
   {
-    return $this->status === 'failed' && $this->retry_count < 3;
+    return $this->status === 'failed' && $this->retry_count < 3 && !$this->is_retrying;
+  }
+  
+  public function isRetrying(): bool
+  {
+    return $this->is_retrying === true;
+  }
+  
+  public function getRetryStatus(): string
+  {
+    if ($this->is_retrying) {
+      return sprintf('%d/3', $this->retry_count + 1);
+    }
+    return sprintf('%d/3', $this->retry_count);
   }
   public function isPublished(): bool
   {
