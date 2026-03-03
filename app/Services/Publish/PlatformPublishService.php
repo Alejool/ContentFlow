@@ -279,7 +279,8 @@ class PlatformPublishService
     $platformResults = [];
 
     // Check for already published platforms to avoid re-publishing
-    $alreadyPublishedPlatforms = [];
+    // Only skip if published with the SAME account_id
+    $alreadyPublishedAccountIds = [];
     foreach ($socialAccounts as $socialAccount) {
       $existingSuccessfulLog = SocialPostLog::where('publication_id', $publication->id)
         ->where('social_account_id', $socialAccount->id)
@@ -287,27 +288,29 @@ class PlatformPublishService
         ->first();
       
       if ($existingSuccessfulLog) {
-        LogHelper::publicationInfo('Platform already published successfully, skipping', [
+        LogHelper::publicationInfo('Account already published successfully, skipping', [
           'platform' => $socialAccount->platform,
           'account_id' => $socialAccount->id,
+          'account_name' => $socialAccount->account_name,
           'log_id' => $existingSuccessfulLog->id
         ]);
         
-        $alreadyPublishedPlatforms[] = $socialAccount->platform;
-        $platformResults[$socialAccount->platform] = [
+        $alreadyPublishedAccountIds[] = $socialAccount->id;
+        $platformResults[$socialAccount->platform . '_' . $socialAccount->id] = [
           'success' => true,
           'published' => 1,
           'failed' => 0,
           'logs' => [$existingSuccessfulLog],
           'skipped' => true, // Mark as skipped to avoid re-notification
+          'account_name' => $socialAccount->account_name,
         ];
         $allLogs[] = $existingSuccessfulLog;
       }
     }
     
-    // Filter out already published accounts
-    $socialAccounts = $socialAccounts->reject(function($account) use ($alreadyPublishedPlatforms) {
-      return in_array($account->platform, $alreadyPublishedPlatforms);
+    // Filter out already published accounts (by account ID, not platform)
+    $socialAccounts = $socialAccounts->reject(function($account) use ($alreadyPublishedAccountIds) {
+      return in_array($account->id, $alreadyPublishedAccountIds);
     });
     
     if ($socialAccounts->isEmpty()) {
@@ -623,6 +626,7 @@ class PlatformPublishService
     $logs = SocialPostLog::where('publication_id', $publication->id)
       ->whereIn('social_account_id', $accountIds)
       ->whereIn('status', ['published', 'failed'])
+      ->with('socialAccount')
       ->get();
 
     $results = [];
@@ -630,6 +634,28 @@ class PlatformPublishService
 
     if ($logs->isEmpty()) {
       return ['success' => true, 'message' => 'No active posts found for selected accounts', 'results' => []];
+    }
+
+    // Validate that the accounts being unpublished are the current active accounts
+    $invalidAccounts = [];
+    foreach ($logs as $log) {
+      $socialAccount = $log->socialAccount;
+      if (!$socialAccount || $socialAccount->trashed()) {
+        $invalidAccounts[] = [
+          'platform' => $log->platform,
+          'account_name' => $log->account_name,
+          'reason' => 'account_disconnected'
+        ];
+      }
+    }
+
+    if (!empty($invalidAccounts)) {
+      return [
+        'success' => false,
+        'message' => 'Cannot unpublish from disconnected accounts',
+        'invalid_accounts' => $invalidAccounts,
+        'results' => []
+      ];
     }
 
     foreach ($logs as $log) {
