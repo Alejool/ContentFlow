@@ -12,6 +12,7 @@ interface PublicationState {
   publishingPlatforms: Record<number, number[]>;
   scheduledPlatforms: Record<number, number[]>;
   removedPlatforms: Record<number, number[]>;
+  retryInfo: Record<number, Record<number, { retry_count: number; is_retrying: boolean; retry_status: string }>>;
 
   isLoading: boolean;
   error: string | null;
@@ -31,6 +32,7 @@ interface PublicationState {
     publishing: number[];
     scheduled: number[];
     removed: number[];
+    retry_info: Record<number, { retry_count: number; is_retrying: boolean; retry_status: string }>;
   }>;
 
   addPublication: (publication: Publication) => void;
@@ -61,6 +63,7 @@ interface PublicationState {
   getRemovedPlatforms: (publicationId: number) => number[];
   getPublishingPlatforms: (publicationId: number) => number[];
   getScheduledPlatforms: (publicationId: number) => number[];
+  getRetryInfo: (publicationId: number, platformId: number) => { retry_count: number; is_retrying: boolean; retry_status: string } | null;
 
   setPublishedPlatforms: (publicationId: number, accountIds: number[]) => void;
   setFailedPlatforms: (publicationId: number, accountIds: number[]) => void;
@@ -88,6 +91,7 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
   publishingPlatforms: {},
   scheduledPlatforms: {},
   removedPlatforms: {},
+  retryInfo: {},
 
   isLoading: false,
   error: null,
@@ -210,6 +214,7 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
       const publishing = response.data.publishing_platforms ?? [];
       const removed = response.data.removed_platforms ?? [];
       const scheduled = response.data.scheduled_platforms ?? [];
+      const retry_info = response.data.retry_info ?? {};
 
       set((state) => ({
         publishedPlatforms: {
@@ -228,15 +233,17 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
           ...state.scheduledPlatforms,
           [publicationId]: scheduled,
         },
-      }));
-      set((state) => ({
         removedPlatforms: {
           ...state.removedPlatforms,
           [publicationId]: removed,
         },
+        retryInfo: {
+          ...state.retryInfo,
+          [publicationId]: retry_info,
+        },
       }));
 
-      return { published, failed, publishing, removed, scheduled };
+      return { published, failed, publishing, removed, scheduled, retry_info };
     } catch {
       return {
         published: [],
@@ -244,6 +251,7 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
         publishing: [],
         removed: [],
         scheduled: [],
+        retry_info: {},
       };
     }
   },
@@ -482,6 +490,11 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
   getPublishingPlatforms: (id) => get().publishingPlatforms[id] ?? [],
 
   getScheduledPlatforms: (id) => get().scheduledPlatforms[id] ?? [],
+  
+  getRetryInfo: (publicationId, platformId) => {
+    const info = get().retryInfo[publicationId];
+    return info?.[platformId] ?? null;
+  },
 
   setPublishedPlatforms: (id, accounts) =>
     set((state) => ({
@@ -518,6 +531,7 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
       publishingPlatforms: {},
       scheduledPlatforms: {},
       removedPlatforms: {},
+      retryInfo: {},
       // Keep currentPublication if user is editing something
       // This prevents losing data if modal is open
     })),
@@ -532,6 +546,7 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
       failedPlatforms: {},
       publishingPlatforms: {},
       scheduledPlatforms: {},
+      retryInfo: {},
       isLoading: false,
       error: null,
     }),

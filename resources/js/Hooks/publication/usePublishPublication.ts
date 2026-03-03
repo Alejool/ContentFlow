@@ -23,6 +23,7 @@ export interface PublishPublicationState {
   youtubeThumbnails: Record<number, File | null>;
   existingThumbnails: Record<number, { url: string; id: number }>;
   isLoadingThumbnails: boolean;
+  retryInfo: Record<number, { retry_count: number; is_retrying: boolean; retry_status: string }>;
 }
 
 export interface UsePublishPublicationReturn extends PublishPublicationState {
@@ -86,6 +87,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
     (s) => s.scheduledPlatforms,
   );
   const removedPlatformsCache = usePublicationStore((s) => s.removedPlatforms);
+  const retryInfoCache = usePublicationStore((s) => s.retryInfo);
 
   const fetchPublishedPlatformsFromStore = usePublicationStore(
     (s) => s.fetchPublishedPlatforms,
@@ -195,6 +197,12 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
       ? removedPlatformsCache[currentPublicationId] || []
       : [];
   }, [removedPlatformsCache, currentPublicationId]);
+  
+  const retryInfo = useMemo(() => {
+    return currentPublicationId
+      ? retryInfoCache[currentPublicationId] || {}
+      : {};
+  }, [retryInfoCache, currentPublicationId]);
 
   /* ------------------------------ Reset state ------------------------------- */
 
@@ -342,12 +350,16 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
   const togglePlatform = useCallback(
     (accountId: number) => {
       // Prevent toggling if platform is already published or scheduled
-      // Note: We don't check publishingPlatforms here because the modal handles that check
-      // based on the actual publication status
       if (
         publishedPlatforms.includes(accountId) ||
         scheduledPlatforms.includes(accountId)
       ) {
+        return;
+      }
+      
+      // Prevent toggling if platform is currently retrying
+      const platformRetry = retryInfoCache[currentPublicationId || 0]?.[accountId];
+      if (platformRetry?.is_retrying) {
         return;
       }
 
@@ -357,16 +369,23 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
           : [...prev, accountId],
       );
     },
-    [publishedPlatforms, scheduledPlatforms],
+    [publishedPlatforms, scheduledPlatforms, retryInfoCache, currentPublicationId],
   );
 
   const selectAll = useCallback(() => {
+    const retryingPlatforms = currentPublicationId 
+      ? Object.entries(retryInfoCache[currentPublicationId] || {})
+          .filter(([_, info]) => info.is_retrying)
+          .map(([id, _]) => parseInt(id))
+      : [];
+    
     setSelectedPlatforms(
       activeAccounts
         .filter(
           (acc) =>
             !publishedPlatforms.includes(acc.id) &&
-            !scheduledPlatforms.includes(acc.id),
+            !scheduledPlatforms.includes(acc.id) &&
+            !retryingPlatforms.includes(acc.id),
         )
         .map((acc) => acc.id),
     );
@@ -374,6 +393,8 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
     activeAccounts,
     publishedPlatforms,
     scheduledPlatforms,
+    retryInfoCache,
+    currentPublicationId,
   ]);
 
   const deselectAll = useCallback(() => {
@@ -571,6 +592,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
     youtubeThumbnails,
     existingThumbnails,
     isLoadingThumbnails,
+    retryInfo,
 
     fetchPublishedPlatforms,
     loadExistingThumbnails,

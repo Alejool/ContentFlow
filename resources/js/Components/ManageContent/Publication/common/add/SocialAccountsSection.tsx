@@ -482,6 +482,42 @@ const SocialAccountsSection = memo(
 
     return (
       <div className="space-y-4">
+        {/* Banner informativo si ya está publicada en algunas cuentas */}
+        {publishedAccountIds && publishedAccountIds.length > 0 && (
+          <div className="p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+            <div className="flex items-start gap-2">
+              <Check className="w-4 h-4 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+              <div className="flex-1">
+                <h4 className="text-xs font-bold text-blue-800 dark:text-blue-200">
+                  {t("publications.modal.publish.alreadyPublishedBanner.title") || "Publicación Activa"}
+                </h4>
+                <p className="text-[11px] text-blue-700 dark:text-blue-300 mt-0.5">
+                  {t("publications.modal.publish.alreadyPublishedBanner.message") || 
+                    "Esta publicación ya está publicada en las siguientes cuentas:"}
+                </p>
+                <div className="mt-1.5 flex flex-wrap gap-1.5">
+                  {socialAccounts
+                    .filter(acc => publishedAccountIds.includes(acc.id))
+                    .map(acc => (
+                      <span 
+                        key={acc.id}
+                        className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/40 text-[10px] font-medium text-blue-800 dark:text-blue-300"
+                      >
+                        <span className="capitalize">{acc.platform}</span>
+                        <span className="opacity-75">@{acc.account_name || acc.name}</span>
+                      </span>
+                    ))
+                  }
+                </div>
+                <p className="text-[11px] text-blue-600 dark:text-blue-400 mt-1.5 font-medium">
+                  {t("publications.modal.publish.alreadyPublishedBanner.hint") || 
+                    "Puedes publicar en cuentas adicionales seleccionándolas a continuación."}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="flex items-center justify-between">
           <label className="text-sm font-semibold flex items-center gap-2">
             <Target className="w-4 h-4" />
