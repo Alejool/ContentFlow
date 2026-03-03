@@ -42,6 +42,25 @@
     "today": "Hoy",
     "optimizing": "Optimizando...",
     "optimize_automatically": "Optimizar automáticamente",
+    "theme": {
+      "changed": "Tema cambiado",
+      "light": "☀️ Claro",
+      "dark": "🌙 Oscuro",
+      "system": "💻 Sistema"
+    },
+    "shortcuts": {
+      "title": "Atajos de Teclado",
+      "theme": {
+        "toggle": "Cambiar tema (Claro/Oscuro/Sistema)"
+      },
+      "help": {
+        "show": "Mostrar atajos de teclado"
+      },
+      "category": {
+        "appearance": "Apariencia",
+        "help": "Ayuda"
+      }
+    },
     "ai": {
       "suggest": "Sugerir con IA",
       "improve": "Mejorar con IA",

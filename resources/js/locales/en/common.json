@@ -40,6 +40,25 @@
     "today": "Today",
     "optimizing": "Optimizing...",
     "optimize_automatically": "Optimize automatically",
+    "theme": {
+      "changed": "Theme changed",
+      "light": "☀️ Light",
+      "dark": "🌙 Dark",
+      "system": "💻 System"
+    },
+    "shortcuts": {
+      "title": "Keyboard Shortcuts",
+      "theme": {
+        "toggle": "Toggle theme (Light/Dark/System)"
+      },
+      "help": {
+        "show": "Show keyboard shortcuts"
+      },
+      "category": {
+        "appearance": "Appearance",
+        "help": "Help"
+      }
+    },
     "ai": {
       "suggest": "Suggest with AI",
       "improve": "Improve with AI",
