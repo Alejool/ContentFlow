@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 
 use App\Models\MediaFiles\MediaFile;
 use App\Models\Social\SocialPostLog;
+use App\Models\Social\SocialAccount;
 use App\Models\Logs\ApprovalLog;
 use App\Models\Workspace\Workspace;
 use App\Models\User;
@@ -54,6 +55,7 @@ class Publication extends Model
     'draft',
     'published',
     'publishing',
+    'retrying', // Added retrying status for job retries
     'processing', // Added processing status
     'failed',
     'pending_review',
@@ -178,15 +180,16 @@ class Publication extends Model
    * 
    * Cannot publish if:
    * - Status is 'pending_review' (must be approved or rejected first)
+   * - Status is 'publishing' or 'retrying' (already in progress)
    */
   public function canBePublished(bool $hasPublishPermission = false): bool
   {
-    // Never allow publishing if pending review
-    if ($this->status === 'pending_review') {
+    // Never allow publishing if pending review, publishing, or retrying
+    if (in_array($this->status, ['pending_review', 'publishing', 'retrying'])) {
       return false;
     }
     
-    // If user has publish permission, allow any status except pending_review
+    // If user has publish permission, allow any status except blocked ones
     if ($hasPublishPermission) {
       return true;
     }
@@ -373,6 +376,7 @@ class Publication extends Model
   {
     $summary = [];
     $logs = $this->socialPostLogs()
+      ->with('socialAccount')
       ->whereIn('id', function ($query) {
         $query->selectRaw('MAX(id)')
           ->from('social_post_logs')
@@ -381,17 +385,101 @@ class Publication extends Model
       })->get();
 
     foreach ($logs as $log) {
+      $socialAccount = $log->socialAccount;
+      $isCurrentAccount = $socialAccount && !$socialAccount->trashed();
+      
       $summary[$log->social_account_id] = [
         'platform' => $log->platform,
         'status' => $log->status,
         'published_at' => $log->published_at,
         'error' => $log->error_message,
         'url' => $log->post_url,
+        'account_name' => $log->account_name,
+        'account_id' => $socialAccount ? $socialAccount->account_id : null,
+        'is_current_account' => $isCurrentAccount,
+        'can_unpublish' => $isCurrentAccount && in_array($log->status, ['published', 'failed']),
       ];
     }
 
     return $summary;
   }
+
+  /**
+   * Get publications in other accounts for the same platform
+   * This helps identify when content is published in a different account
+   */
+  public function getPublicationsInOtherAccounts(string $platform): array
+  {
+    $currentWorkspaceAccounts = SocialAccount::where('workspace_id', $this->workspace_id)
+      ->where('platform', $platform)
+      ->whereNull('deleted_at')
+      ->pluck('id')
+      ->toArray();
+
+    $otherAccountLogs = $this->socialPostLogs()
+      ->with('socialAccount')
+      ->where('platform', $platform)
+      ->whereIn('status', ['published', 'orphaned'])
+      ->whereNotIn('social_account_id', $currentWorkspaceAccounts)
+      ->get();
+
+    return $otherAccountLogs->map(function ($log) {
+      return [
+        'account_name' => $log->account_name,
+        'status' => $log->status,
+        'published_at' => $log->published_at,
+        'url' => $log->post_url,
+      ];
+    })->toArray();
+  }
+
+  /**
+   * Check if publication can be published to a specific platform
+   * considering current account vs previously published accounts
+   */
+  public function canPublishToPlatform(SocialAccount $account): array
+  {
+    // Check if already published with THIS specific account
+    $existingLog = $this->socialPostLogs()
+      ->where('social_account_id', $account->id)
+      ->where('status', 'published')
+      ->first();
+
+    if ($existingLog) {
+      return [
+        'can_publish' => false,
+        'reason' => 'already_published_this_account',
+        'message' => 'Already published with this account',
+      ];
+    }
+
+    // Check if published with a DIFFERENT account of the same platform
+    $otherAccountLog = $this->socialPostLogs()
+      ->with('socialAccount')
+      ->where('platform', $account->platform)
+      ->where('social_account_id', '!=', $account->id)
+      ->where('status', 'published')
+      ->first();
+
+    if ($otherAccountLog) {
+      return [
+        'can_publish' => true,
+        'reason' => 'different_account',
+        'message' => "Content is published on a different {$account->platform} account ({$otherAccountLog->account_name}). You can publish to this account as well.",
+        'other_account' => [
+          'name' => $otherAccountLog->account_name,
+          'published_at' => $otherAccountLog->published_at,
+        ],
+      ];
+    }
+
+    return [
+      'can_publish' => true,
+      'reason' => 'not_published',
+      'message' => 'Ready to publish',
+    ];
+  }
+
 
   public function getMediaLockedByAttribute()
   {

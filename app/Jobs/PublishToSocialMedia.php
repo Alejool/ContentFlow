@@ -186,6 +186,16 @@ class PublishToSocialMedia implements ShouldQueue
             'attempt' => $this->attempts(),
           ], $publisher);
           
+          // Update status to 'retrying'
+          $publication->update(['status' => 'retrying']);
+          
+          // Broadcast status change
+          event(new PublicationStatusUpdated(
+            userId: $publication->user_id,
+            publicationId: $publication->id,
+            status: 'retrying'
+          ));
+          
           throw new \Exception('Partial failure, retrying failed platforms: ' . implode(', ', $failedPlatforms));
         }
       } else {
@@ -195,8 +205,17 @@ class PublishToSocialMedia implements ShouldQueue
           'attempt' => $this->attempts(),
         ], $publisher);
 
-        // Don't update publication status here - let it stay as 'publishing' until all retries exhausted
-        // The failed() method will update it to 'failed' after all retries
+        // If not the last attempt, update status to 'retrying'
+        if ($this->attempts() < $this->tries) {
+          $publication->update(['status' => 'retrying']);
+          
+          // Broadcast status change
+          event(new PublicationStatusUpdated(
+            userId: $publication->user_id,
+            publicationId: $publication->id,
+            status: 'retrying'
+          ));
+        }
         
         // Throw exception to trigger retry mechanism
         throw new \Exception('All platforms failed: ' . (empty($platformResults) ? ($result['message'] ?? 'Initialization failed') : 'All platforms failed'));
