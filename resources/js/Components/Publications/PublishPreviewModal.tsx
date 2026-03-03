@@ -3,6 +3,7 @@ import Modal from '@/Components/common/ui/Modal';
 import PlatformConfigCard from './PlatformConfigCard';
 import { Publication } from '@/types/Publication';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 
 interface MediaInfo {
   duration?: number;
@@ -59,6 +60,7 @@ export default function PublishPreviewModal({
   onClose,
   onPublished,
 }: PublishPreviewModalProps) {
+  const { t } = useTranslation();
   const [previewData, setPreviewData] = useState<PreviewData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isOptimizing, setIsOptimizing] = useState(false);
@@ -338,7 +340,7 @@ export default function PublishPreviewModal({
                         disabled={isOptimizing}
                         className="px-4 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-semibold text-sm shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
                       >
-                        {isOptimizing ? '⏳ Optimizando...' : '⚡ Optimizar automáticamente'}
+                        {isOptimizing ? `⏳ ${t("common.optimizing")}` : `⚡ ${t("common.optimize_automatically")}`}
                       </button>
                     )}
                   </div>
