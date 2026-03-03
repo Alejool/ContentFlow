@@ -97,6 +97,7 @@
     "generate": "Generar",
     "connect": "Conectar",
     "connected": "Conectado",
+    "disconnected": "Desconectada",
     "sent": "Enviado",
     "sending": "Enviando",
     "failed": "Fallido",

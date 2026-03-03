@@ -94,6 +94,7 @@
     "generate": "Generate",
     "connect": "Connect",
     "connected": "Connected",
+    "disconnected": "Disconnected",
     "sent": "Sent",
     "failed": "Failed",
     "show_advanced": "Show Advanced",
