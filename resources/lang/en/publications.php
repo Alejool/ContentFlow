@@ -37,4 +37,8 @@ return [
     'retrying' => 'Retrying',
   ],
   'viewPost' => 'View post',
+  'toast' => [
+    'publishedSuccess' => 'Publication published successfully!',
+    'publishedError' => 'Publication failed to publish.',
+  ],
 ];
