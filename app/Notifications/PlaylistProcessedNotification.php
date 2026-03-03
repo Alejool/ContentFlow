@@ -25,15 +25,22 @@ class PlaylistProcessedNotification extends BaseNotification
   {
     $locale = method_exists($notifiable, 'preferredLocale') ? $notifiable->preferredLocale() : app()->getLocale();
     $message = trans('notifications.playlist_processed', ['platform' => 'YouTube'], $locale);
+    
+    $description = $this->videoTitle
+      ? trans('notifications.playlist_processedVideo', [
+          'video_title' => $this->videoTitle,
+          'playlist_name' => $this->playlistName
+        ], $locale)
+      : trans('notifications.playlist_processedNoVideo', [
+          'playlist_name' => $this->playlistName
+        ], $locale);
 
     return [
       'type' => 'playlist_processed',
       'category' => 'system',
       'status' => 'success',
       'message' => $message,
-      'description' => $this->videoTitle
-        ? "Video '{$this->videoTitle}' added to playlist '{$this->playlistName}'"
-        : "Added to playlist '{$this->playlistName}'",
+      'description' => $description,
       'playlist_name' => $this->playlistName,
       'playlist_id' => $this->queueItem->playlist_id,
       'video_id' => $this->queueItem->video_id,
