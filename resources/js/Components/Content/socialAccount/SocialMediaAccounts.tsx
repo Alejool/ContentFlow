@@ -1,5 +1,6 @@
 import PlatformSettingsModal from "@/Components/ConfigSocialMedia/PlatformSettingsModal";
 import DisconnectWarningModal from "@/Components/Content/modals/DisconnectWarningModal";
+import DisconnectBlockerModal from "@/Components/ManageContent/modals/DisconnectBlockerModal";
 import { SOCIAL_PLATFORMS } from "@/Constants/socialPlatforms";
 import { useSocialMediaAuth } from "@/Hooks/useSocialMediaAuth";
 import { getPlatformSchema } from "@/schemas/platformSettings";
@@ -214,6 +215,8 @@ const SocialMediaAccounts = memo(() => {
   const [blockerModalData, setBlockerModalData] = useState<{
     account: any;
     posts: any[];
+    reason?: string; // 'publishing', 'scheduled', or 'published'
+    canDisconnect?: boolean;
   } | null>(null);
 
   const handleConnectionToggle = async (account: Account) => {
@@ -231,19 +234,29 @@ const SocialMediaAccounts = memo(() => {
         if (result && result.success) {
           fetchConnectedAccounts(); // Refresh to regroup
           setConnectedAccountsCount((prev) => prev - 1);
+          toast.success(
+            `${account.name} ${t(
+              "Content.socialMedia.messages.disconnectSuccess",
+            )}`,
+          );
         } else if (result && !result.success && result.posts) {
+          // Show appropriate modal based on reason
           setBlockerModalData({
             account,
             posts: result.posts,
+            reason: result.reason,
+            canDisconnect: result.can_disconnect,
           });
         }
       } catch (error: any) {
-        }
+        toast.error(t("Content.socialMedia.messages.disconnectError"));
+      }
     } else {
       try {
         await connectAccount(account.platform);
       } catch (error: any) {
-        }
+        toast.error(t("Content.socialMedia.messages.connectError"));
+      }
     }
   };
 
@@ -533,7 +546,19 @@ const SocialMediaAccounts = memo(() => {
             </div>
           )}
 
-          {blockerModalData && (
+          {/* Blocker Modal - for publishing/scheduled posts */}
+          {blockerModalData && !blockerModalData.canDisconnect && (
+            <DisconnectBlockerModal
+              isOpen={!!blockerModalData}
+              onClose={() => setBlockerModalData(null)}
+              accountName={blockerModalData.account.name}
+              posts={blockerModalData.posts}
+              reason={blockerModalData.reason as 'publishing' | 'scheduled'}
+            />
+          )}
+
+          {/* Warning Modal - for published posts */}
+          {blockerModalData && blockerModalData.canDisconnect && (
             <DisconnectWarningModal
               isOpen={!!blockerModalData}
               onClose={() => setBlockerModalData(null)}

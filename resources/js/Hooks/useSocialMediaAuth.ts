@@ -137,12 +137,15 @@ export const useSocialMediaAuth = () => {
       return { success: true };
     } catch (err: any) {
       if (err.response && err.response.status === 400) {
-        const msg = err.response.data.message;
+        const responseData = err.response.data;
+        const msg = responseData.message;
         setError(msg);
         return {
           success: false,
           error: msg,
-          posts: err.response.data.posts,
+          posts: responseData.posts,
+          can_disconnect: responseData.can_disconnect, // Important: indicates if disconnect is possible with force
+          reason: responseData.reason, // 'publishing', 'scheduled', or 'published'
         };
       }
       const errorMessage =

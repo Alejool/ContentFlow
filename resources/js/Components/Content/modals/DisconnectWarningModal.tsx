@@ -114,35 +114,40 @@ export default function DisconnectWarningModal({
                             : "divide-gray-200 text-gray-700"
                         }`}
                       >
-                        {posts.map((post) => (
-                          <tr key={post.id}>
-                            <td className="px-4 py-2 whitespace-nowrap">
-                              <div className="flex items-center gap-2">
-                                <Calendar className="w-3 h-3 opacity-60" />
-                                {(() => {
-                                  const dateVal =
-                                    post.scheduled_at || post.published_at;
-                                  if (!dateVal)
-                                    return (
-                                      <span className="text-xs opacity-50">
-                                        {t("common.noDate") || "Sin fecha"}
-                                      </span>
-                                    );
-                                  const dateObj = new Date(dateVal);
-                                  return !isNaN(dateObj.getTime())
-                                    ? dateObj.toLocaleString()
-                                    : t("common.invalidDate") ||
-                                        "Fecha inválida";
-                                })()}
-                              </div>
-                            </td>
-                            <td className="px-4 py-2">
-                              {post.title ||
-                                post.campaign?.title ||
-                                t("common.unknown")}
-                            </td>
-                          </tr>
-                        ))}
+                        {posts.map((post) => {
+                          // Determine which date to show based on post status
+                          const dateToShow = post.status === 'published' 
+                            ? post.published_at 
+                            : post.scheduled_at;
+                          
+                          return (
+                            <tr key={post.id}>
+                              <td className="px-4 py-2 whitespace-nowrap">
+                                <div className="flex items-center gap-2">
+                                  <Calendar className="w-3 h-3 opacity-60" />
+                                  {(() => {
+                                    if (!dateToShow)
+                                      return (
+                                        <span className="text-xs opacity-50">
+                                          {t("common.noDate") || "Sin fecha"}
+                                        </span>
+                                      );
+                                    const dateObj = new Date(dateToShow);
+                                    return !isNaN(dateObj.getTime())
+                                      ? dateObj.toLocaleString()
+                                      : t("common.invalidDate") ||
+                                          "Fecha inválida";
+                                  })()}
+                                </div>
+                              </td>
+                              <td className="px-4 py-2">
+                                {post.title ||
+                                  post.campaign?.title ||
+                                  t("common.unknown")}
+                              </td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>
