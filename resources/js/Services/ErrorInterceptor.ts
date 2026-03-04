@@ -23,7 +23,6 @@ class ErrorInterceptorClass {
   private async handleError(error: AxiosError<ErrorResponse>) {
     // Ignore canceled requests (from AbortController)
     if (axios.isCancel(error)) {
-      console.log('Request canceled:', error.message);
       return;
     }
 

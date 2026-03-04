@@ -67,11 +67,8 @@ export function OnboardingProvider({ children }: OnboardingProviderProps) {
       // 2. We don't have local state yet (currentStep === 0)
       // 3. Tour was completed on backend but not locally
       if (currentStep === 0 || propsStep > currentStep || (propsTourCompleted && !currentTourCompleted)) {
-        console.log('OnboardingContext: Updating state from props');
-        store.setState(onboardingProps);
-      } else {
-        console.log('OnboardingContext: Keeping local state (more recent)');
-      }
+       store.setState(onboardingProps);
+      } 
     }
   }, [onboardingProps]);
 

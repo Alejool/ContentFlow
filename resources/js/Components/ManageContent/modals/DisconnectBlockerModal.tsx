@@ -20,11 +20,6 @@ export default function DisconnectBlockerModal({
 }: DisconnectBlockerModalProps) {
   const { t } = useTranslation();
 
-  // Debug: log posts to see what data we're receiving
-  if (isOpen) {
-    console.log('DisconnectBlockerModal - Posts received:', posts);
-    console.log('DisconnectBlockerModal - Reason:', reason);
-  }
 
   if (!isOpen) return null;
 
