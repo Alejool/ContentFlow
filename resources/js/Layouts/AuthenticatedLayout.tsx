@@ -110,12 +110,12 @@ export default function AuthenticatedLayout({
     document.documentElement.setAttribute("data-theme-color", color);
   }, [user?.theme_color]);
 
-  // Keyboard shortcut: Ctrl+/ to show shortcuts modal
+  // Keyboard shortcut: Ctrl+/ to toggle shortcuts modal
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if ((event.ctrlKey || event.metaKey) && event.key === "/") {
         event.preventDefault();
-        setShowShortcutsModal(true);
+        setShowShortcutsModal((prev) => !prev);
       }
     };
 
