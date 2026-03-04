@@ -59,7 +59,6 @@
       "move": "Mover"
     },
     "event": "evento",
-    "events": "eventos",
     "selected": "seleccionados",
     "of": "de",
     "total": "total",
@@ -83,7 +82,7 @@
     "deleteCount": "Eliminar {{count}} eventos",
     "deleteCount_one": "Eliminar 1 evento",
     "events": {
-      "count": "Eventos",
+      "count": "eventos",
       "empty": "No hay eventos para este día",
       "noScheduled": "Sin eventos programados"
     },

@@ -13,7 +13,6 @@
       "today": "Today"
     },
     "event": "event",
-    "events": "events",
     "selected": "selected",
     "of": "of",
     "total": "total",
@@ -47,7 +46,7 @@
       "events": "Events Only"
     },
     "events": {
-      "count": "Events",
+      "count": "events",
       "empty": "No events for this day"
     },
     "userEvents": {
