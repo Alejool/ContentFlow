@@ -1,7 +1,7 @@
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { X, Keyboard } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useTheme } from "@/Hooks/useTheme";
+import Button from "@/Components/common/Modern/Button";
 
 interface KeyboardShortcutsModalProps {
   isOpen: boolean;
@@ -29,7 +29,7 @@ const SHORTCUTS_CONFIG: ShortcutDefinition[] = [
     macKeys: ["⌘", "⌥", "T"],
     winKeys: ["Ctrl", "Alt", "T"],
     translationKey: "shortcuts.theme.toggle",
-    fallbackText: "Cambiar tema (Claro/Oscuro/Sistema)",
+    fallbackText: "Cambiar tema (Claro/Oscuro)",
     category: "appearance",
   },
   // Navegación
@@ -55,7 +55,6 @@ export default function KeyboardShortcutsModal({
   onClose,
 }: KeyboardShortcutsModalProps) {
   const { t } = useTranslation();
-  const { theme } = useTheme();
 
   const isMac = typeof navigator !== "undefined" && 
     (navigator.userAgent.toUpperCase().indexOf("MAC") >= 0 || 
@@ -128,15 +127,7 @@ export default function KeyboardShortcutsModal({
                       <div className="flex items-center gap-1">
                         {shortcut.keys.map((key, keyIndex) => (
                           <span key={keyIndex} className="flex items-center gap-1">
-                            <kbd
-                              className={`
-                                px-2.5 py-1.5 rounded text-xs font-mono font-bold shadow-sm
-                                ${theme === "dark"
-                                  ? "bg-neutral-700 text-neutral-200 border border-neutral-600"
-                                  : "bg-white text-gray-700 border border-gray-300"
-                                }
-                              `}
-                            >
+                            <kbd className="px-2.5 py-1.5 rounded text-xs font-mono font-bold shadow-sm bg-white text-gray-700 border border-gray-300 dark:bg-neutral-700 dark:text-neutral-200 dark:border-neutral-600">
                               {key}
                             </kbd>
                             {keyIndex < shortcut.keys.length - 1 && (
@@ -155,12 +146,14 @@ export default function KeyboardShortcutsModal({
           </div>
 
           <div className="flex justify-end gap-3 p-4 border-t border-gray-200 dark:border-neutral-700">
-            <button
+            <Button
               onClick={onClose}
-              className="px-4 py-2 rounded-lg font-medium transition-colors bg-gray-100 dark:bg-neutral-700 hover:bg-gray-200 dark:hover:bg-neutral-600 text-gray-700 dark:text-white"
+              variant="secondary"
+              buttonStyle="ghost"
+              size="md"
             >
               {t("common.close", "Cerrar")}
-            </button>
+            </Button>
           </div>
         </DialogPanel>
       </div>
