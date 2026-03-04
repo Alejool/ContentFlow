@@ -20,6 +20,23 @@ export const dateTimeFormats: Record<string, Intl.DateTimeFormatOptions> = {
     day: "numeric",
     weekday: "long",
   },
+  monthYear: {
+    month: "long",
+    year: "numeric",
+  },
+  dayMonth: {
+    day: "numeric",
+    month: "long",
+  },
+  monthShort: {
+    month: "short",
+  },
+  dayWeekMonthYear: {
+    day: "numeric",
+    weekday: "long",
+    month: "long",
+    year: "numeric",
+  },
   time: {
     hour: "2-digit",
     minute: "2-digit",
