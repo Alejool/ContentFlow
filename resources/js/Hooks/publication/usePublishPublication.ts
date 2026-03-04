@@ -548,17 +548,7 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
         platform_ids: [platformId]
       };
       
-      console.log('handleCancelPlatform called with:', {
-        publicationId,
-        platformId,
-        payload,
-        route: route("api.v1.publications.cancel", publicationId)
-      });
-      
       const response = await axios.post(route("api.v1.publications.cancel", publicationId), payload);
-      
-      console.log('Cancel platform response:', response.data);
-      
       toast.success("Plataforma cancelada");
       
       // Dispatch event to update UI

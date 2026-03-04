@@ -285,13 +285,6 @@ export const useS3Upload = () => {
 
       const { upload_url, key } = signData;
 
-      console.log('📤 Starting single file upload', {
-        filename: file.name,
-        size: file.size,
-        type: file.type,
-        key: key,
-      });
-
       // Get abort controller from store
       const currentUpload = useUploadQueue.getState().queue[id];
       const abortController = currentUpload?.abortController;
@@ -303,25 +296,12 @@ export const useS3Upload = () => {
         onUploadProgress: (p) => handleProgress(p, id, startTime, 0, file.size),
       });
 
-      console.log('✅ Single file upload completed', {
-        filename: file.name,
-        key: key,
-      });
-
       return { key, filename: file.name, mime_type: file.type, size: file.size };
     } catch (error: any) {
       // Check if error is due to cancellation
       if (axios.isCancel(error) || error.name === "CanceledError") {
-        console.log('Upload cancelled:', file.name);
         throw error; // Re-throw to be handled by caller
       }
-
-      console.error('❌ Single file upload failed', {
-        filename: file.name,
-        error: error.message,
-        response: error.response?.data,
-        status: error.response?.status,
-      });
       throw error;
     }
   };

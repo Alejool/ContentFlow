@@ -434,8 +434,6 @@ export const usePublicationForm = ({
     const uploadPromises = newMediaItems.map(async (item) => {
       if (!item.file) return;
 
-      console.log('🚀 Starting upload for file:', item.file.name, 'tempId:', item.tempId);
-      
       // CRITICAL FIX: If editing an existing publication, link immediately
       // so attachMedia gets called when upload completes
       if (publication?.id) {
@@ -449,9 +447,7 @@ export const usePublicationForm = ({
       // CRITICAL: Actually start the upload!
       try {
         uploadFile(item.file, item.tempId); // Fire and forget - uploadFile handles its own state
-        console.log('✅ Upload initiated for:', item.file.name);
       } catch (error) {
-        console.error('❌ Failed to start upload for:', item.file.name, error);
         toast.error(`Failed to upload ${item.file.name}`);
         updateFile(item.tempId, { status: "failed" });
       }
