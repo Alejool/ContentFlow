@@ -1,4 +1,5 @@
 import PublicationThumbnail from "@/Components/ManageContent/Publication/PublicationThumbnail";
+import { formatDate } from "@/Utils/i18nHelpers";
 import { Campaign } from "@/types/Campaign";
 import { format } from "date-fns";
 import { useTranslation } from "react-i18next";
@@ -47,7 +48,7 @@ export default function CampaignPublications({
                           {pub.title}
                         </div>
                         <div className="text-xs text-gray-500">
-                          {new Intl.DateTimeFormat(i18n.language || undefined, { year: 'numeric', month: 'short', day: 'numeric' }).format(new Date(pub.created_at))}
+                          {formatDate(new Date(pub.created_at), "medium")}
                         </div>
                       </div>
                     </div>
