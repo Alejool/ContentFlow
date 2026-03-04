@@ -207,9 +207,35 @@ class PublicationController extends Controller
     }
   }
 
-  public function show(Request $request, Publication $publication)
+  public function show(Request $request, $publicationId)
   {
-    if (!Auth::user()->hasPermission('manage-content', $publication->workspace_id) && !Auth::user()->hasPermission('view-content', $publication->workspace_id)) {
+    // Manually resolve publication to provide better error messages
+    $publication = Publication::withoutGlobalScope('workspace')->find($publicationId);
+    
+    if (!$publication) {
+      return $this->errorResponse('Publication not found.', 404);
+    }
+    
+    // Check if publication belongs to current workspace
+    $currentWorkspaceId = Auth::user()->current_workspace_id ?? Auth::user()->workspaces()->first()?->id;
+    
+    // Verify user has access to the publication's workspace
+    $userWorkspaceIds = Auth::user()->workspaces()->pluck('workspaces.id')->toArray();
+    if (!in_array($publication->workspace_id, $userWorkspaceIds)) {
+      return $this->errorResponse('You do not have access to this publication.', 403);
+    }
+    
+    // If publication is from a different workspace, inform the user
+    if ($publication->workspace_id !== $currentWorkspaceId) {
+      return $this->errorResponse('This publication belongs to a different workspace. Please switch to the correct workspace to view it.', 403);
+    }
+    
+    // Check permissions - allow if user has manage-content, view-content, OR is the publication creator
+    $hasPermission = Auth::user()->hasPermission('manage-content', $publication->workspace_id) 
+      || Auth::user()->hasPermission('view-content', $publication->workspace_id)
+      || $publication->user_id === Auth::id();
+    
+    if (!$hasPermission) {
       return $this->errorResponse('You do not have permission to view this publication.', 403);
     }
 
@@ -422,6 +448,12 @@ class PublicationController extends Controller
   public function destroy(Publication $publication, DeletePublicationAction $action)
   {
     $workspaceId = $publication->workspace_id;
+    $currentWorkspaceId = Auth::user()->current_workspace_id;
+
+    // Verify publication belongs to current workspace
+    if ($workspaceId !== $currentWorkspaceId) {
+      return $this->errorResponse('This publication does not belong to your current workspace.', 403);
+    }
 
     if (!Auth::user()->hasPermission('manage-content', $workspaceId)) {
       return $this->errorResponse('You do not have permission to delete this publication.', 403);
