@@ -1,0 +1,19 @@
+{
+  "shortcuts": {
+    "title": "Atajos de Teclado",
+    "category": {
+      "appearance": "Apariencia",
+      "navigation": "Navegación",
+      "help": "Ayuda"
+    },
+    "theme": {
+      "toggle": "Cambiar tema (Claro/Oscuro/Sistema)"
+    },
+    "search": {
+      "open": "Abrir búsqueda rápida"
+    },
+    "help": {
+      "show": "Mostrar atajos de teclado"
+    }
+  }
+}

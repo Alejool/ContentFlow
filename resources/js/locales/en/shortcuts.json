@@ -1,0 +1,19 @@
+{
+  "shortcuts": {
+    "title": "Keyboard Shortcuts",
+    "category": {
+      "appearance": "Appearance",
+      "navigation": "Navigation",
+      "help": "Help"
+    },
+    "theme": {
+      "toggle": "Toggle theme (Light/Dark/System)"
+    },
+    "search": {
+      "open": "Open quick search"
+    },
+    "help": {
+      "show": "Show keyboard shortcuts"
+    }
+  }
+}
