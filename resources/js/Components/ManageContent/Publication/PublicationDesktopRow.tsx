@@ -144,6 +144,8 @@ const PublicationRow = memo(
             >
               {(item as any).type === "user_event" ? (
                 <Calendar className="w-6 h-6 text-primary-500" />
+              ) : item.scheduled_at && item.status !== "published" ? (
+                <Clock className="w-6 h-6 text-primary-500" />
               ) : (
                 <PublicationThumbnail publication={item} t={t} />
               )}
@@ -265,7 +267,11 @@ const PublicationRow = memo(
               {((item as any).type === "user_event" || item.scheduled_at) && (
                 <div className="flex flex-col gap-0.5 mt-1">
                   <div className="flex items-center gap-1.5">
-                    <Calendar className="w-3 h-3 text-primary-500" />
+                    {(item as any).type === "user_event" ? (
+                      <Calendar className="w-3 h-3 text-primary-500" />
+                    ) : (
+                      <Clock className="w-3 h-3 text-primary-500" />
+                    )}
                     <span className="text-[10px] font-bold text-primary-500 uppercase tracking-tight">
                       {(item as any).type === "user_event"
                         ? "Evento Manual"
@@ -274,7 +280,12 @@ const PublicationRow = memo(
                   </div>
                   {(item as any).type === "user_event" && item.user && (
                     <span className="text-[9px] font-medium text-gray-500 dark:text-gray-400 italic ml-4">
-                      Creado por: {item.user.name}
+                      {item.user.id === currentUserId ? `${item.user.name} (Yo)` : `Creado por: ${item.user.name}`}
+                    </span>
+                  )}
+                  {item.scheduled_at && item.status !== "published" && item.user && (
+                    <span className="text-[9px] font-medium text-gray-500 dark:text-gray-400 italic ml-4">
+                      {item.user.id === currentUserId ? `${item.user.name} (Yo)` : `Creado por: ${item.user.name}`}
                     </span>
                   )}
                 </div>
@@ -509,6 +520,19 @@ const PublicationRow = memo(
               <button
                 onClick={async (e) => {
                   e.stopPropagation();
+                  
+                  // For user events, only the owner can delete
+                  if ((item as any).type === "user_event") {
+                    const isOwner = item.user?.id && Number(item.user.id) === Number(currentUserId);
+                    if (!isOwner) {
+                      toast.error(
+                        t("calendar.userEvents.modal.messages.onlyOwnerCanDelete") ||
+                        "Solo el creador del evento puede eliminarlo"
+                      );
+                      return;
+                    }
+                  }
+                  
                   setIsDeleting(true);
                   try {
                     if ((item as any).type === "user_event") {
@@ -533,15 +557,18 @@ const PublicationRow = memo(
                     } else {
                       await onDelete(item.id);
                     }
-                  } catch (error) {
-                    toast.error("Error al eliminar");
+                  } catch (error: any) {
+                    const errorMessage = error.response?.data?.message || "Error al eliminar";
+                    toast.error(errorMessage);
                   } finally {
                     setIsDeleting(false);
                   }
                 }}
                 disabled={isPublishing || isEditing || isDeleting}
                 className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg dark:hover:bg-red-900/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                title="Eliminar"
+                title={(item as any).type === "user_event" && item.user?.id && Number(item.user.id) !== Number(currentUserId) 
+                  ? "Solo el creador puede eliminar este evento" 
+                  : "Eliminar"}
               >
                 {isDeleting ? (
                   <Loader2 className="w-4 h-4 animate-spin" />

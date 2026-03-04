@@ -247,6 +247,10 @@ const PublicationMobileRow = memo(
                         <div className="w-16 h-16 rounded-lg border border-gray-200 dark:border-neutral-700 bg-gray-100 dark:bg-neutral-800 flex items-center justify-center shadow-sm">
                           <Calendar className="w-8 h-8 text-primary-500" />
                         </div>
+                      ) : item.scheduled_at && item.status !== "published" ? (
+                        <div className="w-16 h-16 rounded-lg border border-gray-200 dark:border-neutral-700 bg-gray-100 dark:bg-neutral-800 flex items-center justify-center shadow-sm">
+                          <Clock className="w-8 h-8 text-primary-500" />
+                        </div>
                       ) : !hasImageError ? (
                         <img
                           src={mediaUrl}
@@ -364,7 +368,15 @@ const PublicationMobileRow = memo(
                     <div className="flex items-center gap-1.5 mb-2">
                       <Users className="w-3 h-3 text-gray-400" />
                       <span className="text-[10px] font-medium text-gray-500 dark:text-gray-400 italic">
-                        Creado por: {item.user.name}
+                        {item.user.id === currentUserId ? `${item.user.name} (Yo)` : `Creado por: ${item.user.name}`}
+                      </span>
+                    </div>
+                  )}
+                  {item.scheduled_at && item.status !== "published" && item.user && (
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <Users className="w-3 h-3 text-gray-400" />
+                      <span className="text-[10px] font-medium text-gray-500 dark:text-gray-400 italic">
+                        {item.user.id === currentUserId ? `${item.user.name} (Yo)` : `Creado por: ${item.user.name}`}
                       </span>
                     </div>
                   )}
@@ -411,7 +423,11 @@ const PublicationMobileRow = memo(
                     {((item as any).type === "user_event" ||
                       (item.scheduled_at && item.status !== "published")) && (
                       <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400">
-                        <Calendar className="w-3.5 h-3.5" />
+                        {(item as any).type === "user_event" ? (
+                          <Calendar className="w-3.5 h-3.5" />
+                        ) : (
+                          <Clock className="w-3.5 h-3.5" />
+                        )}
                         <span className="font-medium">
                           {(item as any).type === "user_event"
                             ? "Evento Manual"
@@ -716,6 +732,19 @@ const PublicationMobileRow = memo(
                           <button
                             onClick={async (e) => {
                               e.stopPropagation();
+                              
+                              // For user events, only the owner can delete
+                              if ((item as any).type === "user_event") {
+                                const isOwner = item.user?.id && Number(item.user.id) === Number(currentUserId);
+                                if (!isOwner) {
+                                  toast.error(
+                                    t("calendar.userEvents.modal.messages.onlyOwnerCanDelete") ||
+                                    "Solo el creador del evento puede eliminarlo"
+                                  );
+                                  return;
+                                }
+                              }
+                              
                               setLoadingStates((prev) => ({
                                 ...prev,
                                 [item.id]: {
@@ -746,8 +775,9 @@ const PublicationMobileRow = memo(
                                 } else {
                                   await onDelete(item.id);
                                 }
-                              } catch (error) {
-                                toast.error("Error al eliminar");
+                              } catch (error: any) {
+                                const errorMessage = error.response?.data?.message || "Error al eliminar";
+                                toast.error(errorMessage);
                               } finally {
                                 setLoadingStates((prev) => ({
                                   ...prev,
@@ -761,10 +791,13 @@ const PublicationMobileRow = memo(
                             disabled={
                               isLoading?.publishing ||
                               isLoading?.editing ||
-                              isLoading?.deleting
+                              isLoading?.deleting ||
+                              ((item as any).type === "user_event" && item.user?.id && Number(item.user.id) !== Number(currentUserId))
                             }
                             className="flex-1 py-2.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/30 font-medium text-xs flex items-center justify-center gap-2 transition-colors active:scale-95 disabled:opacity-50"
-                            title="Eliminar"
+                            title={(item as any).type === "user_event" && item.user?.id && Number(item.user.id) !== Number(currentUserId) 
+                              ? "Solo el creador puede eliminar este evento" 
+                              : "Eliminar"}
                           >
                             {isLoading?.deleting ? (
                               <Loader2 className="w-4 h-4 animate-spin" />
