@@ -7,6 +7,7 @@ import {
   startOfWeek 
 } from 'date-fns';
 import { CalendarEvent, CalendarFilters } from '@/types/calendar';
+import { usePage } from '@inertiajs/react';
 
 interface FetchEventsParams {
   currentMonth: Date;
@@ -27,6 +28,9 @@ interface BulkUpdateParams {
 
 // Fetch calendar events with caching
 export function useCalendarEvents({ currentMonth, filters }: FetchEventsParams) {
+  const { auth } = usePage<any>().props;
+  const workspaceId = auth?.user?.current_workspace_id;
+  
   const start = startOfWeek(startOfMonth(currentMonth)).toISOString();
   const end = endOfWeek(endOfMonth(currentMonth)).toISOString();
 
@@ -43,8 +47,9 @@ export function useCalendarEvents({ currentMonth, filters }: FetchEventsParams) 
     params.statuses = filters.statuses.join(',');
   }
 
-  // Create a unique query key based on date range and filters
-  const queryKey = ['calendar-events', start, end, filters];
+  // Create a unique query key based on workspace, date range and filters
+  // Including workspaceId ensures the cache is invalidated when workspace changes
+  const queryKey = ['calendar-events', workspaceId, start, end, filters];
 
   return useQuery({
     queryKey,
@@ -55,6 +60,7 @@ export function useCalendarEvents({ currentMonth, filters }: FetchEventsParams) 
       return response.data.data || [];
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
+    enabled: !!workspaceId, // Only fetch if workspace is set
   });
 }
 

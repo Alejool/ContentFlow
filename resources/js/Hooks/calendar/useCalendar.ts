@@ -66,8 +66,17 @@ export const useCalendar = () => {
     return events.filter((e) => {
       // Platform filter
       if (platformFilter !== "all") {
-        if (platformFilter === "user_event" && e.type !== "user_event") return false;
-        if (platformFilter !== "user_event" && e.extendedProps.platform?.toLowerCase() !== platformFilter) return false;
+        if (platformFilter === "user_event") {
+          // Only show user events
+          if (e.type !== "user_event") return false;
+        } else {
+          // Show events matching the selected platform
+          if (e.type === "user_event") return false;
+          
+          // Check both platform and extendedProps.platform for compatibility
+          const eventPlatform = (e.platform || e.extendedProps?.platform)?.toLowerCase();
+          if (!eventPlatform || eventPlatform !== platformFilter.toLowerCase()) return false;
+        }
       }
 
       // Status filter

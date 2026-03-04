@@ -91,7 +91,7 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
             </div>
             <div className="flex items-center gap-2">
               <span className="px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300 capitalize">
-                {event.status}
+                {t(`status.${event.status}`, event.status)}
               </span>
               {event.type && (
                 <span className="px-3 py-1 rounded-full bg-primary-100 dark:bg-primary-900/30 text-sm font-medium text-primary-700 dark:text-primary-300 capitalize">

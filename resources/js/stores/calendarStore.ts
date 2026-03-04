@@ -116,13 +116,13 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
 
     // Apply AND logic: event must match ALL active filter types
     return events.filter((event) => {
-      // Platform filter - check the specific platform field (now each event has one platform)
+      // Platform filter - normalize both sides to lowercase for comparison
       const platformMatch =
         filters.platforms.length === 0 ||
-        (event.platform && filters.platforms.includes(event.platform)) ||
+        (event.platform && filters.platforms.map(p => p.toLowerCase()).includes(event.platform.toLowerCase())) ||
         (event.extendedProps?.platforms && 
          Array.isArray(event.extendedProps.platforms) &&
-         event.extendedProps.platforms.some((p: string) => filters.platforms.includes(p)));
+         event.extendedProps.platforms.some((p: string) => filters.platforms.map(f => f.toLowerCase()).includes(p.toLowerCase())));
 
       // Campaign filter - check if event's campaign matches any selected campaign
       const campaignMatch =
@@ -401,15 +401,31 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
 
   deleteEvent: async (id) => {
     try {
-      const resourceId = id.includes("_") ? id.split("_")[2] : id;
-      await axios.delete(`/api/v1/calendar/user-events/${resourceId}`);
+      // Parse event ID to determine type
+      const parts = id.split("_");
+      const type = parts[0]; // 'post', 'user', or 'publication'
+      const resourceId = parts[parts.length - 1]; // Get the last part as resource ID
+
+      if (type === "user") {
+        // Delete user event
+        await axios.delete(`/api/v1/calendar/user-events/${resourceId}`);
+      } else if (type === "post") {
+        // Delete scheduled post
+        await axios.delete(`/api/v1/scheduled-posts/${resourceId}`);
+      } else {
+        // For other types, try user-events endpoint as fallback
+        await axios.delete(`/api/v1/calendar/user-events/${resourceId}`);
+      }
+
+      // Remove from local state
       const events = get().events.filter((ev) => ev.id !== id);
       set({ events });
 
       return true;
     } catch (error: any) {
+      console.error("Delete event error:", error);
       set({
-        error: error.message ?? "Failed to delete event",
+        error: error.response?.data?.message || error.message || "Failed to delete event",
       });
       return false;
     }

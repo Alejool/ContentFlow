@@ -24,14 +24,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
-import {
-  FaFacebook,
-  FaInstagram,
-  FaLinkedin,
-  FaTiktok,
-  FaTwitter,
-  FaYoutube,
-} from "react-icons/fa";
+import { SOCIAL_PLATFORMS } from "@/Constants/socialPlatformsConfig";
 import { CalendarViewSelector } from "@/Components/Calendar/CalendarViewSelector";
 import { CalendarNavigation } from "@/Components/Calendar/CalendarNavigation";
 import { MonthView } from "@/Components/Calendar/MonthView";
@@ -49,27 +42,23 @@ const PlatformIcon = ({
   platform?: string;
   className?: string;
 }) => {
-  switch (platform?.toLowerCase()) {
-    case "instagram":
-      return <FaInstagram className={`text-pink-600 ${className}`} />;
-    case "facebook":
-      return <FaFacebook className={`text-blue-600 ${className}`} />;
-    case "twitter":
-    case "x":
-      return <FaTwitter className={`text-sky-500 ${className}`} />;
-    case "linkedin":
-      return <FaLinkedin className={`text-blue-700 ${className}`} />;
-    case "youtube":
-      return <FaYoutube className={`text-red-600 ${className}`} />;
-    case "tiktok":
-      return <FaTiktok className={`text-black dark:text-white ${className}`} />;
-    case "user_event":
-    case "event":
-    case "events":
-      return <CalendarIcon className={`text-primary-500 ${className}`} />;
-    default:
-      return <CalendarIcon className={`text-gray-500 ${className}`} />;
+  const platformKey = platform?.toLowerCase();
+  
+  // Handle user events
+  if (["user_event", "event", "events"].includes(platformKey || "")) {
+    return <CalendarIcon className={`text-primary-500 ${className}`} />;
   }
+  
+  // Get platform config from SOCIAL_PLATFORMS
+  const platformConfig = platformKey && SOCIAL_PLATFORMS[platformKey as keyof typeof SOCIAL_PLATFORMS];
+  
+  if (platformConfig) {
+    const Icon = platformConfig.icon;
+    return <Icon className={`${platformConfig.textColor} ${className}`} />;
+  }
+  
+  // Fallback for unknown platforms
+  return <CalendarIcon className={`text-gray-500 ${className}`} />;
 };
 
 import { useCalendarStore } from "@/stores/calendarStore";
@@ -157,6 +146,16 @@ export default function CalendarIndex({ auth }: { auth: any }) {
     fetchEvents();
     fetchCampaigns();
   }, [currentDate]);
+
+  // Refresh calendar when workspace changes
+  useEffect(() => {
+    const workspaceId = auth?.user?.current_workspace_id;
+    if (workspaceId) {
+      fetchEvents();
+      fetchCampaigns();
+      clearSelection(); // Clear any selected events from previous workspace
+    }
+  }, [auth?.user?.current_workspace_id]);
 
   // Grid Generation
   const days = eachDayOfInterval({
@@ -344,6 +343,7 @@ export default function CalendarIndex({ auth }: { auth: any }) {
                       onToggleSelection={toggleEventSelection}
                       PlatformIcon={PlatformIcon}
                       currentUser={auth.user}
+                      t={t}
                     />
                   )}
                   
@@ -468,8 +468,8 @@ export default function CalendarIndex({ auth }: { auth: any }) {
         canDelete={
           selectedEvent &&
           ['user_event', 'event'].includes(String(selectedEvent.type)) &&
-          (!selectedEvent.extendedProps?.is_public ||
-            selectedEvent.extendedProps?.user_name === auth.user?.name)
+          (Number(selectedEvent.user?.id) === Number(auth.user?.id) ||
+            (!selectedEvent.user?.id && selectedEvent.extendedProps?.user_name === auth.user?.name))
         }
       />
 

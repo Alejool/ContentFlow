@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, ChevronDown, Calendar as CalendarIcon, Loader2 } from 'lucide-react';
 import { format, setMonth, setYear } from 'date-fns';
 import { useTranslation } from 'react-i18next';
+import { formatDate } from '@/Utils/i18nHelpers';
 import { CalendarView } from '@/types/calendar';
 
 interface CalendarNavigationProps {
@@ -62,23 +63,12 @@ export const CalendarNavigation: React.FC<CalendarNavigationProps> = ({
   const getDateDisplay = () => {
     switch (view) {
       case 'day':
-        return new Intl.DateTimeFormat(i18n.language || undefined, {
-          weekday: 'long',
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-        }).format(currentDate);
+        return formatDate(currentDate, "dayWeekMonthYear");
       case 'week':
-        return new Intl.DateTimeFormat(i18n.language || undefined, {
-          month: 'long',
-          year: 'numeric',
-        }).format(currentDate);
+        return formatDate(currentDate, "monthYear");
       case 'month':
       default:
-        return new Intl.DateTimeFormat(i18n.language || undefined, {
-          month: 'long',
-          year: 'numeric',
-        }).format(currentDate);
+        return formatDate(currentDate, "monthYear");
     }
   };
 
@@ -121,9 +111,7 @@ export const CalendarNavigation: React.FC<CalendarNavigationProps> = ({
                       : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
                   }`}
                 >
-                  {new Intl.DateTimeFormat(i18n.language || undefined, {
-                    month: 'short',
-                  }).format(new Date(2024, i, 1))}
+                  {formatDate(new Date(2024, i, 1), "monthShort")}
                 </button>
               ))}
             </div>
