@@ -198,8 +198,16 @@ export function ThemeProvider({
   };
 
   const toggleTheme = () => {
-    // Ciclo: light -> dark -> system -> light
-    const newTheme = theme === "light" ? "dark" : theme === "dark" ? "system" : "light";
+    // Ciclo: light -> dark -> light (sin system)
+    // Si el tema actual es "system", lo convertimos primero al opuesto del actualTheme
+    let newTheme: Theme;
+    if (theme === "system") {
+      // Si está en system, cambiamos al opuesto del tema actual resuelto
+      newTheme = actualTheme === "light" ? "dark" : "light";
+    } else {
+      // Si no está en system, simplemente alternamos
+      newTheme = theme === "light" ? "dark" : "light";
+    }
     setTheme(newTheme);
   };
 
