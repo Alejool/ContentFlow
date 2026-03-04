@@ -692,7 +692,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
           return (
             <div
               key={hour}
-              className="flex border-b border-gray-100 dark:border-gray-800 min-h-[100px] hover:bg-gray-50 dark:hover:bg-gray-900/30 transition-colors"
+              className="flex flex-1 border-b border-gray-100 dark:border-gray-800 min-h-[100px] hover:bg-gray-50 dark:hover:bg-gray-900/30 transition-colors"
             >
               <div className="w-24 p-4 text-right border-r border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50">
                 <div className="text-sm font-semibold text-gray-900 dark:text-white">
