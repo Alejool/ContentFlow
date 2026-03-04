@@ -121,9 +121,6 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
         }
         return acc;
       }, {} as any);
-
-      console.log('[publicationStore] Fetching publications with filters:', cleanFilters, 'page:', page);
-
       const response = await axios.get(route("api.v1.publications.index"), {
         params: { ...cleanFilters, page },
         paramsSerializer: {
@@ -144,15 +141,6 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
 
       const data = response.data.publications;
 
-      console.log('[publicationStore] Received publications:', data.data?.length || 0, 'items');
-      console.log('[publicationStore] Response structure:', {
-        hasData: !!data,
-        hasDataArray: !!data.data,
-        dataLength: data.data?.length,
-        currentPage: data.current_page,
-        total: data.total
-      });
-
       set({
         publications: data.data ?? [],
         pagination: {
@@ -163,11 +151,8 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
         },
         isLoading: false,
       });
-
-      console.log('[publicationStore] State updated, isLoading set to false');
     } catch (error: any) {
-      console.error('[publicationStore] Error fetching publications:', error);
-      set({
+       set({
         error: error.message ?? "Failed to fetch publications",
         isLoading: false,
       });
