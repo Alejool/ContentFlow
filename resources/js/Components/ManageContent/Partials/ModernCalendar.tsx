@@ -275,7 +275,7 @@ const DroppableTimeSlot = ({
     <div
       ref={setNodeRef}
       className={`
-        p-1 border-r border-gray-100 dark:border-gray-800 
+        flex-1 p-1 border-r border-gray-100 dark:border-gray-800 
         hover:bg-gray-50 dark:hover:bg-gray-900/30 transition-colors
         ${isOver ? "bg-primary-100/50 dark:bg-primary-900/20 ring-1 ring-primary-500" : ""}
       `}
@@ -692,20 +692,20 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
           return (
             <div
               key={hour}
-              className="flex flex-1 border-b border-gray-100 dark:border-gray-800 min-h-[100px] hover:bg-gray-50 dark:hover:bg-gray-900/30 transition-colors"
+              className="flex w-full border-b border-gray-100 dark:border-gray-800 min-h-[100px]"
             >
-              <div className="w-24 p-4 text-right border-r border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50">
+              <div className="w-24 p-4 text-right border-r border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 flex-shrink-0">
                 <div className="text-sm font-semibold text-gray-900 dark:text-white">
                   {format(setHours(new Date(), hour), "HH:mm")}
                 </div>
               </div>
 
               <DroppableTimeSlot id={dropId} day={selectedDate} hour={hour}>
-                <div className="flex-1 p-3 space-y-2">
+                <div className="p-3 space-y-2 w-full">
                   {hourEvents.map((event) => (
                     <div
                       key={event.id}
-                      className="relative p-4 rounded-lg bg-white dark:bg-gray-800 border-l-4 hover:shadow-lg transition-all"
+                      className="relative p-4 rounded-lg bg-white dark:bg-gray-800 border-l-4 hover:shadow-lg transition-all w-full"
                       style={{ borderLeftColor: event.color }}
                     >
                       <div className="flex items-start gap-3">
@@ -716,7 +716,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                             e.stopPropagation();
                             toggleEventSelection(event.id);
                           }}
-                          className="mt-1"
+                          className="mt-1 flex-shrink-0"
                         />
 
                         <div className="flex-1 min-w-0">
@@ -724,17 +724,17 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                             <div className="flex items-center gap-2">
                               {event.type === "user_event" ? (
                                 <CalendarIcon
-                                  className="w-5 h-5"
+                                  className="w-5 h-5 flex-shrink-0"
                                   style={{ color: event.color }}
                                 />
                               ) : event.platform ? (
                                 <PlatformIcon
                                   platform={event.platform}
-                                  className="w-5 h-5"
+                                  className="w-5 h-5 flex-shrink-0"
                                 />
                               ) : (
                                 <Clock
-                                  className="w-5 h-5"
+                                  className="w-5 h-5 flex-shrink-0"
                                   style={{ color: event.color }}
                                 />
                               )}
