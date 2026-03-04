@@ -32,6 +32,9 @@ class CalendarController extends Controller
     $campaigns = $campaignsParam ? array_map('intval', explode(',', $campaignsParam)) : [];
     $statuses = $statusesParam ? explode(',', $statusesParam) : [];
 
+    // Normalize platform names to lowercase for consistent filtering
+    $platforms = array_map('strtolower', $platforms);
+
     $clientTz = $request->header('X-User-Timezone') ?? config('app.timezone', 'UTC');
     try {
       if ($start) $start = Carbon::parse($start, $clientTz)->setTimezone('UTC');
@@ -40,144 +43,99 @@ class CalendarController extends Controller
     }
 
     $workspaceId = Auth::user()->current_workspace_id;
-    $query = Publication::where('workspace_id', $workspaceId)
+
+    // Query ScheduledPosts directly by workspace_id for better performance
+    // ScheduledPosts represent actual platform-specific scheduled posts
+    $scheduledPostsQuery = ScheduledPost::where('workspace_id', $workspaceId)
       ->with([
-        'user:id,name,photo_url',
-        'mediaFiles' => fn($q) => $q->select('media_files.id', 'media_files.file_path', 'media_files.file_type'),
-        'campaigns:id,name'
+        'publication' => function ($q) {
+          $q->with([
+            'user:id,name,photo_url',
+            'mediaFiles' => fn($mq) => $mq->select('media_files.id', 'media_files.file_path', 'media_files.file_type'),
+            'campaigns:id,name'
+          ]);
+        }
       ]);
 
     if ($start && $end) {
-      $query->whereBetween('scheduled_at', [$start, $end]);
+      $scheduledPostsQuery->whereBetween('scheduled_at', [$start, $end]);
     } else {
-      $query->whereMonth('scheduled_at', now()->month)
+      $scheduledPostsQuery->whereMonth('scheduled_at', now()->month)
         ->whereYear('scheduled_at', now()->year);
     }
 
-    // Apply status filter
+    // Apply status filter on the scheduled post status
     if (!empty($statuses)) {
-      $query->whereIn('status', $statuses);
+      $scheduledPostsQuery->whereIn('status', $statuses);
     }
 
-    // Apply campaign filter
+    // Apply platform filter - normalize to lowercase for comparison
+    if (!empty($platforms)) {
+      $scheduledPostsQuery->where(function ($q) use ($platforms) {
+        foreach ($platforms as $platform) {
+          $q->orWhereRaw('LOWER(platform) = ?', [strtolower($platform)]);
+        }
+      });
+    }
+
+    // Apply campaign filter through publication relationship
     if (!empty($campaigns)) {
-      $query->whereHas('campaigns', function ($q) use ($campaigns) {
+      $scheduledPostsQuery->whereHas('publication.campaigns', function ($q) use ($campaigns) {
         $q->whereIn('campaigns.id', $campaigns);
       });
     }
 
-    $publications = $query->get();
+    $scheduledPosts = $scheduledPostsQuery->get();
 
-    // Apply platform filter in memory (since platforms are in platform_settings)
-    if (!empty($platforms)) {
-      $publications = $publications->filter(function ($pub) use ($platforms) {
-        $platformSettings = $pub->platform_settings;
-        
-        // Ensure platform_settings is an array
-        if (!is_array($platformSettings)) {
-          if (is_string($platformSettings)) {
-            $platformSettings = json_decode($platformSettings, true);
-          }
-          if (!is_array($platformSettings)) {
-            $platformSettings = [];
-          }
-        }
-        
-        $enabledPlatforms = [];
-        foreach ($platformSettings as $platform => $settings) {
-          if (is_array($settings) && isset($settings['enabled']) && $settings['enabled'] === true) {
-            $enabledPlatforms[] = $platform;
-          }
-        }
-        
-        return !empty(array_intersect($platforms, $enabledPlatforms));
-      });
-    }
-
-    // Create events - one per platform for each publication
+    // Create events - one per scheduled post (which is already per platform)
     $events = collect();
     
-    foreach ($publications as $pub) {
-      // Get enabled platforms from platform_settings
-      $platformSettings = $pub->platform_settings;
+    foreach ($scheduledPosts as $post) {
+      $pub = $post->publication;
       
-      // Ensure platform_settings is an array
-      if (!is_array($platformSettings)) {
-        if (is_string($platformSettings)) {
-          $platformSettings = json_decode($platformSettings, true);
-        }
-        if (!is_array($platformSettings)) {
-          $platformSettings = [];
-        }
-      }
-      
-      $enabledPlatforms = [];
-      foreach ($platformSettings as $platform => $settings) {
-        if (is_array($settings) && isset($settings['enabled']) && $settings['enabled'] === true) {
-          $enabledPlatforms[] = $platform;
-        }
+      // Skip if publication doesn't exist or doesn't belong to current workspace
+      if (!$pub || $pub->workspace_id !== $workspaceId) {
+        continue;
       }
       
       $campaignNames = $pub->campaigns->pluck('name')->toArray();
       $primaryCampaign = !empty($campaignNames) ? $campaignNames[0] : null;
       
-      // Determine status color based on whether it has platforms
-      $hasNoPlatforms = empty($enabledPlatforms);
-      $displayStatus = $hasNoPlatforms ? 'no_platform' : $pub->status;
-
-      if ($hasNoPlatforms) {
-        // If no platforms, create a single event
-        $events->push([
-          'id' => "pub_{$pub->id}",
-          'resourceId' => $pub->id,
-          'type' => 'publication',
-          'title' => $pub->title,
-          'start' => $pub->scheduled_at ? $pub->scheduled_at->copy()->setTimezone('UTC')->toIso8601String() : null,
-          'status' => $pub->status,
-          'color' => $this->getStatusColor($displayStatus),
-          'platform' => null,
-          'campaign' => $primaryCampaign,
-          'hasNoPlatforms' => true,
-          'user' => $pub->user ? [
-            'id' => $pub->user->id,
-            'name' => $pub->user->name,
-            'photo_url' => $pub->user->photo_url,
-          ] : null,
-          'extendedProps' => [
-            'slug' => '/content',
-            'thumbnail' => $pub->mediaFiles->first()?->file_path,
-            'platforms' => [],
-            'campaigns' => $campaignNames,
-          ]
-        ]);
-      } else {
-        // Create one event per enabled platform
-        foreach ($enabledPlatforms as $platform) {
-          $events->push([
-            'id' => "pub_{$pub->id}_{$platform}", // Unique ID per platform
-            'resourceId' => $pub->id,
-            'type' => 'publication',
-            'title' => $pub->title,
-            'start' => $pub->scheduled_at ? $pub->scheduled_at->copy()->setTimezone('UTC')->toIso8601String() : null,
-            'status' => $pub->status,
-            'color' => $this->getStatusColor($displayStatus),
-            'platform' => $platform, // Set specific platform for this card
-            'campaign' => $primaryCampaign,
-            'hasNoPlatforms' => false,
-            'user' => $pub->user ? [
-              'id' => $pub->user->id,
-              'name' => $pub->user->name,
-              'photo_url' => $pub->user->photo_url,
-            ] : null,
-            'extendedProps' => [
-              'slug' => '/content',
-              'thumbnail' => $pub->mediaFiles->first()?->file_path,
-              'platforms' => [$platform], // Only this platform for filtering
-              'campaigns' => $campaignNames,
-            ]
-          ]);
-        }
-      }
+      // Map 'pending' status to 'scheduled' for display
+      $displayStatus = $post->status === 'pending' ? 'scheduled' : $post->status;
+      
+      // Normalize platform to lowercase for consistency
+      $normalizedPlatform = strtolower($post->platform);
+      
+      // Get platform color from config (matches SOCIAL_PLATFORMS in frontend)
+      $platformColor = $this->getPlatformColor($normalizedPlatform);
+      
+      $events->push([
+        'id' => "post_{$post->id}", // Use scheduled post ID
+        'resourceId' => $post->id,
+        'publicationId' => $pub->id, // Keep reference to publication
+        'type' => 'post',
+        'title' => $pub->title,
+        'start' => $post->scheduled_at ? $post->scheduled_at->copy()->setTimezone('UTC')->toIso8601String() : null,
+        'status' => $displayStatus,
+        'color' => $platformColor, // Use platform color instead of status color
+        'platform' => $normalizedPlatform,
+        'campaign' => $primaryCampaign,
+        'user' => $pub->user ? [
+          'id' => $pub->user->id,
+          'name' => $pub->user->name,
+          'photo_url' => $pub->user->photo_url,
+        ] : null,
+        'extendedProps' => [
+          'slug' => '/content',
+          'thumbnail' => $pub->mediaFiles->first()?->file_path,
+          'platform' => $normalizedPlatform, // Add platform here too for frontend access
+          'platforms' => [$normalizedPlatform],
+          'campaigns' => $campaignNames,
+          'publication_id' => $pub->id, // Add publication_id for frontend
+          'post_id' => $post->post_id, // External platform post ID if exists
+        ]
+      ]);
     }
 
     // 3. Format User Calendar Events
@@ -225,10 +183,12 @@ class CalendarController extends Controller
   {
     $request->validate([
       'scheduled_at' => 'required|date|after:now',
-      'type' => 'nullable|in:publication,post,user_event'
+      'type' => 'nullable|in:post,user_event'
     ]);
 
-    $type = $request->input('type', 'publication');
+    $type = $request->input('type', 'post');
+    $workspaceId = Auth::user()->current_workspace_id;
+    
     // Parse incoming scheduled_at using client's timezone header and convert to UTC
     $clientTz = $request->header('X-User-Timezone') ?? config('app.timezone', 'UTC');
     try {
@@ -237,32 +197,34 @@ class CalendarController extends Controller
       $newDate = Carbon::parse($request->scheduled_at);
     }
 
-    if ($type === 'publication') {
-      $model = Publication::where('workspace_id', Auth::user()->current_workspace_id)->findOrFail($id);
+    if ($type === 'post') {
+      // Find the scheduled post and verify it belongs to current workspace
+      $model = ScheduledPost::where('workspace_id', $workspaceId)
+        ->find($id);
+      
+      if (!$model) {
+        return $this->errorResponse('Scheduled post not found or does not belong to your workspace', 404);
+      }
+      
       // Check if user has permission
-      if (!Auth::user()->hasPermission('manage-content', Auth::user()->current_workspace_id)) {
+      if (!Auth::user()->hasPermission('manage-content', $workspaceId)) {
         return $this->errorResponse('Unauthorized', 403);
       }
+      
       $model->update([
         'scheduled_at' => $newDate,
       ]);
-      $model->load('user:id,name,photo_url');
-    } elseif ($type === 'post') {
-      $model = ScheduledPost::whereHas('publication', function ($q) {
-        $q->where('workspace_id', Auth::user()->current_workspace_id);
-      })->findOrFail($id);
-      // Check if user has permission
-      if (!Auth::user()->hasPermission('manage-content', Auth::user()->current_workspace_id)) {
-        return $this->errorResponse('Unauthorized', 403);
-      }
-      $model->update([
-        'scheduled_at' => $newDate,
-      ]);
-      $model->load('user:id,name,photo_url');
+      
+      // Load publication relationship for response
+      $model->load('publication.user:id,name,photo_url');
     } elseif ($type === 'user_event') {
-      $model = UserCalendarEvent::where('workspace_id', Auth::user()->current_workspace_id)
+      $model = UserCalendarEvent::where('workspace_id', $workspaceId)
         ->where('user_id', Auth::id())
-        ->findOrFail($id);
+        ->find($id);
+      
+      if (!$model) {
+        return $this->errorResponse('User event not found or does not belong to your workspace', 404);
+      }
 
       $duration = $model->end_date ? $model->start_date->diffInSeconds($model->end_date) : null;
 
@@ -276,7 +238,6 @@ class CalendarController extends Controller
     }
 
     // Clear publication cache to reflect the change in the list view
-    $workspaceId = Auth::user()->current_workspace_id;
     try {
       cache()->increment("publications:{$workspaceId}:version");
     } catch (\Exception $e) {
@@ -317,31 +278,17 @@ class CalendarController extends Controller
       try {
         // Parse event ID to get type and resource ID
         $parts = explode('_', $eventId);
-        $type = $parts[0]; // 'pub', 'post', or 'user'
+        $type = $parts[0]; // 'post' or 'user'
         $resourceId = end($parts);
 
-        if ($type === 'pub') {
-          $model = Publication::where('workspace_id', $workspaceId)->findOrFail($resourceId);
+        if ($type === 'post') {
+          // Find the scheduled post and verify it belongs to current workspace
+          $model = ScheduledPost::where('workspace_id', $workspaceId)
+            ->find($resourceId);
           
-          // Store previous state for undo
-          $previousState[] = [
-            'id' => $eventId,
-            'type' => 'publication',
-            'resource_id' => $resourceId,
-            'scheduled_at' => $model->scheduled_at->toIso8601String(),
-          ];
-
-          if ($operation === 'move') {
-            $model->update(['scheduled_at' => $newDate]);
-          } elseif ($operation === 'delete') {
-            $model->delete();
+          if (!$model) {
+            throw new \Exception('Scheduled post not found or does not belong to your workspace');
           }
-          
-          $successful[] = $eventId;
-        } elseif ($type === 'post') {
-          $model = ScheduledPost::whereHas('publication', function ($q) use ($workspaceId) {
-            $q->where('workspace_id', $workspaceId);
-          })->findOrFail($resourceId);
           
           $previousState[] = [
             'id' => $eventId,
@@ -360,7 +307,11 @@ class CalendarController extends Controller
         } elseif ($type === 'user') {
           $model = UserCalendarEvent::where('workspace_id', $workspaceId)
             ->where('user_id', Auth::id())
-            ->findOrFail($resourceId);
+            ->find($resourceId);
+          
+          if (!$model) {
+            throw new \Exception('User event not found or does not belong to your workspace');
+          }
           
           $duration = $model->end_date ? $model->start_date->diffInSeconds($model->end_date) : null;
           
@@ -458,20 +409,25 @@ class CalendarController extends Controller
     // Restore previous state
     foreach ($lastOperation->previous_state as $state) {
       try {
-        if ($state['type'] === 'publication') {
-          $model = Publication::where('workspace_id', $workspaceId)->findOrFail($state['resource_id']);
-          $model->update(['scheduled_at' => Carbon::parse($state['scheduled_at'])]);
-          $successful[] = $state['id'];
-        } elseif ($state['type'] === 'post') {
-          $model = ScheduledPost::whereHas('publication', function ($q) use ($workspaceId) {
-            $q->where('workspace_id', $workspaceId);
-          })->findOrFail($state['resource_id']);
+        if ($state['type'] === 'post') {
+          // Find the scheduled post and verify it belongs to current workspace
+          $model = ScheduledPost::where('workspace_id', $workspaceId)
+            ->find($state['resource_id']);
+          
+          if (!$model) {
+            throw new \Exception('Scheduled post not found or does not belong to your workspace');
+          }
+          
           $model->update(['scheduled_at' => Carbon::parse($state['scheduled_at'])]);
           $successful[] = $state['id'];
         } elseif ($state['type'] === 'user_event') {
           $model = UserCalendarEvent::where('workspace_id', $workspaceId)
             ->where('user_id', Auth::id())
-            ->findOrFail($state['resource_id']);
+            ->find($state['resource_id']);
+          
+          if (!$model) {
+            throw new \Exception('User event not found or does not belong to your workspace');
+          }
           $model->update([
             'start_date' => Carbon::parse($state['start_date']),
             'end_date' => $state['end_date'] ? Carbon::parse($state['end_date']) : null,
@@ -505,24 +461,41 @@ class CalendarController extends Controller
     ], 'Operation undone successfully.');
   }
 
+  /**
+   * Get platform color based on SOCIAL_PLATFORMS config
+   * This matches the frontend configuration in socialPlatformsConfig.tsx
+   */
+  private function getPlatformColor($platform)
+  {
+    $platformColors = [
+      'facebook' => '#2563EB',  // blue-600
+      'instagram' => '#DB2777', // pink-600
+      'tiktok' => '#000000',    // black
+      'twitter' => '#1F2937',   // gray-900
+      'x' => '#1F2937',         // gray-900 (alias for twitter)
+      'youtube' => '#DC2626',   // red-600
+      'linkedin' => '#1D4ED8',  // blue-700
+    ];
+
+    return $platformColors[$platform] ?? '#6B7280'; // gray-500 as default
+  }
+
   private function getStatusColor($status, $isPost = false)
   {
     $colors = [
       'published' => '#10B981', // green
+      'posted' => '#10B981',    // green (same as published)
       'failed' => '#EF4444',    // red
       'publishing' => '#3B82F6', // blue
       'pending_review' => '#F59E0B', // amber
       'approved' => '#8B5CF6',   // violet
-      'pending' => '#6366F1',    // indigo (for posts)
+      'pending' => '#6366F1',    // indigo - scheduled/pending posts
       'scheduled' => '#6366F1',  // indigo
       'draft' => '#6B7280',     // gray
       'no_platform' => '#F97316', // orange - for publications without social networks
     ];
 
     $color = $colors[$status] ?? $colors['draft'];
-
-    // If it's a post, maybe make it slightly different (e.g., more transparent or secondary variant)
-    // For now, same color is fine as the title distinguishes them.
 
     return $color;
   }
