@@ -308,8 +308,6 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
     refreshEvents,
   } = useCalendar();
 
-  console.log('filteredEvents: ', filteredEvents)
-
   const goToMonth = (month: number, year: number) => {
     calendarGoToMonth(month, year);
     setShowMonthPicker(false);

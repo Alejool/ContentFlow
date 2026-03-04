@@ -46,25 +46,15 @@ export const CalendarWithErrorHandling: React.FC = () => {
     // Attempt update
     const success = await updateEvent(eventId, newDate, type);
     
-    if (!success) {
-      // Check if there's a conflict
-      // The store will set the conflict state if a 409 response is received
-      console.log('Update failed, check for conflicts');
-    }
   };
 
   // Handle conflict resolution
   const handleConflictResolve = async (resolution: 'local' | 'server') => {
     const success = await resolveConflict(resolution);
-    if (success) {
-      console.log('Conflict resolved successfully');
-    }
   };
 
   // Handle sync error retry
   const handleSyncRetry = async (error: SyncError) => {
-    // Implement retry logic
-    console.log('Retrying sync for:', error.provider);
   };
 
   return (
