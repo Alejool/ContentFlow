@@ -8,6 +8,7 @@ import {
 } from "@/Constants/socialPlatforms";
 import { useCalendar } from "@/Hooks/calendar/useCalendar";
 import { formatTime } from "@/Utils/formatDate";
+import { formatDate } from "@/Utils/i18nHelpers";
 import { validateDate } from "@/Utils/dateValidation";
 import { useLockStore } from "@/stores/lockStore";
 import { CalendarErrorBoundary } from "@/Components/Calendar/CalendarErrorBoundary";
@@ -74,6 +75,7 @@ interface ModernCalendarProps {
 interface CalendarEvent {
   id: string;
   resourceId: number;
+  publicationId?: number;
   type: "publication" | "post" | "user_event";
   title: string;
   start: string;
@@ -95,7 +97,6 @@ interface CalendarEvent {
     user_name?: string;
   };
 }
-
 const PlatformIcon = ({
   platform,
   className,
@@ -305,6 +306,8 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
     deleteEvent,
     refreshEvents,
   } = useCalendar();
+
+  console.log('filteredEvents: ', filteredEvents)
 
   const goToMonth = (month: number, year: number) => {
     calendarGoToMonth(month, year);
@@ -719,10 +722,22 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-2">
                             <div className="flex items-center gap-2">
-                              <PlatformIcon
-                                platform={event.extendedProps.platform}
-                                className="w-5 h-5"
-                              />
+                              {event.type === "user_event" ? (
+                                <CalendarIcon
+                                  className="w-5 h-5"
+                                  style={{ color: event.color }}
+                                />
+                              ) : event.platform ? (
+                                <PlatformIcon
+                                  platform={event.platform}
+                                  className="w-5 h-5"
+                                />
+                              ) : (
+                                <Clock
+                                  className="w-5 h-5"
+                                  style={{ color: event.color }}
+                                />
+                              )}
                               <h3
                                 className="text-base font-semibold text-gray-900 dark:text-white cursor-pointer hover:text-primary-600"
                                 onClick={() => {
@@ -903,10 +918,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                 onClick={() => setShowMonthPicker(!showMonthPicker)}
                 className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white capitalize flex items-center gap-3 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
               >
-                {new Intl.DateTimeFormat(i18n.language || undefined, {
-                  month: "long",
-                  year: "numeric",
-                }).format(currentMonth)}
+                {formatDate(currentMonth, "monthYear")}
                 <ChevronDown
                   className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform ${showMonthPicker ? "rotate-180" : ""}`}
                 />
@@ -928,9 +940,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                             : "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
                         }`}
                       >
-                        {new Intl.DateTimeFormat(i18n.language || undefined, {
-                          month: "short",
-                        }).format(new Date(2024, i, 1))}
+                        {formatDate(new Date(2024, i, 1), "monthShort")}
                       </button>
                     ))}
                   </div>
@@ -992,7 +1002,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                 <button
                   key={p}
                   onClick={() => setPlatformFilter(p)}
-                  className={`p-1.5 sm:p-2 rounded-md transition-all ${platformFilter === p ? "bg-white dark:bg-gray-700 shadow text-primary-600" : "text-gray-400 hover:text-gray-600"}`}
+                  className={`p-1.5 sm:p-2 rounded-full transition-all ${platformFilter === p ? "bg-white dark:bg-gray-700 shadow text-primary-600" : "text-gray-400 hover:text-gray-600"}`}
                   title={
                     p === "all"
                       ? t("calendar.filters.all")
@@ -1058,7 +1068,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
           </div>
         )}
 
-        <div className="flex flex-col xl:flex-row gap-8">
+        <div className="flex flex-col xl:flex-row gap-8 lg:max-h-[1000px]">
           <div className="flex-1 min-w-0">
             <div id="calendar" className="w-full border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden shadow-sm bg-gray-50 dark:bg-gray-900/50">
               <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
@@ -1067,15 +1077,12 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
             </div>
           </div>
 
-          <div className="w-full xl:w-96 space-y-6">
+          <div className="w-full xl:w-96 flex-1 space-y-6 ">
             <div className="bg-gray-50 dark:bg-neutral-800/30 p-6 rounded-lg border border-gray-100 dark:border-neutral-800/50 h-full flex flex-col">
               <div className="mb-6">
                 <h4 className="font-black text-gray-900 dark:text-white flex items-center gap-2 text-xl">
                   <CalendarIcon className="w-6 h-6 text-primary-500" />
-                  {new Intl.DateTimeFormat(i18n.language || undefined, {
-                    day: "numeric",
-                    month: "long",
-                  }).format(selectedDate)}
+                  {formatDate(selectedDate, "dayMonth")}
                 </h4>
                 <div className="flex items-center gap-2 mt-2">
                   <span className="text-[10px] font-black uppercase tracking-widest text-primary-500 bg-primary-50 dark:bg-primary-900/30 px-2 py-0.5 rounded-full">
@@ -1089,7 +1096,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                 </div>
               </div>
 
-              <div className="space-y-4 flex-1 overflow-y-auto pr-1 scrollbar-thin">
+              <div className="space-y-4 pr-1 overflow-y-auto ">
                 {filteredEvents.filter((e) =>
                   isSameDay(parseISO(e.start), selectedDate),
                 ).length > 0 ? (
@@ -1105,7 +1112,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                             setShowEventModal(true);
                           } else {
                             const pubId =
-                              event.extendedProps.publication_id ||
+                              event.publicationId ||
                               event.resourceId;
                             if (pubId) onEventClick?.(pubId, event.type, event);
                           }
@@ -1116,16 +1123,21 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                           borderColor: `${event.color}40`,
                         }}
                       >
-                        <div className="w-12 h-12 rounded-lg flex-shrink-0 flex items-center justify-center bg-white dark:bg-neutral-900 border border-gray-100 dark:border-neutral-700 group-hover:scale-110 transition-transform shadow-sm">
+                        <div className="w-12 h-12 rounded-lg flex-shrink-0 flex items-center justify-center group-hover:scale-110 transition-transform">
                           {event.type === "user_event" ? (
                             <CalendarIcon
-                              className="w-6 h-6"
+                              className="w-8 h-8"
                               style={{ color: event.color }}
                             />
-                          ) : (
+                          ) : event.platform ? (
                             <PlatformIcon
-                              platform={event.extendedProps.platform}
-                              className="w-6 h-6"
+                              platform={event.platform}
+                              className="w-10 h-10"
+                            />
+                          ) : (
+                            <Clock
+                              className="w-8 h-8"
+                              style={{ color: event.color }}
                             />
                           )}
                         </div>
@@ -1141,7 +1153,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                             <p className="text-[10px] text-gray-500 dark:text-gray-400 font-medium">
                               {t("common.creator")}:{" "}
                               {Number(event.user.id) === Number(currentUser?.id)
-                                ? t("common.me") || "Yo"
+                                ? `${event.user.name} (${t("common.me") || "Yo"})`
                                 : event.user.name}
                             </p>
                           )}

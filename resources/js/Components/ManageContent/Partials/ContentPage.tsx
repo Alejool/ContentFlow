@@ -288,6 +288,14 @@ export default function ManageContentPage() {
     };
   }, [auth.user?.id, handleRefresh]);
 
+  // Refresh data when workspace changes
+  useEffect(() => {
+    const workspaceId = auth?.user?.current_workspace_id;
+    if (workspaceId) {
+      handleRefresh();
+    }
+  }, [auth?.user?.current_workspace_id]);
+
   const [approvalTab, setApprovalTab] = useState("pending");
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
