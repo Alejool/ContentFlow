@@ -7,7 +7,7 @@
       "help": "Help"
     },
     "theme": {
-      "toggle": "Toggle theme (Light/Dark/System)"
+      "toggle": "Toggle theme (Light/Dark)"
     },
     "search": {
       "open": "Open quick search"
