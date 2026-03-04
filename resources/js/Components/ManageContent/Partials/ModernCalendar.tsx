@@ -1068,7 +1068,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
           </div>
         )}
 
-        <div className="flex flex-col xl:flex-row gap-8 lg:max-h-[1000px]">
+        <div className="flex flex-col xl:flex-row gap-8 scroll-x-auto">
           <div className="flex-1 min-w-0">
             <div id="calendar" className="w-full border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden shadow-sm bg-gray-50 dark:bg-gray-900/50">
               <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
@@ -1077,7 +1077,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
             </div>
           </div>
 
-          <div className="w-full xl:w-96 flex-1 space-y-6 ">
+          <div className="w-full xl:w-96 space-y-6 ">
             <div className="bg-gray-50 dark:bg-neutral-800/30 p-6 rounded-lg border border-gray-100 dark:border-neutral-800/50 h-full flex flex-col">
               <div className="mb-6">
                 <h4 className="font-black text-gray-900 dark:text-white flex items-center gap-2 text-xl">
@@ -1112,8 +1112,7 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                             setShowEventModal(true);
                           } else {
                             const pubId =
-                              event.publicationId ||
-                              event.resourceId;
+                              event.publicationId 
                             if (pubId) onEventClick?.(pubId, event.type, event);
                           }
                         }}

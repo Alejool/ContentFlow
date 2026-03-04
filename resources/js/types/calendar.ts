@@ -10,6 +10,7 @@ export interface ViewConfig {
 
 // Calendar Event Types
 export interface CalendarEvent {
+  publicationId: number;
   id: string;
   resourceId: number;
   type: 'publication' | 'post' | 'user_event';
