@@ -14,6 +14,42 @@ interface Shortcut {
   category: string;
 }
 
+interface ShortcutDefinition {
+  macKeys: string[];
+  winKeys: string[];
+  translationKey: string;
+  fallbackText: string;
+  category: string;
+}
+
+// Constante centralizada para definir todos los atajos
+const SHORTCUTS_CONFIG: ShortcutDefinition[] = [
+  // Apariencia
+  {
+    macKeys: ["⌘", "⌥", "T"],
+    winKeys: ["Ctrl", "Alt", "T"],
+    translationKey: "shortcuts.theme.toggle",
+    fallbackText: "Cambiar tema (Claro/Oscuro/Sistema)",
+    category: "appearance",
+  },
+  // Navegación
+  {
+    macKeys: ["⌘", "K"],
+    winKeys: ["Ctrl", "K"],
+    translationKey: "shortcuts.search.open",
+    fallbackText: "Abrir búsqueda rápida",
+    category: "navigation",
+  },
+  // Ayuda
+  {
+    macKeys: ["⌘", "/"],
+    winKeys: ["Ctrl", "/"],
+    translationKey: "shortcuts.help.show",
+    fallbackText: "Mostrar atajos de teclado",
+    category: "help",
+  },
+];
+
 export default function KeyboardShortcutsModal({
   isOpen,
   onClose,
@@ -21,20 +57,24 @@ export default function KeyboardShortcutsModal({
   const { t } = useTranslation();
   const { theme } = useTheme();
 
-  const isMac = typeof navigator !== "undefined" && navigator.platform.toUpperCase().indexOf("MAC") >= 0;
+  const isMac = typeof navigator !== "undefined" && 
+    (navigator.userAgent.toUpperCase().indexOf("MAC") >= 0 || 
+     navigator.userAgent.toUpperCase().indexOf("IPHONE") >= 0 ||
+     navigator.userAgent.toUpperCase().indexOf("IPAD") >= 0);
 
-  const shortcuts: Shortcut[] = [
-    {
-      keys: isMac ? ["⌘", "⌥", "T"] : ["Ctrl", "Alt", "T"],
-      description: t("shortcuts.theme.toggle") || "Cambiar tema (Claro/Oscuro/Sistema)",
-      category: t("shortcuts.category.appearance") || "Apariencia",
-    },
-    {
-      keys: isMac ? ["⌘", "/"] : ["Ctrl", "/"],
-      description: t("shortcuts.help.show") || "Mostrar atajos de teclado",
-      category: t("shortcuts.category.help") || "Ayuda",
-    },
-  ];
+  // Mapeo de categorías a sus traducciones
+  const categoryTranslations: Record<string, string> = {
+    appearance: t("shortcuts.category.appearance", "Apariencia"),
+    navigation: t("shortcuts.category.navigation", "Navegación"),
+    help: t("shortcuts.category.help", "Ayuda"),
+  };
+
+  // Convertir la configuración a shortcuts con las teclas apropiadas
+  const shortcuts: Shortcut[] = SHORTCUTS_CONFIG.map((config) => ({
+    keys: isMac ? config.macKeys : config.winKeys,
+    description: t(config.translationKey, config.fallbackText),
+    category: categoryTranslations[config.category] || config.category,
+  }));
 
   const groupedShortcuts = shortcuts.reduce((acc, shortcut) => {
     if (!acc[shortcut.category]) {
@@ -59,7 +99,7 @@ export default function KeyboardShortcutsModal({
                 <div className="p-1.5 bg-gradient-to-r from-primary-500 to-primary-600 rounded-lg">
                   <Keyboard className="w-5 h-5 text-white" />
                 </div>
-                {t("shortcuts.title") || "Atajos de Teclado"}
+                {t("shortcuts.title", "Atajos de Teclado")}
               </div>
             </DialogTitle>
             <button
@@ -119,7 +159,7 @@ export default function KeyboardShortcutsModal({
               onClick={onClose}
               className="px-4 py-2 rounded-lg font-medium transition-colors bg-gray-100 dark:bg-neutral-700 hover:bg-gray-200 dark:hover:bg-neutral-600 text-gray-700 dark:text-white"
             >
-              {t("common.close") || "Cerrar"}
+              {t("common.close", "Cerrar")}
             </button>
           </div>
         </DialogPanel>
