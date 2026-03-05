@@ -30,12 +30,45 @@ class ProfileController extends Controller
     {
         $user = $request->user();
         
+        // Get subscription information from user's current_plan
+        $subscription = null;
+        $usage = null;
+        
+        if ($user->current_plan) {
+            $planConfig = $user->getPlanConfig();
+            
+            $subscription = [
+                'plan_name' => $planConfig['name'] ?? ucfirst($user->current_plan),
+                'plan_id' => $user->current_plan,
+                'status' => 'active',
+                'current_period_end' => $user->plan_renews_at?->toISOString(),
+                'trial_ends_at' => null,
+                'is_trial' => false,
+            ];
+            
+            // Get current month usage
+            $currentUsage = $user->currentMonthUsage()->first();
+            
+            if ($currentUsage) {
+                $usage = [
+                    'publications_used' => $currentUsage->publications_used,
+                    'publications_limit' => $currentUsage->publications_limit,
+                    'storage_used' => $currentUsage->storage_used_bytes,
+                    'storage_limit' => $currentUsage->storage_limit_bytes,
+                    'ai_requests_used' => $currentUsage->ai_requests_used,
+                    'ai_requests_limit' => $currentUsage->ai_requests_limit,
+                ];
+            }
+        }
+        
         return Inertia::render('Profile/Edit', [
             'mustVerifyEmail' => $user instanceof MustVerifyEmail,
             'status' => session('status'),
             'globalPlatformSettings' => $user->global_platform_settings ?? [],
             'twoFactorEnabled' => !is_null($user->two_factor_secret),
             'twoFactorEnabledAt' => $user->two_factor_enabled_at?->toISOString(),
+            'subscription' => $subscription,
+            'usage' => $usage,
         ]);
     }
 

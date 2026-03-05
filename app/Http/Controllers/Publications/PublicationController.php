@@ -379,6 +379,15 @@ class PublicationController extends Controller
 
   public function publish(Request $request, Publication $publication, PublishPublicationAction $action)
   {
+    // Check payload size to prevent 413 errors
+    $contentLength = $request->header('Content-Length');
+    if ($contentLength && $contentLength > 10 * 1024 * 1024) { // 10MB limit for publish request
+      return $this->errorResponse(
+        'Request payload too large. Please reduce the amount of data being sent.',
+        413
+      );
+    }
+
     // Check permissions first
     $hasPublishPermission = Auth::user()->hasPermission('publish', $publication->workspace_id);
     $hasManageContentPermission = Auth::user()->hasPermission('manage-content', $publication->workspace_id);

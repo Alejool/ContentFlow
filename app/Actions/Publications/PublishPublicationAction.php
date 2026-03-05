@@ -72,7 +72,12 @@ class PublishPublicationAction
 
     // Update platform settings if provided
     if (!empty($options['platform_settings'])) {
-      $publication->update(['platform_settings' => $options['platform_settings']]);
+      // Clean and optimize platform settings to only include relevant data
+      $cleanedSettings = $this->cleanPlatformSettings(
+        $options['platform_settings'], 
+        $socialAccounts->pluck('platform')->toArray()
+      );
+      $publication->update(['platform_settings' => $cleanedSettings]);
     }
 
     $publication->logActivity('publishing', ['platforms' => $platformIds]);
@@ -233,5 +238,52 @@ class PublishPublicationAction
     
     // Archivos mayores a 200MB tienen prioridad baja
     return 'low';
+  }
+
+  /**
+   * Clean platform settings to only include relevant platforms and essential data
+   */
+  private function cleanPlatformSettings(array $settings, array $platforms): array
+  {
+    $cleaned = [];
+    $platformsLower = array_map('strtolower', $platforms);
+
+    foreach ($settings as $key => $value) {
+      $keyLower = strtolower($key);
+      
+      // Only include settings for platforms that are being published to
+      if (in_array($keyLower, $platformsLower)) {
+        // Remove unnecessary nested data and keep only essential settings
+        if (is_array($value)) {
+          $cleaned[$key] = $this->filterEssentialSettings($value);
+        } else {
+          $cleaned[$key] = $value;
+        }
+      }
+    }
+
+    return $cleaned;
+  }
+
+  /**
+   * Filter out non-essential settings to reduce payload size
+   */
+  private function filterEssentialSettings(array $settings): array
+  {
+    // Define essential keys that should be kept
+    $essentialKeys = [
+      'type', 'privacy', 'category', 'title', 'description',
+      'disable_comment', 'disable_duet', 'disable_stitch',
+      'thread', 'article', 'poll_options', 'poll_duration'
+    ];
+
+    $filtered = [];
+    foreach ($settings as $key => $value) {
+      if (in_array($key, $essentialKeys)) {
+        $filtered[$key] = $value;
+      }
+    }
+
+    return $filtered;
   }
 }
