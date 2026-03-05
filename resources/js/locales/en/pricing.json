@@ -1,0 +1,91 @@
+{
+  "pricing": {
+    "title": "Choose the perfect plan for you",
+    "subtitle": "Start free and scale when you need. No commitments, cancel anytime.",
+    "flexiblePlans": "Flexible plans for every need",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "yearlyDiscount": "-20%",
+    "mostPopular": "Most Popular",
+    "demoTemporal": "Temporary Demo",
+    "currentPlan": "Current Plan",
+    "perMonth": "/month",
+    "perYear": "/year",
+    "selectPlan": "Select Plan",
+    "startFree": "Start Free",
+    "processing": "Processing...",
+    "comingSoon": "Coming Soon",
+    "paymentSetup": "Payment setup in progress",
+    "noCreditCard": "No credit card required",
+    "cancelAnytime": "Cancel anytime",
+    "support247": "24/7 Support",
+    "faq": "Have questions?",
+    "faqSubtitle": "We're here to help you choose the best plan",
+    "contactUs": "Contact us at",
+    
+    "plans": {
+      "demo": {
+        "name": "Demo",
+        "description": "Temporary plan for demos and testing. Full access for 30 days.",
+        "trialDays": "days of full access"
+      },
+      "free": {
+        "name": "Free",
+        "description": "Perfect to start and try the platform"
+      },
+      "starter": {
+        "name": "Starter",
+        "description": "Ideal for individual content creators"
+      },
+      "professional": {
+        "name": "Professional",
+        "description": "For growing teams and businesses"
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "description": "Complete solution for large organizations"
+      }
+    },
+    
+    "features": {
+      "fullAccessDays": "Full access for 30 days",
+      "publications3": "3 publications/month",
+      "publications50": "50 publications/month",
+      "publications100": "100 publications/month",
+      "publications200": "200 publications/month",
+      "publicationsUnlimited": "Unlimited publications",
+      "socialAccounts2": "Unlimited social media connections",
+      "socialAccounts10": "Unlimited social media connections",
+      "socialAccounts20": "Unlimited social media connections",
+      "socialAccounts50": "Unlimited social media connections",
+      "socialAccountsUnlimited": "Unlimited social media connections",
+      "storage1": "1 GB storage",
+      "storage10": "10 GB storage",
+      "storage50": "50 GB storage",
+      "storage100": "100 GB storage",
+      "storage1TB": "1 TB storage",
+      "aiRequests10": "10 AI requests/month",
+      "aiRequests100": "100 AI requests/month",
+      "aiRequests500": "500 AI requests/month",
+      "aiRequestsUnlimited": "Unlimited AI requests",
+      "basicAnalytics": "Basic analytics",
+      "advancedAnalytics": "Advanced analytics",
+      "advancedScheduling": "Advanced scheduling",
+      "emailSupport": "Email support",
+      "prioritySupport": "Priority support",
+      "dedicatedSupport": "Dedicated support",
+      "calendarSync": "Calendar sync",
+      "bulkOperations": "Bulk operations",
+      "customBranding": "Custom branding",
+      "whiteLabel": "White-label",
+      "apiAccess": "API access",
+      "customIntegrations": "Custom integrations",
+      "slaGuarantee": "SLA guarantee"
+    },
+    
+    "billing": {
+      "month": "month",
+      "year": "year"
+    }
+  }
+}

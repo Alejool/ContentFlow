@@ -4,6 +4,7 @@
     "tabs": {
       "general": "General",
       "security": "Security",
+      "subscription": "Subscription & Plan",
       "accounts": "Connected Accounts",
       "ai": "Artificial Intelligence",
       "appearance": "Appearance",
@@ -147,6 +148,12 @@
       "restartLabel": "Restart Onboarding Tour",
       "restartHint": "Review the platform features and setup process again",
       "restartButton": "Restart"
+    },
+    "usage": {
+      "title": "Plan Usage",
+      "publications": "Publications",
+      "used": "used",
+      "viewDetails": "View details →"
     }
   }
 }

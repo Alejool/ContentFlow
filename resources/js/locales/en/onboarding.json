@@ -1,4 +1,57 @@
 {
+  "businessInfo": {
+    "title": "Tell us about your business",
+    "description": "Help us personalize your experience based on your needs",
+    "fields": {
+      "name": "Business name",
+      "industry": "Industry",
+      "size": "Team size",
+      "goals": "What are your main goals?"
+    },
+    "placeholders": {
+      "name": "e.g., My Company",
+      "industry": "Select your industry",
+      "goals": "e.g., Increase social media presence, generate more leads..."
+    },
+    "industries": {
+      "technology": "Technology",
+      "retail": "Retail",
+      "healthcare": "Healthcare",
+      "education": "Education",
+      "finance": "Finance",
+      "marketing": "Marketing",
+      "real_estate": "Real Estate",
+      "hospitality": "Hospitality",
+      "manufacturing": "Manufacturing",
+      "other": "Other"
+    },
+    "sizes": {
+      "solo": "Just me",
+      "small": "2-10 people",
+      "medium": "11-50 people",
+      "large": "51+ people"
+    },
+    "errors": {
+      "nameRequired": "Business name is required",
+      "industryRequired": "Please select an industry",
+      "sizeRequired": "Please select your team size"
+    },
+    "optional": "Optional",
+    "skip": "Skip this step",
+    "continue": "Continue"
+  },
+  "planSelection": {
+    "title": "Choose the perfect plan for you",
+    "description": "Start free or choose a plan that fits your needs",
+    "recommended": "Recommended",
+    "intervals": {
+      "month": "month",
+      "forever": "forever"
+    },
+    "startFree": "Start Free",
+    "selectPlan": "Select Plan",
+    "decideLater": "I'll decide later"
+  },
   "tour": {
     "title": "Guided Tour",
     "step": "Step {{current}} of {{total}}",

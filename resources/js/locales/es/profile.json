@@ -4,6 +4,7 @@
     "tabs": {
       "general": "General",
       "security": "Seguridad",
+      "subscription": "Suscripción y Plan",
       "accounts": "Conexiones",
       "ai": "Inteligencia Artificial",
       "appearance": "Apariencia",
@@ -146,6 +147,12 @@
       "restartLabel": "Reiniciar Recorrido de Incorporación",
       "restartHint": "Revisa las características de la plataforma y el proceso de configuración nuevamente",
       "restartButton": "Reiniciar"
+    },
+    "usage": {
+      "title": "Uso del Plan",
+      "publications": "Publicaciones",
+      "used": "usado",
+      "viewDetails": "Ver detalles →"
     }
   }
 }

@@ -28,6 +28,8 @@ import validation from "./validation.json";
 import videoValidation from "./videoValidation.json";
 import welcome from "./welcome.json";
 import workspace from "./workspace.json";
+import pricing from "./pricing.json";
+import subscription from "./subscription.json";
 
 export default {
   ...common,
@@ -39,6 +41,8 @@ export default {
   ...nav,
   ...welcome,
   ...workspace,
+  ...pricing,
+  ...subscription,
   ...profile,
   ...platformSettings,
   ...approvals,
