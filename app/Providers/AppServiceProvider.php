@@ -84,7 +84,7 @@ class AppServiceProvider extends ServiceProvider
       \App\Listeners\AuditLogger::class
     );
 
-    // Register external calendar sync listeners
+    // Register external calendar sync listeners for publications
     \Illuminate\Support\Facades\Event::listen(
       \App\Events\Publications\PublicationCreated::class,
       [\App\Listeners\SyncPublicationToExternalCalendars::class, 'handleCreated']
@@ -96,6 +96,20 @@ class AppServiceProvider extends ServiceProvider
     \Illuminate\Support\Facades\Event::listen(
       \App\Events\Publications\PublicationDeleted::class,
       [\App\Listeners\SyncPublicationToExternalCalendars::class, 'handleDeleted']
+    );
+
+    // Register external calendar sync listeners for user calendar events
+    \Illuminate\Support\Facades\Event::listen(
+      \App\Events\UserCalendarEventCreated::class,
+      [\App\Listeners\SyncUserCalendarEventToExternalCalendars::class, 'handleCreated']
+    );
+    \Illuminate\Support\Facades\Event::listen(
+      \App\Events\UserCalendarEventUpdated::class,
+      [\App\Listeners\SyncUserCalendarEventToExternalCalendars::class, 'handleUpdated']
+    );
+    \Illuminate\Support\Facades\Event::listen(
+      \App\Events\UserCalendarEventDeleted::class,
+      [\App\Listeners\SyncUserCalendarEventToExternalCalendars::class, 'handleDeleted']
     );
   }
 }

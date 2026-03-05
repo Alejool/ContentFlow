@@ -28,6 +28,17 @@ class Kernel extends ConsoleKernel
     // Enviar recordatorios de calendario cada minuto
     $schedule->command('app:send-event-reminders')->everyMinute();
     
+    // Sincronizar calendarios externos cada hora
+    $schedule->command('calendar:sync-external')
+      ->hourly()
+      ->withoutOverlapping()
+      ->runInBackground();
+    
+    // Limpiar eventos huérfanos de calendarios externos diariamente a las 4 AM
+    $schedule->command('calendar:clean-orphaned')
+      ->daily()
+      ->at('04:00');
+    
     // Limpiar caché antiguo diariamente a las 3 AM
     $schedule->command('cache:clear')
       ->daily()
