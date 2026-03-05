@@ -195,4 +195,148 @@ class Workspace extends Model
             })
             ->first();
     }
+
+    /**
+     * Get workspace plan name.
+     */
+    public function getPlanName(): string
+    {
+        $subscription = $this->subscription;
+        return $subscription?->plan ?? 'free';
+    }
+
+    /**
+     * Get workspace plan limits.
+     */
+    public function getPlanLimits(): array
+    {
+        $plan = $this->getPlanName();
+        return config("plans.{$plan}.limits", config('plans.free.limits'));
+    }
+
+    /**
+     * Get workspace plan features.
+     */
+    public function getPlanFeatures(): array
+    {
+        $plan = $this->getPlanName();
+        return config("plans.{$plan}.features", config('plans.free.features'));
+    }
+
+    /**
+     * Check if workspace can perform an action based on limits.
+     */
+    public function canPerformAction(string $limitType): bool
+    {
+        $usageService = app(\App\Services\WorkspaceUsageService::class);
+        return $usageService->canPerformAction($this, $limitType);
+    }
+
+    /**
+     * Check if workspace can add more team members.
+     */
+    public function canAddTeamMember(): bool
+    {
+        return $this->canPerformAction('team_members');
+    }
+
+    /**
+     * Get remaining team member slots.
+     */
+    public function getRemainingTeamSlots(): int
+    {
+        $limits = $this->getPlanLimits();
+        $limit = $limits['team_members'] ?? 1;
+        
+        if ($limit === -1) {
+            return PHP_INT_MAX;
+        }
+        
+        $currentMembers = $this->users()->count();
+        return max(0, $limit - $currentMembers);
+    }
+
+    /**
+     * Check if workspace can connect more social accounts.
+     */
+    public function canConnectSocialAccount(): bool
+    {
+        return $this->canPerformAction('social_accounts');
+    }
+
+    /**
+     * Check if workspace can add more external integrations.
+     */
+    public function canAddIntegration(): bool
+    {
+        return $this->canPerformAction('external_integrations');
+    }
+
+    /**
+     * Check if workspace has a specific feature.
+     */
+    public function hasFeature(string $feature): bool
+    {
+        $features = $this->getPlanFeatures();
+        
+        // Check if feature exists as a key (for features with values)
+        if (isset($features[$feature])) {
+            return $features[$feature] === true || $features[$feature] !== false;
+        }
+        
+        // Check if feature exists in array (for simple feature flags)
+        return in_array($feature, $features);
+    }
+
+    /**
+     * Get analytics type for workspace.
+     */
+    public function getAnalyticsType(): string
+    {
+        $features = $this->getPlanFeatures();
+        return $features['analytics_type'] ?? 'basic';
+    }
+
+    /**
+     * Get support type for workspace.
+     */
+    public function getSupportType(): string
+    {
+        $features = $this->getPlanFeatures();
+        return $features['support_type'] ?? 'email';
+    }
+
+    /**
+     * Check if user is the owner of this workspace.
+     */
+    public function isOwner(User $user): bool
+    {
+        return $this->created_by === $user->id;
+    }
+
+    /**
+     * Check if user can manage subscription (only owner).
+     */
+    public function canManageSubscription(User $user): bool
+    {
+        return $this->isOwner($user);
+    }
+
+    /**
+     * Increment usage for a metric.
+     */
+    public function incrementUsage(string $metricType, int $amount = 1): void
+    {
+        $usageService = app(\App\Services\WorkspaceUsageService::class);
+        $usageService->incrementUsage($this, $metricType, $amount);
+    }
+
+    /**
+     * Decrement usage for a metric.
+     */
+    public function decrementUsage(string $metricType, int $amount = 1): void
+    {
+        $usageService = app(\App\Services\WorkspaceUsageService::class);
+        $usageService->decrementUsage($this, $metricType, $amount);
+    }
 }

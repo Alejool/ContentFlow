@@ -25,10 +25,19 @@ class SubscriptionController extends Controller
             'plan' => 'required|in:starter,professional,enterprise',
         ]);
 
-        $workspace = $request->user()->currentWorkspace ?? $request->user()->workspaces()->first();
+        $user = $request->user();
+        $workspace = $user->currentWorkspace;
         
         if (!$workspace) {
             return response()->json(['error' => 'No workspace found'], 404);
+        }
+
+        // Verificar que el usuario es el owner del workspace
+        if (!$workspace->isOwner($user)) {
+            return response()->json([
+                'error' => 'Forbidden',
+                'message' => 'Only the workspace owner can manage subscriptions',
+            ], 403);
         }
 
         $plan = config("plans.{$request->plan}");
@@ -46,13 +55,20 @@ class SubscriptionController extends Controller
                     'cancel_url' => url('/subscription/cancel'),
                     'metadata' => [
                         'workspace_id' => $workspace->id,
-                        'user_id' => $request->user()->id,
+                        'user_id' => $user->id,
                         'plan' => $request->plan,
                     ],
                 ]);
 
             return response()->json(['url' => $checkout->url]);
         } catch (\Exception $e) {
+            \Log::error('Failed to create checkout session', [
+                'workspace_id' => $workspace->id,
+                'user_id' => $user->id,
+                'plan' => $request->plan,
+                'error' => $e->getMessage(),
+            ]);
+            
             return response()->json([
                 'error' => 'Failed to create checkout session',
                 'message' => $e->getMessage(),
@@ -159,31 +175,34 @@ class SubscriptionController extends Controller
 
     public function getUsage(Request $request): JsonResponse
     {
-        $workspace = $request->user()->currentWorkspace ?? $request->user()->workspaces()->first();
+        $user = $request->user();
+        $workspace = $user->currentWorkspace;
         
         if (!$workspace) {
             return response()->json(['error' => 'No workspace found'], 404);
         }
 
-        $usage = $this->usageTracking->getAllUsageMetrics($workspace);
-        $subscription = $workspace->subscription;
+        $usageService = app(\App\Services\WorkspaceUsageService::class);
+        $usageSummary = $usageService->getUsageSummary($workspace);
 
-        return response()->json([
-            'subscription' => [
-                'plan' => $subscription->plan ?? 'free',
-                'status' => $subscription->status ?? 'inactive',
-                'trial_ends_at' => $subscription->trial_ends_at ?? null,
-            ],
-            'usage' => $usage,
-        ]);
+        return response()->json($usageSummary);
     }
 
     public function cancelSubscription(Request $request): JsonResponse
     {
-        $workspace = $request->user()->currentWorkspace ?? $request->user()->workspaces()->first();
+        $user = $request->user();
+        $workspace = $user->currentWorkspace;
         
         if (!$workspace) {
             return response()->json(['error' => 'No workspace found'], 404);
+        }
+
+        // Verificar que el usuario es el owner
+        if (!$workspace->isOwner($user)) {
+            return response()->json([
+                'error' => 'Forbidden',
+                'message' => 'Only the workspace owner can cancel subscriptions',
+            ], 403);
         }
 
         try {
@@ -200,6 +219,12 @@ class SubscriptionController extends Controller
 
             return response()->json(['message' => 'Subscription canceled successfully']);
         } catch (\Exception $e) {
+            \Log::error('Failed to cancel subscription', [
+                'workspace_id' => $workspace->id,
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+            
             return response()->json([
                 'error' => 'Failed to cancel subscription',
                 'message' => $e->getMessage(),
