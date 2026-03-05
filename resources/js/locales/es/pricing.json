@@ -22,6 +22,15 @@
     "faq": "¿Tienes preguntas?",
     "faqSubtitle": "Estamos aquí para ayudarte a elegir el mejor plan",
     "contactUs": "Contáctanos en",
+    "changeToPlan": "Cambiar a este plan",
+    
+    "activeSubscription": {
+      "title": "Ya tienes una suscripción activa",
+      "description": "Tu plan actual está activo. Para cambiar de plan o gestionar tu suscripción, visita la página de facturación.",
+      "changeDescription": "Puedes cambiar a cualquier plan a continuación. El cambio se aplicará inmediatamente y se ajustará tu facturación de forma prorrateada.",
+      "manageBilling": "Gestionar Facturación",
+      "viewUsage": "Ver Uso del Plan"
+    },
     
     "plans": {
       "demo": {

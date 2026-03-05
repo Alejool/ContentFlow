@@ -22,6 +22,15 @@
     "faq": "Have questions?",
     "faqSubtitle": "We're here to help you choose the best plan",
     "contactUs": "Contact us at",
+    "changeToPlan": "Change to this plan",
+    
+    "activeSubscription": {
+      "title": "You already have an active subscription",
+      "description": "Your current plan is active. To change plans or manage your subscription, visit the billing page.",
+      "changeDescription": "You can change to any plan below. The change will be applied immediately and your billing will be prorated.",
+      "manageBilling": "Manage Billing",
+      "viewUsage": "View Plan Usage"
+    },
     
     "plans": {
       "demo": {
