@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next";
 
 import AiFieldSuggester from "@/Components/AiAssistant/AiFieldSuggester";
 import AiPromptSection from "@/Components/AiAssistant/AiPromptSection";
-import ModalHeader from "@/Components/ManageContent/modals/common/ModalHeader";
+import ModalHeader from "@/Components/Content/modals/common/ModalHeader";
 import Input from "@/Components/common/Modern/Input";
 import Textarea from "@/Components/common/Modern/Textarea";
 
@@ -19,7 +19,7 @@ import { useModalFocusTrap } from "@/Hooks/useModalFocusTrap";
 import { usePublicationsForCampaign } from "@/Hooks/campaign/usePublicationsForCampaign";
 
 import { DollarSign, FileText } from "lucide-react";
-import ModalFooter from "./common/ModalFooter";
+import ModalFooter from "../../Content/modals/common/ModalFooter";
 
 interface AddCampaignModalProps {
   isOpen: boolean;

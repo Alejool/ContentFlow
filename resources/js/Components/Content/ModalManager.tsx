@@ -1,24 +1,26 @@
 import { usePublishPublication } from "@/Hooks/publication/usePublishPublication";
 import { useManageContentUIStore } from "@/stores/manageContentUIStore";
-import { usePublicationStore } from "@/stores/publicationStore";
 import { Campaign } from "@/types/Campaign";
 import { Publication } from "@/types/Publication";
 import { memo } from "react";
 import { createPortal } from "react-dom";
 
 // Modals
-import AddCampaignModal from "@/Components/Content/modals/AddCampaignModal";
-import AddPublicationModal from "@/Components/Content/modals/AddPublicationModal";
-import EditCampaignModal from "@/Components/Content/modals/EditCampaignModal";
-import EditPublicationModal from "@/Components/Content/modals/EditPublicationModal";
+import AddCampaignModal from "@/Components/ManageContent/modals/AddCampaignModal";
+import AddPublicationModal from "@/Components/ManageContent/modals/AddPublicationModal";
+import EditCampaignModal from "@/Components/ManageContent/modals/EditCampaignModal";
+import EditPublicationModal from "@/Components/ManageContent/modals/EditPublicationModal";
 import PublishPublicationModal from "@/Components/Content/modals/PublishPublicationModal";
 import ViewCampaignModal from "@/Components/Content/modals/ViewCampaignModal";
+import { usePublicationStore } from "@/stores/publicationStore";
 
 interface ModalManagerProps {
   onRefresh: () => void;
 }
 
 const ModalManager = memo(({ onRefresh }: ModalManagerProps) => {
+  const manageContentUI = useManageContentUIStore();
+
   const {
     activeTab,
     selectedItem,
@@ -32,7 +34,7 @@ const ModalManager = memo(({ onRefresh }: ModalManagerProps) => {
     closeEditModal,
     closePublishModal,
     closeViewDetailsModal,
-  } = useManageContentUIStore();
+  } = manageContentUI;
 
   const { fetchPublishedPlatforms } = usePublishPublication();
 
@@ -58,6 +60,7 @@ const ModalManager = memo(({ onRefresh }: ModalManagerProps) => {
       : null;
 
   // Determine which Add Modal to show
+  // Prefer addType from store, fallback to activeTab logic
   const showAddCampaign =
     addType === "campaign" || (addType === null && activeTab === "campaigns");
   const showAddPublication = !showAddCampaign;
@@ -84,7 +87,6 @@ const ModalManager = memo(({ onRefresh }: ModalManagerProps) => {
 
       {createPortal(
         <>
-          {/* Always render Publication Modal (hidden/visible handled internally via CSS for performance) */}
           <EditPublicationModal
             isOpen={isEditModalOpen && targetIsPublication}
             onClose={closeEditModal}
@@ -92,7 +94,6 @@ const ModalManager = memo(({ onRefresh }: ModalManagerProps) => {
             onSubmit={onRefresh}
           />
 
-          {/* Render Campaign Modal conditionally */}
           {isEditModalOpen && targetIsCampaign && (
             <EditCampaignModal
               isOpen={isEditModalOpen}
@@ -106,21 +107,20 @@ const ModalManager = memo(({ onRefresh }: ModalManagerProps) => {
       )}
 
       {isPublishModalOpen &&
+        activeTab === "publications" &&
         createPortal(
-          activeTab === "publications" && (
-            <PublishPublicationModal
-              isOpen={isPublishModalOpen}
-              onClose={(id?: number) => {
-                const idToRefresh = id || selectedItem?.id;
-                closePublishModal();
-                if (idToRefresh) {
-                  fetchPublishedPlatforms(idToRefresh);
-                }
-              }}
-              publication={selectedItem as Publication}
-              onSuccess={onRefresh}
-            />
-          ),
+          <PublishPublicationModal
+            isOpen={isPublishModalOpen}
+            onClose={(id?: number) => {
+              const idToRefresh = id || selectedItem?.id;
+              closePublishModal();
+              if (idToRefresh) {
+                fetchPublishedPlatforms(idToRefresh);
+              }
+            }}
+            publication={currentPub}
+            onSuccess={onRefresh}
+          />,
           document.body,
         )}
 
@@ -132,7 +132,6 @@ const ModalManager = memo(({ onRefresh }: ModalManagerProps) => {
             campaign={selectedItem as any}
             onEdit={openEditModal}
           />,
-
           document.body,
         )}
     </>

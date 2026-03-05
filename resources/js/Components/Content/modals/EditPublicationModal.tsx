@@ -7,10 +7,10 @@ import ContentSection from "@/Components/ManageContent/Publication/common/edit/C
 import { LivePreviewSection } from "@/Components/ManageContent/Publication/common/edit/LivePreviewSection";
 import MediaUploadSection from "@/Components/ManageContent/Publication/common/edit/MediaUploadSection";
 import MediaUploadSkeleton from "@/Components/ManageContent/Publication/common/edit/MediaUploadSkeleton";
-import ReelsSection from "@/Components/ManageContent/ReelsSection";
-import ModalFooter from "@/Components/ManageContent/modals/common/ModalFooter";
-import ModalHeader from "@/Components/ManageContent/modals/common/ModalHeader";
-import ScheduleSection from "@/Components/ManageContent/modals/common/ScheduleSection";
+import ReelsSection from "@/Components/Content/ReelsSection";
+import ModalFooter from "@/Components/Content/modals/common/ModalFooter";
+import ModalHeader from "@/Components/Content/modals/common/ModalHeader";
+import ScheduleSection from "@/Components/Content/modals/common/ScheduleSection";
 import YouTubeThumbnailUploader from "@/Components/common/ui/YouTubeThumbnailUploader";
 import { useModalFocusTrap } from "@/Hooks/useModalFocusTrap";
 import { usePublicationForm } from "@/Hooks/publication/usePublicationForm";

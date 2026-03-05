@@ -1,5 +1,5 @@
-import ModalFooter from "@/Components/ManageContent/modals/common/ModalFooter";
-import ModalHeader from "@/Components/ManageContent/modals/common/ModalHeader";
+import ModalFooter from "@/Components/Content/modals/common/ModalFooter";
+import ModalHeader from "@/Components/Content/modals/common/ModalHeader";
 import Modal from "@/Components/common/ui/Modal";
 import DatePickerModern from "@/Components/common/Modern/DatePicker";
 import {

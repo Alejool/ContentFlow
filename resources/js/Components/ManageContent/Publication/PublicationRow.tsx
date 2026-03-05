@@ -1,4 +1,4 @@
-import CampaignTags from "@/Components/ManageContent/Publication/CampaignTags";
+import CampaignTags from "@/Components/Content/Publication/CampaignTags";
 import PublicationThumbnail from "@/Components/ManageContent/Publication/PublicationThumbnail";
 import SocialAccountsDisplay from "@/Components/ManageContent/Publication/SocialAccountsDisplay";
 import { Publication } from "@/types/Publication";

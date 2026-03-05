@@ -1,4 +1,3 @@
-import React from "react";
 import Skeleton from "@/Components/common/ui/Skeleton";
 
 const LogCardSkeleton = () => {

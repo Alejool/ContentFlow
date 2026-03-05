@@ -9,8 +9,8 @@ import { useLockStore } from "@/stores/lockStore";
 import { Filter, LayoutGrid, List as ListIcon, RotateCcw } from "lucide-react";
 import { useEffect, useState, useTransition } from "react";
 import { useTranslation } from "react-i18next";
-import ContentCard from "./ContentCard";
-import ContentCardSkeleton from "./ContentCardSkeleton";
+import ContentCard from "@/Components/Content/ContentCard";
+import ContentCardSkeleton from "@/Components/Content/ContentCardSkeleton";
 
 import MediaLightbox from "@/Components/common/ui/MediaLightbox";
 

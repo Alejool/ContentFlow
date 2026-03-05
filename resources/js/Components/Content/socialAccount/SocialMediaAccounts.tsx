@@ -1,10 +1,10 @@
 import PlatformSettingsModal from "@/Components/ConfigSocialMedia/PlatformSettingsModal";
-import DisconnectWarningModal from "@/Components/Content/modals/DisconnectWarningModal";
+import DisconnectWarningModal from "@/Components/ManageContent/modals/DisconnectWarningModal";
 import DisconnectBlockerModal from "@/Components/ManageContent/modals/DisconnectBlockerModal";
 import { SOCIAL_PLATFORMS } from "@/Constants/socialPlatforms";
 import { useSocialMediaAuth } from "@/Hooks/useSocialMediaAuth";
 import { getPlatformSchema } from "@/schemas/platformSettings";
-import { Link, router, usePage } from "@inertiajs/react";
+import { Link, router } from "@inertiajs/react";
 import axios from "axios";
 import {
   AlertCircle,
@@ -22,6 +22,7 @@ import {
 import { memo, useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
+import SocialAccountCardSkeleton from "@/Components/common/ui/skeletons/SocialAccountCardSkeleton";
 
 interface Account {
   id: number; // For connected accounts, this is the DB ID. For unconnected, it might be platform index.
@@ -39,7 +40,6 @@ interface Account {
 const SocialMediaAccounts = memo(() => {
   const { t } = useTranslation();
   const { isLoading, connectAccount, disconnectAccount } = useSocialMediaAuth();
-  const user = usePage<any>().props.auth.user;
   const [activePlatform, setActivePlatform] = useState<string | null>(null);
   const [localSettings, setLocalSettings] = useState<any>({});
 
@@ -103,12 +103,11 @@ const SocialMediaAccounts = memo(() => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const disconnectSocialMedia = (
-    platform: string,
     id: number | null,
     force: boolean = false,
   ) => {
     if (!id) return { success: false };
-    return disconnectAccount(id, force);
+    return disconnectAccount(id as number, force);
   };
 
   const [accounts, setAccounts] = useState<Account[]>([]);
@@ -152,9 +151,9 @@ const SocialMediaAccounts = memo(() => {
       }
     } catch (error: any) {
       if (error.response?.status === 401) {
-        toast.error(t("Content.socialMedia.messages.unauthorized"));
+        toast.error(t("manageContent.socialMedia.messages.unauthorized"));
       } else {
-        toast.error(t("Content.socialMedia.messages.loadError"));
+        toast.error(t("manageContent.socialMedia.messages.loadError"));
       }
     } finally {
       setLoading(false);
@@ -227,7 +226,6 @@ const SocialMediaAccounts = memo(() => {
     if (account.isConnected) {
       try {
         const result: any = await disconnectSocialMedia(
-          account.platform,
           account.accountId as number,
         );
 
@@ -236,7 +234,7 @@ const SocialMediaAccounts = memo(() => {
           setConnectedAccountsCount((prev) => prev - 1);
           toast.success(
             `${account.name} ${t(
-              "Content.socialMedia.messages.disconnectSuccess",
+              "manageContent.socialMedia.messages.disconnectSuccess",
             )}`,
           );
         } else if (result && !result.success && result.posts) {
@@ -249,20 +247,19 @@ const SocialMediaAccounts = memo(() => {
           });
         }
       } catch (error: any) {
-        toast.error(t("Content.socialMedia.messages.disconnectError"));
+        toast.error(t("manageContent.socialMedia.messages.disconnectError"));
       }
     } else {
       try {
         await connectAccount(account.platform);
       } catch (error: any) {
-        toast.error(t("Content.socialMedia.messages.connectError"));
+        toast.error(t("manageContent.socialMedia.messages.connectError"));
       }
     }
   };
 
   const handleForceDisconnect = async (account: Account) => {
     const result = await disconnectSocialMedia(
-      account.platform,
       account.accountId as number,
       true,
     );
@@ -273,7 +270,7 @@ const SocialMediaAccounts = memo(() => {
       setBlockerModalData(null);
       toast.success(
         `${account.name} ${t(
-          "Content.socialMedia.messages.disconnectSuccess",
+          "manageContent.socialMedia.messages.disconnectSuccess",
         )}`,
       );
     }
@@ -291,11 +288,11 @@ const SocialMediaAccounts = memo(() => {
           </div>
           <div className="text-left">
             <h3 className="font-semibold text-gray-900 dark:text-gray-100">
-              {t("Content.socialMedia.title")}
+              {t("manageContent.socialMedia.title")}
             </h3>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              {connectedAccountsCount} {t("Content.socialMedia.accounts")}{" "}
-              {t("Content.socialMedia.connected")}
+              {connectedAccountsCount} {t("manageContent.socialMedia.accounts")}{" "}
+              {t("manageContent.socialMedia.connected")}
             </p>
           </div>
         </div>
@@ -314,14 +311,14 @@ const SocialMediaAccounts = memo(() => {
             {isExpanded ? (
               <>
                 <span className="text-sm text-gray-600 dark:text-gray-400">
-                  {t("Content.socialMedia.hide")}
+                  {t("manageContent.socialMedia.hide")}
                 </span>
                 <ChevronUp className="w-5 h-5 text-gray-500" />
               </>
             ) : (
               <>
                 <span className="text-sm text-gray-600 dark:text-gray-400">
-                  {t("Content.socialMedia.seeAccounts")}
+                  {t("manageContent.socialMedia.seeAccounts")}
                 </span>
                 <ChevronDown className="w-5 h-5 text-gray-500" />
               </>
@@ -340,24 +337,26 @@ const SocialMediaAccounts = memo(() => {
             <div className="flex items-start gap-4">
               <div>
                 <h3 className="text-lg font-bold mb-3 text-primary-900 dark:text-gray-100">
-                  {t("Content.socialMedia.whyConnect")}
+                  {t("manageContent.socialMedia.whyConnect")}
                 </h3>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
                   {[
                     {
                       icon: Zap,
-                      title: t("Content.socialMedia.benefits.autoPublish"),
+                      title: t(
+                        "manageContent.socialMedia.benefits.autoPublish",
+                      ),
                       color: "text-primary-500",
                     },
                     {
                       icon: BarChart3,
-                      title: t("Content.socialMedia.benefits.manageAll"),
+                      title: t("manageContent.socialMedia.benefits.manageAll"),
                       color: "text-blue-500",
                     },
                     {
                       icon: Shield,
-                      title: t("Content.socialMedia.benefits.control"),
+                      title: t("manageContent.socialMedia.benefits.control"),
                       color: "text-green-500",
                     },
                   ].map((item, i) => (
@@ -384,7 +383,7 @@ const SocialMediaAccounts = memo(() => {
                       {t("common.note")}:
                     </span>
                     <span className="font-medium">
-                      {t("Content.socialMedia.disclaimer")}
+                      {t("manageContent.socialMedia.disclaimer")}
                     </span>
                   </div>
                 </div>
@@ -393,11 +392,10 @@ const SocialMediaAccounts = memo(() => {
           </div>
 
           {loading ? (
-            <div className="flex flex-col items-center justify-center py-12 rounded-lg border transition-colors duration-300 bg-white border-gray-100 dark:bg-neutral-800/50 dark:border-neutral-700/50">
-              <Loader2 className="w-10 h-10 animate-spin mb-4 text-primary-600 dark:text-primary-400" />
-              <p className="font-bold text-gray-500 dark:text-gray-400 uppercase text-xs tracking-widest">
-                {t("common.loading")}
-              </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {Array.from({ length: 4 }).map((_, index) => (
+                <SocialAccountCardSkeleton key={index} />
+              ))}
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -424,12 +422,12 @@ const SocialMediaAccounts = memo(() => {
                       {account.isConnected ? (
                         <>
                           <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                          {t("Content.socialMedia.status.connected")}
+                          {t("manageContent.socialMedia.status.connected")}
                         </>
                       ) : (
                         <>
                           <div className="w-1.5 h-1.5 rounded-full bg-gray-400" />
-                          {t("Content.socialMedia.status.notConnected")}
+                          {t("manageContent.socialMedia.status.notConnected")}
                         </>
                       )}
                     </div>
@@ -481,7 +479,7 @@ const SocialMediaAccounts = memo(() => {
                         </p>
                         {account.connectedBy && (
                           <p className="text-[9px] text-primary-500 font-bold uppercase tracking-wider">
-                            {t("Content.socialMedia.connectedBy") ||
+                            {t("manageContent.socialMedia.connectedBy") ||
                               "Conectado por"}
                             : {account.connectedBy}
                           </p>
@@ -489,10 +487,76 @@ const SocialMediaAccounts = memo(() => {
                       </div>
                     ) : (
                       <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                        {t("Content.socialMedia.status.connectToShare")}
+                        {t("manageContent.socialMedia.status.connectToShare")}
                       </p>
                     )}
                   </div>
+
+                  {/* API Limits Section */}
+                  {(() => {
+                    const platformConfig = SOCIAL_PLATFORMS[account.platform.toLowerCase()];
+                    const apiLimits = platformConfig?.apiLimits;
+                    
+                    if (!apiLimits) return null;
+
+                    return (
+                      <div className="mb-4 px-3 py-2.5 rounded-lg bg-gray-50/80 dark:bg-neutral-800/50 border border-gray-100 dark:border-neutral-700/50">
+                        <p className="text-[9px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">
+                          {t("manageContent.socialMedia.apiLimits")}
+                        </p>
+                        <div className="space-y-1">
+                          {account.platform.toLowerCase() === 'facebook' && (
+                            <>
+                              <div className="flex justify-between items-center text-[10px]">
+                                <span className="text-gray-600 dark:text-gray-400">{t("manageContent.socialMedia.limits.requestsPerHour")}:</span>
+                                <span className="font-bold text-gray-900 dark:text-gray-100">{apiLimits.requestsPerHour}</span>
+                              </div>
+                              <div className="flex justify-between items-center text-[10px]">
+                                <span className="text-gray-600 dark:text-gray-400">{t("manageContent.socialMedia.limits.requestsPerMinute")}:</span>
+                                <span className="font-bold text-gray-900 dark:text-gray-100">{apiLimits.requestsPerMinute}</span>
+                              </div>
+                            </>
+                          )}
+                          {account.platform.toLowerCase() === 'tiktok' && (
+                            <>
+                              <div className="flex justify-between items-center text-[10px]">
+                                <span className="text-gray-600 dark:text-gray-400">{t("manageContent.socialMedia.limits.requestsPerDay")}:</span>
+                                <span className="font-bold text-gray-900 dark:text-gray-100">{apiLimits.requestsPerDay}</span>
+                              </div>
+                              <div className="flex justify-between items-center text-[10px]">
+                                <span className="text-gray-600 dark:text-gray-400">{t("manageContent.socialMedia.limits.postsPerDay")}:</span>
+                                <span className="font-bold text-gray-900 dark:text-gray-100">{apiLimits.postsPerDay}</span>
+                              </div>
+                            </>
+                          )}
+                          {account.platform.toLowerCase() === 'twitter' && (
+                            <>
+                              <div className="flex justify-between items-center text-[10px]">
+                                <span className="text-gray-600 dark:text-gray-400">{t("manageContent.socialMedia.limits.postsPerThreeHours")}:</span>
+                                <span className="font-bold text-gray-900 dark:text-gray-100">{apiLimits.postsPerThreeHours}</span>
+                              </div>
+                              <div className="flex justify-between items-center text-[10px]">
+                                <span className="text-gray-600 dark:text-gray-400">{t("manageContent.socialMedia.limits.requestsPerDay")}:</span>
+                                <span className="font-bold text-gray-900 dark:text-gray-100">{apiLimits.requestsPerDay}</span>
+                              </div>
+                            </>
+                          )}
+                          {account.platform.toLowerCase() === 'youtube' && (
+                            <>
+                              <div className="flex justify-between items-center text-[10px]">
+                                <span className="text-gray-600 dark:text-gray-400">{t("manageContent.socialMedia.limits.dailyQuota")}:</span>
+                                <span className="font-bold text-gray-900 dark:text-gray-100">{apiLimits.quotaUnitsPerDay} units</span>
+                              </div>
+                              <div className="flex justify-between items-center text-[10px]">
+                                <span className="text-gray-600 dark:text-gray-400">{t("manageContent.socialMedia.limits.uploadCost")}:</span>
+                                <span className="font-bold text-gray-900 dark:text-gray-100">{apiLimits.uploadCost}</span>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })()}
 
                   <div className="flex gap-2 w-full">
                     <button
@@ -512,17 +576,17 @@ const SocialMediaAccounts = memo(() => {
                         {isLoading ? (
                           <>
                             <Loader2 className="w-4 h-4 animate-spin" />
-                            {t("Content.socialMedia.actions.processing")}
+                            {t("manageContent.socialMedia.actions.processing")}
                           </>
                         ) : account.isConnected ? (
                           <>
                             <X className="w-4 h-4" />
-                            {t("Content.socialMedia.actions.disconnect")}
+                            {t("manageContent.socialMedia.actions.disconnect")}
                           </>
                         ) : (
                           <>
                             <ExternalLink className="w-4 h-4" />
-                            {t("Content.socialMedia.actions.connect")}
+                            {t("manageContent.socialMedia.actions.connect")}
                           </>
                         )}
                       </span>

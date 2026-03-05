@@ -6,7 +6,7 @@ import {
   PLATFORM_REQUIREMENTS,
   ValidationResult,
 } from "@/Utils/videoValidation";
-import VideoValidationAlert from "@/Components/ManageContent/VideoValidationAlert";
+import VideoValidationAlert from "@/Components/Content/VideoValidationAlert";
 
 interface PlatformVideoSettingsProps {
   platform: string;

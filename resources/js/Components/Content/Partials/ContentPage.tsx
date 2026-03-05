@@ -3,16 +3,35 @@ import ModalManager from "@/Components/Content/ModalManager";
 import ModalFooter from "@/Components/Content/modals/common/ModalFooter";
 import ModalHeader from "@/Components/Content/modals/common/ModalHeader";
 import SocialMediaAccounts from "@/Components/Content/socialAccount/SocialMediaAccounts";
+import Dropdown from "@/Components/common/ui/Dropdown";
 import Modal from "@/Components/common/ui/Modal";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { useCampaignStore } from "@/stores/campaignStore";
 import { usePublicationStore } from "@/stores/publicationStore";
+import {
+  DndContext,
+  DragEndEvent,
+  KeyboardSensor,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  arrayMove,
+  horizontalListSortingStrategy,
+  sortableKeyboardCoordinates,
+  useSortable,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { Head, usePage } from "@inertiajs/react";
 import {
   Calendar as CalendarIcon,
   CheckCircle,
   FileText,
   Folder,
+  GripHorizontal,
   Plus,
   Target,
   Trash2,
@@ -20,13 +39,12 @@ import {
 import { useCallback, useEffect, useState, useTransition } from "react";
 import { toast } from "react-hot-toast";
 
-import ApprovalHistory from "@/Components/ManageContent/ApprovalHistory";
-import ApprovalList from "@/Components/ManageContent/ApprovalList";
-import ApprovalStats from "@/Components/ManageContent/ApprovalStats";
-import ContentList from "@/Components/ManageContent/ContentList";
+import ApprovalHistory from "@/Components/Content/ApprovalHistory";
+import ApprovalList from "@/Components/Content/ApprovalList";
+import ApprovalStats from "@/Components/Content/ApprovalStats";
+import ContentList from "@/Components/Content/ContentList";
 import ModernCalendar from "@/Components/ManageContent/Partials/ModernCalendar";
 import Button from "@/Components/common/Modern/Button";
-import Dropdown from "@/Components/common/ui/Dropdown";
 
 import {
   ContentTab,
@@ -35,7 +53,86 @@ import {
 import { useManageContentUIStore } from "@/stores/manageContentUIStore";
 import { useShallow } from "zustand/react/shallow";
 
-export default function ContentPage() {
+interface SortableTabProps {
+  id: string;
+  label: string;
+  hasBadge: boolean;
+  badgeCount: number;
+  activeTab: string;
+  handleTabChange: (id: string) => void;
+  getTabIcon: (id: string, active: boolean) => React.ReactNode;
+}
+
+const SortableTab = ({ 
+  id, 
+  label, 
+  hasBadge, 
+  badgeCount, 
+  activeTab, 
+  handleTabChange, 
+  getTabIcon 
+}: SortableTabProps) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 50 : "auto",
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  const isActive = activeTab === id;
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="flex items-center gap-1 group/tab"
+    >
+      <Button
+        onClick={() => handleTabChange(id)}
+        variant={isActive ? "primary" : "ghost"}
+        buttonStyle={isActive ? "solid" : "ghost"}
+        size="lg"
+        {...attributes}
+        {...listeners}
+        className={`flex items-center justify-center p-0 rounded-lg text-sm font-bold transition-all duration-200 select-none border-0 ${
+          isActive
+            ? "bg-primary-600 text-white shadow-md shadow-primary-500/20 ring-1 ring-primary-500/50"
+            : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-neutral-700/50"
+        }`}
+      >
+        <div className="flex items-center justify-center gap-2">
+          <GripHorizontal
+            className={`w-3 h-3 opacity-0 group-hover/tab:opacity-40 transition-opacity cursor-grab active:cursor-grabbing mr-[-4px] ${isActive ? "text-white" : ""}`}
+          />
+          {getTabIcon(id, isActive)}
+          <span>{label}</span>
+          {hasBadge && badgeCount > 0 && (
+            <span
+              className={`ml-1 px-1.5 py-0.5 text-[10px] font-bold rounded-full ${
+                isActive
+                  ? "bg-white/20 text-white"
+                  : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+              }`}
+            >
+              {badgeCount}
+            </span>
+          )}
+        </div>
+      </Button>
+    </div>
+  );
+};
+
+export default function ManageContentPage() {
   const { auth } = usePage<any>().props;
   const permissions = auth.current_workspace?.permissions || [];
 
@@ -43,10 +140,12 @@ export default function ContentPage() {
     t,
     handleFilterChange,
     handleSingleFilterChange,
+    handleResetFilters,
     handlePageChange,
     handlePerPageChange,
     handleRefresh,
     handleDeleteItem,
+    handleDuplicateItem,
     handleEditRequest,
     connectedAccounts,
     publications,
@@ -61,7 +160,6 @@ export default function ContentPage() {
     filters,
   } = usePublications();
 
-  // Fetch publication details if ID in URL
   const fetchPublicationById = usePublicationStore(
     (s) => s.fetchPublicationById,
   );
@@ -73,6 +171,10 @@ export default function ContentPage() {
   const {
     activeTab,
     setActiveTab,
+    tabOrder,
+    setTabOrder,
+    showFilters,
+    setShowFilters,
     openAddModal,
     openEditModal,
     openPublishModal,
@@ -81,6 +183,10 @@ export default function ContentPage() {
     useShallow((s) => ({
       activeTab: s.activeTab,
       setActiveTab: s.setActiveTab,
+      tabOrder: s.tabOrder,
+      setTabOrder: s.setTabOrder,
+      showFilters: s.showFilters,
+      setShowFilters: s.setShowFilters,
       openAddModal: s.openAddModal,
       openEditModal: s.openEditModal,
       openPublishModal: s.openPublishModal,
@@ -89,24 +195,32 @@ export default function ContentPage() {
   );
 
   const [isTabPending, startTransition] = useTransition();
-  const [showFilters, setShowFilters] = useState(true);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(() => {
+    const saved = localStorage.getItem(`contentPage_search_${activeTab}`);
+    return saved || "";
+  });
 
-  // Sync search with filters (debounced)
   useEffect(() => {
+    localStorage.setItem(`contentPage_search_${activeTab}`, search);
     const timer = setTimeout(() => {
       handleFilterChange({ ...filters, search: search || undefined });
-    }, 300); // 300ms debounce
+    }, 300);
 
     return () => clearTimeout(timer);
-  }, [search]);
+  }, [search, activeTab]);
 
   const handleTabChange = useCallback(
     (tab: ContentTab) => {
       startTransition(() => {
         setActiveTab(tab);
-        setSearch(""); // Clear search when changing tabs
-        handleFilterChange({});
+        const savedSearch = localStorage.getItem(`contentPage_search_${tab}`);
+        setSearch(savedSearch || "");
+        const savedFilters = localStorage.getItem(`contentPage_filters_${tab}`);
+        if (savedFilters) {
+          handleFilterChange(JSON.parse(savedFilters));
+        } else {
+          handleFilterChange({});
+        }
       });
     },
     [setActiveTab, handleFilterChange],
@@ -153,6 +267,26 @@ export default function ContentPage() {
     openAddModal,
     setActiveTab,
   ]);
+
+  // Listen for real-time publication status updates
+  useEffect(() => {
+    if (!auth.user?.id || !window.Echo) {
+      return;
+    }
+
+    const channel = window.Echo.private(`users.${auth.user.id}`);
+
+    const handleStatusUpdate = (event: any) => {
+      // Refresh the current list when any publication status changes
+      handleRefresh();
+    };
+
+    channel.listen(".PublicationStatusUpdated", handleStatusUpdate);
+
+    return () => {
+      channel.stopListening(".PublicationStatusUpdated", handleStatusUpdate);
+    };
+  }, [auth.user?.id, handleRefresh]);
 
   // Refresh data when workspace changes
   useEffect(() => {
@@ -233,6 +367,45 @@ export default function ContentPage() {
     [publications, openEditModal, fetchPublicationById],
   );
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = tabOrder.indexOf(active.id as string);
+      const newIndex = tabOrder.indexOf(over.id as string);
+      setTabOrder(arrayMove(tabOrder, oldIndex, newIndex));
+    }
+  };
+
+  const getTabIcon = (id: string, active: boolean) => {
+    const className = `w-4 h-4 ${active ? "text-white" : "opacity-70"}`;
+    switch (id) {
+      case "publications":
+        return <Folder className={className} />;
+      case "campaigns":
+        return <Target className={className} />;
+      case "calendar":
+        return <CalendarIcon className={className} />;
+      case "logs":
+        return <FileText className={className} />;
+      case "approvals":
+        return <CheckCircle className={className} />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <AuthenticatedLayout>
       <Head title={t("manageContent.title")} />
@@ -250,49 +423,51 @@ export default function ContentPage() {
             </div>
 
             <div className="flex items-center gap-2">
-              {permissions.includes("content") && (
+              {permissions.includes("manage-content") && (
                 <Dropdown>
                   <Dropdown.Trigger>
                     <Button
-                     id="create-publication"
+                      id="create-publication"
                       variant="primary"
                       size="lg"
                       icon={Plus}
-                      className="gap-2"
+                      className="gap-2 uppercase tracking-wider font-bold text-xs"
                     >
-                      {t("manageContent.createNew")}
+                      {t("manageContent.createNew").toUpperCase()}
                     </Button>
                   </Dropdown.Trigger>
                   <Dropdown.Content
-                    align="left"
-                    className="lg:!left-auto lg:!right-0 lg:!origin-top-right"
+                    align="right"
                     width="auto"
-                    contentClasses="py-2 bg-white dark:bg-neutral-800 shadow-lg rounded-lg border border-gray-100 dark:border-neutral-700 min-w-[220px]"
+                    contentClasses="py-1 bg-white dark:bg-neutral-800 shadow-xl rounded-lg min-w-[220px]"
                   >
-                    <Button
-                      onClick={() => openAddModal("publication")}
-                      variant="ghost"
-                      buttonStyle="ghost"
-                      size="lg"
-                      icon={FileText}
-                      iconPosition="left"
-                      fullWidth
-                      className="justify-start hover:bg-gray-50 dark:hover:bg-neutral-700/50 rounded-lg mx-2 text-gray-700 dark:text-gray-200"
-                    >
-                      {t("manageContent.tabs.publications")}
-                    </Button>
-                    <Button
-                      onClick={() => openAddModal("campaign")}
-                      variant="ghost"
-                      buttonStyle="ghost"
-                      size="lg"
-                      icon={Target}
-                      iconPosition="left"
-                      fullWidth
-                      className="justify-start hover:bg-gray-50 dark:hover:bg-neutral-700/50 rounded-lg mx-2 text-gray-700 dark:text-gray-200"
-                    >
-                      {t("manageContent.tabs.campaigns")}
-                    </Button>
+                    <div className="p-1">
+                      <Button
+                        onClick={() => openAddModal("publication")}
+                        variant="ghost"
+                        buttonStyle="ghost"
+                        size="lg"
+                        icon={FileText}
+                        iconPosition="left"
+                        fullWidth
+                        className="justify-start px-4 py-2 hover:bg-gray-50 dark:hover:bg-neutral-700/50 rounded-lg border-0 transition-all duration-200 uppercase tracking-wider font-bold text-xs"
+                      >
+                        {t("manageContent.tabs.publications").toUpperCase()}
+                      </Button>
+                      <div className="mx-2 my-1 border-t border-gray-100 dark:border-neutral-700/50" />
+                      <Button
+                        onClick={() => openAddModal("campaign")}
+                        variant="ghost"
+                        buttonStyle="ghost"
+                        size="lg"
+                        icon={Target}
+                        iconPosition="left"
+                        fullWidth
+                        className="justify-start px-4 py-2 hover:bg-gray-50 dark:hover:bg-neutral-700/50 rounded-lg border-0 transition-all duration-200 uppercase tracking-wider font-bold text-xs"
+                      >
+                        {t("manageContent.tabs.campaigns").toUpperCase()}
+                      </Button>
+                    </div>
                   </Dropdown.Content>
                 </Dropdown>
               )}
@@ -304,92 +479,45 @@ export default function ContentPage() {
           </div>
 
           <div className="mb-8">
-            <div className="inline-flex items-center p-1 rounded-lg bg-gray-100 dark:bg-neutral-800/50 gap-1 overflow-x-auto max-w-full">
-              <button
-                onClick={() => handleTabChange("publications")}
-                className={`flex items-center justify-center gap-2 py-2 px-4 rounded-md text-sm font-bold transition-all duration-200 whitespace-nowrap ${
-                  activeTab === "publications"
-                    ? "bg-white dark:bg-neutral-800 text-primary-600 shadow-sm ring-1 ring-black/5 dark:ring-white/10"
-                    : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-white/50 dark:hover:bg-neutral-700/50"
-                }`}
-              >
-                <Folder
-                  className={`w-4 h-4 ${activeTab === "publications" ? "text-primary-600 dark:text-primary-400" : "opacity-70"}`}
-                />
-                <span>{t("content.tabs.publications")}</span>
-              </button>
-              <button
-                onClick={() => handleTabChange("campaigns")}
-                className={`flex items-center justify-center gap-2 py-2 px-4 rounded-md text-sm font-bold transition-all duration-200 whitespace-nowrap ${
-                  activeTab === "campaigns"
-                    ? "bg-white dark:bg-neutral-800 text-primary-600 shadow-sm ring-1 ring-black/5 dark:ring-white/10"
-                    : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-white/50 dark:hover:bg-neutral-700/50"
-                }`}
-              >
-                <Target
-                  className={`w-4 h-4 ${activeTab === "campaigns" ? "text-primary-600 dark:text-primary-400" : "opacity-70"}`}
-                />
-                <span>{t("content.tabs.campaigns")}</span>
-              </button>
-              <button
-                id="calendar"
-                onClick={() => handleTabChange("calendar")}
-                className={`flex items-center justify-center gap-2 py-2 px-4 rounded-md text-sm font-bold transition-all duration-200 whitespace-nowrap ${
-                  activeTab === "calendar"
-                    ? "bg-white dark:bg-neutral-800 text-primary-600 shadow-sm ring-1 ring-black/5 dark:ring-white/10"
-                    : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-white/50 dark:hover:bg-neutral-700/50"
-                }`}
-              >
-                <CalendarIcon
-                  className={`w-4 h-4 ${activeTab === "calendar" ? "text-primary-600 dark:text-primary-400" : "opacity-70"}`}
-                />
-                <span>{t("content.tabs.calendar")}</span>
-              </button>
-              <button
-                onClick={() => handleTabChange("logs")}
-                className={`flex items-center justify-center gap-2 py-2 px-4 rounded-md text-sm font-bold transition-all duration-200 whitespace-nowrap ${
-                  activeTab === "logs"
-                    ? "bg-white dark:bg-neutral-800 text-primary-600 shadow-sm ring-1 ring-black/5 dark:ring-white/10"
-                    : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-white/50 dark:hover:bg-neutral-700/50"
-                }`}
-              >
-                <FileText
-                  className={`w-4 h-4 ${activeTab === "logs" ? "text-primary-600 dark:text-primary-400" : "opacity-70"}`}
-                />
-                <span>{t("content.tabs.logs")}</span>
-              </button>
-              {permissions.includes("approve") && (
-                <button
-                  onClick={() => handleTabChange("approvals")}
-                  className={`flex items-center justify-center gap-2 py-2 px-4 rounded-md text-sm font-bold transition-all duration-200 whitespace-nowrap relative ${
-                    activeTab === "approvals"
-                      ? "bg-white dark:bg-neutral-800 text-primary-600 shadow-sm ring-1 ring-black/5 dark:ring-white/10"
-                      : "text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-white/50 dark:hover:bg-neutral-700/50"
-                  }`}
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <div className="inline-flex items-center p-2 rounded-lg bg-white dark:bg-neutral-800 backdrop-blur-sm gap-1 overflow-x-auto max-w-full shadow-sm">
+                <SortableContext
+                  items={tabOrder}
+                  strategy={horizontalListSortingStrategy}
                 >
-                  <CheckCircle
-                    className={`w-4 h-4 ${activeTab === "approvals" ? "text-primary-600 dark:text-primary-400" : "opacity-70"}`}
-                  />
-                  <span>{t("content.tabs.approvals")}</span>
-                  {publications.filter((p) => p.status === "pending_review")
-                    .length > 0 && (
-                    <span
-                      className={`ml-1 px-1.5 py-0.5 text-[10px] font-bold rounded-full ${
-                        activeTab === "approvals"
-                          ? "bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400"
-                          : "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-400"
-                      }`}
-                    >
-                      {
-                        publications.filter(
-                          (p) => p.status === "pending_review",
-                        ).length
-                      }
-                    </span>
-                  )}
-                </button>
-              )}
-            </div>
+                  {tabOrder.map((id) => {
+                    if (id === "approvals" && !permissions.includes("approve"))
+                      return null;
+
+                    const label = t(`manageContent.tabs.${id}`);
+                    const hasBadge = id === "approvals";
+                    const badgeCount =
+                      id === "approvals"
+                        ? publications.filter(
+                            (p) => p.status === "pending_review",
+                          ).length
+                        : 0;
+
+                    return (
+                      <SortableTab
+                        key={id}
+                        id={id}
+                        label={label}
+                        hasBadge={hasBadge}
+                        badgeCount={badgeCount}
+                        activeTab={activeTab}
+                        handleTabChange={handleTabChange}
+                        getTabIcon={getTabIcon}
+                      />
+                    );
+                  })}
+                </SortableContext>
+              </div>
+            </DndContext>
           </div>
 
           <div className="min-h-[500px]">
@@ -406,26 +534,30 @@ export default function ContentPage() {
                 <div className="bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 overflow-hidden shadow-sm">
                   <div className="border-b border-gray-200 dark:border-neutral-700 flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 bg-gray-50/50 dark:bg-neutral-800/50">
                     <div className="flex bg-gray-200/50 dark:bg-neutral-700/50 p-1 rounded-lg w-fit">
-                      <button
+                      <Button
                         onClick={() => setApprovalTab("pending")}
-                        className={`px-6 py-2 rounded-lg font-bold text-sm transition-all ${
+                        variant="ghost"
+                        buttonStyle="solid"
+                        className={`px-6 py-2 rounded-lg font-bold text-sm transition-all border-0 shadow-none hover:bg-transparent ${
                           approvalTab === "pending"
                             ? "bg-white dark:bg-neutral-800 text-primary-600 dark:text-primary-400 shadow-sm ring-1 ring-black/5"
                             : "text-gray-500 hover:text-gray-700"
                         }`}
                       >
-                        {t("approvals.tabs.pending")}
-                      </button>
-                      <button
+                        {t("approvals.tabs.pending").toUpperCase()}
+                      </Button>
+                      <Button
                         onClick={() => setApprovalTab("history")}
-                        className={`px-6 py-2 rounded-lg font-bold text-sm transition-all ${
+                        variant="ghost"
+                        buttonStyle="solid"
+                        className={`px-6 py-2 rounded-lg font-bold text-sm transition-all border-0 shadow-none hover:bg-transparent ${
                           approvalTab === "history"
                             ? "bg-white dark:bg-neutral-800 text-primary-600 dark:text-primary-400 shadow-sm ring-1 ring-black/5"
                             : "text-gray-500 hover:text-gray-700"
                         }`}
                       >
-                        {t("approvals.tabs.history")}
-                      </button>
+                        {t("approvals.tabs.history").toUpperCase()}
+                      </Button>
                     </div>
                   </div>
 
@@ -457,9 +589,12 @@ export default function ContentPage() {
                   onPerPageChange={handlePerPageChange}
                   onRefresh={handleRefresh}
                   onFilterChange={handleSingleFilterChange}
+                  onResetFilters={handleResetFilters}
                   filters={filters}
                   search={search}
                   onSearchChange={setSearch}
+                  showFilters={showFilters[activeTab] ?? false}
+                  onToggleFilters={(show) => setShowFilters(activeTab, show)}
                 />
               </div>
             )}
@@ -469,8 +604,8 @@ export default function ContentPage() {
                 <ContentList
                   title={
                     activeTab === "publications"
-                      ? t("content.tabs.publications")
-                      : t("content.tabs.campaigns")
+                      ? t("manageContent.tabs.publications")
+                      : t("manageContent.tabs.campaigns")
                   }
                   onRefresh={handleRefreshWrapped}
                   items={
@@ -492,6 +627,7 @@ export default function ContentPage() {
                     useManageContentUIStore.getState().openEditModal(item)
                   }
                   onDelete={handleDeleteItemClick}
+                  onDuplicate={handleDuplicateItem}
                   onViewDetails={openViewDetailsModal}
                   onPublish={(item) =>
                     useManageContentUIStore.getState().openPublishModal(item)
@@ -502,10 +638,11 @@ export default function ContentPage() {
                   toggleExpand={toggleExpand}
                   permissions={permissions}
                   onPerPageChange={handlePerPageChange}
-                  showFilters={showFilters}
-                  onToggleFilters={setShowFilters}
+                  showFilters={showFilters[activeTab] ?? true}
+                  onToggleFilters={(show) => setShowFilters(activeTab, show)}
                   filters={filters}
                   onFilterChange={handleSingleFilterChange}
+                  onResetFilters={handleResetFilters}
                   search={search}
                   onSearchChange={setSearch}
                 />
@@ -541,8 +678,8 @@ export default function ContentPage() {
         <ModalFooter
           onClose={() => setDeleteConfirmation({ isOpen: false, id: null })}
           onPrimarySubmit={confirmDelete}
-          submitText={t("common.delete") || "Eliminar"}
-          cancelText={t("common.cancel") || "Cancelar"}
+          submitText={t("common.delete").toUpperCase() || "ELIMINAR"}
+          cancelText={t("common.cancel").toUpperCase() || "CANCELAR"}
           submitVariant="danger"
           submitIcon={<Trash2 className="w-4 h-4" />}
           cancelStyle="outline"

@@ -4,9 +4,9 @@ import PlatformSettingsModal from "@/Components/ConfigSocialMedia/PlatformSettin
 import CampaignSelector from "@/Components/ManageContent/Publication/common/CampaignSelector";
 import SocialAccountsSection from "@/Components/ManageContent/Publication/common/add/SocialAccountsSection";
 import MediaUploadSection from "@/Components/ManageContent/Publication/common/edit/MediaUploadSection";
-import ModalFooter from "@/Components/ManageContent/modals/common/ModalFooter";
-import ModalHeader from "@/Components/ManageContent/modals/common/ModalHeader";
-import ScheduleSection from "@/Components/ManageContent/modals/common/ScheduleSection";
+import ModalFooter from "@/Components/Content/modals/common/ModalFooter";
+import ModalHeader from "@/Components/Content/modals/common/ModalHeader";
+import ScheduleSection from "@/Components/Content/modals/common/ScheduleSection";
 import Input from "@/Components/common/Modern/Input";
 import Textarea from "@/Components/common/Modern/Textarea";
 import { useCampaigns } from "@/Hooks/campaign/useCampaigns";

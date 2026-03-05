@@ -31,7 +31,7 @@ export const LazyPublishPreviewModal = createLazyComponent(
 );
 
 export const LazyReelsCarousel = createLazyComponent(
-  () => import("@/Components/ManageContent/ReelsCarousel")
+  () => import("@/Components/Content/ReelsCarousel")
 );
 
 export const LazyVideoEditor = createLazyComponent(

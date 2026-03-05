@@ -8,13 +8,13 @@ import { useTranslation } from "react-i18next";
 import CampaignDateFields from "@/Components/ManageContent/Campaign/common/CampaignDateFields";
 import CampaignFormFields from "@/Components/ManageContent/Campaign/common/CampaignFormFields";
 import PublicationSelector from "@/Components/ManageContent/Campaign/common/PublicationSelector";
-import ModalHeader from "@/Components/ManageContent/modals/common/ModalHeader";
+import ModalHeader from "@/Components/Content/modals/common/ModalHeader";
 
 import { useEditCampaignForm } from "@/Hooks/campaign/useEditCampaignForm";
 import { useModalFocusTrap } from "@/Hooks/useModalFocusTrap";
 import { usePublicationsForCampaignEdit } from "@/Hooks/campaign/usePublicationsForCampaignEdit";
 import { usePage } from "@inertiajs/react";
-import ModalFooter from "./common/ModalFooter";
+import ModalFooter from "../../Content/modals/common/ModalFooter";
 
 interface EditCampaignModalProps {
   isOpen: boolean;

@@ -1,7 +1,7 @@
 import CampaignMediaCarousel from "@/Components/Campaigns/CampaignMediaCarousel";
-import ReelsCarousel from "@/Components/ManageContent/ReelsCarousel";
-import ActivityList from "@/Components/ManageContent/ActivityList";
-import ApprovalHistory from "@/Components/ManageContent/ApprovalHistory";
+import ReelsCarousel from "@/Components/Content/ReelsCarousel";
+import ActivityList from "@/Components/Content/ActivityList";
+import ApprovalHistory from "@/Components/Content/ApprovalHistory";
 import ApprovalHistorySection from "@/Components/ManageContent/Publication/common/edit/ApprovalHistorySection";
 import { Campaign } from "@/types/Campaign";
 import { Publication } from "@/types/Publication";
