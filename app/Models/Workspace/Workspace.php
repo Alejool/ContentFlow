@@ -15,11 +15,14 @@ use App\Models\Campaigns\Campaign;
 use Illuminate\Notifications\Notifiable;
 use App\Models\Calendar\ExternalCalendarConnection;
 use App\Models\Calendar\BulkOperationHistory;
+use App\Models\Subscription\Subscription;
+use App\Models\Subscription\UsageMetric;
+use Laravel\Cashier\Billable;
 
 
 class Workspace extends Model
 {
-    use HasFactory, SoftDeletes, Notifiable;
+    use HasFactory, SoftDeletes, Notifiable, Billable;
 
 
     protected $fillable = [
@@ -121,5 +124,75 @@ class Workspace extends Model
     public function bulkOperationHistory()
     {
         return $this->hasMany(BulkOperationHistory::class);
+    }
+
+    /**
+     * Get the subscription for this workspace.
+     */
+    public function subscription()
+    {
+        return $this->hasOne(Subscription::class);
+    }
+
+    /**
+     * Get the usage metrics for this workspace.
+     */
+    public function usageMetrics()
+    {
+        return $this->hasMany(UsageMetric::class);
+    }
+
+    /**
+     * Get the current usage metric for a specific type.
+     */
+    public function getUsageMetric(string $metricType): ?UsageMetric
+    {
+        return $this->usageMetrics()
+            ->where('metric_type', $metricType)
+            ->where('period_start', '<=', now())
+            ->where('period_end', '>=', now())
+            ->first();
+    }
+
+    /**
+     * Get monthly publication count.
+     */
+    public function getMonthlyPublicationCount(): int
+    {
+        return $this->publications()
+            ->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])
+            ->count();
+    }
+
+    /**
+     * Get storage usage in GB.
+     */
+    public function getStorageUsageGB(): float
+    {
+        $bytes = $this->mediaFiles()->sum('size');
+        return round($bytes / (1024 * 1024 * 1024), 2);
+    }
+
+    /**
+     * Check if workspace has an active subscription.
+     */
+    public function hasActiveSubscription(): bool
+    {
+        return $this->subscription && $this->subscription->isActive();
+    }
+
+    /**
+     * Get the workspace owner.
+     */
+    public function owner()
+    {
+        return $this->users()
+            ->wherePivot('role_id', function($query) {
+                $query->select('id')
+                    ->from('roles')
+                    ->where('slug', 'owner')
+                    ->limit(1);
+            })
+            ->first();
     }
 }

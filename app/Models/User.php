@@ -26,6 +26,8 @@ use App\Models\Workspace\Workspace;
 use App\Models\Role\Role;
 use App\Models\Calendar\ExternalCalendarConnection;
 use App\Models\Calendar\BulkOperationHistory;
+use App\Models\SubscriptionHistory;
+use App\Models\SubscriptionUsageTracking;
 
 class User extends Model implements Authenticatable, MustVerifyEmail, CanResetPassword, HasLocalePreference
 {
@@ -43,6 +45,9 @@ class User extends Model implements Authenticatable, MustVerifyEmail, CanResetPa
     'is_super_admin',
     'photo_url',
     'email_verified_at',
+    'current_plan',
+    'plan_started_at',
+    'plan_renews_at',
     'locale',
     'theme',
     'theme_color',
@@ -76,6 +81,8 @@ class User extends Model implements Authenticatable, MustVerifyEmail, CanResetPa
     'known_devices' => 'array',
     'last_login_at' => 'datetime',
     'two_factor_enabled_at' => 'datetime',
+    'plan_started_at' => 'datetime',
+    'plan_renews_at' => 'datetime',
   ];
 
   protected $attributes = [
@@ -258,4 +265,83 @@ class User extends Model implements Authenticatable, MustVerifyEmail, CanResetPa
   {
     return $this->hasMany(BulkOperationHistory::class);
   }
+
+  /**
+   * Get the user's subscription history.
+   */
+  public function subscriptionHistory(): HasMany
+  {
+    return $this->hasMany(SubscriptionHistory::class)->orderBy('started_at', 'desc');
+  }
+
+  /**
+   * Get the user's active subscription history.
+   */
+  public function activeSubscriptionHistory()
+  {
+    return $this->hasOne(SubscriptionHistory::class)->where('is_active', true)->latest('started_at');
+  }
+
+  /**
+   * Get the user's usage tracking records.
+   */
+  public function usageTracking(): HasMany
+  {
+    return $this->hasMany(SubscriptionUsageTracking::class)->orderBy('year', 'desc')->orderBy('month', 'desc');
+  }
+
+  /**
+   * Get the user's current month usage tracking.
+   */
+  public function currentMonthUsage()
+  {
+    return $this->hasOne(SubscriptionUsageTracking::class)
+      ->where('year', now()->year)
+      ->where('month', now()->month);
+  }
+
+  /**
+   * Get the current plan configuration.
+   */
+  public function getPlanConfig(): array
+  {
+    return config("plans.{$this->current_plan}", config('plans.free'));
+  }
+
+  /**
+   * Get the current plan limits.
+   */
+  public function getPlanLimits(): array
+  {
+    return $this->getPlanConfig()['limits'] ?? [];
+  }
+
+  /**
+   * Check if user has a specific feature in their plan.
+   */
+  public function hasFeature(string $feature): bool
+  {
+    $features = $this->getPlanConfig()['features'] ?? [];
+    return in_array($feature, $features);
+  }
+
+  /**
+   * Check if the plan needs renewal (monthly cycle).
+   */
+  public function needsPlanRenewal(): bool
+  {
+    if (!$this->plan_renews_at) {
+      return false;
+    }
+    return now()->greaterThanOrEqualTo($this->plan_renews_at);
+  }
+
+  /**
+   * Check if user is on a paid plan.
+   */
+  public function isOnPaidPlan(): bool
+  {
+    return !in_array($this->current_plan, ['free', 'demo']);
+  }
 }
+
