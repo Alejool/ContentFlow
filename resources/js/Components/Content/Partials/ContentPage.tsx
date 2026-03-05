@@ -43,7 +43,7 @@ import ApprovalHistory from "@/Components/Content/ApprovalHistory";
 import ApprovalList from "@/Components/Content/ApprovalList";
 import ApprovalStats from "@/Components/Content/ApprovalStats";
 import ContentList from "@/Components/Content/ContentList";
-import ModernCalendar from "@/Components/ManageContent/Partials/ModernCalendar";
+import ModernCalendar from "@/Components/Content/Partials/ModernCalendar";
 import Button from "@/Components/common/Modern/Button";
 
 import {
