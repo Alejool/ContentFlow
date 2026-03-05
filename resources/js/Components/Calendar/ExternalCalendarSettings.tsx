@@ -249,7 +249,6 @@ const CalendarConnectionCard = ({
               icon={RefreshCw}
               onClick={onSync}
               loading={isSyncing}
-              className="dark:!text-black"
             >
               {t('calendar.external.syncNow')}
             </Button>

@@ -1178,6 +1178,16 @@ export default function ModernCalendar({ onEventClick }: ModernCalendarProps) {
                             className="w-1.5 h-10 rounded-full opacity-50 group-hover:opacity-100 transition-opacity"
                             style={{ backgroundColor: event.color }}
                           />
+                          {event.type === "user_event" &&
+                            Number(event.user?.id) === Number(currentUser?.id) && (
+                              <button
+                                onClick={(e) => handleDeleteEvent(e, event)}
+                                className=" p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-gray-400 hover:text-red-600 dark:hover:text-red-400"
+                                title={t("common.delete") || "Eliminar"}
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            )}
                         </div>
                       </div>
                     ))

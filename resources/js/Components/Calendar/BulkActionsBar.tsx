@@ -100,7 +100,7 @@ export const BulkActionsBar: React.FC<BulkActionsBarProps> = ({
             <div className="flex items-center gap-2">
               {selectedCount < totalEvents && (
                 <Button
-                  variant="secondary"
+                  variant="ghost"
                   size="sm"
                   onClick={onSelectAll}
                   className="whitespace-nowrap"
