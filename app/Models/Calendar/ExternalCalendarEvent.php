@@ -13,6 +13,7 @@ class ExternalCalendarEvent extends Model
     protected $fillable = [
         'connection_id',
         'publication_id',
+        'user_calendar_event_id',
         'external_event_id',
         'provider',
     ];
@@ -21,6 +22,31 @@ class ExternalCalendarEvent extends Model
         'synced_at' => 'datetime',
         'last_updated_at' => 'datetime',
     ];
+
+    /**
+     * Boot the model.
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        // Validate that at least one of publication_id or user_calendar_event_id is set
+        static::creating(function ($model) {
+            if (empty($model->publication_id) && empty($model->user_calendar_event_id)) {
+                throw new \InvalidArgumentException(
+                    'ExternalCalendarEvent must have either publication_id or user_calendar_event_id'
+                );
+            }
+        });
+
+        static::updating(function ($model) {
+            if (empty($model->publication_id) && empty($model->user_calendar_event_id)) {
+                throw new \InvalidArgumentException(
+                    'ExternalCalendarEvent must have either publication_id or user_calendar_event_id'
+                );
+            }
+        });
+    }
 
     /**
      * Get the connection that owns the event.
@@ -36,5 +62,13 @@ class ExternalCalendarEvent extends Model
     public function publication(): BelongsTo
     {
         return $this->belongsTo(Publication::class);
+    }
+
+    /**
+     * Get the user calendar event associated with this event.
+     */
+    public function userCalendarEvent(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\User\UserCalendarEvent::class, 'user_calendar_event_id');
     }
 }

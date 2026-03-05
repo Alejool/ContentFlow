@@ -3,8 +3,10 @@
 namespace App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
-
 use App\Models\Workspace\Workspace;
+use App\Events\UserCalendarEventCreated;
+use App\Events\UserCalendarEventUpdated;
+use App\Events\UserCalendarEventDeleted;
 
 class UserCalendarEvent extends Model
 {
@@ -27,6 +29,12 @@ class UserCalendarEvent extends Model
         'remind_at' => 'datetime',
         'notification_sent' => 'boolean',
         'is_public' => 'boolean',
+    ];
+
+    protected $dispatchesEvents = [
+        'created' => UserCalendarEventCreated::class,
+        'updated' => UserCalendarEventUpdated::class,
+        'deleted' => UserCalendarEventDeleted::class,
     ];
 
     public function user()
