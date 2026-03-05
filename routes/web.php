@@ -25,10 +25,20 @@ use App\Models\Workspace\Workspace;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Admin\SystemNotificationController;
 use App\Http\Controllers\Publications\ClientPortalController;
+use App\Http\Controllers\StripeCheckoutController;
+use App\Http\Controllers\Subscription\PricingController;
+use App\Http\Controllers\Subscription\UsageMetricsController;
 
 Broadcast::routes();
 
 Route::get('/portal/{token}', [ClientPortalController::class, 'renderPortal'])->name('portal.view');
+
+// Stripe Checkout Routes
+Route::prefix('checkout')->name('checkout.')->group(function () {
+  Route::post('/create-session', [StripeCheckoutController::class, 'createCheckoutSession'])->name('create-session');
+  Route::get('/success', [StripeCheckoutController::class, 'success'])->name('success');
+  Route::get('/cancel', [StripeCheckoutController::class, 'cancel'])->name('cancel');
+});
 
 Route::middleware('guest')->group(function () {
   Route::get('/up', fn() => response('OK'));
@@ -117,6 +127,9 @@ Route::prefix('auth')->name('auth.')->group(function () {
   Route::get('/google/callback', [AuthController::class, 'handleGoogleCallback'])->name('google.callback');
 });
 
+// Ruta de pricing (pública, accesible sin autenticación)
+Route::get('/pricing', [PricingController::class, 'index'])->name('pricing');
+
 Route::middleware('auth')->group(function () {
 
   Route::get('/dashboard', [AnalyticsController::class, 'dashboard'])->name('dashboard');
@@ -132,6 +145,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/social', [ProfileController::class, 'socialSettings'])->name('social');
     Route::patch('/social', [ProfileController::class, 'updateSocialSettings'])->name('social.update');
     Route::patch('/locale', [LocaleController::class, 'update'])->name('locale');
+  });
+
+  // Rutas de suscripción (autenticadas)
+  Route::prefix('subscription')->name('subscription.')->group(function () {
+    Route::get('/usage', [UsageMetricsController::class, 'index'])->name('usage');
+    Route::get('/billing', [UsageMetricsController::class, 'billing'])->name('billing');
+    Route::post('/billing-portal', [UsageMetricsController::class, 'billingPortal'])->name('billing-portal');
+    Route::get('/success', [PricingController::class, 'success'])->name('success');
+    Route::get('/cancel', [PricingController::class, 'cancel'])->name('cancel');
   });
 
 

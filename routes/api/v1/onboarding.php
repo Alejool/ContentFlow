@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->prefix('onboarding')->name('onboarding.')->group(function () {
     Route::post('/start', [OnboardingController::class, 'start'])->name('start');
+    Route::post('/business-info/complete', [OnboardingController::class, 'completeBusinessInfo'])->name('business-info.complete');
+    Route::post('/plan/select', [OnboardingController::class, 'selectPlan'])->name('plan.select');
     Route::post('/tour/step', [OnboardingController::class, 'updateTourStep'])->name('tour.step');
     Route::post('/tour/complete', [OnboardingController::class, 'completeTourStep'])->name('tour.complete');
     Route::post('/tour/skip', [OnboardingController::class, 'skipTour'])->name('tour.skip');

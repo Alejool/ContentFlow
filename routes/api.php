@@ -16,6 +16,9 @@ Route::get('/webhooks/youtube', [YouTubeWebhookController::class, 'handle']);
 
 Route::prefix('v1')->name('api.v1.')->group(function () {
   require __DIR__ . '/api/v1/portal.php';
+  
+  // Ruta pública para obtener planes
+  Route::get('/plans', [\App\Http\Controllers\Subscription\PricingController::class, 'getPlans'])->name('plans');
 });
 
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -34,6 +37,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     require __DIR__ . '/api/v1/calendar.php';
     require __DIR__ . '/api/v1/localization.php';
     require __DIR__ . '/api/v1/onboarding.php';
+    require __DIR__ . '/api/v1/subscription.php';
     Route::prefix('uploads')->name('uploads.')->group(function () {
       require __DIR__ . '/api/v1/uploads.php';
     });
