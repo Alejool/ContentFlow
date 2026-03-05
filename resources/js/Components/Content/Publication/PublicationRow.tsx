@@ -1,6 +1,6 @@
 import CampaignTags from "@/Components/Content/Publication/CampaignTags";
 import PublicationThumbnail from "@/Components/Content/Publication/PublicationThumbnail";
-import SocialAccountsDisplay from "@/Components/Content/Publication/SocialAccountsDisplay";
+import SocialAccountsDisplay from "@/Components/ManageContent/Publication/SocialAccountsDisplay";
 import { Publication } from "@/types/Publication";
 import { usePage } from "@inertiajs/react";
 import { Copy, Edit, Eye, Image, Rocket, Trash2, Video } from "lucide-react";
@@ -31,8 +31,8 @@ export default function PublicationRow({
   onDuplicate,
 }: PublicationRowProps) {
   const { auth } = usePage<any>().props;
-  const canContent =
-    auth.current_workspace?.permissions?.includes("content");
+  const canManageContent =
+    auth.current_workspace?.permissions?.includes("manage-content");
 
   const countMediaFiles = (pub: Publication) => {
     if (!pub.media_files || pub.media_files.length === 0) {
@@ -163,7 +163,7 @@ export default function PublicationRow({
               <Eye className="w-4 h-4" />
             </button>
           )}
-          {canContent && (
+          {canManageContent && (
             <>
               <button
                 onClick={() => onPublish(item)}

@@ -5,9 +5,9 @@ import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
-import CampaignDateFields from "@/Components/ManageContent/Campaign/common/CampaignDateFields";
-import CampaignFormFields from "@/Components/ManageContent/Campaign/common/CampaignFormFields";
-import PublicationSelector from "@/Components/ManageContent/Campaign/common/PublicationSelector";
+import CampaignDateFields from "@/Components/Content/Campaign/common/CampaignDateFields";
+import CampaignFormFields from "@/Components/Content/Campaign/common/CampaignFormFields";
+import PublicationSelector from "@/Components/Content/Campaign/common/PublicationSelector";
 import ModalHeader from "@/Components/Content/modals/common/ModalHeader";
 
 import { useEditCampaignForm } from "@/Hooks/campaign/useEditCampaignForm";

@@ -1,5 +1,6 @@
 import PublicationThumbnail from "@/Components/Content/Publication/PublicationThumbnail";
-import SocialAccountsDisplay from "@/Components/Content/Publication/SocialAccountsDisplay";
+import SocialAccountsDisplay from "@/Components/ManageContent/Publication/SocialAccountsDisplay";
+import { usePublicationStore } from "@/stores/publicationStore";
 import { Publication } from "@/types/Publication";
 import { canUserPublishDirectly } from "@/Utils/publicationPermissions";
 import { usePage } from "@inertiajs/react";
@@ -17,7 +18,7 @@ import {
   Trash2,
   Video,
 } from "lucide-react";
-import React, { memo, useState } from "react";
+import React, { memo, useState, useMemo } from "react";
 import { toast } from "react-hot-toast";
 
 // ... (skipping interface to save tokens if possible, or just targeting the specific blocks)
@@ -77,6 +78,10 @@ const PublicationRow = memo(
     const [isPublishing, setIsPublishing] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
+
+    const publishingPlatforms = useMemo(() => {
+      return usePublicationStore.getState().getPublishingPlatforms(item.id);
+    }, [item.id]);
     
     // Verificar si el usuario puede publicar directamente
     const canPublish = canUserPublishDirectly(item, currentUserId, permissions || []);
@@ -224,8 +229,27 @@ const PublicationRow = memo(
                 <div className="flex items-center gap-1.5 mt-1">
                   <span className="flex-shrink-0 w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                   <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-tight">
-                    {t("publications.table.publishingBy") || "Publishing by"}{" "}
-                    {item.publisher.name}
+                    {(() => {
+                      const publishingAccounts = connectedAccounts.filter(
+                        (acc) => publishingPlatforms.includes(acc.id),
+                      );
+                      if (publishingAccounts.length === 1) {
+                        const platformName =
+                          publishingAccounts[0].platform
+                            .charAt(0)
+                            .toUpperCase() +
+                          publishingAccounts[0].platform.slice(1);
+                        return `Publicando en ${platformName} por ${item.publisher.name}`;
+                      } else if (publishingAccounts.length > 1) {
+                        return `Publicando en ${publishingAccounts.length} redes por ${item.publisher.name}`;
+                      }
+                      return (
+                        (t("publications.table.publishingBy") ||
+                          "Publicando por") +
+                        " " +
+                        item.publisher.name
+                      );
+                    })()}
                   </span>
                 </div>
               )}
@@ -331,6 +355,7 @@ const PublicationRow = memo(
           <SocialAccountsDisplay
             publication={item}
             connectedAccounts={connectedAccounts}
+            publishingPlatforms={publishingPlatforms}
             t={t}
             compact={true}
           />
@@ -438,6 +463,7 @@ const PublicationRow = memo(
                       ? "bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed dark:bg-gray-800 dark:border-gray-700 dark:text-gray-600"
                       : "text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20"
                 } rounded-lg disabled:opacity-70 transition-all`}
+                data-testid={`edit-publication-${item.id}`}
                 title={
                   remoteLock
                     ? `${t("publications.table.lockedBy") || "Editando por"} ${lockedByName}`
@@ -478,7 +504,7 @@ const PublicationRow = memo(
                 <Copy className="w-4 h-4" />
               </button>
             )}
-            {/* Delete button - Only for Owner/Admin or users with content */}
+            {/* Delete button - Only for Owner/Admin or users with manage-content */}
             {permissions?.includes("manage-content") && (
               <button
                 onClick={async (e) => {

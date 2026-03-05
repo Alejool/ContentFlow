@@ -1,6 +1,6 @@
 import PlatformSettingsModal from "@/Components/ConfigSocialMedia/PlatformSettingsModal";
-import DisconnectWarningModal from "@/Components/ManageContent/modals/DisconnectWarningModal";
-import DisconnectBlockerModal from "@/Components/ManageContent/modals/DisconnectBlockerModal";
+import DisconnectWarningModal from "@/Components/Content/modals/DisconnectWarningModal";
+import DisconnectBlockerModal from "@/Components/Content/modals/DisconnectBlockerModal";
 import { SOCIAL_PLATFORMS } from "@/Constants/socialPlatforms";
 import { useSocialMediaAuth } from "@/Hooks/useSocialMediaAuth";
 import { getPlatformSchema } from "@/schemas/platformSettings";

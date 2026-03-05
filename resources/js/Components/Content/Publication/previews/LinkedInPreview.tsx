@@ -53,7 +53,10 @@ export const LinkedInPreview = ({
             </div>
           </div>
         </div>
-        <button className="text-gray-600 hover:bg-gray-100 p-1 rounded-full">
+        <button
+          type="button"
+          className="text-gray-600 hover:bg-gray-100 p-1 rounded-full"
+        >
           <MoreHorizontal className="w-5 h-5" />
         </button>
       </div>
@@ -109,19 +112,31 @@ export const LinkedInPreview = ({
 
       {/* Actions */}
       <div className="px-2 py-1 flex items-center justify-between">
-        <button className="flex items-center gap-1.5 px-3 py-3 hover:bg-gray-100 rounded-md text-gray-600 font-semibold text-sm transition-colors flex-1 justify-center">
+        <button
+          type="button"
+          className="flex items-center gap-1.5 px-3 py-3 hover:bg-gray-100 rounded-md text-gray-600 font-semibold text-sm transition-colors flex-1 justify-center"
+        >
           <ThumbsUp className="w-5 h-5" />
           <span>Like</span>
         </button>
-        <button className="flex items-center gap-1.5 px-3 py-3 hover:bg-gray-100 rounded-md text-gray-600 font-semibold text-sm transition-colors flex-1 justify-center">
+        <button
+          type="button"
+          className="flex items-center gap-1.5 px-3 py-3 hover:bg-gray-100 rounded-md text-gray-600 font-semibold text-sm transition-colors flex-1 justify-center"
+        >
           <MessageSquare className="w-5 h-5" />
           <span>Comment</span>
         </button>
-        <button className="flex items-center gap-1.5 px-3 py-3 hover:bg-gray-100 rounded-md text-gray-600 font-semibold text-sm transition-colors flex-1 justify-center">
+        <button
+          type="button"
+          className="flex items-center gap-1.5 px-3 py-3 hover:bg-gray-100 rounded-md text-gray-600 font-semibold text-sm transition-colors flex-1 justify-center"
+        >
           <Share2 className="w-5 h-5" />
           <span>Repost</span>
         </button>
-        <button className="flex items-center gap-1.5 px-3 py-3 hover:bg-gray-100 rounded-md text-gray-600 font-semibold text-sm transition-colors flex-1 justify-center">
+        <button
+          type="button"
+          className="flex items-center gap-1.5 px-3 py-3 hover:bg-gray-100 rounded-md text-gray-600 font-semibold text-sm transition-colors flex-1 justify-center"
+        >
           <Send className="w-5 h-5" />
           <span>Send</span>
         </button>

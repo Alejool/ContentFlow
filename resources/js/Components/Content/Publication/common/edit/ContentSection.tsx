@@ -30,36 +30,41 @@ const ContentSection = memo(
     onHashtagChange,
     disabled,
   }: ContentSectionProps) => {
-    const handleAiSuggest = (data: Record<string, any>) => {
-      if (data.title) setValue("title", data.title, { shouldValidate: true });
+    const handleAiSuggestion = (data: any) => {
+      if (data.title)
+        setValue("title", data.title, {
+          shouldValidate: true,
+          shouldDirty: true,
+        });
       if (data.description)
-        setValue("description", data.description, { shouldValidate: true });
-      if (data.goal) setValue("goal", data.goal, { shouldValidate: true });
+        setValue("description", data.description, {
+          shouldValidate: true,
+          shouldDirty: true,
+        });
+      if (data.goal)
+        setValue("goal", data.goal, {
+          shouldValidate: true,
+          shouldDirty: true,
+        });
       if (data.hashtags) {
-        setValue("hashtags", data.hashtags, { shouldValidate: true });
+        setValue("hashtags", data.hashtags, {
+          shouldValidate: true,
+          shouldDirty: true,
+        });
         onHashtagChange(data.hashtags);
       }
     };
 
     return (
       <div className={`space-y-6 ${disabled ? "opacity-75" : ""}`}>
-        <div className="flex items-center justify-between">
-          <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
-            {t("publications.modal.edit.contentSection") || "Contenido"}
-          </h3>
-          {!disabled && (
-            <AiFieldSuggester
-              type="publication"
-              fields={{
-                title: watched.title,
-                description: watched.description,
-                goal: watched.goal,
-              }}
-              onSuggest={handleAiSuggest}
-            />
-          )}
+        <div className="flex justify-between items-end px-1">
+          <AiFieldSuggester
+            fields={watched}
+            type="publication"
+            onSuggest={handleAiSuggestion}
+            disabled={disabled}
+          />
         </div>
-
         <Input
           id="title"
           label={t("publications.modal.edit.titleField")}

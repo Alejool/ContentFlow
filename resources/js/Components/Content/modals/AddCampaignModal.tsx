@@ -11,8 +11,8 @@ import ModalHeader from "@/Components/Content/modals/common/ModalHeader";
 import Input from "@/Components/common/Modern/Input";
 import Textarea from "@/Components/common/Modern/Textarea";
 
-import CampaignDateFields from "@/Components/ManageContent/Campaign/common/CampaignDateFields";
-import PublicationSelector from "@/Components/ManageContent/Campaign/common/PublicationSelector";
+import CampaignDateFields from "@/Components/Content/Campaign/common/CampaignDateFields";
+import PublicationSelector from "@/Components/Content/Campaign/common/PublicationSelector";
 
 import { useAddCampaignForm } from "@/Hooks/campaign/useAddCampaignForm";
 import { useModalFocusTrap } from "@/Hooks/useModalFocusTrap";

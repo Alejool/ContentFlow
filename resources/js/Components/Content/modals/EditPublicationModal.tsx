@@ -1,13 +1,12 @@
 import PlatformSettingsModal from "@/Components/ConfigSocialMedia/PlatformSettingsModal";
-import { CommentsSection } from "@/Components/ManageContent/Publication/comments/CommentsSection";
-import ApprovalHistoryCompacto from "@/Components/ManageContent/Publication/common/ApprovalHistoryCompacto";
-import TimelineCompacto from "@/Components/ManageContent/Publication/common/TimelineCompacto";
-import SocialAccountsSection from "@/Components/ManageContent/Publication/common/add/SocialAccountsSection";
-import ContentSection from "@/Components/ManageContent/Publication/common/edit/ContentSection";
-import { LivePreviewSection } from "@/Components/ManageContent/Publication/common/edit/LivePreviewSection";
+import { CommentsSection } from "@/Components/Content/Publication/comments/CommentsSection";
+import ApprovalHistoryCompacto from "@/Components/Content/Publication/common/ApprovalHistoryCompacto";
+import TimelineCompacto from "@/Components/Content/Publication/common/TimelineCompacto";
+import SocialAccountsSection from "@/Components/Content/Publication/common/add/SocialAccountsSection";
+import ContentSection from "@/Components/Content/Publication/common/edit/ContentSection";
+import { LivePreviewSection } from "@/Components/Content/Publication/common/edit/LivePreviewSection";
 import MediaUploadSection from "@/Components/Content/Publication/common/edit/MediaUploadSection";
-import MediaUploadSkeleton from "@/Components/ManageContent/Publication/common/edit/MediaUploadSkeleton";
-import ReelsSection from "@/Components/Content/ReelsSection";
+import MediaUploadSkeleton from "@/Components/Content/Publication/common/edit/MediaUploadSkeleton";
 import ModalFooter from "@/Components/Content/modals/common/ModalFooter";
 import ModalHeader from "@/Components/Content/modals/common/ModalHeader";
 import ScheduleSection from "@/Components/Content/modals/common/ScheduleSection";
@@ -25,7 +24,9 @@ import { AlertCircle, Lock, Save } from "lucide-react";
 import { memo, useEffect, useMemo, useState } from "react";
 import { useWatch } from "react-hook-form";
 import { Trans } from "react-i18next";
-import PublicationStatusTimeline from "@/Components/ManageContent/Publication/common/PublicationStatusTimeline";
+import PublicationStatusTimeline from "@/Components/Content/Publication/common/PublicationStatusTimeline";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 const parseUserAgent = (userAgent?: string): string => {
   if (!userAgent) return "Unknown Device";
@@ -284,7 +285,7 @@ const EditPublicationModal = ({
             const account = socialAccounts.find((a) => a.id === id);
             return account?.platform;
           })
-          .filter(Boolean),
+          .filter((platform): platform is string => Boolean(platform)),
       ),
     );
   }, [selectedSocialAccounts, socialAccounts]);
@@ -292,6 +293,7 @@ const EditPublicationModal = ({
   const allPlatformSettings = useMemo(() => {
     const settings: Record<string, any> = {};
     selectedPlatforms.forEach((platform) => {
+      if (!platform) return;
       const platformKey = platform.toLowerCase();
       settings[platformKey] = platformSettings[platformKey] || {};
     });
@@ -591,7 +593,7 @@ const EditPublicationModal = ({
                             ? { url: video.thumbnailUrl, id: video.id || 0 }
                             : null;
                         })()}
-                        onThumbnailChange={(file: File | null) => {
+                        onThumbnailChange={(videoId: number, file: File | null) => {
                           const video = mediaFiles.find(
                             (m) => m.type === "video",
                           );

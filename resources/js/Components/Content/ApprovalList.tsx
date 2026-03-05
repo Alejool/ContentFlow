@@ -1,5 +1,5 @@
-import ApprovalSuccessModal from "@/Components/ManageContent/modals/ApprovalSuccessModal";
-import RejectionReasonModal from "@/Components/ManageContent/modals/RejectionReasonModal";
+import ApprovalSuccessModal from "@/Components/Content/modals/ApprovalSuccessModal";
+import RejectionReasonModal from "@/Components/Content/modals/RejectionReasonModal";
 import Button from "@/Components/common/Modern/Button";
 import AdvancedPagination from "@/Components/common/ui/AdvancedPagination";
 import EmptyState from "@/Components/common/ui/EmptyState";

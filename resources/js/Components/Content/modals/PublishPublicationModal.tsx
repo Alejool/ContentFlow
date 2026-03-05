@@ -1,7 +1,7 @@
 import Button from "@/Components/common/Modern/Button";
 import PlatformSettingsModal from "@/Components/ConfigSocialMedia/PlatformSettingsModal";
 import YouTubeThumbnailUploader from "@/Components/common/ui/YouTubeThumbnailUploader";
-import RejectionReasonModal from "@/Components/ManageContent/modals/RejectionReasonModal";
+import RejectionReasonModal from "@/Components/Content/modals/RejectionReasonModal";
 import { getPlatformConfig } from "@/Constants/socialPlatforms";
 import { usePublishPublication } from "@/Hooks/publication/usePublishPublication";
 import { useConfirm } from "@/Hooks/useConfirm";

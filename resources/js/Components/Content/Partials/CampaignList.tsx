@@ -44,18 +44,18 @@ const CampaignList = memo(
       );
     };
 
-    const handleFilterChange = (key: string, value: string) => {
-      if (key === "status") setStatusFilter(value);
-      if (key === "platform") setPlatformFilter(value);
-      if (key === "date_start") setDateStart(value);
-      if (key === "date_end") setDateEnd(value);
+    const handleFilterChange = (key: string, value: string | string[]) => {
+      if (key === "status") setStatusFilter(Array.isArray(value) ? value[0] : value);
+      if (key === "platform") setPlatformFilter(Array.isArray(value) ? value[0] : value);
+      if (key === "date_start") setDateStart(Array.isArray(value) ? value[0] : value);
+      if (key === "date_end") setDateEnd(Array.isArray(value) ? value[0] : value);
 
       if (onFilterChange) {
         onFilterChange({
-          status: key === "status" ? value : statusFilter,
+          status: key === "status" ? (Array.isArray(value) ? value[0] : value) : statusFilter,
           platform: key === "platform" ? value : platformFilter,
-          date_start: key === "date_start" ? value : dateStart,
-          date_end: key === "date_end" ? value : dateEnd,
+          date_start: key === "date_start" ? (Array.isArray(value) ? value[0] : value) : dateStart,
+          date_end: key === "date_end" ? (Array.isArray(value) ? value[0] : value) : dateEnd,
         });
       }
     };

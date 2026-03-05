@@ -1,7 +1,8 @@
 import DatePickerModern from "@/Components/common/Modern/DatePicker";
+import { validateVideoDuration } from "@/Utils/validationUtils";
 import { parseISO } from "date-fns";
-import { Check, Clock, Loader2, Settings, Target, X } from "lucide-react";
-import React, { memo, useState } from "react";
+import { AlertTriangle, Check, Clock, Settings, Target, X } from "lucide-react";
+import React, { memo, useState, useMemo } from "react";
 
 interface SocialAccount {
   id: number;
@@ -33,7 +34,11 @@ interface SocialAccountsSectionProps {
   publishingAccountIds?: number[];
   failedAccountIds?: number[];
   unpublishing?: number | null;
+  onCancel?: () => void;
   error?: string;
+  durationErrors?: Record<number, string>;
+  videoMetadata?: Record<string, any>;
+  mediaFiles?: any[];
   disabled?: boolean;
   socialPostLogs?: SocialPostLog[];
 }
@@ -184,7 +189,11 @@ interface SocialAccountItemProps {
   isPublishing?: boolean;
   isFailed?: boolean;
   isUnpublishing?: boolean;
+  onCancel?: () => void;
   disabled?: boolean;
+  durationError?: string;
+  videoMetadata?: Record<string, any>;
+  mediaFiles?: any[];
 }
 
 const SocialAccountItem = memo(
@@ -205,99 +214,65 @@ const SocialAccountItem = memo(
     isPublishing,
     isFailed,
     isUnpublishing,
+    onCancel,
     disabled = false,
+    durationError,
+    videoMetadata = {},
+    mediaFiles = [],
   }: SocialAccountItemProps) => {
     const isInternalDisabled =
       isPublished || isPublishing || isUnpublishing || disabled;
     const isCheckedActually =
       isChecked || isPublished || isPublishing || isUnpublishing;
 
+    const complianceInfo = React.useMemo(() => {
+      const videos = mediaFiles.filter((m) => m.type === "video");
+      if (videos.length === 0 || !isCheckedActually) return null;
+
+      const results = videos
+        .map((v) => {
+          const metadata = videoMetadata[v.tempId];
+          if (!metadata) return null;
+          const platformKey = account.platform?.toLowerCase();
+          return validateVideoDuration(platformKey, metadata.duration);
+        })
+        .filter((r): r is NonNullable<typeof r> => r !== null);
+
+      if (results.length === 0) return null;
+
+      const allValid = results.every((r) => r.isValid);
+      return {
+        allValid,
+        formattedMax: results[0].formattedMax,
+      };
+    }, [mediaFiles, videoMetadata, account.platform, isCheckedActually]);
+
     return (
       <div
-        className={`relative flex items-center p-3 rounded-lg border transition-all duration-300 ${
-          isInternalDisabled ? "cursor-default" : "cursor-pointer"
+        className={`relative flex items-start p-3 rounded-lg border transition-all min-h-[80px] ${
+          isInternalDisabled ? "opacity-80 cursor-default" : ""
         } ${
-          isFailed
-            ? "border-red-500 bg-red-50 dark:bg-red-900/10 shadow-sm"
+          isFailed || durationError
+            ? "border-red-500 bg-red-50 dark:bg-red-900/20 shadow-sm"
             : isUnpublishing
-              ? "border-amber-500 bg-amber-50 dark:bg-amber-900/10 shadow-sm"
-              : isPublished
-                ? "border-green-500 bg-green-50 dark:bg-green-900/10 shadow-sm"
-                : isPublishing
-                  ? "border-blue-500 bg-blue-50 dark:bg-blue-900/10 shadow-sm"
-                  : isCheckedActually
-                    ? "border-primary-500 bg-primary-50 dark:bg-primary-900/20 shadow-sm"
-                    : "border-gray-200 dark:border-neutral-600 hover:bg-gray-50 dark:hover:bg-neutral-700/5"
+              ? "border-amber-500 bg-amber-50 dark:bg-amber-900/20 shadow-sm"
+              : isCheckedActually
+                ? `border-primary-500 bg-primary-50 dark:bg-primary-900/20 shadow-sm`
+                : "border-gray-200 dark:border-neutral-600 hover:bg-gray-50 dark:hover:bg-neutral-700/5"
         }`}
-        onClick={() => {
-          if (!isInternalDisabled) onToggle();
-        }}
       >
-        {/* Blocking Overlay Effect for Publishing / Unpublishing */}
-        {(isPublishing || isUnpublishing) && (
-          <div className="absolute inset-0 bg-white/40 dark:bg-black/20 backdrop-blur-[0.5px] rounded-lg z-10 flex items-center justify-center pointer-events-none">
-            <div
-              className={`bg-white dark:bg-neutral-800 px-2 py-1 rounded-full shadow-sm border flex items-center gap-1.5 scale-90 ${
-                isUnpublishing
-                  ? "border-amber-200 dark:border-amber-900/50"
-                  : "border-blue-200 dark:border-blue-900/50"
-              }`}
-            >
-              <Loader2
-                className={`w-3 h-3 animate-spin ${
-                  isUnpublishing ? "text-amber-500" : "text-blue-500"
-                }`}
-              />
-              <span
-                className={`text-[10px] font-bold uppercase tracking-tight ${
-                  isUnpublishing
-                    ? "text-amber-600 dark:text-amber-400"
-                    : "text-blue-600 dark:text-blue-400"
-                }`}
-              >
-                {isUnpublishing
-                  ? t("publications.modal.publish.unpublishing") ||
-                    "Despublicando..."
-                  : t("publications.modal.publish.publishing") || "Publicando"}
-              </span>
-            </div>
-          </div>
-        )}
-
         <div className="flex items-center gap-3 flex-1">
-          <div className="relative w-5 h-5 flex items-center justify-center">
-            {isPublished ? (
-              <div className="w-5 h-5 bg-green-500 rounded flex items-center justify-center">
-                <Check className="w-3 h-3 text-white stroke-[3]" />
-              </div>
-            ) : isPublishing ? (
-              <div className="w-5 h-5 bg-blue-500 rounded flex items-center justify-center">
-                <Loader2 className="w-3 h-3 text-white animate-spin" />
-              </div>
-            ) : isFailed ? (
-              <div className="w-5 h-5 bg-red-500 rounded flex items-center justify-center">
-                <X className="w-3 h-3 text-white stroke-[3]" />
-              </div>
-            ) : isUnpublishing ? (
-              <div className="w-5 h-5 bg-amber-500 rounded flex items-center justify-center">
-                <Loader2 className="w-3 h-3 text-white animate-spin" />
-              </div>
-            ) : (
-              <VisualCheckbox
-                isChecked={!!isCheckedActually}
-                onToggle={(e) => {
-                  e?.stopPropagation();
-                  if (!isInternalDisabled) onToggle();
-                }}
-              />
-            )}
-          </div>
+          <VisualCheckbox
+            isChecked={!!isCheckedActually}
+            onToggle={(e) => {
+              e?.stopPropagation();
+              if (!isInternalDisabled) onToggle();
+            }}
+          />
 
           <div className="flex flex-col flex-1">
             <div className="flex items-center gap-2">
-              <span className="font-semibold text-sm text-gray-900 dark:text-neutral-100">
-                {account.platform}
-              </span>
+              <span className="font-medium text-sm">{account.platform}</span>
               {account.isDisconnected && (
                 <span className="text-[9px] px-1.5 py-0.5 rounded-full font-bold uppercase bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
                   {t("common.disconnected") || "Desconectada"}
@@ -305,18 +280,16 @@ const SocialAccountItem = memo(
               )}
               {isCheckedActually && (
                 <span
-                  className={`text-[9px] px-1.5 py-0.5 rounded-full font-black tracking-tighter uppercase ${
+                  className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold uppercase ${
                     isPublished
                       ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300"
-                      : isFailed
-                        ? "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300"
-                        : isUnpublishing
-                          ? "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
-                          : (customSchedule || globalSchedule) &&
-                              !isPublished &&
-                              !isPublishing
-                            ? "bg-primary-100 text-primary-700 dark:bg-primary-900/40 dark:text-primary-300"
-                            : "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300"
+                      : isPublishing
+                        ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300"
+                        : (customSchedule || globalSchedule) &&
+                            !isPublished &&
+                            !isPublishing
+                          ? "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300"
+                          : "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300"
                   }`}
                 >
                   {isPublished
@@ -379,34 +352,17 @@ const SocialAccountItem = memo(
                   )}
                 </div>
               )}
-            {isPublished && (
-              <div className="flex flex-col gap-1.5 pt-1">
-                <div className="flex items-center gap-1.5">
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onPlatformSettingsClick();
-                    }}
-                    className="p-1.5 rounded-lg transition-all hover:bg-gray-100 text-gray-500 hover:text-primary-600 dark:hover:bg-neutral-700 dark:text-gray-400 dark:hover:text-white"
-                    title={t("platformSettings.configure") || "Configurar red"}
-                  >
-                    <Settings className="w-4 h-4" />
-                  </button>
+            {!customSchedule &&
+              !globalSchedule &&
+              !isPublished &&
+              !isPublishing &&
+              isChecked && (
+                <div className="flex items-center gap-1 text-[10px] text-primary-500 font-medium animate-in fade-in slide-in-from-top-1">
+                  <Clock className="w-3 h-3" />
+                  {t("publications.modal.schedule.instantWarning") ||
+                    "Para publicar inmediatamente, configura la fecha desde el modal de programación."}
                 </div>
-
-                {!customSchedule &&
-                  !globalSchedule &&
-                  !isPublished &&
-                  !isPublishing && (
-                    <div className="flex items-center gap-1 text-[10px] text-primary-500 font-medium animate-in fade-in slide-in-from-left-1">
-                      <Clock className="w-3 h-3" />
-                      {t("schedule.instantWarning") ||
-                        "Para publicar inmediatamente, configura la fecha desde el modal de programación."}
-                    </div>
-                  )}
-              </div>
-            )}
+              )}
             {isPublished && (
               <div className="mt-1 flex items-center gap-1 text-[10px] font-medium text-green-600 dark:text-green-400">
                 <Check className="w-3 h-3" />
@@ -414,9 +370,24 @@ const SocialAccountItem = memo(
               </div>
             )}
             {isPublishing && (
-              <div className="mt-1 flex items-center gap-1 text-[10px] font-medium text-yellow-600 dark:text-yellow-400">
-                <div className="w-3 h-3 border-2 border-yellow-600 border-t-transparent rounded-full animate-spin" />
-                {t("publications.modal.publish.publishing")}
+              <div className="mt-1 flex items-center justify-between gap-1 text-[10px] font-medium text-yellow-600 dark:text-yellow-400">
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 border-2 border-yellow-600 border-t-transparent rounded-full animate-spin" />
+                  {t("publications.modal.publish.publishing")} en{" "}
+                  {account.platform}
+                </div>
+                {onCancel && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onCancel();
+                    }}
+                    className="px-2 py-0.5 rounded bg-red-100 hover:bg-red-200 dark:bg-red-900/30 dark:hover:bg-red-900/50 text-red-700 dark:text-red-400 font-bold uppercase transition-colors"
+                  >
+                    {t("common.cancel") || "Cancelar"}
+                  </button>
+                )}
               </div>
             )}
             {isUnpublishing && (
@@ -434,23 +405,54 @@ const SocialAccountItem = memo(
                 {t("publications.modal.publish.failed") || "Fallido"}
               </div>
             )}
+            {durationError && (
+              <div className="mt-1 flex items-center gap-1 text-[10px] font-medium text-red-600 dark:text-red-400 animate-in slide-in-from-top-1">
+                <AlertTriangle className="w-3 h-3" />
+                {durationError}
+              </div>
+            )}
+            {complianceInfo && complianceInfo.allValid && !durationError && (
+              <div className="mt-1 flex items-center gap-1 text-[10px] font-medium text-emerald-600 dark:text-emerald-400 animate-in slide-in-from-top-1">
+                <Check className="w-3 h-3" />
+                {t("publications.validation.videoComplies", {
+                  platform: account.platform,
+                  defaultValue: `Cumple con la duración para ${account.platform}`,
+                })}
+              </div>
+            )}
           </div>
         </div>
 
-        {isCheckedActually && !isInternalDisabled && (
-          <ScheduleButton
-            account={account}
-            customSchedule={customSchedule}
-            activePopover={activePopover}
-            onScheduleClick={(e) => {
-              e.stopPropagation();
-              onScheduleClick();
-            }}
-            onScheduleChange={onScheduleChange}
-            onScheduleRemove={onScheduleRemove}
-            onPopoverClose={onPopoverClose}
-          />
-        )}
+        <div className="flex items-start gap-2 ml-auto pl-2">
+          {isCheckedActually && !isInternalDisabled && (
+            <ScheduleButton
+              account={account}
+              customSchedule={customSchedule}
+              activePopover={activePopover}
+              onScheduleClick={(e) => {
+                e.stopPropagation();
+                onScheduleClick();
+              }}
+              onScheduleChange={onScheduleChange}
+              onScheduleRemove={onScheduleRemove}
+              onPopoverClose={onPopoverClose}
+            />
+          )}
+          
+          {isCheckedActually && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onPlatformSettingsClick();
+              }}
+              className="p-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-gray-500 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400 transition-colors"
+              title={t("platformSettings.configure") || "Configurar red"}
+            >
+              <Settings className="w-4 h-4" />
+            </button>
+          )}
+        </div>
       </div>
     );
   },
@@ -471,14 +473,18 @@ const SocialAccountsSection = memo(
     publishingAccountIds,
     failedAccountIds,
     unpublishing,
+    onCancel,
     error,
+    durationErrors = {},
+    videoMetadata = {},
+    mediaFiles = [],
     disabled = false,
     socialPostLogs = [],
   }: SocialAccountsSectionProps) => {
     const [activePopover, setActivePopover] = useState<number | null>(null);
 
     // Merge connected accounts with disconnected accounts from social_post_logs
-    const allAccounts = React.useMemo(() => {
+    const allAccounts = useMemo(() => {
       const connectedAccounts = [...socialAccounts];
       const connectedAccountIds = new Set(socialAccounts.map(acc => acc.id));
       
@@ -505,18 +511,86 @@ const SocialAccountsSection = memo(
       return [...connectedAccounts, ...uniqueDisconnected];
     }, [socialAccounts, socialPostLogs]);
 
+    const selectedPlatforms = useMemo(() => {
+      return Array.from(
+        new Set(
+          selectedAccounts
+            .map((id) => {
+              const account = allAccounts.find((a) => a.id === id);
+              return account?.platform;
+            })
+            .filter(Boolean),
+        ),
+      );
+    }, [selectedAccounts, allAccounts]);
+
     return (
       <div className="space-y-4">
+        {/* Banner informativo si ya está publicada en algunas cuentas */}
+        {publishedAccountIds && publishedAccountIds.length > 0 && (
+          <div className="p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+            <div className="flex items-start gap-2">
+              <Check className="w-4 h-4 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+              <div className="flex-1">
+                <h4 className="text-xs font-bold text-blue-800 dark:text-blue-200">
+                  {t("publications.modal.publish.alreadyPublishedBanner.title") || "Publicación Activa"}
+                </h4>
+                <p className="text-[11px] text-blue-700 dark:text-blue-300 mt-0.5">
+                  {t("publications.modal.publish.alreadyPublishedBanner.message") || 
+                    "Esta publicación ya está publicada en las siguientes cuentas:"}
+                </p>
+                <div className="mt-1.5 flex flex-wrap gap-1.5">
+                  {allAccounts
+                    .filter(acc => publishedAccountIds.includes(acc.id))
+                    .map(acc => (
+                      <span 
+                        key={acc.id}
+                        className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/40 text-[10px] font-medium text-blue-800 dark:text-blue-300"
+                      >
+                        <span className="capitalize">{acc.platform}</span>
+                        <span className="opacity-75">@{acc.account_name || acc.name}</span>
+                        {acc.isDisconnected && (
+                          <span className="ml-1 px-1 py-0.5 rounded bg-amber-200 dark:bg-amber-800 text-amber-800 dark:text-amber-200 text-[9px] font-bold">
+                            {t("common.disconnected") || "Desconectada"}
+                          </span>
+                        )}
+                      </span>
+                    ))
+                  }
+                </div>
+                <p className="text-[11px] text-blue-600 dark:text-blue-400 mt-1.5 font-medium">
+                  {t("publications.modal.publish.alreadyPublishedBanner.hint") || 
+                    "Puedes publicar en cuentas adicionales seleccionándolas a continuación."}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="flex items-center justify-between">
           <label className="text-sm font-semibold flex items-center gap-2">
             <Target className="w-4 h-4" />
-            {t("Content.configureNetworks") || "Configura tus redes sociales"}
+            {t("manageContent.configureNetworks") ||
+              "Configura tus redes sociales"}
           </label>
-          {error && (
-            <span className="text-xs text-primary-500 font-medium animate-pulse">
-              {error}
-            </span>
-          )}
+          <div className="flex items-center gap-2">
+            {selectedAccounts.length > 1 && (
+              <button
+                type="button"
+                onClick={() => onPlatformSettingsClick("all")}
+                className="text-xs px-3 py-1.5 rounded-lg bg-primary-500 hover:bg-primary-600 text-white font-medium transition-colors flex items-center gap-1.5"
+                title={t("platformSettings.configureAll") || "Configurar todas"}
+              >
+                <Settings className="w-3.5 h-3.5" />
+                {t("platformSettings.configureAll") || "Configurar todas"}
+              </button>
+            )}
+            {error && (
+              <span className="text-xs text-primary-500 font-medium animate-pulse">
+                {error}
+              </span>
+            )}
+          </div>
         </div>
 
         <div className="grid gap-3">
@@ -525,6 +599,8 @@ const SocialAccountsSection = memo(
             const customSchedule = accountSchedules[account.id];
             const isPublished = publishedAccountIds?.includes(account.id);
             const isPublishing = publishingAccountIds?.includes(account.id);
+            const isFailed = failedAccountIds?.includes(account.id);
+            const isIndividualUnpublishing = unpublishing === account.id;
 
             return (
               <SocialAccountItem
@@ -549,9 +625,13 @@ const SocialAccountsSection = memo(
                 globalSchedule={globalSchedule}
                 isPublished={isPublished}
                 isPublishing={isPublishing}
-                isFailed={failedAccountIds?.includes(account.id)}
-                isUnpublishing={unpublishing === account.id}
+                isFailed={isFailed}
+                isUnpublishing={isIndividualUnpublishing}
+                onCancel={onCancel}
                 disabled={disabled || account.isDisconnected}
+                durationError={durationErrors[account.id]}
+                videoMetadata={videoMetadata}
+                mediaFiles={mediaFiles}
               />
             );
           })}

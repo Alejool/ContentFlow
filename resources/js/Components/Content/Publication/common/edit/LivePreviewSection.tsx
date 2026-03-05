@@ -1,8 +1,19 @@
+import { FacebookPreview } from "@/Components/Content/Publication/previews/FacebookPreview";
 import { InstagramPreview } from "@/Components/Content/Publication/previews/InstagramPreview";
 import { LinkedInPreview } from "@/Components/Content/Publication/previews/LinkedInPreview";
+import { TikTokPreview } from "@/Components/Content/Publication/previews/TikTokPreview";
 import { TwitterPreview } from "@/Components/Content/Publication/previews/TwitterPreview";
-import { Instagram, Linkedin, Twitter } from "lucide-react";
-import { useEffect, useState } from "react";
+import { YouTubePreview } from "@/Components/Content/Publication/previews/YouTubePreview";
+import { SOCIAL_PLATFORMS } from "@/Constants/socialPlatformsConfig";
+import {
+  Facebook,
+  Instagram,
+  Linkedin,
+  Music2,
+  Twitter,
+  Youtube,
+} from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 const EmbeddedPost = ({ platform, url }: { platform: string; url: string }) => {
@@ -47,6 +58,61 @@ const EmbeddedPost = ({ platform, url }: { platform: string; url: string }) => {
         />
       );
 
+    case "facebook":
+      return (
+        <div className="text-center space-y-3 py-8">
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+              <svg className="w-6 h-6 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              </svg>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Publicación de Facebook
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Facebook no permite previsualizar posts embebidos desde localhost o dominios no verificados
+              </p>
+            </div>
+          </div>
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-[#1877f2] hover:bg-[#166fe5] text-white rounded-lg transition-colors"
+          >
+            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+            </svg>
+            Ver en Facebook
+          </a>
+        </div>
+      );
+
+    case "youtube":
+      const videoId = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/))([^&?\s]+)/)?.[1];
+      return (
+        <iframe
+          src={`https://www.youtube.com/embed/${videoId}`}
+          className="w-full max-w-[640px] aspect-video border-0 rounded-lg"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-presentation"
+          allowFullScreen
+        />
+      );
+
+    case "tiktok":
+      return (
+        <iframe
+          src={`https://www.tiktok.com/embed/v2/${url.split("/video/")[1]?.split("?")[0]}`}
+          className="w-full max-w-[325px] h-[730px] border-0"
+          scrolling="no"
+          sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
+          allowFullScreen
+        />
+      );
+
     case "linkedin":
       return (
         <div className="text-center space-y-3 py-8">
@@ -87,9 +153,17 @@ interface LivePreviewSectionProps {
   };
   publishedLinks?: Record<string, string>;
   className?: string;
+  title?: string;
+  publishedAt?: string;
 }
 
-type Platform = "twitter" | "instagram" | "linkedin" | "facebook";
+type Platform =
+  | "twitter"
+  | "instagram"
+  | "linkedin"
+  | "facebook"
+  | "tiktok"
+  | "youtube";
 
 export const LivePreviewSection = ({
   content,
@@ -97,15 +171,30 @@ export const LivePreviewSection = ({
   user,
   publishedLinks,
   className,
+  title,
+  publishedAt,
 }: LivePreviewSectionProps) => {
-  const [activePlatform, setActivePlatform] = useState<Platform>("twitter");
   const { t } = useTranslation();
 
-  const tabs: { id: Platform; label: string; icon: any }[] = [
-    { id: "twitter", label: "Twitter", icon: Twitter },
-    { id: "instagram", label: "Instagram", icon: Instagram },
-    { id: "linkedin", label: "LinkedIn", icon: Linkedin },
-  ];
+  const tabs = useMemo(() => {
+    const allTabs: { id: Platform; label: string; icon: any }[] = [
+      { id: "twitter", label: "Twitter", icon: Twitter },
+      { id: "instagram", label: "Instagram", icon: Instagram },
+      { id: "linkedin", label: "LinkedIn", icon: Linkedin },
+      { id: "facebook", label: "Facebook", icon: Facebook },
+      { id: "youtube", label: "YouTube", icon: Youtube },
+      { id: "tiktok", label: "TikTok", icon: Music2 },
+    ];
+
+    return allTabs.filter((tab) => {
+      const config = (SOCIAL_PLATFORMS as any)[tab.id];
+      return config?.active === true;
+    });
+  }, []);
+
+  const [activePlatform, setActivePlatform] = useState<Platform>(
+    tabs.length > 0 ? tabs[0].id : "twitter",
+  );
 
   return (
     <div className={`space-y-4 ${className || ""}`}>
@@ -122,6 +211,7 @@ export const LivePreviewSection = ({
           return (
             <button
               key={tab.id}
+              type="button"
               onClick={() => setActivePlatform(tab.id)}
               className={`relative flex-1 flex items-center justify-center gap-2 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
                 activePlatform === tab.id
@@ -184,6 +274,26 @@ export const LivePreviewSection = ({
                 content={content}
                 mediaUrls={mediaUrls}
                 user={user}
+              />
+            )}
+            {activePlatform === "facebook" && (
+              <FacebookPreview
+                content={content}
+                mediaUrls={mediaUrls}
+                user={user}
+                publishedAt={publishedAt}
+              />
+            )}
+            {activePlatform === "tiktok" && (
+              <TikTokPreview content={content} mediaUrls={mediaUrls} user={user} />
+            )}
+            {activePlatform === "youtube" && (
+              <YouTubePreview 
+                content={content} 
+                mediaUrls={mediaUrls} 
+                user={user}
+                title={title}
+                publishedAt={publishedAt}
               />
             )}
           </div>

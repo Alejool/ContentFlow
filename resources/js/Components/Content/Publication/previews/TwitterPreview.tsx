@@ -87,7 +87,10 @@ export const TwitterPreview = ({
           )}
 
           <div className="flex justify-between mt-3 max-w-[425px] text-gray-500">
-            <button className="group flex items-center gap-2 hover:text-blue-400 transition-colors">
+            <button
+              type="button"
+              className="group flex items-center gap-2 hover:text-blue-400 transition-colors"
+            >
               <div className="p-2 -ml-2 rounded-full group-hover:bg-blue-400/10 transition-colors">
                 <MessageCircle className="w-[18px] h-[18px]" />
               </div>
@@ -102,7 +105,10 @@ export const TwitterPreview = ({
                 <Heart className="w-[18px] h-[18px]" />
               </div>
             </button>
-            <button className="group flex items-center gap-2 hover:text-blue-400 transition-colors">
+            <button
+              type="button"
+              className="group flex items-center gap-2 hover:text-blue-400 transition-colors"
+            >
               <div className="p-2 -ml-2 rounded-full group-hover:bg-blue-400/10 transition-colors">
                 <Share className="w-[18px] h-[18px]" />
               </div>

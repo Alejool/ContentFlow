@@ -1,4 +1,5 @@
 import { Avatar } from "@/Components/common/Avatar";
+import ConfirmDialog from "@/Components/common/ui/ConfirmDialog";
 import axios from "axios";
 import { format } from "date-fns";
 import { Send, Trash } from "lucide-react";
@@ -35,7 +36,6 @@ export const CommentsSection = ({
   publicationId,
   currentUser,
 }: CommentsSectionProps) => {
-  const { t } = useTranslation();
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
   const [replyTo, setReplyTo] = useState<Comment | null>(null);
@@ -44,6 +44,8 @@ export const CommentsSection = ({
   const [mentionFilter, setMentionFilter] = useState("");
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [commentToDelete, setCommentToDelete] = useState<number | null>(null);
+  const { t } = useTranslation();
 
   const fetchMembers = async () => {
     try {
@@ -105,25 +107,39 @@ export const CommentsSection = ({
       setNewComment("");
       setReplyTo(null);
     } catch (error) {
-      toast.error("Failed to post comment");
+      toast.error(
+        t("publications.modal.comments.postError") || "Failed to post comment",
+      );
     } finally {
       setSubmitting(false);
     }
   };
 
   const handleDelete = async (commentId: number) => {
-    if (!confirm("Are you sure you want to delete this comment?")) return;
+    setCommentToDelete(commentId);
+  };
+
+  const confirmDelete = async () => {
+    if (!commentToDelete) return;
+
     try {
       await axios.delete(
         route("api.v1.publications.comments.destroy", {
           publication: publicationId,
-          comment: commentId,
+          comment: commentToDelete,
         }),
       );
-      setComments((prev) => prev.filter((c) => c.id !== commentId));
-      toast.success("Comment deleted");
+      setComments((prev) => prev.filter((c) => c.id !== commentToDelete));
+      toast.success(
+        t("publications.modal.comments.deleteSuccess") || "Comment deleted",
+      );
     } catch (error) {
-      toast.error("Failed to delete comment");
+      toast.error(
+        t("publications.modal.comments.deleteError") ||
+          "Failed to delete comment",
+      );
+    } finally {
+      setCommentToDelete(null);
     }
   };
 
@@ -132,17 +148,18 @@ export const CommentsSection = ({
   return (
     <div className="space-y-4">
       <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
-        Internal Comments
+        {t("publications.modal.comments.title") || "Internal Comments"}
       </h3>
 
       <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
         {loading && comments.length === 0 ? (
           <div className="text-center text-sm text-gray-500 py-4">
-            Loading comments...
+            {t("publications.modal.comments.loading") || "Loading comments..."}
           </div>
         ) : comments.length === 0 ? (
           <div className="text-center text-sm text-gray-500 py-4">
-            No comments yet. Start the conversation!
+            {t("publications.modal.comments.noComments") ||
+              "No comments yet. Start the conversation!"}
           </div>
         ) : (
           comments.map((comment) => (
@@ -246,7 +263,7 @@ export const CommentsSection = ({
         {replyTo && (
           <div className="flex items-center justify-between px-3 py-1 bg-primary-50 dark:bg-primary-900/10 rounded-t-lg border-x border-t border-gray-200 dark:border-neutral-800 text-[10px] text-primary-700 dark:text-primary-400">
             <span>
-              {t("publications.modal.comments.replyingTo") || "Replying to"}{" "}
+              {t("publications.modal.comments.replyingTo") || "Respondiendo a"}{" "}
               <span className="font-semibold">{replyTo.user.name}</span>
             </span>
             <button
@@ -260,7 +277,7 @@ export const CommentsSection = ({
               }}
               className="hover:text-primary-900"
             >
-              {t("common.cancel") || "Cancel"}
+              {t("common.cancel") || "Cancelar"}
             </button>
           </div>
         )}
@@ -276,7 +293,6 @@ export const CommentsSection = ({
               .map((member) => (
                 <button
                   key={member.id}
-                  type="button"
                   onClick={() => {
                     const parts = newComment.split("@");
                     parts.pop();
@@ -322,13 +338,31 @@ export const CommentsSection = ({
           disabled={submitting}
         />
         <button
-          type="submit"
+          type="button"
+          onClick={handleSubmit as any}
           disabled={!newComment.trim() || submitting}
           className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-md disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           <Send className="w-4 h-4" />
         </button>
       </div>
+
+      <ConfirmDialog
+        isOpen={!!commentToDelete}
+        onClose={() => setCommentToDelete(null)}
+        onConfirm={confirmDelete}
+        title={
+          t("publications.modal.comments.deleteConfirmTitle") ||
+          "¿Eliminar comentario?"
+        }
+        message={
+          t("publications.modal.comments.deleteConfirmMessage") ||
+          "¿Estás seguro de que quieres eliminar este comentario?"
+        }
+        confirmText={t("common.delete") || "Eliminar"}
+        cancelText={t("common.cancel") || "Cancelar"}
+        type="danger"
+      />
     </div>
   );
 };

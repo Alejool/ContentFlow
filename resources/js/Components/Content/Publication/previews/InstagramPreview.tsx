@@ -76,11 +76,19 @@ export const InstagramPreview = ({
       <div className="p-3">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-4">
-            <Heart className="w-6 h-6 hover:text-gray-500 cursor-pointer" />
-            <MessageCircle className="w-6 h-6 hover:text-gray-500 cursor-pointer" />
-            <Send className="w-6 h-6 hover:text-gray-500 cursor-pointer" />
+            <button type="button">
+              <Heart className="w-6 h-6 hover:text-gray-500 cursor-pointer" />
+            </button>
+            <button type="button">
+              <MessageCircle className="w-6 h-6 hover:text-gray-500 cursor-pointer" />
+            </button>
+            <button type="button">
+              <Send className="w-6 h-6 hover:text-gray-500 cursor-pointer" />
+            </button>
           </div>
-          <Bookmark className="w-6 h-6 hover:text-gray-500 cursor-pointer" />
+          <button type="button">
+            <Bookmark className="w-6 h-6 hover:text-gray-500 cursor-pointer" />
+          </button>
         </div>
 
         {/* Likes count (fake) */}

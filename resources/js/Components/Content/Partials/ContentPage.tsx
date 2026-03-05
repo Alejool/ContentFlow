@@ -59,7 +59,7 @@ interface SortableTabProps {
   hasBadge: boolean;
   badgeCount: number;
   activeTab: string;
-  handleTabChange: (id: string) => void;
+  handleTabChange: (id: ContentTab) => void;
   getTabIcon: (id: string, active: boolean) => React.ReactNode;
 }
 
@@ -97,7 +97,7 @@ const SortableTab = ({
       className="flex items-center gap-1 group/tab"
     >
       <Button
-        onClick={() => handleTabChange(id)}
+        onClick={() => handleTabChange(id as ContentTab)}
         variant={isActive ? "primary" : "ghost"}
         buttonStyle={isActive ? "solid" : "ghost"}
         size="lg"
@@ -207,6 +207,7 @@ export default function ManageContentPage() {
     }, 300);
 
     return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search, activeTab]);
 
   const handleTabChange = useCallback(
@@ -223,7 +224,8 @@ export default function ManageContentPage() {
         }
       });
     },
-    [setActiveTab, handleFilterChange],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [setActiveTab],
   );
 
   useEffect(() => {
@@ -589,7 +591,6 @@ export default function ManageContentPage() {
                   onPerPageChange={handlePerPageChange}
                   onRefresh={handleRefresh}
                   onFilterChange={handleSingleFilterChange}
-                  onResetFilters={handleResetFilters}
                   filters={filters}
                   search={search}
                   onSearchChange={setSearch}

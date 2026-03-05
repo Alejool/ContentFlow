@@ -2,7 +2,7 @@ import CampaignMediaCarousel from "@/Components/Campaigns/CampaignMediaCarousel"
 import ReelsCarousel from "@/Components/Content/ReelsCarousel";
 import ActivityList from "@/Components/Content/ActivityList";
 import ApprovalHistory from "@/Components/Content/ApprovalHistory";
-import ApprovalHistorySection from "@/Components/ManageContent/Publication/common/edit/ApprovalHistorySection";
+import ApprovalHistorySection from "@/Components/Content/Publication/common/edit/ApprovalHistorySection";
 import { Campaign } from "@/types/Campaign";
 import { Publication } from "@/types/Publication";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";

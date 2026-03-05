@@ -62,7 +62,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
-import UserEventModal from "./UserEventModal";
+import UserEventModal from "@/Components/Content/Partials/UserEventModal";
 
 interface ModernCalendarProps {
   onEventClick?: (

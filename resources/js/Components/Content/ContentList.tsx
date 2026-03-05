@@ -25,7 +25,7 @@ interface ContentGridItemProps {
   onPublish?: (item: any) => void;
   permissions?: string[];
   remoteLock: any;
-  onPreviewMedia: (media: any[], index: number) => void;
+  onPreviewMedia: (media: { url: string; type: "image" | "video"; title?: string }[], initialIndex?: number) => void;
 }
 
 function ContentGridItem({
@@ -111,10 +111,10 @@ export default function ContentList(props: ContentListProps) {
 
   const handlePreviewMedia = (
     media: { url: string; type: "image" | "video"; title?: string }[],
-    index = 0,
+    initialIndex: number = 0,
   ) => {
     setLightboxMedia(media);
-    setLightboxIndex(index);
+    setLightboxIndex(initialIndex);
   };
 
   // Wrapper para renderItem que pasa las props necesarias

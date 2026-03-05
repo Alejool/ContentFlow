@@ -1,4 +1,4 @@
-import SocialAccountsDisplay from "@/Components/Content/Publication/SocialAccountsDisplay";
+import SocialAccountsDisplay from "@/Components/ManageContent/Publication/SocialAccountsDisplay";
 import { formatDateTime } from "@/Utils/formatDate";
 import { Publication } from "@/types/Publication";
 import { canUserPublishDirectly } from "@/Utils/publicationPermissions";
