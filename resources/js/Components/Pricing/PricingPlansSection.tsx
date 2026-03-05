@@ -32,6 +32,8 @@ interface PricingPlansSectionProps {
   showHeader?: boolean;
   variant?: 'default' | 'compact';
   onPlanSelected?: (planId: string) => void;
+  isOwner?: boolean;
+  hasActiveSubscription?: boolean;
 }
 
 export default function PricingPlansSection({
@@ -42,6 +44,8 @@ export default function PricingPlansSection({
   showHeader = true,
   variant = 'default',
   onPlanSelected,
+  isOwner = true,
+  hasActiveSubscription: propHasActiveSubscription,
 }: PricingPlansSectionProps) {
   const { t } = useTranslation();
   const {
@@ -55,13 +59,15 @@ export default function PricingPlansSection({
     currentPlan,
   });
 
-  const [hasActiveSubscription, setHasActiveSubscription] = React.useState(false);
+  const [hasActiveSubscription, setHasActiveSubscription] = React.useState(propHasActiveSubscription || false);
 
   React.useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && propHasActiveSubscription === undefined) {
       checkActiveSubscription().then(setHasActiveSubscription);
+    } else if (propHasActiveSubscription !== undefined) {
+      setHasActiveSubscription(propHasActiveSubscription);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, propHasActiveSubscription]);
 
   const handlePlanSelect = async (planId: string) => {
     await handleSelectPlan(planId);
@@ -88,6 +94,43 @@ export default function PricingPlansSection({
             {t('pricing.subtitle')}
           </p>
 
+          {/* Mensaje para owner con suscripción activa */}
+          {isOwner && hasActiveSubscription && (
+            <div className="mb-8 max-w-3xl mx-auto">
+              <div className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0">
+                    <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
+                      <Sparkles className="h-6 w-6 text-white" />
+                    </div>
+                  </div>
+                  <div className="flex-1 text-left">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                      {t('pricing.activeSubscription.title', 'Ya tienes una suscripción activa')}
+                    </h3>
+                    <p className="text-gray-700 dark:text-gray-300 mb-3">
+                      {t('pricing.activeSubscription.changeDescription', 'Puedes cambiar a cualquier plan a continuación. El cambio se aplicará inmediatamente y se ajustará tu facturación de forma prorrateada.')}
+                    </p>
+                    <div className="flex flex-wrap gap-3">
+                      <a
+                        href={route('subscription.billing')}
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-neutral-800 border border-blue-200 dark:border-blue-700 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-neutral-700 rounded-lg font-medium transition-colors"
+                      >
+                        {t('pricing.activeSubscription.manageBilling', 'Gestionar Facturación')}
+                      </a>
+                      <a
+                        href={route('subscription.usage')}
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-neutral-800 border border-blue-200 dark:border-blue-700 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-neutral-700 rounded-lg font-medium transition-colors"
+                      >
+                        {t('pricing.activeSubscription.viewUsage', 'Ver Uso del Plan')}
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Billing Toggle */}
           {showBillingToggle && (
             <div className="inline-flex items-center gap-2 bg-white dark:bg-neutral-800 p-1.5 rounded-xl shadow-lg border border-gray-200 dark:border-neutral-700">
@@ -102,7 +145,7 @@ export default function PricingPlansSection({
               >
                 {t('pricing.monthly')}
               </button>
-              <button
+              {/* <button
                 onClick={() => setBillingCycle('yearly')}
                 className={cn(
                   'px-6 py-2.5 rounded-lg font-medium transition-all duration-200 flex items-center gap-2',
@@ -115,7 +158,7 @@ export default function PricingPlansSection({
                 <Badge className="bg-green-500 text-white border-0 text-xs">
                   {t('pricing.yearlyDiscount')}
                 </Badge>
-              </button>
+              </button> */}
             </div>
           )}
         </div>
@@ -131,6 +174,7 @@ export default function PricingPlansSection({
         showCurrentBadge={isAuthenticated}
         variant={variant}
         hasActiveSubscription={hasActiveSubscription}
+        isOwner={isOwner}
       />
     </div>
   );

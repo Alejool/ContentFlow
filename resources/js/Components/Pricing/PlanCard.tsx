@@ -33,6 +33,7 @@ interface PlanCardProps {
   showCurrentBadge?: boolean;
   variant?: 'default' | 'compact';
   hasActiveSubscription?: boolean;
+  isOwner?: boolean;
 }
 
 export default function PlanCard({
@@ -44,6 +45,7 @@ export default function PlanCard({
   showCurrentBadge = true,
   variant = 'default',
   hasActiveSubscription = false,
+  isOwner = true,
 }: PlanCardProps) {
   const { t } = useTranslation();
 

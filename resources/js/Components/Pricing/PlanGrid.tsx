@@ -28,6 +28,7 @@ interface PlanGridProps {
   showCurrentBadge?: boolean;
   variant?: 'default' | 'compact';
   hasActiveSubscription?: boolean;
+  isOwner?: boolean;
 }
 
 export default function PlanGrid({
@@ -39,6 +40,7 @@ export default function PlanGrid({
   showCurrentBadge = true,
   variant = 'default',
   hasActiveSubscription = false,
+  isOwner = true,
 }: PlanGridProps) {
   const { t } = useTranslation();
 
@@ -51,7 +53,7 @@ export default function PlanGrid({
   };
 
   return (
-    <div className="relative grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+    <div className="relative grid grid-cols-1 md:grid-cols-2  gap-6 lg:gap-8">
       {plans
         .filter((plan) => plan.enabled !== false)
         .map((plan) => {
@@ -69,6 +71,7 @@ export default function PlanGrid({
               showCurrentBadge={showCurrentBadge}
               variant={variant}
               hasActiveSubscription={hasActiveSubscription}
+              isOwner={isOwner}
             />
           );
         })}
