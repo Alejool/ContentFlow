@@ -1,8 +1,7 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { Check, X, ZoomIn, ZoomOut } from "lucide-react";
 import { Fragment, useCallback, useState } from "react";
-import Cropper from "react-easy-crop";
-import { Area } from "react-easy-crop/types";
+import Cropper, { Area } from "react-easy-crop";
 import { useTranslation } from "react-i18next";
 
 interface ImageCropperProps {

@@ -5,14 +5,17 @@ import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
+import AiFieldSuggester from "@/Components/AiAssistant/AiFieldSuggester";
+import AiPromptSection from "@/Components/AiAssistant/AiPromptSection";
 import ModalHeader from "@/Components/Content/modals/common/ModalHeader";
 import Input from "@/Components/common/Modern/Input";
 import Textarea from "@/Components/common/Modern/Textarea";
 
-import CampaignDateFields from "@/Components/Content/Campaign/common/CampaignDateFields";
-import PublicationSelector from "@/Components/Content/Campaign/common/PublicationSelector";
+import CampaignDateFields from "@/Components/ManageContent/Campaign/common/CampaignDateFields";
+import PublicationSelector from "@/Components/ManageContent/Campaign/common/PublicationSelector";
 
 import { useAddCampaignForm } from "@/Hooks/campaign/useAddCampaignForm";
+import { useModalFocusTrap } from "@/Hooks/useModalFocusTrap";
 import { usePublicationsForCampaign } from "@/Hooks/campaign/usePublicationsForCampaign";
 
 import { DollarSign, FileText } from "lucide-react";
@@ -33,6 +36,10 @@ export default function AddCampaignModal({
   const { addCampaign } = useCampaignStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Integrate focus trap for modal accessibility
+  // Requirements: 5.5
+  const modalRef = useModalFocusTrap(isOpen);
+
   const { register, handleSubmit, setValue, watch, reset, errors } =
     useAddCampaignForm(t);
 
@@ -43,6 +50,42 @@ export default function AddCampaignModal({
   } = usePublicationsForCampaign(isOpen);
 
   const watchedFields = watch();
+
+  const handleAiSuggestion = (data: any) => {
+    if (data.name || data.title) {
+      setValue("name", data.name || data.title, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+    }
+    if (data.description) {
+      setValue("description", data.description, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+    }
+    if (data.goal) {
+      setValue("goal", data.goal, { shouldValidate: true, shouldDirty: true });
+    }
+    if (data.budget !== undefined) {
+      setValue("budget", data.budget.toString(), {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+    }
+    if (data.start_date) {
+      setValue("start_date", data.start_date, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+    }
+    if (data.end_date) {
+      setValue("end_date", data.end_date, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+    }
+  };
 
   const onFormSubmit = async (data: any) => {
     setIsSubmitting(true);
@@ -106,7 +149,10 @@ export default function AddCampaignModal({
         onClick={handleClose}
       />
 
-      <div className="relative w-full max-w-2xl bg-white dark:bg-neutral-800 rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300">
+      <div 
+        ref={modalRef as React.RefObject<HTMLDivElement>}
+        className="relative w-full max-w-2xl bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-950 rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300 border border-gray-200/50 dark:border-neutral-800/50"
+      >
         <ModalHeader
           t={t}
           onClose={handleClose}
@@ -118,14 +164,29 @@ export default function AddCampaignModal({
         />
 
         <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
+          <AiPromptSection
+            type="campaign"
+            currentFields={watchedFields}
+            onSuggest={handleAiSuggestion}
+            disabled={isSubmitting}
+          />
           <form
             id="campaign-form"
             onSubmit={handleSubmit(onFormSubmit)}
             className="space-y-6"
           >
+            <div className="flex justify-between items-end mb-4 px-1">
+              <AiFieldSuggester
+                fields={watchedFields}
+                type="campaign"
+                onSuggest={handleAiSuggestion}
+                disabled={isSubmitting}
+              />
+            </div>
+
             <div className="form-group">
               <Input
-                id="content-add-campaign-name"
+                id="manage-add-campaign-name"
                 label={t("campaigns.modal.add.name") || "Campaign Name"}
                 register={register}
                 name="name"
@@ -142,7 +203,7 @@ export default function AddCampaignModal({
 
             <div className="form-group">
               <Textarea
-                id="content-add-campaign-description"
+                id="manage-add-campaign-description"
                 label={t("campaigns.modal.add.description")}
                 register={register}
                 name="description"

@@ -5,7 +5,7 @@ import TimelineCompacto from "@/Components/ManageContent/Publication/common/Time
 import SocialAccountsSection from "@/Components/ManageContent/Publication/common/add/SocialAccountsSection";
 import ContentSection from "@/Components/ManageContent/Publication/common/edit/ContentSection";
 import { LivePreviewSection } from "@/Components/ManageContent/Publication/common/edit/LivePreviewSection";
-import MediaUploadSection from "@/Components/ManageContent/Publication/common/edit/MediaUploadSection";
+import MediaUploadSection from "@/Components/Content/Publication/common/edit/MediaUploadSection";
 import MediaUploadSkeleton from "@/Components/ManageContent/Publication/common/edit/MediaUploadSkeleton";
 import ReelsSection from "@/Components/Content/ReelsSection";
 import ModalFooter from "@/Components/Content/modals/common/ModalFooter";
@@ -351,7 +351,7 @@ const EditPublicationModal = ({
 
       <div 
         ref={modalRef as React.RefObject<HTMLDivElement>}
-        className="relative w-full max-w-5xl bg-white dark:bg-neutral-800 rounded-lg shadow-2xl flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300"
+        className="relative w-full max-w-5xl bg-white backdrop-blur-2xl dark:bg-neutral-900/90 rounded-lg shadow-2xl flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300"
       >
         <ModalHeader
           t={t}

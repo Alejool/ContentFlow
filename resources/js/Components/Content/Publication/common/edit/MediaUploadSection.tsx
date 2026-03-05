@@ -9,7 +9,7 @@ import {
   X,
 } from "lucide-react";
 import React, { memo, useRef, useState } from "react";
-import ImageCropper from "./ImageCropper";
+import ImageCropper from "@/Components/Content/Publication/common/edit/ImageCropper";
 
 interface MediaUploadSectionProps {
   mediaPreviews: {
@@ -45,6 +45,9 @@ interface MediaUploadSectionProps {
     photo_url: string;
     isSelf: boolean;
   } | null;
+  videoMetadata?: Record<string, { duration: number; youtubeType: string }>;
+  publicationId?: number;
+  allMediaFiles?: any[];
 }
 
 const MediaUploadSection = memo(
@@ -68,6 +71,9 @@ const MediaUploadSection = memo(
     uploadStats,
     uploadErrors,
     lockedBy,
+    videoMetadata,
+    publicationId,
+    allMediaFiles = [],
   }: MediaUploadSectionProps) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [croppingImage, setCroppingImage] = useState<{
@@ -88,7 +94,7 @@ const MediaUploadSection = memo(
 
     const getUploadAreaStyles = () => {
       if (disabled || isAnyMediaProcessing || (lockedBy && !lockedBy.isSelf)) {
-        return "bg-gray-100 dark:bg-neutral-900/50 cursor-not-allowed opacity-60 border-gray-300 dark:border-neutral-700";
+        return "bg-gray-100 dark:bg-neutral-800/90 cursor-not-allowed opacity-60 border-gray-300 dark:border-neutral-700";
       }
       if (imageError) {
         return "border-primary-300 dark:border-primary-500 bg-primary-50 dark:bg-primary-900/20";
@@ -96,7 +102,7 @@ const MediaUploadSection = memo(
       if (isDragOver) {
         return "bg-primary-50 dark:bg-primary-900/20 border-primary-500 dark:border-primary-400";
       }
-      return "border-gray-200 dark:border-neutral-600 hover:border-primary-300 dark:hover:border-primary-400 bg-gray-50 dark:bg-neutral-900";
+      return "border-gray-200 dark:border-neutral-600 hover:border-primary-300 dark:hover:border-primary-400 bg-gray-50 dark:bg-neutral-900/90";
     };
 
     return (
@@ -115,7 +121,7 @@ const MediaUploadSection = memo(
           </Label>
 
           <label
-            htmlFor="media-file-input-content"
+            htmlFor="media-file-input"
             className={`relative group transition-all duration-300 block ${
               isDragOver && !disabled
                 ? "scale-[1.02] ring-2 ring-primary-500 dark:ring-primary-900 ring-offset-2"
@@ -131,25 +137,27 @@ const MediaUploadSection = memo(
               {mediaPreviews.length > 0 ? (
                 <div className="grid grid-cols-2 gap-4 w-full">
                   {mediaPreviews.map((preview, index) => (
-                    <MediaPreviewItem
-                      key={preview.tempId}
-                      preview={preview}
-                      index={index}
-                      thumbnail={thumbnails[preview.tempId]}
-                      onRemove={() => onRemoveMedia(index)}
-                      onSetThumbnail={(file) =>
-                        onSetThumbnail(preview.tempId, file)
-                      }
-                      onCrop={(tempId, url) =>
-                        setCroppingImage({ tempId, url })
-                      }
-                      onClearThumbnail={() => onClearThumbnail(preview.tempId)}
-                      disabled={disabled || isAnyMediaProcessing}
-                      progress={uploadProgress?.[preview.file?.name || ""]}
-                      stats={uploadStats?.[preview.file?.name || ""]}
-                      error={uploadErrors?.[preview.file?.name || ""]}
-                      isExternalProcessing={preview.status === "processing"}
-                    />
+                    <div key={preview.tempId} className="space-y-2">
+                      <MediaPreviewItem
+                        preview={preview}
+                        index={index}
+                        thumbnail={thumbnails[preview.tempId]}
+                        onRemove={() => onRemoveMedia(index)}
+                        onSetThumbnail={(file) =>
+                          onSetThumbnail(preview.tempId, file)
+                        }
+                        onCrop={(tempId, url) =>
+                          setCroppingImage({ tempId, url })
+                        }
+                        onClearThumbnail={() => onClearThumbnail(preview.tempId)}
+                        disabled={disabled || isAnyMediaProcessing}
+                        progress={uploadProgress?.[preview.file?.name || ""]}
+                        stats={uploadStats?.[preview.file?.name || ""]}
+                        error={uploadErrors?.[preview.file?.name || ""]}
+                        isExternalProcessing={preview.status === "processing"}
+                        metadata={videoMetadata?.[preview.tempId]}
+                      />
+                    </div>
                   ))}
                   {!disabled && !isAnyMediaProcessing && (
                     <AddMoreButton />
@@ -167,7 +175,7 @@ const MediaUploadSection = memo(
               {isAnyMediaProcessing && (
                 <div className="absolute inset-x-0 bottom-0 py-1.5 px-4 bg-primary-500/10 backdrop-blur-md border-t border-primary-500/20 animate-in slide-in-from-bottom-2">
                   <div className="flex items-center gap-3">
-                    <div className="flex-1 h-1.5 bg-gray-200 dark:bg-neutral-900 rounded-full overflow-hidden">
+                    <div className="flex-1 h-1.5 bg-gray-200 dark:bg-neutral-800 rounded-full overflow-hidden">
                       <div
                         className="h-full bg-primary-500 transition-all duration-500 ease-out"
                         style={{
@@ -194,7 +202,7 @@ const MediaUploadSection = memo(
             {!disabled && !isAnyMediaProcessing && (
               <input
                 ref={fileInputRef}
-                id="media-file-input-content"
+                id="media-file-input"
                 type="file"
                 className="hidden"
                 multiple
@@ -239,6 +247,7 @@ const MediaPreviewItem = memo(
     stats,
     error,
     isExternalProcessing,
+    metadata,
   }: {
     preview: any;
     index: number;
@@ -252,6 +261,7 @@ const MediaPreviewItem = memo(
     stats?: { eta?: number; speed?: number };
     error?: string;
     isExternalProcessing?: boolean;
+    metadata?: { duration: number };
   }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -275,7 +285,7 @@ const MediaPreviewItem = memo(
 
     return (
       <div
-        className={`relative group/item aspect-video border rounded-lg overflow-hidden bg-gray-900 ${
+        className={`relative group/item aspect-video rounded-lg overflow-hidden bg-gray-900 ${
           disabled ? "opacity-90" : ""
         } ${error ? "border-red-500 ring-2 ring-red-500/20" : ""} ${isProcessing || isUploading ? "animate-pulse" : ""}`}
         onClick={(e) => e.stopPropagation()}
@@ -301,6 +311,7 @@ const MediaPreviewItem = memo(
             onClearThumbnail={onClearThumbnail}
             fileInputRef={fileInputRef}
             disabled={disabled}
+            duration={metadata?.duration}
           />
         ) : (
           <img src={preview.url} className="w-full h-full object-cover" alt="Media preview" />
@@ -372,6 +383,7 @@ const VideoPreview = memo(
     onClearThumbnail,
     fileInputRef,
     disabled,
+    duration,
   }: {
     preview: any;
     thumbnail?: File;
@@ -379,6 +391,7 @@ const VideoPreview = memo(
     onClearThumbnail: () => void;
     fileInputRef: React.RefObject<HTMLInputElement | null>;
     disabled?: boolean;
+    duration?: number;
   }) => (
     <>
       <video
@@ -387,7 +400,9 @@ const VideoPreview = memo(
       />
       <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
         <span className="text-white/80 text-xs font-medium bg-black/50 px-2 py-1 rounded">
-          Video
+          {duration
+            ? `${Math.floor(duration / 60)}:${(duration % 60).toString().padStart(2, "0")}`
+            : "Video"}
         </span>
         <div className="relative" onClick={(e) => e.stopPropagation()}>
           <input
@@ -439,8 +454,8 @@ const VideoPreview = memo(
 
 const AddMoreButton = memo(() => (
   <label
-    htmlFor="media-file-input-content"
-    className="flex items-center justify-center aspect-video border-2 border-dashed border-gray-300 rounded-lg hover:bg-primary-50 transition-colors cursor-pointer"
+    htmlFor="media-file-input"
+    className="flex items-center justify-center aspect-video border-2 border-dashed border-gray-300 rounded-lg hover:bg-neutral-200/90 hover:dark:bg-neutral-800/90 transition-colors cursor-pointer"
   >
     <div className="text-center">
       <Upload className="w-6 h-6 mx-auto text-gray-400" />

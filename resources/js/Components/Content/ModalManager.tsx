@@ -6,10 +6,10 @@ import { memo } from "react";
 import { createPortal } from "react-dom";
 
 // Modals
-import AddCampaignModal from "@/Components/ManageContent/modals/AddCampaignModal";
-import AddPublicationModal from "@/Components/ManageContent/modals/AddPublicationModal";
-import EditCampaignModal from "@/Components/ManageContent/modals/EditCampaignModal";
-import EditPublicationModal from "@/Components/ManageContent/modals/EditPublicationModal";
+import AddCampaignModal from "@/Components/Content/modals/AddCampaignModal";
+import AddPublicationModal from "@/Components/Content/modals/AddPublicationModal";
+import EditCampaignModal from "@/Components/Content/modals/EditCampaignModal";
+import EditPublicationModal from "@/Components/Content/modals/EditPublicationModal";
 import PublishPublicationModal from "@/Components/Content/modals/PublishPublicationModal";
 import ViewCampaignModal from "@/Components/Content/modals/ViewCampaignModal";
 import { usePublicationStore } from "@/stores/publicationStore";

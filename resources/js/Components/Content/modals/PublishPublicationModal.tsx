@@ -280,8 +280,8 @@ export default function PublishPublicationModal({
         />
 
         <div className="fixed inset-0 flex items-center justify-center p-4">
-          <DialogPanel className="w-full max-w-xl rounded-lg shadow-2xl flex flex-col max-h-[90vh] bg-white dark:bg-neutral-800 dark:border dark:border-neutral-700">
-            <div className="flex items-center justify-between p-6 pb-4 border-b border-gray-200 dark:border-neutral-700 sticky top-0 z-20 bg-white dark:bg-neutral-800 backdrop-blur-sm bg-opacity-95 dark:bg-opacity-95">
+          <DialogPanel className="w-full max-w-xl rounded-lg shadow-2xl flex flex-col max-h-[90vh] bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-950 border border-gray-200/50 dark:border-neutral-800/50">
+            <div className="flex items-center justify-between p-6 pb-4 border-b border-gray-200/50 dark:border-neutral-800/50 sticky top-0 z-20 bg-gradient-to-r from-gray-50 via-white to-gray-50/80 dark:from-neutral-900 dark:via-neutral-900/95 dark:to-neutral-800/90 backdrop-blur-md shadow-sm dark:shadow-neutral-950/20">
               <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white">
                 <div className="flex items-center gap-2">
                   <div className="p-1.5 bg-gradient-to-r from-primary-500 to-primary-600 rounded-lg">
@@ -899,7 +899,7 @@ export default function PublishPublicationModal({
             )}
             </div>
 
-            <div className="flex gap-3 p-4 border-t border-gray-200 dark:border-neutral-700 sticky bottom-0 z-20 bg-white dark:bg-neutral-800 backdrop-blur-sm bg-opacity-95 dark:bg-opacity-95">
+            <div className="flex gap-3 p-4 border-t border-gray-200/50 dark:border-neutral-800/50 sticky bottom-0 z-20 bg-gradient-to-r from-gray-50 via-white to-gray-50/80 dark:from-neutral-900 dark:via-neutral-900/95 dark:to-neutral-800/90 backdrop-blur-md shadow-sm dark:shadow-neutral-950/20">
               <button
                 type="button" 
                 onClick={async () => {

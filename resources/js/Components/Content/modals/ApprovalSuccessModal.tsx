@@ -29,7 +29,7 @@ export default function ApprovalSuccessModal({
       />
 
       <div className="fixed inset-0 flex items-center justify-center p-4">
-        <DialogPanel className="w-full max-w-md rounded-lg shadow-2xl bg-white dark:bg-neutral-800 dark:border dark:border-neutral-700/50 overflow-hidden">
+        <DialogPanel className="w-full max-w-md rounded-lg shadow-2xl bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-950 border border-gray-200/50 dark:border-neutral-800/50 overflow-hidden">
           <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-neutral-700/50">
             <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
               <CheckCircle className="w-6 h-6 text-green-500" />

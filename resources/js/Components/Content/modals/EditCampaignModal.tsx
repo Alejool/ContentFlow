@@ -5,12 +5,13 @@ import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
-import CampaignDateFields from "@/Components/Content/Campaign/common/CampaignDateFields";
-import CampaignFormFields from "@/Components/Content/Campaign/common/CampaignFormFields";
-import PublicationSelector from "@/Components/Content/Campaign/common/PublicationSelector";
+import CampaignDateFields from "@/Components/ManageContent/Campaign/common/CampaignDateFields";
+import CampaignFormFields from "@/Components/ManageContent/Campaign/common/CampaignFormFields";
+import PublicationSelector from "@/Components/ManageContent/Campaign/common/PublicationSelector";
 import ModalHeader from "@/Components/Content/modals/common/ModalHeader";
 
 import { useEditCampaignForm } from "@/Hooks/campaign/useEditCampaignForm";
+import { useModalFocusTrap } from "@/Hooks/useModalFocusTrap";
 import { usePublicationsForCampaignEdit } from "@/Hooks/campaign/usePublicationsForCampaignEdit";
 import { usePage } from "@inertiajs/react";
 import ModalFooter from "./common/ModalFooter";
@@ -32,8 +33,13 @@ export default function EditCampaignModal({
   const { updateItem: updateCampaign } = useContentManagement();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { auth } = usePage<any>().props;
-  const canManage = auth.current_workspace?.permissions?.includes("content");
+  const canManage =
+    auth.current_workspace?.permissions?.includes("manage-content");
   const isDisabled = !canManage;
+
+  // Integrate focus trap for modal accessibility
+  // Requirements: 5.5
+  const modalRef = useModalFocusTrap(isOpen);
 
   const { register, handleSubmit, setValue, watch, reset, errors } =
     useEditCampaignForm(t, campaign);
@@ -126,7 +132,10 @@ export default function EditCampaignModal({
         onClick={handleClose}
       />
 
-      <div className="relative w-full max-w-2xl bg-white dark:bg-neutral-800 rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300">
+      <div 
+        ref={modalRef as React.RefObject<HTMLDivElement>}
+        className="relative w-full max-w-2xl bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-950 rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300 border border-gray-200/50 dark:border-neutral-800/50"
+      >
         <ModalHeader
           t={t}
           onClose={handleClose}
@@ -153,11 +162,13 @@ export default function EditCampaignModal({
           >
             <CampaignFormFields
               register={register}
+              setValue={setValue}
               errors={errors}
               watched={watchedFields}
               t={t}
               mode="edit"
               disabled={isDisabled}
+              showAiPrompt={false}
             />
 
             <CampaignDateFields

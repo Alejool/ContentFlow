@@ -294,7 +294,7 @@ export default function AddPublicationModal({
         onClick={handleClose}
       />
 
-      <div className="relative w-full max-w-4xl bg-white dark:bg-neutral-800 rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300">
+      <div className="relative w-full max-w-5xl bg-white backdrop-blur-2xl dark:bg-neutral-900/90 rounded-lg shadow-2xl flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300">
         <ModalHeader
           t={t}
           onClose={handleClose}

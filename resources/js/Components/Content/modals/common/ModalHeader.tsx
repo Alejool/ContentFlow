@@ -35,7 +35,7 @@ const ModalHeader: React.FC<ModalHeaderProps> = ({
 
   return (
     <div
-      className="px-6 py-4 border-b border-gray-100 dark:border-neutral-700 bg-gradient-to-r from-gray-50 to-white dark:from-neutral-900 dark:to-neutral-800 flex items-center justify-between sticky top-0 z-20 backdrop-blur-sm bg-opacity-95 dark:bg-opacity-95"
+      className="px-6 py-4 border-b border-gray-200/50 dark:border-neutral-800/50 bg-gradient-to-r from-gray-50 via-white to-gray-50/80 dark:from-neutral-900 dark:via-neutral-900/95 dark:to-neutral-800/90 flex items-center justify-between sticky top-0 z-20 backdrop-blur-md shadow-sm dark:shadow-neutral-950/20"
       style={style}
     >
       <div>

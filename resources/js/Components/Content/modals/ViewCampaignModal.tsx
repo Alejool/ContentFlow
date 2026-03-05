@@ -92,7 +92,7 @@ export default function ViewCampaignModal({
       />
 
       <div className="fixed inset-0 flex items-center justify-center p-4">
-        <DialogPanel className="w-full max-w-3xl max-h-[90vh] rounded-lg shadow-2xl flex flex-col bg-white dark:bg-neutral-800 dark:border dark:border-neutral-700">
+        <DialogPanel className="w-full max-w-3xl max-h-[90vh] rounded-lg shadow-2xl flex flex-col bg-gradient-to-br from-white to-gray-50 dark:from-neutral-900 dark:to-neutral-950 border border-gray-200/50 dark:border-neutral-800/50">
           <div className="flex-shrink-0 flex items-center justify-between p-6 border-b border-gray-100 dark:border-neutral-700">
             <DialogTitle className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
               {isActuallyPublication ? (
