@@ -4,6 +4,7 @@ import AiConfigSection from "@/Components/profile/Partials/AiConfigSection";
 import UpdatePasswordForm from "@/Components/profile/Partials/UpdatePasswordForm";
 import UpdateProfileInformationForm from "@/Components/profile/Partials/UpdateProfileInformationForm";
 import OnboardingSection from "@/Components/profile/Partials/OnboardingSection";
+import SubscriptionSection from "@/Components/profile/Partials/SubscriptionSection";
 
 import { useUser } from "@/Hooks/useUser";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
@@ -16,6 +17,7 @@ import {
   Save,
   User,
   RotateCcw,
+  CreditCard,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -23,9 +25,25 @@ import { useTranslation } from "react-i18next";
 interface EditProps {
   mustVerifyEmail: boolean;
   status?: string;
+  subscription?: {
+    plan_name: string;
+    plan_id: string;
+    status: string;
+    current_period_end?: string;
+    trial_ends_at?: string;
+    is_trial?: boolean;
+  };
+  usage?: {
+    publications_used: number;
+    publications_limit: number;
+    storage_used: number;
+    storage_limit: number;
+    ai_requests_used: number;
+    ai_requests_limit: number;
+  };
 }
 
-export default function Edit({ mustVerifyEmail, status }: EditProps) {
+export default function Edit({ mustVerifyEmail, status, subscription, usage }: EditProps) {
   const { t } = useTranslation();
   const user = usePage<any>().props.auth.user;
   const setUser = useUserStore((state) => state.setUser);
@@ -45,6 +63,11 @@ export default function Edit({ mustVerifyEmail, status }: EditProps) {
       name: t("profile.tabs.security") || "Seguridad",
       icon: Lock,
       hidden: user.provider !== null,
+    },
+    {
+      id: "subscription",
+      name: t("profile.tabs.subscription") || "Suscripción y Plan",
+      icon: CreditCard,
     },
     {
       id: "ai",
@@ -127,6 +150,12 @@ export default function Edit({ mustVerifyEmail, status }: EditProps) {
               {activeTab === "password" && (
                 <div>
                   <UpdatePasswordForm user={user} />
+                </div>
+              )}
+
+              {activeTab === "subscription" && (
+                <div>
+                  <SubscriptionSection subscription={subscription} usage={usage} />
                 </div>
               )}
 

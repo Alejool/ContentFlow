@@ -5,9 +5,10 @@ import { OnboardingErrorBoundary } from "./OnboardingErrorBoundary";
 import type { TourStep, SocialPlatform, PublicationTemplate } from "@/types/onboarding";
 
 // Lazy load onboarding components to reduce initial bundle size
+const BusinessInfoStep = lazy(() => import("./BusinessInfoStep"));
+const PlanSelectionStep = lazy(() => import("./PlanSelectionStep"));
 const TourOverlay = lazy(() => import("./TourOverlay"));
 const SetupWizard = lazy(() => import("./SetupWizard"));
-// TemplateGallery removed
 
 interface OnboardingFlowProps {
   tourSteps: TourStep[];
@@ -16,7 +17,7 @@ interface OnboardingFlowProps {
   templates: PublicationTemplate[];
 }
 
-type OnboardingStage = "tour" | "wizard" | "templates" | "complete";
+type OnboardingStage = "businessInfo" | "planSelection" | "tour" | "wizard" | "templates" | "complete";
 
 /**
  * OnboardingFlow orchestrates the complete onboarding experience.
@@ -38,10 +39,20 @@ export default function OnboardingFlow({
   connectedAccounts = [],
   templates,
 }: OnboardingFlowProps) {
-  const { state, completeTourStep, skipTour, nextTourStep } = useOnboarding();
+  const { state, completeBusinessInfo, selectPlan, completeTourStep, skipTour, nextTourStep } = useOnboarding();
   
   // Determine initial stage based on current state to avoid flash
   const determineCurrentStage = useCallback((): OnboardingStage => {
+    // If business info not completed, show business info
+    if (!state.businessInfoCompleted) {
+      return "businessInfo";
+    }
+
+    // If plan not selected, show plan selection
+    if (!state.planSelected) {
+      return "planSelection";
+    }
+
     // If tour not completed or skipped, show tour
     if (!state.tourCompleted && !state.tourSkipped) {
       return "tour";
@@ -54,7 +65,7 @@ export default function OnboardingFlow({
 
     // All stages complete
     return "complete";
-  }, [state.tourCompleted, state.tourSkipped, state.wizardCompleted, state.wizardSkipped]);
+  }, [state.businessInfoCompleted, state.planSelected, state.tourCompleted, state.tourSkipped, state.wizardCompleted, state.wizardSkipped]);
   
   const [currentStage, setCurrentStage] = useState<OnboardingStage>(() => determineCurrentStage());
 
@@ -70,6 +81,8 @@ export default function OnboardingFlow({
       setCurrentStage(stage);
     }
   }, [
+    state.businessInfoCompleted,
+    state.planSelected,
     state.tourCompleted,
     state.tourSkipped,
     state.wizardCompleted,
@@ -78,6 +91,39 @@ export default function OnboardingFlow({
     currentStage,
     determineCurrentStage,
   ]);
+
+  /**
+   * Handles business info completion
+   */
+  const handleBusinessInfoComplete = async (data: any) => {
+    await completeBusinessInfo(data);
+  };
+
+  /**
+   * Handles business info skip
+   */
+  const handleBusinessInfoSkip = async () => {
+    await completeBusinessInfo({
+      businessName: "",
+      businessIndustry: "",
+      businessGoals: "",
+      businessSize: "",
+    });
+  };
+
+  /**
+   * Handles plan selection
+   */
+  const handlePlanSelect = async (planId: string) => {
+    await selectPlan(planId);
+  };
+
+  /**
+   * Handles plan selection skip
+   */
+  const handlePlanSkip = async () => {
+    await selectPlan("free");
+  };
 
   /**
    * Handles tour completion
@@ -134,6 +180,38 @@ export default function OnboardingFlow({
         completionPercentage={state.completionPercentage}
       />
 
+      {/* Business Info Stage */}
+      {currentStage === "businessInfo" && (
+        <OnboardingErrorBoundary>
+          <Suspense fallback={<OnboardingLoadingFallback />}>
+            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+              <div className="bg-white dark:bg-neutral-800 rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto p-8">
+                <BusinessInfoStep
+                  onComplete={handleBusinessInfoComplete}
+                  onSkip={handleBusinessInfoSkip}
+                />
+              </div>
+            </div>
+          </Suspense>
+        </OnboardingErrorBoundary>
+      )}
+
+      {/* Plan Selection Stage */}
+      {currentStage === "planSelection" && (
+        <OnboardingErrorBoundary>
+          <Suspense fallback={<OnboardingLoadingFallback />}>
+            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+              <div className="bg-white dark:bg-neutral-800 rounded-xl shadow-2xl w-full max-w-7xl max-h-[90vh] overflow-y-auto p-8">
+                <PlanSelectionStep
+                  onComplete={handlePlanSelect}
+                  onSkip={handlePlanSkip}
+                />
+              </div>
+            </div>
+          </Suspense>
+        </OnboardingErrorBoundary>
+      )}
+
       {/* Tour Stage */}
       {currentStage === "tour" && tourSteps.length > 0 && (
         <OnboardingErrorBoundary>
@@ -185,9 +263,10 @@ function OnboardingProgressIndicator({
   }
 
   const stages = [
-    { id: "tour", label: t('progress.stages.tour'), icon: "🎯" },
-    { id: "wizard", label: t('progress.stages.connect'), icon: "🔗" },
-    // Templates stage removed
+    { id: "businessInfo", label: t('onboarding.progress.stages.businessInfo'), icon: "🏢" },
+    { id: "planSelection", label: t('onboarding.progress.stages.plan'), icon: "💎" },
+    { id: "tour", label: t('onboarding.progress.stages.tour'), icon: "🎯" },
+    { id: "wizard", label: t('onboarding.progress.stages.connect'), icon: "🔗" },
   ];
 
   const currentStageIndex = stages.findIndex((s) => s.id === currentStage);
@@ -196,7 +275,7 @@ function OnboardingProgressIndicator({
     <div className="fixed top-4 right-4 z-40 bg-white dark:bg-neutral-800 rounded-lg shadow-lg p-4 max-w-xs">
       <div className="flex items-center justify-between mb-3">
         <h4 className="text-sm font-semibold text-gray-900 dark:text-white">
-          {t('progress.title')}
+          {t('onboarding.progress.title')}
         </h4>
         <span className="text-xs text-gray-500 dark:text-gray-400">
           {completionPercentage}%

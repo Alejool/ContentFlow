@@ -1,16 +1,16 @@
 import { Avatar } from "@/Components/common/Avatar";
 import Dropdown from "@/Components/common/ui/Dropdown";
-import { SOCIAL_PLATFORMS } from "@/Constants/socialPlatformsConfig";
 import { useTheme } from "@/Hooks/useTheme";
+import { useSubscriptionUsage } from "@/Hooks/useSubscriptionUsage";
 import axios from "axios";
-import { Check, ChevronDown, Globe, LogOut, Moon, Palette, Sun, User } from "lucide-react";
+import { Check, ChevronDown, Globe, LogOut, Moon, Palette, Sun, User, Zap, HardDrive, Users, FileText } from "lucide-react";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import { transitionTheme } from "@/Utils/themeTransition";
 import enFlag from "@/../assets/Icons/Flags/en.svg";
 import esFlag from "@/../assets/Icons/Flags/es.svg";
-import { usePage } from "@inertiajs/react";
+import { usePage, Link } from "@inertiajs/react";
 
 interface ProfileDropdownProps {
   user: {
@@ -29,6 +29,7 @@ export default function ProfileDropdown({
   const { t, i18n } = useTranslation();
   const { theme, setTheme } = useTheme();
   const { auth } = (usePage().props as any) || {};
+  const { usage, loading: usageLoading } = useSubscriptionUsage();
   const [currentTheme, setCurrentTheme] = useState(
     user.theme_color || "orange",
   );
@@ -37,7 +38,6 @@ export default function ProfileDropdown({
     { name: "orange", value: "orange", bg: "bg-warning-500" },
     { name: "blue", value: "blue", bg: "bg-blue-500" },
     { name: "purple", value: "purple", bg: "bg-purple-500" },
-    { name: "green", value: "green", bg: "bg-green-500" },
     { name: "pink", value: "pink", bg: "bg-pink-500" },
   ];
 
@@ -78,6 +78,25 @@ export default function ProfileDropdown({
         toast.error(t("common.error") || "Error al actualizar el idioma");
       }
     }
+  };
+
+  const getPlanDisplayName = (planName: string) => {
+    const planNames: Record<string, string> = {
+      free: t("pricing.plans.free.name") || "Free",
+      starter: t("pricing.plans.starter.name") || "Starter",
+      professional: t("pricing.plans.professional.name") || "Professional",
+      enterprise: t("pricing.plans.enterprise.name") || "Enterprise",
+    };
+    return planNames[planName] || planName;
+  };
+
+  const formatBytes = (bytes: number, decimals = 2) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
   };
 
   return (
@@ -143,16 +162,8 @@ export default function ProfileDropdown({
                 </div>
               </div>
             </div>
-          </div>
-        </div>
 
-        <div className="px-5 pb-2">
-          <div className="flex items-center gap-2 mb-2">
-            <Palette className="w-3.5 h-3.5 text-gray-500 dark:text-gray-400" />
-            <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              {t("profile.theme.title") || "Tema"}
-            </span>
-          </div>
+        <div className="px-5 pt-3">
           <div className="flex items-center justify-between gap-2 p-1">
             {colors.map((color) => (
               <button
@@ -175,6 +186,90 @@ export default function ProfileDropdown({
             ))}
           </div>
         </div>
+          </div>
+        </div>
+
+        {/* Plan Usage Summary */}
+        {usage && !usageLoading && (
+          <div className="px-2 pb-3">
+            <div className="p-3 rounded-lg bg-gradient-to-br from-primary-50 to-primary-100/50 dark:from-primary-900/20 dark:to-primary-800/10 border border-primary-200 dark:border-primary-800/30">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <Zap className="w-4 h-4 text-primary-600 dark:text-primary-400" />
+                  <span className="text-sm font-bold text-primary-900 dark:text-primary-100">
+                    {getPlanDisplayName(usage.plan)}
+                  </span>
+                </div>
+                <Link
+                  href={route('pricing')}
+                  className="text-xs font-medium text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors"
+                >
+                  {t("subscription.usage.upgradePlan", "Actualizar")}
+                </Link>
+              </div>
+
+              <div className="space-y-2">
+                {/* Publications */}
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-1.5 text-gray-700 dark:text-gray-300">
+                      <FileText className="w-3 h-3" />
+                      <span>{t("subscription.usage.publications", "Publicaciones")}</span>
+                    </div>
+                    <span className="font-semibold text-gray-900 dark:text-white">
+                      {usage.publications.used} / {usage.publications.limit === -1 ? '∞' : usage.publications.limit}
+                    </span>
+                  </div>
+                  <div className="h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all ${
+                        usage.publications.percentage >= 90
+                          ? 'bg-red-500'
+                          : usage.publications.percentage >= 70
+                          ? 'bg-yellow-500'
+                          : 'bg-primary-500'
+                      }`}
+                      style={{ width: `${Math.min(usage.publications.percentage, 100)}%` }}
+                    />
+                  </div>
+                </div>
+
+                {/* Storage */}
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-1.5 text-gray-700 dark:text-gray-300">
+                      <HardDrive className="w-3 h-3" />
+                      <span>{t("subscription.usage.storage", "Almacenamiento")}</span>
+                    </div>
+                    <span className="font-semibold text-gray-900 dark:text-white">
+                      {formatBytes(usage.storage.used_bytes)} / {usage.storage.limit_gb} GB
+                    </span>
+                  </div>
+                  <div className="h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all ${
+                        usage.storage.percentage >= 90
+                          ? 'bg-red-500'
+                          : usage.storage.percentage >= 70
+                          ? 'bg-yellow-500'
+                          : 'bg-primary-500'
+                      }`}
+                      style={{ width: `${Math.min(usage.storage.percentage, 100)}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {usage.limits_reached && (
+                <div className="mt-2 pt-2 border-t border-primary-200 dark:border-primary-800/30">
+                  <p className="text-xs text-red-600 dark:text-red-400 font-medium">
+                    {t("subscription.limitReached", "Has alcanzado el límite de tu plan")}
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         <div className="px-5 pb-2">
           <div className="flex items-center gap-2 mb-2">

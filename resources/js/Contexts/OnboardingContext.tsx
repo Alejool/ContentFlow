@@ -12,6 +12,8 @@ import { ErrorNotification } from "@/Components/Onboarding/ErrorNotification";
  */
 export interface OnboardingContextValue {
   state: OnboardingState & { isLoading: boolean; error: string | null };
+  completeBusinessInfo: (data: any) => Promise<void>;
+  selectPlan: (planId: string) => Promise<void>;
   startTour: () => Promise<void>;
   nextTourStep: () => void;
   skipTour: () => Promise<void>;
@@ -84,9 +86,25 @@ export function OnboardingProvider({ children }: OnboardingProviderProps) {
     return () => clearInterval(syncInterval);
   }, [store.isOffline, store.completedAt]);
 
+  // Listen for subscription changes and sync onboarding state
+  useEffect(() => {
+    const handleSubscriptionChange = () => {
+      // Sync with backend when subscription changes
+      store.syncWithBackend();
+    };
+
+    window.addEventListener('subscription-plan-changed', handleSubscriptionChange);
+
+    return () => {
+      window.removeEventListener('subscription-plan-changed', handleSubscriptionChange);
+    };
+  }, []);
+
   // Create context value with state and actions
   const contextValue: OnboardingContextValue = {
     state: {
+      businessInfoCompleted: store.businessInfoCompleted,
+      planSelected: store.planSelected,
       tourCompleted: store.tourCompleted,
       tourSkipped: store.tourSkipped,
       tourCurrentStep: store.tourCurrentStep,
@@ -103,6 +121,8 @@ export function OnboardingProvider({ children }: OnboardingProviderProps) {
       isLoading: store.isLoading,
       error: store.error,
     },
+    completeBusinessInfo: store.completeBusinessInfo,
+    selectPlan: store.selectPlan,
     startTour: store.startTour,
     nextTourStep: store.nextTourStep,
     skipTour: store.skipTour,

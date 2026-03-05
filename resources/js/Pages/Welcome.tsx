@@ -17,7 +17,7 @@ import {
   Upload,
   Zap,
 } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 
 interface AuthProps {
@@ -40,6 +40,15 @@ const SUPPORTED_NETWORKS = Object.values(SOCIAL_PLATFORMS).filter(
 export default function Welcome({ auth, canLogin, canRegister }: WelcomeProps) {
   const { t, i18n } = useTranslation();
   const { theme } = useTheme();
+  const pricingSectionRef = useRef<HTMLDivElement>(null);
+
+  const scrollToPricing = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    pricingSectionRef.current?.scrollIntoView({ 
+      behavior: 'smooth',
+      block: 'start'
+    });
+  };
 
   useEffect(() => {
     const browserLang = navigator.language.split("-")[0];
@@ -191,6 +200,13 @@ export default function Welcome({ auth, canLogin, canRegister }: WelcomeProps) {
                         {t("welcome.startFree") || "Comenzar Gratis"}
                         <ArrowRight className="w-5 h-5 ml-2" />
                       </Link>
+                      <a
+                        href="#pricing"
+                        onClick={scrollToPricing}
+                        className="inline-flex items-center justify-center px-8 py-3 text-base font-medium text-primary-600 bg-white dark:bg-gray-800 dark:text-primary-400 border-2 border-primary-600 rounded-lg hover:bg-primary-50 dark:hover:bg-gray-700 transition-colors"
+                      >
+                        {t("welcome.viewPricing") || "Ver Planes"}
+                      </a>
                     </>
                   ) : canLogin ? (
                     <Link
@@ -202,6 +218,14 @@ export default function Welcome({ auth, canLogin, canRegister }: WelcomeProps) {
                     </Link>
                   ) : null}
                 </div>
+
+                <p className="mt-6 text-sm text-gray-600 dark:text-gray-400 flex items-center justify-center gap-2">
+                  <Shield className="w-4 h-4 text-green-500" />
+                  {t("welcome.noCreditCardRequired") || "No requiere tarjeta de crédito"}
+                  <span className="mx-2">•</span>
+                  <Sparkles className="w-4 h-4 text-purple-500" />
+                  {t("welcome.freePlanForever") || "Plan gratuito para siempre"}
+                </p>
                 <div className="mt-24 py-8 border-y border-gray-200/50 dark:border-white/5 backdrop-blur-sm relative left-[50%] right-[50%] mx-[-50vw] w-screen px-4">
                   <div className="max-w-7xl mx-auto text-center">
                     <p className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-8">
@@ -247,6 +271,195 @@ export default function Welcome({ auth, canLogin, canRegister }: WelcomeProps) {
                 </div>
               </div>
 
+              {/* Pricing Preview Section */}
+              <div ref={pricingSectionRef} id="pricing" className="mt-20">
+                <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white">
+                  {t("welcome.pricingTitle") || "Planes para cada necesidad"}
+                </h2>
+                <p className="mt-4 text-center text-gray-600 dark:text-gray-300">
+                  {t("welcome.pricingSubtitle") || "Desde planes gratuitos hasta soluciones empresariales"}
+                </p>
+
+                <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                  {/* Free Plan */}
+                  <Link
+                    href={canRegister ? "/register?plan=free" : canLogin ? "/pricing" : "/register"}
+                    className="relative rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 hover:border-primary-500 transition-all hover:shadow-lg cursor-pointer"
+                  >
+                    <div className="text-center">
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                        {t("pricing.plans.free.name") || "Free"}
+                      </h3>
+                      <div className="mt-4">
+                        <span className="text-4xl font-bold text-gray-900 dark:text-white">$0</span>
+                        <span className="text-gray-600 dark:text-gray-400">
+                          {t("pricing.perMonth") || "/mes"}
+                        </span>
+                      </div>
+                      <ul className="mt-6 space-y-3 text-sm text-left">
+                        <li className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 rounded-full bg-green-500"></div>
+                          <span className="text-gray-700 dark:text-gray-300">
+                            {t("pricing.features.publications3")}
+                          </span>
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 rounded-full bg-green-500"></div>
+                          <span className="text-gray-700 dark:text-gray-300">
+                            {t("pricing.features.socialAccounts2")}
+                          </span>
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 rounded-full bg-green-500"></div>
+                          <span className="text-gray-700 dark:text-gray-300">
+                            {t("pricing.features.storage1")}
+                          </span>
+                        </li>
+                      </ul>
+                    </div>
+                  </Link>
+
+                  {/* Starter Plan */}
+                  <Link
+                    href={canRegister ? "/register?plan=starter" : canLogin ? "/pricing" : "/register"}
+                    className="relative rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 hover:border-primary-500 transition-all hover:shadow-lg cursor-pointer"
+                  >
+                    <div className="text-center">
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                        {t("pricing.plans.starter.name") || "Starter"}
+                      </h3>
+                      <div className="mt-4">
+                        <span className="text-4xl font-bold text-gray-900 dark:text-white">$19</span>
+                        <span className="text-gray-600 dark:text-gray-400">
+                          {t("pricing.perMonth") || "/mes"}
+                        </span>
+                      </div>
+                      <ul className="mt-6 space-y-3 text-sm text-left">
+                        <li className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
+                          <span className="text-gray-700 dark:text-gray-300">
+                            {t("pricing.features.publications50")}
+                          </span>
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
+                          <span className="text-gray-700 dark:text-gray-300">
+                            {t("pricing.features.socialAccounts10")}
+                          </span>
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
+                          <span className="text-gray-700 dark:text-gray-300">
+                            {t("pricing.features.storage10")}
+                          </span>
+                        </li>
+                      </ul>
+                    </div>
+                  </Link>
+
+                  {/* Professional Plan - Popular */}
+                  <Link
+                    href={canRegister ? "/register?plan=professional" : canLogin ? "/pricing" : "/register"}
+                    className="relative rounded-lg border-2 border-primary-500 bg-white dark:bg-gray-800 p-6 shadow-lg transform scale-105 hover:shadow-xl transition-all cursor-pointer"
+                  >
+                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-primary-500 text-white">
+                        {t("pricing.mostPopular") || "Más Popular"}
+                      </span>
+                    </div>
+                    <div className="text-center">
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                        {t("pricing.plans.professional.name") || "Professional"}
+                      </h3>
+                      <div className="mt-4">
+                        <span className="text-4xl font-bold text-gray-900 dark:text-white">$49</span>
+                        <span className="text-gray-600 dark:text-gray-400">
+                          {t("pricing.perMonth") || "/mes"}
+                        </span>
+                      </div>
+                      <ul className="mt-6 space-y-3 text-sm text-left">
+                        <li className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 rounded-full bg-yellow-500"></div>
+                          <span className="text-gray-700 dark:text-gray-300">
+                            {t("pricing.features.publications200")}
+                          </span>
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 rounded-full bg-yellow-500"></div>
+                          <span className="text-gray-700 dark:text-gray-300">
+                            {t("pricing.features.socialAccounts50")}
+                          </span>
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 rounded-full bg-yellow-500"></div>
+                          <span className="text-gray-700 dark:text-gray-300">
+                            {t("pricing.features.storage100")}
+                          </span>
+                        </li>
+                      </ul>
+                    </div>
+                  </Link>
+
+                  {/* Enterprise Plan */}
+                  <Link
+                    href={canRegister ? "/register?plan=enterprise" : canLogin ? "/pricing" : "/register"}
+                    className="relative rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 hover:border-primary-500 transition-all hover:shadow-lg cursor-pointer"
+                  >
+                    <div className="text-center">
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                        {t("pricing.plans.enterprise.name") || "Enterprise"}
+                      </h3>
+                      <div className="mt-4">
+                        <span className="text-4xl font-bold text-gray-900 dark:text-white">$199</span>
+                        <span className="text-gray-600 dark:text-gray-400">
+                          {t("pricing.perMonth") || "/mes"}
+                        </span>
+                      </div>
+                      <ul className="mt-6 space-y-3 text-sm text-left">
+                        <li className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 rounded-full bg-purple-500"></div>
+                          <span className="text-gray-700 dark:text-gray-300">
+                            {t("pricing.features.publicationsUnlimited")}
+                          </span>
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 rounded-full bg-purple-500"></div>
+                          <span className="text-gray-700 dark:text-gray-300">
+                            {t("pricing.features.socialAccountsUnlimited")}
+                          </span>
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 rounded-full bg-purple-500"></div>
+                          <span className="text-gray-700 dark:text-gray-300">
+                            {t("pricing.features.storage1TB")}
+                          </span>
+                        </li>
+                      </ul>
+                    </div>
+                  </Link>
+                </div>
+
+                <div className="mt-8 text-center">
+                  {auth.user ? (
+                    <Link
+                      href="/pricing"
+                      className="inline-flex items-center justify-center text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium"
+                    >
+                      {t("welcome.viewAllPlans") || "Ver todos los planes y características"}
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </Link>
+                  ) : (
+                    <Link
+                      href="/register"
+                      className="inline-flex items-center justify-center text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium"
+                    >
+                      {t("welcome.viewAllPlans") || "Ver todos los planes y características"}
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </Link>
+                  )}
+                </div>
+              </div>
+
               <div className="mt-20 relative overflow-hidden rounded-lg bg-gradient-to-r from-primary-50 to-pink-50 dark:from-primary-900/20 dark:to-pink-900/20 backdrop-blur-sm p-8">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-primary-200/20 dark:bg-primary-500/10 rounded-full -translate-y-32 translate-x-32"></div>
                 <div className="relative text-center">
@@ -259,15 +472,24 @@ export default function Welcome({ auth, canLogin, canRegister }: WelcomeProps) {
                       "Únete a miles de creadores que ya usan ContentFlow"}
                   </p>
 
-                  <div className="mt-8">
+                  <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
                     {canRegister ? (
-                      <Link
-                        href="/register"
-                        className="inline-flex items-center justify-center px-8 py-3 text-lg font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors shadow-lg hover:shadow-xl"
-                      >
-                        {t("welcome.createAccount") || "Crear Cuenta Gratis"}
-                        <Rocket className="w-6 h-6 ml-2" />
-                      </Link>
+                      <>
+                        <Link
+                          href="/register"
+                          className="inline-flex items-center justify-center px-8 py-3 text-lg font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors shadow-lg hover:shadow-xl"
+                        >
+                          {t("welcome.createAccount") || "Crear Cuenta Gratis"}
+                          <Rocket className="w-6 h-6 ml-2" />
+                        </Link>
+                        <a
+                          href="#pricing"
+                          onClick={scrollToPricing}
+                          className="inline-flex items-center justify-center px-8 py-3 text-lg font-medium text-primary-600 bg-white dark:bg-gray-800 dark:text-primary-400 border-2 border-primary-600 rounded-lg hover:bg-primary-50 dark:hover:bg-gray-700 transition-colors"
+                        >
+                          {t("welcome.viewPricing") || "Ver Planes y Precios"}
+                        </a>
+                      </>
                     ) : canLogin ? (
                       <Link
                         href="/dashboard"
@@ -279,10 +501,22 @@ export default function Welcome({ auth, canLogin, canRegister }: WelcomeProps) {
                     ) : null}
                   </div>
 
-                  <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">
-                    {t("welcome.noCreditCard") ||
-                      "Sin tarjeta de crédito • Prueba de 14 días"}
-                  </p>
+                  <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+                    <div className="flex items-center gap-2">
+                      <Shield className="w-4 h-4 text-green-500" />
+                      <span>{t("welcome.noCreditCardRequired") || "No requiere tarjeta de crédito"}</span>
+                    </div>
+                    <span className="hidden sm:inline">•</span>
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-purple-500" />
+                      <span>{t("welcome.freePlanForever") || "Plan gratuito para siempre"}</span>
+                    </div>
+                    <span className="hidden sm:inline">•</span>
+                    <div className="flex items-center gap-2">
+                      <Zap className="w-4 h-4 text-yellow-500" />
+                      <span>{t("welcome.demoAccess") || "Demo de 30 días disponible"}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

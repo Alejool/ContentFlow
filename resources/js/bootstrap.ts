@@ -5,6 +5,14 @@ import Pusher from "pusher-js";
 axios.defaults.withCredentials = true;
 axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
 
+// Configurar el token CSRF para todas las peticiones
+const token = document.head.querySelector('meta[name="csrf-token"]');
+if (token) {
+  axios.defaults.headers.common['X-CSRF-TOKEN'] = token.getAttribute('content');
+} else {
+  console.error('CSRF token not found: https://laravel.com/docs/csrf#csrf-x-csrf-token');
+}
+
 // Attach the client's detected timezone to all requests so the backend
 // can use it when needed to parse or normalize datetime values.
 try {

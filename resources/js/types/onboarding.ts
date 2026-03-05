@@ -10,6 +10,8 @@
  * of a user's onboarding process.
  */
 export interface OnboardingState {
+  businessInfoCompleted: boolean;
+  planSelected: boolean;
   tourCompleted: boolean;
   tourSkipped: boolean;
   tourCurrentStep: number;
