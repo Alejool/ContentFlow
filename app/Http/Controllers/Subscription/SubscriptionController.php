@@ -184,8 +184,75 @@ class SubscriptionController extends Controller
 
         $usageService = app(\App\Services\WorkspaceUsageService::class);
         $usageSummary = $usageService->getUsageSummary($workspace);
+        
+        // Agregar información de permisos
+        $usageSummary['permissions'] = [
+            'is_owner' => $workspace->isOwner($user),
+            'can_manage_subscription' => $workspace->canManageSubscription($user),
+            'can_upgrade' => $workspace->isOwner($user),
+            'can_cancel' => $workspace->isOwner($user),
+            'can_view_billing' => $workspace->isOwner($user),
+        ];
+        
+        // Agregar información del owner
+        $owner = $workspace->creator;
+        if ($owner) {
+            $usageSummary['workspace']['owner'] = [
+                'id' => $owner->id,
+                'name' => $owner->name,
+                'email' => $owner->email,
+            ];
+        }
+
+        // Agregar información sobre cambios programados y cancelaciones
+        $subscription = $workspace->subscription;
+        if ($subscription) {
+            $usageSummary['subscription']['pending_plan'] = $subscription->pending_plan;
+            $usageSummary['subscription']['plan_changes_at'] = $subscription->plan_changes_at?->toIso8601String();
+            $usageSummary['subscription']['cancel_at_period_end'] = $subscription->cancel_at_period_end ?? false;
+            $usageSummary['subscription']['grace_period_ends_at'] = $subscription->grace_period_ends_at?->toIso8601String();
+            
+            // Calcular días restantes
+            if ($subscription->ends_at) {
+                $usageSummary['subscription']['days_remaining'] = now()->diffInDays($subscription->ends_at, false);
+            }
+            
+            if ($subscription->grace_period_ends_at) {
+                $usageSummary['subscription']['grace_period_days_remaining'] = now()->diffInDays($subscription->grace_period_ends_at, false);
+            }
+        }
 
         return response()->json($usageSummary);
+    }
+
+    public function getPermissions(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        $workspace = $user->currentWorkspace;
+        
+        if (!$workspace) {
+            return response()->json(['error' => 'No workspace found'], 404);
+        }
+        
+        $owner = $workspace->creator;
+        
+        return response()->json([
+            'is_owner' => $workspace->isOwner($user),
+            'can_manage_subscription' => $workspace->canManageSubscription($user),
+            'can_view_billing' => $workspace->isOwner($user),
+            'can_upgrade' => $workspace->isOwner($user),
+            'can_cancel' => $workspace->isOwner($user),
+            'workspace' => [
+                'id' => $workspace->id,
+                'name' => $workspace->name,
+                'slug' => $workspace->slug,
+            ],
+            'owner' => $owner ? [
+                'id' => $owner->id,
+                'name' => $owner->name,
+                'email' => $owner->email,
+            ] : null,
+        ]);
     }
 
     public function cancelSubscription(Request $request): JsonResponse
@@ -206,18 +273,42 @@ class SubscriptionController extends Controller
         }
 
         try {
-            // Usar Laravel Cashier para cancelar la suscripción
-            $workspace->subscription('default')->cancel();
+            $cashierSubscription = $workspace->subscription('default');
+            
+            if (!$cashierSubscription) {
+                return response()->json([
+                    'error' => 'No active subscription found',
+                ], 404);
+            }
+
+            // Obtener la fecha de fin del período actual
+            $stripeSubscription = $cashierSubscription->asStripeSubscription();
+            $periodEnd = \Carbon\Carbon::createFromTimestamp($stripeSubscription->current_period_end);
+
+            // Cancelar al final del período (NO inmediatamente)
+            $cashierSubscription->cancel();
 
             // Actualizar nuestra tabla personalizada
             if ($workspace->subscription) {
                 $workspace->subscription->update([
                     'status' => 'canceled',
-                    'ends_at' => now(),
+                    'cancel_at_period_end' => true,
+                    'ends_at' => $periodEnd,
+                    'cancellation_reason' => $request->input('reason', 'user_requested'),
                 ]);
             }
 
-            return response()->json(['message' => 'Subscription canceled successfully']);
+            \Log::info('Subscription canceled at period end', [
+                'workspace_id' => $workspace->id,
+                'user_id' => $user->id,
+                'ends_at' => $periodEnd,
+            ]);
+
+            return response()->json([
+                'message' => 'Tu suscripción se cancelará al final del período actual',
+                'ends_at' => $periodEnd->toIso8601String(),
+                'days_remaining' => now()->diffInDays($periodEnd),
+            ]);
         } catch (\Exception $e) {
             \Log::error('Failed to cancel subscription', [
                 'workspace_id' => $workspace->id,
@@ -320,7 +411,7 @@ class SubscriptionController extends Controller
 
             // Get current active subscription
             $currentHistory = $user->subscriptionHistory()->active()->first();
-            $previousPlan = $currentHistory?->plan_name;
+            $previousPlan = $currentHistory?->plan_name ?? 'free';
 
             try {
                 // Get plan configuration
@@ -331,21 +422,17 @@ class SubscriptionController extends Controller
                 }
 
                 // Verificar si el usuario tiene una suscripción activa en Stripe
-                // Usar el método de Cashier correctamente
                 $hasActiveStripeSubscription = false;
                 $cashierSubscription = null;
                 try {
-                    // Verificar si tiene suscripción activa usando Cashier
                     $cashierSubscription = $workspace->subscriptions()
                         ->where('type', 'default')
                         ->where('stripe_status', 'active')
                         ->first();
                     
-                    // Verificar que el stripe_id sea válido (debe empezar con 'sub_')
                     if ($cashierSubscription && str_starts_with($cashierSubscription->stripe_id, 'sub_')) {
                         $hasActiveStripeSubscription = true;
                     } else {
-                        // Si el stripe_id no es válido, no es una suscripción real de Stripe
                         $cashierSubscription = null;
                         $hasActiveStripeSubscription = false;
                     }
@@ -354,6 +441,7 @@ class SubscriptionController extends Controller
                         'user_id' => $user->id,
                         'workspace_id' => $workspace->id,
                         'new_plan' => $newPlan,
+                        'previous_plan' => $previousPlan,
                         'has_active_subscription' => $hasActiveStripeSubscription,
                         'subscription_id' => $cashierSubscription?->stripe_id
                     ]);
@@ -364,9 +452,70 @@ class SubscriptionController extends Controller
                     ]);
                 }
 
-                // Si el usuario tiene una suscripción activa en Stripe, puede cambiar libremente entre cualquier plan
-                // porque ya pagó. Solo actualizamos su preferencia de plan en el sistema.
-                // NO hacemos cambios en Stripe - el usuario mantiene su suscripción activa.
+                // Determinar si es upgrade o downgrade
+                $isDowngrade = $this->isDowngrade($previousPlan, $newPlan);
+                $isUpgrade = $this->isUpgrade($previousPlan, $newPlan);
+
+                // Si tiene suscripción activa en Stripe
+                if ($hasActiveStripeSubscription && $newPlan !== 'free' && $newPlan !== 'demo' && isset($planConfig['stripe_price_id'])) {
+                    try {
+                        if ($isDowngrade) {
+                            // DOWNGRADE: Programar para el final del período
+                            $stripeSubscription = $cashierSubscription->asStripeSubscription();
+                            $periodEnd = \Carbon\Carbon::createFromTimestamp($stripeSubscription->current_period_end);
+                            
+                            // Programar el cambio en Stripe para el final del período
+                            $cashierSubscription->swap($planConfig['stripe_price_id'], [
+                                'proration_behavior' => 'none', // No prorratear
+                            ]);
+                            
+                            // Marcar el downgrade pendiente en nuestra DB
+                            $subscription = $workspace->subscription;
+                            if ($subscription) {
+                                $subscription->update([
+                                    'pending_plan' => $newPlan,
+                                    'plan_changes_at' => $periodEnd,
+                                ]);
+                            }
+                            
+                            \Log::info('Downgrade scheduled for end of period', [
+                                'workspace_id' => $workspace->id,
+                                'current_plan' => $previousPlan,
+                                'pending_plan' => $newPlan,
+                                'changes_at' => $periodEnd,
+                            ]);
+                            
+                            return response()->json([
+                                'success' => true,
+                                'message' => 'Tu plan cambiará al final del ciclo de facturación actual',
+                                'current_plan' => $previousPlan,
+                                'pending_plan' => $newPlan,
+                                'changes_at' => $periodEnd->toIso8601String(),
+                                'is_downgrade' => true,
+                            ]);
+                        } else {
+                            // UPGRADE: Aplicar inmediatamente con prorrateo
+                            $cashierSubscription->swap($planConfig['stripe_price_id']);
+                            
+                            \Log::info('Plan upgraded immediately in Stripe', [
+                                'workspace_id' => $workspace->id,
+                                'old_plan' => $previousPlan,
+                                'new_plan' => $newPlan,
+                                'stripe_price_id' => $planConfig['stripe_price_id']
+                            ]);
+                        }
+                    } catch (\Exception $e) {
+                        \Log::error('Failed to change plan in Stripe', [
+                            'workspace_id' => $workspace->id,
+                            'error' => $e->getMessage()
+                        ]);
+                        
+                        return response()->json([
+                            'error' => 'Failed to change plan in Stripe',
+                            'message' => $e->getMessage(),
+                        ], 500);
+                    }
+                }
                 
                 // Si NO tiene suscripción activa y quiere un plan de pago, debe comprar
                 if (!$hasActiveStripeSubscription && $newPlan !== 'free' && $newPlan !== 'demo' && isset($planConfig['stripe_price_id'])) {
@@ -374,28 +523,33 @@ class SubscriptionController extends Controller
                         'error' => 'No active subscription',
                         'message' => 'Debes suscribirte primero para acceder a este plan',
                         'requires_checkout' => true
-                    ], 402); // 402 Payment Required
+                    ], 402);
                 }
 
-                // Actualizar el campo current_plan del usuario
-                $user->update(['current_plan' => $newPlan]);
+                // Para upgrades o cambios a free/demo, actualizar inmediatamente
+                if (!$isDowngrade || $newPlan === 'free' || $newPlan === 'demo') {
+                    $user->update(['current_plan' => $newPlan]);
 
-                // Record plan change in our tracking system
-                $this->subscriptionTracking->recordPlanChange(
-                    user: $user,
-                    newPlan: $newPlan,
-                    previousPlan: $previousPlan,
-                    stripePriceId: $planConfig['stripe_price_id'] ?? null,
-                    price: $planConfig['price'] ?? 0,
-                    billingCycle: $planConfig['billing_cycle'] ?? 'monthly',
-                    reason: 'user_initiated'
-                );
+                    // Record plan change in our tracking system
+                    $this->subscriptionTracking->recordPlanChange(
+                        user: $user,
+                        newPlan: $newPlan,
+                        previousPlan: $previousPlan,
+                        stripePriceId: $planConfig['stripe_price_id'] ?? null,
+                        price: $planConfig['price'] ?? 0,
+                        billingCycle: $planConfig['billing_cycle'] ?? 'monthly',
+                        reason: 'user_initiated'
+                    );
+                }
 
                 return response()->json([
                     'success' => true,
-                    'message' => 'Plan changed successfully',
-                    'plan' => $newPlan,
-                    'had_active_subscription' => $hasActiveStripeSubscription
+                    'message' => $isDowngrade ? 'El cambio se aplicará al final del período' : 'Plan actualizado exitosamente',
+                    'plan' => $isDowngrade ? $previousPlan : $newPlan,
+                    'pending_plan' => $isDowngrade ? $newPlan : null,
+                    'had_active_subscription' => $hasActiveStripeSubscription,
+                    'is_downgrade' => $isDowngrade,
+                    'is_upgrade' => $isUpgrade,
                 ]);
             } catch (\Exception $e) {
                 \Log::error('Failed to change plan', [
@@ -411,6 +565,44 @@ class SubscriptionController extends Controller
                 ], 500);
             }
         }
+
+    /**
+     * Determinar si un cambio de plan es un downgrade.
+     */
+    private function isDowngrade(string $currentPlan, string $newPlan): bool
+    {
+        $hierarchy = [
+            'free' => 0,
+            'demo' => 1,
+            'starter' => 2,
+            'professional' => 3,
+            'enterprise' => 4,
+        ];
+        
+        $currentLevel = $hierarchy[$currentPlan] ?? 0;
+        $newLevel = $hierarchy[$newPlan] ?? 0;
+        
+        return $newLevel < $currentLevel;
+    }
+
+    /**
+     * Determinar si un cambio de plan es un upgrade.
+     */
+    private function isUpgrade(string $currentPlan, string $newPlan): bool
+    {
+        $hierarchy = [
+            'free' => 0,
+            'demo' => 1,
+            'starter' => 2,
+            'professional' => 3,
+            'enterprise' => 4,
+        ];
+        
+        $currentLevel = $hierarchy[$currentPlan] ?? 0;
+        $newLevel = $hierarchy[$newPlan] ?? 0;
+        
+        return $newLevel > $currentLevel;
+    }
 
     public function checkActiveSubscription(Request $request): JsonResponse
     {

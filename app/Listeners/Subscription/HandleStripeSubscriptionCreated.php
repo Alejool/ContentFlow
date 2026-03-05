@@ -14,21 +14,30 @@ class HandleStripeSubscriptionCreated
 
     public function handle(WebhookReceived $event): void
     {
-        // Solo procesar eventos de suscripción creada o actualizada
-        if (!in_array($event->payload['type'], [
+        // Eventos que procesamos
+        $supportedEvents = [
             'customer.subscription.created',
             'customer.subscription.updated',
-            'checkout.session.completed'
-        ])) {
+            'customer.subscription.deleted',
+            'checkout.session.completed',
+            'invoice.payment_failed',
+            'invoice.payment_succeeded',
+        ];
+
+        if (!in_array($event->payload['type'], $supportedEvents)) {
             return;
         }
 
         try {
-            if ($event->payload['type'] === 'checkout.session.completed') {
-                $this->handleCheckoutCompleted($event->payload);
-            } elseif (in_array($event->payload['type'], ['customer.subscription.created', 'customer.subscription.updated'])) {
-                $this->handleSubscriptionChange($event->payload);
-            }
+            match($event->payload['type']) {
+                'checkout.session.completed' => $this->handleCheckoutCompleted($event->payload),
+                'customer.subscription.created', 
+                'customer.subscription.updated' => $this->handleSubscriptionChange($event->payload),
+                'customer.subscription.deleted' => $this->handleSubscriptionDeleted($event->payload),
+                'invoice.payment_failed' => $this->handlePaymentFailed($event->payload),
+                'invoice.payment_succeeded' => $this->handlePaymentSucceeded($event->payload),
+                default => null,
+            };
         } catch (\Exception $e) {
             Log::error('Error handling Stripe webhook', [
                 'event_type' => $event->payload['type'],
@@ -201,5 +210,149 @@ class HandleStripeSubscriptionCreated
         }
 
         return null;
+    }
+
+    /**
+     * Manejar cuando una suscripción expira o es eliminada.
+     */
+    private function handleSubscriptionDeleted(array $payload): void
+    {
+        $subscription = $payload['data']['object'];
+        $customerId = $subscription['customer'] ?? null;
+        
+        if (!$customerId) {
+            return;
+        }
+
+        // Encontrar workspace por Stripe customer ID
+        $workspace = \App\Models\Workspace\Workspace::where('stripe_id', $customerId)->first();
+        
+        if (!$workspace) {
+            Log::warning('Workspace not found for subscription deletion', [
+                'stripe_customer_id' => $customerId,
+            ]);
+            return;
+        }
+
+        $user = $workspace->owner();
+        
+        if (!$user) {
+            Log::error('Owner not found for workspace', [
+                'workspace_id' => $workspace->id,
+            ]);
+            return;
+        }
+
+        // Cambiar a plan free
+        $planManagement = app(\App\Services\PlanManagementService::class);
+        $planManagement->changePlan(
+            user: $user,
+            newPlan: 'free',
+            reason: 'subscription_expired',
+            metadata: [
+                'stripe_subscription_id' => $subscription['id'],
+                'expired_at' => now()->toDateTimeString(),
+            ]
+        );
+
+        // Actualizar subscription en DB
+        $workspaceSubscription = $workspace->subscription;
+        if ($workspaceSubscription) {
+            $workspaceSubscription->update([
+                'status' => 'expired',
+                'plan' => 'free',
+                'stripe_status' => 'canceled',
+                'ends_at' => now(),
+            ]);
+        }
+
+        Log::info('Subscription expired, moved to free plan', [
+            'workspace_id' => $workspace->id,
+            'user_id' => $user->id,
+            'stripe_subscription_id' => $subscription['id'],
+        ]);
+    }
+
+    /**
+     * Manejar cuando falla un pago - iniciar período de gracia.
+     */
+    private function handlePaymentFailed(array $payload): void
+    {
+        $invoice = $payload['data']['object'];
+        $customerId = $invoice['customer'] ?? null;
+        
+        if (!$customerId) {
+            return;
+        }
+
+        $workspace = \App\Models\Workspace\Workspace::where('stripe_id', $customerId)->first();
+        
+        if (!$workspace) {
+            return;
+        }
+
+        $subscription = $workspace->subscription;
+        
+        if (!$subscription) {
+            return;
+        }
+
+        // Iniciar período de gracia de 7 días
+        $gracePeriodEnd = now()->addDays(7);
+        
+        $subscription->update([
+            'status' => 'past_due',
+            'stripe_status' => 'past_due',
+            'grace_period_ends_at' => $gracePeriodEnd,
+        ]);
+
+        Log::warning('Payment failed, grace period started', [
+            'workspace_id' => $workspace->id,
+            'subscription_id' => $subscription->id,
+            'grace_period_ends' => $gracePeriodEnd->toDateTimeString(),
+            'invoice_id' => $invoice['id'],
+        ]);
+
+        // TODO: Enviar notificación al usuario sobre el pago fallido
+    }
+
+    /**
+     * Manejar cuando un pago es exitoso - limpiar período de gracia.
+     */
+    private function handlePaymentSucceeded(array $payload): void
+    {
+        $invoice = $payload['data']['object'];
+        $customerId = $invoice['customer'] ?? null;
+        
+        if (!$customerId) {
+            return;
+        }
+
+        $workspace = \App\Models\Workspace\Workspace::where('stripe_id', $customerId)->first();
+        
+        if (!$workspace) {
+            return;
+        }
+
+        $subscription = $workspace->subscription;
+        
+        if (!$subscription) {
+            return;
+        }
+
+        // Si estaba en período de gracia, reactivar
+        if ($subscription->status === 'past_due' && $subscription->grace_period_ends_at) {
+            $subscription->update([
+                'status' => 'active',
+                'stripe_status' => 'active',
+                'grace_period_ends_at' => null,
+            ]);
+
+            Log::info('Payment succeeded, subscription reactivated', [
+                'workspace_id' => $workspace->id,
+                'subscription_id' => $subscription->id,
+                'invoice_id' => $invoice['id'],
+            ]);
+        }
     }
 }
