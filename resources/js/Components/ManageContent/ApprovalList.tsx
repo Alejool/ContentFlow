@@ -289,7 +289,7 @@ export default function ApprovalList({
         />
         </div>
 
-        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900">
+        <div className="mt-4 pt-4  dark:border-neutral-700 bg-white dark:bg-neutral-900">
           <AdvancedPagination
             currentPage={currentPage}
             lastPage={totalPages}

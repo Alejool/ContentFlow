@@ -295,7 +295,7 @@ export default function ContentList(props: ContentListProps) {
           </div>
 
           {props.pagination && (
-            <div className="mt-4 pt-4 border-t border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900">
+            <div className="mt-4 pt-4  dark:border-neutral-700 bg-white dark:bg-neutral-900">
               <AdvancedPagination
                 currentPage={props.pagination.current_page}
                 lastPage={props.pagination.last_page}
