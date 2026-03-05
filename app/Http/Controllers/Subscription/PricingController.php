@@ -13,6 +13,47 @@ class PricingController extends Controller
         private \App\Services\PlanManagementService $planManagement
     ) {}
 
+    /**
+     * Obtener planes habilitados y formateados.
+     * Filtra por enabled en config/plans.php
+     */
+    private function getEnabledPlans(): array
+    {
+        $allPlans = config('plans');
+        
+        // Debug: Log para ver qué planes están configurados
+        \Log::info('All plans from config:', array_keys($allPlans));
+        
+        $filtered = collect($allPlans)
+            ->filter(function ($plan, $key) {
+                $enabled = ($plan['enabled'] ?? true) === true;
+                \Log::info("Plan {$key}: enabled = " . ($enabled ? 'true' : 'false'));
+                return $enabled;
+            })
+            ->map(function ($plan, $key) {
+                $isFreePlan = $plan['price'] == 0;
+                
+                return [
+                    'id' => $key,
+                    'name' => $plan['name'],
+                    'price' => $plan['price'],
+                    'description' => $plan['description'] ?? '',
+                    'features' => $plan['features'] ?? [],
+                    'limits' => $plan['limits'],
+                    'popular' => $plan['popular'] ?? ($key === 'professional'),
+                    'enabled' => true, // Ya filtrados, todos están habilitados
+                    'trial_days' => $plan['trial_days'] ?? null,
+                    'requires_stripe' => !$isFreePlan,
+                ];
+            })
+            ->values()
+            ->toArray();
+            
+        \Log::info('Filtered plans:', array_column($filtered, 'id'));
+        
+        return $filtered;
+    }
+
     public function index(Request $request): Response
     {
         $user = $request->user();
@@ -23,36 +64,8 @@ class PricingController extends Controller
             $currentPlan = $user->current_plan ?? 'free';
         }
 
-        // Obtener todos los planes de la configuración
-        $plans = collect(config('plans'))->map(function ($plan, $key) {
-            // Solo mostrar planes que:
-            // 1. Son gratuitos (price = 0), O
-            // 2. Tienen stripe_price_id configurado y válido
-            $isFreePlan = $plan['price'] == 0;
-            $hasValidStripeId = !empty($plan['stripe_price_id']) && 
-                               $plan['stripe_price_id'] !== 'price_starter_monthly' &&
-                               $plan['stripe_price_id'] !== 'price_professional_monthly' &&
-                               $plan['stripe_price_id'] !== 'price_enterprise_monthly';
-            
-            // Si no es plan gratuito y no tiene Stripe ID válido, marcarlo como deshabilitado
-            $enabled = ($plan['enabled'] ?? true) && ($isFreePlan || $hasValidStripeId);
-            
-            return [
-                'id' => $key,
-                'name' => $plan['name'],
-                'price' => $plan['price'],
-                'description' => $plan['description'] ?? '',
-                'features' => $plan['features'] ?? [],
-                'limits' => $plan['limits'],
-                'popular' => $key === 'professional', // Marcar Professional como popular
-                'enabled' => $enabled,
-                'trial_days' => $plan['trial_days'] ?? null,
-                'requires_stripe' => !$isFreePlan, // Indicar si requiere Stripe
-            ];
-        })->values()->toArray();
-
         return Inertia::render('Pricing/PricingPage', [
-            'plans' => $plans,
+            'plans' => $this->getEnabledPlans(),
             'currentPlan' => $currentPlan,
         ]);
     }
@@ -147,34 +160,6 @@ class PricingController extends Controller
      */
     public function getPlans(Request $request)
     {
-        // Obtener todos los planes de la configuración
-        $plans = collect(config('plans'))->map(function ($plan, $key) {
-            // Solo mostrar planes que:
-            // 1. Son gratuitos (price = 0), O
-            // 2. Tienen stripe_price_id configurado y válido
-            $isFreePlan = $plan['price'] == 0;
-            $hasValidStripeId = !empty($plan['stripe_price_id']) && 
-                               $plan['stripe_price_id'] !== 'price_starter_monthly' &&
-                               $plan['stripe_price_id'] !== 'price_professional_monthly' &&
-                               $plan['stripe_price_id'] !== 'price_enterprise_monthly';
-            
-            // Si no es plan gratuito y no tiene Stripe ID válido, marcarlo como deshabilitado
-            $enabled = ($plan['enabled'] ?? true) && ($isFreePlan || $hasValidStripeId);
-            
-            return [
-                'id' => $key,
-                'name' => $plan['name'],
-                'price' => $plan['price'],
-                'description' => $plan['description'] ?? '',
-                'features' => $plan['features'] ?? [],
-                'limits' => $plan['limits'],
-                'popular' => $key === 'professional', // Marcar Professional como popular
-                'enabled' => $enabled,
-                'trial_days' => $plan['trial_days'] ?? null,
-                'requires_stripe' => !$isFreePlan, // Indicar si requiere Stripe
-            ];
-        })->values()->toArray();
-
-        return response()->json($plans);
+        return response()->json($this->getEnabledPlans());
     }
 }
