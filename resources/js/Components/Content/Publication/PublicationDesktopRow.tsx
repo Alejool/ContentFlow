@@ -1,5 +1,5 @@
 import PublicationThumbnail from "@/Components/Content/Publication/PublicationThumbnail";
-import SocialAccountsDisplay from "@/Components/ManageContent/Publication/SocialAccountsDisplay";
+import SocialAccountsDisplay from "@/Components/Content/Publication/SocialAccountsDisplay";
 import { usePublicationStore } from "@/stores/publicationStore";
 import { Publication } from "@/types/Publication";
 import { canUserPublishDirectly } from "@/Utils/publicationPermissions";

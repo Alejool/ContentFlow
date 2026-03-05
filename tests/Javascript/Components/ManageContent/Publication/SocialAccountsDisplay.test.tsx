@@ -1,4 +1,4 @@
-import SocialAccountsDisplay from "@/Components/ManageContent/Publication/SocialAccountsDisplay";
+import SocialAccountsDisplay from "@/Components/Content/Publication/SocialAccountsDisplay";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 

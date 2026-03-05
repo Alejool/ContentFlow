@@ -1,4 +1,4 @@
-import EditPublicationModal from "@/Components/ManageContent/modals/EditPublicationModal";
+import EditPublicationModal from "@/Components/Content/modals/EditPublicationModal";
 import { usePublicationForm } from "@/Hooks/publication/usePublicationForm";
 import { usePublicationLock } from "@/Hooks/usePublicationLock";
 import { useCampaignStore } from "@/stores/campaignStore";
@@ -31,10 +31,10 @@ vi.mock("react-i18next", () => ({
 }));
 
 // Mock sub-components to simplify
-vi.mock("@/Components/ManageContent/modals/common/ModalHeader", () => ({
+vi.mock("@/Components/Content/modals/common/ModalHeader", () => ({
   default: ({ title }: any) => <div data-testid="modal-header">{title}</div>,
 }));
-vi.mock("@/Components/ManageContent/modals/common/ModalFooter", () => ({
+vi.mock("@/Components/Content/modals/common/ModalFooter", () => ({
   default: () => <div data-testid="modal-footer" />,
 }));
 

@@ -3,7 +3,7 @@ import CampaignMobileTable from "@/Components/Content/Campaign/CampaignMobileTab
 import CampaignPublications from "@/Components/Content/Campaign/CampaignPublications";
 import CampaignRow from "@/Components/Content/Campaign/CampaignRow";
 import CampaignRowSkeleton from "@/Components/Content/Campaign/CampaignRowSkeleton";
-import { TableHeader } from "@/Components/ManageContent/Publication/TableHeader";
+import { TableHeader } from "@/Components/Content/Publication/TableHeader";
 import AdvancedPagination from "@/Components/common/ui/AdvancedPagination";
 import EmptyState from "@/Components/common/ui/EmptyState";
 import TableContainer from "@/Components/common/ui/TableContainer";

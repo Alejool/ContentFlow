@@ -2,7 +2,7 @@ import PublicationDesktopRow from "@/Components/Content/Publication/PublicationD
 import PublicationMobileRow from "@/Components/Content/Publication/PublicationMobileRow";
 import PublicationMobileRowSkeleton from "@/Components/Content/Publication/PublicationMobileRowSkeleton";
 import PublicationRowSkeleton from "@/Components/Content/Publication/PublicationRowSkeleton";
-import { TableHeader } from "@/Components/ManageContent/Publication/TableHeader";
+import { TableHeader } from "@/Components/Content/Publication/TableHeader";
 import AdvancedPagination from "@/Components/common/ui/AdvancedPagination";
 import EmptyState from "@/Components/common/ui/EmptyState";
 import TableContainer from "@/Components/common/ui/TableContainer";

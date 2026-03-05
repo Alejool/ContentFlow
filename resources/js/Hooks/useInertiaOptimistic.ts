@@ -104,11 +104,8 @@ export function useShouldUseOptimistic(resource: string): boolean {
   
   // Pages where optimistic updates are beneficial
   const optimisticPages = [
-    'ManageContent/Partials/ContentPage',
     'Content/Partials/ContentPage',
-    'ManageContent/Publication',
     'Content/Publication',
-    'ManageContent/Campaign',
     'Content/Campaign',
     'Reels/Index',
     'Calendar/Index',
