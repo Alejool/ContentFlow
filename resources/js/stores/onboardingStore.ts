@@ -86,6 +86,12 @@ interface OnboardingStoreState extends OnboardingState {
   queuedActionsCount: number;
   lastSyncTimestamp: number | null;
 
+  // Business info actions
+  completeBusinessInfo: (data: any) => Promise<void>;
+  
+  // Plan selection actions
+  selectPlan: (planId: string) => Promise<void>;
+
   // Tour actions
   startTour: () => Promise<void>;
   nextTourStep: () => void;
@@ -150,6 +156,8 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
   
   return {
   // Initial state - use cached state if available
+  businessInfoCompleted: sanitizedCachedState?.businessInfoCompleted ?? false,
+  planSelected: sanitizedCachedState?.planSelected ?? false,
   tourCompleted: sanitizedCachedState?.tourCompleted ?? false,
   tourSkipped: sanitizedCachedState?.tourSkipped ?? false,
   tourCurrentStep: sanitizedCachedState?.tourCurrentStep ?? 0,
@@ -168,6 +176,64 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
   isOffline: false,
   queuedActionsCount: offlineQueue.size(),
   lastSyncTimestamp: null,
+
+  // Business info actions
+  completeBusinessInfo: async (data: any) => {
+    const previousState = {
+      businessInfoCompleted: get().businessInfoCompleted,
+    };
+    
+    set({
+      businessInfoCompleted: true,
+      error: null,
+    });
+    
+    get()._updateCache();
+
+    if (get().isOffline) {
+      offlineQueue.enqueue("completeBusinessInfo", data);
+      set({ queuedActionsCount: offlineQueue.size() });
+      return;
+    }
+
+    try {
+      await get()._executeAction("completeBusinessInfo", data);
+    } catch (error: any) {
+      get()._rollback(previousState);
+      const errorMessage = getErrorMessage(error);
+      set({ error: errorMessage });
+      console.error("Failed to complete business info", error);
+    }
+  },
+
+  // Plan selection actions
+  selectPlan: async (planId: string) => {
+    const previousState = {
+      planSelected: get().planSelected,
+    };
+    
+    set({
+      planSelected: true,
+      error: null,
+    });
+    
+    get()._updateCache();
+
+    if (get().isOffline) {
+      offlineQueue.enqueue("selectPlan", { planId });
+      set({ queuedActionsCount: offlineQueue.size() });
+      return;
+    }
+
+    try {
+      await get()._executeAction("selectPlan", { planId });
+    } catch (error: any) {
+      get()._rollback(previousState);
+      const errorMessage = getErrorMessage(error);
+      set({ error: errorMessage });
+      console.error("Failed to select plan", error);
+    }
+  },
 
   // Tour actions
   startTour: async () => {
@@ -648,6 +714,8 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
   _updateCache: () => {
     const state = get();
     const cacheableState: Partial<OnboardingState> = {
+      businessInfoCompleted: state.businessInfoCompleted,
+      planSelected: state.planSelected,
       tourCompleted: state.tourCompleted,
       tourSkipped: state.tourSkipped,
       tourCurrentStep: state.tourCurrentStep,
@@ -683,6 +751,14 @@ export const useOnboardingStore = create<OnboardingStoreState>((set, get) => {
       let data: any = {};
 
       switch (type) {
+        case "completeBusinessInfo":
+          endpoint = "/api/v1/onboarding/business-info/complete";
+          data = payload;
+          break;
+        case "selectPlan":
+          endpoint = "/api/v1/onboarding/plan/select";
+          data = { plan_id: payload.planId };
+          break;
         case "skipTour":
           endpoint = "/api/v1/onboarding/tour/skip";
           break;

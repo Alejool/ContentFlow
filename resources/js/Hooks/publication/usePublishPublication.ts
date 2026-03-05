@@ -435,11 +435,30 @@ export const usePublishPublication = (): UsePublishPublicationReturn => {
           }
         });
 
+        // Only send platform settings for selected platforms to reduce payload size
         if (platformSettings && Object.keys(platformSettings).length > 0) {
-          formData.append(
-            "platform_settings",
-            JSON.stringify(platformSettings),
+          const selectedAccountPlatforms = new Set(
+            selectedPlatforms
+              .map((id) => {
+                const account = accounts.find((acc) => acc.id === id);
+                return account?.platform?.toLowerCase();
+              })
+              .filter(Boolean)
           );
+
+          const filteredSettings: Record<string, any> = {};
+          Object.entries(platformSettings).forEach(([key, value]) => {
+            if (selectedAccountPlatforms.has(key.toLowerCase())) {
+              filteredSettings[key] = value;
+            }
+          });
+
+          if (Object.keys(filteredSettings).length > 0) {
+            formData.append(
+              "platform_settings",
+              JSON.stringify(filteredSettings),
+            );
+          }
         }
 
         const { success, data } = await publishPublication(
