@@ -293,4 +293,112 @@ class GoogleCalendarProvider implements ExternalCalendarProvider
 
         return implode("\n", $lines);
     }
+
+    /**
+     * Create a user calendar event in Google Calendar
+     */
+    public function createUserEvent(\App\Models\User\UserCalendarEvent $userEvent): string
+    {
+        try {
+            if (!$this->service) {
+                throw new \Exception('Google Calendar service not initialized. Call setAccessToken first.');
+            }
+
+            $event = $this->buildEventFromUserEvent($userEvent);
+            $createdEvent = $this->service->events->insert($this->calendarId, $event);
+
+            Log::info('Google Calendar user event created', [
+                'user_event_id' => $userEvent->id,
+                'external_event_id' => $createdEvent->getId(),
+            ]);
+
+            return $createdEvent->getId();
+        } catch (\Exception $e) {
+            Log::error('Failed to create Google Calendar user event', [
+                'user_event_id' => $userEvent->id,
+                'error' => $e->getMessage(),
+            ]);
+            throw $e;
+        }
+    }
+
+    /**
+     * Update a user calendar event in Google Calendar
+     */
+    public function updateUserEvent(string $eventId, \App\Models\User\UserCalendarEvent $userEvent): bool
+    {
+        try {
+            if (!$this->service) {
+                throw new \Exception('Google Calendar service not initialized. Call setAccessToken first.');
+            }
+
+            $event = $this->buildEventFromUserEvent($userEvent);
+            $this->service->events->update($this->calendarId, $eventId, $event);
+
+            Log::info('Google Calendar user event updated', [
+                'user_event_id' => $userEvent->id,
+                'external_event_id' => $eventId,
+            ]);
+
+            return true;
+        } catch (\Exception $e) {
+            Log::error('Failed to update Google Calendar user event', [
+                'user_event_id' => $userEvent->id,
+                'event_id' => $eventId,
+                'error' => $e->getMessage(),
+            ]);
+            throw $e;
+        }
+    }
+
+    /**
+     * Build a Google Calendar Event from a UserCalendarEvent
+     */
+    private function buildEventFromUserEvent(\App\Models\User\UserCalendarEvent $userEvent): Google_Service_Calendar_Event
+    {
+        $event = new Google_Service_Calendar_Event();
+
+        // Set title
+        $event->setSummary($userEvent->title);
+
+        // Set description
+        if ($userEvent->description) {
+            $event->setDescription($userEvent->description);
+        }
+
+        // Set start time
+        $start = new Google_Service_Calendar_EventDateTime();
+        $start->setDateTime($userEvent->start_date->toRfc3339String());
+        $start->setTimeZone(config('app.timezone'));
+        $event->setStart($start);
+
+        // Set end time
+        $end = new Google_Service_Calendar_EventDateTime();
+        if ($userEvent->end_date) {
+            $end->setDateTime($userEvent->end_date->toRfc3339String());
+        } else {
+            // If no end date, make it 1 hour after start
+            $end->setDateTime($userEvent->start_date->copy()->addHour()->toRfc3339String());
+        }
+        $end->setTimeZone(config('app.timezone'));
+        $event->setEnd($end);
+
+        // Set color if provided
+        if ($userEvent->color) {
+            // Map custom colors to Google Calendar color IDs (1-11)
+            $colorMap = [
+                'blue' => '9',
+                'green' => '10',
+                'red' => '11',
+                'yellow' => '5',
+                'orange' => '6',
+                'purple' => '3',
+                'gray' => '8',
+            ];
+            $colorId = $colorMap[$userEvent->color] ?? '9'; // Default to blue
+            $event->setColorId($colorId);
+        }
+
+        return $event;
+    }
 }

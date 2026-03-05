@@ -6,6 +6,7 @@ use App\Models\Calendar\ExternalCalendarConnection;
 use App\Models\Calendar\ExternalCalendarEvent;
 use App\Models\Publications\Publication;
 use App\Models\User;
+use App\Models\User\UserCalendarEvent;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -144,22 +145,34 @@ class ExternalCalendarSyncService
     {
         try {
             $workspaceId = $connection->workspace_id;
+            $userId = $connection->user_id;
             
             // Get all publications for this workspace that should be synced
             $publications = Publication::where('workspace_id', $workspaceId)
                 ->whereNotNull('scheduled_at')
-                ->where('scheduled_at', '>=', now())
                 ->get()
                 ->filter(function ($publication) use ($connection) {
                     return $this->shouldSyncPublication($publication, $connection);
                 });
 
+            // Get all user calendar events for this workspace
+            // Include public events and private events owned by the connection user
+            $userEvents = UserCalendarEvent::where('workspace_id', $workspaceId)
+                ->where(function ($query) use ($userId) {
+                    $query->where('is_public', true)
+                        ->orWhere('user_id', $userId);
+                })
+                ->get();
+
             $results = [
                 'successful' => [],
                 'failed' => [],
-                'total' => $publications->count(),
+                'total' => $publications->count() + $userEvents->count(),
+                'publications' => 0,
+                'user_events' => 0,
             ];
 
+            // Sync publications
             foreach ($publications as $publication) {
                 try {
                     // Check if event already exists
@@ -175,14 +188,48 @@ class ExternalCalendarSyncService
                         $this->createExternalEvent($connection, $publication);
                     }
 
-                    $results['successful'][] = $publication->id;
+                    $results['successful'][] = ['type' => 'publication', 'id' => $publication->id];
+                    $results['publications']++;
                 } catch (\Exception $e) {
                     $results['failed'][] = [
+                        'type' => 'publication',
                         'id' => $publication->id,
                         'error' => $e->getMessage(),
                     ];
                     Log::warning('Failed to sync publication during full sync', [
                         'publication_id' => $publication->id,
+                        'connection_id' => $connection->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            }
+
+            // Sync user calendar events
+            foreach ($userEvents as $userEvent) {
+                try {
+                    // Check if event already exists
+                    $existingEvent = ExternalCalendarEvent::where('connection_id', $connection->id)
+                        ->where('user_calendar_event_id', $userEvent->id)
+                        ->first();
+
+                    if ($existingEvent) {
+                        // Update existing event
+                        $this->updateExternalUserEvent($connection, $existingEvent, $userEvent);
+                    } else {
+                        // Create new event
+                        $this->createExternalUserEvent($connection, $userEvent);
+                    }
+
+                    $results['successful'][] = ['type' => 'user_event', 'id' => $userEvent->id];
+                    $results['user_events']++;
+                } catch (\Exception $e) {
+                    $results['failed'][] = [
+                        'type' => 'user_event',
+                        'id' => $userEvent->id,
+                        'error' => $e->getMessage(),
+                    ];
+                    Log::warning('Failed to sync user event during full sync', [
+                        'user_event_id' => $userEvent->id,
                         'connection_id' => $connection->id,
                         'error' => $e->getMessage(),
                     ]);
@@ -198,6 +245,8 @@ class ExternalCalendarSyncService
                 'total' => $results['total'],
                 'successful' => count($results['successful']),
                 'failed' => count($results['failed']),
+                'publications' => $results['publications'],
+                'user_events' => $results['user_events'],
             ]);
 
             return $results;
@@ -216,11 +265,50 @@ class ExternalCalendarSyncService
     public function handlePublicationUpdated(Publication $publication): void
     {
         try {
+            $user = $publication->user;
+            
+            if (!$user) {
+                Log::debug('Skipping calendar sync - publication has no user', [
+                    'publication_id' => $publication->id,
+                ]);
+                return;
+            }
+
             // Get all external events for this publication
             $externalEvents = ExternalCalendarEvent::where('publication_id', $publication->id)
                 ->with('connection')
                 ->get();
 
+            // If publication no longer has scheduled_at, delete all external events
+            if (!$publication->scheduled_at) {
+                Log::info('Publication no longer scheduled, removing from external calendars', [
+                    'publication_id' => $publication->id,
+                ]);
+                
+                foreach ($externalEvents as $externalEvent) {
+                    $connection = $externalEvent->connection;
+                    if ($connection) {
+                        try {
+                            $this->deleteExternalEvent($connection, $externalEvent);
+                        } catch (\Exception $e) {
+                            $this->handleSyncError($connection, $e);
+                        }
+                    }
+                }
+                return;
+            }
+
+            // If publication has scheduled_at but no external events exist, create them
+            if ($externalEvents->isEmpty()) {
+                Log::info('Publication now scheduled, creating external calendar events', [
+                    'publication_id' => $publication->id,
+                ]);
+                
+                $this->syncPublication($publication, $user);
+                return;
+            }
+
+            // Update existing events
             foreach ($externalEvents as $externalEvent) {
                 $connection = $externalEvent->connection;
 
@@ -233,6 +321,10 @@ class ExternalCalendarSyncService
                     // Check if publication should still be synced
                     if (!$this->shouldSyncPublication($publication, $connection)) {
                         // Remove from external calendar if no longer matches criteria
+                        Log::info('Publication no longer matches sync criteria, removing', [
+                            'publication_id' => $publication->id,
+                            'connection_id' => $connection->id,
+                        ]);
                         $this->deleteExternalEvent($connection, $externalEvent);
                         continue;
                     }
@@ -291,6 +383,21 @@ class ExternalCalendarSyncService
      */
     private function createExternalEvent(ExternalCalendarConnection $connection, Publication $publication): void
     {
+        // Check if event already exists to prevent duplicates
+        $existingEvent = ExternalCalendarEvent::where('connection_id', $connection->id)
+            ->where('publication_id', $publication->id)
+            ->first();
+
+        if ($existingEvent) {
+            Log::warning('External calendar event already exists, updating instead', [
+                'publication_id' => $publication->id,
+                'connection_id' => $connection->id,
+                'external_event_id' => $existingEvent->external_event_id,
+            ]);
+            $this->updateExternalEvent($connection, $existingEvent, $publication);
+            return;
+        }
+
         $provider = $this->getProviderInstance($connection);
 
         // Refresh token if needed
@@ -380,6 +487,85 @@ class ExternalCalendarSyncService
     }
 
     /**
+     * Create a new user calendar event in external calendar
+     */
+    private function createExternalUserEvent(ExternalCalendarConnection $connection, UserCalendarEvent $userEvent): void
+    {
+        // Check if event already exists to prevent duplicates
+        $existingEvent = ExternalCalendarEvent::where('connection_id', $connection->id)
+            ->where('user_calendar_event_id', $userEvent->id)
+            ->first();
+
+        if ($existingEvent) {
+            Log::warning('External calendar user event already exists, updating instead', [
+                'user_event_id' => $userEvent->id,
+                'connection_id' => $connection->id,
+                'external_event_id' => $existingEvent->external_event_id,
+            ]);
+            $this->updateExternalUserEvent($connection, $existingEvent, $userEvent);
+            return;
+        }
+
+        $provider = $this->getProviderInstance($connection);
+
+        // Refresh token if needed
+        if ($connection->needsRefresh()) {
+            $this->refreshConnectionToken($connection, $provider);
+        }
+
+        // Set access token
+        $provider->setAccessToken(decrypt($connection->access_token));
+
+        // Create event
+        $externalEventId = $provider->createUserEvent($userEvent);
+
+        // Save to database
+        ExternalCalendarEvent::create([
+            'connection_id' => $connection->id,
+            'user_calendar_event_id' => $userEvent->id,
+            'external_event_id' => $externalEventId,
+            'provider' => $connection->provider,
+        ]);
+
+        Log::info('External calendar user event created', [
+            'user_event_id' => $userEvent->id,
+            'provider' => $connection->provider,
+            'external_event_id' => $externalEventId,
+        ]);
+    }
+
+    /**
+     * Update an existing user calendar event in external calendar
+     */
+    private function updateExternalUserEvent(
+        ExternalCalendarConnection $connection,
+        ExternalCalendarEvent $externalEvent,
+        UserCalendarEvent $userEvent
+    ): void {
+        $provider = $this->getProviderInstance($connection);
+
+        // Refresh token if needed
+        if ($connection->needsRefresh()) {
+            $this->refreshConnectionToken($connection, $provider);
+        }
+
+        // Set access token
+        $provider->setAccessToken(decrypt($connection->access_token));
+
+        // Update event
+        $provider->updateUserEvent($externalEvent->external_event_id, $userEvent);
+
+        // Update timestamp
+        $externalEvent->touch('last_updated_at');
+
+        Log::info('External calendar user event updated', [
+            'user_event_id' => $userEvent->id,
+            'provider' => $connection->provider,
+            'external_event_id' => $externalEvent->external_event_id,
+        ]);
+    }
+
+    /**
      * Check if publication should be synced based on connection's sync_config
      */
     private function shouldSyncPublication(Publication $publication, ExternalCalendarConnection $connection): bool
@@ -395,8 +581,14 @@ class ExternalCalendarSyncService
 
         // Check platform filter
         if (!empty($syncConfig['sync_platforms'])) {
-            $publicationPlatforms = $publication->platforms->pluck('name')->toArray();
-            $hasMatchingPlatform = !empty(array_intersect($publicationPlatforms, $syncConfig['sync_platforms']));
+            // Get platforms from scheduled_posts
+            $publicationPlatforms = $publication->scheduled_posts()
+                ->pluck('platform')
+                ->map(fn($p) => strtolower($p))
+                ->toArray();
+            
+            $syncPlatforms = array_map('strtolower', $syncConfig['sync_platforms']);
+            $hasMatchingPlatform = !empty(array_intersect($publicationPlatforms, $syncPlatforms));
             
             if (!$hasMatchingPlatform) {
                 return false;
@@ -409,7 +601,7 @@ class ExternalCalendarSyncService
     /**
      * Refresh connection token
      */
-    private function refreshConnectionToken(ExternalCalendarConnection $connection, ExternalCalendarProvider $provider): void
+    public function refreshConnectionToken(ExternalCalendarConnection $connection, ExternalCalendarProvider $provider): void
     {
         try {
             $refreshToken = decrypt($connection->refresh_token);
@@ -466,7 +658,7 @@ class ExternalCalendarSyncService
     /**
      * Get provider instance
      */
-    private function getProviderInstance(ExternalCalendarConnection $connection): ExternalCalendarProvider
+    public function getProviderInstance(ExternalCalendarConnection $connection): ExternalCalendarProvider
     {
         $providerClass = $this->providers[$connection->provider] ?? null;
 
