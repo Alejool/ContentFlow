@@ -32,6 +32,12 @@ interface Props {
 export default function PricingPage({ auth, plans, currentPlan }: Props) {
   const { t } = useTranslation();
 
+  // Determinar si el usuario es owner del workspace actual
+  const currentWorkspace = auth?.current_workspace;
+  const isOwner = currentWorkspace && 
+    (Number(currentWorkspace.created_by) === Number(auth.user?.id) || 
+     currentWorkspace.user_role_slug === 'owner');
+
   return (
     <AuthenticatedLayout user={auth.user}>
       <Head title={t('pricing.title')} />
@@ -52,6 +58,7 @@ export default function PricingPage({ auth, plans, currentPlan }: Props) {
             showBillingToggle={true}
             showHeader={true}
             variant="default"
+            isOwner={isOwner}
           />
 
           {/* Trust indicators */}

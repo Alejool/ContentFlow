@@ -34,6 +34,12 @@ export default function ProfileDropdown({
     user.theme_color || "orange",
   );
 
+  // Determinar si el usuario es owner del workspace actual
+  const currentWorkspace = auth?.current_workspace;
+  const isOwner = currentWorkspace && 
+    (Number(currentWorkspace.created_by) === Number(user.id) || 
+     currentWorkspace.user_role_slug === 'owner');
+
   const colors = [
     { name: "orange", value: "orange", bg: "bg-warning-500" },
     { name: "blue", value: "blue", bg: "bg-blue-500" },
@@ -200,12 +206,15 @@ export default function ProfileDropdown({
                     {getPlanDisplayName(usage.plan)}
                   </span>
                 </div>
-                <Link
-                  href={route('pricing')}
-                  className="text-xs font-medium text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors"
-                >
-                  {t("subscription.usage.upgradePlan", "Actualizar")}
-                </Link>
+                {/* Botón de actualizar solo visible para owners */}
+                {isOwner && (
+                  <Link
+                    href={route('pricing')}
+                    className="text-xs font-medium text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors"
+                  >
+                    {t("subscription.usage.upgradePlan", "Actualizar")}
+                  </Link>
+                )}
               </div>
 
               <div className="space-y-2">

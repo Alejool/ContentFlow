@@ -46,9 +46,16 @@ interface EditProps {
 export default function Edit({ mustVerifyEmail, status, subscription, usage }: EditProps) {
   const { t } = useTranslation();
   const user = usePage<any>().props.auth.user;
+  const { auth } = usePage<any>().props;
   const setUser = useUserStore((state) => state.setUser);
 
   const [activeTab, setActiveTab] = useState("profile");
+
+  // Determinar si el usuario es owner del workspace actual
+  const currentWorkspace = auth?.current_workspace;
+  const isOwner = currentWorkspace && 
+    (Number(currentWorkspace.created_by) === Number(user.id) || 
+     currentWorkspace.user_role_slug === 'owner');
 
   useEffect(() => {
     if (user) {
@@ -68,6 +75,7 @@ export default function Edit({ mustVerifyEmail, status, subscription, usage }: E
       id: "subscription",
       name: t("profile.tabs.subscription") || "Suscripción y Plan",
       icon: CreditCard,
+      hidden: !isOwner, // Solo visible para owners
     },
     {
       id: "ai",
