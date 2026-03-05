@@ -113,4 +113,8 @@ return [
         'temperature' => (float) env('ANTHROPIC_TEMPERATURE', 0.7),
         'base_url' => env('ANTHROPIC_BASE_URL', 'https://api.anthropic.com'),
     ],
+    'stripe' => [
+        'secret' => env('STRIPE_SECRET'),
+        'public' => env('STRIPE_PUBLISH'),
+    ],
 ];
