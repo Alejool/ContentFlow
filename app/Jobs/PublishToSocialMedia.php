@@ -23,7 +23,7 @@ class PublishToSocialMedia implements ShouldQueue
 {
   use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-  public $timeout = 1800; // 30 minutos para archivos pesados
+  public $timeout = 2000; // 33 minutos para archivos pesados (menor que el worker timeout de 35min)
   public $tries = 2; // Reducir intentos ya que cada uno toma más tiempo
   public $backoff = [60, 180]; // Backoff más largo entre reintentos
   public $maxExceptions = 2;
