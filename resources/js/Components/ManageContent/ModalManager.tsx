@@ -10,8 +10,8 @@ import AddCampaignModal from "@/Components/ManageContent/modals/AddCampaignModal
 import AddPublicationModal from "@/Components/ManageContent/modals/AddPublicationModal";
 import EditCampaignModal from "@/Components/ManageContent/modals/EditCampaignModal";
 import EditPublicationModal from "@/Components/ManageContent/modals/EditPublicationModal";
-import PublishPublicationModal from "@/Components/ManageContent/modals/PublishPublicationModal";
-import ViewCampaignModal from "@/Components/ManageContent/modals/ViewCampaignModal";
+import PublishPublicationModal from "@/Components/Content/modals/PublishPublicationModal";
+import ViewCampaignModal from "@/Components/Content/modals/ViewCampaignModal";
 import { usePublicationStore } from "@/stores/publicationStore";
 
 interface ModalManagerProps {

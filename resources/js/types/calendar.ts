@@ -69,7 +69,8 @@ export type PublicationStatus =
   | 'pending_review' 
   | 'approved' 
   | 'scheduled' 
-  | 'rejected';
+  | 'rejected'
+  | 'retrying';
 
 // Bulk Operations Types
 export interface BulkOperationResult {

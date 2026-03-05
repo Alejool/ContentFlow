@@ -1,7 +1,8 @@
 import CampaignMediaCarousel from "@/Components/Campaigns/CampaignMediaCarousel";
 import ReelsCarousel from "@/Components/ManageContent/ReelsCarousel";
-import ActivityList from "@/Components/Content/ActivityList";
-import ApprovalHistory from "@/Components/Content/ApprovalHistory";
+import ActivityList from "@/Components/ManageContent/ActivityList";
+import ApprovalHistory from "@/Components/ManageContent/ApprovalHistory";
+import ApprovalHistorySection from "@/Components/ManageContent/Publication/common/edit/ApprovalHistorySection";
 import { Campaign } from "@/types/Campaign";
 import { Publication } from "@/types/Publication";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
@@ -37,7 +38,7 @@ export default function ViewCampaignModal({
   const [activeTab, setActiveTab] = useState("overview");
   const [hashtagsExpanded, setHashtagsExpanded] = useState(false);
   const canEdit =
-    auth.current_workspace?.permissions?.includes("content");
+    auth.current_workspace?.permissions?.includes("manage-content");
 
   // Early return after all hooks
   if (!item) return null;
@@ -338,7 +339,7 @@ export default function ViewCampaignModal({
                                     <div className="flex items-center gap-2">
                                       <span className="capitalize font-medium text-sm">
                                         {post?.social_account?.platform ||
-                                          t("common.platformConnect")}
+                                          t("common.platform")}
                                       </span>
                                       {post.status && (
                                         <span
@@ -409,11 +410,20 @@ export default function ViewCampaignModal({
 
                 {/* Approvals Tab */}
                 {activeTab === "approvals" && isActuallyPublication && (
-                  <div className="max-h-96 overflow-y-auto pr-2">
-                    <ApprovalHistory
-                      logs={(item as any).approval_logs || []}
-                      publicationId={item.id}
-                    />
+                  <div className="max-h-[500px] overflow-y-auto pr-2 space-y-4">
+                    {(item as any).approval_logs &&
+                    (item as any).approval_logs.length > 0 ? (
+                      <ApprovalHistorySection
+                        logs={(item as any).approval_logs || []}
+                      />
+                    ) : (
+                      <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+                        <p>
+                          {t("approvals.noHistory") ||
+                            "No hay historial de aprobaciones"}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
