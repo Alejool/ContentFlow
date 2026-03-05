@@ -16,6 +16,11 @@ use App\Http\Middleware\IsSuperAdmin;
 use App\Http\Middleware\ThrottleReelGeneration;
 use App\Http\Middleware\CustomRateLimiter;
 use App\Http\Middleware\Require2FA;
+use App\Http\Middleware\CheckSubscriptionLimits;
+use App\Http\Middleware\CheckFeatureAccess;
+use App\Http\Middleware\ThrottleByPlan;
+use App\Http\Middleware\CheckWorkspaceLimit;
+use App\Http\Middleware\CheckWorkspaceOwner;
 use Illuminate\Routing\Middleware\CacheResponse;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -52,6 +57,11 @@ return Application::configure(basePath: dirname(__DIR__))
             'cache.response' => CacheResponse::class,
             'rate.limit' => CustomRateLimiter::class,
             'require.2fa' => Require2FA::class,
+            'subscription.limits' => CheckSubscriptionLimits::class,
+            'feature.access' => CheckFeatureAccess::class,
+            'throttle.plan' => ThrottleByPlan::class,
+            'workspace.limit' => CheckWorkspaceLimit::class,
+            'workspace.owner' => CheckWorkspaceOwner::class,
         ]);
     })
     ->withSchedule(function ($schedule) {
@@ -62,6 +72,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $schedule->command('social:check-tokens')->daily();
         $schedule->command('youtube:process-playlist-queue')->everyFiveMinutes();
         $schedule->command('app:send-event-reminders')->everyMinute();
+        
+        // Reset monthly usage metrics on the first day of each month
+        $schedule->command('usage:reset-monthly')
+            ->monthlyOn(1, '00:00')
+            ->timezone('UTC');
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->render(function (MethodNotAllowedHttpException $e, $request) {

@@ -111,5 +111,11 @@ class AppServiceProvider extends ServiceProvider
       \App\Events\UserCalendarEventDeleted::class,
       [\App\Listeners\SyncUserCalendarEventToExternalCalendars::class, 'handleDeleted']
     );
+
+    // Register Stripe webhook listeners
+    \Illuminate\Support\Facades\Event::listen(
+      \Laravel\Cashier\Events\WebhookReceived::class,
+      \App\Listeners\Subscription\HandleStripeSubscriptionCreated::class
+    );
   }
 }

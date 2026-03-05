@@ -48,5 +48,25 @@ class Kernel extends ConsoleKernel
     $schedule->command('audit:clean')
       ->daily()
       ->at('02:00');
+
+    // Verificar suscripciones en trial diariamente
+    $schedule->command('subscription:check-trials')
+      ->daily()
+      ->at('09:00');
+
+    // Resetear métricas de uso mensualmente el primer día del mes
+    $schedule->command('subscription:reset-monthly-usage')
+      ->monthlyOn(1, '00:00')
+      ->withoutOverlapping();
+
+    // Renovar límites mensuales (nuevo sistema) el primer día del mes
+    $schedule->command('subscription:renew-monthly-limits')
+      ->monthlyOn(1, '00:10')
+      ->withoutOverlapping();
+
+    // Verificar límites de uso y enviar notificaciones diariamente
+    $schedule->command('subscription:check-limits --notify')
+      ->daily()
+      ->at('10:00');
   }
 }
