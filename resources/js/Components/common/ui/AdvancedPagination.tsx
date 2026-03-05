@@ -52,7 +52,7 @@ export default function AdvancedPagination({
   }));
 
   return (
-    <div className="px-6 py-4  dark:border-neutral-700/50 flex flex-col lg:flex-row items-center justify-between gap-4">
+    <div className="px-6 py-4 border-t border-gray-100 dark:border-neutral-700/50 flex flex-col lg:flex-row items-center justify-between gap-4">
       <div className="flex flex-col sm:flex-row items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
         <div className="flex items-center gap-2">
           <span>
