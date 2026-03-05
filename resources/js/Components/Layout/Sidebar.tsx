@@ -113,7 +113,7 @@ export default function Sidebar({
   return (
     <>
       <div
-        className={`hidden lg:block fixed  h-full z-50 pb-10 transition-all duration-500 ease-in-out ${
+        className={`hidden lg:block fixed h-full z-50 pb-10 transition-all duration-500 ease-in-out ${
           isSidebarOpen ? "w-80" : "w-32"
         }`}
       >
@@ -132,7 +132,7 @@ export default function Sidebar({
               }`}
             >
               <div
-                className={`w-12 h-12 bg-gradient-to-r rounded-lg flex items-center justify-center flex-shrink-0`}
+                className={`w-12 h-14 bg-gradient-to-r rounded-lg flex items-center justify-center flex-shrink-0`}
               >
                 <img
                   src={Logo}

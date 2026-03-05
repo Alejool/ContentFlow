@@ -174,7 +174,6 @@ export default function AuthenticatedLayout({
                 </div>
                 <div className="flex-shrink-0 min-w-0 flex items-center gap-3">
                   <div className="hidden md:flex items-center gap-2">
-                    {/* <LanguageSwitcher /> */}
                     <div className="h-6 w-px bg-gray-200 dark:bg-neutral-800 mx-1"></div>
                     <NotificationButton />
                     <div className="h-6 w-px bg-gray-200 dark:bg-neutral-800 mx-1"></div>
