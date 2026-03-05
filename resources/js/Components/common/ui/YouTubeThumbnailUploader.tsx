@@ -1,6 +1,5 @@
-import { useTheme } from "@/Hooks/useTheme";
 import { Play, Trash2, Upload, X, ZoomIn } from "lucide-react";
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 interface YouTubeThumbnailUploaderProps {
@@ -24,7 +23,6 @@ const YouTubeThumbnailUploader = function YouTubeThumbnailUploader({
   onThumbnailDelete,
 }: YouTubeThumbnailUploaderProps) {
   const { t } = useTranslation();
-  const { theme } = useTheme();
   const [preview, setPreview] = useState<string | null>(
     existingThumbnail?.url || null
   );
@@ -141,17 +139,11 @@ const YouTubeThumbnailUploader = function YouTubeThumbnailUploader({
     }
   }, []);
 
-  const themeClasses = useMemo(() => ({
-    borderColor: theme === "dark" ? "border-neutral-700" : "border-gray-200",
-    bgColor: theme === "dark" ? "bg-neutral-800" : "bg-gray-50",
-    textColor: theme === "dark" ? "text-gray-300" : "text-gray-700",
-  }), [theme]);
-
   return (
     <div className="space-y-3">
       {/* Video Preview */}
       {videoPreviewUrl && (
-        <div className={`p-3 rounded-lg border ${themeClasses.borderColor} ${themeClasses.bgColor}`}>
+        <div className="p-3 rounded-lg border border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800">
           <div className="flex items-center gap-3">
             <div className="relative flex-shrink-0 group cursor-pointer" onClick={handleShowVideoModal}>
               {/* Thumbnail estático sin cargar el video */}
@@ -163,7 +155,7 @@ const YouTubeThumbnailUploader = function YouTubeThumbnailUploader({
               </div>
             </div>
             <div className="flex-1 min-w-0">
-              <p className={`text-xs font-medium ${themeClasses.textColor} mb-1`}>Video:</p>
+              <p className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Video:</p>
               <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
                 {videoFileName || `Video #${videoId}`}
               </p>
@@ -180,7 +172,7 @@ const YouTubeThumbnailUploader = function YouTubeThumbnailUploader({
       )}
 
       <div className="flex items-center justify-between">
-        <label className={`text-sm font-medium ${themeClasses.textColor}`}>
+        <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
           YouTube Thumbnail
           <span className="text-xs text-gray-500 ml-2">
             (Recommended: 1280x720)
@@ -195,7 +187,7 @@ const YouTubeThumbnailUploader = function YouTubeThumbnailUploader({
             <img
               src={preview}
               alt="YouTube Thumbnail"
-              className={`w-full h-32 object-cover rounded-lg border-2 ${themeClasses.borderColor}`}
+              className="w-full h-32 object-cover rounded-lg border-2 border-gray-200 dark:border-neutral-700"
             />
 
             {/* Overlay with actions */}
@@ -223,7 +215,7 @@ const YouTubeThumbnailUploader = function YouTubeThumbnailUploader({
           <button
             type="button"
             onClick={handleInputClick}
-            className={`w-full px-3 py-2 text-sm rounded-lg border ${themeClasses.borderColor} ${themeClasses.bgColor} hover:bg-opacity-80 transition-colors ${themeClasses.textColor}`}
+            className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800 hover:bg-opacity-80 transition-colors text-gray-700 dark:text-gray-300"
           >
             {t("publications.modal.publish.button.change")}
           </button>
@@ -237,7 +229,7 @@ const YouTubeThumbnailUploader = function YouTubeThumbnailUploader({
           className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-all ${
             isDragging
               ? "border-primary-500 bg-primary-50 dark:bg-primary-900/20"
-              : `${themeClasses.borderColor} ${themeClasses.bgColor} hover:border-primary-400`
+              : "border-gray-200 dark:border-neutral-700 bg-gray-50 dark:bg-neutral-800 hover:border-primary-400"
           }`}
         >
           <Upload
@@ -245,7 +237,7 @@ const YouTubeThumbnailUploader = function YouTubeThumbnailUploader({
               isDragging ? "text-primary-500" : "text-gray-400"
             }`}
           />
-          <p className={`text-sm ${themeClasses.textColor} mb-1`}>
+          <p className="text-sm text-gray-700 dark:text-gray-300 mb-1">
             {t("publications.modal.publish.dragDrop.title")}
           </p>
           <p className="text-xs text-gray-500">
