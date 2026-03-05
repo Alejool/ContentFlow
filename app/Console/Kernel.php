@@ -68,5 +68,17 @@ class Kernel extends ConsoleKernel
     $schedule->command('subscription:check-limits --notify')
       ->daily()
       ->at('10:00');
+
+    // ===== NUEVOS COMANDOS DE GESTIÓN DE SUSCRIPCIONES =====
+    
+    // Verificar y aplicar períodos de gracia expirados cada hora
+    $schedule->command('subscriptions:check-grace-periods')
+      ->hourly()
+      ->withoutOverlapping();
+
+    // Aplicar cambios de plan programados (downgrades) cada hora
+    $schedule->command('subscriptions:apply-scheduled-changes')
+      ->hourly()
+      ->withoutOverlapping();
   }
 }
