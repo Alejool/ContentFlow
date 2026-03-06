@@ -9,9 +9,11 @@ use Illuminate\Notifications\DatabaseNotification;
 use App\Observers\NotificationObserver;
 use App\Observers\UserObserver;
 use App\Observers\PublicationObserver;
+use App\Observers\MediaFileObserver;
 
 use App\Models\User;
 use App\Models\Publications\Publication;
+use App\Models\MediaFiles\MediaFile;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -61,6 +63,7 @@ class AppServiceProvider extends ServiceProvider
     DatabaseNotification::observe(NotificationObserver::class);
     User::observe(UserObserver::class);
     Publication::observe(PublicationObserver::class);
+    MediaFile::observe(MediaFileObserver::class);
 
     // Register audit event listeners
     \Illuminate\Support\Facades\Event::listen(

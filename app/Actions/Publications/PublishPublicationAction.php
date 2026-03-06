@@ -9,7 +9,6 @@ use App\Models\Social\SocialAccount;
 use App\Services\Media\MediaProcessingService;
 use App\Events\PublicationStatusUpdated;
 use Illuminate\Support\Facades\Log;
-use App\Models\Social\SocialPostLog;
 use App\Services\Publish\PlatformPublishService;
 use App\Helpers\LogHelper;
 
@@ -32,7 +31,7 @@ class PublishPublicationAction
     // Verify publication can be published
     // Note: Permission check should be done in controller before calling this action
     $hasPublishPermission = auth()->check() && auth()->user()->hasPermission('publish', $publication->workspace_id);
-    
+
     if (!$publication->canBePublished($hasPublishPermission)) {
       if ($publication->status === 'pending_review') {
         throw new \Exception(__('publications.errors.pending_review') . " Current status: {$publication->status}");
@@ -72,9 +71,14 @@ class PublishPublicationAction
 
     // Update platform settings if provided
     if (!empty($options['platform_settings'])) {
+      $settings = $options['platform_settings'];
+      if (is_string($settings)) {
+        $settings = json_decode($settings, true) ?? [];
+      }
+
       // Clean and optimize platform settings to only include relevant data
       $cleanedSettings = $this->cleanPlatformSettings(
-        $options['platform_settings'], 
+        $settings,
         $socialAccounts->pluck('platform')->toArray()
       );
       $publication->update(['platform_settings' => $cleanedSettings]);
@@ -101,17 +105,17 @@ class PublishPublicationAction
         'platform' => $acc->platform,
         'account_name' => $acc->account_name
       ])->toArray();
-      
+
       $notification = new \App\Notifications\PublicationProcessingStartedNotification($publication, $accountsData);
-      
+
       // Notify ALL workspace members (including the one who published)
       if ($publication->workspace) {
         $workspaceUsers = $publication->workspace->users()->get();
-        
+
         foreach ($workspaceUsers as $user) {
           $user->notify($notification);
         }
-        
+
         // Also notify workspace directly if it has webhooks configured (Discord/Slack)
         if ($publication->workspace->discord_webhook_url || $publication->workspace->slack_webhook_url) {
           $publication->workspace->notify($notification);
@@ -158,19 +162,19 @@ class PublishPublicationAction
 
     // Determinar prioridad basada en el tamaño del archivo
     $priority = $this->determineJobPriority($publication);
-    
+
     $job = PublishToSocialMedia::dispatch(
       $publication->id,
       $socialAccounts->pluck('id')->toArray()
     )->onQueue('publishing');
-    
+
     // Si el archivo es pequeño, darle mayor prioridad
     if ($priority === 'high') {
       Log::info('Small file detected, using high priority', [
         'publication_id' => $publication->id
       ]);
     }
-    
+
     // Notificar al usuario sobre la posición en cola si hay espera
     if ($queueSize > 0) {
       try {
@@ -190,7 +194,7 @@ class PublishPublicationAction
       }
     }
   }
-  
+
   /**
    * Estimar tiempo de espera basado en el tamaño de la cola
    */
@@ -199,17 +203,17 @@ class PublishPublicationAction
     if ($queueSize === 0) {
       return 0;
     }
-    
+
     // Estimación: cada job toma aproximadamente 8 minutos en promedio
     // Con 5 workers simultáneos, dividimos el tiempo
     $avgJobTimeMinutes = 8;
     $concurrentWorkers = 5;
-    
+
     $estimatedMinutes = ceil(($queueSize * $avgJobTimeMinutes) / $concurrentWorkers);
-    
+
     return (int) $estimatedMinutes;
   }
-  
+
   /**
    * Determinar la prioridad del job basado en el tamaño del archivo
    */
@@ -218,24 +222,24 @@ class PublishPublicationAction
     if (!$publication->media_path) {
       return 'normal';
     }
-    
+
     $filePath = storage_path('app/' . $publication->media_path);
     if (!file_exists($filePath)) {
       return 'normal';
     }
-    
+
     $fileSizeMB = filesize($filePath) / 1024 / 1024;
-    
+
     // Archivos menores a 50MB tienen prioridad alta
     if ($fileSizeMB < 50) {
       return 'high';
     }
-    
+
     // Archivos entre 50-200MB tienen prioridad normal
     if ($fileSizeMB < 200) {
       return 'normal';
     }
-    
+
     // Archivos mayores a 200MB tienen prioridad baja
     return 'low';
   }
@@ -250,7 +254,7 @@ class PublishPublicationAction
 
     foreach ($settings as $key => $value) {
       $keyLower = strtolower($key);
-      
+
       // Only include settings for platforms that are being published to
       if (in_array($keyLower, $platformsLower)) {
         // Remove unnecessary nested data and keep only essential settings
@@ -272,9 +276,18 @@ class PublishPublicationAction
   {
     // Define essential keys that should be kept
     $essentialKeys = [
-      'type', 'privacy', 'category', 'title', 'description',
-      'disable_comment', 'disable_duet', 'disable_stitch',
-      'thread', 'article', 'poll_options', 'poll_duration'
+      'type',
+      'privacy',
+      'category',
+      'title',
+      'description',
+      'disable_comment',
+      'disable_duet',
+      'disable_stitch',
+      'thread',
+      'article',
+      'poll_options',
+      'poll_duration'
     ];
 
     $filtered = [];

@@ -13,10 +13,9 @@ import { useCampaigns } from "@/Hooks/campaign/useCampaigns";
 import { usePublicationForm } from "@/Hooks/publication/usePublicationForm";
 import { useConfirm } from "@/Hooks/useConfirm";
 import { useS3Upload } from "@/Hooks/useS3Upload";
-import { useMediaStore } from "@/stores/mediaStore";
 import { useAccountsStore } from "@/stores/socialAccountsStore";
 import axios from "axios";
-import { FileText, Hash, Loader2, Save, Target, X } from "lucide-react";
+import { FileText, Hash, Save, Target } from "lucide-react";
 import { useMemo } from "react";
 import { useWatch } from "react-hook-form";
 import { toast } from "react-hot-toast";
@@ -88,13 +87,17 @@ export default function AddPublicationModal({
     try {
       const result = await uploadFile(file, tempId);
       return result;
-    } catch (err) {
-      }
+    } catch (err) {}
   };
 
   const { confirm, ConfirmDialog } = useConfirm();
 
-  const { uploadFile, uploading, progress: uploadProgress } = useS3Upload(); // Use hook
+  const {
+    uploadFile,
+    uploading,
+    progress: uploadProgress,
+    errors: uploadErrors,
+  } = useS3Upload(); // Use hook
 
   // Custom submit handler to intercept fields and upload first
   const handleFormSubmit = async (e: React.FormEvent) => {
@@ -190,52 +193,38 @@ export default function AddPublicationModal({
   const handleUploadAndSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const filesToUpload = mediaFiles.filter((m) => m.file instanceof File);
+    const filesToUpload = mediaFiles.filter(
+      (m) =>
+        m.file instanceof File &&
+        m.status !== "failed" &&
+        !uploadErrors?.[m.tempId],
+    );
 
     if (filesToUpload.length > 0) {
       // Upload all files
       try {
         // Upload files and get metadata
-        const uploadResults = await Promise.all(
-          filesToUpload.map(async (m) => ({
-            tempId: m.tempId,
-            metadata: await uploadFile(m.file!, m.tempId),
-          })),
+        // Use Promise.allSettled to avoid one failure blocking all, though here we want them all ready
+        // But for our purpose, we'll just await all and catch individual errors.
+        await Promise.all(
+          filesToUpload.map(async (m) => {
+            try {
+              await uploadFile(m.file!, m.tempId);
+            } catch (err) {
+              console.error(`Upload failed for ${m.tempId}`, err);
+              // We don't throw here, the UI already reflects the error via updateFile(tempId, {status: 'failed'})
+            }
+          }),
         );
 
-        // If any upload was cancelled (metadata is undefined), stop the process
-        if (uploadResults.some((r) => !r.metadata)) {
-          // One or more uploads cancelled, stopping submission
-          return;
-        }
-
-        // CRITICAL: Update the mediaFiles store to replace File objects with metadata
-        // The usePublicationForm hook reads from mediaFiles store, not form values
-        const updatedMediaFiles = mediaFiles.map((media) => {
-          const uploadResult = uploadResults.find(
-            (r) => r.tempId === media.tempId,
-          );
-          if (uploadResult) {
-            // Replace the File object with S3 metadata
-            return {
-              ...media,
-              file: uploadResult.metadata, // This will be detected as metadata in usePublicationForm
-            };
-          }
-          return media;
-        });
-
-        // Update the store using the proper method
-        const setMediaFiles = useMediaStore.getState().setMediaFiles;
-        setMediaFiles(updatedMediaFiles as any);
-
-        // Small delay to ensure state update propagates
-        await new Promise((resolve) => setTimeout(resolve, 100));
+        // Small delay to ensure state update propagates from the uploads
+        await new Promise((resolve) => setTimeout(resolve, 150));
 
         // Proceed with normal submit
         handleSubmit(e);
       } catch (err) {
-        // Show error
+        console.error("Critical error in handleUploadAndSubmit", err);
+        handleSubmit(e); // Proceed anyway if possible, usePublicationForm will handle missing keys
       }
     } else {
       handleSubmit(e);
@@ -337,6 +326,8 @@ export default function AddPublicationModal({
                   }}
                   lockedBy={remoteLock}
                   onUpdateFile={updateFile}
+                  uploadProgress={uploadProgress}
+                  uploadErrors={uploadErrors}
                 />
 
                 <SocialAccountsSection
@@ -474,13 +465,13 @@ export default function AddPublicationModal({
                   sizeType="lg"
                   hint={`${
                     watched.hashtags
-                      ? typeof watched.hashtags === 'string'
+                      ? typeof watched.hashtags === "string"
                         ? watched.hashtags
                             .split(" ")
                             .filter((tag: string) => tag.startsWith("#")).length
                         : Array.isArray(watched.hashtags)
-                        ? watched.hashtags.length
-                        : 0
+                          ? (watched.hashtags as any).length
+                          : 0
                       : 0
                   }/10 hashtags`}
                 />
@@ -573,14 +564,11 @@ export default function AddPublicationModal({
                   try {
                     const id = (publication as any)?.id;
                     if (id) {
-                      await axios.post(
-                        route("api.v1.publications.cancel", id),
-                      );
+                      await axios.post(route("api.v1.publications.cancel", id));
                       toast.success("Publicación cancelada");
                       handleClose();
                     }
-                  } catch (err) {
-                    }
+                  } catch (err) {}
                 }
               }}
             />

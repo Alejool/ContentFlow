@@ -15,6 +15,7 @@ use App\Notifications\SocialAccountDisconnectedNotification;
 use App\Models\Social\SocialPostLog;
 use Abraham\TwitterOAuth\TwitterOAuth;
 use Carbon\Carbon;
+use App\Services\Subscription\PlanLimitValidator;
 
 
 class SocialAccountController extends Controller
@@ -378,7 +379,7 @@ class SocialAccountController extends Controller
       }
 
       $platform = request()->is('auth/x/*') ? 'x' : 'twitter';
-      
+
       // Paso 1: Obtener tokens OAuth 2.0
       $response = Http::withBasicAuth(
         config('services.twitter.client_id'),
@@ -661,10 +662,10 @@ class SocialAccountController extends Controller
   private function saveAccount($data)
   {
     $workspaceId = Auth::user()->current_workspace_id;
-    
+
     // Ensure account_id is a string
     $data['account_id'] = (string) $data['account_id'];
-    
+
     \Log::info('SaveAccount - Processing account', [
       'platform' => $data['platform'],
       'account_id' => $data['account_id'],
@@ -715,22 +716,37 @@ class SocialAccountController extends Controller
       $existingAccount->update($accountData);
       $account = $existingAccount;
     } else {
-      // Account doesn't exist - use updateOrCreate to handle race conditions
+      // Account doesn't exist — check plan limit before creating a new connection
+      $workspace = Auth::user()->workspaces()->find($workspaceId);
+      if ($workspace) {
+        $validator = app(PlanLimitValidator::class);
+        if (!$validator->canPerformAction($workspace, 'social_accounts')) {
+          $upgradeMsg = $validator->getUpgradeMessage($workspace, 'social_accounts');
+          return $this->closeWindowWithMessage('error', [
+            'message' => $upgradeMsg['message'],
+            'action'  => $upgradeMsg['action'],
+            'limit_type' => 'social_accounts',
+          ]);
+        }
+        // Clear accounts cache after creation
+        $validator->clearCache($workspace, 'social_accounts');
+      }
+
+      // Use the unique constraint fields (platform, account_id, workspace_id) to find or create
       $accountData['platform'] = $data['platform'];
       $accountData['account_id'] = $data['account_id'];
-      
+
       \Log::info('SaveAccount - Creating new account with updateOrCreate');
-      
-      // Use the unique constraint fields (platform, account_id, workspace_id) to find or create
+
       $account = SocialAccount::updateOrCreate(
         [
-          'platform' => $data['platform'],
-          'account_id' => $data['account_id'],
+          'platform'    => $data['platform'],
+          'account_id'  => $data['account_id'],
           'workspace_id' => $workspaceId,
         ],
         $accountData
       );
-      
+
       $isNewConnection = $account->wasRecentlyCreated;
     }
 
@@ -943,7 +959,7 @@ class SocialAccountController extends Controller
 
       foreach ($pendingPosts as $post) {
         $date = null;
-        
+
         // Try to get scheduled_at first
         if ($post->scheduled_at instanceof \DateTimeInterface) {
           $date = $post->scheduled_at;

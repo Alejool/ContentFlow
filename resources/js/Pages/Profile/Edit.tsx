@@ -1,38 +1,32 @@
 import Button from "@/Components/common/Modern/Button";
 import AccountStatistics from "@/Components/profile/Partials/AccountStatistics";
 import AiConfigSection from "@/Components/profile/Partials/AiConfigSection";
-import UpdatePasswordForm from "@/Components/profile/Partials/UpdatePasswordForm";
-import UpdateProfileInformationForm from "@/Components/profile/Partials/UpdateProfileInformationForm";
 import OnboardingSection from "@/Components/profile/Partials/OnboardingSection";
 import SubscriptionSection from "@/Components/profile/Partials/SubscriptionSection";
+import UpdatePasswordForm from "@/Components/profile/Partials/UpdatePasswordForm";
+import UpdateProfileInformationForm from "@/Components/profile/Partials/UpdateProfileInformationForm";
+import UpdateThemeForm from "@/Components/profile/Partials/UpdateThemeForm";
 
 import { useUser } from "@/Hooks/useUser";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { useUserStore } from "@/stores/userStore";
 import { Head, usePage } from "@inertiajs/react";
-import {
-  BrainCircuit,
-  Info,
-  Lock,
-  Save,
-  User,
-  RotateCcw,
-  CreditCard,
-} from "lucide-react";
+import { BrainCircuit, CreditCard, Info, Lock, Save, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 interface EditProps {
   mustVerifyEmail: boolean;
   status?: string;
-  subscription?: {
+  subscription: {
     plan_name: string;
     plan_id: string;
     status: string;
-    current_period_end?: string;
-    trial_ends_at?: string;
-    is_trial?: boolean;
-  };
+    current_period_end: string;
+    trial_ends_at: string | null;
+    is_trial: boolean;
+    features: Record<string, any>;
+  } | null;
   usage?: {
     publications_used: number;
     publications_limit: number;
@@ -40,10 +34,21 @@ interface EditProps {
     storage_limit: number;
     ai_requests_used: number;
     ai_requests_limit: number;
+    social_accounts_used?: number;
+    social_accounts_limit?: number;
+    team_members_used?: number;
+    team_members_limit?: number;
+    external_integrations_used?: number;
+    external_integrations_limit?: number;
   };
 }
 
-export default function Edit({ mustVerifyEmail, status, subscription, usage }: EditProps) {
+export default function Edit({
+  mustVerifyEmail,
+  status,
+  subscription,
+  usage,
+}: EditProps) {
   const { t } = useTranslation();
   const user = usePage<any>().props.auth.user;
   const { auth } = usePage<any>().props;
@@ -53,9 +58,19 @@ export default function Edit({ mustVerifyEmail, status, subscription, usage }: E
 
   // Determinar si el usuario es owner del workspace actual
   const currentWorkspace = auth?.current_workspace;
-  const isOwner = currentWorkspace && 
-    (Number(currentWorkspace.created_by) === Number(user.id) || 
-     currentWorkspace.user_role_slug === 'owner');
+  const isOwner =
+    currentWorkspace &&
+    (Number(currentWorkspace.created_by) === Number(user.id) ||
+      currentWorkspace.user_role_slug === "owner");
+
+  // Debugging ownership
+  console.log("Edit Profile Debug:", {
+    isOwner,
+    currentWorkspaceId: currentWorkspace?.id,
+    user_id: user.id,
+    created_by: currentWorkspace?.created_by,
+    role: currentWorkspace?.user_role_slug,
+  });
 
   useEffect(() => {
     if (user) {
@@ -81,7 +96,7 @@ export default function Edit({ mustVerifyEmail, status, subscription, usage }: E
       id: "ai",
       name: t("profile.tabs.ai") || "Inteligencia Artificial",
       icon: BrainCircuit,
-    }
+    },
   ];
 
   return (
@@ -152,6 +167,10 @@ export default function Edit({ mustVerifyEmail, status, subscription, usage }: E
                     user={user}
                     status={status}
                   />
+
+                  <div className="mt-10 pt-10 border-t border-gray-100 dark:border-neutral-800/50">
+                    <UpdateThemeForm user={user} workspace={currentWorkspace} />
+                  </div>
                 </div>
               )}
 
@@ -163,7 +182,11 @@ export default function Edit({ mustVerifyEmail, status, subscription, usage }: E
 
               {activeTab === "subscription" && (
                 <div>
-                  <SubscriptionSection subscription={subscription} usage={usage} />
+                  <SubscriptionSection
+                    subscription={subscription}
+                    usage={usage}
+                    currentWorkspace={currentWorkspace}
+                  />
                 </div>
               )}
 

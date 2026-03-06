@@ -1,7 +1,7 @@
 import Logo from "@/../assets/logo-with-name.png";
-import { LanguageSwitcher } from "@/Components/common/LanguageSwitcher";
 import ResponsiveNavLink from "@/Components/common/ui/ResponsiveNavLink";
 import { useTheme } from "@/Hooks/useTheme";
+import { usePage } from "@inertiajs/react";
 import {
   BarChart3,
   X as CloseIcon,
@@ -47,8 +47,11 @@ export default function MobileNavbar({
 }: MobileNavbarProps) {
   const { t } = useTranslation();
   const { actualTheme } = useTheme();
+  const { auth } = usePage().props as any;
 
   const isProfileActive = !!route().current("profile.edit");
+
+  const whiteLabelLogo = auth?.current_workspace?.white_label_logo_url;
 
   return (
     <nav
@@ -85,7 +88,15 @@ export default function MobileNavbar({
           </div>
 
           <div className="flex-1 flex justify-center">
-            <img src={Logo} alt="Logo" className="h-20 w-auto object-contain" />
+            <img
+              src={whiteLabelLogo || Logo}
+              alt="Logo"
+              className={
+                whiteLabelLogo
+                  ? "h-12 w-auto object-contain"
+                  : "h-20 w-auto object-contain"
+              }
+            />
           </div>
 
           <div className="flex items-center gap-2">

@@ -12,6 +12,8 @@ use App\Http\Controllers\Content\ContentController;
 use App\Http\Controllers\Social\SocialAccountController;
 use App\Http\Controllers\Locale\LocaleController;
 use App\Http\Controllers\Workspace\WorkspaceController;
+use App\Http\Controllers\Workspace\ApiTokenController;
+use App\Http\Controllers\Workspace\InvitationController;
 use App\Http\Controllers\Calendar\CalendarViewController;
 use App\Http\Controllers\Api\ExternalCalendarController;
 
@@ -118,7 +120,7 @@ Route::prefix('auth')->name('auth.')->group(function () {
   Route::get('/x/callback-v1', [SocialAccountController::class, 'handleTwitterV1Callback'])->name('x.callback.v1');
   Route::get('/youtube/callback', [SocialAccountController::class, 'handleYoutubeCallback'])->name('youtube.callback');
   Route::get('/tiktok/callback', [SocialAccountController::class, 'handleTiktokCallback'])->name('tiktok.callback');
-  
+
   // External calendar callbacks
   Route::get('/google-calendar/callback', [ExternalCalendarController::class, 'handleGoogleCalendarCallback'])->name('google-calendar.callback');
   Route::get('/outlook-calendar/callback', [ExternalCalendarController::class, 'handleOutlookCalendarCallback'])->name('outlook-calendar.callback');
@@ -149,9 +151,10 @@ Route::middleware('auth')->group(function () {
 
   // Rutas de suscripción (autenticadas)
   Route::prefix('subscription')->name('subscription.')->group(function () {
-    Route::get('/usage', [UsageMetricsController::class, 'index'])->name('usage');
+    Route::get('/usage', fn() => redirect()->route('profile.edit'))->name('usage');
     Route::get('/billing', [UsageMetricsController::class, 'billing'])->name('billing');
     Route::post('/billing-portal', [UsageMetricsController::class, 'billingPortal'])->name('billing-portal');
+    Route::get('/billing/export', [UsageMetricsController::class, 'exportInvoices'])->name('billing.export');
     Route::get('/success', [PricingController::class, 'success'])->name('success');
     Route::get('/cancel', [PricingController::class, 'cancel'])->name('cancel');
   });
@@ -165,6 +168,12 @@ Route::middleware('auth')->group(function () {
     Route::get('{workspace}', [WorkspaceController::class, 'show'])->name('show');
     Route::put('{workspace}', [WorkspaceController::class, 'update'])->name('update');
     Route::delete('{workspace}', [WorkspaceController::class, 'destroy'])->name('destroy');
+
+    // Enterprise Only Routes
+    Route::post('{workspace}/white-label', [WorkspaceController::class, 'updateWhiteLabel'])->name('white-label.update');
+    Route::get('{workspace}/api-tokens', [ApiTokenController::class, 'index'])->name('api-tokens.index');
+    Route::post('{workspace}/api-tokens', [ApiTokenController::class, 'store'])->name('api-tokens.store');
+    Route::delete('{workspace}/api-tokens/{token}', [ApiTokenController::class, 'destroy'])->name('api-tokens.destroy');
   });
 
   Route::prefix('content')->name('content.')->group(function () {

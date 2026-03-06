@@ -7,12 +7,10 @@ use App\Services\SocialPlatforms\InstagramService;
 use App\Services\SocialPlatforms\FacebookService;
 use App\Services\SocialPlatforms\TikTokService;
 use App\Services\SocialPlatforms\TwitterService;
-use App\Notifications\VideoUploadedNotification;
 use App\Notifications\VideoDeletedNotification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Artisan;
 use App\Helpers\LogHelper;
 
 
@@ -27,8 +25,6 @@ use App\Events\PublicationStatusUpdated;
 use App\Jobs\VerifyYouTubeVideoStatus;
 
 use App\DTOs\SocialPostDTO;
-
-use App\Notifications\PublicationResultNotification;
 
 
 class PlatformPublishService
@@ -138,6 +134,11 @@ class PlatformPublishService
         ], $result->rawData);
 
         $postLog = $this->logService->markAsPublished($postLog, $response);
+
+        // Increment usage per post
+        if ($publication->workspace) {
+          $publication->workspace->incrementUsage('publications_per_month');
+        }
 
         // YouTube Specific background tasks
         if ($socialAccount->platform === 'youtube' && $result->postId) {
@@ -253,7 +254,7 @@ class PlatformPublishService
         'playlist_name' => $campaignGroup->name,
         'status' => 'pending',
       ]);
-      
+
       ProcessYouTubePlaylistItem::dispatch($queueItem)->delay(now()->addMinutes(2));
     } catch (\Exception $e) {
       Log::warning('Failed to queue playlist operation', ['video_id' => $uploadedPostId, 'error' => $e->getMessage()]);
@@ -286,7 +287,7 @@ class PlatformPublishService
         ->where('social_account_id', $socialAccount->id)
         ->where('status', 'published')
         ->first();
-      
+
       if ($existingSuccessfulLog) {
         LogHelper::publicationInfo('Account already published successfully, skipping', [
           'platform' => $socialAccount->platform,
@@ -294,7 +295,7 @@ class PlatformPublishService
           'account_name' => $socialAccount->account_name,
           'log_id' => $existingSuccessfulLog->id
         ]);
-        
+
         $alreadyPublishedAccountIds[] = $socialAccount->id;
         $platformResults[$socialAccount->platform . '_' . $socialAccount->id] = [
           'success' => true,
@@ -307,12 +308,12 @@ class PlatformPublishService
         $allLogs[] = $existingSuccessfulLog;
       }
     }
-    
+
     // Filter out already published accounts (by account ID, not platform)
-    $socialAccounts = $socialAccounts->reject(function($account) use ($alreadyPublishedAccountIds) {
+    $socialAccounts = $socialAccounts->reject(function ($account) use ($alreadyPublishedAccountIds) {
       return in_array($account->id, $alreadyPublishedAccountIds);
     });
-    
+
     if ($socialAccounts->isEmpty()) {
       Log::info('All platforms already published, nothing to do');
       return [
@@ -604,7 +605,7 @@ class PlatformPublishService
     if (empty($socialAccount->access_token)) {
       throw new \Exception(
         "Access token is missing or invalid for {$socialAccount->platform} account (ID: {$socialAccount->id}). " .
-        "Please reconnect the account."
+          "Please reconnect the account."
       );
     }
 

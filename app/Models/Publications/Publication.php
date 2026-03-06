@@ -24,6 +24,8 @@ use App\Models\Publications\PublicationComment;
 use App\Models\Calendar\ExternalCalendarEvent;
 
 use App\Traits\HandlesUtcDates;
+use App\Events\Publications\PublicationCreated;
+use App\Events\Publications\PublicationDeleted;
 
 class Publication extends Model
 {
@@ -37,6 +39,11 @@ class Publication extends Model
     'approved_at',
     'published_at',
     'rejected_at',
+  ];
+
+  protected $dispatchesEvents = [
+    'created' => PublicationCreated::class,
+    'deleted' => PublicationDeleted::class,
   ];
 
   protected static function boot()

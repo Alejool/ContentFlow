@@ -1,16 +1,29 @@
+import enFlag from "@/../assets/Icons/Flags/en.svg";
+import esFlag from "@/../assets/Icons/Flags/es.svg";
 import { Avatar } from "@/Components/common/Avatar";
 import Dropdown from "@/Components/common/ui/Dropdown";
-import { useTheme } from "@/Hooks/useTheme";
 import { useSubscriptionUsage } from "@/Hooks/useSubscriptionUsage";
+import { useTheme } from "@/Hooks/useTheme";
+import { cssPropertiesManager } from "@/Utils/CSSCustomPropertiesManager";
+import { transitionTheme } from "@/Utils/themeTransition";
+import { Link, usePage } from "@inertiajs/react";
 import axios from "axios";
-import { Check, ChevronDown, Globe, LogOut, Moon, Palette, Sun, User, Zap, HardDrive, Users, FileText } from "lucide-react";
+import {
+  Check,
+  ChevronDown,
+  FileText,
+  Globe,
+  HardDrive,
+  LogOut,
+  Moon,
+  Palette,
+  Sun,
+  User,
+  Zap,
+} from "lucide-react";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
-import { transitionTheme } from "@/Utils/themeTransition";
-import enFlag from "@/../assets/Icons/Flags/en.svg";
-import esFlag from "@/../assets/Icons/Flags/es.svg";
-import { usePage, Link } from "@inertiajs/react";
 
 interface ProfileDropdownProps {
   user: {
@@ -36,9 +49,12 @@ export default function ProfileDropdown({
 
   // Determinar si el usuario es owner del workspace actual
   const currentWorkspace = auth?.current_workspace;
-  const isOwner = currentWorkspace && 
-    (Number(currentWorkspace.created_by) === Number(user.id) || 
-     currentWorkspace.user_role_slug === 'owner');
+  const isOwner =
+    currentWorkspace &&
+    (Number(currentWorkspace.created_by) === Number(user.id) ||
+      currentWorkspace.user_role_slug === "owner");
+
+  const brandingColor = currentWorkspace?.white_label_primary_color;
 
   const colors = [
     { name: "orange", value: "orange", bg: "bg-warning-500" },
@@ -46,6 +62,15 @@ export default function ProfileDropdown({
     { name: "purple", value: "purple", bg: "bg-purple-500" },
     { name: "pink", value: "pink", bg: "bg-pink-500" },
   ];
+
+  if (brandingColor && brandingColor.startsWith("#")) {
+    colors.unshift({
+      name: "custom",
+      value: brandingColor,
+      bg: "",
+      isCustom: true,
+    } as any);
+  }
 
   const languages = [
     { code: "en", name: "English", flag: enFlag },
@@ -55,19 +80,22 @@ export default function ProfileDropdown({
   const getBaseLang = (lang: string) => lang.split("-")[0];
   const currentLangCode = getBaseLang(i18n.resolvedLanguage || i18n.language);
 
-  const handleModeChange = (newTheme: "light" | "dark" | "system", e: React.MouseEvent) => {
-    transitionTheme(() => setTheme(newTheme), e);
+  const handleModeChange = (
+    newTheme: "light" | "dark" | "system",
+    e: React.MouseEvent,
+  ) => {
+    transitionTheme(() => setTheme(newTheme), { event: e });
   };
 
   const handleColorChange = async (color: string) => {
     setCurrentTheme(color);
-    document.documentElement.setAttribute("data-theme-color", color);
+    cssPropertiesManager.applyPrimaryColor(color);
 
     try {
       await axios.patch(route("api.v1.profile.theme.update"), {
         theme_color: color,
       });
-      // Toast de éxito eliminado - el cambio de color es inmediato y visible
+      // La persistencia se maneja en el backend, la UI ya se actualizó visualmente
     } catch (error) {
       toast.error(t("common.error") || "Error al actualizar el tema");
     }
@@ -97,12 +125,12 @@ export default function ProfileDropdown({
   };
 
   const formatBytes = (bytes: number, decimals = 2) => {
-    if (bytes === 0) return '0 Bytes';
+    if (bytes === 0) return "0 Bytes";
     const k = 1024;
     const dm = decimals < 0 ? 0 : decimals;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+    const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
   };
 
   return (
@@ -169,29 +197,38 @@ export default function ProfileDropdown({
               </div>
             </div>
 
-        <div className="px-5 pt-3">
-          <div className="flex items-center justify-between gap-2 p-1">
-            {colors.map((color) => (
-              <button
-                key={color.value}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleColorChange(color.value);
-                }}
-                className={`group relative w-6 h-6 rounded-full flex items-center justify-center transition-all ${
-                  currentTheme === color.value
-                    ? "ring-2 ring-offset-2 ring-primary-500 dark:ring-offset-neutral-900 scale-110"
-                    : "hover:scale-110 opacity-70 hover:opacity-100"
-                } ${color.bg}`}
-                title={t(`colors.${color.name}`) || color.name}
-              >
-                {currentTheme === color.value && (
-                  <Check className="w-3 h-3 text-white" />
-                )}
-              </button>
-            ))}
-          </div>
-        </div>
+            <div className="px-5 pt-3">
+              <div className="flex items-center justify-between gap-2 p-1">
+                {colors.map((color) => (
+                  <button
+                    key={color.value}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleColorChange(color.value);
+                    }}
+                    className={`group relative w-6 h-6 rounded-full flex items-center justify-center transition-all ${
+                      currentTheme === color.value
+                        ? "ring-2 ring-offset-2 ring-primary-500 dark:ring-offset-neutral-900 scale-110"
+                        : "hover:scale-110 opacity-70 hover:opacity-100"
+                    } ${color.bg}`}
+                    style={
+                      (color as any).isCustom
+                        ? { backgroundColor: color.value }
+                        : {}
+                    }
+                    title={
+                      (color as any).isCustom
+                        ? t("workspace.white_label.title") || "Marca Blanca"
+                        : t(`colors.${color.name}`) || color.name
+                    }
+                  >
+                    {currentTheme === color.value && (
+                      <Check className="w-3 h-3 text-white" />
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 
@@ -209,7 +246,7 @@ export default function ProfileDropdown({
                 {/* Botón de actualizar solo visible para owners */}
                 {isOwner && (
                   <Link
-                    href={route('pricing')}
+                    href={route("pricing")}
                     className="text-xs font-medium text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors"
                   >
                     {t("subscription.usage.upgradePlan", "Actualizar")}
@@ -223,22 +260,29 @@ export default function ProfileDropdown({
                   <div className="flex items-center justify-between text-xs">
                     <div className="flex items-center gap-1.5 text-gray-700 dark:text-gray-300">
                       <FileText className="w-3 h-3" />
-                      <span>{t("subscription.usage.publications", "Publicaciones")}</span>
+                      <span>
+                        {t("subscription.usage.publications", "Publicaciones")}
+                      </span>
                     </div>
                     <span className="font-semibold text-gray-900 dark:text-white">
-                      {usage.publications.used} / {usage.publications.limit === -1 ? '∞' : usage.publications.limit}
+                      {usage.publications.used} /{" "}
+                      {usage.publications.limit === -1
+                        ? "∞"
+                        : usage.publications.limit}
                     </span>
                   </div>
                   <div className="h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                     <div
                       className={`h-full rounded-full transition-all ${
                         usage.publications.percentage >= 90
-                          ? 'bg-red-500'
+                          ? "bg-red-500"
                           : usage.publications.percentage >= 70
-                          ? 'bg-yellow-500'
-                          : 'bg-primary-500'
+                            ? "bg-yellow-500"
+                            : "bg-primary-500"
                       }`}
-                      style={{ width: `${Math.min(usage.publications.percentage, 100)}%` }}
+                      style={{
+                        width: `${Math.min(usage.publications.percentage, 100)}%`,
+                      }}
                     />
                   </div>
                 </div>
@@ -248,22 +292,27 @@ export default function ProfileDropdown({
                   <div className="flex items-center justify-between text-xs">
                     <div className="flex items-center gap-1.5 text-gray-700 dark:text-gray-300">
                       <HardDrive className="w-3 h-3" />
-                      <span>{t("subscription.usage.storage", "Almacenamiento")}</span>
+                      <span>
+                        {t("subscription.usage.storage", "Almacenamiento")}
+                      </span>
                     </div>
                     <span className="font-semibold text-gray-900 dark:text-white">
-                      {formatBytes(usage.storage.used_bytes)} / {usage.storage.limit_gb} GB
+                      {formatBytes(usage.storage.used_bytes)} /{" "}
+                      {usage.storage.limit_gb} GB
                     </span>
                   </div>
                   <div className="h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                     <div
                       className={`h-full rounded-full transition-all ${
                         usage.storage.percentage >= 90
-                          ? 'bg-red-500'
+                          ? "bg-red-500"
                           : usage.storage.percentage >= 70
-                          ? 'bg-yellow-500'
-                          : 'bg-primary-500'
+                            ? "bg-yellow-500"
+                            : "bg-primary-500"
                       }`}
-                      style={{ width: `${Math.min(usage.storage.percentage, 100)}%` }}
+                      style={{
+                        width: `${Math.min(usage.storage.percentage, 100)}%`,
+                      }}
                     />
                   </div>
                 </div>
@@ -272,7 +321,10 @@ export default function ProfileDropdown({
               {usage.limits_reached && (
                 <div className="mt-2 pt-2 border-t border-primary-200 dark:border-primary-800/30">
                   <p className="text-xs text-red-600 dark:text-red-400 font-medium">
-                    {t("subscription.limitReached", "Has alcanzado el límite de tu plan")}
+                    {t(
+                      "subscription.limitReached",
+                      "Has alcanzado el límite de tu plan",
+                    )}
                   </p>
                 </div>
               )}
@@ -370,8 +422,6 @@ export default function ProfileDropdown({
             ))}
           </div>
         </div>
-
-
 
         <div className="px-2 space-y-1">
           <Dropdown.Link

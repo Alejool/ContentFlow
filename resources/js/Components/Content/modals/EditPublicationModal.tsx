@@ -1,6 +1,7 @@
 import PlatformSettingsModal from "@/Components/ConfigSocialMedia/PlatformSettingsModal";
 import { CommentsSection } from "@/Components/Content/Publication/comments/CommentsSection";
 import ApprovalHistoryCompacto from "@/Components/Content/Publication/common/ApprovalHistoryCompacto";
+import PublicationStatusTimeline from "@/Components/Content/Publication/common/PublicationStatusTimeline";
 import TimelineCompacto from "@/Components/Content/Publication/common/TimelineCompacto";
 import SocialAccountsSection from "@/Components/Content/Publication/common/add/SocialAccountsSection";
 import ContentSection from "@/Components/Content/Publication/common/edit/ContentSection";
@@ -11,8 +12,8 @@ import ModalFooter from "@/Components/Content/modals/common/ModalFooter";
 import ModalHeader from "@/Components/Content/modals/common/ModalHeader";
 import ScheduleSection from "@/Components/Content/modals/common/ScheduleSection";
 import YouTubeThumbnailUploader from "@/Components/common/ui/YouTubeThumbnailUploader";
-import { useModalFocusTrap } from "@/Hooks/useModalFocusTrap";
 import { usePublicationForm } from "@/Hooks/publication/usePublicationForm";
+import { useModalFocusTrap } from "@/Hooks/useModalFocusTrap";
 import { usePublicationLock } from "@/Hooks/usePublicationLock";
 import { useCampaignStore } from "@/stores/campaignStore";
 import { usePublicationStore } from "@/stores/publicationStore";
@@ -20,13 +21,12 @@ import { useAccountsStore } from "@/stores/socialAccountsStore";
 import { useUploadQueue } from "@/stores/uploadQueueStore";
 import { Publication } from "@/types/Publication";
 import { usePage } from "@inertiajs/react";
+import axios from "axios";
 import { AlertCircle, Lock, Save } from "lucide-react";
 import { memo, useEffect, useMemo, useState } from "react";
 import { useWatch } from "react-hook-form";
-import { Trans } from "react-i18next";
-import PublicationStatusTimeline from "@/Components/Content/Publication/common/PublicationStatusTimeline";
-import axios from "axios";
 import toast from "react-hot-toast";
+import { Trans } from "react-i18next";
 
 const parseUserAgent = (userAgent?: string): string => {
   if (!userAgent) return "Unknown Device";
@@ -152,34 +152,40 @@ const EditPublicationModal = ({
         linkUploadToPublication(tempId, publication.id, publication.title);
       }
       return result;
-    } catch (err) {
-      }
+    } catch (err) {}
   };
 
   // Delete reels when video is removed
-  const handleRemoveMediaWithReels = async (index: number) => {
-    const mediaToRemove = mediaFiles[index];
-    const isVideo = mediaToRemove.type === 'video';
-    
+  // Delete reels when video is removed
+  const handleRemoveMediaWithReels = async (tempId: string) => {
+    const mediaToRemove = mediaFiles.find((m) => m.tempId === tempId);
+    if (!mediaToRemove) return;
+
+    const isVideo = mediaToRemove.type === "video";
+
     if (isVideo && publication?.id && mediaToRemove.id) {
       // Find and delete associated reels
-      const reelsToDelete = publication.media_files?.filter(
-        m => m.metadata?.original_media_id === mediaToRemove.id
-      ) || [];
-      
+      const reelsToDelete =
+        publication.media_files?.filter(
+          (m) => m.metadata?.original_media_id === mediaToRemove.id,
+        ) || [];
+
       if (reelsToDelete.length > 0) {
         try {
           await Promise.all(
-            reelsToDelete.map(reel => axios.delete(`/api/v1/media/${reel.id}`))
+            reelsToDelete.map((reel) =>
+              axios.delete(`/api/v1/media/${reel.id}`),
+            ),
           );
-          toast.success(t('reels.messages.deletedWithVideo'));
+          toast.success(t("reels.messages.deletedWithVideo"));
         } catch (error) {
-          }
+          console.error("Failed to delete associated reels", error);
+        }
       }
     }
-    
+
     // Call original remove handler
-    handleRemoveMedia(index);
+    handleRemoveMedia(tempId);
   };
 
   const { register } = form;
@@ -312,10 +318,14 @@ const EditPublicationModal = ({
   // - Media section lock: if another user has lock OR media is processing OR pending review
   const isPendingReview = publication?.status === "pending_review";
   const isMediaSectionDisabled =
-    isLockedByOtherEditor || isAnyMediaProcessing || !canManage || isPendingReview;
+    isLockedByOtherEditor ||
+    isAnyMediaProcessing ||
+    !canManage ||
+    isPendingReview;
 
   // - Content/Settings section lock: ONLY if another user has lock OR pending review
-  const isContentSectionDisabled = isLockedByOtherEditor || !canManage || isPendingReview;
+  const isContentSectionDisabled =
+    isLockedByOtherEditor || !canManage || isPendingReview;
 
   const canPublish = auth.current_workspace?.permissions?.includes("publish");
 
@@ -335,7 +345,7 @@ const EditPublicationModal = ({
     let text = watched.description || "";
     if (watched.hashtags) {
       const formattedHashtags = Array.isArray(watched.hashtags)
-        ? watched.hashtags.join(' ')
+        ? watched.hashtags.join(" ")
         : watched.hashtags;
       text += `\n\n${formattedHashtags}`;
     }
@@ -351,7 +361,7 @@ const EditPublicationModal = ({
         onClick={handleClose}
       />
 
-      <div 
+      <div
         ref={modalRef as React.RefObject<HTMLDivElement>}
         className="relative w-full max-w-5xl bg-white backdrop-blur-2xl dark:bg-neutral-900/90 rounded-lg shadow-2xl flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-300"
       >
@@ -414,58 +424,66 @@ const EditPublicationModal = ({
               <div className="space-y-6">
                 {/* Media Section */}
                 <div>
-                  {!isLockedByMe && isLockedByOther && !hasPublishedPlatform && allowConfiguration && publication?.status !== "approved" && (
-                    <div className="p-4 mb-6 rounded-lg border border-amber-500 bg-amber-50 dark:bg-amber-900/20 flex gap-3 text-sm text-amber-700 dark:text-amber-300 animate-in shake duration-500">
-                      <AlertCircle className="w-5 h-5 shrink-0 text-amber-500" />
-                      <div>
-                        <p className="font-semibold mb-1">
-                          {lockInfo?.locked_by === "session"
-                            ? t("publications.modal.edit.lockedBySession") ||
-                              "Sesión Duplicada"
-                            : t("publications.modal.edit.lockedByOther") ||
-                              "En cola de espera"}
-                        </p>
-                        <div className="opacity-80">
-                          {lockInfo?.locked_by === "session" ? (
-                            <>
-                              <Trans
-                                i18nKey="publications.modal.edit.locking.sessionMessage"
-                                values={{
-                                  browser: parseUserAgent(lockInfo?.user_agent),
-                                }}
-                                components={{
-                                  1: <span className="font-medium" />,
-                                }}
-                              />
-                              {lockInfo?.ip_address && (
-                                <span className="text-xs opacity-70">
-                                  {" "}
-                                  ({maskIpAddress(lockInfo.ip_address)})
-                                </span>
-                              )}
-                            </>
-                          ) : (
-                            <>
-                              <Trans
-                                i18nKey="publications.modal.edit.locking.userMessage"
-                                values={{
-                                  user: lockInfo?.user_name,
-                                  browser: parseUserAgent(lockInfo?.user_agent),
-                                }}
-                                components={{
-                                  1: <span className="font-medium" />,
-                                }}
-                              />
-                              <p className="mt-1 font-medium text-amber-600 dark:text-amber-400">
-                                Tomarás el control automáticamente cuando se
-                                libere.
-                              </p>
-                            </>
-                          )}
+                  {!isLockedByMe &&
+                    isLockedByOther &&
+                    !hasPublishedPlatform &&
+                    allowConfiguration &&
+                    publication?.status !== "approved" && (
+                      <div className="p-4 mb-6 rounded-lg border border-amber-500 bg-amber-50 dark:bg-amber-900/20 flex gap-3 text-sm text-amber-700 dark:text-amber-300 animate-in shake duration-500">
+                        <AlertCircle className="w-5 h-5 shrink-0 text-amber-500" />
+                        <div>
+                          <p className="font-semibold mb-1">
+                            {lockInfo?.locked_by === "session"
+                              ? t("publications.modal.edit.lockedBySession") ||
+                                "Sesión Duplicada"
+                              : t("publications.modal.edit.lockedByOther") ||
+                                "En cola de espera"}
+                          </p>
+                          <div className="opacity-80">
+                            {lockInfo?.locked_by === "session" ? (
+                              <>
+                                <Trans
+                                  i18nKey="publications.modal.edit.locking.sessionMessage"
+                                  values={{
+                                    browser: parseUserAgent(
+                                      lockInfo?.user_agent,
+                                    ),
+                                  }}
+                                  components={{
+                                    1: <span className="font-medium" />,
+                                  }}
+                                />
+                                {lockInfo?.ip_address && (
+                                  <span className="text-xs opacity-70">
+                                    {" "}
+                                    ({maskIpAddress(lockInfo.ip_address)})
+                                  </span>
+                                )}
+                              </>
+                            ) : (
+                              <>
+                                <Trans
+                                  i18nKey="publications.modal.edit.locking.userMessage"
+                                  values={{
+                                    user: lockInfo?.user_name,
+                                    browser: parseUserAgent(
+                                      lockInfo?.user_agent,
+                                    ),
+                                  }}
+                                  components={{
+                                    1: <span className="font-medium" />,
+                                  }}
+                                />
+                                <p className="mt-1 font-medium text-amber-600 dark:text-amber-400">
+                                  Tomarás el control automáticamente cuando se
+                                  libere.
+                                </p>
+                              </>
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  )}
+                    )}
 
                   {isLockedByMe && activeUsers.length > 1 && (
                     <div className="p-3 mb-6 rounded-lg border border-blue-500 bg-blue-50 dark:bg-blue-900/20 flex gap-2 text-xs text-blue-700 dark:text-blue-300">
@@ -487,28 +505,33 @@ const EditPublicationModal = ({
                             "Publicación en Revisión"}
                         </p>
                         <p className="opacity-90">
-                          {t("publications.modal.edit.pendingReviewWarningHint") ||
+                          {t(
+                            "publications.modal.edit.pendingReviewWarningHint",
+                          ) ||
                             "Esta publicación está esperando aprobación. Debes aprobarla o rechazarla antes de poder editarla. Si la rechazas, el creador podrá hacer cambios y volver a solicitar aprobación."}
                         </p>
                       </div>
                     </div>
                   )}
 
-                  {publication?.status === "approved" && !hasPublishedPlatform && (
-                    <div className="p-4 mb-6 rounded-lg border border-blue-500 bg-blue-50/50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 flex gap-3 text-sm animate-in fade-in slide-in-from-top-4">
-                      <AlertCircle className="w-5 h-5 shrink-0 text-blue-500" />
-                      <div>
-                        <p className="font-semibold mb-1">
-                          {t("publications.modal.edit.approvedEditWarning") ||
-                            "Publicación Aprobada"}
-                        </p>
-                        <p className="opacity-80">
-                          {t("publications.modal.edit.approvedEditWarningHint") ||
-                            "Esta publicación ya fue aprobada. Si realizas cambios, volverá a estado 'Pendiente' y requerirá una nueva aprobación."}
-                        </p>
+                  {publication?.status === "approved" &&
+                    !hasPublishedPlatform && (
+                      <div className="p-4 mb-6 rounded-lg border border-blue-500 bg-blue-50/50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 flex gap-3 text-sm animate-in fade-in slide-in-from-top-4">
+                        <AlertCircle className="w-5 h-5 shrink-0 text-blue-500" />
+                        <div>
+                          <p className="font-semibold mb-1">
+                            {t("publications.modal.edit.approvedEditWarning") ||
+                              "Publicación Aprobada"}
+                          </p>
+                          <p className="opacity-80">
+                            {t(
+                              "publications.modal.edit.approvedEditWarningHint",
+                            ) ||
+                              "Esta publicación ya fue aprobada. Si realizas cambios, volverá a estado 'Pendiente' y requerirá una nueva aprobación."}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
 
                   {hasPublishedPlatform && (
                     <div className="p-4 mb-6 rounded-lg border border-blue-500 bg-blue-50/50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 flex gap-3 text-sm animate-in fade-in slide-in-from-top-4">
@@ -593,7 +616,10 @@ const EditPublicationModal = ({
                             ? { url: video.thumbnailUrl, id: video.id || 0 }
                             : null;
                         })()}
-                        onThumbnailChange={(videoId: number, file: File | null) => {
+                        onThumbnailChange={(
+                          videoId: number,
+                          file: File | null,
+                        ) => {
                           const video = mediaFiles.find(
                             (m) => m.type === "video",
                           );
@@ -709,12 +735,19 @@ const EditPublicationModal = ({
                     }}
                     title={watched.title}
                     publishedAt={publication?.published_at}
-                    publishedLinks={publication?.social_post_logs?.reduce((acc: Record<string, string>, log: any) => {
-                      if (log.status === 'published' && log.post_url && log.platform) {
-                        acc[log.platform.toLowerCase()] = log.post_url;
-                      }
-                      return acc;
-                    }, {})}
+                    publishedLinks={publication?.social_post_logs?.reduce(
+                      (acc: Record<string, string>, log: any) => {
+                        if (
+                          log.status === "published" &&
+                          log.post_url &&
+                          log.platform
+                        ) {
+                          acc[log.platform.toLowerCase()] = log.post_url;
+                        }
+                        return acc;
+                      },
+                      {},
+                    )}
                   />
                 </div>
 
@@ -782,18 +815,30 @@ const EditPublicationModal = ({
           settings={
             activePlatformSettings?.toLowerCase() === "all"
               ? {}
-              : platformSettings[activePlatformSettings?.toLowerCase() || ""] || {}
+              : platformSettings[activePlatformSettings?.toLowerCase() || ""] ||
+                {}
           }
           onSettingsChange={(newSettings) => {
-            if (activePlatformSettings && activePlatformSettings.toLowerCase() !== "all") {
+            if (
+              activePlatformSettings &&
+              activePlatformSettings.toLowerCase() !== "all"
+            ) {
               setPlatformSettings((prev) => ({
                 ...prev,
                 [activePlatformSettings.toLowerCase()]: newSettings,
               }));
             }
           }}
-          allPlatforms={activePlatformSettings?.toLowerCase() === "all" ? selectedPlatforms : []}
-          allSettings={activePlatformSettings?.toLowerCase() === "all" ? allPlatformSettings : {}}
+          allPlatforms={
+            activePlatformSettings?.toLowerCase() === "all"
+              ? selectedPlatforms
+              : []
+          }
+          allSettings={
+            activePlatformSettings?.toLowerCase() === "all"
+              ? allPlatformSettings
+              : {}
+          }
           onAllSettingsChange={(platform, newSettings) => {
             setPlatformSettings((prev) => ({
               ...prev,
@@ -802,7 +847,9 @@ const EditPublicationModal = ({
           }}
           videoMetadata={
             mediaFiles.find((m) => m.type === "video")
-              ? videoMetadata[mediaFiles.find((m) => m.type === "video")!.tempId]
+              ? videoMetadata[
+                  mediaFiles.find((m) => m.type === "video")!.tempId
+                ]
               : undefined
           }
         />

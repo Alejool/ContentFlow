@@ -23,7 +23,15 @@ export default function ActiveWorkspace() {
     >
       <span className="opacity-70">{t("workspace.active_context")}:</span>
       <div className="flex items-center gap-1.5">
-        <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse flex-shrink-0" />
+        {auth?.current_workspace?.white_label_logo_url ? (
+          <img
+            src={auth.current_workspace.white_label_logo_url}
+            alt=""
+            className="h-4 w-4 object-contain"
+          />
+        ) : (
+          <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse flex-shrink-0" />
+        )}
         <span className="truncate max-w-[200px] md:max-w-none">
           {auth?.current_workspace?.name || "..."}
         </span>

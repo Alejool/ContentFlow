@@ -1,10 +1,25 @@
-import { useTranslation } from 'react-i18next';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/Components/ui/card';
-import Button from '@/Components/common/Modern/Button';
-import { Badge } from '@/Components/ui/badge';
-import { Check, ArrowRight, Sparkles, Zap, Star, Award, Shield } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { PLAN_FEATURES, type PlanId } from '@/Constants/plans';
+import Button from "@/Components/common/Modern/Button";
+import { Badge } from "@/Components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/Components/ui/card";
+import { PLAN_FEATURES, type PlanId } from "@/Constants/plans";
+import { cn } from "@/lib/utils";
+import {
+  ArrowRight,
+  Award,
+  Check,
+  Shield,
+  Sparkles,
+  Star,
+  Zap,
+} from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface Plan {
   id: string;
@@ -29,9 +44,9 @@ interface PlanCardProps {
   isCurrentPlan?: boolean;
   isLoading?: boolean;
   onSelectPlan: (planId: string) => void;
-  billingCycle?: 'monthly' | 'yearly';
+  billingCycle?: "monthly" | "yearly";
   showCurrentBadge?: boolean;
-  variant?: 'default' | 'compact';
+  variant?: "default" | "compact";
   hasActiveSubscription?: boolean;
   isOwner?: boolean;
 }
@@ -41,27 +56,49 @@ export default function PlanCard({
   isCurrentPlan = false,
   isLoading = false,
   onSelectPlan,
-  billingCycle = 'monthly',
+  billingCycle = "monthly",
   showCurrentBadge = true,
-  variant = 'default',
+  variant = "default",
   hasActiveSubscription = false,
   isOwner = true,
 }: PlanCardProps) {
   const { t } = useTranslation();
 
+  // Debug log
+  if (process.env.NODE_ENV === "development") {
+    console.log(`PlanCard ${plan.id}:`, {
+      isCurrentPlan,
+      hasActiveSubscription,
+      price: plan.price,
+      requires_stripe: plan.requires_stripe,
+    });
+  }
+
   const getPlanIcon = (planId: string) => {
-    const iconClass = variant === 'compact' ? "w-6 h-6" : "w-6 h-6";
+    const iconClass = variant === "compact" ? "w-6 h-6" : "w-6 h-6";
     switch (planId) {
-      case 'demo':
+      case "demo":
         return <Sparkles className={cn(iconClass, "text-white")} />;
-      case 'free':
-        return <Zap className={cn(iconClass, "text-primary-600 dark:text-primary-400")} />;
-      case 'starter':
-        return <Star className={cn(iconClass, "text-primary-600 dark:text-primary-400")} />;
-      case 'professional':
+      case "free":
+        return (
+          <Zap
+            className={cn(iconClass, "text-primary-600 dark:text-primary-400")}
+          />
+        );
+      case "starter":
+        return (
+          <Star
+            className={cn(iconClass, "text-primary-600 dark:text-primary-400")}
+          />
+        );
+      case "professional":
         return <Award className={cn(iconClass, "text-white")} />;
-      case 'enterprise':
-        return <Shield className={cn(iconClass, "text-primary-600 dark:text-primary-400")} />;
+      case "enterprise":
+        return (
+          <Shield
+            className={cn(iconClass, "text-primary-600 dark:text-primary-400")}
+          />
+        );
       default:
         return null;
     }
@@ -70,29 +107,67 @@ export default function PlanCard({
   const getFeaturesList = (planId: string): string[] => {
     const features = PLAN_FEATURES[planId as PlanId];
     if (!features) return [];
-    
-    return features.map(featureKey => t(`pricing.features.${featureKey}`));
+
+    return features.map((featureKey) => t(`pricing.features.${featureKey}`));
   };
 
   const features = getFeaturesList(plan.id);
-  const isPopular = plan.popular || plan.id === 'professional';
+  const isPopular = plan.popular || plan.id === "professional";
   const displayPrice = plan.price;
 
-  if (variant === 'compact') {
+  // Determinar si este plan es un downgrade no permitido
+  const isPaidPlan = plan.requires_stripe && plan.price > 0;
+  const isFreePlan = plan.id === "free";
+  const isDemoPlan = plan.id === "demo";
+  // Bloquear cambio a Free o Demo si hay suscripción activa de pago
+  const isDowngradeBlocked =
+    hasActiveSubscription && (isFreePlan || isDemoPlan) && !isCurrentPlan;
+
+  // Determinar el texto del botón
+  const getButtonText = () => {
+    if (isCurrentPlan) {
+      return t("pricing.currentPlan", "Plan Actual");
+    }
+
+    if (isDowngradeBlocked) {
+      return t(
+        "pricing.cancelRequired",
+        "Cancela tu suscripción de pago primero",
+      );
+    }
+
+    if (!plan.enabled && plan.requires_stripe) {
+      return t("pricing.comingSoon", "Próximamente");
+    }
+
+    if (plan.price === 0) {
+      return t("pricing.startFree", "Comenzar Gratis");
+    }
+
+    // Si tiene suscripción activa y es un plan de pago, es un cambio de plan
+    if (hasActiveSubscription && plan.requires_stripe) {
+      return t("pricing.changeToPlan", "Cambiar a este plan");
+    }
+
+    // Si no tiene suscripción activa, es una compra nueva
+    return t("pricing.selectPlan", "Seleccionar Plan");
+  };
+
+  if (variant === "compact") {
     return (
       <div
         className={cn(
-          'relative p-6 border-2 rounded-xl transition-all',
+          "relative p-6 border-2 rounded-xl transition-all",
           isPopular
-            ? 'border-primary-600 shadow-lg'
-            : 'border-gray-200 dark:border-neutral-700',
-          isCurrentPlan && 'ring-4 ring-primary-200 dark:ring-primary-900/50'
+            ? "border-primary-600 shadow-lg"
+            : "border-gray-200 dark:border-neutral-700",
+          isCurrentPlan && "ring-4 ring-primary-200 dark:ring-primary-900/50",
         )}
       >
         {isPopular && (
           <div className="absolute -top-3 left-1/2 -translate-x-1/2">
             <span className="px-3 py-1 bg-primary-600 text-white text-xs font-semibold rounded-full">
-              {t('pricing.mostPopular')}
+              {t("pricing.mostPopular")}
             </span>
           </div>
         )}
@@ -109,7 +184,10 @@ export default function PlanCard({
               ${displayPrice}
             </span>
             <span className="text-gray-500 dark:text-gray-400">
-              /{plan.price === 0 ? t('planSelection.intervals.forever') : t('planSelection.intervals.month')}
+              /
+              {plan.price === 0
+                ? t("planSelection.intervals.forever")
+                : t("planSelection.intervals.month")}
             </span>
           </div>
         </div>
@@ -127,21 +205,18 @@ export default function PlanCard({
 
         <Button
           onClick={() => onSelectPlan(plan.id)}
-          disabled={isCurrentPlan || isLoading || (!plan.enabled && plan.requires_stripe)}
-          variant={isPopular ? 'primary' : 'secondary'}
+          disabled={
+            isCurrentPlan ||
+            isLoading ||
+            (!plan.enabled && plan.requires_stripe) ||
+            isDowngradeBlocked
+          }
+          variant={isPopular ? "primary" : "secondary"}
           fullWidth
           size="md"
           loading={isLoading}
         >
-          {isCurrentPlan
-            ? t('pricing.currentPlan')
-            : !plan.enabled && plan.requires_stripe
-            ? t('pricing.comingSoon', 'Próximamente')
-            : plan.price === 0
-            ? t('pricing.startFree')
-            : hasActiveSubscription && plan.requires_stripe
-            ? t('pricing.changeToPlan', 'Cambiar a este plan')
-            : t('pricing.selectPlan')}
+          {getButtonText()}
         </Button>
       </div>
     );
@@ -151,27 +226,27 @@ export default function PlanCard({
     <div className="relative">
       <Card
         className={cn(
-          'relative flex flex-col h-full transition-all duration-300',
+          "relative flex flex-col h-full transition-all duration-300",
           isPopular
-            ? 'border-2 border-primary-500 shadow-2xl bg-white dark:bg-neutral-900 scale-105'
-            : 'border border-gray-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:shadow-xl hover:border-primary-300 dark:hover:border-primary-700',
-          isCurrentPlan && 'ring-2 ring-green-500'
+            ? "border-2 border-primary-600 shadow-xl bg-white dark:bg-neutral-900"
+            : "border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:border-primary-400 dark:hover:border-primary-800",
+          isCurrentPlan && "border-green-500",
         )}
       >
         {/* Badge superior */}
         {isPopular && (
-          <div className="absolute -top-5 left-1/2 transform -translate-x-1/2 z-20">
-            <div className="bg-gradient-to-r from-primary-500 to-primary-600 text-white px-6 py-2 rounded-full text-sm font-semibold shadow-xl flex items-center gap-2 animate-pulse">
-              <Star className="h-4 w-4 fill-current" />
-              {t('pricing.mostPopular')}
+          <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-20">
+            <div className="bg-primary-600 text-white px-4 py-1 rounded-full text-xs font-bold shadow-md flex items-center gap-1.5">
+              <Star className="h-3.5 w-3.5 fill-current" />
+              {t("pricing.mostPopular")}
             </div>
           </div>
         )}
 
-        {plan.id === 'demo' && !isPopular && (
+        {plan.id === "demo" && !isPopular && (
           <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
             <Badge className="bg-purple-500 text-white border-0 shadow-md">
-              {t('pricing.demoTemporal', 'Demo Temporal')}
+              {t("pricing.demoTemporal", "Demo Temporal")}
             </Badge>
           </div>
         )}
@@ -179,26 +254,21 @@ export default function PlanCard({
         {isCurrentPlan && showCurrentBadge && (
           <div className="absolute -top-4 right-4">
             <Badge className="bg-green-500 text-white border-0 shadow-md">
-              {t('pricing.currentPlan', 'Plan Actual')}
+              {t("pricing.currentPlan", "Plan Actual")}
             </Badge>
           </div>
-        )}
-
-        {/* Gradient decorativo para plan popular */}
-        {isPopular && (
-          <div className="absolute inset-0 bg-gradient-to-br from-primary-500/5 to-transparent rounded-lg pointer-events-none" />
         )}
 
         <CardHeader className="relative">
           <div className="flex items-center justify-between mb-4">
             <div
               className={cn(
-                'p-4 rounded-xl transition-all duration-300',
+                "p-3.5 rounded-lg transition-all duration-300",
                 isPopular
-                  ? 'bg-gradient-to-br from-primary-500 to-primary-600 shadow-lg'
-                  : plan.id === 'demo'
-                  ? 'bg-gradient-to-br from-purple-500 to-purple-600 shadow-lg'
-                  : 'bg-primary-50 dark:bg-primary-900/20'
+                  ? "bg-primary-600 text-white"
+                  : plan.id === "demo"
+                    ? "bg-neutral-900 text-white"
+                    : "bg-neutral-100 dark:bg-neutral-800 text-primary-600 dark:text-primary-400",
               )}
             >
               {getPlanIcon(plan.id)}
@@ -217,24 +287,24 @@ export default function PlanCard({
             <div className="flex items-baseline gap-2">
               <span
                 className={cn(
-                  'text-5xl font-bold',
+                  "text-4xl font-extrabold",
                   isPopular
-                    ? 'bg-gradient-to-r from-primary-500 to-primary-600 bg-clip-text text-transparent'
-                    : 'text-gray-900 dark:text-white'
+                    ? "text-primary-600"
+                    : "text-neutral-900 dark:text-white",
                 )}
               >
                 ${displayPrice}
               </span>
               {plan.price > 0 && (
                 <span className="text-gray-600 dark:text-gray-400 text-lg">
-                  /{billingCycle === 'monthly' ? 'mes' : 'año'}
+                  /{billingCycle === "monthly" ? "mes" : "año"}
                 </span>
               )}
             </div>
             {plan.trial_days && (
               <p className="text-sm text-purple-600 dark:text-purple-400 mt-3 flex items-center gap-1">
                 <Sparkles className="h-4 w-4" />
-                {plan.trial_days} {t('pricing.plans.demo.trialDays')}
+                {plan.trial_days} {t("pricing.plans.demo.trialDays")}
               </p>
             )}
           </div>
@@ -246,18 +316,18 @@ export default function PlanCard({
               <li key={index} className="flex items-start gap-3">
                 <div
                   className={cn(
-                    'flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center mt-0.5',
+                    "flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center mt-0.5",
                     isPopular
-                      ? 'bg-primary-100 dark:bg-primary-900/30'
-                      : 'bg-green-100 dark:bg-green-900/30'
+                      ? "bg-primary-100 dark:bg-primary-900/30"
+                      : "bg-green-100 dark:bg-green-900/30",
                   )}
                 >
                   <Check
                     className={cn(
-                      'h-3 w-3',
+                      "h-3 w-3",
                       isPopular
-                        ? 'text-primary-600 dark:text-primary-400'
-                        : 'text-green-600 dark:text-green-400'
+                        ? "text-primary-600 dark:text-primary-400"
+                        : "text-green-600 dark:text-green-400",
                     )}
                   />
                 </div>
@@ -272,35 +342,47 @@ export default function PlanCard({
         <CardFooter className="relative pt-6">
           <Button
             onClick={() => onSelectPlan(plan.id)}
-            disabled={isCurrentPlan || isLoading || (!plan.enabled && plan.requires_stripe)}
-            variant={isPopular ? 'primary' : 'secondary'}
-            buttonStyle={isPopular ? 'gradient' : 'outline'}
+            disabled={
+              isCurrentPlan ||
+              isLoading ||
+              (!plan.enabled && plan.requires_stripe) ||
+              isDowngradeBlocked
+            }
+            variant={isPopular ? "primary" : "secondary"}
             size="lg"
             fullWidth
             loading={isLoading}
-            loadingText={t('pricing.processing')}
-            icon={!isCurrentPlan && (!plan.enabled && plan.requires_stripe) ? undefined : ArrowRight}
+            loadingText={t("pricing.processing")}
+            icon={
+              !isCurrentPlan &&
+              !plan.enabled &&
+              plan.requires_stripe &&
+              !isDowngradeBlocked
+                ? undefined
+                : ArrowRight
+            }
             iconPosition="right"
-            shadow={isPopular ? 'lg' : 'md'}
             className={cn(
-              'group',
-              (!plan.enabled && plan.requires_stripe) && 'opacity-50 cursor-not-allowed'
+              "group transition-all",
+              ((!plan.enabled && plan.requires_stripe) || isDowngradeBlocked) &&
+                "opacity-60 grayscale cursor-not-allowed",
             )}
           >
-            {isCurrentPlan
-              ? t('pricing.currentPlan')
-              : !plan.enabled && plan.requires_stripe
-              ? t('pricing.comingSoon', 'Próximamente')
-              : plan.price === 0
-              ? t('pricing.startFree')
-              : hasActiveSubscription && plan.requires_stripe
-              ? t('pricing.changeToPlan', 'Cambiar a este plan')
-              : t('pricing.selectPlan')}
+            {getButtonText()}
           </Button>
+
+          {isDowngradeBlocked && (
+            <p className="text-xs text-center text-amber-600 dark:text-amber-400 mt-2">
+              {t(
+                "pricing.cancelSubscriptionFirst",
+                "Para cambiar a un plan gratuito, cancela tu suscripción de pago actual y espera a que termine el período de facturación.",
+              )}
+            </p>
+          )}
 
           {!plan.enabled && plan.requires_stripe && (
             <p className="text-xs text-center text-gray-500 dark:text-gray-400 mt-2">
-              {t('pricing.paymentSetup', 'Configuración de pagos en proceso')}
+              {t("pricing.paymentSetup", "Configuración de pagos en proceso")}
             </p>
           )}
         </CardFooter>

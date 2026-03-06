@@ -132,12 +132,17 @@ export default function Sidebar({
               }`}
             >
               <div
-                className={`w-12 h-14 bg-gradient-to-r rounded-lg flex items-center justify-center flex-shrink-0`}
+                className={`w-12 h-14 ${!auth?.current_workspace?.white_label_logo_url ? "bg-gradient-to-r" : ""} rounded-lg flex items-center justify-center flex-shrink-0`}
               >
                 <img
-                  src={Logo}
-                  alt="ContentFlow logo"
-                  className="w-16 h-16 object-contain"
+                  id="sidebar-logo"
+                  src={auth?.current_workspace?.white_label_logo_url || Logo}
+                  alt={`${auth?.current_workspace?.name || "ContentFlow"} logo`}
+                  className={
+                    auth?.current_workspace?.white_label_logo_url
+                      ? "w-full h-full object-contain p-1"
+                      : "w-16 h-16 object-contain"
+                  }
                 />
               </div>
               {isSidebarOpen && (
@@ -145,10 +150,14 @@ export default function Sidebar({
                   <h1
                     className={`text-xl font-bold bg-gradient-to-r ${classes.titleGradient} bg-clip-text text-transparent`}
                   >
-                    ContentFlow
+                    {auth?.current_workspace?.white_label_logo_url
+                      ? auth.current_workspace.name
+                      : "ContentFlow"}
                   </h1>
                   <p className={`text-xs ${classes.subtitleColor}`}>
-                    {auth?.current_workspace?.name || "Social Media Manager"}
+                    {auth?.current_workspace?.white_label_logo_url
+                      ? t("nav.workspace_branding")
+                      : auth?.current_workspace?.name || "Social Media Manager"}
                   </p>
                   {auth?.current_workspace?.role && (
                     <p className="text-[10px] font-bold text-primary-500 uppercase tracking-widest mt-0.5">
@@ -187,7 +196,10 @@ export default function Sidebar({
 
           <WorkspaceSwitcher isSidebarOpen={isSidebarOpen} />
 
-          <nav className="flex-1 px-4 py-6 space-y-2" aria-label="Main navigation">
+          <nav
+            className="flex-1 px-4 py-6 space-y-2"
+            aria-label="Main navigation"
+          >
             {navigationItems.map((item) => {
               const isActive = !!route().current(item.href);
               return (

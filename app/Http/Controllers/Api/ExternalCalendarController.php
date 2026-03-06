@@ -31,6 +31,15 @@ class ExternalCalendarController extends Controller
                 ], 400);
             }
 
+            // Check if workspace plan includes calendar_sync feature
+            $workspace = $user->workspaces()->where('workspaces.id', $workspaceId)->first();
+            if ($workspace && !$workspace->hasFeature('calendar_sync')) {
+                return response()->json([
+                    'error' => 'Tu plan actual no incluye sincronización de calendario. Actualiza tu plan para usar esta función.',
+                    'upgrade_required' => true,
+                ], 403);
+            }
+
             // Create state with user info
             $state = base64_encode(json_encode([
                 'user_id' => $user->id,
@@ -42,7 +51,7 @@ class ExternalCalendarController extends Controller
             // Get authorization URL based on provider with state
             $providerInstance = $this->getProviderInstance($provider);
             $authUrl = $providerInstance->getAuthUrl($state);
-            
+
             Log::info('Generated auth URL', [
                 'provider' => $provider,
                 'auth_url' => $authUrl,

@@ -159,6 +159,9 @@ class HandleInertiaRequests extends Middleware
               } else {
                 $currentWorkspace->permissions = $role ? $role->permissions->pluck('slug')->toArray() : [];
               }
+
+              $currentWorkspace->plan = $currentWorkspace->getPlanName();
+              $currentWorkspace->features = $currentWorkspace->getPlanFeatures();
             }
 
             return $currentWorkspace;
@@ -176,7 +179,7 @@ class HandleInertiaRequests extends Middleware
         'location' => $request->url(),
       ],
       'ai_enabled' => fn() => app(AIService::class)->isAiEnabled(),
-      
+
       // Onboarding data
       'onboarding' => function () use ($request) {
         try {
@@ -187,7 +190,7 @@ class HandleInertiaRequests extends Middleware
 
           $onboardingService = app(OnboardingService::class);
           $state = $onboardingService->getOnboardingState($user);
-          
+
           // Only return onboarding data if not complete
           if ($state->completed_at) {
             return null;
@@ -213,7 +216,7 @@ class HandleInertiaRequests extends Middleware
           return null;
         }
       },
-      
+
       'tourSteps' => function () use ($request) {
         try {
           $user = $request->user();
@@ -223,7 +226,7 @@ class HandleInertiaRequests extends Middleware
 
           $onboardingService = app(OnboardingService::class);
           $state = $onboardingService->getOnboardingState($user);
-          
+
           // Only return tour steps if onboarding is not complete
           if ($state->completed_at) {
             return [];
@@ -296,7 +299,7 @@ class HandleInertiaRequests extends Middleware
           return [];
         }
       },
-      
+
       'availablePlatforms' => function () use ($request) {
         try {
           $user = $request->user();
@@ -306,7 +309,7 @@ class HandleInertiaRequests extends Middleware
 
           $onboardingService = app(OnboardingService::class);
           $state = $onboardingService->getOnboardingState($user);
-          
+
           // Only return platforms if onboarding is not complete
           if ($state->completed_at) {
             return [];
@@ -320,7 +323,7 @@ class HandleInertiaRequests extends Middleware
           return [];
         }
       },
-      
+
       'connectedAccounts' => function () use ($request) {
         try {
           $user = $request->user();
@@ -346,7 +349,7 @@ class HandleInertiaRequests extends Middleware
           return [];
         }
       },
-      
+
       'templates' => function () use ($request) {
         try {
           $user = $request->user();
@@ -356,7 +359,7 @@ class HandleInertiaRequests extends Middleware
 
           $onboardingService = app(OnboardingService::class);
           $state = $onboardingService->getOnboardingState($user);
-          
+
           // Only return templates if onboarding is not complete
           if ($state->completed_at) {
             return [];

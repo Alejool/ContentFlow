@@ -135,7 +135,7 @@ export const usePublicationForm = ({
   // Unified logging for errors
   useEffect(() => {
     if (Object.keys(errors).length > 0) {
-      }
+    }
   }, [errors]);
 
   // Duration Validation Effect
@@ -304,60 +304,60 @@ export const usePublicationForm = ({
           publication.media_files
             ?.filter((media: any) => !media.metadata?.original_media_id) // Exclude reels
             ?.map((media: any) => {
-            const isVideo =
-              media.file_type === "video" ||
-              media.mime_type?.startsWith("video/");
-            const tempId = `existing-${media.id}`;
+              const isVideo =
+                media.file_type === "video" ||
+                media.mime_type?.startsWith("video/");
+              const tempId = `existing-${media.id}`;
 
-            let url = media.file_path || media.url;
-            if (url && !url.startsWith("http") && !url.startsWith("blob:")) {
-              if (url.startsWith("/storage/")) {
-                // Already has leading slash and storage
-              } else if (url.startsWith("storage/")) {
-                url = `/${url}`;
-              } else if (!url.startsWith("/")) {
-                url = `/storage/${url}`;
+              let url = media.file_path || media.url;
+              if (url && !url.startsWith("http") && !url.startsWith("blob:")) {
+                if (url.startsWith("/storage/")) {
+                  // Already has leading slash and storage
+                } else if (url.startsWith("storage/")) {
+                  url = `/${url}`;
+                } else if (!url.startsWith("/")) {
+                  url = `/storage/${url}`;
+                }
               }
-            }
 
-            const thumbDerivative = media.derivatives?.find(
-              (d: any) =>
-                d.derivative_type === "thumbnail" ||
-                d.derivative_type === "thumb",
-            );
-            let thumbnailUrl = thumbDerivative?.file_path;
-            if (
-              thumbnailUrl &&
-              !thumbnailUrl.startsWith("http") &&
-              !thumbnailUrl.startsWith("blob:")
-            ) {
-              if (thumbnailUrl.startsWith("/storage/")) {
-              } else if (thumbnailUrl.startsWith("storage/")) {
-                thumbnailUrl = `/${thumbnailUrl}`;
-              } else if (!thumbnailUrl.startsWith("/")) {
-                thumbnailUrl = `/storage/${thumbnailUrl}`;
+              const thumbDerivative = media.derivatives?.find(
+                (d: any) =>
+                  d.derivative_type === "thumbnail" ||
+                  d.derivative_type === "thumb",
+              );
+              let thumbnailUrl = thumbDerivative?.file_path;
+              if (
+                thumbnailUrl &&
+                !thumbnailUrl.startsWith("http") &&
+                !thumbnailUrl.startsWith("blob:")
+              ) {
+                if (thumbnailUrl.startsWith("/storage/")) {
+                } else if (thumbnailUrl.startsWith("storage/")) {
+                  thumbnailUrl = `/${thumbnailUrl}`;
+                } else if (!thumbnailUrl.startsWith("/")) {
+                  thumbnailUrl = `/storage/${thumbnailUrl}`;
+                }
               }
-            }
 
-            if (isVideo) {
-              setVideoMetadata(tempId, {
-                duration: media.metadata?.duration || 0,
-                youtubeType: media.metadata?.youtubeType || "video",
-              });
-            }
+              if (isVideo) {
+                setVideoMetadata(tempId, {
+                  duration: media.metadata?.duration || 0,
+                  youtubeType: media.metadata?.youtubeType || "video",
+                });
+              }
 
-            return {
-              id: media.id,
-              tempId: tempId,
-              url: url,
-              thumbnailUrl: thumbnailUrl,
-              type: isVideo ? "video" : "image",
-              isNew: false,
-              status: media.status || "completed",
-              file_name: media.file_name,
-              size: media.size,
-            };
-          }) || [];
+              return {
+                id: media.id,
+                tempId: tempId,
+                url: url,
+                thumbnailUrl: thumbnailUrl,
+                type: isVideo ? "video" : "image",
+                isNew: false,
+                status: media.status || "completed",
+                file_name: media.file_name,
+                size: media.size,
+              };
+            }) || [];
 
         // RECOVERY: Check global upload queue for files currently uploading/linked to this publication
         // This ensures if User A closes/reopens while uploading, they see their progress.
@@ -437,11 +437,7 @@ export const usePublicationForm = ({
       // CRITICAL FIX: If editing an existing publication, link immediately
       // so attachMedia gets called when upload completes
       if (publication?.id) {
-        linkUploadToPublication(
-          item.tempId,
-          publication.id,
-          publication.title,
-        );
+        linkUploadToPublication(item.tempId, publication.id, publication.title);
       }
 
       // CRITICAL: Actually start the upload!
@@ -457,7 +453,7 @@ export const usePublicationForm = ({
         try {
           const video = document.createElement("video");
           video.preload = "metadata";
-          
+
           await new Promise<void>((resolve, reject) => {
             video.onloadedmetadata = () => resolve();
             video.onerror = () => reject(new Error("Error loading video"));
@@ -468,7 +464,7 @@ export const usePublicationForm = ({
           const width = video.videoWidth;
           const height = video.videoHeight;
           const aspectRatio = width / height;
-          
+
           URL.revokeObjectURL(video.src);
 
           setVideoMetadata(item.tempId, {
@@ -479,7 +475,7 @@ export const usePublicationForm = ({
             youtubeType: duration <= 60 && aspectRatio < 1 ? "short" : "video",
           });
         } catch (e) {
-          console.error('Failed to extract video metadata:', e);
+          console.error("Failed to extract video metadata:", e);
         }
       }
     });
@@ -500,12 +496,19 @@ export const usePublicationForm = ({
     });
   };
 
-  const handleRemoveMedia = (index: number) => {
-    const file = mediaFiles[index];
+  const handleRemoveMedia = (tempId: string) => {
+    const file = mediaFiles.find((f) => f.tempId === tempId);
     if (file && !file.isNew && file.id) {
       setRemovedMediaIds((prev) => [...prev, file.id!]);
     }
-    removeFile(index);
+
+    // 1. Remove from media store
+    removeFile(tempId);
+
+    // 2. Cleanup from upload queue (if it's a new file being uploaded)
+    const { cancelUpload, removeUpload } = useUploadQueue.getState();
+    cancelUpload(tempId);
+    removeUpload(tempId);
   };
 
   const handleHashtagChange = (value: string) => {
@@ -826,10 +829,12 @@ export const usePublicationForm = ({
       let result: any;
       if (publication) {
         result = await updatePublicationStore(publication.id, formData);
-        
+
         // Force refresh the publication to ensure we have the latest data
         if (result) {
-          await usePublicationStore.getState().fetchPublicationById(publication.id);
+          await usePublicationStore
+            .getState()
+            .fetchPublicationById(publication.id);
         }
       } else {
         result = await createPublication(formData);
@@ -840,14 +845,17 @@ export const usePublicationForm = ({
           publication
             ? t("publications.messages.updateSuccess")
             : t("publications.messages.createSuccess"),
-          { id: publication ? `pub-update-${publication.id}` : "pub-create" }
+          { id: publication ? `pub-update-${publication.id}` : "pub-create" },
         );
       }
 
       // 2. LINK PENDING UPLOADS (Moving this to background, non-awaited for UI snappiness)
       // Identify files that were filtered out (File objects)
       const pendingFiles = (currentMediaFiles || []).filter(
-        (media) => media.isNew && media.file instanceof File,
+        (media) =>
+          media.isNew &&
+          media.file instanceof File &&
+          media.status !== "failed",
       );
 
       const handleBackgroundLinking = async (
@@ -1028,10 +1036,13 @@ export const usePublicationForm = ({
       mediaFiles.some((m) => {
         // Check if file is in mediaStore with uploading/processing status
         if (m.status === "uploading" || m.status === "processing") {
-          // Double-check with uploadQueue to see if it's actually cancelled
+          // Double-check with uploadQueue to see if it's actually cancelled or has an error
           const queueItem = useUploadQueue.getState().queue[m.tempId];
-          if (queueItem && queueItem.status === "cancelled") {
-            return false; // Ignore cancelled uploads
+          if (
+            queueItem &&
+            (queueItem.status === "cancelled" || queueItem.status === "error")
+          ) {
+            return false; // Ignore cancelled or errored uploads
           }
           return true;
         }
@@ -1042,10 +1053,13 @@ export const usePublicationForm = ({
         (publication.media_locked_by as any).id !== user?.id),
     isS3Uploading: mediaFiles.some((m) => {
       if (m.status === "uploading") {
-        // Double-check with uploadQueue to see if it's actually cancelled
+        // Double-check with uploadQueue to see if it's actually cancelled or has an error
         const queueItem = useUploadQueue.getState().queue[m.tempId];
-        if (queueItem && queueItem.status === "cancelled") {
-          return false; // Ignore cancelled uploads
+        if (
+          queueItem &&
+          (queueItem.status === "cancelled" || queueItem.status === "error")
+        ) {
+          return false; // Ignore cancelled or errored uploads
         }
         return true;
       }

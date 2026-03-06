@@ -36,6 +36,7 @@ use App\Models\MediaFiles\MediaFile;
 use App\Models\User;
 use App\Models\Publications\PublicationLock;
 use App\Services\Validation\ContentValidationService;
+use App\Services\Subscription\PlanLimitValidator;
 use Maatwebsite\Excel\Facades\Excel;
 
 class PublicationController extends Controller
@@ -163,6 +164,19 @@ class PublicationController extends Controller
       return $this->errorResponse('You do not have permission to create publications.', 403);
     }
 
+    // Plan limit check: only enforce when trying to publish or schedule directly
+    $intendedStatus = $request->input('status', 'draft');
+    if (in_array($intendedStatus, ['published', 'scheduled', 'publishing'])) {
+      $workspace = Auth::user()->workspaces()->find($workspaceId);
+      if ($workspace) {
+        $validator = app(PlanLimitValidator::class);
+        if (!$validator->canPerformAction($workspace, 'publications')) {
+          $upgradeMsg = $validator->getUpgradeMessage($workspace, 'publications');
+          return $this->errorResponse($upgradeMsg['message'], 402, array_merge($upgradeMsg, ['limit_type' => 'publications']));
+        }
+      }
+    }
+
     try {
       $data = $request->validated();
       // Normalize scheduled_at to UTC using client's timezone header
@@ -211,30 +225,30 @@ class PublicationController extends Controller
   {
     // Manually resolve publication to provide better error messages
     $publication = Publication::withoutGlobalScope('workspace')->find($publicationId);
-    
+
     if (!$publication) {
       return $this->errorResponse('Publication not found.', 404);
     }
-    
+
     // Check if publication belongs to current workspace
     $currentWorkspaceId = Auth::user()->current_workspace_id ?? Auth::user()->workspaces()->first()?->id;
-    
+
     // Verify user has access to the publication's workspace
     $userWorkspaceIds = Auth::user()->workspaces()->pluck('workspaces.id')->toArray();
     if (!in_array($publication->workspace_id, $userWorkspaceIds)) {
       return $this->errorResponse('You do not have access to this publication.', 403);
     }
-    
+
     // If publication is from a different workspace, inform the user
     if ($publication->workspace_id !== $currentWorkspaceId) {
       return $this->errorResponse('This publication belongs to a different workspace. Please switch to the correct workspace to view it.', 403);
     }
-    
+
     // Check permissions - allow if user has manage-content, view-content, OR is the publication creator
-    $hasPermission = Auth::user()->hasPermission('manage-content', $publication->workspace_id) 
+    $hasPermission = Auth::user()->hasPermission('manage-content', $publication->workspace_id)
       || Auth::user()->hasPermission('view-content', $publication->workspace_id)
       || $publication->user_id === Auth::id();
-    
+
     if (!$hasPermission) {
       return $this->errorResponse('You do not have permission to view this publication.', 403);
     }
@@ -265,10 +279,10 @@ class PublicationController extends Controller
     // Check for approval workflow lock
     $approvalLock = null;
     if ($publication->isLockedForEditing()) {
-      $reason = $publication->status === 'pending_review' 
-        ? 'This publication is awaiting approval and cannot be edited.' 
+      $reason = $publication->status === 'pending_review'
+        ? 'This publication is awaiting approval and cannot be edited.'
         : 'This publication has been approved and is ready to publish. It cannot be edited.';
-      
+
       $approvalLock = [
         'locked_by' => 'approval_workflow',
         'status' => $publication->status,
@@ -317,7 +331,7 @@ class PublicationController extends Controller
 
     try {
       $data = $request->validated();
-      
+
       // RBAC ENDFORCEMENT: Check for publish permission
       if (!Auth::user()->hasPermission('publish', $publication->workspace_id)) {
         // If trying to set scheduled_at, remove it
@@ -391,7 +405,7 @@ class PublicationController extends Controller
     // Check permissions first
     $hasPublishPermission = Auth::user()->hasPermission('publish', $publication->workspace_id);
     $hasManageContentPermission = Auth::user()->hasPermission('manage-content', $publication->workspace_id);
-    
+
     if (!$hasManageContentPermission) {
       return $this->errorResponse('You do not have permission to manage content.', 403);
     }
@@ -406,7 +420,7 @@ class PublicationController extends Controller
           ['current_status' => $publication->status]
         );
       }
-      
+
       // If publishing or retrying, show specific message
       if (in_array($publication->status, ['publishing', 'retrying'])) {
         return $this->errorResponse(
@@ -415,7 +429,7 @@ class PublicationController extends Controller
           ['current_status' => $publication->status]
         );
       }
-      
+
       // Otherwise, needs approval
       return $this->errorResponse(
         __('publications.errors.not_approved'),
@@ -425,9 +439,14 @@ class PublicationController extends Controller
     }
 
     try {
+      $platformSettings = $request->input('platform_settings');
+      if (is_string($platformSettings)) {
+        $platformSettings = json_decode($platformSettings, true) ?? [];
+      }
+
       $action->execute($publication, $request->input('platforms'), [
         'thumbnails' => $request->file('thumbnails', []),
-        'platform_settings' => $request->input('platform_settings')
+        'platform_settings' => $platformSettings
       ]);
 
       $publication->logActivity('publishing', ['platforms' => $request->input('platforms')]);
@@ -486,6 +505,9 @@ class PublicationController extends Controller
     if (!Auth::user()->hasPermission('manage-content', $publication->workspace_id)) {
       return $this->errorResponse('You do not have permission to duplicate this publication.', 403);
     }
+
+    // Duplicated publications start as draft so no limit check needed here.
+    // Limit is enforced when the user publishes or schedules the duplicated publication.
 
     try {
       // Load relationships
@@ -576,7 +598,7 @@ class PublicationController extends Controller
       'rejected_at' => null,
       'rejection_reason' => null,
     ];
-    
+
     if ($request->has('platform_settings')) {
       $updateData['platform_settings'] = $request->platform_settings;
     }
@@ -612,7 +634,7 @@ class PublicationController extends Controller
 
     // Broadcast lock change to notify all users in real-time
     broadcast(new \App\Events\Publications\PublicationLockChanged(
-      $publication->id, 
+      $publication->id,
       [
         'locked_by' => 'approval_workflow',
         'status' => 'pending_review',
@@ -682,7 +704,7 @@ class PublicationController extends Controller
 
     // Broadcast lock removal to notify all users in real-time (publication is now editable)
     broadcast(new \App\Events\Publications\PublicationLockChanged(
-      $publication->id, 
+      $publication->id,
       null, // No lock - publication can be edited (will revert to pending if edited)
       $publication->workspace_id
     ))->toOthers();
@@ -761,7 +783,7 @@ class PublicationController extends Controller
 
     // Broadcast lock removal to notify all users in real-time
     broadcast(new \App\Events\Publications\PublicationLockChanged(
-      $publication->id, 
+      $publication->id,
       null, // No lock
       $publication->workspace_id
     ))->toOthers();
@@ -791,7 +813,7 @@ class PublicationController extends Controller
 
     // Check if specific platform(s) should be cancelled
     $platformIds = $request->input('platform_ids', []);
-    
+
     \Log::info('Cancel publication request', [
       'publication_id' => $publication->id,
       'platform_ids' => $platformIds,
@@ -799,10 +821,10 @@ class PublicationController extends Controller
       'platform_ids_empty' => empty($platformIds),
       'request_all' => $request->all()
     ]);
-    
+
     if (!empty($platformIds) && is_array($platformIds) && count($platformIds) > 0) {
       \Log::info('Canceling specific platforms', ['platform_ids' => $platformIds]);
-      
+
       // Cancel only specific platforms - mark as failed and clear retry flags
       $updated = $publication->socialPostLogs()
         ->whereIn('social_account_id', $platformIds)
@@ -814,7 +836,7 @@ class PublicationController extends Controller
           'retry_started_at' => null,
           'updated_at' => now(),
         ]);
-        
+
       \Log::info('Updated social post logs', ['count' => $updated, 'platform_ids' => $platformIds]);
 
       // Try to delete specific platform jobs from queue - improved query
@@ -824,24 +846,24 @@ class PublicationController extends Controller
           $deletedJobs = \Illuminate\Support\Facades\DB::table('jobs')
             ->where('payload', 'like', '%PublishToSocialMedia%')
             ->where('payload', 'like', '%"publicationId":' . $publication->id . '%')
-            ->where(function($query) use ($platformId) {
+            ->where(function ($query) use ($platformId) {
               $query->where('payload', 'like', '%"socialAccountIds":[' . $platformId . ']%')
-                    ->orWhere('payload', 'like', '%"socialAccountIds":[' . $platformId . ',%')
-                    ->orWhere('payload', 'like', '%"socialAccountIds":,%' . $platformId . '%');
+                ->orWhere('payload', 'like', '%"socialAccountIds":[' . $platformId . ',%')
+                ->orWhere('payload', 'like', '%"socialAccountIds":,%' . $platformId . '%');
             })
             ->delete();
-          
+
           // Delete from failed_jobs table
           $deletedFailedJobs = \Illuminate\Support\Facades\DB::table('failed_jobs')
             ->where('payload', 'like', '%PublishToSocialMedia%')
             ->where('payload', 'like', '%"publicationId":' . $publication->id . '%')
-            ->where(function($query) use ($platformId) {
+            ->where(function ($query) use ($platformId) {
               $query->where('payload', 'like', '%"socialAccountIds":[' . $platformId . ']%')
-                    ->orWhere('payload', 'like', '%"socialAccountIds":[' . $platformId . ',%')
-                    ->orWhere('payload', 'like', '%"socialAccountIds":,%' . $platformId . '%');
+                ->orWhere('payload', 'like', '%"socialAccountIds":[' . $platformId . ',%')
+                ->orWhere('payload', 'like', '%"socialAccountIds":,%' . $platformId . '%');
             })
             ->delete();
-            
+
           \Log::info('Deleted queued jobs for platform', [
             'platform_id' => $platformId,
             'deleted_jobs' => $deletedJobs,
@@ -890,12 +912,12 @@ class PublicationController extends Controller
         ->where('payload', 'like', '%PublishToSocialMedia%')
         ->where('payload', 'like', '%"publicationId":' . $publication->id . '%')
         ->delete();
-      
+
       $deletedFailedJobs = \Illuminate\Support\Facades\DB::table('failed_jobs')
         ->where('payload', 'like', '%PublishToSocialMedia%')
         ->where('payload', 'like', '%"publicationId":' . $publication->id . '%')
         ->delete();
-        
+
       \Log::info('Deleted all queued jobs for publication', [
         'publication_id' => $publication->id,
         'deleted_jobs' => $deletedJobs,
@@ -908,7 +930,7 @@ class PublicationController extends Controller
     $publication->logActivity('cancelled', ['previous_status' => $oldStatus]);
 
     $publication->user->notify(new PublicationCancelledNotification($publication));
-    
+
     if ($publication->workspace && ($publication->workspace->discord_webhook_url || $publication->workspace->slack_webhook_url)) {
       $publication->workspace->notify(new PublicationCancelledNotification($publication));
     }
@@ -975,7 +997,7 @@ class PublicationController extends Controller
       if (isset($statusGroups[$status])) {
         $statusGroups[$status][] = $log->social_account_id;
       }
-      
+
       // Add retry information
       if ($log->is_retrying || $log->retry_count > 0) {
         $retryInfo[$log->social_account_id] = [
@@ -1112,7 +1134,7 @@ class PublicationController extends Controller
       // Verify S3 file exists before creating database record
       $path = $request->key;
       $pathTrimmed = ltrim($path, '/');
-      
+
       $fileExists = false;
       try {
         if (Storage::disk('s3')->exists($path)) {
@@ -1247,7 +1269,7 @@ class PublicationController extends Controller
   public function export(Request $request)
   {
     $workspaceId = Auth::user()->current_workspace_id;
-    
+
     if (!Auth::user()->hasPermission('manage-content', $workspaceId) && !Auth::user()->hasPermission('view-content', $workspaceId)) {
       return $this->errorResponse('You do not have permission to export publications.', 403);
     }
