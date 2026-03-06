@@ -237,6 +237,27 @@
         "description": "Start creating content to manage and schedule your social media posts.",
         "action": "Create Content"
       }
+    },
+    "frequencies": {
+      "daily": "Daily",
+      "weekly": "Weekly",
+      "monthly": "Monthly",
+      "yearly": "Yearly"
+    },
+    "units": {
+      "days": "days",
+      "weeks": "weeks",
+      "months": "months",
+      "years": "years"
+    },
+    "days": {
+      "sun": "S",
+      "mon": "M",
+      "tue": "T",
+      "wed": "W",
+      "thu": "T",
+      "fri": "F",
+      "sat": "S"
     }
   }
 }

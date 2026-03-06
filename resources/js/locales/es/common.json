@@ -250,6 +250,27 @@
         "description": "Comienza a crear contenido para gestionar y programar tus publicaciones en redes sociales.",
         "action": "Crear Contenido"
       }
+    },
+    "frequencies": {
+      "daily": "Diario",
+      "weekly": "Semanal",
+      "monthly": "Mensual",
+      "yearly": "Anual"
+    },
+    "units": {
+      "days": "días",
+      "weeks": "semanas",
+      "months": "meses",
+      "years": "años"
+    },
+    "days": {
+      "sun": "D",
+      "mon": "L",
+      "tue": "M",
+      "wed": "X",
+      "thu": "J",
+      "fri": "V",
+      "sat": "S"
     }
   }
 }

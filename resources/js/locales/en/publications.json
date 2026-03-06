@@ -107,10 +107,26 @@
           "startDate": "12/12/2025",
           "endDate": "12/12/2026"
         },
+        "validation": {
+          "titleRequired": "Title is required",
+          "titleLength": "Title cannot exceed 70 characters",
+          "descMin": "Description must have at least 10 characters",
+          "descMax": "Description cannot exceed 700 characters",
+          "objRequired": "Goal is required",
+          "objMax": "Goal cannot exceed 200 characters",
+          "hashtagsRequired": "Hashtags are required",
+          "hashtagValid": "Hashtags must be separated by commas",
+          "hashtagMax": "Maximum 10 hashtags allowed",
+          "scheduledMinDifference": "The date must be at least 1 minute from the current time",
+          "scheduledAtRequired": "Schedule date is required if global schedule is enabled",
+          "recurrenceDaysRequired": "Please select at least one day for weekly recurrence",
+          "recurrence_days": "Invalid recurrence days"
+        },
         "button": {
           "save": "Save",
           "cancel": "Cancel"
-        }
+        },
+        "recurrence_days": "Recurrence Days"
       },
       "schedule": {
         "title": "Date for all networks",
@@ -122,7 +138,13 @@
           "title": "Repeat publication (Recurrence)",
           "locked_title": "Recurrence locked",
           "locked_desc": "Upgrade your plan to schedule automatic repetitions (every X days/weeks) for your publications.",
-          "coming_soon": "Recurrence configuration options..."
+          "coming_soon": "Recurrence configuration options...",
+          "enable": "Enable recurrence",
+          "frequency": "Frequency",
+          "interval": "Every",
+          "ends": "Ends on",
+          "ends_placeholder": "Optional: End date",
+          "days": "Repeat on days"
         }
       },
       "edit": {

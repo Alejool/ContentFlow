@@ -58,6 +58,21 @@
           "startDate": "12/12/2025",
           "endDate": "12/12/2026"
         },
+        "validation": {
+          "titleRequired": "El título es obligatorio",
+          "titleLength": "El título no puede exceder los 70 caracteres",
+          "descMin": "La descripción debe tener al menos 10 caracteres",
+          "descMax": "La descripción no puede exceder los 700 caracteres",
+          "objRequired": "El objetivo es obligatorio",
+          "objMax": "El objetivo no puede exceder los 200 caracteres",
+          "hashtagsRequired": "Los hashtags son obligatorios",
+          "hashtagValid": "Los hashtags deben estar separados por comas",
+          "hashtagMax": "Máximo 10 hashtags permitidos",
+          "scheduledMinDifference": "La fecha debe ser al menos 1 minuto después de la actual",
+          "scheduledAtRequired": "La fecha es requerida si la programación global está activada",
+          "recurrenceDaysRequired": "Por favor selecciona al menos un día para la recurrencia semanal",
+          "recurrence_days": "Días de repetición no válidos"
+        },
         "button": {
           "save": "Actualizar",
           "cancel": "Cancelar"
@@ -82,7 +97,13 @@
           "title": "Repetir publicación (Recurrencia)",
           "locked_title": "Recurrencia bloqueada",
           "locked_desc": "Mejora tu plan para programar repeticiones automáticas (cada X días/semanas) de tus publicaciones.",
-          "coming_soon": "Opciones de configuración de recurrencia..."
+          "coming_soon": "Opciones de configuración de recurrencia...",
+          "enable": "Activar repetición",
+          "frequency": "Frecuencia",
+          "interval": "Cada",
+          "ends": "Termina el",
+          "ends_placeholder": "Opcional: Fecha de fin",
+          "days": "Repetir los días"
         }
       },
       "add": {
@@ -112,6 +133,7 @@
           "title": "Arrastra y suelta para ordenar",
           "subtitle": "Sube tus archivos multimedia aquí"
         },
+        "recurrence_days": "Días de repetición",
         "placeholders": {
           "title": "título",
           "description": "descripción",
@@ -156,6 +178,7 @@
           "title": "Arrastra y suelta para ordenar",
           "subtitle": "Sube tus archivos multimedia aquí"
         },
+        "recurrence_days": "Días de repetición",
         "placeholders": {
           "title": "Arrastra y suelta para ordenar",
           "description": "descripción",
