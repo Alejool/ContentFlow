@@ -73,12 +73,29 @@ export type Publication = {
     name: string;
     photo_url?: string;
   } | null;
+  current_approval_step_id?: number | null;
+  current_approval_step?: {
+    id: number;
+    name: string;
+    step_order: number;
+    workflow?: {
+      id: number;
+      name: string;
+      steps?: any[];
+    };
+  };
   approval_logs?: ApprovalLog[];
   platform_status_summary?: Record<
     string,
     {
       platform: string;
-      status: "published" | "failed" | "pending" | "publishing" | "success" | "orphaned";
+      status:
+        | "published"
+        | "failed"
+        | "pending"
+        | "publishing"
+        | "success"
+        | "orphaned";
       published_at?: string;
       error?: string;
       url?: string;
@@ -108,6 +125,12 @@ export type ApprovalLog = {
     id: number;
     name: string;
     photo_url?: string;
+  };
+  current_step_id?: number | null;
+  current_step?: {
+    id: number;
+    name: string;
+    step_order: number;
   };
 };
 
