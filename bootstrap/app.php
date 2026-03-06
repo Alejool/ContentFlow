@@ -22,6 +22,7 @@ use App\Http\Middleware\ThrottleByPlan;
 use App\Http\Middleware\CheckWorkspaceLimit;
 use App\Http\Middleware\CheckWorkspaceOwner;
 use Illuminate\Routing\Middleware\CacheResponse;
+use App\Http\Middleware\CheckApiWorkspacePlan;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -62,6 +63,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'throttle.plan' => ThrottleByPlan::class,
             'workspace.limit' => CheckWorkspaceLimit::class,
             'workspace.owner' => CheckWorkspaceOwner::class,
+            'api.plan' => CheckApiWorkspacePlan::class,
         ]);
     })
     ->withSchedule(function ($schedule) {
@@ -72,7 +74,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $schedule->command('social:check-tokens')->daily();
         $schedule->command('youtube:process-playlist-queue')->everyFiveMinutes();
         $schedule->command('app:send-event-reminders')->everyMinute();
-        
+
         // Reset monthly usage metrics on the first day of each month
         $schedule->command('usage:reset-monthly')
             ->monthlyOn(1, '00:00')

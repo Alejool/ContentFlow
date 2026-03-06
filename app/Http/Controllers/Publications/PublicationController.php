@@ -30,8 +30,7 @@ use App\Models\Role\Role;
 use App\Models\User;
 use App\Jobs\ProcessBackgroundUpload;
 use App\Models\Workspace\Workspace;
-use App\Models\Campaigns\Campaign;
-use App\Models\Publications\PublicationComment;
+use App\Models\Social\SocialAccount;
 use App\Models\ApprovalStep;
 use App\Models\ApprovalWorkflow;
 use App\Models\MediaFiles\MediaFile;
@@ -1039,10 +1038,11 @@ class PublicationController extends Controller
       ->where('status', 'pending')
       ->pluck('social_account_id')
       ->unique()
+      ->values()
       ->toArray();
 
     // Get current active social accounts for this workspace
-    $activeAccountIds = \App\Models\Social\SocialAccount::where('workspace_id', Auth::user()->current_workspace_id)
+    $activeAccountIds = SocialAccount::where('workspace_id', Auth::user()->current_workspace_id)
       ->whereNull('deleted_at')
       ->pluck('id')
       ->toArray();

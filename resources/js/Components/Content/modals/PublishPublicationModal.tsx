@@ -85,16 +85,16 @@ export default function PublishPublicationModal({
   const permissions = currentWorkspace?.permissions || [];
   const hasPublishPermission = permissions.includes("publish");
   const canManageContent = permissions.includes("manage-content");
-  
+
   // Verificar si el usuario actual tiene una aprobación activa
   const currentUserId = auth.user?.id;
   const hasActiveApproval = publication?.approval_logs?.some(
-    (log: any) => 
-      log.requested_by === currentUserId && 
-      log.action === 'approved' && 
+    (log: any) =>
+      log.requested_by === currentUserId &&
+      log.action === 'approved' &&
       log.reviewed_at !== null
   );
-  
+
   // Una publicación puede publicarse directamente si:
   // 1. El usuario tiene permiso "publish", O
   // 2. El usuario actual tiene una aprobación activa en approval_logs, O
@@ -195,7 +195,7 @@ export default function PublishPublicationModal({
     platform: string,
   ) => {
     if (!publication) return;
-    
+
     // Siempre pedir confirmación al despublicar
     const confirmed = await confirm({
       title: t("publications.modal.publish.unpublish.title", { platform }) || "¿Despublicar de " + platform + "?",
@@ -260,7 +260,7 @@ export default function PublishPublicationModal({
         videoFileName: video.file_name,
         videoPreviewUrl,
         // Crear un nuevo objeto solo si el contenido cambió
-        existingThumbnail: existingThumbnail 
+        existingThumbnail: existingThumbnail
           ? { url: existingThumbnail.url, id: existingThumbnail.id }
           : null,
       };
@@ -315,7 +315,7 @@ export default function PublishPublicationModal({
                       ) ||
                         "Esta publicación está esperando aprobación antes de poder ser publicada."}
                     </p>
-                    
+
                     {/* Información del solicitante */}
                     {publication.approval_logs && publication.approval_logs.length > 0 && (() => {
                       const latestLog = publication.approval_logs[0]; // Ya viene ordenado por requested_at desc
@@ -426,15 +426,15 @@ export default function PublishPublicationModal({
               // 'success' = publicada exitosamente (legacy)
               // 'orphaned' = publicada pero la cuenta fue desconectada
               const publishedAccounts = Object.entries(publication.platform_status_summary)
-                .filter(([_, status]: [string, any]) => 
-                  status.status === 'published' || 
-                  status.status === 'success' || 
+                .filter(([_, status]: [string, any]) =>
+                  status.status === 'published' ||
+                  status.status === 'success' ||
                   status.status === 'orphaned'
                 )
                 .map(([accountId, _]) => parseInt(accountId));
-              
+
               if (publishedAccounts.length === 0) return null;
-              
+
               return (
                 <div className="mb-6 p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
                   <div className="flex items-start gap-3">
@@ -444,28 +444,28 @@ export default function PublishPublicationModal({
                         {t("publications.modal.publish.alreadyPublishedBanner.title") || "Publicación Activa"}
                       </h4>
                       <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
-                        {t("publications.modal.publish.alreadyPublishedBanner.message") || 
+                        {t("publications.modal.publish.alreadyPublishedBanner.message") ||
                           "Esta publicación ya está publicada en las siguientes cuentas:"}
                       </p>
-                      
+
                       <div className="mt-2 flex flex-wrap gap-2">
                         {publishedAccounts.map(accountId => {
                           const statusInfo = publication.platform_status_summary?.[accountId];
                           if (!statusInfo) return null;
-                          
+
                           // Verificar si la cuenta está conectada actualmente
                           const isConnected = connectedAccounts.some(acc => acc.id === accountId);
                           const connectedAcc = connectedAccounts.find(acc => acc.id === accountId);
-                          
+
                           if (isConnected && connectedAcc) {
                             // Cuenta conectada - fondo azul
                             return (
-                              <span 
+                              <span
                                 key={accountId}
                                 className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-blue-100 dark:bg-blue-900/40 text-xs font-medium text-blue-800 dark:text-blue-300"
                               >
-                                <img 
-                                  src={getPlatformIcon(connectedAcc.platform)} 
+                                <img
+                                  src={getPlatformIcon(connectedAcc.platform)}
                                   alt={connectedAcc.platform}
                                   className="w-3.5 h-3.5"
                                 />
@@ -476,12 +476,12 @@ export default function PublishPublicationModal({
                           } else {
                             // Cuenta desconectada - fondo ámbar con etiqueta
                             return (
-                              <span 
+                              <span
                                 key={accountId}
                                 className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-amber-100 dark:bg-amber-900/40 text-xs font-medium text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-700"
                               >
-                                <img 
-                                  src={getPlatformIcon(statusInfo.platform)} 
+                                <img
+                                  src={getPlatformIcon(statusInfo.platform)}
                                   alt={statusInfo.platform}
                                   className="w-3.5 h-3.5"
                                 />
@@ -495,9 +495,9 @@ export default function PublishPublicationModal({
                           }
                         })}
                       </div>
-                      
+
                       <p className="text-xs text-blue-600 dark:text-blue-400 mt-2 font-medium">
-                        {t("publications.modal.publish.alreadyPublishedBanner.hint") || 
+                        {t("publications.modal.publish.alreadyPublishedBanner.hint") ||
                           "Puedes publicar en cuentas adicionales seleccionándolas a continuación."}
                       </p>
                     </div>
@@ -544,11 +544,11 @@ export default function PublishPublicationModal({
                       account.id,
                     );
                     // Mostrar "publishing" si la publicación está en estado "publishing" o "retrying" Y está en la lista
-                    const isPublishing = publishingPlatforms.includes(account.id) && 
+                    const isPublishing = publishingPlatforms.includes(account.id) &&
                       (publication?.status === "publishing" || publication?.status === "retrying");
                     const isScheduled = scheduledPlatforms.includes(account.id);
                     const isUnpublishing = unpublishing === account.id;
-                    
+
                     // Get retry information for this platform
                     const platformRetryInfo = retryInfo[account.id];
                     const isRetrying = platformRetryInfo?.is_retrying || false;
@@ -594,27 +594,27 @@ export default function PublishPublicationModal({
                                   <div className="w-10 h-10 border border-yellow-200 dark:border-yellow-900 rounded-full" />
                                   <div className="absolute inset-0 w-10 h-10 border border-yellow-500 border-t-transparent rounded-full animate-spin" />
                                 </div>
-                                
+
                                 <div className="flex flex-col items-center gap-0.5">
-                                  <span className="text-sm font-bold text-yellow-800 dark:text-yellow-300 uppercase tracking-wide capitalize">
+                                  <span className="text-sm font-bold text-yellow-800 dark:text-yellow-300  tracking-wide capitalize">
                                     {account.platform}
                                   </span>
                                   <span className="text-xs font-medium text-yellow-600 dark:text-yellow-400">
                                     {isRetrying && retryStatus
                                       ? `${t("publications.status.retrying") || "Reintentando"} ${retryStatus}`
-                                      : publication?.status === "retrying" 
+                                      : publication?.status === "retrying"
                                         ? t("publications.status.retrying") || "Reintentando"
                                         : t("publications.modal.publish.publishing")}
                                   </span>
                                 </div>
                               </div>
-                              
+
                               {/* Cancel button for individual platform */}
                               <button
                                 onClick={async (e) => {
                                   e.stopPropagation();
                                   if (!publication) return;
-                                  
+
                                   const confirmed = await confirm({
                                     title: t("publications.modal.cancel_platform.title", { platform: account.platform }) || `¿Cancelar ${account.platform}?`,
                                     message: t("publications.modal.cancel_platform.message", { platform: account.platform }) || `¿Estás seguro de que deseas cancelar la publicación en ${account.platform}? Se detendrán todos los reintentos para esta plataforma.`,
@@ -622,7 +622,7 @@ export default function PublishPublicationModal({
                                     cancelText: t("publications.modal.cancel_platform.cancel") || "No",
                                     type: "warning",
                                   });
-                                  
+
                                   if (confirmed) {
                                     await handleCancelPlatform(publication.id, account.id);
                                   }
@@ -640,7 +640,7 @@ export default function PublishPublicationModal({
                               <div className="flex flex-col items-center gap-2">
                                 <XCircle className="w-10 h-10 text-red-600 dark:text-red-400" />
                                 <div className="flex flex-col items-center gap-0.5">
-                                  <span className="text-sm font-bold text-red-800 dark:text-red-300 uppercase tracking-wide capitalize">
+                                  <span className="text-sm font-bold text-red-800 dark:text-red-300  tracking-wide capitalize">
                                     {account.platform}
                                   </span>
                                   <span className="text-xs font-medium text-red-600 dark:text-red-400">
@@ -677,14 +677,14 @@ export default function PublishPublicationModal({
                                 <div className="flex flex-col items-center gap-2">
                                   <CheckCircle className="w-10 h-10 text-green-600 dark:text-green-400" />
                                   <div className="flex flex-col items-center gap-0.5">
-                                    <span className="text-sm font-bold text-green-800 dark:text-green-300 uppercase tracking-wide capitalize">
+                                    <span className="text-sm font-bold text-green-800 dark:text-green-300  tracking-wide capitalize">
                                       {account.platform}
                                     </span>
                                     <span className="text-xs font-medium text-green-600 dark:text-green-400">
                                       {t("publications.modal.publish.published")}
                                     </span>
                                   </div>
-                                  
+
                                   {/* Enlace a la publicación si existe */}
                                   {postUrl && (
                                     <a
@@ -901,12 +901,12 @@ export default function PublishPublicationModal({
 
             <div className="flex gap-3 p-4 border-t border-gray-200/50 dark:border-neutral-800/50 sticky bottom-0 z-20 bg-gradient-to-r from-gray-50 via-white to-gray-50/80 dark:from-neutral-900 dark:via-neutral-900/95 dark:to-neutral-800/90 backdrop-blur-md shadow-sm dark:shadow-neutral-950/20">
               <button
-                type="button" 
+                type="button"
                 onClick={async () => {
                   // Si hay plataformas publicando o reintentando, preguntar si quiere cancelar
-                  const hasPublishingPlatforms = publishingPlatforms.length > 0 && 
+                  const hasPublishingPlatforms = publishingPlatforms.length > 0 &&
                     (publication.status === "publishing" || publication.status === "retrying");
-                  
+
                   if (hasPublishingPlatforms) {
                     const confirmed = await confirm({
                       title: t("publications.modal.cancelAllConfirm.title") || "¿Cancelar TODAS las plataformas?",
@@ -915,7 +915,7 @@ export default function PublishPublicationModal({
                       cancelText: t("publications.modal.cancelAllConfirm.cancel") || "No",
                       type: "danger",
                     });
-                    
+
                     if (confirmed) {
                       await handleCancelPublication(publication.id);
                       if (onSuccess) onSuccess();
@@ -938,7 +938,7 @@ export default function PublishPublicationModal({
                   type="button"
                   onClick={handlePublishWithNotifications}
                   disabled={
-                    selectedPlatforms.length === 0 || 
+                    selectedPlatforms.length === 0 ||
                     publishing
                   }
                   className="flex-[2] px-4 py-3 rounded-lg font-medium bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
