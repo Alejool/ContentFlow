@@ -15,10 +15,6 @@ use App\Actions\Publications\UpdatePublicationAction;
 use App\Actions\Publications\PublishPublicationAction;
 use App\Actions\Publications\UnpublishPublicationAction;
 use App\Actions\Publications\DeletePublicationAction;
-use App\Notifications\PublicationAwaitingApprovalNotification;
-use App\Notifications\PublicationApprovedNotification;
-use App\Notifications\PublicationRejectedNotification;
-use App\Notifications\PublicationCancelledNotification;
 use App\Events\Publications\PublicationUpdated;
 use App\Events\PublicationStatusUpdated;
 use Carbon\Carbon;
@@ -645,7 +641,7 @@ class PublicationController extends Controller
       ->get();
 
     foreach ($approvers as $approver) {
-      $approver->notify(new PublicationAwaitingApprovalNotification($publication, Auth::user()));
+      $approver->notify(new \App\Notifications\PublicationAwaitingApprovalNotification($publication, Auth::user()));
     }
 
     // Broadcast lock change to notify all users in real-time
@@ -673,6 +669,13 @@ class PublicationController extends Controller
 
     // Only publications in pending_review can be approved
     if ($publication->status !== 'pending_review') {
+      Log::warning('Approve failed: Publication is not in pending_review', [
+        'publication_id' => $publication->id,
+        'current_status' => $publication->status,
+        'user_id' => Auth::id(),
+        'workspace_id' => $publication->workspace_id,
+        'current_workspace_id' => Auth::user()->current_workspace_id
+      ]);
       return $this->errorResponse('Only publications in pending review can be approved.', 422);
     }
 
@@ -773,7 +776,7 @@ class PublicationController extends Controller
     // Notify the redactor (publication owner)
     $publication->load('user');
     if ($publication->user) {
-      $publication->user->notify(new PublicationApprovedNotification($publication, Auth::user()));
+      $publication->user->notify(new \App\Notifications\PublicationApprovedNotification($publication, Auth::user()));
     }
 
     // Broadcast lock removal to notify all users in real-time (publication is now editable)
@@ -805,6 +808,13 @@ class PublicationController extends Controller
 
     // Only publications in pending_review can be rejected
     if ($publication->status !== 'pending_review') {
+      Log::warning('Reject failed: Publication is not in pending_review', [
+        'publication_id' => $publication->id,
+        'current_status' => $publication->status,
+        'user_id' => Auth::id(),
+        'workspace_id' => $publication->workspace_id,
+        'current_workspace_id' => Auth::user()->current_workspace_id
+      ]);
       return $this->errorResponse('Only publications in pending review can be rejected.', 422);
     }
 
@@ -852,7 +862,7 @@ class PublicationController extends Controller
     // Notify the publication owner
     $publication->load('user');
     if ($publication->user) {
-      $publication->user->notify(new PublicationRejectedNotification($publication, Auth::user()));
+      $publication->user->notify(new \App\Notifications\PublicationRejectedNotification($publication, Auth::user()));
     }
 
     // Broadcast lock removal to notify all users in real-time
@@ -1003,10 +1013,10 @@ class PublicationController extends Controller
 
     $publication->logActivity('cancelled', ['previous_status' => $oldStatus]);
 
-    $publication->user->notify(new PublicationCancelledNotification($publication));
+    $publication->user->notify(new \App\Notifications\PublicationCancelledNotification($publication));
 
     if ($publication->workspace && ($publication->workspace->discord_webhook_url || $publication->workspace->slack_webhook_url)) {
-      $publication->workspace->notify(new PublicationCancelledNotification($publication));
+      $publication->workspace->notify(new \App\Notifications\PublicationCancelledNotification($publication));
     }
 
     broadcast(new PublicationStatusUpdated(Auth::id(), $publication->id, 'failed'))->toOthers();
