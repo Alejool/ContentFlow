@@ -160,7 +160,7 @@ export default function WhiteLabelSettingsTab({
                       <div className="text-center">
                         <ImageIcon className="w-12 h-12 text-neutral-300 dark:text-neutral-600 mx-auto mb-2" />
                         <span className="text-xs font-medium text-neutral-400">
-                          Sin Logo
+                          {t("workspace.white_label.no_logo") || "Sin Logo"}
                         </span>
                       </div>
                     )}
@@ -263,7 +263,7 @@ export default function WhiteLabelSettingsTab({
                       value={data.primary_color}
                       onChange={(e) => setData("primary_color", e.target.value)}
                       disabled={!canManageWorkspace}
-                      className="block w-full h-14 pl-10 pr-4 rounded-lg bg-neutral-100 dark:bg-neutral-800 border-transparent focus:ring-2 focus:ring-primary-500 text-lg font-mono font-bold"
+                      className="block w-full h-14 pl-10 pr-4 text-black dark:text-white rounded-lg bg-neutral-100 dark:bg-neutral-800 border-transparent focus:ring-2 focus:ring-primary-500 text-lg font-mono font-bold"
                       placeholder="#000000"
                     />
                     <div className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 font-mono text-lg">
@@ -301,14 +301,14 @@ export default function WhiteLabelSettingsTab({
         <div className="space-y-6">
           <div className="sticky top-24">
             <h4 className="text-sm font-bold text-gray-500 dark:text-neutral-500 uppercase tracking-widest mb-4 ml-2">
-              Vista Previa en Vivo
+              {t("workspace.white_label.live_preview") || "Vista Previa en Vivo"}
             </h4>
 
             <div className="space-y-6">
               {/* Button Preview */}
               <div className="bg-white dark:bg-neutral-900 rounded-lg p-6 border border-neutral-200 dark:border-neutral-800 shadow-sm">
                 <p className="text-xs font-bold text-gray-400 dark:text-neutral-500 mb-4">
-                  BOTONES Y ACCIONES
+                  {t("workspace.white_label.buttons_actions") || "BOTONES Y ACCIONES"}
                 </p>
                 <div className="flex flex-col gap-3">
                   <button
@@ -318,7 +318,7 @@ export default function WhiteLabelSettingsTab({
                       boxShadow: `0 10px 15px -3px ${data.primary_color}40`,
                     }}
                   >
-                    Botón Principal
+                    {t("workspace.white_label.primary_button") || "Botón Principal"}
                   </button>
                   <button
                     className="w-full py-2.5 rounded-lg text-sm font-bold border transition-all"
@@ -327,7 +327,7 @@ export default function WhiteLabelSettingsTab({
                       color: data.primary_color,
                     }}
                   >
-                    Botón Secundario
+                    {t("workspace.white_label.secondary_button") || "Botón Secundario"}
                   </button>
                   <div className="flex items-center gap-2 mt-2">
                     <div
@@ -335,7 +335,7 @@ export default function WhiteLabelSettingsTab({
                       style={{ backgroundColor: data.primary_color }}
                     />
                     <span className="text-xs font-medium text-gray-500">
-                      Indicador de actividad
+                      {t("workspace.white_label.activity_indicator") || "Indicador de actividad"}
                     </span>
                   </div>
                 </div>
@@ -344,7 +344,7 @@ export default function WhiteLabelSettingsTab({
               {/* Sidebar Header Preview */}
               <div className="bg-white dark:bg-neutral-900 rounded-lg p-6 border border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden relative">
                 <p className="text-xs font-bold text-gray-400 dark:text-neutral-500 mb-4 uppercase">
-                  Cabecera del Menú
+                  {t("workspace.white_label.sidebar_header") || "Cabecera del Menú"}
                 </p>
 
                 <div className="rounded-lg p-4 flex items-center gap-3 border dark:border-neutral-800 bg-neutral-50 dark:bg-black/20">
@@ -368,7 +368,7 @@ export default function WhiteLabelSettingsTab({
                       {workspace.name}
                     </p>
                     <p className="text-[10px] font-bold uppercase tracking-tighter opacity-60">
-                      Workspace Branding
+                      {t("workspace.white_label.workspace_branding") || "Workspace Branding"}
                     </p>
                   </div>
                 </div>
@@ -379,8 +379,7 @@ export default function WhiteLabelSettingsTab({
                 <div className="flex gap-3">
                   <ShieldCheck className="w-5 h-5 text-emerald-600 dark:text-emerald-500" />
                   <p className="text-sm text-emerald-800 dark:text-emerald-400 leading-relaxed font-medium">
-                    Los cambios se aplican inmediatamente para todos los
-                    usuarios de este espacio de trabajo.
+                    {t("workspace.white_label.impact_notice") || "Los cambios se aplican inmediatamente para todos los usuarios de este espacio de trabajo."}
                   </p>
                 </div>
               </div>

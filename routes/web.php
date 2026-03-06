@@ -59,7 +59,6 @@ Route::middleware('guest')->group(function () {
   Route::get('/contact', fn() => Inertia::render('Contact'))->name('contact');
   Route::get('/approvals/history-test', fn() => response()->json(['message' => 'History route is reachable outside middleware']));
 
-
   /*
 |--------------------------------------------------------------------------
 | ⚠️ Debug / Maintenance Routes (RECOMENDADO SOLO LOCAL)
@@ -163,7 +162,7 @@ Route::middleware('auth')->group(function () {
   Route::prefix('workspaces')->name('workspaces.')->group(function () {
     Route::get('/', [WorkspaceController::class, 'index'])->name('index');
     Route::post('/', [WorkspaceController::class, 'store'])->name('store');
-    Route::post('/{workspace}/switch', [WorkspaceController::class, 'switch'])->name('switch');
+    Route::post('{workspace}/switch', [WorkspaceController::class, 'switch'])->name('switch');
     Route::get('{workspace}/settings', [WorkspaceController::class, 'settings'])->name('settings');
     Route::get('{workspace}', [WorkspaceController::class, 'show'])->name('show');
     Route::put('{workspace}', [WorkspaceController::class, 'update'])->name('update');

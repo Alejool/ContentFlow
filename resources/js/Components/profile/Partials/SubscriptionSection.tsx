@@ -13,7 +13,6 @@ import {
   ArrowUpCircle,
   Calendar,
   CheckCircle,
-  Cpu,
   CreditCard,
   Crown,
   HardDrive,
@@ -176,7 +175,8 @@ export default function SubscriptionSection({
   const formatDisplayValue = (value: number, type: string) => {
     if (value === undefined || value === null || isNaN(value)) return "0";
     if (type === "storage_gb") {
-      return formatBytes(value);
+      if (value === -1) return "∞";
+      return value.toLocaleString() + " GB";
     }
     if (value === -1) return "∞";
     return value.toString();
@@ -197,13 +197,6 @@ export default function SubscriptionSection({
           limit: usage.storage_limit || 0,
           icon: <HardDrive className="w-4 h-4" />,
           name: t("subscription.usage.storage"),
-        },
-        {
-          type: "ai_requests_per_month",
-          current: usage.ai_requests_used || 0,
-          limit: usage.ai_requests_limit || 0,
-          icon: <Cpu className="w-4 h-4" />,
-          name: t("subscription.usage.aiRequests"),
         },
         {
           type: "social_accounts",
@@ -309,6 +302,51 @@ export default function SubscriptionSection({
             </div>
           )}
 
+          {/* Billing period progress bar */}
+          {subscription.current_period_end &&
+            !subscription.is_trial &&
+            (() => {
+              const now = new Date();
+              const periodEnd = new Date(subscription.current_period_end);
+              // Assume monthly period (30 days)
+              const periodStart = new Date(periodEnd);
+              periodStart.setDate(periodStart.getDate() - 30);
+              const totalMs = periodEnd.getTime() - periodStart.getTime();
+              const elapsedMs = now.getTime() - periodStart.getTime();
+              const elapsedPct = Math.min(
+                100,
+                Math.max(0, (elapsedMs / totalMs) * 100),
+              );
+              const daysLeft = Math.max(
+                0,
+                Math.ceil(
+                  (periodEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
+                ),
+              );
+              return (
+                <div className="p-3 bg-gray-50 dark:bg-neutral-800/50 rounded-lg border border-gray-100 dark:border-neutral-700/50 space-y-1.5">
+                  <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400">
+                    <span className="font-medium">Periodo de facturación</span>
+                    <span className="font-semibold">
+                      {daysLeft} {daysLeft === 1 ? "día" : "días"} restantes
+                    </span>
+                  </div>
+                  <div className="h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-primary-500 dark:bg-primary-400 transition-all duration-500"
+                      style={{ width: `${elapsedPct}%` }}
+                    />
+                  </div>
+                  <div className="flex justify-between text-[10px] text-gray-400">
+                    <span>Inicio</span>
+                    <span>
+                      Renovación: {formatDate(subscription.current_period_end)}
+                    </span>
+                  </div>
+                </div>
+              );
+            })()}
+
           {/* Action Buttons */}
           <div className="flex flex-wrap gap-2 pt-2">
             {(subscription.plan_id === "free" ||
@@ -370,7 +408,7 @@ export default function SubscriptionSection({
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {metricsData.map((metric) => {
                 const percentage = calculatePercentage(
                   metric.current,
@@ -397,16 +435,29 @@ export default function SubscriptionSection({
                 return (
                   <div
                     key={metric.type}
-                    className="p-4 rounded-lg bg-gradient-to-br from-primary-50 to-primary-100/50 dark:from-primary-900/10 dark:to-primary-800/5 border border-primary-200/50 dark:border-primary-800/20 space-y-3"
+                    className={`p-4 rounded-lg border space-y-3 ${
+                      percentage >= 80
+                        ? "bg-amber-50 dark:bg-amber-900/10 border-amber-200 dark:border-amber-800/30"
+                        : "bg-gradient-to-br from-primary-50 to-primary-100/50 dark:from-primary-900/10 dark:to-primary-800/5 border-primary-200/50 dark:border-primary-800/20"
+                    }`}
                   >
                     <div className="flex items-center justify-between text-sm">
                       <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300 font-medium">
-                        <div className="p-1.5 rounded-md bg-white dark:bg-neutral-800 border border-primary-100 dark:border-primary-900/30">
-                          {metric.icon}
-                        </div>
+                        <div className=" rounded-md ">{metric.icon}</div>
                         <span>{metric.name}</span>
+                        {percentage >= 80 && percentage < 100 && (
+                          <span className="text-[10px] font-bold text-amber-700 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/30 px-1.5 py-0.5 rounded-full flex items-center gap-1">
+                            <AlertCircle className="w-2.5 h-2.5" /> 80% usado
+                          </span>
+                        )}
+                        {percentage >= 100 && (
+                          <span className="text-[10px] font-bold text-red-700 dark:text-red-400 bg-red-100 dark:bg-red-900/30 px-1.5 py-0.5 rounded-full flex items-center gap-1">
+                            <AlertCircle className="w-2.5 h-2.5" /> Límite
+                            alcanzado
+                          </span>
+                        )}
                       </div>
-                      <span className="font-bold text-gray-900 dark:text-white">
+                      <span className="font-bold text-gray-900 text-xs dark:text-white">
                         {displayCurrent} / {displayLimit}
                       </span>
                     </div>

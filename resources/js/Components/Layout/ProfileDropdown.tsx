@@ -141,7 +141,7 @@ export default function ProfileDropdown({
             type="button"
             className="group inline-flex items-center gap-3 py-1.5 pl-2 pr-3 rounded-full transition-all duration-300
                        bg-white hover:bg-gray-50 border border-gray-200 hover:border-gray-300 text-gray-700
-                       dark:bg-neutral-800/50 dark:hover:bg-neutral-800 dark:border-neutral-700 dark:hover:border-neutral-600 dark:text-gray-200"
+                       dark:bg-neutral-800/80 dark:hover:bg-neutral-800 dark:border-neutral-700 dark:hover:border-neutral-600 dark:text-gray-200"
           >
             <div className="relative">
               <Avatar
@@ -152,7 +152,7 @@ export default function ProfileDropdown({
               />
             </div>
 
-            <span className="hidden sm:block font-medium text-sm truncate max-w-[100px] group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+            <span className="hidden sm:block font-medium text-sm truncate max-w-[150px] group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
               {user?.name || "User"}
             </span>
 
@@ -163,11 +163,11 @@ export default function ProfileDropdown({
 
       <Dropdown.Content
         align="right"
-        width="64"
+        width="72"
         contentClasses="py-2 bg-white/95 backdrop-blur-xl border border-white/20
-                        dark:bg-neutral-900/95 dark:border-neutral-800"
+                        dark:bg-neutral-900 dark:border-neutral-800/90"
       >
-        <div className="px-2 pt-2 pb-3 mb-2">
+        <div className="px-4 mb-1">
           <div
             className="p-4 rounded-lg relative overflow-hidden group
                        bg-gradient-to-br from-gray-50 to-white border border-gray-100
@@ -264,14 +264,14 @@ export default function ProfileDropdown({
                         {t("subscription.usage.publications", "Publicaciones")}
                       </span>
                     </div>
-                    <span className="font-semibold text-gray-900 dark:text-white">
+                    <span className="font-semibold text-xs text-gray-900 dark:text-white">
                       {usage.publications.used} /{" "}
                       {usage.publications.limit === -1
                         ? "∞"
                         : usage.publications.limit}
                     </span>
                   </div>
-                  <div className="h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                  <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                     <div
                       className={`h-full rounded-full transition-all ${
                         usage.publications.percentage >= 90
@@ -296,12 +296,12 @@ export default function ProfileDropdown({
                         {t("subscription.usage.storage", "Almacenamiento")}
                       </span>
                     </div>
-                    <span className="font-semibold text-gray-900 dark:text-white">
+                    <span className="font-semibold  text-gray-900 dark:text-white">
                       {formatBytes(usage.storage.used_bytes)} /{" "}
                       {usage.storage.limit_gb} GB
                     </span>
                   </div>
-                  <div className="h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                  <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                     <div
                       className={`h-full rounded-full transition-all ${
                         usage.storage.percentage >= 90
@@ -430,7 +430,7 @@ export default function ProfileDropdown({
               ${
                 isProfileActive
                   ? "bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400"
-                  : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-800 hover:text-gray-900 dark:hover:text-white"
+                  : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-neutral-800 hover:text-gray-900dark:hover:text-white"
               }`}
           >
             <div

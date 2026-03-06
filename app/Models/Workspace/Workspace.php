@@ -237,7 +237,7 @@ class Workspace extends Model
     public function getPlanName(): string
     {
         $subscription = $this->subscription;
-        return $subscription?->plan ?? 'free';
+        return $subscription?->plan ?? 'demo';
     }
 
     /**

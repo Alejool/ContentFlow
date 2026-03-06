@@ -1,4 +1,5 @@
 import ApiSettingsTab from "@/Components/Workspace/ApiSettingsTab";
+import ApprovalWorkflowsTab from "@/Components/Workspace/ApprovalWorkflowsTab";
 import EnterpriseSupportTab from "@/Components/Workspace/EnterpriseSupportTab";
 import GeneralSettingsTab from "@/Components/Workspace/GeneralSettingsTab";
 import IntegrationsSettingsTab from "@/Components/Workspace/IntegrationsSettingsTab";
@@ -12,6 +13,7 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head } from "@inertiajs/react";
 import {
   AlertCircle,
+  CheckCircle,
   Key,
   Layout,
   Palette,
@@ -54,6 +56,7 @@ export default function WorkspaceSettings({
     | "white-label"
     | "api"
     | "support"
+    | "approvals"
   >((initialTab as any) || "overview");
 
   if (!current_workspace || !roles) {
@@ -131,6 +134,14 @@ export default function WorkspaceSettings({
     },
   ];
 
+  if (canManageWorkspace) {
+    tabs.splice(4, 0, {
+      id: "approvals",
+      label: "Aprobaciones",
+      icon: CheckCircle,
+    });
+  }
+
   if (isEnterprise && isOwner) {
     tabs.push(
       {
@@ -200,6 +211,14 @@ export default function WorkspaceSettings({
         return (
           <ApiSettingsTab
             workspace={current_workspace}
+            canManageWorkspace={canManageWorkspace}
+          />
+        );
+      case "approvals":
+        return (
+          <ApprovalWorkflowsTab
+            workspace={current_workspace}
+            roles={roles}
             canManageWorkspace={canManageWorkspace}
           />
         );

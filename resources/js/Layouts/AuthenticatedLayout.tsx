@@ -142,13 +142,22 @@ export default function AuthenticatedLayout({
     // Dynamically update favicon
     const faviconUrl =
       auth?.current_workspace?.white_label_favicon_url || "/favicon.ico";
-    let link = document.querySelector("link[rel~='icon']") as HTMLLinkElement;
-    if (!link) {
-      link = document.createElement("link");
+
+    // Find all icon links (icon, shortcut icon, apple-touch-icon)
+    const existingLinks = document.querySelectorAll("link[rel*='icon']");
+    const timestamp = new Date().getTime();
+    const newHref = `${faviconUrl}?v=${timestamp}`;
+
+    if (existingLinks.length > 0) {
+      existingLinks.forEach((link) => {
+        (link as HTMLLinkElement).href = newHref;
+      });
+    } else {
+      const link = document.createElement("link");
       link.rel = "icon";
+      link.href = newHref;
       document.head.appendChild(link);
     }
-    link.href = `${faviconUrl}?v=${new Date().getTime()}`;
   }, [
     user?.theme_color,
     auth?.current_workspace?.white_label_primary_color,

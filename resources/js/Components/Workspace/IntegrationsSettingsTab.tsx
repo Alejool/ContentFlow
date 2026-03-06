@@ -116,11 +116,11 @@ const IntegrationCard = ({
             loading={testing === type}
             disabled={!canManageWorkspace}
             className="gap-2"
+            icon={ExternalLink}
           >
             {isConnected
               ? t("workspace.integrations.test_connection")
               : t("common.connect")}
-            <ExternalLink className="h-3.5 w-3.5" />
           </Button>
         </div>
       </div>
@@ -397,7 +397,7 @@ export default function IntegrationsSettingsTab({
                 t={t}
               />
             </div>
-            
+
             {/* Slack integration hidden but logic preserved */}
             <div className="hidden">
               <IntegrationCard

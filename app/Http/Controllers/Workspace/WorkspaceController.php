@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 use App\Notifications\WorkspaceRemovedNotification;
 
@@ -97,9 +98,26 @@ class WorkspaceController extends Controller
     }
   }
 
-  public function switch(Workspace $workspace)
+  public function switch($idOrSlug)
   {
+    Log::info('Workspace Switch Attempt', ['idOrSlug' => $idOrSlug]);
+
+    $workspace = Workspace::where(function ($q) use ($idOrSlug) {
+      if (is_numeric($idOrSlug)) {
+        $q->where('id', $idOrSlug);
+      }
+      $q->orWhere('slug', $idOrSlug);
+    })->first();
+
+    if (!$workspace) {
+      Log::error('Workspace Not Found during switch', ['idOrSlug' => $idOrSlug]);
+      abort(404, "Workspace [{$idOrSlug}] not found.");
+    }
+
+    Log::info('Workspace Found', ['id' => $workspace->id, 'slug' => $workspace->slug]);
+
     if (!Auth::user()->workspaces()->where('workspaces.id', $workspace->id)->exists()) {
+      Log::warning('User does not belong to workspace', ['user_id' => Auth::id(), 'workspace_id' => $workspace->id]);
       abort(403);
     }
 
@@ -114,8 +132,14 @@ class WorkspaceController extends Controller
     return redirect()->route('dashboard')->with('message', "Switched to {$workspace->name}");
   }
 
-  public function settings(Request $request, Workspace $workspace)
+  public function settings(Request $request, $idOrSlug)
   {
+    $workspace = Workspace::where(function ($q) use ($idOrSlug) {
+      if (is_numeric($idOrSlug)) {
+        $q->where('id', $idOrSlug);
+      }
+      $q->orWhere('slug', $idOrSlug);
+    })->firstOrFail();
 
     if (!$workspace->users()->where('users.id', Auth::id())->exists()) {
       abort(403);
@@ -134,8 +158,14 @@ class WorkspaceController extends Controller
     ]);
   }
 
-  public function update(Request $request, Workspace $workspace)
+  public function update(Request $request, $idOrSlug)
   {
+    $workspace = Workspace::where(function ($q) use ($idOrSlug) {
+      if (is_numeric($idOrSlug)) {
+        $q->where('id', $idOrSlug);
+      }
+      $q->orWhere('slug', $idOrSlug);
+    })->firstOrFail();
 
     if (Auth::id() !== $workspace->created_by) {
       abort(403, 'Only the workspace owner can update workspace settings');
@@ -160,8 +190,15 @@ class WorkspaceController extends Controller
   /**
    * Update white-label settings for enterprise workspaces.
    */
-  public function updateWhiteLabel(Request $request, Workspace $workspace)
+  public function updateWhiteLabel(Request $request, $idOrSlug)
   {
+    $workspace = Workspace::where(function ($q) use ($idOrSlug) {
+      if (is_numeric($idOrSlug)) {
+        $q->where('id', $idOrSlug);
+      }
+      $q->orWhere('slug', $idOrSlug);
+    })->firstOrFail();
+
     Log::info('ENTRY: updateWhiteLabel', [
       'workspace_slug' => $workspace->slug,
       'has_file_logo' => $request->hasFile('logo'),
@@ -280,16 +317,21 @@ class WorkspaceController extends Controller
     return redirect()->back()->with('message', 'White-label settings updated successfully.');
   }
 
-  public function members($workspaceId)
+  public function members(Request $request, $idOrSlug)
   {
-    $workspace = Workspace::with([
+    $workspace = Workspace::where(function ($q) use ($idOrSlug) {
+      if (is_numeric($idOrSlug)) {
+        $q->where('id', $idOrSlug);
+      }
+      $q->orWhere('slug', $idOrSlug);
+    })->with([
       'users' => function ($query) {
         $query->select('users.id', 'users.name', 'users.email', 'users.photo_url', 'users.created_at')
           ->withPivot('role_id', 'created_at');
       }
-    ])->findOrFail($workspaceId);
+    ])->firstOrFail();
 
-    if (!Auth::user()->workspaces()->where('workspaces.id', $workspaceId)->exists()) {
+    if (!Auth::user()->workspaces()->where('workspaces.id', $workspace->id)->exists()) {
       abort(403);
     }
 
@@ -306,11 +348,16 @@ class WorkspaceController extends Controller
     ]);
   }
 
-  public function updateMemberRole(Request $request, $workspaceId, $userId)
+  public function updateMemberRole(Request $request, $idOrSlug, $userId)
   {
-    $workspace = Workspace::findOrFail($workspaceId);
+    $workspace = Workspace::where(function ($q) use ($idOrSlug) {
+      if (is_numeric($idOrSlug)) {
+        $q->where('id', $idOrSlug);
+      }
+      $q->orWhere('slug', $idOrSlug);
+    })->firstOrFail();
 
-    if (!Auth::user()->hasPermission('manage-team', $workspaceId)) {
+    if (!Auth::user()->hasPermission('manage-team', $workspace->id)) {
       abort(403, 'You do not have permission to manage members');
     }
 
@@ -342,11 +389,16 @@ class WorkspaceController extends Controller
     return $this->successResponse(null, 'Member role updated successfully');
   }
 
-  public function removeMember($workspaceId, $userId)
+  public function removeMember($idOrSlug, $userId)
   {
-    $workspace = Workspace::findOrFail($workspaceId);
+    $workspace = Workspace::where(function ($q) use ($idOrSlug) {
+      if (is_numeric($idOrSlug)) {
+        $q->where('id', $idOrSlug);
+      }
+      $q->orWhere('slug', $idOrSlug);
+    })->firstOrFail();
 
-    if (!Auth::user()->hasPermission('manage-team', $workspaceId)) {
+    if (!Auth::user()->hasPermission('manage-team', $workspace->id)) {
       abort(403, 'You do not have permission to manage members');
     }
 
@@ -364,7 +416,7 @@ class WorkspaceController extends Controller
 
     $workspace->users()->detach($userId);
 
-    if ($removedUser && $removedUser->current_workspace_id === (int)$workspaceId) {
+    if ($removedUser && $removedUser->current_workspace_id === (int)$workspace->id) {
       $firstWorkspace = $removedUser->workspaces()->first();
       $removedUser->update(['current_workspace_id' => $firstWorkspace ? $firstWorkspace->id : null]);
     }
@@ -377,11 +429,16 @@ class WorkspaceController extends Controller
     ]);
   }
 
-  public function invite(Request $request, $workspaceId)
+  public function invite(Request $request, $idOrSlug)
   {
-    $workspace = Workspace::findOrFail($workspaceId);
+    $workspace = Workspace::where(function ($q) use ($idOrSlug) {
+      if (is_numeric($idOrSlug)) {
+        $q->where('id', $idOrSlug);
+      }
+      $q->orWhere('slug', $idOrSlug);
+    })->firstOrFail();
 
-    if (!Auth::user()->hasPermission('manage-team', $workspaceId)) {
+    if (!Auth::user()->hasPermission('manage-team', $workspace->id)) {
       abort(403, 'You do not have permission to invite members');
     }
 
@@ -429,8 +486,15 @@ class WorkspaceController extends Controller
   /**
    * Test Slack/Discord webhook connections for a workspace
    */
-  public function testWebhook(Request $request, Workspace $workspace)
+  public function testWebhook(Request $request, $idOrSlug)
   {
+    $workspace = Workspace::where(function ($q) use ($idOrSlug) {
+      if (is_numeric($idOrSlug)) {
+        $q->where('id', $idOrSlug);
+      }
+      $q->orWhere('slug', $idOrSlug);
+    })->firstOrFail();
+
     if (!Auth::user()->hasPermission('manage-team', $workspace->id)) {
       abort(403);
     }
@@ -513,8 +577,15 @@ class WorkspaceController extends Controller
   /**
    * Get recent workspace activity (webhook logs)
    */
-  public function activity(Request $request, Workspace $workspace)
+  public function activity(Request $request, $idOrSlug)
   {
+    $workspace = Workspace::where(function ($q) use ($idOrSlug) {
+      if (is_numeric($idOrSlug)) {
+        $q->where('id', $idOrSlug);
+      }
+      $q->orWhere('slug', $idOrSlug);
+    })->firstOrFail();
+
     if (!Auth::user()->workspaces()->where('workspaces.id', $workspace->id)->exists()) {
       abort(403);
     }
@@ -536,11 +607,23 @@ class WorkspaceController extends Controller
     return $this->successResponse($logs->toArray());
   }
 
+  public function permissions()
+  {
+    return $this->successResponse(\App\Models\Permission\Permission::all());
+  }
+
   /**
    * Show a workspace (switches current workspace and redirects to dashboard)
    */
-  public function show(Workspace $workspace)
+  public function show($idOrSlug)
   {
+    $workspace = Workspace::where(function ($q) use ($idOrSlug) {
+      if (is_numeric($idOrSlug)) {
+        $q->where('id', $idOrSlug);
+      }
+      $q->orWhere('slug', $idOrSlug);
+    })->firstOrFail();
+
     // Verify user belongs to workspace
     if (!Auth::user()->workspaces()->where('workspaces.id', $workspace->id)->exists()) {
       abort(403);
@@ -551,8 +634,52 @@ class WorkspaceController extends Controller
     return redirect()->route('dashboard')->with('message', "Switched to workspace: {$workspace->name}");
   }
 
-  public function destroy(Workspace $workspace)
+  public function storeRole(Request $request, $idOrSlug)
   {
+    $workspace = Workspace::where(function ($q) use ($idOrSlug) {
+      if (is_numeric($idOrSlug)) {
+        $q->where('id', $idOrSlug);
+      }
+      $q->orWhere('slug', $idOrSlug);
+    })->firstOrFail();
+
+    if (!Auth::user()->hasPermission('manage-team', $workspace->id)) {
+      abort(403, 'You do not have permission to create roles');
+    }
+
+    $validated = $request->validate([
+      'name' => 'required|string|max:255|unique:roles,name',
+      'description' => 'nullable|string|max:1000',
+      'permissions' => 'nullable|array',
+      'permissions.*' => 'exists:permissions,id',
+    ]);
+
+    return DB::transaction(function () use ($validated) {
+      $role = Role::create([
+        'name' => $validated['name'],
+        'slug' => Str::slug($validated['name']),
+        'description' => $validated['description'] ?? null,
+      ]);
+
+      if (!empty($validated['permissions'])) {
+        $role->permissions()->sync($validated['permissions']);
+      }
+
+      return $this->successResponse([
+        'role' => $role->load('permissions')
+      ], 'Role created successfully', 201);
+    });
+  }
+
+  public function destroy($idOrSlug)
+  {
+    $workspace = Workspace::where(function ($q) use ($idOrSlug) {
+      if (is_numeric($idOrSlug)) {
+        $q->where('id', $idOrSlug);
+      }
+      $q->orWhere('slug', $idOrSlug);
+    })->firstOrFail();
+
     // STRICT CHECK: Only the creator can delete the workspace
     if (Auth::id() !== $workspace->created_by) {
       abort(403, 'Only the workspace owner can delete this workspace.');

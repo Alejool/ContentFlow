@@ -74,7 +74,7 @@ export default function MembersManagement({
     try {
       await axios.put(
         route("api.v1.workspaces.members.update-role", {
-          workspace: current_workspace.id,
+          idOrSlug: current_workspace.id,
           user: userId,
         }),
         {
@@ -99,7 +99,7 @@ export default function MembersManagement({
     try {
       const response = await axios.delete(
         route("api.v1.workspaces.members.remove", {
-          workspace: current_workspace.id,
+          idOrSlug: current_workspace.id,
           user: userToRemove,
         }),
       );

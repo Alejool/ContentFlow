@@ -1,17 +1,14 @@
-import Button from "@/Components/common/Modern/Button";
 import AccountStatistics from "@/Components/profile/Partials/AccountStatistics";
-import AiConfigSection from "@/Components/profile/Partials/AiConfigSection";
 import OnboardingSection from "@/Components/profile/Partials/OnboardingSection";
 import SubscriptionSection from "@/Components/profile/Partials/SubscriptionSection";
 import UpdatePasswordForm from "@/Components/profile/Partials/UpdatePasswordForm";
 import UpdateProfileInformationForm from "@/Components/profile/Partials/UpdateProfileInformationForm";
 import UpdateThemeForm from "@/Components/profile/Partials/UpdateThemeForm";
 
-import { useUser } from "@/Hooks/useUser";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { useUserStore } from "@/stores/userStore";
 import { Head, usePage } from "@inertiajs/react";
-import { BrainCircuit, CreditCard, Info, Lock, Save, User } from "lucide-react";
+import { CreditCard, Lock, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -56,27 +53,11 @@ export default function Edit({
 
   const [activeTab, setActiveTab] = useState("profile");
 
-  // Determinar si el usuario es owner del workspace actual
   const currentWorkspace = auth?.current_workspace;
   const isOwner =
     currentWorkspace &&
     (Number(currentWorkspace.created_by) === Number(user.id) ||
       currentWorkspace.user_role_slug === "owner");
-
-  // Debugging ownership
-  console.log("Edit Profile Debug:", {
-    isOwner,
-    currentWorkspaceId: currentWorkspace?.id,
-    user_id: user.id,
-    created_by: currentWorkspace?.created_by,
-    role: currentWorkspace?.user_role_slug,
-  });
-
-  useEffect(() => {
-    if (user) {
-      setUser(user);
-    }
-  }, [user, setUser]);
 
   const tabs = [
     { id: "profile", name: t("profile.tabs.general") || "General", icon: User },
@@ -92,12 +73,30 @@ export default function Edit({
       icon: CreditCard,
       hidden: !isOwner, // Solo visible para owners
     },
-    {
-      id: "ai",
-      name: t("profile.tabs.ai") || "Inteligencia Artificial",
-      icon: BrainCircuit,
-    },
   ];
+
+  useEffect(() => {
+    if (user) {
+      setUser(user);
+    }
+  }, [user, setUser]);
+
+  // Sync tab with localStorage and URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tabParam = params.get("tab");
+    const storedTab = localStorage.getItem("profile_active_tab");
+    const initialTab = tabParam || storedTab || "profile";
+
+    const validTab = tabs.find((t) => t.id === initialTab && !t.hidden);
+    if (validTab) {
+      setActiveTab(initialTab);
+    }
+  }, [isOwner, user.provider]);
+
+  useEffect(() => {
+    localStorage.setItem("profile_active_tab", activeTab);
+  }, [activeTab]);
 
   return (
     <AuthenticatedLayout
@@ -190,12 +189,6 @@ export default function Edit({
                 </div>
               )}
 
-              {activeTab === "ai" && (
-                <div>
-                  <AiConfigSectionWrapper user={user} />
-                </div>
-              )}
-
               {activeTab === "onboarding" && (
                 <div>
                   <OnboardingSection />
@@ -206,62 +199,5 @@ export default function Edit({
         </div>
       </div>
     </AuthenticatedLayout>
-  );
-}
-
-/**
- * A wrapper to handle form logic for AI settings
- */
-function AiConfigSectionWrapper({ user }: { user: any }) {
-  const {
-    register,
-    handleSubmit,
-    errors,
-    isSubmitting,
-    hasChanges,
-    watchedValues,
-    setValue,
-  } = useUser(user);
-  const { t } = useTranslation();
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-10">
-      <AiConfigSection
-        register={register}
-        errors={errors}
-        isSubmitting={isSubmitting}
-        watchedValues={watchedValues}
-        setValue={setValue}
-      />
-
-      {/* Save Button for AI Section */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-6 pt-10 border-t border-gray-100 dark:border-neutral-800/50 transition-all duration-300">
-        <div className="flex-1">
-          {hasChanges && !isSubmitting && (
-            <div className="flex items-center gap-3 text-sm font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 px-4 py-2 rounded-lg border border-amber-200 dark:border-amber-800/50 max-w-fit animate-in fade-in slide-in-from-left-2 transition-all">
-              <Info className="w-4 h-4" />
-              {t("profile.messages.unsavedChanges") ||
-                "Tienes cambios sin guardar"}
-            </div>
-          )}
-        </div>
-
-        <Button
-          disabled={isSubmitting}
-          icon={Save}
-          loading={isSubmitting}
-          loadingText={t("common.saving")}
-          className={`w-full sm:w-auto min-w-[200px] transition-all duration-300 rounded-lg shadow-xl font-bold uppercase tracking-wider ${
-            isSubmitting
-              ? "opacity-50 grayscale"
-              : "hover:scale-[1.05] active:scale-[0.95] bg-primary-600 hover:bg-primary-500 text-white border-0 shadow-primary-500/25"
-          }`}
-          type="submit"
-          size="lg"
-        >
-          {t("profile.actions.saveChanges")}
-        </Button>
-      </div>
-    </form>
   );
 }
