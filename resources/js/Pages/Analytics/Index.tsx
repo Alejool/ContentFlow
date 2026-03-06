@@ -1,13 +1,20 @@
 import StatCard from "@/Components/Statistics/StatCard";
+import EmptyState from "@/Components/common/EmptyState";
 import Skeleton from "@/Components/common/ui/Skeleton";
 import { useTheme } from "@/Hooks/useTheme";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head, router } from "@inertiajs/react";
-import { Eye, Heart, MousePointer2, TrendingUp, Users } from "lucide-react";
+import { getEmptyStateByKey } from "@/Utils/emptyStateMapper";
+import { Head, router, usePage } from "@inertiajs/react";
+import {
+  Eye,
+  Heart,
+  LockKeyhole,
+  MousePointer2,
+  TrendingUp,
+  Users,
+} from "lucide-react";
 import { Suspense, lazy, useState } from "react";
 import { useTranslation } from "react-i18next";
-import EmptyState from "@/Components/common/EmptyState";
-import { getEmptyStateByKey } from "@/Utils/emptyStateMapper";
 import { CampaignStat } from "../../Components/Analytics/PerformanceTable";
 import PeriodSelector from "../../Components/Analytics/PeriodSelector";
 
@@ -77,7 +84,15 @@ export default function Index({ stats, period }: AnalyticsProps) {
   const { t } = useTranslation();
   const { actualTheme: theme } = useTheme();
   const [loading, setLoading] = useState(false);
-  const isDark = theme === 'dark';
+  const isDark = theme === "dark";
+  const { auth } = usePage<any>().props;
+
+  // Gate advanced analytics based on workspace plan features
+  const hasAdvancedAnalytics =
+    auth?.current_workspace?.features?.advanced_analytics ||
+    ["professional", "enterprise"].includes(
+      auth?.current_workspace?.plan?.toLowerCase() ?? "",
+    );
 
   const overview = stats?.overview || {};
   const campaigns = stats?.campaigns || [];
@@ -234,44 +249,98 @@ export default function Index({ stats, period }: AnalyticsProps) {
           </div>
         )}
 
-        {detailedPlatforms.length > 0 && (
-          <div className="mb-8">
-            <div className="rounded-lg p-6 mb-4 transition-colors duration-300 bg-white shadow-lg border border-gray-100 dark:bg-neutral-800/50 dark:backdrop-blur-sm dark:border-neutral-700/50">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
-                {t("analytics.charts.detailedPlatforms", "Análisis Detallado por Plataforma")}
-              </h2>
-              <p className={`text-sm mt-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                Métricas diarias actualizadas por cron jobs
-              </p>
-            </div>
-            <Suspense
-              fallback={<Skeleton className="h-[400px] w-full rounded-lg" />}
-            >
-              <DetailedPlatformChart platforms={detailedPlatforms} theme={theme} />
-            </Suspense>
-          </div>
-        )}
+        {/* Advanced analytics — gated by plan */}
+        {hasAdvancedAnalytics ? (
+          <>
+            {detailedPlatforms.length > 0 && (
+              <div className="mb-8">
+                <div className="rounded-lg p-6 mb-4 transition-colors duration-300 bg-white shadow-lg border border-gray-100 dark:bg-neutral-800/50 dark:backdrop-blur-sm dark:border-neutral-700/50">
+                  <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+                    {t(
+                      "analytics.charts.detailedPlatforms",
+                      "Análisis Detallado por Plataforma",
+                    )}
+                  </h2>
+                  <p
+                    className={`text-sm mt-1 ${isDark ? "text-gray-400" : "text-gray-600"}`}
+                  >
+                    Métricas diarias actualizadas por cron jobs
+                  </p>
+                </div>
+                <Suspense
+                  fallback={
+                    <Skeleton className="h-[400px] w-full rounded-lg" />
+                  }
+                >
+                  <DetailedPlatformChart
+                    platforms={detailedPlatforms}
+                    theme={theme}
+                  />
+                </Suspense>
+              </div>
+            )}
 
-        {detailedPublications.length > 0 && (
-          <div className="mb-8">
-            <div className="rounded-lg p-6 mb-4 transition-colors duration-300 bg-white shadow-lg border border-gray-100 dark:bg-neutral-800/50 dark:backdrop-blur-sm dark:border-neutral-700/50">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
-                {t("analytics.charts.detailedPublications", "Rendimiento Detallado de Publicaciones")}
-              </h2>
-              <p className={`text-sm mt-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                Desglose por plataforma y evolución diaria
+            {detailedPublications.length > 0 && (
+              <div className="mb-8">
+                <div className="rounded-lg p-6 mb-4 transition-colors duration-300 bg-white shadow-lg border border-gray-100 dark:bg-neutral-800/50 dark:backdrop-blur-sm dark:border-neutral-700/50">
+                  <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+                    {t(
+                      "analytics.charts.detailedPublications",
+                      "Rendimiento Detallado de Publicaciones",
+                    )}
+                  </h2>
+                  <p
+                    className={`text-sm mt-1 ${isDark ? "text-gray-400" : "text-gray-600"}`}
+                  >
+                    Desglose por plataforma y evolución diaria
+                  </p>
+                </div>
+                <Suspense
+                  fallback={
+                    <Skeleton className="h-[400px] w-full rounded-lg" />
+                  }
+                >
+                  <DetailedPublicationPerformance
+                    publications={detailedPublications}
+                    theme={theme}
+                  />
+                </Suspense>
+              </div>
+            )}
+          </>
+        ) : (
+          // Upgrade prompt for basic plans
+          <div className="mb-8 relative rounded-2xl overflow-hidden border border-primary-200/50 dark:border-primary-800/30 shadow-lg">
+            <div className="absolute inset-0 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center gap-4 p-8">
+              <div className="p-4 rounded-full bg-primary-100 dark:bg-primary-900/40">
+                <LockKeyhole className="w-8 h-8 text-primary-600 dark:text-primary-400" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white text-center">
+                {t("analytics.advanced.locked_title", "Analytics Avanzados")}
+              </h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400 text-center max-w-md">
+                {t(
+                  "analytics.advanced.locked_description",
+                  "Obtén análisis detallado por plataforma, rendimiento de publicaciones y reportes exportables con los planes Professional y Enterprise.",
+                )}
               </p>
+              <button
+                onClick={() => router.visit("/pricing")}
+                className="mt-2 px-6 py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-semibold text-sm transition-colors shadow-md"
+              >
+                {t("analytics.advanced.upgrade_cta", "Actualizar Plan")}
+              </button>
             </div>
-            <Suspense
-              fallback={<Skeleton className="h-[400px] w-full rounded-lg" />}
-            >
-              <DetailedPublicationPerformance publications={detailedPublications} theme={theme} />
-            </Suspense>
+            {/* Blurred dummy content */}
+            <div className="p-6 opacity-20 pointer-events-none select-none">
+              <Skeleton className="h-8 w-48 mb-4 rounded-lg" />
+              <Skeleton className="h-[300px] w-full rounded-lg" />
+            </div>
           </div>
         )}
 
         {campaigns.length === 0 && socialMedia.length === 0 && (
-          <EmptyState config={getEmptyStateByKey('analytics', t)!} />
+          <EmptyState config={getEmptyStateByKey("analytics", t)!} />
         )}
       </div>
     </AuthenticatedLayout>
