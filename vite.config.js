@@ -4,7 +4,7 @@ import { defineConfig } from 'vite';
 import tsconfigPaths from "vite-tsconfig-paths";
 import { VitePWA } from 'vite-plugin-pwa';
 
-const host = process.env.VITE_HMR_HOST || 'leviathan.tail4af8a1.ts.net';
+const host = process.env.VITE_HMR_HOST || 'localhost';
 const certPath = './localhost.pem';
 const keyPath = './localhost-key.pem';
 const isProduction = process.env.NODE_ENV === 'production';
@@ -212,22 +212,22 @@ export default defineConfig({
                         // Other vendors
                         return 'vendor-other';
                     }
-                    
+
                     // Service Worker code in separate chunk
                     if (id.includes('/sw/') || id.includes('workbox')) {
                         return 'service-worker';
                     }
-                    
+
                     // Stores in separate chunk
                     if (id.includes('/stores/')) {
                         return 'stores';
                     }
-                    
+
                     // Utils in separate chunk
                     if (id.includes('/Utils/')) {
                         return 'utils';
                     }
-                    
+
                     // Pages - split by route
                     if (id.includes('/Pages/Analytics/')) {
                         return 'page-analytics';
@@ -301,7 +301,6 @@ export default defineConfig({
         allowedHosts: [
             'localhost',
             'leviathan-port.tail4af8a1.ts.net',
-            'leviathan.tail4af8a1.ts.net',
             '100.125.246.50',
             '127.0.0.1',
             '.ngrok-free.app',
