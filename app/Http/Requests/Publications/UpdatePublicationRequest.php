@@ -128,7 +128,7 @@ class UpdatePublicationRequest extends FormRequest
               ->where('status', 'published')
               ->exists();
 
-            if ($hasPublishedPosts && $value !== 'published') {
+            if ($hasPublishedPosts && $value !== 'published' && !$this->boolean('is_recurring')) {
               $fail('Cannot change status from published when posts are already published on social media. Unpublish first.');
             }
           }
