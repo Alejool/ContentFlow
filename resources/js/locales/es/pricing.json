@@ -23,7 +23,9 @@
     "faqSubtitle": "Estamos aquí para ayudarte a elegir el mejor plan",
     "contactUs": "Contáctanos en",
     "changeToPlan": "Cambiar a este plan",
-    
+    "cancelRequired": "Gestión de suscripción requerida",
+    "cancelSubscriptionFirst": "Para volver al plan gratuito, primero debes cancelar tu suscripción de pago actual. El cambio se aplicará al finalizar tu periodo de facturación.",
+
     "activeSubscription": {
       "title": "Ya tienes una suscripción activa",
       "description": "Tu plan actual está activo. Para cambiar de plan o gestionar tu suscripción, visita la página de facturación.",
@@ -31,7 +33,7 @@
       "manageBilling": "Gestionar Facturación",
       "viewUsage": "Ver Uso del Plan"
     },
-    
+
     "plans": {
       "demo": {
         "name": "Demo",
@@ -55,7 +57,7 @@
         "description": "Solución completa para grandes organizaciones"
       }
     },
-    
+
     "features": {
       "fullAccessDays": "Acceso completo por 30 días",
       "publications3": "3 publicaciones/mes",
@@ -91,7 +93,7 @@
       "customIntegrations": "Integraciones personalizadas",
       "slaGuarantee": "Garantía SLA"
     },
-    
+
     "billing": {
       "month": "mes",
       "year": "año"

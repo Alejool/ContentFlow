@@ -129,7 +129,10 @@
       "members": "Miembros",
       "roles": "Roles",
       "integrations": "Integraciones",
-      "notifications": "Notificaciones"
+      "notifications": "Notificaciones",
+      "white_label": "Marca Blanca",
+      "api": "Acceso API",
+      "support": "Soporte Enterprise"
     },
     "roles_management": {
       "title": "Roles y Permisos",
@@ -220,6 +223,58 @@
       "integrations_description": "Conectar aplicaciones y servicios"
     },
     "recent_activity": "Actividad Reciente",
-    "workspace_age": "Antigüedad del Espacio"
+    "workspace_age": "Antigüedad del Espacio",
+    "white_label": {
+      "title": "Marca Blanca (White-label)",
+      "description": "Personaliza la plataforma con tu propio logotipo y colores corporativos.",
+      "logo": "Logotipo del Espacio",
+      "logo_help": "Recomendado: PNG o SVG con fondo transparente.",
+      "favicon": "Favicon",
+      "favicon_help": "Idealmente 32x32px o 64x64px.",
+      "primary_color": "Color Principal de Marca",
+      "color_help": "Este color se usará en botones, enlaces y reportes.",
+      "update_success": "Branding actualizado exitosamente",
+      "update_error": "Error al actualizar el branding",
+      "enterprise_exclusive": "Función Exclusiva Enterprise",
+      "enterprise_description": "Estos ajustes de marca se aplican a todo el espacio de trabajo y serán visibles para todos los miembros y en los reportes generados."
+    },
+    "api": {
+      "title": "Tokens de Acceso API",
+      "description": "Genera tokens para autenticar solicitudes a la API de ContentFlow.",
+      "token_name_placeholder": "ej. Automatización de Marketing",
+      "generate": "Generar Token",
+      "no_tokens": "Aún no se han generado tokens de API.",
+      "last_used": "Último uso",
+      "token_generated": "Token Generado Exitosamente",
+      "token_warning": "Copia este token ahora. Por razones de seguridad, no se volverá a mostrar.",
+      "revoke_confirm": "¿Estás seguro de que quieres revocar este token? Dejará de funcionar inmediatamente.",
+      "revoke_success": "Token revocado exitosamente",
+      "revoke_error": "Error al revocar el token",
+      "create_success": "Token de API creado exitosamente",
+      "create_error": "Error al crear el token",
+      "security_notice": "Aviso de Seguridad",
+      "security_help": "Los tokens de API otorgan acceso total a este espacio de trabajo. Nunca los compartas ni los subas a repositorios públicos."
+    },
+    "enterprise": {
+      "info_title": "Estado del Espacio Enterprise",
+      "priority_queues": "Colas de Publicación Prioritarias",
+      "custom_onboarding": "Sesión de Onboarding Personalizada",
+      "legal_review": "Acuerdo de Procesamiento de Datos (DPA)",
+      "dedicated_support": {
+        "title": "Gestor de Soporte Dedicado",
+        "description": "Como cliente Enterprise, tienes un gestor de cuenta dedicado disponible vía WhatsApp o correo para asistencia prioritaria.",
+        "action": "Contactar Gestor"
+      },
+      "sla": {
+        "title": "Acuerdo de Nivel de Servicio (SLA)",
+        "description": "Tu espacio está cubierto por nuestra garantía de disponibilidad del 99.9%. Proporcionamos informes mensuales bajo petición.",
+        "action": "Ver Términos SLA"
+      },
+      "integrations": {
+        "title": "Integraciones Personalizadas",
+        "description": "¿Necesitas conectar ContentFlow con tu propio CRM o ERP? Nuestro equipo puede construir integraciones a medida.",
+        "action": "Solicitar Integración"
+      }
+    }
   }
 }

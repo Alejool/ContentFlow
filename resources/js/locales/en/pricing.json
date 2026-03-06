@@ -23,7 +23,9 @@
     "faqSubtitle": "We're here to help you choose the best plan",
     "contactUs": "Contact us at",
     "changeToPlan": "Change to this plan",
-    
+    "cancelRequired": "Subscription management required",
+    "cancelSubscriptionFirst": "To downgrade to the free plan, you must first cancel your current paid subscription. The change will take effect at the end of your billing cycle.",
+
     "activeSubscription": {
       "title": "You already have an active subscription",
       "description": "Your current plan is active. To change plans or manage your subscription, visit the billing page.",
@@ -31,7 +33,7 @@
       "manageBilling": "Manage Billing",
       "viewUsage": "View Plan Usage"
     },
-    
+
     "plans": {
       "demo": {
         "name": "Demo",
@@ -55,7 +57,7 @@
         "description": "Complete solution for large organizations"
       }
     },
-    
+
     "features": {
       "fullAccessDays": "Full access for 30 days",
       "publications3": "3 publications/month",
@@ -91,7 +93,7 @@
       "customIntegrations": "Custom integrations",
       "slaGuarantee": "SLA guarantee"
     },
-    
+
     "billing": {
       "month": "month",
       "year": "year"
