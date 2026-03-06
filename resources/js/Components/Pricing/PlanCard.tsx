@@ -14,6 +14,7 @@ import {
   ArrowRight,
   Award,
   Check,
+  Lock,
   Shield,
   Sparkles,
   Star,
@@ -64,41 +65,19 @@ export default function PlanCard({
 }: PlanCardProps) {
   const { t } = useTranslation();
 
-  // Debug log
-  if (process.env.NODE_ENV === "development") {
-    console.log(`PlanCard ${plan.id}:`, {
-      isCurrentPlan,
-      hasActiveSubscription,
-      price: plan.price,
-      requires_stripe: plan.requires_stripe,
-    });
-  }
-
   const getPlanIcon = (planId: string) => {
-    const iconClass = variant === "compact" ? "w-6 h-6" : "w-6 h-6";
+    const iconClass = variant === "compact" ? "w-8 h-8" : "w-8 h-8";
     switch (planId) {
       case "demo":
         return <Sparkles className={cn(iconClass, "text-white")} />;
       case "free":
-        return (
-          <Zap
-            className={cn(iconClass, "text-primary-600 dark:text-primary-400")}
-          />
-        );
+        return <Zap className={cn(iconClass, "")} />;
       case "starter":
-        return (
-          <Star
-            className={cn(iconClass, "text-primary-600 dark:text-primary-400")}
-          />
-        );
+        return <Star className={cn(iconClass, "")} />;
       case "professional":
-        return <Award className={cn(iconClass, "text-white")} />;
+        return <Award className={cn(iconClass, "")} />;
       case "enterprise":
-        return (
-          <Shield
-            className={cn(iconClass, "text-primary-600 dark:text-primary-400")}
-          />
-        );
+        return <Shield className={cn(iconClass, "")} />;
       default:
         return null;
     }
@@ -111,9 +90,103 @@ export default function PlanCard({
     return features.map((featureKey) => t(`pricing.features.${featureKey}`));
   };
 
+  const getMissingFeatures = (planId: string): string[] => {
+    const currentFeatures = new Set(PLAN_FEATURES[planId as PlanId] || []);
+
+    // Tiers de los planes — demo y enterprise son los más completos
+    const planTiers: Record<string, number> = {
+      free: 1,
+      starter: 2,
+      professional: 3,
+      enterprise: 4,
+      demo: 4, // Demo = acceso total temporal, igual que enterprise
+    };
+
+    const currentTier = planTiers[planId] || 0;
+
+    // Jerarquías de features para no mostrar versiones inferiores si ya tienes la superior
+    const featureHierarchies: Record<string, string[]> = {
+      analytics: ["basicAnalytics", "advancedAnalytics"],
+      support: ["emailSupport", "prioritySupport", "dedicatedSupport"],
+    };
+
+    // Todas las features de planes SUPERIORES
+    const superiorFeatures = new Set<string>();
+    Object.entries(PLAN_FEATURES).forEach(([pid, features]) => {
+      if ((planTiers[pid] || 0) > currentTier) {
+        features.forEach((f) => {
+          // Excluir límites numéricos
+          if (
+            !/^(publications|socialAccounts|storage|aiRequests)\d/.test(f) &&
+            !/^(publications|socialAccounts|storage|aiRequests)Unlimited/.test(
+              f,
+            ) &&
+            !/^(storage)1TB/.test(f) &&
+            f !== "fullAccessDays"
+          ) {
+            superiorFeatures.add(f);
+          }
+        });
+      }
+    });
+
+    // Filtrar lo que ya tiene el plan actual
+    let missing = Array.from(superiorFeatures).filter(
+      (f) => !currentFeatures.has(f),
+    );
+
+    // Aplicar lógica de jerarquías: si el plan tiene una versión superior de algo, no mostrar la inferior como "missing"
+    Object.values(featureHierarchies).forEach((tierList) => {
+      const highestHeldIndex = tierList.reduce((maxIdx, feature, idx) => {
+        return currentFeatures.has(feature) ? Math.max(maxIdx, idx) : maxIdx;
+      }, -1);
+
+      if (highestHeldIndex !== -1) {
+        // El plan ya tiene una versión de esta feature. Quitar de 'missing' cualquier versión igual o inferior.
+        missing = missing.filter((f) => {
+          const idxInTier = tierList.indexOf(f);
+          return idxInTier === -1 || idxInTier > highestHeldIndex;
+        });
+      }
+    });
+
+    return missing.map((f) => t(`pricing.features.${f}`));
+  };
+
   const features = getFeaturesList(plan.id);
+  const missingFeatures = getMissingFeatures(plan.id);
   const isPopular = plan.popular || plan.id === "professional";
   const displayPrice = plan.price;
+
+  // Tagline — one-liner benefit per plan
+  const getPlanTagline = (planId: string): string => {
+    const taglines: Record<string, string> = {
+      demo: t("pricing.taglines.demo", "Explora todo sin compromisos"),
+      free: t("pricing.taglines.free", "Empieza gratis, sin tarjeta"),
+      starter: t("pricing.taglines.starter", "Para creadores individuales"),
+      professional: t(
+        "pricing.taglines.professional",
+        "Escala tu contenido con tu equipo",
+      ),
+      enterprise: t("pricing.taglines.enterprise", "Control total de tu marca"),
+    };
+    return taglines[planId] || "";
+  };
+
+  // Annual savings (20% off)
+  const annualMonthlyPrice = plan.price > 0 ? Math.round(plan.price * 0.8) : 0;
+  const annualSavings = plan.price > 0 ? Math.round(plan.price * 0.2 * 12) : 0;
+
+  // Social proof — chosen by X users
+  const getUserCount = (planId: string): string => {
+    const counts: Record<string, string> = {
+      starter: "2,400+",
+      professional: "8,100+",
+      enterprise: "340+",
+    };
+    return counts[planId] || "";
+  };
+  const userCount = getUserCount(plan.id);
 
   // Determinar si este plan es un downgrade no permitido
   const isPaidPlan = plan.requires_stripe && plan.price > 0;
@@ -173,7 +246,7 @@ export default function PlanCard({
         )}
 
         <div className="text-center mb-6">
-          <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900/20 rounded-lg flex items-center justify-center mx-auto mb-3">
+          <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mx-auto mb-3">
             {getPlanIcon(plan.id)}
           </div>
           <h4 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
@@ -211,7 +284,8 @@ export default function PlanCard({
             (!plan.enabled && plan.requires_stripe) ||
             isDowngradeBlocked
           }
-          variant={isPopular ? "primary" : "secondary"}
+          variant={isPopular ? "primary" : "ghost"}
+          buttonStyle={isPopular ? "solid" : "outline"}
           fullWidth
           size="md"
           loading={isLoading}
@@ -260,28 +334,35 @@ export default function PlanCard({
         )}
 
         <CardHeader className="relative">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-center my-4 ">
             <div
               className={cn(
-                "p-3.5 rounded-lg transition-all duration-300",
+                "p-3.5 rounded-lg mr-2 transition-all duration-300",
                 isPopular
-                  ? "bg-primary-600 text-white"
+                  ? "text-primary-500"
                   : plan.id === "demo"
                     ? "bg-neutral-900 text-white"
-                    : "bg-neutral-100 dark:bg-neutral-800 text-primary-600 dark:text-primary-400",
+                    : "",
               )}
             >
               {getPlanIcon(plan.id)}
             </div>
+
+            <div>
+              <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+                {plan.name}
+              </CardTitle>
+
+              {/* Tagline */}
+              <p className="text-sm font-medium text-primary-600 dark:text-primary-400 mb-1">
+                {getPlanTagline(plan.id)}
+              </p>
+
+              <CardDescription className="text-gray-600 dark:text-gray-400 min-h-[2rem] text-xs">
+                {plan.description}
+              </CardDescription>
+            </div>
           </div>
-
-          <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-            {plan.name}
-          </CardTitle>
-
-          <CardDescription className="text-gray-600 dark:text-gray-400 min-h-[3rem]">
-            {plan.description}
-          </CardDescription>
 
           <div className="mt-6 pt-6 border-t border-gray-200 dark:border-neutral-800">
             <div className="flex items-baseline gap-2">
@@ -301,6 +382,24 @@ export default function PlanCard({
                 </span>
               )}
             </div>
+
+            {/* Annual savings callout */}
+            {plan.price > 0 && (
+              <div className="mt-2 flex items-center gap-2 flex-wrap">
+                <span className="text-xs text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 px-2 py-0.5 rounded-full font-semibold">
+                  Anual: ${annualMonthlyPrice}/mes — ahorras ${annualSavings}
+                  /año
+                </span>
+              </div>
+            )}
+
+            {/* User count badge */}
+            {userCount && (
+              <p className="text-xs text-gray-400 dark:text-neutral-500 mt-2">
+                👥 Elegido por {userCount} equipos
+              </p>
+            )}
+
             {plan.trial_days && (
               <p className="text-sm text-purple-600 dark:text-purple-400 mt-3 flex items-center gap-1">
                 <Sparkles className="h-4 w-4" />
@@ -337,6 +436,26 @@ export default function PlanCard({
               </li>
             ))}
           </ul>
+
+          {missingFeatures.length > 0 && (
+            <div className="mt-8 pt-6 border-t border-gray-100 dark:border-neutral-800/50">
+              <p className="text-xs font-bold text-gray-400 dark:text-neutral-500 uppercase tracking-wider mb-4">
+                {t("pricing.missingFeatures", "Lo que te estás perdiendo")}
+              </p>
+              <ul className="space-y-3">
+                {missingFeatures.map((feature, index) => (
+                  <li key={index} className="flex items-start gap-3 group/item">
+                    <div className="flex-shrink-0 w-5 h-5 rounded-full bg-gray-50 dark:bg-neutral-800/50 flex items-center justify-center mt-0.5 border border-gray-100 dark:border-neutral-700/50">
+                      <Lock className="h-2.5 w-2.5 text-gray-400 dark:text-neutral-500" />
+                    </div>
+                    <span className="text-sm text-gray-400 dark:text-neutral-500 italic">
+                      {feature}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </CardContent>
 
         <CardFooter className="relative pt-6">
@@ -348,7 +467,8 @@ export default function PlanCard({
               (!plan.enabled && plan.requires_stripe) ||
               isDowngradeBlocked
             }
-            variant={isPopular ? "primary" : "secondary"}
+            variant={isPopular ? "primary" : "ghost"}
+            buttonStyle={isPopular ? "solid" : "outline"}
             size="lg"
             fullWidth
             loading={isLoading}

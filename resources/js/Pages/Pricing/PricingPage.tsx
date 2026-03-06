@@ -34,8 +34,8 @@ export default function PricingPage({ auth, plans, currentPlan }: Props) {
 
   // Determinar si el usuario es owner del workspace actual
   const currentWorkspace = auth?.current_workspace;
-  const isOwner = currentWorkspace && 
-    (Number(currentWorkspace.created_by) === Number(auth.user?.id) || 
+  const isOwner = currentWorkspace &&
+    (Number(currentWorkspace.created_by) === Number(auth.user?.id) ||
      currentWorkspace.user_role_slug === 'owner');
 
   return (
@@ -60,41 +60,7 @@ export default function PricingPage({ auth, plans, currentPlan }: Props) {
             variant="default"
             isOwner={isOwner}
           />
-
-          {/* Trust indicators */}
-          <div className="mt-20">
-            <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-xl border border-gray-200 dark:border-neutral-800 p-8">
-              <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12">
-                <div className="flex items-center gap-3 group">
-                  <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg group-hover:scale-110 transition-transform">
-                    <Check className="h-5 w-5 text-green-600 dark:text-green-400" />
-                  </div>
-                  <span className="text-gray-700 dark:text-gray-300 font-medium">
-                    {t('pricing.noCreditCard', 'Sin tarjeta de crédito')}
-                  </span>
-                </div>
-                <div className="flex items-center gap-3 group">
-                  <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg group-hover:scale-110 transition-transform">
-                    <Infinity className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                  </div>
-                  <span className="text-gray-700 dark:text-gray-300 font-medium">
-                    {t('pricing.cancelAnytime', 'Cancela cuando quieras')}
-                  </span>
-                </div>
-                <div className="flex items-center gap-3 group">
-                  <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg group-hover:scale-110 transition-transform">
-                    <Shield className="h-5 w-5 text-purple-600 dark:text-purple-400" />
-                  </div>
-                  <span className="text-gray-700 dark:text-gray-300 font-medium">
-                    {t('pricing.support247', 'Soporte 24/7')}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* FAQ Section */}
-          <div className="mt-20">
+          <div className="mt-12">
             <Card className="">
               <CardHeader className="text-center pb-6">
                 <CardTitle className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-3">
@@ -105,8 +71,8 @@ export default function PricingPage({ auth, plans, currentPlan }: Props) {
                 </CardDescription>
               </CardHeader>
               <CardContent className="text-center pb-8">
-                <a 
-                  href="mailto:support@contentflow.com" 
+                <a
+                  href="mailto:support@contentflow.com"
                   className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-200 group"
                 >
                   <span>support@contentflow.com</span>

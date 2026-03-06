@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Subscription;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Stripe\StripeClient;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -20,10 +22,10 @@ class PricingController extends Controller
     private function getEnabledPlans(): array
     {
         $allPlans = config('plans');
-        
+
         // Debug: Log para ver qué planes están configurados
         \Log::info('All plans from config:', array_keys($allPlans));
-        
+
         $filtered = collect($allPlans)
             ->filter(function ($plan, $key) {
                 $enabled = ($plan['enabled'] ?? true) === true;
@@ -32,7 +34,7 @@ class PricingController extends Controller
             })
             ->map(function ($plan, $key) {
                 $isFreePlan = $plan['price'] == 0;
-                
+
                 return [
                     'id' => $key,
                     'name' => $plan['name'],
@@ -48,32 +50,35 @@ class PricingController extends Controller
             })
             ->values()
             ->toArray();
-            
+
         \Log::info('Filtered plans:', array_column($filtered, 'id'));
-        
+
         return $filtered;
     }
 
     public function index(Request $request): Response
     {
         $user = $request->user();
-        $currentPlan = 'free';
+        $currentPlan = 'demo';
 
         if ($user) {
-            // Intentar obtener el plan desde subscription_history (sistema nuevo)
-            $activeHistory = $user->subscriptionHistory()->active()->first();
-            if ($activeHistory) {
-                $currentPlan = $activeHistory->plan_name;
+            // Obtener el workspace actual
+            $workspace = $user->currentWorkspace ?? $user->workspaces()->first();
+
+            if ($workspace) {
+                // PRIORIZAR el plan del workspace actual
+                $currentPlan = $workspace->getPlanName();
+
+                \Log::info('Pricing page loaded for workspace', [
+                    'user_id' => $user->id,
+                    'workspace_id' => $workspace->id,
+                    'current_plan' => $currentPlan,
+                ]);
             } else {
-                // Fallback al campo current_plan del usuario
-                $currentPlan = $user->current_plan ?? 'free';
+                // Fallback si no hay workspace (poco probable si está autenticado)
+                $activeHistory = $user->subscriptionHistory()->active()->first();
+                $currentPlan = $activeHistory ? $activeHistory->plan_name : ($user->current_plan ?? 'demo');
             }
-            
-            \Log::info('Pricing page loaded', [
-                'user_id' => $user->id,
-                'current_plan' => $currentPlan,
-                'from_history' => $activeHistory ? true : false,
-            ]);
         }
 
         return Inertia::render('Pricing/PricingPage', [
@@ -89,7 +94,7 @@ class PricingController extends Controller
     {
         $sessionId = $request->query('session_id');
         $planFromUrl = $request->query('plan');
-        
+
         if (!$sessionId) {
             return redirect()->route('pricing.index')
                 ->with('error', 'Sesión de pago no válida');
@@ -99,10 +104,10 @@ class PricingController extends Controller
         try {
             $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
             $session = $stripe->checkout->sessions->retrieve($sessionId);
-            
+
             $user = $request->user();
             $planName = $session->metadata->plan ?? $planFromUrl ?? 'starter';
-            
+
             // Usar el servicio centralizado para cambiar el plan
             $success = $this->planManagement->changePlan(
                 user: $user,
@@ -117,7 +122,7 @@ class PricingController extends Controller
                     'currency' => $session->currency,
                 ]
             );
-            
+
             if (!$success) {
                 throw new \Exception('Failed to update plan');
             }
@@ -135,25 +140,24 @@ class PricingController extends Controller
                     'plan' => $planName,
                 ]);
             }
-            
+
             \Log::info('Subscription activated via Stripe checkout success page', [
                 'user_id' => $user->id,
                 'plan' => $planName,
                 'session_id' => $sessionId,
             ]);
-            
+
             return Inertia::render('Subscription/Success', [
                 'plan' => $planName,
                 'amount' => $session->amount_total / 100,
                 'currency' => strtoupper($session->currency ?? 'usd'),
             ]);
-            
         } catch (\Exception $e) {
             \Log::error('Error processing successful payment', [
                 'session_id' => $sessionId,
                 'error' => $e->getMessage(),
             ]);
-            
+
             return redirect()->route('dashboard')
                 ->with('success', '¡Pago procesado exitosamente! Tu suscripción está activa.');
         }

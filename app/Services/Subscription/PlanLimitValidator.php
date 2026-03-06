@@ -99,6 +99,8 @@ class PlanLimitValidator
       'ai_requests'   => $limits['ai_requests_per_month'] ?? 0,
       'team_members'  => $limits['team_members'] ?? 0,
       'workspaces'    => $limits['workspaces'] ?? 0,
+      // discord_channels replaces external_integrations
+      'discord_channels', 'external_integrations' => $limits['discord_channels'] ?? $limits['external_integrations'] ?? 0,
       default         => 0,
     };
   }

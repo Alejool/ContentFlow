@@ -99,7 +99,7 @@ export default function UsageWidget({ plan, usage, className }: Props) {
 
         <div className="pt-4 space-y-2">
           <Link href="/subscription/usage">
-            <Button variant="outline" className="w-full" size="sm">
+            <Button variant="ghost" className="w-full" size="sm">
               {t('subscription.usage.viewFullDetails')}
             </Button>
           </Link>

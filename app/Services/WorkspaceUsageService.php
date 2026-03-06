@@ -230,7 +230,7 @@ class WorkspaceUsageService
      */
     private function calculatePercentage(float $current, float $limit): float
     {
-        if ($limit === -1 || $limit === 0) {
+        if ($limit == -1 || $limit == 0) {
             return 0;
         }
 

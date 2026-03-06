@@ -43,7 +43,7 @@ export const PLAN_CONFIG = {
   // PLAN DEMO - 30 días de prueba
   // ========================================
   demo: {
-    enabled: true, // ← Cambiar a false para ocultar
+    enabled: true,
     price: 0,
     billingCycle: "trial" as const,
     trialDays: 30,
@@ -52,13 +52,18 @@ export const PLAN_CONFIG = {
     features: [
       "fullAccessDays",
       "publications100",
-      "socialAccounts20",
+      "socialAccountsUnlimited",
       "storage50",
       "aiRequests500",
       "advancedAnalytics",
       "advancedScheduling",
+      "schedulingRecurrence",
+      "queuePublishing",
       "calendarSync",
       "bulkOperations",
+      "discordChannels5",
+      "approvalWorkflowsBasic",
+      "historyDays90",
       "emailSupport",
     ],
   },
@@ -67,14 +72,14 @@ export const PLAN_CONFIG = {
   // PLAN FREE - Gratis para siempre
   // ========================================
   free: {
-    enabled: false, // ← Cambiar a false para ocultar
+    enabled: false,
     price: 0,
     billingCycle: "monthly" as const,
     popular: false,
     requiresStripe: false,
     features: [
       "publications3",
-      "socialAccounts2",
+      "socialAccounts1",
       "storage1",
       "aiRequests10",
       "basicAnalytics",
@@ -86,18 +91,21 @@ export const PLAN_CONFIG = {
   // PLAN STARTER - Para emprendedores
   // ========================================
   starter: {
-    enabled: true, // ← Cambiar a false para ocultar
+    enabled: true,
     price: 19,
     billingCycle: "monthly" as const,
     popular: false,
     requiresStripe: true,
     features: [
       "publications50",
-      "socialAccounts10",
+      "socialAccounts3",
       "storage10",
       "aiRequests100",
       "basicAnalytics",
+      "basicScheduling",
       "calendarSync",
+      "discordChannels1",
+      "historyDays30",
       "emailSupport",
     ],
   },
@@ -106,20 +114,26 @@ export const PLAN_CONFIG = {
   // PLAN PROFESSIONAL - Más popular
   // ========================================
   professional: {
-    enabled: true, // ← Cambiar a false para ocultar
+    enabled: true,
     price: 49,
     billingCycle: "monthly" as const,
-    popular: true, // ← Badge de "Más Popular"
+    popular: true,
     requiresStripe: true,
     features: [
       "publications200",
-      "socialAccounts50",
+      "socialAccounts8",
       "storage100",
       "aiRequestsUnlimited",
       "advancedAnalytics",
       "advancedScheduling",
+      "schedulingRecurrence",
+      "queuePublishing",
+      "optimalTimes",
       "calendarSync",
       "bulkOperations",
+      "discordChannels5",
+      "approvalWorkflowsBasic",
+      "historyDays90",
       "customBranding",
       "prioritySupport",
     ],
@@ -129,7 +143,7 @@ export const PLAN_CONFIG = {
   // PLAN ENTERPRISE - Para organizaciones
   // ========================================
   enterprise: {
-    enabled: true, // ← Cambiar a false para ocultar
+    enabled: true,
     price: 199,
     billingCycle: "monthly" as const,
     popular: false,
@@ -141,8 +155,14 @@ export const PLAN_CONFIG = {
       "aiRequestsUnlimited",
       "advancedAnalytics",
       "advancedScheduling",
+      "schedulingRecurrence",
+      "queuePublishing",
+      "optimalTimes",
       "calendarSync",
       "bulkOperations",
+      "discordChannelsUnlimited",
+      "approvalWorkflowsAdvanced",
+      "historyDays365",
       "whiteLabel",
       "apiAccess",
       "customIntegrations",
