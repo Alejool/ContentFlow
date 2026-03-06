@@ -247,6 +247,10 @@ const EditPublicationModal = ({
   const user = auth.user;
   const canManage =
     auth.current_workspace?.permissions?.includes("manage-content");
+  const planId = auth.current_workspace?.plan?.toLowerCase() || "demo";
+  const hasRecurrenceAccess = ["demo", "professional", "enterprise"].includes(
+    planId,
+  );
 
   // Fetch published platforms when modal opens
   useEffect(() => {
@@ -716,6 +720,7 @@ const EditPublicationModal = ({
                       }
                       error={errors.scheduled_at?.message as string}
                       disabled={isContentSectionDisabled || !allowConfiguration}
+                      hasRecurrenceAccess={hasRecurrenceAccess}
                     />
                   </div>
                 </div>

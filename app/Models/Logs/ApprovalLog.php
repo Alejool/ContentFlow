@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\Publications\Publication;
 use App\Models\User;
+use App\Models\ApprovalStep;
 
 class ApprovalLog extends Model
 {
@@ -20,6 +21,7 @@ class ApprovalLog extends Model
     'reviewed_at',
     'action',
     'rejection_reason',
+    'current_step_id',
   ];
 
   protected $casts = [
@@ -49,6 +51,14 @@ class ApprovalLog extends Model
   public function reviewer(): BelongsTo
   {
     return $this->belongsTo(User::class, 'reviewed_by');
+  }
+
+  /**
+   * Get the approval step associated with this log.
+   */
+  public function currentStep(): BelongsTo
+  {
+    return $this->belongsTo(ApprovalStep::class, 'current_step_id');
   }
 
   /**

@@ -23,17 +23,22 @@ use App\Events\Publications\PublicationUpdated;
 use App\Events\PublicationStatusUpdated;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Http;
 
 use App\Models\Social\ScheduledPost;
 use App\Models\Social\SocialPostLog;
 use App\Models\Logs\ApprovalLog;
 use App\Models\Role\Role;
-
-use App\Jobs\ProcessBackgroundUpload;
-use App\Models\MediaFiles\MediaFile;
-
 use App\Models\User;
+use App\Jobs\ProcessBackgroundUpload;
+use App\Models\Workspace\Workspace;
+use App\Models\Campaigns\Campaign;
+use App\Models\Publications\PublicationComment;
+use App\Models\ApprovalStep;
+use App\Models\ApprovalWorkflow;
+use App\Models\MediaFiles\MediaFile;
 use App\Models\Publications\PublicationLock;
 use App\Services\Validation\ContentValidationService;
 use App\Services\Subscription\PlanLimitValidator;
@@ -86,7 +91,6 @@ class PublicationController extends Controller
           'campaigns' => fn($q) => $q->select('campaigns.id', 'campaigns.name', 'campaigns.status'),
           'user' => fn($q) => $q->select('users.id', 'users.name', 'users.email', 'users.photo_url'),
           'publisher' => fn($q) => $q->select('users.id', 'users.name', 'users.photo_url'),
-          'rejector' => fn($q) => $q->select('users.id', 'users.name', 'users.photo_url'),
           'rejector' => fn($q) => $q->select('users.id', 'users.name', 'users.photo_url'),
           'approvalLogs' => fn($q) => $q->latest('requested_at')->with(['requester:id,name,photo_url', 'reviewer:id,name,photo_url']),
           'activities' => fn($q) => $q->orderBy('created_at', 'desc')->with('user:id,name,photo_url')
@@ -603,12 +607,24 @@ class PublicationController extends Controller
       $updateData['platform_settings'] = $request->platform_settings;
     }
 
-    $publication->update($updateData);
+    // Check for active workflow
+    $workflow = ApprovalWorkflow::where('workspace_id', $publication->workspace_id)
+      ->where('is_active', true)
+      ->orderBy('created_at', 'desc')
+      ->first();
+
+    $currentStepId = null;
+    if ($workflow && $workflow->steps->isNotEmpty()) {
+      $currentStepId = $workflow->steps->first()->id;
+    }
+
+    $publication->update($updateData + ['current_approval_step_id' => $currentStepId]);
 
     ApprovalLog::create([
       'publication_id' => $publication->id,
       'requested_by' => Auth::id(),
       'requested_at' => now(),
+      'current_step_id' => $currentStepId, // Assuming we add this to logs too eventually, but keeping it simple for now
     ]);
 
     $publication->logActivity('requested_approval', [
@@ -664,8 +680,71 @@ class PublicationController extends Controller
       'comment' => 'nullable|string|max:500',
     ]);
 
+    $latestLog = $publication->approvalLogs()
+      ->whereNull('reviewed_at')
+      ->latest('requested_at')
+      ->first();
+
+    // Multi-level logic
+    if ($publication->current_approval_step_id) {
+      $currentStep = ApprovalStep::find($publication->current_approval_step_id);
+
+      // Permission check for this specific step
+      $canApproveThisStep = false;
+      if ($currentStep->user_id && $currentStep->user_id === Auth::id()) {
+        $canApproveThisStep = true;
+      } elseif ($currentStep->role_id) {
+        // Find user role in this workspace
+        $userRole = DB::table('workspace_user')
+          ->where('workspace_id', $publication->workspace_id)
+          ->where('user_id', Auth::id())
+          ->first();
+        if ($userRole && $userRole->role_id === $currentStep->role_id) {
+          $canApproveThisStep = true;
+        }
+      } else {
+        // Fallback to general 'approve' permission
+        $canApproveThisStep = true;
+      }
+
+      if (!$canApproveThisStep) {
+        $userRole = DB::table('workspace_user')
+          ->where('workspace_id', $publication->workspace_id)
+          ->where('user_id', Auth::id())
+          ->first();
+        $isOwnerOrAdmin = $userRole && in_array($userRole->role_id, [1, 2]); // Assuming 1=Owner, 2=Admin
+        if (!$isOwnerOrAdmin) {
+          return $this->errorResponse('You do not have permission to approve this specific step.', 403);
+        }
+      }
+
+      // Find next step
+      $nextStep = ApprovalStep::where('workflow_id', $currentStep->workflow_id)
+        ->where('step_order', '>', $currentStep->step_order)
+        ->orderBy('step_order', 'asc')
+        ->first();
+
+      if ($nextStep) {
+        $publication->update([
+          'current_approval_step_id' => $nextStep->id,
+        ]);
+
+        $publication->logActivity('step_approved', [
+          'step_name' => $currentStep->name ?? "Step {$currentStep->step_order}",
+          'approver' => Auth::user()->name,
+          'next_step' => $nextStep->name ?? "Step {$nextStep->step_order}",
+        ]);
+
+        return $this->successResponse([
+          'publication' => $publication->load(['currentApprovalStep', 'approvalLogs']),
+        ], 'Step approved. Publication moved to ' . ($nextStep->name ?? "the next step") . '.');
+      }
+    }
+
+    // If no more steps or no workflow, mark as fully approved
     $publication->update([
       'status' => 'approved',
+      'current_approval_step_id' => null,
       'approved_by' => Auth::id(),
       'approved_at' => now(),
       'approved_retries_remaining' => 3,
@@ -674,17 +753,12 @@ class PublicationController extends Controller
       'rejection_reason' => null,
     ]);
 
-    $latestLog = $publication->approvalLogs()
-      ->whereNull('reviewed_at')
-      ->latest('requested_at')
-      ->first();
-
     if ($latestLog) {
       $latestLog->update([
         'reviewed_by' => Auth::id(),
         'reviewed_at' => now(),
         'action' => 'approved',
-        'rejection_reason' => $request->input('comment'), // Using rejection_reason field for comments
+        'rejection_reason' => $request->input('comment'),
       ]);
     }
 

@@ -63,14 +63,14 @@ interface SortableTabProps {
   getTabIcon: (id: string, active: boolean) => React.ReactNode;
 }
 
-const SortableTab = ({ 
-  id, 
-  label, 
-  hasBadge, 
-  badgeCount, 
-  activeTab, 
-  handleTabChange, 
-  getTabIcon 
+const SortableTab = ({
+  id,
+  label,
+  hasBadge,
+  badgeCount,
+  activeTab,
+  handleTabChange,
+  getTabIcon,
 }: SortableTabProps) => {
   const {
     attributes,
@@ -135,6 +135,10 @@ const SortableTab = ({
 export default function ManageContentPage() {
   const { auth } = usePage<any>().props;
   const permissions = auth.current_workspace?.permissions || [];
+  const planId = auth.current_workspace?.plan?.toLowerCase() || "demo";
+  const hasApprovalAccess = ["demo", "professional", "enterprise"].includes(
+    planId,
+  );
 
   const {
     t,
@@ -531,6 +535,45 @@ export default function ManageContentPage() {
 
             {activeTab === "approvals" && (
               <div className="animate-in fade-in zoom-in duration-300 space-y-6">
+                {!hasApprovalAccess && (
+                  <div className="bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 rounded-lg p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
+                    <div className="flex items-start gap-3">
+                      <div className="p-2 bg-primary-100 dark:bg-primary-900/40 rounded-full shrink-0">
+                        <svg
+                          className="w-5 h-5 text-primary-600 dark:text-primary-400"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M13 10V3L4 14h7v7l9-11h-7z"
+                          />
+                        </svg>
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-primary-800 dark:text-primary-300">
+                          {t("approvals.locked.title") ||
+                            "Aprobaciones básicas habilitadas"}
+                        </h4>
+                        <p className="text-sm text-primary-600 dark:text-primary-400 mt-0.5">
+                          {t("approvals.locked.description") ||
+                            "Actualmente tienes acceso a aprobaciones básicas. Para configurar flujos de aprobación multi-nivel, sube de plan."}
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      variant="primary"
+                      onClick={() => (window.location.href = route("pricing"))}
+                      className="whitespace-nowrap shrink-0 shadow-sm"
+                    >
+                      {t("common.upgradePlan")}
+                    </Button>
+                  </div>
+                )}
+
                 <ApprovalStats refreshTrigger={refreshTrigger} />
 
                 <div className="bg-white dark:bg-neutral-800 rounded-lg border border-gray-200 dark:border-neutral-700 overflow-hidden shadow-sm">

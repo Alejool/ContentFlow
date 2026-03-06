@@ -22,6 +22,7 @@ use App\Models\Social\ScheduledPost;
 use App\Models\Campaigns\Campaign;
 use App\Models\Publications\PublicationComment;
 use App\Models\Calendar\ExternalCalendarEvent;
+use App\Models\ApprovalStep;
 
 use App\Traits\HandlesUtcDates;
 use App\Events\Publications\PublicationCreated;
@@ -184,7 +185,7 @@ class Publication extends Model
    * - Status is 'published' (republish to additional platforms)
    * - Has been approved before (approved_at exists) - allows republishing
    * - Status is 'draft' or 'rejected' (if user has publish permission)
-   * 
+   *
    * Cannot publish if:
    * - Status is 'pending_review' (must be approved or rejected first)
    * - Status is 'publishing' or 'retrying' (already in progress)
@@ -195,15 +196,15 @@ class Publication extends Model
     if (in_array($this->status, ['pending_review', 'publishing', 'retrying'])) {
       return false;
     }
-    
+
     // If user has publish permission, allow any status except blocked ones
     if ($hasPublishPermission) {
       return true;
     }
-    
+
     // Otherwise, only allow if approved, failed, published, or was previously approved
-    return in_array($this->status, ['approved', 'failed', 'published']) || 
-           !is_null($this->approved_at);
+    return in_array($this->status, ['approved', 'failed', 'published']) ||
+      !is_null($this->approved_at);
   }
 
   /**
@@ -217,7 +218,7 @@ class Publication extends Model
       $this->approved_by = null;
       $this->approved_at = null;
       $this->approved_retries_remaining = 2;
-      
+
       $this->logActivity('approval_revoked', [
         'reason' => 'Content was modified after approval'
       ]);
@@ -239,10 +240,10 @@ class Publication extends Model
    */
   public function hasPendingApproval(): bool
   {
-    return $this->status === 'pending_review' && 
-           $this->approvalLogs()
-             ->whereNull('reviewed_at')
-             ->exists();
+    return $this->status === 'pending_review' &&
+      $this->approvalLogs()
+      ->whereNull('reviewed_at')
+      ->exists();
   }
 
   public function approver(): BelongsTo
@@ -371,6 +372,11 @@ class Publication extends Model
     return $this->hasMany(ApprovalLog::class)->orderBy('requested_at', 'desc');
   }
 
+  public function currentApprovalStep(): BelongsTo
+  {
+    return $this->belongsTo(ApprovalStep::class, 'current_approval_step_id');
+  }
+
   // Accessors
   public function getIsActiveAttribute()
   {
@@ -394,7 +400,7 @@ class Publication extends Model
     foreach ($logs as $log) {
       $socialAccount = $log->socialAccount;
       $isCurrentAccount = $socialAccount && !$socialAccount->trashed();
-      
+
       $summary[$log->social_account_id] = [
         'platform' => $log->platform,
         'status' => $log->status,

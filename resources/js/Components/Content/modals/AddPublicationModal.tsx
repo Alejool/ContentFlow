@@ -14,6 +14,7 @@ import { usePublicationForm } from "@/Hooks/publication/usePublicationForm";
 import { useConfirm } from "@/Hooks/useConfirm";
 import { useS3Upload } from "@/Hooks/useS3Upload";
 import { useAccountsStore } from "@/stores/socialAccountsStore";
+import { usePage } from "@inertiajs/react";
 import axios from "axios";
 import { FileText, Hash, Save, Target } from "lucide-react";
 import { useMemo } from "react";
@@ -33,6 +34,11 @@ export default function AddPublicationModal({
 }: AddPublicationModalProps) {
   const { campaigns } = useCampaigns();
   const { accounts: socialAccounts } = useAccountsStore();
+  const { auth } = usePage<any>().props;
+  const planId = auth.current_workspace?.plan?.toLowerCase() || "demo";
+  const hasRecurrenceAccess = ["demo", "professional", "enterprise"].includes(
+    planId,
+  );
 
   const {
     t,
@@ -365,6 +371,7 @@ export default function AddPublicationModal({
                     setValue("use_global_schedule", val)
                   }
                   error={errors.scheduled_at?.message as string}
+                  hasRecurrenceAccess={hasRecurrenceAccess}
                 />
               </div>
 

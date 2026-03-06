@@ -62,7 +62,7 @@ export default function DisconnectWarningModal({
                   theme === "dark" ? "text-white" : "text-gray-900"
                 }`}
               >
-                {t("Content.socialMedia.disconnectModal.title")}
+                {t("manageContent.socialMedia.disconnectModal.title")}
               </DialogTitle>
 
               <div className="mt-2 text-sm">
@@ -72,10 +72,10 @@ export default function DisconnectWarningModal({
                   }`}
                 >
                   <span className="font-semibold text-primary-500">
-                    {t("Content.socialMedia.disconnectModal.warning")}
+                    {t("manageContent.socialMedia.disconnectModal.warning")}
                   </span>
                   <br />
-                  {t("Content.socialMedia.disconnectModal.explanation")}
+                  {t("manageContent.socialMedia.disconnectModal.explanation")}
                 </p>
 
                 <div
@@ -97,12 +97,12 @@ export default function DisconnectWarningModal({
                         <tr>
                           <th className="px-4 py-2 font-medium">
                             {t(
-                              "Content.socialMedia.disconnectModal.table.date"
+                              "manageContent.socialMedia.disconnectModal.table.date",
                             )}
                           </th>
                           <th className="px-4 py-2 font-medium">
                             {t(
-                              "Content.socialMedia.disconnectModal.table.publication"
+                              "manageContent.socialMedia.disconnectModal.table.publication",
                             )}
                           </th>
                         </tr>
@@ -116,10 +116,11 @@ export default function DisconnectWarningModal({
                       >
                         {posts.map((post) => {
                           // Determine which date to show based on post status
-                          const dateToShow = post.status === 'published' 
-                            ? post.published_at 
-                            : post.scheduled_at;
-                          
+                          const dateToShow =
+                            post.status === "published"
+                              ? post.published_at
+                              : post.scheduled_at;
+
                           return (
                             <tr key={post.id}>
                               <td className="px-4 py-2 whitespace-nowrap">
@@ -165,7 +166,7 @@ export default function DisconnectWarningModal({
                   onClick={onClose}
                   disabled={isLoading}
                 >
-                  {t("Content.socialMedia.disconnectModal.cancelButton")}
+                  {t("manageContent.socialMedia.disconnectModal.cancelButton")}
                 </button>
                 <button
                   type="button"
@@ -180,7 +181,7 @@ export default function DisconnectWarningModal({
                   {isLoading
                     ? t("common.processing")
                     : t(
-                        "Content.socialMedia.disconnectModal.confirmButton"
+                        "manageContent.socialMedia.disconnectModal.confirmButton",
                       )}
                 </button>
               </div>

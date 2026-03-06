@@ -7,8 +7,8 @@ import { VirtualList } from "@/Components/common/ui/VirtualList";
 import { getDateFnsLocale } from "@/Utils/dateLocales";
 import { Publication } from "@/types/Publication";
 import axios from "axios";
-import { format, formatDistanceToNow, Locale } from "date-fns";
-import { Check, Clock, Eye, User, X } from "lucide-react";
+import { Locale, format, formatDistanceToNow } from "date-fns";
+import { Check, Clock, Eye, Layers, User, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
@@ -53,6 +53,14 @@ function ApprovalPublicationItem({
             >
               {t(`manageContent.status.${pub.status}`) || pub.status}
             </span>
+            {pub.current_approval_step && (
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400 border border-primary-200 dark:border-primary-800 flex items-center gap-1">
+                <Layers className="w-3 h-3" />
+                {pub.current_approval_step.name}
+                {pub.current_approval_step.workflow?.steps &&
+                  ` (${pub.current_approval_step.step_order}/${pub.current_approval_step.workflow.steps.length})`}
+              </span>
+            )}
             <span
               className="text-xs text-gray-500 flex items-center gap-1.5"
               title={format(new Date(pub.updated_at), "PPP HH:mm", {
@@ -146,16 +154,23 @@ export default function ApprovalList({
         route("api.v1.publications.approve", publication.id),
       );
       if (response.data.success) {
-        toast.success(t("approvals.approvedSuccess"));
-
         const pub = response.data.publication;
-        // Show success modal with approver info
-        setSelectedPublication(pub);
-        setApprovalData({
-          approverName: pub.approved_by?.name || "Admin",
-          approvedAt: pub.approved_at,
-        });
-        setApprovalModalOpen(true);
+
+        if (pub.status === "approved") {
+          toast.success(t("approvals.approvedSuccess"));
+          // Show success modal with approver info
+          setSelectedPublication(pub);
+          setApprovalData({
+            approverName: pub.approved_by?.name || "Admin",
+            approvedAt: pub.approved_at,
+          });
+          setApprovalModalOpen(true);
+        } else {
+          // Partial approval (next step)
+          toast.success(
+            `Aprobación del nivel registrada. Ahora en: ${pub.current_approval_step?.name || "Siguiente paso"}`,
+          );
+        }
 
         onRefresh();
       }
@@ -273,20 +288,20 @@ export default function ApprovalList({
 
   return (
     <>
-      <div className="flex flex-col" >
+      <div className="flex flex-col">
         <div className="flex-1 overflow-y-auto">
           <VirtualList
             items={displayedPublications}
             estimatedItemSize={120}
             overscan={3}
             renderItem={renderItem}
-          emptyState={
-            <EmptyState
-              title={t("approvals.noPending")}
-              description={t("approvals.noPendingDesc")}
-            />
-          }
-        />
+            emptyState={
+              <EmptyState
+                title={t("approvals.noPending")}
+                description={t("approvals.noPendingDesc")}
+              />
+            }
+          />
         </div>
 
         <div className="mt-4 pt-4  dark:border-neutral-700 bg-white dark:bg-neutral-900">
@@ -294,14 +309,14 @@ export default function ApprovalList({
             currentPage={currentPage}
             lastPage={totalPages}
             total={totalItems}
-          perPage={perPage}
-          onPageChange={setCurrentPage}
-          onPerPageChange={(val) => {
-            setPerPage(val);
-            setCurrentPage(1);
-          }}
-          t={t}
-        />
+            perPage={perPage}
+            onPageChange={setCurrentPage}
+            onPerPageChange={(val) => {
+              setPerPage(val);
+              setCurrentPage(1);
+            }}
+            t={t}
+          />
         </div>
       </div>
 
