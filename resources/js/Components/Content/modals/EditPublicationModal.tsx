@@ -199,6 +199,17 @@ const EditPublicationModal = ({
   const goal = useWatch({ control, name: "goal" });
   const hashtags = useWatch({ control, name: "hashtags" });
   const campaign_id = useWatch({ control, name: "campaign_id" });
+  const is_recurring = useWatch({ control, name: "is_recurring" });
+  const recurrence_type = useWatch({ control, name: "recurrence_type" });
+  const recurrence_interval = useWatch({
+    control,
+    name: "recurrence_interval",
+  });
+  const recurrence_days = useWatch({ control, name: "recurrence_days" });
+  const recurrence_end_date = useWatch({
+    control,
+    name: "recurrence_end_date",
+  });
 
   const watched = useMemo(
     () => ({
@@ -210,6 +221,11 @@ const EditPublicationModal = ({
       goal,
       hashtags,
       campaign_id,
+      is_recurring,
+      recurrence_type,
+      recurrence_interval,
+      recurrence_days,
+      recurrence_end_date,
     }),
     [
       selectedSocialAccounts,
@@ -220,6 +236,11 @@ const EditPublicationModal = ({
       goal,
       hashtags,
       campaign_id,
+      is_recurring,
+      recurrence_type,
+      recurrence_interval,
+      recurrence_days,
+      recurrence_end_date,
     ],
   );
 
@@ -721,6 +742,19 @@ const EditPublicationModal = ({
                       error={errors.scheduled_at?.message as string}
                       disabled={isContentSectionDisabled || !allowConfiguration}
                       hasRecurrenceAccess={hasRecurrenceAccess}
+                      recurrenceDaysError={errors.recurrence_days?.message}
+                      isRecurring={watched.is_recurring}
+                      recurrenceType={watched.recurrence_type as any}
+                      recurrenceInterval={watched.recurrence_interval}
+                      recurrenceDays={watched.recurrence_days}
+                      recurrenceEndDate={
+                        watched.recurrence_end_date ?? undefined
+                      }
+                      onRecurrenceChange={(data) => {
+                        Object.entries(data).forEach(([key, val]) => {
+                          setValue(key as any, val, { shouldValidate: true });
+                        });
+                      }}
                     />
                   </div>
                 </div>

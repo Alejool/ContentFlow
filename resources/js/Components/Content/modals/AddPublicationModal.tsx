@@ -249,6 +249,17 @@ export default function AddPublicationModal({
   const hashtags = useWatch({ control, name: "hashtags" });
   const description = useWatch({ control, name: "description" });
   const campaign_id = useWatch({ control, name: "campaign_id" });
+  const is_recurring = useWatch({ control, name: "is_recurring" });
+  const recurrence_type = useWatch({ control, name: "recurrence_type" });
+  const recurrence_interval = useWatch({
+    control,
+    name: "recurrence_interval",
+  });
+  const recurrence_days = useWatch({ control, name: "recurrence_days" });
+  const recurrence_end_date = useWatch({
+    control,
+    name: "recurrence_end_date",
+  });
 
   const watched = useMemo(
     () => ({
@@ -260,6 +271,11 @@ export default function AddPublicationModal({
       goal,
       hashtags,
       campaign_id,
+      is_recurring,
+      recurrence_type,
+      recurrence_interval,
+      recurrence_days,
+      recurrence_end_date,
     }),
     [
       selectedSocialAccounts,
@@ -270,6 +286,11 @@ export default function AddPublicationModal({
       goal,
       hashtags,
       campaign_id,
+      is_recurring,
+      recurrence_type,
+      recurrence_interval,
+      recurrence_days,
+      recurrence_end_date,
     ],
   );
 
@@ -372,6 +393,19 @@ export default function AddPublicationModal({
                   }
                   error={errors.scheduled_at?.message as string}
                   hasRecurrenceAccess={hasRecurrenceAccess}
+                  isRecurring={watched.is_recurring}
+                  recurrenceType={watched.recurrence_type as any}
+                  recurrenceInterval={watched.recurrence_interval}
+                  recurrenceDays={watched.recurrence_days}
+                  recurrenceEndDate={watched.recurrence_end_date ?? undefined}
+                  recurrenceDaysError={
+                    errors.recurrence_days?.message as string
+                  }
+                  onRecurrenceChange={(data) => {
+                    Object.entries(data).forEach(([key, val]) => {
+                      setValue(key as any, val, { shouldValidate: true });
+                    });
+                  }}
                 />
               </div>
 

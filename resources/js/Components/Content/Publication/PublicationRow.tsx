@@ -3,7 +3,16 @@ import PublicationThumbnail from "@/Components/Content/Publication/PublicationTh
 import SocialAccountsDisplay from "@/Components/Content/Publication/SocialAccountsDisplay";
 import { Publication } from "@/types/Publication";
 import { usePage } from "@inertiajs/react";
-import { Copy, Edit, Eye, Image, Rocket, Trash2, Video } from "lucide-react";
+import {
+  Copy,
+  Edit,
+  Eye,
+  Image,
+  Repeat,
+  Rocket,
+  Trash2,
+  Video,
+} from "lucide-react";
 
 interface PublicationRowProps {
   item: Publication;
@@ -58,8 +67,16 @@ export default function PublicationRow({
             <PublicationThumbnail publication={item} />
           </div>
           <div>
-            <h3 className="font-medium text-sm text-gray-900 dark:text-white">
+            <h3 className="font-medium text-sm text-gray-900 dark:text-white flex items-center gap-1.5">
               {item.title || "Untitled"}
+              {item.is_recurring && (
+                <span
+                  title={t("publications.recurring") || "Recurrente"}
+                  className="flex items-center"
+                >
+                  <Repeat className="w-3.5 h-3.5 text-primary-500" />
+                </span>
+              )}
             </h3>
             <p className="text-xs mt-0.5 line-clamp-1 text-gray-500 dark:text-gray-400">
               {item.description || "No description"}
@@ -181,9 +198,13 @@ export default function PublicationRow({
                   }
                 }}
                 className={`p-2 ${
-                  item.status === "published" ? "text-amber-500" : "text-blue-500"
+                  item.status === "published"
+                    ? "text-amber-500"
+                    : "text-blue-500"
                 } hover:bg-blue-50 rounded-lg dark:hover:bg-blue-900/20`}
-                title={item.status === "published" ? "Unpublish to Edit" : "Edit"}
+                title={
+                  item.status === "published" ? "Unpublish to Edit" : "Edit"
+                }
               >
                 <Edit className="w-4 h-4" />
               </button>
