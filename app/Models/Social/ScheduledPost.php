@@ -13,7 +13,7 @@ use App\Models\Workspace\Workspace;
 use App\Models\MediaFiles\MediaFile;
 use App\Models\Campaigns\Campaign;
 use App\Models\Publications\Publication;
-use App\Models\Logs\PostLog;
+use App\Models\Social\SocialPostLog;
 
 use App\Traits\HandlesUtcDates;
 
@@ -76,6 +76,6 @@ class ScheduledPost extends Model
 
     public function postLogs(): HasMany
     {
-        return $this->hasMany(PostLog::class);
+        return $this->hasMany(SocialPostLog::class);
     }
 }

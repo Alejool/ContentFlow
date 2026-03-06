@@ -5,41 +5,77 @@ namespace App\Services\Scheduling;
 use App\Models\Publications\Publication;
 use App\Models\Social\ScheduledPost;
 use App\Models\Social\SocialAccount;
+use App\Models\Social\SocialPostLog;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class SchedulingService
 {
   public function scheduleForAccounts(Publication $publication, array $accountIds, array $accountSchedules = []): void
   {
-    $baseSchedule = $publication->scheduled_at;
+    $globalSchedule = $publication->scheduled_at;
 
-    // Generate dates if recurring
-    $dates = [$baseSchedule];
-    if ($publication->is_recurring && $baseSchedule) {
-      $dates = $this->calculateRecurrenceDates($publication);
-    }
+    // Pre-load the latest published log per social account for this publication.
+    // This is the most accurate base date: the exact moment each account was published.
+    $publishedLogs = SocialPostLog::where('publication_id', $publication->id)
+      ->where('status', 'published')
+      ->whereIn('social_account_id', $accountIds)
+      ->orderBy('id', 'desc')
+      ->get()
+      ->keyBy('social_account_id');
+
+    // Pre-load previously 'posted' ScheduledPosts (marked as posted when publishing started).
+    // Fallback when log.published_at is null — the original scheduled_at is reliable.
+    $postedSchedules = ScheduledPost::where('publication_id', $publication->id)
+      ->where('status', 'posted')
+      ->whereIn('social_account_id', $accountIds)
+      ->orderBy('id', 'desc')
+      ->get()
+      ->keyBy('social_account_id');
+
+    // Publication-level fallback dates (in order of preference)
+    $publicationFallback = $globalSchedule
+      ?? $publication->published_at
+      ?? ($publication->publish_date ? Carbon::parse($publication->publish_date) : null);
+
     $socialAccounts = SocialAccount::whereIn('id', $accountIds)->get()->keyBy('id');
 
     foreach ($accountIds as $accountId) {
       $socialAccount = $socialAccounts[$accountId] ?? null;
 
-      // If specific account schedule is provided in $accountSchedules, it overrides everything for that account?
-      // Actually, $accountSchedules IS used in the frontend for custom per-account timing.
-      // But if it's recurring, we probably want to apply the recurrence to all.
+      // Determine the effective base date for THIS account (most specific wins):
+      // 1. The account's own published_at from its social_post_log (exact publish time)
+      // 2. The original scheduled_at from the ScheduledPost marked as 'posted'
+      // 3. A per-account schedule override passed from the frontend
+      // 4. The publication's global scheduled_at
+      // 5. The publication's published_at / publish_date
+      $accountLog = $publishedLogs[$accountId] ?? null;
+      $accountLogDate = $accountLog?->published_at ?? null;
 
-      $accountBaseSchedule = isset($accountSchedules[$accountId]) ? $accountSchedules[$accountId] : $baseSchedule;
+      $postedSchedule = $postedSchedules[$accountId] ?? null;
+      $postedScheduleDate = $postedSchedule?->scheduled_at ?? null;
 
-      // If it's recurring, we use the calculated $dates.
-      // If it's NOT recurring, we use the single $accountBaseSchedule.
-      $specificDates = ($publication->is_recurring && !$publication->social_account_schedules) ? $dates : [$accountBaseSchedule];
+      $accountScheduleDate = isset($accountSchedules[$accountId]) ? $accountSchedules[$accountId] : null;
+
+      $accountBase = $accountLogDate
+        ?? $postedScheduleDate
+        ?? $accountScheduleDate
+        ?? $globalSchedule
+        ?? $publicationFallback;
+
+      if ($publication->is_recurring && $accountBase) {
+        // Calculate recurrence dates using this account's specific base date
+        $specificDates = $this->calculateRecurrenceDatesFromBase($publication, $accountBase);
+      } else {
+        // Not recurring: use the single effective date for this account
+        $specificDates = [$accountBase];
+      }
 
       foreach ($specificDates as $scheduledAt) {
         if (!$scheduledAt) {
           continue;
         }
 
-        // Use separate find and update/create to ensure scheduled_at is always updated
-        // For recurring, we should probably check if a post already exists for this date and account.
         $existingPost = ScheduledPost::where('publication_id', $publication->id)
           ->where('social_account_id', $accountId)
           ->where('scheduled_at', $scheduledAt)
@@ -66,7 +102,7 @@ class SchedulingService
       }
     }
 
-    // Cleanup: Remove accounts that are no longer selected
+    // Cleanup: Remove pending schedules for accounts that are no longer selected
     if (empty($accountIds)) {
       ScheduledPost::where('publication_id', $publication->id)
         ->where('status', 'pending')
@@ -108,17 +144,18 @@ class SchedulingService
   }
 
   /**
-   * Calculate future dates for a recurring publication.
+   * Calculate future recurrence dates for a publication given a specific base date.
+   * The base date is the original publish/schedule time for a particular social account.
    */
-  protected function calculateRecurrenceDates(Publication $publication): array
+  protected function calculateRecurrenceDatesFromBase(Publication $publication, $baseDate): array
   {
-    if (!$publication->scheduled_at) {
+    if (!$baseDate) {
       return [];
     }
 
     $dates = [];
-    $startDate = \Carbon\Carbon::parse($publication->scheduled_at);
-    $endDate = $publication->recurrence_end_date ? \Carbon\Carbon::parse($publication->recurrence_end_date) : null;
+    $startDate = Carbon::parse($baseDate);
+    $endDate = $publication->recurrence_end_date ? Carbon::parse($publication->recurrence_end_date) : null;
     $interval = max(1, $publication->recurrence_interval ?? 1);
 
     // Default limit: 3 months if no end date
@@ -128,10 +165,13 @@ class SchedulingService
 
     $currentDate = clone $startDate;
 
-    // We limit to 50 occurrences to avoid memory/timeout issues
+    // Limit to 50 occurrences to avoid memory/timeout issues
     $count = 0;
     while ($currentDate->lessThanOrEqualTo($endDate) && $count < 50) {
-      $dates[] = $currentDate->toIso8601String();
+      // Only include future dates (allow 5-min grace period for dates that just passed)
+      if ($currentDate->greaterThanOrEqualTo(now()->subMinutes(5))) {
+        $dates[] = $currentDate->toIso8601String();
+      }
 
       switch ($publication->recurrence_type) {
         case 'daily':
@@ -139,23 +179,24 @@ class SchedulingService
           break;
         case 'weekly':
           if (!empty($publication->recurrence_days)) {
-            // Complex weekly recursion (specific days)
-            $foundNext = false;
-            $originalDay = $currentDate->dayOfWeek;
+            $currentDay = $currentDate->dayOfWeek;
+            $nextDay = null;
 
-            // Try remaining days this week
-            for ($i = 1; $i <= 7; $i++) {
-              $currentDate->addDay();
-              if (in_array($currentDate->dayOfWeek, $publication->recurrence_days)) {
-                // If it's the start of a new week cycle based on interval
-                // This is a simplified version: handles daily within week, but interval applies to week jump.
-                $foundNext = true;
+            $sortedDays = $publication->recurrence_days;
+            sort($sortedDays);
+
+            foreach ($sortedDays as $day) {
+              if ($day > $currentDay) {
+                $nextDay = $day;
                 break;
               }
             }
-            if (!$foundNext) {
-              // Fallback if no days selected
-              $currentDate->addWeeks($interval);
+
+            if ($nextDay !== null) {
+              $currentDate->addDays($nextDay - $currentDay);
+            } else {
+              $nextDay = $sortedDays[0];
+              $currentDate->subDays($currentDay)->addWeeks($interval)->addDays($nextDay);
             }
           } else {
             $currentDate->addWeeks($interval);
@@ -172,5 +213,18 @@ class SchedulingService
     }
 
     return $dates;
+  }
+
+  /**
+   * Calculate future dates for a recurring publication.
+   * Kept for backward compatibility — uses publication-level date as base.
+   */
+  protected function calculateRecurrenceDates(Publication $publication): array
+  {
+    $baseDate = $publication->scheduled_at
+      ?? $publication->published_at
+      ?? ($publication->publish_date ? Carbon::parse($publication->publish_date) : null);
+
+    return $this->calculateRecurrenceDatesFromBase($publication, $baseDate);
   }
 }
