@@ -15,6 +15,25 @@ class StorePublicationRequest extends FormRequest
     return true;
   }
 
+  /**
+   * Prepare the data for validation.
+   */
+  protected function prepareForValidation(): void
+  {
+    if ($this->has('is_recurring')) {
+      $this->merge([
+        'is_recurring' => filter_var($this->is_recurring, FILTER_VALIDATE_BOOLEAN)
+      ]);
+    }
+
+    if ($this->has('recurrence_days') && is_string($this->recurrence_days)) {
+      $days = array_filter(explode(',', $this->recurrence_days), 'strlen');
+      $this->merge([
+        'recurrence_days' => array_map('intval', $days)
+      ]);
+    }
+  }
+
   public function rules(): array
   {
     // Debug: Log incoming data before validation
@@ -49,7 +68,7 @@ class StorePublicationRequest extends FormRequest
           if ($value) {
             $scheduledDate = Carbon::parse($value);
             $now = Carbon::now();
-            
+
             // Check if scheduled date is more than 1 minute in the future
             if ($scheduledDate->diffInSeconds($now, false) >= -60) {
               $fail(__('publications.validation.scheduledMinDifference'));
@@ -67,7 +86,7 @@ class StorePublicationRequest extends FormRequest
           if ($value) {
             $scheduledDate = Carbon::parse($value);
             $now = Carbon::now();
-            
+
             // Check if scheduled date is more than 1 minute in the future
             if ($scheduledDate->diffInSeconds($now, false) >= -60) {
               $fail(__('publications.validation.scheduledMinDifference'));
@@ -101,6 +120,13 @@ class StorePublicationRequest extends FormRequest
       'youtube_types' => 'nullable|array',
       'durations' => 'nullable|array',
       'thumbnails' => 'nullable|array',
+      // Recurrence
+      'is_recurring' => 'nullable|boolean',
+      'recurrence_type' => 'nullable|required_if:is_recurring,true|in:daily,weekly,monthly,yearly',
+      'recurrence_interval' => 'nullable|integer|min:1',
+      'recurrence_days' => 'nullable|array',
+      'recurrence_days.*' => 'integer|min:0|max:6',
+      'recurrence_end_date' => 'nullable|date|after_or_equal:now',
     ];
   }
 }

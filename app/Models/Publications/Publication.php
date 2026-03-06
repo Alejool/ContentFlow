@@ -97,6 +97,11 @@ class Publication extends Model
     'rejected_at',
     'rejection_reason',
     'portal_token',
+    'is_recurring',
+    'recurrence_type',
+    'recurrence_interval',
+    'recurrence_days',
+    'recurrence_end_date',
   ];
 
   protected $appends = ['platform_status_summary', 'media_locked_by', 'approval_lock'];
@@ -117,6 +122,10 @@ class Publication extends Model
     'published_at' => 'datetime',
     'rejected_by' => 'integer',
     'rejected_at' => 'datetime',
+    'is_recurring' => 'boolean',
+    'recurrence_interval' => 'integer',
+    'recurrence_days' => 'array',
+    'recurrence_end_date' => 'date',
   ];
 
   public function scopeDraft($query)

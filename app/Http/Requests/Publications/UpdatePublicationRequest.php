@@ -12,7 +12,7 @@ class UpdatePublicationRequest extends FormRequest
   public function authorize(): bool
   {
     $publication = $this->route('publication');
-    
+
     if (!$publication instanceof Publication) {
       $publication = Publication::find($publication);
     }
@@ -42,14 +42,14 @@ class UpdatePublicationRequest extends FormRequest
   protected function failedAuthorization()
   {
     $publication = $this->route('publication');
-    
+
     if (!$publication instanceof Publication) {
       $publication = Publication::find($publication);
     }
 
     if ($publication && $publication->isLockedForEditing()) {
       $message = 'This publication is locked for editing. ';
-      
+
       if ($publication->status === 'pending_review') {
         $message .= 'It is awaiting approval and cannot be modified until it is approved or rejected.';
       } elseif ($publication->status === 'approved') {
@@ -70,7 +70,7 @@ class UpdatePublicationRequest extends FormRequest
     // Handle social_accounts if it comes as JSON string
     if ($this->has('social_accounts')) {
       $socialAccounts = $this->input('social_accounts');
-      
+
       // If it's a string, try to decode it
       if (is_string($socialAccounts)) {
         // Handle empty string
@@ -84,7 +84,21 @@ class UpdatePublicationRequest extends FormRequest
           }
         }
       }
-    } 
+    }
+
+    // Cast is_recurring to actual boolean so validation rules like required_if work seamlessly
+    if ($this->has('is_recurring')) {
+      $this->merge([
+        'is_recurring' => filter_var($this->is_recurring, FILTER_VALIDATE_BOOLEAN)
+      ]);
+    }
+
+    if ($this->has('recurrence_days') && is_string($this->recurrence_days)) {
+      $days = array_filter(explode(',', $this->recurrence_days), 'strlen');
+      $this->merge([
+        'recurrence_days' => array_map('intval', $days)
+      ]);
+    }
   }
 
   public function rules(): array
@@ -129,7 +143,7 @@ class UpdatePublicationRequest extends FormRequest
           if ($value) {
             $scheduledDate = Carbon::parse($value);
             $now = Carbon::now();
-            
+
             // Check if scheduled date is more than 1 minute in the future
             if ($scheduledDate->diffInSeconds($now, false) >= -60) {
               $fail(__('publications.validation.scheduledMinDifference'));
@@ -159,7 +173,7 @@ class UpdatePublicationRequest extends FormRequest
 
             $scheduledDate = Carbon::parse($value);
             $now = Carbon::now();
-            
+
             // Check if scheduled date is more than 1 minute in the future
             if ($scheduledDate->diffInSeconds($now, false) >= -60) {
               $fail(__('publications.validation.scheduledMinDifference'));
@@ -182,7 +196,7 @@ class UpdatePublicationRequest extends FormRequest
             if ($globalSchedule) {
               $scheduledDate = Carbon::parse($globalSchedule);
               $now = Carbon::now();
-              
+
               // Check if scheduled date is more than 1 minute in the future
               if ($scheduledDate->diffInSeconds($now, false) >= -60) {
                 $fail(__('publications.validation.scheduledMinDifference'));
@@ -215,6 +229,13 @@ class UpdatePublicationRequest extends FormRequest
       'removed_thumbnail_ids' => 'nullable|array',
       'youtube_thumbnail' => 'nullable|file|mimes:jpeg,png,jpg|max:5120',
       'youtube_thumbnail_video_id' => 'nullable|exists:media_files,id',
+      // Recurrence
+      'is_recurring' => 'nullable|boolean',
+      'recurrence_type' => 'nullable|required_if:is_recurring,true|in:daily,weekly,monthly,yearly',
+      'recurrence_interval' => 'nullable|integer|min:1',
+      'recurrence_days' => 'nullable|array',
+      'recurrence_days.*' => 'integer|min:0|max:6',
+      'recurrence_end_date' => 'nullable|date|after_or_equal:now',
     ];
   }
 }

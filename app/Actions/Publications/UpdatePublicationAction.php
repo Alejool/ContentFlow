@@ -32,22 +32,22 @@ class UpdatePublicationAction
       // Check if content has changed (requires re-approval)
       $contentChanged = false;
       if ($currentStatus === 'approved' || $currentStatus === 'scheduled') {
-        $contentChanged = 
+        $contentChanged =
           ($data['title'] !== $publication->title) ||
           ($data['description'] !== $publication->description) ||
           (($data['hashtags'] ?? $publication->hashtags) !== $publication->hashtags) ||
           !empty($newFiles) ||
           !empty($data['removed_media_ids']);
-        
+
         // If content changed, revert to pending for re-approval
         if ($contentChanged) {
           $newStatus = 'pending';
-          
+
           // Clear approval metadata
           $data['approved_by'] = null;
           $data['approved_at'] = null;
           $data['approved_retries_remaining'] = 2;
-          
+
           Log::info('Publication content changed, reverting to pending for re-approval', [
             'publication_id' => $publication->id,
             'previous_status' => $currentStatus
@@ -67,7 +67,7 @@ class UpdatePublicationAction
         ];
 
         $allowedStatuses = $allowedTransitions[$currentStatus] ?? [$currentStatus];
-        
+
         if (!in_array($data['status'], $allowedStatuses)) {
           // Ignore invalid status change attempt
           unset($data['status']);
@@ -113,6 +113,8 @@ class UpdatePublicationAction
         }
       }
 
+      $isRecurring = isset($data['is_recurring']) ? filter_var($data['is_recurring'], FILTER_VALIDATE_BOOLEAN) : $publication->is_recurring;
+
       $updateData = [
         'title' => $data['title'],
         'description' => $data['description'],
@@ -122,6 +124,11 @@ class UpdatePublicationAction
         'end_date' => $data['end_date'] ?? $publication->end_date,
         'status' => $newStatus,
         'scheduled_at' => $data['scheduled_at'] ?? $publication->scheduled_at,
+        'is_recurring' => $isRecurring,
+        'recurrence_type' => $isRecurring ? ($data['recurrence_type'] ?? $publication->recurrence_type) : null,
+        'recurrence_interval' => $isRecurring ? ($data['recurrence_interval'] ?? $publication->recurrence_interval) : null,
+        'recurrence_days' => $isRecurring ? (array_key_exists('recurrence_days', $data) ? $data['recurrence_days'] : []) : null,
+        'recurrence_end_date' => $isRecurring ? ($data['recurrence_end_date'] ?? $publication->recurrence_end_date) : null,
       ];
 
       // Add approval fields if they were cleared due to content changes
@@ -197,44 +204,44 @@ class UpdatePublicationAction
       // Handle Schedules
       $socialAccounts = [];
       $shouldSyncSchedules = false;
-      
+
       // Check if we should clear all social accounts
       if (array_key_exists('clear_social_accounts', $data) && !empty($data['clear_social_accounts'])) {
         $socialAccounts = [];
         $shouldSyncSchedules = true;
-      } 
+      }
       // Check if social_accounts key exists (even if empty array)
       elseif (array_key_exists('social_accounts', $data)) {
         // Handle case where social_accounts might be sent as JSON string or array
         $socialAccounts = $data['social_accounts'] ?? [];
-        
+
         // If it's a string, try to decode it
         if (is_string($socialAccounts)) {
           $decoded = json_decode($socialAccounts, true);
           $socialAccounts = is_array($decoded) ? $decoded : [];
         }
-        
+
         // Ensure it's an array
         if (!is_array($socialAccounts)) {
           $socialAccounts = [];
         }
-        
+
         // Filter out empty strings and null values, then convert to integers
         $socialAccounts = array_values(array_filter(
-          array_map(function($id) {
+          array_map(function ($id) {
             return $id === '' || $id === null ? null : intval($id);
           }, $socialAccounts),
-          function($id) {
+          function ($id) {
             return $id !== null && $id > 0;
           }
         ));
-        
+
         $shouldSyncSchedules = true;
       }
-      
+
       // Sync schedules if needed
       if ($shouldSyncSchedules) {
-        
+
         $this->schedulingService->syncSchedules(
           $publication,
           $socialAccounts,
