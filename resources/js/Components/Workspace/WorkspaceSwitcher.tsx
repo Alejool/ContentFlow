@@ -28,8 +28,8 @@ export default function WorkspaceSwitcher({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleSwitch = (workspaceId: number) => {
-    post(route("workspaces.switch", workspaceId), {
+  const handleSwitch = (slug: string) => {
+    post(route("workspaces.switch", slug), {
       onSuccess: () => setIsOpen(false),
     });
   };
@@ -121,7 +121,7 @@ export default function WorkspaceSwitcher({
                 return (
                   <button
                     key={ws.id}
-                    onClick={() => handleSwitch(ws.id)}
+                    onClick={() => handleSwitch(ws.slug)}
                     className={`
                                             w-full flex items-center gap-3 p-2 rounded-lg text-sm
                                             transition-colors duration-200

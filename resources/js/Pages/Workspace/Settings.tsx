@@ -1,14 +1,20 @@
+import ApiSettingsTab from "@/Components/Workspace/ApiSettingsTab";
+import EnterpriseSupportTab from "@/Components/Workspace/EnterpriseSupportTab";
 import GeneralSettingsTab from "@/Components/Workspace/GeneralSettingsTab";
 import IntegrationsSettingsTab from "@/Components/Workspace/IntegrationsSettingsTab";
 import MembersManagement from "@/Components/Workspace/MembersManagement";
 import OverviewTab from "@/Components/Workspace/OverviewTab";
 import RolesManagementTab from "@/Components/Workspace/RolesManagementTab";
 import SettingsTabs from "@/Components/Workspace/SettingsTabs";
+import WhiteLabelSettingsTab from "@/Components/Workspace/WhiteLabelSettingsTab";
 import WorkspaceSettingsHeader from "@/Components/Workspace/WorkspaceSettingsHeader";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head } from "@inertiajs/react";
 import {
   AlertCircle,
+  Key,
+  Layout,
+  Palette,
   Settings as SettingsIcon,
   Share2,
   Shield,
@@ -40,7 +46,14 @@ export default function WorkspaceSettings({
   const params = new URLSearchParams(window.location.search);
   const initialTab = params.get("tab");
   const [activeTab, setActiveTab] = useState<
-    "general" | "members" | "roles" | "integrations" | "overview"
+    | "general"
+    | "members"
+    | "roles"
+    | "integrations"
+    | "overview"
+    | "white-label"
+    | "api"
+    | "support"
   >((initialTab as any) || "overview");
 
   if (!current_workspace || !roles) {
@@ -85,6 +98,11 @@ export default function WorkspaceSettings({
 
   const canManageWorkspace = isOwner || userRole === "admin";
 
+  const isEnterprise =
+    current_workspace.features?.white_label ||
+    current_workspace.subscription?.plan === "enterprise" ||
+    current_workspace.plan === "enterprise";
+
   const tabs = [
     {
       id: "overview",
@@ -112,6 +130,26 @@ export default function WorkspaceSettings({
       icon: Share2,
     },
   ];
+
+  if (isEnterprise && isOwner) {
+    tabs.push(
+      {
+        id: "white-label",
+        label: t("workspace.tabs.white_label") || "White-label",
+        icon: Palette,
+      },
+      {
+        id: "api",
+        label: t("workspace.tabs.api") || "API Access",
+        icon: Key,
+      },
+      {
+        id: "support",
+        label: t("workspace.tabs.support") || "Enterprise Support",
+        icon: Layout,
+      },
+    );
+  }
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -151,6 +189,22 @@ export default function WorkspaceSettings({
             canManageWorkspace={canManageWorkspace}
           />
         );
+      case "white-label":
+        return (
+          <WhiteLabelSettingsTab
+            workspace={current_workspace}
+            canManageWorkspace={canManageWorkspace}
+          />
+        );
+      case "api":
+        return (
+          <ApiSettingsTab
+            workspace={current_workspace}
+            canManageWorkspace={canManageWorkspace}
+          />
+        );
+      case "support":
+        return <EnterpriseSupportTab />;
       default:
         return (
           <OverviewTab

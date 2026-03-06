@@ -8,13 +8,16 @@ use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 use App\Notifications\WorkspaceRemovedNotification;
 
 use App\Models\User;
 use App\Models\Logs\WebhookLog;
 use App\Models\Workspace\Workspace;
-use App\Models\Role\Role;;
+use App\Models\Role\Role;
+use Illuminate\Support\Str;
 
 class WorkspaceController extends Controller
 {
@@ -154,6 +157,129 @@ class WorkspaceController extends Controller
     return redirect()->back()->with('message', 'Workspace updated successfully.');
   }
 
+  /**
+   * Update white-label settings for enterprise workspaces.
+   */
+  public function updateWhiteLabel(Request $request, Workspace $workspace)
+  {
+    Log::info('ENTRY: updateWhiteLabel', [
+      'workspace_slug' => $workspace->slug,
+      'has_file_logo' => $request->hasFile('logo'),
+      'has_file_favicon' => $request->hasFile('favicon'),
+      'primary_color' => $request->primary_color
+    ]);
+
+    if (Auth::id() !== $workspace->created_by) {
+      abort(403, 'Only the workspace owner can update white-label settings');
+    }
+
+    // Check if the workspace is on the enterprise plan
+    if ($workspace->getPlanName() !== 'enterprise') {
+      return $this->errorResponse('This feature is only available for Enterprise plans.', 403);
+    }
+
+    $request->validate([
+      'logo' => 'nullable|image|max:2048',
+      'favicon' => 'nullable|image|max:1024',
+      'primary_color' => ['nullable', 'string', 'regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/'],
+    ]);
+
+    $data = [
+      'white_label_primary_color' => $request->primary_color,
+    ];
+
+    $disk = config('filesystems.default') === 's3' ? 's3' : 'public';
+
+    try {
+      if ($request->hasFile('logo')) {
+        $oldLogo = $workspace->white_label_logo_url;
+        $file = $request->file('logo');
+        $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
+
+        Log::info('Attempting logo storage', ['filename' => $filename, 'disk' => $disk]);
+
+        $path = false;
+        try {
+          $path = $file->storeAs('workspace-branding', $filename, [
+            'disk' => $disk,
+            'visibility' => 'public'
+          ]);
+        } catch (\Exception $e) {
+          Log::warning('Logo storage public failed', ['error' => $e->getMessage()]);
+        }
+
+        if (!$path) {
+          Log::info('Retrying logo storage default');
+          $path = $file->storeAs('workspace-branding', $filename, $disk);
+        }
+
+        if ($path) {
+          Log::info('Logo stored successfully', ['path' => $path]);
+          $data['white_label_logo_url'] = Storage::disk($disk)->url($path);
+
+          if ($oldLogo && str_contains($oldLogo, 'workspace-branding')) {
+            preg_match('/workspace-branding\/[^\?]+/', $oldLogo, $matches);
+            if (!empty($matches)) {
+              Storage::disk($disk)->delete($matches[0]);
+            }
+          }
+        }
+      }
+
+      if ($request->hasFile('favicon')) {
+        $oldFavicon = $workspace->white_label_favicon_url;
+        $file = $request->file('favicon');
+        $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
+
+        Log::info('Attempting favicon storage', ['filename' => $filename, 'disk' => $disk]);
+
+        $path = false;
+        try {
+          $path = $file->storeAs('workspace-branding', $filename, [
+            'disk' => $disk,
+            'visibility' => 'public'
+          ]);
+        } catch (\Exception $e) {
+          Log::warning('Favicon storage public failed', ['error' => $e->getMessage()]);
+        }
+
+        if (!$path) {
+          Log::info('Retrying favicon storage default');
+          $path = $file->storeAs('workspace-branding', $filename, $disk);
+        }
+
+        if ($path) {
+          Log::info('Favicon stored successfully', ['path' => $path]);
+          $data['white_label_favicon_url'] = Storage::disk($disk)->url($path);
+
+          if ($oldFavicon && str_contains($oldFavicon, 'workspace-branding')) {
+            preg_match('/workspace-branding\/[^\?]+/', $oldFavicon, $matches);
+            if (!empty($matches)) {
+              Storage::disk($disk)->delete($matches[0]);
+            }
+          }
+        }
+      }
+
+      $workspace->update($data);
+    } catch (\Exception $e) {
+      Log::error('WHITE_LABEL_CRITICAL_FAILURE', [
+        'message' => $e->getMessage(),
+        'exception' => get_class($e),
+        'file' => $e->getFile(),
+        'line' => $e->getLine(),
+        'trace' => substr($e->getTraceAsString(), 0, 500)
+      ]);
+      return $this->errorResponse('Branding Error: ' . $e->getMessage(), 500);
+    }
+
+    if ($request->wantsJson() || $request->is('api/*')) {
+      return $this->successResponse(['workspace' => $workspace, 'data' => $data], 'White-label settings updated successfully.');
+    }
+
+    return redirect()->back()->with('message', 'White-label settings updated successfully.');
+  }
+
   public function members($workspaceId)
   {
     $workspace = Workspace::with([
@@ -257,6 +383,15 @@ class WorkspaceController extends Controller
 
     if (!Auth::user()->hasPermission('manage-team', $workspaceId)) {
       abort(403, 'You do not have permission to invite members');
+    }
+
+    // Check member limits
+    if (!$workspace->canAddTeamMember()) {
+      $usageService = app(\App\Services\WorkspaceUsageService::class);
+      return response()->json([
+        'success' => false,
+        'message' => $usageService->getLimitReachedMessage($workspace, 'team_members')
+      ], 422);
     }
 
     $validated = $request->validate([

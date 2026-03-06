@@ -18,11 +18,12 @@ use App\Models\Calendar\BulkOperationHistory;
 use App\Models\Subscription\Subscription;
 use App\Models\Subscription\UsageMetric;
 use Laravel\Cashier\Billable;
+use Laravel\Sanctum\HasApiTokens;
 
 
 class Workspace extends Model
 {
-    use HasFactory, SoftDeletes, Notifiable, Billable;
+    use HasFactory, SoftDeletes, Notifiable, Billable, HasApiTokens;
 
 
     protected $fillable = [
@@ -34,6 +35,9 @@ class Workspace extends Model
         'allow_public_invites',
         'slack_webhook_url',
         'discord_webhook_url',
+        'white_label_logo_url',
+        'white_label_primary_color',
+        'white_label_favicon_url',
     ];
 
     protected static function booted()
@@ -59,6 +63,14 @@ class Workspace extends Model
 
             $workspace->slug = $slug;
         });
+    }
+
+    /**
+     * Route model binding key — use slug so URLs work with slugs.
+     */
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
     }
 
     public function users()
@@ -155,7 +167,30 @@ class Workspace extends Model
     }
 
     /**
-     * Get monthly publication count.
+     * Get monthly post count (published + scheduled).
+     */
+    public function getMonthlyPostCount(): int
+    {
+        $start = now()->startOfMonth();
+        $end = now()->endOfMonth();
+
+        // Count published posts from this month
+        $publishedCount = \App\Models\Social\SocialPostLog::where('workspace_id', $this->id)
+            ->whereIn('status', ['published', 'orphaned', 'publishing'])
+            ->whereBetween('published_at', [$start, $end])
+            ->count();
+
+        // Count scheduled posts for this month (that are still scheduled)
+        $scheduledCount = \App\Models\Social\ScheduledPost::where('workspace_id', $this->id)
+            ->where('status', 'scheduled')
+            ->whereBetween('scheduled_at', [$start, $end])
+            ->count();
+
+        return $publishedCount + $scheduledCount;
+    }
+
+    /**
+     * Get monthly publication count. (DEPRECATED in favor of getMonthlyPostCount)
      */
     public function getMonthlyPublicationCount(): int
     {
@@ -187,7 +222,7 @@ class Workspace extends Model
     public function owner()
     {
         return $this->users()
-            ->wherePivot('role_id', function($query) {
+            ->wherePivot('role_id', function ($query) {
                 $query->select('id')
                     ->from('roles')
                     ->where('slug', 'owner')
@@ -247,11 +282,11 @@ class Workspace extends Model
     {
         $limits = $this->getPlanLimits();
         $limit = $limits['team_members'] ?? 1;
-        
+
         if ($limit === -1) {
             return PHP_INT_MAX;
         }
-        
+
         $currentMembers = $this->users()->count();
         return max(0, $limit - $currentMembers);
     }
@@ -278,12 +313,12 @@ class Workspace extends Model
     public function hasFeature(string $feature): bool
     {
         $features = $this->getPlanFeatures();
-        
+
         // Check if feature exists as a key (for features with values)
         if (isset($features[$feature])) {
             return $features[$feature] === true || $features[$feature] !== false;
         }
-        
+
         // Check if feature exists in array (for simple feature flags)
         return in_array($feature, $features);
     }
