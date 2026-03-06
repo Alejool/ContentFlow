@@ -46,6 +46,7 @@ export type Publication = {
   approved_at?: string;
   published_by?: number;
   published_at?: string;
+  publish_date?: string;
   rejected_by?: number;
   rejected_at?: string;
   rejection_reason?: string;

@@ -12,7 +12,13 @@ interface PublicationState {
   publishingPlatforms: Record<number, number[]>;
   scheduledPlatforms: Record<number, number[]>;
   removedPlatforms: Record<number, number[]>;
-  retryInfo: Record<number, Record<number, { retry_count: number; is_retrying: boolean; retry_status: string }>>;
+  retryInfo: Record<
+    number,
+    Record<
+      number,
+      { retry_count: number; is_retrying: boolean; retry_status: string }
+    >
+  >;
 
   isLoading: boolean;
   error: string | null;
@@ -32,7 +38,10 @@ interface PublicationState {
     publishing: number[];
     scheduled: number[];
     removed: number[];
-    retry_info: Record<number, { retry_count: number; is_retrying: boolean; retry_status: string }>;
+    retry_info: Record<
+      number,
+      { retry_count: number; is_retrying: boolean; retry_status: string }
+    >;
   }>;
 
   addPublication: (publication: Publication) => void;
@@ -63,7 +72,14 @@ interface PublicationState {
   getRemovedPlatforms: (publicationId: number) => number[];
   getPublishingPlatforms: (publicationId: number) => number[];
   getScheduledPlatforms: (publicationId: number) => number[];
-  getRetryInfo: (publicationId: number, platformId: number) => { retry_count: number; is_retrying: boolean; retry_status: string } | null;
+  getRetryInfo: (
+    publicationId: number,
+    platformId: number,
+  ) => {
+    retry_count: number;
+    is_retrying: boolean;
+    retry_status: string;
+  } | null;
 
   setPublishedPlatforms: (publicationId: number, accountIds: number[]) => void;
   setFailedPlatforms: (publicationId: number, accountIds: number[]) => void;
@@ -113,14 +129,17 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
 
     try {
       // Limpiar filtros vacíos
-      const cleanFilters = Object.entries(filters).reduce((acc, [key, value]) => {
-        if (Array.isArray(value) && value.length > 0) {
-          acc[key] = value;
-        } else if (value && !Array.isArray(value) && value !== 'all') {
-          acc[key] = value;
-        }
-        return acc;
-      }, {} as any);
+      const cleanFilters = Object.entries(filters).reduce(
+        (acc, [key, value]) => {
+          if (Array.isArray(value) && value.length > 0) {
+            acc[key] = value;
+          } else if (value && !Array.isArray(value) && value !== "all") {
+            acc[key] = value;
+          }
+          return acc;
+        },
+        {} as any,
+      );
       const response = await axios.get(route("api.v1.publications.index"), {
         params: { ...cleanFilters, page },
         paramsSerializer: {
@@ -129,14 +148,16 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
             const searchParams = new URLSearchParams();
             Object.entries(params).forEach(([key, value]) => {
               if (Array.isArray(value)) {
-                value.forEach(v => searchParams.append(`${key}[]`, String(v)));
+                value.forEach((v) =>
+                  searchParams.append(`${key}[]`, String(v)),
+                );
               } else if (value !== null && value !== undefined) {
                 searchParams.append(key, String(value));
               }
             });
             return searchParams.toString();
-          }
-        }
+          },
+        },
       });
 
       const data = response.data.publications;
@@ -152,7 +173,7 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
         isLoading: false,
       });
     } catch (error: any) {
-       set({
+      set({
         error: error.message ?? "Failed to fetch publications",
         isLoading: false,
       });
@@ -194,11 +215,24 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
         route("api.v1.publications.published-platforms", publicationId),
       );
 
-      const published = response.data.published_platforms ?? [];
-      const failed = response.data.failed_platforms ?? [];
-      const publishing = response.data.publishing_platforms ?? [];
-      const removed = response.data.removed_platforms ?? [];
-      const scheduled = response.data.scheduled_platforms ?? [];
+      const published = Array.isArray(response.data.published_platforms)
+        ? response.data.published_platforms
+        : [];
+      const failed = Array.isArray(response.data.failed_platforms)
+        ? response.data.failed_platforms
+        : [];
+      const publishing = Array.isArray(response.data.publishing_platforms)
+        ? response.data.publishing_platforms
+        : [];
+      const removed = Array.isArray(response.data.removed_platforms)
+        ? response.data.removed_platforms
+        : [];
+      const scheduled = Array.isArray(response.data.scheduled_platforms)
+        ? response.data.scheduled_platforms
+        : typeof response.data.scheduled_platforms === "object" &&
+            response.data.scheduled_platforms !== null
+          ? Object.values(response.data.scheduled_platforms)
+          : [];
       const retry_info = response.data.retry_info ?? {};
 
       set((state) => ({
@@ -280,10 +314,16 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
 
           if (status === "published" || status === "success") {
             published.push(log.social_account_id);
-          } else if (status === "failed" || (status === "pending" && attempts >= maxAttempts)) {
+          } else if (
+            status === "failed" ||
+            (status === "pending" && attempts >= maxAttempts)
+          ) {
             // Mark as failed if explicitly failed OR if all retry attempts exhausted
             failed.push(log.social_account_id);
-          } else if ((status === "publishing" || status === "pending") && attempts < maxAttempts) {
+          } else if (
+            (status === "publishing" || status === "pending") &&
+            attempts < maxAttempts
+          ) {
             // Only show as publishing if actively in progress and retries remain
             publishing.push(log.social_account_id);
           } else if (status === "removed_on_platform" || status === "deleted") {
@@ -475,7 +515,7 @@ export const usePublicationStore = create<PublicationState>((set, get) => ({
   getPublishingPlatforms: (id) => get().publishingPlatforms[id] ?? [],
 
   getScheduledPlatforms: (id) => get().scheduledPlatforms[id] ?? [],
-  
+
   getRetryInfo: (publicationId, platformId) => {
     const info = get().retryInfo[publicationId];
     return info?.[platformId] ?? null;
