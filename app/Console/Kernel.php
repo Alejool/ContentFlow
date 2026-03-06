@@ -27,18 +27,18 @@ class Kernel extends ConsoleKernel
 
     // Enviar recordatorios de calendario cada minuto
     $schedule->command('app:send-event-reminders')->everyMinute();
-    
+
     // Sincronizar calendarios externos cada hora
     $schedule->command('calendar:sync-external')
       ->hourly()
       ->withoutOverlapping()
       ->runInBackground();
-    
+
     // Limpiar eventos huérfanos de calendarios externos diariamente a las 4 AM
     $schedule->command('calendar:clean-orphaned')
       ->daily()
       ->at('04:00');
-    
+
     // Limpiar caché antiguo diariamente a las 3 AM
     $schedule->command('cache:clear')
       ->daily()
@@ -59,6 +59,11 @@ class Kernel extends ConsoleKernel
       ->monthlyOn(1, '00:00')
       ->withoutOverlapping();
 
+    // Resetear métricas de publicaciones IA y actualizar storage real (nuevo sistema)
+    $schedule->command('usage:reset-monthly')
+      ->monthlyOn(1, '00:05')
+      ->withoutOverlapping();
+
     // Renovar límites mensuales (nuevo sistema) el primer día del mes
     $schedule->command('subscription:renew-monthly-limits')
       ->monthlyOn(1, '00:10')
@@ -70,7 +75,7 @@ class Kernel extends ConsoleKernel
       ->at('10:00');
 
     // ===== NUEVOS COMANDOS DE GESTIÓN DE SUSCRIPCIONES =====
-    
+
     // Verificar y aplicar períodos de gracia expirados cada hora
     $schedule->command('subscriptions:check-grace-periods')
       ->hourly()

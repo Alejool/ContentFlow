@@ -11,35 +11,45 @@ use Illuminate\Support\Facades\Log;
 
 class UsageTrackingService
 {
-    public function incrementUsage(Workspace $workspace, string $metricType, int $amount = 1): void
+    /**
+     * Get plan limits for a workspace. Works with or without a Stripe subscription.
+     */
+    protected function getWorkspacePlanLimits(Workspace $workspace): array
     {
         $subscription = $workspace->subscription;
-        
-        if (!$subscription) {
-            return;
-        }
+        $plan = $subscription?->plan ?? 'demo';
 
-        $limits = $subscription->getPlanLimits()['limits'] ?? [];
+        return config("plans.{$plan}.limits", config('plans.demo.limits', []));
+    }
+
+    public function incrementUsage(Workspace $workspace, string $metricType, int $amount = 1): void
+    {
+        $limits = $this->getWorkspacePlanLimits($workspace);
         $limit = $this->getMetricLimit($limits, $metricType);
 
         $metric = UsageMetric::firstOrCreate(
             [
                 'workspace_id' => $workspace->id,
-                'metric_type' => $metricType,
-                'period_start' => now()->startOfMonth(),
-                'period_end' => now()->endOfMonth(),
+                'metric_type'  => $metricType,
+                'period_start' => now()->startOfMonth()->toDateString(),
+                'period_end'   => now()->endOfMonth()->toDateString(),
             ],
             [
                 'current_usage' => 0,
-                'limit' => $limit,
+                'limit'         => $limit,
             ]
         );
+
+        // Ensure limit is kept in sync if plan changed
+        if ($metric->limit !== $limit) {
+            $metric->update(['limit' => $limit]);
+        }
 
         $oldUsage = $metric->current_usage;
         $metric->increment('current_usage', $amount);
         $metric->refresh();
 
-        // Limpiar caché
+        // Clear cache
         Cache::forget("workspace.{$workspace->id}.usage.{$metricType}");
 
         // Dispatch events for limit warnings
@@ -47,49 +57,53 @@ class UsageTrackingService
 
         Log::info("Usage incremented for workspace {$workspace->id}", [
             'workspace_id' => $workspace->id,
-            'metric_type' => $metricType,
-            'amount' => $amount,
-            'old_usage' => $oldUsage,
-            'new_usage' => $metric->current_usage,
-            'limit' => $limit,
+            'metric_type'  => $metricType,
+            'amount'       => $amount,
+            'old_usage'    => $oldUsage,
+            'new_usage'    => $metric->current_usage,
+            'limit'        => $limit,
         ]);
     }
 
     public function decrementUsage(Workspace $workspace, string $metricType, int $amount = 1): void
     {
         $metric = $this->getUsageMetric($workspace, $metricType);
-        
+
         if ($metric) {
             $oldUsage = $metric->current_usage;
-            $metric->decrement('current_usage', $amount);
-            $metric->update(['current_usage' => max(0, $metric->current_usage)]);
-            
+            $newUsage = max(0, $metric->current_usage - $amount);
+            $metric->update(['current_usage' => $newUsage]);
+
             Cache::forget("workspace.{$workspace->id}.usage.{$metricType}");
 
             Log::info("Usage decremented for workspace {$workspace->id}", [
                 'workspace_id' => $workspace->id,
-                'metric_type' => $metricType,
-                'amount' => $amount,
-                'old_usage' => $oldUsage,
-                'new_usage' => $metric->current_usage,
+                'metric_type'  => $metricType,
+                'amount'       => $amount,
+                'old_usage'    => $oldUsage,
+                'new_usage'    => $newUsage,
             ]);
         }
     }
 
     public function canPerformAction(Workspace $workspace, string $metricType): bool
     {
+        $limits = $this->getWorkspacePlanLimits($workspace);
+        $limit  = $this->getMetricLimit($limits, $metricType);
+
+        // -1 means unlimited
+        if ($limit === -1) {
+            return true;
+        }
+
         $metric = $this->getUsageMetric($workspace, $metricType);
-        
+
+        // No metric yet means no usage — can perform
         if (!$metric) {
             return true;
         }
 
-        // -1 significa ilimitado
-        if ($metric->limit === -1) {
-            return true;
-        }
-
-        return $metric->current_usage < $metric->limit;
+        return $metric->current_usage < $limit;
     }
 
     public function getUsageMetric(Workspace $workspace, string $metricType): ?UsageMetric
@@ -99,79 +113,101 @@ class UsageTrackingService
             now()->addMinutes(5),
             fn() => UsageMetric::where('workspace_id', $workspace->id)
                 ->where('metric_type', $metricType)
-                ->where('period_start', '<=', now())
-                ->where('period_end', '>=', now())
+                ->where('period_start', '<=', now()->toDateString())
+                ->where('period_end', '>=', now()->toDateString())
                 ->first()
         );
     }
 
     public function getAllUsageMetrics(Workspace $workspace): array
     {
-        $metrics = UsageMetric::where('workspace_id', $workspace->id)
-            ->where('period_start', '<=', now())
-            ->where('period_end', '>=', now())
-            ->get();
+        $usageService = app(\App\Services\WorkspaceUsageService::class);
+        $summary = $usageService->getUsageSummary($workspace);
 
-        return $metrics->map(function ($metric) {
-            return [
-                'type' => $metric->metric_type,
-                'current' => $metric->current_usage,
-                'limit' => $metric->limit,
-                'percentage' => $metric->getUsagePercentage(),
-                'remaining' => $metric->getRemainingUsage(),
-            ];
-        })->toArray();
+        $metrics = [];
+
+        foreach (['publications', 'storage', 'ai_requests', 'social_accounts', 'team_members', 'external_integrations'] as $type) {
+            if (isset($summary['usage'][$type])) {
+                $data = $summary['usage'][$type];
+
+                // Si es storage, convertir GB a bytes para mantener la consistencia con el DB record viejo si es necesario,
+                // pero la vista de Vue/React (UsageMetrics.tsx/UsageDashboard.tsx) espera un objeto "UsageMetric".
+                // interface UsageMetric { type: string; current: number; limit: number; percentage: number; remaining: number; }
+
+                $metrics[] = [
+                    'type'       => $type === 'publications' ? 'publications_per_month' : ($type === 'ai_requests' ? 'ai_requests_per_month' : ($type === 'storage' ? 'storage_gb' : $type)),
+                    'current'    => $data['current'],
+                    'limit'      => $data['limit'],
+                    'percentage' => $data['percentage'],
+                    'remaining'  => $data['remaining'],
+                ];
+            }
+        }
+
+        return $metrics;
     }
 
     public function resetMonthlyUsage(Workspace $workspace): void
     {
-        $subscription = $workspace->subscription;
-        
-        if (!$subscription) {
-            return;
-        }
+        $limits = $this->getWorkspacePlanLimits($workspace);
 
-        $limits = $subscription->getPlanLimits()['limits'] ?? [];
+        // Metrics that reset monthly (publications, ai_requests)
+        $monthlyMetrics = ['publications', 'ai_requests'];
 
-        // Archive old metrics instead of deleting
-        UsageMetric::where('workspace_id', $workspace->id)
-            ->where('period_end', '<', now())
-            ->delete();
-
-        // Crear nuevas métricas para el nuevo período
-        foreach (['publications', 'ai_requests', 'storage'] as $metricType) {
+        foreach ($monthlyMetrics as $metricType) {
             $limit = $this->getMetricLimit($limits, $metricType);
-            
+
             UsageMetric::updateOrCreate(
                 [
                     'workspace_id' => $workspace->id,
-                    'metric_type' => $metricType,
-                    'period_start' => now()->startOfMonth(),
-                    'period_end' => now()->endOfMonth(),
+                    'metric_type'  => $metricType,
+                    'period_start' => now()->startOfMonth()->toDateString(),
+                    'period_end'   => now()->endOfMonth()->toDateString(),
                 ],
                 [
                     'current_usage' => 0,
-                    'limit' => $limit,
+                    'limit'         => $limit,
                 ]
             );
+
+            Cache::forget("workspace.{$workspace->id}.usage.{$metricType}");
         }
 
-        // Clear all usage cache for this workspace
-        Cache::tags(["workspace.{$workspace->id}.usage"])->flush();
+        // Storage (storage_bytes) is cumulative — recalculate from actual media file sizes
+        $actualStorageBytes = $workspace->mediaFiles()->sum('size');
+        $storageLimit = $this->getMetricLimit($limits, 'storage_bytes');
+
+        UsageMetric::updateOrCreate(
+            [
+                'workspace_id' => $workspace->id,
+                'metric_type'  => 'storage_bytes',
+                'period_start' => now()->startOfMonth()->toDateString(),
+                'period_end'   => now()->endOfMonth()->toDateString(),
+            ],
+            [
+                'current_usage' => $actualStorageBytes,
+                'limit'         => $storageLimit,
+            ]
+        );
+
+        Cache::forget("workspace.{$workspace->id}.usage.storage_bytes");
 
         Log::info("Monthly usage reset for workspace {$workspace->id}", [
-            'workspace_id' => $workspace->id,
-            'period_start' => now()->startOfMonth()->toDateString(),
-            'period_end' => now()->endOfMonth()->toDateString(),
+            'workspace_id'   => $workspace->id,
+            'period_start'   => now()->startOfMonth()->toDateString(),
+            'period_end'     => now()->endOfMonth()->toDateString(),
+            'storage_bytes'  => $actualStorageBytes,
         ]);
     }
 
     private function getMetricLimit(array $limits, string $metricType): int
     {
-        return match($metricType) {
-            'publications' => $limits['publications_per_month'] ?? 0,
-            'ai_requests' => $limits['ai_requests_per_month'] ?? 0,
-            'storage' => $limits['storage_gb'] ?? 0,
+        return match ($metricType) {
+            'publications'  => $limits['publications_per_month'] ?? 0,
+            'ai_requests'   => $limits['ai_requests_per_month'] ?? 0,
+            'storage_bytes' => ($limits['storage_gb'] ?? 0) === -1
+                ? -1
+                : (($limits['storage_gb'] ?? 0) * 1024 * 1024 * 1024),
             default => 0,
         };
     }
@@ -202,4 +238,3 @@ class UsageTrackingService
         }
     }
 }
-

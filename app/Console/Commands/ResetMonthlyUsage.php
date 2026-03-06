@@ -4,42 +4,46 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\Workspace\Workspace;
-use App\Services\WorkspaceUsageService;
+use App\Services\Usage\UsageTrackingService;
 
 class ResetMonthlyUsage extends Command
 {
-    protected $signature = 'usage:reset-monthly';
-    protected $description = 'Reset monthly usage metrics for all workspaces';
+    protected $signature   = 'usage:reset-monthly';
+    protected $description = 'Reset monthly usage metrics (publications, AI requests) for all workspaces. Storage is recalculated from actual files.';
 
     public function __construct(
-        private WorkspaceUsageService $usageService
+        private UsageTrackingService $usageTracking
     ) {
         parent::__construct();
     }
 
-    public function handle()
+    public function handle(): int
     {
         $this->info('Resetting monthly usage for all workspaces...');
-        
+
         $workspaces = Workspace::all();
-        $count = 0;
-        
+        $success    = 0;
+        $failed     = 0;
+
         foreach ($workspaces as $workspace) {
             try {
-                $this->usageService->resetMonthlyUsage($workspace);
-                $count++;
-                $this->info("✓ Reset usage for workspace: {$workspace->name} (ID: {$workspace->id})");
+                $this->usageTracking->resetMonthlyUsage($workspace);
+                $success++;
+                $this->line("  ✓ <info>{$workspace->name}</info> (ID: {$workspace->id})");
             } catch (\Exception $e) {
-                $this->error("✗ Failed to reset usage for workspace: {$workspace->name}");
-                $this->error("  Error: {$e->getMessage()}");
+                $failed++;
+                $this->line("  ✗ <error>{$workspace->name}</error> — {$e->getMessage()}");
             }
         }
-        
+
         $this->newLine();
         $this->info("Summary:");
-        $this->info("- Total workspaces processed: {$count}");
-        $this->info("- Date: " . now()->format('Y-m-d H:i:s'));
-        
-        return 0;
+        $this->info("  Workspaces reset: {$success}");
+        if ($failed > 0) {
+            $this->warn("  Failed: {$failed}");
+        }
+        $this->info("  Date: " . now()->format('Y-m-d H:i:s'));
+
+        return $failed > 0 ? Command::FAILURE : Command::SUCCESS;
     }
 }

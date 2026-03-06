@@ -60,8 +60,20 @@ class PricingController extends Controller
         $currentPlan = 'free';
 
         if ($user) {
-            // Leer del campo current_plan del usuario
-            $currentPlan = $user->current_plan ?? 'free';
+            // Intentar obtener el plan desde subscription_history (sistema nuevo)
+            $activeHistory = $user->subscriptionHistory()->active()->first();
+            if ($activeHistory) {
+                $currentPlan = $activeHistory->plan_name;
+            } else {
+                // Fallback al campo current_plan del usuario
+                $currentPlan = $user->current_plan ?? 'free';
+            }
+            
+            \Log::info('Pricing page loaded', [
+                'user_id' => $user->id,
+                'current_plan' => $currentPlan,
+                'from_history' => $activeHistory ? true : false,
+            ]);
         }
 
         return Inertia::render('Pricing/PricingPage', [

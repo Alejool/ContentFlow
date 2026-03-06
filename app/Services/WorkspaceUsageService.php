@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Workspace\Workspace;
 use App\Models\Subscription\UsageMetric;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class WorkspaceUsageService
 {
@@ -14,33 +15,33 @@ class WorkspaceUsageService
     public function incrementUsage(Workspace $workspace, string $metricType, int $amount = 1): void
     {
         $usage = $this->getCurrentUsageMetric($workspace, $metricType);
-        
+
         if (!$usage) {
             $usage = $this->createUsageMetric($workspace, $metricType);
         }
-        
+
         $usage->increment('current_usage', $amount);
-        
-        \Log::info('Usage incremented', [
+
+        Log::info('Usage incremented', [
             'workspace_id' => $workspace->id,
             'metric_type' => $metricType,
             'amount' => $amount,
             'new_usage' => $usage->fresh()->current_usage,
         ]);
     }
-    
+
     /**
      * Decrement usage for a specific metric.
      */
     public function decrementUsage(Workspace $workspace, string $metricType, int $amount = 1): void
     {
         $usage = $this->getCurrentUsageMetric($workspace, $metricType);
-        
+
         if ($usage && $usage->current_usage > 0) {
             $usage->decrement('current_usage', $amount);
         }
     }
-    
+
     /**
      * Get current usage metric for a workspace.
      */
@@ -52,7 +53,7 @@ class WorkspaceUsageService
             ->where('period_end', '>=', now())
             ->first();
     }
-    
+
     /**
      * Create usage metric for current period.
      */
@@ -60,7 +61,7 @@ class WorkspaceUsageService
     {
         $limits = $workspace->getPlanLimits();
         $limit = $limits[$metricType] ?? 0;
-        
+
         return $workspace->usageMetrics()->create([
             'metric_type' => $metricType,
             'current_usage' => 0,
@@ -69,20 +70,20 @@ class WorkspaceUsageService
             'period_end' => now()->endOfMonth(),
         ]);
     }
-    
+
     /**
      * Reset monthly usage metrics.
      */
     public function resetMonthlyUsage(Workspace $workspace): void
     {
         $limits = $workspace->getPlanLimits();
-        
+
         // Métricas que se resetean mensualmente
         $monthlyMetrics = [
             'publications_per_month',
             'ai_requests_per_month',
         ];
-        
+
         foreach ($monthlyMetrics as $metric) {
             $workspace->usageMetrics()->create([
                 'metric_type' => $metric,
@@ -92,13 +93,13 @@ class WorkspaceUsageService
                 'period_end' => now()->endOfMonth(),
             ]);
         }
-        
-        \Log::info('Monthly usage reset', [
+
+        Log::info('Monthly usage reset', [
             'workspace_id' => $workspace->id,
             'workspace_name' => $workspace->name,
         ]);
     }
-    
+
     /**
      * Get usage summary for workspace.
      */
@@ -107,7 +108,7 @@ class WorkspaceUsageService
         $limits = $workspace->getPlanLimits();
         $plan = $workspace->getPlanName();
         $features = $workspace->getPlanFeatures();
-        
+
         return [
             'workspace' => [
                 'id' => $workspace->id,
@@ -127,17 +128,23 @@ class WorkspaceUsageService
             ],
         ];
     }
-    
+
     /**
      * Get metric summary with usage details.
      */
     private function getMetricSummary(Workspace $workspace, string $metricType): array
     {
-        $usage = $this->getCurrentUsageMetric($workspace, $metricType);
         $limits = $workspace->getPlanLimits();
         $limit = $limits[$metricType] ?? 0;
-        $current = $usage?->current_usage ?? 0;
-        
+
+        // Calculate current usage
+        if ($metricType === 'publications_per_month') {
+            $current = $workspace->getMonthlyPostCount();
+        } else {
+            $usage = $this->getCurrentUsageMetric($workspace, $metricType);
+            $current = $usage?->current_usage ?? 0;
+        }
+
         return [
             'current' => $current,
             'limit' => $limit,
@@ -147,14 +154,14 @@ class WorkspaceUsageService
             'can_perform' => $limit === -1 || $current < $limit,
         ];
     }
-    
+
     /**
      * Get storage summary.
      */
     private function getStorageSummary(Workspace $workspace, int $limitGB): array
     {
         $usageGB = $workspace->getStorageUsageGB();
-        
+
         return [
             'current' => $usageGB,
             'limit' => $limitGB,
@@ -165,14 +172,14 @@ class WorkspaceUsageService
             'unit' => 'GB',
         ];
     }
-    
+
     /**
      * Get social accounts summary.
      */
     private function getSocialAccountsSummary(Workspace $workspace, int $limit): array
     {
         $current = $workspace->socialAccounts()->count();
-        
+
         return [
             'current' => $current,
             'limit' => $limit,
@@ -182,14 +189,14 @@ class WorkspaceUsageService
             'can_perform' => $limit === -1 || $current < $limit,
         ];
     }
-    
+
     /**
      * Get team members summary.
      */
     private function getTeamMembersSummary(Workspace $workspace, int $limit): array
     {
         $current = $workspace->users()->count();
-        
+
         return [
             'current' => $current,
             'limit' => $limit,
@@ -199,7 +206,7 @@ class WorkspaceUsageService
             'can_perform' => $limit === -1 || $current < $limit,
         ];
     }
-    
+
     /**
      * Get external integrations summary.
      */
@@ -207,7 +214,7 @@ class WorkspaceUsageService
     {
         // Asumiendo que tienes una relación externalIntegrations en Workspace
         $current = $workspace->externalCalendarConnections()->count();
-        
+
         return [
             'current' => $current,
             'limit' => $limit,
@@ -217,7 +224,7 @@ class WorkspaceUsageService
             'can_perform' => $limit === -1 || $current < $limit,
         ];
     }
-    
+
     /**
      * Calculate percentage of usage.
      */
@@ -226,10 +233,10 @@ class WorkspaceUsageService
         if ($limit === -1 || $limit === 0) {
             return 0;
         }
-        
+
         return round(($current / $limit) * 100, 2);
     }
-    
+
     /**
      * Check if workspace can perform action.
      */
@@ -237,46 +244,46 @@ class WorkspaceUsageService
     {
         $limits = $workspace->getPlanLimits();
         $limit = $limits[$limitType] ?? 0;
-        
+
         // -1 significa ilimitado
         if ($limit === -1) {
             return true;
         }
-        
+
         // Para métricas mensuales
         if (in_array($limitType, ['publications_per_month', 'ai_requests_per_month'])) {
             $usage = $this->getCurrentUsageMetric($workspace, $limitType);
             $current = $usage?->current_usage ?? 0;
             return $current < $limit;
         }
-        
+
         // Para storage
         if ($limitType === 'storage_gb') {
             $usageGB = $workspace->getStorageUsageGB();
             return $usageGB < $limit;
         }
-        
+
         // Para social accounts
         if ($limitType === 'social_accounts') {
             $current = $workspace->socialAccounts()->count();
             return $current < $limit;
         }
-        
+
         // Para team members
         if ($limitType === 'team_members') {
             $current = $workspace->users()->count();
             return $current < $limit;
         }
-        
+
         // Para external integrations
         if ($limitType === 'external_integrations') {
             $current = $workspace->externalCalendarConnections()->count();
             return $current < $limit;
         }
-        
+
         return true;
     }
-    
+
     /**
      * Get limit reached message.
      */
@@ -285,7 +292,7 @@ class WorkspaceUsageService
         $plan = $workspace->getPlanName();
         $limits = $workspace->getPlanLimits();
         $limit = $limits[$limitType] ?? 0;
-        
+
         $messages = [
             'publications_per_month' => "Has alcanzado el límite de {$limit} publicaciones por mes del plan {$plan}. Actualiza tu plan para continuar publicando.",
             'ai_requests_per_month' => "Has alcanzado el límite de {$limit} solicitudes de IA por mes del plan {$plan}. Actualiza tu plan para continuar usando IA.",
@@ -294,7 +301,7 @@ class WorkspaceUsageService
             'team_members' => "Has alcanzado el límite de {$limit} miembros del plan {$plan}. Actualiza tu plan para agregar más miembros.",
             'external_integrations' => "Has alcanzado el límite de {$limit} integraciones externas del plan {$plan}. Actualiza tu plan para agregar más integraciones.",
         ];
-        
+
         return $messages[$limitType] ?? "Has alcanzado el límite de tu plan {$plan}. Actualiza para continuar.";
     }
 }

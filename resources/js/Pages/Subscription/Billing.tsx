@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Head, router, usePage } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
@@ -6,10 +6,11 @@ import Button from '@/Components/common/Modern/Button';
 import { Badge } from '@/Components/ui/badge';
 import { Alert, AlertDescription } from '@/Components/ui/alert';
 import { Progress } from '@/Components/ui/progress';
-import { Download, CreditCard, Calendar, DollarSign, ArrowLeft, Info, TrendingUp, FileText, HardDrive, Sparkles, Users, AlertCircle } from 'lucide-react';
+import { Download, CreditCard, Calendar, DollarSign, ArrowLeft, Info, TrendingUp, FileText, HardDrive, Sparkles, Users, AlertCircle, FileSpreadsheet } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-hot-toast';
 import axios from 'axios';
+import AdvancedPagination from '@/Components/common/ui/AdvancedPagination';
 
 declare function route(name: string, params?: any): string;
 
@@ -19,6 +20,20 @@ interface Invoice {
   total: string;
   status: string;
   invoice_pdf: string;
+  hosted_invoice_url?: string;
+  plan_name?: string;
+  description?: string;
+  currency?: string;
+}
+
+interface InvoicesPagination {
+  data: Invoice[];
+  current_page: number;
+  per_page: number;
+  total: number;
+  last_page: number;
+  from: number;
+  to: number;
 }
 
 interface UsageMetric {
@@ -38,7 +53,7 @@ interface Props {
     trial_ends_at?: string;
     ends_at?: string;
   };
-  invoices: Invoice[];
+  invoices: Invoice[] | InvoicesPagination;
   upcomingInvoice?: any;
   usage?: UsageMetric[];
 }
@@ -46,6 +61,39 @@ interface Props {
 export default function Billing({ auth, subscription, invoices, upcomingInvoice, usage }: Props) {
   const { t, i18n } = useTranslation();
   const { flash } = usePage().props as any;
+
+  // Determinar si invoices es paginado o array simple
+  const isPaginated = invoices && typeof invoices === 'object' && 'data' in invoices;
+  const invoicesList = isPaginated ? (invoices as InvoicesPagination).data : (invoices as Invoice[] || []);
+  const pagination = isPaginated ? (invoices as InvoicesPagination) : null;
+
+  const [perPage, setPerPage] = useState(pagination?.per_page || 10);
+
+  // Sincronizar perPage con la paginación del backend
+  useEffect(() => {
+    if (pagination?.per_page && pagination.per_page !== perPage) {
+      setPerPage(pagination.per_page);
+    }
+  }, [pagination?.per_page]);
+
+  const handlePageChange = (page: number) => {
+    router.visit(route('subscription.billing', { page, per_page: perPage }), {
+      preserveState: true,
+      preserveScroll: true,
+    });
+  };
+
+  const handlePerPageChange = (newPerPage: number) => {
+    setPerPage(newPerPage);
+    router.visit(route('subscription.billing', { page: 1, per_page: newPerPage }), {
+      preserveState: true,
+      preserveScroll: true,
+    });
+  };
+
+  const handleExportInvoices = () => {
+    window.location.href = route('subscription.billing.export');
+  };
 
   useEffect(() => {
     if (flash?.error) {
@@ -178,6 +226,22 @@ export default function Billing({ auth, subscription, invoices, upcomingInvoice,
               {t('subscription.billing.workspaceNote', 'Este plan aplica para todos los miembros de este workspace')}
             </AlertDescription>
           </Alert>
+
+          {/* Active Subscription Info */}
+          {subscription.plan !== 'free' && subscription.plan !== 'demo' && subscription.stripe_status === 'active' && (
+            <Alert className="mb-6 border-green-200 bg-green-50 dark:bg-green-900/20">
+              <Info className="h-4 w-4 text-green-600 dark:text-green-400" />
+              <AlertDescription className="text-green-800 dark:text-green-300">
+                {t('subscription.billing.activeSubscriptionNote', 'Tienes una suscripción activa. Puedes cambiar a cualquier plan de pago desde la página de Pricing. Para cambiar a Free, primero cancela tu suscripción.')}
+                <Button 
+                  className="ml-2 p-0 h-auto text-green-800 dark:text-green-300 underline"
+                  onClick={() => router.visit('/pricing')}
+                >
+                  {t('subscription.billing.changePlan', 'Cambiar Plan')}
+                </Button>
+              </AlertDescription>
+            </Alert>
+          )}
 
           {/* Free/Demo Plan Alert */}
           {(subscription.plan === 'free' || subscription.plan === 'demo') && (
@@ -354,16 +418,31 @@ export default function Billing({ auth, subscription, invoices, upcomingInvoice,
           {/* Invoice History */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <DollarSign className="w-5 h-5" />
-                {t('subscription.billing.invoiceHistory', 'Historial de Facturas')}
-              </CardTitle>
-              <CardDescription>
-                {t('subscription.billing.invoiceHistoryDescription', 'Todas tus facturas anteriores')}
-              </CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <DollarSign className="w-5 h-5" />
+                    {t('subscription.billing.invoiceHistory', 'Historial de Facturas')}
+                  </CardTitle>
+                  <CardDescription>
+                    {t('subscription.billing.invoiceHistoryDescription', 'Todas tus facturas anteriores')}
+                  </CardDescription>
+                </div>
+                {invoicesList.length > 0 && (
+                  <Button
+                    size="md"
+                    icon={FileSpreadsheet}
+                    variant="secondary"
+                    buttonStyle="outline"
+                    onClick={handleExportInvoices}
+                  >
+                    {t('subscription.billing.exportToExcel', 'Exportar a Excel')}
+                  </Button>
+                )}
+              </div>
             </CardHeader>
             <CardContent>
-              {invoices.length === 0 ? (
+              {invoicesList.length === 0 ? (
                 <div className="text-center py-12">
                   <DollarSign className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                   <p className="text-gray-600 dark:text-gray-400">
@@ -371,46 +450,76 @@ export default function Billing({ auth, subscription, invoices, upcomingInvoice,
                   </p>
                 </div>
               ) : (
-                <div className="space-y-3">
-                  {invoices.map((invoice) => (
-                    <div
-                      key={invoice.id}
-                      className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
-                          <DollarSign className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                <>
+                  <div className="space-y-3">
+                    {invoicesList.map((invoice) => (
+                      <div
+                        key={invoice.id}
+                        className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                      >
+                        <div className="flex items-center gap-4 flex-1">
+                          <div className="p-3 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 rounded-lg">
+                            <FileText className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-1">
+                              <p className="font-semibold text-gray-900 dark:text-white">
+                                {formatDate(invoice.date)}
+                              </p>
+                              {invoice.plan_name && invoice.plan_name !== 'N/A' && (
+                                <Badge className="bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300 border-primary-200 dark:border-primary-800">
+                                  {invoice.plan_name}
+                                </Badge>
+                              )}
+                            </div>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                              {invoice.description || 'Suscripción'}
+                            </p>
+                            <div className="flex items-center gap-4 mt-2">
+                              <span className="text-lg font-bold text-gray-900 dark:text-white">
+                                {invoice.currency || 'USD'} ${formatAmount(invoice.total)}
+                              </span>
+                              <Badge variant={invoice.status === 'paid' ? 'default' : 'destructive'} className="text-xs">
+                                {t(`subscription.status.${invoice.status}`, invoice.status)}
+                              </Badge>
+                            </div>
+                          </div>
                         </div>
-                        <div>
-                          <p className="font-medium text-gray-900 dark:text-white">
-                            {formatDate(invoice.date)}
-                          </p>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
-                            ${formatAmount(invoice.total)}
-                          </p>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            size="md"
+                            icon={Download}
+                            variant="secondary"
+                            buttonStyle="outline"
+                            onClick={() => {
+                              // Priorizar hosted_invoice_url de Stripe, luego invoice_pdf
+                              const url = invoice.hosted_invoice_url || invoice.invoice_pdf;
+                              if (url) {
+                                window.open(url, '_blank');
+                              }
+                            }}
+                            disabled={!invoice.hosted_invoice_url && !invoice.invoice_pdf}
+                          >
+                            {t('subscription.billing.download', 'Descargar')}
+                          </Button>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3">
-                        <Badge variant={invoice.status === 'paid' ? 'default' : 'destructive'}>
-                          {t(`subscription.status.${invoice.status}`, invoice.status)}
-                        </Badge>
-                        <Button
-                          size="md"
-                          icon={Download}
-                          onClick={() => {
-                            if (invoice.invoice_pdf) {
-                              window.open(invoice.invoice_pdf, '_blank');
-                            }
-                          }}
-                          disabled={!invoice.invoice_pdf}
-                        >
-                   
-                          {t('subscription.billing.download', 'Descargar')}
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+
+                  {/* Paginación Avanzada */}
+                  {pagination && (
+                    <AdvancedPagination
+                      currentPage={pagination.current_page}
+                      lastPage={pagination.last_page}
+                      total={pagination.total}
+                      perPage={perPage}
+                      onPageChange={handlePageChange}
+                      onPerPageChange={handlePerPageChange}
+                      t={t}
+                    />
+                  )}
+                </>
               )}
             </CardContent>
           </Card>

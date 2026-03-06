@@ -456,6 +456,19 @@ class SubscriptionController extends Controller
                 $isDowngrade = $this->isDowngrade($previousPlan, $newPlan);
                 $isUpgrade = $this->isUpgrade($previousPlan, $newPlan);
 
+                // PREVENIR DOWNGRADE MANUAL DE PLAN DE PAGO A FREE O DEMO
+                // Solo permitir downgrade automático cuando expire la suscripción
+                if ($hasActiveStripeSubscription && ($newPlan === 'free' || $newPlan === 'demo') && $previousPlan !== 'free' && $previousPlan !== 'demo') {
+                    $planName = $newPlan === 'free' ? 'Free' : 'Demo';
+                    return response()->json([
+                        'error' => 'Manual downgrade not allowed',
+                        'message' => "No puedes cambiar manualmente a plan {$planName} mientras tengas una suscripción activa de pago. Para cambiar a {$planName}, cancela tu suscripción y espera a que termine el período de facturación actual.",
+                        'requires_cancellation' => true,
+                        'current_plan' => $previousPlan,
+                        'attempted_plan' => $newPlan,
+                    ], 403);
+                }
+
                 // Si tiene suscripción activa en Stripe
                 if ($hasActiveStripeSubscription && $newPlan !== 'free' && $newPlan !== 'demo' && isset($planConfig['stripe_price_id'])) {
                     try {
@@ -614,16 +627,41 @@ class SubscriptionController extends Controller
         }
 
         try {
+            // Verificar suscripción en Stripe (Cashier)
             $subscription = $workspace->subscriptions()
                 ->where('type', 'default')
                 ->where('stripe_status', 'active')
                 ->first();
 
             // Verificar que el stripe_id sea válido (debe empezar con 'sub_')
-            $hasActiveSubscription = $subscription && str_starts_with($subscription->stripe_id, 'sub_');
+            $hasActiveStripeSubscription = $subscription && str_starts_with($subscription->stripe_id, 'sub_');
+            
+            // También verificar si el usuario tiene un plan de pago en current_plan
+            $currentPlan = $user->current_plan ?? 'free';
+            $isPaidPlan = in_array($currentPlan, ['starter', 'professional', 'enterprise']);
+            
+            // Verificar subscription_history
+            $activeHistory = $user->subscriptionHistory()->active()->first();
+            $hasActiveHistory = $activeHistory && in_array($activeHistory->plan_name, ['starter', 'professional', 'enterprise']);
+
+            // Tiene suscripción activa si:
+            // 1. Tiene suscripción válida en Stripe, O
+            // 2. Tiene un plan de pago en current_plan, O
+            // 3. Tiene historial activo de plan de pago
+            $hasActiveSubscription = $hasActiveStripeSubscription || $isPaidPlan || $hasActiveHistory;
+
+            \Log::info('Checking active subscription', [
+                'user_id' => $user->id,
+                'has_stripe' => $hasActiveStripeSubscription,
+                'current_plan' => $currentPlan,
+                'is_paid_plan' => $isPaidPlan,
+                'has_history' => $hasActiveHistory,
+                'result' => $hasActiveSubscription,
+            ]);
 
             return response()->json([
-                'has_active_subscription' => $hasActiveSubscription
+                'has_active_subscription' => $hasActiveSubscription,
+                'current_plan' => $currentPlan,
             ]);
         } catch (\Exception $e) {
             \Log::error('Error checking active subscription', [

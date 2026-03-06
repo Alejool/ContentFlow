@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
-import axios from 'axios';
+import { usePage } from "@inertiajs/react";
+import axios from "axios";
+import { useEffect, useState } from "react";
 
 interface UsageData {
   period: {
@@ -54,27 +55,33 @@ export function useSubscriptionUsage(): UseSubscriptionUsageReturn {
     try {
       setLoading(true);
       setError(null);
-      const response = await axios.get(route('api.v1.subscription.current-usage'), {
-        // Add timestamp to prevent caching
-        params: { _t: Date.now() }
-      });
-      
+      const response = await axios.get(
+        route("api.v1.subscription.limits.usage"),
+        {
+          // Add timestamp to prevent caching
+          params: { _t: Date.now() },
+        },
+      );
+
       if (response.data.success) {
         setUsage(response.data.data);
       } else {
-        setError(response.data.message || 'Failed to fetch usage data');
+        setError(response.data.message || "Failed to fetch usage data");
       }
     } catch (err: any) {
       if (err.response?.status === 404) {
         // No active subscription - this is okay, just set usage to null
         setUsage(null);
       } else {
-        setError(err.response?.data?.message || 'Error fetching usage data');
+        setError(err.response?.data?.message || "Error fetching usage data");
       }
     } finally {
       setLoading(false);
     }
   };
+
+  const { auth } = (usePage().props as any) || {};
+  const currentWorkspaceId = auth?.user?.current_workspace_id;
 
   useEffect(() => {
     fetchUsage();
@@ -84,7 +91,7 @@ export function useSubscriptionUsage(): UseSubscriptionUsageReturn {
       fetchUsage();
     };
 
-    window.addEventListener('subscription-plan-changed', handlePlanChanged);
+    window.addEventListener("subscription-plan-changed", handlePlanChanged);
 
     // Refetch usage every 30 seconds to catch plan changes
     const interval = setInterval(() => {
@@ -92,10 +99,13 @@ export function useSubscriptionUsage(): UseSubscriptionUsageReturn {
     }, 30000);
 
     return () => {
-      window.removeEventListener('subscription-plan-changed', handlePlanChanged);
+      window.removeEventListener(
+        "subscription-plan-changed",
+        handlePlanChanged,
+      );
       clearInterval(interval);
     };
-  }, []);
+  }, [currentWorkspaceId]);
 
   return {
     usage,

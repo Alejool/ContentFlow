@@ -27,25 +27,59 @@ class SubscriptionLimitController extends Controller
         }
 
         $subscription = $workspace->subscription;
-        $limits = $subscription?->getPlanLimits()['limits'] ?? [];
+        $limits = $this->validator->getPlanLimits($workspace);
+        $plan = $subscription?->plan ?? 'free';
 
         $usage = [
-            'plan' => $subscription?->plan ?? 'free',
-            'metrics' => [],
+            'success' => true,
+            'data' => [
+                'period' => [
+                    'year' => now()->year,
+                    'month' => now()->month,
+                    'start' => now()->startOfMonth()->toDateString(),
+                    'end' => now()->endOfMonth()->toDateString(),
+                ],
+                'plan' => $plan,
+                'limits_reached' => false, // Will be set to true if any metric is at 100%
+            ]
         ];
 
         $metricTypes = ['publications', 'social_accounts', 'storage', 'ai_requests', 'team_members'];
 
+        $limitsReached = false;
+
         foreach ($metricTypes as $metricType) {
-            $usage['metrics'][$metricType] = [
-                'current' => $this->validator->getCurrentUsage($workspace, $metricType),
-                'limit' => $this->validator->getLimit($limits, $metricType),
-                'percentage' => round($this->validator->getUsagePercentage($workspace, $metricType), 2),
-                'remaining' => $this->validator->getRemainingUsage($workspace, $metricType),
-                'can_perform' => $this->validator->canPerformAction($workspace, $metricType),
-                'near_limit' => $this->validator->isNearLimit($workspace, $metricType),
-            ];
+            $currentLimit = $this->validator->getLimit($limits, $metricType);
+            $currentUsageAmount = $this->validator->getCurrentUsage($workspace, $metricType);
+            $percentage = $this->validator->getUsagePercentage($workspace, $metricType);
+
+            if ($percentage >= 100) {
+                $limitsReached = true;
+            }
+
+            if ($metricType === 'storage') {
+                $usage['data'][$metricType] = [
+                    'used_bytes' => $currentUsageAmount,
+                    'used_mb' => round($currentUsageAmount / (1024 * 1024), 2),
+                    'used_gb' => round($currentUsageAmount / (1024 * 1024 * 1024), 2),
+                    'limit_bytes' => $currentLimit,
+                    'limit_gb' => $currentLimit === -1 ? -1 : round($currentLimit / (1024 * 1024 * 1024), 2),
+                    'remaining_bytes' => $this->validator->getRemainingUsage($workspace, $metricType),
+                    'percentage' => $percentage,
+                    'limit_reached' => $percentage >= 100,
+                ];
+            } else {
+                $usage['data'][$metricType] = [
+                    'used' => $currentUsageAmount,
+                    'limit' => $currentLimit,
+                    'remaining' => $this->validator->getRemainingUsage($workspace, $metricType),
+                    'percentage' => $percentage,
+                    'limit_reached' => $percentage >= 100,
+                ];
+            }
         }
+
+        $usage['data']['limits_reached'] = $limitsReached;
 
         return response()->json($usage);
     }
@@ -65,7 +99,7 @@ class SubscriptionLimitController extends Controller
 
         if (!$canPerform) {
             $upgradeMessage = $this->validator->getUpgradeMessage($workspace, $limitType);
-            
+
             return response()->json([
                 'can_perform' => false,
                 'upgrade_message' => $upgradeMessage,

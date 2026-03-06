@@ -21,9 +21,30 @@ export function usePricing({ isAuthenticated, currentPlan }: UsePricingOptions) 
       return;
     }
 
-    // Si es plan gratuito o demo, activar directamente
+    // Si es el plan actual, no hacer nada
+    if (planId === currentPlan) {
+      return;
+    }
+
+    // Para planes gratuitos (free/demo), verificar primero si hay suscripción activa
     if (planId === 'free' || planId === 'demo') {
       setIsLoading(planId);
+      
+      // Verificar si hay suscripción activa de pago
+      const hasActiveSubscription = await checkActiveSubscription();
+      
+      // BLOQUEAR cambio a Free o Demo si hay suscripción activa de pago
+      if (hasActiveSubscription && (planId === 'free' || planId === 'demo')) {
+        const planName = planId === 'free' ? 'Free' : 'Demo';
+        alert(`No puedes cambiar a plan ${planName} mientras tengas una suscripción activa de pago. Por favor, cancela tu suscripción primero desde la página de Facturación y espera a que termine el período de facturación.`);
+        setIsLoading(null);
+        setTimeout(() => {
+          router.visit('/subscription/billing');
+        }, 1500);
+        return;
+      }
+      
+      // Si no hay suscripción activa, permitir activación
       router.post('/api/v1/subscription/activate-free-plan', 
         { plan: planId },
         {
@@ -66,7 +87,9 @@ export function usePricing({ isAuthenticated, currentPlan }: UsePricingOptions) 
 
       // Si el cambio fue exitoso (tiene suscripción activa)
       if (changeResponse.ok && changeData.success) {
-        const message = changeData.had_active_subscription 
+        const message = changeData.is_downgrade
+          ? 'Tu plan cambiará al final del período de facturación actual.'
+          : changeData.had_active_subscription 
           ? 'Plan actualizado exitosamente. Tu suscripción activa ha sido modificada.'
           : 'Plan cambiado exitosamente.';
         
@@ -79,6 +102,18 @@ export function usePricing({ isAuthenticated, currentPlan }: UsePricingOptions) 
             preserveScroll: false,
           });
         }, 500);
+        return;
+      }
+
+      // Si es un error 403 (downgrade no permitido)
+      if (changeResponse.status === 403 && changeData.requires_cancellation) {
+        alert(changeData.message || 'No puedes cambiar manualmente a plan Free mientras tengas una suscripción activa. Por favor, cancela tu suscripción primero.');
+        setIsLoading(null);
+        
+        // Redirigir a la página de facturación para que pueda cancelar
+        setTimeout(() => {
+          router.visit('/subscription/billing');
+        }, 1500);
         return;
       }
 
@@ -139,6 +174,7 @@ export function usePricing({ isAuthenticated, currentPlan }: UsePricingOptions) 
 
       if (response.ok) {
         const data = await response.json();
+        console.log('checkActiveSubscription response:', data);
         return data.has_active_subscription || false;
       }
     } catch (error) {
