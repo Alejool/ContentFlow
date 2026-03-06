@@ -1,4 +1,5 @@
 import Button from "@/Components/common/Modern/Button";
+import { cssPropertiesManager } from "@/Utils/CSSCustomPropertiesManager";
 import { useForm } from "@inertiajs/react";
 import axios from "axios";
 import { Check, Palette } from "lucide-react";
@@ -8,9 +9,13 @@ import { useTranslation } from "react-i18next";
 
 interface UpdateThemeFormProps {
   user: any;
+  workspace?: any;
 }
 
-export default function UpdateThemeForm({ user }: UpdateThemeFormProps) {
+export default function UpdateThemeForm({
+  user,
+  workspace,
+}: UpdateThemeFormProps) {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const { data, setData } = useForm({
@@ -19,7 +24,7 @@ export default function UpdateThemeForm({ user }: UpdateThemeFormProps) {
 
   const applyTheme = (color: string) => {
     setData("theme_color", color);
-    document.documentElement.setAttribute("data-theme-color", color);
+    cssPropertiesManager.applyPrimaryColor(color);
   };
 
   const submit = async (e: React.FormEvent) => {
@@ -51,6 +56,8 @@ export default function UpdateThemeForm({ user }: UpdateThemeFormProps) {
     }
   };
 
+  const brandingColor = workspace?.white_label_primary_color;
+
   const colors = [
     { name: "orange", value: "orange", bg: "bg-warning-500" },
     { name: "blue", value: "blue", bg: "bg-blue-500" },
@@ -58,6 +65,15 @@ export default function UpdateThemeForm({ user }: UpdateThemeFormProps) {
     { name: "green", value: "green", bg: "bg-green-500" },
     { name: "pink", value: "pink", bg: "bg-pink-500" },
   ];
+
+  if (brandingColor && brandingColor.startsWith("#")) {
+    colors.unshift({
+      name: "custom",
+      value: brandingColor,
+      bg: "",
+      isCustom: true,
+    } as any);
+  }
 
   return (
     <section className="space-y-6">
@@ -87,6 +103,11 @@ export default function UpdateThemeForm({ user }: UpdateThemeFormProps) {
             >
               <div
                 className={`w-12 h-12 rounded-full mb-3 shadow-sm ${color.bg} flex items-center justify-center text-white transition-transform group-hover:scale-110`}
+                style={
+                  (color as any).isCustom
+                    ? { backgroundColor: color.value }
+                    : {}
+                }
               >
                 {data.theme_color === color.value && (
                   <Check className="w-6 h-6" />
