@@ -89,27 +89,30 @@ class CalendarController extends Controller
 
     // Create events - one per scheduled post (which is already per platform)
     $events = collect();
-    
+
     foreach ($scheduledPosts as $post) {
       $pub = $post->publication;
-      
+
       // Skip if publication doesn't exist or doesn't belong to current workspace
       if (!$pub || $pub->workspace_id !== $workspaceId) {
         continue;
       }
-      
+
+      // Get the latest log if it exists to show post URL or error message
+      $latestLog = $post->postLogs()->latest()->first();
+
       $campaignNames = $pub->campaigns->pluck('name')->toArray();
       $primaryCampaign = !empty($campaignNames) ? $campaignNames[0] : null;
-      
+
       // Map 'pending' status to 'scheduled' for display
       $displayStatus = $post->status === 'pending' ? 'scheduled' : $post->status;
-      
+
       // Normalize platform to lowercase for consistency
       $normalizedPlatform = strtolower($post->platform);
-      
+
       // Get platform color from config (matches SOCIAL_PLATFORMS in frontend)
       $platformColor = $this->getPlatformColor($normalizedPlatform);
-      
+
       $events->push([
         'id' => "post_{$post->id}", // Use scheduled post ID
         'resourceId' => $post->id,
@@ -134,6 +137,8 @@ class CalendarController extends Controller
           'campaigns' => $campaignNames,
           'publication_id' => $pub->id, // Add publication_id for frontend
           'post_id' => $post->post_id, // External platform post ID if exists
+          'post_url' => $latestLog?->post_url,
+          'error_message' => $latestLog?->error_message,
         ]
       ]);
     }
@@ -188,7 +193,7 @@ class CalendarController extends Controller
 
     $type = $request->input('type', 'post');
     $workspaceId = Auth::user()->current_workspace_id;
-    
+
     // Parse incoming scheduled_at using client's timezone header and convert to UTC
     $clientTz = $request->header('X-User-Timezone') ?? config('app.timezone', 'UTC');
     try {
@@ -201,27 +206,27 @@ class CalendarController extends Controller
       // Find the scheduled post and verify it belongs to current workspace
       $model = ScheduledPost::where('workspace_id', $workspaceId)
         ->find($id);
-      
+
       if (!$model) {
         return $this->errorResponse('Scheduled post not found or does not belong to your workspace', 404);
       }
-      
+
       // Check if user has permission
       if (!Auth::user()->hasPermission('manage-content', $workspaceId)) {
         return $this->errorResponse('Unauthorized', 403);
       }
-      
+
       $model->update([
         'scheduled_at' => $newDate,
       ]);
-      
+
       // Load publication relationship for response
       $model->load('publication.user:id,name,photo_url');
     } elseif ($type === 'user_event') {
       $model = UserCalendarEvent::where('workspace_id', $workspaceId)
         ->where('user_id', Auth::id())
         ->find($id);
-      
+
       if (!$model) {
         return $this->errorResponse('User event not found or does not belong to your workspace', 404);
       }
@@ -254,7 +259,7 @@ class CalendarController extends Controller
   {
 
     $workspaceId = Auth::user()->current_workspace_id;
-    
+
     // Check if user has permission
     if (!Auth::user()->hasPermission('manage-content', $workspaceId)) {
       return $this->errorResponse('Unauthorized', 403);
@@ -263,7 +268,7 @@ class CalendarController extends Controller
     $eventIds = $request->input('event_ids');
     $operation = $request->input('operation');
     $clientTz = $request->header('X-User-Timezone') ?? config('app.timezone', 'UTC');
-    
+
     try {
       $newDate = Carbon::parse($request->input('new_date'), $clientTz)->setTimezone('UTC');
     } catch (\Exception $e) {
@@ -285,11 +290,11 @@ class CalendarController extends Controller
           // Find the scheduled post and verify it belongs to current workspace
           $model = ScheduledPost::where('workspace_id', $workspaceId)
             ->find($resourceId);
-          
+
           if (!$model) {
             throw new \Exception('Scheduled post not found or does not belong to your workspace');
           }
-          
+
           $previousState[] = [
             'id' => $eventId,
             'type' => 'post',
@@ -302,19 +307,19 @@ class CalendarController extends Controller
           } elseif ($operation === 'delete') {
             $model->delete();
           }
-          
+
           $successful[] = $eventId;
         } elseif ($type === 'user') {
           $model = UserCalendarEvent::where('workspace_id', $workspaceId)
             ->where('user_id', Auth::id())
             ->find($resourceId);
-          
+
           if (!$model) {
             throw new \Exception('User event not found or does not belong to your workspace');
           }
-          
+
           $duration = $model->end_date ? $model->start_date->diffInSeconds($model->end_date) : null;
-          
+
           $previousState[] = [
             'id' => $eventId,
             'type' => 'user_event',
@@ -331,7 +336,7 @@ class CalendarController extends Controller
           } elseif ($operation === 'delete') {
             $model->delete();
           }
-          
+
           $successful[] = $eventId;
         }
       } catch (\Exception $e) {
@@ -382,7 +387,7 @@ class CalendarController extends Controller
   public function undoBulkOperation(Request $request)
   {
     $workspaceId = Auth::user()->current_workspace_id;
-    
+
     // Check if user has permission
     if (!Auth::user()->hasPermission('manage-content', $workspaceId)) {
       return $this->errorResponse('Unauthorized', 403);
@@ -413,18 +418,18 @@ class CalendarController extends Controller
           // Find the scheduled post and verify it belongs to current workspace
           $model = ScheduledPost::where('workspace_id', $workspaceId)
             ->find($state['resource_id']);
-          
+
           if (!$model) {
             throw new \Exception('Scheduled post not found or does not belong to your workspace');
           }
-          
+
           $model->update(['scheduled_at' => Carbon::parse($state['scheduled_at'])]);
           $successful[] = $state['id'];
         } elseif ($state['type'] === 'user_event') {
           $model = UserCalendarEvent::where('workspace_id', $workspaceId)
             ->where('user_id', Auth::id())
             ->find($state['resource_id']);
-          
+
           if (!$model) {
             throw new \Exception('User event not found or does not belong to your workspace');
           }
