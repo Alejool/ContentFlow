@@ -173,6 +173,8 @@ Route::middleware('auth')->group(function () {
     Route::get('{workspace}/api-tokens', [ApiTokenController::class, 'index'])->name('api-tokens.index');
     Route::post('{workspace}/api-tokens', [ApiTokenController::class, 'store'])->name('api-tokens.store');
     Route::delete('{workspace}/api-tokens/{token}', [ApiTokenController::class, 'destroy'])->name('api-tokens.destroy');
+    // Enterprise API Documentation Downloads
+    Route::get('{workspace}/api-docs/download', [ApiTokenController::class, 'downloadDocs'])->name('api-docs.download');
   });
 
   Route::prefix('content')->name('content.')->group(function () {
