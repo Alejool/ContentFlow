@@ -22,9 +22,17 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   loadingText?: string;
   fullWidth?: boolean;
   iconPosition?: "left" | "right";
-  rounded?: "none" | "sm" | "md" | "lg" | "full";
-  shadow?: "none" | "sm" | "md" | "lg" | "xl";
-  animation?: "none" | "pulse" | "bounce";
+  rounded?: "none" | "sm" | "md" | "lg" | "xl" | "2xl" | "full";
+  shadow?:
+    | "none"
+    | "sm"
+    | "md"
+    | "lg"
+    | "xl"
+    | "primary"
+    | "danger"
+    | "success";
+  animation?: "none" | "pulse" | "bounce" | "scale";
   theme?: "light" | "dark";
   icon?: any;
 }
@@ -59,6 +67,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       md: "px-4 py-2.5 text-base",
       lg: "px-5 py-3 text-lg",
       xl: "px-6 py-3.5 text-xl",
+      premium: "px-10 py-4 text-base font-bold",
     };
 
     const variantColors = {
@@ -192,6 +201,8 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       sm: "rounded-sm",
       md: "rounded-lg",
       lg: "rounded-lg",
+      xl: "rounded-xl",
+      "2xl": "rounded-2xl",
       full: "rounded-full",
     };
 
@@ -201,12 +212,16 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       md: "shadow",
       lg: "shadow-lg",
       xl: "shadow-xl",
+      primary: "shadow-lg shadow-primary-500/25",
+      danger: "shadow-lg shadow-red-500/25",
+      success: "shadow-lg shadow-green-500/25",
     };
 
     const animationClasses = {
       none: "",
       pulse: "animate-pulse",
       bounce: "animate-bounce",
+      scale: "transform active:scale-95 transition-transform duration-200",
     };
 
     const baseStyles = `
@@ -218,6 +233,11 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       ${fullWidth ? "w-full" : ""}
       ${sizeClasses[size]}
       ${getStyleClasses()}
+      ${
+        variant === "primary" && buttonStyle !== "outline"
+          ? "hover:shadow-primary-500/25 shadow-xl hover:shadow-2xl"
+          : ""
+      }
       ${roundedClasses[rounded]}
       ${shadowClasses[shadow]}
       ${animationClasses[animation]}
