@@ -103,7 +103,9 @@
           "interval": "Cada",
           "ends": "Termina el",
           "ends_placeholder": "Opcional: Fecha de fin",
-          "days": "Repetir los días"
+          "days": "Repetir los días",
+          "preview_title": "Próximas fechas de publicación",
+          "preview_note": "Estas fechas se basan en tu configuración de recurrencia y fecha de inicio."
         }
       },
       "add": {

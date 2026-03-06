@@ -144,7 +144,9 @@
           "interval": "Every",
           "ends": "Ends on",
           "ends_placeholder": "Optional: End date",
-          "days": "Repeat on days"
+          "days": "Repeat on days",
+          "preview_title": "Upcoming publication dates",
+          "preview_note": "These dates are based on your recurrence settings and start date."
         }
       },
       "edit": {
