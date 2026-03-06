@@ -63,6 +63,10 @@
     "tabs": {
       "pending": "Pendientes",
       "history": "Historial"
-    }
+    },
+    "locked": {
+    "title": "Aprobaciones básicas habilitadas",
+    "description": "Tu plan actual permite aprobaciones de un nivel. Mejora tu plan para crear flujos de aprobación avanzados y multi-nivel."
+  }
   }
 }

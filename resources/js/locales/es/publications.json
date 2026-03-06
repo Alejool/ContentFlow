@@ -77,7 +77,13 @@
         "description": "Define una fecha única para publicar en todas las redes sociales seleccionadas a la vez.",
         "placeholder": "Seleccionar fecha y hora",
         "instantWarning": "Para publicar inmediatamente, usa el botón Publicar del modal.",
-        "useGlobal": "Programación Global"
+        "useGlobal": "Programación Global",
+        "recurrence": {
+          "title": "Repetir publicación (Recurrencia)",
+          "locked_title": "Recurrencia bloqueada",
+          "locked_desc": "Mejora tu plan para programar repeticiones automáticas (cada X días/semanas) de tus publicaciones.",
+          "coming_soon": "Opciones de configuración de recurrencia..."
+        }
       },
       "add": {
         "title": "Agregar publicación",
@@ -371,7 +377,7 @@
     },
     "status": {
       "draft": "Borrador",
-      "pending_review": "Pendiente de revisión",      
+      "pending_review": "Pendiente de revisión",
       "failed": "Fallidas",
       "publishing": "Publicando",
       "published": "Publicado",
@@ -467,10 +473,10 @@
       "all": "Todo",
       "published": "Publicadas",
       "draft": "Borrador",
-      "approved": "Aprobadas",      
-      "scheduled": "Programadas",    
+      "approved": "Aprobadas",
+      "scheduled": "Programadas",
       "pending_review": "Pendiente de revisión",
-      "rejected": "Rechazadas",    
+      "rejected": "Rechazadas",
       "failed": "Fallidas"
     },
     "gallery": {

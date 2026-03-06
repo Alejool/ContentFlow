@@ -236,7 +236,16 @@
       "update_success": "Branding actualizado exitosamente",
       "update_error": "Error al actualizar el branding",
       "enterprise_exclusive": "Función Exclusiva Enterprise",
-      "enterprise_description": "Estos ajustes de marca se aplican a todo el espacio de trabajo y serán visibles para todos los miembros y en los reportes generados."
+      "enterprise_description": "Estos ajustes de marca se aplican a todo el espacio de trabajo y serán visibles para todos los miembros y en los reportes generados.",
+      "live_preview": "Vista Previa en Vivo",
+      "buttons_actions": "BOTONES Y ACCIONES",
+      "primary_button": "Botón Principal",
+      "secondary_button": "Botón Secundario",
+      "activity_indicator": "Indicador de actividad",
+      "sidebar_header": "Cabecera del Menú",
+      "workspace_branding": "Marca del Espacio",
+      "impact_notice": "Los cambios se aplican inmediatamente para todos los usuarios de este espacio de trabajo.",
+      "no_logo": "Sin Logo"
     },
     "api": {
       "title": "Tokens de Acceso API",

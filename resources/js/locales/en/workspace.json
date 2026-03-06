@@ -239,7 +239,16 @@
       "update_success": "Branding updated successfully",
       "update_error": "Failed to update branding",
       "enterprise_exclusive": "Enterprise-exclusive Feature",
-      "enterprise_description": "These branding settings are applied workspace-wide and will be visible to all members and in generated reports."
+      "enterprise_description": "These branding settings are applied workspace-wide and will be visible to all members and in generated reports.",
+      "live_preview": "Live Preview",
+      "buttons_actions": "BUTTONS & ACTIONS",
+      "primary_button": "Primary Button",
+      "secondary_button": "Secondary Button",
+      "activity_indicator": "Activity Indicator",
+      "sidebar_header": "Sidebar Header",
+      "workspace_branding": "Workspace Branding",
+      "impact_notice": "Changes are applied immediately for all users in this workspace.",
+      "no_logo": "No Logo"
     },
     "api": {
       "title": "API Access Tokens",

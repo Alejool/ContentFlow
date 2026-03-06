@@ -117,7 +117,13 @@
         "description": "Set a single date to publish on all selected social networks at once.",
         "placeholder": "Select date and time",
         "instantWarning": "To publish now, use the Publish button after saving.",
-        "useGlobal": "Use global schedule settings"
+        "useGlobal": "Global",
+        "recurrence": {
+          "title": "Repeat publication (Recurrence)",
+          "locked_title": "Recurrence locked",
+          "locked_desc": "Upgrade your plan to schedule automatic repetitions (every X days/weeks) for your publications.",
+          "coming_soon": "Recurrence configuration options..."
+        }
       },
       "edit": {
         "title": "Edit Publication",
