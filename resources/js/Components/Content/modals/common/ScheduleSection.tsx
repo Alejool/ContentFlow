@@ -1,8 +1,17 @@
 import DatePickerModern from "@/Components/common/Modern/DatePicker";
 import Label from "@/Components/common/Modern/Label";
-import { parseISO } from "date-fns";
-import { Clock } from "lucide-react";
-import React from "react";
+import {
+  addDays,
+  addMonths,
+  addWeeks,
+  addYears,
+  format,
+  parseISO,
+  subDays,
+} from "date-fns";
+import { es } from "date-fns/locale";
+import { AlertCircle, Calendar as CalendarIcon, Clock } from "lucide-react";
+import React, { useMemo } from "react";
 
 interface ScheduleSectionProps {
   scheduledAt?: string;
@@ -26,6 +35,8 @@ interface ScheduleSectionProps {
     recurrence_days?: number[];
     recurrence_end_date?: string;
   }) => void;
+  i18n?: any;
+  publishDate?: string;
 }
 
 const ScheduleSection: React.FC<ScheduleSectionProps> = ({
@@ -44,6 +55,8 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
   recurrenceEndDate,
   onRecurrenceChange,
   recurrenceDaysError,
+  i18n,
+  publishDate,
 }) => {
   const daysOfWeek = [
     { label: t("common.days.sun") || "D", value: 0 },
@@ -54,6 +67,82 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
     { label: t("common.days.fri") || "V", value: 5 },
     { label: t("common.days.sat") || "S", value: 6 },
   ];
+
+  const nextDates = useMemo(() => {
+    const baseDate = scheduledAt || publishDate;
+    if (!isRecurring || !baseDate) return [];
+
+    const dates: Date[] = [];
+    let currentDate = parseISO(baseDate);
+    const endDate = recurrenceEndDate ? parseISO(recurrenceEndDate) : null;
+    const interval = Math.max(1, recurrenceInterval || 1);
+    const maxCount = 5;
+
+    // Safety limit for calculation loops
+    let iterations = 0;
+    while (dates.length < maxCount && iterations < 50) {
+      iterations++;
+
+      // Don't include the very first date if it's already used as the base
+      if (iterations > 1) {
+        if (endDate && currentDate > endDate) break;
+        dates.push(new Date(currentDate));
+      }
+
+      if (dates.length >= maxCount) break;
+
+      switch (recurrenceType) {
+        case "daily":
+          currentDate = addDays(currentDate, interval);
+          break;
+        case "weekly":
+          if (recurrenceDays.length > 0) {
+            const currentDay = currentDate.getDay();
+            let nextDayMatch = null;
+            const sortedDays = [...recurrenceDays].sort((a, b) => a - b);
+
+            for (const day of sortedDays) {
+              if (day > currentDay) {
+                nextDayMatch = day;
+                break;
+              }
+            }
+
+            if (nextDayMatch !== null) {
+              currentDate = addDays(currentDate, nextDayMatch - currentDay);
+            } else {
+              const firstDayOfCycle = sortedDays[0];
+              // Go to start of current week (Sunday), then jump interval weeks, then to the first selected day
+              currentDate = addDays(
+                subDays(currentDate, currentDay),
+                interval * 7 + firstDayOfCycle,
+              );
+            }
+          } else {
+            currentDate = addWeeks(currentDate, interval);
+          }
+          break;
+        case "monthly":
+          currentDate = addMonths(currentDate, interval);
+          break;
+        case "yearly":
+          currentDate = addYears(currentDate, interval);
+          break;
+        default:
+          currentDate = addDays(currentDate, 1);
+      }
+    }
+
+    return dates;
+  }, [
+    isRecurring,
+    scheduledAt,
+    publishDate,
+    recurrenceType,
+    recurrenceInterval,
+    recurrenceDays,
+    recurrenceEndDate,
+  ]);
 
   return (
     <div className="space-y-4">
@@ -342,6 +431,45 @@ const ScheduleSection: React.FC<ScheduleSectionProps> = ({
                     disabled={disabled}
                   />
                 </div>
+
+                {/* Next Dates Preview */}
+                {nextDates.length > 0 && (
+                  <div className="mt-4 p-3 bg-primary-50/30 dark:bg-primary-900/10 rounded-lg border border-primary-100/50 dark:border-primary-800/30">
+                    <div className="flex items-center gap-2 mb-2 text-primary-700 dark:text-primary-400">
+                      <CalendarIcon className="w-3.5 h-3.5" />
+                      <span className="text-xs font-semibold uppercase tracking-wider">
+                        {t(
+                          "publications.modal.schedule.recurrence.preview_title",
+                        ) || "Próximas fechas de publicación"}
+                      </span>
+                    </div>
+                    <ul className="space-y-1.5">
+                      {nextDates.map((date: Date, idx: number) => (
+                        <li
+                          key={idx}
+                          className="flex items-center justify-between text-sm"
+                        >
+                          <span className="text-gray-600 dark:text-gray-400 font-medium">
+                            {idx + 1}.{" "}
+                            {format(date, "EEEE, d 'de' MMMM", {
+                              locale: i18n?.language === "es" ? es : undefined,
+                            })}
+                          </span>
+                          <span className="text-gray-400 dark:text-gray-500 font-mono text-xs">
+                            {format(date, "HH:mm")}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                    <p className="mt-3 text-[10px] text-gray-500 dark:text-gray-500 italic flex items-start gap-1">
+                      <AlertCircle className="w-3 h-3 shrink-0 mt-0.5" />
+                      {t(
+                        "publications.modal.schedule.recurrence.preview_note",
+                      ) ||
+                        "Estas fechas son estimadas y se reflejarán en el calendario al guardar."}
+                    </p>
+                  </div>
+                )}
               </div>
             )}
           </div>

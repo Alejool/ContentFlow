@@ -1,12 +1,21 @@
-import React, { useState } from 'react';
-import { CalendarEvent } from '@/types/calendar';
-import { DynamicModal } from '@/Components/common/Modern/DynamicModal';
-import Button from '@/Components/common/Modern/Button';
-import { DateTimePicker } from './DateTimePicker';
-import { formatTime } from '@/Utils/formatDate';
-import { format, parseISO } from 'date-fns';
-import { Calendar, Clock, Tag, Link as LinkIcon, Edit2, Trash2 } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
+import Button from "@/Components/common/Modern/Button";
+import { DynamicModal } from "@/Components/common/Modern/DynamicModal";
+import { formatTime } from "@/Utils/formatDate";
+import { CalendarEvent } from "@/types/calendar";
+import { format, parseISO } from "date-fns";
+import {
+  AlertCircle,
+  Calendar,
+  Clock,
+  Edit2,
+  ExternalLink,
+  Link as LinkIcon,
+  Tag,
+  Trash2,
+} from "lucide-react";
+import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { DateTimePicker } from "./DateTimePicker";
 
 interface EventDetailsModalProps {
   event: CalendarEvent | null;
@@ -48,7 +57,7 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
       setNewDate(null);
       onClose();
     } catch (error) {
-      console.error('Error updating event date:', error);
+      console.error("Error updating event date:", error);
     } finally {
       setIsSaving(false);
     }
@@ -65,7 +74,7 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
     <DynamicModal
       isOpen={isOpen}
       onClose={onClose}
-      title={t('calendar.eventDetails.title') || 'Detalles del Evento'}
+      title={t("calendar.eventDetails.title") || "Detalles del Evento"}
       size="lg"
     >
       <div className="space-y-6">
@@ -79,8 +88,8 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
             <div className="flex items-center gap-2 mb-2">
               <PlatformIcon
                 platform={
-                  ['user_event', 'event'].includes(String(event.type))
-                    ? 'user_event'
+                  ["user_event", "event"].includes(String(event.type))
+                    ? "user_event"
                     : event.platform
                 }
                 className="w-6 h-6"
@@ -95,7 +104,7 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
               </span>
               {event.type && (
                 <span className="px-3 py-1 rounded-full bg-primary-100 dark:bg-primary-900/30 text-sm font-medium text-primary-700 dark:text-primary-300 capitalize">
-                  {event.type.replace('_', ' ')}
+                  {event.type.replace("_", " ")}
                 </span>
               )}
             </div>
@@ -109,15 +118,13 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
             <Calendar className="w-5 h-5 text-gray-400 mt-0.5" />
             <div className="flex-1">
               <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
-                {t('calendar.eventDetails.dateTime') || 'Fecha y Hora'}
+                {t("calendar.eventDetails.dateTime") || "Fecha y Hora"}
               </div>
               {isEditingDate ? (
                 <div className="space-y-3">
                   <DateTimePicker
-                    selected={newDate || eventDate}
+                    selectedDate={newDate || eventDate}
                     onChange={(date) => setNewDate(date)}
-                    showTimeSelect
-                    dateFormat="dd/MM/yyyy HH:mm"
                   />
                   <div className="flex gap-2">
                     <Button
@@ -125,7 +132,9 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
                       onClick={handleSaveDate}
                       disabled={isSaving || !newDate}
                     >
-                      {isSaving ? t('common.saving') || 'Guardando...' : t('common.save') || 'Guardar'}
+                      {isSaving
+                        ? t("common.saving") || "Guardando..."
+                        : t("common.save") || "Guardar"}
                     </Button>
                     <Button
                       size="sm"
@@ -135,7 +144,7 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
                         setNewDate(null);
                       }}
                     >
-                      {t('common.cancel') || 'Cancelar'}
+                      {t("common.cancel") || "Cancelar"}
                     </Button>
                   </div>
                 </div>
@@ -148,7 +157,7 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
                     <button
                       onClick={() => setIsEditingDate(true)}
                       className="p-1 rounded-md text-gray-400 hover:text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all"
-                      title={t('common.edit') || 'Editar'}
+                      title={t("common.edit") || "Editar"}
                     >
                       <Edit2 className="w-4 h-4" />
                     </button>
@@ -168,7 +177,7 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
               <Tag className="w-5 h-5 text-gray-400 mt-0.5" />
               <div className="flex-1">
                 <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
-                  {t('calendar.eventDetails.platform') || 'Plataforma'}
+                  {t("calendar.eventDetails.platform") || "Plataforma"}
                 </div>
                 <div className="text-base text-gray-900 dark:text-white capitalize">
                   {event.platform}
@@ -183,7 +192,7 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
               <Tag className="w-5 h-5 text-gray-400 mt-0.5" />
               <div className="flex-1">
                 <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
-                  {t('calendar.eventDetails.campaign') || 'Campaña'}
+                  {t("calendar.eventDetails.campaign") || "Campaña"}
                 </div>
                 <div className="text-base text-gray-900 dark:text-white">
                   {event.campaign}
@@ -198,7 +207,7 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
               <LinkIcon className="w-5 h-5 text-gray-400 mt-0.5" />
               <div className="flex-1">
                 <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
-                  {t('calendar.eventDetails.description') || 'Descripción'}
+                  {t("calendar.eventDetails.description") || "Descripción"}
                 </div>
                 <div className="text-base text-gray-900 dark:text-white">
                   {event.extendedProps.description}
@@ -207,22 +216,60 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
             </div>
           )}
 
-          {/* Link to publication */}
-          {event.extendedProps?.slug && event.type === 'publication' && (
+          {/* Link to publication (Internal) */}
+          {event.extendedProps?.slug && (
             <div className="flex items-start gap-3">
               <LinkIcon className="w-5 h-5 text-gray-400 mt-0.5" />
               <div className="flex-1">
                 <div className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
-                  {t('calendar.eventDetails.viewPublication') || 'Ver Publicación'}
+                  {t("calendar.eventDetails.viewPublication") ||
+                    "Ver en ContentFlow"}
                 </div>
                 <a
-                  href={`/content`}
+                  href={`${event.extendedProps.slug}?id=${event.publicationId || event.extendedProps.publication_id}`}
                   className="text-base text-primary-600 dark:text-primary-400 hover:underline"
+                >
+                  {t("calendar.eventDetails.openInEditor") ||
+                    "Abrir en el editor"}
+                </a>
+              </div>
+            </div>
+          )}
+
+          {/* External platform link */}
+          {event.extendedProps?.post_url && (
+            <div className="flex items-start gap-3 p-3 bg-primary-50 dark:bg-primary-900/10 rounded-lg border border-primary-100 dark:border-primary-800/30">
+              <ExternalLink className="w-5 h-5 text-primary-600 dark:text-primary-400 mt-0.5" />
+              <div className="flex-1">
+                <div className="text-sm font-medium text-primary-700 dark:text-primary-300 mb-1">
+                  {t("calendar.eventDetails.publishedLink") ||
+                    "Publicado en la red social"}
+                </div>
+                <a
+                  href={event.extendedProps.post_url}
+                  className="inline-flex items-center gap-1.5 text-sm text-primary-600 dark:text-primary-400 hover:underline font-semibold"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  {t('calendar.eventDetails.openPublication') || 'Abrir publicación'}
+                  {t("calendar.eventDetails.viewOnPlatform") ||
+                    "Ver publicación real"}
+                  <ExternalLink className="w-3 h-3" />
                 </a>
+              </div>
+            </div>
+          )}
+
+          {/* Error Message */}
+          {event.status === "failed" && event.extendedProps?.error_message && (
+            <div className="flex items-start gap-3 p-3 bg-red-50 dark:bg-red-900/10 rounded-lg border border-red-100 dark:border-red-900/30">
+              <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 mt-0.5" />
+              <div className="flex-1">
+                <div className="text-sm font-medium text-red-700 dark:text-red-300 mb-1">
+                  {t("calendar.eventDetails.errorTitle") || "Error en el envío"}
+                </div>
+                <div className="text-sm text-red-600 dark:text-red-400 font-medium italic">
+                  {event.extendedProps.error_message}
+                </div>
               </div>
             </div>
           )}
@@ -238,12 +285,12 @@ export const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
                 onClick={handleDelete}
                 icon={<Trash2 className="w-4 h-4" />}
               >
-                {t('common.delete') || 'Eliminar'}
+                {t("common.delete") || "Eliminar"}
               </Button>
             )}
           </div>
           <Button variant="secondary" onClick={onClose}>
-            {t('common.close') || 'Cerrar'}
+            {t("common.close") || "Cerrar"}
           </Button>
         </div>
       </div>

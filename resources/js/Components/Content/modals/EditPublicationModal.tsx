@@ -15,6 +15,7 @@ import YouTubeThumbnailUploader from "@/Components/common/ui/YouTubeThumbnailUpl
 import { usePublicationForm } from "@/Hooks/publication/usePublicationForm";
 import { useModalFocusTrap } from "@/Hooks/useModalFocusTrap";
 import { usePublicationLock } from "@/Hooks/usePublicationLock";
+import { useCalendarStore } from "@/stores/calendarStore";
 import { useCampaignStore } from "@/stores/campaignStore";
 import { usePublicationStore } from "@/stores/publicationStore";
 import { useAccountsStore } from "@/stores/socialAccountsStore";
@@ -126,10 +127,20 @@ const EditPublicationModal = ({
     durationErrors,
     updateFile: baseUpdateFile,
     uploadFile,
+    i18n,
   } = usePublicationForm({
     publication,
     onClose,
-    onSubmitSuccess: onSubmit,
+    onSubmitSuccess: (success) => {
+      if (success) {
+        try {
+          useCalendarStore.getState().fetchEvents();
+        } catch (e) {
+          // Store might not be initialized if not on calendar page
+        }
+      }
+      onSubmit(success);
+    },
     isOpen,
   });
 
@@ -377,6 +388,12 @@ const EditPublicationModal = ({
     return text;
   }, [watched.description, watched.hashtags]);
 
+  const handleRecurrenceChange = (data: any) => {
+    Object.entries(data).forEach(([key, val]) => {
+      setValue(key as any, val, { shouldValidate: true });
+    });
+  };
+
   return (
     <div
       className={`fixed inset-0 z-50 flex items-center justify-center sm:p-6 text-gray-900 dark:text-white transition-opacity duration-200 ${isOpen ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"}`}
@@ -453,7 +470,7 @@ const EditPublicationModal = ({
                     isLockedByOther &&
                     !hasPublishedPlatform &&
                     allowConfiguration &&
-                    publication?.status !== "approved" && (
+                    publication?.status !== "pending_review" && (
                       <div className="p-4 mb-6 rounded-lg border border-amber-500 bg-amber-50 dark:bg-amber-900/20 flex gap-3 text-sm text-amber-700 dark:text-amber-300 animate-in shake duration-500">
                         <AlertCircle className="w-5 h-5 shrink-0 text-amber-500" />
                         <div>
@@ -750,11 +767,9 @@ const EditPublicationModal = ({
                       recurrenceEndDate={
                         watched.recurrence_end_date ?? undefined
                       }
-                      onRecurrenceChange={(data) => {
-                        Object.entries(data).forEach(([key, val]) => {
-                          setValue(key as any, val, { shouldValidate: true });
-                        });
-                      }}
+                      onRecurrenceChange={handleRecurrenceChange}
+                      i18n={i18n}
+                      publishDate={publication?.publish_date}
                     />
                   </div>
                 </div>

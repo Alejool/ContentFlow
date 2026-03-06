@@ -29,7 +29,25 @@ export const usePublicationForm = ({
   onSubmitSuccess,
   isOpen,
 }: UsePublicationFormProps) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+
+  const safeJsonParse = (value: any): any => {
+    if (!value) return {};
+    if (typeof value === "object" && value !== null) return value;
+    try {
+      let parsed = typeof value === "string" ? JSON.parse(value) : value;
+      // Handle potential multiple stringification
+      let attempts = 0;
+      while (typeof parsed === "string" && attempts < 5) {
+        parsed = JSON.parse(parsed);
+        attempts++;
+      }
+      return typeof parsed === "object" && parsed !== null ? parsed : {};
+    } catch (e) {
+      return {};
+    }
+  };
+
   const schema = useMemo(() => publicationSchema(t), [t]);
 
   const { props } = usePage<PageProps>();
@@ -197,7 +215,7 @@ export const usePublicationForm = ({
 
       // Sync platform settings (complex JSON, not in reset)
       // Check if user has touched platform settings locally? No easy way, but usually safe
-      setPlatformSettings(publication.platform_settings || {});
+      setPlatformSettings(safeJsonParse(publication.platform_settings));
     } else if (isOpen && !publication) {
       // Logic for NEW publication
       reset({
@@ -683,16 +701,24 @@ export const usePublicationForm = ({
 
     if (data.social_accounts && data.social_accounts.length > 0) {
       const hasGlobalSchedule = !!data.scheduled_at;
-      const allAccountsHaveSchedule = data.social_accounts.every(
-        (id) => accountSchedules[id] || hasGlobalSchedule,
-      );
 
-      if (!allAccountsHaveSchedule && !data.scheduled_at) {
-        toast.error(
-          t("publications.modal.validation.scheduleRequired") ||
-            "Debes programar una fecha para todas las redes seleccionadas o establecer una fecha global.",
+      // For already-published recurring posts, the backend uses each account's
+      // social_post_log.published_at as the recurrence base — no manual date needed.
+      const isPublishedRecurring =
+        data.is_recurring && publication?.status === "published";
+
+      if (!isPublishedRecurring) {
+        const allAccountsHaveSchedule = data.social_accounts.every(
+          (id) => accountSchedules[id] || hasGlobalSchedule,
         );
-        return;
+
+        if (!allAccountsHaveSchedule && !data.scheduled_at) {
+          toast.error(
+            t("publications.modal.validation.scheduleRequired") ||
+              "Debes programar una fecha para todas las redes seleccionadas o establecer una fecha global.",
+          );
+          return;
+        }
       }
     }
 
@@ -717,7 +743,18 @@ export const usePublicationForm = ({
         formData.append("campaign_id", "");
       }
 
-      const socialAccounts = data.social_accounts || [];
+      let socialAccounts = [...(data.social_accounts || [])];
+
+      // If recurring, we MUST include already published accounts so the backend
+      // knows to schedule future instances for them as well.
+      if (data.is_recurring) {
+        publishedAccountIds.forEach((id) => {
+          if (!socialAccounts.includes(id)) {
+            socialAccounts.push(id);
+          }
+        });
+      }
+
       const currentStatus = getValues("status") || "draft";
       const validStatuses = [
         "draft",
@@ -730,7 +767,9 @@ export const usePublicationForm = ({
         "rejected",
       ];
       const finalStatus =
-        socialAccounts.length === 0 && !data.scheduled_at
+        socialAccounts.length === 0 &&
+        !data.scheduled_at &&
+        currentStatus !== "published"
           ? "draft"
           : validStatuses.includes(currentStatus)
             ? currentStatus
@@ -1056,6 +1095,7 @@ export const usePublicationForm = ({
     trigger,
     control,
     uploadFile,
+    i18n,
 
     // Data loading state
     isDataReady,

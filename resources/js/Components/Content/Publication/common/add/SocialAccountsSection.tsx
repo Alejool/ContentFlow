@@ -2,7 +2,7 @@ import DatePickerModern from "@/Components/common/Modern/DatePicker";
 import { validateVideoDuration } from "@/Utils/validationUtils";
 import { parseISO } from "date-fns";
 import { AlertTriangle, Check, Clock, Settings, Target, X } from "lucide-react";
-import React, { memo, useState, useMemo } from "react";
+import React, { memo, useMemo, useState } from "react";
 
 interface SocialAccount {
   id: number;
@@ -98,7 +98,12 @@ const SchedulePopoverContent = memo(
         <DatePickerModern
           selected={customSchedule ? parseISO(customSchedule) : null}
           onChange={(date: Date | null) => {
-            onScheduleChange(date ? date.toISOString() : "");
+            if (date) {
+              onScheduleChange(date.toISOString());
+            } else {
+              // Clearing the date removes the per-account override → falls back to global schedule
+              onScheduleRemove();
+            }
           }}
           showTimeSelect
           placeholder="Select date & time"
@@ -438,7 +443,7 @@ const SocialAccountItem = memo(
               onPopoverClose={onPopoverClose}
             />
           )}
-          
+
           {isCheckedActually && (
             <button
               type="button"
@@ -486,28 +491,30 @@ const SocialAccountsSection = memo(
     // Merge connected accounts with disconnected accounts from social_post_logs
     const allAccounts = useMemo(() => {
       const connectedAccounts = [...socialAccounts];
-      const connectedAccountIds = new Set(socialAccounts.map(acc => acc.id));
-      
+      const connectedAccountIds = new Set(socialAccounts.map((acc) => acc.id));
+
       // Find published accounts that are no longer connected
       const disconnectedPublishedAccounts = socialPostLogs
-        .filter(log => 
-          (log.status === 'published' || log.status === 'publishing' || log.status === 'failed') &&
-          !connectedAccountIds.has(log.social_account_id)
+        .filter(
+          (log) =>
+            (log.status === "published" ||
+              log.status === "publishing" ||
+              log.status === "failed") &&
+            !connectedAccountIds.has(log.social_account_id),
         )
-        .map(log => ({
+        .map((log) => ({
           id: log.social_account_id,
           platform: log.platform,
-          name: log.account_name || 'Unknown',
+          name: log.account_name || "Unknown",
           account_name: log.account_name,
           isDisconnected: true,
         }));
-      
+
       // Remove duplicates from disconnected accounts
       const uniqueDisconnected = disconnectedPublishedAccounts.filter(
-        (acc, index, self) => 
-          index === self.findIndex(a => a.id === acc.id)
+        (acc, index, self) => index === self.findIndex((a) => a.id === acc.id),
       );
-      
+
       return [...connectedAccounts, ...uniqueDisconnected];
     }, [socialAccounts, socialPostLogs]);
 
@@ -533,33 +540,40 @@ const SocialAccountsSection = memo(
               <Check className="w-4 h-4 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
               <div className="flex-1">
                 <h4 className="text-xs font-bold text-blue-800 dark:text-blue-200">
-                  {t("publications.modal.publish.alreadyPublishedBanner.title") || "Publicación Activa"}
+                  {t(
+                    "publications.modal.publish.alreadyPublishedBanner.title",
+                  ) || "Publicación Activa"}
                 </h4>
                 <p className="text-[11px] text-blue-700 dark:text-blue-300 mt-0.5">
-                  {t("publications.modal.publish.alreadyPublishedBanner.message") || 
+                  {t(
+                    "publications.modal.publish.alreadyPublishedBanner.message",
+                  ) ||
                     "Esta publicación ya está publicada en las siguientes cuentas:"}
                 </p>
                 <div className="mt-1.5 flex flex-wrap gap-1.5">
                   {allAccounts
-                    .filter(acc => publishedAccountIds.includes(acc.id))
-                    .map(acc => (
-                      <span 
+                    .filter((acc) => publishedAccountIds.includes(acc.id))
+                    .map((acc) => (
+                      <span
                         key={acc.id}
                         className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/40 text-[10px] font-medium text-blue-800 dark:text-blue-300"
                       >
                         <span className="capitalize">{acc.platform}</span>
-                        <span className="opacity-75">@{acc.account_name || acc.name}</span>
+                        <span className="opacity-75">
+                          @{acc.account_name || acc.name}
+                        </span>
                         {acc.isDisconnected && (
                           <span className="ml-1 px-1 py-0.5 rounded bg-amber-200 dark:bg-amber-800 text-amber-800 dark:text-amber-200 text-[9px] font-bold">
                             {t("common.disconnected") || "Desconectada"}
                           </span>
                         )}
                       </span>
-                    ))
-                  }
+                    ))}
                 </div>
                 <p className="text-[11px] text-blue-600 dark:text-blue-400 mt-1.5 font-medium">
-                  {t("publications.modal.publish.alreadyPublishedBanner.hint") || 
+                  {t(
+                    "publications.modal.publish.alreadyPublishedBanner.hint",
+                  ) ||
                     "Puedes publicar en cuentas adicionales seleccionándolas a continuación."}
                 </p>
               </div>
