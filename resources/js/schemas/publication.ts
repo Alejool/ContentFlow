@@ -40,7 +40,8 @@ export const publicationSchema = (t: any) =>
             const scheduledDate = new Date(val);
             const now = new Date();
             // Check if scheduled date is more than 1 minute (60 seconds) in the future
-            const diffInSeconds = (scheduledDate.getTime() - now.getTime()) / 1000;
+            const diffInSeconds =
+              (scheduledDate.getTime() - now.getTime()) / 1000;
             return diffInSeconds > 60;
           },
           t("publications.modal.validation.scheduledMinDifference") ||
@@ -63,6 +64,25 @@ export const publicationSchema = (t: any) =>
       campaign_id: z.any().optional().nullable(),
       lock_content: z.boolean().optional(),
       use_global_schedule: z.boolean().optional().default(false),
+      // Recurrence
+      is_recurring: z.boolean().optional().default(false),
+      recurrence_type: z
+        .enum(["daily", "weekly", "monthly", "yearly"])
+        .optional(),
+      recurrence_interval: z.number().min(1).optional().default(1),
+      recurrence_days: z.preprocess((val) => {
+        if (typeof val === "string") {
+          return val
+            .split(",")
+            .filter((v) => v.trim() !== "")
+            .map((v) => parseInt(v));
+        }
+        if (Array.isArray(val)) {
+          return val.map((v) => (typeof v === "string" ? parseInt(v) : v));
+        }
+        return val;
+      }, z.array(z.number()).optional().default([])),
+      recurrence_end_date: z.string().optional().nullable(),
     })
     .refine(
       (data) => {
@@ -77,6 +97,21 @@ export const publicationSchema = (t: any) =>
           t("publications.modal.validation.scheduledAtRequired") ||
           "Schedule date is required if global schedule is enabled",
         path: ["scheduled_at"],
+      },
+    )
+    .refine(
+      (data) => {
+        // If it's recurring and type is weekly, ensure at least one day is selected
+        if (data.is_recurring && data.recurrence_type === "weekly") {
+          return data.recurrence_days && data.recurrence_days.length > 0;
+        }
+        return true;
+      },
+      {
+        message:
+          t("publications.modal.validation.recurrenceDaysRequired") ||
+          "Please select at least one day for weekly recurrence",
+        path: ["recurrence_days"],
       },
     );
 

@@ -116,6 +116,11 @@ export const usePublicationForm = ({
       scheduled_at: null,
       lock_content: false,
       status: "draft",
+      is_recurring: false,
+      recurrence_type: "daily",
+      recurrence_interval: 1,
+      recurrence_days: [],
+      recurrence_end_date: null,
     },
   });
 
@@ -172,6 +177,13 @@ export const usePublicationForm = ({
           (l) => l.status === "published" || l.status === "publishing",
         ),
         use_global_schedule: !!publication.scheduled_at,
+        is_recurring: !!publication.is_recurring,
+        recurrence_type: publication.recurrence_type || "daily",
+        recurrence_interval: publication.recurrence_interval || 1,
+        recurrence_days: (publication.recurrence_days || []).map((d: any) =>
+          parseInt(d),
+        ),
+        recurrence_end_date: publication.recurrence_end_date || null,
       };
 
       if (isInitialLoad) {
@@ -199,6 +211,11 @@ export const usePublicationForm = ({
         status: "draft",
         use_global_schedule: false,
         lock_content: false,
+        is_recurring: false,
+        recurrence_type: "daily",
+        recurrence_interval: 1,
+        recurrence_days: [],
+        recurrence_end_date: null,
       });
       setPlatformSettings({});
       clearMedia();
@@ -737,6 +754,26 @@ export const usePublicationForm = ({
             );
           }
         });
+      }
+
+      // Add Recurrence Fields
+      if (data.is_recurring) {
+        formData.append("is_recurring", "1");
+        formData.append("recurrence_type", data.recurrence_type || "daily");
+        formData.append(
+          "recurrence_interval",
+          (data.recurrence_interval || 1).toString(),
+        );
+        if (data.recurrence_days && data.recurrence_days.length > 0) {
+          data.recurrence_days.forEach((day, i) => {
+            formData.append(`recurrence_days[]`, day.toString());
+          });
+        }
+        if (data.recurrence_end_date) {
+          formData.append("recurrence_end_date", data.recurrence_end_date);
+        }
+      } else {
+        formData.append("is_recurring", "0");
       }
 
       // CRITICAL: Read mediaFiles FRESH from store (not from stale selector)

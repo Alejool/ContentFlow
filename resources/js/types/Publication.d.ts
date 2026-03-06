@@ -105,6 +105,11 @@ export type Publication = {
       can_unpublish?: boolean;
     }
   >;
+  is_recurring?: boolean;
+  recurrence_type?: "daily" | "weekly" | "monthly" | "yearly";
+  recurrence_interval?: number;
+  recurrence_days?: number[];
+  recurrence_end_date?: string;
 };
 
 export type ApprovalLog = {
