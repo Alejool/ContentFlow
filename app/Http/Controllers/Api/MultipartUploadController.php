@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Aws\S3\Exception\S3Exception;
 
@@ -19,11 +20,31 @@ class MultipartUploadController extends Controller
     $request->validate([
       'filename' => 'required|string',
       'content_type' => 'required|string',
+      'file_size' => 'nullable|integer|min:1',
     ]);
+
+    // --- Storage limit pre-check ---
+    $fileSize = (int) $request->input('file_size', 0);
+    if ($fileSize > 0) {
+      $user      = $request->user();
+      $workspace = $user?->currentWorkspace ?? $user?->workspaces()->find($user?->current_workspace_id);
+      if ($workspace) {
+        $validator = app(\App\Services\Subscription\PlanLimitValidator::class);
+        if (!$validator->canUploadSize($workspace, $fileSize)) {
+          $upgradeMsg = $validator->getUpgradeMessage($workspace, 'storage');
+          return response()->json([
+            'error'       => $upgradeMsg['message'],
+            'action'      => $upgradeMsg['action'],
+            'limit_type'  => 'storage',
+            'upgrade_plan' => $upgradeMsg['suggested_plan'],
+          ], 402);
+        }
+      }
+    }
 
     $filename = $request->input('filename');
     $contentType = $request->input('content_type');
-    
+
     // Validate content type against allowed types
     $allowedMimeTypes = [
       'image/jpeg',
@@ -32,24 +53,24 @@ class MultipartUploadController extends Controller
       'video/mp4',
       'application/pdf',
     ];
-    
+
     if (!in_array($contentType, $allowedMimeTypes)) {
       return response()->json([
         'error' => 'File type not allowed. Allowed types: ' . implode(', ', $allowedMimeTypes)
       ], 400);
     }
-    
+
     // Check for executable extensions
     $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
     $executableExtensions = ['exe', 'bat', 'cmd', 'com', 'pif', 'scr', 'vbs', 'js', 'jar', 'sh', 'php', 'py'];
-    
+
     if (in_array($extension, $executableExtensions)) {
-      \Log::warning('Executable file upload attempt via multipart upload', [
+      Log::warning('Executable file upload attempt via multipart upload', [
         'filename' => $filename,
         'ip' => $request->ip(),
-        'user_id' => auth()->id(),
+        'user_id' => $request->user()?->id,
       ]);
-      
+
       return response()->json([
         'error' => 'Executable files are not allowed'
       ], 400);

@@ -29,7 +29,7 @@ interface MediaState {
 
   setMediaFiles: (files: MediaFile[]) => void;
   addFiles: (files: MediaFile[]) => void;
-  removeFile: (index: number) => void;
+  removeFile: (tempId: string) => void;
   updateFile: (tempId: string, updates: Partial<MediaFile>) => void;
   setVideoMetadata: (
     tempId: string,
@@ -39,7 +39,7 @@ interface MediaState {
       height?: number;
       aspectRatio?: number;
       youtubeType: "short" | "video";
-    }
+    },
   ) => void;
   setThumbnail: (tempId: string, file: File) => void;
   clearThumbnail: (tempId: string) => void;
@@ -68,17 +68,17 @@ export const useMediaStore = create<MediaState>((set) => ({
       ),
     })),
 
-  removeFile: (index) =>
+  removeFile: (tempId) =>
     set((state) => {
-      const fileToRemove = state.mediaFiles[index];
-      const newMediaFiles = state.mediaFiles.filter((_, i) => i !== index);
+      const fileToRemove = state.mediaFiles.find((f) => f.tempId === tempId);
+      const newMediaFiles = state.mediaFiles.filter((f) => f.tempId !== tempId);
       const newVideoMetadata = { ...state.videoMetadata };
       const newThumbnails = { ...state.thumbnails };
       const newRemovedThumbnailIds = [...state.removedThumbnailIds];
 
       if (fileToRemove) {
-        delete newVideoMetadata[fileToRemove.tempId];
-        delete newThumbnails[fileToRemove.tempId];
+        delete newVideoMetadata[tempId];
+        delete newThumbnails[tempId];
         if (fileToRemove.id) {
           const indexToRemove = newRemovedThumbnailIds.indexOf(fileToRemove.id);
           if (indexToRemove > -1) {
