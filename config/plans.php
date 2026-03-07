@@ -109,7 +109,7 @@ return [
         'name' => 'Free',
         'price' => 0,
         'stripe_price_id' => null,
-        'enabled' => false, // ← Cambiar a false para ocultar
+        'enabled' => true, // ← Cambiar a false para ocultar
         'billing_cycle' => 'monthly',
         'limits' => [
             // Límites por workspace

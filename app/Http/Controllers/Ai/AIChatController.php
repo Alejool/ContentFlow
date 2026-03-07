@@ -46,9 +46,11 @@ class AIChatController extends Controller
             /** @var User $user */
             $user = Auth::user();
 
-            // Plan limit check for AI requests
+            // Plan limit check for AI requests — only enforced for external API token calls.
+            // Internal dashboard requests (session auth, no Bearer token) bypass this limit.
             $workspace = $user->currentWorkspace ?? $user->workspaces()->find($user->current_workspace_id);
-            if ($workspace) {
+            $isExternalApiRequest = !empty($request->bearerToken());
+            if ($workspace && $isExternalApiRequest) {
                 if (!$this->planLimits->canPerformAction($workspace, 'ai_requests')) {
                     $upgradeMsg = $this->planLimits->getUpgradeMessage($workspace, 'ai_requests');
                     return response()->json([
@@ -171,9 +173,11 @@ class AIChatController extends Controller
             $user = Auth::user();
             $language = $request->input('language', $user->locale ?? 'es');
 
-            // Plan limit check for AI requests
+            // Plan limit check for AI requests — only enforced for external API token calls.
+            // Internal dashboard requests (session auth, no Bearer token) bypass this limit.
             $workspace = $user->currentWorkspace ?? $user->workspaces()->find($user->current_workspace_id);
-            if ($workspace) {
+            $isExternalApiRequest = !empty($request->bearerToken());
+            if ($workspace && $isExternalApiRequest) {
                 if (!$this->planLimits->canPerformAction($workspace, 'ai_requests')) {
                     $upgradeMsg = $this->planLimits->getUpgradeMessage($workspace, 'ai_requests');
                     return response()->json([

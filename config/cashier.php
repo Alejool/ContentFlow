@@ -69,4 +69,19 @@ return [
     */
 
   'currency_locale' => env('CASHIER_CURRENCY_LOCALE', 'en'),
+
+  /*
+    |--------------------------------------------------------------------------
+    | Billing Portal
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for the Stripe Customer Portal. You can specify a custom
+    | configuration ID created in your Stripe dashboard to control which
+    | features are available (payment method updates, subscription changes, etc.)
+    |
+    */
+
+  'billing_portal' => [
+    'configuration_id' => env('STRIPE_BILLING_PORTAL_CONFIG_ID'),
+  ],
 ];

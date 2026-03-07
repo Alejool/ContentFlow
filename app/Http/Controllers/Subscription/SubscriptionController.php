@@ -292,7 +292,7 @@ class SubscriptionController extends Controller
             // Actualizar nuestra tabla personalizada
             if ($workspace->subscription) {
                 $workspace->subscription->update([
-                    'status' => 'canceled',
+                    'status' => 'canceling',  // Usar 'canceling' para mantener acceso hasta el fin del período
                     'cancel_at_period_end' => true,
                     'ends_at' => $periodEnd,
                     'cancellation_reason' => $request->input('reason', 'user_requested'),
@@ -324,7 +324,7 @@ class SubscriptionController extends Controller
         }
     }
 
-    public function activateFreePlan(Request $request): RedirectResponse
+    public function activateFreePlan(Request $request): \Illuminate\Http\Response|\Illuminate\Http\JsonResponse|RedirectResponse
     {
         $request->validate([
             'plan' => 'required|in:free,demo',
@@ -333,10 +333,45 @@ class SubscriptionController extends Controller
         $user = $request->user();
         $plan = $request->plan;
         $planConfig = config("plans.{$plan}");
+        $workspace = $user->currentWorkspace ?? $user->workspaces()->first();
 
         // Verificar si el plan demo está habilitado
         if ($plan === 'demo' && !($planConfig['enabled'] ?? true)) {
+            if ($request->expectsJson()) {
+                return response()->json(['error' => 'El plan demo no está disponible en este momento.'], 403);
+            }
             return back()->with('error', 'El plan demo no está disponible en este momento.');
+        }
+
+        // Bloquear cambio a Free / Demo si hay suscripción de pago activa
+        if ($workspace) {
+            $hasActiveStripeSubscription = $workspace->subscriptions()
+                ->where('type', 'default')
+                ->where('stripe_status', 'active')
+                ->whereRaw("stripe_id LIKE 'sub_%'")
+                ->exists();
+
+            $hasActiveManualSubscription =
+                $workspace->subscription &&
+                $workspace->subscription->isActive() &&
+                in_array($workspace->subscription->plan, ['starter', 'professional', 'enterprise']);
+
+            if ($hasActiveStripeSubscription || $hasActiveManualSubscription) {
+                $message = "No puedes cambiar a un plan gratuito mientras tengas una suscripción de pago activa.\nPrimero debes cancelar tu suscripción actual.";
+
+                if ($request->expectsJson()) {
+                    return response()->json([
+                        'error' => 'Active subscription exists',
+                        'message' => $message,
+                        'requires_cancellation' => true,
+                        'current_plan' => $workspace->subscription->plan ?? 'unknown',
+                        'can_cancel' => $workspace->isOwner($user),
+                        'cancel_url' => route('subscription.cancel')
+                    ], 403);
+                }
+                return back()->with('error', $message)
+                            ->with('show_cancel_button', true);
+            }
         }
 
         try {
@@ -355,6 +390,9 @@ class SubscriptionController extends Controller
                 throw new \Exception('Failed to activate plan');
             }
 
+            if ($request->expectsJson()) {
+                return response()->json(['success' => true, 'plan' => $plan]);
+            }
             return back()->with('success', __('Plan activado exitosamente'));
         } catch (\Exception $e) {
             Log::error('Failed to activate free plan', [
@@ -363,9 +401,13 @@ class SubscriptionController extends Controller
                 'error' => $e->getMessage()
             ]);
 
+            if ($request->expectsJson()) {
+                return response()->json(['error' => 'Error al activar el plan. Por favor, intenta de nuevo.'], 500);
+            }
             return back()->with('error', 'Error al activar el plan. Por favor, intenta de nuevo.');
         }
     }
+
 
     public function resumeSubscription(Request $request): JsonResponse
     {
@@ -410,9 +452,22 @@ class SubscriptionController extends Controller
             return response()->json(['error' => 'No workspace found'], 404);
         }
 
-        // Get current active subscription
-        $currentHistory = $user->subscriptionHistory()->active()->first();
-        $previousPlan = $currentHistory?->plan_name ?? 'demo';
+        // Get current plan - usar current_plan del usuario como fuente de verdad
+        $previousPlan = $user->current_plan ?? 'free';
+        
+        // Fallback: si current_plan está vacío, buscar en subscription history
+        if (!$previousPlan || $previousPlan === '') {
+            $currentHistory = $user->subscriptionHistory()->active()->first();
+            $previousPlan = $currentHistory?->plan_name ?? 'free';
+        }
+        
+        Log::info('Starting plan change', [
+            'user_id' => $user->id,
+            'workspace_id' => $workspace->id,
+            'previous_plan' => $previousPlan,
+            'new_plan' => $newPlan,
+            'user_current_plan' => $user->current_plan
+        ]);
 
         try {
             // Get plan configuration
@@ -422,34 +477,175 @@ class SubscriptionController extends Controller
                 return response()->json(['error' => 'Invalid plan configuration'], 400);
             }
 
-            // Verificar si el usuario tiene una suscripción activa en Stripe
+            // 1. PRIMERO: Verificar si ya tiene una suscripción activa para el plan solicitado
+            // Esto permite cambiar entre planes ya comprados sin pasar por Stripe
+            // Buscar en workspace (las suscripciones están asociadas al workspace, no al usuario directamente)
+            $matchingSubscription = $workspace->subscriptions()
+                ->where('stripe_status', 'active')
+                ->where(function ($query) use ($newPlan, $planConfig) {
+                    // Buscar por nombre de plan O por stripe_price_id
+                    $query->where('plan', $newPlan)
+                        ->orWhere('stripe_price', $planConfig['stripe_price_id']);
+                })
+                ->first();
+            
+            Log::info('Checking for matching subscription', [
+                'workspace_id' => $workspace->id,
+                'user_id' => $user->id,
+                'new_plan' => $newPlan,
+                'stripe_price_id' => $planConfig['stripe_price_id'],
+                'found_matching' => $matchingSubscription ? true : false,
+                'matching_subscription_id' => $matchingSubscription?->stripe_id,
+                'matching_subscription_plan' => $matchingSubscription?->plan,
+                'matching_subscription_price' => $matchingSubscription?->stripe_price,
+            ]);
+
+            if ($matchingSubscription) {
+                Log::info('Switching to already active subscription', [
+                    'workspace_id' => $workspace->id,
+                    'plan' => $newPlan,
+                    'subscription_id' => $matchingSubscription->stripe_id,
+                    'user_id' => $user->id,
+                    'previous_plan' => $previousPlan
+                ]);
+
+                // CRITICAL: Update user's current_plan
+                $user->update(['current_plan' => $newPlan]);
+                
+                Log::info('User current_plan updated', [
+                    'user_id' => $user->id,
+                    'new_current_plan' => $user->fresh()->current_plan
+                ]);
+                
+                // CRITICAL: Also update workspace subscription if exists
+                if ($workspace->subscription) {
+                    $workspace->subscription->update(['plan' => $newPlan]);
+                    Log::info('Workspace subscription updated', [
+                        'workspace_id' => $workspace->id,
+                        'new_plan' => $workspace->subscription->fresh()->plan
+                    ]);
+                }
+
+                // Record plan change
+                $this->subscriptionTracking->recordPlanChange(
+                    user: $user,
+                    newPlan: $newPlan,
+                    previousPlan: $previousPlan,
+                    stripePriceId: $planConfig['stripe_price_id'] ?? null,
+                    price: $planConfig['price'] ?? 0,
+                    billingCycle: $planConfig['billing_cycle'] ?? 'monthly',
+                    reason: 'switch_to_active_subscription'
+                );
+                
+                // Invalidate cache
+                cache()->forget("user_subscription_{$user->id}");
+                
+                Log::info('Plan change completed successfully', [
+                    'user_id' => $user->id,
+                    'workspace_id' => $workspace->id,
+                    'new_plan' => $newPlan,
+                    'user_current_plan_after' => $user->fresh()->current_plan
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Cambiado al plan ' . ucfirst($newPlan) . ' exitosamente.',
+                    'plan' => $newPlan,
+                    'is_switch' => true,
+                    'requires_reload' => true
+                ]);
+            }
+
+            // 2. Si no tiene una activa directa, buscar cualquier suscripción activa para SWAP
             $hasActiveStripeSubscription = false;
             $cashierSubscription = null;
+            $hasAnyActiveSubscription = false; // Nueva variable para suscripciones manuales/demo
+            
             try {
+                // CRITICAL: Buscar suscripciones en el workspace
+                // Las suscripciones están asociadas al workspace, no al usuario directamente
                 $cashierSubscription = $workspace->subscriptions()
                     ->where('type', 'default')
                     ->where('stripe_status', 'active')
                     ->first();
 
-                if ($cashierSubscription && str_starts_with($cashierSubscription->stripe_id, 'sub_')) {
-                    $hasActiveStripeSubscription = true;
+                // Verificar si es una suscripción real de Stripe o manual/demo
+                if ($cashierSubscription) {
+                    $hasAnyActiveSubscription = true;
+                    if (str_starts_with($cashierSubscription->stripe_id, 'sub_')) {
+                        $hasActiveStripeSubscription = true;
+                    } else {
+                        // Es una suscripción manual/demo
+                        $hasActiveStripeSubscription = false;
+                    }
                 } else {
                     $cashierSubscription = null;
                     $hasActiveStripeSubscription = false;
+                    $hasAnyActiveSubscription = false;
                 }
 
-                Log::info('Checking subscription for plan change', [
+                Log::info('Checking subscription for plan swap', [
                     'user_id' => $user->id,
                     'workspace_id' => $workspace->id,
                     'new_plan' => $newPlan,
-                    'previous_plan' => $previousPlan,
-                    'has_active_subscription' => $hasActiveStripeSubscription,
-                    'subscription_id' => $cashierSubscription?->stripe_id
+                    'has_active_stripe' => $hasActiveStripeSubscription,
+                    'has_any_active' => $hasAnyActiveSubscription,
+                    'subscription_id' => $cashierSubscription?->stripe_id,
+                    'subscription_status' => $cashierSubscription?->stripe_status,
                 ]);
             } catch (\Exception $e) {
-                Log::warning('Error checking Stripe subscription', [
+                Log::warning('Error checking Stripe subscription for swap', [
                     'workspace_id' => $workspace->id,
                     'error' => $e->getMessage()
+                ]);
+            }
+            
+            // SANDBOX MODE: Si no hay suscripciones reales de Stripe pero tiene suscripción activa (manual/demo),
+            // permitir cambios entre planes sin verificar Stripe (útil para testing)
+            $isSandboxMode = config('app.env') !== 'production';
+            $hasPaidPlan = in_array($previousPlan, ['starter', 'professional', 'enterprise']);
+            
+            // También verificar si tiene una suscripción manual activa
+            $hasActiveManualSubscription =
+                $workspace->subscription &&
+                $workspace->subscription->isActive() &&
+                in_array($workspace->subscription->plan, ['starter', 'professional', 'enterprise']);
+            
+            if ($isSandboxMode && !$hasActiveStripeSubscription && ($hasPaidPlan || $hasActiveManualSubscription || $hasAnyActiveSubscription) && $newPlan !== 'free' && $newPlan !== 'demo') {
+                Log::info('SANDBOX MODE: Allowing plan change without real Stripe subscription', [
+                    'workspace_id' => $workspace->id,
+                    'user_id' => $user->id,
+                    'previous_plan' => $previousPlan,
+                    'new_plan' => $newPlan,
+                    'has_manual_subscription' => $hasActiveManualSubscription,
+                    'has_any_active_subscription' => $hasAnyActiveSubscription
+                ]);
+                
+                // Actualizar plan directamente
+                $user->update(['current_plan' => $newPlan]);
+                
+                if ($workspace->subscription) {
+                    $workspace->subscription->update(['plan' => $newPlan]);
+                }
+                
+                $this->subscriptionTracking->recordPlanChange(
+                    user: $user,
+                    newPlan: $newPlan,
+                    previousPlan: $previousPlan,
+                    stripePriceId: $planConfig['stripe_price_id'] ?? null,
+                    price: $planConfig['price'] ?? 0,
+                    billingCycle: $planConfig['billing_cycle'] ?? 'monthly',
+                    reason: 'sandbox_mode_switch'
+                );
+                
+                cache()->forget("user_subscription_{$user->id}");
+                
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Plan actualizado (modo sandbox)',
+                    'plan' => $newPlan,
+                    'requires_reload' => true,
+                    'is_sandbox' => true
                 ]);
             }
 
@@ -470,72 +666,99 @@ class SubscriptionController extends Controller
                 ], 403);
             }
 
-            // Si tiene suscripción activa en Stripe
-            if ($hasActiveStripeSubscription && $newPlan !== 'free' && $newPlan !== 'demo' && isset($planConfig['stripe_price_id'])) {
-                try {
-                    if ($isDowngrade) {
-                        // DOWNGRADE: Programar para el final del período
-                        $stripeSubscription = $cashierSubscription->asStripeSubscription();
-                        $periodEnd = \Carbon\Carbon::createFromTimestamp($stripeSubscription->current_period_end);
-
-                        // Programar el cambio en Stripe para el final del período
-                        $cashierSubscription->swap($planConfig['stripe_price_id'], [
-                            'proration_behavior' => 'none', // No prorratear
-                        ]);
-
-                        // Marcar el downgrade pendiente en nuestra DB
-                        $subscription = $workspace->subscription;
-                        if ($subscription) {
-                            $subscription->update([
-                                'pending_plan' => $newPlan,
-                                'plan_changes_at' => $periodEnd,
-                            ]);
-                        }
-
-                        Log::info('Downgrade scheduled for end of period', [
+            // SWAP: Para cambios entre planes de pago con suscripción activa de Stripe
+            // Esto aplica prorrateo automático
+            if ($hasActiveStripeSubscription && 
+                $cashierSubscription &&
+                $newPlan !== 'free' && 
+                $newPlan !== 'demo') {
+                
+                // Verificar que el plan anterior también sea de pago (no free/demo)
+                $isPreviousPlanPaid = in_array($previousPlan, ['starter', 'professional', 'enterprise']);
+                
+                if ($isPreviousPlanPaid) {
+                    try {
+                        Log::info('Executing Stripe swap for paid-to-paid plan change', [
                             'workspace_id' => $workspace->id,
-                            'current_plan' => $previousPlan,
-                            'pending_plan' => $newPlan,
-                            'changes_at' => $periodEnd,
+                            'user_id' => $user->id,
+                            'previous_plan' => $previousPlan,
+                            'new_plan' => $newPlan,
+                            'stripe_price_id' => $planConfig['stripe_price_id'],
+                            'subscription_id' => $cashierSubscription->stripe_id
                         ]);
 
+                        // Usar Stripe swap API con prorrateo automático
+                        $cashierSubscription->swap($planConfig['stripe_price_id']);
+                        
+                        // Actualizar inmediatamente el plan del usuario
+                        $user->update(['current_plan' => $newPlan]);
+                        
+                        // Actualizar workspace subscription si existe
+                        if ($workspace->subscription) {
+                            $workspace->subscription->update(['plan' => $newPlan]);
+                        }
+                        
+                        // Registrar cambio en el sistema de tracking
+                        $this->subscriptionTracking->recordPlanChange(
+                            user: $user,
+                            newPlan: $newPlan,
+                            previousPlan: $previousPlan,
+                            stripePriceId: $planConfig['stripe_price_id'] ?? null,
+                            price: $planConfig['price'] ?? 0,
+                            billingCycle: $planConfig['billing_cycle'] ?? 'monthly',
+                            reason: 'stripe_swap_with_proration'
+                        );
+                        
+                        // Invalidate cache
+                        cache()->forget("user_subscription_{$user->id}");
+                        
+                        Log::info('Stripe swap completed successfully', [
+                            'workspace_id' => $workspace->id,
+                            'user_id' => $user->id,
+                            'new_plan' => $newPlan,
+                            'user_current_plan_after' => $user->fresh()->current_plan
+                        ]);
+                        
+                        // Invalidar caché de Inertia para forzar refresh
                         return response()->json([
                             'success' => true,
-                            'message' => 'Tu plan cambiará al final del ciclo de facturación actual',
-                            'current_plan' => $previousPlan,
-                            'pending_plan' => $newPlan,
-                            'changes_at' => $periodEnd->toIso8601String(),
-                            'is_downgrade' => true,
+                            'message' => 'Plan actualizado con prorrateo automático',
+                            'plan' => $newPlan,
+                            'requires_reload' => true,
+                            'is_swap' => true
                         ]);
-                    } else {
-                        // UPGRADE: Aplicar inmediatamente con prorrateo
-                        $cashierSubscription->swap($planConfig['stripe_price_id']);
-
-                        Log::info('Plan upgraded immediately in Stripe', [
+                    } catch (\Exception $e) {
+                        Log::error('Failed to execute Stripe swap', [
                             'workspace_id' => $workspace->id,
-                            'old_plan' => $previousPlan,
-                            'new_plan' => $newPlan,
-                            'stripe_price_id' => $planConfig['stripe_price_id']
+                            'user_id' => $user->id,
+                            'error' => $e->getMessage(),
+                            'trace' => $e->getTraceAsString()
                         ]);
+                        
+                        return response()->json([
+                            'error' => 'Failed to swap plan',
+                            'message' => 'No se pudo cambiar el plan. Por favor, intenta de nuevo.',
+                        ], 500);
                     }
-                } catch (\Exception $e) {
-                    Log::error('Failed to change plan in Stripe', [
-                        'workspace_id' => $workspace->id,
-                        'error' => $e->getMessage()
-                    ]);
-
-                    return response()->json([
-                        'error' => 'Failed to change plan in Stripe',
-                        'message' => $e->getMessage(),
-                    ], 500);
                 }
             }
 
-            // Si NO tiene suscripción activa y quiere un plan de pago, debe comprar
-            if (!$hasActiveStripeSubscription && $newPlan !== 'free' && $newPlan !== 'demo' && isset($planConfig['stripe_price_id'])) {
+            // REMOVED: Ya no permitimos cambios entre planes de pago sin pasar por Stripe (excepto en modo sandbox)
+            // Todos los cambios de planes de pago deben ir a Stripe Checkout en producción
+            
+            // Si llegamos aqui y requiere un pago por Stripe, obligar al checkout (para agregar una nueva subscripción)
+            if ($newPlan !== 'free' && $newPlan !== 'demo' && isset($planConfig['stripe_price_id'])) {
+                Log::info('Requiring Stripe checkout for plan change', [
+                    'workspace_id' => $workspace->id,
+                    'user_id' => $user->id,
+                    'current_plan' => $previousPlan,
+                    'new_plan' => $newPlan,
+                    'has_manual_subscription' => $hasActiveManualSubscription
+                ]);
+                
                 return response()->json([
-                    'error' => 'No active subscription',
-                    'message' => 'Debes suscribirte primero para acceder a este plan',
+                    'error' => 'Payment required',
+                    'message' => 'Complete su pago de forma segura a través de Stripe para usar este plan.',
                     'requires_checkout' => true
                 ], 402);
             }
@@ -652,14 +875,26 @@ class SubscriptionController extends Controller
 
             // 4. Obtener TODAS las suscripciones activas (para listar)
             $activeSubscriptions = $workspace->subscriptions()
-                ->whereIn('stripe_status', ['active', 'trailing', 'past_due'])
+                ->whereIn('stripe_status', ['active', 'trialing', 'past_due'])
                 ->get();
 
             $activePlansDetail = $activeSubscriptions->map(function ($sub) {
+                // Inferir plan si no está en la columna plan
+                $planName = $sub->plan;
+                if (!$planName) {
+                    $plans = config('plans');
+                    foreach ($plans as $key => $config) {
+                        if (($config['stripe_price_id'] ?? null) === $sub->stripe_price) {
+                            $planName = $key;
+                            break;
+                        }
+                    }
+                }
+
                 return [
                     'id' => $sub->id,
-                    'plan' => $sub->plan,
-                    'name' => config("plans.{$sub->plan}.name", ucfirst($sub->plan)),
+                    'plan' => $planName,
+                    'name' => config("plans.{$planName}.name", ucfirst($planName ?? 'unknown')),
                     'status' => $sub->stripe_status,
                     'ends_at' => $sub->ends_at ? $sub->ends_at->toIso8601String() : null,
                     'cancel_at_period_end' => (bool)$sub->cancel_at_period_end,
@@ -678,31 +913,73 @@ class SubscriptionController extends Controller
                 ];
             }
 
-            // 5. Obtener planes EXPIRADOS (históricamente comprados pero no activos ahora)
-            // Esto lo sacamos del historial de suscripciones del usuario
+            // IMPORTANTE: Obtener array de planes activos (todos los que tienen suscripción activa)
+            $activePlansArray = array_unique(array_filter(array_column($activePlansDetail, 'plan')));
+
+            // 5. Obtener planes CON TIEMPO DISPONIBLE (comprados y aún no expirados)
+            // Estos son planes que el usuario compró y puede usar sin pagar nuevamente
+            // Si hay múltiples registros del mismo plan, solo tomar el más reciente
+            $plansWithTimeAvailable = $user->subscriptionHistory()
+                ->where(function($query) {
+                    $query->whereNull('ended_at') // Sin fecha de fin (tiempo ilimitado)
+                          ->orWhere('ended_at', '>', now()); // O aún no ha expirado
+                })
+                ->whereNotIn('plan_name', ['free', 'demo']) // No incluir planes gratuitos
+                ->orderBy('created_at', 'desc') // Más reciente primero
+                ->get()
+                ->unique('plan_name') // Solo un registro por plan (el más reciente)
+                ->pluck('plan_name')
+                ->toArray();
+
+            // DEBUG: Log para ver qué hay en subscription_history
+            $allHistory = $user->subscriptionHistory()->get(['plan_name', 'ended_at', 'is_active', 'started_at', 'created_at']);
+            Log::info('Subscription History Debug', [
+                'user_id' => $user->id,
+                'all_history' => $allHistory->toArray(),
+                'plans_with_time' => $plansWithTimeAvailable,
+            ]);
+
+            // 6. Obtener planes EXPIRADOS (tiempo de uso consumido)
             $expiredPlans = $user->subscriptionHistory()
-                ->where('is_active', false)
-                ->whereNotIn('plan_name', array_column($activePlansDetail, 'plan'))
+                ->whereNotNull('ended_at') // Tiene fecha de fin
+                ->where('ended_at', '<', now()) // Y ya expiró
+                ->whereNotIn('plan_name', $plansWithTimeAvailable) // NO mostrar planes con tiempo disponible
+                ->whereNotIn('plan_name', ['free', 'demo']) // No mostrar free/demo
+                ->reorder()
                 ->distinct()
                 ->pluck('plan_name')
                 ->toArray();
+
+
+            // Determinar current_plan
+            // Usamos el plan de Workspace por defecto, pero le damos prioridad
+            // a la elección del usuario (importante cuando tiene múltiples checkouts)
+            $currentPlan = $workspacePlan;
+            if ($user->current_plan && in_array($user->current_plan, $activePlansArray)) {
+                $currentPlan = $user->current_plan;
+            } elseif (!empty($activePlansArray) && !in_array($workspacePlan, $activePlansArray)) {
+                $currentPlan = $activePlansArray[0]; // Si el workspacePlan ya no está activo, usar el primero activo
+            }
 
             Log::info('Checking active subscription (workspace-aware)', [
                 'user_id' => $user->id,
                 'workspace_id' => $workspace->id,
                 'has_stripe' => $hasActiveStripeSubscription,
                 'workspace_plan' => $workspacePlan,
+                'user_current_plan' => $user->current_plan,
+                'final_current_plan' => $currentPlan,
                 'is_paid_plan' => $isWorkspacePaidPlan,
                 'has_manual' => $hasActiveManualSubscription,
                 'result' => $hasActiveSubscription,
                 'active_plans_count' => count($activePlansDetail),
+                'plans_with_time_available' => $plansWithTimeAvailable,
                 'expired_plans_count' => count($expiredPlans),
             ]);
 
             return response()->json([
                 'has_active_subscription' => $hasActiveSubscription,
-                'current_plan' => $workspacePlan,
-                'active_plans' => array_column($activePlansDetail, 'plan'),
+                'current_plan' => $currentPlan,
+                'active_plans' => $plansWithTimeAvailable, // Planes con tiempo disponible
                 'active_subscriptions' => $activePlansDetail,
                 'expired_plans' => $expiredPlans,
             ]);

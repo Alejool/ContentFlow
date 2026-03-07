@@ -272,6 +272,9 @@ class UsageMetricsController extends Controller
         $workspace = $user->currentWorkspace ?? $user->workspaces()->first();
 
         if (!$workspace) {
+            if ($request->expectsJson()) {
+                return response()->json(['error' => __('No workspace found')], 404);
+            }
             return redirect()->back()->with('error', __('No workspace found'));
         }
 
@@ -282,23 +285,42 @@ class UsageMetricsController extends Controller
             !$subscription->stripe_id || 
             str_starts_with($subscription->stripe_id, 'free_') || 
             str_starts_with($subscription->stripe_id, 'demo_')) {
-            return redirect()->back()->with('error', __('No tienes una suscripción activa de Stripe. Por favor, suscríbete a un plan primero.'));
+            $message = __('No tienes una suscripción activa de Stripe. El portal de facturación solo está disponible para suscripciones de pago reales.');
+            if ($request->expectsJson()) {
+                return response()->json(['error' => $message], 400);
+            }
+            return redirect()->back()->with('error', $message);
         }
 
         try {
             // Verificar que el workspace tenga un stripe_id válido
             if (!$workspace->stripe_id) {
+                if ($request->expectsJson()) {
+                    return response()->json(['error' => __('No se encontró información de cliente en Stripe. Por favor, contacta con soporte.')], 400);
+                }
                 return redirect()->back()->with('error', __('No se encontró información de cliente en Stripe. Por favor, contacta con soporte.'));
             }
 
-            // Crear sesión del portal de facturación de Stripe
+            // Crear sesión del portal de facturación de Stripe con configuración personalizada
             $returnUrl = route('subscription.billing');
             
-            // Obtener la URL del portal en lugar de devolver la redirección
-            $portalSession = $workspace->billingPortalUrl($returnUrl);
+            // Crear la sesión del portal con opciones para permitir actualización de método de pago
+            $stripe = new \Stripe\StripeClient(config('cashier.secret'));
+            
+            $sessionParams = [
+                'customer' => $workspace->stripe_id,
+                'return_url' => $returnUrl,
+            ];
+            
+            // Si hay un ID de configuración personalizada, usarlo
+            if ($configId = config('cashier.billing_portal.configuration_id')) {
+                $sessionParams['configuration'] = $configId;
+            }
+            
+            $portalSession = $stripe->billingPortal->sessions->create($sessionParams);
             
             // Devolver la URL para que el frontend haga la redirección
-            return response()->json(['url' => $portalSession]);
+            return response()->json(['url' => $portalSession->url]);
         } catch (\Exception $e) {
             \Log::error('Error creating billing portal session: ' . $e->getMessage(), [
                 'workspace_id' => $workspace->id,
@@ -310,6 +332,54 @@ class UsageMetricsController extends Controller
             return response()->json(['error' => __('No se pudo acceder al portal de facturación. Por favor, intenta más tarde.')], 500);
         }
     }
+
+    public function cancelSubscription(Request $request)
+    {
+        $user = $request->user();
+        $workspace = $user->currentWorkspace ?? $user->workspaces()->first();
+
+        if (!$workspace) {
+            return response()->json(['error' => __('No workspace found')], 404);
+        }
+
+        $subscription = $workspace->subscription;
+
+        // Verificar si el workspace tiene una suscripción válida de Stripe
+        if (!$subscription ||
+            !$subscription->stripe_id ||
+            str_starts_with($subscription->stripe_id, 'free_') ||
+            str_starts_with($subscription->stripe_id, 'demo_')) {
+            return response()->json([
+                'error' => __('La cancelación solo está disponible para suscripciones de pago reales de Stripe. Tu suscripción actual es manual/sandbox.')
+            ], 400);
+        }
+
+        try {
+            // Cancelar la suscripción al final del período de facturación
+            $workspace->subscription('default')->cancel();
+
+            \Log::info('Subscription cancelled successfully', [
+                'workspace_id' => $workspace->id,
+                'subscription_id' => $subscription->stripe_id,
+                'ends_at' => $subscription->ends_at,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => __('Tu suscripción ha sido cancelada. Tendrás acceso hasta el final del período de facturación actual.')
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error cancelling subscription: ' . $e->getMessage(), [
+                'workspace_id' => $workspace->id,
+                'subscription_stripe_id' => $subscription->stripe_id ?? 'none',
+                'exception' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json(['error' => __('No se pudo cancelar la suscripción. Por favor, intenta más tarde.')], 500);
+        }
+    }
+
 
     /**
      * Exportar historial de facturas a Excel

@@ -28,7 +28,7 @@ class SubscriptionLimitController extends Controller
 
         $subscription = $workspace->subscription;
         $limits = $this->validator->getPlanLimits($workspace);
-        $plan = $subscription?->plan ?? 'free';
+        $plan = $workspace->getPlanName();
 
         $usage = [
             'success' => true,
@@ -147,7 +147,7 @@ class SubscriptionLimitController extends Controller
         }
 
         $subscription = $workspace->subscription;
-        $plan = $subscription?->plan ?? 'free';
+        $plan = $workspace->getPlanName();
         $features = config("plans.{$plan}.features", []);
 
         return response()->json([
