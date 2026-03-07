@@ -85,5 +85,11 @@ class Kernel extends ConsoleKernel
     $schedule->command('subscriptions:apply-scheduled-changes')
       ->hourly()
       ->withoutOverlapping();
+
+    // Expirar suscripciones canceladas que han llegado a su fecha de fin
+    $schedule->command('subscriptions:expire')
+      ->hourly()
+      ->withoutOverlapping()
+      ->runInBackground();
   }
 }

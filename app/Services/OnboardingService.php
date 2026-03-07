@@ -283,6 +283,8 @@ class OnboardingService implements OnboardingServiceInterface
         // Check if this was the last wizard step
         if ($stepNumber >= $this->getTotalWizardSteps()) {
             $updateData['wizard_completed'] = true;
+            $updateData['template_selected'] = true; // Auto-select template when wizard is completed
+            $updateData['template_id'] = 'default'; // Use a default template ID
             $this->checkAndMarkOnboardingComplete($user, $state);
         }
 
@@ -405,6 +407,8 @@ class OnboardingService implements OnboardingServiceInterface
 
         $this->repository->update($user->id, [
             'wizard_skipped' => true,
+            'template_selected' => true, // Auto-select template when wizard is skipped
+            'template_id' => 'default', // Use a default template ID
         ]);
 
         // Record analytics asynchronously

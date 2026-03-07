@@ -153,6 +153,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/usage', fn() => redirect()->route('profile.edit'))->name('usage');
     Route::get('/billing', [UsageMetricsController::class, 'billing'])->name('billing');
     Route::post('/billing-portal', [UsageMetricsController::class, 'billingPortal'])->name('billing-portal');
+    Route::post('/cancel-subscription', [UsageMetricsController::class, 'cancelSubscription'])->name('cancel-subscription');
     Route::get('/billing/export', [UsageMetricsController::class, 'exportInvoices'])->name('billing.export');
     Route::get('/success', [PricingController::class, 'success'])->name('success');
     Route::get('/cancel', [PricingController::class, 'cancel'])->name('cancel');
