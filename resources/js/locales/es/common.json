@@ -148,7 +148,9 @@
     "engagement": "Engagement",
     "filters": {
       "all": "Todos",
-      "title": "Filtros"
+      "title": "Filtros",
+      "startDate": "Inicio",
+      "endDate": "Fin"
     },
     "status": {
       "active": "Activa",

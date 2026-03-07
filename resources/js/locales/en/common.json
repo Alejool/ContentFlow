@@ -140,7 +140,9 @@
     "invalidDate": "Invalid date",
     "filters": {
       "all": "All",
-      "title": "Filters"
+      "title": "Filters",
+      "startDate": "Start",
+      "endDate": "End"
     },
     "status": {
       "active": "Active",

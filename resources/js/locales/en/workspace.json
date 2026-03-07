@@ -265,7 +265,44 @@
       "create_success": "API token created successfully",
       "create_error": "Failed to create token",
       "security_notice": "Security Notice",
-      "security_help": "API tokens grant full access to this workspace. Never share them or commit them to public repositories."
+      "security_help": "API tokens grant full access to this workspace. Never share them or commit them to public repositories.",
+      "documentation": {
+        "title": "API Documentation",
+        "description": "Download the complete Enterprise API reference to integrate ContentFlow into your systems.",
+        "enterprise_guide_title": "Complete Enterprise Guide",
+        "enterprise_guide_description": "Markdown reference with all endpoints, request/response examples, and business logic.",
+        "enterprise_guide_badge": ".md · ~700 lines",
+        "openapi_title": "OpenAPI 3.0 Definition",
+        "openapi_description": "JSON schema directly importable into Postman, Insomnia, or any API client.",
+        "openapi_badge": ".json · OpenAPI 3.0",
+        "pdf_conversion_help": "To convert Markdown to PDF: open the file in VS Code → install the \"Markdown PDF\" extension → right-click → Export (pdf)."
+      },
+      "usage_info": {
+        "title": "How to use your API Token?",
+        "description": "Send the token in the <code>Authorization</code> header as a <strong>Bearer token</strong>. Dashboard tokens <strong>do not expire automatically</strong> — they last until you manually revoke them.",
+        "example_title": "Example Request:",
+        "refresh_token_help": "Need short-lived tokens with automatic refresh? Use the programmatic endpoint <code>POST /api/auth/token</code> — see downloadable documentation."
+      },
+      "token_types": {
+        "dashboard": "Dashboard",
+        "dashboard_description": "Created from panel, no expiration",
+        "api_access": "API · Access",
+        "api_access_description": "24h, requires refresh",
+        "api_refresh": "API · Refresh",
+        "api_refresh_description": "30 days, to renew access tokens"
+      },
+      "table": {
+        "refresh_list": "Refresh List",
+        "name": "Name",
+        "type": "Type",
+        "last_used": "Last Used",
+        "expires_status": "Expires / Status",
+        "created": "Created",
+        "actions": "Actions",
+        "never_used": "Never",
+        "revoke_token": "Revoke Token",
+        "revoke_error": "Failed to revoke token"
+      }
     },
     "enterprise": {
       "info_title": "Enterprise Workspace Status",

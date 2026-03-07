@@ -55,8 +55,6 @@
       "moveDescription": "Selecciona la nueva fecha y hora para mover los {count} eventos seleccionados.",
       "moveSuccess": "Eventos movidos exitosamente",
       "moveError": "Error al mover los eventos",
-      "undoSuccess": "Operación deshecha exitosamente",
-      "undoError": "Error al deshacer operación",
       "cancel": "Cancelar",
       "move": "Mover"
     },
