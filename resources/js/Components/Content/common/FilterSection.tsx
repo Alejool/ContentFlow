@@ -132,7 +132,7 @@ export default function FilterSection({
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
           <Filter className="w-4 h-4" />
-          Filtros
+          {t("common.filters.title")}
         </h3>
         <div className="flex items-center gap-2">
           {showExportButtons && (
@@ -150,7 +150,7 @@ export default function FilterSection({
               className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-100 dark:hover:bg-neutral-700 rounded-lg transition-colors"
             >
               <RotateCcw className="w-3.5 h-3.5" />
-              Reiniciar
+              {t("logs.filters.clear")}
             </button>
           )}
         </div>
@@ -281,7 +281,7 @@ export default function FilterSection({
                     d ? format(d, "yyyy-MM-dd") : "",
                   )
                 }
-                placeholder="Inicio"
+                placeholder={t("common.filters.startDate")}
                 withPortal
                 variant="outlined"
                 size="md"
@@ -299,7 +299,7 @@ export default function FilterSection({
                     d ? format(d, "yyyy-MM-dd") : "",
                   )
                 }
-                placeholder="Fin"
+                placeholder={t("common.filters.endDate")}
                 withPortal
                 activeColor={activeColor}
                 size="md"

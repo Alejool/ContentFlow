@@ -54,7 +54,8 @@ export default function ExportButtons({ endpoint, filters = {}, className = "" }
                 onClick={() => handleExport('xlsx')}
                 disabled={isExporting}
                 variant="ghost"
-                size="md"
+                buttonStyle ="outline"
+                size="sm"
                 icon={FileSpreadsheet}
                 className="flex items-center gap-2"
             >
@@ -65,7 +66,8 @@ export default function ExportButtons({ endpoint, filters = {}, className = "" }
                 onClick={() => handleExport('csv')}
                 disabled={isExporting}
                 variant="ghost"
-                size="md"
+                buttonStyle ="outline"
+                size="sm"
                 icon={FileText}
                 className="flex items-center gap-2"
             >
@@ -76,7 +78,8 @@ export default function ExportButtons({ endpoint, filters = {}, className = "" }
                 onClick={() => handleExport('pdf')}
                 disabled={isExporting}
                 variant="ghost"
-                size="md"
+                buttonStyle ="outline"
+                size="sm"
                 icon={Download}
                 className="flex items-center gap-2"
             >
