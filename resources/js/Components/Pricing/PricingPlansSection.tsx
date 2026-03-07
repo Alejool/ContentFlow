@@ -155,12 +155,7 @@ export default function PricingPlansSection({
 
   // DEBUG: Ver qué datos llegan
   React.useEffect(() => {
-    console.log('🔍 DEBUG Pricing Data:', {
-      currentPlan,
-      effectiveActivePlans,
-      expiredPlans,
-      activeSubscriptions,
-    });
+    
   }, [currentPlan, effectiveActivePlans, expiredPlans, activeSubscriptions]);
 
   // Plans purchased + still active (not current) → can switch for free
